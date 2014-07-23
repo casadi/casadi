@@ -48,6 +48,7 @@ namespace casadi {
       static const std::string compiler;
       static const std::string compiler_flags;
       static const std::string modules;
+      static const std::string plugins;
 #endif //SWIG
     /** \brief Obtain the version number of CasADi
     *  The format is 'x.y.z' or 'x.y.z+'
@@ -87,6 +88,9 @@ namespace casadi {
     /** \brief Obtain modules list
     */
     static std::string getModules() { return modules; }
+    /** \brief Obtain plugins list
+    */
+    static std::string getPlugins() { return plugins; }
   };
 
 }  // namespace casadi

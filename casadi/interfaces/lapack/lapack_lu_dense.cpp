@@ -34,7 +34,7 @@ namespace casadi {
   casadi_register_linearsolver_lapacklu(LinearSolverInternal::Plugin* plugin) {
     plugin->creator = LapackLUDenseInternal::creator;
     plugin->name = "lapacklu";
-    plugin->doc = "LapackLU docs not available";
+    plugin->doc = LapackLUDenseInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

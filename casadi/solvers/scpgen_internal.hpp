@@ -30,26 +30,33 @@
 
 #include <deque>
 
+/** \defgroup plugin_NlpSolver_scpgen
+   A structure-exploiting sequential quadratic programming
+     (to be come sequential convex programming) method for nonlinear programming.
+*/
+
+/** \pluginsection{NlpSolver,scpgen} */
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /**
-     \brief A structure-exploiting sequential quadratic programming
-     (to be come sequential convex programming) method for nonlinear programming.
-
+  /**  \brief \pluginbrief{NlpSolver,scpgen}
+     
+     @copy_doc NLPSolver_doc
+     @copy_doc plugin_NlpSolver_scpgen
+     
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */
-  class CASADI_NLPSOLVER_SCPGEN_EXPORT SCPgenInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_SCPGEN_EXPORT SCPgenInternal : public NlpSolverInternal {
   public:
     explicit SCPgenInternal(const Function& nlp);
     virtual ~SCPgenInternal();
     virtual SCPgenInternal* clone() const { return new SCPgenInternal(*this);}
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new SCPgenInternal(nlp);}
 
     virtual void init();
@@ -93,7 +100,7 @@ namespace casadi {
     double t_eval_mat_, t_eval_res_, t_eval_vec_, t_eval_exp_, t_solve_qp_, t_mainloop_;
 
     /// QP solver for the subproblems
-    QPSolver qp_solver_;
+    QpSolver qp_solver_;
 
     /// use Gauss-Newton Hessian
     bool gauss_newton_;
@@ -133,8 +140,8 @@ namespace casadi {
     /// Enable Code generation
     bool codegen_;
 
-    /// Access QPSolver
-    const QPSolver getQPSolver() const { return qp_solver_;}
+    /// Access QpSolver
+    const QpSolver getQpSolver() const { return qp_solver_;}
 
     /// Regularization
     bool regularize_;
@@ -229,6 +236,10 @@ namespace casadi {
 
     // Hessian times a step
     std::vector<double> qpH_times_du_;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

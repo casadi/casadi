@@ -42,7 +42,7 @@ namespace casadi {
   casadi_register_dplesolver_simple(DpleInternal::Plugin* plugin) {
     plugin->creator = SimpleIndefDpleInternal::creator;
     plugin->name = "simple";
-    plugin->doc = "slicot docs not available";
+    plugin->doc = SimpleIndefDpleInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

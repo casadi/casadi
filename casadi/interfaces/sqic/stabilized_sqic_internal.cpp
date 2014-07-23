@@ -37,17 +37,17 @@ namespace casadi {
 
   extern "C"
   int CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT
-  casadi_register_stabilizedqpsolver_sqic(StabilizedQPSolverInternal::Plugin* plugin) {
+  casadi_register_stabilizedqpsolver_sqic(StabilizedQpSolverInternal::Plugin* plugin) {
     plugin->creator = StabilizedSQICInternal::creator;
     plugin->name = "sqic";
-    plugin->doc = "SQIC docs not available";
+    plugin->doc = StabilizedSQICInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
 
   extern "C"
   void CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT casadi_load_stabilizedqpsolver_sqic() {
-    StabilizedQPSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_sqic);
+    StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_sqic);
   }
 
   StabilizedSQICInternal* StabilizedSQICInternal::clone() const {
@@ -59,7 +59,7 @@ namespace casadi {
   }
 
   StabilizedSQICInternal::StabilizedSQICInternal(const std::vector<Sparsity>& st)
-    : StabilizedQPSolverInternal(st) {
+    : StabilizedQpSolverInternal(st) {
     is_init_ = false;
   }
 
@@ -118,7 +118,7 @@ namespace casadi {
 
   void StabilizedSQICInternal::init() {
     // Call the init method of the base class
-    StabilizedQPSolverInternal::init();
+    StabilizedQpSolverInternal::init();
 
     if (is_init_) sqicDestroy();
 

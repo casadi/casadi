@@ -1071,8 +1071,8 @@ namespace casadi {
 #define HEAD(k, j) (ata ? head[k] : j)
 #define NEXT(J)   (ata ? next[J] : -1)
   std::vector<int> SparsityInternal::counts(const int *parent, const int *post, int ata) const {
-    int i, j, k, n, m, J, s, p, q, jleaf, *maxfirst, *prevleaf, *ancestor,
-        *head = NULL, *next = NULL, *first;
+    int i, j, k, n, m, J, s, p, q, jleaf=0, *maxfirst, *prevleaf, *ancestor,
+        *head = 0, *next = 0, *first;
 
     m = nrow_;
     n = ncol_;
@@ -1231,7 +1231,7 @@ namespace casadi {
     // Free memory
     AT = Sparsity();
     // drop diagonal entries
-    C->drop(diag, NULL);
+    C->drop(diag, 0);
 
     Cp = &C.colindRef().front();
     cnz = Cp[n] ;

@@ -33,7 +33,18 @@
  *  If A is structurally singular, an error will be thrown during init.
  *  If A is numerically singular, the prepare step will fail.
  *
- */
+ *  The usual procedure to use LinearSolver is: \n
+ *  -# init()
+ *  -# set the first input (A)
+ *  -# prepare()
+ *  -# set the second input (b)
+ *  -# solve()
+ *  -# Repeat steps 4 and 5 to work with other b vectors.
+ *
+ * The method evaluate() combines the prepare() and solve() step and is
+ * therefore more expensive if A is invariant.
+ *
+*/
 
 namespace casadi {
 
@@ -57,6 +68,10 @@ namespace casadi {
   /** \brief Base class for the linear solver classes
 
    *  @copydoc LinearSolver_doc
+   
+      \generalsection{LinearSolver}
+      \pluginssection{LinearSolver}
+      
    \author Joel Andersson
    \date 2010-2013
   */
@@ -71,7 +86,9 @@ namespace casadi {
     /// Create a linear solver given a sparsity pattern (creates a dummy solver only)
     explicit LinearSolver(const Sparsity& sp, int nrhs=1);
 
-    /// Create a linear solver given a sparsity pattern
+    /** \brief Create a linear solver given a sparsity pattern
+    * \param name \pluginargument{LinearSolver}
+    */
     LinearSolver(const std::string& name, const Sparsity& sp, int nrhs=1);
 
     /// \cond INTERNAL

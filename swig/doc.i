@@ -1379,7 +1379,7 @@ Callback.
 
 In C++, supply a CallbackCPtr function pointer When the callback function
 returns a non-zero integer, the host is signalled of a problem. E.g. an
-NLPSolver may halt iterations if the Callback is something else than 0
+NlpSolver may halt iterations if the Callback is something else than 0
 
 In python, supply a callable, annotated with pycallback decorator
 
@@ -4834,7 +4834,7 @@ per major interval
 
 Joris Gillis
 
->Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 4) [controlsimulatorIn]
+>Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3) [controlsimulatorIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -5383,7 +5383,7 @@ Parameters:
 ffcn:  Continuous time dynamics, an casadi::Function with the following
 mapping:
 
->Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 10) [controldaeIn]
+>Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -5422,7 +5422,7 @@ mapping:
 |                        |                        | interval (1-by-1) .    |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 4) [daeOut]
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -5439,7 +5439,7 @@ Parameters:
 output_fcn:  output function which maps ControlledDAEInput or DAEInput to n
 outputs.
 
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -5452,7 +5452,7 @@ outputs.
 | DAE_T     | t     | Explicit time dependence . |
 +-----------+-------+----------------------------+
 
->Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 10) [controldaeIn]
+>Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -9369,7 +9369,7 @@ Direct collocation.
 
 Joel Andersson
 
->Input scheme: casadi::OCPInput (OCP_NUM_IN = 14) [ocpIn]
+>Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -9400,7 +9400,7 @@ Joel Andersson
 | OCP_UBG    | ubg    | Upper bound for the coupling constraints .   |
 +------------+--------+----------------------------------------------+
 
->Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 5) [ocpOut]
+>Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -9493,7 +9493,7 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_STRING    | GenericType( | An NLPSolver | casadi::Dire |
+| nlp_solver   | OT_STRING    | GenericType( | An NlpSolver | casadi::Dire |
 |              |              | )            | creator      | ctCollocatio |
 |              |              |              | function     | nInternal    |
 +--------------+--------------+--------------+--------------+--------------+
@@ -9718,6 +9718,12 @@ input/output scheme.
 std::string &str) const  "
 
 Get the type name of a certain option.
+
+";
+
+%feature("docstring")  casadi::DirectCollocation::getNlpSolver() const  "
+
+Access the underlying NlpSolver object.
 
 ";
 
@@ -10043,12 +10049,6 @@ Get the reference count.
 std::string &str) const  "
 
 Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::DirectCollocation::getNLPSolver() const  "
-
-Access the underlying NLPSolver object.
 
 ";
 
@@ -10757,6 +10757,9 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
+%feature("docstring")  casadi::DirectMultipleShooting::getNlpSolver() const
+" ";
+
 %feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
 
 Return a string with a representation (for SWIG)
@@ -11336,7 +11339,7 @@ cfcn.input(0).size()
 
 Joel Andersson
 
->Input scheme: casadi::OCPInput (OCP_NUM_IN = 14) [ocpIn]
+>Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -11367,7 +11370,7 @@ Joel Andersson
 | OCP_UBG    | ubg    | Upper bound for the coupling constraints .   |
 +------------+--------+----------------------------------------------+
 
->Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 5) [ocpOut]
+>Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -11461,7 +11464,7 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_STRING    | GenericType( | An NLPSolver | casadi::Dire |
+| nlp_solver   | OT_STRING    | GenericType( | An NlpSolver | casadi::Dire |
 |              |              | )            | creator      | ctMultipleSh |
 |              |              |              | function     | ootingIntern |
 |              |              |              |              | al           |
@@ -11778,7 +11781,7 @@ Parameters:
 ffcn:  Continuous time dynamics, an casadi::Function with the following
 mapping:
 
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -11791,7 +11794,7 @@ mapping:
 | DAE_T     | t     | Explicit time dependence . |
 +-----------+-------+----------------------------+
 
->Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 4) [daeOut]
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -11817,7 +11820,7 @@ Parameters:
 
 mfcn:  Mayer term, casadi::Function mapping to cost (1 x 1)
 
->Input scheme: casadi::MayerInput (MAYER_NUM_IN = 3) [mayerIn]
+>Input scheme: casadi::MayerInput (MAYER_NUM_IN = 2) [mayerIn]
 +-----------+-------+---------------------------------------------+
 | Full name | Short |                 Description                 |
 +===========+=======+=============================================+
@@ -11831,7 +11834,7 @@ Parameters:
 
 cfcn:  Path constraints, casadi::Function mapping to (nh x 1)
 
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -11877,9 +11880,6 @@ internally
 ";
 
 %feature("docstring")  casadi::OCPSolver::getCfcn() const  " ";
-
-%feature("docstring")  casadi::DirectMultipleShooting::getNLPSolver() const
-" ";
 
 %feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
 Reset the sparsity propagation.
@@ -12428,9 +12428,6 @@ pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::DirectSingleShooting::getNLPSolver() const  "
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
 
 Get the dictionary.
@@ -12669,7 +12666,7 @@ cfcn.input(0).size()
 
 Joel Andersson
 
->Input scheme: casadi::OCPInput (OCP_NUM_IN = 14) [ocpIn]
+>Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -12700,7 +12697,7 @@ Joel Andersson
 | OCP_UBG    | ubg    | Upper bound for the coupling constraints .   |
 +------------+--------+----------------------------------------------+
 
->Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 5) [ocpOut]
+>Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -12794,7 +12791,7 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_STRING    | GenericType( | An NLPSolver | casadi::Dire |
+| nlp_solver   | OT_STRING    | GenericType( | An NlpSolver | casadi::Dire |
 |              |              | )            | creator      | ctSingleShoo |
 |              |              |              | function     | tingInternal |
 +--------------+--------------+--------------+--------------+--------------+
@@ -12856,6 +12853,9 @@ point to this new object
 SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 " [INTERNAL]  SWIGINTERNAL
 
+";
+
+%feature("docstring")  casadi::DirectSingleShooting::getNlpSolver() const  "
 ";
 
 %feature("docstring")
@@ -13575,7 +13575,7 @@ Parameters:
 ffcn:  Continuous time dynamics, an casadi::Function with the following
 mapping:
 
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -13588,7 +13588,7 @@ mapping:
 | DAE_T     | t     | Explicit time dependence . |
 +-----------+-------+----------------------------+
 
->Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 4) [daeOut]
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -13614,7 +13614,7 @@ Parameters:
 
 mfcn:  Mayer term, casadi::Function mapping to cost (1 x 1)
 
->Input scheme: casadi::MayerInput (MAYER_NUM_IN = 3) [mayerIn]
+>Input scheme: casadi::MayerInput (MAYER_NUM_IN = 2) [mayerIn]
 +-----------+-------+---------------------------------------------+
 | Full name | Short |                 Description                 |
 +===========+=======+=============================================+
@@ -13628,7 +13628,7 @@ Parameters:
 
 cfcn:  Path constraints, casadi::Function mapping to (nh x 1)
 
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -14785,9 +14785,11 @@ A_k in R^(n x n) V_k in R^n
 provides all of $P_k$ that satisfy:
 
 P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
-1..K-1 Joris Gillis
+1..K-1
 
->Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 3) [dpleIn]
+General information
+
+>Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 2) [dpleIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -14800,7 +14802,7 @@ P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
 |                        |                        | blkdiag otherwise) .   |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::DPLEOutput (DPLE_NUM_OUT = 2) [dpleOut]
+>Output scheme: casadi::DPLEOutput (DPLE_NUM_OUT = 1) [dpleOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -14922,7 +14924,85 @@ P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_DpleSolver_simple'>simple</a>
+
+- <a href='#plugin_DpleSolver_slicot'>slicot</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+DpleSolver.doc(\"myextraplugin\")
+
+simple
+
+Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| linear_solver   | OT_STRING       | GenericType()   | User-defined    |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | class. Needed   |
+|                 |                 |                 | for             |
+|                 |                 |                 | sensitivities.  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ptions          |                 |                 | passed to the   |
+|                 |                 |                 | linear solver.  |
++-----------------+-----------------+-----------------+-----------------+
+
+slicot
+
+An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
+
+Uses Periodic Schur Decomposition ('psd') and does not assume positive
+definiteness. Based on Periodic Lyapunov equations: some applications and
+new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| linear_solver   | OT_STRING       | GenericType()   | User-defined    |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | class. Needed   |
+|                 |                 |                 | for             |
+|                 |                 |                 | sensitivities.  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ptions          |                 |                 | passed to the   |
+|                 |                 |                 | linear solver.  |
++-----------------+-----------------+-----------------+-----------------+
+| psd_num_zero    | OT_REAL         | 0.000           | Numerical zero  |
+|                 |                 |                 | used in         |
+|                 |                 |                 | Periodic Schur  |
+|                 |                 |                 | decomposition   |
+|                 |                 |                 | with            |
+|                 |                 |                 | slicot.This     |
+|                 |                 |                 | option is       |
+|                 |                 |                 | needed when     |
+|                 |                 |                 | your systems    |
+|                 |                 |                 | has Floquet     |
+|                 |                 |                 | multiplierszero |
+|                 |                 |                 | or close to     |
+|                 |                 |                 | zero            |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++----------------+
+|       Id       |
++================+
+| t_linear_solve |
++----------------+
+| t_psd          |
++----------------+
+| t_total        |
++----------------+
+
+Joris Gillis Diagrams
 
 C++ includes: dple_solver.hpp ";
 
@@ -14977,6 +15057,29 @@ Default constructor.
 &name, const std::vector< Sparsity > &A, const std::vector< Sparsity > &V) "
 
 DpleSolver solver factory.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_DpleSolver_simple'>simple</a>
+
+- <a href='#plugin_DpleSolver_slicot'>slicot</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+DpleSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+A:  List of sparsities of A_i
+
+V:  List of sparsities of V_i
 
 ";
 
@@ -21798,14 +21901,265 @@ C++ includes: schemes_helpers.hpp ";
 >::HNLPInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 
-// File: classcasadi_1_1HomotopyNLPSolver.xml
+// File: classcasadi_1_1HomotopyNlpSolver.xml
 
 
 /*  Simple Getters & Setters  */
 
 /*  Advanced Getters  */
 
-/*  Option Functionality  */ %feature("docstring")
+/*  Option Functionality  */ %feature("docstring")  casadi::IOInterface<
+Function  >::output(int oind=0) const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+"
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
+num_in) "
+
+Set the number of function inputs.
+
+";
+
+%feature("docstring") casadi::HomotopyNlpSolver::HomotopyNlpSolver() "
+
+Default constructor.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::getSanitizedName() const  "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
+
+";
+
+%feature("docstring")
+casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind, const std::string
+&oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+const std::string &oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+Dictionary &dict, bool skipUnknown=false) "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
+std::string &str) const  "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
+casadi::IOScheme &scheme, const std::string &name, bool input) const "
+[INTERNAL]  Find the index for a string describing a particular entry of a
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
+
+Get output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::callParallel(const std::vector<
+std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
+
+";
+
+%feature("docstring")  casadi::Function::setInputScheme(const
+casadi::IOScheme &scheme) "
+
+Set input scheme.
+
+";
+
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring")
 casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
 int v) " [INTERNAL]  Set a certain option by giving an enum value.
 
@@ -21817,83 +22171,28 @@ Is initialized?
 
 ";
 
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
 %feature("docstring")  casadi::Function::getStats() const  "
 
 Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
-const "
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
 
-Get the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind, const std::string
-&oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-const std::string &oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
 
 ";
 
@@ -21907,27 +22206,48 @@ input/output scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInputSX() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
-
-There is no guarantee that consecutive calls return identical objects
+%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
+const  " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
+[INTERNAL]  Access an output.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
+const " [INTERNAL]  Const access an output.
 
-check if there is an option str
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+int oind=0) "
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+const std::string &oname) "
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -22023,62 +22343,47 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
+%feature("docstring")  casadi::Function::getNumInputElements() const  "
 
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
+Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
+%feature("docstring")  casadi::IOInterface< Function
+>::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an output scheme.
 
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
 
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
+Set output scheme.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
+std::string &str) const  "
 
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
+Get the type of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::Function::setFullJacobian(const Function
+&jac) "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
 
 ";
 
-%feature("docstring")  casadi::Function::evaluate() "
-
-Evaluate.
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
@@ -22182,34 +22487,6 @@ Get input scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
 %feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -22253,16 +22530,49 @@ Evaluate the function symbolically or numerically.
 
 ";
 
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
+a const pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
+pointer to the node.
+
+";
+
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
 class
 
 ";
 
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
-(for usage, see the example propagating_sparsity.cpp)
+";
+
+%feature("docstring")  casadi::Function::evaluate() "
+
+Evaluate.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+std::string &str) const  "
+
+get an option value
 
 ";
 
@@ -22274,29 +22584,10 @@ Print options to a stream.
 
 ";
 
-%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
 %feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
 const "
 
 Get the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
 
 ";
 
@@ -22317,6 +22608,25 @@ Generate C code for the function.
 &filename) "
 
 Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::removeMonitor(const std::string
+&mon) "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
+Deep copy.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
+num_out) "
+
+Set the number of function outputs.
 
 ";
 
@@ -22430,38 +22740,8 @@ the length of the vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
-
-";
-
 %feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
 Get the reference count.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-Dictionary &dict, bool skipUnknown=false) "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
 
 ";
 
@@ -22471,144 +22751,51 @@ Get the dictionary.
 
 ";
 
-%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
-Input/output structures of the function
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
+
+Copy all options from another object.
 
 ";
 
-%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
-Input/output structures of the function
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
+const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
 
 ";
 
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
 Is a null pointer?
-
-";
-
-%feature("docstring") casadi::HomotopyNLPSolver::HomotopyNLPSolver() "
-
-Default constructor.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind, const std::string
-&oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-const std::string &oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
-casadi::IOScheme &scheme, const std::string &name, bool input) const "
-[INTERNAL]  Find the index for a string describing a particular entry of a
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
-
-Get output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
 
 ";
 
@@ -22628,8 +22815,50 @@ SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 
 ";
 
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
+int nfwd, int nadj) "
+
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
+
+";
+
+%feature("docstring")  casadi::HomotopyNlpSolver::checkNode() const  "
+
+Check if the node is pointing to the right type of object.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
+*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
+const "
+
+Get the number of function outputs.
 
 ";
 
@@ -22661,7 +22890,74 @@ Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver "
+%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind, const std::string
+&oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+const std::string &oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::HomotopyNlpSolver "
 
 Base class for Homotopy NLP Solvers.
 
@@ -22672,9 +22968,9 @@ ng: number of constraints     np: number of parameters
 
 In a homotopy from tau = 0 to tau = 1.
 
-Joris Gillis
+General information
 
->Input scheme: casadi::NLPSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -22712,7 +23008,7 @@ Joris Gillis
 |                        |                        | .                      |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::NLPSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
+>Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -22834,43 +23130,61 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_HomotopyNlpSolver_simple'>simple</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+HomotopyNlpSolver.doc(\"myextraplugin\")
+
+simple
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| nlp_solver      | OT_STRING       | GenericType()   | The NLP solver  |
+|                 |                 |                 | to be used by   |
+|                 |                 |                 | the Homotopy    |
+|                 |                 |                 | solver          |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ons             |                 |                 | passed to the   |
+|                 |                 |                 | Homotopy solver |
++-----------------+-----------------+-----------------+-----------------+
+| num_steps       | OT_INTEGER      | 10              | Take this many  |
+|                 |                 |                 | steps to go     |
+|                 |                 |                 | from tau=0 to   |
+|                 |                 |                 | tau=1.          |
++-----------------+-----------------+-----------------+-----------------+
+
+Joris Gillis Diagrams
 
 C++ includes: homotopy_nlp_solver.hpp ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-int oind=0) "
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
 
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-const std::string &oname) "
+%feature("docstring")  casadi::Function::symbolicInput() const  "
 
-Set an output by name.
+Get a vector of symbolic variables with the same dimensions as the inputs.
 
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
+There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring")  casadi::Function::getNumInputElements() const  "
+%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
+std::string &str) const  "
 
-Get total number of elements in all of the matrix-valued inputs.
+check if there is an option str
 
 ";
 
@@ -22882,19 +23196,51 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function
->::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an output scheme.
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
 
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
 
 ";
 
-%feature("docstring")  casadi::Function::setOutputScheme(const
-casadi::IOScheme &scheme) "
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
 
-Set output scheme.
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -22932,11 +23278,48 @@ Add modules to be monitored.
 
 ";
 
+%feature("docstring")  casadi::Function::symbolicInputSX() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
 %feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
 
 Initialize or re-initialize the object:
 
 more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
@@ -22965,259 +23348,9 @@ Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
 
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-"
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
-num_in) "
-
-Set the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::Function::callParallel(const std::vector<
-std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
-[INTERNAL]  Access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
-const " [INTERNAL]  Const access an output.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::removeMonitor(const std::string
-&mon) "
-
-Remove modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
-num_out) "
-
-Set the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring")  casadi::Function::setFullJacobian(const Function
-&jac) "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
-const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
-int nfwd, int nadj) "
-
-Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-NOTE: Does not take ownership, only weak references to the derivatives are
-kept internally
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
-
-";
-
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::HomotopyNLPSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
-
-";
-
-%feature("docstring")  casadi::Function::setInputScheme(const
-casadi::IOScheme &scheme) "
-
-Set input scheme.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
-const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
@@ -24499,6 +24632,24 @@ Create an implicit function solver.
 Parameters:
 -----------
 
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_ImplicitFunction_kinsol'>kinsol</a>
+
+- <a href='#plugin_ImplicitFunction_newton'>newton</a>
+
+- <a href='#plugin_ImplicitFunction_nlp'>nlp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+ImplicitFunction.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
 f:   Function mapping from (n+1) inputs to 1 output
 
 ";
@@ -24712,7 +24863,7 @@ may be zero. The first output is the solved for z.
 You can provide an initial guess for z by setting output(0) of
 ImplicitFunction.
 
-Joel Andersson
+General information
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -24840,7 +24991,159 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_ImplicitFunction_kinsol'>kinsol</a>
+
+- <a href='#plugin_ImplicitFunction_newton'>newton</a>
+
+- <a href='#plugin_ImplicitFunction_nlp'>nlp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+ImplicitFunction.doc(\"myextraplugin\")
+
+kinsol
+
+KINSOL interface from the Sundials suite
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| abstol          | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion       |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| disable_interna | OT_BOOLEAN      | false           | Disable KINSOL  |
+| l_warnings      |                 |                 | internal        |
+|                 |                 |                 | warning         |
+|                 |                 |                 | messages        |
++-----------------+-----------------+-----------------+-----------------+
+| exact_jacobian  | OT_BOOLEAN      | true            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| f_scale         | OT_REALVECTOR   |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iterative_solve | OT_STRING       | \"gmres\"         | gmres|bcgstab|t |
+| r               |                 |                 | fqmr            |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_t | OT_STRING       | \"dense\"         | dense|banded|it |
+| ype             |                 |                 | erative|user_de |
+|                 |                 |                 | fined           |
++-----------------+-----------------+-----------------+-----------------+
+| lower_bandwidth | OT_INTEGER      |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_iter        | OT_INTEGER      | 0               | Maximum number  |
+|                 |                 |                 | of Newton       |
+|                 |                 |                 | iterations.     |
+|                 |                 |                 | Putting 0 sets  |
+|                 |                 |                 | the default     |
+|                 |                 |                 | value of        |
+|                 |                 |                 | KinSol.         |
++-----------------+-----------------+-----------------+-----------------+
+| max_krylov      | OT_INTEGER      | 0               |                 |
++-----------------+-----------------+-----------------+-----------------+
+| pretype         | OT_STRING       | \"none\"          | (none|left|righ |
+|                 |                 |                 | t|both)         |
++-----------------+-----------------+-----------------+-----------------+
+| strategy        | OT_STRING       | \"none\"          | Globalization   |
+|                 |                 |                 | strategy (none| |
+|                 |                 |                 | linesearch)     |
++-----------------+-----------------+-----------------+-----------------+
+| u_scale         | OT_REALVECTOR   |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| upper_bandwidth | OT_INTEGER      |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| use_preconditio | OT_BOOLEAN      | false           | precondition an |
+| ner             |                 |                 | iterative       |
+|                 |                 |                 | solver          |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++-----------+
+|    Id     |
++===========+
+| eval_djac |
++-----------+
+| eval_f    |
++-----------+
+
+newton
+
+Implements simple newton iterations to solve an implicit function.
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| abstol          | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion       |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | max(|F|)        |
++-----------------+-----------------+-----------------+-----------------+
+| abstolStep      | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion       |
+|                 |                 |                 | tolerance on    |
+|                 |                 |                 | step size       |
++-----------------+-----------------+-----------------+-----------------+
+| max_iter        | OT_INTEGER      | 1000            | Maximum number  |
+|                 |                 |                 | of Newton       |
+|                 |                 |                 | iterations to   |
+|                 |                 |                 | perform before  |
+|                 |                 |                 | returning.      |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++----------+
+|    Id    |
++==========+
+| F        |
++----------+
+| J        |
++----------+
+| normF    |
++----------+
+| step     |
++----------+
+| stepsize |
++----------+
+
+>List of available stats
++---------------+
+|      Id       |
++===============+
+| iter          |
++---------------+
+| return_status |
++---------------+
+
+nlp
+
+Use an NlpSolver as ImplicitFunction solver
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| nlp_solver      | OT_STRING       | GenericType()   | The NlpSolver   |
+|                 |                 |                 | used to solve   |
+|                 |                 |                 | the implicit    |
+|                 |                 |                 | system.         |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ons             |                 |                 | passed to the   |
+|                 |                 |                 | NlpSolver       |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++------------------+
+|        Id        |
++==================+
+| nlp_solver_stats |
++------------------+
+
+Joel Andersson Diagrams
 
 C++ includes: implicit_function.hpp ";
 
@@ -26827,6 +27130,92 @@ Default constructor.
 
 Integrator factory.
 
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_Integrator_cvodes'>cvodes</a>
+
+- <a href='#plugin_Integrator_idas'>idas</a>
+
+- <a href='#plugin_Integrator_collocation'>collocation</a>
+
+- <a href='#plugin_Integrator_oldcollocation'>oldcollocation</a>
+
+- <a href='#plugin_Integrator_rk'>rk</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Integrator.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+f:  dynamical system
+
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
++-----------+-------+----------------------------+
+| Full name | Short |        Description         |
++===========+=======+============================+
+| DAE_X     | x     | Differential state .       |
++-----------+-------+----------------------------+
+| DAE_Z     | z     | Algebraic state .          |
++-----------+-------+----------------------------+
+| DAE_P     | p     | Parameter .                |
++-----------+-------+----------------------------+
+| DAE_T     | t     | Explicit time dependence . |
++-----------+-------+----------------------------+
+
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
++-----------+-------+--------------------------------------------+
+| Full name | Short |                Description                 |
++===========+=======+============================================+
+| DAE_ODE   | ode   | Right hand side of the implicit ODE .      |
++-----------+-------+--------------------------------------------+
+| DAE_ALG   | alg   | Right hand side of algebraic equations .   |
++-----------+-------+--------------------------------------------+
+| DAE_QUAD  | quad  | Right hand side of quadratures equations . |
++-----------+-------+--------------------------------------------+
+
+Parameters:
+-----------
+
+g:  backwards system
+
+>Input scheme: casadi::RDAEInput (RDAE_NUM_IN = 7) [rdaeIn]
++-----------+-------+-------------------------------+
+| Full name | Short |          Description          |
++===========+=======+===============================+
+| RDAE_RX   | rx    | Backward differential state . |
++-----------+-------+-------------------------------+
+| RDAE_RZ   | rz    | Backward algebraic state .    |
++-----------+-------+-------------------------------+
+| RDAE_RP   | rp    | Backward parameter vector .   |
++-----------+-------+-------------------------------+
+| RDAE_X    | x     | Forward differential state .  |
++-----------+-------+-------------------------------+
+| RDAE_Z    | z     | Forward algebraic state .     |
++-----------+-------+-------------------------------+
+| RDAE_P    | p     | Parameter vector .            |
++-----------+-------+-------------------------------+
+| RDAE_T    | t     | Explicit time dependence .    |
++-----------+-------+-------------------------------+
+
+>Output scheme: casadi::RDAEOutput (RDAE_NUM_OUT = 3) [rdaeOut]
++-----------+-------+-------------------------------------------+
+| Full name | Short |                Description                |
++===========+=======+===========================================+
+| RDAE_ODE  | ode   | Right hand side of ODE. .                 |
++-----------+-------+-------------------------------------------+
+| RDAE_ALG  | alg   | Right hand side of algebraic equations. . |
++-----------+-------+-------------------------------------------+
+| RDAE_QUAD | quad  | Right hand side of quadratures. .         |
++-----------+-------+-------------------------------------------+
+
 ";
 
 %feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
@@ -26989,12 +27378,9 @@ on rx, rz and rp.
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points.
 
-The class does not specify the method used for the integration. This is
-defined in derived classes.
+General information
 
-Joel Andersson
-
->Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 7) [integratorIn]
+>Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) [integratorIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -27018,7 +27404,7 @@ Joel Andersson
 |                        |                        | variable .             |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 7) [integratorOut]
+>Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6) [integratorOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -27163,7 +27549,712 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_Integrator_cvodes'>cvodes</a>
+
+- <a href='#plugin_Integrator_idas'>idas</a>
+
+- <a href='#plugin_Integrator_collocation'>collocation</a>
+
+- <a href='#plugin_Integrator_oldcollocation'>oldcollocation</a>
+
+- <a href='#plugin_Integrator_rk'>rk</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Integrator.doc(\"myextraplugin\")
+
+cvodes
+
+Interface to CVodes from the Sundials suite.
+
+A call to evaluate will integrate to the end.
+
+You can retrieve the entire state trajectory as follows, after the evaluate
+call: Call reset. Then call integrate(t_i) and getOuput for a series of
+times t_i.
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| abstol          | OT_REAL         | 0.000           | Absolute        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the IVP         |
+|                 |                 |                 | solution        |
++-----------------+-----------------+-----------------+-----------------+
+| abstolB         | OT_REAL         | GenericType()   | Absolute        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the adjoint     |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | solution        |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to abstol]      |
++-----------------+-----------------+-----------------+-----------------+
+| disable_interna | OT_BOOLEAN      | false           | Disable CVodes  |
+| l_warnings      |                 |                 | internal        |
+|                 |                 |                 | warning         |
+|                 |                 |                 | messages        |
++-----------------+-----------------+-----------------+-----------------+
+| exact_jacobian  | OT_BOOLEAN      | true            | Use exact       |
+|                 |                 |                 | Jacobian        |
+|                 |                 |                 | information for |
+|                 |                 |                 | the forward     |
+|                 |                 |                 | integration     |
++-----------------+-----------------+-----------------+-----------------+
+| exact_jacobianB | OT_BOOLEAN      | GenericType()   | Use exact       |
+|                 |                 |                 | Jacobian        |
+|                 |                 |                 | information for |
+|                 |                 |                 | the backward    |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to              |
+|                 |                 |                 | exact_jacobian] |
++-----------------+-----------------+-----------------+-----------------+
+| finite_differen | OT_BOOLEAN      | false           | Use finite      |
+| ce_fsens        |                 |                 | differences to  |
+|                 |                 |                 | approximate the |
+|                 |                 |                 | forward         |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | equations (if   |
+|                 |                 |                 | AD is not       |
+|                 |                 |                 | available)      |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_abstol    | OT_REAL         | GenericType()   | Absolute        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the forward     |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | solution        |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to abstol]      |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_all_at_on | OT_BOOLEAN      | true            | Calculate all   |
+| ce              |                 |                 | right hand      |
+|                 |                 |                 | sides of the    |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | equations at    |
+|                 |                 |                 | once            |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_err_con   | OT_BOOLEAN      | true            | include the     |
+|                 |                 |                 | forward         |
+|                 |                 |                 | sensitivities   |
+|                 |                 |                 | in all error    |
+|                 |                 |                 | controls        |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_reltol    | OT_REAL         | GenericType()   | Relative        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the forward     |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | solution        |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to reltol]      |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_scaling_f | OT_REALVECTOR   | GenericType()   | Scaling factor  |
+| actors          |                 |                 | for the         |
+|                 |                 |                 | components if   |
+|                 |                 |                 | finite          |
+|                 |                 |                 | differences is  |
+|                 |                 |                 | used            |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_sensitivi | OT_INTEGERVECTO | GenericType()   | Specifies which |
+| y_parameters    | R               |                 | components will |
+|                 |                 |                 | be used when    |
+|                 |                 |                 | estimating the  |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | equations       |
++-----------------+-----------------+-----------------+-----------------+
+| interpolation_t | OT_STRING       | \"hermite\"       | Type of         |
+| ype             |                 |                 | interpolation   |
+|                 |                 |                 | for the adjoint |
+|                 |                 |                 | sensitivities ( |
+|                 |                 |                 | hermite|polynom |
+|                 |                 |                 | ial)            |
++-----------------+-----------------+-----------------+-----------------+
+| iterative_solve | OT_STRING       | \"gmres\"         | (gmres|bcgstab| |
+| r               |                 |                 | tfqmr)          |
++-----------------+-----------------+-----------------+-----------------+
+| iterative_solve | OT_STRING       | GenericType()   | (gmres|bcgstab| |
+| rB              |                 |                 | tfqmr)          |
++-----------------+-----------------+-----------------+-----------------+
+| linear_multiste | OT_STRING       | \"bdf\"           | Integrator      |
+| p_method        |                 |                 | scheme          |
+|                 |                 |                 | (bdf|adams)     |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver   | OT_STRING       | GenericType()   | A custom linear |
+|                 |                 |                 | solver creator  |
+|                 |                 |                 | function        |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solverB  | OT_STRING       | GenericType()   | A custom linear |
+|                 |                 |                 | solver creator  |
+|                 |                 |                 | function for    |
+|                 |                 |                 | backwards       |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to              |
+|                 |                 |                 | linear_solver]  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ptions          |                 |                 | passed to the   |
+|                 |                 |                 | linear solver   |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ptionsB         |                 |                 | passed to the   |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | for backwards   |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to linear_solve |
+|                 |                 |                 | r_options]      |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
+| ype             |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
+| ypeB            |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
++-----------------+-----------------+-----------------+-----------------+
+| lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
+|                 |                 |                 | width of banded |
+|                 |                 |                 | Jacobian        |
+|                 |                 |                 | (estimations)   |
++-----------------+-----------------+-----------------+-----------------+
+| lower_bandwidth | OT_INTEGER      | GenericType()   | lower band-     |
+| B               |                 |                 | width of banded |
+|                 |                 |                 | jacobians for   |
+|                 |                 |                 | backward        |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to lower_bandwi |
+|                 |                 |                 | dth]            |
++-----------------+-----------------+-----------------+-----------------+
+| max_krylov      | OT_INTEGER      | 10              | Maximum Krylov  |
+|                 |                 |                 | subspace size   |
++-----------------+-----------------+-----------------+-----------------+
+| max_krylovB     | OT_INTEGER      | GenericType()   | Maximum krylov  |
+|                 |                 |                 | subspace size   |
++-----------------+-----------------+-----------------+-----------------+
+| max_multistep_o | OT_INTEGER      | 5               |                 |
+| rder            |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_num_steps   | OT_INTEGER      | 10000           | Maximum number  |
+|                 |                 |                 | of integrator   |
+|                 |                 |                 | steps           |
++-----------------+-----------------+-----------------+-----------------+
+| nonlinear_solve | OT_STRING       | \"newton\"        | (newton|functio |
+| r_iteration     |                 |                 | nal)            |
++-----------------+-----------------+-----------------+-----------------+
+| pretype         | OT_STRING       | \"none\"          | (none|left|righ |
+|                 |                 |                 | t|both)         |
++-----------------+-----------------+-----------------+-----------------+
+| pretypeB        | OT_STRING       | GenericType()   | (none|left|righ |
+|                 |                 |                 | t|both)         |
++-----------------+-----------------+-----------------+-----------------+
+| quad_err_con    | OT_BOOLEAN      | false           | Should the      |
+|                 |                 |                 | quadratures     |
+|                 |                 |                 | affect the step |
+|                 |                 |                 | size control    |
++-----------------+-----------------+-----------------+-----------------+
+| reltol          | OT_REAL         | 0.000           | Relative        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the IVP         |
+|                 |                 |                 | solution        |
++-----------------+-----------------+-----------------+-----------------+
+| reltolB         | OT_REAL         | GenericType()   | Relative        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the adjoint     |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | solution        |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to reltol]      |
++-----------------+-----------------+-----------------+-----------------+
+| sensitivity_met | OT_STRING       | \"simultaneous\"  | (simultaneous|s |
+| hod             |                 |                 | taggered)       |
++-----------------+-----------------+-----------------+-----------------+
+| steps_per_check | OT_INTEGER      | 20              | Number of steps |
+| point           |                 |                 | between two     |
+|                 |                 |                 | consecutive     |
+|                 |                 |                 | checkpoints     |
++-----------------+-----------------+-----------------+-----------------+
+| stop_at_end     | OT_BOOLEAN      | true            | Stop the        |
+|                 |                 |                 | integrator at   |
+|                 |                 |                 | the end of the  |
+|                 |                 |                 | interval        |
++-----------------+-----------------+-----------------+-----------------+
+| upper_bandwidth | OT_INTEGER      | GenericType()   | Upper band-     |
+|                 |                 |                 | width of banded |
+|                 |                 |                 | Jacobian        |
+|                 |                 |                 | (estimations)   |
++-----------------+-----------------+-----------------+-----------------+
+| upper_bandwidth | OT_INTEGER      | GenericType()   | Upper band-     |
+| B               |                 |                 | width of banded |
+|                 |                 |                 | jacobians for   |
+|                 |                 |                 | backward        |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to upper_bandwi |
+|                 |                 |                 | dth]            |
++-----------------+-----------------+-----------------+-----------------+
+| use_preconditio | OT_BOOLEAN      | false           | Precondition an |
+| ner             |                 |                 | iterative       |
+|                 |                 |                 | solver          |
++-----------------+-----------------+-----------------+-----------------+
+| use_preconditio | OT_BOOLEAN      | GenericType()   | Precondition an |
+| nerB            |                 |                 | iterative       |
+|                 |                 |                 | solver for the  |
+|                 |                 |                 | backwards       |
+|                 |                 |                 | problem         |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to use_precondi |
+|                 |                 |                 | tioner]         |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++---------+
+|   Id    |
++=========+
+| djacB   |
++---------+
+| psetupB |
++---------+
+| res     |
++---------+
+| resB    |
++---------+
+| resQB   |
++---------+
+| reset   |
++---------+
+
+>List of available stats
++-------------+
+|     Id      |
++=============+
+| nlinsetups  |
++-------------+
+| nlinsetupsB |
++-------------+
+| nsteps      |
++-------------+
+| nstepsB     |
++-------------+
+
+idas
+
+Interface to IDAS from the Sundials suite.
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| abstol          | OT_REAL         | 0.000           | Absolute        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the IVP         |
+|                 |                 |                 | solution        |
++-----------------+-----------------+-----------------+-----------------+
+| abstolB         | OT_REAL         | GenericType()   | Absolute        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the adjoint     |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | solution        |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to abstol]      |
++-----------------+-----------------+-----------------+-----------------+
+| abstolv         | OT_REALVECTOR   |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| calc_ic         | OT_BOOLEAN      | true            | Use IDACalcIC   |
+|                 |                 |                 | to get          |
+|                 |                 |                 | consistent      |
+|                 |                 |                 | initial         |
+|                 |                 |                 | conditions.     |
++-----------------+-----------------+-----------------+-----------------+
+| calc_icB        | OT_BOOLEAN      | GenericType()   | Use IDACalcIC   |
+|                 |                 |                 | to get          |
+|                 |                 |                 | consistent      |
+|                 |                 |                 | initial         |
+|                 |                 |                 | conditions for  |
+|                 |                 |                 | backwards       |
+|                 |                 |                 | system          |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to calc_ic].    |
++-----------------+-----------------+-----------------+-----------------+
+| cj_scaling      | OT_BOOLEAN      | false           | IDAS scaling on |
+|                 |                 |                 | cj for the      |
+|                 |                 |                 | user-defined    |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | module          |
++-----------------+-----------------+-----------------+-----------------+
+| disable_interna | OT_BOOLEAN      | false           | Disable IDAS    |
+| l_warnings      |                 |                 | internal        |
+|                 |                 |                 | warning         |
+|                 |                 |                 | messages        |
++-----------------+-----------------+-----------------+-----------------+
+| exact_jacobian  | OT_BOOLEAN      | true            | Use exact       |
+|                 |                 |                 | Jacobian        |
+|                 |                 |                 | information for |
+|                 |                 |                 | the forward     |
+|                 |                 |                 | integration     |
++-----------------+-----------------+-----------------+-----------------+
+| exact_jacobianB | OT_BOOLEAN      | GenericType()   | Use exact       |
+|                 |                 |                 | Jacobian        |
+|                 |                 |                 | information for |
+|                 |                 |                 | the backward    |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to              |
+|                 |                 |                 | exact_jacobian] |
++-----------------+-----------------+-----------------+-----------------+
+| extra_fsens_cal | OT_BOOLEAN      | false           | Call calc ic an |
+| c_ic            |                 |                 | extra time,     |
+|                 |                 |                 | with fsens=0    |
++-----------------+-----------------+-----------------+-----------------+
+| finite_differen | OT_BOOLEAN      | false           | Use finite      |
+| ce_fsens        |                 |                 | differences to  |
+|                 |                 |                 | approximate the |
+|                 |                 |                 | forward         |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | equations (if   |
+|                 |                 |                 | AD is not       |
+|                 |                 |                 | available)      |
++-----------------+-----------------+-----------------+-----------------+
+| first_time      | OT_REAL         | GenericType()   | First requested |
+|                 |                 |                 | time as a       |
+|                 |                 |                 | fraction of the |
+|                 |                 |                 | time interval   |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_abstol    | OT_REAL         | GenericType()   | Absolute        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the forward     |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | solution        |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to abstol]      |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_abstolv   | OT_REALVECTOR   |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_err_con   | OT_BOOLEAN      | true            | include the     |
+|                 |                 |                 | forward         |
+|                 |                 |                 | sensitivities   |
+|                 |                 |                 | in all error    |
+|                 |                 |                 | controls        |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_reltol    | OT_REAL         | GenericType()   | Relative        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the forward     |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | solution        |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to reltol]      |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_scaling_f | OT_REALVECTOR   | GenericType()   | Scaling factor  |
+| actors          |                 |                 | for the         |
+|                 |                 |                 | components if   |
+|                 |                 |                 | finite          |
+|                 |                 |                 | differences is  |
+|                 |                 |                 | used            |
++-----------------+-----------------+-----------------+-----------------+
+| fsens_sensitivi | OT_INTEGERVECTO | GenericType()   | Specifies which |
+| y_parameters    | R               |                 | components will |
+|                 |                 |                 | be used when    |
+|                 |                 |                 | estimating the  |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | equations       |
++-----------------+-----------------+-----------------+-----------------+
+| init_xdot       | OT_REALVECTOR   | GenericType()   | Initial values  |
+|                 |                 |                 | for the state   |
+|                 |                 |                 | derivatives     |
++-----------------+-----------------+-----------------+-----------------+
+| interpolation_t | OT_STRING       | \"hermite\"       | Type of         |
+| ype             |                 |                 | interpolation   |
+|                 |                 |                 | for the adjoint |
+|                 |                 |                 | sensitivities ( |
+|                 |                 |                 | hermite|polynom |
+|                 |                 |                 | ial)            |
++-----------------+-----------------+-----------------+-----------------+
+| iterative_solve | OT_STRING       | \"gmres\"         | (gmres|bcgstab| |
+| r               |                 |                 | tfqmr)          |
++-----------------+-----------------+-----------------+-----------------+
+| iterative_solve | OT_STRING       | GenericType()   | (gmres|bcgstab| |
+| rB              |                 |                 | tfqmr)          |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver   | OT_STRING       | GenericType()   | A custom linear |
+|                 |                 |                 | solver creator  |
+|                 |                 |                 | function        |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solverB  | OT_STRING       | GenericType()   | A custom linear |
+|                 |                 |                 | solver creator  |
+|                 |                 |                 | function for    |
+|                 |                 |                 | backwards       |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to              |
+|                 |                 |                 | linear_solver]  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ptions          |                 |                 | passed to the   |
+|                 |                 |                 | linear solver   |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ptionsB         |                 |                 | passed to the   |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | for backwards   |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to linear_solve |
+|                 |                 |                 | r_options]      |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
+| ype             |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
+| ypeB            |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
++-----------------+-----------------+-----------------+-----------------+
+| lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
+|                 |                 |                 | width of banded |
+|                 |                 |                 | Jacobian        |
+|                 |                 |                 | (estimations)   |
++-----------------+-----------------+-----------------+-----------------+
+| lower_bandwidth | OT_INTEGER      | GenericType()   | lower band-     |
+| B               |                 |                 | width of banded |
+|                 |                 |                 | jacobians for   |
+|                 |                 |                 | backward        |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to lower_bandwi |
+|                 |                 |                 | dth]            |
++-----------------+-----------------+-----------------+-----------------+
+| max_krylov      | OT_INTEGER      | 10              | Maximum Krylov  |
+|                 |                 |                 | subspace size   |
++-----------------+-----------------+-----------------+-----------------+
+| max_krylovB     | OT_INTEGER      | GenericType()   | Maximum krylov  |
+|                 |                 |                 | subspace size   |
++-----------------+-----------------+-----------------+-----------------+
+| max_multistep_o | OT_INTEGER      | 5               |                 |
+| rder            |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| max_num_steps   | OT_INTEGER      | 10000           | Maximum number  |
+|                 |                 |                 | of integrator   |
+|                 |                 |                 | steps           |
++-----------------+-----------------+-----------------+-----------------+
+| max_step_size   | OT_REAL         | 0               | Maximim step    |
+|                 |                 |                 | size            |
++-----------------+-----------------+-----------------+-----------------+
+| pretype         | OT_STRING       | \"none\"          | (none|left|righ |
+|                 |                 |                 | t|both)         |
++-----------------+-----------------+-----------------+-----------------+
+| pretypeB        | OT_STRING       | GenericType()   | (none|left|righ |
+|                 |                 |                 | t|both)         |
++-----------------+-----------------+-----------------+-----------------+
+| quad_err_con    | OT_BOOLEAN      | false           | Should the      |
+|                 |                 |                 | quadratures     |
+|                 |                 |                 | affect the step |
+|                 |                 |                 | size control    |
++-----------------+-----------------+-----------------+-----------------+
+| reltol          | OT_REAL         | 0.000           | Relative        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the IVP         |
+|                 |                 |                 | solution        |
++-----------------+-----------------+-----------------+-----------------+
+| reltolB         | OT_REAL         | GenericType()   | Relative        |
+|                 |                 |                 | tolerence for   |
+|                 |                 |                 | the adjoint     |
+|                 |                 |                 | sensitivity     |
+|                 |                 |                 | solution        |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to reltol]      |
++-----------------+-----------------+-----------------+-----------------+
+| sensitivity_met | OT_STRING       | \"simultaneous\"  | (simultaneous|s |
+| hod             |                 |                 | taggered)       |
++-----------------+-----------------+-----------------+-----------------+
+| steps_per_check | OT_INTEGER      | 20              | Number of steps |
+| point           |                 |                 | between two     |
+|                 |                 |                 | consecutive     |
+|                 |                 |                 | checkpoints     |
++-----------------+-----------------+-----------------+-----------------+
+| stop_at_end     | OT_BOOLEAN      | true            | Stop the        |
+|                 |                 |                 | integrator at   |
+|                 |                 |                 | the end of the  |
+|                 |                 |                 | interval        |
++-----------------+-----------------+-----------------+-----------------+
+| suppress_algebr | OT_BOOLEAN      | false           | Supress         |
+| aic             |                 |                 | algebraic       |
+|                 |                 |                 | variables in    |
+|                 |                 |                 | the error       |
+|                 |                 |                 | testing         |
++-----------------+-----------------+-----------------+-----------------+
+| upper_bandwidth | OT_INTEGER      | GenericType()   | Upper band-     |
+|                 |                 |                 | width of banded |
+|                 |                 |                 | Jacobian        |
+|                 |                 |                 | (estimations)   |
++-----------------+-----------------+-----------------+-----------------+
+| upper_bandwidth | OT_INTEGER      | GenericType()   | Upper band-     |
+| B               |                 |                 | width of banded |
+|                 |                 |                 | jacobians for   |
+|                 |                 |                 | backward        |
+|                 |                 |                 | integration     |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to upper_bandwi |
+|                 |                 |                 | dth]            |
++-----------------+-----------------+-----------------+-----------------+
+| use_preconditio | OT_BOOLEAN      | false           | Precondition an |
+| ner             |                 |                 | iterative       |
+|                 |                 |                 | solver          |
++-----------------+-----------------+-----------------+-----------------+
+| use_preconditio | OT_BOOLEAN      | GenericType()   | Precondition an |
+| nerB            |                 |                 | iterative       |
+|                 |                 |                 | solver for the  |
+|                 |                 |                 | backwards       |
+|                 |                 |                 | problem         |
+|                 |                 |                 | [default: equal |
+|                 |                 |                 | to use_precondi |
+|                 |                 |                 | tioner]         |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++--------------------------+
+|            Id            |
++==========================+
+| bjacB                    |
++--------------------------+
+| correctInitialConditions |
++--------------------------+
+| jtimesB                  |
++--------------------------+
+| psetup                   |
++--------------------------+
+| psetupB                  |
++--------------------------+
+| psolveB                  |
++--------------------------+
+| res                      |
++--------------------------+
+| resB                     |
++--------------------------+
+| resS                     |
++--------------------------+
+| rhsQB                    |
++--------------------------+
+
+>List of available stats
++-------------+
+|     Id      |
++=============+
+| nlinsetups  |
++-------------+
+| nlinsetupsB |
++-------------+
+| nsteps      |
++-------------+
+| nstepsB     |
++-------------+
+
+collocation
+
+Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on
+collocation schemes
+
+The method is still under development
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| collocation_sch | OT_STRING       | \"radau\"         | Collocation     |
+| eme             |                 |                 | scheme (radau|l |
+|                 |                 |                 | egendre)        |
++-----------------+-----------------+-----------------+-----------------+
+| implicit_solver | OT_STRING       | GenericType()   | An implicit     |
+|                 |                 |                 | function solver |
++-----------------+-----------------+-----------------+-----------------+
+| implicit_solver | OT_DICTIONARY   | GenericType()   | Options to be   |
+| _options        |                 |                 | passed to the   |
+|                 |                 |                 | NLP Solver      |
++-----------------+-----------------+-----------------+-----------------+
+| interpolation_o | OT_INTEGER      | 3               | Order of the    |
+| rder            |                 |                 | interpolating   |
+|                 |                 |                 | polynomials     |
++-----------------+-----------------+-----------------+-----------------+
+| number_of_finit | OT_INTEGER      | 20              | Number of       |
+| e_elements      |                 |                 | finite elements |
++-----------------+-----------------+-----------------+-----------------+
+
+oldcollocation
+
+Collocation integrator ODE/DAE integrator based on collocation
+
+The method is still under development
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| collocation_sch | OT_STRING       | \"radau\"         | Collocation     |
+| eme             |                 |                 | scheme (radau|l |
+|                 |                 |                 | egendre)        |
++-----------------+-----------------+-----------------+-----------------+
+| expand_f        | OT_BOOLEAN      | false           | Expand the      |
+|                 |                 |                 | ODE/DAE         |
+|                 |                 |                 | residual        |
+|                 |                 |                 | function in an  |
+|                 |                 |                 | SX graph        |
++-----------------+-----------------+-----------------+-----------------+
+| expand_q        | OT_BOOLEAN      | false           | Expand the      |
+|                 |                 |                 | quadrature      |
+|                 |                 |                 | function in an  |
+|                 |                 |                 | SX graph        |
++-----------------+-----------------+-----------------+-----------------+
+| hotstart        | OT_BOOLEAN      | true            | Initialize the  |
+|                 |                 |                 | trajectory at   |
+|                 |                 |                 | the previous    |
+|                 |                 |                 | solution        |
++-----------------+-----------------+-----------------+-----------------+
+| implicit_solver | OT_STRING       | GenericType()   | An implicit     |
+|                 |                 |                 | function solver |
++-----------------+-----------------+-----------------+-----------------+
+| implicit_solver | OT_DICTIONARY   | GenericType()   | Options to be   |
+| _options        |                 |                 | passed to the   |
+|                 |                 |                 | implicit solver |
++-----------------+-----------------+-----------------+-----------------+
+| interpolation_o | OT_INTEGER      | 3               | Order of the    |
+| rder            |                 |                 | interpolating   |
+|                 |                 |                 | polynomials     |
++-----------------+-----------------+-----------------+-----------------+
+| number_of_finit | OT_INTEGER      | 20              | Number of       |
+| e_elements      |                 |                 | finite elements |
++-----------------+-----------------+-----------------+-----------------+
+| startup_integra | OT_STRING       | GenericType()   | An ODE/DAE      |
+| tor             |                 |                 | integrator that |
+|                 |                 |                 | can be used to  |
+|                 |                 |                 | generate a      |
+|                 |                 |                 | startup         |
+|                 |                 |                 | trajectory      |
++-----------------+-----------------+-----------------+-----------------+
+| startup_integra | OT_DICTIONARY   | GenericType()   | Options to be   |
+| tor_options     |                 |                 | passed to the   |
+|                 |                 |                 | startup         |
+|                 |                 |                 | integrator      |
++-----------------+-----------------+-----------------+-----------------+
+
+rk
+
+Fixed-step explicit Runge-Kutta integrator for ODEs Currently implements
+RK4.
+
+The method is still under development
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| number_of_finit | OT_INTEGER      | 20              | Number of       |
+| e_elements      |                 |                 | finite elements |
++-----------------+-----------------+-----------------+-----------------+
+
+Joel Andersson Diagrams
 
 C++ includes: integrator.hpp ";
 
@@ -29467,6 +30558,28 @@ only)
 
 Create a linear solver given a sparsity pattern.
 
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_LinearSolver_csparsecholesky'>csparsecholesky</a>
+
+- <a href='#plugin_LinearSolver_csparse'>csparse</a>
+
+- <a href='#plugin_LinearSolver_lapacklu'>lapacklu</a>
+
+- <a href='#plugin_LinearSolver_lapackqr'>lapackqr</a>
+
+- <a href='#plugin_LinearSolver_symbolicqr'>symbolicqr</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LinearSolver.doc(\"myextraplugin\")
+
 ";
 
 %feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
@@ -29973,9 +31086,26 @@ Solves the linear system A*X = B or A^T*X = B for X with A square and non-
 singular
 
 If A is structurally singular, an error will be thrown during init. If A is
-numerically singular, the prepare step will fail. Joel Andersson
+numerically singular, the prepare step will fail.
 
->Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 3) [linsolIn]
+The usual procedure to use LinearSolver is:  init()
+
+set the first input (A)
+
+prepare()
+
+set the second input (b)
+
+solve()
+
+Repeat steps 4 and 5 to work with other b vectors.
+
+The method evaluate() combines the prepare() and solve() step and is
+therefore more expensive if A is invariant.
+
+General information
+
+>Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) [linsolIn]
 +-----------+-------+------------------------------------------------+
 | Full name | Short |                  Description                   |
 +===========+=======+================================================+
@@ -29984,7 +31114,7 @@ numerically singular, the prepare step will fail. Joel Andersson
 | LINSOL_B  | B     | The right-hand-side matrix b: dense, (n x m) . |
 +-----------+-------+------------------------------------------------+
 
->Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 2) [linsolOut]
+>Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 1) [linsolOut]
 +-----------+-------+----------------------------------------------+
 | Full name | Short |                 Description                  |
 +===========+=======+==============================================+
@@ -30077,7 +31207,88 @@ numerically singular, the prepare step will fail. Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_LinearSolver_csparsecholesky'>csparsecholesky</a>
+
+- <a href='#plugin_LinearSolver_csparse'>csparse</a>
+
+- <a href='#plugin_LinearSolver_lapacklu'>lapacklu</a>
+
+- <a href='#plugin_LinearSolver_lapackqr'>lapackqr</a>
+
+- <a href='#plugin_LinearSolver_symbolicqr'>symbolicqr</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LinearSolver.doc(\"myextraplugin\")
+
+csparsecholesky
+
+LinearSolver with CSparseCholesky Interface
+
+>List of available options
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
+
+csparse
+
+LinearSolver with CSparse Interface
+
+>List of available options
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
+
+lapacklu
+
+This class solves the linear system A.x=b by making an LU factorization of
+A: A = L.U, with L lower and U upper triangular
+
+>List of available options
++-----------------------------+------------+---------+-------------+
+|             Id              |    Type    | Default | Description |
++=============================+============+=========+=============+
+| allow_equilibration_failure | OT_BOOLEAN | false   |             |
++-----------------------------+------------+---------+-------------+
+| equilibration               | OT_BOOLEAN | true    |             |
++-----------------------------+------------+---------+-------------+
+
+lapackqr
+
+This class solves the linear system A.x=b by making an QR factorization of
+A: A = Q.R, with Q orthogonal and R upper triangular
+
+>List of available options
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
+
+symbolicqr
+
+LinearSolver based on QR factorization with sparsity pattern based
+reordering without partial pivoting
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| codegen         | OT_BOOLEAN      | false           | C-code          |
+|                 |                 |                 | generation      |
++-----------------+-----------------+-----------------+-----------------+
+| compiler        | OT_STRING       | \"gcc -fPIC -O2\" | Compiler        |
+|                 |                 |                 | command to be   |
+|                 |                 |                 | used for        |
+|                 |                 |                 | compiling       |
+|                 |                 |                 | generated code  |
++-----------------+-----------------+-----------------+-----------------+
+
+Joel Andersson Diagrams
 
 C++ includes: linear_solver.hpp ";
 
@@ -30743,7 +31954,7 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 
-// File: classcasadi_1_1LPSolver.xml
+// File: classcasadi_1_1LpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -30751,725 +31962,7 @@ C++ includes: schemes_helpers.hpp ";
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::OptionsFunctionality::hasOption(const std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-int oind=0, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
-iind=0) const "
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
-std::string &iname) const "
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
-iind=0) " [INTERNAL]  Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
-const std::string &iname) " [INTERNAL]  Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
-&arg, bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
-bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
-bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(const std::string
-&filename) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode() "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(std::ostream
-&filename) "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
-
-";
-
-%feature("docstring")  casadi::Function::setFullJacobian(const Function
-&jac) "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::evaluate() "
-
-Evaluate.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
-"
-
-INTERNAL.
-
-Get a list of all option names
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
-[INTERNAL]  Access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
-const " [INTERNAL]  Const access an output.
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputElements() const  "
-
-Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-Dictionary &dict, bool skipUnknown=false) "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
-class
-
-";
-
-%feature("docstring")  casadi::LPSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-"
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
-"
-
-Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputElements() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::callParallel(const std::vector<
-std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInputSX() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::setInputScheme(const
-casadi::IOScheme &scheme) "
-
-Set input scheme.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::Function::getInputScheme() const  "
-
-Get input scheme.
-
-";
-
-%feature("docstring")  casadi::Function::setOutputScheme(const
-casadi::IOScheme &scheme) "
-
-Set output scheme.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
-casadi::IOScheme &scheme, const std::string &name, bool input) const "
-[INTERNAL]  Find the index for a string describing a particular entry of a
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
-
-";
-
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::removeMonitor(const std::string
-&mon) "
-
-Remove modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
-
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  SWIGINTERNAL
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-int oind=0) "
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-const std::string &oname) "
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
-SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
-&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
-MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
-&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
+casadi::Function::gradient(int iind=0, int oind=0) "
 
 Generate a gradient function of output oind with respect to input iind.
 
@@ -31536,262 +32029,13 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
-int nfwd, int nadj) "
-
-Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-NOTE: Does not take ownership, only weak references to the derivatives are
-kept internally
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::printOptions(std::ostream &stream=std::cout)
-const  "
-
-Print options to a stream.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
-num_out) "
-
-Set the number of function outputs.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
-const  " [INTERNAL]  Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
-num_in) "
-
-Set the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an input scheme.
+%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
+casadi::IOScheme &scheme, const std::string &name, bool input) const "
+[INTERNAL]  Find the index for a string describing a particular entry of a
+scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring")  casadi::Function::fullJacobian() "
-
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind, const std::string
-&oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-const std::string &oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
-iind=0) "
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
-const std::string &iname) "
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::getStats() const  "
-
-Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
-std::string &str) const  "
-
-INTERNAL.
-
-Get the default of a certain option
 
 ";
 
@@ -31800,60 +32044,51 @@ Get the default of a certain option
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
-const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
+class
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) const "
+%feature("docstring")  casadi::Function::removeMonitor(const std::string
+&mon) "
 
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
+Remove modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
 
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
-const "
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
 
-Get the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInput() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
 
-get an option value
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
+"
+
+Add modules to be monitored.
 
 ";
 
@@ -31924,24 +32159,605 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
+%feature("docstring")  casadi::Function::evaluate() "
 
-Get output scheme.
+Evaluate.
+
+";
+
+%feature("docstring") casadi::LpSolver::LpSolver() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::LpSolver::LpSolver(const std::string &name,
+const LPStructure &st) "
+
+Constructor.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_LpSolver_qp'>qp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+st:  Problem structure
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
+a const pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
+pointer to the node.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+"
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::Function::getSanitizedName() const  "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
+[INTERNAL]  Access an input.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
+" [INTERNAL]  Const access an input.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(const std::string
+&filename) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode() "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(std::ostream
+&filename) "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::getStats() const  "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
+Deep copy.
 
 ";
 
 %feature("docstring")  casadi::IOInterface< Function
->::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an output scheme.
+>::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an input scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::LPSolver "
+%feature("docstring")  casadi::SharedObject::isNull() const  "
 
-LPSolver.
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::Function::fullJacobian() "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isInit() const  "
+
+Is initialized?
+
+";
+
+%feature("docstring")  casadi::Function::getInputScheme() const  "
+
+Get input scheme.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
+std::string &str) const  "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+int oind=0) "
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+const std::string &oname) "
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
+iind=0) const "
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
+std::string &iname) const "
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
+iind=0) " [INTERNAL]  Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
+const std::string &iname) " [INTERNAL]  Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
+
+Set output scheme.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
+iind=0) "
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
+const std::string &iname) "
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
+Get the reference count.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
+const "
+
+Get the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
+&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
+DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
+DMatrixVectorVector &output_asens, bool always_inline=false, bool
+never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
+numerically with directional derivatives The first two arguments are the
+nondifferentiated inputs and results of the evaluation, the next two
+arguments are a set of forward directional seeds and the resulting forward
+directional derivatives, the length of the vector being the number of
+forward directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of the
+vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
+SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
+&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
+MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
+&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+std::string &str) const  "
+
+get an option value
+
+";
+
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
+
+Get the dictionary.
+
+";
+
+%feature("docstring")  casadi::Function::callParallel(const std::vector<
+std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
+&arg, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
+num_out) "
+
+Set the number of function outputs.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+Dictionary &dict, bool skipUnknown=false) "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
+const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
+const "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInputSX() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+"
+
+INTERNAL.
+
+Get a list of all option names
+
+";
+
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::LpSolver "
+
+LpSolver.
 
 Solves the following linear problem:
 
@@ -31950,9 +32766,9 @@ n x 1) c ( n x 1 ) A sparse matrix ( nc x n) LBA, UBA dense vector (nc x 1)
 LBX, UBX dense vector (n x 1)  n: number of decision variables (x) nc:
 number of constraints (A)
 
-Joris Gillis
+General information
 
->Input scheme: casadi::LPSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
+>Input scheme: casadi::LpSolverInput (LP_SOLVER_NUM_IN = 6) [lpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -31973,7 +32789,7 @@ Joris Gillis
 | LP_SOLVER_UBX          | ubx                    | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::LPSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
+>Output scheme: casadi::LpSolverOutput (LP_SOLVER_NUM_OUT = 4) [lpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -32076,14 +32892,147 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_LpSolver_qp'>qp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LpSolver.doc(\"myextraplugin\")
+
+qp
+
+Solve LPs using a QpSolver
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| qp_solver       | OT_STRING       | GenericType()   | The QPSOlver    |
+|                 |                 |                 | used to solve   |
+|                 |                 |                 | the LPs.        |
++-----------------+-----------------+-----------------+-----------------+
+| qp_solver_optio | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ns              |                 |                 | passed to the   |
+|                 |                 |                 | QPSOlver        |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++-----------------+
+|       Id        |
++=================+
+| qp_solver_stats |
++-----------------+
+
+Joris Gillis Diagrams
 
 C++ includes: lp_solver.hpp ";
 
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
+%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
+Access input/output scheme.
 
-Get a single statistic obtained at the end of the last evaluate call.
+";
+
+%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+std::string &str) const  "
+
+INTERNAL.
+
+Get the default of a certain option
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInput() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::LpSolver::checkNode() const  "
+
+Check if the node is pointing to the right type of object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring")  casadi::Function::setInputScheme(const
+casadi::IOScheme &scheme) "
+
+Set input scheme.
+
+";
+
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
+
+Get output scheme.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
+std::string &str) const  "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
+const  " [INTERNAL]  Print a representation of the object.
+
+";
+
+%feature("docstring")
+casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function
+>::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an output scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
+num_in) "
+
+Set the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
+*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
 
 ";
 
@@ -32097,61 +33046,371 @@ Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
-[INTERNAL]  Access an input.
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+
+Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
-" [INTERNAL]  Const access an input.
+%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
 
-";
-
-%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
-const "
-
-Get the number of function outputs.
-
-";
-
-%feature("docstring") casadi::LPSolver::LPSolver() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::LPSolver::LPSolver(const std::string &name,
-const LPStructure &st) "
-
-Constructor.
+Generate a tangent function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
-st:  Problem structure
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind, const std::string
+&oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+const std::string &oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
+SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+" [INTERNAL]  SWIGINTERNAL
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
+std::string &str) const  "
+
+check if there is an option str
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
+int nfwd, int nadj) "
+
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::printOptions(std::ostream &stream=std::cout)
+const  "
+
+Print options to a stream.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputElements() const  "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setFullJacobian(const Function
+&jac) "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
+[INTERNAL]  Access an output.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
+const " [INTERNAL]  Const access an output.
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputElements() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+int oind=0, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
+
+Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
 
-// File: classcasadi_1_1LPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+// File: classcasadi_1_1LpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector< M
->::LPSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::LpSolverInputIOSchemeVector< M
+>::LpSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a description of the object.
@@ -32176,19 +33435,19 @@ st:  Problem structure
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'LPSolverInput'
+%feature("docstring") casadi::LpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'LpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
 
-// File: classcasadi_1_1LPSolverOutputIOSchemeVector.xml
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+// File: classcasadi_1_1LpSolverOutputIOSchemeVector.xml
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'LPSolverOutput'
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'LpSolverOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
@@ -32212,10 +33471,10 @@ C++ includes: schemes_helpers.hpp ";
 
 ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector< M
->::LPSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector< M
+>::LpSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
@@ -38828,7 +40087,7 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 
-// File: classcasadi_1_1NLPSolver.xml
+// File: classcasadi_1_1NlpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -38836,67 +40095,485 @@ C++ includes: schemes_helpers.hpp ";
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::Function::getNumOutputNonzeros() const  "
+casadi::Function::setFullJacobian(const Function &jac) "
 
-Get total number of nonzeros in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::NLPSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
+%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
+*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-Dictionary &dict, bool skipUnknown=false) "
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
+iind=0) const "
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+Get an input by index.
 
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
+Parameters:
+-----------
 
-";
-
-%feature("docstring")  casadi::NLPSolver::setQPOptions() "
-
-Set options that make the NLP solver more suitable for solving QPs.
+iind:  index within the range [0.. getNumInputs()-1]
 
 ";
 
-%feature("docstring")  casadi::NLPSolver::getReportConstraints() "";
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
+std::string &iname) const "
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+Get an input by name.
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
+Parameters:
+-----------
 
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
+iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring")  casadi::Function::getNumInputElements() const  "
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
+iind=0) " [INTERNAL]  Get an input by index.
 
-Get total number of elements in all of the matrix-valued inputs.
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
+const std::string &iname) " [INTERNAL]  Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
+Deep copy.
+
+";
+
+%feature("docstring")  casadi::Function::callParallel(const std::vector<
+std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
+num_in) "
+
+Set the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
+iind=0) "
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
+const std::string &iname) "
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind, const std::string
+&oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+const std::string &oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::NlpSolver::NlpSolver() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::NlpSolver::NlpSolver(const std::string &name,
+const Function &nlp) "
+
+NLP solver factory.
+
+";
+
+%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
+int nfwd, int nadj) "
+
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::removeMonitor(const std::string
+&mon) "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::NlpSolver::jacG() "
+
+Access the Jacobian of the constraint function.
+
+>Input scheme: casadi::HessLagInput (HESSLAG_NUM_IN = 4) [hessLagIn]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| HESSLAG_X              | x                      | Decision variable .    |
++------------------------+------------------------+------------------------+
+| HESSLAG_P              | p                      | Fixed parameter .      |
++------------------------+------------------------+------------------------+
+| HESSLAG_LAM_F          | lam_f                  | Multiplier for f. Just |
+|                        |                        | a scalar factor for    |
+|                        |                        | the objective that the |
+|                        |                        | NLP solver might use   |
+|                        |                        | to scale the           |
+|                        |                        | objective.             |
++------------------------+------------------------+------------------------+
+| HESSLAG_LAM_G          | lam_g                  | Multiplier for g .     |
++------------------------+------------------------+------------------------+
+
+>Output scheme: casadi::HessLagOutput (HESSLAG_NUM_OUT = 5) [hessLagOut]
++----------------+--------+------------------------------------------------+
+|   Full name    | Short  |                  Description                   |
++================+========+================================================+
+| HESSLAG_HESS   | hess   | Hessian of the Lagrangian .                    |
++----------------+--------+------------------------------------------------+
+| HESSLAG_F      | f      | Objective function .                           |
++----------------+--------+------------------------------------------------+
+| HESSLAG_G      | g      | Constraint function .                          |
++----------------+--------+------------------------------------------------+
+| HESSLAG_GRAD_X | grad_x | Gradient of the Lagrangian with respect to x . |
++----------------+--------+------------------------------------------------+
+| HESSLAG_GRAD_P | grad_p | Gradient of the Lagrangian with respect to p . |
++----------------+--------+------------------------------------------------+
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+int oind=0) "
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+const std::string &oname) "
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
+num_out) "
+
+Set the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::Function::setInputScheme(const
+casadi::IOScheme &scheme) "
+
+Set input scheme.
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
+SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+" [INTERNAL]  SWIGINTERNAL
+
+";
+
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
+"
+
+Add modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring")  casadi::NlpSolver::nlp() "
+
+Access the NLP.
+
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLP_SOLVER_X0          | x0                     | Decision variables,    |
+|                        |                        | initial guess (nx x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_P           | p                      | Value of fixed         |
+|                        |                        | parameters (np x 1) .  |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LBX         | lbx                    | Decision variables     |
+|                        |                        | lower bound (nx x 1),  |
+|                        |                        | default -inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_UBX         | ubx                    | Decision variables     |
+|                        |                        | upper bound (nx x 1),  |
+|                        |                        | default +inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LBG         | lbg                    | Constraints lower      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default -inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_UBG         | ubg                    | Constraints upper      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default +inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LAM_X0      | lam_x0                 | Lagrange multipliers   |
+|                        |                        | for bounds on X,       |
+|                        |                        | initial guess (nx x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LAM_G0      | lam_g0                 | Lagrange multipliers   |
+|                        |                        | for bounds on G,       |
+|                        |                        | initial guess (ng x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+
+>Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLP_SOLVER_X           | x                      | Decision variables at  |
+|                        |                        | the optimal solution   |
+|                        |                        | (nx x 1) .             |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_F           | f                      | Cost function value at |
+|                        |                        | the optimal solution   |
+|                        |                        | (1 x 1) .              |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_G           | g                      | Constraints function   |
+|                        |                        | at the optimal         |
+|                        |                        | solution (ng x 1) .    |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LAM_X       | lam_x                  | Lagrange multipliers   |
+|                        |                        | for bounds on X at the |
+|                        |                        | solution (nx x 1) .    |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LAM_G       | lam_g                  | Lagrange multipliers   |
+|                        |                        | for bounds on G at the |
+|                        |                        | solution (ng x 1) .    |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LAM_P       | lam_p                  | Lagrange multipliers   |
+|                        |                        | for bounds on P at the |
+|                        |                        | solution (np x 1) .    |
++------------------------+------------------------+------------------------+
+
+";
+
+%feature("docstring")  casadi::Function::getSanitizedName() const  "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring")  casadi::NlpSolver::getReducedHessian() "
+
+Get the reduced Hessian. Requires a patched sIPOPT installation, see CasADi
+documentation.
 
 ";
 
@@ -38919,6 +40596,133 @@ adjoint sensitivities, one direction at a time.
 The functions returned are cached, meaning that if called multiple timed
 with the same value, then multiple references to the same function will be
 returned.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind, const std::string
+&oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+const std::string &oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
+a const pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
+pointer to the node.
+
+";
+
+%feature("docstring")  casadi::NlpSolver::setQPOptions() "
+
+Set options that make the NLP solver more suitable for solving QPs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function
+>::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an input scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
 
 ";
 
@@ -38995,6 +40799,13 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
+
+";
+
 %feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
 Access input/output scheme.
 
@@ -39005,17 +40816,22 @@ input/output scheme.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
-const "
-
-Get the number of function inputs.
+%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
+Get the reference count.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
+%feature("docstring")  casadi::NlpSolver::reportConstraints(std::ostream
+&stream=std::cout) "
 
-Get the type of a certain option.
+Prints out a human readable report about possible constraint violations,
+after solving.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
@@ -39111,20 +40927,31 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
-Access input/output scheme.
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
-input/output scheme.
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
 
-Get a single statistic obtained at the end of the last evaluate call.
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
@@ -39137,12 +40964,13 @@ Get the default of a certain option
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInputSX() const  "
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
+[INTERNAL]  Access an output.
 
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
+";
 
-There is no guarantee that consecutive calls return identical objects
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
+const " [INTERNAL]  Const access an output.
 
 ";
 
@@ -39174,43 +41002,29 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function
->::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an output scheme.
+%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
+const "
 
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
+Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::NLPSolver::hessLag() "
+%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
+std::string &str) const  "
 
-Access the Hessian of the Lagrangian function.
-
->Input scheme: casadi::JacGInput (JACG_NUM_IN = 3) [jacGIn]
-+-----------+-------+---------------------+
-| Full name | Short |     Description     |
-+===========+=======+=====================+
-| JACG_X    | x     | Decision variable . |
-+-----------+-------+---------------------+
-| JACG_P    | p     | Fixed parameter .   |
-+-----------+-------+---------------------+
-
->Output scheme: casadi::JacGOutput (JACG_NUM_OUT = 4) [jacGOut]
-+-----------+-------+-------------------------------+
-| Full name | Short |          Description          |
-+===========+=======+===============================+
-| JACG_JAC  | jac   | Jacobian of the constraints . |
-+-----------+-------+-------------------------------+
-| JACG_F    | f     | Objective function .          |
-+-----------+-------+-------------------------------+
-| JACG_G    | g     | Constraint function .         |
-+-----------+-------+-------------------------------+
+check if there is an option str
 
 ";
 
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+std::string &str) const  "
+
+get an option value
 
 ";
 
@@ -39230,10 +41044,9 @@ Get input scheme.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
 
-Copy all options from another object.
+Return a string with a representation (for SWIG)
 
 ";
 
@@ -39244,18 +41057,18 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::NLPSolver "
+%feature("docstring") casadi::NlpSolver "
 
-NLPSolver.
+NlpSolver.
 
 Solves the following parametric nonlinear program (NLP):min          F(x, p)
 x  subject to             LBX <=   x    <= UBX LBG <= G(x, p) <= UBG
 p  == P      nx: number of decision variables     ng: number of constraints
 np: number of parameters
 
-Joel Andersson
+General information
 
->Input scheme: casadi::NLPSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -39293,7 +41106,7 @@ Joel Andersson
 |                        |                        | .                      |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::NLPSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
+>Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -39360,7 +41173,7 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| eval_errors_ | OT_BOOLEAN   | false        | When errors  | casadi::NLPS |
+| eval_errors_ | OT_BOOLEAN   | false        | When errors  | casadi::NlpS |
 | fatal        |              |              | occur during | olverInterna |
 |              |              |              | evaluation   | l            |
 |              |              |              | of           |              |
@@ -39368,7 +41181,7 @@ Joel Andersson
 |              |              |              | the          |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NLPS |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NlpS |
 |              |              |              | NLP function | olverInterna |
 |              |              |              | in terms of  | l            |
 |              |              |              | scalar       |              |
@@ -39382,7 +41195,7 @@ Joel Andersson
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
 |              |              |              | the gradient | l            |
 |              |              |              | of the       |              |
@@ -39391,7 +41204,7 @@ Joel Andersson
 |              |              |              | ogenerated   |              |
 |              |              |              | by default)  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
 |              |              |              | the gradient | l            |
 |              |              |              | of the       |              |
@@ -39400,7 +41213,7 @@ Joel Andersson
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
 |              |              |              | the Hessian  | l            |
 |              |              |              | of the       |              |
@@ -39409,7 +41222,7 @@ Joel Andersson
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NlpS |
 | _vec         |              |              | true, the    | olverInterna |
 |              |              |              | input shape  | l            |
 |              |              |              | of F will    |              |
@@ -39425,7 +41238,7 @@ Joel Andersson
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NLPS |
+| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NlpS |
 | llback       |              | )            | that will be | olverInterna |
 |              |              |              | called at    | l            |
 |              |              |              | each         |              |
@@ -39437,20 +41250,20 @@ Joel Andersson
 |              |              |              | n of         |              |
 |              |              |              | Callback .   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NlpS |
 | llback_ignor |              |              | true, errors | olverInterna |
 | e_errors     |              |              | thrown by it | l            |
 |              |              |              | eration_call |              |
 |              |              |              | back will be |              |
 |              |              |              | ignored.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NLPS |
+| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NlpS |
 | llback_step  |              |              | the callback | olverInterna |
 |              |              |              | function     | l            |
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
 |              |              |              | the jacobian | l            |
 |              |              |              | of the       |              |
@@ -39460,7 +41273,7 @@ Joel Andersson
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NlpS |
 |              |              | )            | calculating  | olverInterna |
 |              |              |              | the Jacobian | l            |
 |              |              |              | of the       |              |
@@ -39500,14 +41313,3802 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NLPS |
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NlpS |
 | _bounds      |              |              | initial      | olverInterna |
 |              |              |              | guess does   | l            |
 |              |              |              | not satisfy  |              |
 |              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_NlpSolver_ipopt'>ipopt</a>
+
+- <a href='#plugin_NlpSolver_knitro'>knitro</a>
+
+- <a href='#plugin_NlpSolver_snopt'>snopt</a>
+
+- <a href='#plugin_NlpSolver_worhp'>worhp</a>
+
+- <a href='#plugin_NlpSolver_scpgen'>scpgen</a>
+
+- <a href='#plugin_NlpSolver_sqpmethod'>sqpmethod</a>
+
+- <a href='#plugin_NlpSolver_stabilizedsqp'>stabilizedsqp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+NlpSolver.doc(\"myextraplugin\")
+
+ipopt
+
+When in warmstart mode, output NLP_SOLVER_LAM_X may be used as input
+
+NOTE: Even when max_iter == 0, it is not guaranteed that
+input(NLP_SOLVER_X0) == output(NLP_SOLVER_X). Indeed if bounds on X or
+constraints are unmet, they will differ.
+
+For a good tutorial on IPOPT,
+seehttp://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf
+
+A good resource about the algorithms in IPOPT is: Wachter and L. T. Biegler,
+On the Implementation of an Interior-Point Filter Line-Search Algorithm for
+Large-Scale Nonlinear Programming, Mathematical Programming 106(1), pp.
+25-57, 2006 (As Research Report RC 23149, IBM T. J. Watson Research Center,
+Yorktown, USA
+
+Caveats: with default options, multipliers for the decision variables are
+wrong for equality constraints. Change the 'fixed_variable_treatment' to
+'make_constraint' or 'relax_bounds' to obtain correct results.
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| accept_after_ma | OT_INTEGER      | -1              | Accept a trial  |
+| x_steps         |                 |                 | point after     |
+|                 |                 |                 | maximal this    |
+|                 |                 |                 | number of       |
+|                 |                 |                 | steps. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| accept_every_tr | OT_STRING       | no              | Always accept   |
+| ial_step        |                 |                 | the first trial |
+|                 |                 |                 | step. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| acceptable_comp | OT_REAL         | 0.010           | \"Acceptance\"    |
+| l_inf_tol       |                 |                 | threshold for   |
+|                 |                 |                 | the             |
+|                 |                 |                 | complementarity |
+|                 |                 |                 | conditions.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| acceptable_cons | OT_REAL         | 0.010           | \"Acceptance\"    |
+| tr_viol_tol     |                 |                 | threshold for   |
+|                 |                 |                 | the constraint  |
+|                 |                 |                 | violation. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| acceptable_dual | OT_REAL         | 1.000e+10       | \"Acceptance\"    |
+| _inf_tol        |                 |                 | threshold for   |
+|                 |                 |                 | the dual        |
+|                 |                 |                 | infeasibility.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| acceptable_iter | OT_INTEGER      | 15              | Number of       |
+|                 |                 |                 | \"acceptable\"    |
+|                 |                 |                 | iterates before |
+|                 |                 |                 | triggering      |
+|                 |                 |                 | termination.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| acceptable_obj_ | OT_REAL         | 1.000e+20       | \"Acceptance\"    |
+| change_tol      |                 |                 | stopping        |
+|                 |                 |                 | criterion based |
+|                 |                 |                 | on objective    |
+|                 |                 |                 | function        |
+|                 |                 |                 | change. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| acceptable_tol  | OT_REAL         | 0.000           | \"Acceptable\"    |
+|                 |                 |                 | convergence     |
+|                 |                 |                 | tolerance       |
+|                 |                 |                 | (relative).     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| adaptive_mu_glo | OT_STRING       | obj-constr-     | Globalization   |
+| balization      |                 | filter          | strategy for    |
+|                 |                 |                 | the adaptive mu |
+|                 |                 |                 | selection mode. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| adaptive_mu_kkt | OT_STRING       | 2-norm-squared  | Norm used for   |
+| _norm_type      |                 |                 | the KKT error   |
+|                 |                 |                 | in the adaptive |
+|                 |                 |                 | mu              |
+|                 |                 |                 | globalization   |
+|                 |                 |                 | strategies.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| adaptive_mu_kkt | OT_REAL         | 1.000           | Sufficient      |
+| error_red_fact  |                 |                 | decrease factor |
+|                 |                 |                 | for \"kkt-error\" |
+|                 |                 |                 | globalization   |
+|                 |                 |                 | strategy. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| adaptive_mu_kkt | OT_INTEGER      | 4               | Maximum number  |
+| error_red_iters |                 |                 | of iterations   |
+|                 |                 |                 | requiring       |
+|                 |                 |                 | sufficient      |
+|                 |                 |                 | progress. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| adaptive_mu_mon | OT_REAL         | 0.800           | Determines the  |
+| otone_init_fact |                 |                 | initial value   |
+| or              |                 |                 | of the barrier  |
+|                 |                 |                 | parameter when  |
+|                 |                 |                 | switching to    |
+|                 |                 |                 | the monotone    |
+|                 |                 |                 | mode. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| adaptive_mu_res | OT_STRING       | no              | Indicates if    |
+| tore_previous_i |                 |                 | the previous    |
+| terate          |                 |                 | iterate should  |
+|                 |                 |                 | be restored if  |
+|                 |                 |                 | the monotone    |
+|                 |                 |                 | mode is         |
+|                 |                 |                 | entered. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| adaptive_mu_saf | OT_REAL         | 0               | (see IPOPT      |
+| eguard_factor   |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| alpha_for_y     | OT_STRING       | primal          | Method to       |
+|                 |                 |                 | determine the   |
+|                 |                 |                 | step size for   |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | multipliers.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| alpha_for_y_tol | OT_REAL         | 10              | Tolerance for   |
+|                 |                 |                 | switching to    |
+|                 |                 |                 | full equality   |
+|                 |                 |                 | multiplier      |
+|                 |                 |                 | steps. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| alpha_min_frac  | OT_REAL         | 0.050           | Safety factor   |
+|                 |                 |                 | for the minimal |
+|                 |                 |                 | step size       |
+|                 |                 |                 | (before         |
+|                 |                 |                 | switching to    |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase). (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| alpha_red_facto | OT_REAL         | 0.500           | Fractional      |
+| r               |                 |                 | reduction of    |
+|                 |                 |                 | the trial step  |
+|                 |                 |                 | size in the     |
+|                 |                 |                 | backtracking    |
+|                 |                 |                 | line search.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| barrier_tol_fac | OT_REAL         | 10              | Factor for mu   |
+| tor             |                 |                 | in barrier stop |
+|                 |                 |                 | test. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| bound_frac      | OT_REAL         | 0.010           | Desired minimum |
+|                 |                 |                 | relative        |
+|                 |                 |                 | distance from   |
+|                 |                 |                 | the initial     |
+|                 |                 |                 | point to bound. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| bound_mult_init | OT_STRING       | constant        | Initialization  |
+| _method         |                 |                 | method for      |
+|                 |                 |                 | bound           |
+|                 |                 |                 | multipliers     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| bound_mult_init | OT_REAL         | 1               | Initial value   |
+| _val            |                 |                 | for the bound   |
+|                 |                 |                 | multipliers.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| bound_mult_rese | OT_REAL         | 1000            | Threshold for   |
+| t_threshold     |                 |                 | resetting bound |
+|                 |                 |                 | multipliers     |
+|                 |                 |                 | after the       |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| bound_push      | OT_REAL         | 0.010           | Desired minimum |
+|                 |                 |                 | absolute        |
+|                 |                 |                 | distance from   |
+|                 |                 |                 | the initial     |
+|                 |                 |                 | point to bound. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| bound_relax_fac | OT_REAL         | 0.000           | Factor for      |
+| tor             |                 |                 | initial         |
+|                 |                 |                 | relaxation of   |
+|                 |                 |                 | the bounds.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| check_derivativ | OT_STRING       | no              | Indicates       |
+| es_for_naninf   |                 |                 | whether it is   |
+|                 |                 |                 | desired to      |
+|                 |                 |                 | check for       |
+|                 |                 |                 | Nan/Inf in      |
+|                 |                 |                 | derivative      |
+|                 |                 |                 | matrices (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| chi_cup         | OT_REAL         | 1.500           | LIFENG WRITES   |
+|                 |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| chi_hat         | OT_REAL         | 2               | LIFENG WRITES   |
+|                 |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| chi_tilde       | OT_REAL         | 5               | LIFENG WRITES   |
+|                 |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| compl_inf_tol   | OT_REAL         | 0.000           | Desired         |
+|                 |                 |                 | threshold for   |
+|                 |                 |                 | the             |
+|                 |                 |                 | complementarity |
+|                 |                 |                 | conditions.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| con_integer_md  | OT_DICTIONARY   | None            | Integer         |
+|                 |                 |                 | metadata (a     |
+|                 |                 |                 | dictionary with |
+|                 |                 |                 | lists of        |
+|                 |                 |                 | integers) about |
+|                 |                 |                 | constraints to  |
+|                 |                 |                 | be passed to    |
+|                 |                 |                 | IPOPT           |
++-----------------+-----------------+-----------------+-----------------+
+| con_numeric_md  | OT_DICTIONARY   | None            | Numeric         |
+|                 |                 |                 | metadata (a     |
+|                 |                 |                 | dictionary with |
+|                 |                 |                 | lists of reals) |
+|                 |                 |                 | about           |
+|                 |                 |                 | constraints to  |
+|                 |                 |                 | be passed to    |
+|                 |                 |                 | IPOPT           |
++-----------------+-----------------+-----------------+-----------------+
+| con_string_md   | OT_DICTIONARY   | None            | String metadata |
+|                 |                 |                 | (a dictionary   |
+|                 |                 |                 | with lists of   |
+|                 |                 |                 | strings) about  |
+|                 |                 |                 | constraints to  |
+|                 |                 |                 | be passed to    |
+|                 |                 |                 | IPOPT           |
++-----------------+-----------------+-----------------+-----------------+
+| constr_mult_ini | OT_REAL         | 1000            | Maximum allowed |
+| t_max           |                 |                 | least-square    |
+|                 |                 |                 | guess of        |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | multipliers.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| constr_mult_res | OT_REAL         | 0               | Threshold for   |
+| et_threshold    |                 |                 | resetting       |
+|                 |                 |                 | equality and    |
+|                 |                 |                 | inequality      |
+|                 |                 |                 | multipliers     |
+|                 |                 |                 | after           |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| constr_viol_tol | OT_REAL         | 0.000           | Desired         |
+|                 |                 |                 | threshold for   |
+|                 |                 |                 | the constraint  |
+|                 |                 |                 | violation. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| constraint_viol | OT_STRING       | 1-norm          | Norm to be used |
+| ation_norm_type |                 |                 | for the         |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | violation in    |
+|                 |                 |                 | the line        |
+|                 |                 |                 | search. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| corrector_compl | OT_REAL         | 1               | Complementarity |
+| _avrg_red_fact  |                 |                 | tolerance       |
+|                 |                 |                 | factor for      |
+|                 |                 |                 | accepting       |
+|                 |                 |                 | corrector step  |
+|                 |                 |                 | (unsupported!). |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| corrector_type  | OT_STRING       | none            | The type of     |
+|                 |                 |                 | corrector steps |
+|                 |                 |                 | that should be  |
+|                 |                 |                 | taken           |
+|                 |                 |                 | (unsupported!). |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| delta           | OT_REAL         | 1               | Multiplier for  |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | violation in    |
+|                 |                 |                 | the switching   |
+|                 |                 |                 | rule. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| delta_y_max     | OT_REAL         | 1.000e+12       | a parameter     |
+|                 |                 |                 | used to check   |
+|                 |                 |                 | if the fast     |
+|                 |                 |                 | direction can   |
+|                 |                 |                 | be used asthe   |
+|                 |                 |                 | line search     |
+|                 |                 |                 | direction (for  |
+|                 |                 |                 | Chen-Goldfarb   |
+|                 |                 |                 | line search).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| dependency_dete | OT_STRING       | no              | Indicates if    |
+| ction_with_rhs  |                 |                 | the right hand  |
+|                 |                 |                 | sides of the    |
+|                 |                 |                 | constraints     |
+|                 |                 |                 | should be       |
+|                 |                 |                 | considered      |
+|                 |                 |                 | during          |
+|                 |                 |                 | dependency      |
+|                 |                 |                 | detection (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| dependency_dete | OT_STRING       | none            | Indicates which |
+| ctor            |                 |                 | linear solver   |
+|                 |                 |                 | should be used  |
+|                 |                 |                 | to detect       |
+|                 |                 |                 | linearly        |
+|                 |                 |                 | dependent       |
+|                 |                 |                 | equality        |
+|                 |                 |                 | constraints.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_test | OT_STRING       | none            | Enable          |
+|                 |                 |                 | derivative      |
+|                 |                 |                 | checker (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_test | OT_INTEGER      | -2              | Index of first  |
+| _first_index    |                 |                 | quantity to be  |
+|                 |                 |                 | checked by      |
+|                 |                 |                 | derivative      |
+|                 |                 |                 | checker (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_test | OT_REAL         | 0.000           | Size of the     |
+| _perturbation   |                 |                 | finite          |
+|                 |                 |                 | difference      |
+|                 |                 |                 | perturbation in |
+|                 |                 |                 | derivative      |
+|                 |                 |                 | test. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_test | OT_STRING       | no              | Indicates       |
+| _print_all      |                 |                 | whether         |
+|                 |                 |                 | information for |
+|                 |                 |                 | all estimated   |
+|                 |                 |                 | derivatives     |
+|                 |                 |                 | should be       |
+|                 |                 |                 | printed. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_test | OT_REAL         | 0.000           | Threshold for   |
+| _tol            |                 |                 | indicating      |
+|                 |                 |                 | wrong           |
+|                 |                 |                 | derivative.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| diverging_itera | OT_REAL         | 1.000e+20       | Threshold for   |
+| tes_tol         |                 |                 | maximal value   |
+|                 |                 |                 | of primal       |
+|                 |                 |                 | iterates. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| dual_inf_tol    | OT_REAL         | 1               | Desired         |
+|                 |                 |                 | threshold for   |
+|                 |                 |                 | the dual        |
+|                 |                 |                 | infeasibility.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| epsilon_c       | OT_REAL         | 0.010           | LIFENG WRITES   |
+|                 |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| eta_min         | OT_REAL         | 10              | LIFENG WRITES   |
+|                 |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| eta_penalty     | OT_REAL         | 0.000           | Relaxation      |
+|                 |                 |                 | factor in the   |
+|                 |                 |                 | Armijo          |
+|                 |                 |                 | condition for   |
+|                 |                 |                 | the penalty     |
+|                 |                 |                 | function. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| eta_phi         | OT_REAL         | 0.000           | Relaxation      |
+|                 |                 |                 | factor in the   |
+|                 |                 |                 | Armijo          |
+|                 |                 |                 | condition. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| evaluate_orig_o | OT_STRING       | yes             | Determines if   |
+| bj_at_resto_tri |                 |                 | the original    |
+| al              |                 |                 | objective       |
+|                 |                 |                 | function should |
+|                 |                 |                 | be evaluated at |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase trial     |
+|                 |                 |                 | points. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| expect_infeasib | OT_STRING       | no              | Enable          |
+| le_problem      |                 |                 | heuristics to   |
+|                 |                 |                 | quickly detect  |
+|                 |                 |                 | an infeasible   |
+|                 |                 |                 | problem. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| expect_infeasib | OT_REAL         | 0.001           | Threshold for   |
+| le_problem_ctol |                 |                 | disabling \"expe |
+|                 |                 |                 | ct_infeasible_p |
+|                 |                 |                 | roblem\" option. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| expect_infeasib | OT_REAL         | 100000000       | Multiplier      |
+| le_problem_ytol |                 |                 | threshold for   |
+|                 |                 |                 | activating \"exp |
+|                 |                 |                 | ect_infeasible_ |
+|                 |                 |                 | problem\"        |
+|                 |                 |                 | option. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| fast_des_fact   | OT_REAL         | 0.100           | a parameter     |
+|                 |                 |                 | used to check   |
+|                 |                 |                 | if the fast     |
+|                 |                 |                 | direction can   |
+|                 |                 |                 | be used asthe   |
+|                 |                 |                 | line search     |
+|                 |                 |                 | direction (for  |
+|                 |                 |                 | Chen-Goldfarb   |
+|                 |                 |                 | line search).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| fast_step_compu | OT_STRING       | no              | Indicates if    |
+| tation          |                 |                 | the linear      |
+|                 |                 |                 | system should   |
+|                 |                 |                 | be solved       |
+|                 |                 |                 | quickly. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| file_print_leve | OT_INTEGER      | 5               | Verbosity level |
+| l               |                 |                 | for output      |
+|                 |                 |                 | file. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| filter_margin_f | OT_REAL         | 0.000           | Factor          |
+| act             |                 |                 | determining     |
+|                 |                 |                 | width of margin |
+|                 |                 |                 | for obj-constr- |
+|                 |                 |                 | filter adaptive |
+|                 |                 |                 | globalization   |
+|                 |                 |                 | strategy. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| filter_max_marg | OT_REAL         | 1               | Maximum width   |
+| in              |                 |                 | of margin in    |
+|                 |                 |                 | obj-constr-     |
+|                 |                 |                 | filter adaptive |
+|                 |                 |                 | globalization   |
+|                 |                 |                 | strategy. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| filter_reset_tr | OT_INTEGER      | 5               | Number of       |
+| igger           |                 |                 | iterations that |
+|                 |                 |                 | trigger the     |
+|                 |                 |                 | filter reset.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| findiff_perturb | OT_REAL         | 0.000           | Size of the     |
+| ation           |                 |                 | finite          |
+|                 |                 |                 | difference      |
+|                 |                 |                 | perturbation    |
+|                 |                 |                 | for derivative  |
+|                 |                 |                 | approximation.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| first_hessian_p | OT_REAL         | 0.000           | Size of first   |
+| erturbation     |                 |                 | x-s             |
+|                 |                 |                 | perturbation    |
+|                 |                 |                 | tried. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| fixed_mu_oracle | OT_STRING       | average_compl   | Oracle for the  |
+|                 |                 |                 | barrier         |
+|                 |                 |                 | parameter when  |
+|                 |                 |                 | switching to    |
+|                 |                 |                 | fixed mode.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| fixed_variable_ | OT_STRING       | make_parameter  | Determines how  |
+| treatment       |                 |                 | fixed variables |
+|                 |                 |                 | should be       |
+|                 |                 |                 | handled. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| gamma_hat       | OT_REAL         | 0.040           | LIFENG WRITES   |
+|                 |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| gamma_phi       | OT_REAL         | 0.000           | Relaxation      |
+|                 |                 |                 | factor in the   |
+|                 |                 |                 | filter margin   |
+|                 |                 |                 | for the barrier |
+|                 |                 |                 | function. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| gamma_theta     | OT_REAL         | 0.000           | Relaxation      |
+|                 |                 |                 | factor in the   |
+|                 |                 |                 | filter margin   |
+|                 |                 |                 | for the         |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | violation. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| gamma_tilde     | OT_REAL         | 4               | LIFENG WRITES   |
+|                 |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| hessian_approxi | OT_STRING       | exact           | Indicates what  |
+| mation          |                 |                 | Hessian         |
+|                 |                 |                 | information is  |
+|                 |                 |                 | to be used.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| hessian_approxi | OT_STRING       | nonlinear-      | Indicates in    |
+| mation_space    |                 | variables       | which subspace  |
+|                 |                 |                 | the Hessian     |
+|                 |                 |                 | information is  |
+|                 |                 |                 | to be           |
+|                 |                 |                 | approximated.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| hessian_constan | OT_STRING       | no              | Indicates       |
+| t               |                 |                 | whether the     |
+|                 |                 |                 | problem is a    |
+|                 |                 |                 | quadratic       |
+|                 |                 |                 | problem (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| honor_original_ | OT_STRING       | yes             | Indicates       |
+| bounds          |                 |                 | whether final   |
+|                 |                 |                 | points should   |
+|                 |                 |                 | be projected    |
+|                 |                 |                 | into original   |
+|                 |                 |                 | bounds. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| inf_pr_output   | OT_STRING       | original        | Determines what |
+|                 |                 |                 | value is        |
+|                 |                 |                 | printed in the  |
+|                 |                 |                 | \"inf_pr\" output |
+|                 |                 |                 | column. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| jac_c_constant  | OT_STRING       | no              | Indicates       |
+|                 |                 |                 | whether all     |
+|                 |                 |                 | equality        |
+|                 |                 |                 | constraints are |
+|                 |                 |                 | linear (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| jac_d_constant  | OT_STRING       | no              | Indicates       |
+|                 |                 |                 | whether all     |
+|                 |                 |                 | inequality      |
+|                 |                 |                 | constraints are |
+|                 |                 |                 | linear (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| jacobian_approx | OT_STRING       | exact           | Specifies       |
+| imation         |                 |                 | technique to    |
+|                 |                 |                 | compute         |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | Jacobian (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| jacobian_regula | OT_REAL         | 0.250           | Exponent for mu |
+| rization_expone |                 |                 | in the          |
+| nt              |                 |                 | regularization  |
+|                 |                 |                 | for rank-       |
+|                 |                 |                 | deficient       |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | Jacobians. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| jacobian_regula | OT_REAL         | 0.000           | Size of the     |
+| rization_value  |                 |                 | regularization  |
+|                 |                 |                 | for rank-       |
+|                 |                 |                 | deficient       |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | Jacobians. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_d         | OT_REAL         | 0.000           | Weight for      |
+|                 |                 |                 | linear damping  |
+|                 |                 |                 | term (to handle |
+|                 |                 |                 | one-sided       |
+|                 |                 |                 | bounds). (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_sigma     | OT_REAL         | 1.000e+10       | Factor limiting |
+|                 |                 |                 | the deviation   |
+|                 |                 |                 | of dual         |
+|                 |                 |                 | variables from  |
+|                 |                 |                 | primal          |
+|                 |                 |                 | estimates. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_soc       | OT_REAL         | 0.990           | Factor in the   |
+|                 |                 |                 | sufficient      |
+|                 |                 |                 | reduction rule  |
+|                 |                 |                 | for second      |
+|                 |                 |                 | order           |
+|                 |                 |                 | correction.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_x_dis     | OT_REAL         | 100             | a parameter     |
+|                 |                 |                 | used to check   |
+|                 |                 |                 | if the fast     |
+|                 |                 |                 | direction can   |
+|                 |                 |                 | be used asthe   |
+|                 |                 |                 | line search     |
+|                 |                 |                 | direction (for  |
+|                 |                 |                 | Chen-Goldfarb   |
+|                 |                 |                 | line search).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| kappa_y_dis     | OT_REAL         | 10000           | a parameter     |
+|                 |                 |                 | used to check   |
+|                 |                 |                 | if the fast     |
+|                 |                 |                 | direction can   |
+|                 |                 |                 | be used asthe   |
+|                 |                 |                 | line search     |
+|                 |                 |                 | direction (for  |
+|                 |                 |                 | Chen-Goldfarb   |
+|                 |                 |                 | line search).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| least_square_in | OT_STRING       | no              | Least square    |
+| it_duals        |                 |                 | initialization  |
+|                 |                 |                 | of all dual     |
+|                 |                 |                 | variables (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| least_square_in | OT_STRING       | no              | Least square    |
+| it_primal       |                 |                 | initialization  |
+|                 |                 |                 | of the primal   |
+|                 |                 |                 | variables (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| limited_memory_ | OT_STRING       | sherman-        | Strategy for    |
+| aug_solver      |                 | morrison        | solving the     |
+|                 |                 |                 | augmented       |
+|                 |                 |                 | system for low- |
+|                 |                 |                 | rank Hessian.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| limited_memory_ | OT_REAL         | 1               | Value for B0 in |
+| init_val        |                 |                 | low-rank        |
+|                 |                 |                 | update. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| limited_memory_ | OT_REAL         | 100000000       | Upper bound on  |
+| init_val_max    |                 |                 | value for B0 in |
+|                 |                 |                 | low-rank        |
+|                 |                 |                 | update. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| limited_memory_ | OT_REAL         | 0.000           | Lower bound on  |
+| init_val_min    |                 |                 | value for B0 in |
+|                 |                 |                 | low-rank        |
+|                 |                 |                 | update. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| limited_memory_ | OT_STRING       | scalar1         | Initialization  |
+| initialization  |                 |                 | strategy for    |
+|                 |                 |                 | the limited     |
+|                 |                 |                 | memory quasi-   |
+|                 |                 |                 | Newton          |
+|                 |                 |                 | approximation.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| limited_memory_ | OT_INTEGER      | 6               | Maximum size of |
+| max_history     |                 |                 | the history for |
+|                 |                 |                 | the limited     |
+|                 |                 |                 | quasi-Newton    |
+|                 |                 |                 | Hessian         |
+|                 |                 |                 | approximation.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| limited_memory_ | OT_INTEGER      | 2               | Threshold for   |
+| max_skipping    |                 |                 | successive      |
+|                 |                 |                 | iterations      |
+|                 |                 |                 | where update is |
+|                 |                 |                 | skipped. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| limited_memory_ | OT_STRING       | no              | Determines if   |
+| special_for_res |                 |                 | the quasi-      |
+| to              |                 |                 | Newton updates  |
+|                 |                 |                 | should be       |
+|                 |                 |                 | special during  |
+|                 |                 |                 | the restoration |
+|                 |                 |                 | phase. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| limited_memory_ | OT_STRING       | bfgs            | Quasi-Newton    |
+| update_type     |                 |                 | update formula  |
+|                 |                 |                 | for the limited |
+|                 |                 |                 | memory          |
+|                 |                 |                 | approximation.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| line_search_met | OT_STRING       | filter          | Globalization   |
+| hod             |                 |                 | method used in  |
+|                 |                 |                 | backtracking    |
+|                 |                 |                 | line search     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_scaling_ | OT_STRING       | yes             | Flag indicating |
+| on_demand       |                 |                 | that linear     |
+|                 |                 |                 | scaling is only |
+|                 |                 |                 | done if it      |
+|                 |                 |                 | seems required. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver   | OT_STRING       | mumps           | Linear solver   |
+|                 |                 |                 | used for step   |
+|                 |                 |                 | computations.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_system_s | OT_STRING       | none            | Method for      |
+| caling          |                 |                 | scaling the     |
+|                 |                 |                 | linear system.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma27_ignore_sin | OT_STRING       | no              | Enables MA27's  |
+| gularity        |                 |                 | ability to      |
+|                 |                 |                 | solve a linear  |
+|                 |                 |                 | system even if  |
+|                 |                 |                 | the matrix is   |
+|                 |                 |                 | singular. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma27_la_init_fa | OT_REAL         | 5               | Real workspace  |
+| ctor            |                 |                 | memory for      |
+|                 |                 |                 | MA27. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma27_liw_init_f | OT_REAL         | 5               | Integer         |
+| actor           |                 |                 | workspace       |
+|                 |                 |                 | memory for      |
+|                 |                 |                 | MA27. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma27_meminc_fac | OT_REAL         | 2               | Increment       |
+| tor             |                 |                 | factor for      |
+|                 |                 |                 | workspace size  |
+|                 |                 |                 | for MA27. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma27_pivtol     | OT_REAL         | 0.000           | Pivot tolerance |
+|                 |                 |                 | for the linear  |
+|                 |                 |                 | solver MA27.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma27_pivtolmax  | OT_REAL         | 0.000           | Maximum pivot   |
+|                 |                 |                 | tolerance for   |
+|                 |                 |                 | the linear      |
+|                 |                 |                 | solver MA27.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma27_skip_inert | OT_STRING       | no              | Always pretend  |
+| ia_check        |                 |                 | inertia is      |
+|                 |                 |                 | correct. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma28_pivtol     | OT_REAL         | 0.010           | Pivot tolerance |
+|                 |                 |                 | for linear      |
+|                 |                 |                 | solver MA28.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma57_automatic_ | OT_STRING       | no              | Controls MA57   |
+| scaling         |                 |                 | automatic       |
+|                 |                 |                 | scaling (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma57_block_size | OT_INTEGER      | 16              | Controls block  |
+|                 |                 |                 | size used by    |
+|                 |                 |                 | Level 3 BLAS in |
+|                 |                 |                 | MA57BD (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma57_node_amalg | OT_INTEGER      | 16              | Node            |
+| amation         |                 |                 | amalgamation    |
+|                 |                 |                 | parameter (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma57_pivot_orde | OT_INTEGER      | 5               | Controls pivot  |
+| r               |                 |                 | order in MA57   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma57_pivtol     | OT_REAL         | 0.000           | Pivot tolerance |
+|                 |                 |                 | for the linear  |
+|                 |                 |                 | solver MA57.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma57_pivtolmax  | OT_REAL         | 0.000           | Maximum pivot   |
+|                 |                 |                 | tolerance for   |
+|                 |                 |                 | the linear      |
+|                 |                 |                 | solver MA57.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma57_pre_alloc  | OT_REAL         | 1.050           | Safety factor   |
+|                 |                 |                 | for work space  |
+|                 |                 |                 | memory          |
+|                 |                 |                 | allocation for  |
+|                 |                 |                 | the linear      |
+|                 |                 |                 | solver MA57.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma57_small_pivo | OT_INTEGER      | 0               | If set to 1,    |
+| t_flag          |                 |                 | then when small |
+|                 |                 |                 | entries defined |
+|                 |                 |                 | by CNTL(2) are  |
+|                 |                 |                 | detected they   |
+|                 |                 |                 | are removed and |
+|                 |                 |                 | the             |
+|                 |                 |                 | corresponding   |
+|                 |                 |                 | pivots placed   |
+|                 |                 |                 | at the end of   |
+|                 |                 |                 | the             |
+|                 |                 |                 | factorization.  |
+|                 |                 |                 | This can be     |
+|                 |                 |                 | particularly    |
+|                 |                 |                 | efficient if    |
+|                 |                 |                 | the matrix is   |
+|                 |                 |                 | highly rank     |
+|                 |                 |                 | deficient. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_buffer_lpa | OT_INTEGER      | 4096            | Number of       |
+| ge              |                 |                 | scalars per     |
+|                 |                 |                 | MA77 buffer     |
+|                 |                 |                 | page (see IPOPT |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_buffer_npa | OT_INTEGER      | 1600            | Number of pages |
+| ge              |                 |                 | that make up    |
+|                 |                 |                 | MA77 buffer     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_file_size  | OT_INTEGER      | 2097152         | Target size of  |
+|                 |                 |                 | each temporary  |
+|                 |                 |                 | file for MA77,  |
+|                 |                 |                 | scalars per     |
+|                 |                 |                 | type (see IPOPT |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_maxstore   | OT_INTEGER      | 0               | Maximum storage |
+|                 |                 |                 | size for MA77   |
+|                 |                 |                 | in-core mode    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_nemin      | OT_INTEGER      | 8               | Node            |
+|                 |                 |                 | Amalgamation    |
+|                 |                 |                 | parameter (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_order      | OT_STRING       | amd             | Controls type   |
+|                 |                 |                 | of ordering     |
+|                 |                 |                 | used by         |
+|                 |                 |                 | HSL_MA77 (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_print_leve | OT_INTEGER      | -1              | Debug printing  |
+| l               |                 |                 | level for the   |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | MA77 (see IPOPT |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_small      | OT_REAL         | 0.000           | Zero Pivot      |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_static     | OT_REAL         | 0               | Static Pivoting |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_u          | OT_REAL         | 0.000           | Pivoting        |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma77_umax       | OT_REAL         | 0.000           | Maximum         |
+|                 |                 |                 | Pivoting        |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma86_nemin      | OT_INTEGER      | 32              | Node            |
+|                 |                 |                 | Amalgamation    |
+|                 |                 |                 | parameter (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma86_order      | OT_STRING       | amd             | Controls type   |
+|                 |                 |                 | of ordering     |
+|                 |                 |                 | used by         |
+|                 |                 |                 | HSL_MA86 (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma86_print_leve | OT_INTEGER      | -1              | Debug printing  |
+| l               |                 |                 | level for the   |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | MA86 (see IPOPT |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma86_scaling    | OT_STRING       | mc64            | Controls        |
+|                 |                 |                 | scaling of      |
+|                 |                 |                 | matrix (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma86_small      | OT_REAL         | 0.000           | Zero Pivot      |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma86_static     | OT_REAL         | 0               | Static Pivoting |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma86_u          | OT_REAL         | 0.000           | Pivoting        |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma86_umax       | OT_REAL         | 0.000           | Maximum         |
+|                 |                 |                 | Pivoting        |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_nemin      | OT_INTEGER      | 8               | Node            |
+|                 |                 |                 | Amalgamation    |
+|                 |                 |                 | parameter (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_order      | OT_STRING       | auto            | Controls type   |
+|                 |                 |                 | of ordering     |
+|                 |                 |                 | used by         |
+|                 |                 |                 | HSL_MA97 (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_print_leve | OT_INTEGER      | 0               | Debug printing  |
+| l               |                 |                 | level for the   |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | MA97 (see IPOPT |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_scaling    | OT_STRING       | dynamic         | Specifies       |
+|                 |                 |                 | strategy for    |
+|                 |                 |                 | scaling in      |
+|                 |                 |                 | HSL_MA97 linear |
+|                 |                 |                 | solver (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_scaling1   | OT_STRING       | mc64            | First scaling.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_scaling2   | OT_STRING       | mc64            | Second scaling. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_scaling3   | OT_STRING       | mc64            | Third scaling.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_small      | OT_REAL         | 0.000           | Zero Pivot      |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_solve_blas | OT_STRING       | no              | Controls if     |
+| 3               |                 |                 | blas2 or blas3  |
+|                 |                 |                 | routines are    |
+|                 |                 |                 | used for solve  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_switch1    | OT_STRING       | od_hd_reuse     | First switch,   |
+|                 |                 |                 | determine when  |
+|                 |                 |                 | ma97_scaling1   |
+|                 |                 |                 | is enabled.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_switch2    | OT_STRING       | never           | Second switch,  |
+|                 |                 |                 | determine when  |
+|                 |                 |                 | ma97_scaling2   |
+|                 |                 |                 | is enabled.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_switch3    | OT_STRING       | never           | Third switch,   |
+|                 |                 |                 | determine when  |
+|                 |                 |                 | ma97_scaling3   |
+|                 |                 |                 | is enabled.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_u          | OT_REAL         | 0.000           | Pivoting        |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| ma97_umax       | OT_REAL         | 0.000           | Maximum         |
+|                 |                 |                 | Pivoting        |
+|                 |                 |                 | Threshold (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| magic_steps     | OT_STRING       | no              | Enables magic   |
+|                 |                 |                 | steps. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| max_cpu_time    | OT_REAL         | 1000000         | Maximum number  |
+|                 |                 |                 | of CPU seconds. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| max_filter_rese | OT_INTEGER      | 5               | Maximal allowed |
+| ts              |                 |                 | number of       |
+|                 |                 |                 | filter resets   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| max_hessian_per | OT_REAL         | 1.000e+20       | Maximum value   |
+| turbation       |                 |                 | of              |
+|                 |                 |                 | regularization  |
+|                 |                 |                 | parameter for   |
+|                 |                 |                 | handling        |
+|                 |                 |                 | negative        |
+|                 |                 |                 | curvature. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| max_iter        | OT_INTEGER      | 3000            | Maximum number  |
+|                 |                 |                 | of iterations.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| max_refinement_ | OT_INTEGER      | 10              | Maximum number  |
+| steps           |                 |                 | of iterative    |
+|                 |                 |                 | refinement      |
+|                 |                 |                 | steps per       |
+|                 |                 |                 | linear system   |
+|                 |                 |                 | solve. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| max_resto_iter  | OT_INTEGER      | 3000000         | Maximum number  |
+|                 |                 |                 | of successive   |
+|                 |                 |                 | iterations in   |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| max_soc         | OT_INTEGER      | 4               | Maximum number  |
+|                 |                 |                 | of second order |
+|                 |                 |                 | correction      |
+|                 |                 |                 | trial steps at  |
+|                 |                 |                 | each iteration. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| max_soft_resto_ | OT_INTEGER      | 10              | Maximum number  |
+| iters           |                 |                 | of iterations   |
+|                 |                 |                 | performed       |
+|                 |                 |                 | successively in |
+|                 |                 |                 | soft            |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mehrotra_algori | OT_STRING       | no              | Indicates if we |
+| thm             |                 |                 | want to do      |
+|                 |                 |                 | Mehrotra's      |
+|                 |                 |                 | algorithm. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| min_alpha_prima | OT_REAL         | 0.000           | LIFENG WRITES   |
+| l               |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| min_hessian_per | OT_REAL         | 0.000           | Smallest        |
+| turbation       |                 |                 | perturbation of |
+|                 |                 |                 | the Hessian     |
+|                 |                 |                 | block. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| min_refinement_ | OT_INTEGER      | 1               | Minimum number  |
+| steps           |                 |                 | of iterative    |
+|                 |                 |                 | refinement      |
+|                 |                 |                 | steps per       |
+|                 |                 |                 | linear system   |
+|                 |                 |                 | solve. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_allow_fast_m | OT_STRING       | yes             | Allow skipping  |
+| onotone_decreas |                 |                 | of barrier      |
+| e               |                 |                 | problem if      |
+|                 |                 |                 | barrier test is |
+|                 |                 |                 | already met.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_init         | OT_REAL         | 0.100           | Initial value   |
+|                 |                 |                 | for the barrier |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_linear_decre | OT_REAL         | 0.200           | Determines      |
+| ase_factor      |                 |                 | linear decrease |
+|                 |                 |                 | rate of barrier |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_max          | OT_REAL         | 100000          | Maximum value   |
+|                 |                 |                 | for barrier     |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_max_fact     | OT_REAL         | 1000            | Factor for      |
+|                 |                 |                 | initialization  |
+|                 |                 |                 | of maximum      |
+|                 |                 |                 | value for       |
+|                 |                 |                 | barrier         |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_min          | OT_REAL         | 0.000           | Minimum value   |
+|                 |                 |                 | for barrier     |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_oracle       | OT_STRING       | quality-        | Oracle for a    |
+|                 |                 | function        | new barrier     |
+|                 |                 |                 | parameter in    |
+|                 |                 |                 | the adaptive    |
+|                 |                 |                 | strategy. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_strategy     | OT_STRING       | monotone        | Update strategy |
+|                 |                 |                 | for barrier     |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_superlinear_ | OT_REAL         | 1.500           | Determines      |
+| decrease_power  |                 |                 | superlinear     |
+|                 |                 |                 | decrease rate   |
+|                 |                 |                 | of barrier      |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mu_target       | OT_REAL         | 0               | Desired value   |
+|                 |                 |                 | of complementar |
+|                 |                 |                 | ity. (see IPOPT |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mult_diverg_fea | OT_REAL         | 0.000           | tolerance for   |
+| sibility_tol    |                 |                 | deciding if the |
+|                 |                 |                 | multipliers are |
+|                 |                 |                 | diverging (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mult_diverg_y_t | OT_REAL         | 100000000       | tolerance for   |
+| ol              |                 |                 | deciding if the |
+|                 |                 |                 | multipliers are |
+|                 |                 |                 | diverging (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mumps_dep_tol   | OT_REAL         | 0               | Pivot threshold |
+|                 |                 |                 | for detection   |
+|                 |                 |                 | of linearly     |
+|                 |                 |                 | dependent       |
+|                 |                 |                 | constraints in  |
+|                 |                 |                 | MUMPS. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mumps_mem_perce | OT_INTEGER      | 1000            | Percentage      |
+| nt              |                 |                 | increase in the |
+|                 |                 |                 | estimated       |
+|                 |                 |                 | working space   |
+|                 |                 |                 | for MUMPS. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mumps_permuting | OT_INTEGER      | 7               | Controls        |
+| _scaling        |                 |                 | permuting and   |
+|                 |                 |                 | scaling in      |
+|                 |                 |                 | MUMPS (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mumps_pivot_ord | OT_INTEGER      | 7               | Controls pivot  |
+| er              |                 |                 | order in MUMPS  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mumps_pivtol    | OT_REAL         | 0.000           | Pivot tolerance |
+|                 |                 |                 | for the linear  |
+|                 |                 |                 | solver MUMPS.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mumps_pivtolmax | OT_REAL         | 0.100           | Maximum pivot   |
+|                 |                 |                 | tolerance for   |
+|                 |                 |                 | the linear      |
+|                 |                 |                 | solver MUMPS.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| mumps_scaling   | OT_INTEGER      | 77              | Controls        |
+|                 |                 |                 | scaling in      |
+|                 |                 |                 | MUMPS (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| neg_curv_test_t | OT_REAL         | 0               | Tolerance for   |
+| ol              |                 |                 | heuristic to    |
+|                 |                 |                 | ignore wrong    |
+|                 |                 |                 | inertia. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| never_use_fact_ | OT_STRING       | no              | Toggle to       |
+| cgpen_direction |                 |                 | switch off the  |
+|                 |                 |                 | fast Chen-      |
+|                 |                 |                 | Goldfarb        |
+|                 |                 |                 | direction (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| never_use_piece | OT_STRING       | no              | Toggle to       |
+| wise_penalty_ls |                 |                 | switch off the  |
+|                 |                 |                 | piecewise       |
+|                 |                 |                 | penalty method  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_lower_bound | OT_REAL         | -1.000e+19      | any bound less  |
+| _inf            |                 |                 | or equal this   |
+|                 |                 |                 | value will be   |
+|                 |                 |                 | considered -inf |
+|                 |                 |                 | (i.e. not lower |
+|                 |                 |                 | bounded). (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_scaling_con | OT_REAL         | 0               | Target value    |
+| str_target_grad |                 |                 | for constraint  |
+| ient            |                 |                 | function        |
+|                 |                 |                 | gradient size.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_scaling_max | OT_REAL         | 100             | Maximum         |
+| _gradient       |                 |                 | gradient after  |
+|                 |                 |                 | NLP scaling.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_scaling_met | OT_STRING       | gradient-based  | Select the      |
+| hod             |                 |                 | technique used  |
+|                 |                 |                 | for scaling the |
+|                 |                 |                 | NLP. (see IPOPT |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_scaling_min | OT_REAL         | 0.000           | Minimum value   |
+| _value          |                 |                 | of gradient-    |
+|                 |                 |                 | based scaling   |
+|                 |                 |                 | values. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_scaling_obj | OT_REAL         | 0               | Target value    |
+| _target_gradien |                 |                 | for objective   |
+| t               |                 |                 | function        |
+|                 |                 |                 | gradient size.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_upper_bound | OT_REAL         | 1.000e+19       | any bound       |
+| _inf            |                 |                 | greater or this |
+|                 |                 |                 | value will be   |
+|                 |                 |                 | considered +inf |
+|                 |                 |                 | (i.e. not upper |
+|                 |                 |                 | bounded). (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| nu_inc          | OT_REAL         | 0.000           | Increment of    |
+|                 |                 |                 | the penalty     |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| nu_init         | OT_REAL         | 0.000           | Initial value   |
+|                 |                 |                 | of the penalty  |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| num_linear_vari | OT_INTEGER      | 0               | Number of       |
+| ables           |                 |                 | linear          |
+|                 |                 |                 | variables (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| obj_max_inc     | OT_REAL         | 5               | Determines the  |
+|                 |                 |                 | upper bound on  |
+|                 |                 |                 | the acceptable  |
+|                 |                 |                 | increase of     |
+|                 |                 |                 | barrier         |
+|                 |                 |                 | objective       |
+|                 |                 |                 | function. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| obj_scaling_fac | OT_REAL         | 1               | Scaling factor  |
+| tor             |                 |                 | for the         |
+|                 |                 |                 | objective       |
+|                 |                 |                 | function. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| option_file_nam | OT_STRING       | ipopt.opt       | File name of    |
+| e               |                 |                 | options file.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| output_file     | OT_STRING       |                 | File name of    |
+|                 |                 |                 | desired output  |
+|                 |                 |                 | file (leave     |
+|                 |                 |                 | unset for no    |
+|                 |                 |                 | file output).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_iter_co | OT_INTEGER      | 5000            | Maximum Size of |
+| arse_size       |                 |                 | Coarse Grid     |
+|                 |                 |                 | Matrix (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_iter_dr | OT_REAL         | 0.500           | dropping value  |
+| opping_factor   |                 |                 | for incomplete  |
+|                 |                 |                 | factor (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_iter_dr | OT_REAL         | 0.100           | dropping value  |
+| opping_schur    |                 |                 | for sparsify    |
+|                 |                 |                 | schur           |
+|                 |                 |                 | complement      |
+|                 |                 |                 | factor (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_iter_in | OT_REAL         | 5000000         | (see IPOPT      |
+| verse_norm_fact |                 |                 | documentation)  |
+| or              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_iter_ma | OT_INTEGER      | 10              | Maximum Size of |
+| x_levels        |                 |                 | Grid Levels     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_iter_ma | OT_INTEGER      | 10000000        | max fill for    |
+| x_row_fill      |                 |                 | each row (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_iter_re | OT_REAL         | 0.000           | Relative        |
+| lative_tol      |                 |                 | Residual        |
+|                 |                 |                 | Convergence     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_iterati | OT_STRING       | no              | Switch on       |
+| ve              |                 |                 | iterative       |
+|                 |                 |                 | solver in       |
+|                 |                 |                 | Pardiso library |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_matchin | OT_STRING       | complete+2x2    | Matching        |
+| g_strategy      |                 |                 | strategy to be  |
+|                 |                 |                 | used by Pardiso |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_max_dro | OT_INTEGER      | 4               | Maximal number  |
+| ptol_correction |                 |                 | of decreases of |
+| s               |                 |                 | drop tolerance  |
+|                 |                 |                 | during one      |
+|                 |                 |                 | solve. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_max_ite | OT_INTEGER      | 500             | Maximum number  |
+| r               |                 |                 | of Krylov-      |
+|                 |                 |                 | Subspace        |
+|                 |                 |                 | Iteration (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_msglvl  | OT_INTEGER      | 0               | Pardiso message |
+|                 |                 |                 | level (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_out_of_ | OT_INTEGER      | 0               | Enables out-of- |
+| core_power      |                 |                 | core variant of |
+|                 |                 |                 | Pardiso (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_redo_sy | OT_STRING       | no              | Toggle for      |
+| mbolic_fact_onl |                 |                 | handling case   |
+| y_if_inertia_wr |                 |                 | when elements   |
+| ong             |                 |                 | were perturbed  |
+|                 |                 |                 | by Pardiso.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_repeate | OT_STRING       | no              | Interpretation  |
+| d_perturbation_ |                 |                 | of perturbed    |
+| means_singular  |                 |                 | elements. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pardiso_skip_in | OT_STRING       | no              | Always pretend  |
+| ertia_check     |                 |                 | inertia is      |
+|                 |                 |                 | correct. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pass_nonlinear_ | OT_BOOLEAN      | False           | n/a             |
+| variables       |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| pen_des_fact    | OT_REAL         | 0.200           | a parameter     |
+|                 |                 |                 | used in penalty |
+|                 |                 |                 | parameter       |
+|                 |                 |                 | computation     |
+|                 |                 |                 | (for Chen-      |
+|                 |                 |                 | Goldfarb line   |
+|                 |                 |                 | search). (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pen_init_fac    | OT_REAL         | 50              | a parameter     |
+|                 |                 |                 | used to choose  |
+|                 |                 |                 | initial penalty |
+|                 |                 |                 | parameterswhen  |
+|                 |                 |                 | the regularized |
+|                 |                 |                 | Newton method   |
+|                 |                 |                 | is used. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| pen_theta_max_f | OT_REAL         | 10000           | Determines      |
+| act             |                 |                 | upper bound for |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | violation in    |
+|                 |                 |                 | the filter.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| penalty_init_ma | OT_REAL         | 100000          | Maximal value   |
+| x               |                 |                 | for the intial  |
+|                 |                 |                 | penalty         |
+|                 |                 |                 | parameter (for  |
+|                 |                 |                 | Chen-Goldfarb   |
+|                 |                 |                 | line search).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| penalty_init_mi | OT_REAL         | 1               | Minimal value   |
+| n               |                 |                 | for the intial  |
+|                 |                 |                 | penalty         |
+|                 |                 |                 | parameter for   |
+|                 |                 |                 | line search(for |
+|                 |                 |                 | Chen-Goldfarb   |
+|                 |                 |                 | line search).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| penalty_max     | OT_REAL         | 1.000e+30       | Maximal value   |
+|                 |                 |                 | for the penalty |
+|                 |                 |                 | parameter (for  |
+|                 |                 |                 | Chen-Goldfarb   |
+|                 |                 |                 | line search).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| penalty_update_ | OT_REAL         | 10              | LIFENG WRITES   |
+| compl_tol       |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| penalty_update_ | OT_REAL         | 0.000           | Threshold for   |
+| infeasibility_t |                 |                 | infeasibility   |
+| ol              |                 |                 | in penalty      |
+|                 |                 |                 | parameter       |
+|                 |                 |                 | update test.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| perturb_always_ | OT_STRING       | no              | Active          |
+| cd              |                 |                 | permanent       |
+|                 |                 |                 | perturbation of |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | linearization.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| perturb_dec_fac | OT_REAL         | 0.333           | Decrease factor |
+| t               |                 |                 | for x-s         |
+|                 |                 |                 | perturbation.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| perturb_inc_fac | OT_REAL         | 8               | Increase factor |
+| t               |                 |                 | for x-s         |
+|                 |                 |                 | perturbation.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| perturb_inc_fac | OT_REAL         | 100             | Increase factor |
+| t_first         |                 |                 | for x-s         |
+|                 |                 |                 | perturbation    |
+|                 |                 |                 | for very first  |
+|                 |                 |                 | perturbation.   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| piecewisepenalt | OT_REAL         | 0.000           | LIFENG WRITES   |
+| y_gamma_infeasi |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| piecewisepenalt | OT_REAL         | 0.000           | LIFENG WRITES   |
+| y_gamma_obj     |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| point_perturbat | OT_REAL         | 10              | Maximal         |
+| ion_radius      |                 |                 | perturbation of |
+|                 |                 |                 | an evaluation   |
+|                 |                 |                 | point. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| print_frequency | OT_INTEGER      | 1               | Determines at   |
+| _iter           |                 |                 | which iteration |
+|                 |                 |                 | frequency the   |
+|                 |                 |                 | summarizing     |
+|                 |                 |                 | iteration       |
+|                 |                 |                 | output line     |
+|                 |                 |                 | should be       |
+|                 |                 |                 | printed. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| print_frequency | OT_REAL         | 0               | Determines at   |
+| _time           |                 |                 | which time      |
+|                 |                 |                 | frequency the   |
+|                 |                 |                 | summarizing     |
+|                 |                 |                 | iteration       |
+|                 |                 |                 | output line     |
+|                 |                 |                 | should be       |
+|                 |                 |                 | printed. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| print_info_stri | OT_STRING       | no              | Enables         |
+| ng              |                 |                 | printing of     |
+|                 |                 |                 | additional info |
+|                 |                 |                 | string at end   |
+|                 |                 |                 | of iteration    |
+|                 |                 |                 | output. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| print_level     | OT_INTEGER      | 5               | Output          |
+|                 |                 |                 | verbosity       |
+|                 |                 |                 | level. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| print_options_d | OT_STRING       | no              | Switch to print |
+| ocumentation    |                 |                 | all algorithmic |
+|                 |                 |                 | options. (see   |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| print_options_l | OT_STRING       | no              | Undocumented    |
+| atex_mode       |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOLEAN      | True            | print           |
+|                 |                 |                 | information     |
+|                 |                 |                 | about execution |
+|                 |                 |                 | time            |
++-----------------+-----------------+-----------------+-----------------+
+| print_timing_st | OT_STRING       | no              | Switch to print |
+| atistics        |                 |                 | timing          |
+|                 |                 |                 | statistics.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| print_user_opti | OT_STRING       | no              | Print all       |
+| ons             |                 |                 | options set by  |
+|                 |                 |                 | the user. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| quality_functio | OT_STRING       | none            | The balancing   |
+| n_balancing_ter |                 |                 | term included   |
+| m               |                 |                 | in the quality  |
+|                 |                 |                 | function for    |
+|                 |                 |                 | centrality.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| quality_functio | OT_STRING       | none            | The penalty     |
+| n_centrality    |                 |                 | term for        |
+|                 |                 |                 | centrality that |
+|                 |                 |                 | is included in  |
+|                 |                 |                 | quality         |
+|                 |                 |                 | function. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| quality_functio | OT_INTEGER      | 8               | Maximum number  |
+| n_max_section_s |                 |                 | of search steps |
+| teps            |                 |                 | during direct   |
+|                 |                 |                 | search          |
+|                 |                 |                 | procedure       |
+|                 |                 |                 | determining the |
+|                 |                 |                 | optimal         |
+|                 |                 |                 | centering       |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| quality_functio | OT_STRING       | 2-norm-squared  | Norm used for   |
+| n_norm_type     |                 |                 | components of   |
+|                 |                 |                 | the quality     |
+|                 |                 |                 | function. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| quality_functio | OT_REAL         | 0               | Tolerance for   |
+| n_section_qf_to |                 |                 | the golden      |
+| l               |                 |                 | section search  |
+|                 |                 |                 | procedure       |
+|                 |                 |                 | determining the |
+|                 |                 |                 | optimal         |
+|                 |                 |                 | centering       |
+|                 |                 |                 | parameter (in   |
+|                 |                 |                 | the function    |
+|                 |                 |                 | value space).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| quality_functio | OT_REAL         | 0.010           | Tolerance for   |
+| n_section_sigma |                 |                 | the section     |
+| _tol            |                 |                 | search          |
+|                 |                 |                 | procedure       |
+|                 |                 |                 | determining the |
+|                 |                 |                 | optimal         |
+|                 |                 |                 | centering       |
+|                 |                 |                 | parameter (in   |
+|                 |                 |                 | sigma space).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| recalc_y        | OT_STRING       | no              | Tells the       |
+|                 |                 |                 | algorithm to    |
+|                 |                 |                 | recalculate the |
+|                 |                 |                 | equality and    |
+|                 |                 |                 | inequality      |
+|                 |                 |                 | multipliers as  |
+|                 |                 |                 | least square    |
+|                 |                 |                 | estimates. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| recalc_y_feas_t | OT_REAL         | 0.000           | Feasibility     |
+| ol              |                 |                 | threshold for   |
+|                 |                 |                 | recomputation   |
+|                 |                 |                 | of multipliers. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| replace_bounds  | OT_STRING       | no              | Indicates if    |
+|                 |                 |                 | all variable    |
+|                 |                 |                 | bounds should   |
+|                 |                 |                 | be replaced by  |
+|                 |                 |                 | inequality      |
+|                 |                 |                 | constraints     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| required_infeas | OT_REAL         | 0.900           | Required        |
+| ibility_reducti |                 |                 | reduction of    |
+| on              |                 |                 | infeasibility   |
+|                 |                 |                 | before leaving  |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| residual_improv | OT_REAL         | 1.000           | Minimal         |
+| ement_factor    |                 |                 | required        |
+|                 |                 |                 | reduction of    |
+|                 |                 |                 | residual test   |
+|                 |                 |                 | ratio in        |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | refinement.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| residual_ratio_ | OT_REAL         | 0.000           | Iterative       |
+| max             |                 |                 | refinement      |
+|                 |                 |                 | tolerance (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| residual_ratio_ | OT_REAL         | 0.000           | Threshold for   |
+| singular        |                 |                 | declaring       |
+|                 |                 |                 | linear system   |
+|                 |                 |                 | singular after  |
+|                 |                 |                 | failed          |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | refinement.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| resto_failure_f | OT_REAL         | 0               | Threshold for   |
+| easibility_thre |                 |                 | primal          |
+| shold           |                 |                 | infeasibility   |
+|                 |                 |                 | to declare      |
+|                 |                 |                 | failure of      |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| resto_penalty_p | OT_REAL         | 1000            | Penalty         |
+| arameter        |                 |                 | parameter in    |
+|                 |                 |                 | the restoration |
+|                 |                 |                 | phase objective |
+|                 |                 |                 | function. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| resto_proximity | OT_REAL         | 1               | Weighting       |
+| _weight         |                 |                 | factor for the  |
+|                 |                 |                 | proximity term  |
+|                 |                 |                 | in restoration  |
+|                 |                 |                 | phase           |
+|                 |                 |                 | objective. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| rho             | OT_REAL         | 0.100           | Value in        |
+|                 |                 |                 | penalty         |
+|                 |                 |                 | parameter       |
+|                 |                 |                 | update formula. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| s_max           | OT_REAL         | 100             | Scaling         |
+|                 |                 |                 | threshold for   |
+|                 |                 |                 | the NLP error.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| s_phi           | OT_REAL         | 2.300           | Exponent for    |
+|                 |                 |                 | linear barrier  |
+|                 |                 |                 | function model  |
+|                 |                 |                 | in the          |
+|                 |                 |                 | switching rule. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| s_theta         | OT_REAL         | 1.100           | Exponent for    |
+|                 |                 |                 | current         |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | violation in    |
+|                 |                 |                 | the switching   |
+|                 |                 |                 | rule. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| sb              | OT_STRING       | no              | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| sigma_max       | OT_REAL         | 100             | Maximum value   |
+|                 |                 |                 | of the          |
+|                 |                 |                 | centering       |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| sigma_min       | OT_REAL         | 0.000           | Minimum value   |
+|                 |                 |                 | of the          |
+|                 |                 |                 | centering       |
+|                 |                 |                 | parameter. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| skip_corr_if_ne | OT_STRING       | yes             | Skip the        |
+| g_curv          |                 |                 | corrector step  |
+|                 |                 |                 | in negative     |
+|                 |                 |                 | curvature       |
+|                 |                 |                 | iteration       |
+|                 |                 |                 | (unsupported!). |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| skip_corr_in_mo | OT_STRING       | yes             | Skip the        |
+| notone_mode     |                 |                 | corrector step  |
+|                 |                 |                 | during monotone |
+|                 |                 |                 | barrier         |
+|                 |                 |                 | parameter mode  |
+|                 |                 |                 | (unsupported!). |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| skip_finalize_s | OT_STRING       | no              | Indicates if    |
+| olution_call    |                 |                 | call to NLP::Fi |
+|                 |                 |                 | nalizeSolution  |
+|                 |                 |                 | after           |
+|                 |                 |                 | optimization    |
+|                 |                 |                 | should be       |
+|                 |                 |                 | suppressed (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| slack_bound_fra | OT_REAL         | 0.010           | Desired minimum |
+| c               |                 |                 | relative        |
+|                 |                 |                 | distance from   |
+|                 |                 |                 | the initial     |
+|                 |                 |                 | slack to bound. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| slack_bound_pus | OT_REAL         | 0.010           | Desired minimum |
+| h               |                 |                 | absolute        |
+|                 |                 |                 | distance from   |
+|                 |                 |                 | the initial     |
+|                 |                 |                 | slack to bound. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| slack_move      | OT_REAL         | 0.000           | Correction size |
+|                 |                 |                 | for very small  |
+|                 |                 |                 | slacks. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| soft_resto_pder | OT_REAL         | 1.000           | Required        |
+| ror_reduction_f |                 |                 | reduction in    |
+| actor           |                 |                 | primal-dual     |
+|                 |                 |                 | error in the    |
+|                 |                 |                 | soft            |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| start_with_rest | OT_STRING       | no              | Tells algorithm |
+| o               |                 |                 | to switch to    |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | phase in first  |
+|                 |                 |                 | iteration. (see |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| suppress_all_ou | OT_STRING       | no              | Undocumented    |
+| tput            |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| tau_min         | OT_REAL         | 0.990           | Lower bound on  |
+|                 |                 |                 | fraction-to-    |
+|                 |                 |                 | the-boundary    |
+|                 |                 |                 | parameter tau.  |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| theta_max_fact  | OT_REAL         | 10000           | Determines      |
+|                 |                 |                 | upper bound for |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | violation in    |
+|                 |                 |                 | the filter.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| theta_min       | OT_REAL         | 0.000           | LIFENG WRITES   |
+|                 |                 |                 | THIS. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| theta_min_fact  | OT_REAL         | 0.000           | Determines      |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | violation       |
+|                 |                 |                 | threshold in    |
+|                 |                 |                 | the switching   |
+|                 |                 |                 | rule. (see      |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| tiny_step_tol   | OT_REAL         | 0.000           | Tolerance for   |
+|                 |                 |                 | detecting       |
+|                 |                 |                 | numerically     |
+|                 |                 |                 | insignificant   |
+|                 |                 |                 | steps. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| tiny_step_y_tol | OT_REAL         | 0.010           | Tolerance for   |
+|                 |                 |                 | quitting        |
+|                 |                 |                 | because of      |
+|                 |                 |                 | numerically     |
+|                 |                 |                 | insignificant   |
+|                 |                 |                 | steps. (see     |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| tol             | OT_REAL         | 0.000           | Desired         |
+|                 |                 |                 | convergence     |
+|                 |                 |                 | tolerance       |
+|                 |                 |                 | (relative).     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| var_integer_md  | OT_DICTIONARY   | None            | Integer         |
+|                 |                 |                 | metadata (a     |
+|                 |                 |                 | dictionary with |
+|                 |                 |                 | lists of        |
+|                 |                 |                 | integers) about |
+|                 |                 |                 | variables to be |
+|                 |                 |                 | passed to IPOPT |
++-----------------+-----------------+-----------------+-----------------+
+| var_numeric_md  | OT_DICTIONARY   | None            | Numeric         |
+|                 |                 |                 | metadata (a     |
+|                 |                 |                 | dictionary with |
+|                 |                 |                 | lists of reals) |
+|                 |                 |                 | about variables |
+|                 |                 |                 | to be passed to |
+|                 |                 |                 | IPOPT           |
++-----------------+-----------------+-----------------+-----------------+
+| var_string_md   | OT_DICTIONARY   | None            | String metadata |
+|                 |                 |                 | (a dictionary   |
+|                 |                 |                 | with lists of   |
+|                 |                 |                 | strings) about  |
+|                 |                 |                 | variables to be |
+|                 |                 |                 | passed to IPOPT |
++-----------------+-----------------+-----------------+-----------------+
+| vartheta        | OT_REAL         | 0.500           | a parameter     |
+|                 |                 |                 | used to check   |
+|                 |                 |                 | if the fast     |
+|                 |                 |                 | direction can   |
+|                 |                 |                 | be used asthe   |
+|                 |                 |                 | line search     |
+|                 |                 |                 | direction (for  |
+|                 |                 |                 | Chen-Goldfarb   |
+|                 |                 |                 | line search).   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_boun | OT_REAL         | 0.001           | same as         |
+| d_frac          |                 |                 | bound_frac for  |
+|                 |                 |                 | the regular     |
+|                 |                 |                 | initializer.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_boun | OT_REAL         | 0.001           | same as         |
+| d_push          |                 |                 | bound_push for  |
+|                 |                 |                 | the regular     |
+|                 |                 |                 | initializer.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_enti | OT_STRING       | no              | Tells algorithm |
+| re_iterate      |                 |                 | whether to use  |
+|                 |                 |                 | the GetWarmStar |
+|                 |                 |                 | tIterate method |
+|                 |                 |                 | in the NLP.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_init | OT_STRING       | no              | Warm-start for  |
+| _point          |                 |                 | initial point   |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_mult | OT_REAL         | 0.001           | same as         |
+| _bound_push     |                 |                 | mult_bound_push |
+|                 |                 |                 | for the regular |
+|                 |                 |                 | initializer.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_mult | OT_REAL         | 1000000         | Maximum initial |
+| _init_max       |                 |                 | value for the   |
+|                 |                 |                 | equality        |
+|                 |                 |                 | multipliers.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_same | OT_STRING       | no              | Indicates       |
+| _structure      |                 |                 | whether a       |
+|                 |                 |                 | problem with a  |
+|                 |                 |                 | structure       |
+|                 |                 |                 | identical to    |
+|                 |                 |                 | the previous    |
+|                 |                 |                 | one is to be    |
+|                 |                 |                 | solved. (see    |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_slac | OT_REAL         | 0.001           | same as slack_b |
+| k_bound_frac    |                 |                 | ound_frac for   |
+|                 |                 |                 | the regular     |
+|                 |                 |                 | initializer.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_slac | OT_REAL         | 0.001           | same as slack_b |
+| k_bound_push    |                 |                 | ound_push for   |
+|                 |                 |                 | the regular     |
+|                 |                 |                 | initializer.    |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start_targ | OT_REAL         | 0               | Unsupported!    |
+| et_mu           |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| watchdog_shorte | OT_INTEGER      | 10              | Number of       |
+| ned_iter_trigge |                 |                 | shortened       |
+| r               |                 |                 | iterations that |
+|                 |                 |                 | trigger the     |
+|                 |                 |                 | watchdog. (see  |
+|                 |                 |                 | IPOPT           |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| watchdog_trial_ | OT_INTEGER      | 3               | Maximum number  |
+| iter_max        |                 |                 | of watchdog     |
+|                 |                 |                 | iterations.     |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+| wsmp_iterative  | OT_STRING       | no              | Switches to     |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | solver in WSMP. |
+|                 |                 |                 | (see IPOPT      |
+|                 |                 |                 | documentation)  |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++-------------+
+|     Id      |
++=============+
+| eval_f      |
++-------------+
+| eval_g      |
++-------------+
+| eval_grad_f |
++-------------+
+| eval_h      |
++-------------+
+| eval_jac_g  |
++-------------+
+
+>List of available stats
++--------------------+
+|         Id         |
++====================+
+| con_integer_md     |
++--------------------+
+| con_numeric_md     |
++--------------------+
+| con_string_md      |
++--------------------+
+| iter_count         |
++--------------------+
+| iteration          |
++--------------------+
+| iterations         |
++--------------------+
+| n_eval_f           |
++--------------------+
+| n_eval_g           |
++--------------------+
+| n_eval_grad_f      |
++--------------------+
+| n_eval_h           |
++--------------------+
+| n_eval_jac_g       |
++--------------------+
+| return_status      |
++--------------------+
+| t_callback_fun     |
++--------------------+
+| t_callback_prepare |
++--------------------+
+| t_eval_f           |
++--------------------+
+| t_eval_g           |
++--------------------+
+| t_eval_grad_f      |
++--------------------+
+| t_eval_h           |
++--------------------+
+| t_eval_jac_g       |
++--------------------+
+| t_mainloop         |
++--------------------+
+| var_integer_md     |
++--------------------+
+| var_numeric_md     |
++--------------------+
+| var_string_md      |
++--------------------+
+
+knitro
+
+KNITRO interface
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| BarRule         | OT_INTEGER      | 0               | Barrier Rule    |
++-----------------+-----------------+-----------------+-----------------+
+| Debug           | OT_INTEGER      | 0               | Debug level     |
++-----------------+-----------------+-----------------+-----------------+
+| Delta           | OT_REAL         | 1               | Initial region  |
+|                 |                 |                 | scaling factor  |
++-----------------+-----------------+-----------------+-----------------+
+| FeasModeTol     | OT_REAL         | 0.000           | Feasible mode   |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| FeasTol         | OT_REAL         | 0.000           | Feasible        |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| FeasTolAbs      | OT_REAL         | 1               | Absolute        |
+|                 |                 |                 | feasible        |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| Feasible        | OT_BOOLEAN      | 0               | Allow           |
+|                 |                 |                 | infeasible      |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| GradOpt         | OT_INTEGER      | 1               | Gradient        |
+|                 |                 |                 | calculation     |
+|                 |                 |                 | method          |
++-----------------+-----------------+-----------------+-----------------+
+| HessOpt         | OT_INTEGER      | 1               | Hessian         |
+|                 |                 |                 | calculation     |
+|                 |                 |                 | method          |
++-----------------+-----------------+-----------------+-----------------+
+| HonorBnds       | OT_BOOLEAN      | 0               | Enforce bounds  |
++-----------------+-----------------+-----------------+-----------------+
+| InitPt          | OT_BOOLEAN      | 0               | Use initial     |
+|                 |                 |                 | point strategy  |
++-----------------+-----------------+-----------------+-----------------+
+| LmSize          | OT_INTEGER      | 10              | Memory pairsize |
+|                 |                 |                 | limit           |
++-----------------+-----------------+-----------------+-----------------+
+| LpSolver        | OT_BOOLEAN      | 0               | Use LpSolver    |
++-----------------+-----------------+-----------------+-----------------+
+| MaxCgIt         | OT_INTEGER      | 0               | Maximum         |
+|                 |                 |                 | conjugate       |
+|                 |                 |                 | gradient        |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| MaxIt           | OT_INTEGER      | 10000           | Iteration limit |
++-----------------+-----------------+-----------------+-----------------+
+| Mu              | OT_REAL         | 0.100           | Initial barrier |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| Multistart      | OT_BOOLEAN      | 0               | Use multistart  |
++-----------------+-----------------+-----------------+-----------------+
+| NewPoint        | OT_BOOLEAN      | 0               | Select new-     |
+|                 |                 |                 | point feature   |
++-----------------+-----------------+-----------------+-----------------+
+| ObjRange        | OT_REAL         | 0.000           | Maximum         |
+|                 |                 |                 | objective value |
++-----------------+-----------------+-----------------+-----------------+
+| OptTol          | OT_REAL         | 0.000           | Relative        |
+|                 |                 |                 | optimality      |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| OptTolAbs       | OT_REAL         | 0               | Absolute        |
+|                 |                 |                 | optimality      |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| OutLev          | OT_INTEGER      | 2               | Log output      |
+|                 |                 |                 | level           |
++-----------------+-----------------+-----------------+-----------------+
+| Pivot           | OT_REAL         | 0.000           | Initial pivot   |
+|                 |                 |                 | threshold       |
++-----------------+-----------------+-----------------+-----------------+
+| Scale           | OT_BOOLEAN      | 1               | Perform scaling |
++-----------------+-----------------+-----------------+-----------------+
+| ShiftInit       | OT_BOOLEAN      | 1               | Interior-point  |
+|                 |                 |                 | shifting        |
+|                 |                 |                 | initial point   |
++-----------------+-----------------+-----------------+-----------------+
+| Soc             | OT_INTEGER      | 1               | Second order    |
+|                 |                 |                 | correction      |
++-----------------+-----------------+-----------------+-----------------+
+| XTol            | OT_REAL         | 0.000           | Relative        |
+|                 |                 |                 | solution change |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| contype         | OT_INTEGERVECTO |                 |                 |
+|                 | R               |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++-------------+
+|     Id      |
++=============+
+| eval_f      |
++-------------+
+| eval_g      |
++-------------+
+| eval_grad_f |
++-------------+
+| eval_h      |
++-------------+
+| eval_jac_g  |
++-------------+
+
+snopt
+
+SNOPT interface
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| _feasibility_to | OT_REAL         | None            | Feasibility     |
+| lerance         |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| _iprint         | OT_INTEGER      | 0               | n/a             |
++-----------------+-----------------+-----------------+-----------------+
+| _isumm          | OT_INTEGER      | 6               | n/a             |
++-----------------+-----------------+-----------------+-----------------+
+| _major_iteratio | OT_INTEGER      | None            | Major iteration |
+| n_limit         |                 |                 | limit           |
++-----------------+-----------------+-----------------+-----------------+
+| _minor_iteratio | OT_INTEGER      | None            | Minor iteration |
+| n_limit         |                 |                 | limit           |
++-----------------+-----------------+-----------------+-----------------+
+| _optimality_tol | OT_REAL         | None            | Optimality      |
+| erance          |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| _scale_option   | OT_INTEGER      | None            | Scale option    |
++-----------------+-----------------+-----------------+-----------------+
+| _start          | OT_STRING       | Cold            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| _verify_level   | OT_INTEGER      | None            | Verify level    |
++-----------------+-----------------+-----------------+-----------------+
+| detect_linear   | OT_BOOLEAN      | True            | Make an effort  |
+|                 |                 |                 | to treat linear |
+|                 |                 |                 | constraints and |
+|                 |                 |                 | linear          |
+|                 |                 |                 | variables       |
+|                 |                 |                 | specially.      |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOLEAN      | True            | print           |
+|                 |                 |                 | information     |
+|                 |                 |                 | about execution |
+|                 |                 |                 | time            |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++-----------+
+|    Id     |
++===========+
+| eval_nlp  |
++-----------+
+| setup_nlp |
++-----------+
+
+>List of available stats
++----------------+
+|       Id       |
++================+
+| iter_count     |
++----------------+
+| iterations     |
++----------------+
+| n_callback_fun |
++----------------+
+| n_eval_grad_f  |
++----------------+
+| n_eval_jac_g   |
++----------------+
+| return_status  |
++----------------+
+| t_callback_fun |
++----------------+
+| t_eval_grad_f  |
++----------------+
+| t_eval_jac_g   |
++----------------+
+| t_mainloop     |
++----------------+
+
+worhp
+
+WORHP interface
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| AcceptTolFeas   | OT_REAL         | 0.001           | Tolerance for   |
+|                 |                 |                 | acceptable      |
+|                 |                 |                 | feasibility     |
++-----------------+-----------------+-----------------+-----------------+
+| AcceptTolOpti   | OT_REAL         | 0.001           | Tolerance for   |
+|                 |                 |                 | acceptable      |
+|                 |                 |                 | optimality      |
++-----------------+-----------------+-----------------+-----------------+
+| AlphaMinConst   | OT_BOOLEAN      | False           | Use a constant  |
+|                 |                 |                 | lower bound on  |
+|                 |                 |                 | Armijo stepsize |
+|                 |                 |                 | in Filter       |
++-----------------+-----------------+-----------------+-----------------+
+| Ares            | OT_INTEGERVECTO | [42, 41, 42,    | Armijo recovery |
+|                 | R               | 43, 44, 41, 50] | strategies.     |
+|                 |                 |                 | Vector of size  |
+|                 |                 |                 | 7               |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoBeta      | OT_REAL         | 0.712           | Trial stepsize  |
+|                 |                 |                 | decrease factor |
+|                 |                 |                 | for Armijo rule |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoMaxAlpha  | OT_REAL         | 1               | Initial alpha   |
+|                 |                 |                 | for Armijo rule |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoMinAlpha  | OT_REAL         | 0.000           | Lower bound on  |
+|                 |                 |                 | alpha for       |
+|                 |                 |                 | Armijo rule     |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoMinAlphaR | OT_REAL         | 0.000           | Lower bound on  |
+| ec              |                 |                 | alpha for       |
+|                 |                 |                 | Armijo rule     |
+|                 |                 |                 | during recovery |
++-----------------+-----------------+-----------------+-----------------+
+| ArmijoSigma     | OT_REAL         | 0.005           | Scale factor    |
+|                 |                 |                 | for linearised  |
+|                 |                 |                 | descent check   |
+|                 |                 |                 | in Armijo rule  |
++-----------------+-----------------+-----------------+-----------------+
+| AutoQPRecovery  | OT_BOOLEAN      | True            | Enable          |
+|                 |                 |                 | automatic QP    |
+|                 |                 |                 | recovery        |
++-----------------+-----------------+-----------------+-----------------+
+| BFGSmaxblockSiz | OT_INTEGER      | 300             | Block size      |
+| e               |                 |                 | parameter used  |
+|                 |                 |                 | by certain BFGS |
+|                 |                 |                 | methods         |
++-----------------+-----------------+-----------------+-----------------+
+| BFGSmethod      | OT_INTEGER      | 0               | Choose BFGS     |
+|                 |                 |                 | method (0:      |
+|                 |                 |                 | dense, 1-3:     |
+|                 |                 |                 | block, 100+:    |
+|                 |                 |                 | sparse)         |
++-----------------+-----------------+-----------------+-----------------+
+| BFGSminblockSiz | OT_INTEGER      | 300             | Block size      |
+| e               |                 |                 | parameter used  |
+|                 |                 |                 | by certain BFGS |
+|                 |                 |                 | methods         |
++-----------------+-----------------+-----------------+-----------------+
+| BFGSrestart     | OT_INTEGER      | 50              | Restart BFGS    |
+|                 |                 |                 | update after    |
+|                 |                 |                 | this many       |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| BettsFactor     | OT_REAL         | 2.100           | Update factor   |
+|                 |                 |                 | for Betts'      |
+|                 |                 |                 | Hessian         |
+|                 |                 |                 | regularisation  |
++-----------------+-----------------+-----------------+-----------------+
+| BettsPoint      | OT_REAL         | 1               | Smallest        |
+|                 |                 |                 | eigenvalue of   |
+|                 |                 |                 | the regularised |
+|                 |                 |                 | Hessian         |
++-----------------+-----------------+-----------------+-----------------+
+| BoundTolFac     | OT_REAL         | 1000            | Factor in       |
+|                 |                 |                 | determining     |
+|                 |                 |                 | active          |
+|                 |                 |                 | constraints by  |
+|                 |                 |                 | KKT             |
++-----------------+-----------------+-----------------+-----------------+
+| CheckFJ         | OT_REAL         | 1.000e+12       | Upper bound     |
+|                 |                 |                 | used by Fritz-  |
+|                 |                 |                 | John heuristic  |
++-----------------+-----------------+-----------------+-----------------+
+| CheckStructureD | OT_BOOLEAN      | True            | Enable          |
+| F               |                 |                 | structural      |
+|                 |                 |                 | checking of DF  |
++-----------------+-----------------+-----------------+-----------------+
+| CheckStructureD | OT_BOOLEAN      | True            | Enable          |
+| G               |                 |                 | structural      |
+|                 |                 |                 | checking of DG  |
++-----------------+-----------------+-----------------+-----------------+
+| CheckStructureH | OT_BOOLEAN      | True            | Enable          |
+| M               |                 |                 | structural      |
+|                 |                 |                 | checking of HM  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepBettsSum | OT_REAL         | 0.500           | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepConStop  | OT_REAL         | 0.000           | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepConvio   | OT_REAL         | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepMaxIter  | OT_INTEGER      | 50              | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepMethod   | OT_INTEGER      | 0               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepMode     | OT_INTEGER      | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepPFactor  | OT_REAL         | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepPMax     | OT_REAL         | 1000000         | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| CorStepRecovery | OT_BOOLEAN      | False           | (experimental)  |
+| DX              |                 |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| CurvBCond       | OT_REAL         | 0.020           | Block BFGS      |
+|                 |                 |                 | curvature       |
+|                 |                 |                 | condition bound |
++-----------------+-----------------+-----------------+-----------------+
+| CurvBFac        | OT_REAL         | 0.300           | Block BFGS      |
+|                 |                 |                 | curvature       |
+|                 |                 |                 | condition       |
+|                 |                 |                 | regularisation  |
+|                 |                 |                 | factor          |
++-----------------+-----------------+-----------------+-----------------+
+| CurvCond        | OT_REAL         | 0.020           | BFGS Curvature  |
+|                 |                 |                 | condition bound |
++-----------------+-----------------+-----------------+-----------------+
+| CurvFac         | OT_REAL         | 0.300           | BFGS curvature  |
+|                 |                 |                 | condition       |
+|                 |                 |                 | regularisation  |
+|                 |                 |                 | factor          |
++-----------------+-----------------+-----------------+-----------------+
+| DebugMarker05   | OT_INTEGER      | 42              | Debug marker.   |
+|                 |                 |                 | Used to find    |
+|                 |                 |                 | memory alignmen |
+|                 |                 |                 | t/padding       |
+|                 |                 |                 | issues          |
++-----------------+-----------------+-----------------+-----------------+
+| DebugMarker06   | OT_INTEGER      | 42              | Debug marker.   |
+|                 |                 |                 | Used to find    |
+|                 |                 |                 | memory alignmen |
+|                 |                 |                 | t/padding       |
+|                 |                 |                 | issues          |
++-----------------+-----------------+-----------------+-----------------+
+| FGtogether      | OT_BOOLEAN      | False           | F and G cannot  |
+|                 |                 |                 | be evaluated    |
+|                 |                 |                 | separately      |
++-----------------+-----------------+-----------------+-----------------+
+| FJandND         | OT_BOOLEAN      | False           | Enable Fritz-   |
+|                 |                 |                 | John and non-   |
+|                 |                 |                 | differentiable  |
+|                 |                 |                 | check           |
+|                 |                 |                 | heuristics      |
++-----------------+-----------------+-----------------+-----------------+
+| FeasibleDual    | OT_BOOLEAN      | False           | Activate dual   |
+|                 |                 |                 | feasibility     |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| FeasibleInit    | OT_BOOLEAN      | False           | Activate        |
+|                 |                 |                 | initial         |
+|                 |                 |                 | feasibility     |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| FeasibleInitTol | OT_REAL         | 0.001           | Feasibility     |
+|                 |                 |                 | tolerance for   |
+|                 |                 |                 | no-objective    |
+|                 |                 |                 | feasible mode   |
++-----------------+-----------------+-----------------+-----------------+
+| FeasibleOnly    | OT_BOOLEAN      | False           | Activate        |
+|                 |                 |                 | feasible-only   |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| FidifEps        | OT_REAL         | 0.000           | Finite          |
+|                 |                 |                 | difference      |
+|                 |                 |                 | perturbation    |
++-----------------+-----------------+-----------------+-----------------+
+| FidifHM         | OT_BOOLEAN      | False           | Approximate     |
+|                 |                 |                 | Hessian by      |
+|                 |                 |                 | finite          |
+|                 |                 |                 | differences     |
+|                 |                 |                 | (otherwise      |
+|                 |                 |                 | BFGS)           |
++-----------------+-----------------+-----------------+-----------------+
+| FilterBisecAlph | OT_BOOLEAN      | True            | Filter          |
+| a               |                 |                 | heuristic to    |
+|                 |                 |                 | save Armijo     |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| FilterGammaCV   | OT_REAL         | 0.000           | Constraint      |
+|                 |                 |                 | violation       |
+|                 |                 |                 | decrease factor |
+|                 |                 |                 | in Filter       |
+|                 |                 |                 | acceptance      |
+|                 |                 |                 | check           |
++-----------------+-----------------+-----------------+-----------------+
+| FilterGammaF    | OT_REAL         | 0.000           | Objective       |
+|                 |                 |                 | decrease factor |
+|                 |                 |                 | in Filter       |
+|                 |                 |                 | acceptance      |
+|                 |                 |                 | check           |
++-----------------+-----------------+-----------------+-----------------+
+| FilterIntersecA | OT_BOOLEAN      | True            | Filter          |
+| lpha            |                 |                 | heuristic to    |
+|                 |                 |                 | save Armijo     |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| FirstDifCentral | OT_BOOLEAN      | True            | Use central     |
+|                 |                 |                 | finite          |
+|                 |                 |                 | difference      |
+|                 |                 |                 | quotient for    |
+|                 |                 |                 | first           |
+|                 |                 |                 | derivatives     |
++-----------------+-----------------+-----------------+-----------------+
+| FocusOnFeas     | OT_BOOLEAN      | True            | Enable Focus-   |
+|                 |                 |                 | on-Feasibility  |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| FocusOnFeasFact | OT_REAL         | 1.360           | Factor in       |
+| or              |                 |                 | Focus-on-       |
+|                 |                 |                 | Feasibility     |
+|                 |                 |                 | mode            |
++-----------------+-----------------+-----------------+-----------------+
+| GammaAlpha      | OT_REAL         | 0.050           | Safety factor   |
+|                 |                 |                 | for alphamin    |
+|                 |                 |                 | calculation by  |
+|                 |                 |                 | Filter          |
++-----------------+-----------------+-----------------+-----------------+
+| GroupMethod     | OT_INTEGER      | 1               | Select method   |
+|                 |                 |                 | to determine    |
+|                 |                 |                 | graph colouring |
+|                 |                 |                 | groups          |
++-----------------+-----------------+-----------------+-----------------+
+| IgnoreFilterCri | OT_BOOLEAN      | False           | Activate        |
+| t               |                 |                 | accelerating    |
+|                 |                 |                 | heuristics for  |
+|                 |                 |                 | Filter          |
++-----------------+-----------------+-----------------+-----------------+
+| IncBettsTau     | OT_REAL         | 2               | Increase factor |
+|                 |                 |                 | for Betts'      |
+|                 |                 |                 | update          |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| IncBettsTauMore | OT_REAL         | 100             | Larger increase |
+|                 |                 |                 | factor for      |
+|                 |                 |                 | Betts' update   |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| IncreaseIWS     | OT_REAL         | 1               | Increase factor |
+|                 |                 |                 | for estimated   |
+|                 |                 |                 | integer         |
+|                 |                 |                 | workspace       |
+|                 |                 |                 | requirement     |
++-----------------+-----------------+-----------------+-----------------+
+| IncreaseRWS     | OT_REAL         | 1               | Increase factor |
+|                 |                 |                 | for estimated   |
+|                 |                 |                 | real workspace  |
+|                 |                 |                 | requirement     |
++-----------------+-----------------+-----------------+-----------------+
+| Infty           | OT_REAL         | 1.000e+20       | Upper bound for |
+|                 |                 |                 | numbers to be   |
+|                 |                 |                 | regarded as     |
+|                 |                 |                 | finite          |
++-----------------+-----------------+-----------------+-----------------+
+| InftyUnbounded  | OT_REAL         | 1.000e+20       | Tolerance for   |
+|                 |                 |                 | unboundedness   |
+|                 |                 |                 | detection       |
+|                 |                 |                 | heuristic       |
++-----------------+-----------------+-----------------+-----------------+
+| InitialLMest    | OT_BOOLEAN      | True            | Enable initial  |
+|                 |                 |                 | Lagrange        |
+|                 |                 |                 | multiplier      |
+|                 |                 |                 | estimate        |
++-----------------+-----------------+-----------------+-----------------+
+| KeepAcceptableS | OT_BOOLEAN      | True            | Save acceptable |
+| ol              |                 |                 | solutions as    |
+|                 |                 |                 | fallback        |
++-----------------+-----------------+-----------------+-----------------+
+| LMestQPipComTol | OT_REAL         | 0.003           | IP              |
+|                 |                 |                 | complementarity |
+|                 |                 |                 | tolerance in    |
+|                 |                 |                 | initial         |
+|                 |                 |                 | multiplier      |
+|                 |                 |                 | estimate        |
++-----------------+-----------------+-----------------+-----------------+
+| LMestQPipResTol | OT_REAL         | 1               | IP residual     |
+|                 |                 |                 | tolerance in    |
+|                 |                 |                 | initial         |
+|                 |                 |                 | multiplier      |
+|                 |                 |                 | estimate        |
++-----------------+-----------------+-----------------+-----------------+
+| LinMult         | OT_BOOLEAN      | False           | Control         |
+|                 |                 |                 | Lagrange        |
+|                 |                 |                 | multiplier      |
+|                 |                 |                 | update          |
++-----------------+-----------------+-----------------+-----------------+
+| LogLevel        | OT_INTEGER      | 0               | Enable XML      |
+|                 |                 |                 | logfiles and    |
+|                 |                 |                 | writing         |
+|                 |                 |                 | interval        |
++-----------------+-----------------+-----------------+-----------------+
+| LogResult       | OT_INTEGER      | 0               | Enable XML      |
+|                 |                 |                 | result logging  |
+|                 |                 |                 | and detail      |
+|                 |                 |                 | level           |
++-----------------+-----------------+-----------------+-----------------+
+| LowPassAlphaF   | OT_REAL         | 0.950           | Lowpass-filter  |
+|                 |                 |                 | update factor   |
+|                 |                 |                 | for objective   |
+|                 |                 |                 | values          |
++-----------------+-----------------+-----------------+-----------------+
+| LowPassAlphaG   | OT_REAL         | 0.950           | Lowpass-filter  |
+|                 |                 |                 | update factor   |
+|                 |                 |                 | for constraint  |
+|                 |                 |                 | values          |
++-----------------+-----------------+-----------------+-----------------+
+| LowPassAlphaMer | OT_REAL         | 0.100           | Lowpass-filter  |
+| it              |                 |                 | update factor   |
+|                 |                 |                 | for merit       |
+|                 |                 |                 | function values |
++-----------------+-----------------+-----------------+-----------------+
+| LowPassFilter   | OT_BOOLEAN      | True            | Enable lowpass- |
+|                 |                 |                 | filter          |
+|                 |                 |                 | termination     |
+|                 |                 |                 | criterion       |
++-----------------+-----------------+-----------------+-----------------+
+| MAPivotThreshol | OT_REAL         | 0.000           | Pivoting        |
+| d               |                 |                 | tolerance for   |
+|                 |                 |                 | MA solvers      |
++-----------------+-----------------+-----------------+-----------------+
+| MatrixCC        | OT_BOOLEAN      | False           | Not to be       |
+|                 |                 |                 | included into a |
+|                 |                 |                 | parameter file! |
++-----------------+-----------------+-----------------+-----------------+
+| MaxCalls        | OT_INTEGER      | 2.147e+09       | Upper bound to  |
+|                 |                 |                 | Reverse         |
+|                 |                 |                 | Communication   |
+|                 |                 |                 | calls           |
++-----------------+-----------------+-----------------+-----------------+
+| MaxForce        | OT_INTEGER      | 1000            | Maximum number  |
+|                 |                 |                 | of Force        |
+|                 |                 |                 | recovery        |
+|                 |                 |                 | strategy steps  |
++-----------------+-----------------+-----------------+-----------------+
+| MaxGPart        | OT_INTEGER      | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| MaxIter         | OT_INTEGER      | 500             | Upper bound on  |
+|                 |                 |                 | major           |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| MaxLScounter    | OT_INTEGER      | 3               | Control         |
+|                 |                 |                 | activation of   |
+|                 |                 |                 | Filter          |
+|                 |                 |                 | acceleration    |
+|                 |                 |                 | heuristics      |
++-----------------+-----------------+-----------------+-----------------+
+| MaxNorm         | OT_BOOLEAN      | True            | Select max-norm |
+|                 |                 |                 | instead of      |
+|                 |                 |                 | 1-norm in       |
+|                 |                 |                 | Filter          |
++-----------------+-----------------+-----------------+-----------------+
+| MeritFunction   | OT_INTEGER      | 4               | Select merit    |
+|                 |                 |                 | function and    |
+|                 |                 |                 | penalty update  |
+|                 |                 |                 | [0, 3..5]       |
++-----------------+-----------------+-----------------+-----------------+
+| MeritGradTol    | OT_REAL         | 0.000           | Threshold of    |
+|                 |                 |                 | meritfunction   |
+|                 |                 |                 | gradient for    |
+|                 |                 |                 | increasing      |
+|                 |                 |                 | Hessian         |
+|                 |                 |                 | regularisation  |
++-----------------+-----------------+-----------------+-----------------+
+| MinBettsTau     | OT_REAL         | 0.000           | Lower bound for |
+|                 |                 |                 | Betts' update   |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| MoreRelax       | OT_BOOLEAN      | False           | Introduce one   |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | variable for    |
+|                 |                 |                 | every           |
+|                 |                 |                 | constraint      |
++-----------------+-----------------+-----------------+-----------------+
+| NLPmethod       | OT_INTEGER      | 1               | Select (1)      |
+|                 |                 |                 | Meritfunction   |
+|                 |                 |                 | or (3) Filter   |
+|                 |                 |                 | globalisation   |
++-----------------+-----------------+-----------------+-----------------+
+| NLPprint        | OT_INTEGER      | 2               | NLP print level |
+|                 |                 |                 | [-1..4]         |
++-----------------+-----------------+-----------------+-----------------+
+| PairMethod      | OT_INTEGER      | 1               | Select method   |
+|                 |                 |                 | to determine    |
+|                 |                 |                 | graph colouring |
+|                 |                 |                 | pairgroups      |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdEpsBar    | OT_REAL         | 0.900           | Penalty update  |
+|                 |                 |                 | parameter       |
+|                 |                 |                 | factor for      |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 3               |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdEpsKFac   | OT_REAL         | 2               | Penalty update  |
+|                 |                 |                 | parameter       |
+|                 |                 |                 | factor for      |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 4               |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdEpsKSeque | OT_INTEGER      | 2               | Penalty update  |
+| nce             |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdMaxDeltaK | OT_REAL         | 11              | Max penalty for |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 4               |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdMaxFac    | OT_REAL         | 100000000       | Max factor for  |
+|                 |                 |                 | increasing      |
+|                 |                 |                 | penalty for     |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 4               |
++-----------------+-----------------+-----------------+-----------------+
+| PenUpdRBar      | OT_REAL         | 2               | Penalty update  |
+|                 |                 |                 | parameter for   |
+|                 |                 |                 | MeritFunction = |
+|                 |                 |                 | 3               |
++-----------------+-----------------+-----------------+-----------------+
+| PrecisionF      | OT_REAL         | 0.000           | (currently      |
+|                 |                 |                 | unused)         |
+|                 |                 |                 | Relative        |
+|                 |                 |                 | precision of    |
+|                 |                 |                 | objective       |
++-----------------+-----------------+-----------------+-----------------+
+| PrecisionG      | OT_REAL         | 0.000           | (currently      |
+|                 |                 |                 | unused)         |
+|                 |                 |                 | Relative        |
+|                 |                 |                 | precision of    |
+|                 |                 |                 | constraints     |
++-----------------+-----------------+-----------------+-----------------+
+| QPscaleParam    | OT_REAL         | 0               | (currently      |
+|                 |                 |                 | unused) Scaling |
+|                 |                 |                 | factor for QP   |
++-----------------+-----------------+-----------------+-----------------+
+| QuadraticProble | OT_BOOLEAN      | False           | Not to be       |
+| m               |                 |                 | included into a |
+|                 |                 |                 | parameter file! |
++-----------------+-----------------+-----------------+-----------------+
+| ReduceBettsTau  | OT_REAL         | 0.300           | Decrease factor |
+|                 |                 |                 | for Betts'      |
+|                 |                 |                 | update          |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| RegStrategy     | OT_INTEGER      | 1               | Select Hessian  |
+|                 |                 |                 | regularisation  |
+|                 |                 |                 | strategy in     |
+|                 |                 |                 | Filter          |
++-----------------+-----------------+-----------------+-----------------+
+| ReinitFilter    | OT_BOOLEAN      | False           | Enables Filter- |
+|                 |                 |                 | reinitialisatio |
+|                 |                 |                 | n accelerating  |
+|                 |                 |                 | heuristic       |
++-----------------+-----------------+-----------------+-----------------+
+| RelaxMaxDelta   | OT_REAL         | 0.920           | Upper bound for |
+|                 |                 |                 | accepting the   |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | variable        |
++-----------------+-----------------+-----------------+-----------------+
+| RelaxMaxPen     | OT_REAL         | 50000000        | Upper bound on  |
+|                 |                 |                 | the constraint  |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | penalty         |
++-----------------+-----------------+-----------------+-----------------+
+| RelaxRho        | OT_REAL         | 6               | Update factor   |
+|                 |                 |                 | for the         |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | penalty         |
++-----------------+-----------------+-----------------+-----------------+
+| RelaxStart      | OT_REAL         | 1               | Initial value   |
+|                 |                 |                 | of the          |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | penalty         |
++-----------------+-----------------+-----------------+-----------------+
+| RestUntilFeas   | OT_BOOLEAN      | False           | Do restoration  |
+|                 |                 |                 | until a         |
+|                 |                 |                 | feasible        |
+|                 |                 |                 | solution is     |
+|                 |                 |                 | found           |
++-----------------+-----------------+-----------------+-----------------+
+| ScaleConIter    | OT_BOOLEAN      | False           | Scale           |
+|                 |                 |                 | constraints in  |
+|                 |                 |                 | every iteration |
++-----------------+-----------------+-----------------+-----------------+
+| ScaleFacObj     | OT_REAL         | 10              | Value to scale  |
+|                 |                 |                 | large objective |
+|                 |                 |                 | functions to    |
++-----------------+-----------------+-----------------+-----------------+
+| ScaleFacQP      | OT_REAL         | 10              | Upper bound on  |
+|                 |                 |                 | resulting       |
+|                 |                 |                 | matrix norm for |
+|                 |                 |                 | QP scaling      |
++-----------------+-----------------+-----------------+-----------------+
+| ScaledFD        | OT_BOOLEAN      | True            | Use a scaled    |
+|                 |                 |                 | perturbation    |
+|                 |                 |                 | for finite      |
+|                 |                 |                 | differences     |
++-----------------+-----------------+-----------------+-----------------+
+| ScaledKKT       | OT_BOOLEAN      | True            | Scale KKT       |
+|                 |                 |                 | conditions      |
++-----------------+-----------------+-----------------+-----------------+
+| ScaledObj       | OT_BOOLEAN      | True            | Scale the       |
+|                 |                 |                 | objective       |
+|                 |                 |                 | function        |
++-----------------+-----------------+-----------------+-----------------+
+| ScaledQP        | OT_BOOLEAN      | True            | Scale some      |
+|                 |                 |                 | matrices handed |
+|                 |                 |                 | to the QP       |
++-----------------+-----------------+-----------------+-----------------+
+| StartBettsTau   | OT_REAL         | 0.100           | Initial value   |
+|                 |                 |                 | for Betts'      |
+|                 |                 |                 | update          |
+|                 |                 |                 | dampening term  |
++-----------------+-----------------+-----------------+-----------------+
+| SwitchingDelta  | OT_REAL         | 0.010           | Filter          |
+|                 |                 |                 | switching       |
+|                 |                 |                 | condition       |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| SwitchingSCV    | OT_REAL         | 1.100           | Filter          |
+|                 |                 |                 | switching       |
+|                 |                 |                 | condition       |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| SwitchingSF     | OT_REAL         | 2.300           | Filter          |
+|                 |                 |                 | switching       |
+|                 |                 |                 | condition       |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| TakeQPSol       | OT_BOOLEAN      | False           | Evaluate QP     |
+|                 |                 |                 | search          |
+|                 |                 |                 | direction       |
+|                 |                 |                 | regardless of   |
+|                 |                 |                 | convergence     |
++-----------------+-----------------+-----------------+-----------------+
+| Timeout         | OT_REAL         | 300             | Timeout in      |
+|                 |                 |                 | seconds         |
++-----------------+-----------------+-----------------+-----------------+
+| TolComp         | OT_REAL         | 0.001           | Complementarity |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| TolFeas         | OT_REAL         | 0.000           | Feasibility     |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| TolOpti         | OT_REAL         | 0.000           | Optimality      |
+|                 |                 |                 | tolerance       |
++-----------------+-----------------+-----------------+-----------------+
+| TolWeakActive   | OT_REAL         | 1               | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| TooBig          | OT_BOOLEAN      | True            | Enable too-big  |
+|                 |                 |                 | termination     |
+|                 |                 |                 | heuristics      |
++-----------------+-----------------+-----------------+-----------------+
+| TooBigCV        | OT_REAL         | 1.000e+25       | Upper bound on  |
+|                 |                 |                 | constraint      |
+|                 |                 |                 | violation for   |
+|                 |                 |                 | too-big         |
+|                 |                 |                 | heuristic       |
++-----------------+-----------------+-----------------+-----------------+
+| TooBigKKT       | OT_REAL         | 1.000e+30       | Upper bound on  |
+|                 |                 |                 | KKT values for  |
+|                 |                 |                 | too-big         |
+|                 |                 |                 | heuristic       |
++-----------------+-----------------+-----------------+-----------------+
+| UserDF          | OT_BOOLEAN      | True            | Objective       |
+|                 |                 |                 | gradient values |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| UserDG          | OT_BOOLEAN      | True            | Jacobian values |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| UserHM          | OT_BOOLEAN      | True            | Hessian values  |
+|                 |                 |                 | supplied by     |
+|                 |                 |                 | caller          |
++-----------------+-----------------+-----------------+-----------------+
+| UserHMstructure | OT_INTEGER      | 2               | Enable          |
+|                 |                 |                 | automatic       |
+|                 |                 |                 | Hessian         |
+|                 |                 |                 | structure       |
+|                 |                 |                 | generation or   |
+|                 |                 |                 | checking        |
++-----------------+-----------------+-----------------+-----------------+
+| WeakActiveSet   | OT_BOOLEAN      | False           | (experimental)  |
++-----------------+-----------------+-----------------+-----------------+
+| eps             | OT_REAL         | 0.000           | Machine epsilon |
++-----------------+-----------------+-----------------+-----------------+
+| internalParChan | OT_INTEGER      | 0               | Counter for     |
+| ged             |                 |                 | changed         |
+|                 |                 |                 | parameters.     |
+|                 |                 |                 | Internal use    |
+|                 |                 |                 | only.           |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOLEAN      | True            | Print           |
+|                 |                 |                 | information     |
+|                 |                 |                 | about execution |
+|                 |                 |                 | time            |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipBarrier    | OT_REAL         | 7.800           | IP barrier      |
+|                 |                 |                 | parameter.      |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipComTol     | OT_REAL         | 0.000           | IP              |
+|                 |                 |                 | complementarity |
+|                 |                 |                 | tolerance.      |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipFracBound  | OT_REAL         | 0.880           | IP fraction-to- |
+|                 |                 |                 | the-boundary    |
+|                 |                 |                 | parameter.      |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipLsMethod   | OT_STRING       | None            | Select the      |
+|                 |                 |                 | direct linear   |
+|                 |                 |                 | solver used by  |
+|                 |                 |                 | the IP method.  |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipMinAlpha   | OT_REAL         | 0.000           | IP line search  |
+|                 |                 |                 | minimum step    |
+|                 |                 |                 | size.           |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipRelaxDiv   | OT_REAL         | 2               | The relaxation  |
+|                 |                 |                 | term is divided |
+|                 |                 |                 | by this value   |
+|                 |                 |                 | if successful.  |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipRelaxMax   | OT_REAL         | 0.000           | Maximum         |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | value.          |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipRelaxMin   | OT_REAL         | 0.000           | Mimimum         |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | value.          |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipRelaxMult  | OT_REAL         | 10              | The relaxation  |
+|                 |                 |                 | term is         |
+|                 |                 |                 | multiplied by   |
+|                 |                 |                 | this value if   |
+|                 |                 |                 | unsuccessful.   |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipResTol     | OT_REAL         | 0.000           | IP residuals    |
+|                 |                 |                 | tolerance.      |
++-----------------+-----------------+-----------------+-----------------+
+| qp_ipTryRelax   | OT_BOOLEAN      | True            | Enable          |
+|                 |                 |                 | relaxation      |
+|                 |                 |                 | strategy when   |
+|                 |                 |                 | encountering an |
+|                 |                 |                 | error.          |
++-----------------+-----------------+-----------------+-----------------+
+| qp_lsItMaxIter  | OT_INTEGER      | 1000            | Maximum number  |
+|                 |                 |                 | of iterations   |
+|                 |                 |                 | of the          |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | linear solvers. |
++-----------------+-----------------+-----------------+-----------------+
+| qp_lsItMethod   | OT_STRING       | None            | Select the      |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | linear solver.  |
++-----------------+-----------------+-----------------+-----------------+
+| qp_lsItPrecondM | OT_STRING       | None            | Select          |
+| ethod           |                 |                 | preconditioner  |
+|                 |                 |                 | for the         |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | linear solver.  |
++-----------------+-----------------+-----------------+-----------------+
+| qp_lsRefineMaxI | OT_INTEGER      | 10              | Maximum number  |
+| ter             |                 |                 | of iterative    |
+|                 |                 |                 | refinement      |
+|                 |                 |                 | steps of the    |
+|                 |                 |                 | direct linear   |
+|                 |                 |                 | solvers.        |
++-----------------+-----------------+-----------------+-----------------+
+| qp_lsScale      | OT_BOOLEAN      | True            | Enables scaling |
+|                 |                 |                 | on linear       |
+|                 |                 |                 | solver level.   |
++-----------------+-----------------+-----------------+-----------------+
+| qp_lsTol        | OT_REAL         | 0.000           | Tolerance for   |
+|                 |                 |                 | the linear      |
+|                 |                 |                 | solver.         |
++-----------------+-----------------+-----------------+-----------------+
+| qp_lsTrySimple  | OT_BOOLEAN      | False           | Some matrices   |
+|                 |                 |                 | can be solved   |
+|                 |                 |                 | without calling |
+|                 |                 |                 | a linear        |
+|                 |                 |                 | equation solver |
+|                 |                 |                 | .Currently only |
+|                 |                 |                 | diagonal        |
+|                 |                 |                 | matrices are    |
+|                 |                 |                 | supported.Non-  |
+|                 |                 |                 | diagonal        |
+|                 |                 |                 | matrices will   |
+|                 |                 |                 | besolved with   |
+|                 |                 |                 | the chosen      |
+|                 |                 |                 | linear equation |
+|                 |                 |                 | solver.         |
++-----------------+-----------------+-----------------+-----------------+
+| qp_maxIter      | OT_INTEGER      | 80              | Imposes an      |
+|                 |                 |                 | upper limit on  |
+|                 |                 |                 | the number of   |
+|                 |                 |                 | minor solver    |
+|                 |                 |                 | iterations,     |
+|                 |                 |                 | i.e. for the    |
+|                 |                 |                 | quadratic       |
+|                 |                 |                 | subproblem      |
+|                 |                 |                 | solver.If the   |
+|                 |                 |                 | limit is        |
+|                 |                 |                 | reached before  |
+|                 |                 |                 | convergence,    |
+|                 |                 |                 | WORHP will      |
+|                 |                 |                 | activate QP     |
+|                 |                 |                 | recovery        |
+|                 |                 |                 | strategies to   |
+|                 |                 |                 | prevent a       |
+|                 |                 |                 | solver          |
+|                 |                 |                 | breakdown.      |
++-----------------+-----------------+-----------------+-----------------+
+| qp_method       | OT_STRING       | None            | Select the      |
+|                 |                 |                 | solution method |
+|                 |                 |                 | used by the QP  |
+|                 |                 |                 | solver.         |
++-----------------+-----------------+-----------------+-----------------+
+| qp_nsnBeta      | OT_REAL         | 0.900           | NSN stepsize    |
+|                 |                 |                 | decrease        |
+|                 |                 |                 | factor.         |
++-----------------+-----------------+-----------------+-----------------+
+| qp_nsnGradStep  | OT_BOOLEAN      | True            | Enable gradient |
+|                 |                 |                 | steps in the    |
+|                 |                 |                 | NSN method.     |
++-----------------+-----------------+-----------------+-----------------+
+| qp_nsnKKT       | OT_REAL         | 0.000           | NSN KKT         |
+|                 |                 |                 | tolerance.      |
++-----------------+-----------------+-----------------+-----------------+
+| qp_nsnLsMethod  | OT_STRING       | None            | Select the      |
+|                 |                 |                 | direct linear   |
+|                 |                 |                 | solver used by  |
+|                 |                 |                 | the NSN method. |
++-----------------+-----------------+-----------------+-----------------+
+| qp_nsnMinAlpha  | OT_REAL         | 0.000           | NSN line search |
+|                 |                 |                 | minimum step    |
+|                 |                 |                 | size.           |
++-----------------+-----------------+-----------------+-----------------+
+| qp_nsnSigma     | OT_REAL         | 0.010           | NSN line search |
+|                 |                 |                 | slope           |
+|                 |                 |                 | parameter.      |
++-----------------+-----------------+-----------------+-----------------+
+| qp_printLevel   | OT_STRING       | None            | Controls the    |
+|                 |                 |                 | amount of QP    |
+|                 |                 |                 | solver output.  |
++-----------------+-----------------+-----------------+-----------------+
+| qp_scaleIntern  | OT_BOOLEAN      | False           | Enable scaling  |
+|                 |                 |                 | on QP level.    |
++-----------------+-----------------+-----------------+-----------------+
+| qp_strict       | OT_BOOLEAN      | True            | Use strict      |
+|                 |                 |                 | termination     |
+|                 |                 |                 | criteria in IP  |
+|                 |                 |                 | method.         |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++-------------+
+|     Id      |
++=============+
+| eval_f      |
++-------------+
+| eval_g      |
++-------------+
+| eval_grad_f |
++-------------+
+| eval_h      |
++-------------+
+| eval_jac_g  |
++-------------+
+
+>List of available stats
++--------------------+
+|         Id         |
++====================+
+| iter_count         |
++--------------------+
+| iteration          |
++--------------------+
+| iterations         |
++--------------------+
+| n_eval_f           |
++--------------------+
+| n_eval_g           |
++--------------------+
+| n_eval_grad_f      |
++--------------------+
+| n_eval_h           |
++--------------------+
+| n_eval_jac_g       |
++--------------------+
+| return_code        |
++--------------------+
+| return_status      |
++--------------------+
+| t_callback_fun     |
++--------------------+
+| t_callback_prepare |
++--------------------+
+| t_eval_f           |
++--------------------+
+| t_eval_g           |
++--------------------+
+| t_eval_grad_f      |
++--------------------+
+| t_eval_h           |
++--------------------+
+| t_eval_jac_g       |
++--------------------+
+| t_mainloop         |
++--------------------+
+
+scpgen
+
+A structure-exploiting sequential quadratic programming (to be come
+sequential convex programming) method for nonlinear programming.
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| beta            | OT_REAL         | 0.800           | Line-search     |
+|                 |                 |                 | parameter,      |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | factor of       |
+|                 |                 |                 | stepsize        |
++-----------------+-----------------+-----------------+-----------------+
+| c1              | OT_REAL         | 0.000           | Armijo          |
+|                 |                 |                 | condition,      |
+|                 |                 |                 | coefficient of  |
+|                 |                 |                 | decrease in     |
+|                 |                 |                 | merit           |
++-----------------+-----------------+-----------------+-----------------+
+| codegen         | OT_BOOLEAN      | false           | C-code          |
+|                 |                 |                 | generation      |
++-----------------+-----------------+-----------------+-----------------+
+| compiler        | OT_STRING       | \"gcc -fPIC -O2\" | Compiler        |
+|                 |                 |                 | command to be   |
+|                 |                 |                 | used for        |
+|                 |                 |                 | compiling       |
+|                 |                 |                 | generated code  |
++-----------------+-----------------+-----------------+-----------------+
+| hessian_approxi | OT_STRING       | \"exact\"         | gauss-          |
+| mation          |                 |                 | newton|exact    |
++-----------------+-----------------+-----------------+-----------------+
+| lbfgs_memory    | OT_INTEGER      | 10              | Size of L-BFGS  |
+|                 |                 |                 | memory.         |
++-----------------+-----------------+-----------------+-----------------+
+| max_iter        | OT_INTEGER      | 50              | Maximum number  |
+|                 |                 |                 | of SQP          |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| max_iter_ls     | OT_INTEGER      | 1               | Maximum number  |
+|                 |                 |                 | of linesearch   |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| merit_memsize   | OT_INTEGER      | 4               | Size of memory  |
+|                 |                 |                 | to store        |
+|                 |                 |                 | history of      |
+|                 |                 |                 | merit function  |
+|                 |                 |                 | values          |
++-----------------+-----------------+-----------------+-----------------+
+| merit_start     | OT_REAL         | 0.000           | Lower bound for |
+|                 |                 |                 | the merit       |
+|                 |                 |                 | function        |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| name_x          | OT_STRINGVECTOR | GenericType()   | Names of the    |
+|                 |                 |                 | variables.      |
++-----------------+-----------------+-----------------+-----------------+
+| print_header    | OT_BOOLEAN      | true            | Print the       |
+|                 |                 |                 | header with     |
+|                 |                 |                 | problem         |
+|                 |                 |                 | statistics      |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOLEAN      | true            | Print           |
+|                 |                 |                 | information     |
+|                 |                 |                 | about execution |
+|                 |                 |                 | time            |
++-----------------+-----------------+-----------------+-----------------+
+| print_x         | OT_INTEGERVECTO | GenericType()   | Which variables |
+|                 | R               |                 | to print.       |
++-----------------+-----------------+-----------------+-----------------+
+| qp_solver       | OT_STRING       | GenericType()   | The QP solver   |
+|                 |                 |                 | to be used by   |
+|                 |                 |                 | the SQP method  |
++-----------------+-----------------+-----------------+-----------------+
+| qp_solver_optio | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ns              |                 |                 | passed to the   |
+|                 |                 |                 | QP solver       |
++-----------------+-----------------+-----------------+-----------------+
+| reg_threshold   | OT_REAL         | 0.000           | Threshold for   |
+|                 |                 |                 | the             |
+|                 |                 |                 | regularization. |
++-----------------+-----------------+-----------------+-----------------+
+| regularize      | OT_BOOLEAN      | false           | Automatic       |
+|                 |                 |                 | regularization  |
+|                 |                 |                 | of Lagrange     |
+|                 |                 |                 | Hessian.        |
++-----------------+-----------------+-----------------+-----------------+
+| tol_du          | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion for   |
+|                 |                 |                 | dual            |
+|                 |                 |                 | infeasability   |
++-----------------+-----------------+-----------------+-----------------+
+| tol_pr          | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion for   |
+|                 |                 |                 | primal          |
+|                 |                 |                 | infeasibility   |
++-----------------+-----------------+-----------------+-----------------+
+| tol_pr_step     | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion for   |
+|                 |                 |                 | the step size   |
++-----------------+-----------------+-----------------+-----------------+
+| tol_reg         | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion for   |
+|                 |                 |                 | regularization  |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++-------------+
+|     Id      |
++=============+
+| dx          |
++-------------+
+| eval_f      |
++-------------+
+| eval_g      |
++-------------+
+| eval_grad_f |
++-------------+
+| eval_h      |
++-------------+
+| eval_jac_g  |
++-------------+
+| qp          |
++-------------+
+
+>List of available stats
++------------+
+|     Id     |
++============+
+| iter_count |
++------------+
+
+sqpmethod
+
+A textbook SQPMethod
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| beta            | OT_REAL         | 0.800           | Line-search     |
+|                 |                 |                 | parameter,      |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | factor of       |
+|                 |                 |                 | stepsize        |
++-----------------+-----------------+-----------------+-----------------+
+| c1              | OT_REAL         | 0.000           | Armijo          |
+|                 |                 |                 | condition,      |
+|                 |                 |                 | coefficient of  |
+|                 |                 |                 | decrease in     |
+|                 |                 |                 | merit           |
++-----------------+-----------------+-----------------+-----------------+
+| hessian_approxi | OT_STRING       | \"exact\"         | limited-        |
+| mation          |                 |                 | memory|exact    |
++-----------------+-----------------+-----------------+-----------------+
+| lbfgs_memory    | OT_INTEGER      | 10              | Size of L-BFGS  |
+|                 |                 |                 | memory.         |
++-----------------+-----------------+-----------------+-----------------+
+| max_iter        | OT_INTEGER      | 50              | Maximum number  |
+|                 |                 |                 | of SQP          |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| max_iter_ls     | OT_INTEGER      | 3               | Maximum number  |
+|                 |                 |                 | of linesearch   |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| merit_memory    | OT_INTEGER      | 4               | Size of memory  |
+|                 |                 |                 | to store        |
+|                 |                 |                 | history of      |
+|                 |                 |                 | merit function  |
+|                 |                 |                 | values          |
++-----------------+-----------------+-----------------+-----------------+
+| min_step_size   | OT_REAL         | 0.000           | The size (inf-  |
+|                 |                 |                 | norm) of the    |
+|                 |                 |                 | step size       |
+|                 |                 |                 | should not      |
+|                 |                 |                 | become smaller  |
+|                 |                 |                 | than this.      |
++-----------------+-----------------+-----------------+-----------------+
+| print_header    | OT_BOOLEAN      | true            | Print the       |
+|                 |                 |                 | header with     |
+|                 |                 |                 | problem         |
+|                 |                 |                 | statistics      |
++-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOLEAN      | true            | Print           |
+|                 |                 |                 | information     |
+|                 |                 |                 | about execution |
+|                 |                 |                 | time            |
++-----------------+-----------------+-----------------+-----------------+
+| qp_solver       | OT_STRING       | GenericType()   | The QP solver   |
+|                 |                 |                 | to be used by   |
+|                 |                 |                 | the SQP method  |
++-----------------+-----------------+-----------------+-----------------+
+| qp_solver_optio | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ns              |                 |                 | passed to the   |
+|                 |                 |                 | QP solver       |
++-----------------+-----------------+-----------------+-----------------+
+| regularize      | OT_BOOLEAN      | false           | Automatic       |
+|                 |                 |                 | regularization  |
+|                 |                 |                 | of Lagrange     |
+|                 |                 |                 | Hessian.        |
++-----------------+-----------------+-----------------+-----------------+
+| tol_du          | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion for   |
+|                 |                 |                 | dual            |
+|                 |                 |                 | infeasability   |
++-----------------+-----------------+-----------------+-----------------+
+| tol_pr          | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion for   |
+|                 |                 |                 | primal          |
+|                 |                 |                 | infeasibility   |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++-------------+
+|     Id      |
++=============+
+| bfgs        |
++-------------+
+| dx          |
++-------------+
+| eval_f      |
++-------------+
+| eval_g      |
++-------------+
+| eval_grad_f |
++-------------+
+| eval_h      |
++-------------+
+| eval_jac_g  |
++-------------+
+| qp          |
++-------------+
+
+>List of available stats
++--------------------+
+|         Id         |
++====================+
+| iter_count         |
++--------------------+
+| iteration          |
++--------------------+
+| iterations         |
++--------------------+
+| n_eval_f           |
++--------------------+
+| n_eval_g           |
++--------------------+
+| n_eval_grad_f      |
++--------------------+
+| n_eval_h           |
++--------------------+
+| n_eval_jac_g       |
++--------------------+
+| return_status      |
++--------------------+
+| t_callback_fun     |
++--------------------+
+| t_callback_prepare |
++--------------------+
+| t_eval_f           |
++--------------------+
+| t_eval_g           |
++--------------------+
+| t_eval_grad_f      |
++--------------------+
+| t_eval_h           |
++--------------------+
+| t_eval_jac_g       |
++--------------------+
+| t_mainloop         |
++--------------------+
+
+stabilizedsqp
+
+Stabilized Sequential Quadratic Programming method.
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| TReta1          | OT_REAL         | 0.800           | Required        |
+|                 |                 |                 | predicted /     |
+|                 |                 |                 | actual decrease |
+|                 |                 |                 | for TR increase |
++-----------------+-----------------+-----------------+-----------------+
+| TReta2          | OT_REAL         | 0.200           | Required        |
+|                 |                 |                 | predicted /     |
+|                 |                 |                 | actual decrease |
+|                 |                 |                 | for TR decrease |
++-----------------+-----------------+-----------------+-----------------+
+| alphaMin        | OT_REAL         | 0.001           | Used to check   |
+|                 |                 |                 | whether to      |
+|                 |                 |                 | increase rho.   |
++-----------------+-----------------+-----------------+-----------------+
+| beta            | OT_REAL         | 0.500           | Line-search     |
+|                 |                 |                 | parameter,      |
+|                 |                 |                 | restoration     |
+|                 |                 |                 | factor of       |
+|                 |                 |                 | stepsize        |
++-----------------+-----------------+-----------------+-----------------+
+| c1              | OT_REAL         | 0.001           | Armijo          |
+|                 |                 |                 | condition,      |
+|                 |                 |                 | coefficient of  |
+|                 |                 |                 | decrease in     |
+|                 |                 |                 | merit           |
++-----------------+-----------------+-----------------+-----------------+
+| dvMax0          | OT_REAL         | 100             | Parameter used  |
+|                 |                 |                 | to defined the  |
+|                 |                 |                 | max step        |
+|                 |                 |                 | length.         |
++-----------------+-----------------+-----------------+-----------------+
+| eps_active      | OT_REAL         | 0.000           | Threshold for   |
+|                 |                 |                 | the epsilon-    |
+|                 |                 |                 | active set.     |
++-----------------+-----------------+-----------------+-----------------+
+| gamma1          | OT_REAL         | 2               | Trust region    |
+|                 |                 |                 | increase        |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| gamma2          | OT_REAL         | 1               | Trust region    |
+|                 |                 |                 | update          |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| gamma3          | OT_REAL         | 1               | Trust region    |
+|                 |                 |                 | decrease        |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| hessian_approxi | OT_STRING       | \"exact\"         | limited-        |
+| mation          |                 |                 | memory|exact    |
++-----------------+-----------------+-----------------+-----------------+
+| lbfgs_memory    | OT_INTEGER      | 10              | Size of L-BFGS  |
+|                 |                 |                 | memory.         |
++-----------------+-----------------+-----------------+-----------------+
+| max_iter        | OT_INTEGER      | 100             | Maximum number  |
+|                 |                 |                 | of SQP          |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| max_iter_ls     | OT_INTEGER      | 20              | Maximum number  |
+|                 |                 |                 | of linesearch   |
+|                 |                 |                 | iterations      |
++-----------------+-----------------+-----------------+-----------------+
+| max_time        | OT_REAL         | 1.000e+12       | Timeout         |
++-----------------+-----------------+-----------------+-----------------+
+| merit_memory    | OT_INTEGER      | 4               | Size of memory  |
+|                 |                 |                 | to store        |
+|                 |                 |                 | history of      |
+|                 |                 |                 | merit function  |
+|                 |                 |                 | values          |
++-----------------+-----------------+-----------------+-----------------+
+| min_step_size   | OT_REAL         | 0.000           | The size (inf-  |
+|                 |                 |                 | norm) of the    |
+|                 |                 |                 | step size       |
+|                 |                 |                 | should not      |
+|                 |                 |                 | become smaller  |
+|                 |                 |                 | than this.      |
++-----------------+-----------------+-----------------+-----------------+
+| muR0            | OT_REAL         | 0.000           | Initial choice  |
+|                 |                 |                 | of              |
+|                 |                 |                 | regularization  |
+|                 |                 |                 | parameter       |
++-----------------+-----------------+-----------------+-----------------+
+| nu              | OT_REAL         | 1               | Parameter for   |
+|                 |                 |                 | primal-dual     |
+|                 |                 |                 | augmented       |
+|                 |                 |                 | Lagrangian.     |
++-----------------+-----------------+-----------------+-----------------+
+| phiWeight       | OT_REAL         | 0.000           | Weight used in  |
+|                 |                 |                 | pseudo-filter.  |
++-----------------+-----------------+-----------------+-----------------+
+| print_header    | OT_BOOLEAN      | true            | Print the       |
+|                 |                 |                 | header with     |
+|                 |                 |                 | problem         |
+|                 |                 |                 | statistics      |
++-----------------+-----------------+-----------------+-----------------+
+| regularize      | OT_BOOLEAN      | false           | Automatic       |
+|                 |                 |                 | regularization  |
+|                 |                 |                 | of Lagrange     |
+|                 |                 |                 | Hessian.        |
++-----------------+-----------------+-----------------+-----------------+
+| stabilized_qp_s | OT_STRING       | GenericType()   | The Stabilized  |
+| olver           |                 |                 | QP solver to be |
+|                 |                 |                 | used by the SQP |
+|                 |                 |                 | method          |
++-----------------+-----------------+-----------------+-----------------+
+| stabilized_qp_s | OT_DICTIONARY   | GenericType()   | Options to be   |
+| olver_options   |                 |                 | passed to the   |
+|                 |                 |                 | Stabilized QP   |
+|                 |                 |                 | solver          |
++-----------------+-----------------+-----------------+-----------------+
+| tau0            | OT_REAL         | 0.010           | Initial         |
+|                 |                 |                 | parameter for   |
+|                 |                 |                 | the merit       |
+|                 |                 |                 | function        |
+|                 |                 |                 | optimality      |
+|                 |                 |                 | threshold.      |
++-----------------+-----------------+-----------------+-----------------+
+| tol_du          | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion for   |
+|                 |                 |                 | dual            |
+|                 |                 |                 | infeasability   |
++-----------------+-----------------+-----------------+-----------------+
+| tol_pr          | OT_REAL         | 0.000           | Stopping        |
+|                 |                 |                 | criterion for   |
+|                 |                 |                 | primal          |
+|                 |                 |                 | infeasibility   |
++-----------------+-----------------+-----------------+-----------------+
+| yEinitial       | OT_STRING       | \"simple\"        | Initial         |
+|                 |                 |                 | multiplier.     |
+|                 |                 |                 | Simple (all     |
+|                 |                 |                 | zero) or least  |
+|                 |                 |                 | (LSQ).          |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available monitors
++-------------+
+|     Id      |
++=============+
+| dx          |
++-------------+
+| eval_f      |
++-------------+
+| eval_g      |
++-------------+
+| eval_grad_f |
++-------------+
+| eval_h      |
++-------------+
+| eval_jac_g  |
++-------------+
+| qp          |
++-------------+
+
+>List of available stats
++---------------+
+|      Id       |
++===============+
+| iter_count    |
++---------------+
+| return_status |
++---------------+
+
+Joel Andersson Diagrams
 
 C++ includes: nlp_solver.hpp ";
 
@@ -39524,6 +45125,47 @@ propagating_sparsity.cpp)
 
 ";
 
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
+const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
 %feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
 [INTERNAL]  Access an input.
 
@@ -39534,128 +45176,36 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
 Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
+Access input/output scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
+input/output scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::tangent(int iind, const std::string
-&oind) "
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
 
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+Get output scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-const std::string &oind) "
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
 
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+Set output scheme.
 
 ";
 
-%feature("docstring")  casadi::NLPSolver::setOptionsFromFile(const
+%feature("docstring")  casadi::NlpSolver::setOptionsFromFile(const
 std::string &file) "
 
 Read options from parameter xml.
@@ -39666,17 +45216,6 @@ Read options from parameter xml.
 std::string &str) const  "
 
 Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
-int nfwd, int nadj) "
-
-Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-NOTE: Does not take ownership, only weak references to the derivatives are
-kept internally
 
 ";
 
@@ -39716,57 +45255,18 @@ Access output argument
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
-num_out) "
-
-Set the number of function outputs.
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
-Input/output structures of the function
+%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
+casadi::IOScheme &scheme, const std::string &name, bool input) const "
+[INTERNAL]  Find the index for a string describing a particular entry of a
+scheme.
 
-";
-
-%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::removeMonitor(const std::string
-&mon) "
-
-Remove modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-int oind=0) "
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-const std::string &oname) "
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
@@ -39775,16 +45275,20 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
+%feature("docstring")  casadi::NlpSolver::gradF() "
 
-Get the dictionary.
+Access the objective gradient function>Input scheme: casadi::GradFInput
+(GRADF_NUM_IN = 2) [gradFIn] +-----------+-------+---------------------+ |
+Full name | Short |     Description     |
++===========+=======+=====================+ | GRADF_X   | x     | Decision
+variable . | +-----------+-------+---------------------+ | GRADF_P   | p
+| Fixed parameter .   | +-----------+-------+---------------------+
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
+%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
 
-Get the type name of a certain option.
+Get the dictionary.
 
 ";
 
@@ -39809,81 +45313,24 @@ Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring")  casadi::NLPSolver::nlp() "
+%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
+const "
 
-Access the NLP.
-
->Input scheme: casadi::NLPSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLP_SOLVER_X0          | x0                     | Decision variables,    |
-|                        |                        | initial guess (nx x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_P           | p                      | Value of fixed         |
-|                        |                        | parameters (np x 1) .  |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LBX         | lbx                    | Decision variables     |
-|                        |                        | lower bound (nx x 1),  |
-|                        |                        | default -inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_UBX         | ubx                    | Decision variables     |
-|                        |                        | upper bound (nx x 1),  |
-|                        |                        | default +inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LBG         | lbg                    | Constraints lower      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default -inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_UBG         | ubg                    | Constraints upper      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default +inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LAM_X0      | lam_x0                 | Lagrange multipliers   |
-|                        |                        | for bounds on X,       |
-|                        |                        | initial guess (nx x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LAM_G0      | lam_g0                 | Lagrange multipliers   |
-|                        |                        | for bounds on G,       |
-|                        |                        | initial guess (ng x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-
->Output scheme: casadi::NLPSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLP_SOLVER_X           | x                      | Decision variables at  |
-|                        |                        | the optimal solution   |
-|                        |                        | (nx x 1) .             |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_F           | f                      | Cost function value at |
-|                        |                        | the optimal solution   |
-|                        |                        | (1 x 1) .              |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_G           | g                      | Constraints function   |
-|                        |                        | at the optimal         |
-|                        |                        | solution (ng x 1) .    |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LAM_X       | lam_x                  | Lagrange multipliers   |
-|                        |                        | for bounds on X at the |
-|                        |                        | solution (nx x 1) .    |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LAM_G       | lam_g                  | Lagrange multipliers   |
-|                        |                        | for bounds on G at the |
-|                        |                        | solution (ng x 1) .    |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LAM_P       | lam_p                  | Lagrange multipliers   |
-|                        |                        | for bounds on P at the |
-|                        |                        | solution (np x 1) .    |
-+------------------------+------------------------+------------------------+
+Get the number of function outputs.
 
 ";
 
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
+%feature("docstring")
+casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
@@ -39893,76 +45340,15 @@ class
 
 ";
 
+%feature("docstring")  casadi::NlpSolver::checkNode() const  "
+
+Check if the node is pointing to the right type of object.
+
+";
+
 %feature("docstring")  casadi::Function::evaluate() "
 
 Evaluate.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind, const std::string
-&oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-const std::string &oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
 
 ";
 
@@ -39971,6 +45357,28 @@ casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
 const  "
 
 Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+Dictionary &dict, bool skipUnknown=false) "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
 
 ";
 
@@ -39988,381 +45396,23 @@ Print options to a stream.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
+%feature("docstring")  casadi::Function::symbolicInput() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
+%feature("docstring")  casadi::Function::getNumInputElements() const  "
 
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
-num_in) "
-
-Set the number of function inputs.
+Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
-
-";
-
-%feature("docstring")  casadi::Function::setFullJacobian(const Function
-&jac) "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
-
-";
-
-%feature("docstring") casadi::NLPSolver::NLPSolver() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::NLPSolver::NLPSolver(const std::string &name,
-const Function &nlp) "
-
-NLP solver factory.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
-
-";
-
-%feature("docstring")  casadi::NLPSolver::reportConstraints(std::ostream
-&stream=std::cout) "
-
-Prints out a human readable report about possible constraint violations,
-after solving.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(const std::string
-&filename) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode() "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(std::ostream
-&filename) "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
-[INTERNAL]  Access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
-const " [INTERNAL]  Const access an output.
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::NLPSolver::getReducedHessian() "
-
-Get the reduced Hessian. Requires a patched sIPOPT installation, see CasADi
-documentation.
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
-iind=0) const "
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
-std::string &iname) const "
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
-iind=0) " [INTERNAL]  Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
-const std::string &iname) " [INTERNAL]  Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::Function::callParallel(const std::vector<
-std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
-const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
-iind=0) "
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
-const std::string &iname) "
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
-
-Get output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::setOutputScheme(const
-casadi::IOScheme &scheme) "
-
-Set output scheme.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an input scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
-casadi::IOScheme &scheme, const std::string &name, bool input) const "
-[INTERNAL]  Find the index for a string describing a particular entry of a
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
 
 ";
 
@@ -40409,128 +45459,124 @@ the length of the vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring")  casadi::NLPSolver::jacG() "
-
-Access the Jacobian of the constraint function.
-
->Input scheme: casadi::HessLagInput (HESSLAG_NUM_IN = 5) [hessLagIn]
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| HESSLAG_X              | x                      | Decision variable .    |
-+------------------------+------------------------+------------------------+
-| HESSLAG_P              | p                      | Fixed parameter .      |
-+------------------------+------------------------+------------------------+
-| HESSLAG_LAM_F          | lam_f                  | Multiplier for f. Just |
-|                        |                        | a scalar factor for    |
-|                        |                        | the objective that the |
-|                        |                        | NLP solver might use   |
-|                        |                        | to scale the           |
-|                        |                        | objective.             |
-+------------------------+------------------------+------------------------+
-| HESSLAG_LAM_G          | lam_g                  | Multiplier for g .     |
-+------------------------+------------------------+------------------------+
-
->Output scheme: casadi::HessLagOutput (HESSLAG_NUM_OUT = 6) [hessLagOut]
-+----------------+--------+------------------------------------------------+
-|   Full name    | Short  |                  Description                   |
-+================+========+================================================+
-| HESSLAG_HESS   | hess   | Hessian of the Lagrangian .                    |
-+----------------+--------+------------------------------------------------+
-| HESSLAG_F      | f      | Objective function .                           |
-+----------------+--------+------------------------------------------------+
-| HESSLAG_G      | g      | Constraint function .                          |
-+----------------+--------+------------------------------------------------+
-| HESSLAG_GRAD_X | grad_x | Gradient of the Lagrangian with respect to x . |
-+----------------+--------+------------------------------------------------+
-| HESSLAG_GRAD_P | grad_p | Gradient of the Lagrangian with respect to p . |
-+----------------+--------+------------------------------------------------+
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
 std::string &str) const  "
 
-get an option value
+Get the type of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::setInputScheme(const
-casadi::IOScheme &scheme) "
+%feature("docstring")  casadi::NlpSolver::getReportConstraints() "";
 
-Set input scheme.
+%feature("docstring")  casadi::Function::generateCode(const std::string
+&filename) "
 
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
-
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  SWIGINTERNAL
+%feature("docstring")  casadi::Function::generateCode() "
+
+Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::NLPSolver::gradF() "
+%feature("docstring")  casadi::Function::generateCode(std::ostream
+&filename) "
 
-Access the objective gradient function>Input scheme: casadi::GradFInput
-(GRADF_NUM_IN = 3) [gradFIn] +-----------+-------+---------------------+ |
-Full name | Short |     Description     |
-+===========+=======+=====================+ | GRADF_X   | x     | Decision
-variable . | +-----------+-------+---------------------+ | GRADF_P   | p
-| Fixed parameter .   | +-----------+-------+---------------------+
+Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
+%feature("docstring")  casadi::IOInterface< Function
+>::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an output scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
-"
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
 
-Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
-const "
-
-Get the number of function outputs.
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
 
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
+Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
+%feature("docstring")  casadi::Function::symbolicInputSX() const  "
 
-Get total number of nonzeros in all of the matrix-valued inputs.
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::NlpSolver::hessLag() "
+
+Access the Hessian of the Lagrangian function.
+
+>Input scheme: casadi::JacGInput (JACG_NUM_IN = 2) [jacGIn]
++-----------+-------+---------------------+
+| Full name | Short |     Description     |
++===========+=======+=====================+
+| JACG_X    | x     | Decision variable . |
++-----------+-------+---------------------+
+| JACG_P    | p     | Fixed parameter .   |
++-----------+-------+---------------------+
+
+>Output scheme: casadi::JacGOutput (JACG_NUM_OUT = 3) [jacGOut]
++-----------+-------+-------------------------------+
+| Full name | Short |          Description          |
++===========+=======+===============================+
+| JACG_JAC  | jac   | Jacobian of the constraints . |
++-----------+-------+-------------------------------+
+| JACG_F    | f     | Objective function .          |
++-----------+-------+-------------------------------+
+| JACG_G    | g     | Constraint function .         |
++-----------+-------+-------------------------------+
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
 
 ";
 
 
-// File: classcasadi_1_1NLPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+// File: classcasadi_1_1NlpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::PrintableObject::getDescription() const  "
 [INTERNAL]  Return a string with a description (for SWIG)
@@ -40545,20 +45591,20 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector< M
->::NLPSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector< M
+>::NlpSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'NLPSolverInput'
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'NlpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
@@ -40568,14 +45614,14 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 
-// File: classcasadi_1_1NLPSolverOutputIOSchemeVector.xml
+// File: classcasadi_1_1NlpSolverOutputIOSchemeVector.xml
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'NLPSolverOutput'
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'NlpSolverOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
@@ -40592,19 +45638,19 @@ C++ includes: schemes_helpers.hpp ";
 
 ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector< M
->::NLPSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector< M
+>::NlpSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
 
 // File: structcasadi_1_1NonnegativeChecker.xml
@@ -44595,7 +49641,7 @@ Base class for OCP solvers.
 
 Joel Andersson
 
->Input scheme: casadi::OCPInput (OCP_NUM_IN = 14) [ocpIn]
+>Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -44626,7 +49672,7 @@ Joel Andersson
 | OCP_UBG    | ubg    | Upper bound for the coupling constraints .   |
 +------------+--------+----------------------------------------------+
 
->Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 5) [ocpOut]
+>Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -49702,7 +54748,7 @@ new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
 
 Joris Gillis
 
->Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 3) [dpleIn]
+>Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 2) [dpleIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -49715,7 +54761,7 @@ Joris Gillis
 |                        |                        | blkdiag otherwise) .   |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::DPLEOutput (DPLE_NUM_OUT = 2) [dpleOut]
+>Output scheme: casadi::DPLEOutput (DPLE_NUM_OUT = 1) [dpleOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -50002,1217 +55048,16 @@ input/output scheme.
 ";
 
 
-// File: classcasadi_1_1QCQPSolver.xml
+// File: classcasadi_1_1QcqpSolver.xml
 
 
 /*  Simple Getters & Setters  */
 
 /*  Advanced Getters  */
 
-/*  Option Functionality  */ %feature("docstring")
-casadi::SharedObject::repr(std::ostream &stream) const  " [INTERNAL]  Print
-a representation of the object.
+/*  Option Functionality  */ %feature("docstring") casadi::QcqpSolver "
 
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
-num_in) "
-
-Set the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-int oind=0) "
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-const std::string &oname) "
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
-[INTERNAL]  Access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
-const " [INTERNAL]  Const access an output.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
-"
-
-INTERNAL.
-
-Get a list of all option names
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
-%feature("docstring")  casadi::Function::getStats() const  "
-
-Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-int oind=0, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
-&arg, bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
-bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
-bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::evaluate() "
-
-Evaluate.
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputElements() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInputSX() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an input scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::removeMonitor(const std::string
-&mon) "
-
-Remove modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
-int nfwd, int nadj) "
-
-Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-NOTE: Does not take ownership, only weak references to the derivatives are
-kept internally
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
-iind=0) const "
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
-std::string &iname) const "
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
-iind=0) " [INTERNAL]  Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
-const std::string &iname) " [INTERNAL]  Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind, const std::string
-&oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-const std::string &oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
-[INTERNAL]  Access an input.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
-" [INTERNAL]  Const access an input.
-
-";
-
-%feature("docstring")  casadi::Function::getInputScheme() const  "
-
-Get input scheme.
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring")  casadi::Function::setInputScheme(const
-casadi::IOScheme &scheme) "
-
-Set input scheme.
-
-";
-
-%feature("docstring")  casadi::QCQPSolver::setQPOptions() "
-
-Set options that make the QP solver more suitable for solving LPs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-Dictionary &dict, bool skipUnknown=false) "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(const std::string
-&filename) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode() "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(std::ostream
-&filename) "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInput() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
-
-Get output scheme.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputElements() const  "
-
-Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an output scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring") casadi::QCQPSolver::QCQPSolver() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::QCQPSolver::QCQPSolver(const std::string
-&name, const QCQPStructure &st) "
-
-Constructor.
-
-Parameters:
------------
-
-st:  Problem structure
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
-const "
-
-Get the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
-
-";
-
-%feature("docstring")  casadi::QCQPSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
-
-";
-
-%feature("docstring")  casadi::Function::setOutputScheme(const
-casadi::IOScheme &scheme) "
-
-Set output scheme.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
-iind=0) "
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
-const std::string &iname) "
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
-num_out) "
-
-Set the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
-SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
-&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
-MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
-&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callParallel(const std::vector<
-std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
-const "
-
-Get the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
-const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-int oind=0) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind, const
-std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-const std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
-"
-
-Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-"
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind, const std::string
-&oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-const std::string &oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::Function::setFullJacobian(const Function
-&jac) "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
-class
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
-casadi::IOScheme &scheme, const std::string &name, bool input) const "
-[INTERNAL]  Find the index for a string describing a particular entry of a
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
-
-";
-
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::Function::fullJacobian() "
-
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
-
-";
-
-%feature("docstring") casadi::QCQPSolver "
-
-QCQPSolver.
+QcqpSolver.
 
 Solves the following strictly convex problem:
 
@@ -51224,9 +55069,9 @@ quadratic constraints
 
 If H, Pi is not positive-definite, the solver should throw an error.
 
-Joris Gillis
+General information
 
->Input scheme: casadi::QCQPSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
+>Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 12) [qcqpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -51274,7 +55119,7 @@ Joris Gillis
 | QCQP_SOLVER_LAM_X0     | lam_x0                 | dense                  |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::QCQPSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
+>Output scheme: casadi::QcqpSolverOutput (QCQP_SOLVER_NUM_OUT = 4) [qcqpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -51377,7 +55222,55 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_QcqpSolver_socp'>socp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+QcqpSolver.doc(\"myextraplugin\")
+
+socp
+
+Solve a QCQP with an SocpSolver
+
+Note: this implementation relies on Cholesky decomposition: Chol(H) = L -> H
+= LL' with L lower triangular This requires Pi, H to be positive definite.
+Positive semi-definite is not sufficient. Notably, H==0 will not work.
+
+A better implementation would rely on matrix square root, but we need
+singular value decomposition to implement that.
+
+This implementation makes use of the epigraph reformulation:*  min f(x) *
+x * *   min  t *    x, t  f(x) <= t *
+
+This implementation makes use of the following identity:*  || Gx+h||_2 <=
+e'x + f * *  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0 * where we
+put e = [0 0 ... 1] for the quadratic constraint arising from the epigraph
+reformulation and e==0 for all other quadratic constraints.
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| socp_solver     | OT_STRING       | GenericType()   | The SocpSolver  |
+|                 |                 |                 | used to solve   |
+|                 |                 |                 | the QCQPs.      |
++-----------------+-----------------+-----------------+-----------------+
+| socp_solver_opt | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ions            |                 |                 | passed to the   |
+|                 |                 |                 | SOCPSOlver      |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++-------------------+
+|        Id         |
++===================+
+| socp_solver_stats |
++-------------------+
+
+Joris Gillis Diagrams
 
 C++ includes: qcqp_solver.hpp ";
 
@@ -51387,28 +55280,17 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
 
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  SWIGINTERNAL
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
 std::string &str) const  "
 
-INTERNAL.
-
-Get the default of a certain option
+check if the user has there is an option str
 
 ";
 
@@ -51420,13 +55302,41 @@ Print options to a stream.
 
 ";
 
-%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
-Access input/output scheme.
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
+
+Get the description of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
-input/output scheme.
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+int oind=0) "
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+const std::string &oname) "
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -51438,241 +55348,95 @@ improper use will cause memory leaks!
 
 ";
 
-
-// File: classcasadi_1_1QCQPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
-
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector< M
->::QCQPSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
-
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
-
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
-
-%feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
-[INTERNAL] ";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
+class
 
 ";
 
-%feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
+&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
+DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
+DMatrixVectorVector &output_asens, bool always_inline=false, bool
+never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
+numerically with directional derivatives The first two arguments are the
+nondifferentiated inputs and results of the evaluation, the next two
+arguments are a set of forward directional seeds and the resulting forward
+directional derivatives, the length of the vector being the number of
+forward directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of the
+vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'QCQPSolverInput'
-
-C++ includes: schemes_helpers.hpp ";
-
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
-
-";
-
-
-// File: classcasadi_1_1QCQPSolverOutputIOSchemeVector.xml
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'QCQPSolverOutput'
-
-C++ includes: schemes_helpers.hpp ";
-
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
-
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
-
-%feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
+SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
+&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
+MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
+&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector< M
->::QCQPSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
+casadi::IOScheme &scheme, const std::string &name, bool input) const "
+[INTERNAL]  Find the index for a string describing a particular entry of a
+scheme.
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring")  casadi::Function::callParallel(const std::vector<
+std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
 
-%feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
-[INTERNAL] ";
+Evaluate symbolically in parallel (matrix graph)
 
+Parameters:
+-----------
 
-// File: classcasadi_1_1QCQPStructIOSchemeVector.xml
-%feature("docstring") casadi::QCQPStructIOSchemeVector "[INTERNAL]  Helper
-function for 'QCQPStruct'
-
-C++ includes: casadi_types.hpp ";
-
-%feature("docstring") casadi::QCQPStructIOSchemeVector::__getitem__ "[INTERNAL] ";
-
-%feature("docstring") casadi::QCQPStructIOSchemeVector::__getitem__ "[INTERNAL] ";
-
-%feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
-[INTERNAL] ";
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::QCQPStructIOSchemeVector< T
->::QCQPStructIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
-
-%feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::QCQPStructIOSchemeVector::__len__ "[INTERNAL]
-";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
+*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
 
 ";
 
-
-// File: classcasadi_1_1QPSolver.xml
-
-
-/*  Simple Getters & Setters  */
-
-/*  Advanced Getters  */
-
-/*  Option Functionality  */ %feature("docstring")  casadi::IOInterface<
-Function  >::output(int oind=0) const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+INTERNAL.
 
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
-iind=0) const "
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
-std::string &iname) const "
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
-iind=0) " [INTERNAL]  Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
-const std::string &iname) " [INTERNAL]  Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
-num_out) "
-
-Set the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
+Get a list of all option names
 
 ";
 
@@ -51682,76 +55446,25 @@ get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring")  casadi::QPSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
-
-";
-
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
+%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
+a const pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
+%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
+pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::Function::setFullJacobian(const Function
-&jac) "
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
 
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+Copy all options from another object.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
-iind=0) "
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
-const std::string &iname) "
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
-
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  SWIGINTERNAL
+%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
+Get the reference count.
 
 ";
 
@@ -51822,21 +55535,187 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
+%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+int oind=0, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
+std::string &str) const  "
+
+check if there is an option str
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring")  casadi::QcqpSolver::checkNode() const  "
+
+Check if the node is pointing to the right type of object.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+std::string &str) const  "
+
+get an option value
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
+%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+%feature("docstring") casadi::QcqpSolver::QcqpSolver() "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
+Default constructor.
 
-There is no guarantee that consecutive calls return identical objects
+";
+
+%feature("docstring") casadi::QcqpSolver::QcqpSolver(const std::string
+&name, const QCQPStructure &st) "
+
+Constructor.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_QcqpSolver_socp'>socp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+QcqpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+st:  Problem structure
+
+";
+
+%feature("docstring")  casadi::Function::getInputScheme() const  "
+
+Get input scheme.
+
+";
+
+%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
+"
+
+Add modules to be monitored.
 
 ";
 
@@ -51847,25 +55726,110 @@ Get the type name of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInputSX() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
-
-There is no guarantee that consecutive calls return identical objects
+%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
+Deep copy.
 
 ";
 
-%feature("docstring")  casadi::Function::setOutputScheme(const
-casadi::IOScheme &scheme) "
-
-Set output scheme.
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
 
 ";
 
-%feature("docstring")  casadi::Function::evaluate() "
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
 
-Evaluate.
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
+const  " [INTERNAL]  Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
+[INTERNAL]  Access an output.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
+const " [INTERNAL]  Const access an output.
+
+";
+
+%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
+
+Get output scheme.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -51873,6 +55837,83 @@ Evaluate.
 casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
 &name, int i) " [INTERNAL]  Set a certain option by giving its index into
 the allowed values.
+
+";
+
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::QcqpSolver::setQPOptions() "
+
+Set options that make the QP solver more suitable for solving LPs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
+const "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
+std::string &str) const  "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputElements() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::getStats() const  "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
 
 ";
 
@@ -51901,6 +55942,748 @@ Generate the sparsity of a Jacobian block
 const std::string &iind, const std::string &oind, bool compact=false) "
 
 Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::SharedObject::isInit() const  "
+
+Is initialized?
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInput() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputElements() const  "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::Function::fullJacobian() "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+Dictionary &dict, bool skipUnknown=false) "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring")  casadi::Function::setFullJacobian(const Function
+&jac) "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function
+>::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an input scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
+num_in) "
+
+Set the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind, const std::string
+&oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+const std::string &oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
+SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+" [INTERNAL]  SWIGINTERNAL
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+std::string &str) const  "
+
+INTERNAL.
+
+Get the default of a certain option
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+"
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
+&arg, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::evaluate() "
+
+Evaluate.
+
+";
+
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
+
+Set output scheme.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
+iind=0) const "
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
+std::string &iname) const "
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
+iind=0) " [INTERNAL]  Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
+const std::string &iname) " [INTERNAL]  Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::removeMonitor(const std::string
+&mon) "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
+[INTERNAL]  Access an input.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
+" [INTERNAL]  Const access an input.
+
+";
+
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::Function::setInputScheme(const
+casadi::IOScheme &scheme) "
+
+Set input scheme.
+
+";
+
+%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
+int nfwd, int nadj) "
+
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
+
+";
+
+%feature("docstring")  casadi::SharedObject::isNull() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function
+>::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an output scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
+const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind, const std::string
+&oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+const std::string &oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(const std::string
+&filename) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode() "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(std::ostream
+&filename) "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
+iind=0) "
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
+const std::string &iname) "
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
+
+Get the dictionary.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
+num_out) "
+
+Set the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
+const "
+
+Get the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInputSX() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+
+// File: classcasadi_1_1QcqpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector< M
+>::QcqpSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+
+%feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
+[INTERNAL] ";
+
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+[INTERNAL]  Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
+&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'QcqpSolverInput'
+
+C++ includes: schemes_helpers.hpp ";
+
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+[INTERNAL]  Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
+&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+
+";
+
+
+// File: classcasadi_1_1QcqpSolverOutputIOSchemeVector.xml
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'QcqpSolverOutput'
+
+C++ includes: schemes_helpers.hpp ";
+
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+
+%feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
+&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+[INTERNAL]  Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector< M
+>::QcqpSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+[INTERNAL]  Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
+&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+
+%feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
+[INTERNAL] ";
+
+
+// File: classcasadi_1_1QCQPStructIOSchemeVector.xml
+%feature("docstring") casadi::QCQPStructIOSchemeVector "[INTERNAL]  Helper
+function for 'QCQPStruct'
+
+C++ includes: casadi_types.hpp ";
+
+%feature("docstring") casadi::QCQPStructIOSchemeVector::__getitem__ "[INTERNAL] ";
+
+%feature("docstring") casadi::QCQPStructIOSchemeVector::__getitem__ "[INTERNAL] ";
+
+%feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
+&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
+[INTERNAL] ";
+
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+[INTERNAL]  Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::QCQPStructIOSchemeVector< T
+>::QCQPStructIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+
+%feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
+&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::QCQPStructIOSchemeVector::__len__ "[INTERNAL]
+";
+
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+[INTERNAL]  Return a string with a description (for SWIG)
+
+";
+
+
+// File: classcasadi_1_1QpSolver.xml
+
+
+/*  Simple Getters & Setters  */
+
+/*  Advanced Getters  */
+
+/*  Option Functionality  */ %feature("docstring")  casadi::IOInterface<
+Function  >::getNumInputs() const "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+"
+
+INTERNAL.
+
+Get a list of all option names
 
 ";
 
@@ -51934,15 +56717,654 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
+num_in) "
 
-Get total number of nonzeros in all of the matrix-valued outputs.
+Set the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::QPSolver "
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
 
-QPSolver.
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::QpSolver::generateNativeCode(const
+std::string &filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::QpSolver::generateNativeCode(std::ostream
+&file) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
+int nfwd, int nadj) "
+
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
+
+";
+
+%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+Dictionary &dict, bool skipUnknown=false) "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(const std::string
+&filename) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode() "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(std::ostream
+&filename) "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
+iind=0) const "
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
+std::string &iname) const "
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
+iind=0) " [INTERNAL]  Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
+const std::string &iname) " [INTERNAL]  Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+int oind=0, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::setInputScheme(const
+casadi::IOScheme &scheme) "
+
+Set input scheme.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
+casadi::IOScheme &scheme, const std::string &name, bool input) const "
+[INTERNAL]  Find the index for a string describing a particular entry of a
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
+iind=0) "
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
+const std::string &iname) "
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isNull() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
+
+Get the dictionary.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+"
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInput() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::QpSolver::QpSolver() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::QpSolver::QpSolver(const std::string &name,
+const QPStructure &st) "
+
+Constructor.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_QpSolver_cplex'>cplex</a>
+
+- <a href='#plugin_QpSolver_ooqp'>ooqp</a>
+
+- <a href='#plugin_QpSolver_qpoases'>qpoases</a>
+
+- <a href='#plugin_QpSolver_sqic'>sqic</a>
+
+- <a href='#plugin_QpSolver_nlp'>nlp</a>
+
+- <a href='#plugin_QpSolver_qcqp'>qcqp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+QpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+st:  Problem structure
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+int oind=0) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(int iind, const
+std::string &oind) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+const std::string &oind) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::setFullJacobian(const Function
+&jac) "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputElements() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
+const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
+Get the reference count.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isInit() const  "
+
+Is initialized?
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::getSanitizedName() const  "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputElements() const  "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+std::string &str) const  "
+
+get an option value
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
+a const pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
+pointer to the node.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
+&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
+DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
+DMatrixVectorVector &output_asens, bool always_inline=false, bool
+never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
+numerically with directional derivatives The first two arguments are the
+nondifferentiated inputs and results of the evaluation, the next two
+arguments are a set of forward directional seeds and the resulting forward
+directional derivatives, the length of the vector being the number of
+forward directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of the
+vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
+SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
+&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
+MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
+&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring") casadi::QpSolver "
+
+QpSolver.
 
 Solves the following strictly convex problem:
 
@@ -51953,9 +57375,9 @@ constraints (A)
 
 If H is not positive-definite, the solver should throw an error.
 
-Joel Andersson
+General information
 
->Input scheme: casadi::QPSolverInput (QP_SOLVER_NUM_IN = 10) [qpIn]
+>Input scheme: casadi::QpSolverInput (QP_SOLVER_NUM_IN = 9) [qpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -51987,7 +57409,7 @@ Joel Andersson
 | QP_SOLVER_LAM_X0       | lam_x0                 | dense                  |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::QPSolverOutput (QP_SOLVER_NUM_OUT = 5) [qpOut]
+>Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 4) [qpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -52090,388 +57512,364 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_QpSolver_cplex'>cplex</a>
+
+- <a href='#plugin_QpSolver_ooqp'>ooqp</a>
+
+- <a href='#plugin_QpSolver_qpoases'>qpoases</a>
+
+- <a href='#plugin_QpSolver_sqic'>sqic</a>
+
+- <a href='#plugin_QpSolver_nlp'>nlp</a>
+
+- <a href='#plugin_QpSolver_qcqp'>qcqp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+QpSolver.doc(\"myextraplugin\")
+
+cplex
+
+Interface to Cplex solver for sparse Quadratic Programs
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| barrier_maxiter | OT_INTEGER      | 2.100e+09       | Maximum number  |
+|                 |                 |                 | of barrier      |
+|                 |                 |                 | iterations.     |
++-----------------+-----------------+-----------------+-----------------+
+| convex          | OT_BOOLEAN      | true            | Indicates if    |
+|                 |                 |                 | the QP is       |
+|                 |                 |                 | convex or not   |
+|                 |                 |                 | (affects only   |
+|                 |                 |                 | the barrier     |
+|                 |                 |                 | method).        |
++-----------------+-----------------+-----------------+-----------------+
+| dep_check       | OT_STRING       | \"off\"           | Detect          |
+|                 |                 |                 | redundant       |
+|                 |                 |                 | constraints. (a |
+|                 |                 |                 | utomatic:-1|off |
+|                 |                 |                 | :0|begin:1|end: |
+|                 |                 |                 | 2|both:3)       |
++-----------------+-----------------+-----------------+-----------------+
+| dump_filename   | OT_STRING       | \"qp.dat\"        | The filename to |
+|                 |                 |                 | dump to.        |
++-----------------+-----------------+-----------------+-----------------+
+| dump_to_file    | OT_BOOLEAN      | false           | Dumps QP to     |
+|                 |                 |                 | file in CPLEX   |
+|                 |                 |                 | format.         |
++-----------------+-----------------+-----------------+-----------------+
+| qp_method       | OT_STRING       | \"automatic\"     | Determines      |
+|                 |                 |                 | which CPLEX     |
+|                 |                 |                 | algorithm to    |
+|                 |                 |                 | use. (automatic |
+|                 |                 |                 | |primal_simplex |
+|                 |                 |                 | |dual_simplex|n |
+|                 |                 |                 | etwork|barrier| |
+|                 |                 |                 | sifting|concurr |
+|                 |                 |                 | ent|crossover)  |
++-----------------+-----------------+-----------------+-----------------+
+| simplex_maxiter | OT_INTEGER      | 2.100e+09       | Maximum number  |
+|                 |                 |                 | of simplex      |
+|                 |                 |                 | iterations.     |
++-----------------+-----------------+-----------------+-----------------+
+| tol             | OT_REAL         | 0.000           | Tolerance of    |
+|                 |                 |                 | solver          |
++-----------------+-----------------+-----------------+-----------------+
+| warm_start      | OT_BOOLEAN      | false           | Use warm start  |
+|                 |                 |                 | with simplex    |
+|                 |                 |                 | methods         |
+|                 |                 |                 | (affects only   |
+|                 |                 |                 | the simplex     |
+|                 |                 |                 | methods).       |
++-----------------+-----------------+-----------------+-----------------+
+
+ooqp
+
+Interface to the OOQP Solver for quadratic programming The current
+implementation assumes that OOQP is configured with the MA27 sparse linear
+solver.
+
+NOTE: when doing multiple calls to evaluate(), check if you need to
+reInit();
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| artol           | OT_REAL         | 0.000           | tolerance as    |
+|                 |                 |                 | provided with   |
+|                 |                 |                 | setArTol to     |
+|                 |                 |                 | OOQP            |
++-----------------+-----------------+-----------------+-----------------+
+| mutol           | OT_REAL         | 0.000           | tolerance as    |
+|                 |                 |                 | provided with   |
+|                 |                 |                 | setMuTol to     |
+|                 |                 |                 | OOQP            |
++-----------------+-----------------+-----------------+-----------------+
+| print_level     | OT_INTEGER      | 0               | Print level.    |
+|                 |                 |                 | OOQP listens to |
+|                 |                 |                 | print_level 0,  |
+|                 |                 |                 | 10 and 100      |
++-----------------+-----------------+-----------------+-----------------+
+
+qpoases
+
+Interface to QPOases Solver for quadratic programming
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| CPUtime         | OT_REAL         | None            | The maximum     |
+|                 |                 |                 | allowed CPU     |
+|                 |                 |                 | time in seconds |
+|                 |                 |                 | for the whole   |
+|                 |                 |                 | initialisation  |
+|                 |                 |                 | (and the        |
+|                 |                 |                 | actually        |
+|                 |                 |                 | required one on |
+|                 |                 |                 | output).        |
+|                 |                 |                 | Disabled if     |
+|                 |                 |                 | unset.          |
++-----------------+-----------------+-----------------+-----------------+
+| boundRelaxation | OT_REAL         | 10000           | Initial         |
+|                 |                 |                 | relaxation of   |
+|                 |                 |                 | bounds to start |
+|                 |                 |                 | homotopy and    |
+|                 |                 |                 | initial value   |
+|                 |                 |                 | for far bounds. |
++-----------------+-----------------+-----------------+-----------------+
+| boundTolerance  | OT_REAL         | 0.000           | If upper and    |
+|                 |                 |                 | lower bounds    |
+|                 |                 |                 | differ less     |
+|                 |                 |                 | than this       |
+|                 |                 |                 | tolerance, they |
+|                 |                 |                 | are regarded    |
+|                 |                 |                 | equal, i.e. as  |
+|                 |                 |                 | equality        |
+|                 |                 |                 | constraint.     |
++-----------------+-----------------+-----------------+-----------------+
+| enableCholeskyR | OT_INTEGER      | 0               | Specifies the   |
+| efactorisation  |                 |                 | frequency of a  |
+|                 |                 |                 | full re-        |
+|                 |                 |                 | factorisation   |
+|                 |                 |                 | of projected    |
+|                 |                 |                 | Hessian matrix: |
+|                 |                 |                 | 0: turns them   |
+|                 |                 |                 | off, 1: uses    |
+|                 |                 |                 | them at each    |
+|                 |                 |                 | iteration etc.  |
++-----------------+-----------------+-----------------+-----------------+
+| enableDriftCorr | OT_INTEGER      | 1               | Specifies the   |
+| ection          |                 |                 | frequency of    |
+|                 |                 |                 | drift           |
+|                 |                 |                 | corrections: 0: |
+|                 |                 |                 | turns them off. |
++-----------------+-----------------+-----------------+-----------------+
+| enableEqualitie | OT_BOOLEAN      | False           | Specifies       |
+| s               |                 |                 | whether         |
+|                 |                 |                 | equalities      |
+|                 |                 |                 | should be       |
+|                 |                 |                 | treated as      |
+|                 |                 |                 | always active   |
+|                 |                 |                 | (True) or not   |
+|                 |                 |                 | (False)         |
++-----------------+-----------------+-----------------+-----------------+
+| enableFarBounds | OT_BOOLEAN      | True            | Enables the use |
+|                 |                 |                 | of far bounds.  |
++-----------------+-----------------+-----------------+-----------------+
+| enableFlippingB | OT_BOOLEAN      | True            | Enables the use |
+| ounds           |                 |                 | of flipping     |
+|                 |                 |                 | bounds.         |
++-----------------+-----------------+-----------------+-----------------+
+| enableFullLITes | OT_BOOLEAN      | False           | Enables         |
+| ts              |                 |                 | condition-      |
+|                 |                 |                 | hardened (but   |
+|                 |                 |                 | more expensive) |
+|                 |                 |                 | LI test.        |
++-----------------+-----------------+-----------------+-----------------+
+| enableNZCTests  | OT_BOOLEAN      | True            | Enables nonzero |
+|                 |                 |                 | curvature       |
+|                 |                 |                 | tests.          |
++-----------------+-----------------+-----------------+-----------------+
+| enableRamping   | OT_BOOLEAN      | True            | Enables         |
+|                 |                 |                 | ramping.        |
++-----------------+-----------------+-----------------+-----------------+
+| enableRegularis | OT_BOOLEAN      | False           | Enables         |
+| ation           |                 |                 | automatic       |
+|                 |                 |                 | Hessian         |
+|                 |                 |                 | regularisation. |
++-----------------+-----------------+-----------------+-----------------+
+| epsDen          | OT_REAL         | 0.000           | Denominator     |
+|                 |                 |                 | tolerance for   |
+|                 |                 |                 | ratio tests.    |
++-----------------+-----------------+-----------------+-----------------+
+| epsFlipping     | OT_REAL         | 0.000           | Tolerance of    |
+|                 |                 |                 | squared         |
+|                 |                 |                 | Cholesky        |
+|                 |                 |                 | diagonal factor |
+|                 |                 |                 | which triggers  |
+|                 |                 |                 | flipping bound. |
++-----------------+-----------------+-----------------+-----------------+
+| epsIterRef      | OT_REAL         | 0.000           | Early           |
+|                 |                 |                 | termination     |
+|                 |                 |                 | tolerance for   |
+|                 |                 |                 | iterative       |
+|                 |                 |                 | refinement.     |
++-----------------+-----------------+-----------------+-----------------+
+| epsLITests      | OT_REAL         | 0.000           | Tolerance for   |
+|                 |                 |                 | linear          |
+|                 |                 |                 | independence    |
+|                 |                 |                 | tests.          |
++-----------------+-----------------+-----------------+-----------------+
+| epsNZCTests     | OT_REAL         | 0.000           | Tolerance for   |
+|                 |                 |                 | nonzero         |
+|                 |                 |                 | curvature       |
+|                 |                 |                 | tests.          |
++-----------------+-----------------+-----------------+-----------------+
+| epsNum          | OT_REAL         | -0.000          | Numerator       |
+|                 |                 |                 | tolerance for   |
+|                 |                 |                 | ratio tests.    |
++-----------------+-----------------+-----------------+-----------------+
+| epsRegularisati | OT_REAL         | 0.000           | Scaling factor  |
+| on              |                 |                 | of identity     |
+|                 |                 |                 | matrix used for |
+|                 |                 |                 | Hessian         |
+|                 |                 |                 | regularisation. |
++-----------------+-----------------+-----------------+-----------------+
+| finalRamping    | OT_REAL         | 1               | Final value for |
+|                 |                 |                 | ramping         |
+|                 |                 |                 | strategy.       |
++-----------------+-----------------+-----------------+-----------------+
+| growFarBounds   | OT_REAL         | 1000            | Factor to grow  |
+|                 |                 |                 | far bounds.     |
++-----------------+-----------------+-----------------+-----------------+
+| initialFarBound | OT_REAL         | 1000000         | Initial size    |
+| s               |                 |                 | for far bounds. |
++-----------------+-----------------+-----------------+-----------------+
+| initialRamping  | OT_REAL         | 0.500           | Start value for |
+|                 |                 |                 | ramping         |
+|                 |                 |                 | strategy.       |
++-----------------+-----------------+-----------------+-----------------+
+| initialStatusBo | OT_STRING       | lower           | Initial status  |
+| unds            |                 |                 | of bounds at    |
+|                 |                 |                 | first           |
+|                 |                 |                 | iteration.      |
++-----------------+-----------------+-----------------+-----------------+
+| maxDualJump     | OT_REAL         | 100000000       | Maximum allowed |
+|                 |                 |                 | jump in dual    |
+|                 |                 |                 | variables in    |
+|                 |                 |                 | linear          |
+|                 |                 |                 | independence    |
+|                 |                 |                 | tests.          |
++-----------------+-----------------+-----------------+-----------------+
+| maxPrimalJump   | OT_REAL         | 100000000       | Maximum allowed |
+|                 |                 |                 | jump in primal  |
+|                 |                 |                 | variables in    |
+|                 |                 |                 | nonzero         |
+|                 |                 |                 | curvature       |
+|                 |                 |                 | tests.          |
++-----------------+-----------------+-----------------+-----------------+
+| nWSR            | OT_INTEGER      | None            | The maximum     |
+|                 |                 |                 | number of       |
+|                 |                 |                 | working set     |
+|                 |                 |                 | recalculations  |
+|                 |                 |                 | to be performed |
+|                 |                 |                 | during the      |
+|                 |                 |                 | initial         |
+|                 |                 |                 | homotopy.       |
+|                 |                 |                 | Default is 5(nx |
+|                 |                 |                 | + nc)           |
++-----------------+-----------------+-----------------+-----------------+
+| numRefinementSt | OT_INTEGER      | 1               | Maximum number  |
+| eps             |                 |                 | of iterative    |
+|                 |                 |                 | refinement      |
+|                 |                 |                 | steps.          |
++-----------------+-----------------+-----------------+-----------------+
+| numRegularisati | OT_INTEGER      | 0               | Maximum number  |
+| onSteps         |                 |                 | of successive   |
+|                 |                 |                 | regularisation  |
+|                 |                 |                 | steps.          |
++-----------------+-----------------+-----------------+-----------------+
+| printLevel      | OT_STRING       | medium          | Defines the     |
+|                 |                 |                 | amount of text  |
+|                 |                 |                 | output during   |
+|                 |                 |                 | QP solution,    |
+|                 |                 |                 | see Section 5.7 |
++-----------------+-----------------+-----------------+-----------------+
+| terminationTole | OT_REAL         | 0.000           | Relative        |
+| rance           |                 |                 | termination     |
+|                 |                 |                 | tolerance to    |
+|                 |                 |                 | stop homotopy.  |
++-----------------+-----------------+-----------------+-----------------+
+
+sqic
+
+Interface to the SQIC solver for quadratic programming
+
+>List of available options
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
+
+nlp
+
+Solve QPs using an NlpSolver
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| nlp_solver      | OT_STRING       | GenericType()   | The NLPSOlver   |
+|                 |                 |                 | used to solve   |
+|                 |                 |                 | the QPs.        |
++-----------------+-----------------+-----------------+-----------------+
+| nlp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ons             |                 |                 | passed to the   |
+|                 |                 |                 | NLPSOlver       |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++------------------+
+|        Id        |
++==================+
+| nlp_solver_stats |
++------------------+
+
+qcqp
+
+Solve QP using a QcqpSolver
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| qcqp_solver     | OT_STRING       | GenericType()   | The QcqpSolver  |
+|                 |                 |                 | used to solve   |
+|                 |                 |                 | the QPs.        |
++-----------------+-----------------+-----------------+-----------------+
+| qcqp_solver_opt | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ions            |                 |                 | passed to the   |
+|                 |                 |                 | QCQPSOlver      |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++-------------------+
+|        Id         |
++===================+
+| qcqp_solver_stats |
++-------------------+
+
+Joel Andersson Diagrams
 
 C++ includes: qp_solver.hpp ";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
-[INTERNAL]  Access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
-const " [INTERNAL]  Const access an output.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(const std::string
-&filename) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode() "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(std::ostream
-&filename) "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
-std::string &str) const  "
-
-INTERNAL.
-
-Get the default of a certain option
-
-";
-
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
-
-";
-
-%feature("docstring")  casadi::Function::getInputScheme() const  "
-
-Get input scheme.
-
-";
-
-%feature("docstring")  casadi::QPSolver::setLPOptions() "
-
-Set options that make the QP solver more suitable for solving LPs.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
-num_in) "
-
-Set the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind, const std::string
-&oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-const std::string &oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::callParallel(const std::vector<
-std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-int oind=0, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputElements() const  "
-
-Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
-
-Get output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::fullJacobian() "
-
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
-
-";
-
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
-const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
-class
-
-";
 
 %feature("docstring")  casadi::PrintableObject::getDescription() const  "
 
@@ -52479,8 +57877,41 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
+SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+" [INTERNAL]  SWIGINTERNAL
+
+";
+
+%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -52490,89 +57921,11 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
-SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
-&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
-MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
-&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
-const "
-
-Get the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")  casadi::Function::setInputScheme(const
-casadi::IOScheme &scheme) "
-
-Set input scheme.
-
-";
-
 %feature("docstring")
-casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
-const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+casadi::OptionsFunctionality::printOptions(std::ostream &stream=std::cout)
+const  "
+
+Print options to a stream.
 
 ";
 
@@ -52643,191 +57996,10 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
 
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::printOptions(std::ostream &stream=std::cout)
-const  "
-
-Print options to a stream.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an input scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputElements() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
-int nfwd, int nadj) "
-
-Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-NOTE: Does not take ownership, only weak references to the derivatives are
-kept internally
-
-";
-
-%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-Dictionary &dict, bool skipUnknown=false) "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
-"
-
-Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
+Set output scheme.
 
 ";
 
@@ -52838,85 +58010,16 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring")  casadi::Function::getStats() const  "
-
-Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
-casadi::IOScheme &scheme, const std::string &name, bool input) const "
-[INTERNAL]  Find the index for a string describing a particular entry of a
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an output scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
-
-";
-
-%feature("docstring") casadi::QPSolver::QPSolver() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::QPSolver::QPSolver(const std::string &name,
-const QPStructure &st) "
-
-Constructor.
-
-Parameters:
------------
-
-st:  Problem structure
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
-[INTERNAL]  Access an input.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
-" [INTERNAL]  Const access an input.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
 std::string &str) const  "
 
-check if the user has there is an option str
+Get the type of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
+
+Get output scheme.
 
 ";
 
@@ -52927,12 +58030,74 @@ Remove modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+%feature("docstring")  casadi::Function::fullJacobian() "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
+*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
+[INTERNAL]  Access an output.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
+const " [INTERNAL]  Const access an output.
+
+";
+
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
 "
+
+Add modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
+std::string &str) const  "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInputSX() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+std::string &str) const  "
 
 INTERNAL.
 
-Get a list of all option names
+Get the default of a certain option
+
+";
+
+%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
+Deep copy.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
+std::string &str) const  "
+
+check if there is an option str
 
 ";
 
@@ -52957,6 +58122,12 @@ Evaluate the function symbolically or numerically.
 
 ";
 
+%feature("docstring")  casadi::Function::getInputScheme() const  "
+
+Get input scheme.
+
+";
+
 %feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
 
 Initialize or re-initialize the object:
@@ -52965,34 +58136,349 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
+
+Get the description of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
+const  " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::QPSolver::generateNativeCode(const
-std::string &filename) const  "
-
-Generate native code in the interfaced language for debugging
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
+[INTERNAL]  Access an input.
 
 ";
 
-%feature("docstring")  casadi::QPSolver::generateNativeCode(std::ostream
-&file) const  "
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
+" [INTERNAL]  Const access an input.
 
-Generate native code in the interfaced language for debugging
+";
+
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function
+>::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an input scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
+class
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind, const std::string
+&oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+const std::string &oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
+num_out) "
+
+Set the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring")  casadi::Function::evaluate() "
+
+Evaluate.
+
+";
+
+%feature("docstring")  casadi::QpSolver::checkNode() const  "
+
+Check if the node is pointing to the right type of object.
+
+";
+
+%feature("docstring")  casadi::QpSolver::setLPOptions() "
+
+Set options that make the QP solver more suitable for solving LPs.
+
+";
+
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring")  casadi::Function::getStats() const  "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function
+>::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an output scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::callParallel(const std::vector<
+std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
+
+";
+
+%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")
+casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
 
 ";
 
 
-// File: classcasadi_1_1QPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::QPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'QPSolverInput'
+// File: classcasadi_1_1QpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::QpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'QpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
@@ -53004,19 +58490,19 @@ C++ includes: schemes_helpers.hpp ";
 
 ";
 
-%feature("docstring") casadi::QPSolverInputIOSchemeVector< M
->::QPSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::QpSolverInputIOSchemeVector< M
+>::QpSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring") casadi::QPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
 [INTERNAL]  Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::QPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::PrintableObject::getDescription() const  "
 [INTERNAL]  Return a string with a description (for SWIG)
@@ -53029,12 +58515,12 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 
-// File: classcasadi_1_1QPSolverOutputIOSchemeVector.xml
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+// File: classcasadi_1_1QpSolverOutputIOSchemeVector.xml
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a description of the object.
@@ -53046,21 +58532,21 @@ C++ includes: schemes_helpers.hpp ";
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
-
-";
-
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector< M
->::QPSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+[INTERNAL]  Return a string with a description (for SWIG)
 
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'QPSolverOutput'
+";
+
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector< M
+>::QpSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'QpSolverOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
@@ -55471,15 +60957,211 @@ C++ includes: schemes_helpers.hpp ";
 >::SDPOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 
-// File: classcasadi_1_1SDPSolver.xml
+// File: classcasadi_1_1SdpSolver.xml
 
 
 /*  Simple Getters & Setters  */
 
 /*  Advanced Getters  */
 
-/*  Option Functionality  */ %feature("docstring")
-casadi::SDPSolver::setSOCPOptions() "
+/*  Option Functionality  */ %feature("docstring")  casadi::IOInterface<
+Function  >::setNumInputs(int num_in) "
+
+Set the number of function inputs.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
+const  " [INTERNAL]  Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::Function::getSanitizedName() const  "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::SdpSolver::SdpSolver() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::SdpSolver::SdpSolver(const std::string &name,
+const SDPStructure &st) "
+
+Constructor.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_SdpSolver_dsdp'>dsdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SdpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+st:  Problem structure
+
+";
+
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
+
+Set output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::callParallel(const std::vector<
+std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
+
+";
+
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
+&arg, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
+a const pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
+pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isNull() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring")
+casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
+[INTERNAL]  Access an input.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
+" [INTERNAL]  Const access an input.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
+std::string &str) const  "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
+std::string &str) const  "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
+std::string &str) const  "
+
+check if there is an option str
+
+";
+
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
+
+Get output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::fullJacobian() "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring")  casadi::SdpSolver::setSOCPOptions() "
 
 Set options that make the SDP solver more suitable for solving SOCPs.
 
@@ -55491,85 +61173,26 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
+%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
+Access input/output scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
+input/output scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-int oind=0) "
+%feature("docstring")  casadi::Function::removeMonitor(const std::string
+&mon) "
 
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+Remove modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::Function::tangent(int iind, const std::string
-&oind) "
+%feature("docstring") casadi::SdpSolver "
 
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-const std::string &oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring") casadi::SDPSolver "
-
-SDPSolver.
+SdpSolver.
 
 Solves an SDP problem in standard form.
 Seehttp://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -55605,11 +61228,11 @@ symmetric ( m x m)
 You can cast this into the standard form with: G = blkdiag(Gj for all j) Fi
 = blkdiag(F_ij for all j)
 
-Implementations of SDPSolver are encouraged to exploit this block structure.
+Implementations of SdpSolver are encouraged to exploit this block structure.
 
-Joel Andersson
+General information
 
->Input scheme: casadi::SDPInput (SDP_SOLVER_NUM_IN = 9) [sdpIn]
+>Input scheme: casadi::SDPInput (SDP_SOLVER_NUM_IN = 8) [sdpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -55639,7 +61262,7 @@ Joel Andersson
 |                        |                        | x 1 ) .                |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::SDPOutput (SDP_SOLVER_NUM_OUT = 8) [sdpOut]
+>Output scheme: casadi::SDPOutput (SDP_SOLVER_NUM_OUT = 7) [sdpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -55692,7 +61315,7 @@ Joel Andersson
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| calc_dual    | OT_BOOLEAN   | true         | Indicate if  | casadi::SDPS |
+| calc_dual    | OT_BOOLEAN   | true         | Indicate if  | casadi::SdpS |
 |              |              |              | dual should  | olverInterna |
 |              |              |              | be allocated | l            |
 |              |              |              | and          |              |
@@ -55708,7 +61331,7 @@ Joel Andersson
 |              |              |              | always dense |              |
 |              |              |              | (m x m).     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| calc_p       | OT_BOOLEAN   | true         | Indicate if  | casadi::SDPS |
+| calc_p       | OT_BOOLEAN   | true         | Indicate if  | casadi::SdpS |
 |              |              |              | the P-part   | olverInterna |
 |              |              |              | of primal    | l            |
 |              |              |              | solution     |              |
@@ -55770,7 +61393,7 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| print_proble | OT_BOOLEAN   | false        | Print out    | casadi::SDPS |
+| print_proble | OT_BOOLEAN   | false        | Print out    | casadi::SdpS |
 | m            |              |              | problem      | olverInterna |
 |              |              |              | statement    | l            |
 |              |              |              | for          |              |
@@ -55799,9 +61422,139 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_SdpSolver_dsdp'>dsdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SdpSolver.doc(\"myextraplugin\")
+
+dsdp
+
+Interface to the SDP solver DSDP Warning: The solver DSDP is not good at
+handling linear equalities. There are several options if you notice
+difficulties: play around with the parameter \"_penalty\" leave a gap
+manually switch to another SDP Solver
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| _loglevel       | OT_INTEGER      | 0               | An integer that |
+|                 |                 |                 | specifies how   |
+|                 |                 |                 | much logging is |
+|                 |                 |                 | done on stdout. |
++-----------------+-----------------+-----------------+-----------------+
+| _penalty        | OT_REAL         | 100000          | Penality        |
+|                 |                 |                 | parameter       |
+|                 |                 |                 | lambda. Must    |
+|                 |                 |                 | exceed the      |
+|                 |                 |                 | trace of Y.     |
+|                 |                 |                 | This parameter  |
+|                 |                 |                 | heavily         |
+|                 |                 |                 | influences the  |
+|                 |                 |                 | ability of DSDP |
+|                 |                 |                 | to treat linear |
+|                 |                 |                 | equalities. The |
+|                 |                 |                 | DSDP standard   |
+|                 |                 |                 | default (1e8)   |
+|                 |                 |                 | will make a     |
+|                 |                 |                 | problem with    |
+|                 |                 |                 | linear equality |
+|                 |                 |                 | return unusable |
+|                 |                 |                 | solutions.      |
++-----------------+-----------------+-----------------+-----------------+
+| _printlevel     | OT_INTEGER      | 1               | A printlevel of |
+|                 |                 |                 | zero will       |
+|                 |                 |                 | disable all     |
+|                 |                 |                 | output. Another |
+|                 |                 |                 | number          |
+|                 |                 |                 | indicates how   |
+|                 |                 |                 | often a line is |
+|                 |                 |                 | printed.        |
++-----------------+-----------------+-----------------+-----------------+
+| _reuse          | OT_INTEGER      | 4               | Maximum on the  |
+|                 |                 |                 | number of times |
+|                 |                 |                 | the Schur       |
+|                 |                 |                 | complement      |
+|                 |                 |                 | matrix is       |
+|                 |                 |                 | reused          |
++-----------------+-----------------+-----------------+-----------------+
+| _rho            | OT_REAL         | 4               | Potential       |
+|                 |                 |                 | parameter. Must |
+|                 |                 |                 | be >=1          |
++-----------------+-----------------+-----------------+-----------------+
+| _use_penalty    | OT_BOOLEAN      | true            | Modifies the    |
+|                 |                 |                 | algorithm to    |
+|                 |                 |                 | use a penality  |
+|                 |                 |                 | gamma on r.     |
++-----------------+-----------------+-----------------+-----------------+
+| _zbar           | OT_REAL         | 1.000e+10       | Initial upper   |
+|                 |                 |                 | bound on the    |
+|                 |                 |                 | objective of    |
+|                 |                 |                 | the dual        |
+|                 |                 |                 | problem.        |
++-----------------+-----------------+-----------------+-----------------+
+| dualTol         | OT_REAL         | 0.000           | Tolerance for   |
+|                 |                 |                 | dual            |
+|                 |                 |                 | infeasibility   |
+|                 |                 |                 | (translates to  |
+|                 |                 |                 | primal          |
+|                 |                 |                 | infeasibility   |
+|                 |                 |                 | in dsdp terms)  |
++-----------------+-----------------+-----------------+-----------------+
+| gapTol          | OT_REAL         | 0.000           | Convergence     |
+|                 |                 |                 | criterion based |
+|                 |                 |                 | on distance     |
+|                 |                 |                 | between primal  |
+|                 |                 |                 | and dual        |
+|                 |                 |                 | objective       |
++-----------------+-----------------+-----------------+-----------------+
+| inf             | OT_REAL         | 1.000e+30       | Treat numbers   |
+|                 |                 |                 | higher than     |
+|                 |                 |                 | this as         |
+|                 |                 |                 | infinity        |
++-----------------+-----------------+-----------------+-----------------+
+| maxIter         | OT_INTEGER      | 500             | Maximum number  |
+|                 |                 |                 | of iterations   |
++-----------------+-----------------+-----------------+-----------------+
+| primalTol       | OT_REAL         | 0.000           | Tolerance for   |
+|                 |                 |                 | primal          |
+|                 |                 |                 | infeasibility   |
+|                 |                 |                 | (translates to  |
+|                 |                 |                 | dual            |
+|                 |                 |                 | infeasibility   |
+|                 |                 |                 | in dsdp terms)  |
++-----------------+-----------------+-----------------+-----------------+
+| stepTol         | OT_REAL         | 0.050           | Terminate the   |
+|                 |                 |                 | solver if the   |
+|                 |                 |                 | step length in  |
+|                 |                 |                 | the primal is   |
+|                 |                 |                 | below this      |
+|                 |                 |                 | tolerance.      |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++--------------------+
+|         Id         |
++====================+
+| solution_type      |
++--------------------+
+| termination_reason |
++--------------------+
+
+Joel Andersson Diagrams
 
 C++ includes: sdp_solver.hpp ";
+
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
+
+Copy all options from another object.
+
+";
 
 %feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
 const "
@@ -55845,16 +61598,11 @@ Get the dictionary.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
+%feature("docstring")  casadi::Function::symbolicInput() const  "
 
-Is a null pointer?
+Get a vector of symbolic variables with the same dimensions as the inputs.
 
-";
-
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
+There is no guarantee that consecutive calls return identical objects
 
 ";
 
@@ -55901,24 +61649,14 @@ the length of the vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
+%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
+int nfwd, int nadj) "
 
-";
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
 
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
-
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  SWIGINTERNAL
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -55929,56 +61667,23 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
+%feature("docstring")  casadi::Function::generateCode(const std::string
+&filename) "
 
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
+Export / Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
+%feature("docstring")  casadi::Function::generateCode() "
 
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
+Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
+%feature("docstring")  casadi::Function::generateCode(std::ostream
+&filename) "
 
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
+Generate C code for the function.
 
 ";
 
@@ -55988,14 +61693,47 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
-const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
+num_out) "
+
+Set the number of function outputs.
 
 ";
 
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+int oind=0) "
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+const std::string &oname) "
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -56010,25 +61748,59 @@ Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
 
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
-Input/output structures of the function
+Get the type name of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
-Input/output structures of the function
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
+const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
+const "
+
+Get the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+std::string &str) const  "
+
+get an option value
 
 ";
 
@@ -56099,11 +61871,125 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring")  casadi::IOInterface< Function
+>::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an output scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
+casadi::IOScheme &scheme, const std::string &name, bool input) const "
+[INTERNAL]  Find the index for a string describing a particular entry of a
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
 %feature("docstring")
 casadi::OptionsFunctionality::printOptions(std::ostream &stream=std::cout)
 const  "
 
 Print options to a stream.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+int oind=0) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind, const std::string
+&oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+const std::string &oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
@@ -56129,21 +62015,155 @@ Set input scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::setOutputScheme(const
-casadi::IOScheme &scheme) "
-
-Set output scheme.
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-
-Return a string with a representation (for SWIG)
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
+SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+" [INTERNAL]  SWIGINTERNAL
+
+";
+
+%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
+Get the reference count.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
+[INTERNAL]  Access an output.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
+const " [INTERNAL]  Const access an output.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+Dictionary &dict, bool skipUnknown=false) "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function
+>::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an input scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputElements() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+"
+
+INTERNAL.
+
+Get a list of all option names
+
+";
+
+%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::setFullJacobian(const Function
+&jac) "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInputSX() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
 
 ";
 
@@ -56169,150 +62189,9 @@ returned.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an input scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
-"
-
-INTERNAL.
-
-Get a list of all option names
-
-";
-
-%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
-
-Get output scheme.
-
-";
-
-%feature("docstring") casadi::SDPSolver::SDPSolver() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::SDPSolver::SDPSolver(const std::string &name,
-const SDPStructure &st) "
-
-Constructor.
-
-Parameters:
------------
-
-st:  Problem structure
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
-[INTERNAL]  Access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
-const " [INTERNAL]  Const access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
-num_in) "
-
-Set the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
-
-Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
-
-";
-
 %feature("docstring")
 casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
 int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::Function::removeMonitor(const std::string
-&mon) "
-
-Remove modules to be monitored.
 
 ";
 
@@ -56486,36 +62365,90 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
 
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInput() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
 
 ";
 
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
+%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
 
-(for usage, see the example propagating_sparsity.cpp)
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
-int nfwd, int nadj) "
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+int oind=0) "
 
-Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
+Generate a tangent function of output oind with respect to input iind.
 
-NOTE: Does not take ownership, only weak references to the derivatives are
-kept internally
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind, const std::string
+&oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+const std::string &oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
+Deep copy.
+
+";
+
+%feature("docstring")  casadi::SdpSolver::checkNode() const  "
+
+Check if the node is pointing to the right type of object.
 
 ";
 
@@ -56526,36 +62459,65 @@ Add modules to be monitored.
 
 ";
 
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
 %feature("docstring")  casadi::Function::getInputScheme() const  "
 
 Get input scheme.
 
 ";
 
-%feature("docstring")  casadi::Function::generateCode(const std::string
-&filename) "
+%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
+Propagate the sparsity pattern through a set of directional.
 
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode() "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(std::ostream
-&filename) "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
-num_out) "
-
-Set the number of function outputs.
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -56565,33 +62527,8 @@ class
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-int oind=0) "
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-const std::string &oname) "
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
 
 ";
 
@@ -56635,340 +62572,25 @@ Is initialized?
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
-const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
-const "
-
-Get the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
-%feature("docstring")  casadi::SDPSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an output scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
-casadi::IOScheme &scheme, const std::string &name, bool input) const "
-[INTERNAL]  Find the index for a string describing a particular entry of a
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind, const std::string
-&oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-const std::string &oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::callParallel(const std::vector<
-std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
-&arg, bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
-bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
-bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
 %feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
 [INTERNAL]  Swap content with another instance.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
 
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-Dictionary &dict, bool skipUnknown=false) "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
+%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
+Input/output structures of the function
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
-[INTERNAL]  Access an input.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
-" [INTERNAL]  Const access an input.
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputElements() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring")  casadi::Function::setFullJacobian(const Function
-&jac) "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInputSX() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::Function::fullJacobian() "
-
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
+Input/output structures of the function
 
 ";
 
@@ -57093,7 +62715,7 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 
-// File: classcasadi_1_1SDQPSolver.xml
+// File: classcasadi_1_1SdqpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -57101,363 +62723,23 @@ C++ includes: schemes_helpers.hpp ";
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::Function::inputScheme() const  " [INTERNAL]  Access input/output
-scheme.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
-"
-
-Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::evaluate() "
-
-Evaluate.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-int oind=0) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(int iind, const std::string
-&oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::hessian(const std::string &iind,
-const std::string &oind) "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
-Propagate the sparsity pattern through a set of directional.
+casadi::Function::spEvaluate(bool fwd) " [INTERNAL]  Propagate the sparsity
+pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
+%feature("docstring") casadi::SdqpSolver "
 
-";
+SdqpSolver.
 
-%feature("docstring")
-casadi::OptionsFunctionality::printOptions(std::ostream &stream=std::cout)
-const  "
+Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 
-Print options to a stream.
+General information
 
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::Function::getInputScheme() const  "
-
-Get input scheme.
-
-";
-
-%feature("docstring")  casadi::Function::setOutputScheme(const
-casadi::IOScheme &scheme) "
-
-Set output scheme.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
-"
-
-INTERNAL.
-
-Get a list of all option names
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-int oind=0) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind, const
-std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-const std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
-
-";
-
-%feature("docstring") casadi::SDQPSolver::SDQPSolver() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::SDQPSolver::SDQPSolver(const std::string
-&name, const SDQPStructure &st) "
-
-Constructor.
-
-Parameters:
------------
-
-st:  Problem structure
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::SDQPSolver::setSOCQPOptions() "
-
-Set options that make the SDQP solver more suitable for solving SOCPs.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
-const  " [INTERNAL]  Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
-casadi::IOScheme &scheme, const std::string &name, bool input) const "
-[INTERNAL]  Find the index for a string describing a particular entry of a
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
-%feature("docstring") casadi::SDQPSolver "
-
-SDQPSolver.
-
-Same as an SDPSolver, but with a quadratic objective 1/2 x' H x
-
-Joel Andersson
-
->Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 10) [sdqpIn]
+>Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 9) [sdqpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -57490,7 +62772,7 @@ Joel Andersson
 |                        |                        | x 1 ) .                |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::SDQPOutput (SDQP_SOLVER_NUM_OUT = 8) [sdqpOut]
+>Output scheme: casadi::SDQPOutput (SDQP_SOLVER_NUM_OUT = 7) [sdqpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -57593,13 +62875,13 @@ Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| sdp_solver   | OT_STRING    | GenericType( | The          | casadi::SDQP |
-|              |              | )            | SDQPSolver   | SolverIntern |
+| sdp_solver   | OT_STRING    | GenericType( | The          | casadi::Sdqp |
+|              |              | )            | SdqpSolver   | SolverIntern |
 |              |              |              | used to      | al           |
 |              |              |              | solve the    |              |
 |              |              |              | SDPs.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| sdp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::SDQP |
+| sdp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Sdqp |
 | ptions       | Y            | )            | be passed to | SolverIntern |
 |              |              |              | the          | al           |
 |              |              |              | SDPSOlver    |              |
@@ -57620,65 +62902,178 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_SdqpSolver_sdp'>sdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SdqpSolver.doc(\"myextraplugin\")
+
+sdp
+
+Solve an SQDP using an SdpSolver Note: this implementation relies on
+Cholesky decomposition: Chol(H) = L -> H = LL' with L lower triangular This
+requires Pi, H to be positive definite. Positive semi-definite is not
+sufficient. Notably, H==0 will not work.
+
+A better implementation would rely on matrix square root, but we need
+singular value decomposition to implement that.
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| sdp_solver      | OT_STRING       | GenericType()   | The SdpSolver   |
+|                 |                 |                 | used to solve   |
+|                 |                 |                 | the SDQPs.      |
++-----------------+-----------------+-----------------+-----------------+
+| sdp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ons             |                 |                 | passed to the   |
+|                 |                 |                 | SDPSOlver       |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++------------------+
+|        Id        |
++==================+
+| sdp_solver_stats |
++------------------+
+
+Joel Andersson Diagrams
 
 C++ includes: sdqp_solver.hpp ";
 
-%feature("docstring")  casadi::Function::fullJacobian() "
+%feature("docstring")  casadi::IOInterface< Function
+>::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an output scheme.
 
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
-SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
-&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
-MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
-&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
+%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
+const "
+
+Get the number of function outputs.
 
 ";
 
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
 
-improper use will cause memory leaks!
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
+SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+" [INTERNAL]  SWIGINTERNAL
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
+num_in) "
+
+Set the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
+[INTERNAL]  Access an input.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
+" [INTERNAL]  Const access an input.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+std::string &str) const  "
+
+INTERNAL.
+
+Get the default of a certain option
+
+";
+
+%feature("docstring")  casadi::Function::callParallel(const std::vector<
+std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
+[INTERNAL]  Access an output.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
+const " [INTERNAL]  Const access an output.
+
+";
+
+%feature("docstring")  casadi::Function::evaluate() "
+
+Evaluate.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
+num_out) "
+
+Set the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
+*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
+
+";
+
+%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
 
 ";
 
@@ -57691,10 +63086,10 @@ are kept internally
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
+%feature("docstring")  casadi::OptionsFunctionality::getOption(const
 std::string &str) const  "
 
-check if the user has there is an option str
+get an option value
 
 ";
 
@@ -57704,57 +63099,88 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Function::removeMonitor(const std::string
-&mon) "
+%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
 
-Remove modules to be monitored.
+Generate a gradient function of output oind with respect to input iind.
 
-";
+Parameters:
+-----------
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
+iind:  The index of the input
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
+oind:  The index of the output
 
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
-&arg, bool always_inline=false, bool never_inline=false) "
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+int oind=0) "
 
-Evaluate the function symbolically or numerically.
+Generate a gradient function of output oind with respect to input iind.
 
-";
+Parameters:
+-----------
 
-%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
-bool always_inline=false, bool never_inline=false) "
+iind:  The index of the input
 
-Evaluate the function symbolically or numerically.
+oind:  The index of the output
 
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
-bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::getStats() const  "
+%feature("docstring")  casadi::Function::gradient(int iind, const
+std::string &oind) "
 
-Get all statistics obtained at the end of the last evaluate call.
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+const std::string &oind) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
 
@@ -57808,41 +63234,107 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
 
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  SWIGINTERNAL
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
 
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
+Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-Dictionary &dict, bool skipUnknown=false) "
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
 
-set a set of options. For a list of options, check the class documentation
-of this class.
+Get, if necessary generate, the sparsity of a Jacobian block
 
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
+";
+
+%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
+Get the reference count.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
+&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
+DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
+DMatrixVectorVector &output_asens, bool always_inline=false, bool
+never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
+numerically with directional derivatives The first two arguments are the
+nondifferentiated inputs and results of the evaluation, the next two
+arguments are a set of forward directional seeds and the resulting forward
+directional derivatives, the length of the vector being the number of
+forward directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of the
+vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
+SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
+&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
+MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
+&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isInit() const  "
+
+Is initialized?
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+"
+
+INTERNAL.
+
+Get a list of all option names
 
 ";
 
@@ -57855,122 +63347,41 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
+%feature("docstring")  casadi::Function::removeMonitor(const std::string
+&mon) "
 
-Get output scheme.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
+Remove modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
+%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
+Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-"
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
+%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
+Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) "
+%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
+&arg, bool always_inline=false, bool never_inline=false) "
 
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
+Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring")  casadi::Function::getNumOutputElements() const  "
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+bool always_inline=false, bool never_inline=false) "
 
-Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+bool always_inline=false, bool never_inline=false) "
 
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-int oind=0) "
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-const std::string &oname) "
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
+Evaluate the function symbolically or numerically.
 
 ";
 
@@ -57980,18 +63391,114 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
 
-Get the allowed values of a certain option.
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+int oind=0) "
 
-Initialize or re-initialize the object:
+Generate a Hessian function of output oind with respect to input iind.
 
-more documentation in the node class ( SharedObjectNode and derived classes)
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(int iind, const std::string
+&oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::hessian(const std::string &iind,
+const std::string &oind) "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
+casadi::IOScheme &scheme, const std::string &name, bool input) const "
+[INTERNAL]  Find the index for a string describing a particular entry of a
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
 
 ";
 
@@ -58062,273 +63569,14 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
-int nfwd, int nadj) "
-
-Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-NOTE: Does not take ownership, only weak references to the derivatives are
-kept internally
-
-";
-
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
-
-";
-
 %feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
 Deep copy.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
-const "
-
-Get the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(const std::string
-&filename) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode() "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(std::ostream
-&filename) "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
-std::string &str) const  "
-
-INTERNAL.
-
-Get the default of a certain option
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
-const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
-iind=0) "
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
-const std::string &iname) "
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
-num_out) "
-
-Set the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputElements() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
-const "
-
-Get the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::Function::callParallel(const std::vector<
-std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
-[INTERNAL]  Access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
-const " [INTERNAL]  Const access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an output scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
+class
 
 ";
 
@@ -58433,16 +63681,74 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
-num_in) "
-
-Set the number of function inputs.
+%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
+Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::SDQPSolver::checkNode() const  "
+%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
+Input/output structures of the function
 
-Check if the node is pointing to the right type of object.
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::printOptions(std::ostream &stream=std::cout)
+const  "
+
+Print options to a stream.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
+"
+
+Add modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+"
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
 
 ";
 
@@ -58452,13 +63758,268 @@ Get the dictionary.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
-[INTERNAL]  Access an input.
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
-" [INTERNAL]  Const access an input.
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
+const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")
+casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
+
+";
+
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
+
+Set output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
+
+Get output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInput() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::Function::setInputScheme(const
+casadi::IOScheme &scheme) "
+
+Set input scheme.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
+iind=0) "
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
+const std::string &iname) "
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::SdqpSolver::SdqpSolver() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::SdqpSolver::SdqpSolver(const std::string
+&name, const SDQPStructure &st) "
+
+Constructor.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_SdqpSolver_sdp'>sdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SdqpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+st:  Problem structure
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
+int nfwd, int nadj) "
+
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
+
+";
+
+%feature("docstring")  casadi::Function::getStats() const  "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
+const  " [INTERNAL]  Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+int oind=0) "
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+const std::string &oname) "
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputElements() const  "
+
+Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
@@ -58472,64 +64033,178 @@ pointer to the node.
 
 ";
 
+%feature("docstring")  casadi::Function::getNumInputElements() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
+
+";
+
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
+
+";
+
+%feature("docstring")  casadi::Function::fullJacobian() "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring")  casadi::Function::getInputScheme() const  "
+
+Get input scheme.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring")  casadi::SdqpSolver::checkNode() const  "
+
+Check if the node is pointing to the right type of object.
+
+";
+
+%feature("docstring")  casadi::SdqpSolver::setSOCQPOptions() "
+
+Set options that make the SDQP solver more suitable for solving SOCPs.
+
+";
+
 %feature("docstring")  casadi::Function::getSanitizedName() const  "
 
 get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, int oind, bool compact=false) "
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
 
-Generate the sparsity of a Jacobian block
+set an option. For a list of options, check the class documentation of this
+class.
 
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
 
 ";
 
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, const std::string &oind, bool compact=false) "
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+Dictionary &dict, bool skipUnknown=false) "
 
-Generate the sparsity of a Jacobian block
+set a set of options. For a list of options, check the class documentation
+of this class.
 
-";
-
-%feature("docstring")  casadi::Function::setInputScheme(const
-casadi::IOScheme &scheme) "
-
-Set input scheme.
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
 
 ";
 
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
+%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
+const "
 
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
+Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
-class
+%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
+std::string &str) const  "
+
+check if the user has there is an option str
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
+std::string &str) const  "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(const std::string
+&filename) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode() "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(std::ostream
+&filename) "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
+std::string &str) const  "
+
+check if there is an option str
+
+";
+
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -61448,7 +67123,7 @@ for each time step.
 
 Joel Andersson
 
->Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 7) [integratorIn]
+>Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) [integratorIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -62321,7 +67996,7 @@ Parameters:
 
 output_fcn:  output function which maps to n outputs.
 
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -62880,70 +68555,39 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::SOCPOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 
-// File: classcasadi_1_1SOCPSolver.xml
+// File: classcasadi_1_1SocpSolver.xml
 
 
 /*  Simple Getters & Setters  */
 
 /*  Advanced Getters  */
 
-/*  Option Functionality  */ %feature("docstring")
-casadi::SOCPSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
+/*  Option Functionality  */ %feature("docstring")  casadi::IOInterface<
+Function  >::outputS(int i) " [INTERNAL]  Access an output.
 
 ";
 
-%feature("docstring")  casadi::Function::getInputScheme() const  "
-
-Get input scheme.
-
-";
-
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
+const " [INTERNAL]  Const access an output.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
-
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
+const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  SWIGINTERNAL
+%feature("docstring")  casadi::Function::getStats() const  "
+
+Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
+%feature("docstring")  casadi::Function::fullJacobian() "
 
-Get output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::callParallel(const std::vector<
-std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
 
 ";
 
@@ -62953,40 +68597,20 @@ Get the dictionary.
 
 ";
 
-%feature("docstring")  casadi::Function::setFullJacobian(const Function
-&jac) "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
+a const pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
+%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
+pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-Dictionary &dict, bool skipUnknown=false) "
+%feature("docstring")  casadi::OptionsFunctionality::getOption(const
+std::string &str) const  "
 
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
+get an option value
 
 ";
 
@@ -63082,6 +68706,172 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
+Deep copy.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::callParallel(const std::vector<
+std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
+iind=0) const "
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
+std::string &iname) const "
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
+iind=0) " [INTERNAL]  Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
+const std::string &iname) " [INTERNAL]  Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInput() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isNull() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
+[INTERNAL]  Access an input.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
+" [INTERNAL]  Const access an input.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+Dictionary &dict, bool skipUnknown=false) "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
+num_in) "
+
+Set the number of function inputs.
+
+";
+
 %feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
 int oind=0) "
 
@@ -63140,264 +68930,43 @@ Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
-const "
+%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
 
-Get the number of function outputs.
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
+%feature("docstring") casadi::SocpSolver::SocpSolver() "
 
-Generate a tangent function of output oind with respect to input iind.
+Default constructor.
+
+";
+
+%feature("docstring") casadi::SocpSolver::SocpSolver(const std::string
+&name, const SOCPStructure &st) "
+
+Constructor.
 
 Parameters:
 -----------
 
-iind:  The index of the input
+name:
 
-oind:  The index of the output
+Name of a solver. It might be one of:
 
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
+- <a href='#plugin_SocpSolver_sdp'>sdp</a>
 
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-int oind=0) "
-
-Generate a tangent function of output oind with respect to input iind.
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SocpSolver.doc(\"myextraplugin\")
 
 Parameters:
 -----------
 
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(int iind, const std::string
-&oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::tangent(const std::string &iind,
-const std::string &oind) "
-
-Generate a tangent function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the input must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
-
-get an option value
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputElements() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an output scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
-"
-
-INTERNAL.
-
-Get a list of all option names
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
-class
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
-std::string &str) const  "
-
-INTERNAL.
-
-Get the default of a certain option
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
-"
-
-Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
-iind=0) const "
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
-std::string &iname) const "
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
-iind=0) " [INTERNAL]  Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
-const std::string &iname) " [INTERNAL]  Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::fullJacobian() "
-
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+st:  Problem structure
 
 ";
 
@@ -63407,82 +68976,16 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
+%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
 
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
+Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-int oind=0) "
+%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
+std::string &str) const  "
 
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind, const
-std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-const std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
-num_in) "
-
-Set the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
+Get the type name of a certain option.
 
 ";
 
@@ -63494,267 +68997,21 @@ Print options to a stream.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
-const "
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
 
-Get the number of function inputs.
-
-";
-
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
+Get output scheme.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::Function::getInputScheme() const  "
 
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+Get input scheme.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-const "
+%feature("docstring") casadi::SocpSolver "
 
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-"
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an input scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring") casadi::SOCPSolver::SOCPSolver() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::SOCPSolver::SOCPSolver(const std::string
-&name, const SOCPStructure &st) "
-
-Constructor.
-
-Parameters:
------------
-
-st:  Problem structure
-
-";
-
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
-int nfwd, int nadj) "
-
-Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-NOTE: Does not take ownership, only weak references to the derivatives are
-kept internally
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
-casadi::IOScheme &scheme, const std::string &name, bool input) const "
-[INTERNAL]  Find the index for a string describing a particular entry of a
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
-const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::setInputScheme(const
-casadi::IOScheme &scheme) "
-
-Set input scheme.
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputElements() const  "
-
-Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInput() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
-
-";
-
-%feature("docstring")  casadi::Function::getStats() const  "
-
-Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::SOCPSolver "
-
-SOCPSolver.
+SocpSolver.
 
 Solves an Second Order Cone Programming (SOCP) problem in standard form.
 
@@ -63766,9 +69023,9 @@ LBA <= A x <= UBA LBX <= x   <= UBX  with x ( n x 1) c ( n x 1 ) Gi  sparse
 ni A sparse (nc x n) LBA, UBA dense vector (nc x 1) LBX, UBX dense vector (n
 x 1)
 
-Joris Gillis
+General information
 
->Input scheme: casadi::SOCPInput (SOCP_SOLVER_NUM_IN = 11) [socpIn]
+>Input scheme: casadi::SOCPInput (SOCP_SOLVER_NUM_IN = 10) [socpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -63807,7 +69064,7 @@ Joris Gillis
 |                        |                        | x 1 ) .                |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 5) [socpOut]
+>Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 4) [socpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -63891,14 +69148,14 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| ni           | OT_INTEGERVE | GenericType( | Provide the  | casadi::SOCP |
+| ni           | OT_INTEGERVE | GenericType( | Provide the  | casadi::Socp |
 |              | CTOR         | )            | size of each | SolverIntern |
 |              |              |              | SOC          | al           |
 |              |              |              | constraint.  |              |
 |              |              |              | Must sum up  |              |
 |              |              |              | to N.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| print_proble | OT_BOOLEAN   | false        | Print out    | casadi::SOCP |
+| print_proble | OT_BOOLEAN   | false        | Print out    | casadi::Socp |
 | m            |              |              | problem      | SolverIntern |
 |              |              |              | statement    | al           |
 |              |              |              | for          |              |
@@ -63927,51 +69184,193 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_SocpSolver_sdp'>sdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SocpSolver.doc(\"myextraplugin\")
+
+sdp
+
+Solve SOCPs using an SdpSolver
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| sdp_solver      | OT_STRING       | GenericType()   | The SdpSolver   |
+|                 |                 |                 | used to solve   |
+|                 |                 |                 | the SOCPs.      |
++-----------------+-----------------+-----------------+-----------------+
+| sdp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ons             |                 |                 | passed to the   |
+|                 |                 |                 | SDPSOlver       |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++------------------+
+|        Id        |
++==================+
+| sdp_solver_stats |
++------------------+
+
+Joris Gillis Diagrams
 
 C++ includes: socp_solver.hpp ";
 
-%feature("docstring")  casadi::Function::symbolicInputSX() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
-
-There is no guarantee that consecutive calls return identical objects
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
 %feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
+casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::Function::setOutputScheme(const
+%feature("docstring")  casadi::Function::setInputScheme(const
 casadi::IOScheme &scheme) "
 
-Set output scheme.
+Set input scheme.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
-[INTERNAL]  Access an input.
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
-" [INTERNAL]  Const access an input.
+%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
+Get the reference count.
 
 ";
 
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputElements() const  "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::Function::getSanitizedName() const  "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function
+>::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an output scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
+class
+
+";
+
+%feature("docstring")  casadi::SocpSolver::checkNode() const  "
+
+Check if the node is pointing to the right type of object.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
+std::string &str) const  "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+"
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -64005,35 +69404,58 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+%feature("docstring")  casadi::Function::removeMonitor(const std::string
+&mon) "
 
-Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
+Remove modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::Function::evaluate() "
+%feature("docstring")  casadi::Function::getNumInputElements() const  "
 
-Evaluate.
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
+casadi::IOScheme &scheme, const std::string &name, bool input) const "
+[INTERNAL]  Find the index for a string describing a particular entry of a
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
 
 ";
 
 %feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
+%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
+const  " [INTERNAL]  Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -64058,9 +69480,142 @@ Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
+%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
 
-Get total number of nonzeros in all of the matrix-valued inputs.
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
+int nfwd, int nadj) "
+
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
+const "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
+const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::Function::evaluate() "
+
+Evaluate.
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
+SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+" [INTERNAL]  SWIGINTERNAL
+
+";
+
+%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
+*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
+num_out) "
+
+Set the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isInit() const  "
+
+Is initialized?
 
 ";
 
@@ -64074,65 +69629,102 @@ Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+"
 
-Get an output by index.
+INTERNAL.
+
+Get a list of all option names
+
+";
+
+%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
+
+Generate a gradient function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
-oind:  index within the range [0.. getNumOutputs()-1]
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+int oind=0) "
 
-Get an output by name.
+Generate a gradient function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
-oname:  output name. Only allowed when an output scheme is set.
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
+%feature("docstring")  casadi::Function::gradient(int iind, const
+std::string &oind) "
+
+Generate a gradient function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+iind:  The index of the input
 
-oind:  index within the range [0.. getNumOutputs()-1]
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+const std::string &oind) "
+
+Generate a gradient function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+iind:  The index of the input
 
-oname:  output name. Only allowed when an output scheme is set.
+oind:  The index of the output
 
-";
-
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
 std::string &str) const  "
 
-Get the allowed values of a certain option.
+check if the user has there is an option str
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+std::string &str) const  "
+
+INTERNAL.
+
+Get the default of a certain option
+
+";
+
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
+
+Set output scheme.
 
 ";
 
@@ -64203,30 +69795,82 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring")  casadi::Function::removeMonitor(const std::string
-&mon) "
+%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
+"
 
-Remove modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
-[INTERNAL]  Access an output.
+Add modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
-const " [INTERNAL]  Const access an output.
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
 
 ";
 
-%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
-Access input/output scheme.
+%feature("docstring")  casadi::Function::tangent(int iind=0, int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
-input/output scheme.
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+int oind=0) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(int iind, const std::string
+&oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::tangent(const std::string &iind,
+const std::string &oind) "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
@@ -64250,15 +69894,21 @@ Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
-num_out) "
+%feature("docstring")  casadi::Function::symbolicInputSX() const  "
 
-Set the number of function outputs.
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
+%feature("docstring")  casadi::IOInterface< Function
+>::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an input scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
@@ -64305,16 +69955,87 @@ the length of the vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
 
-improper use will cause memory leaks!
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
 
 ";
 
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::setFullJacobian(const Function
+&jac) "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
+std::string &str) const  "
+
+check if there is an option str
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getNumOutputs()
+const "
+
+Get the number of function outputs.
 
 ";
 
@@ -66490,7 +72211,7 @@ Get function reference.
 ";
 
 
-// File: classcasadi_1_1StabilizedQPSolver.xml
+// File: classcasadi_1_1StabilizedQpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -66498,9 +72219,532 @@ Get function reference.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::StabilizedQPSolver "
+casadi::OptionsFunctionality::getOption(const std::string &str) const  "
 
-StabilizedQPSolver.
+get an option value
+
+";
+
+%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
+int iind=0, int oind=0, bool compact=false) "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
+const  "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+int oind=0, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
+const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::setFullJacobian(const Function
+&jac) "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
+iind=0) const "
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
+std::string &iname) const "
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
+iind=0) " [INTERNAL]  Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
+const std::string &iname) " [INTERNAL]  Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
+&name, int i) " [INTERNAL]  Set a certain option by giving its index into
+the allowed values.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+int oind=0) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(int iind, const
+std::string &oind) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::gradient(const std::string &iind,
+const std::string &oind) "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::evaluate() "
+
+Evaluate.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
+std::string &str) const  "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
+bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, int oind=0, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(int iind, const
+std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::jacSparsity(const std::string
+&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+int oind=0) "
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
+const std::string &oname) "
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
+Access input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring")  casadi::Function::removeMonitor(const std::string
+&mon) "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputElements() const  "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assertInit() const  "
+[INTERNAL]  Assert that it is initialized
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
+std::string &str) const  "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::getStat(const std::string &name)
+const  "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
+int v) " [INTERNAL]  Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
+&arg, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
+a const pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
+pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+std::string &str, const GenericType &val) "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::setOption(const
+Dictionary &dict, bool skipUnknown=false) "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
+std::string &str) const  "
+
+INTERNAL.
+
+Get the default of a certain option
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
+const "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(const std::string
+&filename) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode() "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generateCode(std::ostream
+&filename) "
+
+Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Function::fullJacobian() "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
+class
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInputSX() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::StabilizedQpSolver "
+
+StabilizedQpSolver.
 
 Solves the following strictly convex problem:
 
@@ -66510,9 +72754,9 @@ decision variables (x) nc: number of constraints (A)
 
 If H is not positive-definite, the solver should throw an error.
 
-Joel Andersson
+General information
 
->Input scheme: casadi::StabilizedQPSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]
+>Input scheme: casadi::StabilizedQpSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 12) [stabilizedQpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -66559,7 +72803,7 @@ Joel Andersson
 | U                      |                        |                        |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::QPSolverOutput (QP_SOLVER_NUM_OUT = 5) [qpOut]
+>Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 4) [qpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -66662,39 +72906,295 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
+List of plugins
+
+- <a href='#plugin_StabilizedQpSolver_sqic'>sqic</a>
+
+- <a href='#plugin_StabilizedQpSolver_qp'>qp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+StabilizedQpSolver.doc(\"myextraplugin\")
+
+sqic
+
+Interface to SQIC
+
+>List of available options
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
+
+qp
+
+Solved a stabilized QP using a standard QP solver
+
+>List of available options
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| qp_solver       | OT_STRING       | GenericType()   | The QP solver   |
+|                 |                 |                 | used to solve   |
+|                 |                 |                 | the stabilized  |
+|                 |                 |                 | QPs.            |
++-----------------+-----------------+-----------------+-----------------+
+| qp_solver_optio | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ns              |                 |                 | passed to the   |
+|                 |                 |                 | QP solver       |
+|                 |                 |                 | instance        |
++-----------------+-----------------+-----------------+-----------------+
+
+>List of available stats
++-----------------+
+|       Id        |
++=================+
+| qp_solver_stats |
++-----------------+
+
+Joel Andersson Diagrams
 
 C++ includes: stabilized_qp_solver.hpp ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionAllowed(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
+"
 
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::StabilizedQPSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
+Add modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
-num_out) "
+%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
+OptionsFunctionality &obj, bool skipUnknown=false) "
 
-Set the number of function outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+Copy all options from another object.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getNumInputs()
+%feature("docstring")  casadi::IOInterface< Function
+>::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an input scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::getSanitizedName() const  "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
+Get the reference count.
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
+SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+" [INTERNAL]  SWIGINTERNAL
+
+";
+
+%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
+
+Get the dictionary.
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, int oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+int iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
+const std::string &iind, const std::string &oind, bool compact=false) "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
+casadi::IOScheme &scheme, const std::string &name, bool input) const "
+[INTERNAL]  Find the index for a string describing a particular entry of a
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::symbolicInput() const  "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function
+>::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
+index for a string describing a particular entry of an output scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")
+casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
+const  " [INTERNAL]  Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring")  casadi::SharedObject::isInit() const  "
+
+Is initialized?
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
 const "
 
-Get the number of function inputs.
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) const "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::input(const
+std::string &iname) "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
 
 ";
 
@@ -66765,615 +73265,6 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-"
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::inputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an input scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
-const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
-Check if the numerical values of the supplied bounds make sense.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() const  " [INTERNAL]
-Access input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::inputScheme() "[INTERNAL]  Access
-input/output scheme.
-
-";
-
-%feature("docstring")  casadi::Function::removeMonitor(const std::string
-&mon) "
-
-Remove modules to be monitored.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
-[INTERNAL]  Access an input.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
-" [INTERNAL]  Const access an input.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-std::string &str, const GenericType &val) "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::setOption(const
-Dictionary &dict, bool skipUnknown=false) "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
-std::string &str) const  "
-
-check if the user has there is an option str
-
-";
-
-%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(const std::string
-&filename) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode() "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generateCode(std::ostream
-&filename) "
-
-Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::fullJacobian() "
-
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function
->::outputSchemeEntry(const std::string &name) const " [INTERNAL]  Find the
-index for a string describing a particular entry of an output scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
-const  " [INTERNAL]  Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
-SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
-&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
-MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
-&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
-bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
-the function symbolically or numerically with directional derivatives The
-first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions.
-
-";
-
-%feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
-"
-
-Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< DMatrix >
-&arg, bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
-bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
-bool always_inline=false, bool never_inline=false) "
-
-Evaluate the function symbolically or numerically.
-
-";
-
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-int oind=0, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::Function::jacobian(const std::string &iind,
-const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
-iind=0) "
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
-const std::string &iname) "
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInput() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputElements() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::Function::getNumInputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued inputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
-std::string &str) const  "
-
-check if there is an option str
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputElements() const  "
-
-Get total number of elements in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assertInit() const  "
-[INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::Function::callParallel(const std::vector<
-std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
-std::string &str) const  "
-
-Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, int oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-int iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::setJacSparsity(const Sparsity &sp,
-const std::string &iind, const std::string &oind, bool compact=false) "
-
-Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::symbolicInputSX() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
-[INTERNAL]  Access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
-const " [INTERNAL]  Const access an output.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
-iind=0) const "
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
-std::string &iname) const "
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val, int
-iind=0) " [INTERNAL]  Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(T val,
-const std::string &iname) " [INTERNAL]  Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring")  casadi::Function::derivative(int nfwd, int nadj) "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
-inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
-at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
-direction at a time. The first n_out outputs correspond to nondifferentiated
-outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
-one direction at a time and the last nadj*n_in outputs corresponds to
-adjoint sensitivities, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
-
-";
-
-%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
-Propagate the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
-
-Get output scheme.
-
-";
-
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::Function::setOutputScheme(const
-casadi::IOScheme &scheme) "
-
-Set output scheme.
-
-";
-
 %feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
 
 Generate a Hessian function of output oind with respect to input iind.
@@ -67441,249 +73332,14 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring")  casadi::Function::jacSparsity(int iind=0, int oind=0,
-bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, int oind=0, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(int iind, const
-std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::jacSparsity(const std::string
-&iind, const std::string &oind, bool compact=false, bool symmetric=false) "
-
-Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::input_struct() const  " [INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::Function::input_struct() "[INTERNAL]
-Input/output structures of the function
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
 
 ";
 
 %feature("docstring")  casadi::Function::getInputScheme() const  "
 
 Get input scheme.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-int oind=0) "
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
-const std::string &oname) "
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::StabilizedQPSolver::generateNativeCode(const
-std::string &filename) const  "
-
-Generate native code in the interfaced language for debugging
-
-";
-
-%feature("docstring")  casadi::Function::setFullJacobian(const Function
-&jac) "
-
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
-
-";
-
-%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
-int nfwd, int nadj) "
-
-Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives.
-
-NOTE: Does not take ownership, only weak references to the derivatives are
-kept internally
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-int oind=0) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(int iind, const
-std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring")  casadi::Function::gradient(const std::string &iind,
-const std::string &oind) "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
-
-";
-
-%feature("docstring") casadi::StabilizedQPSolver::StabilizedQPSolver() "
-
-Default constructor.
-
-";
-
-%feature("docstring") casadi::StabilizedQPSolver::StabilizedQPSolver(const
-std::string &name, const QPStructure &st) "
-
-Constructor.
-
-Parameters:
------------
-
-st:  Problem structure
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
 
 ";
 
@@ -67694,72 +73350,59 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+%feature("docstring")  casadi::SharedObject::isNull() const  "
 
-Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
+Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
-
-Get total number of nonzeros in all of the matrix-valued outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
+%feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
+&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
+DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
+DMatrixVectorVector &output_asens, bool always_inline=false, bool
+never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
+numerically with directional derivatives The first two arguments are the
+nondifferentiated inputs and results of the evaluation, the next two
+arguments are a set of forward directional seeds and the resulting forward
+directional derivatives, the length of the vector being the number of
+forward directions. The next two arguments are a set of adjoint directional
+seeds and the resulting adjoint directional derivatives, the length of the
+vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
-
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  SWIGINTERNAL
+%feature("docstring")  casadi::Function::callDerivative(const SXVector &arg,
+SXVector &output_res, const SXVectorVector &fseed, SXVectorVector
+&output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
-"
-
-INTERNAL.
-
-Get a list of all option names
+%feature("docstring")  casadi::Function::callDerivative(const MXVector &arg,
+MXVector &output_res, const MXVectorVector &fseed, MXVectorVector
+&output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
 
 ";
 
-%feature("docstring")  casadi::Function::setInputScheme(const
-casadi::IOScheme &scheme) "
+%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
+num_in) "
 
-Set input scheme.
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
+Set the number of function inputs.
 
 ";
 
@@ -67771,18 +73414,54 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring")  casadi::Function::getStats() const  "
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
 
-Get all statistics obtained at the end of the last evaluate call.
+Set output scheme.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOptionDefault(const
-std::string &str) const  "
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i) "
+[INTERNAL]  Access an output.
 
-INTERNAL.
+";
 
-Get the default of a certain option
+%feature("docstring")  casadi::IOInterface< Function  >::outputS(int i)
+const " [INTERNAL]  Const access an output.
+
+";
+
+%feature("docstring") casadi::StabilizedQpSolver::StabilizedQpSolver() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::StabilizedQpSolver::StabilizedQpSolver(const
+std::string &name, const QPStructure &st) "
+
+Constructor.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_StabilizedQpSolver_sqic'>sqic</a>
+
+- <a href='#plugin_StabilizedQpSolver_qp'>qp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+StabilizedQpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+st:  Problem structure
 
 ";
 
@@ -67801,80 +73480,46 @@ Print options to a stream.
 
 ";
 
-%feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
-Access input/output scheme.
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val, int
+iind=0) "
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0.. getNumInputs()-1]
 
 ";
 
-%feature("docstring")  casadi::Function::outputScheme() "[INTERNAL]  Access
-input/output scheme.
+%feature("docstring")  casadi::IOInterface< Function  >::setInput(T val,
+const std::string &iname) "
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
-casadi::IOScheme &scheme, const std::string &name, bool input) const "
-[INTERNAL]  Find the index for a string describing a particular entry of a
-scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring")  casadi::StabilizedQPSolver::setLPOptions() "
+%feature("docstring")  casadi::StabilizedQpSolver::setLPOptions() "
 
 Set options that make the QP solver more suitable for solving LPs.
 
 ";
 
-%feature("docstring")  casadi::Function::output_struct() const  " [INTERNAL]
-Input/output structures of the function
+%feature("docstring")  casadi::OptionsFunctionality::hasOption(const
+std::string &str) const  "
 
-";
-
-%feature("docstring")  casadi::Function::output_struct() "[INTERNAL]
-Input/output structures of the function
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0)
-const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) const "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(int iind=0) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::input(const
-std::string &iname) "
-
-[UNSAFE] Obtain reference to inputs  getInput, setInput
-
-Access input argument
-
-";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  "
-
-Is initialized?
+check if there is an option str
 
 ";
 
@@ -67883,10 +73528,155 @@ Is initialized?
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::setNumInputs(int
-num_in) "
+%feature("docstring")  casadi::Function::callParallel(const std::vector<
+std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) "
 
-Set the number of function inputs.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
+const  " [INTERNAL]  Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+"
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring")  casadi::Function::getStats() const  "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring")  casadi::Function::spEvaluate(bool fwd) " [INTERNAL]
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::StabilizedQpSolver::checkNode() const  "
+
+Check if the node is pointing to the right type of object.
+
+";
+
+%feature("docstring")  casadi::OptionsFunctionality::hasSetOption(const
+std::string &str) const  "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::SharedObject::init(bool allow_reinit=true) "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::setNumOutputs(int
+num_out) "
+
+Set the number of function outputs.
+
+";
+
+%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
+Deep copy.
+
+";
+
+%feature("docstring")  casadi::Function::getNumInputElements() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::StabilizedQpSolver::generateNativeCode(const
+std::string &filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::setDerivative(const Function &fcn,
+int nfwd, int nadj) "
+
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) "
+[INTERNAL]  Access an input.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::inputS(int i) const
+" [INTERNAL]  Const access an input.
 
 ";
 
@@ -67896,42 +73686,35 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
+"
 
-Return a string with a description (for SWIG)
+INTERNAL.
 
-";
-
-%feature("docstring")  casadi::Function::evaluate() "
-
-Evaluate.
+Get a list of all option names
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::getOption(const
-std::string &str) const  "
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
 
-get an option value
-
-";
-
-%feature("docstring")  casadi::Function::setJacobian(const Function &jac,
-int iind=0, int oind=0, bool compact=false) "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
+Get output scheme.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
-class
+%feature("docstring")  casadi::Function::setInputScheme(const
+casadi::IOScheme &scheme) "
+
+Set input scheme.
+
+";
+
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
 
 ";
 
 
-// File: classcasadi_1_1StabilizedQPSolverInputIOSchemeVector.xml
+// File: classcasadi_1_1StabilizedQpSolverInputIOSchemeVector.xml
 %feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
 [INTERNAL]  Return a string with a representation (for SWIG)
 
@@ -67945,26 +73728,26 @@ class
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring") casadi::StabilizedQPSolverInputIOSchemeVector "[INTERNAL]  Helper function for 'StabilizedQPSolverInput'
+%feature("docstring") casadi::StabilizedQpSolverInputIOSchemeVector "[INTERNAL]  Helper function for 'StabilizedQpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")
-casadi::StabilizedQPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+casadi::StabilizedQpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")
-casadi::StabilizedQPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+casadi::StabilizedQpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::StabilizedQPSolverInputIOSchemeVector< M
->::StabilizedQPSolverInputIOSchemeVector(const std::vector< M > &t) "
+%feature("docstring") casadi::StabilizedQpSolverInputIOSchemeVector< M
+>::StabilizedQpSolverInputIOSchemeVector(const std::vector< M > &t) "
 [INTERNAL] ";
 
-%feature("docstring") casadi::StabilizedQPSolverInputIOSchemeVector::__len__
+%feature("docstring") casadi::StabilizedQpSolverInputIOSchemeVector::__len__
 "[INTERNAL] ";
 
 %feature("docstring")  casadi::PrintableObject::getDescription() const  "
@@ -75462,7 +81245,7 @@ Parameters:
 
 f:  dynamical system
 
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -75475,7 +81258,7 @@ f:  dynamical system
 | DAE_T     | t     | Explicit time dependence . |
 +-----------+-------+----------------------------+
 
->Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 4) [daeOut]
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -75622,7 +81405,7 @@ Hash a sparsity pattern.
 ";
 
 %feature("docstring")
-casadi::casadi_register_nlpsolver_sqpmethod(NLPSolverInternal::Plugin
+casadi::casadi_register_nlpsolver_sqpmethod(NlpSolverInternal::Plugin
 *plugin) " ";
 
 %feature("docstring")  casadi::addMultiple(const Matrix< DataType > &A,
@@ -75642,7 +81425,7 @@ casadi::casadi_register_integrator_idas(IntegratorInternal::Plugin *plugin)
 
 Input arguments of an NLP Jacobian function
 
->Input scheme: casadi::JacGInput (JACG_NUM_IN = 3) [jacGIn]
+>Input scheme: casadi::JacGInput (JACG_NUM_IN = 2) [jacGIn]
 +-----------+-------+---------------------+
 | Full name | Short |     Description     |
 +===========+=======+=====================+
@@ -75664,7 +81447,7 @@ std::string &arg_s2="", const M &arg_m2=M()) "
 
 Output arguments of an ODE/DAE backward integration function
 
->Output scheme: casadi::RDAEOutput (RDAE_NUM_OUT = 4) [rdaeOut]
+>Output scheme: casadi::RDAEOutput (RDAE_NUM_OUT = 3) [rdaeOut]
 +-----------+-------+-------------------------------------------+
 | Full name | Short |                Description                |
 +===========+=======+===========================================+
@@ -75695,7 +81478,7 @@ Get lower triangular part.
 ";
 
 %feature("docstring")
-casadi::casadi_register_nlpsolver_stabilizedsqp(NLPSolverInternal::Plugin
+casadi::casadi_register_nlpsolver_stabilizedsqp(NlpSolverInternal::Plugin
 *plugin) " ";
 
 %feature("docstring")  casadi::mtaylor(const SX &ex, const SX &x, const SX
@@ -75777,7 +81560,7 @@ const M &arg_m3=M()) "
 
 Output arguments of an QP Solver
 
->Output scheme: casadi::QCQPSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
+>Output scheme: casadi::QcqpSolverOutput (QCQP_SOLVER_NUM_OUT = 4) [qcqpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -75896,7 +81679,7 @@ const M &arg_m3=M()) "
 
 Output arguments of an QP Solver
 
->Output scheme: casadi::QPSolverOutput (QP_SOLVER_NUM_OUT = 5) [qpOut]
+>Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 4) [qpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -76105,7 +81888,7 @@ elementary functions from the 'math.h' ('cmath') header.
 
 Input arguments of a dple solver
 
->Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 3) [dpleIn]
+>Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 2) [dpleIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -76266,7 +82049,7 @@ Example usage:>>   x
 ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_sqic(QPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_qpsolver_sqic(QpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::str(const PrintableObject &obj) " ";
 
@@ -76284,7 +82067,7 @@ const M &arg_m3=M()) "
 
 Output arguments of an SOCP Solver
 
->Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 5) [socpOut]
+>Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 4) [socpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -76312,7 +82095,7 @@ std::string &arg_s0="", const std::string &arg_s1="", const std::string
 &arg_s2="", const std::string &arg_s3="") " ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_cplex(QPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_qpsolver_cplex(QpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::isIncreasing(const std::vector< T > &v) "
@@ -76329,7 +82112,7 @@ M &arg_m0=M()) "
 
 Output arguments of a linear solver
 
->Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 2) [linsolOut]
+>Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 1) [linsolOut]
 +-----------+-------+----------------------------------------------+
 | Full name | Short |                 Description                  |
 +===========+=======+==============================================+
@@ -76447,7 +82230,7 @@ const M &arg_m10=M(), const std::string &arg_s11="", const M &arg_m11=M()) "
 
 Input arguments of a QP problem
 
->Input scheme: casadi::QCQPSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
+>Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 12) [qcqpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -76532,7 +82315,7 @@ ffcn.input(INTEGRATOR_P).size() nu: Number of controls: from nc - np np:
 Number of parameters: from option number_of_parameters nh: Number of point
 constraints: from cfcn.input(0).size()
 
->Input scheme: casadi::OCPInput (OCP_NUM_IN = 14) [ocpIn]
+>Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -76581,7 +82364,7 @@ elementary functions from the 'math.h' ('cmath') header.
 ";
 
 %feature("docstring")
-casadi::casadi_register_lpsolver_qp(LPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_lpsolver_qp(LpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::copysign(const T &x, const T &y) " [INTERNAL]
 copysign function
@@ -76631,7 +82414,7 @@ CasADi additions.
 ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_nlp(QPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_qpsolver_nlp(QpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::profileWriteEntry(std::ofstream &f, T *a) "
 [INTERNAL] ";
@@ -76641,7 +82424,7 @@ casadi::casadi_register_qpsolver_nlp(QPSolverInternal::Plugin *plugin) " ";
 
 Input arguments of an NLP objective gradient function
 
->Input scheme: casadi::GradFInput (GRADF_NUM_IN = 3) [gradFIn]
+>Input scheme: casadi::GradFInput (GRADF_NUM_IN = 2) [gradFIn]
 +-----------+-------+---------------------+
 | Full name | Short |     Description     |
 +===========+=======+=====================+
@@ -76664,7 +82447,7 @@ const M &arg_m3=M()) "
 
 Input arguments of an ODE/DAE function
 
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -76759,7 +82542,7 @@ Get the sparsity pattern of a matrix.
 ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_ooqp(QPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_qpsolver_ooqp(QpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::acos(const T &x) " [INTERNAL]  Pre-C99
 elementary functions from the 'math.h' ('cmath') header.
@@ -76767,7 +82550,7 @@ elementary functions from the 'math.h' ('cmath') header.
 ";
 
 %feature("docstring")
-casadi::casadi_register_nlpsolver_ipopt(NLPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_nlpsolver_ipopt(NlpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::sdqpIn(const std::string &arg_s0="", const M
@@ -76780,7 +82563,7 @@ const std::string &arg_s5="", const M &arg_m5=M(), const std::string
 
 Input arguments of a SDQP problem
 
->Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 10) [sdqpIn]
+>Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 9) [sdqpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -76852,7 +82635,7 @@ Check if the vector is strictly monotone.
 ";
 
 %feature("docstring")
-casadi::casadi_register_sdqpsolver_sdp(SDQPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_sdqpsolver_sdp(SdqpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::isRegular(const std::vector< T > &v) "
@@ -76871,7 +82654,7 @@ const std::string &arg_s5="", const M &arg_m5=M(), const std::string
 
 Input arguments of a SDP problem
 
->Input scheme: casadi::SDPInput (SDP_SOLVER_NUM_IN = 9) [sdpIn]
+>Input scheme: casadi::SDPInput (SDP_SOLVER_NUM_IN = 8) [sdpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -76916,9 +82699,8 @@ std::string &arg_s7="") " ";
 
 %feature("docstring")  casadi::dormqr_(char *side, char *trans, int *n, int
 *m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double
-*work, int *lwork, int *info) "
-
-Multiply right hand side with Q-transpose (lapack)
+*work, int *lwork, int *info) " [INTERNAL]  Multiply right hand side with
+Q-transpose (lapack)
 
 ";
 
@@ -76932,7 +82714,7 @@ const std::string &arg_s2="", const M &arg_m2=M(), const std::string
 
 Output arguments of an integrator
 
->Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 7) [integratorOut]
+>Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6) [integratorOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -76969,7 +82751,7 @@ std::string &arg_s2="", const std::string &arg_s3="", const std::string
 [INTERNAL] ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_qpoases(QPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_qpsolver_qpoases(QpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::toVector(const T &v0) " [INTERNAL] ";
@@ -77012,7 +82794,7 @@ std::string &arg_s2="", const M &arg_m2=M()) "
 
 Input arguments of an Homotopy NLP function
 
->Input scheme: casadi::HNLPInput (HNL_NUM_IN = 4) [hnlpIn]
+>Input scheme: casadi::HNLPInput (HNL_NUM_IN = 3) [hnlpIn]
 +-----------+-------+----------------------+
 | Full name | Short |     Description      |
 +===========+=======+======================+
@@ -77073,7 +82855,7 @@ pointers.
 
 Input arguments of a control simulator
 
->Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 4) [controlsimulatorIn]
+>Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3) [controlsimulatorIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -77110,7 +82892,7 @@ const M &arg_m3=M()) "
 
 Input arguments of an NLP Hessian function
 
->Input scheme: casadi::HessLagInput (HESSLAG_NUM_IN = 5) [hessLagIn]
+>Input scheme: casadi::HessLagInput (HESSLAG_NUM_IN = 4) [hessLagIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -77174,7 +82956,7 @@ const M &arg_m3=M()) "
 
 Output arguments of an OCP Solver
 
->Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 5) [ocpOut]
+>Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -77342,7 +83124,7 @@ derived class, cf. dynamic_cast (const)
 ";
 
 %feature("docstring")
-casadi::casadi_register_socpsolver_sdp(SOCPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_socpsolver_sdp(SocpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::transpose(const Sparsity &a) "
@@ -77385,7 +83167,7 @@ const std::string &arg_s5="", const M &arg_m5=M(), const std::string
 
 Input arguments of a QP problem
 
->Input scheme: casadi::QPSolverInput (QP_SOLVER_NUM_IN = 10) [qpIn]
+>Input scheme: casadi::QpSolverInput (QP_SOLVER_NUM_IN = 9) [qpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -77466,7 +83248,7 @@ const std::string &arg_s9="", const M &arg_m9=M(), const std::string
 
 Input arguments of a QP problem
 
->Input scheme: casadi::StabilizedQPSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]
+>Input scheme: casadi::StabilizedQpSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 12) [stabilizedQpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -77567,7 +83349,7 @@ std::string &arg_s2="", const M &arg_m2=M()) "
 
 Output arguments of an NLP objective gradient function
 
->Output scheme: casadi::GradFOutput (GRADF_NUM_OUT = 4) [gradFOut]
+>Output scheme: casadi::GradFOutput (GRADF_NUM_OUT = 3) [gradFOut]
 +------------+-------+-------------------------------+
 | Full name  | Short |          Description          |
 +============+=======+===============================+
@@ -77594,7 +83376,7 @@ roots are real.
 ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_qcqp(QPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_qpsolver_qcqp(QpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")
 casadi::casadi_register_integrator_cvodes(IntegratorInternal::Plugin
@@ -77607,7 +83389,7 @@ casadi::casadi_register_integrator_cvodes(IntegratorInternal::Plugin
 
 Output arguments of an NLP function
 
->Output scheme: casadi::NLPOutput (NL_NUM_OUT = 3) [nlpOut]
+>Output scheme: casadi::NLPOutput (NL_NUM_OUT = 2) [nlpOut]
 +-----------+-------+-----------------------+
 | Full name | Short |      Description      |
 +===========+=======+=======================+
@@ -77810,7 +83592,7 @@ T > &) " [INTERNAL]  Apply a function f to each element in a vector
 ";
 
 %feature("docstring")
-casadi::casadi_register_nlpsolver_knitro(NLPSolverInternal::Plugin *plugin)
+casadi::casadi_register_nlpsolver_knitro(NlpSolverInternal::Plugin *plugin)
 " ";
 
 %feature("docstring")  casadi::vecNZ(const MX &x) "
@@ -77861,7 +83643,7 @@ const M &arg_m7=M(), const std::string &arg_s8="", const M &arg_m8=M()) "
 
 Input arguments of an ODE/DAE function
 
->Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 10) [controldaeIn]
+>Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -77922,7 +83704,7 @@ const std::string &arg_s2="", const M &arg_m2=M(), const std::string
 
 Output arguments of an NLP Hessian function
 
->Output scheme: casadi::HessLagOutput (HESSLAG_NUM_OUT = 6) [hessLagOut]
+>Output scheme: casadi::HessLagOutput (HESSLAG_NUM_OUT = 5) [hessLagOut]
 +----------------+--------+------------------------------------------------+
 |   Full name    | Short  |                  Description                   |
 +================+========+================================================+
@@ -77977,7 +83759,7 @@ Integrate f from a to b using Gaussian quadrature with n points.
 
 Input arguments of a Mayer Term nx: Number of states: from
 ffcn.input(INTEGRATOR_X0).size() np: Number of parameters: from option
-number_of_parameters>Input scheme: casadi::MayerInput (MAYER_NUM_IN = 3)
+number_of_parameters>Input scheme: casadi::MayerInput (MAYER_NUM_IN = 2)
 [mayerIn]
 +-----------+-------+---------------------------------------------+ | Full
 name | Short |                 Description                 |
@@ -78005,7 +83787,7 @@ std::string &arg_s9="", const M &arg_m9=M()) "
 
 Input arguments of a SOCP problem
 
->Input scheme: casadi::SOCPInput (SOCP_SOLVER_NUM_IN = 11) [socpIn]
+>Input scheme: casadi::SOCPInput (SOCP_SOLVER_NUM_IN = 10) [socpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78060,7 +83842,7 @@ const M &arg_m3=M()) "
 
 Output arguments of an LP Solver
 
->Output scheme: casadi::LPSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
+>Output scheme: casadi::LpSolverOutput (LP_SOLVER_NUM_OUT = 4) [lpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78092,7 +83874,7 @@ std::string &arg_s2="", const M &arg_m2=M()) "
 
 Output arguments of an NLP Jacobian function
 
->Output scheme: casadi::JacGOutput (JACG_NUM_OUT = 4) [jacGOut]
+>Output scheme: casadi::JacGOutput (JACG_NUM_OUT = 3) [jacGOut]
 +-----------+-------+-------------------------------+
 | Full name | Short |          Description          |
 +===========+=======+===============================+
@@ -78134,7 +83916,7 @@ const std::string &arg_s5="", const M &arg_m5=M()) "
 
 Input arguments of a LP problem
 
->Input scheme: casadi::LPSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
+>Input scheme: casadi::LpSolverInput (LP_SOLVER_NUM_IN = 6) [lpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78168,7 +83950,7 @@ std::string &arg_s2="", const M &arg_m2=M()) "
 
 Output arguments of an DAE function
 
->Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 4) [daeOut]
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -78207,7 +83989,7 @@ const std::string &arg_s5="", const M &arg_m5=M(), const std::string
 
 Output arguments of an SDQP Solver
 
->Output scheme: casadi::SDQPOutput (SDQP_SOLVER_NUM_OUT = 8) [sdqpOut]
+>Output scheme: casadi::SDQPOutput (SDQP_SOLVER_NUM_OUT = 7) [sdqpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78290,7 +84072,7 @@ trans(x)
 
 Output arguments of a dple solver
 
->Output scheme: casadi::DPLEOutput (DPLE_NUM_OUT = 2) [dpleOut]
+>Output scheme: casadi::DPLEOutput (DPLE_NUM_OUT = 1) [dpleOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78386,7 +84168,7 @@ const std::string &arg_s2="", const M &arg_m2=M(), const std::string
 
 Output arguments of an NLP Solver
 
->Output scheme: casadi::NLPSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
+>Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78432,7 +84214,7 @@ M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
 
 Input arguments of a linear solver
 
->Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 3) [linsolIn]
+>Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) [linsolIn]
 +-----------+-------+------------------------------------------------+
 | Full name | Short |                  Description                   |
 +===========+=======+================================================+
@@ -78449,7 +84231,7 @@ std::string &arg_s0="", const std::string &arg_s1="") " ";
 %feature("docstring")  casadi::casadi_load_integrator_collocation() "";
 
 %feature("docstring")
-casadi::casadi_register_stabilizedqpsolver_qp(StabilizedQPSolverInternal::Plugin
+casadi::casadi_register_stabilizedqpsolver_qp(StabilizedQpSolverInternal::Plugin
 *plugin) " ";
 
 %feature("docstring")  casadi::sqrt(const T &x) " [INTERNAL]  Pre-C99
@@ -78505,9 +84287,7 @@ elementary functions from the 'math.h' ('cmath') header.
 
 %feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
 char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
-int *ldb) "
-
-Solve upper triangular system (lapack)
+int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
 
 ";
 
@@ -78516,7 +84296,7 @@ casadi::casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin
 *plugin) " ";
 
 %feature("docstring")
-casadi::casadi_register_qcqpsolver_socp(QCQPSolverInternal::Plugin *plugin)
+casadi::casadi_register_qcqpsolver_socp(QcqpSolverInternal::Plugin *plugin)
 " ";
 
 %feature("docstring")  casadi::ceil(const T &x) " [INTERNAL]  Pre-C99
@@ -78533,7 +84313,7 @@ inc_x) " [INTERNAL]  ASUM: ||x||_1 -> return.
 ";
 
 %feature("docstring")
-casadi::casadi_register_nlpsolver_worhp(NLPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_nlpsolver_worhp(NlpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::isnan(double x) " [INTERNAL]  throw () C99
@@ -78542,9 +84322,8 @@ elementary functions from the 'math.h' header.
 ";
 
 %feature("docstring")  casadi::dgeqrf_(int *m, int *n, double *a, int *lda,
-double *tau, double *work, int *lwork, int *info) "
-
-QR-factorize dense matrix (lapack)
+double *tau, double *work, int *lwork, int *info) " [INTERNAL]  QR-factorize
+dense matrix (lapack)
 
 ";
 
@@ -78553,7 +84332,7 @@ QR-factorize dense matrix (lapack)
 
 Input arguments of an NLP function
 
->Input scheme: casadi::NLPInput (NL_NUM_IN = 3) [nlpIn]
+>Input scheme: casadi::NLPInput (NL_NUM_IN = 2) [nlpIn]
 +-----------+-------+---------------------+
 | Full name | Short |     Description     |
 +===========+=======+=====================+
@@ -78637,7 +84416,7 @@ const std::string &arg_s5="", const M &arg_m5=M(), const std::string
 
 Output arguments of an SDP Solver
 
->Output scheme: casadi::SDPOutput (SDP_SOLVER_NUM_OUT = 8) [sdpOut]
+>Output scheme: casadi::SDPOutput (SDP_SOLVER_NUM_OUT = 7) [sdpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78685,7 +84464,7 @@ const std::string &arg_s2="", const M &arg_m2=M(), const std::string
 
 Input arguments of an integrator
 
->Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 7) [integratorIn]
+>Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) [integratorIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78747,7 +84526,7 @@ with Z_k Z_k' = eye(n) = Z_k' Z_k
 ";
 
 %feature("docstring")
-casadi::casadi_register_nlpsolver_scpgen(NLPSolverInternal::Plugin *plugin)
+casadi::casadi_register_nlpsolver_scpgen(NlpSolverInternal::Plugin *plugin)
 " ";
 
 %feature("docstring")  casadi::cos(const T &x) " [INTERNAL]  Pre-C99
@@ -78897,7 +84676,7 @@ const std::string &arg_s5="", const M &arg_m5=M(), const std::string
 
 Input arguments of an ODE/DAE backward integration function
 
->Input scheme: casadi::RDAEInput (RDAE_NUM_IN = 8) [rdaeIn]
+>Input scheme: casadi::RDAEInput (RDAE_NUM_IN = 7) [rdaeIn]
 +-----------+-------+-------------------------------+
 | Full name | Short |          Description          |
 +===========+=======+===============================+
@@ -79080,7 +84859,7 @@ Matrix< DataType > &y) " [INTERNAL] ";
 %feature("docstring")  casadi::horzcat(const vector< MX > &x) " ";
 
 %feature("docstring")
-casadi::casadi_register_nlpsolver_snopt(NLPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_nlpsolver_snopt(NlpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::bvec_toggle(bvec_t *s, int begin, int end,
@@ -79251,7 +85030,7 @@ Get typename.
 %feature("docstring")  casadi::casadi_load_nlpsolver_worhp() "";
 
 %feature("docstring")
-casadi::casadi_register_stabilizedqpsolver_sqic(StabilizedQPSolverInternal::Plugin
+casadi::casadi_register_stabilizedqpsolver_sqic(StabilizedQpSolverInternal::Plugin
 *plugin) " ";
 
 %feature("docstring")  casadi::casadi_load_linearsolver_symbolicqr() "";
@@ -79271,7 +85050,7 @@ const M &arg_m7=M()) "
 
 Input arguments of an NLP Solver
 
->Input scheme: casadi::NLPSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -79341,7 +85120,7 @@ Parameters:
 
 f:  dynamical system
 
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -79354,7 +85133,7 @@ f:  dynamical system
 | DAE_T     | t     | Explicit time dependence . |
 +-----------+-------+----------------------------+
 
->Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 4) [daeOut]
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -79466,7 +85245,7 @@ elementary functions from the 'math.h' ('cmath') header.
 %feature("docstring")  casadi::ProfilingType() "[INTERNAL] ";
 
 %feature("docstring")
-casadi::casadi_register_sdpsolver_dsdp(SDPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_sdpsolver_dsdp(SdpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::dense(const MX &x) "
@@ -79691,6 +85470,9 @@ int i) " ";
 // File: collocation__integrator__internal_8hpp.xml
 
 
+// File: collocation__integrator__internal__meta_8cpp.xml
+
+
 // File: coloring_8hpp.xml
 
 
@@ -79724,6 +85506,9 @@ int i) " ";
 // File: controlsimulator_8hpp.xml
 
 
+// File: core_8hpp.xml
+
+
 // File: countNodes_8hpp.xml
 
 
@@ -79731,6 +85516,9 @@ int i) " ";
 
 
 // File: cplex__internal_8hpp.xml
+
+
+// File: cplex__internal__meta_8cpp.xml
 
 
 // File: createParent_8hpp.xml
@@ -79742,10 +85530,16 @@ int i) " ";
 // File: csparse__cholesky__internal_8hpp.xml
 
 
+// File: csparse__cholesky__internal__meta_8cpp.xml
+
+
 // File: csparse__internal_8cpp.xml
 
 
 // File: csparse__internal_8hpp.xml
+
+
+// File: csparse__internal__meta_8cpp.xml
 
 
 // File: ctemplate_8cpp.xml
@@ -79775,6 +85569,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: cvodes__internal_8hpp.xml
+
+
+// File: cvodes__internal__meta_8cpp.xml
 
 
 // File: d0__stats_8hpp.xml
@@ -79841,6 +85638,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: dsdp__internal_8hpp.xml
+
+
+// File: dsdp__internal__meta_8cpp.xml
 
 
 // File: dulmageMendelsohn_8hpp.xml
@@ -79954,6 +85754,9 @@ This file does absolutely nothing but including all headers ";
 // File: idas__internal_8hpp.xml
 
 
+// File: idas__internal__meta_8cpp.xml
+
+
 // File: implicit__fixed__step__integrator__internal_8cpp.xml
 
 
@@ -80029,6 +85832,9 @@ This file does absolutely nothing but including all headers ";
 // File: ipopt__internal_8hpp.xml
 
 
+// File: ipopt__internal__meta_8cpp.xml
+
+
 // File: ipopt__nlp_8cpp.xml
 
 
@@ -80044,6 +85850,9 @@ This file does absolutely nothing but including all headers ";
 // File: kinsol__internal_8hpp.xml
 
 
+// File: kinsol__internal__meta_8cpp.xml
+
+
 // File: KinsolSolver_8hpp.xml
 
 
@@ -80053,16 +85862,25 @@ This file does absolutely nothing but including all headers ";
 // File: knitro__internal_8hpp.xml
 
 
+// File: knitro__internal__meta_8cpp.xml
+
+
 // File: lapack__lu__dense_8cpp.xml
 
 
 // File: lapack__lu__dense_8hpp.xml
 
 
+// File: lapack__lu__dense__meta_8cpp.xml
+
+
 // File: lapack__qr__dense_8cpp.xml
 
 
 // File: lapack__qr__dense_8hpp.xml
+
+
+// File: lapack__qr__dense__meta_8cpp.xml
 
 
 // File: limitPrinting_8hpp.xml
@@ -80164,6 +85982,9 @@ This file does absolutely nothing but including all headers ";
 // File: newton__implicit__internal_8hpp.xml
 
 
+// File: newton__implicit__internal__meta_8cpp.xml
+
+
 // File: NewtonImplicitSolver_8hpp.xml
 
 
@@ -80173,10 +85994,16 @@ This file does absolutely nothing but including all headers ";
 // File: nlp__implicit__internal_8hpp.xml
 
 
+// File: nlp__implicit__internal__meta_8cpp.xml
+
+
 // File: nlp__qp__internal_8cpp.xml
 
 
 // File: nlp__qp__internal_8hpp.xml
+
+
+// File: nlp__qp__internal__meta_8cpp.xml
 
 
 // File: nlp__solver_8cpp.xml
@@ -80233,10 +86060,16 @@ This file does absolutely nothing but including all headers ";
 // File: old__collocation__integrator__internal_8hpp.xml
 
 
+// File: old__collocation__integrator__internal__meta_8cpp.xml
+
+
 // File: ooqp__internal_8cpp.xml
 
 
 // File: ooqp__internal_8hpp.xml
+
+
+// File: ooqp__internal__meta_8cpp.xml
 
 
 // File: options__functionality_8cpp.xml
@@ -80290,6 +86123,9 @@ This file does absolutely nothing but including all headers ";
 // File: psd__indef__dple__internal_8hpp.xml
 
 
+// File: psd__indef__dple__internal__meta_8cpp.xml
+
+
 // File: psd__indef__dple__solver_8cpp.xml
 
 
@@ -80300,6 +86136,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: qcqp__qp__internal_8hpp.xml
+
+
+// File: qcqp__qp__internal__meta_8cpp.xml
 
 
 // File: qcqp__solver_8cpp.xml
@@ -80320,6 +86159,9 @@ This file does absolutely nothing but including all headers ";
 // File: qp__lp__internal_8hpp.xml
 
 
+// File: qp__lp__internal__meta_8cpp.xml
+
+
 // File: qp__solver_8cpp.xml
 
 
@@ -80338,10 +86180,16 @@ This file does absolutely nothing but including all headers ";
 // File: qp__stabilizer__internal_8hpp.xml
 
 
+// File: qp__stabilizer__internal__meta_8cpp.xml
+
+
 // File: qpoases__internal_8cpp.xml
 
 
 // File: qpoases__internal_8hpp.xml
+
+
+// File: qpoases__internal__meta_8cpp.xml
 
 
 // File: range_8hpp.xml
@@ -80357,6 +86205,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: rk__integrator__internal_8hpp.xml
+
+
+// File: rk__integrator__internal__meta_8cpp.xml
 
 
 // File: runtime_8hpp.xml
@@ -80377,16 +86228,25 @@ This file does absolutely nothing but including all headers ";
 // File: scpgen__internal_8hpp.xml
 
 
+// File: scpgen__internal__meta_8cpp.xml
+
+
 // File: sdp__sdqp__internal_8cpp.xml
 
 
 // File: sdp__sdqp__internal_8hpp.xml
 
 
+// File: sdp__sdqp__internal__meta_8cpp.xml
+
+
 // File: sdp__socp__internal_8cpp.xml
 
 
 // File: sdp__socp__internal_8hpp.xml
+
+
+// File: sdp__socp__internal__meta_8cpp.xml
 
 
 // File: sdp__solver_8cpp.xml
@@ -80437,10 +86297,16 @@ This file does absolutely nothing but including all headers ";
 // File: simple__homotopy__nlp__internal_8hpp.xml
 
 
+// File: simple__homotopy__nlp__internal__meta_8cpp.xml
+
+
 // File: simple__indef__dple__internal_8cpp.xml
 
 
 // File: simple__indef__dple__internal_8hpp.xml
+
+
+// File: simple__indef__dple__internal__meta_8cpp.xml
 
 
 // File: simulator_8cpp.xml
@@ -80486,10 +86352,16 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 // File: snopt__internal_8hpp.xml
 
 
+// File: snopt__internal__meta_8cpp.xml
+
+
 // File: socp__qcqp__internal_8cpp.xml
 
 
 // File: socp__qcqp__internal_8hpp.xml
+
+
+// File: socp__qcqp__internal__meta_8cpp.xml
 
 
 // File: socp__solver_8cpp.xml
@@ -80546,10 +86418,16 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 // File: sqic__internal_8hpp.xml
 
 
+// File: sqic__internal__meta_8cpp.xml
+
+
 // File: sqp__internal_8cpp.xml
 
 
 // File: sqp__internal_8hpp.xml
+
+
+// File: sqp__internal__meta_8cpp.xml
 
 
 // File: ssym_8hpp.xml
@@ -80573,10 +86451,16 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 // File: stabilized__sqic__internal_8hpp.xml
 
 
+// File: stabilized__sqic__internal__meta_8cpp.xml
+
+
 // File: stabilized__sqp__internal_8cpp.xml
 
 
 // File: stabilized__sqp__internal_8hpp.xml
+
+
+// File: stabilized__sqp__internal__meta_8cpp.xml
 
 
 // File: std__vector__tools_8cpp.xml
@@ -80672,6 +86556,9 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 // File: symbolic__qr__internal_8hpp.xml
 
 
+// File: symbolic__qr__internal__meta_8cpp.xml
+
+
 // File: symbolic__sx_8hpp.xml
 
 
@@ -80718,6 +86605,9 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 
 
 // File: worhp__internal_8hpp.xml
+
+
+// File: worhp__internal__meta_8cpp.xml
 
 
 // File: wsnopt_8hpp.xml
@@ -80799,7 +86689,11 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__DPLE__doc.xml
 
 
-// File: group__HomotopyNLPSolver__doc.xml
+// File: group__plugin__DpleSolver__simple.xml
+
+
+
+// File: group__HomotopyNlpSolver__doc.xml
 
 
 // File: group__ImplicitFunction__doc.xml
@@ -80829,40 +86723,176 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__LinearSolver__doc.xml
 
 
-// File: group__LPSolver__doc.xml
+// File: group__LpSolver__doc.xml
 
 
-// File: group__NLPSolver__doc.xml
+// File: group__NlpSolver__doc.xml
 
 
 // File: group__Nullspace__doc.xml
 
 
-// File: group__QCQPSolver__doc.xml
+// File: group__QcqpSolver__doc.xml
 
 
-// File: group__QPSolver__doc.xml
+// File: group__QpSolver__doc.xml
 
 
-// File: group__SDPSolver__doc.xml
+// File: group__SdpSolver__doc.xml
 
 
-// File: group__SDQPSolver__doc.xml
+// File: group__SdqpSolver__doc.xml
 
 
-// File: group__SOCPSolver__doc.xml
+// File: group__SocpSolver__doc.xml
 
 
-// File: group__StabilizedQPSolver__doc.xml
+// File: group__StabilizedQpSolver__doc.xml
 
 
 // File: group__expression__tools.xml
 
 
+// File: group__plugin__QpSolver__cplex.xml
+
+
+
+// File: group__plugin__LinearSolver__csparsecholesky.xml
+
+
+
+// File: group__plugin__LinearSolver__csparse.xml
+
+
+
+// File: group__plugin__SdpSolver__dsdp.xml
+
+
+
+// File: group__plugin__NlpSolver__ipopt.xml
+
+
+
+// File: group__plugin__NlpSolver__knitro.xml
+
+
+
+// File: group__plugin__LinearSolver__lapacklu.xml
+
+
+
+// File: group__plugin__LinearSolver__lapackqr.xml
+
+
+
+// File: group__plugin__QpSolver__ooqp.xml
+
+
+
+// File: group__plugin__QpSolver__qpoases.xml
+
+
+
+// File: group__plugin__DpleSolver__slicot.xml
+
+
+
+// File: group__plugin__NlpSolver__snopt.xml
+
+
+
+// File: group__plugin__QpSolver__sqic.xml
+
+
+
+// File: group__plugin__StabilizedQpSolver__sqic.xml
+
+
+
+// File: group__plugin__Integrator__cvodes.xml
+
+
+
+// File: group__plugin__Integrator__idas.xml
+
+
+
+// File: group__plugin__ImplicitFunction__kinsol.xml
+
+
+
+// File: group__plugin__NlpSolver__worhp.xml
+
+
+
+// File: group__plugin__Integrator__collocation.xml
+
+
+
+// File: group__plugin__ImplicitFunction__newton.xml
+
+
+
+// File: group__plugin__ImplicitFunction__nlp.xml
+
+
+
+// File: group__plugin__QpSolver__nlp.xml
+
+
+
+// File: group__plugin__Integrator__oldcollocation.xml
+
+
+
+// File: group__plugin__QpSolver__qcqp.xml
+
+
+
+// File: group__plugin__LpSolver__qp.xml
+
+
+
+// File: group__plugin__StabilizedQpSolver__qp.xml
+
+
+
+// File: group__plugin__Integrator__rk.xml
+
+
+
+// File: group__plugin__NlpSolver__scpgen.xml
+
+
+
+// File: group__plugin__SdqpSolver__sdp.xml
+
+
+
+// File: group__plugin__SocpSolver__sdp.xml
+
+
+
+// File: group__plugin__QcqpSolver__socp.xml
+
+
+
+// File: group__plugin__NlpSolver__sqpmethod.xml
+
+
+
+// File: group__plugin__NlpSolver__stabilizedsqp.xml
+
+
+
+// File: group__plugin__LinearSolver__symbolicqr.xml
+
+
+
 // File: group__scheme__IntegratorOutput.xml
 
 
-// File: group__scheme__QCQPSolverInput.xml
+// File: group__scheme__SDPOutput.xml
 
 
 // File: group__scheme__HessLagOutput.xml
@@ -80874,13 +86904,10 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__SOCPOutput.xml
 
 
-// File: group__scheme__NLPSolverOutput.xml
+// File: group__scheme__QpSolverInput.xml
 
 
 // File: group__scheme__SDPInput.xml
-
-
-// File: group__scheme__LPSolverInput.xml
 
 
 // File: group__scheme__RDAEInput.xml
@@ -80892,28 +86919,19 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__DPLEInput.xml
 
 
-// File: group__scheme__SDPOutput.xml
-
-
-// File: group__scheme__NLPSolverInput.xml
-
-
 // File: group__scheme__DAEInput.xml
 
 
 // File: group__scheme__DAEOutput.xml
 
 
+// File: group__scheme__QpSolverOutput.xml
+
+
 // File: group__scheme__InputOutputScheme.xml
 
 
-// File: group__scheme__StabilizedQPSolverInput.xml
-
-
 // File: group__scheme__GradFInput.xml
-
-
-// File: group__scheme__LPSolverOutput.xml
 
 
 // File: group__scheme__GradFOutput.xml
@@ -80925,7 +86943,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__OCPInput.xml
 
 
-// File: group__scheme__QCQPSolverOutput.xml
+// File: group__scheme__SDQPOutput.xml
 
 
 // File: group__scheme__MayerInput.xml
@@ -80937,10 +86955,13 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__NLPInput.xml
 
 
+// File: group__scheme__StabilizedQpSolverInput.xml
+
+
 // File: group__scheme__IntegratorInput.xml
 
 
-// File: group__scheme__QPSolverInput.xml
+// File: group__scheme__QcqpSolverOutput.xml
 
 
 // File: group__scheme__OCPOutput.xml
@@ -80949,13 +86970,19 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__RDAEOutput.xml
 
 
+// File: group__scheme__NlpSolverOutput.xml
+
+
 // File: group__scheme__JacGOutput.xml
 
 
 // File: group__scheme__LinsolOutput.xml
 
 
-// File: group__scheme__SDQPOutput.xml
+// File: group__scheme__QcqpSolverInput.xml
+
+
+// File: group__scheme__NlpSolverInput.xml
 
 
 // File: group__scheme__ControlSimulatorInput.xml
@@ -80964,7 +86991,13 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__SOCPInput.xml
 
 
+// File: group__scheme__LpSolverOutput.xml
+
+
 // File: group__scheme__JacGInput.xml
+
+
+// File: group__scheme__LpSolverInput.xml
 
 
 // File: group__scheme__DPLEOutput.xml
@@ -80973,10 +87006,128 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__HessLagInput.xml
 
 
-// File: group__scheme__QPSolverOutput.xml
-
-
 // File: group__scheme__HNLPInput.xml
+
+
+// File: group__pluginlist__DpleSolver.xml
+
+
+// File: group__plugins__DpleSolver.xml
+
+
+// File: group__pluginlist__QpSolver.xml
+
+
+// File: group__plugins__QpSolver.xml
+
+
+// File: group__pluginlist__LinearSolver.xml
+
+
+// File: group__plugins__LinearSolver.xml
+
+
+// File: group__pluginlist__SdpSolver.xml
+
+
+// File: group__plugins__SdpSolver.xml
+
+
+// File: group__pluginlist__NlpSolver.xml
+
+
+// File: group__plugins__NlpSolver.xml
+
+
+// File: group__pluginlist__StabilizedQpSolver.xml
+
+
+// File: group__plugins__StabilizedQpSolver.xml
+
+
+// File: group__pluginlist__Integrator.xml
+
+
+// File: group__plugins__Integrator.xml
+
+
+// File: group__pluginlist__ImplicitFunction.xml
+
+
+// File: group__plugins__ImplicitFunction.xml
+
+
+// File: group__pluginlist__LpSolver.xml
+
+
+// File: group__plugins__LpSolver.xml
+
+
+// File: group__pluginlist__SdqpSolver.xml
+
+
+// File: group__plugins__SdqpSolver.xml
+
+
+// File: group__pluginlist__SocpSolver.xml
+
+
+// File: group__plugins__SocpSolver.xml
+
+
+// File: group__pluginlist__HomotopyNlpSolver.xml
+
+
+// File: group__plugins__HomotopyNlpSolver.xml
+
+
+// File: group__pluginlist__QcqpSolver.xml
+
+
+// File: group__plugins__QcqpSolver.xml
+
+
+// File: group__general__DpleSolver.xml
+
+
+// File: group__general__HomotopyNlpSolver.xml
+
+
+// File: group__general__Integrator.xml
+
+
+// File: group__general__LinearSolver.xml
+
+
+// File: group__general__LpSolver.xml
+
+
+// File: group__general__NlpSolver.xml
+
+
+// File: group__general__QcqpSolver.xml
+
+
+// File: group__general__QpSolver.xml
+
+
+// File: group__general__SdpSolver.xml
+
+
+// File: group__general__SdqpSolver.xml
+
+
+// File: group__general__SocpSolver.xml
+
+
+// File: group__general__StabilizedQpSolver.xml
+
+
+// File: group__general__ImplicitFunction.xml
+
+
+// File: group__plugin__HomotopyNlpSolver__simple.xml
+
 
 
 // File: chapter1.xml

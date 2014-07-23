@@ -113,7 +113,7 @@ int main(){
   MXFunction nlp(nlpIn("x",U),nlpOut("f",F,"g",G));
 
   // Allocate an NLP solver
-  NLPSolver solver("ipopt", nlp);
+  NlpSolver solver("ipopt", nlp);
   
   // Set options
   solver.setOption("tol",1e-10);

@@ -7,15 +7,18 @@ embed_resource("sqic" "wsqic.f90" resource_file)
 
 message("including: ${resource_file}")
 
-casadi_library(casadi_qpsolver_sqic
+casadi_plugin(QpSolver sqic
   sqic_internal.hpp
   sqic_internal.cpp
+  sqic_internal_meta.cpp
   ${resource_file})
 
-casadi_library(casadi_stabilizedqpsolver_sqic
+casadi_plugin(StabilizedQpSolver sqic
   stabilized_sqic_internal.hpp
-  stabilized_sqic_internal.cpp)
-target_link_libraries(casadi_stabilizedqpsolver_sqic casadi_qpsolver_sqic)
+  stabilized_sqic_internal.cpp
+  stabilized_sqic_internal_meta.cpp
+  ${resource_file})
+casadi_plugin_link_libraries(StabilizedQpSolver sqic casadi_qpsolver_sqic)
 
 if(ENABLE_STATIC)
 add_library(sqic_fortran_c_bridge STATIC wsqic.f90)
@@ -23,8 +26,8 @@ endif()
 if(ENABLE_SHARED)
 add_library(sqic_fortran_c_bridge SHARED wsqic.f90)
 endif()
-target_link_libraries(casadi_qpsolver_sqic sqic_fortran_c_bridge ${CMAKE_DL_LIBS})
-target_link_libraries(casadi_stabilizedqpsolver_sqic sqic_fortran_c_bridge ${CMAKE_DL_LIBS})
+casadi_plugin_link_libraries(QpSolver sqic sqic_fortran_c_bridge ${CMAKE_DL_LIBS})
+casadi_plugin_link_libraries(StabilizedQpSolver sqic sqic_fortran_c_bridge ${CMAKE_DL_LIBS})
 target_link_libraries(sqic_fortran_c_bridge ${SQIC_LIBRARIES})
 
 install(TARGETS sqic_fortran_c_bridge

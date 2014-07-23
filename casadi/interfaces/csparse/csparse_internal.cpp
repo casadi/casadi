@@ -33,7 +33,7 @@ namespace casadi {
   casadi_register_linearsolver_csparse(LinearSolverInternal::Plugin* plugin) {
     plugin->creator = CSparseInternal::creator;
     plugin->name = "csparse";
-    plugin->doc = "CSparse docs not available";
+    plugin->doc = CSparseInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

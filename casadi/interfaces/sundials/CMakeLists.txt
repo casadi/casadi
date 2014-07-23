@@ -8,20 +8,26 @@ if(PRECOND_TEST)
 endif()
 
 # CVODES
-casadi_library(casadi_integrator_cvodes
+casadi_plugin(Integrator cvodes
   sundials_internal.hpp  sundials_internal.cpp
-  cvodes_internal.hpp    cvodes_internal.cpp)
-target_link_libraries(casadi_integrator_cvodes ${SUNDIALS_LIBRARIES})
+  cvodes_internal.hpp    cvodes_internal.cpp
+  cvodes_internal_meta.cpp
+  )
+casadi_plugin_link_libraries(Integrator cvodes ${SUNDIALS_LIBRARIES})
 
 # IDAS
-casadi_library(casadi_integrator_idas
-  idas_internal.hpp      idas_internal.cpp)
-target_link_libraries(casadi_integrator_idas casadi_integrator_cvodes)
+casadi_plugin(Integrator idas
+  idas_internal.hpp      idas_internal.cpp
+  idas_internal_meta.cpp
+  )
+casadi_plugin_link_libraries(Integrator idas casadi_integrator_cvodes)
 
 # KINSOL
-casadi_library(casadi_implicitfunction_kinsol 
-   kinsol_internal.hpp    kinsol_internal.cpp)
-target_link_libraries(casadi_implicitfunction_kinsol ${SUNDIALS_LIBRARIES})
+casadi_plugin(ImplicitFunction kinsol 
+   kinsol_internal.hpp    kinsol_internal.cpp
+   kinsol_internal_meta.cpp
+   )
+casadi_plugin_link_libraries(ImplicitFunction kinsol  ${SUNDIALS_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/sundials

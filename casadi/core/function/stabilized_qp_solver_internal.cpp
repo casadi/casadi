@@ -24,14 +24,14 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
-INPUTSCHEME(StabilizedQPSolverInput)
-OUTPUTSCHEME(QPSolverOutput)
+INPUTSCHEME(StabilizedQpSolverInput)
+OUTPUTSCHEME(QpSolverOutput)
 
 using namespace std;
 namespace casadi {
 
   // Constructor
-  StabilizedQPSolverInternal::StabilizedQPSolverInternal(const std::vector<Sparsity> &st)
+  StabilizedQpSolverInternal::StabilizedQpSolverInternal(const std::vector<Sparsity> &st)
       : st_(st) {
     // Get structure
     casadi_assert_message(st_.size()==QP_STRUCT_NUM, "Problem structure mismatch");
@@ -80,27 +80,27 @@ namespace casadi {
     output(QP_SOLVER_LAM_A)         =  DMatrix::zeros(a_sparsity);
 
     // IO scheme
-    input_.scheme = SCHEME_StabilizedQPSolverInput;
-    output_.scheme = SCHEME_QPSolverOutput;
+    input_.scheme = SCHEME_StabilizedQpSolverInput;
+    output_.scheme = SCHEME_QpSolverOutput;
   }
 
-  void StabilizedQPSolverInternal::init() {
+  void StabilizedQpSolverInternal::init() {
     // Call the init method of the base class
     FunctionInternal::init();
   }
 
-  StabilizedQPSolverInternal::~StabilizedQPSolverInternal() {
+  StabilizedQpSolverInternal::~StabilizedQpSolverInternal() {
   }
 
-  void StabilizedQPSolverInternal::evaluate() {
-    throw CasadiException("StabilizedQPSolverInternal::evaluate: Not implemented");
+  void StabilizedQpSolverInternal::evaluate() {
+    throw CasadiException("StabilizedQpSolverInternal::evaluate: Not implemented");
   }
 
-  void StabilizedQPSolverInternal::solve() {
-    throw CasadiException("StabilizedQPSolverInternal::solve: Not implemented");
+  void StabilizedQpSolverInternal::solve() {
+    throw CasadiException("StabilizedQpSolverInternal::solve: Not implemented");
   }
 
-  void StabilizedQPSolverInternal::checkInputs() const {
+  void StabilizedQpSolverInternal::checkInputs() const {
     // Check box constraints
     const vector<double>& lbx = input(STABILIZED_QP_SOLVER_LBX).data();
     const vector<double>& ubx = input(STABILIZED_QP_SOLVER_UBX).data();
@@ -122,9 +122,9 @@ namespace casadi {
     }
   }
 
-  std::map<std::string, StabilizedQPSolverInternal::Plugin> StabilizedQPSolverInternal::solvers_;
+  std::map<std::string, StabilizedQpSolverInternal::Plugin> StabilizedQpSolverInternal::solvers_;
 
-  const std::string StabilizedQPSolverInternal::infix_ = "stabilizedqpsolver";
+  const std::string StabilizedQpSolverInternal::infix_ = "stabilizedqpsolver";
 
 
 } // namespace casadi

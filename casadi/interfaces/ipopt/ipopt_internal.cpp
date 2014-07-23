@@ -43,20 +43,20 @@ namespace casadi {
 
   extern "C"
   int CASADI_NLPSOLVER_IPOPT_EXPORT
-  casadi_register_nlpsolver_ipopt(NLPSolverInternal::Plugin* plugin) {
+  casadi_register_nlpsolver_ipopt(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = IpoptInternal::creator;
     plugin->name = "ipopt";
-    plugin->doc = "IPOPT docs not available";
+    plugin->doc = IpoptInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
 
   extern "C"
   void CASADI_NLPSOLVER_IPOPT_EXPORT casadi_load_nlpsolver_ipopt() {
-    NLPSolverInternal::registerPlugin(casadi_register_nlpsolver_ipopt);
+    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_ipopt);
   }
 
-  IpoptInternal::IpoptInternal(const Function& nlp) : NLPSolverInternal(nlp) {
+  IpoptInternal::IpoptInternal(const Function& nlp) : NlpSolverInternal(nlp) {
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
     addOption("print_time",               OT_BOOLEAN, true,
               "print information about execution time");
@@ -182,7 +182,7 @@ namespace casadi {
     freeIpopt();
 
     // Call the init method of the base class
-    NLPSolverInternal::init();
+    NlpSolverInternal::init();
 
     // Read user options
     exact_hessian_ = !hasSetOption("hessian_approximation") ||

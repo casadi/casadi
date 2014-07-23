@@ -28,18 +28,26 @@
 
 #include <casadi/solvers/casadi_socpsolver_sdp_export.h>
 
+/** \defgroup plugin_SocpSolver_sdp
+   Solve SOCPs using an SdpSolver
+*/
+
+
+/** \pluginsection{SocpSolver,sdp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief SOCP Solver for quadratic programming
+  /** \brief \pluginbrief{SocpSolver,sdp}
 
-      @copydoc SOCPSolver_doc
+      @copydoc SocpSolver_doc
+      @copydoc plugin_SocpSolver_sdp
 
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SOCPSolverInternal {
-    friend class SDPSOCPSolver;
+  class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SocpSolverInternal {
+    friend class SDPSocpSolver;
   public:
 
     /** \brief  Create a new Solver */
@@ -52,7 +60,7 @@ namespace casadi {
     virtual SDPSOCPInternal* clone() const;
   
     /** \brief  Create a new SOCP Solver */
-    static SOCPSolverInternal* creator(const SOCPStructure& st)
+    static SocpSolverInternal* creator(const SOCPStructure& st)
     { return new SDPSOCPInternal(st);}
 
     /** \brief  Initialize */
@@ -60,8 +68,11 @@ namespace casadi {
 
     virtual void evaluate();
 
+    /// A documentation string
+    static const std::string meta_doc;
+
   protected:
-    SDPSolver sdpsolver_;
+    SdpSolver sdpsolver_;
 
     /// Mapping from G, H, E, F to P, G
     Function mapping_;

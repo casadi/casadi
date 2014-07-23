@@ -204,7 +204,7 @@ def minimize(f,gl=[],verbose=False):
   makeSparse(patt)
   G = patt
     
-  solver = DSDPSolver(sdpStruct(a=A.sparsity(),f=F.sparsity(),g=G.sparsity()))
+  solver = DSdpSolver(sdpStruct(a=A.sparsity(),f=F.sparsity(),g=G.sparsity()))
   if not verbose:
     solver.setOption("_printlevel",0)
   solver.init()

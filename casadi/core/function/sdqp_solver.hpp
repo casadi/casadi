@@ -26,9 +26,9 @@
 #include "function.hpp"
 
 
-/** \defgroup SDQPSolver_doc
+/** \defgroup SdqpSolver_doc
 
-    Same as an SDPSolver, but with a quadratic objective 1/2 x' H x
+    Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 
 */
 
@@ -87,31 +87,34 @@ namespace casadi {
     SDQP_STRUCT_NUM};
 
   // Forward declaration of internal class
-  class SDQPSolverInternal;
+  class SdqpSolverInternal;
 
-  /** \brief SDQPSolver
+  /** \brief SdqpSolver
 
 
-      @copydoc SDQPSolver_doc
+      @copydoc SdqpSolver_doc
 
+      \generalsection{SdqpSolver}
+      \pluginssection{SdqpSolver}
+      
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT SDQPSolver : public Function {
+  class CASADI_CORE_EXPORT SdqpSolver : public Function {
   public:
 
     /// Default constructor
-    SDQPSolver();
+    SdqpSolver();
 
     /** \brief Constructor
-     *  \param st Problem structure
-     *  \copydoc scheme_SDQPStruct
+     *  \param name \pluginargument{SdqpSolver}
+     *  \param st \structargument{SDQP}
      */
-    SDQPSolver(const std::string& name, const SDQPStructure& st);
+    SdqpSolver(const std::string& name, const SDQPStructure& st);
 
     /// Access functions of the node
-    SDQPSolverInternal* operator->();
-    const SDQPSolverInternal* operator->() const;
+    SdqpSolverInternal* operator->();
+    const SdqpSolverInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

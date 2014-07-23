@@ -28,18 +28,26 @@
 
 #include <casadi/solvers/casadi_lpsolver_qp_export.h>
 
+/** \defgroup plugin_LpSolver_qp
+
+    Solve LPs using a QpSolver
+*/
+
+/** \pluginsection{LpSolver,qp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Solve LPs using a QP Solver
+  /** \brief \pluginbrief{LpSolver,qp}
 
-   @copydoc LPSolver_doc
+   @copydoc LpSolver_doc
+   @copydoc plugin_LpSolver_qp
 
    \author Joris Gillis
    \date 2013
   */
-class CASADI_LPSOLVER_QP_EXPORT QPLPInternal : public LPSolverInternal {
-  friend class QPLPSolver;
+class CASADI_LPSOLVER_QP_EXPORT QPLPInternal : public LpSolverInternal {
+  friend class QPLpSolver;
 public:
 
   /** \brief  Create a new Solver */
@@ -52,7 +60,7 @@ public:
   virtual QPLPInternal* clone() const;
 
   /** \brief  Create a new QP Solver */
-  static LPSolverInternal* creator(const LPStructure& st)
+  static LpSolverInternal* creator(const LPStructure& st)
   { return new QPLPInternal(st);}
 
   /** \brief  Initialize */
@@ -60,8 +68,11 @@ public:
 
   virtual void evaluate();
 
+  /// A documentation string
+  static const std::string meta_doc;
+    
   protected:
-    QPSolver qpsolver_;
+    QpSolver qpsolver_;
 
 };
 

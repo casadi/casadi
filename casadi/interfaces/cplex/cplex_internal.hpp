@@ -28,16 +28,26 @@
 
 #include <string>
 
+/** \defgroup plugin_QpSolver_cplex
+     
+      Interface to Cplex solver for sparse Quadratic Programs
+*/
+
+/** \pluginsection{QpSolver,cplex} */
+
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /** \brief Interface to Cplex solver for sparse Quadratic Programs
-      @copydoc QPSolver_doc
+  /** \brief \pluginbrief{QpSolver,cplex}
+
+      @copydoc QpSolver_doc
+      @copydoc plugin_QpSolver_cplex
+      
       \author Attila Kozma, Joel Andersson
       \date 2012
   */
-  class CASADI_QPSOLVER_CPLEX_EXPORT CplexInternal : public QPSolverInternal {
+  class CASADI_QPSOLVER_CPLEX_EXPORT CplexInternal : public QpSolverInternal {
   public:
     /** \brief Default constructor */
     explicit CplexInternal();
@@ -46,7 +56,7 @@ namespace casadi {
     virtual CplexInternal* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static QPSolverInternal* creator(const QPStructure& st)
+    static QpSolverInternal* creator(const QPStructure& st)
     { return new CplexInternal(st);}
 
     /// Constructor using sparsity patterns
@@ -114,6 +124,9 @@ namespace casadi {
     /// CPLEX environment
     CPXENVptr env_;
     CPXLPptr lp_;
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   };
 } // end namespace casadi

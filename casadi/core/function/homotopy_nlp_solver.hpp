@@ -26,7 +26,7 @@
 #include "function.hpp"
 
 
-/** \defgroup HomotopyNLPSolver_doc
+/** \defgroup HomotopyNlpSolver_doc
 
   Solves the following parametric nonlinear program (NLP):
   \verbatim
@@ -65,16 +65,19 @@ namespace casadi {
 
   /** \brief Base class for Homotopy NLP Solvers
 
-      @copydoc HomotopyNLPSolver_doc
+      @copydoc HomotopyNlpSolver_doc
 
+      \generalsection{HomotopyNlpSolver}
+      \pluginssection{HomotopyNlpSolver}
+      
       \author Joris Gillis
       \date 2014
   */
-  class CASADI_CORE_EXPORT HomotopyNLPSolver : public Function {
+  class CASADI_CORE_EXPORT HomotopyNlpSolver : public Function {
   public:
 
     /// Default constructor
-    HomotopyNLPSolver();
+    HomotopyNlpSolver();
 
     /// Access functions of the node
     HomotopyNLPInternal* operator->();

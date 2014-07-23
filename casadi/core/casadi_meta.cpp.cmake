@@ -20,7 +20,7 @@
  *
  */
 
-#include "casadi_meta.hpp"
+#include <casadi/core/casadi_meta.hpp>
 
 namespace casadi {
   const std::string CasadiMeta::version = "${PACKAGE_VERSION}";  // NOLINT(whitespace/line_length)
@@ -32,4 +32,5 @@ namespace casadi {
   const std::string CasadiMeta::compiler = "${CMAKE_CXX_COMPILER}";  // NOLINT(whitespace/line_length)
   const std::string CasadiMeta::compiler_flags ="${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPER_CMAKE_BUILD_TYPE}}";  // NOLINT(whitespace/line_length)
   const std::string CasadiMeta::modules ="${CASADI_MODULES}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::plugins ="${CASADI_PLUGINS}";  // NOLINT(whitespace/line_length)
 } // namespace casadi

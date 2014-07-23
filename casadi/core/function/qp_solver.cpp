@@ -26,46 +26,46 @@ using namespace std;
 namespace casadi {
 
 
-  QPSolver::QPSolver() {
+  QpSolver::QpSolver() {
   }
 
-  QPSolverInternal* QPSolver::operator->() {
-    return static_cast<QPSolverInternal*>(Function::operator->());
+  QpSolverInternal* QpSolver::operator->() {
+    return static_cast<QpSolverInternal*>(Function::operator->());
   }
 
-  const QPSolverInternal* QPSolver::operator->() const {
-    return static_cast<const QPSolverInternal*>(Function::operator->());
+  const QpSolverInternal* QpSolver::operator->() const {
+    return static_cast<const QpSolverInternal*>(Function::operator->());
   }
 
-  bool QPSolver::checkNode() const {
-    return dynamic_cast<const QPSolverInternal*>(get())!=0;
+  bool QpSolver::checkNode() const {
+    return dynamic_cast<const QpSolverInternal*>(get())!=0;
   }
 
-  void QPSolver::setLPOptions() {
+  void QpSolver::setLPOptions() {
     (*this)->setLPOptions();
   }
 
-  void QPSolver::generateNativeCode(const std::string &filename) const {
+  void QpSolver::generateNativeCode(const std::string &filename) const {
     std::ofstream file;
     file.open(filename.c_str());
 
     (*this)->generateNativeCode(file);
   }
 
-  void QPSolver::generateNativeCode(std::ostream &file) const {
+  void QpSolver::generateNativeCode(std::ostream &file) const {
     (*this)->generateNativeCode(file);
   }
 
-  QPSolver::QPSolver(const std::string& name, const QPStructure& st) {
-    assignNode(QPSolverInternal::getPlugin(name).creator(st));
+  QpSolver::QpSolver(const std::string& name, const QPStructure& st) {
+    assignNode(QpSolverInternal::getPlugin(name).creator(st));
   }
 
-  void QPSolver::loadPlugin(const std::string& name) {
-    QPSolverInternal::loadPlugin(name);
+  void QpSolver::loadPlugin(const std::string& name) {
+    QpSolverInternal::loadPlugin(name);
   }
 
-  std::string QPSolver::doc(const std::string& name) {
-    return QPSolverInternal::getPlugin(name).doc;
+  std::string QpSolver::doc(const std::string& name) {
+    return QpSolverInternal::getPlugin(name).doc;
   }
 
 } // namespace casadi

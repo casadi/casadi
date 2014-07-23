@@ -32,15 +32,15 @@ namespace casadi {
 
   /// Internal class
   class CASADI_CORE_EXPORT
-  QPSolverInternal : public FunctionInternal,
-                     public PluginInterface<QPSolverInternal> {
+  QpSolverInternal : public FunctionInternal,
+                     public PluginInterface<QpSolverInternal> {
   public:
 
     // Constructor
-    QPSolverInternal(const std::vector<Sparsity> &st);
+    QpSolverInternal(const std::vector<Sparsity> &st);
 
     // Destructor
-    virtual ~QPSolverInternal() = 0;
+    virtual ~QpSolverInternal() = 0;
 
     // Initialize
     virtual void init();
@@ -61,7 +61,7 @@ namespace casadi {
     virtual void generateNativeCode(std::ostream& file) const {}
 
     // Creator function for internal class
-    typedef QPSolverInternal* (*Creator)(const QPStructure& st);
+    typedef QpSolverInternal* (*Creator)(const QPStructure& st);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

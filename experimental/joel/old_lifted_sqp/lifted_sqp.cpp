@@ -34,11 +34,11 @@ LiftedSQP::LiftedSQP(const Function& F, const Function& G){
 }
 
 LiftedSQPInternal* LiftedSQP::operator->(){
-  return (LiftedSQPInternal*)(NLPSolver::operator->());
+  return (LiftedSQPInternal*)(NlpSolver::operator->());
 }
 
 const LiftedSQPInternal* LiftedSQP::operator->() const{
-  return (const LiftedSQPInternal*)(NLPSolver::operator->());
+  return (const LiftedSQPInternal*)(NlpSolver::operator->());
 }
     
 bool LiftedSQP::checkNode() const{

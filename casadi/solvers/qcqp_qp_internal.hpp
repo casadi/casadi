@@ -27,17 +27,24 @@
 #include "casadi/core/function/qcqp_solver.hpp"
 #include <casadi/solvers/casadi_qpsolver_qcqp_export.h>
 
+/** \defgroup plugin_QpSolver_qcqp
+   Solve QP using a QcqpSolver
+*/
+
+/** \pluginsection{QpSolver,qcqp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Use a QCQP solver to solve q QP
-
-      @copydoc QPSolver_doc
+  /** \brief \pluginbrief{QpSolver,qcqp}
+  
+      @copydoc QpSolver_doc
+      @copydoc plugin_QpSolver_qcqp
 
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QPSolverInternal {
+  class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QpSolverInternal {
   public:
 
     /** \brief  Create a new Solver */
@@ -50,7 +57,7 @@ namespace casadi {
     virtual QCQPQPInternal* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static QPSolverInternal* creator(const QPStructure& st)
+    static QpSolverInternal* creator(const QPStructure& st)
     { return new QCQPQPInternal(st);}
 
     /** \brief  Initialize */
@@ -58,8 +65,11 @@ namespace casadi {
 
     virtual void evaluate();
 
+    /// A documentation string
+    static const std::string meta_doc;
+
   protected:
-    QCQPSolver qcqpsolver_;
+    QcqpSolver qcqpsolver_;
 
   };
 

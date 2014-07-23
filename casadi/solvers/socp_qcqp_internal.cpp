@@ -30,17 +30,17 @@ namespace casadi {
 
   extern "C"
   int CASADI_QCQPSOLVER_SOCP_EXPORT
-  casadi_register_qcqpsolver_socp(QCQPSolverInternal::Plugin* plugin) {
+  casadi_register_qcqpsolver_socp(QcqpSolverInternal::Plugin* plugin) {
     plugin->creator = SOCPQCQPInternal::creator;
     plugin->name = "socp";
-    plugin->doc = "socp docs not available";
+    plugin->doc = SOCPQCQPInternal::meta_doc.c_str();;
     plugin->version = 20;
     return 0;
   }
 
   extern "C"
   void CASADI_QCQPSOLVER_SOCP_EXPORT casadi_load_qcqpsolver_socp() {
-    QCQPSolverInternal::registerPlugin(casadi_register_qcqpsolver_socp);
+    QcqpSolverInternal::registerPlugin(casadi_register_qcqpsolver_socp);
   }
 
   SOCPQCQPInternal* SOCPQCQPInternal::clone() const {
@@ -51,9 +51,9 @@ namespace casadi {
     return node;
   }
 
-  SOCPQCQPInternal::SOCPQCQPInternal(const std::vector<Sparsity> &st) : QCQPSolverInternal(st) {
+  SOCPQCQPInternal::SOCPQCQPInternal(const std::vector<Sparsity> &st) : QcqpSolverInternal(st) {
     addOption("socp_solver",       OT_STRING, GenericType(),
-              "The SOCPSolver used to solve the QCQPs.");
+              "The SocpSolver used to solve the QCQPs.");
     addOption("socp_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the SOCPSOlver");
 
@@ -169,7 +169,7 @@ namespace casadi {
 
   void SOCPQCQPInternal::init() {
 
-    QCQPSolverInternal::init();
+    QcqpSolverInternal::init();
 
     // Collection of sparsities that will make up SOCP_SOLVER_G
     std::vector<Sparsity> socp_g;
@@ -192,7 +192,7 @@ namespace casadi {
 
     // Create an socpsolver instance
     std::string socpsolver_name = getOption("socp_solver");
-    socpsolver_ = SOCPSolver(socpsolver_name,
+    socpsolver_ = SocpSolver(socpsolver_name,
                              socpStruct("g", horzcat(socp_g),
                                         "a", horzcat(input(QCQP_SOLVER_A).sparsity(), Sparsity::sparse(nc_, 1))));
 

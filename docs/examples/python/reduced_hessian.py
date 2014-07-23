@@ -55,7 +55,7 @@ ubg = [0.00]
 
 # Create NLP solver
 nlp = SXFunction(nlpIn(x=x),nlpOut(f=f,g=g))
-solver = NLPSolver("ipopt", nlp)
+solver = NlpSolver("ipopt", nlp)
 
 # Mark the parameters amongst the variables (see sIPOPT documentation)
 var_integer_md = {}

@@ -29,24 +29,34 @@
 
 #include <casadi/solvers/casadi_nlpsolver_sqpmethod_export.h>
 
+/** \defgroup plugin_NlpSolver_sqpmethod
+ A textbook SQPMethod
+*/
+
+/** \pluginsection{NlpSolver,sqpmethod} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  class CASADI_NLPSOLVER_SQPMETHOD_EXPORT SQPInternal : public NLPSolverInternal {
+  /** \brief  \pluginbrief{NlpSolver,sqpmethod}
+  *  @copydoc NLPSolver_doc
+  *  @copydoc plugin_NlpSolver_sqpmethod
+  */
+  class CASADI_NLPSOLVER_SQPMETHOD_EXPORT SQPInternal : public NlpSolverInternal {
   public:
     explicit SQPInternal(const Function& nlp);
     virtual ~SQPInternal();
     virtual SQPInternal* clone() const { return new SQPInternal(*this);}
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new SQPInternal(nlp);}
 
     virtual void init();
     virtual void evaluate();
 
     /// QP solver for the subproblems
-    QPSolver qp_solver_;
+    QpSolver qp_solver_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -76,8 +86,8 @@ namespace casadi {
     /// Hessian regularization
     double reg_;
 
-    /// Access QPSolver
-    const QPSolver getQPSolver() const { return qp_solver_;}
+    /// Access QpSolver
+    const QpSolver getQpSolver() const { return qp_solver_;}
 
     /// Lagrange multipliers of the NLP
     std::vector<double> mu_, mu_x_;
@@ -187,6 +197,9 @@ namespace casadi {
     int n_eval_g_; // number of calls to eval_g
     int n_eval_jac_g_; // number of calls to eval_jac_g
     int n_eval_h_; // number of calls to eval_h
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   };
 

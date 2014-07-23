@@ -158,7 +158,7 @@ int main(){
       iter_count[test][solver] = 9999;
 	
       // Get the nlp solver and NLP solver options
-      NLPSolver nlp_solver;
+      NlpSolver nlp_solver;
       switch(solver){
 	case IPOPT:
 	  if(gauss_newton) continue; // not supported

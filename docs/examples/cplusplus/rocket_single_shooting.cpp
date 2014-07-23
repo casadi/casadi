@@ -156,9 +156,9 @@ int main(){
   MXFunction nlp(nlpIn("x",U),nlpOut("f",F,"g",G));
 
   // Allocate an NLP solver
-  NLPSolver solver;
+  NlpSolver solver;
   if(lifted_newton){
-    solver = NLPSolver("scpgen", nlp);
+    solver = NlpSolver("scpgen", nlp);
 
     solver.setOption("verbose",true);
     solver.setOption("regularize",false);
@@ -176,7 +176,7 @@ int main(){
     qp_solver_options["nlp_solver_options"] = ipopt_options;
     solver.setOption("qp_solver_options",qp_solver_options);
   } else {
-    solver = NLPSolver("ipopt", nlp);
+    solver = NlpSolver("ipopt", nlp);
     
     // Set options
     solver.setOption("tol",1e-10);

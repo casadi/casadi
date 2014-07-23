@@ -26,7 +26,7 @@
 #include "function.hpp"
 
 
-/** \defgroup SDPSolver_doc
+/** \defgroup SdpSolver_doc
 
     Solves an SDP problem in standard form.
     See http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -104,7 +104,7 @@
     G  = blkdiag(Gj for all j)
     Fi = blkdiag(F_ij for all j)
 
-    Implementations of SDPSolver are encouraged to exploit this block structure.
+    Implementations of SdpSolver are encouraged to exploit this block structure.
 
 */
 
@@ -159,31 +159,34 @@ namespace casadi {
     SDP_STRUCT_NUM};
 
   // Forward declaration of internal class
-  class SDPSolverInternal;
+  class SdpSolverInternal;
 
-  /** \brief SDPSolver
+  /** \brief SdpSolver
 
 
-      @copydoc SDPSolver_doc
+      @copydoc SdpSolver_doc
 
+      \generalsection{SdpSolver}
+      \pluginssection{SdpSolver}
+      
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT SDPSolver : public Function {
+  class CASADI_CORE_EXPORT SdpSolver : public Function {
   public:
 
     /// Default constructor
-    SDPSolver();
+    SdpSolver();
 
     /** \brief Constructor
-     *  \param st Problem structure
-     *  \copydoc scheme_SDPStruct
+     *  \param name \pluginargument{SdpSolver}
+     *  \param st \structargument{SDP}
      */
-    SDPSolver(const std::string& name, const SDPStructure& st);
+    SdpSolver(const std::string& name, const SDPStructure& st);
 
     /// Access functions of the node
-    SDPSolverInternal* operator->();
-    const SDPSolverInternal* operator->() const;
+    SdpSolverInternal* operator->();
+    const SdpSolverInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

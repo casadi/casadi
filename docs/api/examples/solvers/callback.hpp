@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* casadi::NLPSolver();
+* casadi::NlpSolver();
 * \endcode
 *
 */

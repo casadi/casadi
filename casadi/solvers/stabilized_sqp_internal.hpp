@@ -29,30 +29,39 @@
 
 #include <casadi/solvers/casadi_nlpsolver_stabilizedsqp_export.h>
 
+/** \defgroup plugin_NlpSolver_stabilizedsqp
+      Stabilized Sequential Quadratic Programming method.
+*/
+
+/** \pluginsection{NlpSolver,stabilizedsqp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
   /**
-     \brief Stabilized Sequential Quadratic Programming method.
+     \brief \pluginbrief{NlpSolver,stabilizedsqp}
+     
+     @copydoc NlpSolver_doc
+     @copydoc plugin_NlpSolver_stabilizedsqp
 
      \author Slava Kung
      \date 2013
   */
-  class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSQPInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSQPInternal : public NlpSolverInternal {
   public:
     explicit StabilizedSQPInternal(const Function& nlp);
     virtual ~StabilizedSQPInternal();
     virtual StabilizedSQPInternal* clone() const { return new StabilizedSQPInternal(*this);}
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new StabilizedSQPInternal(nlp);}
 
     virtual void init();
     virtual void evaluate();
 
     /// Stabilized QP solver for the subproblems
-    StabilizedQPSolver stabilized_qp_solver_;
+    StabilizedQpSolver stabilized_qp_solver_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -106,8 +115,8 @@ namespace casadi {
     double rhoap_, rhoap_mu_;
     int TRsuccess_;
 
-    /// Access StabilizedQPSolver
-    const StabilizedQPSolver getStabilizedQPSolver() const { return stabilized_qp_solver_;}
+    /// Access StabilizedQpSolver
+    const StabilizedQpSolver getStabilizedQpSolver() const { return stabilized_qp_solver_;}
 
     /// Lagrange multipliers of the NLP
     std::vector<double> mu_, mu_x_, mu_e_, pi_, pi2_;
@@ -218,6 +227,9 @@ namespace casadi {
 
     /// Calculate 1-norm of a matrix
     double norm1matrix(const DMatrix& A);
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   };
   /// \endcond

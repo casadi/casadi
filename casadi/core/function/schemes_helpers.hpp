@@ -673,20 +673,20 @@ std::vector<M> linsolOut(const std::vector<M>& args,
 
 }
 /// \cond INTERNAL
-/// Helper function for 'LPSolverInput'
+/// Helper function for 'LpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT LPSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT LpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit LPSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LPSolverInput) {}
+    explicit LpSolverInputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_LpSolverInput) {}
 };
 /// \endcond
 /// Input arguments of a LP problem
 ///
-/// \copydoc scheme_LPSolverInput
+/// \copydoc scheme_LpSolverInput
 template<class M>
-LPSolverInputIOSchemeVector<M> lpIn(
+LpSolverInputIOSchemeVector<M> lpIn(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -703,14 +703,14 @@ LPSolverInputIOSchemeVector<M> lpIn(
   if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LPSolverInput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_LpSolverInput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in LPSolverInput: '" << it->first
+      casadi_error("Keyword error in LpSolverInput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "c, a, lba, uba, lbx, ubx");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return LPSolverInputIOSchemeVector<M>(ret);
+  return LpSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> lpIn(const std::vector<M>& args,
@@ -721,30 +721,30 @@ std::vector<M> lpIn(const std::vector<M>& args,
     const std::string &arg_s4="",
     const std::string &arg_s5="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
 /// \cond INTERNAL
-/// Helper function for 'LPSolverOutput'
+/// Helper function for 'LpSolverOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT LPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT LpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit LPSolverOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_LPSolverOutput) {}
+    explicit LpSolverOutputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_LpSolverOutput) {}
 };
 /// \endcond
 /// Output arguments of an LP Solver
 ///
-/// \copydoc scheme_LPSolverOutput
+/// \copydoc scheme_LpSolverOutput
 template<class M>
-LPSolverOutputIOSchemeVector<M> lpOut(
+LpSolverOutputIOSchemeVector<M> lpOut(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -757,14 +757,14 @@ LPSolverOutputIOSchemeVector<M> lpOut(
   if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_LPSolverOutput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_LpSolverOutput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in LPSolverOutput: '" << it->first
+      casadi_error("Keyword error in LpSolverOutput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "x, cost, lam_a, lam_x");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return LPSolverOutputIOSchemeVector<M>(ret);
+  return LpSolverOutputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> lpOut(const std::vector<M>& args,
@@ -773,10 +773,10 @@ std::vector<M> lpOut(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1183,20 +1183,20 @@ std::vector<M> hessLagOut(const std::vector<M>& args,
 
 }
 /// \cond INTERNAL
-/// Helper function for 'NLPSolverInput'
+/// Helper function for 'NlpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT NLPSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT NlpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit NLPSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_NLPSolverInput) {}
+    explicit NlpSolverInputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_NlpSolverInput) {}
 };
 /// \endcond
 /// Input arguments of an NLP Solver
 ///
-/// \copydoc scheme_NLPSolverInput
+/// \copydoc scheme_NlpSolverInput
 template<class M>
-NLPSolverInputIOSchemeVector<M> nlpSolverIn(
+NlpSolverInputIOSchemeVector<M> nlpSolverIn(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -1217,14 +1217,14 @@ NLPSolverInputIOSchemeVector<M> nlpSolverIn(
   if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NLPSolverInput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_NlpSolverInput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLPSolverInput: '" << it->first
+      casadi_error("Keyword error in NlpSolverInput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return NLPSolverInputIOSchemeVector<M>(ret);
+  return NlpSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> nlpSolverIn(const std::vector<M>& args,
@@ -1237,32 +1237,32 @@ std::vector<M> nlpSolverIn(const std::vector<M>& args,
     const std::string &arg_s6="",
     const std::string &arg_s7="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
 /// \cond INTERNAL
-/// Helper function for 'NLPSolverOutput'
+/// Helper function for 'NlpSolverOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT NLPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT NlpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit NLPSolverOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_NLPSolverOutput) {}
+    explicit NlpSolverOutputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_NlpSolverOutput) {}
 };
 /// \endcond
 /// Output arguments of an NLP Solver
 ///
-/// \copydoc scheme_NLPSolverOutput
+/// \copydoc scheme_NlpSolverOutput
 template<class M>
-NLPSolverOutputIOSchemeVector<M> nlpSolverOut(
+NlpSolverOutputIOSchemeVector<M> nlpSolverOut(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -1279,14 +1279,14 @@ NLPSolverOutputIOSchemeVector<M> nlpSolverOut(
   if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NLPSolverOutput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_NlpSolverOutput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLPSolverOutput: '" << it->first
+      casadi_error("Keyword error in NlpSolverOutput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "x, f, g, lam_x, lam_g, lam_p");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return NLPSolverOutputIOSchemeVector<M>(ret);
+  return NlpSolverOutputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> nlpSolverOut(const std::vector<M>& args,
@@ -1297,12 +1297,12 @@ std::vector<M> nlpSolverOut(const std::vector<M>& args,
     const std::string &arg_s4="",
     const std::string &arg_s5="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s5))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1493,20 +1493,20 @@ std::vector<M> ocpOut(const std::vector<M>& args,
 
 }
 /// \cond INTERNAL
-/// Helper function for 'QCQPSolverInput'
+/// Helper function for 'QcqpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT QCQPSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT QcqpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QCQPSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QCQPSolverInput) {}
+    explicit QcqpSolverInputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_QcqpSolverInput) {}
 };
 /// \endcond
 /// Input arguments of a QP problem
 ///
-/// \copydoc scheme_QCQPSolverInput
+/// \copydoc scheme_QcqpSolverInput
 template<class M>
-QCQPSolverInputIOSchemeVector<M> qcqpIn(
+QcqpSolverInputIOSchemeVector<M> qcqpIn(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -1535,14 +1535,14 @@ QCQPSolverInputIOSchemeVector<M> qcqpIn(
   if (arg_s11 != "") arg.insert(make_pair(arg_s11, arg_m11));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QCQPSolverInput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_QcqpSolverInput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in QCQPSolverInput: '" << it->first
+      casadi_error("Keyword error in QcqpSolverInput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return QCQPSolverInputIOSchemeVector<M>(ret);
+  return QcqpSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> qcqpIn(const std::vector<M>& args,
@@ -1559,36 +1559,36 @@ std::vector<M> qcqpIn(const std::vector<M>& args,
     const std::string &arg_s10="",
     const std::string &arg_s11="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
-  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
-  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
+  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
+  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
 /// \cond INTERNAL
-/// Helper function for 'QCQPSolverOutput'
+/// Helper function for 'QcqpSolverOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT QCQPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT QcqpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QCQPSolverOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QCQPSolverOutput) {}
+    explicit QcqpSolverOutputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_QcqpSolverOutput) {}
 };
 /// \endcond
 /// Output arguments of an QP Solver
 ///
-/// \copydoc scheme_QCQPSolverOutput
+/// \copydoc scheme_QcqpSolverOutput
 template<class M>
-QCQPSolverOutputIOSchemeVector<M> qcqpOut(
+QcqpSolverOutputIOSchemeVector<M> qcqpOut(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -1601,14 +1601,14 @@ QCQPSolverOutputIOSchemeVector<M> qcqpOut(
   if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QCQPSolverOutput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_QcqpSolverOutput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in QCQPSolverOutput: '" << it->first
+      casadi_error("Keyword error in QcqpSolverOutput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "x, cost, lam_a, lam_x");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return QCQPSolverOutputIOSchemeVector<M>(ret);
+  return QcqpSolverOutputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> qcqpOut(const std::vector<M>& args,
@@ -1617,10 +1617,10 @@ std::vector<M> qcqpOut(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1671,20 +1671,20 @@ std::vector<M> qcqpStruct(const std::vector<M>& args,
 
 }
 /// \cond INTERNAL
-/// Helper function for 'QPSolverInput'
+/// Helper function for 'QpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT QPSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT QpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QPSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QPSolverInput) {}
+    explicit QpSolverInputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_QpSolverInput) {}
 };
 /// \endcond
 /// Input arguments of a QP problem
 ///
-/// \copydoc scheme_QPSolverInput
+/// \copydoc scheme_QpSolverInput
 template<class M>
-QPSolverInputIOSchemeVector<M> qpIn(
+QpSolverInputIOSchemeVector<M> qpIn(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -1707,14 +1707,14 @@ QPSolverInputIOSchemeVector<M> qpIn(
   if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QPSolverInput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_QpSolverInput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in QPSolverInput: '" << it->first
+      casadi_error("Keyword error in QpSolverInput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "h, g, a, lba, uba, lbx, ubx, x0, lam_x0");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return QPSolverInputIOSchemeVector<M>(ret);
+  return QpSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> qpIn(const std::vector<M>& args,
@@ -1728,33 +1728,33 @@ std::vector<M> qpIn(const std::vector<M>& args,
     const std::string &arg_s7="",
     const std::string &arg_s8="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
 /// \cond INTERNAL
-/// Helper function for 'QPSolverOutput'
+/// Helper function for 'QpSolverOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT QPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT QpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QPSolverOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_QPSolverOutput) {}
+    explicit QpSolverOutputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_QpSolverOutput) {}
 };
 /// \endcond
 /// Output arguments of an QP Solver
 ///
-/// \copydoc scheme_QPSolverOutput
+/// \copydoc scheme_QpSolverOutput
 template<class M>
-QPSolverOutputIOSchemeVector<M> qpOut(
+QpSolverOutputIOSchemeVector<M> qpOut(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -1767,14 +1767,14 @@ QPSolverOutputIOSchemeVector<M> qpOut(
   if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QPSolverOutput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_QpSolverOutput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in QPSolverOutput: '" << it->first
+      casadi_error("Keyword error in QpSolverOutput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "x, cost, lam_a, lam_x");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return QPSolverOutputIOSchemeVector<M>(ret);
+  return QpSolverOutputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> qpOut(const std::vector<M>& args,
@@ -1783,10 +1783,10 @@ std::vector<M> qpOut(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2355,20 +2355,20 @@ std::vector<M> socpStruct(const std::vector<M>& args,
 
 }
 /// \cond INTERNAL
-/// Helper function for 'StabilizedQPSolverInput'
+/// Helper function for 'StabilizedQpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT StabilizedQPSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT StabilizedQpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit StabilizedQPSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_StabilizedQPSolverInput) {}
+    explicit StabilizedQpSolverInputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_StabilizedQpSolverInput) {}
 };
 /// \endcond
 /// Input arguments of a QP problem
 ///
-/// \copydoc scheme_StabilizedQPSolverInput
+/// \copydoc scheme_StabilizedQpSolverInput
 template<class M>
-StabilizedQPSolverInputIOSchemeVector<M> stabilizedQpIn(
+StabilizedQpSolverInputIOSchemeVector<M> stabilizedQpIn(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -2397,14 +2397,14 @@ StabilizedQPSolverInputIOSchemeVector<M> stabilizedQpIn(
   if (arg_s11 != "") arg.insert(make_pair(arg_s11, arg_m11));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in StabilizedQPSolverInput: '" << it->first
+      casadi_error("Keyword error in StabilizedQpSolverInput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return StabilizedQPSolverInputIOSchemeVector<M>(ret);
+  return StabilizedQpSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> stabilizedQpIn(const std::vector<M>& args,
@@ -2421,18 +2421,18 @@ std::vector<M> stabilizedQpIn(const std::vector<M>& args,
     const std::string &arg_s10="",
     const std::string &arg_s11="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
-  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
-  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
+  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
+  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2450,8 +2450,8 @@ template class IntegratorInputIOSchemeVector<T>;\
 template class IntegratorOutputIOSchemeVector<T>;\
 template class LinsolInputIOSchemeVector<T>;\
 template class LinsolOutputIOSchemeVector<T>;\
-template class LPSolverInputIOSchemeVector<T>;\
-template class LPSolverOutputIOSchemeVector<T>;\
+template class LpSolverInputIOSchemeVector<T>;\
+template class LpSolverOutputIOSchemeVector<T>;\
 template class LPStructIOSchemeVector<T>;\
 template class NLPInputIOSchemeVector<T>;\
 template class NLPOutputIOSchemeVector<T>;\
@@ -2461,16 +2461,16 @@ template class JacGInputIOSchemeVector<T>;\
 template class JacGOutputIOSchemeVector<T>;\
 template class HessLagInputIOSchemeVector<T>;\
 template class HessLagOutputIOSchemeVector<T>;\
-template class NLPSolverInputIOSchemeVector<T>;\
-template class NLPSolverOutputIOSchemeVector<T>;\
+template class NlpSolverInputIOSchemeVector<T>;\
+template class NlpSolverOutputIOSchemeVector<T>;\
 template class MayerInputIOSchemeVector<T>;\
 template class OCPInputIOSchemeVector<T>;\
 template class OCPOutputIOSchemeVector<T>;\
-template class QCQPSolverInputIOSchemeVector<T>;\
-template class QCQPSolverOutputIOSchemeVector<T>;\
+template class QcqpSolverInputIOSchemeVector<T>;\
+template class QcqpSolverOutputIOSchemeVector<T>;\
 template class QCQPStructIOSchemeVector<T>;\
-template class QPSolverInputIOSchemeVector<T>;\
-template class QPSolverOutputIOSchemeVector<T>;\
+template class QpSolverInputIOSchemeVector<T>;\
+template class QpSolverOutputIOSchemeVector<T>;\
 template class QPStructIOSchemeVector<T>;\
 template class SDPInputIOSchemeVector<T>;\
 template class SDPOutputIOSchemeVector<T>;\
@@ -2481,7 +2481,7 @@ template class SDQPStructIOSchemeVector<T>;\
 template class SOCPInputIOSchemeVector<T>;\
 template class SOCPOutputIOSchemeVector<T>;\
 template class SOCPStructIOSchemeVector<T>;\
-template class StabilizedQPSolverInputIOSchemeVector<T>;\
+template class StabilizedQpSolverInputIOSchemeVector<T>;\
 
 } // namespace casadi
 #endif //SCHEMES_HELPERS_HPP

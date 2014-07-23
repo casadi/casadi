@@ -30,17 +30,17 @@ namespace casadi {
 
   extern "C"
   int CASADI_LPSOLVER_QP_EXPORT
-  casadi_register_lpsolver_qp(LPSolverInternal::Plugin* plugin) {
+  casadi_register_lpsolver_qp(LpSolverInternal::Plugin* plugin) {
     plugin->creator = QPLPInternal::creator;
     plugin->name = "qp";
-    plugin->doc = "QP docs not available";
+    plugin->doc = QPLPInternal::meta_doc.c_str();;
     plugin->version = 20;
     return 0;
   }
 
   extern "C"
   void CASADI_LPSOLVER_QP_EXPORT casadi_load_lpsolver_qp() {
-    LPSolverInternal::registerPlugin(casadi_register_lpsolver_qp);
+    LpSolverInternal::registerPlugin(casadi_register_lpsolver_qp);
   }
 
   QPLPInternal* QPLPInternal::clone() const {
@@ -51,7 +51,7 @@ namespace casadi {
     return node;
   }
 
-  QPLPInternal::QPLPInternal(const std::vector<Sparsity> &st) : LPSolverInternal(st) {
+  QPLPInternal::QPLPInternal(const std::vector<Sparsity> &st) : LpSolverInternal(st) {
     addOption("qp_solver",       OT_STRING, GenericType(),
               "The QPSOlver used to solve the LPs.");
     addOption("qp_solver_options",       OT_DICTIONARY, GenericType(),
@@ -89,11 +89,11 @@ namespace casadi {
 
   void QPLPInternal::init() {
 
-    LPSolverInternal::init();
+    LpSolverInternal::init();
 
     // Create an qpsolver instance
     std::string qpsolver_name = getOption("qp_solver");
-    qpsolver_ = QPSolver(qpsolver_name,
+    qpsolver_ = QpSolver(qpsolver_name,
                          qpStruct("h", Sparsity::sparse(n_, n_),
                                   "a", input(LP_SOLVER_A).sparsity()));
 

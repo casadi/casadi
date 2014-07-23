@@ -82,7 +82,7 @@ int main(){
   SXFunction nlp(nlpIn("x",u),nlpOut("f",f,"g",g));
   
   // Allocate an NLP solver
-  NLPSolver solver("ipopt", nlp);
+  NlpSolver solver("ipopt", nlp);
 
   // initialize the solver
   solver.init();

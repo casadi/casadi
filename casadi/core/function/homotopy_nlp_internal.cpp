@@ -26,8 +26,8 @@
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
 
-INPUTSCHEME(NLPSolverInput)
-OUTPUTSCHEME(NLPSolverOutput)
+INPUTSCHEME(NlpSolverInput)
+OUTPUTSCHEME(NlpSolverOutput)
 
 using namespace std;
 namespace casadi {
@@ -38,8 +38,8 @@ namespace casadi {
               "Expand the NLP function in terms of scalar operations, i.e. MX->SX");
 
     // Enable string notation for IO
-    input_.scheme = SCHEME_NLPSolverInput;
-    output_.scheme = SCHEME_NLPSolverOutput;
+    input_.scheme = SCHEME_NlpSolverInput;
+    output_.scheme = SCHEME_NlpSolverOutput;
 
   }
 

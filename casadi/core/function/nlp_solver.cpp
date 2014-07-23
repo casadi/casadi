@@ -30,50 +30,50 @@
 using namespace std;
 namespace casadi {
 
-  NLPSolver::NLPSolver() {
+  NlpSolver::NlpSolver() {
   }
 
-  NLPSolver::NLPSolver(const std::string& name, const Function& nlp) {
-    assignNode(NLPSolverInternal::getPlugin(name).creator(nlp));
+  NlpSolver::NlpSolver(const std::string& name, const Function& nlp) {
+    assignNode(NlpSolverInternal::getPlugin(name).creator(nlp));
   }
 
-  NLPSolverInternal* NLPSolver::operator->() {
-    return static_cast<NLPSolverInternal*>(Function::operator->());
+  NlpSolverInternal* NlpSolver::operator->() {
+    return static_cast<NlpSolverInternal*>(Function::operator->());
   }
 
-  const NLPSolverInternal* NLPSolver::operator->() const {
-    return static_cast<const NLPSolverInternal*>(Function::operator->());
+  const NlpSolverInternal* NlpSolver::operator->() const {
+    return static_cast<const NlpSolverInternal*>(Function::operator->());
   }
 
-  bool NLPSolver::checkNode() const {
-    return dynamic_cast<const NLPSolverInternal*>(get())!=0;
+  bool NlpSolver::checkNode() const {
+    return dynamic_cast<const NlpSolverInternal*>(get())!=0;
   }
 
-  void NLPSolver::reportConstraints(std::ostream &stream) {
+  void NlpSolver::reportConstraints(std::ostream &stream) {
     (*this)->reportConstraints();
   }
 
-  void NLPSolver::setQPOptions() {
+  void NlpSolver::setQPOptions() {
     (*this)->setQPOptions();
   }
 
-  Function NLPSolver::nlp() {
+  Function NlpSolver::nlp() {
     return (*this)->nlp_;
   }
 
-  Function NLPSolver::gradF() {
+  Function NlpSolver::gradF() {
     return (*this)->gradF();
   }
 
-  Function NLPSolver::jacG() {
+  Function NlpSolver::jacG() {
     return (*this)->jacG();
   }
 
-  Function NLPSolver::hessLag() {
+  Function NlpSolver::hessLag() {
     return (*this)->hessLag();
   }
 
-  Function NLPSolver::joinFG(Function F, Function G) {
+  Function NlpSolver::joinFG(Function F, Function G) {
     if (G.isNull()) {
       // unconstrained
       if (is_a<SXFunction>(F)) {
@@ -191,19 +191,19 @@ namespace casadi {
     } // constrained/unconstrained
   }
 
-  void NLPSolver::loadPlugin(const std::string& name) {
-    NLPSolverInternal::loadPlugin(name);
+  void NlpSolver::loadPlugin(const std::string& name) {
+    NlpSolverInternal::loadPlugin(name);
   }
 
-  std::string NLPSolver::doc(const std::string& name) {
-    return NLPSolverInternal::getPlugin(name).doc;
+  std::string NlpSolver::doc(const std::string& name) {
+    return NlpSolverInternal::getPlugin(name).doc;
   }
 
-  DMatrix NLPSolver::getReducedHessian() {
+  DMatrix NlpSolver::getReducedHessian() {
     return (*this)->getReducedHessian();
   }
 
-  void NLPSolver::setOptionsFromFile(const std::string & file) {
+  void NlpSolver::setOptionsFromFile(const std::string & file) {
     (*this)->setOptionsFromFile(file);
   }
 

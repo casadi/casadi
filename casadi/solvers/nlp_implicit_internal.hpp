@@ -29,13 +29,19 @@
 
 #include <casadi/solvers/casadi_implicitfunction_nlp_export.h>
 
+/** \defgroup plugin_ImplicitFunction_nlp
+  Use an NlpSolver as ImplicitFunction solver
+*/
+/** \pluginsection{ImplicitFunction,nlp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Use an NLPSolver as ImplicitFunction solver
+  /** \brief  \pluginbrief{ImplicitFunction,nlp}
 
    @copydoc ImplicitFunction_doc
-
+   @copydoc plugin_ImplicitFunction_nlp
+  
    \author Joris Gillis
    \date 2012
   */
@@ -72,7 +78,10 @@ namespace casadi {
     virtual void solveNonLinear();
 
     // NLP solver instance
-    NLPSolver nlp_solver_;
+    NlpSolver nlp_solver_;
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   };
 

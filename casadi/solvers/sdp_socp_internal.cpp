@@ -32,17 +32,17 @@ namespace casadi {
 
   extern "C"
   int CASADI_SOCPSOLVER_SDP_EXPORT
-  casadi_register_socpsolver_sdp(SOCPSolverInternal::Plugin* plugin) {
+  casadi_register_socpsolver_sdp(SocpSolverInternal::Plugin* plugin) {
     plugin->creator = SDPSOCPInternal::creator;
     plugin->name = "sdp";
-    plugin->doc = "sdp docs not available";
+    plugin->doc = SDPSOCPInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
 
   extern "C"
   void CASADI_SOCPSOLVER_SDP_EXPORT casadi_load_socpsolver_sdp() {
-    SOCPSolverInternal::registerPlugin(casadi_register_socpsolver_sdp);
+    SocpSolverInternal::registerPlugin(casadi_register_socpsolver_sdp);
   }
 
   SDPSOCPInternal* SDPSOCPInternal::clone() const {
@@ -53,9 +53,9 @@ namespace casadi {
     return node;
   }
 
-  SDPSOCPInternal::SDPSOCPInternal(const std::vector<Sparsity> &st) : SOCPSolverInternal(st) {
+  SDPSOCPInternal::SDPSOCPInternal(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
     addOption("sdp_solver",       OT_STRING, GenericType(),
-              "The SDPSolver used to solve the SOCPs.");
+              "The SdpSolver used to solve the SOCPs.");
     addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the SDPSOlver");
 
@@ -96,7 +96,7 @@ namespace casadi {
 
   void SDPSOCPInternal::init() {
 
-    SOCPSolverInternal::init();
+    SocpSolverInternal::init();
 
 
     /*
@@ -173,7 +173,7 @@ namespace casadi {
 
     // Create an sdpsolver instance
     std::string sdpsolver_name = getOption("sdp_solver");
-    sdpsolver_ = SDPSolver(sdpsolver_name,
+    sdpsolver_ = SdpSolver(sdpsolver_name,
                            sdpStruct("a", input(SOCP_SOLVER_A).sparsity(),
                                      "f", mapping_.output(0).sparsity(),
                                      "g", mapping_.output(1).sparsity()));

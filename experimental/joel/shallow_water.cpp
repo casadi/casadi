@@ -74,7 +74,7 @@ public:
   vector<double> p_scale_;
 
   /// NLP solver
-  NLPSolver nlp_solver_;
+  NlpSolver nlp_solver_;
 };
 
 void Tester::model(){
@@ -361,7 +361,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
 
   Dictionary qp_solver_options;
   if(ipopt_as_qp_solver){
-    nlp_solver_.setOption("qp_solver",NLPQPSolver::creator);
+    nlp_solver_.setOption("qp_solver",NLPQpSolver::creator);
     qp_solver_options["nlp_solver"] = IpoptSolver::creator;
     Dictionary nlp_solver_options;
     nlp_solver_options["tol"] = 1e-12;

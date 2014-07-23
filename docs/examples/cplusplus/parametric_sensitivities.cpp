@@ -92,7 +92,7 @@ int main(){
     
   // Create NLP solver
   SXFunction nlp(nlpIn("x",x),nlpOut("f",f,"g",g));
-  NLPSolver solver("ipopt", nlp);
+  NlpSolver solver("ipopt", nlp);
   
   // Mark the parameters amongst the constraints (see sIPOPT documentation)
   Dictionary con_integer_md;

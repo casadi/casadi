@@ -168,7 +168,7 @@ int main(){
   MXFunction nlp(nlpIn("x",V),nlpOut("f",J,"g",vertcat(g)));
   
   // Create an NLP solver instance
-  NLPSolver nlp_solver("ipopt", nlp);
+  NlpSolver nlp_solver("ipopt", nlp);
   nlp_solver.setOption("tol",1e-5);
   nlp_solver.setOption("max_iter",100);
   nlp_solver.setOption("linear_solver","ma57");

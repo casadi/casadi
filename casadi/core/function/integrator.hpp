@@ -166,9 +166,9 @@ namespace casadi {
       The Integrator class provides some additional functionality, such as getting the value
       of the state and/or sensitivities at certain time points.
 
-      The class does not specify the method used for the integration.
-      This is defined in derived classes.
-
+      \generalsection{Integrator}
+      \pluginssection{Integrator}
+      
       \author Joel Andersson
       \date 2010
   */
@@ -177,7 +177,20 @@ namespace casadi {
     /// Default constructor
     Integrator();
 
-    /// Integrator factory
+    /** \brief  Integrator factory
+    *
+    * \param name \pluginargument{Integrator}
+    * \param f dynamical system
+    * \parblock
+    * \copydoc scheme_DAEInput
+    * \copydoc scheme_DAEOutput
+    * \endparblock
+    * \param g backwards system
+    * \parblock
+    * \copydoc scheme_RDAEInput
+    * \copydoc scheme_RDAEOutput
+    * \endparblock
+    */
     Integrator(const std::string& name, const Function& f, const Function& g=Function());
 
     /// Clone

@@ -28,11 +28,15 @@
 
 #include <casadi/solvers/casadi_homotopynlpsolver_simple_export.h>
 
+/** \pluginsection{HomotopyNlpSolver,simple} */
+
 /// \cond INTERNAL
 namespace casadi {
 
   /** 
-      \brief Solving an NLP homotopy with regular NLP solvers
+      \brief \pluginbrief{HomotopyNlpSolver,simple}
+       
+       Solving an NLP homotopy with regular NLP solvers
 
       \author Joris Gillis
       \date 2014
@@ -52,10 +56,13 @@ namespace casadi {
     virtual void init();
     virtual void evaluate();
 
-    NLPSolver nlpsolver_;
+    NlpSolver nlpsolver_;
 
     /// Take this many steps to go from tau=0 to tau=1
     int num_steps_;
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   };
   /// \endcond

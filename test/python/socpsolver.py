@@ -28,14 +28,14 @@ from helpers import *
 
 socpsolvers = []
 try:
-  SDPSolver.loadPlugin("dsdp")
-  socpsolvers.append((SDPSOCPSolver,{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
+  SdpSolver.loadPlugin("dsdp")
+  socpsolvers.append((SDPSocpSolver,{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
 except:
   pass
   
 print socpsolvers
   
-class SOCPSolverTests(casadiTestCase):
+class SocpSolverTests(casadiTestCase):
 
   def test_simple(self):
     #  min  2 x + y

@@ -38,7 +38,7 @@ MySolver = "ipopt"
 #MySolver = "sqpmethod"
 
 # Allocate a solver
-solver = NLPSolver(MySolver, nlp)
+solver = NlpSolver(MySolver, nlp)
 if MySolver=="sqpmethod":
   solver.setOption("qp_solver","qpoases")
   solver.setOption("qp_solver_options",{"printLevel":"none"})

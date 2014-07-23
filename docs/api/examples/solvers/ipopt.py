@@ -19,7 +19,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 # 
-#! NLPSolver
+#! NlpSolver
 #! =====================
 from casadi import *
 from numpy import *
@@ -36,7 +36,7 @@ from numpy import *
 x=SX.sym("x")
 nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2))
 
-solver = NLPSolver("ipopt", nlp)
+solver = NlpSolver("ipopt", nlp)
 solver.init()
 solver.setInput([-10],"lbx")
 solver.setInput([10],"ubx")
@@ -61,7 +61,7 @@ x=SX.sym("x",n)
 #! Note how we do not distinguish between equalities and inequalities here
 nlp=SXFunction(nlpIn(x=x),nlpOut(f=mul((x-1).T,x-1),g=vertcat([x[1]+x[2],x[0]])))
 
-solver = NLPSolver("ipopt", nlp)
+solver = NlpSolver("ipopt", nlp)
 solver.init()
 solver.setInput([-10]*n,"lbx")
 solver.setInput([10]*n,"ubx")
@@ -88,7 +88,7 @@ a=SX.sym("a")
 a_ = 2
 nlp=SXFunction(nlpIn(x=x,p=a),nlpOut(f=(x-a)**2))
 
-solver = NLPSolver("ipopt", nlp)
+solver = NlpSolver("ipopt", nlp)
 solver.init()
 solver.setInput([-10],"lbx")
 solver.setInput([10],"ubx")

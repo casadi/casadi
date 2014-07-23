@@ -28,6 +28,15 @@
 
 namespace casadi {
 
+/** \defgroup plugin_LinearSolver_lapacklu
+*
+   * This class solves the linear system <tt>A.x=b</tt> by making an LU factorization of A: \n
+   * <tt>A = L.U</tt>, with L lower and U upper triangular
+   *
+*/ 
+
+/** \pluginsection{LinearSolver,lapacklu} */
+
 /// \cond INTERNAL
 
   /// LU-Factorize dense matrix (lapack)
@@ -45,25 +54,10 @@ namespace casadi {
   extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
                           double *colcnd, double *rowcnd, double *amax, char *equed);
 
-  /** \brief  LU LinearSolver with Lapack Interface
+  /** \brief \pluginbrief{LinearSolver,lapacklu}
+   *
    * @copydoc LinearSolver_doc
-   *
-   * This class solves the linear system <tt>A.x=b</tt> by making an LU factorization of A: \n
-   * <tt>A = L.U</tt>, with L lower and U upper triangular
-   *
-   * LapackLUDense is an casadi::Function mapping from 2 inputs 
-   * [ A (matrix), b (vector)] to one output [x (vector)].
-   *
-   * The usual procedure to use LapackLUDense is: \n
-   *  -# init()
-   *  -# set the first input (A)
-   *  -# prepare()
-   *  -# set the second input (b)
-   *  -# solve()
-   *  -# Repeat steps 4 and 5 to work with other b vectors.
-   *
-   * The method evaluate() combines the prepare() and solve() step and is
-   * therefore more expensive if A is invariant.
+   * @copydoc plugin_LinearSolver_lapacklu
    *
    */
   class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLUDenseInternal : public LinearSolverInternal {
@@ -75,48 +69,51 @@ namespace casadi {
     static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
     { return new LapackLUDenseInternal(sp, nrhs);}
 
-    // Clone
+    /// Clone
     virtual LapackLUDenseInternal* clone() const;
 
-    // Destructor
+    /// Destructor
     virtual ~LapackLUDenseInternal();
 
-    // Initialize the solver
+    /// Initialize the solver
     virtual void init();
 
-    // Prepare the solution of the linear system
+    /// Prepare the solution of the linear system
     virtual void prepare();
 
-    // Solve the system of equations
+    /// Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
 
-    // Scale columns
+    /// Scale columns
     void colScaling(double* x, int nrhs);
 
-    // Scale rows
+    /// Scale rows
     void rowScaling(double* x, int nrhs);
 
     // Matrix
     std::vector<double> mat_;
 
-    // Pivoting elements
+    /// Pivoting elements
     std::vector<int> ipiv_;
 
-    // Col and row scaling
+    /// Col and row scaling
     std::vector<double> r_, c_;
 
-    // Type of scaling during the last equilibration
+    /// Type of scaling during the last equilibration
     char equed_;
 
-    // Equilibrate?
+    /// Equilibrate?
     bool equilibriate_;
 
-    // Allow the equilibration to fail
+    /// Allow the equilibration to fail
     bool allow_equilibration_failure_;
 
-    // Dimensions
+    /// Dimensions
     int ncol_, nrow_;
 
   };

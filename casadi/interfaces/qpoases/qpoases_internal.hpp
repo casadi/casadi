@@ -27,16 +27,26 @@
 #include <casadi/interfaces/qpoases/casadi_qpsolver_qpoases_export.h>
 #include <qpOASES.hpp>
 
+/** \defgroup plugin_QpSolver_qpoases
+Interface to QPOases Solver for quadratic programming
+
+*/ 
+
+/** \pluginsection{QpSolver,qpoases} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Interface to QPOases Solver for quadratic programming
+  /** \brief \pluginbrief{QpSolver,qpoases}
+   * 
+   * @copydoc QPSolver_doc
+   * @copydoc plugin_QpSolver_qpoases
    * 
    * \author Joris Gillis, Joel Andersson
    * \date 2011
    *
    * */
-class CASADI_QPSOLVER_QPOASES_EXPORT QPOasesInternal : public QPSolverInternal {
+class CASADI_QPSOLVER_QPOASES_EXPORT QPOasesInternal : public QpSolverInternal {
   friend class QPOasesSolver;
 public:
   /** \brief  Constructor */
@@ -46,7 +56,7 @@ public:
   virtual QPOasesInternal* clone() const;
 
   /** \brief  Create a new QP Solver */
-  static QPSolverInternal* creator(const QPStructure& st)
+  static QpSolverInternal* creator(const QPStructure& st)
   { return new QPOasesInternal(st);}
 
   /** \brief  Create a new Solver */
@@ -59,6 +69,9 @@ public:
   virtual void init();
 
   virtual void evaluate();
+
+  /// A documentation string
+  static const std::string meta_doc;
 
   protected:
 
@@ -98,6 +111,7 @@ public:
 
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);
+
 };
 
 } // namespace casadi

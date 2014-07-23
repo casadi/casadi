@@ -3,10 +3,11 @@ cmake_minimum_required(VERSION 2.6)
 include_directories(../)
 include_directories(${WORHP_INCLUDE_DIR})
 
-casadi_library(casadi_nlpsolver_worhp
+casadi_plugin(NlpSolver worhp
   worhp_internal.hpp
-  worhp_internal.cpp)
-target_link_libraries(casadi_nlpsolver_worhp ${WORHP_LIBRARIES})
+  worhp_internal.cpp
+  worhp_internal_meta.cpp)
+casadi_plugin_link_libraries(NlpSolver worhp ${WORHP_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/worhp

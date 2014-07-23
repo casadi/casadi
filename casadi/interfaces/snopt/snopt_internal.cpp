@@ -42,20 +42,20 @@ namespace casadi {
 
   extern "C"
   int CASADI_NLPSOLVER_SNOPT_EXPORT
-  casadi_register_nlpsolver_snopt(NLPSolverInternal::Plugin* plugin) {
+  casadi_register_nlpsolver_snopt(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = SnoptInternal::creator;
     plugin->name = "snopt";
-    plugin->doc = "SNOPT docs not available";
+    plugin->doc = SnoptInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
 
   extern "C"
   void CASADI_NLPSOLVER_SNOPT_EXPORT casadi_load_nlpsolver_snopt() {
-    NLPSolverInternal::registerPlugin(casadi_register_nlpsolver_snopt);
+    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_snopt);
   }
 
-  SnoptInternal::SnoptInternal(const Function& nlp) : NLPSolverInternal(nlp) {
+  SnoptInternal::SnoptInternal(const Function& nlp) : NlpSolverInternal(nlp) {
     addOption("detect_linear", OT_BOOLEAN, true,
               "Make an effort to treat linear constraints and linear variables specially.");
 
@@ -99,7 +99,7 @@ namespace casadi {
     detect_linear_ = getOption("detect_linear");
 
     // Call the init method of the base class
-    NLPSolverInternal::init();
+    NlpSolverInternal::init();
 
     // Get/generate required functions
     jacF();

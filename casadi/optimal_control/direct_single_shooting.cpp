@@ -58,8 +58,8 @@ void DirectSingleShooting::setOptimalSolution(const std::vector<double> &V_opt) 
   (*this)->setOptimalSolution(V_opt);
 }
 
-  NLPSolver DirectSingleShooting::getNLPSolver() const
-  { return isNull() ? NLPSolver(): (*this)->nlp_solver_; }
+  NlpSolver DirectSingleShooting::getNlpSolver() const
+  { return isNull() ? NlpSolver(): (*this)->nlp_solver_; }
 
 void DirectSingleShooting::reportConstraints(std::ostream &stream) {
   (*this)->reportConstraints();

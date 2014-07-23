@@ -26,13 +26,41 @@
 #include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
 #include "casadi/core/function/nlp_solver_internal.hpp"
 
+/** \defgroup plugin_NlpSolver_ipopt
+*
+* When in warmstart mode, output NLP_SOLVER_LAM_X may be used as input
+*
+* NOTE: Even when max_iter == 0, it is not guaranteed that
+* input(NLP_SOLVER_X0) == output(NLP_SOLVER_X).
+* Indeed if bounds on X or constraints are unmet, they will differ.
+*
+* For a good tutorial on IPOPT, see
+* http://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf
+*
+* A good resource about the algorithms in IPOPT is: Wachter and L. T. Biegler,
+* On the Implementation of an Interior-Point Filter Line-Search Algorithm for
+* Large-Scale Nonlinear Programming, Mathematical Programming 106(1), pp. 25-57,
+* 2006 (As Research Report RC 23149, IBM T. J. Watson Research Center, Yorktown, USA
+*
+* Caveats:
+* * with default options, multipliers for the decision variables are wrong for equality
+* constraints.
+* Change the 'fixed_variable_treatment' to 'make_constraint' or 'relax_bounds' to obtain
+* correct results.
+*
+*/
+
+/** \pluginsection{NlpSolver,ipopt} **/
+
 /// \cond INTERNAL
 namespace casadi {
 
-/**
-@copydoc NLPSolver_doc
+/** \brief \pluginbrief{NlpSolver,ipopt}
+
+@copydoc NlpSolver_doc
+@copydoc plugin_NlpSolver_ipopt
 */
-class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInternal : public NLPSolverInternal {
+class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInternal : public NlpSolverInternal {
 friend class IpoptUserClass;
 
 public:
@@ -41,7 +69,7 @@ public:
   virtual IpoptInternal* clone() const { return new IpoptInternal(*this);}
 
   /** \brief  Create a new NLP Solver */
-  static NLPSolverInternal* creator(const Function& nlp)
+  static NlpSolverInternal* creator(const Function& nlp)
   { return new IpoptInternal(nlp);}
 
   // Free Ipopt related memory
@@ -140,6 +168,9 @@ public:
   bool compute_red_hessian_;
   DMatrix red_hess_;
   #endif // WITH_SIPOPT
+
+  /// A documentation string
+  static const std::string meta_doc;
 
 };
 

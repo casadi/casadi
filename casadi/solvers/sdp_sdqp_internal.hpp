@@ -29,11 +29,9 @@
 
 #include <casadi/solvers/casadi_sdqpsolver_sdp_export.h>
 
-/// \cond INTERNAL
-namespace casadi {
+/** \defgroup plugin_SdqpSolver_sdp
 
-  /** \brief SDP SDQP Solver for quadratic programming
-   *
+    Solve an SQDP using an SdpSolver
    *  Note: this implementation relies on Cholesky decomposition:
    *        <tt>Chol(H) = L ->  H = LL'</tt> with L lower triangular
    *   This requires Pi, H to be positive definite. Positive semi-definite is not sufficient.
@@ -42,14 +40,24 @@ namespace casadi {
    *  A better implementation would rely on matrix square root,
    *  but we need singular value decomposition to implement that.
    *
-   *
-   @copydoc SDQPSolver_doc
+*/
 
+/** \pluginsection{SdqpSolver,sdp} */
+
+/// \cond INTERNAL
+namespace casadi {
+
+  /** \brief \pluginbrief{SdqpSolver,sdp}
+   *
+   *
+   @copydoc SdqpSolver_doc
+   @copydoc plugin_SdqpSolver_sdp
+   
    \author Joris Gillis
    \date 2013
   */
-  class CASADI_SDQPSOLVER_SDP_EXPORT SDPSDQPInternal : public SDQPSolverInternal {
-    friend class SDPSDQPSolver;
+  class CASADI_SDQPSOLVER_SDP_EXPORT SDPSDQPInternal : public SdqpSolverInternal {
+    friend class SDPSdqpSolver;
   public:
 
     /** \brief Constructor */
@@ -59,7 +67,7 @@ namespace casadi {
     virtual SDPSDQPInternal* clone() const { return new SDPSDQPInternal(*this);}
 
     /** \brief  Create a new SDQP Solver */
-    static SDQPSolverInternal* creator(const SDQPStructure& st)
+    static SdqpSolverInternal* creator(const SDQPStructure& st)
     { return new SDPSDQPInternal(st);}
 
     /// Deep copy data members
@@ -75,13 +83,17 @@ namespace casadi {
     virtual void evaluate();
 
     /// Underlying SDP solver
-    SDPSolver sdpsolver_;
+    SdpSolver sdpsolver_;
 
     /// Cholesky Decomposition
     LinearSolver cholesky_;
 
     /// Mapping
     Function mapping_;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

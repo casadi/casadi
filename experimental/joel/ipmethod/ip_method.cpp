@@ -34,11 +34,11 @@ IPMethod::IPMethod(const Function& F, const Function& G){
 }
 
 IPInternal* IPMethod::operator->(){
-  return (IPInternal*)(NLPSolver::operator->());
+  return (IPInternal*)(NlpSolver::operator->());
 }
 
 const IPInternal* IPMethod::operator->() const{
-  return (const IPInternal*)(NLPSolver::operator->());
+  return (const IPInternal*)(NlpSolver::operator->());
 }
     
 bool IPMethod::checkNode() const{

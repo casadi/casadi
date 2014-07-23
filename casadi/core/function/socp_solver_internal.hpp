@@ -33,15 +33,15 @@ namespace casadi {
 
   /// Internal class
   class CASADI_CORE_EXPORT
-  SOCPSolverInternal : public FunctionInternal,
-                       public PluginInterface<SOCPSolverInternal> {
+  SocpSolverInternal : public FunctionInternal,
+                       public PluginInterface<SocpSolverInternal> {
   public:
 
     // Constructor
-    SOCPSolverInternal(const std::vector<Sparsity>& st);
+    SocpSolverInternal(const std::vector<Sparsity>& st);
 
     // Destructor
-    virtual ~SOCPSolverInternal() = 0;
+    virtual ~SocpSolverInternal() = 0;
 
     // Initialize
     virtual void init();
@@ -59,7 +59,7 @@ namespace casadi {
     void printProblem(std::ostream &stream=std::cout) const;
 
     // Creator function for internal class
-    typedef SOCPSolverInternal* (*Creator)(const SOCPStructure& st);
+    typedef SocpSolverInternal* (*Creator)(const SOCPStructure& st);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

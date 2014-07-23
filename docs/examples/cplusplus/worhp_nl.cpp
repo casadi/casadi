@@ -47,7 +47,7 @@ int main(int argc, char **argv){
   SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
  
   // Allocate NLP solver
-  NLPSolver nlp_solver("worhp", nlp);
+  NlpSolver nlp_solver("worhp", nlp);
 
   // Set options
   // nlp_solver.setOption("verbose",true);

@@ -25,6 +25,8 @@
 
 #include "../function/function_internal.hpp"
 
+/// \cond INTERNAL
+
 // For dynamic loading
 #ifdef WITH_DL
 #ifdef _WIN32 // also for 64-bit
@@ -157,5 +159,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
 
 #endif // CASADI_PLUGIN_INTERFACE_HPP

@@ -33,7 +33,7 @@ using namespace std;
 namespace casadi {
 
 // Constructor
-SDPSolverInternal::SDPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
   addOption("calc_p", OT_BOOLEAN, true,
             "Indicate if the P-part of primal solution should be allocated and calculated. "
             "You may want to avoid calculating this variable for problems with n large, "
@@ -49,7 +49,7 @@ SDPSolverInternal::SDPSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
   const Sparsity& G = st_[SDP_STRUCT_G];
   const Sparsity& F = st_[SDP_STRUCT_F];
 
-  casadi_assert_message(G==G.transpose(), "SDPSolverInternal: Supplied G sparsity must "
+  casadi_assert_message(G==G.transpose(), "SdpSolverInternal: Supplied G sparsity must "
                         "symmetric but got " << G.dimString());
 
   m_ = G.size1();
@@ -57,10 +57,10 @@ SDPSolverInternal::SDPSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
   nc_ = A.size1();
   n_ = A.size2();
 
-  casadi_assert_message(F.size1()==m_, "SDPSolverInternal: Supplied F sparsity: number of rows ("
+  casadi_assert_message(F.size1()==m_, "SdpSolverInternal: Supplied F sparsity: number of rows ("
                         << F.size1() <<  ")  must match m (" << m_ << ")");
 
-  casadi_assert_message(F.size2()%n_==0, "SDPSolverInternal: Supplied F sparsity: "
+  casadi_assert_message(F.size2()%n_==0, "SdpSolverInternal: Supplied F sparsity: "
                         "number of columns (" << F.size2()
                         <<  ")  must be an integer multiple of n (" << n_
                         << "), but got remainder " << F.size2()%n_);
@@ -79,7 +79,7 @@ SDPSolverInternal::SDPSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
   for (int i=0;i<n_;i++) {
     Sparsity s = input(SDP_SOLVER_F)(ALL, Slice(i*m_, (i+1)*m_)).sparsity();
     casadi_assert_message(s==s.transpose(),
-                          "SDPSolverInternal: Each supplied Fi must be symmetric. "
+                          "SdpSolverInternal: Each supplied Fi must be symmetric. "
                           "But got " << s.dimString() <<  " for i = " << i << ".");
   }
 
@@ -88,7 +88,7 @@ SDPSolverInternal::SDPSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
 
 }
 
-void SDPSolverInternal::init() {
+void SdpSolverInternal::init() {
   // Call the init method of the base class
   FunctionInternal::init();
 
@@ -158,10 +158,10 @@ void SDPSolverInternal::init() {
 
 }
 
-SDPSolverInternal::~SDPSolverInternal() {
+SdpSolverInternal::~SdpSolverInternal() {
 }
 
-void SDPSolverInternal::printProblem(std::ostream &stream) const {
+void SdpSolverInternal::printProblem(std::ostream &stream) const {
   stream << "SDP Problem statement -- start" << std::endl;
 
   stream << "f: "<< std::endl;  input(SDP_SOLVER_F).printDense(stream);
@@ -176,15 +176,15 @@ void SDPSolverInternal::printProblem(std::ostream &stream) const {
   stream << "SDP Problem statement -- end" << std::endl;
 }
 
-void SDPSolverInternal::evaluate() {
-  throw CasadiException("SDPSolverInternal::evaluate: Not implemented");
+void SdpSolverInternal::evaluate() {
+  throw CasadiException("SdpSolverInternal::evaluate: Not implemented");
 }
 
-void SDPSolverInternal::solve() {
-  throw CasadiException("SDPSolverInternal::solve: Not implemented");
+void SdpSolverInternal::solve() {
+  throw CasadiException("SdpSolverInternal::solve: Not implemented");
 }
 
-void SDPSolverInternal::checkInputs() const {
+void SdpSolverInternal::checkInputs() const {
   for (int i=0;i<input(SDP_SOLVER_LBX).size();++i) {
     casadi_assert_message(input(SDP_SOLVER_LBX).at(i)<=input(SDP_SOLVER_UBX).at(i),
                           "LBX[i] <= UBX[i] was violated for i=" << i
@@ -199,8 +199,8 @@ void SDPSolverInternal::checkInputs() const {
   }
 }
 
-  std::map<std::string, SDPSolverInternal::Plugin> SDPSolverInternal::solvers_;
+  std::map<std::string, SdpSolverInternal::Plugin> SdpSolverInternal::solvers_;
 
-  const std::string SDPSolverInternal::infix_ = "sdpsolver";
+  const std::string SdpSolverInternal::infix_ = "sdpsolver";
 
 } // namespace casadi

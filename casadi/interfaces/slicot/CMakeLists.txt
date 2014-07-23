@@ -6,10 +6,11 @@ casadi_library(casadi_slicot_interface
 target_link_libraries(casadi_slicot_interface casadi_control ${SLICOT_LIBRARIES})
 set_property(GLOBAL APPEND PROPERTY CASADI_SWIG_MODULES casadi_slicot_interface)
 
-casadi_library(casadi_dplesolver_slicot
+casadi_plugin(DpleSolver slicot
   psd_indef_dple_internal.hpp
-  psd_indef_dple_internal.cpp)
-target_link_libraries(casadi_dplesolver_slicot casadi_slicot_interface casadi_control ${SLICOT_LIBRARIES})
+  psd_indef_dple_internal.cpp
+  psd_indef_dple_internal_meta.cpp)
+casadi_plugin_link_libraries(DpleSolver slicot casadi_slicot_interface casadi_control ${SLICOT_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/slicot

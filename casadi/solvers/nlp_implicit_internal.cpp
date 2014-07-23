@@ -33,7 +33,7 @@ namespace casadi {
   casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin* plugin) {
     plugin->creator = NLPImplicitInternal::creator;
     plugin->name = "nlp";
-    plugin->doc = "NLP docs not available";
+    plugin->doc = NLPImplicitInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -47,9 +47,9 @@ namespace casadi {
                                            const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {
     addOption("nlp_solver",               OT_STRING,  GenericType(),
-              "The NLPSolver used to solve the implicit system.");
+              "The NlpSolver used to solve the implicit system.");
     addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
-              "Options to be passed to the NLPSolver");
+              "Options to be passed to the NlpSolver");
   }
 
   NLPImplicitInternal::~NLPImplicitInternal() {
@@ -138,7 +138,7 @@ namespace casadi {
 
     // Create an nlpsolver instance
     std::string solver_name = getOption("nlp_solver");
-    nlp_solver_ = NLPSolver(solver_name, nlp);
+    nlp_solver_ = NlpSolver(solver_name, nlp);
     if (hasSetOption("nlp_solver_options")) {
       nlp_solver_.setOption(getOption("nlp_solver_options"));
     }

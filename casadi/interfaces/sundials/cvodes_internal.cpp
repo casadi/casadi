@@ -35,7 +35,7 @@ namespace casadi {
   int CASADI_INTEGRATOR_CVODES_EXPORT casadi_register_integrator_cvodes(IntegratorInternal::Plugin* plugin){
     plugin->creator = CVodesInternal::creator;
     plugin->name = "cvodes";
-    plugin->doc = "CVODES docs not available";
+    plugin->doc = CVodesInternal::meta_doc.c_str();;
     plugin->version = 20;
     return 0;
   }

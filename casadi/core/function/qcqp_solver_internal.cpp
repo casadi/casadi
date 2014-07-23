@@ -24,14 +24,14 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
-INPUTSCHEME(QCQPSolverInput)
-OUTPUTSCHEME(QCQPSolverOutput)
+INPUTSCHEME(QcqpSolverInput)
+OUTPUTSCHEME(QcqpSolverOutput)
 
 using namespace std;
 namespace casadi {
 
   // Constructor
-  QCQPSolverInternal::QCQPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  QcqpSolverInternal::QcqpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
 
     casadi_assert_message(st_.size()==QCQP_STRUCT_NUM, "Problem structure mismatch");
 
@@ -98,27 +98,27 @@ namespace casadi {
     output(QCQP_SOLVER_LAM_X) = DMatrix(x_sparsity);
     output(QCQP_SOLVER_LAM_A) = DMatrix(bounds_sparsity);
 
-    input_.scheme = SCHEME_QCQPSolverInput;
-    output_.scheme = SCHEME_QCQPSolverOutput;
+    input_.scheme = SCHEME_QcqpSolverInput;
+    output_.scheme = SCHEME_QcqpSolverOutput;
   }
 
-  void QCQPSolverInternal::init() {
+  void QcqpSolverInternal::init() {
     // Call the init method of the base class
     FunctionInternal::init();
   }
 
-  QCQPSolverInternal::~QCQPSolverInternal() {
+  QcqpSolverInternal::~QcqpSolverInternal() {
   }
 
-  void QCQPSolverInternal::evaluate() {
-    throw CasadiException("QCQPSolverInternal::evaluate: Not implemented");
+  void QcqpSolverInternal::evaluate() {
+    throw CasadiException("QcqpSolverInternal::evaluate: Not implemented");
   }
 
-  void QCQPSolverInternal::solve() {
-    throw CasadiException("QCQPSolverInternal::solve: Not implemented");
+  void QcqpSolverInternal::solve() {
+    throw CasadiException("QcqpSolverInternal::solve: Not implemented");
   }
 
-  void QCQPSolverInternal::checkInputs() const {
+  void QcqpSolverInternal::checkInputs() const {
     for (int i=0;i<input(QCQP_SOLVER_LBX).size();++i) {
       casadi_assert_message(input(QCQP_SOLVER_LBX).at(i)<=input(QCQP_SOLVER_UBX).at(i),
                             "LBX[i] <= UBX[i] was violated for i=" << i
@@ -133,8 +133,8 @@ namespace casadi {
     }
   }
 
-  std::map<std::string, QCQPSolverInternal::Plugin> QCQPSolverInternal::solvers_;
+  std::map<std::string, QcqpSolverInternal::Plugin> QcqpSolverInternal::solvers_;
 
-  const std::string QCQPSolverInternal::infix_ = "qcqpsolver";
+  const std::string QcqpSolverInternal::infix_ = "qcqpsolver";
 
 } // namespace casadi

@@ -28,16 +28,25 @@
 
 #include <casadi/solvers/casadi_stabilizedqpsolver_qp_export.h>
 
+/** \defgroup plugin_StabilizedQpSolver_qp
+      Solved a stabilized QP using a standard QP solver
+*/
+
+/** \pluginsection{StabilizedQpSolver,qp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Solved a stabilized QP using a standard QP solver
+  /** \brief \pluginbrief{StabilizedQpSolver,qp}
+     
+      @copydoc StabilizedQpSolver_doc
+      @copydoc plugin_StabilizedQpSolver_qp
 
       \author Joris Gillis
       \date 2013
   */
   class CASADI_STABILIZEDQPSOLVER_QP_EXPORT QPStabilizerInternal
-    : public StabilizedQPSolverInternal {
+    : public StabilizedQpSolverInternal {
     friend class QPStabilizer;
   public:
 
@@ -51,7 +60,7 @@ namespace casadi {
     virtual QPStabilizerInternal* clone() const { return new QPStabilizerInternal(*this);}
 
     /** \brief  Create a new Stabilized QP Solver */
-    static StabilizedQPSolverInternal* creator(const QPStructure& st)
+    static StabilizedQpSolverInternal* creator(const QPStructure& st)
     { return new QPStabilizerInternal(st);}
 
     /** \brief  Deep copy data members */
@@ -67,7 +76,11 @@ namespace casadi {
     virtual void generateNativeCode(std::ostream &file) const;
 
     /// Data members
-    QPSolver qp_solver_;
+    QpSolver qp_solver_;
+    
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

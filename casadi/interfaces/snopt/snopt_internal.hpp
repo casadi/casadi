@@ -27,13 +27,20 @@
 #include "casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h"
 #include "wsnopt.hpp"
 
+/** \defgroup plugin_NlpSolver_snopt
+  SNOPT interface
+*/
+
+/** \pluginsection{NlpSolver,snopt} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /**
-     @copydoc NLPSolver_doc
+  /** \brief \pluginbrief{NlpSolver,snopt}
+     @copydoc NlpSolver_doc
+     @copydoc plugin_NlpSolver_snopt
   */
-  class CASADI_NLPSOLVER_SNOPT_EXPORT SnoptInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_SNOPT_EXPORT SnoptInternal : public NlpSolverInternal {
 
   public:
     // Constructor
@@ -46,7 +53,7 @@ namespace casadi {
     virtual SnoptInternal* clone() const;
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new SnoptInternal(nlp);}
 
     // Reset solver
@@ -157,6 +164,9 @@ namespace casadi {
     // Matrix A has a dummy row
     bool dummyrow_;
 
+    /// A documentation string
+    static const std::string meta_doc;
+
   private:
       void snInit(int iPrint, int iSumm);
       void snSeti(const std::string &snopt_name, int value);
@@ -191,6 +201,7 @@ namespace casadi {
       int n_eval_jac_g_; // number of calls to eval_jac_g
       int n_callback_fun_; // number of calls to callback function
       int n_iter_; // number of major iterations
+
   };
 
 } // namespace casadi

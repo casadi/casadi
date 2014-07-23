@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 include_directories(${DSDP_INCLUDE_DIR})
 
-casadi_library(casadi_sdpsolver_dsdp
+casadi_plugin(SdpSolver dsdp
   dsdp_internal.hpp
-  dsdp_internal.cpp)
+  dsdp_internal.cpp
+  dsdp_internal_meta.cpp)
 
-target_link_libraries(casadi_sdpsolver_dsdp ${DSDP_LIBRARIES})
+casadi_plugin_link_libraries(SdpSolver dsdp ${DSDP_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/dsdp

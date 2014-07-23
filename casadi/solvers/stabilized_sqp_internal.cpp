@@ -38,20 +38,20 @@ namespace casadi {
 
   extern "C"
   int CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT
-  casadi_register_nlpsolver_stabilizedsqp(NLPSolverInternal::Plugin* plugin) {
+  casadi_register_nlpsolver_stabilizedsqp(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = StabilizedSQPInternal::creator;
     plugin->name = "stabilizedsqp";
-    plugin->doc = "StabilizedSQP docs not available";
+    plugin->doc = StabilizedSQPInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
 
   extern "C"
   void CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT casadi_load_nlpsolver_stabilizedsqp() {
-    NLPSolverInternal::registerPlugin(casadi_register_nlpsolver_stabilizedsqp);
+    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_stabilizedsqp);
   }
 
-  StabilizedSQPInternal::StabilizedSQPInternal(const Function& nlp) : NLPSolverInternal(nlp) {
+  StabilizedSQPInternal::StabilizedSQPInternal(const Function& nlp) : NlpSolverInternal(nlp) {
     casadi_warning("The SQP method is under development");
     addOption("stabilized_qp_solver",         OT_STRING,   GenericType(),
               "The Stabilized QP solver to be used by the SQP method");
@@ -128,7 +128,7 @@ namespace casadi {
 
   void StabilizedSQPInternal::init() {
     // Call the init method of the base class
-    NLPSolverInternal::init();
+    NlpSolverInternal::init();
 
     // Read options
     max_iter_ = getOption("max_iter");
@@ -173,7 +173,7 @@ namespace casadi {
         : jacG().output().sparsity();
 
     std::string stabilized_qp_solver_name = getOption("stabilized_qp_solver");
-    stabilized_qp_solver_ = StabilizedQPSolver(stabilized_qp_solver_name,
+    stabilized_qp_solver_ = StabilizedQpSolver(stabilized_qp_solver_name,
                                                qpStruct("h", H_sparsity, "a", A_sparsity));
 
     // Set options if provided

@@ -28,27 +28,27 @@ from helpers import *
 
 lpsolvers = []
 try:
-  QPSolver.loadPlugin("ooqp")
+  QpSolver.loadPlugin("ooqp")
   lpsolvers.append(("qp",{"qp_solver": "ooqp" },False))
 except:
   pass
 
 try:
-  NLPSolver.loadPlugin("ipopt")
+  NlpSolver.loadPlugin("ipopt")
   lpsolvers.append(("qp",{"qp_solver": "nlp", "qp_solver_options":{"nlp_solver":"ipopt"}},False))
 except:
   pass
 
 
 # try:  
-#   QPSolver.loadPlugin("dsdp")
-#   def SDPLPSolver(st):
-#     return DSDPSolver(sdpStruct(a=st["a"],f=Sparsity.sparse(0,0),g=Sparsity.sparse(0,0)))
-#   lpsolvers.append((SDPLPSolver,{},False))
+#   QpSolver.loadPlugin("dsdp")
+#   def SDPLpSolver(st):
+#     return DSdpSolver(sdpStruct(a=st["a"],f=Sparsity.sparse(0,0),g=Sparsity.sparse(0,0)))
+#   lpsolvers.append((SDPLpSolver,{},False))
 # except:
 #  pass
 
-class LPSolverTests(casadiTestCase):
+class LpSolverTests(casadiTestCase):
 
   def testboundsviol(self):
     A = DMatrix([[-1,1],[1,1],[1,-2]])
@@ -61,7 +61,7 @@ class LPSolverTests(casadiTestCase):
     for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = LPSolver(lpsolver,lpStruct(a=A.sparsity()))
+      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
       solver.setOption(lp_options)
       solver.init()
 
@@ -86,7 +86,7 @@ class LPSolverTests(casadiTestCase):
     for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = LPSolver(lpsolver,lpStruct(a=A.sparsity()))
+      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
       solver.setOption(lp_options)
       solver.init()
 
@@ -115,7 +115,7 @@ class LPSolverTests(casadiTestCase):
     for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = LPSolver(lpsolver,lpStruct(a=A.sparsity()))
+      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
       solver.setOption(lp_options)
       solver.init()
 
@@ -244,7 +244,7 @@ class LPSolverTests(casadiTestCase):
     for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = LPSolver(lpsolver,lpStruct(a=A.sparsity()))
+      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
       solver.setOption(lp_options)
       solver.init()
 

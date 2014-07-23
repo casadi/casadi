@@ -35,17 +35,25 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/// \cond INTERNAL
-namespace casadi {
-
-  /** \brief Interface to CVodes from the Sundials suite.
-
-      @copydoc DAE_doc
+/** \defgroup plugin_Integrator_cvodes
+  
+      Interface to CVodes from the Sundials suite.
 
       A call to evaluate will integrate to the end.
 
       You can retrieve the entire state trajectory as follows, after the evaluate call: 
       Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
+*/
+
+/** \pluginsection{Integrator,cvodes} */
+
+/// \cond INTERNAL
+namespace casadi {
+
+  /** \brief \pluginbrief{Integrator,cvodes}
+
+      @copydoc DAE_doc
+      @copydoc plugin_Integrator_cvodes
 
   */
   class CASADI_INTEGRATOR_CVODES_EXPORT CVodesInternal : public SundialsInternal {
@@ -110,6 +118,9 @@ namespace casadi {
 
     /** \brief  Get the integrator Jacobian for the backward problem */
     virtual Function getJacB();
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
 
@@ -284,7 +295,7 @@ namespace casadi {
     bool monitor_rhsQB_;
 
     bool disable_internal_warnings_;
-
+    
   };
 
 } // namespace casadi

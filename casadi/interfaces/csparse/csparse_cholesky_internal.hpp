@@ -23,6 +23,12 @@
 #ifndef CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
 #define CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
 
+/** \defgroup plugin_LinearSolver_csparsecholesky
+   * LinearSolver with CSparseCholesky Interface
+*/
+
+/** \pluginsection{LinearSolver,csparsecholesky} */
+
 /// \cond INTERNAL
 extern "C" {
 #include "external_packages/CSparse/Include/cs.h"
@@ -32,30 +38,11 @@ extern "C" {
 
 namespace casadi {
 
-  /** \brief  LinearSolver with CSparseCholesky Interface
+  /** \brief \pluginbrief{LinearSolver,csparsecholesky}
+   * 
    *
    @copydoc LinearSolver_doc
-   *
-   * CSparseCholesky is an casadi::Function mapping from 2 inputs
-   * [ A (matrix), b (vector)] to one output [x (vector)].
-   *
-   * \verbatim
-   *  A = LL'
-   *    Ax = b
-   *    LL'x = b
-   *    L'x = L^-1 b
-   * \endverbatim
-   *
-   * The usual procedure to use CSparseCholesky is: \n
-   *  -# init()
-   *  -# set the first input (A)
-   *  -# prepare()
-   *  -# set the second input (b)
-   *  -# solve()
-   *  -# Repeat steps 4 and 5 to work with other b vectors.
-   *
-   * The method evaluate() combines the prepare() and solve()
-   * step and is therefore more expensive if A is invariant.
+   @copydoc plugin_LinearSolver_csparsecholesky
    *
    */
   class CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT
@@ -106,6 +93,10 @@ namespace casadi {
 
     // Temporary
     std::vector<double> temp_;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

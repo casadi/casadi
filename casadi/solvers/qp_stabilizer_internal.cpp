@@ -30,21 +30,21 @@ namespace casadi {
 
   extern "C"
   int CASADI_STABILIZEDQPSOLVER_QP_EXPORT
-  casadi_register_stabilizedqpsolver_qp(StabilizedQPSolverInternal::Plugin* plugin) {
+  casadi_register_stabilizedqpsolver_qp(StabilizedQpSolverInternal::Plugin* plugin) {
     plugin->creator = QPStabilizerInternal::creator;
     plugin->name = "qp";
-    plugin->doc = "QPStabilizer docs not available";
+    plugin->doc = QPStabilizerInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
 
   extern "C"
   void CASADI_STABILIZEDQPSOLVER_QP_EXPORT casadi_load_stabilizedqpsolver_qp() {
-    StabilizedQPSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_qp);
+    StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_qp);
   }
 
   QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st)
-      : StabilizedQPSolverInternal(st) {
+      : StabilizedQpSolverInternal(st) {
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver used to solve the stabilized QPs.");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
@@ -56,19 +56,19 @@ namespace casadi {
 
   void QPStabilizerInternal::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    StabilizedQPSolverInternal::deepCopyMembers(already_copied);
+    StabilizedQpSolverInternal::deepCopyMembers(already_copied);
     qp_solver_ = deepcopy(qp_solver_, already_copied);
   }
 
   void QPStabilizerInternal::init() {
     // Initialize the base classes
-    StabilizedQPSolverInternal::init();
+    StabilizedQpSolverInternal::init();
 
     // Form augmented QP
     Sparsity H_sparsity_qp = blkdiag(st_[QP_STRUCT_H], Sparsity::diag(nc_));
     Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A], Sparsity::diag(nc_));
     std::string qp_solver_name = getOption("qp_solver");
-    qp_solver_ = QPSolver(qp_solver_name,
+    qp_solver_ = QpSolver(qp_solver_name,
                           qpStruct("h", H_sparsity_qp, "a", A_sparsity_qp));
 
     // Pass options if provided

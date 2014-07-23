@@ -26,7 +26,7 @@
 #include "function.hpp"
 #include "qp_solver.hpp"
 
-/** \defgroup StabilizedQPSolver_doc
+/** \defgroup StabilizedQpSolver_doc
 
     Solves the following strictly convex problem:
 
@@ -54,7 +54,7 @@
 namespace casadi {
 
   /// Input arguments of a QP problem [stabilizedQpIn]
-  enum StabilizedQPSolverInput {
+  enum StabilizedQpSolverInput {
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
     /// The matrix is assumed to be symmetrical. [h]
     STABILIZED_QP_SOLVER_H,
@@ -83,31 +83,35 @@ namespace casadi {
     STABILIZED_QP_SOLVER_NUM_IN};
 
   // Forward declaration of internal class
-  class StabilizedQPSolverInternal;
+  class StabilizedQpSolverInternal;
 
-  /** \brief StabilizedQPSolver
+  /** \brief StabilizedQpSolver
 
 
-      @copydoc StabilizedQPSolver_doc
+      @copydoc StabilizedQpSolver_doc
+
+      \generalsection{StabilizedQpSolver}
+      \pluginssection{StabilizedQpSolver}
 
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT StabilizedQPSolver : public Function {
+  class CASADI_CORE_EXPORT StabilizedQpSolver : public Function {
   public:
 
     /// Default constructor
-    StabilizedQPSolver();
+    StabilizedQpSolver();
 
     /** \brief Constructor
+     *  \param name \pluginargument{StabilizedQpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_QPStruct
      */
-    StabilizedQPSolver(const std::string& name, const QPStructure& st);
+    StabilizedQpSolver(const std::string& name, const QPStructure& st);
 
     /// Access functions of the node
-    StabilizedQPSolverInternal* operator->();
-    const StabilizedQPSolverInternal* operator->() const;
+    StabilizedQpSolverInternal* operator->();
+    const StabilizedQpSolverInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

@@ -564,6 +564,8 @@ namespace casadi {
     Matrix<DataType> __div__(const Matrix<DataType> &y) const;
     Matrix<DataType> __lt__(const Matrix<DataType> &y) const;
     Matrix<DataType> __le__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __gt__(const Matrix<DataType> &y) const { return y.__lt__(*this);}
+    Matrix<DataType> __ge__(const Matrix<DataType> &y) const { return y.__le__(*this);}
     Matrix<DataType> __eq__(const Matrix<DataType> &y) const;
     Matrix<DataType> __ne__(const Matrix<DataType> &y) const;
     Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return __div__(y);}

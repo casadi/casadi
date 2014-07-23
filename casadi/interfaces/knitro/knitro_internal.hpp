@@ -27,13 +27,20 @@
 #include <knitro.h>
 #include "casadi/core/function/nlp_solver_internal.hpp"
 
+/** \defgroup plugin_NlpSolver_knitro
+  KNITRO interface
+*/
+
+/** \pluginsection{NlpSolver,knitro} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /**
-     @copydoc NLPSolver_doc
+  /** \brief \pluginbrief{NlpSolver,knitro}
+     @copydoc NlpSolver_doc
+     @copydoc plugin_NlpSolver_knitro
   */
-  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInternal : public NlpSolverInternal {
 
   public:
     explicit KnitroInternal(const Function& nlp);
@@ -41,7 +48,7 @@ namespace casadi {
     virtual KnitroInternal* clone() const { return new KnitroInternal(*this);}
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new KnitroInternal(nlp);}
 
     virtual void init();
@@ -70,6 +77,10 @@ namespace casadi {
 
     // KNITRO string parameter
     std::map<std::string, std::string> string_param_;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

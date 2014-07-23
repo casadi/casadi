@@ -29,7 +29,7 @@
 
 namespace casadi{
     
-class IPInternal : public NLPSolverInternal{
+class IPInternal : public NlpSolverInternal{
 
 public:
   explicit IPInternal(const Function& F, const Function& G);

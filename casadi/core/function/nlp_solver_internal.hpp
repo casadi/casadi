@@ -33,20 +33,20 @@ namespace casadi {
 
 /** \brief NLP solver storage class
 
-  @copydoc NLPSolver_doc
+  @copydoc NlpSolver_doc
   \author Joel Andersson
   \date 2010-2013
 */
   class CASADI_CORE_EXPORT
-  NLPSolverInternal : public FunctionInternal,
-                      public PluginInterface<NLPSolverInternal> {
+  NlpSolverInternal : public FunctionInternal,
+                      public PluginInterface<NlpSolverInternal> {
 
   public:
     /// Constructor
-    NLPSolverInternal(const Function& nlp);
+    NlpSolverInternal(const Function& nlp);
 
     /// Destructor
-    virtual ~NLPSolverInternal() = 0;
+    virtual ~NlpSolverInternal() = 0;
 
     /// Initialize
     virtual void init();
@@ -142,7 +142,7 @@ namespace casadi {
     Function ref_;
 
     // Creator function for internal class
-    typedef NLPSolverInternal* (*Creator)(const Function& nlp);
+    typedef NlpSolverInternal* (*Creator)(const Function& nlp);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
@@ -155,6 +155,7 @@ namespace casadi {
 
     /// Read options from parameter xml
     virtual void setOptionsFromFile(const std::string & file);
+
   };
 
 } // namespace casadi

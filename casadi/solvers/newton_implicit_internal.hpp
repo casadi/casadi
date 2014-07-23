@@ -29,13 +29,20 @@
 
 #include <casadi/solvers/casadi_implicitfunction_newton_export.h>
 
+/** \defgroup plugin_ImplicitFunction_newton
+     Implements simple newton iterations to solve an implicit function.
+*/
+
+/** \pluginsection{ImplicitFunction,newton} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Implements simple newton iterations to solve an implicit function.
-
+  /** \brief \pluginbrief{ImplicitFunction,newton}
+  
       @copydoc ImplicitFunction_doc
-   
+      @copydoc plugin_ImplicitFunction_newton
+         
       \author Joris Gillis
       \date 2012
   */
@@ -67,6 +74,9 @@ namespace casadi {
 
     /** \brief  Solve the nonlinear system of equations */
     virtual void solveNonLinear();
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
     /// Maximum number of Newton iterations

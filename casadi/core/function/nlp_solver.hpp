@@ -26,7 +26,7 @@
 #include "function.hpp"
 
 
-/** \defgroup NLPSolver_doc
+/** \defgroup NlpSolver_doc
 
   Solves the following parametric nonlinear program (NLP):
   \verbatim
@@ -143,7 +143,7 @@ namespace casadi {
   };
 
   /// Input arguments of an NLP Solver [nlpSolverIn]
-  enum NLPSolverInput {
+  enum NlpSolverInput {
     /// Decision variables, initial guess (nx x 1)  [x0]
     NLP_SOLVER_X0,
     /// Value of fixed parameters (np x 1) [p]
@@ -164,7 +164,7 @@ namespace casadi {
   };
 
   /// Output arguments of an NLP Solver [nlpSolverOut]
-  enum NLPSolverOutput {
+  enum NlpSolverOutput {
     /// Decision variables at the optimal solution (nx x 1) [x]
     NLP_SOLVER_X,
     /// Cost function value at the optimal solution (1 x 1) [f]
@@ -180,27 +180,43 @@ namespace casadi {
     NLP_SOLVER_NUM_OUT
   };
 
-  class NLPSolverInternal;
+  class NlpSolverInternal;
 
-  /** \brief NLPSolver
+  /** \brief NlpSolver
 
-      @copydoc NLPSolver_doc
+      @copydoc NlpSolver_doc
+      
+      \generalsection{NlpSolver}
+      \pluginssection{NlpSolver}
 
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT NLPSolver : public Function {
+  class CASADI_CORE_EXPORT NlpSolver : public Function {
   public:
 
     /// Default constructor
-    NLPSolver();
+    NlpSolver();
 
     /// NLP solver factory
-    NLPSolver(const std::string& name, const Function& nlp);
-
+    NlpSolver(
+      const std::string& name,
+      /**< \pluginargument{NlpSolver} 
+      */
+      const Function& nlp
+      /**< \parblock
+       *  nlp function: \f$ [\mathbb {R}^{n_x} \times \mathbb{R}^{n_p}]
+       * \mapsto [\mathbb {R} \times \mathbb{R}^{n_g}]\f$
+       *
+       *  @copydoc scheme_NLPInput
+       *  @copydoc scheme_NLPOutput
+       *
+       *  \endparblock
+       */
+      ); // NOLINT(whitespace/parens)
     /// Access functions of the node
-    NLPSolverInternal* operator->();
-    const NLPSolverInternal* operator->() const;
+    NlpSolverInternal* operator->();
+    const NlpSolverInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
@@ -221,8 +237,8 @@ namespace casadi {
     void setQPOptions();
 
     /** \brief Access the NLP
-    *  \copydoc scheme_NLPSolverInput
-    *  \copydoc scheme_NLPSolverOutput
+    *  \copydoc scheme_NlpSolverInput
+    *  \copydoc scheme_NlpSolverOutput
     */
     Function nlp();
 

@@ -26,17 +26,20 @@
 #include "dple_internal.hpp"
 #include <casadi/control/casadi_dplesolver_simple_export.h>
 
+/** \defgroup plugin_DpleSolver_simple
+ Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
+
+*/
+/** \pluginsection{DpleSolver,simple} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Solving the Discrete Periodic Lyapunov Equations with regular Linear Solvers
-
-       @copydoc DPLE_doc
-
-       Uses Periodic Schur Decomposition (simple) and does not assume positive definiteness.
-       Based on Periodic Lyapunov equations: some applications and new algorithms.
-       Int. J. Control, vol. 67, pp. 69-87, 1997.
-
+  /** \brief \pluginbrief{DpleSolver,simple}
+  
+   @copydoc DPLE_doc
+   @copydoc plugin_DpleSolver_simple
+   
        \author Joris Gillis
       \date 2014
 
@@ -81,6 +84,9 @@ namespace casadi {
      and \a nadj adjoint derivatives
     */
     virtual Function getDerivative(int nfwd, int nadj);
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   private:
     /// Main implementation as MXFunction

@@ -34,7 +34,7 @@ namespace casadi {
   int CASADI_INTEGRATOR_IDAS_EXPORT casadi_register_integrator_idas(IntegratorInternal::Plugin* plugin){
     plugin->creator = IdasInternal::creator;
     plugin->name = "idas";
-    plugin->doc = "IDAS docs not available";
+    plugin->doc = IdasInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

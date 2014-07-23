@@ -26,17 +26,27 @@
 #include "../../control/dple_internal.hpp"
 #include <casadi/interfaces/slicot/casadi_dplesolver_slicot_export.h>
 
+/** \defgroup plugin_DpleSolver_slicot
+ *
+ * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
+ 
+ * Uses Periodic Schur Decomposition ('psd') and does not assume positive definiteness.
+ * Based on Periodic Lyapunov equations: some applications and new algorithms.
+ * Int. J. Control, vol. 67, pp. 69-87, 1997.
+*/
+
+/** \pluginsection{DpleSolver,slicot} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
+  /** \brief \pluginbrief{DpleSolver,slicot}
+   * 
+   * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
    *
    * @copydoc DPLE_doc
+   * @copydoc plugin_DpleSolver_slicot
    
-       Uses Periodic Schur Decomposition ('psd') and does not assume positive definiteness.
-       Based on Periodic Lyapunov equations: some applications and new algorithms.
-       Int. J. Control, vol. 67, pp. 69-87, 1997.
-
        \author Joris Gillis
       \date 2014
 
@@ -82,6 +92,9 @@ namespace casadi {
     and \a nadj adjoint derivatives
     */
     virtual Function getDerivative(int nfwd, int nadj);
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   private:
     /// Dimension of state-space

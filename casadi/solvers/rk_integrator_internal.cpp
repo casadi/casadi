@@ -30,7 +30,7 @@ namespace casadi {
   int CASADI_INTEGRATOR_RK_EXPORT casadi_register_integrator_rk(IntegratorInternal::Plugin* plugin) {
     plugin->creator = RKIntegratorInternal::creator;
     plugin->name = "rk";
-    plugin->doc = "rk docs not available";
+    plugin->doc = RKIntegratorInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

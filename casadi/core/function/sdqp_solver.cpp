@@ -25,35 +25,35 @@
 using namespace std;
 namespace casadi {
 
-  SDQPSolver::SDQPSolver() {
+  SdqpSolver::SdqpSolver() {
   }
 
-  SDQPSolverInternal* SDQPSolver::operator->() {
-    return static_cast<SDQPSolverInternal*>(Function::operator->());
+  SdqpSolverInternal* SdqpSolver::operator->() {
+    return static_cast<SdqpSolverInternal*>(Function::operator->());
   }
 
-  const SDQPSolverInternal* SDQPSolver::operator->() const {
-    return static_cast<const SDQPSolverInternal*>(Function::operator->());
+  const SdqpSolverInternal* SdqpSolver::operator->() const {
+    return static_cast<const SdqpSolverInternal*>(Function::operator->());
   }
 
-  bool SDQPSolver::checkNode() const {
-    return dynamic_cast<const SDQPSolverInternal*>(get())!=0;
+  bool SdqpSolver::checkNode() const {
+    return dynamic_cast<const SdqpSolverInternal*>(get())!=0;
   }
 
-  void SDQPSolver::setSOCQPOptions() {
+  void SdqpSolver::setSOCQPOptions() {
     (*this)->setSOCQPOptions();
   }
 
-  SDQPSolver::SDQPSolver(const std::string& name, const SDQPStructure& st) {
-    assignNode(SDQPSolverInternal::getPlugin(name).creator(st));
+  SdqpSolver::SdqpSolver(const std::string& name, const SDQPStructure& st) {
+    assignNode(SdqpSolverInternal::getPlugin(name).creator(st));
   }
 
-  void SDQPSolver::loadPlugin(const std::string& name) {
-    SDQPSolverInternal::loadPlugin(name);
+  void SdqpSolver::loadPlugin(const std::string& name) {
+    SdqpSolverInternal::loadPlugin(name);
   }
 
-  std::string SDQPSolver::doc(const std::string& name) {
-    return SDQPSolverInternal::getPlugin(name).doc;
+  std::string SdqpSolver::doc(const std::string& name) {
+    return SdqpSolverInternal::getPlugin(name).doc;
   }
 
 } // namespace casadi

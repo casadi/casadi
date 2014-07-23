@@ -408,7 +408,7 @@ string(REPLACE "\n" "\\n" feature_list "${feature_list}")
 # Pass meta information
 configure_file(
   ${CMAKE_SOURCE_DIR}/casadi/core/casadi_meta.cpp.cmake
-  ${CMAKE_SOURCE_DIR}/casadi/core/casadi_meta.cpp
+  ${PROJECT_BINARY_DIR}/casadi_meta.cpp
   ESCAPE_QUOTES
 )
 

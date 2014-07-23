@@ -41,7 +41,7 @@ nl.parseNL("../nl_files/hs107.nl",{"verbose":False})
 nlp = SXFunction(nlpIn(x=nl.x),nlpOut(f=nl.f,g=nl.g))
   
 # NLP solver
-nlp_solver = NLPSolver("ipopt", nlp)
+nlp_solver = NlpSolver("ipopt", nlp)
   
 # Set options
 # nlp_solver.setOption("max_iter",10)

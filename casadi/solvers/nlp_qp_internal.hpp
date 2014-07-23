@@ -28,17 +28,25 @@
 
 #include <casadi/solvers/casadi_qpsolver_nlp_export.h>
 
+
+/** \defgroup plugin_QpSolver_nlp
+   Solve QPs using an NlpSolver
+*/
+
+/** \pluginsection{QpSolver,nlp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Solve QPs using an NLP solver
-
-   @copydoc QPSolver_doc
-
+  /** \brief \pluginbrief{QpSolver,nlp}
+  
+   @copydoc QpSolver_doc
+   @copydoc plugin_QpSolver_nlp
+   
    \author Joris Gillis
    \date 2011
   */
-class CASADI_QPSOLVER_NLP_EXPORT NLPQPInternal : public QPSolverInternal {
+class CASADI_QPSOLVER_NLP_EXPORT NLPQPInternal : public QpSolverInternal {
 public:
   /** \brief  Constructor */
   explicit NLPQPInternal();
@@ -47,7 +55,7 @@ public:
   virtual NLPQPInternal* clone() const;
 
   /** \brief  Create a new QP Solver */
-  static QPSolverInternal* creator(const QPStructure& st)
+  static QpSolverInternal* creator(const QPStructure& st)
   { return new NLPQPInternal(st);}
 
   /** \brief  Create a new Solver */
@@ -61,8 +69,11 @@ public:
 
   virtual void evaluate();
 
+  /// A documentation string
+  static const std::string meta_doc;
+
   protected:
-    NLPSolver nlpsolver_;
+    NlpSolver nlpsolver_;
 
 };
 

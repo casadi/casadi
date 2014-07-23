@@ -26,13 +26,22 @@
 #include "fixed_step_integrator_internal.hpp"
 #include <casadi/solvers/casadi_integrator_rk_export.h>
 
-/// \cond INTERNAL
-namespace casadi {
-
-  /** \brief Fixed-step explicit Runge-Kutta integrator for ODEs
+/** \defgroup plugin_Integrator_rk
+      Fixed-step explicit Runge-Kutta integrator for ODEs
       Currently implements RK4.
 
       The method is still under development
+*/
+/** \pluginsection{Integrator,rk} */
+
+/// \cond INTERNAL
+namespace casadi {
+
+  /** \brief \pluginbrief{Integrator,rk}
+  
+
+      @copydoc DAE_doc
+      @copydoc plugin_Integrator_rk
 
       \author Joel Andersson
       \date 2011-2014
@@ -66,6 +75,9 @@ namespace casadi {
     /// Setup F and G
     virtual void setupFG();
 
+    /// A documentation string
+    static const std::string meta_doc;
+  
   };
 
 } // namespace casadi
