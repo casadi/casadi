@@ -34,4 +34,5 @@ def print_subclasses(myclass, depth=0):
 def loadAllCompiledPlugins():
   for k in CasadiMeta.getPlugins().split(";"):
     cls, name = k.split("::")
+    print "Testing: ", cls, name
     getattr(casadi,cls).loadPlugin(name)
