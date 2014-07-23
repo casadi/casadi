@@ -67,6 +67,14 @@
 <tr><td>QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
 </table>
 */
+/** \defgroup scheme_SOCPStruct
+<a name='schemes'></a><table>
+<caption>Struct scheme: casadi::SOCPStruct  ( = 2) [socpStruct]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>SOCP_STRUCT_G</td><td>g</td><td>The horizontal stack of all matrices Gi: ( n x N) .</td></tr>
+<tr><td>SOCP_STRUCT_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
+</table>
+*/
 /** \defgroup scheme_SDPInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::SDPInput  (SDP_SOLVER_NUM_IN = 8) [sdpIn]</caption>
@@ -92,6 +100,13 @@
 <tr><td>RDAE_Z</td><td>z</td><td>Forward algebraic state .</td></tr>
 <tr><td>RDAE_P</td><td>p</td><td>Parameter vector .</td></tr>
 <tr><td>RDAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
+</table>
+*/
+/** \defgroup scheme_LPStruct
+<a name='schemes'></a><table>
+<caption>Struct scheme: casadi::LPStruct  ( = 1) [lpStruct]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>LP_STRUCT_A</td><td>a</td><td>The matrix A: sparse .</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPOutput
@@ -202,6 +217,14 @@
 <tr><td>OCP_UBG</td><td>ubg</td><td>Upper bound for the coupling constraints .</td></tr>
 </table>
 */
+/** \defgroup scheme_QPStruct
+<a name='schemes'></a><table>
+<caption>Struct scheme: casadi::QPStruct  ( = 2) [qpStruct]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>QP_STRUCT_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
+<tr><td>QP_STRUCT_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
+</table>
+*/
 /** \defgroup scheme_SDQPOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::SDQPOutput  (SDQP_SOLVER_NUM_OUT = 7) [sdqpOut]</caption>
@@ -276,6 +299,16 @@
 <tr><td>INTEGRATOR_RZ0</td><td>rz0</td><td>Initial guess for the backwards algebraic variable .</td></tr>
 </table>
 */
+/** \defgroup scheme_SDQPStruct
+<a name='schemes'></a><table>
+<caption>Struct scheme: casadi::SDQPStruct  ( = 4) [sdqpStruct]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>SDQP_STRUCT_H</td><td>h</td><td>The matrix H: sparse ( n x n) .</td></tr>
+<tr><td>SDQP_STRUCT_F</td><td>f</td><td>The horizontal stack of all matrices F_i: ( m x nm) .</td></tr>
+<tr><td>SDQP_STRUCT_G</td><td>g</td><td>The matrix G: ( m x m) .</td></tr>
+<tr><td>SDQP_STRUCT_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
+</table>
+*/
 /** \defgroup scheme_QcqpSolverOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::QcqpSolverOutput  (QCQP_SOLVER_NUM_OUT = 4) [qcqpOut]</caption>
@@ -324,6 +357,15 @@
 <tr><td>JACG_JAC</td><td>jac</td><td>Jacobian of the constraints .</td></tr>
 <tr><td>JACG_F</td><td>f</td><td>Objective function .</td></tr>
 <tr><td>JACG_G</td><td>g</td><td>Constraint function .</td></tr>
+</table>
+*/
+/** \defgroup scheme_QCQPStruct
+<a name='schemes'></a><table>
+<caption>Struct scheme: casadi::QCQPStruct  ( = 3) [qcqpStruct]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>QCQP_STRUCT_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
+<tr><td>QCQP_STRUCT_P</td><td>p</td><td>The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
+<tr><td>QCQP_STRUCT_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
 </table>
 */
 /** \defgroup scheme_LinsolOutput
@@ -398,6 +440,15 @@
 <tr><td>LP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
 <tr><td>LP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
 <tr><td>LP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
+</table>
+*/
+/** \defgroup scheme_SDPStruct
+<a name='schemes'></a><table>
+<caption>Struct scheme: casadi::SDPStruct  ( = 3) [sdpStruct]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>SDP_STRUCT_F</td><td>f</td><td>The horizontal stack of all matrices F_i: ( m x nm) .</td></tr>
+<tr><td>SDP_STRUCT_G</td><td>g</td><td>The matrix G: ( m x m) .</td></tr>
+<tr><td>SDP_STRUCT_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
 </table>
 */
 /** \defgroup scheme_JacGInput

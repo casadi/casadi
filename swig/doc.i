@@ -32193,7 +32193,13 @@ LpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.>Struct scheme: casadi::LPStruct ( = 1) [lpStruct]
++-------------+-------+------------------------+ |  Full name  | Short |
+Description       | +=============+=======+========================+ |
+LP_STRUCT_A | a     | The matrix A: sparse . |
++-------------+-------+------------------------+
 
 ";
 
@@ -33617,9 +33623,20 @@ Numpy compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::__ge__ "
+%feature("docstring")  casadi::Matrix< T
+>::indexed_one_based_assignment(const Matrix< int > &k, const Matrix<
+DataType > &m) " [INTERNAL]  Indexing for interfaced languages get a non-
+zero
 
-No need to have both <= and >=.
+";
+
+%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
+rr, int cc, const DataType &m) " [INTERNAL]  set a matrix element
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
+rr, const DataType &m) " [INTERNAL]  set a vector element
 
 ";
 
@@ -34013,20 +34030,8 @@ operations Octave/Python naming
 
 ";
 
-%feature("docstring")  casadi::Matrix< T
->::indexed_one_based_assignment(const Matrix< int > &k, const Matrix<
-DataType > &m) " [INTERNAL]  Indexing for interfaced languages get a non-
-zero
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
-rr, int cc, const DataType &m) " [INTERNAL]  set a matrix element
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
-rr, const DataType &m) " [INTERNAL]  set a vector element
+%feature("docstring") casadi::Matrix::__ge__ "[INTERNAL]  Elementwise
+operations Octave/Python naming
 
 ";
 
@@ -34214,9 +34219,8 @@ namespace for unambiguous access and Numpy compatibility
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::erase(const std::vector<
-int > &rr, const std::vector< int > &cc) " [INTERNAL]  Erase a submatrix
-Erase rows and/or columns of a matrix.
+%feature("docstring") casadi::Matrix::__gt__ "[INTERNAL]  Elementwise
+operations Octave/Python naming
 
 ";
 
@@ -34657,9 +34661,9 @@ access and Numpy compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::__gt__ "
-
-No need to have both < and >
+%feature("docstring")  casadi::Matrix< DataType >::erase(const std::vector<
+int > &rr, const std::vector< int > &cc) " [INTERNAL]  Erase a submatrix
+Erase rows and/or columns of a matrix.
 
 ";
 
@@ -55702,7 +55706,32 @@ QcqpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.>Struct scheme: casadi::QCQPStruct ( = 3) [qcqpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| QCQP_STRUCT_H          | h                      | The square matrix H:   |
+|                        |                        | sparse, (n x n). Only  |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QCQP_STRUCT_P          | p                      | The horizontal stack   |
+|                        |                        | of all Pi. Each Pi is  |
+|                        |                        | sparse (n x n). Only   |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QCQP_STRUCT_A          | a                      | The matrix A: sparse,  |
+|                        |                        | (nc x n) - product     |
+|                        |                        | with x must be dense.  |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -57142,7 +57171,24 @@ QpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.>Struct scheme: casadi::QPStruct ( = 2) [qpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| QP_STRUCT_H            | h                      | The square matrix H:   |
+|                        |                        | sparse, (n x n). Only  |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QP_STRUCT_A            | a                      | The matrix A: sparse,  |
+|                        |                        | (nc x n) - product     |
+|                        |                        | with x must be dense.  |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -61016,7 +61062,22 @@ SdpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.>Struct scheme: casadi::SDPStruct ( = 3) [sdpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| SDP_STRUCT_F           | f                      | The horizontal stack   |
+|                        |                        | of all matrices F_i: ( |
+|                        |                        | m x nm) .              |
++------------------------+------------------------+------------------------+
+| SDP_STRUCT_G           | g                      | The matrix G: ( m x m) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| SDP_STRUCT_A           | a                      | The matrix A: ( nc x   |
+|                        |                        | n) .                   |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -63954,7 +64015,25 @@ SdqpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.>Struct scheme: casadi::SDQPStruct ( = 4) [sdqpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| SDQP_STRUCT_H          | h                      | The matrix H: sparse ( |
+|                        |                        | n x n) .               |
++------------------------+------------------------+------------------------+
+| SDQP_STRUCT_F          | f                      | The horizontal stack   |
+|                        |                        | of all matrices F_i: ( |
+|                        |                        | m x nm) .              |
++------------------------+------------------------+------------------------+
+| SDQP_STRUCT_G          | g                      | The matrix G: ( m x m) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| SDQP_STRUCT_A          | a                      | The matrix A: ( nc x   |
+|                        |                        | n) .                   |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -68966,7 +69045,19 @@ SocpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.>Struct scheme: casadi::SOCPStruct ( = 2) [socpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| SOCP_STRUCT_G          | g                      | The horizontal stack   |
+|                        |                        | of all matrices Gi: (  |
+|                        |                        | n x N) .               |
++------------------------+------------------------+------------------------+
+| SOCP_STRUCT_A          | a                      | The matrix A: ( nc x   |
+|                        |                        | n) .                   |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -73462,6 +73553,23 @@ Parameters:
 -----------
 
 st:  Problem structure
+
+>Struct scheme: casadi::QPStruct ( = 2) [qpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| QP_STRUCT_H            | h                      | The square matrix H:   |
+|                        |                        | sparse, (n x n). Only  |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QP_STRUCT_A            | a                      | The matrix A: sparse,  |
+|                        |                        | (nc x n) - product     |
+|                        |                        | with x must be dense.  |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -81790,6 +81898,24 @@ const std::string &arg_s2="", const M &arg_m2=M(), const std::string
 
 Structure specification of an SDQP
 
+>Struct scheme: casadi::SDQPStruct ( = 4) [sdqpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| SDQP_STRUCT_H          | h                      | The matrix H: sparse ( |
+|                        |                        | n x n) .               |
++------------------------+------------------------+------------------------+
+| SDQP_STRUCT_F          | f                      | The horizontal stack   |
+|                        |                        | of all matrices F_i: ( |
+|                        |                        | m x nm) .              |
++------------------------+------------------------+------------------------+
+| SDQP_STRUCT_G          | g                      | The matrix G: ( m x m) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| SDQP_STRUCT_A          | a                      | The matrix A: ( nc x   |
+|                        |                        | n) .                   |
++------------------------+------------------------+------------------------+
+
 ";
 
 %feature("docstring")  casadi::sdqpStruct(const std::vector< M > &args,
@@ -83041,6 +83167,31 @@ const std::string &arg_s2="", const M &arg_m2=M()) "
 
 Structure specification of a QP
 
+>Struct scheme: casadi::QCQPStruct ( = 3) [qcqpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| QCQP_STRUCT_H          | h                      | The square matrix H:   |
+|                        |                        | sparse, (n x n). Only  |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QCQP_STRUCT_P          | p                      | The horizontal stack   |
+|                        |                        | of all Pi. Each Pi is  |
+|                        |                        | sparse (n x n). Only   |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QCQP_STRUCT_A          | a                      | The matrix A: sparse,  |
+|                        |                        | (nc x n) - product     |
+|                        |                        | with x must be dense.  |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+
 ";
 
 %feature("docstring")  casadi::qcqpStruct(const std::vector< M > &args,
@@ -83151,6 +83302,13 @@ Transpose of a matrix.
 M &arg_m0=M()) "
 
 Structure specification of an LP
+
+>Struct scheme: casadi::LPStruct ( = 1) [lpStruct]
++-------------+-------+------------------------+
+|  Full name  | Short |      Description       |
++=============+=======+========================+
+| LP_STRUCT_A | a     | The matrix A: sparse . |
++-------------+-------+------------------------+
 
 ";
 
@@ -84054,6 +84212,21 @@ M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
 std::string &arg_s2="", const M &arg_m2=M()) "
 
 Structure specification of an SDP
+
+>Struct scheme: casadi::SDPStruct ( = 3) [sdpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| SDP_STRUCT_F           | f                      | The horizontal stack   |
+|                        |                        | of all matrices F_i: ( |
+|                        |                        | m x nm) .              |
++------------------------+------------------------+------------------------+
+| SDP_STRUCT_G           | g                      | The matrix G: ( m x m) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| SDP_STRUCT_A           | a                      | The matrix A: ( nc x   |
+|                        |                        | n) .                   |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -85321,6 +85494,18 @@ const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
 
 Structure specification of an SOCP
 
+>Struct scheme: casadi::SOCPStruct ( = 2) [socpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| SOCP_STRUCT_G          | g                      | The horizontal stack   |
+|                        |                        | of all matrices Gi: (  |
+|                        |                        | n x N) .               |
++------------------------+------------------------+------------------------+
+| SOCP_STRUCT_A          | a                      | The matrix A: ( nc x   |
+|                        |                        | n) .                   |
++------------------------+------------------------+------------------------+
+
 ";
 
 %feature("docstring")  casadi::socpStruct(const std::vector< M > &args,
@@ -85344,6 +85529,23 @@ Matrix determinant (experimental)
 M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
 
 Structure specification of a QP
+
+>Struct scheme: casadi::QPStruct ( = 2) [qpStruct]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| QP_STRUCT_H            | h                      | The square matrix H:   |
+|                        |                        | sparse, (n x n). Only  |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QP_STRUCT_A            | a                      | The matrix A: sparse,  |
+|                        |                        | (nc x n) - product     |
+|                        |                        | with x must be dense.  |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -86907,10 +87109,16 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__QpSolverInput.xml
 
 
+// File: group__scheme__SOCPStruct.xml
+
+
 // File: group__scheme__SDPInput.xml
 
 
 // File: group__scheme__RDAEInput.xml
+
+
+// File: group__scheme__LPStruct.xml
 
 
 // File: group__scheme__NLPOutput.xml
@@ -86943,6 +87151,9 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__OCPInput.xml
 
 
+// File: group__scheme__QPStruct.xml
+
+
 // File: group__scheme__SDQPOutput.xml
 
 
@@ -86961,6 +87172,9 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__IntegratorInput.xml
 
 
+// File: group__scheme__SDQPStruct.xml
+
+
 // File: group__scheme__QcqpSolverOutput.xml
 
 
@@ -86974,6 +87188,9 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 
 
 // File: group__scheme__JacGOutput.xml
+
+
+// File: group__scheme__QCQPStruct.xml
 
 
 // File: group__scheme__LinsolOutput.xml
@@ -86992,6 +87209,9 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 
 
 // File: group__scheme__LpSolverOutput.xml
+
+
+// File: group__scheme__SDPStruct.xml
 
 
 // File: group__scheme__JacGInput.xml
