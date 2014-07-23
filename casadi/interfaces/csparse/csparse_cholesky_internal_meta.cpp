@@ -29,4 +29,13 @@
 "LinearSolver with CSparseCholesky Interface\n"
 "\n"
 "\n"
+">List of available options\n"
+"+----+------+---------+-------------+\n"
+"| Id | Type | Default | Description |\n"
+"+====+======+=========+=============+\n"
+"+----+------+---------+-------------+\n"
+"\n"
+"\n"
+"\n"
+"\n"
 ;
