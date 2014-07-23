@@ -27,6 +27,8 @@
 #include <typeinfo>
 #include "../casadi_exception.hpp"
 
+/// \cond INTERNAL
+
 namespace casadi {
 
   template<typename DataType>
@@ -214,5 +216,7 @@ namespace casadi {
   };
 
 } // namespace casadi
+
+/// \endcond
 
 #endif // CASADI_SPARSE_STORAGE_HPP
