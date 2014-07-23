@@ -56,7 +56,8 @@ class NZproxy:
     return self.matrix.size()
     
   def __iter__(self):
-      return self.matrix.data().__iter__()
+    for k in range(len(self)):
+      yield self[k]
 %}
 
 %define %matrix_convertors
@@ -67,7 +68,8 @@ class NZproxy:
         return n.matrix(self.toArray())
 
     def __iter__(self):
-      return self.data().__iter__()
+      for k in self.nz:
+        yield k
         
 %}
 %enddef 

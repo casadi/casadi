@@ -49,8 +49,7 @@
     raise Exception("MX cannot be converted to an array. MX.__array__ purely exists to allow ufunc/numpy goodies")
     
   def __iter__(self):
-    for i in range(self.size()):
-      yield self[i]
+    return self.nz.__iter__()
     
   %}
   #endif //SWIGPYTHON
