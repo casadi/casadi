@@ -14785,7 +14785,34 @@ A_k in R^(n x n) V_k in R^n
 provides all of $P_k$ that satisfy:
 
 P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
-1..K-1 Joris Gillis
+1..K-1
+
+General information
+
+List of plugins
+
+- <a href='#plugin_DpleSolver_simple'>simple</a>
+
+- <a href='#plugin_DpleSolver_slicot'>slicot</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+DpleSolver.doc(\"myextraplugin\")
+
+simple
+
+Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
+
+slicot
+
+An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
+
+Uses Periodic Schur Decomposition ('psd') and does not assume positive
+definiteness. Based on Periodic Lyapunov equations: some applications and
+new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
+
+Joris Gillis
 
 >Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 3) [dpleIn]
 +------------------------+------------------------+------------------------+
@@ -14977,6 +15004,29 @@ Default constructor.
 &name, const std::vector< Sparsity > &A, const std::vector< Sparsity > &V) "
 
 DpleSolver solver factory.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_DpleSolver_simple'>simple</a>
+
+- <a href='#plugin_DpleSolver_slicot'>slicot</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+DpleSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+A:  List of sparsities of A_i
+
+V:  List of sparsities of V_i
 
 ";
 
@@ -22865,6 +22915,19 @@ ng: number of constraints     np: number of parameters
 
 In a homotopy from tau = 0 to tau = 1.
 
+General information
+
+List of plugins
+
+- <a href='#plugin_HomotopyNlpSolver_simple'>simple</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+HomotopyNlpSolver.doc(\"myextraplugin\")
+
+simple
+
 Joris Gillis
 
 >Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
@@ -24499,6 +24562,24 @@ Create an implicit function solver.
 Parameters:
 -----------
 
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_ImplicitFunction_kinsol'>kinsol</a>
+
+- <a href='#plugin_ImplicitFunction_newton'>newton</a>
+
+- <a href='#plugin_ImplicitFunction_nlp'>nlp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+ImplicitFunction.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
 f:   Function mapping from (n+1) inputs to 1 output
 
 ";
@@ -24711,6 +24792,33 @@ may be zero. The first output is the solved for z.
 
 You can provide an initial guess for z by setting output(0) of
 ImplicitFunction.
+
+General information
+
+List of plugins
+
+- <a href='#plugin_ImplicitFunction_kinsol'>kinsol</a>
+
+- <a href='#plugin_ImplicitFunction_newton'>newton</a>
+
+- <a href='#plugin_ImplicitFunction_nlp'>nlp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+ImplicitFunction.doc(\"myextraplugin\")
+
+kinsol
+
+KINSOL interface from the Sundials suite
+
+newton
+
+Implements simple newton iterations to solve an implicit function.
+
+nlp
+
+Use an NlpSolver as ImplicitFunction solver
 
 Joel Andersson
 
@@ -26827,6 +26935,92 @@ Default constructor.
 
 Integrator factory.
 
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_Integrator_cvodes'>cvodes</a>
+
+- <a href='#plugin_Integrator_idas'>idas</a>
+
+- <a href='#plugin_Integrator_collocation'>collocation</a>
+
+- <a href='#plugin_Integrator_oldcollocation'>oldcollocation</a>
+
+- <a href='#plugin_Integrator_rk'>rk</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Integrator.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+f:  dynamical system
+
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
++-----------+-------+----------------------------+
+| Full name | Short |        Description         |
++===========+=======+============================+
+| DAE_X     | x     | Differential state .       |
++-----------+-------+----------------------------+
+| DAE_Z     | z     | Algebraic state .          |
++-----------+-------+----------------------------+
+| DAE_P     | p     | Parameter .                |
++-----------+-------+----------------------------+
+| DAE_T     | t     | Explicit time dependence . |
++-----------+-------+----------------------------+
+
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 4) [daeOut]
++-----------+-------+--------------------------------------------+
+| Full name | Short |                Description                 |
++===========+=======+============================================+
+| DAE_ODE   | ode   | Right hand side of the implicit ODE .      |
++-----------+-------+--------------------------------------------+
+| DAE_ALG   | alg   | Right hand side of algebraic equations .   |
++-----------+-------+--------------------------------------------+
+| DAE_QUAD  | quad  | Right hand side of quadratures equations . |
++-----------+-------+--------------------------------------------+
+
+Parameters:
+-----------
+
+g:  backwards system
+
+>Input scheme: casadi::RDAEInput (RDAE_NUM_IN = 8) [rdaeIn]
++-----------+-------+-------------------------------+
+| Full name | Short |          Description          |
++===========+=======+===============================+
+| RDAE_RX   | rx    | Backward differential state . |
++-----------+-------+-------------------------------+
+| RDAE_RZ   | rz    | Backward algebraic state .    |
++-----------+-------+-------------------------------+
+| RDAE_RP   | rp    | Backward parameter vector .   |
++-----------+-------+-------------------------------+
+| RDAE_X    | x     | Forward differential state .  |
++-----------+-------+-------------------------------+
+| RDAE_Z    | z     | Forward algebraic state .     |
++-----------+-------+-------------------------------+
+| RDAE_P    | p     | Parameter vector .            |
++-----------+-------+-------------------------------+
+| RDAE_T    | t     | Explicit time dependence .    |
++-----------+-------+-------------------------------+
+
+>Output scheme: casadi::RDAEOutput (RDAE_NUM_OUT = 4) [rdaeOut]
++-----------+-------+-------------------------------------------+
+| Full name | Short |                Description                |
++===========+=======+===========================================+
+| RDAE_ODE  | ode   | Right hand side of ODE. .                 |
++-----------+-------+-------------------------------------------+
+| RDAE_ALG  | alg   | Right hand side of algebraic equations. . |
++-----------+-------+-------------------------------------------+
+| RDAE_QUAD | quad  | Right hand side of quadratures. .         |
++-----------+-------+-------------------------------------------+
+
 ";
 
 %feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
@@ -26989,8 +27183,58 @@ on rx, rz and rp.
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points.
 
-The class does not specify the method used for the integration. This is
-defined in derived classes.
+General information
+
+List of plugins
+
+- <a href='#plugin_Integrator_cvodes'>cvodes</a>
+
+- <a href='#plugin_Integrator_idas'>idas</a>
+
+- <a href='#plugin_Integrator_collocation'>collocation</a>
+
+- <a href='#plugin_Integrator_oldcollocation'>oldcollocation</a>
+
+- <a href='#plugin_Integrator_rk'>rk</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Integrator.doc(\"myextraplugin\")
+
+cvodes
+
+Interface to CVodes from the Sundials suite.
+
+A call to evaluate will integrate to the end.
+
+You can retrieve the entire state trajectory as follows, after the evaluate
+call: Call reset. Then call integrate(t_i) and getOuput for a series of
+times t_i.
+
+idas
+
+Interface to IDAS from the Sundials suite.
+
+collocation
+
+Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on
+collocation schemes
+
+The method is still under development
+
+oldcollocation
+
+Collocation integrator ODE/DAE integrator based on collocation
+
+The method is still under development
+
+rk
+
+Fixed-step explicit Runge-Kutta integrator for ODEs Currently implements
+RK4.
+
+The method is still under development
 
 Joel Andersson
 
@@ -29467,6 +29711,28 @@ only)
 
 Create a linear solver given a sparsity pattern.
 
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_LinearSolver_csparsecholesky'>csparsecholesky</a>
+
+- <a href='#plugin_LinearSolver_csparse'>csparse</a>
+
+- <a href='#plugin_LinearSolver_lapacklu'>lapacklu</a>
+
+- <a href='#plugin_LinearSolver_lapackqr'>lapackqr</a>
+
+- <a href='#plugin_LinearSolver_symbolicqr'>symbolicqr</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LinearSolver.doc(\"myextraplugin\")
+
 ";
 
 %feature("docstring")  casadi::IOInterface< Function  >::setOutput(T val,
@@ -29973,7 +30239,66 @@ Solves the linear system A*X = B or A^T*X = B for X with A square and non-
 singular
 
 If A is structurally singular, an error will be thrown during init. If A is
-numerically singular, the prepare step will fail. Joel Andersson
+numerically singular, the prepare step will fail.
+
+The usual procedure to use LinearSolver is:  init()
+
+set the first input (A)
+
+prepare()
+
+set the second input (b)
+
+solve()
+
+Repeat steps 4 and 5 to work with other b vectors.
+
+The method evaluate() combines the prepare() and solve() step and is
+therefore more expensive if A is invariant.
+
+General information
+
+List of plugins
+
+- <a href='#plugin_LinearSolver_csparsecholesky'>csparsecholesky</a>
+
+- <a href='#plugin_LinearSolver_csparse'>csparse</a>
+
+- <a href='#plugin_LinearSolver_lapacklu'>lapacklu</a>
+
+- <a href='#plugin_LinearSolver_lapackqr'>lapackqr</a>
+
+- <a href='#plugin_LinearSolver_symbolicqr'>symbolicqr</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LinearSolver.doc(\"myextraplugin\")
+
+csparsecholesky
+
+LinearSolver with CSparseCholesky Interface
+
+csparse
+
+LinearSolver with CSparse Interface
+
+lapacklu
+
+This class solves the linear system A.x=b by making an LU factorization of
+A: A = L.U, with L lower and U upper triangular
+
+lapackqr
+
+This class solves the linear system A.x=b by making an QR factorization of
+A: A = Q.R, with Q orthogonal and R upper triangular
+
+symbolicqr
+
+LinearSolver based on QR factorization with sparsity pattern based
+reordering without partial pivoting
+
+Joel Andersson
 
 >Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 3) [linsolIn]
 +-----------+-------+------------------------------------------------+
@@ -30968,6 +31293,20 @@ Constructor.
 Parameters:
 -----------
 
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_LpSolver_qp'>qp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
 st:  Problem structure
 
 ";
@@ -31540,6 +31879,21 @@ min          c' x x  subject to LBA <= A x <= UBA LBX <= x   <= UBX with x (
 n x 1) c ( n x 1 ) A sparse matrix ( nc x n) LBA, UBA dense vector (nc x 1)
 LBX, UBX dense vector (n x 1)  n: number of decision variables (x) nc:
 number of constraints (A)
+
+General information
+
+List of plugins
+
+- <a href='#plugin_LpSolver_qp'>qp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+LpSolver.doc(\"myextraplugin\")
+
+qp
+
+Solve LPs using a QpSolver
 
 Joris Gillis
 
@@ -39807,6 +40161,75 @@ Solves the following parametric nonlinear program (NLP):min          F(x, p)
 x  subject to             LBX <=   x    <= UBX LBG <= G(x, p) <= UBG
 p  == P      nx: number of decision variables     ng: number of constraints
 np: number of parameters
+
+General information
+
+List of plugins
+
+- <a href='#plugin_NlpSolver_ipopt'>ipopt</a>
+
+- <a href='#plugin_NlpSolver_knitro'>knitro</a>
+
+- <a href='#plugin_NlpSolver_snopt'>snopt</a>
+
+- <a href='#plugin_NlpSolver_worhp'>worhp</a>
+
+- <a href='#plugin_NlpSolver_scpgen'>scpgen</a>
+
+- <a href='#plugin_NlpSolver_sqpmethod'>sqpmethod</a>
+
+- <a href='#plugin_NlpSolver_stabilizedsqp'>stabilizedsqp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+NlpSolver.doc(\"myextraplugin\")
+
+ipopt
+
+When in warmstart mode, output NLP_SOLVER_LAM_X may be used as input
+
+NOTE: Even when max_iter == 0, it is not guaranteed that
+input(NLP_SOLVER_X0) == output(NLP_SOLVER_X). Indeed if bounds on X or
+constraints are unmet, they will differ.
+
+For a good tutorial on IPOPT,
+seehttp://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf
+
+A good resource about the algorithms in IPOPT is: Wachter and L. T. Biegler,
+On the Implementation of an Interior-Point Filter Line-Search Algorithm for
+Large-Scale Nonlinear Programming, Mathematical Programming 106(1), pp.
+25-57, 2006 (As Research Report RC 23149, IBM T. J. Watson Research Center,
+Yorktown, USA
+
+Caveats: with default options, multipliers for the decision variables are
+wrong for equality constraints. Change the 'fixed_variable_treatment' to
+'make_constraint' or 'relax_bounds' to obtain correct results.
+
+knitro
+
+KNITRO interface
+
+snopt
+
+SNOPT interface
+
+worhp
+
+WORHP interface
+
+scpgen
+
+A structure-exploiting sequential quadratic programming (to be come
+sequential convex programming) method for nonlinear programming.
+
+sqpmethod
+
+A textbook SQPMethod
+
+stabilizedsqp
+
+Stabilized Sequential Quadratic Programming method.
 
 Joel Andersson
 
@@ -50023,6 +50446,36 @@ quadratic constraints
 
 If H, Pi is not positive-definite, the solver should throw an error.
 
+General information
+
+List of plugins
+
+- <a href='#plugin_QcqpSolver_socp'>socp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+QcqpSolver.doc(\"myextraplugin\")
+
+socp
+
+Solve a QCQP with an SocpSolver
+
+Note: this implementation relies on Cholesky decomposition: Chol(H) = L -> H
+= LL' with L lower triangular This requires Pi, H to be positive definite.
+Positive semi-definite is not sufficient. Notably, H==0 will not work.
+
+A better implementation would rely on matrix square root, but we need
+singular value decomposition to implement that.
+
+This implementation makes use of the epigraph reformulation:*  min f(x) *
+x * *   min  t *    x, t  f(x) <= t *
+
+This implementation makes use of the following identity:*  || Gx+h||_2 <=
+e'x + f * *  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0 * where we
+put e = [0 0 ... 1] for the quadratic constraint arising from the epigraph
+reformulation and e==0 for all other quadratic constraints.
+
 Joris Gillis
 
 >Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
@@ -50590,6 +51043,20 @@ Default constructor.
 &name, const QCQPStructure &st) "
 
 Constructor.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_QcqpSolver_socp'>socp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+QcqpSolver.doc(\"myextraplugin\")
 
 Parameters:
 -----------
@@ -52010,6 +52477,30 @@ Constructor.
 Parameters:
 -----------
 
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_QpSolver_cplex'>cplex</a>
+
+- <a href='#plugin_QpSolver_ooqp'>ooqp</a>
+
+- <a href='#plugin_QpSolver_qpoases'>qpoases</a>
+
+- <a href='#plugin_QpSolver_sqic'>sqic</a>
+
+- <a href='#plugin_QpSolver_nlp'>nlp</a>
+
+- <a href='#plugin_QpSolver_qcqp'>qcqp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+QpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
 st:  Problem structure
 
 ";
@@ -52242,6 +52733,56 @@ g dense  (n x 1)      n: number of decision variables (x)     nc: number of
 constraints (A)
 
 If H is not positive-definite, the solver should throw an error.
+
+General information
+
+List of plugins
+
+- <a href='#plugin_QpSolver_cplex'>cplex</a>
+
+- <a href='#plugin_QpSolver_ooqp'>ooqp</a>
+
+- <a href='#plugin_QpSolver_qpoases'>qpoases</a>
+
+- <a href='#plugin_QpSolver_sqic'>sqic</a>
+
+- <a href='#plugin_QpSolver_nlp'>nlp</a>
+
+- <a href='#plugin_QpSolver_qcqp'>qcqp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+QpSolver.doc(\"myextraplugin\")
+
+cplex
+
+Interface to Cplex solver for sparse Quadratic Programs
+
+ooqp
+
+Interface to the OOQP Solver for quadratic programming The current
+implementation assumes that OOQP is configured with the MA27 sparse linear
+solver.
+
+NOTE: when doing multiple calls to evaluate(), check if you need to
+reInit();
+
+qpoases
+
+Interface to QPOases Solver for quadratic programming
+
+sqic
+
+Interface to the SQIC solver for quadratic programming
+
+nlp
+
+Solve QPs using an NlpSolver
+
+qcqp
+
+Solve QP using a QcqpSolver
 
 Joel Andersson
 
@@ -55515,6 +56056,20 @@ Constructor.
 Parameters:
 -----------
 
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_SdpSolver_dsdp'>dsdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SdpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
 st:  Problem structure
 
 ";
@@ -55728,6 +56283,24 @@ You can cast this into the standard form with: G = blkdiag(Gj for all j) Fi
 = blkdiag(F_ij for all j)
 
 Implementations of SdpSolver are encouraged to exploit this block structure.
+
+General information
+
+List of plugins
+
+- <a href='#plugin_SdpSolver_dsdp'>dsdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SdpSolver.doc(\"myextraplugin\")
+
+dsdp
+
+Interface to the SDP solver DSDP Warning: The solver DSDP is not good at
+handling linear equalities. There are several options if you notice
+difficulties: play around with the parameter \"_penalty\" leave a gap
+manually switch to another SDP Solver
 
 Joel Andersson
 
@@ -57113,6 +57686,27 @@ SdqpSolver.
 
 Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 
+General information
+
+List of plugins
+
+- <a href='#plugin_SdqpSolver_sdp'>sdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SdqpSolver.doc(\"myextraplugin\")
+
+sdp
+
+Solve an SQDP using an SdpSolver Note: this implementation relies on
+Cholesky decomposition: Chol(H) = L -> H = LL' with L lower triangular This
+requires Pi, H to be positive definite. Positive semi-definite is not
+sufficient. Notably, H==0 will not work.
+
+A better implementation would rely on matrix square root, but we need
+singular value decomposition to implement that.
+
 Joel Andersson
 
 >Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 10) [sdqpIn]
@@ -58273,6 +58867,20 @@ Default constructor.
 &name, const SDQPStructure &st) "
 
 Constructor.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_SdqpSolver_sdp'>sdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SdqpSolver.doc(\"myextraplugin\")
 
 Parameters:
 -----------
@@ -63275,6 +63883,20 @@ Constructor.
 Parameters:
 -----------
 
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_SocpSolver_sdp'>sdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SocpSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
 st:  Problem structure
 
 ";
@@ -63331,6 +63953,21 @@ LBA <= A x <= UBA LBX <= x   <= UBX  with x ( n x 1) c ( n x 1 ) Gi  sparse
 (n x ni) hi  dense (ni x 1) ei  dense (n x 1) fi  dense (1 x 1) N = Sum_i^m
 ni A sparse (nc x n) LBA, UBA dense vector (nc x 1) LBX, UBX dense vector (n
 x 1)
+
+General information
+
+List of plugins
+
+- <a href='#plugin_SocpSolver_sdp'>sdp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+SocpSolver.doc(\"myextraplugin\")
+
+sdp
+
+Solve SOCPs using an SdpSolver
 
 Joris Gillis
 
@@ -67030,6 +67667,27 @@ decision variables (x) nc: number of constraints (A)
 
 If H is not positive-definite, the solver should throw an error.
 
+General information
+
+List of plugins
+
+- <a href='#plugin_StabilizedQpSolver_sqic'>sqic</a>
+
+- <a href='#plugin_StabilizedQpSolver_qp'>qp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+StabilizedQpSolver.doc(\"myextraplugin\")
+
+sqic
+
+Interface to SQIC
+
+qp
+
+Solved a stabilized QP using a standard QP solver
+
 Joel Andersson
 
 >Input scheme: casadi::StabilizedQpSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]
@@ -67670,6 +68328,22 @@ Default constructor.
 std::string &name, const QPStructure &st) "
 
 Constructor.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_StabilizedQpSolver_sqic'>sqic</a>
+
+- <a href='#plugin_StabilizedQpSolver_qp'>qp</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+StabilizedQpSolver.doc(\"myextraplugin\")
 
 Parameters:
 -----------
@@ -76912,9 +77586,8 @@ std::string &arg_s7="") " ";
 
 %feature("docstring")  casadi::dormqr_(char *side, char *trans, int *n, int
 *m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double
-*work, int *lwork, int *info) "
-
-Multiply right hand side with Q-transpose (lapack)
+*work, int *lwork, int *info) " [INTERNAL]  Multiply right hand side with
+Q-transpose (lapack)
 
 ";
 
@@ -78501,9 +79174,7 @@ elementary functions from the 'math.h' ('cmath') header.
 
 %feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
 char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
-int *ldb) "
-
-Solve upper triangular system (lapack)
+int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
 
 ";
 
@@ -78538,9 +79209,8 @@ elementary functions from the 'math.h' header.
 ";
 
 %feature("docstring")  casadi::dgeqrf_(int *m, int *n, double *a, int *lda,
-double *tau, double *work, int *lwork, int *info) "
-
-QR-factorize dense matrix (lapack)
+double *tau, double *work, int *lwork, int *info) " [INTERNAL]  QR-factorize
+dense matrix (lapack)
 
 ";
 
@@ -79687,6 +80357,9 @@ int i) " ";
 // File: collocation__integrator__internal_8hpp.xml
 
 
+// File: collocation__integrator__internal__meta_8cpp.xml
+
+
 // File: coloring_8hpp.xml
 
 
@@ -79732,6 +80405,9 @@ int i) " ";
 // File: cplex__internal_8hpp.xml
 
 
+// File: cplex__internal__meta_8cpp.xml
+
+
 // File: createParent_8hpp.xml
 
 
@@ -79741,10 +80417,16 @@ int i) " ";
 // File: csparse__cholesky__internal_8hpp.xml
 
 
+// File: csparse__cholesky__internal__meta_8cpp.xml
+
+
 // File: csparse__internal_8cpp.xml
 
 
 // File: csparse__internal_8hpp.xml
+
+
+// File: csparse__internal__meta_8cpp.xml
 
 
 // File: ctemplate_8cpp.xml
@@ -79774,6 +80456,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: cvodes__internal_8hpp.xml
+
+
+// File: cvodes__internal__meta_8cpp.xml
 
 
 // File: d0__stats_8hpp.xml
@@ -79840,6 +80525,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: dsdp__internal_8hpp.xml
+
+
+// File: dsdp__internal__meta_8cpp.xml
 
 
 // File: dulmageMendelsohn_8hpp.xml
@@ -79953,6 +80641,9 @@ This file does absolutely nothing but including all headers ";
 // File: idas__internal_8hpp.xml
 
 
+// File: idas__internal__meta_8cpp.xml
+
+
 // File: implicit__fixed__step__integrator__internal_8cpp.xml
 
 
@@ -80028,6 +80719,9 @@ This file does absolutely nothing but including all headers ";
 // File: ipopt__internal_8hpp.xml
 
 
+// File: ipopt__internal__meta_8cpp.xml
+
+
 // File: ipopt__nlp_8cpp.xml
 
 
@@ -80043,6 +80737,9 @@ This file does absolutely nothing but including all headers ";
 // File: kinsol__internal_8hpp.xml
 
 
+// File: kinsol__internal__meta_8cpp.xml
+
+
 // File: KinsolSolver_8hpp.xml
 
 
@@ -80052,16 +80749,25 @@ This file does absolutely nothing but including all headers ";
 // File: knitro__internal_8hpp.xml
 
 
+// File: knitro__internal__meta_8cpp.xml
+
+
 // File: lapack__lu__dense_8cpp.xml
 
 
 // File: lapack__lu__dense_8hpp.xml
 
 
+// File: lapack__lu__dense__meta_8cpp.xml
+
+
 // File: lapack__qr__dense_8cpp.xml
 
 
 // File: lapack__qr__dense_8hpp.xml
+
+
+// File: lapack__qr__dense__meta_8cpp.xml
 
 
 // File: limitPrinting_8hpp.xml
@@ -80163,6 +80869,9 @@ This file does absolutely nothing but including all headers ";
 // File: newton__implicit__internal_8hpp.xml
 
 
+// File: newton__implicit__internal__meta_8cpp.xml
+
+
 // File: NewtonImplicitSolver_8hpp.xml
 
 
@@ -80172,10 +80881,16 @@ This file does absolutely nothing but including all headers ";
 // File: nlp__implicit__internal_8hpp.xml
 
 
+// File: nlp__implicit__internal__meta_8cpp.xml
+
+
 // File: nlp__qp__internal_8cpp.xml
 
 
 // File: nlp__qp__internal_8hpp.xml
+
+
+// File: nlp__qp__internal__meta_8cpp.xml
 
 
 // File: nlp__solver_8cpp.xml
@@ -80232,10 +80947,16 @@ This file does absolutely nothing but including all headers ";
 // File: old__collocation__integrator__internal_8hpp.xml
 
 
+// File: old__collocation__integrator__internal__meta_8cpp.xml
+
+
 // File: ooqp__internal_8cpp.xml
 
 
 // File: ooqp__internal_8hpp.xml
+
+
+// File: ooqp__internal__meta_8cpp.xml
 
 
 // File: options__functionality_8cpp.xml
@@ -80289,6 +81010,9 @@ This file does absolutely nothing but including all headers ";
 // File: psd__indef__dple__internal_8hpp.xml
 
 
+// File: psd__indef__dple__internal__meta_8cpp.xml
+
+
 // File: psd__indef__dple__solver_8cpp.xml
 
 
@@ -80299,6 +81023,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: qcqp__qp__internal_8hpp.xml
+
+
+// File: qcqp__qp__internal__meta_8cpp.xml
 
 
 // File: qcqp__solver_8cpp.xml
@@ -80319,6 +81046,9 @@ This file does absolutely nothing but including all headers ";
 // File: qp__lp__internal_8hpp.xml
 
 
+// File: qp__lp__internal__meta_8cpp.xml
+
+
 // File: qp__solver_8cpp.xml
 
 
@@ -80337,10 +81067,16 @@ This file does absolutely nothing but including all headers ";
 // File: qp__stabilizer__internal_8hpp.xml
 
 
+// File: qp__stabilizer__internal__meta_8cpp.xml
+
+
 // File: qpoases__internal_8cpp.xml
 
 
 // File: qpoases__internal_8hpp.xml
+
+
+// File: qpoases__internal__meta_8cpp.xml
 
 
 // File: range_8hpp.xml
@@ -80356,6 +81092,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: rk__integrator__internal_8hpp.xml
+
+
+// File: rk__integrator__internal__meta_8cpp.xml
 
 
 // File: runtime_8hpp.xml
@@ -80376,16 +81115,25 @@ This file does absolutely nothing but including all headers ";
 // File: scpgen__internal_8hpp.xml
 
 
+// File: scpgen__internal__meta_8cpp.xml
+
+
 // File: sdp__sdqp__internal_8cpp.xml
 
 
 // File: sdp__sdqp__internal_8hpp.xml
 
 
+// File: sdp__sdqp__internal__meta_8cpp.xml
+
+
 // File: sdp__socp__internal_8cpp.xml
 
 
 // File: sdp__socp__internal_8hpp.xml
+
+
+// File: sdp__socp__internal__meta_8cpp.xml
 
 
 // File: sdp__solver_8cpp.xml
@@ -80436,10 +81184,16 @@ This file does absolutely nothing but including all headers ";
 // File: simple__homotopy__nlp__internal_8hpp.xml
 
 
+// File: simple__homotopy__nlp__internal__meta_8cpp.xml
+
+
 // File: simple__indef__dple__internal_8cpp.xml
 
 
 // File: simple__indef__dple__internal_8hpp.xml
+
+
+// File: simple__indef__dple__internal__meta_8cpp.xml
 
 
 // File: simulator_8cpp.xml
@@ -80485,10 +81239,16 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 // File: snopt__internal_8hpp.xml
 
 
+// File: snopt__internal__meta_8cpp.xml
+
+
 // File: socp__qcqp__internal_8cpp.xml
 
 
 // File: socp__qcqp__internal_8hpp.xml
+
+
+// File: socp__qcqp__internal__meta_8cpp.xml
 
 
 // File: socp__solver_8cpp.xml
@@ -80545,10 +81305,16 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 // File: sqic__internal_8hpp.xml
 
 
+// File: sqic__internal__meta_8cpp.xml
+
+
 // File: sqp__internal_8cpp.xml
 
 
 // File: sqp__internal_8hpp.xml
+
+
+// File: sqp__internal__meta_8cpp.xml
 
 
 // File: ssym_8hpp.xml
@@ -80572,10 +81338,16 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 // File: stabilized__sqic__internal_8hpp.xml
 
 
+// File: stabilized__sqic__internal__meta_8cpp.xml
+
+
 // File: stabilized__sqp__internal_8cpp.xml
 
 
 // File: stabilized__sqp__internal_8hpp.xml
+
+
+// File: stabilized__sqp__internal__meta_8cpp.xml
 
 
 // File: std__vector__tools_8cpp.xml
@@ -80671,6 +81443,9 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 // File: symbolic__qr__internal_8hpp.xml
 
 
+// File: symbolic__qr__internal__meta_8cpp.xml
+
+
 // File: symbolic__sx_8hpp.xml
 
 
@@ -80717,6 +81492,9 @@ double *a, f_int *lda1, f_int *lda2, double *tau, f_int *ldtau, double
 
 
 // File: worhp__internal_8hpp.xml
+
+
+// File: worhp__internal__meta_8cpp.xml
 
 
 // File: wsnopt_8hpp.xml
@@ -80798,6 +81576,10 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__DPLE__doc.xml
 
 
+// File: group__plugin__DpleSolver__simple.xml
+
+
+
 // File: group__HomotopyNlpSolver__doc.xml
 
 
@@ -80856,6 +81638,142 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 
 
 // File: group__expression__tools.xml
+
+
+// File: group__plugin__QpSolver__cplex.xml
+
+
+
+// File: group__plugin__LinearSolver__csparsecholesky.xml
+
+
+
+// File: group__plugin__LinearSolver__csparse.xml
+
+
+
+// File: group__plugin__SdpSolver__dsdp.xml
+
+
+
+// File: group__plugin__NlpSolver__ipopt.xml
+
+
+
+// File: group__plugin__NlpSolver__knitro.xml
+
+
+
+// File: group__plugin__LinearSolver__lapacklu.xml
+
+
+
+// File: group__plugin__LinearSolver__lapackqr.xml
+
+
+
+// File: group__plugin__QpSolver__ooqp.xml
+
+
+
+// File: group__plugin__QpSolver__qpoases.xml
+
+
+
+// File: group__plugin__DpleSolver__slicot.xml
+
+
+
+// File: group__plugin__NlpSolver__snopt.xml
+
+
+
+// File: group__plugin__QpSolver__sqic.xml
+
+
+
+// File: group__plugin__StabilizedQpSolver__sqic.xml
+
+
+
+// File: group__plugin__Integrator__cvodes.xml
+
+
+
+// File: group__plugin__Integrator__idas.xml
+
+
+
+// File: group__plugin__ImplicitFunction__kinsol.xml
+
+
+
+// File: group__plugin__NlpSolver__worhp.xml
+
+
+
+// File: group__plugin__Integrator__collocation.xml
+
+
+
+// File: group__plugin__ImplicitFunction__newton.xml
+
+
+
+// File: group__plugin__ImplicitFunction__nlp.xml
+
+
+
+// File: group__plugin__QpSolver__nlp.xml
+
+
+
+// File: group__plugin__Integrator__oldcollocation.xml
+
+
+
+// File: group__plugin__QpSolver__qcqp.xml
+
+
+
+// File: group__plugin__LpSolver__qp.xml
+
+
+
+// File: group__plugin__StabilizedQpSolver__qp.xml
+
+
+
+// File: group__plugin__Integrator__rk.xml
+
+
+
+// File: group__plugin__NlpSolver__scpgen.xml
+
+
+
+// File: group__plugin__SdqpSolver__sdp.xml
+
+
+
+// File: group__plugin__SocpSolver__sdp.xml
+
+
+
+// File: group__plugin__QcqpSolver__socp.xml
+
+
+
+// File: group__plugin__NlpSolver__sqpmethod.xml
+
+
+
+// File: group__plugin__NlpSolver__stabilizedsqp.xml
+
+
+
+// File: group__plugin__LinearSolver__symbolicqr.xml
+
 
 
 // File: group__scheme__IntegratorOutput.xml
@@ -80976,6 +81894,84 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 
 
 // File: group__scheme__HNLPInput.xml
+
+
+// File: group__pluginlist__DpleSolver.xml
+
+
+// File: group__plugins__DpleSolver.xml
+
+
+// File: group__pluginlist__QpSolver.xml
+
+
+// File: group__plugins__QpSolver.xml
+
+
+// File: group__pluginlist__LinearSolver.xml
+
+
+// File: group__plugins__LinearSolver.xml
+
+
+// File: group__pluginlist__SdpSolver.xml
+
+
+// File: group__plugins__SdpSolver.xml
+
+
+// File: group__pluginlist__NlpSolver.xml
+
+
+// File: group__plugins__NlpSolver.xml
+
+
+// File: group__pluginlist__StabilizedQpSolver.xml
+
+
+// File: group__plugins__StabilizedQpSolver.xml
+
+
+// File: group__pluginlist__Integrator.xml
+
+
+// File: group__plugins__Integrator.xml
+
+
+// File: group__pluginlist__ImplicitFunction.xml
+
+
+// File: group__plugins__ImplicitFunction.xml
+
+
+// File: group__pluginlist__LpSolver.xml
+
+
+// File: group__plugins__LpSolver.xml
+
+
+// File: group__pluginlist__SdqpSolver.xml
+
+
+// File: group__plugins__SdqpSolver.xml
+
+
+// File: group__pluginlist__SocpSolver.xml
+
+
+// File: group__plugins__SocpSolver.xml
+
+
+// File: group__pluginlist__HomotopyNlpSolver.xml
+
+
+// File: group__plugins__HomotopyNlpSolver.xml
+
+
+// File: group__pluginlist__QcqpSolver.xml
+
+
+// File: group__plugins__QcqpSolver.xml
 
 
 // File: chapter1.xml
