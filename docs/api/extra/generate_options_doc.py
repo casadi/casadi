@@ -557,7 +557,7 @@ def enumsashtml(n,title):
 
 # Write out all input/output information
 for scheme in enums:
-  types = ["input","output"]
+  types = ["input","output","struct"]
   for t in types:
     if re.search(t,scheme,re.IGNORECASE):
       f.write("/** \defgroup scheme_%s\n" % scheme)
