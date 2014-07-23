@@ -32193,7 +32193,9 @@ LpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.
 
 ";
 
@@ -33617,9 +33619,20 @@ Numpy compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::__ge__ "
+%feature("docstring")  casadi::Matrix< T
+>::indexed_one_based_assignment(const Matrix< int > &k, const Matrix<
+DataType > &m) " [INTERNAL]  Indexing for interfaced languages get a non-
+zero
 
-No need to have both <= and >=.
+";
+
+%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
+rr, int cc, const DataType &m) " [INTERNAL]  set a matrix element
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
+rr, const DataType &m) " [INTERNAL]  set a vector element
 
 ";
 
@@ -34013,20 +34026,8 @@ operations Octave/Python naming
 
 ";
 
-%feature("docstring")  casadi::Matrix< T
->::indexed_one_based_assignment(const Matrix< int > &k, const Matrix<
-DataType > &m) " [INTERNAL]  Indexing for interfaced languages get a non-
-zero
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
-rr, int cc, const DataType &m) " [INTERNAL]  set a matrix element
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
-rr, const DataType &m) " [INTERNAL]  set a vector element
+%feature("docstring") casadi::Matrix::__ge__ "[INTERNAL]  Elementwise
+operations Octave/Python naming
 
 ";
 
@@ -34214,9 +34215,8 @@ namespace for unambiguous access and Numpy compatibility
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::erase(const std::vector<
-int > &rr, const std::vector< int > &cc) " [INTERNAL]  Erase a submatrix
-Erase rows and/or columns of a matrix.
+%feature("docstring") casadi::Matrix::__gt__ "[INTERNAL]  Elementwise
+operations Octave/Python naming
 
 ";
 
@@ -34657,9 +34657,9 @@ access and Numpy compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::__gt__ "
-
-No need to have both < and >
+%feature("docstring")  casadi::Matrix< DataType >::erase(const std::vector<
+int > &rr, const std::vector< int > &cc) " [INTERNAL]  Erase a submatrix
+Erase rows and/or columns of a matrix.
 
 ";
 
@@ -55702,7 +55702,9 @@ QcqpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.
 
 ";
 
@@ -57142,7 +57144,9 @@ QpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.
 
 ";
 
@@ -61016,7 +61020,9 @@ SdpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.
 
 ";
 
@@ -63954,7 +63960,9 @@ SdqpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.
 
 ";
 
@@ -68966,7 +68974,9 @@ SocpSolver.doc(\"myextraplugin\")
 Parameters:
 -----------
 
-st:  Problem structure
+st:
+
+Problem structure.
 
 ";
 
