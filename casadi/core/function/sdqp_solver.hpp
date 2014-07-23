@@ -108,8 +108,7 @@ namespace casadi {
 
     /** \brief Constructor
      *  \param name \pluginargument{SdqpSolver}
-     *  \param st Problem structure
-     *  \copydoc scheme_SDQPStruct
+     *  \param st \structargument{SDQP}
      */
     SdqpSolver(const std::string& name, const SDQPStructure& st);
 

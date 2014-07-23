@@ -110,8 +110,7 @@ namespace casadi {
 
     /** \brief Constructor
      *  \param name \pluginargument{LpSolver}
-     *  \param st Problem structure
-     *  \copydoc scheme_LPStruct
+     *  \param st \structargument{LP}
      */
     LpSolver(const std::string& name, const LPStructure& st);
 

@@ -124,8 +124,7 @@ namespace casadi {
 
     /** \brief Constructor
      *  \param name \pluginargument{SocpSolver}
-     *  \param st Problem structure
-     *  \copydoc scheme_SOCPStruct
+     *  \param st \structargument{SOCP}
      */
     SocpSolver(const std::string& name, const SOCPStructure& st);
 

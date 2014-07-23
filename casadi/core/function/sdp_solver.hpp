@@ -180,8 +180,7 @@ namespace casadi {
 
     /** \brief Constructor
      *  \param name \pluginargument{SdpSolver}
-     *  \param st Problem structure
-     *  \copydoc scheme_SDPStruct
+     *  \param st \structargument{SDP}
      */
     SdpSolver(const std::string& name, const SDPStructure& st);
 

@@ -122,8 +122,7 @@ namespace casadi {
 
     /** \brief Constructor
      *  \param name \pluginargument{QpSolver}
-     *  \param st Problem structure
-     *  \copydoc scheme_QPStruct
+     *  \param st \structargument{QP}
      */
     QpSolver(const std::string& name, const QPStructure& st);
 
