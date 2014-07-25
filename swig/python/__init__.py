@@ -22,6 +22,7 @@
 # -*- coding: utf-8 -*-
 
 import warnings
+import os
 
 # workaround for issue #1012
 # Since ipopt uses "dlopen" internally, we have to make sure that all the
@@ -41,6 +42,12 @@ if hasattr(sys,"getdlopenflags"):
 
 from casadi import *    # import everything
 import casadi as casadi # import everything
+
+# add to PATH to make dlopen find the libraries
+if "PATH" in os.environ:
+  os.environ["PATH"] = os.environ["PATH"] + os.pathsep + os.path.dirname(casadi.__file__)
+else:
+  os.environ["PATH"] = os.pathsep + os.path.dirname(casadi.__file__)
 
 if 'casadi_core' in failed_modules:
     raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_core"]))
