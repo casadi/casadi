@@ -4999,6 +4999,9 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: control_simulator.hpp ";
 
@@ -6613,6 +6616,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: custom_function.hpp ";
 
@@ -9544,6 +9550,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: direct_collocation.hpp ";
 
@@ -11524,6 +11533,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: direct_multiple_shooting.hpp ";
 
@@ -12856,6 +12868,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: direct_single_shooting.hpp ";
 
@@ -14808,8 +14823,9 @@ Given matrices $A_k$ and symmetric $V_k, k = 0..K-1$
 
 ::
 
-A_k in R^(n x n)
-V_k in R^n
+  A_k in R^(n x n)
+  V_k in R^n
+  
 
 
 
@@ -14819,12 +14835,16 @@ provides all of $P_k$ that satisfy:
 
 ::
 
-P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k
-P_k+1 = A_k*P_k*A_k' + V_k  for k = 1..K-1
+  P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k
+  P_k+1 = A_k*P_k*A_k' + V_k  for k = 1..K-1
+  
 
 
 
 General information
+===================
+
+
 
 >Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 2) [dpleIn]
 
@@ -14965,6 +14985,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_DpleSolver_simple'>simple</a>
 
@@ -14975,7 +14998,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 DpleSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 simple
+------
+
+
 
 Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
 
@@ -14995,7 +15025,16 @@ Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
 |                 |                 |                 | linear solver.  |
 +-----------------+-----------------+-----------------+-----------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 slicot
+------
+
+
 
 An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
 
@@ -15045,7 +15084,15 @@ new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
 | t_total        |
 +----------------+
 
-Joris Gillis Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: dple_solver.hpp ";
 
@@ -16798,6 +16845,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: external_function.hpp ";
 
@@ -18660,6 +18710,9 @@ Joel Andersson
 +---------+--------------------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: function.hpp ";
 
@@ -23011,23 +23064,27 @@ Solves the following parametric nonlinear program (NLP):
 
 ::
 
-min          F(x, p, tau)
- x
-
-subject to
-            LBX <=   x    <= UBX
-            LBG <= G(x, p) <= UBG
-                       p  == P
-
-    nx: number of decision variables
-    ng: number of constraints
-    np: number of parameters
+  min          F(x, p, tau)
+   x
+  
+  subject to
+              LBX <=   x    <= UBX
+              LBG <= G(x, p) <= UBG
+                         p  == P
+  
+      nx: number of decision variables
+      ng: number of constraints
+      np: number of parameters
+  
 
 
 
 In a homotopy from tau = 0 to tau = 1.
 
 General information
+===================
+
+
 
 >Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
 
@@ -23193,6 +23250,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_HomotopyNlpSolver_simple'>simple</a>
 
@@ -23201,7 +23261,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 HomotopyNlpSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 simple
+------
+
+
 
 >List of available options
 
@@ -23223,7 +23290,15 @@ simple
 |                 |                 |                 | tau=1.          |
 +-----------------+-----------------+-----------------+-----------------+
 
-Joris Gillis Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: homotopy_nlp_solver.hpp ";
 
@@ -24927,6 +25002,9 @@ You can provide an initial guess for z by setting output(0) of
 ImplicitFunction.
 
 General information
+===================
+
+
 
 >List of available options
 
@@ -25056,6 +25134,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_ImplicitFunction_kinsol'>kinsol</a>
 
@@ -25068,7 +25149,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 ImplicitFunction.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 kinsol
+------
+
+
 
 KINSOL interface from the Sundials suite
 
@@ -25135,7 +25223,16 @@ KINSOL interface from the Sundials suite
 | eval_f    |
 +-----------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 newton
+------
+
+
 
 Implements simple newton iterations to solve an implicit function.
 
@@ -25187,7 +25284,16 @@ Implements simple newton iterations to solve an implicit function.
 | return_status |
 +---------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 nlp
+---
+
+
 
 Use an NlpSolver as ImplicitFunction solver
 
@@ -25214,7 +25320,15 @@ Use an NlpSolver as ImplicitFunction solver
 | nlp_solver_stats |
 +------------------+
 
-Joel Andersson Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: implicit_function.hpp ";
 
@@ -27442,27 +27556,27 @@ equation and a set of quadratures:
 
 ::
 
-Initial conditions at t=t0
- x(t0)  = x0
- q(t0)  = 0
-
- Forward integration from t=t0 to t=tf
- der(x) = function(x, z, p, t)                  Forward ODE
- 0 = fz(x, z, p, t)                  Forward algebraic equations
- der(q) = fq(x, z, p, t)                  Forward quadratures
-
- Terminal conditions at t=tf
- rx(tf)  = rx0
- rq(tf)  = 0
-
- Backward integration from t=tf to t=t0
- der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
- 0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
- der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-
- where we assume that both the forward and backwards integrations are index-1
- (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
- gx, gz and gq have a linear dependency on rx, rz and rp.
+   Initial conditions at t=t0
+   x(t0)  = x0
+   q(t0)  = 0
+  
+   Forward integration from t=t0 to t=tf
+   der(x) = function(x, z, p, t)                  Forward ODE
+   0 = fz(x, z, p, t)                  Forward algebraic equations
+   der(q) = fq(x, z, p, t)                  Forward quadratures
+  
+   Terminal conditions at t=tf
+   rx(tf)  = rx0
+   rq(tf)  = 0
+  
+   Backward integration from t=tf to t=t0
+   der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+   0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
+   der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
+  
+   where we assume that both the forward and backwards integrations are index-1
+   (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
+   gx, gz and gq have a linear dependency on rx, rz and rp.
 
 
 
@@ -27470,6 +27584,9 @@ The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points.
 
 General information
+===================
+
+
 
 >Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) [integratorIn]
 
@@ -27644,6 +27761,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_Integrator_cvodes'>cvodes</a>
 
@@ -27660,7 +27780,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Integrator.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 cvodes
+------
+
+
 
 Interface to CVodes from the Sundials suite.
 
@@ -27938,7 +28065,16 @@ times t_i.
 | nstepsB     |
 +-------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 idas
+----
+
+
 
 Interface to IDAS from the Sundials suite.
 
@@ -28252,7 +28388,16 @@ Interface to IDAS from the Sundials suite.
 | nstepsB     |
 +-------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 collocation
+-----------
+
+
 
 Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on
 collocation schemes
@@ -28283,7 +28428,16 @@ The method is still under development
 | e_elements      |                 |                 | finite elements |
 +-----------------+-----------------+-----------------+-----------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 oldcollocation
+--------------
+
+
 
 Collocation integrator ODE/DAE integrator based on collocation
 
@@ -28341,7 +28495,15 @@ The method is still under development
 |                 |                 |                 | integrator      |
 +-----------------+-----------------+-----------------+-----------------+
 
-rk
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+rk --
+
+
 
 Fixed-step explicit Runge-Kutta integrator for ODEs Currently implements
 RK4.
@@ -28357,7 +28519,15 @@ The method is still under development
 | e_elements      |                 |                 | finite elements |
 +-----------------+-----------------+-----------------+-----------------+
 
-Joel Andersson Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: integrator.hpp ";
 
@@ -31207,6 +31377,9 @@ The method evaluate() combines the prepare() and solve() step and is
 therefore more expensive if A is invariant.
 
 General information
+===================
+
+
 
 >Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) [linsolIn]
 
@@ -31314,6 +31487,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_LinearSolver_csparsecholesky'>csparsecholesky</a>
 
@@ -31330,7 +31506,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 LinearSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 csparsecholesky
+---------------
+
+
 
 LinearSolver with CSparseCholesky Interface
 
@@ -31341,7 +31524,16 @@ LinearSolver with CSparseCholesky Interface
 +====+======+=========+=============+
 +----+------+---------+-------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 csparse
+-------
+
+
 
 LinearSolver with CSparse Interface
 
@@ -31352,7 +31544,16 @@ LinearSolver with CSparse Interface
 +====+======+=========+=============+
 +----+------+---------+-------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 lapacklu
+--------
+
+
 
 This class solves the linear system A.x=b by making an LU factorization of
 A: A = L.U, with L lower and U upper triangular
@@ -31367,7 +31568,16 @@ A: A = L.U, with L lower and U upper triangular
 | equilibration               | OT_BOOLEAN | true    |             |
 +-----------------------------+------------+---------+-------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 lapackqr
+--------
+
+
 
 This class solves the linear system A.x=b by making an QR factorization of
 A: A = Q.R, with Q orthogonal and R upper triangular
@@ -31379,7 +31589,16 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 +====+======+=========+=============+
 +----+------+---------+-------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 symbolicqr
+----------
+
+
 
 LinearSolver based on QR factorization with sparsity pattern based
 reordering without partial pivoting
@@ -31399,7 +31618,15 @@ reordering without partial pivoting
 |                 |                 |                 | generated code  |
 +-----------------+-----------------+-----------------+-----------------+
 
-Joel Andersson Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: linear_solver.hpp ";
 
@@ -32884,25 +33111,28 @@ Solves the following linear problem:
 
 ::
 
-min          c' x
-x
-
-subject to
-LBA <= A x <= UBA
-LBX <= x   <= UBX
-
-with x ( n x 1)
-c ( n x 1 )
-A sparse matrix ( nc x n)
-LBA, UBA dense vector (nc x 1)
-LBX, UBX dense vector (n x 1)
-
-n: number of decision variables (x)
-nc: number of constraints (A)
+  min          c' x
+  x
+  
+  subject to
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with x ( n x 1)
+  c ( n x 1 )
+  A sparse matrix ( nc x n)
+  LBA, UBA dense vector (nc x 1)
+  LBX, UBX dense vector (n x 1)
+  
+  n: number of decision variables (x)
+  nc: number of constraints (A)
 
 
 
 General information
+===================
+
+
 
 >Input scheme: casadi::LpSolverInput (LP_SOLVER_NUM_IN = 6) [lpIn]
 
@@ -33032,6 +33262,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_LpSolver_qp'>qp</a>
 
@@ -33040,7 +33273,13 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 LpSolver.doc(\"myextraplugin\")
 
-qp
+
+
+--------------------------------------------------------------------------------
+
+qp --
+
+
 
 Solve LPs using a QpSolver
 
@@ -33066,7 +33305,15 @@ Solve LPs using a QpSolver
 | qp_solver_stats |
 +-----------------+
 
-Joris Gillis Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: lp_solver.hpp ";
 
@@ -38999,6 +39246,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: mx_function.hpp ";
 
@@ -41211,21 +41461,25 @@ Solves the following parametric nonlinear program (NLP):
 
 ::
 
-min          F(x, p)
- x
-
-subject to
-            LBX <=   x    <= UBX
-            LBG <= G(x, p) <= UBG
-                       p  == P
-
-    nx: number of decision variables
-    ng: number of constraints
-    np: number of parameters
+  min          F(x, p)
+   x
+  
+  subject to
+              LBX <=   x    <= UBX
+              LBG <= G(x, p) <= UBG
+                         p  == P
+  
+      nx: number of decision variables
+      ng: number of constraints
+      np: number of parameters
+  
 
 
 
 General information
+===================
+
+
 
 >Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
 
@@ -41483,6 +41737,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_NlpSolver_ipopt'>ipopt</a>
 
@@ -41503,7 +41760,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 NlpSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 ipopt
+-----
+
+
 
 When in warmstart mode, output NLP_SOLVER_LAM_X may be used as input
 
@@ -43812,7 +44076,16 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 | var_string_md      |
 +--------------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 knitro
+------
+
+
 
 KNITRO interface
 
@@ -43925,7 +44198,16 @@ KNITRO interface
 | eval_jac_g  |
 +-------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 snopt
+-----
+
+
 
 SNOPT interface
 
@@ -44005,7 +44287,16 @@ SNOPT interface
 | t_mainloop     |
 +----------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 worhp
+-----
+
+
 
 WORHP interface
 
@@ -44838,7 +45129,16 @@ WORHP interface
 | t_mainloop         |
 +--------------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 scpgen
+------
+
+
 
 A structure-exploiting sequential quadratic programming (to be come
 sequential convex programming) method for nonlinear programming.
@@ -44974,7 +45274,16 @@ sequential convex programming) method for nonlinear programming.
 | iter_count |
 +------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 sqpmethod
+---------
+
+
 
 A textbook SQPMethod
 
@@ -45118,7 +45427,16 @@ A textbook SQPMethod
 | t_mainloop         |
 +--------------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 stabilizedsqp
+-------------
+
+
 
 Stabilized Sequential Quadratic Programming method.
 
@@ -45290,7 +45608,15 @@ Stabilized Sequential Quadratic Programming method.
 | return_status |
 +---------------+
 
-Joel Andersson Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: nlp_solver.hpp ";
 
@@ -49471,6 +49797,9 @@ basis Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: nullspace.hpp ";
 
@@ -49980,6 +50309,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: ocp_solver.hpp ";
 
@@ -51455,6 +51787,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: options_functionality.hpp ";
 
@@ -51718,6 +52053,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: options_functionality.hpp ";
 
@@ -53101,6 +53439,9 @@ Joel Andersson
 +-----------------+------------------------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: parallelizer.hpp ";
 
@@ -54935,8 +55276,9 @@ Given matrices $A_k$ and symmetric $V_k, k = 0..K-1$
 
 ::
 
-A_k in R^(n x n)
-V_k in R^n
+  A_k in R^(n x n)
+  V_k in R^n
+  
 
 
 
@@ -54946,8 +55288,9 @@ provides all of $P_k$ that satisfy:
 
 ::
 
-P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k
-P_k+1 = A_k*P_k*A_k' + V_k  for k = 1..K-1
+  P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k
+  P_k+1 = A_k*P_k*A_k' + V_k  for k = 1..K-1
+  
 
 
 
@@ -55135,6 +55478,9 @@ Joris Gillis
 +----------------+------------------------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: psd_indef_dple_solver.hpp ";
 
@@ -55278,28 +55624,31 @@ Solves the following strictly convex problem:
 
 ::
 
-min          1/2 x' H x + g' x
-x
-
-subject to
-1/2 x' Pi x  +  qi' x + ri  <= 0   for i=0..nq-1
-LBA <= A x <= UBA
-LBX <= x   <= UBX
-
-with :
-H, Pi sparse (n x n) positive definite
-g, qi dense  (n x 1)
-ri scalar
-
-n: number of decision variables (x)
-nc: number of linear constraints (A)
-nq: number of quadratic constraints
+  min          1/2 x' H x + g' x
+  x
+  
+  subject to
+  1/2 x' Pi x  +  qi' x + ri  <= 0   for i=0..nq-1
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with :
+  H, Pi sparse (n x n) positive definite
+  g, qi dense  (n x 1)
+  ri scalar
+  
+  n: number of decision variables (x)
+  nc: number of linear constraints (A)
+  nq: number of quadratic constraints
 
 
 
 If H, Pi is not positive-definite, the solver should throw an error.
 
 General information
+===================
+
+
 
 >Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 12) [qcqpIn]
 
@@ -55456,6 +55805,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_QcqpSolver_socp'>socp</a>
 
@@ -55464,7 +55816,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 QcqpSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 socp
+----
+
+
 
 Solve a QCQP with an SocpSolver
 
@@ -55479,12 +55838,12 @@ This implementation makes use of the epigraph reformulation:
 
 ::
 
-*  min f(x)
-*    x
-*
-*   min  t
-*    x, t  f(x) <= t
-*
+  *  min f(x)
+  *    x
+  *
+  *   min  t
+  *    x, t  f(x) <= t
+  * 
 
 
 
@@ -55492,10 +55851,10 @@ This implementation makes use of the following identity:
 
 ::
 
-*  || Gx+h||_2 <= e'x + f
-*
-*  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0
-*
+  *  || Gx+h||_2 <= e'x + f
+  *
+  *  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0
+  * 
 
 where we put e = [0 0 ... 1] for the quadratic constraint arising from the
 epigraph reformulation and e==0 for all other quadratic constraints.
@@ -55522,7 +55881,15 @@ epigraph reformulation and e==0 for all other quadratic constraints.
 | socp_solver_stats |
 +-------------------+
 
-Joris Gillis Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: qcqp_solver.hpp ";
 
@@ -57668,25 +58035,28 @@ Solves the following strictly convex problem:
 
 ::
 
-min          1/2 x' H x + g' x
- x
-
-subject to
-            LBA <= A x <= UBA
-            LBX <= x   <= UBX
-
-    with :
-      H sparse (n x n) positive definite
-      g dense  (n x 1)
-
-    n: number of decision variables (x)
-    nc: number of constraints (A)
+  min          1/2 x' H x + g' x
+   x
+  
+  subject to
+              LBA <= A x <= UBA
+              LBX <= x   <= UBX
+  
+      with :
+        H sparse (n x n) positive definite
+        g dense  (n x 1)
+  
+      n: number of decision variables (x)
+      nc: number of constraints (A)
 
 
 
 If H is not positive-definite, the solver should throw an error.
 
 General information
+===================
+
+
 
 >Input scheme: casadi::QpSolverInput (QP_SOLVER_NUM_IN = 9) [qpIn]
 
@@ -57827,6 +58197,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_QpSolver_cplex'>cplex</a>
 
@@ -57845,7 +58218,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 QpSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 cplex
+-----
+
+
 
 Interface to Cplex solver for sparse Quadratic Programs
 
@@ -57904,7 +58284,16 @@ Interface to Cplex solver for sparse Quadratic Programs
 |                 |                 |                 | methods).       |
 +-----------------+-----------------+-----------------+-----------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 ooqp
+----
+
+
 
 Interface to the OOQP Solver for quadratic programming The current
 implementation assumes that OOQP is configured with the MA27 sparse linear
@@ -57934,7 +58323,16 @@ reInit();
 |                 |                 |                 | 10 and 100      |
 +-----------------+-----------------+-----------------+-----------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 qpoases
+-------
+
+
 
 Interface to QPOases Solver for quadratic programming
 
@@ -58126,7 +58524,16 @@ Interface to QPOases Solver for quadratic programming
 |                 |                 |                 | stop homotopy.  |
 +-----------------+-----------------+-----------------+-----------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 sqic
+----
+
+
 
 Interface to the SQIC solver for quadratic programming
 
@@ -58137,7 +58544,16 @@ Interface to the SQIC solver for quadratic programming
 +====+======+=========+=============+
 +----+------+---------+-------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 nlp
+---
+
+
 
 Solve QPs using an NlpSolver
 
@@ -58163,7 +58579,16 @@ Solve QPs using an NlpSolver
 | nlp_solver_stats |
 +------------------+
 
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
 qcqp
+----
+
+
 
 Solve QP using a QcqpSolver
 
@@ -58189,7 +58614,15 @@ Solve QP using a QcqpSolver
 | qcqp_solver_stats |
 +-------------------+
 
-Joel Andersson Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: qp_solver.hpp ";
 
@@ -61541,22 +61974,22 @@ Primal:
 
 ::
 
-min          c' x
-x
-subject to
-P = Sum_i^m F_i x_i - G
-P negative semidefinite
-
-LBA <= A x <= UBA
-LBX <= x   <= UBX
-
-with x ( n x 1)
-c ( n x 1 )
-G, F_i  sparse symmetric (m x m)
-X dense symmetric ( m x m )
-A sparse matrix ( nc x n)
-LBA, UBA dense vector (nc x 1)
-LBX, UBX dense vector (n x 1)
+  min          c' x
+  x
+  subject to
+  P = Sum_i^m F_i x_i - G
+  P negative semidefinite
+  
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with x ( n x 1)
+  c ( n x 1 )
+  G, F_i  sparse symmetric (m x m)
+  X dense symmetric ( m x m )
+  A sparse matrix ( nc x n)
+  LBA, UBA dense vector (nc x 1)
+  LBX, UBX dense vector (n x 1)
 
 
 
@@ -61569,14 +62002,14 @@ Dual:
 
 ::
 
-max          trace(G Y)
-Y
-
-subject to
-trace(F_i Y) = c_i
-Y positive semidefinite
-
-with Y dense symmetric ( m x m)
+  max          trace(G Y)
+  Y
+  
+  subject to
+  trace(F_i Y) = c_i
+  Y positive semidefinite
+  
+  with Y dense symmetric ( m x m)
 
 
 
@@ -61588,16 +62021,16 @@ Primal:
 
 ::
 
-min          c' x
-x
-subject to
-Pj = Sum_i^m F_ij x_i - gj   for all j
-Pj negative semidefinite   for all j
-
-with x ( n x 1)
-c ( n x 1 )
-G, F_i  sparse symmetric (m x m)
-X dense symmetric ( m x m )
+  min          c' x
+  x
+  subject to
+  Pj = Sum_i^m F_ij x_i - gj   for all j
+  Pj negative semidefinite   for all j
+  
+  with x ( n x 1)
+  c ( n x 1 )
+  G, F_i  sparse symmetric (m x m)
+  X dense symmetric ( m x m )
 
 
 
@@ -61605,14 +62038,14 @@ Dual:
 
 ::
 
-max          Sum_j trace(Gj Yj)
-Yj
-
-subject to
-Sum_j trace(F_ij Yj) = c_i   for all j
-Yj positive semidefinite     for all j
-
-with Y dense symmetric ( m x m)
+  max          Sum_j trace(Gj Yj)
+  Yj
+  
+  subject to
+  Sum_j trace(F_ij Yj) = c_i   for all j
+  Yj positive semidefinite     for all j
+  
+  with Y dense symmetric ( m x m)
 
 
 
@@ -61622,6 +62055,9 @@ You can cast this into the standard form with: G = blkdiag(Gj for all j) Fi
 Implementations of SdpSolver are encouraged to exploit this block structure.
 
 General information
+===================
+
+
 
 >Input scheme: casadi::SDPInput (SDP_SOLVER_NUM_IN = 8) [sdpIn]
 
@@ -61817,6 +62253,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_SdpSolver_dsdp'>dsdp</a>
 
@@ -61825,7 +62264,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 SdpSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 dsdp
+----
+
+
 
 Interface to the SDP solver DSDP Warning: The solver DSDP is not good at
 handling linear equalities. There are several options if you notice
@@ -61941,7 +62387,15 @@ manually switch to another SDP Solver
 | termination_reason |
 +--------------------+
 
-Joel Andersson Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: sdp_solver.hpp ";
 
@@ -63134,6 +63588,9 @@ SdqpSolver.
 Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 
 General information
+===================
+
+
 
 >Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 9) [sdqpIn]
 
@@ -63302,6 +63759,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_SdqpSolver_sdp'>sdp</a>
 
@@ -63310,7 +63770,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 SdqpSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 sdp
+---
+
+
 
 Solve an SQDP using an SdpSolver Note: this implementation relies on
 Cholesky decomposition: Chol(H) = L -> H = LL' with L lower triangular This
@@ -63342,7 +63809,15 @@ singular value decomposition to implement that.
 | sdp_solver_stats |
 +------------------+
 
-Joel Andersson Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: sdqp_solver.hpp ";
 
@@ -67671,6 +68146,9 @@ Joel Andersson
 +---------+---------------------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: simulator.hpp ";
 
@@ -69458,28 +69936,31 @@ Primal:
 
 ::
 
-min          c' x
-x
-subject to
-|| Gi' x + hi ||_2 <= ei' x + fi  i = 1..m
-
-LBA <= A x <= UBA
-LBX <= x   <= UBX
-
-with x ( n x 1)
-c ( n x 1 )
-Gi  sparse (n x ni)
-hi  dense (ni x 1)
-ei  dense (n x 1)
-fi  dense (1 x 1)
-N = Sum_i^m ni
-A sparse (nc x n)
-LBA, UBA dense vector (nc x 1)
-LBX, UBX dense vector (n x 1)
+  min          c' x
+  x
+  subject to
+  || Gi' x + hi ||_2 <= ei' x + fi  i = 1..m
+  
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with x ( n x 1)
+  c ( n x 1 )
+  Gi  sparse (n x ni)
+  hi  dense (ni x 1)
+  ei  dense (n x 1)
+  fi  dense (1 x 1)
+  N = Sum_i^m ni
+  A sparse (nc x n)
+  LBA, UBA dense vector (nc x 1)
+  LBX, UBX dense vector (n x 1)
 
 
 
 General information
+===================
+
+
 
 >Input scheme: casadi::SOCPInput (SOCP_SOLVER_NUM_IN = 10) [socpIn]
 
@@ -69644,6 +70125,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_SocpSolver_sdp'>sdp</a>
 
@@ -69652,7 +70136,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 SocpSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 sdp
+---
+
+
 
 Solve SOCPs using an SdpSolver
 
@@ -69678,7 +70169,15 @@ Solve SOCPs using an SdpSolver
 | sdp_solver_stats |
 +------------------+
 
-Joris Gillis Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: socp_solver.hpp ";
 
@@ -73213,25 +73712,28 @@ Solves the following strictly convex problem:
 
 ::
 
-min          1/2 x' H x + g' x
-x
-
-subject to
-LBA <= A x <= UBA
-LBX <= x   <= UBX
-
-with :
-H sparse (n x n) positive definite
-g dense  (n x 1)
-
-n: number of decision variables (x)
-nc: number of constraints (A)
+  min          1/2 x' H x + g' x
+  x
+  
+  subject to
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with :
+  H sparse (n x n) positive definite
+  g dense  (n x 1)
+  
+  n: number of decision variables (x)
+  nc: number of constraints (A)
 
 
 
 If H is not positive-definite, the solver should throw an error.
 
 General information
+===================
+
+
 
 >Input scheme: casadi::StabilizedQpSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 12) [stabilizedQpIn]
 
@@ -73387,6 +73889,9 @@ General information
 +--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
+===============
+
+
 
 - <a href='#plugin_StabilizedQpSolver_sqic'>sqic</a>
 
@@ -73397,7 +73902,14 @@ system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 StabilizedQpSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
 sqic
+----
+
+
 
 Interface to SQIC
 
@@ -73408,7 +73920,15 @@ Interface to SQIC
 +====+======+=========+=============+
 +----+------+---------+-------------+
 
-qp
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+qp --
+
+
 
 Solved a stabilized QP using a standard QP solver
 
@@ -73436,7 +73956,15 @@ Solved a stabilized QP using a standard QP solver
 | qp_solver_stats |
 +-----------------+
 
-Joel Andersson Diagrams
+--------------------------------------------------------------------------------
+
+
+
+Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: stabilized_qp_solver.hpp ";
 
@@ -77101,6 +77629,9 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
+--------
+
+
 
 C++ includes: sx_function.hpp ";
 
@@ -78283,44 +78814,56 @@ Eliminate interdependencies amongst the outputs.
 A flat OCP representation coupled to an XML file.
 
 Variables:
+==========
+
+
 
 
 
 ::
 
-x:      differential states
-z:      algebraic states
-p :     independent parameters
-t :     time
-u :     control signals
-q :     quadrature states
-y :     dependent variables
+  x:      differential states
+  z:      algebraic states
+  p :     independent parameters
+  t :     time
+  u :     control signals
+  q :     quadrature states
+  y :     dependent variables
+  
 
 
 
 Equations:
+==========
+
+
 
 
 
 ::
 
-explicit or implicit ODE: \\\\dot {x} = ode(t, x, z, u, p_free, pi, pd)
-or                           0 = ode(t, x, z,\\\\dot {x}, u, p_free, pi, pd)
-algebraic equations:            0 = alg(t, x, z, u, p_free, pi, pd)
-quadratures:              \\\\dot {q} = quad(t, x, z, u, p_free, pi, pd)
-dependent equations:            y = dep(t, x, z, u, p_free, pi, pd)
-initial equations:              0 = initial(t, x, z, u, p_free, pi, pd)
+  explicit or implicit ODE: \\\\dot {x} = ode(t, x, z, u, p_free, pi, pd)
+  or                           0 = ode(t, x, z,\\\\dot {x}, u, p_free, pi, pd)
+  algebraic equations:            0 = alg(t, x, z, u, p_free, pi, pd)
+  quadratures:              \\\\dot {q} = quad(t, x, z, u, p_free, pi, pd)
+  dependent equations:            y = dep(t, x, z, u, p_free, pi, pd)
+  initial equations:              0 = initial(t, x, z, u, p_free, pi, pd)
+  
 
 
 
 Objective function terms:
+=========================
+
+
 
 
 
 ::
 
-Mayer terms:          \\\\sum {mterm_k}
-Lagrange terms:       \\\\sum {\\\\integral{mterm}}
+  Mayer terms:          \\\\sum {mterm_k}
+  Lagrange terms:       \\\\sum {\\\\integral{mterm}}
+  
 
 
 
@@ -78329,6 +78872,9 @@ Note that when parsed, all dynamic equations end up in the implicit category
 explicit form, possibly in addition to a set of quadrature states.
 
 Usage skeleton:
+===============
+
+
 
 Call default constructor  SymbolicOCP ocp;
 
@@ -85161,10 +85707,11 @@ Finds Z_i such that
 
 ::
 
-Z_1' * A_1 * Z_2 = T_1,
-          Z_2' * A_2 * Z_3 = T_2,
-                 ...
-          Z_K' * A_K * Z_1 = T_K,
+            Z_1' * A_1 * Z_2 = T_1,
+            Z_2' * A_2 * Z_3 = T_2,
+                   ...
+            Z_K' * A_K * Z_1 = T_K,
+  
 
 
 
