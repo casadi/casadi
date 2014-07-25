@@ -42,12 +42,12 @@ if hasattr(sys,"getdlopenflags"):
 
 # add to PATH to make dlopen find the libraries
 if "PATH" in os.environ:
-  os.environ["PATH"] = os.environ["PATH"] + os.pathsep + os.path.dirname(__file__)
+  os.environ["PATH"] = os.path.dirname(__file__) + os.pathsep +  os.environ["PATH"]
 else:
   os.environ["PATH"] = os.path.dirname(__file__)
 
 if "LD_LIBRARY_PATH" in os.environ:
-  os.environ["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"] + os.pathsep + os.path.dirname(__file__)
+  os.environ["LD_LIBRARY_PATH"] = os.path.dirname(__file__) + os.pathsep + os.environ["LD_LIBRARY_PATH"]
 else:
   os.environ["LD_LIBRARY_PATH"] = os.path.dirname(__file__)
 
