@@ -40,19 +40,19 @@ if hasattr(sys,"getdlopenflags"):
     flags0 = sys.getdlopenflags() # get the original flags
     sys.setdlopenflags( flags0 | ctypes.RTLD_GLOBAL ) # set our workaround flags
 
-from casadi import *    # import everything
-import casadi as casadi # import everything
-
 # add to PATH to make dlopen find the libraries
 if "PATH" in os.environ:
-  os.environ["PATH"] = os.environ["PATH"] + os.pathsep + os.path.dirname(casadi.__file__)
+  os.environ["PATH"] = os.environ["PATH"] + os.pathsep + os.path.dirname(__file__)
 else:
-  os.environ["PATH"] = os.path.dirname(casadi.__file__)
+  os.environ["PATH"] = os.path.dirname(__file__)
 
 if "LD_LIBRARY_PATH" in os.environ:
-  os.environ["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"] + os.pathsep + os.path.dirname(casadi.__file__)
+  os.environ["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"] + os.pathsep + os.path.dirname(__file__)
 else:
-  os.environ["LD_LIBRARY_PATH"] = os.path.dirname(casadi.__file__)
+  os.environ["LD_LIBRARY_PATH"] = os.path.dirname(__file__)
+
+from casadi import *    # import everything
+import casadi as casadi # import everything
   
 if 'casadi_core' in failed_modules:
     raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_core"]))
