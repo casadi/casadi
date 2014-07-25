@@ -129,7 +129,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
           elif i.find('// File:') > -1: # leave comments alone.
               ret.extend([i, '\n'])
           else:
-              if i.strip().startswith(">"):
+              if i.strip().startswith(">") or "-------" in i or "%%newline%%" in i:
+                i = i.replace("%%newline%%","\n")
                 _tmp = i.strip()
               else:
                 _tmp = textwrap.fill(i.strip(), 80-4, break_long_words=False)
@@ -165,7 +166,11 @@ class Doxy2SWIG_X(Doxy2SWIG):
           p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated,merge=self.merge,groupdoc=self.groupdoc)
           p.generate()
           self.pieces.extend(self.clean_pieces(p.pieces))
-            
+
+  def do_verbatim(self, node):
+    self.add_text("\n\n::\n\n")
+    self.add_text(node.firstChild.data.replace("\n","%%newline%%").replace('\\', r'\\\\').replace('"', r'\"')+"\n\n")
+    
   def do_table(self, node):
      
     caption = node.getElementsByTagName("caption")

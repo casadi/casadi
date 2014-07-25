@@ -4466,6 +4466,7 @@ per major interval
 Joris Gillis
 
 >Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3) [controlsimulatorIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -4485,6 +4486,7 @@ Joris Gillis
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -4922,6 +4924,7 @@ ffcn:  Continuous time dynamics, an casadi::Function with the following
 mapping:
 
 >Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -4961,6 +4964,7 @@ mapping:
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
+
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -4978,6 +4982,7 @@ output_fcn:  output function which maps ControlledDAEInput or DAEInput to n
 outputs.
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -4991,6 +4996,7 @@ outputs.
 +-----------+-------+----------------------------+
 
 >Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -5889,6 +5895,7 @@ Interface to a custom function.
 Joel Andersson
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -8349,6 +8356,7 @@ Direct collocation.
 Joel Andersson
 
 >Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
+
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -8380,6 +8388,7 @@ Joel Andersson
 +------------+--------+----------------------------------------------+
 
 >Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -8397,6 +8406,7 @@ Joel Andersson
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -9620,6 +9630,7 @@ cfcn.input(0).size()
 Joel Andersson
 
 >Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
+
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -9651,6 +9662,7 @@ Joel Andersson
 +------------+--------+----------------------------------------------+
 
 >Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -9668,6 +9680,7 @@ Joel Andersson
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -10060,6 +10073,7 @@ ffcn:  Continuous time dynamics, an casadi::Function with the following
 mapping:
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -10073,6 +10087,7 @@ mapping:
 +-----------+-------+----------------------------+
 
 >Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
+
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -10099,6 +10114,7 @@ Parameters:
 mfcn:  Mayer term, casadi::Function mapping to cost (1 x 1)
 
 >Input scheme: casadi::MayerInput (MAYER_NUM_IN = 2) [mayerIn]
+
 +-----------+-------+---------------------------------------------+
 | Full name | Short |                 Description                 |
 +===========+=======+=============================================+
@@ -10113,6 +10129,7 @@ Parameters:
 cfcn:  Path constraints, casadi::Function mapping to (nh x 1)
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -10736,6 +10753,7 @@ cfcn.input(0).size()
 Joel Andersson
 
 >Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
+
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -10767,6 +10785,7 @@ Joel Andersson
 +------------+--------+----------------------------------------------+
 
 >Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -10784,6 +10803,7 @@ Joel Andersson
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -11331,6 +11351,7 @@ ffcn:  Continuous time dynamics, an casadi::Function with the following
 mapping:
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -11344,6 +11365,7 @@ mapping:
 +-----------+-------+----------------------------+
 
 >Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
+
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -11370,6 +11392,7 @@ Parameters:
 mfcn:  Mayer term, casadi::Function mapping to cost (1 x 1)
 
 >Input scheme: casadi::MayerInput (MAYER_NUM_IN = 2) [mayerIn]
+
 +-----------+-------+---------------------------------------------+
 | Full name | Short |                 Description                 |
 +===========+=======+=============================================+
@@ -11384,6 +11407,7 @@ Parameters:
 cfcn:  Path constraints, casadi::Function mapping to (nh x 1)
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -12172,16 +12196,30 @@ Base class for Discrete Periodic Lyapunov Equation Solvers.
 
 Given matrices $A_k$ and symmetric $V_k, k = 0..K-1$
 
-A_k in R^(n x n) V_k in R^n
+
+
+::
+
+A_k in R^(n x n)
+V_k in R^n
+
+
 
 provides all of $P_k$ that satisfy:
 
-P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
-1..K-1
+
+
+::
+
+P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k
+P_k+1 = A_k*P_k*A_k' + V_k  for k = 1..K-1
+
+
 
 General information
 
 >Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 2) [dpleIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -12195,6 +12233,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::DPLEOutput (DPLE_NUM_OUT = 1) [dpleOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -12206,6 +12245,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -12332,6 +12372,7 @@ simple
 Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -12355,6 +12396,7 @@ definiteness. Based on Periodic Lyapunov equations: some applications and
 new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -12384,6 +12426,7 @@ new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +----------------+
 |       Id       |
 +================+
@@ -13624,6 +13667,7 @@ Interface for a function that is not implemented by CasADi symbolics.
 Joel Andersson
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -15080,6 +15124,7 @@ this.
 Joel Andersson
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -15166,6 +15211,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
+
 +---------+--------------------------+
 |   Id    |         Used in          |
 +=========+==========================+
@@ -18827,16 +18873,30 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 Base class for Homotopy NLP Solvers.
 
-Solves the following parametric nonlinear program (NLP):min          F(x, p,
-tau)  x  subject to             LBX <=   x    <= UBX             LBG <= G(x,
-p) <= UBG                        p  == P nx: number of decision variables
-ng: number of constraints     np: number of parameters
+Solves the following parametric nonlinear program (NLP):
+
+::
+
+min          F(x, p, tau)
+ x
+
+subject to
+            LBX <=   x    <= UBX
+            LBG <= G(x, p) <= UBG
+                       p  == P
+
+    nx: number of decision variables
+    ng: number of constraints
+    np: number of parameters
+
+
 
 In a homotopy from tau = 0 to tau = 1.
 
 General information
 
 >Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -18875,6 +18935,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -18904,6 +18965,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -19008,6 +19070,7 @@ HomotopyNlpSolver.doc(\"myextraplugin\")
 simple
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -20526,6 +20589,7 @@ ImplicitFunction.
 General information
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -20669,6 +20733,7 @@ kinsol
 KINSOL interface from the Sundials suite
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -20721,6 +20786,7 @@ KINSOL interface from the Sundials suite
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +-----------+
 |    Id     |
 +===========+
@@ -20734,6 +20800,7 @@ newton
 Implements simple newton iterations to solve an implicit function.
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -20755,6 +20822,7 @@ Implements simple newton iterations to solve an implicit function.
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +----------+
 |    Id    |
 +==========+
@@ -20770,6 +20838,7 @@ Implements simple newton iterations to solve an implicit function.
 +----------+
 
 >List of available stats
+
 +---------------+
 |      Id       |
 +===============+
@@ -20783,6 +20852,7 @@ nlp
 Use an NlpSolver as ImplicitFunction solver
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -20797,6 +20867,7 @@ Use an NlpSolver as ImplicitFunction solver
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +------------------+
 |        Id        |
 +==================+
@@ -22291,6 +22362,7 @@ Parameters:
 f:  dynamical system
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -22304,6 +22376,7 @@ f:  dynamical system
 +-----------+-------+----------------------------+
 
 >Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
+
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -22320,6 +22393,7 @@ Parameters:
 g:  backwards system
 
 >Input scheme: casadi::RDAEInput (RDAE_NUM_IN = 7) [rdaeIn]
+
 +-----------+-------+-------------------------------+
 | Full name | Short |          Description          |
 +===========+=======+===============================+
@@ -22339,6 +22413,7 @@ g:  backwards system
 +-----------+-------+-------------------------------+
 
 >Output scheme: casadi::RDAEOutput (RDAE_NUM_OUT = 3) [rdaeOut]
+
 +-----------+-------+-------------------------------------------+
 | Full name | Short |                Description                |
 +===========+=======+===========================================+
@@ -22436,17 +22511,33 @@ Integrator abstract base class
 
 Solves an initial value problem (IVP) coupled to a terminal value problem
 with differential equation given as an implicit ODE coupled to an algebraic
-equation and a set of quadratures: Initial conditions at t=t0  x(t0)  = x0
-q(t0)  = 0   Forward integration from t=t0 to t=tf  der(x) = function(x, z,
-p, t) Forward ODE  0 = fz(x, z, p, t)                  Forward algebraic
-equations  der(q) = fq(x, z, p, t)                  Forward quadratures
-Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  = 0 Backward integration
-from t=tf to t=t0  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-0 = gz(rx, rz, rp, x, z, p, t) Backward algebraic equations  der(rq) =
-gq(rx, rz, rp, x, z, p, t) Backward quadratures   where we assume that both
-the forward and backwards integrations are index-1  (i.e. dfz/dz, dgz/drz
-are invertible) and furthermore that  gx, gz and gq have a linear dependency
-on rx, rz and rp.
+equation and a set of quadratures:
+
+::
+
+Initial conditions at t=t0
+ x(t0)  = x0
+ q(t0)  = 0
+
+ Forward integration from t=t0 to t=tf
+ der(x) = function(x, z, p, t)                  Forward ODE
+ 0 = fz(x, z, p, t)                  Forward algebraic equations
+ der(q) = fq(x, z, p, t)                  Forward quadratures
+
+ Terminal conditions at t=tf
+ rx(tf)  = rx0
+ rq(tf)  = 0
+
+ Backward integration from t=tf to t=t0
+ der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+ 0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
+ der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
+
+ where we assume that both the forward and backwards integrations are index-1
+ (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
+ gx, gz and gq have a linear dependency on rx, rz and rp.
+
+
 
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points.
@@ -22454,6 +22545,7 @@ the value of the state and/or sensitivities at certain time points.
 General information
 
 >Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) [integratorIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -22478,6 +22570,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6) [integratorOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -22504,6 +22597,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -22650,6 +22744,7 @@ call: Call reset. Then call integrate(t_i) and getOuput for a series of
 times t_i.
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -22885,6 +22980,7 @@ times t_i.
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +---------+
 |   Id    |
 +=========+
@@ -22902,6 +22998,7 @@ times t_i.
 +---------+
 
 >List of available stats
+
 +-------------+
 |     Id      |
 +=============+
@@ -22919,6 +23016,7 @@ idas
 Interface to IDAS from the Sundials suite.
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -23188,6 +23286,7 @@ Interface to IDAS from the Sundials suite.
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +--------------------------+
 |            Id            |
 +==========================+
@@ -23213,6 +23312,7 @@ Interface to IDAS from the Sundials suite.
 +--------------------------+
 
 >List of available stats
+
 +-------------+
 |     Id      |
 +=============+
@@ -23233,6 +23333,7 @@ collocation schemes
 The method is still under development
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -23262,6 +23363,7 @@ Collocation integrator ODE/DAE integrator based on collocation
 The method is still under development
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -23320,6 +23422,7 @@ RK4.
 The method is still under development
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -25650,6 +25753,7 @@ therefore more expensive if A is invariant.
 General information
 
 >Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) [linsolIn]
+
 +-----------+-------+------------------------------------------------+
 | Full name | Short |                  Description                   |
 +===========+=======+================================================+
@@ -25659,6 +25763,7 @@ General information
 +-----------+-------+------------------------------------------------+
 
 >Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 1) [linsolOut]
+
 +-----------+-------+----------------------------------------------+
 | Full name | Short |                 Description                  |
 +===========+=======+==============================================+
@@ -25666,6 +25771,7 @@ General information
 +-----------+-------+----------------------------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -25773,6 +25879,7 @@ csparsecholesky
 LinearSolver with CSparseCholesky Interface
 
 >List of available options
+
 +----+------+---------+-------------+
 | Id | Type | Default | Description |
 +====+======+=========+=============+
@@ -25783,6 +25890,7 @@ csparse
 LinearSolver with CSparse Interface
 
 >List of available options
+
 +----+------+---------+-------------+
 | Id | Type | Default | Description |
 +====+======+=========+=============+
@@ -25794,6 +25902,7 @@ This class solves the linear system A.x=b by making an LU factorization of
 A: A = L.U, with L lower and U upper triangular
 
 >List of available options
+
 +-----------------------------+------------+---------+-------------+
 |             Id              |    Type    | Default | Description |
 +=============================+============+=========+=============+
@@ -25808,6 +25917,7 @@ This class solves the linear system A.x=b by making an QR factorization of
 A: A = Q.R, with Q orthogonal and R upper triangular
 
 >List of available options
+
 +----+------+---------+-------------+
 | Id | Type | Default | Description |
 +====+======+=========+=============+
@@ -25819,6 +25929,7 @@ LinearSolver based on QR factorization with sparsity pattern based
 reordering without partial pivoting
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -26461,9 +26572,11 @@ Parameters:
 st:
 
 Problem structure.>Struct scheme: casadi::LPStruct ( = 1) [lpStruct]
-+-------------+-------+------------------------+ |  Full name  | Short |
-Description       | +=============+=======+========================+ |
-LP_STRUCT_A | a     | The matrix A: sparse . |
+
++-------------+-------+------------------------+
+|  Full name  | Short |      Description       |
++=============+=======+========================+
+| LP_STRUCT_A | a     | The matrix A: sparse . |
 +-------------+-------+------------------------+
 
 ";
@@ -26912,14 +27025,32 @@ LpSolver.
 
 Solves the following linear problem:
 
-min          c' x x  subject to LBA <= A x <= UBA LBX <= x   <= UBX with x (
-n x 1) c ( n x 1 ) A sparse matrix ( nc x n) LBA, UBA dense vector (nc x 1)
-LBX, UBX dense vector (n x 1)  n: number of decision variables (x) nc:
-number of constraints (A)
+
+
+::
+
+min          c' x
+x
+
+subject to
+LBA <= A x <= UBA
+LBX <= x   <= UBX
+
+with x ( n x 1)
+c ( n x 1 )
+A sparse matrix ( nc x n)
+LBA, UBA dense vector (nc x 1)
+LBX, UBX dense vector (n x 1)
+
+n: number of decision variables (x)
+nc: number of constraints (A)
+
+
 
 General information
 
 >Input scheme: casadi::LpSolverInput (LP_SOLVER_NUM_IN = 6) [lpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -26941,6 +27072,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::LpSolverOutput (LP_SOLVER_NUM_OUT = 4) [lpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -26958,6 +27090,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -27057,6 +27190,7 @@ qp
 Solve LPs using a QpSolver
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -27070,6 +27204,7 @@ Solve LPs using a QpSolver
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +-----------------+
 |       Id        |
 +=================+
@@ -27575,22 +27710,9 @@ in the standard namespace for unambiguous access and Numpy compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::indexed_one_based_assignment "
+%feature("docstring") casadi::Matrix::__ge__ "
 
->  void casadi::Matrix< T >::indexed_one_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m)
-------------------------------------------------------------------------
-[INTERNAL] 
-Indexing for interfaced languages get a non-zero
-
->  void casadi::Matrix< T >::indexed_one_based_assignment(int rr, int cc, const DataType &m)
-------------------------------------------------------------------------
-[INTERNAL] 
-set a matrix element
-
->  void casadi::Matrix< T >::indexed_one_based_assignment(int rr, const DataType &m)
-------------------------------------------------------------------------
-[INTERNAL] 
-set a vector element
+No need to have both <= and >=.
 
 ";
 
@@ -27876,8 +27998,22 @@ operations Octave/Python naming
 
 ";
 
-%feature("docstring") casadi::Matrix::__ge__ "[INTERNAL]  Elementwise
-operations Octave/Python naming
+%feature("docstring") casadi::Matrix::indexed_one_based_assignment "
+
+>  void casadi::Matrix< T >::indexed_one_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m)
+------------------------------------------------------------------------
+[INTERNAL] 
+Indexing for interfaced languages get a non-zero
+
+>  void casadi::Matrix< T >::indexed_one_based_assignment(int rr, int cc, const DataType &m)
+------------------------------------------------------------------------
+[INTERNAL] 
+set a matrix element
+
+>  void casadi::Matrix< T >::indexed_one_based_assignment(int rr, const DataType &m)
+------------------------------------------------------------------------
+[INTERNAL] 
+set a vector element
 
 ";
 
@@ -27965,8 +28101,8 @@ compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::__gt__ "[INTERNAL]  Elementwise
-operations Octave/Python naming
+%feature("docstring") casadi::Matrix::erase "[INTERNAL]  Erase a submatrix
+Erase rows and/or columns of a matrix.
 
 ";
 
@@ -28323,8 +28459,9 @@ compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::erase "[INTERNAL]  Erase a submatrix
-Erase rows and/or columns of a matrix.
+%feature("docstring") casadi::Matrix::__gt__ "
+
+No need to have both < and >
 
 ";
 
@@ -31554,6 +31691,7 @@ General function mapping from/to MX.
 Joel Andersson
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -32880,6 +33018,7 @@ Remove modules to be monitored.
 Access the Jacobian of the constraint function.
 
 >Input scheme: casadi::HessLagInput (HESSLAG_NUM_IN = 4) [hessLagIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -32898,6 +33037,7 @@ Access the Jacobian of the constraint function.
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::HessLagOutput (HESSLAG_NUM_OUT = 5) [hessLagOut]
+
 +----------------+--------+------------------------------------------------+
 |   Full name    | Short  |                  Description                   |
 +================+========+================================================+
@@ -32995,6 +33135,7 @@ Get the type name of a certain option.
 Access the NLP.
 
 >Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -33033,6 +33174,7 @@ Access the NLP.
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -33352,14 +33494,28 @@ check if the user has there is an option str
 
 NlpSolver.
 
-Solves the following parametric nonlinear program (NLP):min          F(x, p)
-x  subject to             LBX <=   x    <= UBX LBG <= G(x, p) <= UBG
-p  == P      nx: number of decision variables     ng: number of constraints
-np: number of parameters
+Solves the following parametric nonlinear program (NLP):
+
+::
+
+min          F(x, p)
+ x
+
+subject to
+            LBX <=   x    <= UBX
+            LBG <= G(x, p) <= UBG
+                       p  == P
+
+    nx: number of decision variables
+    ng: number of constraints
+    np: number of parameters
+
+
 
 General information
 
 >Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -33398,6 +33554,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -33427,6 +33584,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -33654,6 +33812,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 'make_constraint' or 'relax_bounds' to obtain correct results.
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -35873,6 +36032,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +-------------+
 |     Id      |
 +=============+
@@ -35888,6 +36048,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 +-------------+
 
 >List of available stats
+
 +--------------------+
 |         Id         |
 +====================+
@@ -35943,6 +36104,7 @@ knitro
 KNITRO interface
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -36035,6 +36197,7 @@ KNITRO interface
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +-------------+
 |     Id      |
 +=============+
@@ -36054,6 +36217,7 @@ snopt
 SNOPT interface
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -36093,6 +36257,7 @@ SNOPT interface
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +-----------+
 |    Id     |
 +===========+
@@ -36102,6 +36267,7 @@ SNOPT interface
 +-----------+
 
 >List of available stats
+
 +----------------+
 |       Id       |
 +================+
@@ -36131,6 +36297,7 @@ worhp
 WORHP interface
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -36901,6 +37068,7 @@ WORHP interface
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +-------------+
 |     Id      |
 +=============+
@@ -36916,6 +37084,7 @@ WORHP interface
 +-------------+
 
 >List of available stats
+
 +--------------------+
 |         Id         |
 +====================+
@@ -36962,6 +37131,7 @@ A structure-exploiting sequential quadratic programming (to be come
 sequential convex programming) method for nonlinear programming.
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -37064,6 +37234,7 @@ sequential convex programming) method for nonlinear programming.
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +-------------+
 |     Id      |
 +=============+
@@ -37083,6 +37254,7 @@ sequential convex programming) method for nonlinear programming.
 +-------------+
 
 >List of available stats
+
 +------------+
 |     Id     |
 +============+
@@ -37094,6 +37266,7 @@ sqpmethod
 A textbook SQPMethod
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -37171,6 +37344,7 @@ A textbook SQPMethod
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +-------------+
 |     Id      |
 +=============+
@@ -37192,6 +37366,7 @@ A textbook SQPMethod
 +-------------+
 
 >List of available stats
+
 +--------------------+
 |         Id         |
 +====================+
@@ -37235,6 +37410,7 @@ stabilizedsqp
 Stabilized Sequential Quadratic Programming method.
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -37372,6 +37548,7 @@ Stabilized Sequential Quadratic Programming method.
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
+
 +-------------+
 |     Id      |
 +=============+
@@ -37391,6 +37568,7 @@ Stabilized Sequential Quadratic Programming method.
 +-------------+
 
 >List of available stats
+
 +---------------+
 |      Id       |
 +===============+
@@ -37507,11 +37685,15 @@ that it is initialized
 %feature("docstring") casadi::NlpSolver::gradF "
 
 Access the objective gradient function>Input scheme: casadi::GradFInput
-(GRADF_NUM_IN = 2) [gradFIn] +-----------+-------+---------------------+ |
-Full name | Short |     Description     |
-+===========+=======+=====================+ | GRADF_X   | x     | Decision
-variable . | +-----------+-------+---------------------+ | GRADF_P   | p
-| Fixed parameter .   | +-----------+-------+---------------------+
+(GRADF_NUM_IN = 2) [gradFIn]
+
++-----------+-------+---------------------+
+| Full name | Short |     Description     |
++===========+=======+=====================+
+| GRADF_X   | x     | Decision variable . |
++-----------+-------+---------------------+
+| GRADF_P   | p     | Fixed parameter .   |
++-----------+-------+---------------------+
 
 ";
 
@@ -37694,6 +37876,7 @@ There is no guarantee that consecutive calls return identical objects
 Access the Hessian of the Lagrangian function.
 
 >Input scheme: casadi::JacGInput (JACG_NUM_IN = 2) [jacGIn]
+
 +-----------+-------+---------------------+
 | Full name | Short |     Description     |
 +===========+=======+=====================+
@@ -37703,6 +37886,7 @@ Access the Hessian of the Lagrangian function.
 +-----------+-------+---------------------+
 
 >Output scheme: casadi::JacGOutput (JACG_NUM_OUT = 3) [jacGOut]
+
 +-----------+-------+-------------------------------+
 | Full name | Short |          Description          |
 +===========+=======+===============================+
@@ -40886,6 +41070,7 @@ Implementations are not required to construct an orthogonal or orthonormal
 basis Joris Gillis
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -41265,6 +41450,7 @@ Base class for OCP solvers.
 Joel Andersson
 
 >Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
+
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -41296,6 +41482,7 @@ Joel Andersson
 +------------+--------+----------------------------------------------+
 
 >Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -41313,6 +41500,7 @@ Joel Andersson
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -42497,6 +42685,7 @@ corresponding vectors.
 Joel Andersson
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -42723,6 +42912,7 @@ Internal class.
 Joel Andersson
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -43792,6 +43982,7 @@ Parallelizer execution of functions.
 Joel Andersson
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -43882,6 +44073,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
+
 +-----------------+------------------------------+
 |       Id        |           Used in            |
 +=================+==============================+
@@ -45139,12 +45331,25 @@ An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT.
 
 Given matrices $A_k$ and symmetric $V_k, k = 0..K-1$
 
-A_k in R^(n x n) V_k in R^n
+
+
+::
+
+A_k in R^(n x n)
+V_k in R^n
+
+
 
 provides all of $P_k$ that satisfy:
 
-P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
-1..K-1
+
+
+::
+
+P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k
+P_k+1 = A_k*P_k*A_k' + V_k  for k = 1..K-1
+
+
 
 Uses Periodic Schur Decomposition ('psd') and does not assume positive
 definiteness. Based on Periodic Lyapunov equations: some applications and
@@ -45153,6 +45358,7 @@ new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
 Joris Gillis
 
 >Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 2) [dpleIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -45166,6 +45372,7 @@ Joris Gillis
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::DPLEOutput (DPLE_NUM_OUT = 1) [dpleOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -45177,6 +45384,7 @@ Joris Gillis
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -45315,6 +45523,7 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
+
 +----------------+------------------------------+
 |       Id       |           Used in            |
 +================+==============================+
@@ -45422,17 +45631,35 @@ QcqpSolver.
 
 Solves the following strictly convex problem:
 
-min          1/2 x' H x + g' x x  subject to 1/2 x' Pi x  +  qi' x + ri  <=
-0   for i=0..nq-1 LBA <= A x <= UBA LBX <= x   <= UBX  with : H, Pi sparse
-(n x n) positive definite g, qi dense  (n x 1) ri scalar n: number of
-decision variables (x) nc: number of linear constraints (A) nq: number of
-quadratic constraints
+
+
+::
+
+min          1/2 x' H x + g' x
+x
+
+subject to
+1/2 x' Pi x  +  qi' x + ri  <= 0   for i=0..nq-1
+LBA <= A x <= UBA
+LBX <= x   <= UBX
+
+with :
+H, Pi sparse (n x n) positive definite
+g, qi dense  (n x 1)
+ri scalar
+
+n: number of decision variables (x)
+nc: number of linear constraints (A)
+nq: number of quadratic constraints
+
+
 
 If H, Pi is not positive-definite, the solver should throw an error.
 
 General information
 
 >Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 12) [qcqpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -45481,6 +45708,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::QcqpSolverOutput (QCQP_SOLVER_NUM_OUT = 4) [qcqpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -45498,6 +45726,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -45603,15 +45832,33 @@ Positive semi-definite is not sufficient. Notably, H==0 will not work.
 A better implementation would rely on matrix square root, but we need
 singular value decomposition to implement that.
 
-This implementation makes use of the epigraph reformulation:*  min f(x) *
-x * *   min  t *    x, t  f(x) <= t *
+This implementation makes use of the epigraph reformulation:
 
-This implementation makes use of the following identity:*  || Gx+h||_2 <=
-e'x + f * *  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0 * where we
-put e = [0 0 ... 1] for the quadratic constraint arising from the epigraph
-reformulation and e==0 for all other quadratic constraints.
+::
+
+*  min f(x)
+*    x
+*
+*   min  t
+*    x, t  f(x) <= t
+*
+
+
+
+This implementation makes use of the following identity:
+
+::
+
+*  || Gx+h||_2 <= e'x + f
+*
+*  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0
+*
+
+where we put e = [0 0 ... 1] for the quadratic constraint arising from the
+epigraph reformulation and e==0 for all other quadratic constraints.
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -45625,6 +45872,7 @@ reformulation and e==0 for all other quadratic constraints.
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +-------------------+
 |        Id         |
 +===================+
@@ -45893,6 +46141,7 @@ Parameters:
 st:
 
 Problem structure.>Struct scheme: casadi::QCQPStruct ( = 3) [qcqpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -46963,6 +47212,7 @@ Parameters:
 st:
 
 Problem structure.>Struct scheme: casadi::QPStruct ( = 2) [qpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -47090,16 +47340,32 @@ QpSolver.
 
 Solves the following strictly convex problem:
 
-min          1/2 x' H x + g' x  x  subject to             LBA <= A x <= UBA
-LBX <= x   <= UBX      with :       H sparse (n x n) positive definite
-g dense  (n x 1)      n: number of decision variables (x)     nc: number of
-constraints (A)
+
+
+::
+
+min          1/2 x' H x + g' x
+ x
+
+subject to
+            LBA <= A x <= UBA
+            LBX <= x   <= UBX
+
+    with :
+      H sparse (n x n) positive definite
+      g dense  (n x 1)
+
+    n: number of decision variables (x)
+    nc: number of constraints (A)
+
+
 
 If H is not positive-definite, the solver should throw an error.
 
 General information
 
 >Input scheme: casadi::QpSolverInput (QP_SOLVER_NUM_IN = 9) [qpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -47132,6 +47398,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 4) [qpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -47149,6 +47416,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -47258,6 +47526,7 @@ cplex
 Interface to Cplex solver for sparse Quadratic Programs
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -47321,6 +47590,7 @@ NOTE: when doing multiple calls to evaluate(), check if you need to
 reInit();
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -47345,6 +47615,7 @@ qpoases
 Interface to QPOases Solver for quadratic programming
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -47536,6 +47807,7 @@ sqic
 Interface to the SQIC solver for quadratic programming
 
 >List of available options
+
 +----+------+---------+-------------+
 | Id | Type | Default | Description |
 +====+======+=========+=============+
@@ -47546,6 +47818,7 @@ nlp
 Solve QPs using an NlpSolver
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -47559,6 +47832,7 @@ Solve QPs using an NlpSolver
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +------------------+
 |        Id        |
 +==================+
@@ -47570,6 +47844,7 @@ qcqp
 Solve QP using a QcqpSolver
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -47583,6 +47858,7 @@ Solve QP using a QcqpSolver
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +-------------------+
 |        Id         |
 +===================+
@@ -50365,6 +50641,7 @@ Parameters:
 st:
 
 Problem structure.>Struct scheme: casadi::SDPStruct ( = 3) [sdpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -50536,31 +50813,84 @@ Seehttp://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
 
 Primal:
 
-min          c' x x subject to P = Sum_i^m F_i x_i - G P negative
-semidefinite  LBA <= A x <= UBA LBX <= x   <= UBX  with x ( n x 1) c ( n x 1
-) G, F_i  sparse symmetric (m x m) X dense symmetric ( m x m ) A sparse
-matrix ( nc x n) LBA, UBA dense vector (nc x 1) LBX, UBX dense vector (n x
-1)
+
+
+::
+
+min          c' x
+x
+subject to
+P = Sum_i^m F_i x_i - G
+P negative semidefinite
+
+LBA <= A x <= UBA
+LBX <= x   <= UBX
+
+with x ( n x 1)
+c ( n x 1 )
+G, F_i  sparse symmetric (m x m)
+X dense symmetric ( m x m )
+A sparse matrix ( nc x n)
+LBA, UBA dense vector (nc x 1)
+LBX, UBX dense vector (n x 1)
+
+
 
 This formulation is chosen as primal, because it does not call for a large
 decision variable space.
 
 Dual:
 
-max          trace(G Y) Y  subject to trace(F_i Y) = c_i Y positive
-semidefinite  with Y dense symmetric ( m x m)
+
+
+::
+
+max          trace(G Y)
+Y
+
+subject to
+trace(F_i Y) = c_i
+Y positive semidefinite
+
+with Y dense symmetric ( m x m)
+
+
 
 On generality: you might have formulation with block partitioning:
 
 Primal:
 
-min          c' x x subject to Pj = Sum_i^m F_ij x_i - gj   for all j Pj
-negative semidefinite   for all j  with x ( n x 1) c ( n x 1 ) G, F_i
-sparse symmetric (m x m) X dense symmetric ( m x m )
 
-Dual:max          Sum_j trace(Gj Yj) Yj  subject to Sum_j trace(F_ij Yj) =
-c_i   for all j Yj positive semidefinite     for all j  with Y dense
-symmetric ( m x m)
+
+::
+
+min          c' x
+x
+subject to
+Pj = Sum_i^m F_ij x_i - gj   for all j
+Pj negative semidefinite   for all j
+
+with x ( n x 1)
+c ( n x 1 )
+G, F_i  sparse symmetric (m x m)
+X dense symmetric ( m x m )
+
+
+
+Dual:
+
+::
+
+max          Sum_j trace(Gj Yj)
+Yj
+
+subject to
+Sum_j trace(F_ij Yj) = c_i   for all j
+Yj positive semidefinite     for all j
+
+with Y dense symmetric ( m x m)
+
+
 
 You can cast this into the standard form with: G = blkdiag(Gj for all j) Fi
 = blkdiag(F_ij for all j)
@@ -50570,6 +50900,7 @@ Implementations of SdpSolver are encouraged to exploit this block structure.
 General information
 
 >Input scheme: casadi::SDPInput (SDP_SOLVER_NUM_IN = 8) [sdpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -50600,6 +50931,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::SDPOutput (SDP_SOLVER_NUM_OUT = 7) [sdpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -50633,6 +50965,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -50776,6 +51109,7 @@ difficulties: play around with the parameter \"_penalty\" leave a gap
 manually switch to another SDP Solver
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -50874,6 +51208,7 @@ manually switch to another SDP Solver
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +--------------------+
 |         Id         |
 +====================+
@@ -51675,6 +52010,7 @@ Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 General information
 
 >Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 9) [sdqpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -51708,6 +52044,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::SDQPOutput (SDQP_SOLVER_NUM_OUT = 7) [sdqpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -51741,6 +52078,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -51857,6 +52195,7 @@ A better implementation would rely on matrix square root, but we need
 singular value decomposition to implement that.
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -51870,6 +52209,7 @@ singular value decomposition to implement that.
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +------------------+
 |        Id        |
 +==================+
@@ -52492,6 +52832,7 @@ Parameters:
 st:
 
 Problem structure.>Struct scheme: casadi::SDQPStruct ( = 4) [sdqpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -55577,6 +55918,7 @@ for each time step.
 Joel Andersson
 
 >Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) [integratorIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -55601,6 +55943,7 @@ Joel Andersson
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -55688,6 +56031,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
+
 +---------+---------------------------+
 |   Id    |          Used in          |
 +=========+===========================+
@@ -56174,6 +56518,7 @@ Parameters:
 output_fcn:  output function which maps to n outputs.
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -56919,6 +57264,7 @@ Parameters:
 st:
 
 Problem structure.>Struct scheme: casadi::SOCPStruct ( = 2) [socpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -56976,15 +57322,35 @@ Solves an Second Order Cone Programming (SOCP) problem in standard form.
 
 Primal:
 
-min          c' x x subject to || Gi' x + hi ||_2 <= ei' x + fi  i = 1..m
-LBA <= A x <= UBA LBX <= x   <= UBX  with x ( n x 1) c ( n x 1 ) Gi  sparse
-(n x ni) hi  dense (ni x 1) ei  dense (n x 1) fi  dense (1 x 1) N = Sum_i^m
-ni A sparse (nc x n) LBA, UBA dense vector (nc x 1) LBX, UBX dense vector (n
-x 1)
+
+
+::
+
+min          c' x
+x
+subject to
+|| Gi' x + hi ||_2 <= ei' x + fi  i = 1..m
+
+LBA <= A x <= UBA
+LBX <= x   <= UBX
+
+with x ( n x 1)
+c ( n x 1 )
+Gi  sparse (n x ni)
+hi  dense (ni x 1)
+ei  dense (n x 1)
+fi  dense (1 x 1)
+N = Sum_i^m ni
+A sparse (nc x n)
+LBA, UBA dense vector (nc x 1)
+LBX, UBX dense vector (n x 1)
+
+
 
 General information
 
 >Input scheme: casadi::SOCPInput (SOCP_SOLVER_NUM_IN = 10) [socpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -57024,6 +57390,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 4) [socpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -57045,6 +57412,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -57157,6 +57525,7 @@ sdp
 Solve SOCPs using an SdpSolver
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -57170,6 +57539,7 @@ Solve SOCPs using an SdpSolver
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +------------------+
 |        Id        |
 +==================+
@@ -60046,15 +60416,32 @@ StabilizedQpSolver.
 
 Solves the following strictly convex problem:
 
-min          1/2 x' H x + g' x x  subject to LBA <= A x <= UBA LBX <= x   <=
-UBX  with : H sparse (n x n) positive definite g dense  (n x 1) n: number of
-decision variables (x) nc: number of constraints (A)
+
+
+::
+
+min          1/2 x' H x + g' x
+x
+
+subject to
+LBA <= A x <= UBA
+LBX <= x   <= UBX
+
+with :
+H sparse (n x n) positive definite
+g dense  (n x 1)
+
+n: number of decision variables (x)
+nc: number of constraints (A)
+
+
 
 If H is not positive-definite, the solver should throw an error.
 
 General information
 
 >Input scheme: casadi::StabilizedQpSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 12) [stabilizedQpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -60102,6 +60489,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 4) [qpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -60119,6 +60507,7 @@ General information
 +------------------------+------------------------+------------------------+
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -60220,6 +60609,7 @@ sqic
 Interface to SQIC
 
 >List of available options
+
 +----+------+---------+-------------+
 | Id | Type | Default | Description |
 +====+======+=========+=============+
@@ -60230,6 +60620,7 @@ qp
 Solved a stabilized QP using a standard QP solver
 
 >List of available options
+
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
@@ -60245,6 +60636,7 @@ Solved a stabilized QP using a standard QP solver
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available stats
+
 +-----------------+
 |       Id        |
 +=================+
@@ -60573,6 +60965,7 @@ Parameters:
 st:  Problem structure
 
 >Struct scheme: casadi::QPStruct ( = 2) [qpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -63031,6 +63424,7 @@ operations.
 Joel Andersson
 
 >List of available options
+
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
@@ -64255,23 +64649,45 @@ A flat OCP representation coupled to an XML file.
 
 Variables:
 
-x:      differential states z:      algebraic states p : independent
-parameters t :     time u :     control signals q : quadrature states y :
-dependent variables
+
+
+::
+
+x:      differential states
+z:      algebraic states
+p :     independent parameters
+t :     time
+u :     control signals
+q :     quadrature states
+y :     dependent variables
+
+
 
 Equations:
 
-explicit or implicit ODE: \\\\dot {x} = ode(t, x, z, u, p_free, pi, pd) or
-0 = ode(t, x, z,\\\\dot {x}, u, p_free, pi, pd) algebraic equations:
-0 = alg(t, x, z, u, p_free, pi, pd) quadratures:              \\\\dot {q} =
-quad(t, x, z, u, p_free, pi, pd) dependent equations:            y = dep(t,
-x, z, u, p_free, pi, pd) initial equations:              0 = initial(t, x,
-z, u, p_free, pi, pd)
+
+
+::
+
+explicit or implicit ODE: \\\\dot {x} = ode(t, x, z, u, p_free, pi, pd)
+or                           0 = ode(t, x, z,\\\\dot {x}, u, p_free, pi, pd)
+algebraic equations:            0 = alg(t, x, z, u, p_free, pi, pd)
+quadratures:              \\\\dot {q} = quad(t, x, z, u, p_free, pi, pd)
+dependent equations:            y = dep(t, x, z, u, p_free, pi, pd)
+initial equations:              0 = initial(t, x, z, u, p_free, pi, pd)
+
+
 
 Objective function terms:
 
-Mayer terms:          \\\\sum {mterm_k} Lagrange terms:       \\\\sum
-{\\\\integral{mterm}}
+
+
+::
+
+Mayer terms:          \\\\sum {mterm_k}
+Lagrange terms:       \\\\sum {\\\\integral{mterm}}
+
+
 
 Note that when parsed, all dynamic equations end up in the implicit category
 \"dae\". At a later state, the DAE can be reformulated, for example in semi-
@@ -67626,6 +68042,7 @@ Parameters:
 f:  dynamical system
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -67639,6 +68056,7 @@ f:  dynamical system
 +-----------+-------+----------------------------+
 
 >Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
+
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -67776,6 +68194,7 @@ same as: res += mul(A, v)
 Input arguments of an NLP Jacobian function
 
 >Input scheme: casadi::JacGInput (JACG_NUM_IN = 2) [jacGIn]
+
 +-----------+-------+---------------------+
 | Full name | Short |     Description     |
 +===========+=======+=====================+
@@ -67796,6 +68215,7 @@ Input arguments of an NLP Jacobian function
 Output arguments of an ODE/DAE backward integration function
 
 >Output scheme: casadi::RDAEOutput (RDAE_NUM_OUT = 3) [rdaeOut]
+
 +-----------+-------+-------------------------------------------+
 | Full name | Short |                Description                |
 +===========+=======+===========================================+
@@ -67903,6 +68323,7 @@ with x and y vectors
 Output arguments of an QP Solver
 
 >Output scheme: casadi::QcqpSolverOutput (QCQP_SOLVER_NUM_OUT = 4) [qcqpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -67995,6 +68416,7 @@ terms.
 Output arguments of an QP Solver
 
 >Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 4) [qpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -68101,6 +68523,7 @@ few rows.
 Structure specification of an SDQP
 
 >Struct scheme: casadi::SDQPStruct ( = 4) [sdqpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -68203,6 +68626,7 @@ functions from the 'math.h' ('cmath') header.
 Input arguments of a dple solver
 
 >Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 2) [dpleIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -68332,7 +68756,13 @@ respect to variable 'x' around the point 'a'
 $(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
 {(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
 
-Example usage:>>   x
+Example usage:
+
+::
+
+>>   x
+
+
 
 ";
 
@@ -68354,6 +68784,7 @@ Check if two expressions are equal, assuming that they are comparable.
 Output arguments of an SOCP Solver
 
 >Output scheme: casadi::SOCPOutput (SOCP_SOLVER_NUM_OUT = 4) [socpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -68394,6 +68825,7 @@ Check if the vector is strictly increasing.
 Output arguments of a linear solver
 
 >Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 1) [linsolOut]
+
 +-----------+-------+----------------------------------------------+
 | Full name | Short |                 Description                  |
 +===========+=======+==============================================+
@@ -68478,6 +68910,7 @@ it at which expansion should stop.
 Input arguments of a QP problem
 
 >Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 12) [qcqpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -68546,6 +68979,7 @@ Number of parameters: from option number_of_parameters nh: Number of point
 constraints: from cfcn.input(0).size()
 
 >Input scheme: casadi::OCPInput (OCP_NUM_IN = 13) [ocpIn]
+
 +------------+--------+----------------------------------------------+
 | Full name  | Short  |                 Description                  |
 +============+========+==============================================+
@@ -68651,6 +69085,7 @@ CasADi additions.
 Input arguments of an NLP objective gradient function
 
 >Input scheme: casadi::GradFInput (GRADF_NUM_IN = 2) [gradFIn]
+
 +-----------+-------+---------------------+
 | Full name | Short |     Description     |
 +===========+=======+=====================+
@@ -68671,6 +69106,7 @@ Input arguments of an NLP objective gradient function
 Input arguments of an ODE/DAE function
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -68776,6 +69212,7 @@ functions from the 'math.h' ('cmath') header.
 Input arguments of a SDQP problem
 
 >Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 9) [sdqpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -68855,6 +69292,7 @@ Checks if vector does not contain NaN or Inf.
 Input arguments of a SDP problem
 
 >Input scheme: casadi::SDPInput (SDP_SOLVER_NUM_IN = 8) [sdpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -68891,8 +69329,9 @@ Input arguments of a SDP problem
 %feature("docstring") casadi::ProfilingType< ProfilingData_IO > " [INTERNAL]
 ";
 
-%feature("docstring") casadi::dormqr_ "[INTERNAL]  Multiply right hand side
-with Q-transpose (lapack)
+%feature("docstring") casadi::dormqr_ "
+
+Multiply right hand side with Q-transpose (lapack)
 
 ";
 
@@ -68906,6 +69345,7 @@ with Q-transpose (lapack)
 Output arguments of an integrator
 
 >Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6) [integratorOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -68973,6 +69413,7 @@ from the 'math.h' ('cmath') header.
 Input arguments of an Homotopy NLP function
 
 >Input scheme: casadi::HNLPInput (HNL_NUM_IN = 3) [hnlpIn]
+
 +-----------+-------+----------------------+
 | Full name | Short |     Description      |
 +===========+=======+======================+
@@ -69018,6 +69459,7 @@ convert vectors to vectors of pointers.
 Input arguments of a control simulator
 
 >Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3) [controlsimulatorIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69048,6 +69490,7 @@ Input arguments of a control simulator
 Input arguments of an NLP Hessian function
 
 >Input scheme: casadi::HessLagInput (HESSLAG_NUM_IN = 4) [hessLagIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69105,6 +69548,7 @@ D:  interpolating coefficients to obtain end state Length: order+1
 Output arguments of an OCP Solver
 
 >Output scheme: casadi::OCPOutput (OCP_NUM_OUT = 4) [ocpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69179,6 +69623,7 @@ matrix A is slender (size1<size2), mul(pinv(A), A) is unity.
 Structure specification of a QP
 
 >Struct scheme: casadi::QCQPStruct ( = 3) [qcqpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69298,6 +69743,7 @@ Transpose of a matrix.
 Structure specification of an LP
 
 >Struct scheme: casadi::LPStruct ( = 1) [lpStruct]
+
 +-------------+-------+------------------------+
 |  Full name  | Short |      Description       |
 +=============+=======+========================+
@@ -69314,6 +69760,7 @@ Structure specification of an LP
 Input arguments of a QP problem
 
 >Input scheme: casadi::QpSolverInput (QP_SOLVER_NUM_IN = 9) [qpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69381,6 +69828,7 @@ Construct a matrix from 4 blocks.
 Input arguments of a QP problem
 
 >Input scheme: casadi::StabilizedQpSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 12) [stabilizedQpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69483,6 +69931,7 @@ append components
 Output arguments of an NLP objective gradient function
 
 >Output scheme: casadi::GradFOutput (GRADF_NUM_OUT = 3) [gradFOut]
+
 +------------+-------+-------------------------------+
 | Full name  | Short |          Description          |
 +============+=======+===============================+
@@ -69518,6 +69967,7 @@ roots are real.
 Output arguments of an NLP function
 
 >Output scheme: casadi::NLPOutput (NL_NUM_OUT = 2) [nlpOut]
+
 +-----------+-------+-----------------------+
 | Full name | Short |      Description      |
 +===========+=======+=======================+
@@ -69723,6 +70173,7 @@ y <- x.
 Input arguments of an ODE/DAE function
 
 >Input scheme: casadi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9) [controldaeIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69777,6 +70228,7 @@ Obtain the structural rank of a sparsity-pattern.
 Output arguments of an NLP Hessian function
 
 >Output scheme: casadi::HessLagOutput (HESSLAG_NUM_OUT = 5) [hessLagOut]
+
 +----------------+--------+------------------------------------------------+
 |   Full name    | Short  |                  Description                   |
 +================+========+================================================+
@@ -69823,12 +70275,13 @@ Input arguments of a Mayer Term nx: Number of states: from
 ffcn.input(INTEGRATOR_X0).size() np: Number of parameters: from option
 number_of_parameters>Input scheme: casadi::MayerInput (MAYER_NUM_IN = 2)
 [mayerIn]
-+-----------+-------+---------------------------------------------+ | Full
-name | Short |                 Description                 |
-+===========+=======+=============================================+ |
-MAYER_X   | x     | States at the end of integration (nx x 1) . |
-+-----------+-------+---------------------------------------------+ |
-MAYER_P   | p     | Problem parameters (np x 1) .               |
+
++-----------+-------+---------------------------------------------+
+| Full name | Short |                 Description                 |
++===========+=======+=============================================+
+| MAYER_X   | x     | States at the end of integration (nx x 1) . |
++-----------+-------+---------------------------------------------+
+| MAYER_P   | p     | Problem parameters (np x 1) .               |
 +-----------+-------+---------------------------------------------+
 
 ";
@@ -69843,6 +70296,7 @@ MAYER_P   | p     | Problem parameters (np x 1) .               |
 Input arguments of a SOCP problem
 
 >Input scheme: casadi::SOCPInput (SOCP_SOLVER_NUM_IN = 10) [socpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69891,6 +70345,7 @@ Input arguments of a SOCP problem
 Output arguments of an LP Solver
 
 >Output scheme: casadi::LpSolverOutput (LP_SOLVER_NUM_OUT = 4) [lpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69919,6 +70374,7 @@ Output arguments of an LP Solver
 Output arguments of an NLP Jacobian function
 
 >Output scheme: casadi::JacGOutput (JACG_NUM_OUT = 3) [jacGOut]
+
 +-----------+-------+-------------------------------+
 | Full name | Short |          Description          |
 +===========+=======+===============================+
@@ -69956,6 +70412,7 @@ Obtain the structural rank of a sparsity-pattern.
 Input arguments of a LP problem
 
 >Input scheme: casadi::LpSolverInput (LP_SOLVER_NUM_IN = 6) [lpIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -69986,6 +70443,7 @@ Input arguments of a LP problem
 Output arguments of an DAE function
 
 >Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
+
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -70019,6 +70477,7 @@ Matrix trace.
 Output arguments of an SDQP Solver
 
 >Output scheme: casadi::SDQPOutput (SDQP_SOLVER_NUM_OUT = 7) [sdqpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -70080,6 +70539,7 @@ val:  vector with the value of the function for each interval (length n)
 Structure specification of an SDP
 
 >Struct scheme: casadi::SDPStruct ( = 3) [sdpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -70109,6 +70569,7 @@ trans(x)
 Output arguments of a dple solver
 
 >Output scheme: casadi::DPLEOutput (DPLE_NUM_OUT = 1) [dpleOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -70198,6 +70659,7 @@ from the 'math.h' ('cmath') header.
 Output arguments of an NLP Solver
 
 >Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 6) [nlpSolverOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -70241,6 +70703,7 @@ Output arguments of an NLP Solver
 Input arguments of a linear solver
 
 >Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) [linsolIn]
+
 +-----------+-------+------------------------------------------------+
 | Full name | Short |                  Description                   |
 +===========+=======+================================================+
@@ -70299,8 +70762,9 @@ from the 'math.h' ('cmath') header.
 
 ";
 
-%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
-system (lapack)
+%feature("docstring") casadi::dtrsm_ "
+
+Solve upper triangular system (lapack)
 
 ";
 
@@ -70327,8 +70791,9 @@ functions from the 'math.h' header.
 
 ";
 
-%feature("docstring") casadi::dgeqrf_ "[INTERNAL]  QR-factorize dense
-matrix (lapack)
+%feature("docstring") casadi::dgeqrf_ "
+
+QR-factorize dense matrix (lapack)
 
 ";
 
@@ -70340,6 +70805,7 @@ matrix (lapack)
 Input arguments of an NLP function
 
 >Input scheme: casadi::NLPInput (NL_NUM_IN = 2) [nlpIn]
+
 +-----------+-------+---------------------+
 | Full name | Short |     Description     |
 +===========+=======+=====================+
@@ -70416,6 +70882,7 @@ Make a matrix sparse by removing numerical zeros.
 Output arguments of an SDP Solver
 
 >Output scheme: casadi::SDPOutput (SDP_SOLVER_NUM_OUT = 7) [sdpOut]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -70458,6 +70925,7 @@ Output arguments of an SDP Solver
 Input arguments of an integrator
 
 >Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) [integratorIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -70498,8 +70966,16 @@ Obtain Periodic Schur Form of a set of matrices.
 
 Finds Z_i such that
 
-Z_1' * A_1 * Z_2 = T_1,           Z_2' * A_2 * Z_3 = T_2, ...           Z_K'
-* A_K * Z_1 = T_K,
+
+
+::
+
+Z_1' * A_1 * Z_2 = T_1,
+          Z_2' * A_2 * Z_3 = T_2,
+                 ...
+          Z_K' * A_K * Z_1 = T_K,
+
+
 
 with T_1 in Hessenberg form (upper triangular + one band below the diagonal)
 and T_2..T_K upper diagonal
@@ -70629,6 +71105,7 @@ Matlab's cross command.
 Input arguments of an ODE/DAE backward integration function
 
 >Input scheme: casadi::RDAEInput (RDAE_NUM_IN = 7) [rdaeIn]
+
 +-----------+-------+-------------------------------+
 | Full name | Short |          Description          |
 +===========+=======+===============================+
@@ -70895,12 +71372,25 @@ Get the diagonal of a matrix or construct a diagonal.
 When the input is square, the diagonal elements are returned. If the input
 is vector-like, a diagonal matrix is constructed with it.
 
+>  MX casadi::diag(const std::vector< MX > &A)
+------------------------------------------------------------------------
+
+Construct a matrix with given elements on the diagonal This is an alias of
+blkdiag.
+
 >  Matrix< DataType > casadi::diag(const Matrix< DataType > &A)
 ------------------------------------------------------------------------
 
 Get the diagonal of a matrix or construct a diagonal When the input is
 square, the diagonal elements are returned. If the input is vector- like, a
 diagonal matrix is constructed with it.
+
+>  Matrix< DataType > casadi::diag(const std::vector< Matrix< DataType > > &A)
+------------------------------------------------------------------------
+
+Construct a matrix with given elements on the diagonal.
+
+This is an alias of blkdiag
 
 ";
 
@@ -70956,6 +71446,7 @@ return.
 Input arguments of an NLP Solver
 
 >Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -71019,6 +71510,7 @@ Parameters:
 f:  dynamical system
 
 >Input scheme: casadi::DAEInput (DAE_NUM_IN = 4) [daeIn]
+
 +-----------+-------+----------------------------+
 | Full name | Short |        Description         |
 +===========+=======+============================+
@@ -71032,6 +71524,7 @@ f:  dynamical system
 +-----------+-------+----------------------------+
 
 >Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 3) [daeOut]
+
 +-----------+-------+--------------------------------------------+
 | Full name | Short |                Description                 |
 +===========+=======+============================================+
@@ -71078,6 +71571,8 @@ Construct a matrix with given blocks on the diagonal.
 
 >  Matrix< DataType > casadi::blkdiag(const std::vector< Matrix< DataType > > &A)
 ------------------------------------------------------------------------
+
+Construct a matrix with given blocks on the diagonal.
 
 Construct a matrix with given block on the diagonal.
 
@@ -71198,6 +71693,7 @@ Make a matrix dense.
 Structure specification of an SOCP
 
 >Struct scheme: casadi::SOCPStruct ( = 2) [socpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -71232,6 +71728,7 @@ Matrix determinant (experimental)
 Structure specification of a QP
 
 >Struct scheme: casadi::QPStruct ( = 2) [qpStruct]
+
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -73030,112 +73527,112 @@ This file does absolutely nothing but including all headers ";
 // File: chapter6.xml
 
 
-// File: dir_a242f0f31177b4ee0e0f2869a68661e2.xml
+// File: dir_a4bb65585d72ea8864902e0e8bd317f3.xml
 
 
-// File: dir_173fa14f8112bf6d4fa5fb60c663b079.xml
+// File: dir_45aa6f2216a5d10f3a03e40fb0c843ba.xml
 
 
-// File: dir_cc00533f663a868a74a94bae6d243fa8.xml
+// File: dir_fe20a6a9b920c0185800ab4c931032db.xml
 
 
-// File: dir_84ec18459fb5686aa61a50c9a4a5f1ce.xml
+// File: dir_a897820eadc1cc178613e4731556f725.xml
 
 
-// File: dir_165538d1629d63b540b717a0a8f8d17c.xml
+// File: dir_0a0548ce933ac3bcd73673e3c69e8f0e.xml
 
 
-// File: dir_b67f2d3e502497e52a0860566e264050.xml
+// File: dir_70b4de16310d285888f6500a2968856a.xml
 
 
-// File: dir_2211bd5fdd011119a318ab290df1d2d6.xml
+// File: dir_c820745887dbc1b45e5f277e4b59dfed.xml
 
 
-// File: dir_c6bf31233a1f0eb03dbc4c2e0b88ebf9.xml
+// File: dir_d0541218daf8c145935c90ec6c848aeb.xml
 
 
-// File: dir_fc8898f6998d6b3cefcb64c4ce7ea1c4.xml
+// File: dir_7888a989defb3099dc35e085c8ae7846.xml
 
 
-// File: dir_2acbf2200173536f11c2515b42b2be1c.xml
+// File: dir_0e49deac8cca116344d7e6837bb8c60d.xml
 
 
-// File: dir_97f17b870f201e193796f88aa8b24ee7.xml
+// File: dir_8c27ee4c23a4e7d8fa9f9ae199a2d035.xml
 
 
-// File: dir_b0fbc30274a97f995867282301b5a22c.xml
+// File: dir_d3ef72f14216a94bbd08caf10384f62a.xml
 
 
-// File: dir_674186e89c51fd5db44b7bb8b4bfd175.xml
+// File: dir_6679fe927273d7fd63bb1b81c758ee7e.xml
 
 
-// File: dir_6b24c408f936f5e3fad85af85fac13be.xml
+// File: dir_476f43bd324fdf94268fe491eaa40058.xml
 
 
-// File: dir_dbed38ee933aae81b6ffa699ce6b0d5a.xml
+// File: dir_392dfda9cf19f5b8676a0d2f82f3deac.xml
 
 
-// File: dir_0d90fb8f8b911bb67f5baffe35d6baec.xml
+// File: dir_08d5f95ed1fd3287f40df0a95a34f197.xml
 
 
-// File: dir_d560fb3fdf7c7d0fd11fcef22350e515.xml
+// File: dir_422b1a06fb920e21c569a601357ad7ca.xml
 
 
-// File: dir_2d4c4b22cf4ab2426dc22dcaf8e55868.xml
+// File: dir_480bbcf8c751c3c42631e3097f9701d9.xml
 
 
-// File: dir_2ad7570a4726f50d9009d41ebbe56c46.xml
+// File: dir_4fc0177ae5cc9c32796963f8238b00d5.xml
 
 
-// File: dir_8e58e9c65aabba9bd90a5ba5a1949f24.xml
+// File: dir_d559b77640fc467ca19a83f4bc1df488.xml
 
 
-// File: dir_c3317fe2a063fec6069fcec6e906343a.xml
+// File: dir_975207c754656c73e2f7fbf038556416.xml
 
 
-// File: dir_62b1d21e3c79c65cf07537ce621f8931.xml
+// File: dir_a83bb42ad3ed6d7137d8274dd1cdfe48.xml
 
 
-// File: dir_35c4f5a62eb3f9b26d6fc9bafe9412e0.xml
+// File: dir_7fc7c13ab0828c2b32130df63046e128.xml
 
 
-// File: dir_a0db0368355cb586cba4163f7f6a5add.xml
+// File: dir_6406c051d31d57b2b73f4893eb809a46.xml
 
 
-// File: dir_06b07da53372e68ec9ec3f325c8c4e88.xml
+// File: dir_e61465d109b8f1a7321ef04819e6e043.xml
 
 
-// File: dir_0e38855d9854873885416e0db777a031.xml
+// File: dir_c5c856477210905cd156e955e8b2b01f.xml
 
 
-// File: dir_c7851ef3eb1eedcf1931ca03c2b2de61.xml
+// File: dir_ef1bb1b13b433d373dff88da52130881.xml
 
 
-// File: dir_4c54b8644cdb97524ad2593db88f43f8.xml
+// File: dir_9a4ac4e798b8234ad73d4efc308ac72c.xml
 
 
-// File: dir_19f99a3a6b2e15dd5d3dc3717aef760f.xml
+// File: dir_54548d7df996b1472a7ed950f700c591.xml
 
 
-// File: dir_d9a214f13db5f3374d3d8a9611ce0446.xml
+// File: dir_643816914cad03ee0c039047f782c90c.xml
 
 
-// File: dir_32cb5448079888161100d95b01b6198d.xml
+// File: dir_126a08654a608eb74e0611979f2a9737.xml
 
 
-// File: dir_36edc65709980d217f100f7aceab18f7.xml
+// File: dir_c48fb9df2c88145d37ff5b2025ac591b.xml
 
 
-// File: dir_b35908272f9e1123cc1a956ba5b2e3aa.xml
+// File: dir_3c0d9f70bedbd0946d14fb8881a36983.xml
 
 
-// File: dir_4d46dafef57ae63a601f2959a12876ee.xml
+// File: dir_cba5b603d515380b22c73aebf57db184.xml
 
 
-// File: dir_32807da43d094e5518f780a9c1b04df2.xml
+// File: dir_93f5d88304aec78553b730ef0a627ff0.xml
 
 
-// File: dir_8d74aeb32c16fa9fd07602045437f1d6.xml
+// File: dir_058dc6e8a0edc5a8be0f42af5f5156a1.xml
 
 
 // File: algebra_2LinearSolver_8py-example.xml
