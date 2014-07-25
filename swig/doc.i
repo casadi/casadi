@@ -34005,9 +34005,20 @@ Numpy compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::__ge__ "
+%feature("docstring")  casadi::Matrix< T
+>::indexed_one_based_assignment(const Matrix< int > &k, const Matrix<
+DataType > &m) " [INTERNAL]  Indexing for interfaced languages get a non-
+zero
 
-No need to have both <= and >=.
+";
+
+%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
+rr, int cc, const DataType &m) " [INTERNAL]  set a matrix element
+
+";
+
+%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
+rr, const DataType &m) " [INTERNAL]  set a vector element
 
 ";
 
@@ -34401,20 +34412,8 @@ operations Octave/Python naming
 
 ";
 
-%feature("docstring")  casadi::Matrix< T
->::indexed_one_based_assignment(const Matrix< int > &k, const Matrix<
-DataType > &m) " [INTERNAL]  Indexing for interfaced languages get a non-
-zero
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
-rr, int cc, const DataType &m) " [INTERNAL]  set a matrix element
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::indexed_one_based_assignment(int
-rr, const DataType &m) " [INTERNAL]  set a vector element
+%feature("docstring") casadi::Matrix::__ge__ "[INTERNAL]  Elementwise
+operations Octave/Python naming
 
 ";
 
@@ -34602,9 +34601,8 @@ namespace for unambiguous access and Numpy compatibility
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::erase(const std::vector<
-int > &rr, const std::vector< int > &cc) " [INTERNAL]  Erase a submatrix
-Erase rows and/or columns of a matrix.
+%feature("docstring") casadi::Matrix::__gt__ "[INTERNAL]  Elementwise
+operations Octave/Python naming
 
 ";
 
@@ -35045,9 +35043,9 @@ access and Numpy compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::__gt__ "
-
-No need to have both < and >
+%feature("docstring")  casadi::Matrix< DataType >::erase(const std::vector<
+int > &rr, const std::vector< int > &cc) " [INTERNAL]  Erase a submatrix
+Erase rows and/or columns of a matrix.
 
 ";
 
@@ -83809,9 +83807,8 @@ std::string &arg_s7="") " ";
 
 %feature("docstring")  casadi::dormqr_(char *side, char *trans, int *n, int
 *m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double
-*work, int *lwork, int *info) "
-
-Multiply right hand side with Q-transpose (lapack)
+*work, int *lwork, int *info) " [INTERNAL]  Multiply right hand side with
+Q-transpose (lapack)
 
 ";
 
@@ -85469,9 +85466,7 @@ elementary functions from the 'math.h' ('cmath') header.
 
 %feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
 char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
-int *ldb) "
-
-Solve upper triangular system (lapack)
+int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
 
 ";
 
@@ -85506,9 +85501,8 @@ elementary functions from the 'math.h' header.
 ";
 
 %feature("docstring")  casadi::dgeqrf_(int *m, int *n, double *a, int *lda,
-double *tau, double *work, int *lwork, int *info) "
-
-QR-factorize dense matrix (lapack)
+double *tau, double *work, int *lwork, int *info) " [INTERNAL]  QR-factorize
+dense matrix (lapack)
 
 ";
 
@@ -86185,27 +86179,11 @@ is vector-like, a diagonal matrix is constructed with it.
 
 ";
 
-%feature("docstring")  casadi::diag(const std::vector< MX > &A) "
-
-Construct a matrix with given elements on the diagonal This is an alias of
-blkdiag.
-
-";
-
 %feature("docstring")  casadi::diag(const Matrix< DataType > &A) "
 
 Get the diagonal of a matrix or construct a diagonal When the input is
 square, the diagonal elements are returned. If the input is vector- like, a
 diagonal matrix is constructed with it.
-
-";
-
-%feature("docstring")  casadi::diag(const std::vector< Matrix< DataType > >
-&A) "
-
-Construct a matrix with given elements on the diagonal.
-
-This is an alias of blkdiag
 
 ";
 
@@ -86398,8 +86376,6 @@ Construct a matrix with given blocks on the diagonal.
 
 %feature("docstring")  casadi::blkdiag(const std::vector< Matrix< DataType >
 > &A) "
-
-Construct a matrix with given blocks on the diagonal.
 
 Construct a matrix with given block on the diagonal.
 
@@ -88416,112 +88392,112 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: chapter6.xml
 
 
-// File: dir_a4bb65585d72ea8864902e0e8bd317f3.xml
+// File: dir_a242f0f31177b4ee0e0f2869a68661e2.xml
 
 
-// File: dir_45aa6f2216a5d10f3a03e40fb0c843ba.xml
+// File: dir_173fa14f8112bf6d4fa5fb60c663b079.xml
 
 
-// File: dir_fe20a6a9b920c0185800ab4c931032db.xml
+// File: dir_cc00533f663a868a74a94bae6d243fa8.xml
 
 
-// File: dir_a897820eadc1cc178613e4731556f725.xml
+// File: dir_84ec18459fb5686aa61a50c9a4a5f1ce.xml
 
 
-// File: dir_0a0548ce933ac3bcd73673e3c69e8f0e.xml
+// File: dir_165538d1629d63b540b717a0a8f8d17c.xml
 
 
-// File: dir_70b4de16310d285888f6500a2968856a.xml
+// File: dir_b67f2d3e502497e52a0860566e264050.xml
 
 
-// File: dir_c820745887dbc1b45e5f277e4b59dfed.xml
+// File: dir_2211bd5fdd011119a318ab290df1d2d6.xml
 
 
-// File: dir_d0541218daf8c145935c90ec6c848aeb.xml
+// File: dir_c6bf31233a1f0eb03dbc4c2e0b88ebf9.xml
 
 
-// File: dir_7888a989defb3099dc35e085c8ae7846.xml
+// File: dir_fc8898f6998d6b3cefcb64c4ce7ea1c4.xml
 
 
-// File: dir_0e49deac8cca116344d7e6837bb8c60d.xml
+// File: dir_2acbf2200173536f11c2515b42b2be1c.xml
 
 
-// File: dir_8c27ee4c23a4e7d8fa9f9ae199a2d035.xml
+// File: dir_97f17b870f201e193796f88aa8b24ee7.xml
 
 
-// File: dir_d3ef72f14216a94bbd08caf10384f62a.xml
+// File: dir_b0fbc30274a97f995867282301b5a22c.xml
 
 
-// File: dir_6679fe927273d7fd63bb1b81c758ee7e.xml
+// File: dir_674186e89c51fd5db44b7bb8b4bfd175.xml
 
 
-// File: dir_476f43bd324fdf94268fe491eaa40058.xml
+// File: dir_6b24c408f936f5e3fad85af85fac13be.xml
 
 
-// File: dir_392dfda9cf19f5b8676a0d2f82f3deac.xml
+// File: dir_dbed38ee933aae81b6ffa699ce6b0d5a.xml
 
 
-// File: dir_08d5f95ed1fd3287f40df0a95a34f197.xml
+// File: dir_0d90fb8f8b911bb67f5baffe35d6baec.xml
 
 
-// File: dir_422b1a06fb920e21c569a601357ad7ca.xml
+// File: dir_d560fb3fdf7c7d0fd11fcef22350e515.xml
 
 
-// File: dir_480bbcf8c751c3c42631e3097f9701d9.xml
+// File: dir_2d4c4b22cf4ab2426dc22dcaf8e55868.xml
 
 
-// File: dir_4fc0177ae5cc9c32796963f8238b00d5.xml
+// File: dir_2ad7570a4726f50d9009d41ebbe56c46.xml
 
 
-// File: dir_d559b77640fc467ca19a83f4bc1df488.xml
+// File: dir_8e58e9c65aabba9bd90a5ba5a1949f24.xml
 
 
-// File: dir_975207c754656c73e2f7fbf038556416.xml
+// File: dir_c3317fe2a063fec6069fcec6e906343a.xml
 
 
-// File: dir_a83bb42ad3ed6d7137d8274dd1cdfe48.xml
+// File: dir_62b1d21e3c79c65cf07537ce621f8931.xml
 
 
-// File: dir_7fc7c13ab0828c2b32130df63046e128.xml
+// File: dir_35c4f5a62eb3f9b26d6fc9bafe9412e0.xml
 
 
-// File: dir_6406c051d31d57b2b73f4893eb809a46.xml
+// File: dir_a0db0368355cb586cba4163f7f6a5add.xml
 
 
-// File: dir_e61465d109b8f1a7321ef04819e6e043.xml
+// File: dir_06b07da53372e68ec9ec3f325c8c4e88.xml
 
 
-// File: dir_c5c856477210905cd156e955e8b2b01f.xml
+// File: dir_0e38855d9854873885416e0db777a031.xml
 
 
-// File: dir_ef1bb1b13b433d373dff88da52130881.xml
+// File: dir_c7851ef3eb1eedcf1931ca03c2b2de61.xml
 
 
-// File: dir_9a4ac4e798b8234ad73d4efc308ac72c.xml
+// File: dir_4c54b8644cdb97524ad2593db88f43f8.xml
 
 
-// File: dir_54548d7df996b1472a7ed950f700c591.xml
+// File: dir_19f99a3a6b2e15dd5d3dc3717aef760f.xml
 
 
-// File: dir_643816914cad03ee0c039047f782c90c.xml
+// File: dir_d9a214f13db5f3374d3d8a9611ce0446.xml
 
 
-// File: dir_126a08654a608eb74e0611979f2a9737.xml
+// File: dir_32cb5448079888161100d95b01b6198d.xml
 
 
-// File: dir_c48fb9df2c88145d37ff5b2025ac591b.xml
+// File: dir_36edc65709980d217f100f7aceab18f7.xml
 
 
-// File: dir_3c0d9f70bedbd0946d14fb8881a36983.xml
+// File: dir_b35908272f9e1123cc1a956ba5b2e3aa.xml
 
 
-// File: dir_cba5b603d515380b22c73aebf57db184.xml
+// File: dir_4d46dafef57ae63a601f2959a12876ee.xml
 
 
-// File: dir_93f5d88304aec78553b730ef0a627ff0.xml
+// File: dir_32807da43d094e5518f780a9c1b04df2.xml
 
 
-// File: dir_058dc6e8a0edc5a8be0f42af5f5156a1.xml
+// File: dir_8d74aeb32c16fa9fd07602045437f1d6.xml
 
 
 // File: algebra_2LinearSolver_8py-example.xml
