@@ -193,7 +193,7 @@ class CASADI_CORE_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     s+= "     b) %s = %s(arg,%s)\n" % ( ", ".join([name for name, doc, enum in self.entries]), self.name , ", ".join(['"' + name+'"' for name, doc, enum in self.entries]))
     s+= "          all arguments after the first optional\n"
     s+= "\n".join(map(lambda x: "  " + x.rstrip(),self.getDoc().split("\n"))) + "\n"
-    s+= "  Keyword arguments:\n"
+    s+= "  Keyword arguments::\n\n"
     maxlenname = max([len(name) for name, doc, enum in self.entries])
     for name, doc, enum in self.entries:
       s+="    " + name + (" "*(maxlenname-len(name))) +  " -- " +  doc + " [" + enum + "]\n"
