@@ -104,8 +104,7 @@ int main(){
   // Get the reduced Hessian
   try{
     DMatrix red_hess = solver.getReducedHessian();
-    cout << "Reduced Hessian = " << endl;
-    red_hess.printDense();
+    cout << "Reduced Hessian = " << red_hess << endl;
   } catch(...){
     cout << "Support for retrieving the reduced Hessian not enabled." << endl;
   }

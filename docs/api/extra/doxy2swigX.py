@@ -129,8 +129,11 @@ class Doxy2SWIG_X(Doxy2SWIG):
           elif i.find('// File:') > -1: # leave comments alone.
               ret.extend([i, '\n'])
           else:
-              if i.strip().startswith(">"):
-                _tmp = i.strip()
+              if i.strip().startswith(">") or "---" in i or "===" in i or "%%newline%%" in i:
+                if "%%newline%%" in i:
+                  _tmp = i.replace("%%newline%%","\n")
+                else:
+                  _tmp = i.strip()
               else:
                 _tmp = textwrap.fill(i.strip(), 80-4, break_long_words=False)
               _tmp = self.lead_spc.sub(r'\1"\2', _tmp)
@@ -165,12 +168,32 @@ class Doxy2SWIG_X(Doxy2SWIG):
           p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated,merge=self.merge,groupdoc=self.groupdoc)
           p.generate()
           self.pieces.extend(self.clean_pieces(p.pieces))
-            
+  
+  def do_hruler(self,node):
+    self.add_text("\n\n" + "-"*80 + "\n\n")
+
+  def do_heading(self,node):
+    level = int(node.attributes['level'].value)-2
+    text = astext(node)
+    length = len(text)
+    self.add_text(text+"\n")
+    if level==1:
+      self.add_text(("="*length) + "\n\n")
+    else:
+      self.add_text(("-"*length) + "\n\n")
+      
+  def do_verbatim(self, node):
+    self.add_text("\n\n::\n\n")
+    text = node.firstChild.data
+    text = "\n".join(["  " +i for i in text.split("\n")])
+    
+    self.add_text(text.replace("\n","%%newline%%").replace('\\', r'\\\\').replace('"', r'\"')+"\n\n")
+    
   def do_table(self, node):
      
     caption = node.getElementsByTagName("caption")
     if len(caption)==1:
-      self.add_text(">" + astext(caption[0]).encode("ascii","ignore")+"\n")
+      self.add_text(">" + astext(caption[0]).encode("ascii","ignore")+"\n\n")
     
     rows = []
     for (i,row) in enumerate(node.getElementsByTagName("row")):
@@ -442,7 +465,7 @@ if __name__ == '__main__':
       
       for p in "".join(v).split("\n"):
         f.write('"')
-        f.write(p+"\\n")
+        f.write(p.replace('%%newline%%','\\n"\n"')+"\\n")
         f.write('"\n')
       f.write(';\n')
       f.close()
