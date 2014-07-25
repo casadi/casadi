@@ -47,8 +47,13 @@ import casadi as casadi # import everything
 if "PATH" in os.environ:
   os.environ["PATH"] = os.environ["PATH"] + os.pathsep + os.path.dirname(casadi.__file__)
 else:
-  os.environ["PATH"] = os.pathsep + os.path.dirname(casadi.__file__)
+  os.environ["PATH"] = os.path.dirname(casadi.__file__)
 
+if "LD_LIBRARY_PATH" in os.environ:
+  os.environ["LD_LIBRARY_PATH"] = os.environ["LD_LIBRARY_PATH"] + os.pathsep + os.path.dirname(casadi.__file__)
+else:
+  os.environ["LD_LIBRARY_PATH"] = os.path.dirname(casadi.__file__)
+  
 if 'casadi_core' in failed_modules:
     raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_core"]))
 
