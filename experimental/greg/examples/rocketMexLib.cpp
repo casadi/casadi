@@ -22,10 +22,10 @@
 
 #include <iostream>
 
-#include <symbolic/std_vector_tools.hpp>
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/function/sx_function.hpp>
-//#include <symbolic/function/jacobian.hpp>
+#include <core/std_vector_tools.hpp>
+#include <core/sx/sx_tools.hpp>
+#include <core/function/sx_function.hpp>
+//#include <core/function/jacobian.hpp>
 
 #include <interfaces/ipopt/ipopt_solver.hpp>
 
@@ -37,7 +37,7 @@
 #include <string>
 #include <map>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 void

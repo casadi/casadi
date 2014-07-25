@@ -38,24 +38,26 @@ except:
 integrators = []
 
 try:
-  integrators.append((CVodesIntegrator,["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False}))
+  Integrator.loadPlugin("cvodes")
+  integrators.append(("cvodes",["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False}))
 except:
   pass
   
 try:
-  integrators.append((IdasIntegrator,["dae","ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True}))
+  Integrator.loadPlugin("idas")
+  integrators.append(("idas",["dae","ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True}))
 except:
   pass
 
-integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18}))
+integrators.append(("collocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18}))
 
-integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18,"startup_integrator":CVodesIntegrator}))
-#integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator,"implicit_solver_options": {"nlp_solver": IpoptSolver,"linear_solver_creator": CSparse}}))
-integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
+integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18,"startup_integrator":"cvodes"}))
+#integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": "csparse"}}))
+integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000}))
 
 print "Will test these integrators:"
 for cl, t, options in integrators:
-  print cl.__name__, " : ", t
+  print cl, " : ", t
 
 class Integrationtests(casadiTestCase):
 
@@ -73,7 +75,7 @@ class Integrationtests(casadiTestCase):
         
     f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
     f.init()
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     integrator.setOption("fsens_err_con", True)
@@ -105,7 +107,7 @@ class Integrationtests(casadiTestCase):
     
     for integrator in [
          explicitRK(f,tf,4,10),
-         implicitRK(f,NewtonImplicitSolver,{"linear_solver": CSparse},tf,4,"radau",10)
+         implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",10)
        ]:
       integrator.init()
       
@@ -136,7 +138,7 @@ class Integrationtests(casadiTestCase):
     tf = 1
     for integrator in [
          explicitRK(f,tf,4,500),
-         implicitRK(f,NewtonImplicitSolver,{"linear_solver": CSparse},tf,4,"radau",50)
+         implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",50)
        ]:
       integrator.init()
       
@@ -161,8 +163,8 @@ class Integrationtests(casadiTestCase):
     tend = SX.sym("tend")
     
     integrators = [
-              (IdasIntegrator,["dae","ode"],{"abstol": 1e-9,"reltol":1e-9,"fsens_err_con": True,"calc_ic":True,"calc_icB":True}),
-              (CVodesIntegrator,["ode"],{"abstol": 1e-5,"reltol":1e-5,"fsens_err_con": False,"quad_err_con": False})
+              ("idas",["dae","ode"],{"abstol": 1e-9,"reltol":1e-9,"fsens_err_con": True,"calc_ic":True,"calc_icB":True}),
+              ("cvodes",["ode"],{"abstol": 1e-5,"reltol":1e-5,"fsens_err_con": False,"quad_err_con": False})
               ]
 
     def variations(p_features, din, dout, rdin, rdout, *args):
@@ -212,7 +214,7 @@ class Integrationtests(casadiTestCase):
     for tt in checks():
       for p_features, din, dout, rdin, rdout,  solutionin, solution, point, (tstart_, tend_) in variations(*tt):
         for Integrator, features, options in integrators:
-          self.message(Integrator.__name__)
+          self.message(Integrator)
           if p_features[0] in features:
             g = Function()
             if len(rdin)>1:
@@ -232,7 +234,7 @@ class Integrationtests(casadiTestCase):
             def itoptions(post=""):
               yield {"iterative_solver"+post: "gmres"}
               yield {"iterative_solver"+post: "bcgstab"}
-              yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : CSparse} # Bug in Sundials? Preconditioning seems to be needed
+              yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
              
             def solveroptions(post=""):
               yield {"linear_solver_type" +post: "dense" }
@@ -241,13 +243,13 @@ class Integrationtests(casadiTestCase):
               #  d.update(it)
               #  yield d
               #yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
-              yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: CSparse }
+              yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
                 
             for a_options in solveroptions("B"):
               for f_options in solveroptions():
                 message = "f_options: %s , a_options: %s" % (str(f_options) , str(a_options))
                 print message
-                integrator = Integrator(f,g)
+                integrator = c.Integrator(Integrator,f,g)
                 integrator.setOption("exact_jacobianB",True)
                 integrator.setOption("gather_stats",True)
                 #integrator.setOption("verbose",True)
@@ -285,8 +287,8 @@ class Integrationtests(casadiTestCase):
     tend = SX.sym("tend")
     
     integrators = [
-              (IdasIntegrator,["dae","ode"],{"abstol": 1e-9,"reltol":1e-9,"fsens_err_con": True,"calc_ic":True,"calc_icB":True}),
-              (CVodesIntegrator,["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False})
+              ("idas",["dae","ode"],{"abstol": 1e-9,"reltol":1e-9,"fsens_err_con": True,"calc_ic":True,"calc_icB":True}),
+              ("cvodes",["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False})
               ]
               
     def checks():  
@@ -323,7 +325,7 @@ class Integrationtests(casadiTestCase):
     for p_features, din, dout, rdin, rdout, solutionin, solution, point, (tstart_, tend_) in checks():
 
       for Integrator, features, options in integrators:
-        self.message(Integrator.__name__)
+        self.message(Integrator)
         if p_features[0] in features:
           g = Function()
           if len(rdin)>1:
@@ -342,7 +344,7 @@ class Integrationtests(casadiTestCase):
           def itoptions(post=""):
             yield {"iterative_solver"+post: "gmres"}
             yield {"iterative_solver"+post: "bcgstab"}
-            yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : CSparse} # Bug in Sundials? Preconditioning seems to be needed
+            yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
            
           def solveroptions(post=""):
             yield {"linear_solver_type" +post: "dense" }
@@ -351,13 +353,13 @@ class Integrationtests(casadiTestCase):
               d.update(it)
               yield d
             #yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
-            yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: CSparse }
+            yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
               
           for a_options in solveroptions("B"):
             for f_options in solveroptions():
               message = "f_options: %s , a_options: %s" % (str(f_options) , str(a_options))
               print message
-              integrator = Integrator(f,g)
+              integrator = c.Integrator(Integrator,f,g)
               integrator.setOption("exact_jacobianB",True)
               integrator.setOption("t0",tstart_)
               integrator.setOption("tf",tend_)
@@ -389,7 +391,7 @@ class Integrationtests(casadiTestCase):
 
     
     for Integrator, features, options in integrators:
-      self.message(Integrator.__name__)
+      self.message(Integrator)
         
         
       def variations(p_features, din, dout, rdin, rdout, *args):
@@ -488,7 +490,7 @@ class Integrationtests(casadiTestCase):
         print tt
         for p_features, din, dout, rdin, rdout, solutionin, solution, point, (tstart_, tend_) in variations(*tt):
           if p_features[0] in features:
-            message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator.__name__,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
+            message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
             print message
             g = Function()
             if len(rdin)>1:
@@ -504,7 +506,7 @@ class Integrationtests(casadiTestCase):
             fs = SXFunction(integratorIn(**solutionin),integratorOut(**solution))
             fs.init()
             
-            integrator = Integrator(f,g)
+            integrator = c.Integrator(Integrator,f,g)
             integrator.setOption(options)
             integrator.setOption("t0",tstart_)
             if integrator.hasOption("abstol"):
@@ -570,7 +572,7 @@ class Integrationtests(casadiTestCase):
     p=SX.sym("p")
     f=SXFunction(daeIn(t=t, x=x, p=p),daeOut(ode=x/p*t**2))
     f.init()
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     integrator.setOption("fsens_err_con", True)
@@ -637,7 +639,7 @@ class Integrationtests(casadiTestCase):
     x=SXElement.sym("x")
     y=SXElement.sym("y")
     f=SXFunction(daeIn(t=t, x=vertcat([x,y])),daeOut(ode=vertcat([x,(1+1e-9)*x])))
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("t0",0)
     integrator.setOption("tf",1)
@@ -661,7 +663,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(t=t,x=q),daeOut(ode=dq))
     f.init()
 
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("reltol",1e-12)
     integrator.setOption("t0",0)
@@ -755,7 +757,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],dh])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     #integrator.setOption("verbose",True)
@@ -782,7 +784,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],(1+1e-9)*dh])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     #integrator.setOption("verbose",True)
@@ -903,7 +905,7 @@ class Integrationtests(casadiTestCase):
     f_out = daeOut(ode=mul(c.reshape(p,3,3),q))
     f=SXFunction(f_in,f_out)
     f.init()
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("steps_per_checkpoint",1000)
     integrator.setOption("t0",0)
@@ -938,7 +940,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(t=t,x=q,p=p),daeOut(ode=mul(c.reshape(p,3,3),q)))
     f.init()
 
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
@@ -1005,7 +1007,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
@@ -1055,7 +1057,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     #integrator.setOption("verbose",True)
@@ -1185,7 +1187,7 @@ class Integrationtests(casadiTestCase):
     x = SX.sym("x",N)
 
     ode = SXFunction(daeIn(x=x, p=vec(A)),daeOut(ode=mul(A,x)))
-    I = CVodesIntegrator(ode)
+    I = Integrator("cvodes",ode)
     I.setOption("fsens_err_con", True)
     I.setOption('reltol',1e-12)
     I.init()
@@ -1235,7 +1237,7 @@ class Integrationtests(casadiTestCase):
     g = SXFunction(rdaeIn(**{'x': x, 'z': z, 'rx': rx, 'rz': rz}),rdaeOut(**{'alg': x-rz, 'ode': rz}))
     g.init()
 
-    integrator = IdasIntegrator(f,g)
+    integrator = Integrator("idas",f,g)
     integrator.setOption({'calc_ic': True, 'tf': 2.3, 'reltol': 1e-10, 'augmented_options': {'reltol': 1e-09, 'abstol': 1e-09 }, 'calc_icB': True, 'abstol': 1e-10, 't0': 0.2})
     integrator.init()
 

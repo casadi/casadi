@@ -21,57 +21,52 @@
  */
 
 %{
-#include "symbolic/matrix/sparsity.hpp"
-#include "symbolic/matrix/slice.hpp"
-#include "symbolic/matrix/generic_expression.hpp"
-#include "symbolic/matrix/generic_matrix.hpp"
-#include "symbolic/matrix/matrix.hpp"
-#include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/sx/sx_element.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/mx/mx.hpp"
+#include "casadi/core/matrix/sparsity.hpp"
+#include "casadi/core/matrix/slice.hpp"
+#include "casadi/core/matrix/generic_expression.hpp"
+#include "casadi/core/matrix/generic_matrix.hpp"
+#include "casadi/core/matrix/matrix.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/sx/sx_element.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/mx/mx.hpp"
 
 %}
-
-// http://www.gnu.org/software/octave/doc/interpreter/Operator-Overloading.html#Operator-Overloading
-// http://mentat.za.net/DaCodaAlFine.pdf
-// "dispatch binary operator" can be found in octrun.swg: look for dispatch_binary_op in swig generated
-
 
 #ifndef SWIGXML
 %include "typemaps.i"
 #endif
 
-%include "symbolic/matrix/sparsity.hpp"
-%include "symbolic/matrix/slice.hpp"
+%include "casadi/core/matrix/sparsity.hpp"
+%include "casadi/core/matrix/slice.hpp"
 
-%include "symbolic/matrix/generic_expression.hpp"
-%template(ExpIMatrix)        CasADi::GenericExpression<CasADi::Matrix<int> >;
-%template(ExpDMatrix)        CasADi::GenericExpression<CasADi::Matrix<double> >;
-%template(ExpSX)       CasADi::GenericExpression<CasADi::Matrix<CasADi::SXElement> >;
-%template(ExpMX)             CasADi::GenericExpression<CasADi::MX>;
-%template(ExpSXElement)             CasADi::GenericExpression<CasADi::SXElement>;
+%include "casadi/core/matrix/generic_expression.hpp"
+%template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
+%template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
+%template(ExpSX)       casadi::GenericExpression<casadi::Matrix<casadi::SXElement> >;
+%template(ExpMX)             casadi::GenericExpression<casadi::MX>;
+%template(ExpSXElement)             casadi::GenericExpression<casadi::SXElement>;
 
-%include "symbolic/matrix/generic_matrix.hpp"
-%template(GenIMatrix)        CasADi::GenericMatrix<CasADi::Matrix<int> >;
-%template(GenDMatrix)        CasADi::GenericMatrix<CasADi::Matrix<double> >;
-%template(GenSX)       CasADi::GenericMatrix<CasADi::Matrix<CasADi::SXElement> >;
-%template(GenMX)             CasADi::GenericMatrix<CasADi::MX>;
+%include "casadi/core/matrix/generic_matrix.hpp"
+%template(GenIMatrix)        casadi::GenericMatrix<casadi::Matrix<int> >;
+%template(GenDMatrix)        casadi::GenericMatrix<casadi::Matrix<double> >;
+%template(GenSX)       casadi::GenericMatrix<casadi::Matrix<casadi::SXElement> >;
+%template(GenMX)             casadi::GenericMatrix<casadi::MX>;
 
-%include "symbolic/matrix/matrix.hpp"
-%template(IMatrix)           CasADi::Matrix<int>;
-%template(DMatrix)           CasADi::Matrix<double>;
+%include "casadi/core/matrix/matrix.hpp"
+%template(IMatrix)           casadi::Matrix<int>;
+%template(DMatrix)           casadi::Matrix<double>;
 
-%extend CasADi::Matrix<double> {
+%extend casadi::Matrix<double> {
    %template(DMatrix) Matrix<int>;
 };
 
-%include "symbolic/sx/sx_element.hpp"
+%include "casadi/core/sx/sx_element.hpp"
 
 
 
 #ifdef SWIGPYTHON
-%extend CasADi::Sparsity{
+%extend casadi::Sparsity{
     %pythoncode %{
         @property
         def shape(self):
@@ -88,9 +83,9 @@
 
 #endif // SWIGPYTHON
 
-VECTOR_REPR(CasADi::SXElement)
-VECTOR_REPR(std::vector<CasADi::SXElement>)
-VECTOR_REPR(CasADi::Matrix<CasADi::SXElement>)
+VECTOR_REPR(casadi::SXElement)
+VECTOR_REPR(std::vector<casadi::SXElement>)
+VECTOR_REPR(casadi::Matrix<casadi::SXElement>)
 
 #ifdef SWIGPYTHON
 %pythoncode %{
@@ -171,7 +166,7 @@ except:
 %}
 #endif // SWIGPYTHON
 
-namespace CasADi {
+namespace casadi {
 
 
 %extend SXElement {
@@ -189,23 +184,11 @@ namespace CasADi {
     return r
   %}
   
-  
-
   #endif // SWIGPYTHON
   
-  #ifdef SWIGOCTAVE
-  std::vector<int> __dims__() const {
-    std::vector<int> ret(2);
-    ret[0] = 1;
-    ret[1] = 1;
-    return ret;
-  }
-  
-  #endif // SWIGOCTAVE
-  
-  binopsrFull(CasADi::SXElement)
+  binopsrFull(casadi::SXElement)
   // a+b when a is SXElement, b is numpy.array. __array_priority works, but does not suffice to yield implicit casting
-  binopsFull(const CasADi::Matrix<CasADi::SXElement> & b,,CasADi::Matrix<CasADi::SXElement>,CasADi::Matrix<CasADi::SXElement>)
+  binopsFull(const casadi::Matrix<casadi::SXElement> & b,,casadi::Matrix<casadi::SXElement>,casadi::Matrix<casadi::SXElement>)
 
 };
 
@@ -214,7 +197,7 @@ namespace CasADi {
 %extend Matrix<SXElement>{
     
     %matrix_convertors
-    %matrix_helpers(CasADi::Matrix<CasADi::SXElement>)
+    %matrix_helpers(casadi::Matrix<casadi::SXElement>)
        
     #ifdef SWIGPYTHON
     %pythoncode %{
@@ -233,12 +216,12 @@ namespace CasADi {
   %python_array_wrappers(1001.0)
   #endif // SWIGPYTHON 
   
-  binopsrFull(CasADi::Matrix<CasADi::SXElement>)  
+  binopsrFull(casadi::Matrix<casadi::SXElement>)  
 };
  
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #ifdef SWIGPYTHON
 #ifdef WITH_NUMPY
@@ -252,9 +235,9 @@ namespace CasADi {
 #endif // SWIGPYTHON
 
 
-%template(SX)             CasADi::Matrix<CasADi::SXElement>;
+%template(SX)             casadi::Matrix<casadi::SXElement>;
 
-%extend CasADi::Matrix<CasADi::SXElement> {
+%extend casadi::Matrix<casadi::SXElement> {
    %template(SX) Matrix<int>;
    %template(SX) Matrix<double>;
 };

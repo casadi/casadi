@@ -20,35 +20,19 @@
  *
  */
 
-#ifdef SWIGOCTAVE
-%rename(__el_mul__) __mul__;
-%rename(__el_div__) __div__;
-%rename(__rel_mul__) __rmul__;
-%rename(__rel_div__) __rdiv__;
-%rename(__el_pow__) __pow__;
-%rename(__rel_pow__) __rpow__;
-%rename(__mul__) mul;
-%rename(__rmul__) rmul;
-%rename(__transpose__) transpose;
-%rename(__div__) __mrdivide__;
-%rename(__rdiv__) __rmrdivide__;
-%rename(__pow__) __mpower__;
-%rename(__rpow__) __rmpower__;
-#endif // SWIGOCTAVE
-
 %{
-#include "symbolic/matrix/sparsity.hpp"
-#include "symbolic/matrix/matrix.hpp"
+#include "casadi/core/matrix/sparsity.hpp"
+#include "casadi/core/matrix/matrix.hpp"
 #include <sstream>
-#include "symbolic/casadi_exception.hpp"
+#include "casadi/core/casadi_exception.hpp"
 
 // to allow for typechecking
-#include "symbolic/sx/sx_element.hpp"
+#include "casadi/core/sx/sx_element.hpp"
 
 // to typecheck for MX
-#include "symbolic/mx/mx.hpp"
+#include "casadi/core/mx/mx.hpp"
 // to have prod available
-#include "symbolic/mx/mx_tools.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
 %}
 
 #ifdef SWIGPYTHON
@@ -72,7 +56,8 @@ class NZproxy:
     return self.matrix.size()
     
   def __iter__(self):
-      return self.matrix.data().__iter__()
+    for k in range(len(self)):
+      yield self[k]
 %}
 
 %define %matrix_convertors
@@ -83,7 +68,8 @@ class NZproxy:
         return n.matrix(self.toArray())
 
     def __iter__(self):
-      return self.data().__iter__()
+      for k in self.nz:
+        yield k
         
 %}
 %enddef 
@@ -94,11 +80,11 @@ class NZproxy:
         return (self.size1(),self.size2())
         
     def reshape(self,arg):
-        return _casadi_global.reshape(self,arg)
+        return _casadi_core.reshape(self,arg)
         
     @property
     def T(self):
-        return _casadi_global.transpose(self)
+        return _casadi_core.transpose(self)
         
     def __getitem__(self,s):
         if isinstance(s,tuple) and len(s)==2:
@@ -165,21 +151,6 @@ class NZproxy:
 %enddef
 #endif // SWIGPYTHON
 
-#ifdef SWIGOCTAVE
-%define %matrix_helpers(Type)
-
-  Type __hermitian__() const { return transpose((*$self)); }
-  
-  std::vector<int> __dims__() const {
-    std::vector<int> ret(2);
-    ret[0] = $self->size1();
-    ret[1] = $self->size2();
-    return ret;
-  }
-  
-%enddef
-#endif //SWIGOCTAVE
-
 #ifdef SWIGXML
 %define %matrix_helpers(Type)
 %enddef
@@ -190,18 +161,6 @@ class NZproxy:
 %enddef
 #endif
 
-#ifdef SWIGOCTAVE
-%rename(__paren__) indexed_one_based;
-%rename(__paren__) indexed;
-%rename(__paren_asgn__) indexed_one_based_assignment;
-%rename(__paren_asgn__) indexed_assignment;
-%rename(__vertcat__) vertcat;
-%rename(__horzcat__) horzcat;
-%rename(__brace__) nz_indexed_one_based;
-%rename(__brace__) nz_indexed;
-%rename(__brace_asgn__) nz_indexed_one_based_assignment;
-%rename(__brace_asgn__) nz_indexed_assignment;
-#endif
 #ifdef SWIGPYTHON
 %rename(__Cgetitem__) indexed_zero_based;
 %rename(__Cgetitem__) indexed;
@@ -214,64 +173,32 @@ class NZproxy:
 #endif
 
 
-#ifdef SWIGOCTAVE
-namespace CasADi{
-%extend Matrix<double> {
-/// Create a 2D contiguous NP_DOUBLE numpy.ndarray
-
-octave_value toSparse() {
-  int nz = (*$self).size(), nr = (*$self).size1(), nc = (*$self).size2();
-  
-  Array<int> Ar(nz);
-  Array<int> Ac(nz);
-  
-  std::vector<int> vc = (*$self).sparsity().getCol();
-  Array<double> mydata(nz);
-  const std::vector<double> &cdata = (*$self).data();
-  
-  for(int k=0; k<nz; ++k){
-    Ac(k)=vc[k];
-    Ar(k)=(*$self).sparsity().row()[k];
-    mydata(k)=cdata[k];
-  }
-  
-  return octave_value(SparseMatrix(mydata,Ar,Ac,nr,nc));
-}
-
-binopsrFull(CasADi::Matrix<double>)
-binopsFull(const CasADi::Matrix<CasADi::SXElement> & b,,CasADi::Matrix<CasADi::SXElement>,CasADi::Matrix<CasADi::SXElement>)
-binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
-
-}; // extend Matrix<double>
-} // namespace CasADi
-#endif // SWIGOCTAVE
-
-namespace CasADi{
+namespace casadi{
   %extend Matrix<double> {
 
-    void assign(const CasADi::Matrix<double>&rhs) { (*$self)=rhs; }
+    void assign(const casadi::Matrix<double>&rhs) { (*$self)=rhs; }
     %matrix_convertors
-    %matrix_helpers(CasADi::Matrix<double>)
+    %matrix_helpers(casadi::Matrix<double>)
 
   }
   %extend Matrix<int> {
 
-    void assign(const CasADi::Matrix<int>&rhs) { (*$self)=rhs; }
+    void assign(const casadi::Matrix<int>&rhs) { (*$self)=rhs; }
     %matrix_convertors
-    %matrix_helpers(CasADi::Matrix<int>)
+    %matrix_helpers(casadi::Matrix<int>)
 
   }
 }
 
 #ifdef SWIGPYTHON
-namespace CasADi{
+namespace casadi{
 %extend Matrix<double> {
 /// Create a 2D contiguous NP_DOUBLE numpy.ndarray
 
 #ifdef WITH_NUMPY
 PyObject* arrayView() {
   if ($self->size()!=$self->numel()) 
-    throw  CasADi::CasadiException("Matrix<double>::arrayview() can only construct arrayviews for dense DMatrices.");
+    throw  casadi::CasadiException("Matrix<double>::arrayview() can only construct arrayviews for dense DMatrices.");
   npy_intp dims[2];
   dims[0] = $self->size2();
   dims[1] = $self->size1();
@@ -315,7 +242,10 @@ PyObject* arrayView() {
 %pythoncode %{
   def toCsc_matrix(self):
     import numpy as n
-    from scipy.sparse import csc_matrix
+    import warnings
+    with warnings.catch_warnings():
+      warnings.simplefilter("ignore")
+      from scipy.sparse import csc_matrix
     return csc_matrix( (list(self.data()),self.row(),self.colind()), shape = self.shape, dtype=n.double )
 
   def tocsc(self):
@@ -355,9 +285,9 @@ PyObject* arrayView() {
     return abs(self.__float__())
 %}
 
-binopsrFull(CasADi::Matrix<double>)
-binopsFull(const CasADi::Matrix<CasADi::SXElement> & b,,CasADi::Matrix<CasADi::SXElement>,CasADi::Matrix<CasADi::SXElement>)
-binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
+binopsrFull(casadi::Matrix<double>)
+binopsFull(const casadi::Matrix<casadi::SXElement> & b,,casadi::Matrix<casadi::SXElement>,casadi::Matrix<casadi::SXElement>)
+binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 
 }; // extend Matrix<double>
 
@@ -393,10 +323,10 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
       return self.toScalar()
   %}
 
-  binopsrFull(CasADi::Matrix<int>)
-  binopsFull(const CasADi::Matrix<CasADi::SXElement> & b,,CasADi::Matrix<CasADi::SXElement>,CasADi::Matrix<CasADi::SXElement>)
-  binopsFull(const CasADi::Matrix<double> & b,,CasADi::Matrix<double>,CasADi::Matrix<double>)
-  binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
+  binopsrFull(casadi::Matrix<int>)
+  binopsFull(const casadi::Matrix<casadi::SXElement> & b,,casadi::Matrix<casadi::SXElement>,casadi::Matrix<casadi::SXElement>)
+  binopsFull(const casadi::Matrix<double> & b,,casadi::Matrix<double>,casadi::Matrix<double>)
+  binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
   %pythoncode %{
     def __abs__(self):
       return int(self.__int__())
@@ -450,21 +380,21 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 }
 
 
-} // namespace CasADi
+} // namespace casadi
 #endif // SWIGPYTHON
 
   
 
 
-namespace CasADi{
+namespace casadi{
 
 %{
 #ifdef SWIGPYTHON
-/// CasADi::Slice
-template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
+/// casadi::Slice
+template<> char meta< casadi::Slice >::expected_message[] = "Expecting Slice or number";
 template <>
-int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
-  NATIVERETURN(CasADi::Slice,m)
+int meta< casadi::Slice >::as(PyObject * p,casadi::Slice &m) {
+  NATIVERETURN(casadi::Slice,m)
 
   if (PyInt_Check(p)) {
     m.start_ = PyInt_AsLong(p);
@@ -483,20 +413,20 @@ int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
 
 }
 
-/// CasADi::IndexList
-template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
+/// casadi::IndexList
+template<> char meta< casadi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 template <>
-int meta< CasADi::IndexList >::as(PyObject * p,CasADi::IndexList &m) {
-  NATIVERETURN(CasADi::IndexList,m)
+int meta< casadi::IndexList >::as(PyObject * p,casadi::IndexList &m) {
+  NATIVERETURN(casadi::IndexList,m)
   if (meta< int >::couldbe(p)) {
-    m.type = CasADi::IndexList::INT;
+    m.type = casadi::IndexList::INT;
     meta< int >::as(p,m.i);
   } else if (meta< std::vector<int> >::couldbe(p)) {
-    m.type = CasADi::IndexList::IVECTOR;
+    m.type = casadi::IndexList::IVECTOR;
     return meta< std::vector<int> >::as(p,m.iv);
-  } else if (meta< CasADi::Slice>::couldbe(p)) {
-    m.type = CasADi::IndexList::SLICE;
-    return meta< CasADi::Slice >::as(p,m.slice);
+  } else if (meta< casadi::Slice>::couldbe(p)) {
+    m.type = casadi::IndexList::SLICE;
+    return meta< casadi::Slice >::as(p,m.slice);
   } else {
     return false;
   }
@@ -505,72 +435,15 @@ int meta< CasADi::IndexList >::as(PyObject * p,CasADi::IndexList &m) {
 
 #endif //SWIGPYTHON
 
-#ifdef SWIGOCTAVE
-/// CasADi::Slice
-template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
-
-template <>
-int meta< CasADi::Slice >::as(const octave_value& p,CasADi::Slice &m) {
-  if (p.is_range()) {
-    Range r = p.range_value();
-    m.start_ = r.base()-1;
-    m.stop_ = r.limit();
-    m.step_ = r.inc();
-  } else if (p.is_magic_colon()) {
-    m.start_ = 0;
-    m.stop_ = std::numeric_limits<int>::max();
-  } else if (p.is_numeric_type()) {
-    m.start_ = p.int_value()-1;
-    m.stop_ = m.start_+1;
-  } else {
-    return false;
-  }
-  return true;
-}
-
-template <>
-bool meta<  CasADi::Slice >::couldbe(const octave_value& p) {
-  return p.is_range() || p.is_magic_colon()|| (p.is_real_scalar() && p.is_numeric_type());
-}
-
-
-/// CasADi::IndexList
-template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
-
-template <>
-int meta< CasADi::IndexList >::as(const octave_value& p,CasADi::IndexList &m) {
-  if ((p.is_real_scalar() && p.is_numeric_type())) {
-    m.type = CasADi::IndexList::INT;
-    m.i = p.int_value()-1;
-  } else if (meta< std::vector<int> >::couldbe(p)) {
-    m.type = CasADi::IndexList::IVECTOR;
-    bool result = meta< std::vector<int> >::as(p,m.iv);
-    if (!result) return false;
-    for (int k=0; k < m.iv.size();k++) m.iv[k]--;
-  } else if (meta< CasADi::Slice>::couldbe(p)) {
-    m.type = CasADi::IndexList::SLICE;
-    return meta< CasADi::Slice >::as(p,m.slice);
-  } else {
-    return false;
-  }
-  return true;
-}
-
-
-template <>
-bool meta<  CasADi::IndexList >::couldbe(const octave_value& p) {
-  return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || (p.is_real_scalar() && p.is_numeric_type());
-}
-#endif // SWIGOCTAVE
 %}
 
 %{
-template<> swig_type_info** meta< CasADi::Slice >::name = &SWIGTYPE_p_CasADi__Slice;
-template<> swig_type_info** meta< CasADi::IndexList >::name = &SWIGTYPE_p_CasADi__IndexList;
+template<> swig_type_info** meta< casadi::Slice >::name = &SWIGTYPE_p_casadi__Slice;
+template<> swig_type_info** meta< casadi::IndexList >::name = &SWIGTYPE_p_casadi__IndexList;
 %}
 
-%my_generic_const_typemap(PRECEDENCE_SLICE,CasADi::Slice);
-%my_generic_const_typemap(PRECEDENCE_IndexVector,CasADi::IndexList);
+%my_generic_const_typemap(PRECEDENCE_SLICE,casadi::Slice);
+%my_generic_const_typemap(PRECEDENCE_IndexVector,casadi::IndexList);
 
 
 #ifdef SWIGPYTHON
@@ -610,7 +483,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			  }
-			  $5 = CasADi::DENSETRANS;
+			  $5 = casadi::DENSETRANS;
 			  $2 = array_size(p,0)*array_size(p,1);
 			  $1 = (double*) array_data(p);
 			} else if (array_numdims(p)==1) {
@@ -623,14 +496,14 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			  }
-			  $5 = CasADi::SPARSE;
+			  $5 = casadi::SPARSE;
 			  $2 = array_size(p,0);
 			  $1 = (double*) array_data(p);
 			} else {
 			  SWIG_exception_fail(SWIG_TypeError, "Expecting 1D or 2D numpy.ndarray");
 			}
 	} else if (PyObjectHasClassName(p,"csc_matrix")) {
-			$5 = CasADi::SPARSE;
+			$5 = casadi::SPARSE;
 			PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
 			if (!(array_is_contiguous(narray) && array_is_native(narray) && array_type(narray)==NPY_DOUBLE))
 			  SWIG_exception_fail(SWIG_TypeError, "csc_matrix should be contiguous, native & of datatype double");
@@ -672,7 +545,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			  }
-			  $3 = CasADi::DENSETRANS;
+			  $3 = casadi::DENSETRANS;
 			  $2 = array_size(array,0)*array_size(array,1);
 			  $1 = (double*) array_data(array);
 			} else if (array_numdims(array)==1) {
@@ -685,14 +558,14 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			  }
-			  $3 = CasADi::SPARSE;
+			  $3 = casadi::SPARSE;
 			  $2 = array_size(array,0);
 			  $1 = (double*) array_data(array);
 			} else {
 			  SWIG_exception_fail(SWIG_TypeError, "Expecting 1D or 2D numpy.ndarray");
 			}
 	} else if (PyObjectHasClassName(p,"csc_matrix")) {
-			$3 = CasADi::SPARSE;
+			$3 = casadi::SPARSE;
 			PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
 			$2 = array_size(narray,0);
 			if (!(array_size(narray,0)==arg1->size() ) ) {
@@ -740,4 +613,4 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 #endif // SWIGPYTHON
 
 
-} // namespace CasADi
+} // namespace casadi

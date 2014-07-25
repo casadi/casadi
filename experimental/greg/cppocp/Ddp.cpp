@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <iostream>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 Ddp::Ddp(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> state, map<string,SX> action, int timestep, int _N)) : ode(_ode)

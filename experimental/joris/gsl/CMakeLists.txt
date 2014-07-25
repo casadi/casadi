@@ -13,17 +13,15 @@ set(GSL_INTERFACE_SRCS
 
 if(ENABLE_STATIC)
 add_library(gsl_interface STATIC ${GSL_INTERFACE_SRCS})
-endif(ENABLE_STATIC)
+endif()
 if(ENABLE_SHARED)
 add_library(gsl_interface SHARED ${GSL_INTERFACE_SRCS})
-endif(ENABLE_SHARED)
+endif()
 install(TARGETS gsl_interface
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-install(DIRECTORY ./ 
-   DESTINATION include/casadi/interfaces/gsl
-   FILES_MATCHING PATTERN "*.hpp"
-   PATTERN ".svn" EXCLUDE
-)
+  ARCHIVE DESTINATION lib)
 
+install(DIRECTORY ./
+  DESTINATION include/casadi/interfaces/gsl
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE)

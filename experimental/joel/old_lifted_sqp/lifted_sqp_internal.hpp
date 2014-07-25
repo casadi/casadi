@@ -24,12 +24,12 @@
 #define LIFTED_SQP_INTERNAL_HPP
 
 #include "lifted_sqp.hpp"
-#include "symbolic/function/nlp_solver_internal.hpp"
-#include "symbolic/function/qp_solver.hpp"
+#include "core/function/nlp_solver_internal.hpp"
+#include "core/function/qp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
     
-class LiftedSQPInternal : public NLPSolverInternal{
+class LiftedSQPInternal : public NlpSolverInternal{
 
 public:
   explicit LiftedSQPInternal(const Function& F, const Function& G);
@@ -40,7 +40,7 @@ public:
   virtual void evaluate(int nfdir, int nadir);
   
   /// QP solver for the subproblems
-  QPSolver qp_solver_;
+  QpSolver qp_solver_;
 
   /// maximum number of sqp iterations
   int max_iter_; 
@@ -94,6 +94,6 @@ public:
    
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //LIFTED_SQP_INTERNAL_HPP

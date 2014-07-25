@@ -2,12 +2,12 @@
 # Joel Andersson
 # K.U. Leuven 2012
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.0)
+cmake_minimum_required(VERSION 2.0)
 
-PROJECT(sundials-2.5mod C)
+project(sundials-2.5mod C)
 include_directories(.)
 
-SET(SUNDIALS_INCLUDES 
+set(SUNDIALS_INCLUDES
   nvector/nvector_serial.h
 
   sundials/sundials_band.h
@@ -57,8 +57,8 @@ SET(SUNDIALS_INCLUDES
   kinsol/kinsol_spils.h
   kinsol/kinsol_sptfqmr.h
 )
-  
-SET(SUNDIALS_SOURCES
+
+set(SUNDIALS_SOURCES
   nvector/nvector_serial.c
 
   sundials/sundials_band.c
@@ -67,7 +67,7 @@ SET(SUNDIALS_SOURCES
   sundials/sundials_iterative.c
   sundials/sundials_math.c
   sundials/sundials_nvector.c
-  sundials/sundials_spbcgs.c  
+  sundials/sundials_spbcgs.c
   sundials/sundials_spgmr.c
   sundials/sundials_sptfqmr.c
 
@@ -77,7 +77,7 @@ SET(SUNDIALS_SOURCES
   cvodes/cvodes_bandpre.c
   cvodes/cvodes_bandpre_impl.h
   cvodes/cvodes_bbdpre.c
-  cvodes/cvodes_bbdpre_impl.h  
+  cvodes/cvodes_bbdpre_impl.h
   cvodes/cvodes.c
   cvodes/cvodes_dense.c
   cvodes/cvodes_diag.c
@@ -111,7 +111,7 @@ SET(SUNDIALS_SOURCES
   idas/idas_spils.c
   idas/idas_spils_impl.h
   idas/idas_sptfqmr.c
-  
+
   kinsol/kinsol_band.c
   kinsol/kinsol_bbdpre.c
   kinsol/kinsol_bbdpre_impl.h
@@ -127,18 +127,18 @@ SET(SUNDIALS_SOURCES
   kinsol/kinsol_spils.c
   kinsol/kinsol_spils_impl.h
   kinsol/kinsol_sptfqmr.c
-)  
-  
+)
+
 if(ENABLE_STATIC)
 add_library(casadi_sundials STATIC ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})
-endif(ENABLE_STATIC)
+endif()
 if(ENABLE_SHARED)
 add_library(casadi_sundials SHARED ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})
-endif(ENABLE_SHARED)
+endif()
 install(TARGETS casadi_sundials
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
+  ARCHIVE DESTINATION lib)
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 set_target_properties(casadi_sundials PROPERTIES COMPILE_FLAGS "-Wno-format-security")
 endif()

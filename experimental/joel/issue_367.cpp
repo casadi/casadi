@@ -1,5 +1,5 @@
-#include "symbolic/sx/sx.hpp"
-CasADi::SX a;
+#include "core/sx/sx.hpp"
+casadi::SX a;
 int main(){
   return 0;
 }

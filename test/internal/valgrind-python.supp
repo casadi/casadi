@@ -525,3 +525,50 @@
    fun:malloc
    obj:/usr/lib/pyshared/python2.7/numpy/lib/_compiled_base.so
 }
+
+{
+   memory leak in swig multiple modules
+   Memcheck:Leak
+   fun:malloc
+   fun:SwigPyClientData_New
+   fun:*_swigregister
+   fun:PyEval_EvalFrameEx
+   ...
+   fun:PyImport_ExecCodeModuleEx
+}
+
+{
+   leak in numpy 1.8.1
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/python2.7/dist-packages/numpy/lib/_compiled_base.so
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+
+{
+   bug in numpy 1.8.1
+   Memcheck:Addr4
+   fun:_PyString_Resize
+   ...
+   fun:PyAST_Compile
+   fun:PyRun_StringFlags
+   ...
+   fun:PyImport_ExecCodeModuleEx
+   ...
+   fun:PyImport_ImportModuleLevel
+}
+
+{
+   No idea what this is
+   Memcheck:Addr4
+   fun:_PyString_Resize
+   fun:assemble.35298
+   fun:compiler_body.35590
+   fun:compiler_body.35590
+   fun:PyAST_Compile
+   fun:run_mod.42573.2971
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+}

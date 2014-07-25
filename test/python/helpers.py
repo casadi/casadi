@@ -530,6 +530,19 @@ class requires(object):
     else:
       print "Not available %s, skipping unittests" % self.att
       return None
+      
+class requiresPlugin(object):
+  def __init__(self,att,n):
+    self.att = att
+    self.n = n
+  
+  def __call__(self,c):
+    try:
+      self.att.loadPlugin(self.n)
+      return c
+    except:
+      print "Not available %s plugin %s, skipping unittests" % (str(self.att),self.n)
+      return None
 
 class skip(object):
   def __init__(self, skip=True):

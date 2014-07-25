@@ -21,21 +21,58 @@
 # 
 # -*- coding: utf-8 -*-
 
-from casadi import *
-import casadi
+import warnings
+import os
 
+# workaround for issue #1012
+# Since ipopt uses "dlopen" internally, we have to make sure that all the
+# libraries we linked against are visible to the libraries dlopen loads.
+# Specifically, hsl.so needs blas and lapack.
+try:
+    import numpy as np
+except:
+    pass
+
+import sys
+import ctypes
+
+if hasattr(sys,"getdlopenflags"):
+    flags0 = sys.getdlopenflags() # get the original flags
+    sys.setdlopenflags( flags0 | ctypes.RTLD_GLOBAL ) # set our workaround flags
+
+# add to PATH to make dlopen find the libraries
+if "PATH" in os.environ:
+  os.environ["PATH"] = os.path.dirname(__file__) + os.pathsep +  os.environ["PATH"]
+else:
+  os.environ["PATH"] = os.path.dirname(__file__)
+
+if "LD_LIBRARY_PATH" in os.environ:
+  os.environ["LD_LIBRARY_PATH"] = os.path.dirname(__file__) + os.pathsep + os.environ["LD_LIBRARY_PATH"]
+else:
+  os.environ["LD_LIBRARY_PATH"] = os.path.dirname(__file__)
+
+from casadi import *    # import everything
+import casadi as casadi # import everything
+  
+if 'casadi_core' in failed_modules:
+    raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_core"]))
+
+if hasattr(sys,"getdlopenflags"):
+    sys.setdlopenflags( flags0 ) # set the old flags back
+  
+import os
 import types
   
 def wrapper(f, warning,error=False):
     def new(*args, **kwargs):
-      print "*" * 40
-      print "Deprecation Warning"
-      print "-" * 40
-      print warning
-      print "*" * 40
-      if error:
-        raise Exception("Deprecation error: " + warning)
-      return f(*args, **kwargs)
+        print "*" * 40
+        print "Deprecation Warning"
+        print "-" * 40
+        print warning
+        print "*" * 40
+        if error:
+            raise Exception("Deprecation error: " + warning)
+        return f(*args, **kwargs)
     return new
 
 
@@ -58,59 +95,19 @@ class Deprecate(object):
         output.warned = False
         return output
 
-deprecated = {}
-for oldenum, newenum, string , io in [
-  ("NLP_X_INIT","NLP_SOLVER_X0","x0","input"),
-  ("NLP_LBX","NLP_SOLVER_LBX","lbx","input"),
-  ("NLP_UBX","NLP_SOLVER_UBX","ubx","input"),
-  ("NLP_LBG","NLP_SOLVER_LBG","lbg","input"),
-  ("NLP_UBG","NLP_SOLVER_UBG","ubg","input"),
-  ("NLP_LAMBDA_INIT","NLP_SOLVER_LAM_G0","lam_g0","input"),
-  ("NLP_P","NLP_SOLVER_P","p","input"),
-  ("NLP_X_OPT","NLP_SOLVER_X","x","output"),
-  ("NLP_COST","NLP_SOLVER_F","f","output"),
-  ("NLP_LAMBDA_G","NLP_SOLVER_LAM_G","lam_g","output"),
-  ("NLP_LAMBDA_X","NLP_SOLVER_LAM_X","lam_x","output"),
-  ("NLP_G","NLP_SOLVER_G","g","output"),
-  ]:
-    deprecated[oldenum] = Deprecate(-1,"""%s is dropped. Use %s instead.\nYou can in fact avoid using either of them alltogether:\n  solver.%s(%s)\n     becomes\n  solver.%s("%s")\nreference: https://github.com/casadi/casadi/issues/566""" % (oldenum,newenum,io,oldenum,io,string),error=True)
-          
-for oldenum, newenum in [
-    ("NLP_NUM_IN","NLP_SOLVER_NUM_IN"),
-    ("NLP_NUM_OUT","NLP_SOLVER_NUM_OUT"),
-  ]:
-    deprecated[oldenum] = Deprecate(-1,"""%s is dropped. Use %s instead.\nreference: https://github.com/casadi/casadi/issues/566""" % (oldenum,newenum),error=True)
-
-NLP_X_INIT = deprecated["NLP_X_INIT"]
-NLP_LBX = deprecated["NLP_LBX"]
-NLP_UBX = deprecated["NLP_UBX"]
-NLP_LBG = deprecated["NLP_LBG"]
-NLP_UBG = deprecated["NLP_UBG"]
-NLP_LAMBDA_INIT = deprecated["NLP_LAMBDA_INIT"]
-NLP_X_OPT = deprecated["NLP_X_OPT"]
-NLP_COST = deprecated["NLP_COST"]
-NLP_LAMBDA_G = deprecated["NLP_LAMBDA_G"]
-NLP_LAMBDA_X = deprecated["NLP_LAMBDA_X"]
-
-# The following has new implementations, currently named NL_P, etc. Remove in next release.
-NLP_P = deprecated["NLP_P"]
-NLP_G = deprecated["NLP_G"]
-NLP_NUM_IN = deprecated["NLP_NUM_IN"]
-NLP_NUM_OUT = deprecated["NLP_NUM_OUT"]
-
-
 import warnings
-warnings.filterwarnings("default",".*This function.*",DeprecationWarning)
+warnings.filterwarnings("default",".*This CasADi function.*",DeprecationWarning)
 
 import contextlib
 
 @contextlib.contextmanager
 def internalAPI():
-  backup = CasadiOptions.getAllowedInternalAPI()
-  CasadiOptions.setAllowedInternalAPI(True)
-  yield
-  CasadiOptions.setAllowedInternalAPI(backup)
+    backup = CasadiOptions.getAllowedInternalAPI()
+    CasadiOptions.setAllowedInternalAPI(True)
+    yield
+    CasadiOptions.setAllowedInternalAPI(backup)
 
 __version__ = CasadiMeta.getVersion()
 if '+' in __version__ and CasadiMeta.getGitDescribe()!='':
-  __version__  = CasadiMeta.getGitDescribe()
+    __version__  = CasadiMeta.getGitDescribe()
+  

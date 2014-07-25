@@ -21,16 +21,16 @@
  */
 
 %{
-#include "symbolic/matrix/sparsity.hpp"
-#include "symbolic/matrix/matrix.hpp"
+#include "casadi/core/matrix/sparsity.hpp"
+#include "casadi/core/matrix/matrix.hpp"
 #include <sstream>
-#include "symbolic/casadi_exception.hpp"
+#include "casadi/core/casadi_exception.hpp"
 
 // to allow for typechecking
-#include "symbolic/sx/sx_element.hpp"
+#include "casadi/core/sx/sx_element.hpp"
 
 // to typecheck for MX
-#include "symbolic/mx/mx.hpp"
+#include "casadi/core/mx/mx.hpp"
 %}
 
 #ifndef SWIGXML
@@ -43,28 +43,6 @@
 #ifdef SWIGPYTHON
 #define GUESTOBJECT PyObject * p
 #endif // SWIGPYTHON
-
-#ifdef  SWIGOCTAVE
-#define GUESTOBJECT const octave_value& p
-#endif // SWIGOCTAVE
-
-#ifdef  SWIGOCTAVE
-/** Check if Guest object is of a particular SWIG type */
-bool istype(GUESTOBJECT, swig_type_info *type) {
-  if (p.is_cell() && p.rows() == 1 && p.columns() == 1)
-    return istype(p.cell_value()(0),type);
-  if (!p.is_defined())
-    return false;
-  if (p.type_id() != octave_swig_ref::static_type_id())
-    return false;
-  octave_swig_ref *osr = static_cast < octave_swig_ref *>(p.internal_rep());
-  octave_swig_type *ost = osr->get_ptr();
-  void *vptr = ost->cast(type,0, 0);
-  if (!vptr)
-    return false;
-  return true;
-}
-#endif // SWIGOCTAVE
 
 #ifdef  SWIGPYTHON
 /** Check if Guest object is of a particular SWIG type */
@@ -82,9 +60,6 @@ class meta {
       #ifdef SWIGPYTHON
       if (p == Py_None) return false;
       #endif // SWIGPYTHON
-      #ifdef SWIGOCTAVE
-      if (p.is_null_value()) return false;
-      #endif // SWIGOCTAVE
       return istype(p,*meta<T>::name);
     };
     /// Convert Python object to pointer of type T
@@ -122,7 +97,7 @@ class meta {
     
     #ifdef SWIGPYTHON
     static bool couldbe_sequence(PyObject * p) {
-      if(PySequence_Check(p) && !PyString_Check(p) && !meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
+      if(PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::Matrix<casadi::SXElement> >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) return false;
         PyObject *pe;
@@ -141,23 +116,10 @@ class meta {
     }
     #endif // SWIGPYTHON
     
-   #ifdef SWIGOCTAVE
-    static bool couldbe_sequence(const octave_value& p) {
-      if (!p.is_cell()) return false;
-      int nrow = p.rows();
-      int ncol = p.columns();
-      if (nrow!=1 && ncol!=1) return false;
-      for(int i=0; i<p.length(); ++i){
-        if (!meta< T >::couldbe(p.cell_value()(i))) return false;
-      }
-      return true;
-    }
-    #endif // SWIGOCTAVE
-    
     // Assumes that p is a PYTHON sequence
     #ifdef SWIGPYTHON
     static int as_vector(PyObject * p, std::vector<T> &m) {
-      if(PySequence_Check(p) && !PyString_Check(p) && !meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
+      if(PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::Matrix<casadi::SXElement> >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) { PyErr_Clear();  return false;}
         PyObject *pe;
@@ -179,29 +141,6 @@ class meta {
       return false;
     }
     #endif // SWIGPYTHON
-    
-    // Assumes that p is an octave cell
-    #ifdef SWIGOCTAVE
-    static int as_vector(const octave_value& p , std::vector<T> &m) {
-      if (!p.is_cell()) return false;
-      int nrow = p.rows();
-      int ncol = p.columns();
-      if (nrow!=1 && ncol!=1) return false;
-      m.resize(p.length());
-      
-      Cell c = p.cell_value();
-      for(int i=0; i<p.length(); ++i){
-        // Get the octave object
-        const octave_value& obj_i = c(i);
-        
-        if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
-          bool ret = meta< T >::as(obj_i,m[i]);
-          if(!ret) return false;
-        }
-      }
-      return true;
-    }
-    #endif // SWIGOCTAVE
     
     
     #ifdef SWIGPYTHON
@@ -319,8 +258,8 @@ void PyDECREFParent(PyObject* self) {
 %extend Type {
 %pythoncode%{
     def __del__(self):
-      if not(_casadi_main_module is None):
-         _casadi_main_module.PyDECREFParent(self)
+      if not(_casadi_core is None):
+         _casadi_core.PyDECREFParent(self)
 
 %}
 
@@ -338,8 +277,8 @@ void PyDECREFParent(PyObject* self) {
 %extend Type {
 %pythoncode%{
     def __del__(self):
-      if not(_casadi_main_module is None):
-         _casadi_main_module.PyDECREFParent(self)
+      if not(_casadi_core is None):
+         _casadi_core.PyDECREFParent(self)
 
 %}
 
@@ -414,7 +353,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 bool PyIsSequence(PyObject* p) {
-  return PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) && !meta< CasADi::MX >::isa(p);
+  return PySequence_Check(p) && !meta< casadi::Matrix<casadi::SXElement> >::isa(p) && !meta< casadi::MX >::isa(p);
 }
 
 %}

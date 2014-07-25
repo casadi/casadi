@@ -7,7 +7,7 @@
 #include "Ode.hpp"
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 Ode::Ode(string _name)
 {

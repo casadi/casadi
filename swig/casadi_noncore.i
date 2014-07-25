@@ -20,13 +20,11 @@
  *
  */
 
-#ifdef WITH_SWIG_SPLIT
 %module casadi_noncore
 
 %include "common.i"
 
 %import "casadi_primitive_tools.i"
-#endif //WITH_SWIG_SPLIT
 
 // Function
 %include "casadi_function.i"

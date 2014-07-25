@@ -20,12 +20,12 @@
  *
  */
 
-#include "symbolic/casadi.hpp"
+#include "core/casadi.hpp"
 #include "interfaces/ooqp/ooqp_solver.hpp"
 #include <ctime>
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 int main() {
   DMatrix H(2,2,0);
@@ -55,7 +55,7 @@ int main() {
   ubA(0) = 2.0;
   
   for(int rep=0; rep<2; ++rep){
-    OOQPSolver qp_solver(H.sparsity(), A.sparsity());
+    OOQpSolver qp_solver(H.sparsity(), A.sparsity());
     qp_solver.init();
     qp_solver.setInput(A,"a");
     qp_solver.setInput(H,"h");

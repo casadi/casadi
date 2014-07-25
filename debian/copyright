@@ -1,0 +1,30 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: casadi
+Source: http://casadi.org
+
+Files: *
+Copyright: 2010-2014 Joel Anderson <joel@casadi.org>
+           2010-2014 Joris Gillis <joris@casadi.org>
+           2012-2014 Greg Horn <greg@casadi.org>
+License: LGPL-3.0+
+
+Files: debian/*
+Copyright: 2014 Greg Horn <gregmainland@gmail.com>
+License: LGPL-3.0+
+
+License: LGPL-3.0+
+ This package is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 3 of the License, or (at your option) any later version.
+ .
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the complete text of the GNU Lesser General
+ Public License can be found in "/usr/share/common-licenses/LGPL-3".

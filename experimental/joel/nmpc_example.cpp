@@ -20,7 +20,7 @@
  *
  */
 
-#include <symbolic/casadi.hpp>
+#include <core/casadi.hpp>
 #include <interfaces/qpoases/qpoases_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <nonlinear_programming/nlp_qp_solver.hpp>
@@ -30,7 +30,7 @@
 #include <ctime>
 #include <cstdlib>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 int main(){
@@ -121,7 +121,7 @@ int main(){
 
   Dictionary qp_solver_options;
   if(false){
-    solver.setOption("qp_solver",NLPQPSolver::creator);
+    solver.setOption("qp_solver",NLPQpSolver::creator);
     qp_solver_options["nlp_solver"] = IpoptSolver::creator;
     Dictionary nlp_solver_options;
     nlp_solver_options["tol"] = 1e-12;

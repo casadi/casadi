@@ -1,0 +1,3 @@
+usr/lib/libcasadi_nlpsolver_snopt.so
+usr/lib/pkgconfig/casadi_nlpsolver_snopt.pc
+usr/include/casadi/interfaces/snopt/*

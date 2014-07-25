@@ -45,6 +45,7 @@ def nice_stdout():
       sys.stdout.write(os.read(r,2**20)[:-1])
       os.close(r)
       os.close(w)
+      os.close(backup)
       
       
 @contextlib.contextmanager

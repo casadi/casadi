@@ -40,11 +40,11 @@
 
 #include <iostream>
 #include <ctime>
-#include <symbolic/casadi.hpp>
+#include <core/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/std_vector_tools.hpp>
+#include <core/std_vector_tools.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 int main(){

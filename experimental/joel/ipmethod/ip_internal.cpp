@@ -21,19 +21,19 @@
  */
 
 #include "ip_internal.hpp"
-#include "symbolic/std_vector_tools.hpp"
-#include "symbolic/matrix/sparsity_tools.hpp"
-#include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/function/sx_function.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/casadi_calculus.hpp"
+#include "core/std_vector_tools.hpp"
+#include "core/matrix/sparsity_tools.hpp"
+#include "core/matrix/matrix_tools.hpp"
+#include "core/function/sx_function.hpp"
+#include "core/sx/sx_tools.hpp"
+#include "core/casadi_calculus.hpp"
 #include <ctime>
 #include <iomanip>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
-IPInternal::IPInternal(const Function& F, const Function& G) : NLPSolverInternal(Function(),F,G){
+IPInternal::IPInternal(const Function& F, const Function& G) : NlpSolverInternal(Function(),F,G){
   casadi_warning("The IP method is experimental and incomplete. Can be used as the basis of an IP solver in CasADi.");
   addOption("linear_solver",         OT_LINEARSOLVER,   GenericType(), "The linear solver to be used by the IP method");
   addOption("linear_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
@@ -44,7 +44,7 @@ IPInternal::~IPInternal(){
 
 void IPInternal::init(){
   // Call the init method of the base class
-  NLPSolverInternal::init();
+  NlpSolverInternal::init();
     
   // Assume SXFunction
   SXFunction FF = shared_cast<SXFunction>(F_);
@@ -62,15 +62,15 @@ void IPInternal::init(){
   SX t = ssym("t");
   
   // Objective of the equality constraint problem
-  SX f_eq = t*f - sumAll(CasADi::log(x));
+  SX f_eq = t*f - sumAll(casadi::log(x));
 //   cout << "f_eq = " << f_eq << endl;
   
   // Hessian of the objective
-  SX H = CasADi::hessian(f_eq,x);
+  SX H = casadi::hessian(f_eq,x);
 //  cout << "H = " << H << endl;
   
   // Jacobian of the constraints
-  SX A = CasADi::jacobian(g,x);
+  SX A = casadi::jacobian(g,x);
 //  cout << "A = " << A << endl;
   
   // Form the KKT matrix
@@ -80,7 +80,7 @@ void IPInternal::init(){
   }
   
   // Form the right hand side of the KKT system
-  SX k = vertcat(-CasADi::gradient(f_eq,x),SX::sparse(ng_));
+  SX k = vertcat(-casadi::gradient(f_eq,x),SX::sparse(ng_));
   makeDense(k);
   if(verbose()){
     cout << "k = " << k << endl;
@@ -147,4 +147,4 @@ void IPInternal::evaluate(int nfdir, int nadir){
   }
 }
 
-} // namespace CasADi
+} // namespace casadi

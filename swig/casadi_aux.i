@@ -22,46 +22,35 @@
 
 %{
 #include <sstream>
-#include "symbolic/std_vector_tools.hpp"
-#include "symbolic/printable_object.hpp"
-#include "symbolic/shared_object.hpp"
-#include "symbolic/weak_ref.hpp"
-#include "symbolic/generic_type.hpp"
-#include "symbolic/options_functionality.hpp"
-#include "symbolic/casadi_calculus.hpp"
+#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/printable_object.hpp"
+#include "casadi/core/shared_object.hpp"
+#include "casadi/core/weak_ref.hpp"
+#include "casadi/core/generic_type.hpp"
+#include "casadi/core/options_functionality.hpp"
+#include "casadi/core/casadi_calculus.hpp"
 %}
 
-#ifdef SWIGPYTHON
-%pythoncode %{
-_swig_repr_default = _swig_repr
-def _swig_repr(self):
-  if hasattr(self,'getRepresentation'):
-    return self.getRepresentation()
-  else:
-    return _swig_repr_default(self)
-%}
-#endif // SWIGPYTHON
-
-%include "symbolic/std_vector_tools.hpp"
+%include "casadi/core/std_vector_tools.hpp"
 VECTOR_TOOLS_TEMPLATES(int)
 VECTOR_TOOLS_TEMPLATES(double)
 
 %define VECTOR_REPR(type)
 %extend std::vector< type >{
-  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
-  std::string __str__(){ return CasADi::getDescription(*$self); }
+  std::string __repr__(){ return casadi::getRepresentation(*$self); }
+  std::string __str__(){ return casadi::getDescription(*$self); }
 };
 %enddef
 
-%include "symbolic/printable_object.hpp"
-%include "symbolic/shared_object.hpp"
-%include "symbolic/weak_ref.hpp"
-%include "symbolic/casadi_types.hpp"
-%include "symbolic/generic_type.hpp"
-%include "symbolic/options_functionality.hpp"
-%include "symbolic/casadi_calculus.hpp"
+%include "casadi/core/printable_object.hpp"
+%include "casadi/core/shared_object.hpp"
+%include "casadi/core/weak_ref.hpp"
+%include "casadi/core/casadi_types.hpp"
+%include "casadi/core/generic_type.hpp"
+%include "casadi/core/options_functionality.hpp"
+%include "casadi/core/casadi_calculus.hpp"
 
-namespace CasADi {
+namespace casadi {
   %extend OptionsFunctionality {
     void setOption(const std::string &name, const std::string& val){$self->setOption(name,val);} 
     void setOption(const std::string &name, const std::vector<int>& val){$self->setOption(name,val);} 
@@ -70,5 +59,5 @@ namespace CasADi {
     void setOption(const std::string &name, int val){$self->setOption(name,val);} 
     void setOption(const std::string &name, bool val){$self->setOption(name,val);}  
   }
-} // namespace CasADi
+} // namespace casadi
 

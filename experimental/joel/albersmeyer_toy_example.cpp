@@ -24,14 +24,14 @@
 #include <fstream>
 #include <ctime>
 #include <iomanip>
-#include <symbolic/casadi.hpp>
+#include <core/casadi.hpp>
 #include <nonlinear_programming/sqp_method.hpp>
 #include <interfaces/qpoases/qpoases_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/std_vector_tools.hpp>
+#include <core/std_vector_tools.hpp>
 #include <nonlinear_programming/lifted_sqp.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 int main(){
@@ -158,7 +158,7 @@ int main(){
       iter_count[test][solver] = 9999;
 	
       // Get the nlp solver and NLP solver options
-      NLPSolver nlp_solver;
+      NlpSolver nlp_solver;
       switch(solver){
 	case IPOPT:
 	  if(gauss_newton) continue; // not supported

@@ -216,7 +216,7 @@ class SXtests(casadiTestCase):
       else:
         x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toArray()
       
-        self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SX",setx0=x0)
+        self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SX",setx0=x0,excludeflags={'nozero'})
       
   def test_SXbinary(self):
       self.message("SX binary operations")
@@ -435,7 +435,8 @@ class SXtests(casadiTestCase):
     
   def test_SXFunctionc2(self):
     self.message("SXmatrix typemaps constructors")
-    simplify(SXElement.sym("x"))                 
+    with internalAPI():
+      simplify(SXElement.sym("x"))                 
     SX(array([[SXElement.sym("x")]])).isEmpty()
     list = [ ("SXElement" ,SXElement.sym("x"),(1,1)),
                 ("number",2.3, (1,1)),

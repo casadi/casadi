@@ -40,10 +40,10 @@ nlp_solver = SCPgen
 qp_solver = QPOasesSolver
 qp_solver_options = {"printLevel" : "none"}
 
-#qp_solver = NLPQPSolver
+#qp_solver = NLPQpSolver
 #qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
 
-#qp_solver = OOQPSolver
+#qp_solver = OOQpSolver
 #qp_solver_options = {}
 
 # Create solver

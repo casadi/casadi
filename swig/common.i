@@ -24,6 +24,8 @@
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
 
+#define CASADI_CORE_EXPORT
+
 // Incude cmath early on, see #622
 %begin %{
 #include <cmath>
@@ -34,6 +36,8 @@
 #undef _POSIX_C_SOURCE
 #endif
 %}
+
+%ignore *::operator->;
 
 %begin %{
 #define SWIG_PYTHON_OUTPUT_TUPLE
@@ -53,10 +57,22 @@ class _copyableObject(_object):
     return shallow
 
 _object = _copyableObject
+
+_swig_repr_default = _swig_repr
+def _swig_repr(self):
+  if hasattr(self,'getRepresentation'):
+    return self.getRepresentation()
+  else:
+    return _swig_repr_default(self)
+
 %}
 #endif // WITH_SWIGPYTHON
 
+#ifdef SWIGPYTHON
+%include "doc_merged.i"
+#else
 %include "doc.i"
+#endif
 
 
 %feature("autodoc", "1");
@@ -68,8 +84,8 @@ _object = _copyableObject
 
 #ifndef SWIGXML
 %feature("compactdefaultargs","1");
-//%feature("compactdefaultargs","0") CasADi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
-%feature("compactdefaultargs","0") CasADi::solve; // buggy
+//%feature("compactdefaultargs","0") casadi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
+%feature("compactdefaultargs","0") casadi::solve; // buggy
 #endif //SWIGXML
 
 // STL
@@ -387,19 +403,6 @@ namespace std {
   }
 };
 
-#ifdef SWIGOCTAVE
-%inline %{
-#include <octave/dim-vector.h>
-%}
-#endif
-
-%{
-#include "symbolic/casadi_options.hpp" 
-#include "symbolic/casadi_meta.hpp" 
-%}
-%include "symbolic/casadi_options.hpp"
-%include "symbolic/casadi_meta.hpp"
-
 #ifdef CASADI_MODULE
 
 %define DEPRECATED_MSG(MSG)
@@ -413,24 +416,11 @@ if (internal("$decl")) SWIG_fail;
 #ifdef SWIGPYTHON
 %wrapper %{
 int deprecated(const std::string & c,const std::string & a) {
-  return PyErr_WarnEx(PyExc_DeprecationWarning,("This function (" + c+") is deprecated. "  + a).c_str(),2);
+  return PyErr_WarnEx(PyExc_DeprecationWarning,("This CasADi function (" + c+") is deprecated. "  + a).c_str(),2);
 }
 int internal(const std::string & c) {
   if (CasadiOptions::allowed_internal_api) return 0;
-  return PyErr_WarnEx(PyExc_SyntaxWarning,("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str(),2);
-}
-%}
-#endif
-
-#ifdef SWIGOCTAVE
-%wrapper %{
-int deprecated(const std::string & c,const std::string & a) {
-  warning("deprecated",("This function (" + c+") is deprecated. "  + a).c_str());
-  return 0;
-}
-int internal(const std::string & c) {
-  warning("internalAPI",("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str());
-  return 0;
+  return PyErr_WarnEx(PyExc_SyntaxWarning,("This CasADi function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str(),2);
 }
 %}
 #endif
@@ -438,30 +428,12 @@ int internal(const std::string & c) {
 #ifdef SWIGPYTHON
 %{
 #define START \
-  if (CasADi::CasadiOptions::catch_errors_python){ \
+  if (casadi::CasadiOptions::catch_errors_python){ \
   try {
   
 #define STOP \
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } catch (const char* e) { \
-    SWIG_exception(SWIG_RuntimeError, e); \
-  } \
-} else
-%}
-#endif
-
-#ifdef SWIGOCTAVE
-%{
-#define START \
-  if (CasADi::CasadiOptions::catch_errors_python){ \
-  try {
-  
-#define STOP \
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } catch (const char* e) { \
-    SWIG_exception(SWIG_RuntimeError, e); \
   } \
 } else
 %}
@@ -480,8 +452,6 @@ int internal(const std::string & c) {
     $action
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } catch (const char* e) { \
-    SWIG_exception(SWIG_RuntimeError, e); \
   }
 }
 
@@ -493,8 +463,6 @@ int internal(const std::string & c) {
     // foobar
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_TypeError, e.what()); \
-  } catch (const char* e) { \
-    SWIG_exception(SWIG_TypeError, e); \
   }
 }
 %include "internal.i"
@@ -578,7 +546,6 @@ returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*
 // These methods must be added since the implicit type cast does not work.
 // Consider a+b  with a DMatrix and b SX
 // In C++, operator+(SX,SX) will be called (implicit cast)
-// In octave, a.__add__(b) will be called   (no implicit cast)
 // In python, __array_priority__ will be checked and b.__radd__(a) will be called (effectively implicit casting)
 
 // This is a list of all operators:
@@ -610,12 +577,12 @@ memberbinops(mpower,argtype,argCast,selfCast,returntype)
 #define binopsNoPriority(argtype,argCast,selfCast,returntype) \
 memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
-//%traits_swigtype(CasADi::GenericType);
-//%traits_swigtype(std::mapCasADi::Dictionary);
+//%traits_swigtype(casadi::GenericType);
+//%traits_swigtype(std::mapcasadi::Dictionary);
 
-//%fragment(SWIG_Traits_frag(std::map< std::string, CasADi::GenericType, std::less<std::string > , allocator<std::pair<const std::string, CasADi::GenericType > > >));
+//%fragment(SWIG_Traits_frag(std::map< std::string, casadi::GenericType, std::less<std::string > , allocator<std::pair<const std::string, casadi::GenericType > > >));
 
-//%fragment(SWIG_Traits_frag(CasADi::Dictionary));
+//%fragment(SWIG_Traits_frag(casadi::Dictionary));
 
 // typemaphelpers
 %include "typemaphelpers.i"
@@ -623,105 +590,75 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 // typemap meta implementations
 %include "meta.i"
 
-%include "symbolic/function/schemes_metadata.hpp"
-
 // common typemaps
 %include "commontypemaps.i"
 
 %{
-#include "symbolic/matrix/matrix.hpp" 
-#include "symbolic/matrix/matrix_tools.hpp" 
-#include "symbolic/matrix/sparsity_tools.hpp" 
+#include "casadi/core/matrix/matrix.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/matrix/sparsity_tools.hpp"
 	 
 // Scalar expressions 
-#include "symbolic/sx/sx_element.hpp" 
-#include "symbolic/sx/sx_tools.hpp" 
-#include "symbolic/function/sx_function.hpp" 
+#include "casadi/core/sx/sx_element.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/function/sx_function.hpp"
 	 
 // Matrix expressions 
-#include "symbolic/mx/mx.hpp" 
-#include "symbolic/mx/mx_tools.hpp" 
+#include "casadi/core/mx/mx.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
 
-#include "symbolic/function/mx_function.hpp" 
- 	
-#include "symbolic/function/mx_function.hpp"
-#include "symbolic/function/custom_function.hpp"
-#include "symbolic/function/ocp_solver.hpp"
-#include "symbolic/function/simulator.hpp"
-#include "symbolic/function/parallelizer.hpp"
-#include "symbolic/function/external_function.hpp"
+#include "casadi/core/function/mx_function.hpp"
 
+#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/function/custom_function.hpp"
+#include "casadi/core/function/ocp_solver.hpp"
+#include "casadi/core/function/simulator.hpp"
+#include "casadi/core/function/parallelizer.hpp"
+#include "casadi/core/function/external_function.hpp"
 
-#include "optimal_control/direct_multiple_shooting.hpp"
-#include "optimal_control/symbolic_ocp.hpp"
+#include "casadi/core/function/io_interface.hpp"
+#include "casadi/core/function/function.hpp"
+#include "casadi/core/function/sx_function.hpp"
+#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/function/linear_solver.hpp"
+#include "casadi/core/function/implicit_function.hpp"
+#include "casadi/core/function/integrator.hpp"
+#include "casadi/core/function/simulator.hpp"
+#include "casadi/core/function/control_simulator.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
+#include "casadi/core/function/homotopy_nlp_solver.hpp"
+#include "casadi/core/function/qp_solver.hpp"
+#include "casadi/core/function/stabilized_qp_solver.hpp"
+#include "casadi/core/function/lp_solver.hpp"
+#include "casadi/core/function/ocp_solver.hpp"
+#include "casadi/core/function/sdp_solver.hpp"
+#include "casadi/core/function/socp_solver.hpp"
+#include "casadi/core/function/qcqp_solver.hpp"
+#include "casadi/core/function/sdqp_solver.hpp"
+#include "casadi/core/function/external_function.hpp"
+#include "casadi/core/function/parallelizer.hpp"
+#include "casadi/core/function/custom_function.hpp"
+#include "casadi/core/function/nullspace.hpp"
+#include "casadi/core/functor.hpp"
 
-#include "symbolic/function/io_interface.hpp"
-#include "symbolic/function/function.hpp"
-#include "symbolic/function/sx_function.hpp"
-#include "symbolic/function/mx_function.hpp"
-#include "symbolic/function/linear_solver.hpp"
-#include "symbolic/function/symbolic_qr.hpp"
-#include "symbolic/function/implicit_function.hpp"
-#include "symbolic/function/integrator.hpp"
-#include "symbolic/function/simulator.hpp"
-#include "symbolic/function/control_simulator.hpp"
-#include "symbolic/function/nlp_solver.hpp"
-#include "symbolic/function/qp_solver.hpp"
-#include "symbolic/function/stabilized_qp_solver.hpp"
-#include "symbolic/function/lp_solver.hpp"
-#include "symbolic/function/ocp_solver.hpp"
-#include "symbolic/function/sdp_solver.hpp"
-#include "symbolic/function/socp_solver.hpp"
-#include "symbolic/function/qcqp_solver.hpp"
-#include "symbolic/function/sdqp_solver.hpp"
-#include "symbolic/function/external_function.hpp"
-#include "symbolic/function/parallelizer.hpp"
-#include "symbolic/function/custom_function.hpp"
-#include "symbolic/function/nullspace.hpp"
-
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/stabilized_sqp_method.hpp"
-#include "nonlinear_programming/scpgen.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-#include "nonlinear_programming/newton_implicit_solver.hpp"
-
-#include "integration/fixed_step_integrator.hpp"
-#include "integration/implicit_fixed_step_integrator.hpp"
-#include "integration/rk_integrator.hpp"
-#include "integration/collocation_integrator.hpp"
-#include "integration/old_collocation_integrator.hpp"
-#include "integration/integration_tools.hpp"
-
-
-#include "optimal_control/variable.hpp"
-#include "optimal_control/symbolic_ocp.hpp"
-#include "optimal_control/direct_single_shooting.hpp"
-#include "optimal_control/direct_multiple_shooting.hpp"
-#include "optimal_control/direct_collocation.hpp"
-
-#include "control/dple_solver.hpp"
-#include "control/simple_indef_dple_solver.hpp"
-
-using namespace CasADi;
+using namespace casadi;
 
 %}
 
 #ifndef SWIGXML
-%traits_swigtype(CasADi::DerivativeGenerator);
-%fragment(SWIG_Traits_frag(CasADi::DerivativeGenerator));
-%traits_swigtype(CasADi::Callback);
-%fragment(SWIG_Traits_frag(CasADi::Callback));
-%traits_swigtype(CasADi::CustomEvaluate);
-%fragment(SWIG_Traits_frag(CasADi::CustomEvaluate));
-%traits_swigtype(CasADi::IndexList);
-%fragment(SWIG_Traits_frag(CasADi::IndexList));
+%traits_swigtype(casadi::DerivativeGenerator);
+%fragment(SWIG_Traits_frag(casadi::DerivativeGenerator));
+%traits_swigtype(casadi::Callback);
+%fragment(SWIG_Traits_frag(casadi::Callback));
+%traits_swigtype(casadi::CustomEvaluate);
+%fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
+%traits_swigtype(casadi::IndexList);
+%fragment(SWIG_Traits_frag(casadi::IndexList));
 
-%template(Dictionary) std::map<std::string,CasADi::GenericType>;
+%template(Dictionary) std::map<std::string,casadi::GenericType>;
 
-%traits_swigtype(CasADi::Function);
-%fragment(SWIG_Traits_frag(CasADi::Function));
+%traits_swigtype(casadi::Function);
+%fragment(SWIG_Traits_frag(casadi::Function));
 
 #endif
 
@@ -731,91 +668,84 @@ using namespace CasADi;
 
 %{
 namespace std {
-void dummy(CasADi::SXElement foo,
+void dummy(casadi::SXElement foo,
 	std::vector< std::vector<double> > foo1,
 	std::vector<double> &foo2,
-	std::vector<CasADi::MX> &foo3,
-	CasADi::MX foo4,
-	CasADi::Matrix<double> foo5,
-	CasADi::Sparsity foo6,
-	std::vector<CasADi::SXElement> foo7,
-	std::vector< std::vector<CasADi::SXElement> > foo8,
-	CasADi::Matrix<CasADi::SXElement> foo9,
-	CasADi::GenericType foo10,
-	std::vector < CasADi::Matrix<double> > foo11,
-  std::vector < std::vector < CasADi::Matrix<double> > > foo12,
-  std::vector < CasADi::Matrix<int> > foo13,
-  std::vector < std::vector < CasADi::Matrix<int> > > foo14,
-  std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
-  std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
-  std::vector < std::vector < CasADi::MX > > foo17,
-  std::vector < std::vector < CasADi::MX* > > foo17b,
-  CasADi::Dictionary foo18,
+	std::vector<casadi::MX> &foo3,
+	casadi::MX foo4,
+	casadi::Matrix<double> foo5,
+	casadi::Sparsity foo6,
+	std::vector<casadi::SXElement> foo7,
+	std::vector< std::vector<casadi::SXElement> > foo8,
+	casadi::Matrix<casadi::SXElement> foo9,
+	casadi::GenericType foo10,
+	std::vector < casadi::Matrix<double> > foo11,
+  std::vector < std::vector < casadi::Matrix<double> > > foo12,
+  std::vector < casadi::Matrix<int> > foo13,
+  std::vector < std::vector < casadi::Matrix<int> > > foo14,
+  std::vector < casadi::Matrix<casadi::SXElement> > foo15,
+  std::vector < std::vector < casadi::Matrix<casadi::SXElement> > > foo16,
+  std::vector < std::vector < casadi::MX > > foo17,
+  std::vector < std::vector < casadi::MX* > > foo17b,
+  casadi::Dictionary foo18,
   std::string& foo19,
-  CasADi::Matrix<int> foo20,
-  CasADi::CustomFunction foo24,
-  CasADi::Function foo25,
+  casadi::Matrix<int> foo20,
+  casadi::CustomFunction foo24,
+  casadi::Function foo25,
 	int &bar,
 	double &baz) {}
 
 
 #ifdef SWIGPYTHON
 void dummy2(
-  CasADi::DerivativeGenerator foo1,
-  CasADi::Callback foo2,
-  CasADi::CustomEvaluate foo3
+  casadi::DerivativeGenerator foo1,
+  casadi::Callback foo2,
+  casadi::CustomEvaluate foo3
   ) {}
 #endif// SWIGPYTHON
 };
 %}
 
 #ifdef SWIGPYTHON
-#ifdef WITH_SWIG_SPLIT
 %pythoncode %{
-import _casadi_main as _casadi_main_module
+import _casadi_core
 %}
-#endif // WITH_SWIG_SPLIT
-#ifndef WITH_SWIG_SPLIT
-%pythoncode %{
-_casadi_main_module = _casadi
-%}
-#endif // WITH_SWIG_SPLIT
 #endif // SWIGPYTHON
 
 namespace std {
-void dummy(CasADi::SXElement foo,
+void dummy(casadi::SXElement foo,
 	std::vector< std::vector<double> > foo1,
 	std::vector<double> &foo2,
-	std::vector<CasADi::MX> &foo3,
-	CasADi::MX foo4,
-	CasADi::Matrix<double> foo5,
-	CasADi::Sparsity foo6,
-	std::vector<CasADi::SXElement> foo7,
-	std::vector< std::vector<CasADi::SXElement> > foo8,
-	CasADi::Matrix<CasADi::SXElement> foo9,
-  CasADi::GenericType foo10,
-  std::vector < CasADi::Matrix<double> > foo11,
-  std::vector < std::vector < CasADi::Matrix<double> > > foo12,
-  std::vector < CasADi::Matrix<int> > foo13,
-  std::vector < std::vector < CasADi::Matrix<int> > > foo14,
-  std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
-  std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
-  std::vector < std::vector < CasADi::MX > > foo17,
-  std::vector < std::vector < CasADi::MX* > > foo17b,
-  CasADi::Dictionary foo18,
+	std::vector<casadi::MX> &foo3,
+	casadi::MX foo4,
+	casadi::Matrix<double> foo5,
+	casadi::Sparsity foo6,
+	std::vector<casadi::SXElement> foo7,
+	std::vector< std::vector<casadi::SXElement> > foo8,
+	casadi::Matrix<casadi::SXElement> foo9,
+  casadi::GenericType foo10,
+  std::vector < casadi::Matrix<double> > foo11,
+  std::vector < std::vector < casadi::Matrix<double> > > foo12,
+  std::vector < casadi::Matrix<int> > foo13,
+  std::vector < std::vector < casadi::Matrix<int> > > foo14,
+  std::vector < casadi::Matrix<casadi::SXElement> > foo15,
+  std::vector < std::vector < casadi::Matrix<casadi::SXElement> > > foo16,
+  std::vector < std::vector < casadi::MX > > foo17,
+  std::vector < std::vector < casadi::MX* > > foo17b,
+  casadi::Dictionary foo18,
   std::string& foo19,
-  CasADi::Matrix<int> foo20,
-  CasADi::CustomFunction foo24,
-  CasADi::Function foo25,
+  casadi::Matrix<int> foo20,
+  casadi::CustomFunction foo24,
+  casadi::Function foo25,
 	int &bar,
 	double &baz);
 
 
 #ifdef SWIGPYTHON
 void dummy2(
-  CasADi::DerivativeGenerator foo1,
-  CasADi::Callback foo2,
-  CasADi::CustomEvaluate foo3
+  casadi::DerivativeGenerator foo1,
+  casadi::Callback foo2,
+  casadi::CustomEvaluate foo3
   ) {}
 #endif
 

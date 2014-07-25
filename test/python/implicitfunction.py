@@ -28,15 +28,20 @@ from helpers import *
 
 solvers= []
 try:
-  solvers.append((KinsolSolver,{"linear_solver": CSparse,"abstol":1e-10}))
+  LinearSolver.loadPlugin("csparse")
+  ImplicitFunction.loadPlugin("kinsol")
+  solvers.append(("kinsol",{"linear_solver": "csparse","abstol":1e-10}))
 except:
   pass
 try:
-  solvers.append((NLPImplicitSolver,{"linear_solver": CSparse,"nlp_solver": IpoptSolver}))
+  LinearSolver.loadPlugin("csparse")
+  NlpSolver.loadPlugin("ipopt")
+  solvers.append(("nlp",{"linear_solver": "csparse", "nlp_solver": "ipopt"}))
 except:
   pass
 try:
-  solvers.append((NewtonImplicitSolver,{"linear_solver": CSparse}))
+  LinearSolver.loadPlugin("csparse")
+  solvers.append(("newton",{"linear_solver": "csparse"}))
 except:
   pass
 
@@ -44,11 +49,11 @@ class NLPtests(casadiTestCase):
   def test_scalar1(self):
     self.message("Scalar implicit problem, n=0")
     for Solver, options in solvers:
-      self.message(Solver.__name__)
+      self.message(Solver)
       x=SX.sym("x")
       f=SXFunction([x],[sin(x)])
       f.init()
-      solver=Solver(f)
+      solver=ImplicitFunction(Solver,f)
       solver.setOption(options)
       solver.init()
       solver.setInput(6)
@@ -62,14 +67,14 @@ class NLPtests(casadiTestCase):
   def test_scalar2(self):
     self.message("Scalar implicit problem, n=1")
     for Solver, options in solvers:
-      self.message(Solver.__name__)
-      message = Solver.__name__
+      self.message(Solver)
+      message = Solver
       x=SX.sym("x")
       y=SX.sym("y")
       n=0.2
       f=SXFunction([y,x],[x-arcsin(y)])
       f.init()
-      solver=Solver(f)
+      solver=ImplicitFunction(Solver,f)
       solver.setOption(options)
       solver.init()
       solver.setInput(n,1)
@@ -81,14 +86,14 @@ class NLPtests(casadiTestCase):
 
   def test_scalar2_indirect(self):
     for Solver, options in solvers:
-      self.message(Solver.__name__)
-      message = Solver.__name__
+      self.message(Solver)
+      message = Solver
       x=SXElement.sym("x")
       y=SXElement.sym("y")
       n=0.2
       f=SXFunction([y,x],[x-arcsin(y)])
       f.init()
-      solver=Solver(f)
+      solver=ImplicitFunction(Solver,f)
       solver.setOption(options)
       solver.init()
       
@@ -106,10 +111,10 @@ class NLPtests(casadiTestCase):
       
   def test_large(self):
     for Solver, options in solvers:
-      if 'Kinsol' in str(Solver): continue
-      if 'Newton' in str(Solver): continue
+      if 'kinsol' in str(Solver): continue
+      if 'newton' in str(Solver): continue
       
-      message = Solver.__name__
+      message = Solver
       N = 5
       s = Sparsity.tril(N)
       x=SX.sym("x",s)
@@ -119,7 +124,7 @@ class NLPtests(casadiTestCase):
 
       f=SXFunction([vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
       f.init()
-      solver=Solver(f)
+      solver=ImplicitFunction(Solver,f)
       solver.setOption(options)
       # Cholesky is only unique for positive diagonal entries
       solver.setOption("constraints",[1]*s.size())
@@ -151,8 +156,8 @@ class NLPtests(casadiTestCase):
   def test_vector2(self):
     self.message("Scalar implicit problem, n=1")
     for Solver, options in solvers:
-      self.message(Solver.__name__)
-      message = Solver.__name__
+      self.message(Solver)
+      message = Solver
       x=SXElement.sym("x")
       y=SX.sym("y",2)
       y0 = DMatrix([0.1,0.4])
@@ -160,7 +165,7 @@ class NLPtests(casadiTestCase):
       n=0.2
       f=SXFunction([y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
       f.init()
-      solver=Solver(f)
+      solver=ImplicitFunction(Solver,f)
       solver.setOption(options)
       solver.init()
       solver.setInput(n)
@@ -176,7 +181,7 @@ class NLPtests(casadiTestCase):
     x=SXElement.sym("x")
     f=SXFunction([x],[sin(x)])
     f.init()
-    solver=KinsolSolver(f)
+    solver=ImplicitFunction("kinsol",f)
     solver.setOption("constraints",[-1])
     print solver.dictionary()
     solver.init()
@@ -186,13 +191,13 @@ class NLPtests(casadiTestCase):
     
   def test_constraints(self):
     for Solver, options in solvers:
-      if 'Kinsol' in str(Solver): continue
-      if 'Newton' in str(Solver): continue
+      if 'kinsol' in str(Solver): continue
+      if 'newton' in str(Solver): continue
       x=SX.sym("x",2)
       f=SXFunction([x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       f.init()
       
-      solver=Solver(f)
+      solver=ImplicitFunction(Solver,f)
       solver.setOption(options)
       solver.setOption("constraints",[-1,0])
       solver.init()
@@ -203,7 +208,7 @@ class NLPtests(casadiTestCase):
       f=SXFunction([x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       f.init()
       
-      solver=Solver(f)
+      solver=ImplicitFunction(Solver,f)
       solver.setOption(options)
       solver.setOption("constraints",[1,0])
       solver.init()
@@ -228,8 +233,8 @@ class NLPtests(casadiTestCase):
     vfcn_sx.setOption("ad_mode","forward")
 
     # Create a implicit function instance to solve the system of equations
-    ifcn = NewtonImplicitSolver(vfcn_sx)
-    ifcn.setOption("linear_solver",CSparse)
+    ifcn = ImplicitFunction("newton",vfcn_sx)
+    ifcn.setOption("linear_solver","csparse")
     ifcn.init()
 
     #ifcn = MXFunction([X0],[vertcat([X0])])

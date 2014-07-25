@@ -21,20 +21,20 @@
  */
 
 #include "lifted_sqp_internal.hpp"
-#include "symbolic/std_vector_tools.hpp"
-#include "symbolic/matrix/sparsity_tools.hpp"
-#include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/function/sx_function.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/casadi_calculus.hpp"
+#include "core/std_vector_tools.hpp"
+#include "core/matrix/sparsity_tools.hpp"
+#include "core/matrix/matrix_tools.hpp"
+#include "core/function/sx_function.hpp"
+#include "core/sx/sx_tools.hpp"
+#include "core/casadi_calculus.hpp"
 #include <ctime>
 #include <iomanip>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
-LiftedSQPInternal::LiftedSQPInternal(const Function& F, const Function& G) : NLPSolverInternal(Function(),F,G){
-  casadi_warning("CasADi::LiftedSQP has been replaced by CasADi::SCPgen. This class will be deleted.");
+LiftedSQPInternal::LiftedSQPInternal(const Function& F, const Function& G) : NlpSolverInternal(Function(),F,G){
+  casadi_warning("casadi::LiftedSQP has been replaced by casadi::SCPgen. This class will be deleted.");
   addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
   addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
   addOption("max_iter",           OT_INTEGER,    100,           "Maximum number of SQP iterations");
@@ -62,7 +62,7 @@ LiftedSQPInternal::~LiftedSQPInternal(){
 
 void LiftedSQPInternal::init(){
   // Call the init method of the base class
-  NLPSolverInternal::init();
+  NlpSolverInternal::init();
 
   // Number of lifted variables
   nv = getOption("num_lifted");
@@ -152,7 +152,7 @@ void LiftedSQPInternal::init(){
     if(!v.empty()) lag += inner_prod(lam_v_eq,v_def);
     
     // Gradient of the Lagrangian
-    SX lgrad = CasADi::gradient(lag,x);
+    SX lgrad = casadi::gradient(lag,x);
     if(!v.empty()) lgrad -= vertcat(SX::zeros(nu),lam_v_eq); // Put here to ensure that lgrad is of the form "h_extended -v_extended"
     makeDense(lgrad);
     if(verbose_){
@@ -337,7 +337,7 @@ void LiftedSQPInternal::init(){
   DMatrix &lam_g_k = output(NLP_SOLVER_LAM_G);
 
   // Allocate a QP solver
-  QPSolverCreator qp_solver_creator = getOption("qp_solver");
+  QpSolverCreator qp_solver_creator = getOption("qp_solver");
   qp_solver_ = qp_solver_creator(B1.sparsity(),B2.sparsity());
   
   // Set options if provided
@@ -532,4 +532,4 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
   stats_["iter_count"] = k;
 }
 
-} // namespace CasADi
+} // namespace casadi
