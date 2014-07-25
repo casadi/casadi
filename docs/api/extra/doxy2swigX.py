@@ -170,7 +170,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
      
     caption = node.getElementsByTagName("caption")
     if len(caption)==1:
-      self.add_text(">" + astext(caption[0]).encode("ascii","ignore")+"\n")
+      self.add_text(">" + astext(caption[0]).encode("ascii","ignore")+"\n\n")
     
     rows = []
     for (i,row) in enumerate(node.getElementsByTagName("row")):
