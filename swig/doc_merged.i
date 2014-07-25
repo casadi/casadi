@@ -12233,7 +12233,8 @@ provides all of $P_k$ that satisfy:
 
 
 
-General information ===================
+General information
+===================
 
 
 
@@ -12375,7 +12376,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -12392,7 +12394,8 @@ DpleSolver.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-simple ------
+simple
+------
 
 
 
@@ -12420,7 +12423,8 @@ Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
 
 --------------------------------------------------------------------------------
 
-slicot ------
+slicot
+------
 
 
 
@@ -18943,7 +18947,8 @@ Solves the following parametric nonlinear program (NLP):
 
 In a homotopy from tau = 0 to tau = 1.
 
-General information ===================
+General information
+===================
 
 
 
@@ -19110,7 +19115,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -19125,7 +19131,8 @@ HomotopyNlpSolver.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-simple ------
+simple
+------
 
 
 
@@ -20654,7 +20661,8 @@ may be zero. The first output is the solved for z.
 You can provide an initial guess for z by setting output(0) of
 ImplicitFunction.
 
-General information ===================
+General information
+===================
 
 
 
@@ -20785,7 +20793,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -20804,7 +20813,8 @@ ImplicitFunction.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-kinsol ------
+kinsol
+------
 
 
 
@@ -20879,7 +20889,8 @@ KINSOL interface from the Sundials suite
 
 --------------------------------------------------------------------------------
 
-newton ------
+newton
+------
 
 
 
@@ -20939,7 +20950,8 @@ Implements simple newton iterations to solve an implicit function.
 
 --------------------------------------------------------------------------------
 
-nlp ---
+nlp
+---
 
 
 
@@ -22644,7 +22656,8 @@ equation and a set of quadratures:
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points.
 
-General information ===================
+General information
+===================
 
 
 
@@ -22820,7 +22833,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -22843,7 +22857,8 @@ Integrator.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-cvodes ------
+cvodes
+------
 
 
 
@@ -23129,7 +23144,8 @@ times t_i.
 
 --------------------------------------------------------------------------------
 
-idas ----
+idas
+----
 
 
 
@@ -25904,7 +25920,8 @@ Repeat steps 4 and 5 to work with other b vectors.
 The method evaluate() combines the prepare() and solve() step and is
 therefore more expensive if A is invariant.
 
-General information ===================
+General information
+===================
 
 
 
@@ -26013,7 +26030,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -27256,7 +27274,8 @@ Solves the following linear problem:
 
 
 
-General information ===================
+General information
+===================
 
 
 
@@ -27387,7 +27406,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -33743,7 +33763,8 @@ Solves the following parametric nonlinear program (NLP):
 
 
 
-General information ===================
+General information
+===================
 
 
 
@@ -34002,7 +34023,8 @@ General information ===================
 |              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -34029,7 +34051,8 @@ NlpSolver.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-ipopt -----
+ipopt
+-----
 
 
 
@@ -36346,7 +36369,8 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 
 --------------------------------------------------------------------------------
 
-knitro ------
+knitro
+------
 
 
 
@@ -36467,7 +36491,8 @@ KNITRO interface
 
 --------------------------------------------------------------------------------
 
-snopt -----
+snopt
+-----
 
 
 
@@ -36555,7 +36580,8 @@ SNOPT interface
 
 --------------------------------------------------------------------------------
 
-worhp -----
+worhp
+-----
 
 
 
@@ -37396,7 +37422,8 @@ WORHP interface
 
 --------------------------------------------------------------------------------
 
-scpgen ------
+scpgen
+------
 
 
 
@@ -45975,7 +46002,8 @@ Solves the following strictly convex problem:
 
 If H, Pi is not positive-definite, the solver should throw an error.
 
-General information ===================
+General information
+===================
 
 
 
@@ -46133,7 +46161,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -46148,7 +46177,8 @@ QcqpSolver.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-socp ----
+socp
+----
 
 
 
@@ -47699,7 +47729,8 @@ Solves the following strictly convex problem:
 
 If H is not positive-definite, the solver should throw an error.
 
-General information ===================
+General information
+===================
 
 
 
@@ -47841,7 +47872,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -47866,7 +47898,8 @@ QpSolver.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-cplex -----
+cplex
+-----
 
 
 
@@ -47933,7 +47966,8 @@ Interface to Cplex solver for sparse Quadratic Programs
 
 --------------------------------------------------------------------------------
 
-ooqp ----
+ooqp
+----
 
 
 
@@ -48172,7 +48206,8 @@ Interface to QPOases Solver for quadratic programming
 
 --------------------------------------------------------------------------------
 
-sqic ----
+sqic
+----
 
 
 
@@ -48191,7 +48226,8 @@ Interface to the SQIC solver for quadratic programming
 
 --------------------------------------------------------------------------------
 
-nlp ---
+nlp
+---
 
 
 
@@ -48225,7 +48261,8 @@ Solve QPs using an NlpSolver
 
 --------------------------------------------------------------------------------
 
-qcqp ----
+qcqp
+----
 
 
 
@@ -51293,7 +51330,8 @@ You can cast this into the standard form with: G = blkdiag(Gj for all j) Fi
 
 Implementations of SdpSolver are encouraged to exploit this block structure.
 
-General information ===================
+General information
+===================
 
 
 
@@ -51490,7 +51528,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -51505,7 +51544,8 @@ SdpSolver.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-dsdp ----
+dsdp
+----
 
 
 
@@ -52421,7 +52461,8 @@ SdqpSolver.
 
 Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 
-General information ===================
+General information
+===================
 
 
 
@@ -52591,7 +52632,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -52606,7 +52648,8 @@ SdqpSolver.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-sdp ---
+sdp
+---
 
 
 
@@ -57782,7 +57825,8 @@ Primal:
 
 
 
-General information ===================
+General information
+===================
 
 
 
@@ -57948,7 +57992,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -57963,7 +58008,8 @@ SocpSolver.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-sdp ---
+sdp
+---
 
 
 
@@ -60891,7 +60937,8 @@ Solves the following strictly convex problem:
 
 If H is not positive-definite, the solver should throw an error.
 
-General information ===================
+General information
+===================
 
 
 
@@ -61048,7 +61095,8 @@ General information ===================
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-List of plugins ===============
+List of plugins
+===============
 
 
 
@@ -61065,7 +61113,8 @@ StabilizedQpSolver.doc(\"myextraplugin\")
 
 --------------------------------------------------------------------------------
 
-sqic ----
+sqic
+----
 
 
 
@@ -65129,7 +65178,8 @@ Eliminate interdependencies amongst the outputs.
 
 A flat OCP representation coupled to an XML file.
 
-Variables: ==========
+Variables:
+==========
 
 
 
@@ -65148,7 +65198,8 @@ Variables: ==========
 
 
 
-Equations: ==========
+Equations:
+==========
 
 
 
@@ -65166,7 +65217,8 @@ Equations: ==========
 
 
 
-Objective function terms: =========================
+Objective function terms:
+=========================
 
 
 
@@ -65184,7 +65236,8 @@ Note that when parsed, all dynamic equations end up in the implicit category
 \"dae\". At a later state, the DAE can be reformulated, for example in semi-
 explicit form, possibly in addition to a set of quadrature states.
 
-Usage skeleton: ===============
+Usage skeleton:
+===============
 
 
 

@@ -129,7 +129,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
           elif i.find('// File:') > -1: # leave comments alone.
               ret.extend([i, '\n'])
           else:
-              if i.strip().startswith(">") or "-------" in i or "%%newline%%" in i:
+              if i.strip().startswith(">") or "---" in i or "===" in i or "%%newline%%" in i:
                 if "%%newline%%" in i:
                   _tmp = i.replace("%%newline%%","\n")
                 else:
