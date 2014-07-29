@@ -58,7 +58,8 @@ def dpleIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a \e dple solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     a -- A matrices (horzcat when const_dim, blkdiag otherwise) [DPLE_A]
     v -- V matrices (horzcat when const_dim, blkdiag otherwise) [DPLE_V]
   """
@@ -104,7 +105,8 @@ def dpleOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of a \e dple solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     p -- Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [DPLE_P]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleOut. Either use keywords or non-keywords ")
@@ -146,7 +148,8 @@ def controldaeIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an ODE/DAE function
   
-  Keyword arguments:
+  Keyword arguments::
+
     t        -- Global physical time. (1-by-1) [CONTROL_DAE_T]
     x        -- non-zeros as DAEOutput:DAE_RES [CONTROL_DAE_X]
     z        -- Algebraic state vector (dimension np-by-1). [CONTROL_DAE_Z]
@@ -220,7 +223,8 @@ def controlsimulatorIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a control simulator
   
-  Keyword arguments:
+  Keyword arguments::
+
     x0 -- Differential or algebraic state at t0  (dimension nx-by-1) [CONTROLSIMULATOR_X0]
     p  -- Parameters that are fixed over the entire horizon  (dimension np-by-1) [CONTROLSIMULATOR_P]
     u  -- Parameters that change over the integration intervals (dimension nu-by-(ns-1)) [CONTROLSIMULATOR_U]
@@ -270,7 +274,8 @@ def hnlpIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an Homotopy NLP function
   
-  Keyword arguments:
+  Keyword arguments::
+
     x   -- Decision variable [HNL_X]
     p   -- Fixed parameter [HNL_P]
     tau -- Homotopy parameter [HNL_TAU]
@@ -320,7 +325,8 @@ def daeIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an ODE/DAE function
   
-  Keyword arguments:
+  Keyword arguments::
+
     x -- Differential state [DAE_X]
     z -- Algebraic state [DAE_Z]
     p -- Parameter [DAE_P]
@@ -374,7 +380,8 @@ def daeOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an DAE function
   
-  Keyword arguments:
+  Keyword arguments::
+
     ode  -- Right hand side of the implicit ODE [DAE_ODE]
     alg  -- Right hand side of algebraic equations [DAE_ALG]
     quad -- Right hand side of quadratures equations [DAE_QUAD]
@@ -424,7 +431,8 @@ def rdaeIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an ODE/DAE backward integration function
   
-  Keyword arguments:
+  Keyword arguments::
+
     rx -- Backward differential state [RDAE_RX]
     rz -- Backward algebraic state [RDAE_RZ]
     rp -- Backward  parameter vector [RDAE_RP]
@@ -490,7 +498,8 @@ def rdaeOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an ODE/DAE backward integration function
   
-  Keyword arguments:
+  Keyword arguments::
+
     ode  -- Right hand side of ODE. [RDAE_ODE]
     alg  -- Right hand side of algebraic equations. [RDAE_ALG]
     quad -- Right hand side of quadratures. [RDAE_QUAD]
@@ -540,7 +549,8 @@ def integratorIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an integrator
   
-  Keyword arguments:
+  Keyword arguments::
+
     x0  -- Differential state at the initial time [INTEGRATOR_X0]
     p   -- Parameters [INTEGRATOR_P]
     z0  -- Initial guess for the algebraic variable [INTEGRATOR_Z0]
@@ -602,7 +612,8 @@ def integratorOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an integrator
   
-  Keyword arguments:
+  Keyword arguments::
+
     xf  -- Differential state at the final time [INTEGRATOR_XF]
     qf  -- Quadrature state at the final time [INTEGRATOR_QF]
     zf  -- Algebraic variable at the final time [INTEGRATOR_ZF]
@@ -664,7 +675,8 @@ def linsolIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a linear solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     A -- The square matrix A: sparse, (n x n). [LINSOL_A]
     B -- The right-hand-side matrix b: dense,  (n x m) [LINSOL_B]
   """
@@ -710,7 +722,8 @@ def linsolOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of a linear solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     X -- Solution to the linear system of equations [LINSOL_X]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolOut. Either use keywords or non-keywords ")
@@ -752,7 +765,8 @@ def lpIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a LP problem
   
-  Keyword arguments:
+  Keyword arguments::
+
     c   -- The vector c: dense (n x 1) [LP_SOLVER_C]
     a   -- The matrix A: sparse, (nc x n) - product with x must be dense. [LP_SOLVER_A]
     lba -- dense, (nc x 1) [LP_SOLVER_LBA]
@@ -814,7 +828,8 @@ def lpOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an LP Solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     x     -- The primal solution [LP_SOLVER_X]
     cost  -- The optimal cost [LP_SOLVER_COST]
     lam_a -- The dual solution corresponding to linear bounds [LP_SOLVER_LAM_A]
@@ -868,7 +883,8 @@ def lpStruct(*dummy,**kwargs):
           all arguments after the first optional
   Structure specification of an LP
   
-  Keyword arguments:
+  Keyword arguments::
+
     a -- The matrix A: sparse [LP_STRUCT_A]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpStruct. Either use keywords or non-keywords ")
@@ -903,7 +919,8 @@ def nlpIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an NLP function
   
-  Keyword arguments:
+  Keyword arguments::
+
     x -- Decision variable [NL_X]
     p -- Fixed parameter [NL_P]
   """
@@ -949,7 +966,8 @@ def nlpOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an NLP function
   
-  Keyword arguments:
+  Keyword arguments::
+
     f -- Objective function [NL_F]
     g -- Constraint function [NL_G]
   """
@@ -995,7 +1013,8 @@ def gradFIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an NLP objective gradient function
   
-  Keyword arguments:
+  Keyword arguments::
+
     x -- Decision variable [GRADF_X]
     p -- Fixed parameter [GRADF_P]
   """
@@ -1041,7 +1060,8 @@ def gradFOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an NLP objective gradient function
   
-  Keyword arguments:
+  Keyword arguments::
+
     grad -- Jacobian of the constraints [GRADF_GRAD]
     f    -- Objective function [GRADF_F]
     g    -- Constraint function [GRADF_G]
@@ -1091,7 +1111,8 @@ def jacGIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an NLP Jacobian function
   
-  Keyword arguments:
+  Keyword arguments::
+
     x -- Decision variable [JACG_X]
     p -- Fixed parameter [JACG_P]
   """
@@ -1137,7 +1158,8 @@ def jacGOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an NLP Jacobian function
   
-  Keyword arguments:
+  Keyword arguments::
+
     jac -- Jacobian of the constraints [JACG_JAC]
     f   -- Objective function [JACG_F]
     g   -- Constraint function [JACG_G]
@@ -1187,7 +1209,8 @@ def hessLagIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an NLP Hessian function
   
-  Keyword arguments:
+  Keyword arguments::
+
     x     -- Decision variable [HESSLAG_X]
     p     -- Fixed parameter [HESSLAG_P]
     lam_f -- NLP solver might use to scale the objective. [HESSLAG_LAM_F]
@@ -1241,7 +1264,8 @@ def hessLagOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an NLP Hessian function
   
-  Keyword arguments:
+  Keyword arguments::
+
     hess   -- Hessian of the Lagrangian [HESSLAG_HESS]
     f      -- Objective function [HESSLAG_F]
     g      -- Constraint function [HESSLAG_G]
@@ -1299,7 +1323,8 @@ def nlpSolverIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of an NLP Solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     x0     -- Decision variables, initial guess (nx x 1)  [NLP_SOLVER_X0]
     p      -- Value of fixed parameters (np x 1) [NLP_SOLVER_P]
     lbx    -- Decision variables lower bound (nx x 1), default -inf [NLP_SOLVER_LBX]
@@ -1369,7 +1394,8 @@ def nlpSolverOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an NLP Solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     x     -- Decision variables at the optimal solution (nx x 1) [NLP_SOLVER_X]
     f     -- Cost function value at the optimal solution (1 x 1) [NLP_SOLVER_F]
     g     -- Constraints function at the optimal solution (ng x 1) [NLP_SOLVER_G]
@@ -1433,7 +1459,8 @@ def mayerIn(*dummy,**kwargs):
   nx: Number of states: from ffcn.input(INTEGRATOR_X0).size()
   np: Number of parameters: from option number_of_parameters
   
-  Keyword arguments:
+  Keyword arguments::
+
     x -- States at the end of integration (nx x 1) [MAYER_X]
     p -- Problem parameters (np x 1) [MAYER_P]
   """
@@ -1485,7 +1512,8 @@ def ocpIn(*dummy,**kwargs):
   np: Number of parameters: from option number_of_parameters
   nh: Number of point constraints: from cfcn.input(0).size()
   
-  Keyword arguments:
+  Keyword arguments::
+
     lbx    -- States lower bounds (nx x (ns+1)) [OCP_LBX]
     ubx    -- States upper bounds (nx x (ns+1)) [OCP_UBX]
     x_init -- States initial guess (nx x (ns+1)) [OCP_X_INIT]
@@ -1575,7 +1603,8 @@ def ocpOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an OCP Solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     x_opt -- Optimal state trajectory [OCP_X_OPT]
     u_opt -- Optimal control trajectory [OCP_U_OPT]
     p_opt -- Optimal parameters [OCP_P_OPT]
@@ -1629,7 +1658,8 @@ def qcqpIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a QP problem
   
-  Keyword arguments:
+  Keyword arguments::
+
     h      -- The matrix is assumed to be symmetrical. [QCQP_SOLVER_H]
     g      -- The vector g: dense,  (n x 1) [QCQP_SOLVER_G]
     p      -- triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_SOLVER_P]
@@ -1715,7 +1745,8 @@ def qcqpOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an QP Solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     x     -- The primal solution [QCQP_SOLVER_X]
     cost  -- The optimal cost [QCQP_SOLVER_COST]
     lam_a -- The dual solution corresponding to linear bounds [QCQP_SOLVER_LAM_A]
@@ -1769,7 +1800,8 @@ def qcqpStruct(*dummy,**kwargs):
           all arguments after the first optional
   Structure specification of a QP
   
-  Keyword arguments:
+  Keyword arguments::
+
     h -- The matrix is assumed to be symmetrical. [QCQP_STRUCT_H]
     p -- triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_STRUCT_P]
     a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QCQP_STRUCT_A]
@@ -1812,7 +1844,8 @@ def qpIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a QP problem
   
-  Keyword arguments:
+  Keyword arguments::
+
     h      -- The matrix is assumed to be symmetrical. [QP_SOLVER_H]
     g      -- The vector g: dense,  (n x 1) [QP_SOLVER_G]
     a      -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_SOLVER_A]
@@ -1886,7 +1919,8 @@ def qpOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an QP Solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     x     -- The primal solution [QP_SOLVER_X]
     cost  -- The optimal cost [QP_SOLVER_COST]
     lam_a -- The dual solution corresponding to linear bounds [QP_SOLVER_LAM_A]
@@ -1940,7 +1974,8 @@ def qpStruct(*dummy,**kwargs):
           all arguments after the first optional
   Structure specification of a QP
   
-  Keyword arguments:
+  Keyword arguments::
+
     h -- The matrix is assumed to be symmetrical. [QP_STRUCT_H]
     a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_STRUCT_A]
   """
@@ -1979,7 +2014,8 @@ def sdpIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a SDP problem
   
-  Keyword arguments:
+  Keyword arguments::
+
     f   -- The horizontal stack of all matrices F_i: ( m x nm) [SDP_SOLVER_F]
     c   -- The vector c: ( n x 1) [SDP_SOLVER_C]
     g   -- The matrix G: ( m x m) [SDP_SOLVER_G]
@@ -2049,7 +2085,8 @@ def sdpOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an SDP Solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     x         -- The primal solution (n x 1) - may be used as initial guess [SDP_SOLVER_X]
     p         -- The solution P (m x m) - may be used as initial guess [SDP_SOLVER_P]
     dual      -- The dual solution (m x m) - may be used as initial guess [SDP_SOLVER_DUAL]
@@ -2115,7 +2152,8 @@ def sdpStruct(*dummy,**kwargs):
           all arguments after the first optional
   Structure specification of an SDP
   
-  Keyword arguments:
+  Keyword arguments::
+
     f -- The horizontal stack of all matrices F_i: ( m x nm) [SDP_STRUCT_F]
     g -- The matrix G: ( m x m) [SDP_STRUCT_G]
     a -- The matrix A: ( nc x n) [SDP_STRUCT_A]
@@ -2158,7 +2196,8 @@ def sdqpIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a SDQP problem
   
-  Keyword arguments:
+  Keyword arguments::
+
     h   -- The matrix H: sparse ( n x n) [SDQP_SOLVER_H]
     c   -- The vector c: ( n x 1) [SDQP_SOLVER_C]
     f   -- The horizontal stack of all matrices F_i: ( m x nm) [SDQP_SOLVER_F]
@@ -2232,7 +2271,8 @@ def sdqpOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an SDQP Solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     x         -- The primal solution (n x 1) - may be used as initial guess [SDQP_SOLVER_X]
     p         -- The solution P (m x m) - may be used as initial guess [SDQP_SOLVER_P]
     dual      -- The dual solution (m x m) - may be used as initial guess [SDQP_SOLVER_DUAL]
@@ -2298,7 +2338,8 @@ def sdqpStruct(*dummy,**kwargs):
           all arguments after the first optional
   Structure specification of an SDQP
   
-  Keyword arguments:
+  Keyword arguments::
+
     h -- The matrix H: sparse ( n x n) [SDQP_STRUCT_H]
     f -- The horizontal stack of all matrices F_i: ( m x nm) [SDQP_STRUCT_F]
     g -- The matrix G: ( m x m) [SDQP_STRUCT_G]
@@ -2345,7 +2386,8 @@ def socpIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a SOCP problem
   
-  Keyword arguments:
+  Keyword arguments::
+
     g   -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_SOLVER_G]
     h   -- The vertical stack of all vectors hi: ( N x 1) [SOCP_SOLVER_H]
     e   -- The vertical stack of all vectors ei: ( nm x 1) [SOCP_SOLVER_E]
@@ -2423,7 +2465,8 @@ def socpOut(*dummy,**kwargs):
           all arguments after the first optional
   Output arguments of an SOCP Solver
   
-  Keyword arguments:
+  Keyword arguments::
+
     x     -- The primal solution (n x 1) [SOCP_SOLVER_X]
     cost  -- The primal optimal cost (1 x 1) [SOCP_SOLVER_COST]
     lam_a -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
@@ -2477,7 +2520,8 @@ def socpStruct(*dummy,**kwargs):
           all arguments after the first optional
   Structure specification of an SOCP
   
-  Keyword arguments:
+  Keyword arguments::
+
     g -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_STRUCT_G]
     a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
   """
@@ -2516,7 +2560,8 @@ def stabilizedQpIn(*dummy,**kwargs):
           all arguments after the first optional
   Input arguments of a QP problem
   
-  Keyword arguments:
+  Keyword arguments::
+
     h      -- The matrix is assumed to be symmetrical. [STABILIZED_QP_SOLVER_H]
     g      -- The vector g: dense,  (n x 1) [STABILIZED_QP_SOLVER_G]
     a      -- The matrix A: sparse, (nc x n) - product with x must be dense. [STABILIZED_QP_SOLVER_A]
