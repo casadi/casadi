@@ -459,8 +459,8 @@ class CasadiStructureDerivable:
     if isinstance(a,MX):
       return MXStruct(self,data=a)
 
-    if isinstance(a,SXMatrix):
-      return SXMatrixStruct(self,data=a)
+    if isinstance(a,SX):
+      return SXStruct(self,data=a)
     
   def repeated(self,arg=0):
     if isinstance(arg,DMatrix):

@@ -30,6 +30,7 @@
 "\n"
 "\n"
 ">List of available options\n"
+"\n"
 "+----+------+---------+-------------+\n"
 "| Id | Type | Default | Description |\n"
 "+====+======+=========+=============+\n"
