@@ -2,7 +2,7 @@
 set(SNOPT_LIBS_LIST snopt7)
 
 set(SNOPT_LIBRARIES)
-foreach(LIB in ${SNOPT_LIBS_LIST})
+foreach(LIB ${SNOPT_LIBS_LIST})
   find_library(SNOPT_LIB_${LIB}
     NAMES ${LIB}
     HINTS $ENV{SNOPT}/lib)
