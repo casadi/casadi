@@ -32,6 +32,11 @@
 
 namespace casadi {
 
+/**
+\ingroup expression_tools
+@{
+*/
+
   /// Transpose of a matrix
   template<typename DataType>
   Matrix<DataType> transpose(const Matrix<DataType> &x);
@@ -396,6 +401,10 @@ namespace casadi {
   /// Obtain the structural rank of a sparsity-pattern
   template<typename DataType>
   int sprank(const Matrix<DataType>& A);
+
+/*
+@}
+*/
 
 } // namespace casadi
 
