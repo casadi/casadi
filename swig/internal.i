@@ -2344,6 +2344,21 @@
 %exception  casadi::SparseStorage< DataType >::begin() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::SparseStorage< DataType >::clear() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::colind() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::colind(int col) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::data() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::data() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::SparseStorage< DataType >::elem(int rr, int cc=0) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2362,6 +2377,12 @@
 %exception  casadi::SparseStorage< DataType >::front() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::SparseStorage< DataType >::getElement(int rr, int cc=0) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::hasNZ(int rr, int cc) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::SparseStorage< DataType >::rbegin() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2372,6 +2393,33 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::SparseStorage< DataType >::rend() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::reserve(int nnz) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::reserve(int nnz, int ncol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::resize(int nrow, int ncol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::row() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::row(int el) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::sanityCheck(bool complete=false) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::sparsity() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::sparsityRef() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::toScalar() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Sparsity::T() const  {
@@ -3452,6 +3500,36 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::Solve< Tr >::Solve(const MX &r, const MX &A, const LinearSolver &linear_solver) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< A > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< DataType > &m) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const DataType &val=DataType(0)) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const std::vector< DataType > &d) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x, int nrow, int ncol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x, int nrow, int ncol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< std::vector< DataType > > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::Split::Split(const MX &x, const std::vector< int > &offset) {

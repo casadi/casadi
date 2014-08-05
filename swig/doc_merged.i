@@ -4629,11 +4629,6 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: control_simulator.hpp ";
 
 %feature("docstring") casadi::ControlSimulator::isInit "
@@ -5983,11 +5978,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: custom_function.hpp ";
 
@@ -8528,11 +8518,6 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: direct_collocation.hpp ";
 
 %feature("docstring") casadi::DirectCollocation::DirectCollocation "
@@ -9812,11 +9797,6 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: direct_multiple_shooting.hpp ";
 
 %feature("docstring") casadi::DirectMultipleShooting::getMfcn "";
@@ -10935,11 +10915,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: direct_single_shooting.hpp ";
 
@@ -12481,10 +12456,6 @@ new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: dple_solver.hpp ";
 
@@ -13799,11 +13770,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: external_function.hpp ";
 
@@ -15269,11 +15235,6 @@ Joel Andersson
 +---------+--------------------------+
 | outputs | casadi::FunctionInternal |
 +---------+--------------------------+
-
-Diagrams
---------
-
-
 
 C++ includes: function.hpp ";
 
@@ -19161,10 +19122,6 @@ simple
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: homotopy_nlp_solver.hpp ";
 
@@ -20985,10 +20942,6 @@ Use an NlpSolver as ImplicitFunction solver
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: implicit_function.hpp ";
 
@@ -23597,10 +23550,6 @@ The method is still under development
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: integrator.hpp ";
 
@@ -26167,10 +26116,6 @@ reordering without partial pivoting
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: linear_solver.hpp ";
 
@@ -27455,10 +27400,6 @@ Solve LPs using a QpSolver
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: lp_solver.hpp ";
 
@@ -32021,11 +31962,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: mx_function.hpp ";
 
@@ -37898,10 +37834,6 @@ Stabilized Sequential Quadratic Programming method.
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: nlp_solver.hpp ";
 
@@ -41485,11 +41417,6 @@ basis Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: nullspace.hpp ";
 
 %feature("docstring") casadi::Nullspace::setNumOutputs "
@@ -41924,11 +41851,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: ocp_solver.hpp ";
 
@@ -43024,11 +42946,6 @@ Joel Andersson
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: options_functionality.hpp ";
 
 %feature("docstring") casadi::OptionsFunctionality::getOptionAllowed "
@@ -43253,11 +43170,6 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: options_functionality.hpp ";
 
@@ -44428,11 +44340,6 @@ Joel Andersson
 | task_starttime  | casadi::ParallelizerInternal |
 +-----------------+------------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: parallelizer.hpp ";
 
 %feature("docstring") casadi::Parallelizer::input "
@@ -44719,17 +44626,14 @@ Generate the sparsity of a Jacobian block
 
 
 // File: structcasadi_1_1PluginInterface_1_1Plugin.xml
-%feature("docstring") casadi::PluginInterface::Plugin "
-
-Fields.
+%feature("docstring") casadi::PluginInterface::Plugin "[INTERNAL]  Fields.
 
 C++ includes: plugin_interface.hpp ";
 
 
 // File: classcasadi_1_1PluginInterface.xml
-%feature("docstring") casadi::PluginInterface "
-
-Interface for accessing input and output data structures.
+%feature("docstring") casadi::PluginInterface "[INTERNAL]  Interface for
+accessing input and output data structures.
 
 Joel Andersson
 
@@ -45875,11 +45779,6 @@ Joris Gillis
 | t_total        | casadi::PsdIndefDpleInternal |
 +----------------+------------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: psd_indef_dple_solver.hpp ";
 
 %feature("docstring") casadi::PsdIndefDpleSolver::repr "[INTERNAL]  Print a
@@ -46241,10 +46140,6 @@ epigraph reformulation and e==0 for all other quadratic constraints.
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: qcqp_solver.hpp ";
 
@@ -48293,10 +48188,6 @@ Solve QP using a QcqpSolver
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: qp_solver.hpp ";
 
@@ -51666,10 +51557,6 @@ manually switch to another SDP Solver
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: sdp_solver.hpp ";
 
@@ -52686,10 +52573,6 @@ singular value decomposition to implement that.
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: sdqp_solver.hpp ";
 
@@ -56517,11 +56400,6 @@ Joel Andersson
 | step    | casadi::SimulatorInternal |
 +---------+---------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: simulator.hpp ";
 
 %feature("docstring") casadi::Simulator::inputS "
@@ -58040,10 +57918,6 @@ Solve SOCPs using an SdpSolver
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: socp_solver.hpp ";
 
@@ -59054,9 +58928,8 @@ Propagate sparsity, no work.
 
 
 // File: classcasadi_1_1SparseStorage.xml
-%feature("docstring") casadi::SparseStorage::sanityCheck "
-
-Check if the dimensions and colind, row vectors are compatible.
+%feature("docstring") casadi::SparseStorage::sanityCheck "[INTERNAL]  Check
+if the dimensions and colind, row vectors are compatible.
 
 Parameters:
 -----------
@@ -59068,8 +58941,7 @@ result
 
 %feature("docstring") casadi::SparseStorage::end "[INTERNAL] ";
 
-%feature("docstring") casadi::SparseStorage::sparsityRef "
-
+%feature("docstring") casadi::SparseStorage::sparsityRef "[INTERNAL]
 Access the sparsity, make a copy if there are multiple references to it.
 
 ";
@@ -59086,27 +58958,24 @@ Get references to beginning and end.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::SparseStorage::sparsity "
-
-Const access the sparsity - reference to data member.
+%feature("docstring") casadi::SparseStorage::sparsity "[INTERNAL]  Const
+access the sparsity - reference to data member.
 
 ";
 
-%feature("docstring") casadi::SparseStorage::hasNZ "
-
-Returns true if the matrix has a non-zero at location rr, cc.
+%feature("docstring") casadi::SparseStorage::hasNZ "[INTERNAL]  Returns
+true if the matrix has a non-zero at location rr, cc.
 
 ";
 
 %feature("docstring") casadi::SparseStorage::back "[INTERNAL] ";
 
-%feature("docstring") casadi::SparseStorage::clear "";
+%feature("docstring") casadi::SparseStorage::clear "[INTERNAL] ";
 
-%feature("docstring") casadi::SparseStorage::reserve "";
+%feature("docstring") casadi::SparseStorage::reserve "[INTERNAL] ";
 
-%feature("docstring") casadi::SparseStorage::getElement "
-
-get an element, do not allocate
+%feature("docstring") casadi::SparseStorage::getElement "[INTERNAL]  get an
+element, do not allocate
 
 ";
 
@@ -59138,27 +59007,26 @@ Get iterators to beginning and end.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::SparseStorage::colind "";
+%feature("docstring") casadi::SparseStorage::colind "[INTERNAL] ";
 
-%feature("docstring") casadi::SparseStorage::toScalar "
-
-Convert to scalar type.
+%feature("docstring") casadi::SparseStorage::toScalar "[INTERNAL]  Convert
+to scalar type.
 
 ";
 
-%feature("docstring") casadi::SparseStorage "C++ includes:
+%feature("docstring") casadi::SparseStorage "[INTERNAL] C++ includes:
 sparse_storage.hpp ";
 
 %feature("docstring") casadi::SparseStorage::data "
 
 >  std::vector< DataType > & casadi::SparseStorage< DataType >::data()
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Access the non-zero elements.
 
 >  const std::vector< DataType > & casadi::SparseStorage< DataType >::data() const 
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Const access the non-zero elements.
 
 ";
@@ -59167,34 +59035,34 @@ Const access the non-zero elements.
 
 >  casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const DataType &val=DataType(0))
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Sparse matrix with a given sparsity
 
 >  casadi::SparseStorage< DataType >::SparseStorage()
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 constructors
 
 empty 0-by-0 matrix constructor
 
 >  casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< DataType > &m)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Copy constructor.
 
 >  casadi::SparseStorage< DataType >::SparseStorage(const std::vector< std::vector< DataType > > &m)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Dense matrix constructor with data given as vector of vectors.
 
 >  casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const std::vector< DataType > &d)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Sparse matrix with a given sparsity and non-zero elements.
 
 >  casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Construct from a vector.
 
 Thanks to implicit conversion, you can pretend that SparseStorage(const
@@ -59203,31 +59071,31 @@ octave interfaces
 
 >  casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x, int nrow, int ncol)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Construct dense matrix from a vector with the elements in column major
 ordering.
 
 >  casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< A > &x)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Create a matrix from a matrix with a different type of matrix entries
 (assuming that the scalar conversion is valid)
 
 >  casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Create an expression from an stl vector.
 
 >  casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x, int nrow, int ncol)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Create a non-vector expression from an stl vector.
 
 ";
 
-%feature("docstring") casadi::SparseStorage::row "";
+%feature("docstring") casadi::SparseStorage::row "[INTERNAL] ";
 
-%feature("docstring") casadi::SparseStorage::resize "";
+%feature("docstring") casadi::SparseStorage::resize "[INTERNAL] ";
 
 %feature("docstring") casadi::SparseStorage::rend "[INTERNAL] ";
 
@@ -61166,10 +61034,6 @@ Solved a stabilized QP using a standard QP solver
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: stabilized_qp_solver.hpp ";
 
@@ -64053,11 +63917,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: sx_function.hpp ";
 
@@ -72366,9 +72225,6 @@ Structure specification of a QP
 // File: casadi__math_8hpp.xml
 
 
-// File: casadi__meta_8cpp.xml
-
-
 // File: casadi__meta_8hpp.xml
 
 
@@ -72567,9 +72423,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: dulmageMendelsohn_8hpp.xml
-
-
-// File: e0__diagram_8hpp.xml
 
 
 // File: empty__lib_8cpp.xml
@@ -74054,112 +73907,112 @@ This file does absolutely nothing but including all headers ";
 // File: chapter6.xml
 
 
-// File: dir_a242f0f31177b4ee0e0f2869a68661e2.xml
+// File: dir_72042a10ffde756f36fe09606962000a.xml
 
 
-// File: dir_173fa14f8112bf6d4fa5fb60c663b079.xml
+// File: dir_07cc71dd3b939bb425a8669b3c802ea8.xml
 
 
-// File: dir_cc00533f663a868a74a94bae6d243fa8.xml
+// File: dir_886b2db020cea1c8ffc1c558916a6c11.xml
 
 
-// File: dir_84ec18459fb5686aa61a50c9a4a5f1ce.xml
+// File: dir_52d8f4855074c7f26a99beef14c842bf.xml
 
 
-// File: dir_165538d1629d63b540b717a0a8f8d17c.xml
+// File: dir_7eb064d025716eb650d05de1782f5b2b.xml
 
 
-// File: dir_b67f2d3e502497e52a0860566e264050.xml
+// File: dir_6977cc14cc8bd48e490a686a2cfcf4c6.xml
 
 
-// File: dir_2211bd5fdd011119a318ab290df1d2d6.xml
+// File: dir_66769b70347d740680522118e6edaac8.xml
 
 
-// File: dir_c6bf31233a1f0eb03dbc4c2e0b88ebf9.xml
+// File: dir_fea3fe6a356014f2898ca1285e3cd002.xml
 
 
-// File: dir_fc8898f6998d6b3cefcb64c4ce7ea1c4.xml
+// File: dir_be6ce1d63c4f7926fe7ce7393f165529.xml
 
 
-// File: dir_2acbf2200173536f11c2515b42b2be1c.xml
+// File: dir_eee29f6598cea43c50d232200a736877.xml
 
 
-// File: dir_97f17b870f201e193796f88aa8b24ee7.xml
+// File: dir_bf55922315bcf9f52c01371cdddb84c6.xml
 
 
-// File: dir_b0fbc30274a97f995867282301b5a22c.xml
+// File: dir_9349a63641e187483d0c94f3b523d451.xml
 
 
-// File: dir_674186e89c51fd5db44b7bb8b4bfd175.xml
+// File: dir_fc6061f2869425cf3ddf1852728ba29e.xml
 
 
-// File: dir_6b24c408f936f5e3fad85af85fac13be.xml
+// File: dir_374e4b802917690314973e8bfe93ed73.xml
 
 
-// File: dir_dbed38ee933aae81b6ffa699ce6b0d5a.xml
+// File: dir_59f456f451c6a5ade243c71477723c46.xml
 
 
-// File: dir_0d90fb8f8b911bb67f5baffe35d6baec.xml
+// File: dir_fc12f14bf51d5ad22332d2f99bfff1b1.xml
 
 
-// File: dir_d560fb3fdf7c7d0fd11fcef22350e515.xml
+// File: dir_8d687bc24aa1527d4378d94e73ac29a1.xml
 
 
-// File: dir_2d4c4b22cf4ab2426dc22dcaf8e55868.xml
+// File: dir_a283c4e4c647890b04a2775ed878d15d.xml
 
 
-// File: dir_2ad7570a4726f50d9009d41ebbe56c46.xml
+// File: dir_c88aa46dbc10b2a8d7e3acf8efbe09e6.xml
 
 
-// File: dir_8e58e9c65aabba9bd90a5ba5a1949f24.xml
+// File: dir_bcc6dc4e5ba367c929e95b8281d413de.xml
 
 
-// File: dir_c3317fe2a063fec6069fcec6e906343a.xml
+// File: dir_2de25148e49724fdd35492cd062e0c91.xml
 
 
-// File: dir_62b1d21e3c79c65cf07537ce621f8931.xml
+// File: dir_3f3200b3112b4c9c15a36f8bb6a32cfe.xml
 
 
-// File: dir_35c4f5a62eb3f9b26d6fc9bafe9412e0.xml
+// File: dir_012f305a30a0a83279acd310a6b59d43.xml
 
 
-// File: dir_a0db0368355cb586cba4163f7f6a5add.xml
+// File: dir_79b750c991f6c8685caebe7a36ee3c0d.xml
 
 
-// File: dir_06b07da53372e68ec9ec3f325c8c4e88.xml
+// File: dir_6bc0ee321bdc059665c26bc2442505a4.xml
 
 
-// File: dir_0e38855d9854873885416e0db777a031.xml
+// File: dir_59fb842a78c241ff306a83ac684823a9.xml
 
 
-// File: dir_c7851ef3eb1eedcf1931ca03c2b2de61.xml
+// File: dir_f59ffc5a01ba160b1c4e59fe5aa133af.xml
 
 
-// File: dir_4c54b8644cdb97524ad2593db88f43f8.xml
+// File: dir_27cb8c33bd472ddd024441084e1d7e56.xml
 
 
-// File: dir_19f99a3a6b2e15dd5d3dc3717aef760f.xml
+// File: dir_cf6d6ce5d2253c7015c48f48be3240f4.xml
 
 
-// File: dir_d9a214f13db5f3374d3d8a9611ce0446.xml
+// File: dir_5e73a5696114407f502faa3df529dcff.xml
 
 
-// File: dir_32cb5448079888161100d95b01b6198d.xml
+// File: dir_6ddb1ff6f225d5e772b93b7cdf234abf.xml
 
 
-// File: dir_36edc65709980d217f100f7aceab18f7.xml
+// File: dir_a6fb270b19ee497ac5630a2ccfb995ad.xml
 
 
-// File: dir_b35908272f9e1123cc1a956ba5b2e3aa.xml
+// File: dir_c0e7f6c8ede5643ce2ee6c7cce183604.xml
 
 
-// File: dir_4d46dafef57ae63a601f2959a12876ee.xml
+// File: dir_339b5c6c84b946d5fc9d1fef3f4d3e22.xml
 
 
-// File: dir_32807da43d094e5518f780a9c1b04df2.xml
+// File: dir_8c21b4e6f2029dd1648c3382e3c555f8.xml
 
 
-// File: dir_8d74aeb32c16fa9fd07602045437f1d6.xml
+// File: dir_6cbff8257564547e02bc1b4a36bb9a1f.xml
 
 
 // File: algebra_2LinearSolver_8py-example.xml
