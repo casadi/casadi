@@ -30,7 +30,7 @@ def setdummybackend(dir):
   """
   Set the matplotlib backend to a dummy value, so that no graphs are generated.
   """
-  shutil.copy('internal/pylab.py',dir)
+  #shutil.copy('internal/pylab.py',dir)
   f=file(dir+'/matplotlibrc','w')
   f.write('backend : Template')
   f.close()
