@@ -4,7 +4,7 @@ from casadi.tools import *
 class OptimizationObject(MX):
   def create(self,shape,name):
     if not isinstance(shape,tuple): shape = (shape,) 
-    MX.__init__(self,name,sp_dense(*shape))
+    MX.__init__(self,MX.sym(name,Sparsity.dense(*shape)))
     self.mapping[hash(self)] = self
     
   def __iter__(self):
@@ -159,11 +159,11 @@ def minimize(f,gl=[],verbose=False):
   original = MXFunction(x+p,nlpOut(f=f,g=G))
   original.init()
   
-  nlp = MXFunction(nlpIn(x=X,p=P),original.evalMX(X[...]+P[...]))
+  nlp = MXFunction(nlpIn(x=X,p=P),original(X[...]+P[...]))
   nlp.init()
   
   # Allocate an ipopt solver
-  solver = IpoptSolver(nlp)
+  solver = NlpSolver("ipopt",nlp)
   if not verbose:
     solver.setOption("print_time",False)
     solver.setOption("print_level",0)
@@ -201,7 +201,7 @@ def minimize(f,gl=[],verbose=False):
       ubg[str(i)] = 0
   
   # Solve the problem numerically
-  solver.solve()
+  solver.evaluate()
   
   # Raise an exception if not converged
   if solver.getStat('return_status')!="Solve_Succeeded":
