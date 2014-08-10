@@ -50,7 +50,7 @@ for tol in tolerances:
   sim.setInput([1,0],"x0")
   sim.evaluate()
 
-  plot(ts,array(sim.getOutput())[:,0],label="tol = 1e%d" % tol)
+  plot(ts,array(sim.getOutput())[0,:].T,label="tol = 1e%d" % tol)
 
 legend( loc='upper left')
 xlabel("Time [s]")

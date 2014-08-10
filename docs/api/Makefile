@@ -26,7 +26,8 @@ doxlocal:
 doxpublish:
 	rm -rf XML XML_internal XML_clutter
 	patch -u Doxyfile.in publish.patch -o - | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(REVISION)/' |    sed 's/PROJECT_BRIEF          = /PROJECT_BRIEF          = $(READABLEREVISION)/' | doxygen -
-	sed -i.bak "s/q:query/q:query,db:dbLocation/g" html/search/search.js 
+	sed -i.bak "s/q:query/q:query,db:dbLocation/g" html/search/search.js
+	find html/ -name "*html" -type f -exec sed -i -e 's/CASADI_[A-Z_]*_EXPORT//g' {} \;
 	doxyindexer searchdata.xml -o html
 	cp style/casadi.png html/casadi.png
 	python extra/generate_overview.py

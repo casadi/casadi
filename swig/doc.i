@@ -82169,6 +82169,66 @@ to be monotonously increasing
 
 ";
 
+%feature("docstring")  casadi::unite(const Matrix< DataType > &A, const
+Matrix< DataType > &B) "
+
+Unite two matrices no overlapping sparsity.
+
+";
+
+%feature("docstring")  casadi::unite(const MX &A, const MX &B) "
+
+Unite two matrices no overlapping sparsity.
+
+";
+
+%feature("docstring")  casadi::pw_lin(const SXElement &t, const SX &tval,
+const SX &val) "
+
+t a scalar variable (e.g. time)
+
+Create a piecewise linear function Create a piecewise linear function:
+
+Inputs: tval vector with the the discrete values of t (monotonically
+increasing) val vector with the corresponding function values (same length
+as tval)
+
+";
+
+%feature("docstring")  casadi::all(const Matrix< DataType > &x) " ";
+
+%feature("docstring")  casadi::dense_mul_tn(int n, int m, int l, const
+double *A, const double *B, double *C) " [INTERNAL] ";
+
+%feature("docstring")  casadi::vertsplit(const Matrix< DataType > &v, const
+std::vector< int > &offset) "
+
+split horizontally, retaining groups of rows
+
+Parameters:
+-----------
+
+output_offset:  List of all start rows for each group the last row group
+will run to the end.
+
+vertcat(vertsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  casadi::vertsplit(const Matrix< DataType > &v, int
+incr=1) "
+
+split horizontally, retaining fixed-sized groups of rows
+
+Parameters:
+-----------
+
+incr:  Size of each group of rows
+
+vertcat(vertsplit(x, ...)) = x
+
+";
+
 %feature("docstring")  casadi::vertsplit(const Sparsity &sp, const
 std::vector< int > &output_offset) "
 
@@ -82201,66 +82261,6 @@ Parameters:
 incr:  Size of each group of rows
 
 vertcat(vertsplit(x, ...)) = x
-
-";
-
-%feature("docstring")  casadi::vertsplit(const Matrix< DataType > &v, const
-std::vector< int > &offset) "
-
-split horizontally, retaining groups of rows
-
-Parameters:
------------
-
-output_offset:  List of all start rows for each group the last row group
-will run to the end.
-
-vertcat(vertsplit(x, ...)) = x
-
-";
-
-%feature("docstring")  casadi::vertsplit(const Matrix< DataType > &v, int
-incr=1) "
-
-split horizontally, retaining fixed-sized groups of rows
-
-Parameters:
------------
-
-incr:  Size of each group of rows
-
-vertcat(vertsplit(x, ...)) = x
-
-";
-
-%feature("docstring")  casadi::pw_lin(const SXElement &t, const SX &tval,
-const SX &val) "
-
-t a scalar variable (e.g. time)
-
-Create a piecewise linear function Create a piecewise linear function:
-
-Inputs: tval vector with the the discrete values of t (monotonically
-increasing) val vector with the corresponding function values (same length
-as tval)
-
-";
-
-%feature("docstring")  casadi::all(const Matrix< DataType > &x) " ";
-
-%feature("docstring")  casadi::dense_mul_tn(int n, int m, int l, const
-double *A, const double *B, double *C) " [INTERNAL] ";
-
-%feature("docstring")  casadi::unite(const MX &A, const MX &B) "
-
-Unite two matrices no overlapping sparsity.
-
-";
-
-%feature("docstring")  casadi::unite(const Matrix< DataType > &A, const
-Matrix< DataType > &B) "
-
-Unite two matrices no overlapping sparsity.
 
 ";
 
@@ -82356,30 +82356,6 @@ interval
 %feature("docstring")  casadi::ProfilingType< ProfilingData_EXIT >() "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::blocksplit(const MX &x, const std::vector<
-int > &vert_offset, const std::vector< int > &horz_offset) "
-
-chop up into blocks
-
-vert_offset Defines the boundaries of the block cols horz_offset Defines the
-boundaries of the block rows
-
-blockcat(blocksplit(x,..., ...)) = x
-
-";
-
-%feature("docstring")  casadi::blocksplit(const MX &x, int vert_incr=1, int
-horz_incr=1) "
-
-chop up into blocks
-
-vert_incr Defines the increment for block boundaries in col dimension
-horz_incr Defines the increment for block boundaries in row dimension
-
-blockcat(blocksplit(x,..., ...)) = x
-
-";
-
 %feature("docstring")  casadi::blocksplit(const Matrix< DataType > &x, const
 std::vector< int > &vert_offset, const std::vector< int > &horz_offset) "
 
@@ -82404,6 +82380,30 @@ blockcat(blocksplit(x,..., ...)) = x
 
 ";
 
+%feature("docstring")  casadi::blocksplit(const MX &x, const std::vector<
+int > &vert_offset, const std::vector< int > &horz_offset) "
+
+chop up into blocks
+
+vert_offset Defines the boundaries of the block cols horz_offset Defines the
+boundaries of the block rows
+
+blockcat(blocksplit(x,..., ...)) = x
+
+";
+
+%feature("docstring")  casadi::blocksplit(const MX &x, int vert_incr=1, int
+horz_incr=1) "
+
+chop up into blocks
+
+vert_incr Defines the increment for block boundaries in col dimension
+horz_incr Defines the increment for block boundaries in row dimension
+
+blockcat(blocksplit(x,..., ...)) = x
+
+";
+
 %feature("docstring")  casadi::casadi_scal(int n, real_t alpha, real_t *x,
 int inc_x) " [INTERNAL]  SCAL: x <- alpha*x.
 
@@ -82415,13 +82415,13 @@ Get all the free variables in an expression.
 
 ";
 
-%feature("docstring")  casadi::sumRows(const MX &x) "
+%feature("docstring")  casadi::sumRows(const Matrix< DataType > &x) "
 
 Return a row-wise summation of elements.
 
 ";
 
-%feature("docstring")  casadi::sumRows(const Matrix< DataType > &x) "
+%feature("docstring")  casadi::sumRows(const MX &x) "
 
 Return a row-wise summation of elements.
 
@@ -82606,13 +82606,10 @@ Get upper triangular part.
 
 %feature("docstring")  casadi::casadi_load_integrator_oldcollocation() "";
 
-%feature("docstring")  casadi::twice(const T &x) " [INTERNAL] ";
+%feature("docstring")  casadi::cofactor(const Matrix< DataType > &x, int i,
+int j) "
 
-%feature("docstring")  casadi::outer_prod(const MX &x, const MX &y) "
-
-Take the outer product of two vectors Equals.
-
-with x and y vectors
+Transpose of a matrix.
 
 ";
 
@@ -82620,6 +82617,14 @@ with x and y vectors
 Matrix< DataType > &y) "
 
 Outer product of two vectors Equals.
+
+with x and y vectors
+
+";
+
+%feature("docstring")  casadi::outer_prod(const MX &x, const MX &y) "
+
+Take the outer product of two vectors Equals.
 
 with x and y vectors
 
@@ -82815,6 +82820,18 @@ depend.
 
 ";
 
+%feature("docstring")  casadi::vec(const Matrix< DataType > &a) "
+
+make a vector Reshapes/vectorizes the Matrix<DataType> such that the shape
+becomes (expr.numel(), 1). Columns are stacked on top of each other. Same as
+reshape(expr, expr.numel(), 1)
+
+a c b d  turns into
+
+a b c d
+
+";
+
 %feature("docstring")  casadi::vec(const Sparsity &a) "
 
 Vectorize the pattern.
@@ -82828,18 +82845,6 @@ Returns a vectorized version of the MX Same as reshape(x, x.numel(), 1)
 a c b d
 
 turns into
-
-a b c d
-
-";
-
-%feature("docstring")  casadi::vec(const Matrix< DataType > &a) "
-
-make a vector Reshapes/vectorizes the Matrix<DataType> such that the shape
-becomes (expr.numel(), 1). Columns are stacked on top of each other. Same as
-reshape(expr, expr.numel(), 1)
-
-a c b d  turns into
 
 a b c d
 
@@ -82957,7 +82962,11 @@ double *a, int lda1, int lda2, const double *tau, int ldtau, double *dwork,
 int ldwork) " [INTERNAL] ";
 
 %feature("docstring")  casadi::getMinor(const Matrix< DataType > &x, int i,
-int j) " ";
+int j) "
+
+Transpose of a matrix.
+
+";
 
 %feature("docstring")  casadi::collocationPoints(int order, const
 std::string &scheme="radau") "
@@ -82976,29 +82985,8 @@ elementary functions from the 'math.h' ('cmath') header.
 
 ";
 
-%feature("docstring")  casadi::dpleIn(const std::string &arg_s0="", const M
-&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
-
-Input arguments of a dple solver
-
->Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 2) [dpleIn]
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| DPLE_A                 | a                      | A matrices (horzcat    |
-|                        |                        | when const_dim,        |
-|                        |                        | blkdiag otherwise) .   |
-+------------------------+------------------------+------------------------+
-| DPLE_V                 | v                      | V matrices (horzcat    |
-|                        |                        | when const_dim,        |
-|                        |                        | blkdiag otherwise) .   |
-+------------------------+------------------------+------------------------+
-
-";
-
-%feature("docstring")  casadi::dpleIn(const std::vector< M > &args, const
-std::string &arg_s0="", const std::string &arg_s1="") " ";
+%feature("docstring")  casadi::bvec_toggle(bvec_t *s, int begin, int end,
+int j) " [INTERNAL] ";
 
 %feature("docstring")  casadi::substituteInPlace(const std::vector< MX > &v,
 std::vector< MX > &vdef, bool reverse=false) " [INTERNAL]  Inplace
@@ -83042,6 +83030,35 @@ number of other expressions piggyback (vector version)
 double *a, int lda1, int lda2, double *tau, int ldtau, double *dwork) "
 [INTERNAL] ";
 
+%feature("docstring")  casadi::horzsplit(const Matrix< DataType > &v, const
+std::vector< int > &offset) "
+
+split vertically, retaining groups of cols
+
+Parameters:
+-----------
+
+offset:  List of all start cols for each group the last col group will run
+to the end.
+
+horzcat(horzsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  casadi::horzsplit(const Matrix< DataType > &v, int
+incr=1) "
+
+split vertically, retaining fixed-sized groups of cols
+
+Parameters:
+-----------
+
+incr:  Size of each group of cols
+
+horzcat(horzsplit(x, ...)) = x
+
+";
+
 %feature("docstring")  casadi::horzsplit(const Sparsity &sp, const
 std::vector< int > &output_offset) "
 
@@ -83077,44 +83094,9 @@ horzcat(horzsplit(x, ...)) = x
 
 ";
 
-%feature("docstring")  casadi::horzsplit(const Matrix< DataType > &v, const
-std::vector< int > &offset) "
-
-split vertically, retaining groups of cols
-
-Parameters:
------------
-
-offset:  List of all start cols for each group the last col group will run
-to the end.
-
-horzcat(horzsplit(x, ...)) = x
-
-";
-
-%feature("docstring")  casadi::horzsplit(const Matrix< DataType > &v, int
-incr=1) "
-
-split vertically, retaining fixed-sized groups of cols
-
-Parameters:
------------
-
-incr:  Size of each group of cols
-
-horzcat(horzsplit(x, ...)) = x
-
-";
-
 %feature("docstring")  casadi::isNonIncreasing(const std::vector< T > &v) "
 
 Check if the vector is non-increasing.
-
-";
-
-%feature("docstring")  casadi::veccat(const std::vector< MX > &comp) "
-
-Concatenate vertically while vectorizing all arguments.
 
 ";
 
@@ -83122,6 +83104,12 @@ Concatenate vertically while vectorizing all arguments.
 > &comp) "
 
 concatenate vertically while vectorizing all arguments with vec
+
+";
+
+%feature("docstring")  casadi::veccat(const std::vector< MX > &comp) "
+
+Concatenate vertically while vectorizing all arguments.
 
 ";
 
@@ -83259,6 +83247,21 @@ Extract shared subexpressions from an set of expressions.
 
 ";
 
+%feature("docstring")  casadi::vertcat(const std::vector< Matrix< DataType >
+> &v) "
+
+Concatenate a list of matrices horizontally Alternative terminology:
+horizontal stack, hstack, horizontal append, [a b].
+
+vertcat(vertsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  casadi::vertcat(const Matrix< DataType > &x, const
+Matrix< DataType > &y) " [INTERNAL]   Transpose of a matrix.
+
+";
+
 %feature("docstring")  casadi::vertcat(const std::vector< Sparsity > &v) "
 
 Concatenate a list of sparsities vertically Alternative terminology:
@@ -83284,19 +83287,6 @@ concatenate horizontally
 vertcat(vertsplit(x, ...)) = x
 
 ";
-
-%feature("docstring")  casadi::vertcat(const std::vector< Matrix< DataType >
-> &v) "
-
-Concatenate a list of matrices horizontally Alternative terminology:
-horizontal stack, hstack, horizontal append, [a b].
-
-vertcat(vertsplit(x, ...)) = x
-
-";
-
-%feature("docstring")  casadi::vertcat(const Matrix< DataType > &x, const
-Matrix< DataType > &y) " [INTERNAL] ";
 
 %feature("docstring")  casadi::vertcat(const vector< MX > &x) " ";
 
@@ -83486,13 +83476,13 @@ copysign function
 casadi::casadi_register_integrator_oldcollocation(IntegratorInternal::Plugin
 *plugin) " ";
 
-%feature("docstring")  casadi::norm_inf(const MX &x) "
+%feature("docstring")  casadi::norm_inf(const Matrix< DataType > &x) "
 
 Infinity-norm.
 
 ";
 
-%feature("docstring")  casadi::norm_inf(const Matrix< DataType > &x) "
+%feature("docstring")  casadi::norm_inf(const MX &x) "
 
 Infinity-norm.
 
@@ -83543,7 +83533,10 @@ Input arguments of an NLP objective gradient function
 %feature("docstring")  casadi::gradFIn(const std::vector< M > &args, const
 std::string &arg_s0="", const std::string &arg_s1="") " ";
 
-%feature("docstring")  casadi::casadi_load_stabilizedqpsolver_sqic() "";
+%feature("docstring")  casadi::fmod(const T &x, const T &y) " [INTERNAL]
+Pre-C99 elementary functions from the 'math.h' ('cmath') header.
+
+";
 
 %feature("docstring")  casadi::daeIn(const std::string &arg_s0="", const M
 &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
@@ -83888,7 +83881,11 @@ deep copy of an object (Note: default is a shallow copy!)
 
 %feature("docstring")  casadi::casadi_load_dplesolver_slicot() "";
 
-%feature("docstring")  casadi::adj(const Matrix< DataType > &a) " ";
+%feature("docstring")  casadi::adj(const Matrix< DataType > &a) "
+
+Transpose of a matrix.
+
+";
 
 %feature("docstring")  casadi::casadi_load_integrator_idas() "";
 
@@ -84266,6 +84263,12 @@ derived class, cf. dynamic_cast (const)
 casadi::casadi_register_socpsolver_sdp(SocpSolverInternal::Plugin *plugin) "
 ";
 
+%feature("docstring")  casadi::transpose(const Matrix< DataType > &x) "
+
+Transpose of a matrix.
+
+";
+
 %feature("docstring")  casadi::transpose(const Sparsity &a) "
 
 Transpose the pattern.
@@ -84275,12 +84278,6 @@ Transpose the pattern.
 %feature("docstring")  casadi::transpose(const MX &x) "
 
 Transpose an expression.
-
-";
-
-%feature("docstring")  casadi::transpose(const Matrix< DataType > &x) "
-
-Transpose of a matrix.
 
 ";
 
@@ -84355,6 +84352,19 @@ std::string &arg_s0="", const std::string &arg_s1="", const std::string
 const std::string &arg_s5="", const std::string &arg_s6="", const
 std::string &arg_s7="", const std::string &arg_s8="") " ";
 
+%feature("docstring")  casadi::blockcat(const std::vector< std::vector<
+Matrix< DataType > > > &v) "
+
+Construct a matrix from a list of list of blocks.
+
+";
+
+%feature("docstring")  casadi::blockcat(const Matrix< DataType > &A, const
+Matrix< DataType > &B, const Matrix< DataType > &C, const Matrix< DataType >
+&D) " [INTERNAL]  Construct a matrix from 4 blocks.
+
+";
+
 %feature("docstring")  casadi::blockcat(const std::vector< std::vector< MX >
 > &v) "
 
@@ -84367,19 +84377,6 @@ blockcat(blocksplit(x,..., ...)) = x
 %feature("docstring")  casadi::blockcat(const MX &A, const MX &B, const MX
 &C, const MX &D) " [INTERNAL]  Construct a matrix from a list of list of
 blocks.
-
-";
-
-%feature("docstring")  casadi::blockcat(const std::vector< std::vector<
-Matrix< DataType > > > &v) "
-
-Construct a matrix from a list of list of blocks.
-
-";
-
-%feature("docstring")  casadi::blockcat(const Matrix< DataType > &A, const
-Matrix< DataType > &B, const Matrix< DataType > &C, const Matrix< DataType >
-&D) " [INTERNAL]  Construct a matrix from 4 blocks.
 
 ";
 
@@ -84593,14 +84590,14 @@ double *r, double *c, double *colcnd, double *rowcnd, double *amax, char
 
 ";
 
-%feature("docstring")  casadi::polyval(const MX &p, const MX &x) "
+%feature("docstring")  casadi::polyval(const Matrix< DataType > &p, const
+Matrix< DataType > &x) "
 
 Evaluate a polynomial with coefficients p in x.
 
 ";
 
-%feature("docstring")  casadi::polyval(const Matrix< DataType > &p, const
-Matrix< DataType > &x) "
+%feature("docstring")  casadi::polyval(const MX &p, const MX &x) "
 
 Evaluate a polynomial with coefficients p in x.
 
@@ -84746,15 +84743,15 @@ T > &) " [INTERNAL]  Apply a function f to each element in a vector
 casadi::casadi_register_nlpsolver_knitro(NlpSolverInternal::Plugin *plugin)
 " ";
 
-%feature("docstring")  casadi::vecNZ(const MX &x) "
-
-Returns a vectorized version of the MX, preserving only nonzeros.
-
-";
-
 %feature("docstring")  casadi::vecNZ(const Matrix< DataType > &a) "
 
 Returns a flattened version of the Matrix, preserving only nonzeros.
+
+";
+
+%feature("docstring")  casadi::vecNZ(const MX &x) "
+
+Returns a vectorized version of the MX, preserving only nonzeros.
 
 ";
 
@@ -84879,7 +84876,11 @@ const std::string &arg_s0="", const std::string &arg_s1="", const
 std::string &arg_s2="", const std::string &arg_s3="", const std::string
 &arg_s4="") " ";
 
-%feature("docstring")  casadi::inv(const Matrix< DataType > &a) " ";
+%feature("docstring")  casadi::inv(const Matrix< DataType > &a) "
+
+Transpose of a matrix.
+
+";
 
 %feature("docstring")  casadi::inv(const MX &A) "
 
@@ -85054,10 +85055,7 @@ Remove identical calculations.
 
 ";
 
-%feature("docstring")  casadi::fmod(const T &x, const T &y) " [INTERNAL]
-Pre-C99 elementary functions from the 'math.h' ('cmath') header.
-
-";
+%feature("docstring")  casadi::casadi_load_stabilizedqpsolver_sqic() "";
 
 %feature("docstring")  casadi::rank(const Sparsity &a) "
 
@@ -85128,16 +85126,19 @@ std::string &arg_s0="", const std::string &arg_s1="", const std::string
 
 %feature("docstring")  casadi::casadi_load_qpsolver_qcqp() "";
 
-%feature("docstring")  casadi::cofactor(const Matrix< DataType > &x, int i,
-int j) " ";
+%feature("docstring")  casadi::twice(const T &x) " [INTERNAL] ";
+
+%feature("docstring")  casadi::trace(const Matrix< DataType > &a) "
+
+Transpose of a matrix.
+
+";
 
 %feature("docstring")  casadi::trace(const MX &A) "
 
 Matrix trace.
 
 ";
-
-%feature("docstring")  casadi::trace(const Matrix< DataType > &a) " ";
 
 %feature("docstring")  casadi::sdqpOut(const std::string &arg_s0="", const M
 &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const
@@ -85265,6 +85266,24 @@ Output arguments of a dple solver
 %feature("docstring")  casadi::dpleOut(const std::vector< M > &args, const
 std::string &arg_s0="") " ";
 
+%feature("docstring")  casadi::mul(const Matrix< DataType > &x, const
+Matrix< DataType > &y, const Sparsity &sp_z=Sparsity()) "
+
+Matrix product of two matrices.
+
+With optional sp_z you can specify the sparsity of the result A typical use
+case might be where the product is only constructed to inspect the trace of
+it. sp_z diagonal will be more efficient in that case.
+
+";
+
+%feature("docstring")  casadi::mul(const std::vector< Matrix< DataType > >
+&args) "
+
+Matrix product of n matrices.
+
+";
+
 %feature("docstring")  casadi::mul(const Sparsity &a, const Sparsity &b) "
 
 Get the sparsity resulting from a matrix multiplication.
@@ -85285,24 +85304,6 @@ it. sp_z diagonal will be more efficient then.
 %feature("docstring")  casadi::mul(const std::vector< MX > &x) "
 
 Take the matrix product of n MX objects.
-
-";
-
-%feature("docstring")  casadi::mul(const Matrix< DataType > &x, const
-Matrix< DataType > &y, const Sparsity &sp_z=Sparsity()) "
-
-Matrix product of two matrices.
-
-With optional sp_z you can specify the sparsity of the result A typical use
-case might be where the product is only constructed to inspect the trace of
-it. sp_z diagonal will be more efficient in that case.
-
-";
-
-%feature("docstring")  casadi::mul(const std::vector< Matrix< DataType > >
-&args) "
-
-Matrix product of n matrices.
 
 ";
 
@@ -85789,6 +85790,27 @@ elementary functions from the 'math.h' header.
 
 ";
 
+%feature("docstring")  casadi::reshape(const Matrix< DataType > &a, int
+nrow, int ncol) "
+
+Transpose of a matrix.
+
+";
+
+%feature("docstring")  casadi::reshape(const Matrix< DataType > &a,
+std::pair< int, int > rc) "
+
+Transpose of a matrix.
+
+";
+
+%feature("docstring")  casadi::reshape(const Matrix< DataType > &a, const
+Sparsity &sp) "
+
+Transpose of a matrix.
+
+";
+
 %feature("docstring")  casadi::reshape(const Sparsity &a, int nrow, int
 ncol) "
 
@@ -85814,22 +85836,13 @@ Reshape the MX.
 
 ";
 
-%feature("docstring")  casadi::reshape(const Matrix< DataType > &a, int
-nrow, int ncol) " ";
-
-%feature("docstring")  casadi::reshape(const Matrix< DataType > &a,
-std::pair< int, int > rc) " ";
-
-%feature("docstring")  casadi::reshape(const Matrix< DataType > &a, const
-Sparsity &sp) " ";
-
-%feature("docstring")  casadi::norm_F(const MX &x) "
+%feature("docstring")  casadi::norm_F(const Matrix< DataType > &x) "
 
 Frobenius norm.
 
 ";
 
-%feature("docstring")  casadi::norm_F(const Matrix< DataType > &x) "
+%feature("docstring")  casadi::norm_F(const MX &x) "
 
 Frobenius norm.
 
@@ -85946,21 +85959,15 @@ elementary functions from the 'math.h' header.
 %feature("docstring")  casadi::ProfilingType< ProfilingData_TIMELINE >() "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::sumAll(const MX &x) "
-
-Return summation of all elements.
-
-";
-
 %feature("docstring")  casadi::sumAll(const Matrix< DataType > &x) "
 
 Return summation of all elements.
 
 ";
 
-%feature("docstring")  casadi::vecNZcat(const std::vector< MX > &comp) "
+%feature("docstring")  casadi::sumAll(const MX &x) "
 
-concatenate vertically while vecing all arguments with vecNZ
+Return summation of all elements.
 
 ";
 
@@ -85968,6 +85975,12 @@ concatenate vertically while vecing all arguments with vecNZ
 > > &comp) "
 
 concatenate vertically while vectorizing all arguments with vecNZ
+
+";
+
+%feature("docstring")  casadi::vecNZcat(const std::vector< MX > &comp) "
+
+concatenate vertically while vecing all arguments with vecNZ
 
 ";
 
@@ -86009,6 +86022,21 @@ calls to this function.
 
 ";
 
+%feature("docstring")  casadi::horzcat(const std::vector< Matrix< DataType >
+> &v) "
+
+Concatenate a list of matrices vertically Alternative terminology: vertical
+stack, vstack, vertical append, [a;b].
+
+horzcat(horzsplit(x, ...)) = x
+
+";
+
+%feature("docstring")  casadi::horzcat(const Matrix< DataType > &x, const
+Matrix< DataType > &y) " [INTERNAL]   Transpose of a matrix.
+
+";
+
 %feature("docstring")  casadi::horzcat(const std::vector< Sparsity > &v) "
 
 Concatenate a list of sparsities horizontally Alternative terminology:
@@ -86035,27 +86063,35 @@ horzcat(horzsplit(x, ...)) = x
 
 ";
 
-%feature("docstring")  casadi::horzcat(const std::vector< Matrix< DataType >
-> &v) "
-
-Concatenate a list of matrices vertically Alternative terminology: vertical
-stack, vstack, vertical append, [a;b].
-
-horzcat(horzsplit(x, ...)) = x
-
-";
-
-%feature("docstring")  casadi::horzcat(const Matrix< DataType > &x, const
-Matrix< DataType > &y) " [INTERNAL] ";
-
 %feature("docstring")  casadi::horzcat(const vector< MX > &x) " ";
 
 %feature("docstring")
 casadi::casadi_register_nlpsolver_snopt(NlpSolverInternal::Plugin *plugin) "
 ";
 
-%feature("docstring")  casadi::bvec_toggle(bvec_t *s, int begin, int end,
-int j) " [INTERNAL] ";
+%feature("docstring")  casadi::dpleIn(const std::string &arg_s0="", const M
+&arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M()) "
+
+Input arguments of a dple solver
+
+>Input scheme: casadi::DPLEInput (DPLE_NUM_IN = 2) [dpleIn]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| DPLE_A                 | a                      | A matrices (horzcat    |
+|                        |                        | when const_dim,        |
+|                        |                        | blkdiag otherwise) .   |
++------------------------+------------------------+------------------------+
+| DPLE_V                 | v                      | V matrices (horzcat    |
+|                        |                        | when const_dim,        |
+|                        |                        | blkdiag otherwise) .   |
++------------------------+------------------------+------------------------+
+
+";
+
+%feature("docstring")  casadi::dpleIn(const std::vector< M > &args, const
+std::string &arg_s0="", const std::string &arg_s1="") " ";
 
 %feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
 
@@ -86096,13 +86132,13 @@ replaces the ternary conditional operator \"?:\", which cannot be overloaded
 
 ";
 
-%feature("docstring")  casadi::sumCols(const MX &x) "
+%feature("docstring")  casadi::sumCols(const Matrix< DataType > &x) "
 
 Return a col-wise summation of elements.
 
 ";
 
-%feature("docstring")  casadi::sumCols(const Matrix< DataType > &x) "
+%feature("docstring")  casadi::sumCols(const MX &x) "
 
 Return a col-wise summation of elements.
 
@@ -86170,6 +86206,14 @@ largest absolute value.
 %feature("docstring")  casadi::getSchemeEntryNames(InputOutputScheme scheme)
 " ";
 
+%feature("docstring")  casadi::diag(const Matrix< DataType > &A) "
+
+Get the diagonal of a matrix or construct a diagonal When the input is
+square, the diagonal elements are returned. If the input is vector- like, a
+diagonal matrix is constructed with it.
+
+";
+
 %feature("docstring")  casadi::diag(const MX &x) "
 
 Get the diagonal of a matrix or construct a diagonal.
@@ -86179,25 +86223,9 @@ is vector-like, a diagonal matrix is constructed with it.
 
 ";
 
-%feature("docstring")  casadi::diag(const Matrix< DataType > &A) "
-
-Get the diagonal of a matrix or construct a diagonal When the input is
-square, the diagonal elements are returned. If the input is vector- like, a
-diagonal matrix is constructed with it.
-
-";
-
 %feature("docstring")  casadi::isMonotone(const std::vector< T > &v) "
 
 Check if the vector is monotone.
-
-";
-
-%feature("docstring")  casadi::inner_prod(const MX &x, const MX &y) "
-
-Take the inner product of two vectors Equals.
-
-with x and y vectors
 
 ";
 
@@ -86207,6 +86235,14 @@ Matrix< DataType > &y) "
 Inner product of two matrices Equals.
 
 with x and y matrices of the same dimension
+
+";
+
+%feature("docstring")  casadi::inner_prod(const MX &x, const MX &y) "
+
+Take the inner product of two vectors Equals.
+
+with x and y vectors
 
 ";
 
@@ -86351,6 +86387,13 @@ interval
 
 ";
 
+%feature("docstring")  casadi::blkdiag(const std::vector< Matrix< DataType >
+> &A) "
+
+Construct a matrix with given block on the diagonal.
+
+";
+
 %feature("docstring")  casadi::blkdiag(const std::vector< Sparsity > &v) "
 
 Construct a Sparsity with given blocks on the diagonal.
@@ -86371,13 +86414,6 @@ Construct a matrix with given blocks on the diagonal.
 
 %feature("docstring")  casadi::blkdiag(const MX &A, const MX &B) "
 [INTERNAL]  Construct a matrix with given blocks on the diagonal.
-
-";
-
-%feature("docstring")  casadi::blkdiag(const std::vector< Matrix< DataType >
-> &A) "
-
-Construct a matrix with given block on the diagonal.
 
 ";
 
@@ -86408,14 +86444,14 @@ ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...)
 
 ";
 
-%feature("docstring")  casadi::repmat(const MX &A, int n, int m) "
+%feature("docstring")  casadi::repmat(const Matrix< DataType > &A, int n,
+int m) "
 
 Repeat matrix A n times vertically and m times horizontally.
 
 ";
 
-%feature("docstring")  casadi::repmat(const Matrix< DataType > &A, int n,
-int m) "
+%feature("docstring")  casadi::repmat(const MX &A, int n, int m) "
 
 Repeat matrix A n times vertically and m times horizontally.
 
@@ -86443,6 +86479,12 @@ elementary functions from the 'math.h' ('cmath') header.
 casadi::casadi_register_sdpsolver_dsdp(SdpSolverInternal::Plugin *plugin) "
 ";
 
+%feature("docstring")  casadi::dense(const Matrix< DataType > &A) "
+
+Make a matrix dense.
+
+";
+
 %feature("docstring")  casadi::dense(const MX &x) "
 
 create a clipped view into a matrix Create a sparse matrix from a dense
@@ -86467,25 +86509,19 @@ Make the matrix dense if not already
 
 ";
 
-%feature("docstring")  casadi::dense(const Matrix< DataType > &A) "
-
-Make a matrix dense.
-
-";
-
 %feature("docstring")  casadi::casadi_load_linearsolver_csparse() "";
 
 %feature("docstring")
 casadi::casadi_register_implicitfunction_newton(ImplicitFunctionInternal::Plugin
 *plugin) " ";
 
-%feature("docstring")  casadi::norm_1(const MX &x) "
+%feature("docstring")  casadi::norm_1(const Matrix< DataType > &x) "
 
 1-norm
 
 ";
 
-%feature("docstring")  casadi::norm_1(const Matrix< DataType > &x) "
+%feature("docstring")  casadi::norm_1(const MX &x) "
 
 1-norm
 
@@ -86494,13 +86530,13 @@ casadi::casadi_register_implicitfunction_newton(ImplicitFunctionInternal::Plugin
 %feature("docstring")  casadi::norm_1(const std::vector< T > &x) "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::norm_2(const MX &x) "
+%feature("docstring")  casadi::norm_2(const Matrix< DataType > &x) "
 
 2-norm
 
 ";
 
-%feature("docstring")  casadi::norm_2(const Matrix< DataType > &x) "
+%feature("docstring")  casadi::norm_2(const MX &x) "
 
 2-norm
 
@@ -86538,7 +86574,11 @@ const std::string &arg_s0="", const std::string &arg_s1="") " ";
 casadi::casadi_register_linearsolver_csparse(LinearSolverInternal::Plugin
 *plugin) " ";
 
-%feature("docstring")  casadi::det(const Matrix< DataType > &a) " ";
+%feature("docstring")  casadi::det(const Matrix< DataType > &a) "
+
+Transpose of a matrix.
+
+";
 
 %feature("docstring")  casadi::det(const MX &A) "
 

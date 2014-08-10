@@ -29,7 +29,7 @@
 #include "../casadi_options.hpp"
 
 /** \defgroup expression_tools Expression tools
-* Functions for manipulating SX, MX or Sparsity
+* Functions for manipulating DMatrix, SX, MX or Sparsity
 *
 */
 
