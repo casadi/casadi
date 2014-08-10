@@ -897,6 +897,12 @@ class typemaptests(casadiTestCase):
       self.checkarray(val(SX(a)),DMatrix([[1,2],[3,4]]))
       self.checkarray(val(SX(a.T).T),DMatrix([[1,2],[3,4]]))
       
+  def test_issue1158(self):
+    A = numpy.zeros((0,2))
+    a = DMatrix(A)
+    self.assertEqual(a.shape[0],0)
+    self.assertEqual(a.shape[1],2)
+    
   def test_matrices(self):
 
     from scipy.sparse import csc_matrix

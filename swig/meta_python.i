@@ -625,6 +625,42 @@ int meta< casadi::Matrix<int> >::as(PyObject * p,casadi::Matrix<int> &m) {
     int res = meta< int >::as(p,t);
     m = t;
     return res;
+  } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<int>
+    if (array_numdims(p)==0) {
+      int d;
+      int result = meta< int >::as(p,d);
+      if (!result) return result;
+      m = casadi::Matrix<int>(d);
+      return result;
+    }
+    if (array_numdims(p)>2 || array_numdims(p)<1) {
+      return false;
+    }
+    int nrows = array_size(p,0); // 1D array is cast into column vector
+    int ncols  = 1;
+    if (array_numdims(p)==2)
+      ncols=array_size(p,1); 
+    int size=nrows*ncols; // number of elements in the dense matrix
+    if (!array_is_native(p)) {
+      return false;
+    }
+    // Make sure we have a contigous array with double datatype
+    int array_is_new_object;
+    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
+    if (!array) { 
+      std::cout << "foo" << std::endl;
+      return false;
+    }
+    
+    int* d=(int*) array_data(array);
+    std::vector<int> v(d,d+size);
+    
+    m = casadi::Matrix<int>::zeros(nrows,ncols);
+    m.set(d,casadi::DENSETRANS);
+                  
+    // Free memory
+    if (array_is_new_object)
+      Py_DECREF(array);
   } else if ( meta< int >::couldbe_sequence(p)) {
     std::vector <int> t;
     int res = meta< int >::as_vector(p,t);
