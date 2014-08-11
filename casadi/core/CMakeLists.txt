@@ -115,6 +115,7 @@ set(CASADI_SRCS
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
   misc/symbolic_nlp.hpp            misc/symbolic_nlp.cpp
+  misc/xml_file.hpp                misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
 
   # User include class with the most essential includes
   core.hpp
