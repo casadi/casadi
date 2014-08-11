@@ -41,6 +41,9 @@ namespace casadi {
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
 
+    // Parse an XML file
+    virtual XmlNode parse(const std::string& filename);
+
     // Creator function for internal class
     typedef XmlFileInternal* (*Creator)();
 

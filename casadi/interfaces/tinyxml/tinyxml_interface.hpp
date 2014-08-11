@@ -52,12 +52,21 @@ namespace casadi {
 
     // Clone
     virtual TinyXmlInterface* clone() const;
+    
+    // Parse an XML file
+    virtual XmlNode parse(const std::string& filename);
+
+    // Parse an XML tree
+    XmlNode addNode(TiXmlNode* n);
 
     // Destructor
     virtual ~TinyXmlInterface();
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// XML file
+    TiXmlDocument doc_;
   };
 
 } // namespace casadi

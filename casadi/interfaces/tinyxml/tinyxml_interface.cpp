@@ -50,4 +50,65 @@ namespace casadi {
     return new TinyXmlInterface();
   }
 
+  XmlNode TinyXmlInterface::parse(const std::string& filename) {
+    bool flag = doc_.LoadFile(filename.c_str());
+    casadi_assert_message(flag, "Cound not open " << filename);
+    return addNode(&doc_);
+  }
+
+  XmlNode TinyXmlInterface::addNode(TiXmlNode* n) {
+    if (!n) throw CasadiException("Error in TinyXmlInterface::addNode: Node is 0");
+    XmlNode ret;
+
+    // Save name
+    ret.setName(n->Value());
+
+    // Save attributes
+    int type = n->Type();
+    if (type == TiXmlNode::ELEMENT) {
+      if (n->ToElement()!=0) {
+        for (TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
+             pAttrib;
+             pAttrib=pAttrib->Next()) {
+          ret.setAttribute(pAttrib->Name(), pAttrib->Value());
+        }
+      }
+    } else if (type == TiXmlNode::DOCUMENT) {
+      // do nothing
+    } else {
+      throw CasadiException("TinyXmlInterface::addNode");
+    }
+
+    // Count the number of children
+    int num_children = 0;
+    for (TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling()) {
+      num_children++;
+    }
+    ret.children_.reserve(num_children);
+
+    // add children
+    int ch = 0;
+    for (TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling(), ++ch) {
+      int childtype = child->Type();
+
+      if (childtype == TiXmlNode::ELEMENT) {
+        XmlNode newnode = addNode(child);
+        ret.children_.push_back(newnode);
+        ret.child_indices_[newnode.getName()] = ch;
+      } else if (childtype == TiXmlNode::COMMENT) {
+        ret.comment_ = child->Value();
+      } else if (childtype == TiXmlNode::TEXT) {
+        ret.text_ = child->ToText()->Value();
+      } else if (childtype == TiXmlNode::DECLARATION) {
+        cout << "Warning: Skipped TiXmlNode::DECLARATION" << endl;
+      } else {
+        throw CasadiException("Error in TinyXmlInterface::addNode: Unknown node type");
+      }
+    }
+    
+    // Note: Return value optimization
+    return ret;
+  }
+
+
 } // namespace casadi

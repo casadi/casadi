@@ -29,7 +29,7 @@
 namespace casadi {
 
   // Forward declarations
-  class XMLNode;
+  class XmlNode;
 
   /** \brief A flat OCP representation coupled to an XML file
 
@@ -428,7 +428,7 @@ namespace casadi {
   protected:
 
     /// Get the qualified name
-    static std::string qualifiedName(const XMLNode& nn);
+    static std::string qualifiedName(const XmlNode& nn);
 
     /// Find of variable by name
     typedef std::map<std::string, Variable> VarMap;
@@ -438,10 +438,10 @@ namespace casadi {
     bool ignore_timed_variables_;
 
     /// Read an equation
-    SX readExpr(const XMLNode& odenode);
+    SX readExpr(const XmlNode& odenode);
 
     /// Read a variable
-    Variable& readVariable(const XMLNode& node);
+    Variable& readVariable(const XmlNode& node);
 
     /// Get an attribute by expression
     typedef double (SymbolicOCP::*getAtt)(const std::string& name, bool normalized) const;

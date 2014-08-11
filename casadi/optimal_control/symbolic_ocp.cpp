@@ -21,7 +21,6 @@
  */
 
 #include "symbolic_ocp.hpp"
-#include "xml_node.hpp"
 
 #include <map>
 #include <string>
@@ -29,12 +28,12 @@
 #include <ctime>
 
 #include "casadi/core/std_vector_tools.hpp"
-#include "external_packages/tinyxml/tinyxml.h"
 #include "casadi/core/casadi_exception.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/integrator.hpp"
 #include "casadi/core/casadi_calculus.hpp"
+#include "casadi/core/misc/xml_file.hpp"
 
 using namespace std;
 namespace casadi {
@@ -55,26 +54,21 @@ namespace casadi {
   void SymbolicOCP::parseFMI(const std::string& filename) {
 
     // Load
-    TiXmlDocument doc;
-    bool flag = doc.LoadFile(filename.c_str());
-    casadi_assert_message(flag, "Cound not open " << filename);
-
-    // parse
-    XMLNode document;
-    document.addNode(&doc);
+    XmlFile xml_file("tinyxml");
+    XmlNode document = xml_file.parse(filename);
 
     // **** Add model variables ****
     {
       //if (verbose) cout << "Adding model variables." << endl;
 
       // Get a reference to the ModelVariables node
-      const XMLNode& modvars = document[0]["ModelVariables"];
+      const XmlNode& modvars = document[0]["ModelVariables"];
 
       // Add variables
       for (int i=0; i<modvars.size(); ++i) {
 
         // Get a reference to the variable
-        const XMLNode& vnode = modvars[i];
+        const XmlNode& vnode = modvars[i];
 
         // Get the attributes
         string name        = vnode.getAttribute("name");
@@ -89,7 +83,7 @@ namespace casadi {
           continue;
 
         // Get the name
-        const XMLNode& nn = vnode["QualifiedName"];
+        const XmlNode& nn = vnode["QualifiedName"];
         string qn = qualifiedName(nn);
 
         // Add variable, if not already added
@@ -139,7 +133,7 @@ namespace casadi {
 
           // Other properties
           if (vnode.hasChild("Real")) {
-            const XMLNode& props = vnode["Real"];
+            const XmlNode& props = vnode["Real"];
             props.readAttribute("unit", var.unit, false);
             props.readAttribute("displayUnit", var.displayUnit, false);
             double dmin = -numeric_limits<double>::infinity();
@@ -224,10 +218,10 @@ namespace casadi {
       //if (verbose) cout << "Adding binding equations." << endl;
 
       // Get a reference to the BindingEquations node
-      const XMLNode& bindeqs = document[0]["equ:BindingEquations"];
+      const XmlNode& bindeqs = document[0]["equ:BindingEquations"];
 
       for (int i=0; i<bindeqs.size(); ++i) {
-        const XMLNode& beq = bindeqs[i];
+        const XmlNode& beq = bindeqs[i];
 
         // Get the variable and binding expression
         Variable& var = readVariable(beq[0]);
@@ -239,13 +233,13 @@ namespace casadi {
     // **** Add dynamic equations ****
     {
       // Get a reference to the DynamicEquations node
-      const XMLNode& dyneqs = document[0]["equ:DynamicEquations"];
+      const XmlNode& dyneqs = document[0]["equ:DynamicEquations"];
 
       // Add equations
       for (int i=0; i<dyneqs.size(); ++i) {
 
         // Get a reference to the variable
-        const XMLNode& dnode = dyneqs[i];
+        const XmlNode& dnode = dyneqs[i];
 
         // Add the differential equation
         SX de_new = readExpr(dnode[0]);
@@ -256,13 +250,13 @@ namespace casadi {
     // **** Add initial equations ****
     {
       // Get a reference to the DynamicEquations node
-      const XMLNode& initeqs = document[0]["equ:InitialEquations"];
+      const XmlNode& initeqs = document[0]["equ:InitialEquations"];
 
       // Add equations
       for (int i=0; i<initeqs.size(); ++i) {
 
         // Get a reference to the node
-        const XMLNode& inode = initeqs[i];
+        const XmlNode& inode = initeqs[i];
 
         // Add the differential equations
         for (int i=0; i<inode.size(); ++i) {
@@ -275,10 +269,10 @@ namespace casadi {
     if (document[0].hasChild("opt:Optimization")) {
 
       // Get a reference to the DynamicEquations node
-      const XMLNode& opts = document[0]["opt:Optimization"];
+      const XmlNode& opts = document[0]["opt:Optimization"];
 
       // Start time
-      const XMLNode& intervalStartTime = opts["opt:IntervalStartTime"];
+      const XmlNode& intervalStartTime = opts["opt:IntervalStartTime"];
       if (intervalStartTime.hasChild("opt:Value"))
         intervalStartTime["opt:Value"].getText(t0);
       if (intervalStartTime.hasChild("opt:Free"))
@@ -287,7 +281,7 @@ namespace casadi {
         intervalStartTime["opt:InitialGuess"].getText(t0_guess);
 
       // Terminal time
-      const XMLNode& IntervalFinalTime = opts["opt:IntervalFinalTime"];
+      const XmlNode& IntervalFinalTime = opts["opt:IntervalFinalTime"];
       if (IntervalFinalTime.hasChild("opt:Value"))
         IntervalFinalTime["opt:Value"].getText(tf);
       if (IntervalFinalTime.hasChild("opt:Free"))
@@ -296,7 +290,7 @@ namespace casadi {
         IntervalFinalTime["opt:InitialGuess"].getText(tf_guess);
 
       // Time points
-      const XMLNode& tpnode = opts["opt:TimePoints"];
+      const XmlNode& tpnode = opts["opt:TimePoints"];
       tp.resize(tpnode.size());
       for (int i=0; i<tp.size(); ++i) {
         // Get index
@@ -320,14 +314,14 @@ namespace casadi {
       for (int i=0; i<opts.size(); ++i) {
 
         // Get a reference to the node
-        const XMLNode& onode = opts[i];
+        const XmlNode& onode = opts[i];
 
         // Get the type
         if (onode.checkName("opt:ObjectiveFunction")) { // mayer term
           try {
             // Add components
             for (int i=0; i<onode.size(); ++i) {
-              const XMLNode& var = onode[i];
+              const XmlNode& var = onode[i];
 
               // If string literal, ignore
               if (var.checkName("exp:StringLiteral"))
@@ -343,7 +337,7 @@ namespace casadi {
         } else if (onode.checkName("opt:IntegrandObjectiveFunction")) {
           try {
             for (int i=0; i<onode.size(); ++i) {
-              const XMLNode& var = onode[i];
+              const XmlNode& var = onode[i];
 
               // If string literal, ignore
               if (var.checkName("exp:StringLiteral"))
@@ -365,7 +359,7 @@ namespace casadi {
           // Ignore, treated above
         } else if (onode.checkName("opt:PointConstraints")) {
           for (int i=0; i<onode.size(); ++i) {
-            const XMLNode& constr_i = onode[i];
+            const XmlNode& constr_i = onode[i];
 
             // Create a new variable
             Variable v;
@@ -394,7 +388,7 @@ namespace casadi {
           }
         } else if (onode.checkName("opt:Constraints") || onode.checkName("opt:PathConstraints")) {
           for (int i=0; i<onode.size(); ++i) {
-            const XMLNode& constr_i = onode[i];
+            const XmlNode& constr_i = onode[i];
             // Create a new variable
             Variable v;
             stringstream ss;
@@ -437,7 +431,7 @@ namespace casadi {
                           "algebraic variables.");
   }
 
-  Variable& SymbolicOCP::readVariable(const XMLNode& node) {
+  Variable& SymbolicOCP::readVariable(const XmlNode& node) {
     // Qualified name
     string qn = qualifiedName(node);
 
@@ -445,7 +439,7 @@ namespace casadi {
     return variable(qn);
   }
 
-  SX SymbolicOCP::readExpr(const XMLNode& node) {
+  SX SymbolicOCP::readExpr(const XmlNode& node) {
     const string& fullname = node.getName();
     if (fullname.find("exp:")== string::npos) {
       casadi_error("SymbolicOCP::readExpr: unknown - expression is supposed to "
@@ -1292,7 +1286,7 @@ namespace casadi {
     varmap_[name] = var;
   }
 
-  std::string SymbolicOCP::qualifiedName(const XMLNode& nn) {
+  std::string SymbolicOCP::qualifiedName(const XmlNode& nn) {
     // Stringstream to assemble name
     stringstream qn;
 

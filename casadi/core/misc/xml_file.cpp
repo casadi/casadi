@@ -35,4 +35,16 @@ namespace casadi {
   XmlFile::~XmlFile() {
   }
 
+  const XmlFileInternal* XmlFile::operator->() const {
+    return static_cast<const XmlFileInternal*>(OptionsFunctionality::operator->());
+  }
+
+  XmlFileInternal* XmlFile::operator->() {
+    return static_cast<XmlFileInternal*>(OptionsFunctionality::operator->());
+  }
+
+  XmlNode XmlFile::parse(const std::string& filename){
+    return (*this)->parse(filename);
+  }
+
 } // namespace casadi

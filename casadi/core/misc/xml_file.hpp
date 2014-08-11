@@ -23,10 +23,21 @@
 #ifndef CASADI_XML_FILE_HPP
 #define CASADI_XML_FILE_HPP
 
+#include "xml_file.hpp"
 #include "../options_functionality.hpp"
+#include "xml_node.hpp"
 
 namespace casadi {
 
+  /** Forward declaration of internal class */
+  class XmlFileInternal;
+
+  /** \brief XML parser
+      Can be used for parsing XML files into CasADi data structures.
+
+      \author Joel Andersson
+      \date 2014
+   */
   class CASADI_CORE_EXPORT XmlFile : public OptionsFunctionality {
   public:
     // Default constructor
@@ -37,6 +48,15 @@ namespace casadi {
 
     // Destructor
     ~XmlFile();
+
+    /** \brief  Access functions of the node */
+    XmlFileInternal* operator->();
+
+    /** \brief  Const access functions of the node */
+    const XmlFileInternal* operator->() const;
+
+    // Parse an XML file
+    XmlNode parse(const std::string& filename);
   };
 
 } // namespace casadi
