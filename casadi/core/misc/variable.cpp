@@ -20,46 +20,59 @@
  *
  */
 
-#include "variable_internal.hpp"
-#include "casadi/core/casadi_exception.hpp"
+#include "../casadi_exception.hpp"
+#include "variable.hpp"
 
 using namespace std;
 namespace casadi {
 
-  VariableInternal::VariableInternal(const string& name) {
+  Variable::Variable() {
+    this->variability = CONTINUOUS;
+    this->causality = INTERNAL;
+    this->category = CAT_UNKNOWN;
+    this->alias = NO_ALIAS;
+    this->description = "";
+    this->valueReference = -1; //?
+    this->min = -numeric_limits<double>::infinity();
+    this->max = numeric_limits<double>::infinity();
+    this->initialGuess = 0;
+    this->nominal = 1.0;
+    this->start = 0.0;
+    this->derivativeStart = 0.0;
+    this->unit = "";
+    this->displayUnit = "";
+    this->free = false;
+    this->index = -1;
   }
 
-  VariableInternal::~VariableInternal() {
+  string Variable::name() const {
+    return this->v.getName();
   }
 
-  void VariableInternal::repr(ostream &stream) const {
-    var_.print(stream);
+  void Variable::setName(const std::string& name) {
+    this->v = this->beq = SXElement::sym(name);
+    this->d = this->ode = SXElement::sym("der_" + name);
   }
 
-
-  void VariableInternal::print(ostream &stream) const {
-    var_.print(stream);
-  }
-
-  SX VariableInternal::atTime(double t, bool allocate) const {
+  SXElement Variable::atTime(double t, bool allocate) const {
     casadi_assert(!allocate);
-    return const_cast<VariableInternal*>(this)->atTime(t, false);
+    return const_cast<Variable*>(this)->atTime(t, false);
   }
 
-  SX VariableInternal::atTime(double t, bool allocate) {
+  SXElement Variable::atTime(double t, bool allocate) {
     // Find an existing element
-    map<double, SX>::const_iterator it = timed_sx_.find(t);
+    map<double, SXElement>::const_iterator it = timed_.find(t);
 
     // If not found
-    if (it==timed_sx_.end()) {
+    if (it==timed_.end()) {
       if (allocate) {
         // Create a timed variable
         stringstream ss;
-        ss << var_.getName() << ".atTime(" << t << ")";
-        SX tvar = SX::sym(ss.str());
+        ss << name() << ".atTime(" << t << ")";
+        SXElement tvar = SXElement::sym(ss.str());
 
         // Save to map
-        timed_sx_[t] = tvar;
+        timed_[t] = tvar;
 
         // Return the expression
         return tvar;
@@ -73,5 +86,12 @@ namespace casadi {
     }
   }
 
-} // namespace casadi
+  void Variable::repr(ostream &stream) const {
+    stream << name();
+  }
 
+  void Variable::print(ostream &stream) const {
+    stream << name();
+  }
+
+} // namespace casadi

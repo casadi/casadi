@@ -23,7 +23,7 @@
 #ifndef CASADI_SYMBOLIC_OCP_HPP
 #define CASADI_SYMBOLIC_OCP_HPP
 
-#include "variable.hpp"
+#include "casadi/core/misc/variable.hpp"
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 
 namespace casadi {
