@@ -84,11 +84,11 @@ set(CASADI_SRCS
   mx/mx_tools.hpp            mx/mx_tools.cpp
 
   # A dynamically created function with AD capabilities
-  function/io_interface.hpp                                   # Input/output interface for Function and FunctionInternal
+  function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
   function/io_scheme.hpp           function/io_scheme.cpp           function/io_scheme_internal.hpp           function/io_scheme_internal.cpp
-  function/function.hpp                  function/function.cpp                  function/function_internal.hpp                  function/function_internal.cpp
-  function/plugin_interface.hpp                                   # Plugin interface for Function
-  function/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
+  function/function.hpp            function/function.cpp            function/function_internal.hpp            function/function_internal.cpp
+  function/plugin_interface.hpp                                     # Plugin interface for Function
+  function/x_function_internal.hpp                                  # Base class for SXFunction and MXFunction
   function/sx_function.hpp         function/sx_function.cpp         function/sx_function_internal.hpp         function/sx_function_internal.cpp
   function/mx_function.hpp         function/mx_function.cpp         function/mx_function_internal.hpp         function/mx_function_internal.cpp
   function/custom_function.hpp     function/custom_function.cpp     function/custom_function_internal.hpp     function/custom_function_internal.cpp
@@ -101,7 +101,6 @@ set(CASADI_SRCS
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
   function/control_simulator.hpp   function/control_simulator.cpp   function/control_simulator_internal.hpp   function/control_simulator_internal.cpp
   function/parallelizer.hpp        function/parallelizer.cpp        function/parallelizer_internal.hpp        function/parallelizer_internal.cpp
-  function/ocp_solver.hpp          function/ocp_solver.cpp          function/ocp_solver_internal.hpp          function/ocp_solver_internal.cpp
   function/qp_solver.hpp           function/qp_solver.cpp           function/qp_solver_internal.hpp           function/qp_solver_internal.cpp
   function/stabilized_qp_solver.hpp    function/stabilized_qp_solver.cpp    function/stabilized_qp_solver_internal.hpp function/stabilized_qp_solver_internal.cpp
   function/sdp_solver.hpp          function/sdp_solver.cpp          function/sdp_solver_internal.hpp          function/sdp_solver_internal.cpp

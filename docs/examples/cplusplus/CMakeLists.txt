@@ -75,26 +75,11 @@ if(WITH_SUNDIALS AND IPOPT_FOUND)
     casadi_nlpsolver_scpgen casadi_implicitfunction_newton casadi_qpsolver_nlp)
 endif()
 
-# Van der pol with multiple shooting
-if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
-  add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
-  target_link_libraries(vdp_multiple_shooting
-    casadi_integrator_cvodes casadi_nlpsolver_ipopt  casadi_linearsolver_csparse
-    casadi_optimal_control casadi_integrator_oldcollocation
-    casadi_implicitfunction_newton)
-endif()
-
 # Writing a multiple shooting code from scratch
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(multiple_shooting_from_scratch multiple_shooting_from_scratch.cpp)
   target_link_libraries(multiple_shooting_from_scratch
     casadi_integrator_cvodes casadi_nlpsolver_ipopt)
-endif()
-
-# CSTR multiple shooting
-if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
-  add_executable(cstr cstr.cpp)
-  target_link_libraries(cstr casadi_optimal_control)
 endif()
 
 # CSparse via CasADi

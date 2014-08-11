@@ -611,7 +611,6 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/function/custom_function.hpp"
-#include "casadi/core/function/ocp_solver.hpp"
 #include "casadi/core/function/simulator.hpp"
 #include "casadi/core/function/parallelizer.hpp"
 #include "casadi/core/function/external_function.hpp"
@@ -630,7 +629,6 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "casadi/core/function/qp_solver.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
 #include "casadi/core/function/lp_solver.hpp"
-#include "casadi/core/function/ocp_solver.hpp"
 #include "casadi/core/function/sdp_solver.hpp"
 #include "casadi/core/function/socp_solver.hpp"
 #include "casadi/core/function/qcqp_solver.hpp"

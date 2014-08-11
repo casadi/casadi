@@ -251,224 +251,224 @@ class OCPtests(casadiTestCase):
     
     mystates = []
 
-  @requiresPlugin(NlpSolver,"ipopt")
-  def testMSclass_prim(self):
-    self.message("CasADi multiple shooting class")
+  # @requiresPlugin(NlpSolver,"ipopt")
+  # def testMSclass_prim(self):
+  #   self.message("CasADi multiple shooting class")
     
-    ns = 20
-    nx = 3
-    nu = 2
-    np = 0
-    nh = 0
-    tf = 0.2
+  #   ns = 20
+  #   nx = 3
+  #   nu = 2
+  #   np = 0
+  #   nh = 0
+  #   tf = 0.2
     
-    t = SX.sym("t")
-    x0 = SX.sym("x0",nx)
-    p = SX.sym("p",nu)
-    xf = x0 + p[0]
-    daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
-    mayer = SXFunction([x0],[7*x0[0]])
-    ms = DirectMultipleShooting(daeres,mayer)
-    ms.setOption("integrator", "cvodes")
-    ms.setOption("number_of_grid_points",ns)
-    ms.setOption("final_time",tf)
-    ms.setOption("nlp_solver", "ipopt")
-    ms.init()
+  #   t = SX.sym("t")
+  #   x0 = SX.sym("x0",nx)
+  #   p = SX.sym("p",nu)
+  #   xf = x0 + p[0]
+  #   daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
+  #   mayer = SXFunction([x0],[7*x0[0]])
+  #   ms = DirectMultipleShooting(daeres,mayer)
+  #   ms.setOption("integrator", "cvodes")
+  #   ms.setOption("number_of_grid_points",ns)
+  #   ms.setOption("final_time",tf)
+  #   ms.setOption("nlp_solver", "ipopt")
+  #   ms.init()
     
-    for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
-      self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
+  #   for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
+  #     self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-    for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
-      self.checkarray(ms.input(i).shape,(nu,ns),"shape")
+  #   for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
+  #     self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
-    for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
-      self.checkarray(ms.input(i).shape,(np,1),"shape")
+  #   for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
+  #     self.checkarray(ms.input(i).shape,(np,1),"shape")
 
-    for i in [OCP_LBH,OCP_UBH]:
-      self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
+  #   for i in [OCP_LBH,OCP_UBH]:
+  #     self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
       
-    ns = 20
-    nx = 3
-    nu = 2
-    np = 4
-    nh = 2
-    tf = 0.2
+  #   ns = 20
+  #   nx = 3
+  #   nu = 2
+  #   np = 4
+  #   nh = 2
+  #   tf = 0.2
     
-    t = SX.sym("t")
-    x0 = SX.sym("x0",nx)
-    p = SX.sym("p",nu+np)
-    xf = x0 + p[0]
-    daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
-    mayer = SXFunction([x0],[7*x0[0]])
+  #   t = SX.sym("t")
+  #   x0 = SX.sym("x0",nx)
+  #   p = SX.sym("p",nu+np)
+  #   xf = x0 + p[0]
+  #   daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
+  #   mayer = SXFunction([x0],[7*x0[0]])
     
-    t = SXElement.sym("t")
-    cfcn = SXFunction(daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
-    cfcn.init()
+  #   t = SXElement.sym("t")
+  #   cfcn = SXFunction(daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
+  #   cfcn.init()
     
-    ms = DirectMultipleShooting(daeres,mayer,cfcn)
-    ms.setOption("integrator", "cvodes")
-    ms.setOption("number_of_grid_points",ns)
-    ms.setOption("number_of_parameters",np)
-    ms.setOption("final_time",tf)
-    ms.setOption("nlp_solver", "ipopt")
-    ms.init()
+  #   ms = DirectMultipleShooting(daeres,mayer,cfcn)
+  #   ms.setOption("integrator", "cvodes")
+  #   ms.setOption("number_of_grid_points",ns)
+  #   ms.setOption("number_of_parameters",np)
+  #   ms.setOption("final_time",tf)
+  #   ms.setOption("nlp_solver", "ipopt")
+  #   ms.init()
     
-    for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
-      self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
+  #   for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
+  #     self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-    for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
-      self.checkarray(ms.input(i).shape,(nu,ns),"shape")
+  #   for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
+  #     self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
-    for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
-      self.checkarray(ms.input(i).shape,(np,1),"shape")
+  #   for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
+  #     self.checkarray(ms.input(i).shape,(np,1),"shape")
 
-    for i in [OCP_LBH,OCP_UBH]:
-      self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
+  #   for i in [OCP_LBH,OCP_UBH]:
+  #     self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
 
-  @requiresPlugin(NlpSolver,"ipopt")
-  def testMSclassSimple(self):
-    self.message("CasADi multiple shooting class: simple example")
-    """
-    The problem consists of a harmonic oscilator and a power harvester.
+  # @requiresPlugin(NlpSolver,"ipopt")
+  # def testMSclassSimple(self):
+  #   self.message("CasADi multiple shooting class: simple example")
+  #   """
+  #   The problem consists of a harmonic oscilator and a power harvester.
     
-    max     int_0^T u(t) * x(t)
-     u,x,y
-            s.t    x'(t) = y(t)
-                   y'(t) = -x(t)
-                   -1  <=   u(t) <= 1
-                   x(0) = 1
-                   y(0) = 0
+  #   max     int_0^T u(t) * x(t)
+  #    u,x,y
+  #           s.t    x'(t) = y(t)
+  #                  y'(t) = -x(t)
+  #                  -1  <=   u(t) <= 1
+  #                  x(0) = 1
+  #                  y(0) = 0
                    
-    The trivial solution for u(t) is u(t)=sign(x(t))
+  #   The trivial solution for u(t) is u(t)=sign(x(t))
     
     
-    """
-    te = 2*pi
-    N = 20
-    t=SXElement.sym("t")
-    y=SX.sym("y",3,1)
-    p=SXElement.sym("p")
-    f=SXFunction(daeIn(t=t, x=y, p=p),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
-    f.init()
+  #   """
+  #   te = 2*pi
+  #   N = 20
+  #   t=SXElement.sym("t")
+  #   y=SX.sym("y",3,1)
+  #   p=SXElement.sym("p")
+  #   f=SXFunction(daeIn(t=t, x=y, p=p),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
+  #   f.init()
     
-    # Options to be passed to the integrator
-    integrator_options = {}
-    integrator_options["reltol"]=1e-9
-    integrator_options["abstol"]=1e-9
-    integrator_options["steps_per_checkpoint"]=10000
-    integrator_options["t0"]=0
-    integrator_options["tf"]=te/N
+  #   # Options to be passed to the integrator
+  #   integrator_options = {}
+  #   integrator_options["reltol"]=1e-9
+  #   integrator_options["abstol"]=1e-9
+  #   integrator_options["steps_per_checkpoint"]=10000
+  #   integrator_options["t0"]=0
+  #   integrator_options["tf"]=te/N
     
-    mayer = SXFunction([y],[-y[2]])
-    mayer.init()
+  #   mayer = SXFunction([y],[-y[2]])
+  #   mayer.init()
     
-    ms = DirectMultipleShooting(f,mayer)
-    ms.setOption("integrator", "cvodes")
-    ms.setOption("integrator_options",integrator_options)
-    ms.setOption("number_of_grid_points",N)
-    ms.setOption("final_time",te)
-    ms.setOption("nlp_solver", "ipopt")
-    nlp_solver_options = {}
-    nlp_solver_options["tol"] = 1e-10
-    nlp_solver_options["hessian_approximation"] = "limited-memory"
-    nlp_solver_options["max_iter"] = 100
-    nlp_solver_options["linear_solver"] = "ma57"
-    nlp_solver_options["derivative_test"] = "first-order"
-    ms.setOption("nlp_solver_options",nlp_solver_options)
-    ms.init()
+  #   ms = DirectMultipleShooting(f,mayer)
+  #   ms.setOption("integrator", "cvodes")
+  #   ms.setOption("integrator_options",integrator_options)
+  #   ms.setOption("number_of_grid_points",N)
+  #   ms.setOption("final_time",te)
+  #   ms.setOption("nlp_solver", "ipopt")
+  #   nlp_solver_options = {}
+  #   nlp_solver_options["tol"] = 1e-10
+  #   nlp_solver_options["hessian_approximation"] = "limited-memory"
+  #   nlp_solver_options["max_iter"] = 100
+  #   nlp_solver_options["linear_solver"] = "ma57"
+  #   nlp_solver_options["derivative_test"] = "first-order"
+  #   ms.setOption("nlp_solver_options",nlp_solver_options)
+  #   ms.init()
     
-    ms.setInput(-inf,"lbx")
-    ms.setInput(inf,"ubx")
-    ms.setInput(0,"x_init")
+  #   ms.setInput(-inf,"lbx")
+  #   ms.setInput(inf,"ubx")
+  #   ms.setInput(0,"x_init")
     
-    ms.setInput(-1,"lbu")
-    ms.setInput(1,"ubu")
-    ms.setInput(0,"u_init")
+  #   ms.setInput(-1,"lbu")
+  #   ms.setInput(1,"ubu")
+  #   ms.setInput(0,"u_init")
     
-    ms.input("lbx")[0,0] = 1
-    ms.input("ubx")[0,0] = 1
+  #   ms.input("lbx")[0,0] = 1
+  #   ms.input("ubx")[0,0] = 1
    
-    ms.input("lbx")[1,0] = 0
-    ms.input("ubx")[1,0] = 0
+  #   ms.input("lbx")[1,0] = 0
+  #   ms.input("ubx")[1,0] = 0
  
-    ms.input("lbx")[2,0] = 0
-    ms.input("ubx")[2,0] = 0
+  #   ms.input("lbx")[2,0] = 0
+  #   ms.input("ubx")[2,0] = 0
     
-    ms.evaluate()
+  #   ms.evaluate()
     
-    self.checkarray(sign(matrix(ms.getOutput("x_opt"))[0,:-1]),ms.getOutput("u_opt"),"solution")
+  #   self.checkarray(sign(matrix(ms.getOutput("x_opt"))[0,:-1]),ms.getOutput("u_opt"),"solution")
 
 
-  def testMSclassSimple2(self):
-    return 
-    self.message("CasADi multiple shooting class: simple example 2")
-    """
-    The problem consists of a harmonic oscilator and a power harvester.
+  # def testMSclassSimple2(self):
+  #   return 
+  #   self.message("CasADi multiple shooting class: simple example 2")
+  #   """
+  #   The problem consists of a harmonic oscilator and a power harvester.
     
-    max     x(tend)
-     u,x,a
-            s.t    x'(t) = a*x(t) + u(t)
-                   -1  <=   u(t) <= 1
-                   -2  <=   a <= 2
-                   x(0) = 0
+  #   max     x(tend)
+  #    u,x,a
+  #           s.t    x'(t) = a*x(t) + u(t)
+  #                  -1  <=   u(t) <= 1
+  #                  -2  <=   a <= 2
+  #                  x(0) = 0
                    
-    The trivial solution for u(t) is u(t)=1, a = 1
-    x(t) = 1/2 (e^(2 t)-1)
+  #   The trivial solution for u(t) is u(t)=1, a = 1
+  #   x(t) = 1/2 (e^(2 t)-1)
     
     
-    """
-    te = 1
-    N = 20
-    t=SX.sym("t")
-    x=SX.sym("x")
-    a=SX.sym("a")
-    u=SX.sym("u")
-    f=SXFunction(daeIn(t=t, x=x, p=vertcat([a,u])),daeOut(a*x+u))
-    f.init()
+  #   """
+  #   te = 1
+  #   N = 20
+  #   t=SX.sym("t")
+  #   x=SX.sym("x")
+  #   a=SX.sym("a")
+  #   u=SX.sym("u")
+  #   f=SXFunction(daeIn(t=t, x=x, p=vertcat([a,u])),daeOut(a*x+u))
+  #   f.init()
     
-    integrator_options = {}
-    integrator_options["reltol"]=1e-9
-    integrator_options["abstol"]=1e-9
-    integrator_options["steps_per_checkpoint"]=10000
-    integrator_options["t0"]=0
-    integrator_options["tf"]=te/N
+  #   integrator_options = {}
+  #   integrator_options["reltol"]=1e-9
+  #   integrator_options["abstol"]=1e-9
+  #   integrator_options["steps_per_checkpoint"]=10000
+  #   integrator_options["t0"]=0
+  #   integrator_options["tf"]=te/N
     
-    mayer = SXFunction([x],[-x])
-    mayer.init()
+  #   mayer = SXFunction([x],[-x])
+  #   mayer.init()
     
-    ms = DirectMultipleShooting(f,mayer)
-    ms.setOption("integrator", "cvodes")
-    ms.setOption("integrator_options",integrator_options)
-    ms.setOption("number_of_grid_points",N);
-    ms.setOption("number_of_parameters",1);
-    ms.setOption("final_time",te);
+  #   ms = DirectMultipleShooting(f,mayer)
+  #   ms.setOption("integrator", "cvodes")
+  #   ms.setOption("integrator_options",integrator_options)
+  #   ms.setOption("number_of_grid_points",N);
+  #   ms.setOption("number_of_parameters",1);
+  #   ms.setOption("final_time",te);
 
-    ms.setOption("nlp_solver", "ipopt")
-    nlp_solver_options = {}
-    nlp_solver_options["tol"] = 1e-10
-    nlp_solver_options["hessian_approximation"] = "limited-memory"
-    nlp_solver_options["max_iter"] = 100
-    nlp_solver_options["linear_solver"] = "ma57"
-    nlp_solver_options["derivative_test"] = "first-order"
-    ms.setOption("nlp_solver_options",nlp_solver_options)
-    ms.init()
+  #   ms.setOption("nlp_solver", "ipopt")
+  #   nlp_solver_options = {}
+  #   nlp_solver_options["tol"] = 1e-10
+  #   nlp_solver_options["hessian_approximation"] = "limited-memory"
+  #   nlp_solver_options["max_iter"] = 100
+  #   nlp_solver_options["linear_solver"] = "ma57"
+  #   nlp_solver_options["derivative_test"] = "first-order"
+  #   ms.setOption("nlp_solver_options",nlp_solver_options)
+  #   ms.init()
     
-    ms.setInput(-inf,"lbx")
-    ms.setInput(inf,"ubx")
-    ms.setInput(0,"x_init")
+  #   ms.setInput(-inf,"lbx")
+  #   ms.setInput(inf,"ubx")
+  #   ms.setInput(0,"x_init")
     
-    ms.setInput(-1,"lbu")
-    ms.setInput(1,"ubu")
-    ms.setInput(0,"u_init")
+  #   ms.setInput(-1,"lbu")
+  #   ms.setInput(1,"ubu")
+  #   ms.setInput(0,"u_init")
     
-    ms.setInput(-2,"lbp")
-    ms.setInput(2,"ubp")
-    ms.setInput(0,"p_init")
+  #   ms.setInput(-2,"lbp")
+  #   ms.setInput(2,"ubp")
+  #   ms.setInput(0,"p_init")
     
-    ms.input("lbx")[0,0] = 0
-    ms.input("ubx")[0,0] = 0
+  #   ms.input("lbx")[0,0] = 0
+  #   ms.input("ubx")[0,0] = 0
    
-    ms.evaluate()
+  #   ms.evaluate()
     
   
 if __name__ == '__main__':
