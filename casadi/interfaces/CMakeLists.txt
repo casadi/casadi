@@ -50,6 +50,10 @@ if(SLICOT_FOUND)
   add_subdirectory(slicot)
 endif()
 
+if(TINYXML_FOUND)
+  add_subdirectory(tinyxml)
+endif()
+
 set(LINT_TARGETS ${LINT_TARGETS} PARENT_SCOPE)
 set(SPELL_TARGETS ${SPELL_TARGETS} PARENT_SCOPE)
 set(CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)

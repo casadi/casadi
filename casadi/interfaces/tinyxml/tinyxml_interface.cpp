@@ -20,37 +20,34 @@
  *
  */
 
-#ifndef CASADI_XML_FILE_INTERNAL_HPP
-#define CASADI_XML_FILE_INTERNAL_HPP
+#include "tinyxml_interface.hpp"
 
-#include "xml_file.hpp"
-#include "../function/plugin_interface.hpp"
-
+using namespace std;
 namespace casadi {
 
-  class CASADI_CORE_EXPORT
-  XmlFileInternal : public OptionsFunctionalityNode,
-                    public PluginInterface<XmlFileInternal> {
-  public:
-    // Constructor
-    XmlFileInternal();
+  extern "C"
+  int CASADI_XMLFILE_TINYXML_EXPORT
+  casadi_register_xmlfile_tinyxml(XmlFileInternal::Plugin* plugin) {
+    plugin->creator = TinyXmlInterface::creator;
+    plugin->name = "tinyxml";
+    plugin->doc = TinyXmlInterface::meta_doc.c_str();
+    plugin->version = 20;
+    return 0;
+  }
 
-    // Destructor
-    virtual ~XmlFileInternal();
+  extern "C"
+  void CASADI_XMLFILE_TINYXML_EXPORT casadi_load_xmlfile_tinyxml() {
+    XmlFileInternal::registerPlugin(casadi_register_xmlfile_tinyxml);
+  }
 
-    /** \brief  Print */
-    virtual void print(std::ostream &stream) const;
+  TinyXmlInterface::TinyXmlInterface() : XmlFileInternal() {
+  }
 
-    // Creator function for internal class
-    typedef XmlFileInternal* (*Creator)();
+  TinyXmlInterface::~TinyXmlInterface() {
+  }
 
-    /// Collection of solvers
-    static std::map<std::string, Plugin> solvers_;
-
-    /// Infix
-    static const std::string infix_;
-  };
+  TinyXmlInterface* TinyXmlInterface::clone() const {
+    return new TinyXmlInterface();
+  }
 
 } // namespace casadi
-
-#endif // CASADI_XML_FILE_INTERNAL_HPP

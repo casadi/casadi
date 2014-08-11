@@ -20,37 +20,12 @@
  *
  */
 
-#ifndef CASADI_XML_FILE_INTERNAL_HPP
-#define CASADI_XML_FILE_INTERNAL_HPP
 
-#include "xml_file.hpp"
-#include "../function/plugin_interface.hpp"
+      #include "tinyxml_interface.hpp"
+      #include <string>
 
-namespace casadi {
-
-  class CASADI_CORE_EXPORT
-  XmlFileInternal : public OptionsFunctionalityNode,
-                    public PluginInterface<XmlFileInternal> {
-  public:
-    // Constructor
-    XmlFileInternal();
-
-    // Destructor
-    virtual ~XmlFileInternal();
-
-    /** \brief  Print */
-    virtual void print(std::ostream &stream) const;
-
-    // Creator function for internal class
-    typedef XmlFileInternal* (*Creator)();
-
-    /// Collection of solvers
-    static std::map<std::string, Plugin> solvers_;
-
-    /// Infix
-    static const std::string infix_;
-  };
-
-} // namespace casadi
-
-#endif // CASADI_XML_FILE_INTERNAL_HPP
+      const std::string casadi::TinyXmlInterface::meta_doc=
+      "\n"
+"Interface to TinyXml\n"
+"\n"
+;

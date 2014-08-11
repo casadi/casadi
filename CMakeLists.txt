@@ -119,6 +119,7 @@ option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
+option(WITH_TINYXML "Compile the interface to TinyXML (the source code is included)" ON)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
 
@@ -337,6 +338,14 @@ if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
   set(QPOASES_FOUND true)
 endif()
 add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
+
+# Use the included TinyXML
+if(WITH_TINYXML)
+  set(TINYXML_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/tinyxml)
+  set(TINYXML_LIBRARIES casadi_tinyxml)
+  set(TINYXML_FOUND true)
+endif()
+add_feature_info(tinyxml-interface TINYXML_FOUND "Interface to the XML parser TinyXML.")
 
 if(WITH_OOQP AND BLAS_FOUND AND HSL_FOUND)
   find_package(OOQP)
