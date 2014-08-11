@@ -848,33 +848,34 @@ namespace casadi {
     SXFunction f(arg, ex);
     f.init();
 
-    // Dimension of v
-    int v1 = v.size2(), v2 = v.size1();
+    // Split up v
+    vector<SX> vv = horzsplit(v);
 
     // Make sure well-posed
-    casadi_assert(v2 >= 1);
-    casadi_assert(ex.size1()==1);
-    casadi_assert(arg.size1()==1);
+    casadi_assert(vv.size() >= 1);
+    casadi_assert(ex.isVector());
+    casadi_assert(arg.isVector());
     if (transpose_jacobian) {
-      casadi_assert(v1==ex.size2());
+      casadi_assert(v.size1()==ex.size1());
     } else {
-      casadi_assert(v1==arg.size2());
+      casadi_assert(v.size1()==arg.size1());
     }
 
     // Number of sensitivities
-    int nfsens = transpose_jacobian ? 0 : v2;
-    int nasens = transpose_jacobian ? v2 : 0;
+    int nfsens = transpose_jacobian ? 0 : vv.size();
+    int nasens = transpose_jacobian ? vv.size() : 0;
 
     // Assemble arguments and directional derivatives
     vector<SX> argv = f.inputExpr();
     vector<SX> resv = f.outputExpr();
     vector<vector<SX> > fseed(nfsens, argv), fsens(nfsens, resv),
         aseed(nasens, resv), asens(nasens, argv);
-    for (int dir=0; dir<v2; ++dir) {
+
+    for (int dir=0; dir<vv.size(); ++dir) {
       if (transpose_jacobian) {
-        aseed[dir][0].set(v(dir, Slice(0, v1)));
+        aseed[dir][0].set(vv[dir]);
       } else {
-        fseed[dir][0].set(v(dir, Slice(0, v1)));
+        fseed[dir][0].set(vv[dir]);
       }
     }
 
@@ -882,15 +883,14 @@ namespace casadi {
     f.callDerivative(argv, resv, fseed, fsens, aseed, asens);
 
     // Get the results
-    vector<SX> dirder(v2);
-    for (int dir=0; dir<v2; ++dir) {
+    for (int dir=0; dir<vv.size(); ++dir) {
       if (transpose_jacobian) {
-        dirder[dir] = asens[dir][0];
+        vv[dir] = asens[dir][0];
       } else {
-        dirder[dir] = fsens[dir][0];
+        vv[dir] = fsens[dir][0];
       }
     }
-    return vertcat(dirder);
+    return horzcat(vv);
   }
 
   void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v,

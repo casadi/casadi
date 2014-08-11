@@ -260,7 +260,7 @@ namespace casadi {
   CASADI_CORE_EXPORT void hessian(const SX &ex, const SX &arg, SX &H, SX &g);
   ///@}
 
-  /** \brief Calculate the Jacobian and multiply by a vector from the left
+  /** \brief Calculate the Jacobian and multiply by a vector from the right
       This is equivalent to <tt>mul(jacobian(ex, arg), v)</tt> or
       <tt>mul(jacobian(ex, arg).T, v)</tt> for
       transpose_jacobian set to false and true respectively. If contrast to these
