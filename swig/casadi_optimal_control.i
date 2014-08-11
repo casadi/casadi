@@ -29,15 +29,11 @@
 #define CASADI_OPTIMAL_CONTROL_EXPORT
 
 %{
-#include "casadi/optimal_control/variable.hpp"
-#include "casadi/optimal_control/symbolic_ocp.hpp"
 #include "casadi/optimal_control/direct_single_shooting.hpp"
 #include "casadi/optimal_control/direct_multiple_shooting.hpp"
 #include "casadi/optimal_control/direct_collocation.hpp"
 %}
 
-%include "casadi/optimal_control/variable.hpp"
-%include "casadi/optimal_control/symbolic_ocp.hpp"
 %include "casadi/optimal_control/direct_single_shooting.hpp"
 %include "casadi/optimal_control/direct_multiple_shooting.hpp"
 %include "casadi/optimal_control/direct_collocation.hpp"

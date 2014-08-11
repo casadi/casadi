@@ -69,6 +69,8 @@ namespace casadi {
   class CustomEvaluate;
   class CustomFunction;
   class SymbolicNLP;
+  class Variable;
+  class SymbolicOCP;
 
 #ifndef SWIG
   // The number of derivative directions for which the tool has been optimized

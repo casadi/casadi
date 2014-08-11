@@ -27,13 +27,13 @@
 #include <sstream>
 #include <ctime>
 
-#include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/casadi_exception.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
-#include "casadi/core/function/integrator.hpp"
-#include "casadi/core/casadi_calculus.hpp"
-#include "casadi/core/misc/xml_file.hpp"
+#include "../std_vector_tools.hpp"
+#include "../casadi_exception.hpp"
+#include "../matrix/matrix_tools.hpp"
+#include "../sx/sx_tools.hpp"
+#include "../function/integrator.hpp"
+#include "../casadi_calculus.hpp"
+#include "xml_file.hpp"
 
 using namespace std;
 namespace casadi {

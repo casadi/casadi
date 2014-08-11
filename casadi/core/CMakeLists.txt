@@ -118,6 +118,7 @@ set(CASADI_SRCS
   misc/xml_node.hpp                misc/xml_node.cpp
   misc/xml_file.hpp                misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
   misc/variable.hpp                misc/variable.cpp
+  misc/symbolic_ocp.hpp            misc/symbolic_ocp.cpp
 
   # User include class with the most essential includes
   core.hpp

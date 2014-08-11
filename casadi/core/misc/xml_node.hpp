@@ -49,7 +49,8 @@ namespace casadi {
 
     /** \brief  Read the value of an attribute */
     template<typename T>
-      void readAttribute(const std::string& attribute_name, T& val, bool assert_existance=true) const {
+      void readAttribute(const std::string& attribute_name, T& val,
+                         bool assert_existance=true) const {
       // find the attribute
       std::map<std::string, std::string>::const_iterator it = attributes_.find(attribute_name);
 

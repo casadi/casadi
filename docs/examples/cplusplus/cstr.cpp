@@ -22,7 +22,7 @@
 
 #include <casadi/casadi.hpp>
 
-#include <casadi/optimal_control/symbolic_ocp.hpp>
+#include <casadi/core/misc/symbolic_ocp.hpp>
 #include <casadi/optimal_control/direct_multiple_shooting.hpp>
 
 using namespace casadi;

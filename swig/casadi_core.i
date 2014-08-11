@@ -56,6 +56,10 @@
 %{
 #include "casadi/core/misc/integration_tools.hpp"
 #include "casadi/core/misc/symbolic_nlp.hpp"
+#include "casadi/core/misc/variable.hpp"
+#include "casadi/core/misc/symbolic_ocp.hpp"
 %}
 %include "casadi/core/misc/integration_tools.hpp"
 %include "casadi/core/misc/symbolic_nlp.hpp"
+%include "casadi/core/misc/variable.hpp"
+%include "casadi/core/misc/symbolic_ocp.hpp"

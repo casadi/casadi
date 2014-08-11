@@ -105,7 +105,7 @@ namespace casadi {
         throw CasadiException("Error in TinyXmlInterface::addNode: Unknown node type");
       }
     }
-    
+
     // Note: Return value optimization
     return ret;
   }

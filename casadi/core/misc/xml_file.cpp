@@ -43,7 +43,7 @@ namespace casadi {
     return static_cast<XmlFileInternal*>(OptionsFunctionality::operator->());
   }
 
-  XmlNode XmlFile::parse(const std::string& filename){
+  XmlNode XmlFile::parse(const std::string& filename) {
     return (*this)->parse(filename);
   }
 
