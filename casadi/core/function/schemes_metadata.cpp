@@ -52,9 +52,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_HessLagOutput: return "HessLagOutput";
     case SCHEME_NlpSolverInput: return "NlpSolverInput";
     case SCHEME_NlpSolverOutput: return "NlpSolverOutput";
-    case SCHEME_MayerInput: return "MayerInput";
-    case SCHEME_OCPInput: return "OCPInput";
-    case SCHEME_OCPOutput: return "OCPOutput";
     case SCHEME_QcqpSolverInput: return "QcqpSolverInput";
     case SCHEME_QcqpSolverOutput: return "QcqpSolverOutput";
     case SCHEME_QCQPStruct: return "QCQPStruct";
@@ -128,12 +125,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
     case SCHEME_NlpSolverOutput:
       return "x, f, g, lam_x, lam_g, lam_p";
-    case SCHEME_MayerInput:
-      return "x, p";
-    case SCHEME_OCPInput:
-      return "lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg";
-    case SCHEME_OCPOutput:
-      return "x_opt, u_opt, p_opt, cost";
     case SCHEME_QcqpSolverInput:
       return "h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QcqpSolverOutput:
@@ -320,31 +311,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==3) return "lam_x";
       if (i==4) return "lam_g";
       if (i==5) return "lam_p";
-      break;
-    case SCHEME_MayerInput:
-      if (i==0) return "x";
-      if (i==1) return "p";
-      break;
-    case SCHEME_OCPInput:
-      if (i==0) return "lbx";
-      if (i==1) return "ubx";
-      if (i==2) return "x_init";
-      if (i==3) return "lbu";
-      if (i==4) return "ubu";
-      if (i==5) return "u_init";
-      if (i==6) return "lbp";
-      if (i==7) return "ubp";
-      if (i==8) return "p_init";
-      if (i==9) return "lbh";
-      if (i==10) return "ubh";
-      if (i==11) return "lbg";
-      if (i==12) return "ubg";
-      break;
-    case SCHEME_OCPOutput:
-      if (i==0) return "x_opt";
-      if (i==1) return "u_opt";
-      if (i==2) return "p_opt";
-      if (i==3) return "cost";
       break;
     case SCHEME_QcqpSolverInput:
       if (i==0) return "h";
@@ -635,31 +601,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==4) return "Lagrange multipliers for bounds on G at the solution (ng x 1)";  // NOLINT(whitespace/line_length)
       if (i==5) return "Lagrange multipliers for bounds on P at the solution (np x 1)";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_MayerInput:
-      if (i==0) return "States at the end of integration (nx x 1)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Problem parameters (np x 1)";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_OCPInput:
-      if (i==0) return "States lower bounds (nx x (ns+1))";  // NOLINT(whitespace/line_length)
-      if (i==1) return "States upper bounds (nx x (ns+1))";  // NOLINT(whitespace/line_length)
-      if (i==2) return "States initial guess (nx x (ns+1))";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Controls lower bounds (nu x ns)";  // NOLINT(whitespace/line_length)
-      if (i==4) return "Controls upper bounds (nu x ns)";  // NOLINT(whitespace/line_length)
-      if (i==5) return "Controls initial guess (nu x ns)";  // NOLINT(whitespace/line_length)
-      if (i==6) return "Parameters lower bounds (np x 1)";  // NOLINT(whitespace/line_length)
-      if (i==7) return "Parameters upper bounds (np x 1)";  // NOLINT(whitespace/line_length)
-      if (i==8) return "Parameters initial guess (np x 1)";  // NOLINT(whitespace/line_length)
-      if (i==9) return "Point constraint lower bound (nh x (ns+1))";  // NOLINT(whitespace/line_length)
-      if (i==10) return "Point constraint upper bound (nh x (ns+1))";  // NOLINT(whitespace/line_length)
-      if (i==11) return "Lower bound for the coupling constraints";  // NOLINT(whitespace/line_length)
-      if (i==12) return "Upper bound for the coupling constraints";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_OCPOutput:
-      if (i==0) return "Optimal state trajectory";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Optimal control trajectory";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Optimal parameters";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Objective/cost function for optimal solution (1 x 1)";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_QcqpSolverInput:
       if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
       if (i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
@@ -949,31 +890,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==4) return "NLP_SOLVER_LAM_G";
       if (i==5) return "NLP_SOLVER_LAM_P";
       break;
-    case SCHEME_MayerInput:
-      if (i==0) return "MAYER_X";
-      if (i==1) return "MAYER_P";
-      break;
-    case SCHEME_OCPInput:
-      if (i==0) return "OCP_LBX";
-      if (i==1) return "OCP_UBX";
-      if (i==2) return "OCP_X_INIT";
-      if (i==3) return "OCP_LBU";
-      if (i==4) return "OCP_UBU";
-      if (i==5) return "OCP_U_INIT";
-      if (i==6) return "OCP_LBP";
-      if (i==7) return "OCP_UBP";
-      if (i==8) return "OCP_P_INIT";
-      if (i==9) return "OCP_LBH";
-      if (i==10) return "OCP_UBH";
-      if (i==11) return "OCP_LBG";
-      if (i==12) return "OCP_UBG";
-      break;
-    case SCHEME_OCPOutput:
-      if (i==0) return "OCP_X_OPT";
-      if (i==1) return "OCP_U_OPT";
-      if (i==2) return "OCP_P_OPT";
-      if (i==3) return "OCP_COST";
-      break;
     case SCHEME_QcqpSolverInput:
       if (i==0) return "QCQP_SOLVER_H";
       if (i==1) return "QCQP_SOLVER_G";
@@ -1192,15 +1108,6 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_NlpSolverOutput:
       return 6;
       break;
-    case SCHEME_MayerInput:
-      return 2;
-      break;
-    case SCHEME_OCPInput:
-      return 13;
-      break;
-    case SCHEME_OCPOutput:
-      return 4;
-      break;
     case SCHEME_QcqpSolverInput:
       return 12;
       break;
@@ -1403,31 +1310,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="lam_x") return 3;
       if (name=="lam_g") return 4;
       if (name=="lam_p") return 5;
-      break;
-    case SCHEME_MayerInput:
-      if (name=="x") return 0;
-      if (name=="p") return 1;
-      break;
-    case SCHEME_OCPInput:
-      if (name=="lbx") return 0;
-      if (name=="ubx") return 1;
-      if (name=="x_init") return 2;
-      if (name=="lbu") return 3;
-      if (name=="ubu") return 4;
-      if (name=="u_init") return 5;
-      if (name=="lbp") return 6;
-      if (name=="ubp") return 7;
-      if (name=="p_init") return 8;
-      if (name=="lbh") return 9;
-      if (name=="ubh") return 10;
-      if (name=="lbg") return 11;
-      if (name=="ubg") return 12;
-      break;
-    case SCHEME_OCPOutput:
-      if (name=="x_opt") return 0;
-      if (name=="u_opt") return 1;
-      if (name=="p_opt") return 2;
-      if (name=="cost") return 3;
       break;
     case SCHEME_QcqpSolverInput:
       if (name=="h") return 0;
