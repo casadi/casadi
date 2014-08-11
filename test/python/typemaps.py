@@ -40,9 +40,21 @@ class typemaptests(casadiTestCase):
   def setUp(self):
     pass
 
+  def test_0a(self):
+    self.message("Typemap array -> IMatrix")
+    arrays = [array([[1,2,3],[4,5,6]],dtype=int32),array([[1,2,3],[4,5,6]],dtype=int64),array([[1,2,3],[4,5,6]],dtype=int),array([[1,2,3],[4,5,6]],dtype=long)]
+    for i in range(len(arrays)):
+      m = arrays[i]
+      zt=c.transpose(c.transpose(m))
+      self.assertTrue(isinstance(zt,IMatrix),"IMatrix expected")
+      self.checkarray(m,zt,"IMatrix(numpy.ndarray)")
+      self.checkarray(m,zt.toArray(),"IMatrix(numpy.ndarray).toArray()")
+      #if scipy_available:
+      #  self.checkarray(m,zt.toCsc_matrix(),"IMatrix(numpy.ndarray).toCsc_matrix()")
+      
   def test_0(self):
     self.message("Typemap array -> DMatrix")
-    arrays = [array([[1,2,3],[4,5,6]]),array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
+    arrays = [array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))

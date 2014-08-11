@@ -644,12 +644,24 @@ int meta< casadi::Matrix<int> >::as(PyObject * p,casadi::Matrix<int> &m) {
     if (!array_is_native(p)) {
       return false;
     }
-    // Make sure we have a contigous array with double datatype
-    int array_is_new_object;
+    // Make sure we have a contigous array with int datatype
+    int array_is_new_object=0;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
-    if (!array) { 
-      std::cout << "foo" << std::endl;
-      return false;
+    if (!array) { // Trying LONG
+      PyErr_Clear();
+      array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
+      if (!array) {
+        PyErr_Clear();
+        return false;
+      }
+      long* temp=(long*) array_data(array);
+      m = casadi::Matrix<int>::zeros(ncols,nrows);
+      for (int k=0;k<nrows*ncols;k++) m.data()[k]=temp[k];
+      m = m.trans();                  
+      // Free memory
+      if (array_is_new_object)
+        Py_DECREF(array);
+      return true;
     }
     
     int* d=(int*) array_data(array);
