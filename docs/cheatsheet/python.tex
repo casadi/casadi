@@ -1,32 +1,33 @@
-\documentclass[a4paper,8pt,twocolumn]{article}
+\documentclass[a4paper,8pt]{article}
 
 \usepackage{fullpage}
 \usepackage{multirow}
-
+\usepackage{multicol}
 \begin{document}
+
 \title{CasADi Python cheatsheet}
 \date{}
 \maketitle
 
-\begin{center}
-\begin{table}
-\begin{tabular}{ll|lll}
- & & scalar & dense & sparse \\
+\begin{table}[ht]
+\centering
+\begin{tabular}{ll|ll}
+ & & dense & sparse \\
 \hline
-\multirow{2}{*}{SX} & sym & \verb|SX("x")| & \verb|SX.sym("x",n,m)|  &  \\ 
-    & num & \verb|SX(d)|  & \verb|SX(d)|  & \verb|SX(sp,d)| \\
+\multirow{2}{*}{SX} & sym & \verb|SX.sym("x",n,m)|  & \verb|SX.sym("x",sp)| \\ 
+    & num & \verb|SX(d)|   & \verb|SX(sp,d)| \\
 \hline
-\multirow{2}{*}{MX} & sym & - & \verb|MX.sym("x",n,m)|  & \verb|MX.sym("x",sp)|\\
-    & num & - & \verb|MX(d)| &  \verb|MX(DMatrix(sp,d))| \\
+\multirow{2}{*}{MX} & sym &  \verb|MX.sym("x",n,m)|  & \verb|MX.sym("x",sp)|\\
+    & num & \verb|MX(d)| &  \verb|MX(DMatrix(sp,d))| \\
 \hline
-    & DMatrix & -  & \verb|DMatrix(d)|  & \verb|DMatrix(sp,d)| \\
+    & DMatrix &  \verb|DMatrix(d)|  & \verb|DMatrix(sp,d)| \\
 \end{tabular}
+
 \caption{\texttt{d} is a real number, \texttt{n} and \texttt{m} are integers }
 \label{tab:constr}
 \end{table}
-\end{center}
 
-
+\begin{multicols}{2}
 
 \paragraph{Header}
 \begin{verbatim}
@@ -67,8 +68,8 @@
 
 \paragraph{Reshaping}
 \begin{verbatim}
-  column_matrix = vec(some_matrix)
-  reshaped_matrix = reshape(some_matrix,[3,4])
+  column_matrix = vec(m)
+  reshaped_matrix = reshape(m,[3,4])
 \end{verbatim}
 
 \paragraph{Slicing}
@@ -96,6 +97,15 @@
   g.init()
 \end{verbatim}
 
+\paragraph{Function MIMO with scheme}
+\begin{verbatim}
+  solver = SXFunction(
+    nlpIn(x=x),
+    nlpOut(f=f,g=vertcat([x,2*x]))
+  )
+  solver.init()
+\end{verbatim}
+
 \paragraph{Setting options}
 \begin{verbatim}
   f.setOption("option_name",option value)
@@ -104,22 +114,30 @@
 \paragraph{Evaluate SISO}
 
 \begin{verbatim}
-  f.input().set(3)
+  f.setInput(3)
   f.evaluate()
-  print f.output()
+  print f.getOutput()
 \end{verbatim}
 
 \paragraph{Evaluate MIMO}
 \begin{verbatim}
-  g.input(0).set(5)
-  g.input(1).set(range(20))
+  g.setInput(5,0)
+  g.setInput(range(20),1)
   g.evaluate()
-  print g.output(0), g.output(1), g.output(2)
+  print g.getOutput(0), g.getOutput(1)
+\end{verbatim}
+
+\paragraph{Evaluate MIMO with scheme}
+\begin{verbatim}
+  solver.setInput(5,"x")
+  solver.evaluate()
+  print solver.getOutput("f"), solver.getOutput("g")
 \end{verbatim}
 
 \paragraph{Caveats in Python}
 \begin{verbatim}
   1/2 # integer division => 0
 \end{verbatim}
+\end{multicols}
 
 \end{document}
