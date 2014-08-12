@@ -42,7 +42,7 @@ class typemaptests(casadiTestCase):
 
   def test_0a(self):
     self.message("Typemap array -> IMatrix")
-    arrays = [array([[1,2,3],[4,5,6]],dtype=int32),array([[1,2,3],[4,5,6]],dtype=int64),array([[1,2,3],[4,5,6]],dtype=int),array([[1,2,3],[4,5,6]],dtype=long)]
+    arrays = [array([[1,2,3],[4,5,6]],dtype=int32),array([[1,2,3],[4,5,6]]),array([[1,2,3],[4,5,6]],dtype=int)]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))
