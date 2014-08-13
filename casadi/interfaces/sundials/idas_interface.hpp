@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_IDAS_INTERNAL_HPP
-#define CASADI_IDAS_INTERNAL_HPP
+#ifndef CASADI_IDAS_INTERFACE_HPP
+#define CASADI_IDAS_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_integrator_idas_export.h>
 #include "sundials_internal.hpp"
@@ -53,32 +53,32 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_INTEGRATOR_IDAS_EXPORT IdasInternal : public SundialsInternal {
+  class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInternal {
 
   public:
 
     /** \brief  Constructor */
-    explicit IdasInternal(const Function& f, const Function& g);
+    explicit IdasInterface(const Function& f, const Function& g);
 
     /** \brief  Copy constructor */
-    //  IdasInternal(const IdasInternal& integrator);
+    //  IdasInterface(const IdasInterface& integrator);
 
     /** \brief  Clone */
-    virtual IdasInternal* clone() const;
+    virtual IdasInterface* clone() const;
 
     /** \brief  Create a new integrator */
-    virtual IdasInternal* create(const Function& f, const Function& g) const
-    { return new IdasInternal(f, g);}
+    virtual IdasInterface* create(const Function& f, const Function& g) const
+    { return new IdasInterface(f, g);}
 
     /** \brief  Create a new integrator */
     static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new IdasInternal(f, g);}
+    { return new IdasInterface(f, g);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Destructor */
-    virtual ~IdasInternal();
+    virtual ~IdasInterface();
 
     /** \brief  Free all IDAS memory */
     virtual void freeIDAS();
@@ -317,5 +317,5 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_IDAS_INTERNAL_HPP
+#endif // CASADI_IDAS_INTERFACE_HPP
 

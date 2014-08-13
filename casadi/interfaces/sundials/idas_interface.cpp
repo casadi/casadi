@@ -20,7 +20,7 @@
  *
  */
 
-#include "idas_internal.hpp"
+#include "idas_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
@@ -32,9 +32,9 @@ namespace casadi {
 
   extern "C"
   int CASADI_INTEGRATOR_IDAS_EXPORT casadi_register_integrator_idas(IntegratorInternal::Plugin* plugin){
-    plugin->creator = IdasInternal::creator;
+    plugin->creator = IdasInterface::creator;
     plugin->name = "idas";
-    plugin->doc = IdasInternal::meta_doc.c_str();
+    plugin->doc = IdasInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -44,20 +44,20 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_idas);
   }
 
-  IdasInternal* IdasInternal::clone() const {
+  IdasInterface* IdasInterface::clone() const {
     // Return a deep copy
-    IdasInternal* node = new IdasInternal(f_, g_);
+    IdasInterface* node = new IdasInterface(f_, g_);
     node->setOption(dictionary());
     node->jac_ = jac_;
     node->linsol_ = linsol_;
     return node;
   }
 
-  void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
+  void IdasInterface::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     SundialsInternal::deepCopyMembers(already_copied);
   }
 
-  IdasInternal::IdasInternal(const Function& f, const Function& g) : SundialsInternal(f, g) {
+  IdasInterface::IdasInterface(const Function& f, const Function& g) : SundialsInternal(f, g) {
     addOption("suppress_algebraic",          OT_BOOLEAN,          false,
               "Supress algebraic variables in the error testing");
     addOption("calc_ic",                     OT_BOOLEAN,          true,
@@ -98,11 +98,11 @@ namespace casadi {
     disable_internal_warnings_ = false;
   }
 
-  IdasInternal::~IdasInternal() {
+  IdasInterface::~IdasInterface() {
     freeIDAS();
   }
 
-  void IdasInternal::freeIDAS() {
+  void IdasInterface::freeIDAS() {
     if (mem_) { IDAFree(&mem_); mem_ = 0; }
 
     // Forward integration
@@ -124,8 +124,8 @@ namespace casadi {
         if (*it) { N_VDestroy_Serial(*it); *it = 0; }
   }
 
-  void IdasInternal::init() {
-    log("IdasInternal::init", "begin");
+  void IdasInterface::init() {
+    log("IdasInterface::init", "begin");
 
     // Free memory if already initialized
     if (isInit()) freeIDAS();
@@ -169,7 +169,7 @@ namespace casadi {
     N_VConst(0.0, xz_);
     N_VConst(0.0, xzdot_);
     IDAInit(mem_, res_wrapper, t0, xz_, xzdot_);
-    log("IdasInternal::init", "IDA initialized");
+    log("IdasInterface::init", "IDA initialized");
 
     // Disable internal warning messages?
     disable_internal_warnings_ = getOption("disable_internal_warnings");
@@ -263,7 +263,7 @@ namespace casadi {
       }
     }
 
-    log("IdasInternal::init", "attached linear solver");
+    log("IdasInterface::init", "attached linear solver");
 
     // // Forward sensitivity problem
     // if (nfdir_>0) {
@@ -369,7 +369,7 @@ namespace casadi {
     //     if (flag != IDA_SUCCESS) idas_error("IDAQuadSensSStolerances", flag);
     //   }
 
-    //   log("IdasInternal::init", "initialized forward sensitivities");
+    //   log("IdasInterface::init", "initialized forward sensitivities");
     // } // enable fsens
 
     // Adjoint sensitivity problem
@@ -384,14 +384,14 @@ namespace casadi {
       // Allocate n-vectors for quadratures
       rq_ = N_VMake_Serial(nrq_, output(INTEGRATOR_RQF).ptr());
     }
-    log("IdasInternal::init", "initialized adjoint sensitivities");
+    log("IdasInterface::init", "initialized adjoint sensitivities");
 
     isInitTaping_ = false;
     isInitAdj_ = false;
-    log("IdasInternal::init", "end");
+    log("IdasInterface::init", "end");
   }
 
-  void IdasInternal::initTaping() {
+  void IdasInterface::initTaping() {
     casadi_assert(!isInitTaping_);
     int flag;
 
@@ -414,8 +414,8 @@ namespace casadi {
     isInitTaping_ = true;
   }
 
-  void IdasInternal::initAdj() {
-    log("IdasInternal::initAdj", "start");
+  void IdasInterface::initAdj() {
+    log("IdasInterface::initAdj", "start");
 
     casadi_assert(!isInitAdj_);
     int flag;
@@ -487,12 +487,12 @@ namespace casadi {
     // Mark initialized
     isInitAdj_ = true;
 
-    log("IdasInternal::initAdj", "end");
+    log("IdasInterface::initAdj", "end");
   }
 
 
-  void IdasInternal::res(double t, const double* xz, const double* xzdot, double* r) {
-    log("IdasInternal::res", "begin");
+  void IdasInterface::res(double t, const double* xz, const double* xzdot, double* r) {
+    log("IdasInterface::res", "begin");
 
     // Get time
     time1 = clock();
@@ -524,9 +524,9 @@ namespace casadi {
 
     if (regularity_check_) {
       casadi_assert_message(isRegular(f_.output(DAE_ODE).data()),
-                            "IdasInternal::res: f.output(DAE_ODE) is not regular.");
+                            "IdasInterface::res: f.output(DAE_ODE) is not regular.");
       casadi_assert_message(isRegular(f_.output(DAE_ALG).data()),
-                            "IdasInternal::res: f.output(DAE_ALG) is not regular.");
+                            "IdasInterface::res: f.output(DAE_ALG) is not regular.");
     }
 
     // Subtract state derivative to get residual
@@ -536,13 +536,13 @@ namespace casadi {
 
     time2 = clock();
     t_res += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::res", "end");
+    log("IdasInterface::res", "end");
   }
 
-  int IdasInternal::res_wrapper(double t, N_Vector xz, N_Vector xzdot,
+  int IdasInterface::res_wrapper(double t, N_Vector xz, N_Vector xzdot,
                                 N_Vector rr, void *user_data) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->res(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(rr));
       return 0;
     } catch(int flag) { // recoverable error
@@ -553,24 +553,24 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::ehfun_wrapper(int error_code, const char *module, const char *function,
+  void IdasInterface::ehfun_wrapper(int error_code, const char *module, const char *function,
                                    char *msg, void *eh_data) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(eh_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(eh_data);
       this_->ehfun(error_code, module, function, msg);
     } catch(exception& e) {
       cerr << "ehfun failed: " << e.what() << endl;
     }
   }
 
-  void IdasInternal::ehfun(int error_code, const char *module, const char *function, char *msg) {
+  void IdasInterface::ehfun(int error_code, const char *module, const char *function, char *msg) {
     cerr << msg << endl;
   }
 
-  void IdasInternal::jtimes(double t, const double *xz, const double *xzdot, const double *rr,
+  void IdasInterface::jtimes(double t, const double *xz, const double *xzdot, const double *rr,
                             const double *v, double *Jv, double cj,
                             double *tmp1, double *tmp2) {
-    log("IdasInternal::jtimes", "begin");
+    log("IdasInterface::jtimes", "begin");
     // Get time
     time1 = clock();
 
@@ -599,14 +599,14 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::jtimes", "end");
+    log("IdasInterface::jtimes", "end");
   }
 
-  int IdasInternal::jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
+  int IdasInterface::jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
                                    N_Vector Jv, double cj, void *user_data,
                                    N_Vector tmp1, N_Vector tmp2) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->jtimes(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(rr), NV_DATA_S(v),
                     NV_DATA_S(Jv), cj, NV_DATA_S(tmp1), NV_DATA_S(tmp2));
       return 0;
@@ -616,10 +616,10 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::jtimesB(double t, const double *xz, const double *xzdot, const double *xzB,
+  void IdasInterface::jtimesB(double t, const double *xz, const double *xzdot, const double *xzB,
                              const double *xzdotB, const double *resvalB, const double *vB,
                              double *JvB, double cjB, double * tmp1B, double * tmp2B) {
-    log("IdasInternal::jtimesB", "begin");
+    log("IdasInterface::jtimesB", "begin");
     // Get time
     time1 = clock();
 
@@ -691,15 +691,15 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::jtimesB", "end");
+    log("IdasInterface::jtimesB", "end");
   }
 
-  int IdasInternal::jtimesB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
+  int IdasInterface::jtimesB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                                     N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
                                     double cjB, void *user_data,
                                     N_Vector tmp1B, N_Vector tmp2B) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->jtimesB(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(xzB),
                      NV_DATA_S(xzdotB), NV_DATA_S(resvalB), NV_DATA_S(vB),
                      NV_DATA_S(JvB), cjB, NV_DATA_S(tmp1B), NV_DATA_S(tmp2B));
@@ -710,10 +710,10 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::resS(int Ns, double t, const double* xz, const double* xzdot,
+  void IdasInterface::resS(int Ns, double t, const double* xz, const double* xzdot,
                           const double *resval, N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF,
                           double *tmp1, double *tmp2, double *tmp3) {
-    log("IdasInternal::resS", "begin");
+    log("IdasInterface::resS", "begin");
     //    casadi_assert(Ns==nfdir_);
 
     // Record the current cpu time
@@ -758,14 +758,14 @@ namespace casadi {
     // Record timings
     time2 = clock();
     t_fres += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::resS", "end");
+    log("IdasInterface::resS", "end");
   }
 
-  int IdasInternal::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
+  int IdasInterface::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
                                  N_Vector *xzF, N_Vector *xzdotF, N_Vector *rrF, void *user_data,
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->resS(Ns, t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(resval),
                   xzF, xzdotF, rrF, NV_DATA_S(tmp1), NV_DATA_S(tmp2), NV_DATA_S(tmp3));
       return 0;
@@ -775,8 +775,8 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::reset() {
-    log("IdasInternal::reset", "begin");
+  void IdasInterface::reset() {
+    log("IdasInterface::reset", "begin");
 
     // Reset the base classes
     SundialsInternal::reset();
@@ -805,7 +805,7 @@ namespace casadi {
     // Re-initialize
     flag = IDAReInit(mem_, t0_, xz_, xzdot_);
     if (flag != IDA_SUCCESS) idas_error("IDAReInit", flag);
-    log("IdasInternal::reset", "re-initialized IVP solution");
+    log("IdasInterface::reset", "re-initialized IVP solution");
 
 
     // Re-initialize quadratures
@@ -813,7 +813,7 @@ namespace casadi {
       N_VConst(0.0, q_);
       flag = IDAQuadReInit(mem_, q_);
       if (flag != IDA_SUCCESS) idas_error("IDAQuadReInit", flag);
-      log("IdasInternal::reset", "re-initialized quadratures");
+      log("IdasInterface::reset", "re-initialized quadratures");
     }
 
     // if (nsens>0) {
@@ -827,13 +827,13 @@ namespace casadi {
     //   // Re-initialize sensitivities
     //   flag = IDASensReInit(mem_, ism_, getPtr(xzF_), getPtr(xzdotF_));
     //   if (flag != IDA_SUCCESS) idas_error("IDASensReInit", flag);
-    //   log("IdasInternal::reset", "re-initialized forward sensitivity solution");
+    //   log("IdasInterface::reset", "re-initialized forward sensitivity solution");
 
     //   if (nq_>0) {
     //     for (vector<N_Vector>::iterator it=qF_.begin(); it!=qF_.end(); ++it) N_VConst(0.0, *it);
     //     flag = IDAQuadSensReInit(mem_, getPtr(qF_));
     //     if (flag != IDA_SUCCESS) idas_error("IDAQuadSensReInit", flag);
-    //     log("IdasInternal::reset", "re-initialized forward sensitivity dependent quadratures");
+    //     log("IdasInterface::reset", "re-initialized forward sensitivity dependent quadratures");
     //   }
     // } else {
     // Turn of sensitivities
@@ -855,12 +855,12 @@ namespace casadi {
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(tf_);
 
-    log("IdasInternal::reset", "end");
+    log("IdasInterface::reset", "end");
   }
 
 
-  void IdasInternal::correctInitialConditions() {
-    log("IdasInternal::correctInitialConditions", "begin");
+  void IdasInterface::correctInitialConditions() {
+    log("IdasInterface::correctInitialConditions", "begin");
     if (monitored("correctInitialConditions")) {
       cout << "initial guess: " << endl;
       cout << "p = " << input(INTEGRATOR_P) << endl;
@@ -887,7 +887,7 @@ namespace casadi {
     if (flag != IDA_SUCCESS) idas_error("IDAGetConsistentIC", flag);
 
     // Print progress
-    log("IdasInternal::correctInitialConditions", "found consistent initial values");
+    log("IdasInterface::correctInitialConditions", "found consistent initial values");
     if (monitored("correctInitialConditions")) {
       cout << "p = " << input(INTEGRATOR_P) << endl;
       cout << "x0 = " << input(INTEGRATOR_X0) << endl;
@@ -899,15 +899,15 @@ namespace casadi {
       //   }
       // }
     }
-    log("IdasInternal::correctInitialConditions", "end");
+    log("IdasInterface::correctInitialConditions", "end");
   }
 
-  void IdasInternal::integrate(double t_out) {
-    casadi_log("IdasInternal::integrate(" << t_out << ") begin");
+  void IdasInterface::integrate(double t_out) {
+    casadi_log("IdasInterface::integrate(" << t_out << ") begin");
 
-    casadi_assert_message(t_out>=t0_, "IdasInternal::integrate(" << t_out << "): "
+    casadi_assert_message(t_out>=t0_, "IdasInterface::integrate(" << t_out << "): "
                           "Cannot integrate to a time earlier than t0 (" << t0_ << ")");
-    casadi_assert_message(t_out<=tf_ || !stop_at_end_, "IdasInternal::integrate(" << t_out << "): "
+    casadi_assert_message(t_out<=tf_ || !stop_at_end_, "IdasInterface::integrate(" << t_out << "): "
                           "Cannot integrate past a time later than tf (" << tf_ << ") "
                           "unless stop_at_end is set to False.");
 
@@ -917,22 +917,22 @@ namespace casadi {
     double ttol = 1e-9;   // tolerance
     if (fabs(t_-t_out)<ttol) {
       // No integration necessary
-      log("IdasInternal::integrate", "already at the end of the horizon end");
+      log("IdasInterface::integrate", "already at the end of the horizon end");
 
     } else {
       // Integrate ...
       if (nrx_>0) {
         // ... with taping
-        log("IdasInternal::integrate", "integration with taping");
+        log("IdasInterface::integrate", "integration with taping");
         flag = IDASolveF(mem_, t_out, &t_, xz_, xzdot_, IDA_NORMAL, &ncheck_);
         if (flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolveF", flag);
       } else {
         // ... without taping
-        log("IdasInternal::integrate", "integration without taping");
+        log("IdasInterface::integrate", "integration without taping");
         flag = IDASolve(mem_, t_out, &t_, xz_, xzdot_, IDA_NORMAL);
         if (flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolve", flag);
       }
-      log("IdasInternal::integrate", "integration complete");
+      log("IdasInterface::integrate", "integration complete");
 
       // Get quadrature states
       if (nq_>0) {
@@ -982,11 +982,11 @@ namespace casadi {
     }
 
 
-    casadi_log("IdasInternal::integrate(" << t_out << ") end");
+    casadi_log("IdasInterface::integrate(" << t_out << ") end");
   }
 
-  void IdasInternal::resetB() {
-    log("IdasInternal::resetB", "begin");
+  void IdasInterface::resetB() {
+    log("IdasInterface::resetB", "begin");
 
     int flag;
 
@@ -1015,10 +1015,10 @@ namespace casadi {
 
     // Correct initial values for the integration if necessary
     if (calc_icB_) {
-      log("IdasInternal::resetB", "IDACalcICB begin");
+      log("IdasInterface::resetB", "IDACalcICB begin");
       flag = IDACalcICB(mem_, whichB_, t0_, xz_, xzdot_);
       if (flag != IDA_SUCCESS) idas_error("IDACalcICB", flag);
-      log("IdasInternal::resetB", "IDACalcICB end");
+      log("IdasInterface::resetB", "IDACalcICB end");
 
       // Retrieve the initial values
       flag = IDAGetConsistentICB(mem_, whichB_, rxz_, rxzdot_);
@@ -1026,12 +1026,12 @@ namespace casadi {
 
     }
 
-    log("IdasInternal::resetB", "end");
+    log("IdasInterface::resetB", "end");
 
   }
 
-  void IdasInternal::integrateB(double t_out) {
-    casadi_log("IdasInternal::integrateB(" << t_out << ") begin");
+  void IdasInterface::integrateB(double t_out) {
+    casadi_log("IdasInterface::integrateB(" << t_out << ") begin");
     int flag;
     // Integrate backwards to t_out
     flag = IDASolveB(mem_, t_out, IDA_NORMAL);
@@ -1068,10 +1068,10 @@ namespace casadi {
       stats_["nstepsB"] = 1.0*nsteps;
       stats_["nlinsetupsB"] = 1.0*nlinsetups;
     }
-    casadi_log("IdasInternal::integrateB(" << t_out << ") end");
+    casadi_log("IdasInterface::integrateB(" << t_out << ") end");
   }
 
-  void IdasInternal::printStats(std::ostream &stream) const {
+  void IdasInterface::printStats(std::ostream &stream) const {
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
@@ -1126,7 +1126,7 @@ namespace casadi {
     stream << std::endl;
   }
 
-  void IdasInternal::idas_error(const string& module, int flag) {
+  void IdasInterface::idas_error(const string& module, int flag) {
     // Find the error
     char* flagname = IDAGetReturnFlagName(flag);
     stringstream ss;
@@ -1155,10 +1155,10 @@ namespace casadi {
     casadi_error(ss.str());
   }
 
-  int IdasInternal::rhsQ_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rhsQ,
+  int IdasInterface::rhsQ_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rhsQ,
                                  void *user_data) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->rhsQ(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(rhsQ));
       return 0;
     } catch(exception& e) {
@@ -1167,8 +1167,8 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::rhsQ(double t, const double* xz, const double* xzdot, double* rhsQ) {
-    log("IdasInternal::rhsQ", "begin");
+  void IdasInterface::rhsQ(double t, const double* xz, const double* xzdot, double* rhsQ) {
+    log("IdasInterface::rhsQ", "begin");
     // Pass input
     f_.setInput(&t, DAE_T);
     f_.setInput(xz, DAE_X);
@@ -1180,14 +1180,14 @@ namespace casadi {
 
     // Get results
     f_.getOutput(rhsQ, DAE_QUAD);
-    log("IdasInternal::rhsQ", "end");
+    log("IdasInterface::rhsQ", "end");
   }
 
-  void IdasInternal::rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF,
+  void IdasInterface::rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF,
                            N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF,
                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
 
-    log("IdasInternal::rhsQS", "enter");
+    log("IdasInterface::rhsQS", "enter");
     //    casadi_assert(Ns==nfdir_);
 
     // Commented out since a new implementation currently cannot be tested
@@ -1212,15 +1212,15 @@ namespace casadi {
     //   // Get the output seeds
     //   f_.getFwdSens(NV_DATA_S(qdotF[i]), DAE_QUAD);
     //  }
-    log("IdasInternal::rhsQS", "end");
+    log("IdasInterface::rhsQS", "end");
   }
 
-  int IdasInternal::rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF,
+  int IdasInterface::rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF,
                                   N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF, void *user_data,
                                   N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
 
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->rhsQS(Ns, t, xz, xzdot, xzF, xzdotF, rrQ, qdotF, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -1229,9 +1229,9 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::resB(double t, const double* xz, const double* xzdot, const double* xzA,
+  void IdasInterface::resB(double t, const double* xz, const double* xzdot, const double* xzA,
                           const double* xzdotA, double* rrA) {
-    log("IdasInternal::resB", "begin");
+    log("IdasInterface::resB", "begin");
 
     // Pass inputs
     g_.setInput(&t, RDAE_T);
@@ -1287,13 +1287,13 @@ namespace casadi {
     }
 
 
-    log("IdasInternal::resB", "end");
+    log("IdasInterface::resB", "end");
   }
 
-  int IdasInternal::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzA,
+  int IdasInterface::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzA,
                                  N_Vector xzdotA, N_Vector rrA, void *user_data) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->resB(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(xzA),
                   NV_DATA_S(xzdotA), NV_DATA_S(rrA));
       return 0;
@@ -1303,9 +1303,9 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::rhsQB(double t, const double* xz, const double* xzdot, const double* xzA,
+  void IdasInterface::rhsQB(double t, const double* xz, const double* xzdot, const double* xzA,
                            const double* xzdotA, double *qdotA) {
-    log("IdasInternal::rhsQB", "begin");
+    log("IdasInterface::rhsQB", "begin");
 
     // Pass inputs
     g_.setInput(&t, RDAE_T);
@@ -1337,13 +1337,13 @@ namespace casadi {
     for (int i=0; i<nrq_; ++i)
       qdotA[i] *= -1;
 
-    log("IdasInternal::rhsQB", "end");
+    log("IdasInterface::rhsQB", "end");
   }
 
-  int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xzA,
+  int IdasInterface::rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xzA,
                                   N_Vector xzdotA, N_Vector qdotA, void *user_data) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->rhsQB(t, NV_DATA_S(y), NV_DATA_S(xzdot), NV_DATA_S(xzA),
                    NV_DATA_S(xzdotA), NV_DATA_S(qdotA));
       return 0;
@@ -1353,10 +1353,10 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
+  void IdasInterface::djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
                           N_Vector rr, DlsMat Jac,
                           N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
-    log("IdasInternal::djac", "begin");
+    log("IdasInterface::djac", "begin");
 
     // Get time
     time1 = clock();
@@ -1392,14 +1392,14 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::djac", "end");
+    log("IdasInterface::djac", "end");
   }
 
-  int IdasInternal::djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
+  int IdasInterface::djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
                                  N_Vector rr, DlsMat Jac, void *user_data,
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->djac(Neq, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -1408,10 +1408,10 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::djacB(long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
+  void IdasInterface::djacB(long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
                            N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB,
                            N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
-    log("IdasInternal::djacB", "begin");
+    log("IdasInterface::djacB", "begin");
 
     // Get time
     time1 = clock();
@@ -1475,15 +1475,15 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_jacB += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::djacB", "end");
+    log("IdasInterface::djacB", "end");
   }
 
-  int IdasInternal::djacB_wrapper(long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
+  int IdasInterface::djacB_wrapper(long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
                                   N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB,
                                   void *user_data,
                                   N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->djacB(NeqB, t, cjB, xz, xzdot, xzB, xzdotB, rrB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
@@ -1492,10 +1492,10 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::bjac(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz,
+  void IdasInterface::bjac(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz,
                           N_Vector xzdot, N_Vector rr, DlsMat Jac,
                           N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
-    log("IdasInternal::bjac", "begin");
+    log("IdasInterface::bjac", "begin");
     // Get time
     time1 = clock();
 
@@ -1530,15 +1530,15 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::bjac", "end");
+    log("IdasInterface::bjac", "end");
   }
 
-  int IdasInternal::bjac_wrapper(long Neq, long mupper, long mlower, double t, double cj,
+  int IdasInterface::bjac_wrapper(long Neq, long mupper, long mlower, double t, double cj,
                                  N_Vector xz, N_Vector xzdot, N_Vector rr,
                                  DlsMat Jac, void *user_data,
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->bjac(Neq, mupper, mlower, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -1547,11 +1547,11 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, double cjB,
+  void IdasInterface::bjacB(long NeqB, long mupperB, long mlowerB, double t, double cjB,
                            N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                            N_Vector resvalB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
                            N_Vector tmp3B) {
-    log("IdasInternal::bjacB", "begin");
+    log("IdasInterface::bjacB", "begin");
 
     // Get time
     time1 = clock();
@@ -1615,16 +1615,16 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_jacB += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::bjacB", "end");
+    log("IdasInterface::bjacB", "end");
   }
 
-  int IdasInternal::bjacB_wrapper(
+  int IdasInterface::bjacB_wrapper(
     long NeqB, long mupperB, long mlowerB, double t, double cjB,
     N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
     N_Vector resvalB, DlsMat JacB, void *user_data, N_Vector tmp1B,
     N_Vector tmp2B, N_Vector tmp3B) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       this_->bjacB(NeqB, mupperB, mlowerB, t, cjB, xz, xzdot, xzB, xzdotB,
                    resvalB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
@@ -1634,17 +1634,17 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::setStopTime(double tf) {
+  void IdasInterface::setStopTime(double tf) {
     // Set the stop time of the integration -- don't integrate past this point
     int flag = IDASetStopTime(mem_, tf);
     if (flag != IDA_SUCCESS) idas_error("IDASetStopTime", flag);
   }
 
-  int IdasInternal::psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
+  int IdasInterface::psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
                                    N_Vector rvec, N_Vector zvec, double cj, double delta,
                                    void *user_data, N_Vector tmp) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       casadi_assert(this_);
       this_->psolve(t, xz, xzdot, rr, rvec, zvec, cj, delta, tmp);
       return 0;
@@ -1654,12 +1654,12 @@ namespace casadi {
     }
   }
 
-  int IdasInternal::psolveB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
+  int IdasInterface::psolveB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                                     N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB,
                                     N_Vector zvecB, double cjB, double deltaB,
                                     void *user_data, N_Vector tmpB) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       casadi_assert(this_);
       this_->psolveB(t, xz, xzdot, xzB, xzdotB, resvalB, rvecB, zvecB, cjB, deltaB, tmpB);
       return 0;
@@ -1669,11 +1669,11 @@ namespace casadi {
     }
   }
 
-  int IdasInternal::psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
+  int IdasInterface::psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
                                    double cj, void* user_data,
                                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       casadi_assert(this_);
       this_->psetup(t, xz, xzdot, rr, cj, tmp1, tmp2, tmp3);
       return 0;
@@ -1683,12 +1683,12 @@ namespace casadi {
     }
   }
 
-  int IdasInternal::psetupB_wrapper(double t, N_Vector xz, N_Vector xzdot,
+  int IdasInterface::psetupB_wrapper(double t, N_Vector xz, N_Vector xzdot,
                                     N_Vector xzB, N_Vector xzdotB,
                                     N_Vector resvalB, double cjB, void *user_data,
                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+      IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
       casadi_assert(this_);
       this_->psetupB(t, xz, xzdot, xzB, xzdotB, resvalB, cjB, tmp1B, tmp2B, tmp3B);
       return 0;
@@ -1698,9 +1698,9 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
+  void IdasInterface::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
                             N_Vector zvec, double cj, double delta, N_Vector tmp) {
-    log("IdasInternal::psolve", "begin");
+    log("IdasInterface::psolve", "begin");
 
     // Get time
     time1 = clock();
@@ -1718,14 +1718,14 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::psolve", "end");
+    log("IdasInterface::psolve", "end");
   }
 
 
-  void IdasInternal::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+  void IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                              N_Vector resvalB, N_Vector rvecB, N_Vector zvecB,
                              double cjB, double deltaB, N_Vector tmpB) {
-    log("IdasInternal::psolveB", "begin");
+    log("IdasInterface::psolveB", "begin");
 
     // Get time
     time1 = clock();
@@ -1762,12 +1762,12 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("IdasInternal::psolveB", "end");
+    log("IdasInterface::psolveB", "end");
   }
 
-  void IdasInternal::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
+  void IdasInterface::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
                             N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
-    log("IdasInternal::psetup", "begin");
+    log("IdasInterface::psetup", "begin");
 
     // Get time
     time1 = clock();
@@ -1809,15 +1809,15 @@ namespace casadi {
     time1 = clock();
     t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
 
-    log("IdasInternal::psetup", "end");
+    log("IdasInterface::psetup", "end");
 
   }
 
 
-  void IdasInternal::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+  void IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                              N_Vector resvalB, double cjB,
                              N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
-    log("IdasInternal::psetupB", "begin");
+    log("IdasInterface::psetupB", "begin");
 
     // Get time
     time1 = clock();
@@ -1875,15 +1875,15 @@ namespace casadi {
     time1 = clock();
     t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
 
-    log("IdasInternal::psetupB", "end");
+    log("IdasInterface::psetupB", "end");
 
   }
 
 
-  int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
+  int IdasInterface::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
                                    N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(IDA_mem->ida_lmem);
+      IdasInterface *this_ = static_cast<IdasInterface*>(IDA_mem->ida_lmem);
       casadi_assert(this_);
       this_->lsetup(IDA_mem, xz, xzdot, resp, vtemp1, vtemp2, vtemp3);
       return 0;
@@ -1893,10 +1893,10 @@ namespace casadi {
     }
   }
 
-  int IdasInternal::lsetupB_wrapper(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB,
+  int IdasInterface::lsetupB_wrapper(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB,
                                     N_Vector vtemp1B, N_Vector vtemp2B, N_Vector vtemp3B) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(IDA_mem->ida_lmem);
+      IdasInterface *this_ = static_cast<IdasInterface*>(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
       //IDABMem IDAB_mem;
@@ -1928,10 +1928,10 @@ namespace casadi {
   }
 
 
-  int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
+  int IdasInterface::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
                                    N_Vector xzdot, N_Vector rr) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(IDA_mem->ida_lmem);
+      IdasInterface *this_ = static_cast<IdasInterface*>(IDA_mem->ida_lmem);
       casadi_assert(this_);
       this_->lsolve(IDA_mem, b, weight, xz, xzdot, rr);
       return 0;
@@ -1944,10 +1944,10 @@ namespace casadi {
     }
   }
 
-  int IdasInternal::lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzB,
+  int IdasInterface::lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzB,
                                     N_Vector xzdotB, N_Vector rrB) {
     try {
-      IdasInternal *this_ = static_cast<IdasInternal*>(IDA_mem->ida_lmem);
+      IdasInterface *this_ = static_cast<IdasInterface*>(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
       //IDABMem IDAB_mem;
@@ -1982,9 +1982,9 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
+  void IdasInterface::lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
                             N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
-    log("IdasInternal::lsetup", "begin");
+    log("IdasInterface::lsetup", "begin");
 
     // Current time
     double t = IDA_mem->ida_tn;
@@ -1994,23 +1994,23 @@ namespace casadi {
 
     // Call the preconditioner setup function (which sets up the linear solver)
     psetup(t, xz, xzdot, 0, cj, vtemp1, vtemp1, vtemp3);
-    log("IdasInternal::lsetup", "end");
+    log("IdasInterface::lsetup", "end");
   }
 
-  void IdasInternal::lsetupB(double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector xzB,
+  void IdasInterface::lsetupB(double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                              N_Vector xzdotB, N_Vector resp,
                              N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
-    log("IdasInternal::lsetupB", "begin");
+    log("IdasInterface::lsetupB", "begin");
 
     // Call the preconditioner setup function (which sets up the linear solver)
     psetupB(t, xz, xzdot, xzB, xzdotB, 0, cj, vtemp1, vtemp1, vtemp3);
-    log("IdasInternal::lsetupB", "end");
+    log("IdasInterface::lsetupB", "end");
   }
 
 
-  void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
+  void IdasInterface::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
                             N_Vector xzdot, N_Vector rr) {
-    log("IdasInternal::lsolve", "begin");
+    log("IdasInterface::lsolve", "begin");
     // Current time
     double t = IDA_mem->ida_tn;
 
@@ -2028,13 +2028,13 @@ namespace casadi {
       double cjratio = IDA_mem->ida_cjratio;
       if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
     }
-    log("IdasInternal::lsolve", "end");
+    log("IdasInterface::lsolve", "end");
   }
 
-  void IdasInternal::lsolveB(double t, double cj, double cjratio, N_Vector b, N_Vector weight,
+  void IdasInterface::lsolveB(double t, double cj, double cjratio, N_Vector b, N_Vector weight,
                              N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                              N_Vector rr) {
-    log("IdasInternal::lsolveB", "begin");
+    log("IdasInterface::lsolveB", "begin");
 
     // Accuracy
     double delta = 0.0;
@@ -2047,11 +2047,11 @@ namespace casadi {
       if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
     }
 
-    log("IdasInternal::lsolveB", "end");
+    log("IdasInterface::lsolveB", "end");
   }
 
 
-  void IdasInternal::initDenseLinearSolver() {
+  void IdasInterface::initDenseLinearSolver() {
     // Dense jacobian
     int flag = IDADense(mem_, nx_+nz_);
     if (flag != IDA_SUCCESS) idas_error("IDADense", flag);
@@ -2066,7 +2066,7 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::initBandedLinearSolver() {
+  void IdasInterface::initBandedLinearSolver() {
     // Banded jacobian
     int flag = IDABand(mem_, nx_+nz_,
                        getOption("upper_bandwidth").toInt(),
@@ -2080,7 +2080,7 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::initIterativeLinearSolver() {
+  void IdasInterface::initIterativeLinearSolver() {
     // Attach an iterative solver
     int flag;
     switch (itsol_f_) {
@@ -2112,11 +2112,11 @@ namespace casadi {
     if (use_preconditioner_) {
       // Make sure that a Jacobian has been provided
       if (jac_.isNull())
-          throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
+          throw CasadiException("IdasInterface::init(): No Jacobian has been provided.");
 
       // Make sure that a linear solver has been provided
       if (linsol_.isNull())
-          throw CasadiException("IdasInternal::init(): "
+          throw CasadiException("IdasInterface::init(): "
                                 "No user defined linear solver has been provided.");
 
       // Pass to IDA
@@ -2125,7 +2125,7 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::initUserDefinedLinearSolver() {
+  void IdasInterface::initUserDefinedLinearSolver() {
     // Make sure that a Jacobian has been provided
     casadi_assert(!jac_.isNull());
 
@@ -2140,7 +2140,7 @@ namespace casadi {
     IDA_mem->ida_setupNonNull = TRUE;
   }
 
-  void IdasInternal::initDenseLinearSolverB() {
+  void IdasInterface::initDenseLinearSolverB() {
     // Dense jacobian
     int flag = IDADenseB(mem_, whichB_, nrx_+nrz_);
     if (flag != IDA_SUCCESS) idas_error("IDADenseB", flag);
@@ -2151,7 +2151,7 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::initBandedLinearSolverB() {
+  void IdasInterface::initBandedLinearSolverB() {
     int flag = IDABandB(mem_, whichB_, nrx_+nrz_,
                         getOption("upper_bandwidthB").toInt(),
                         getOption("lower_bandwidthB").toInt());
@@ -2163,7 +2163,7 @@ namespace casadi {
     }
   }
 
-  void IdasInternal::initIterativeLinearSolverB() {
+  void IdasInterface::initIterativeLinearSolverB() {
     int flag;
     switch (itsol_g_) {
     case SD_GMRES:
@@ -2194,11 +2194,11 @@ namespace casadi {
     if (use_preconditionerB_) {
       // Make sure that a Jacobian has been provided
       if (jacB_.isNull())
-          throw CasadiException("IdasInternal::init(): No backwards Jacobian has been provided.");
+          throw CasadiException("IdasInterface::init(): No backwards Jacobian has been provided.");
 
       // Make sure that a linear solver has been provided
       if (linsolB_.isNull())
-          throw CasadiException("IdasInternal::init(): No backwards user "
+          throw CasadiException("IdasInterface::init(): No backwards user "
                                 "defined linear solver has been provided.");
 
       // Pass to IDA
@@ -2208,7 +2208,7 @@ namespace casadi {
 
   }
 
-  void IdasInternal::initUserDefinedLinearSolverB() {
+  void IdasInterface::initUserDefinedLinearSolverB() {
     // Make sure that a Jacobian has been provided
     casadi_assert(!jacB_.isNull());
 
@@ -2228,7 +2228,7 @@ namespace casadi {
   }
 
   template<typename FunctionType>
-  FunctionType IdasInternal::getJacGen() {
+  FunctionType IdasInterface::getJacGen() {
     FunctionType f = shared_cast<FunctionType>(f_);
     casadi_assert(!f.isNull());
 
@@ -2249,7 +2249,7 @@ namespace casadi {
   }
 
   template<typename FunctionType>
-  FunctionType IdasInternal::getJacGenB() {
+  FunctionType IdasInterface::getJacGenB() {
     FunctionType g = shared_cast<FunctionType>(g_);
     casadi_assert(!g.isNull());
 
@@ -2270,23 +2270,23 @@ namespace casadi {
     return FunctionType(jac_in, jac);
   }
 
-  Function IdasInternal::getJacB() {
+  Function IdasInterface::getJacB() {
     if (is_a<SXFunction>(g_)) {
       return getJacGenB<SXFunction>();
     } else if (is_a<MXFunction>(g_)) {
       return getJacGenB<MXFunction>();
     } else {
-      throw CasadiException("IdasInternal::getJacB(): Not an SXFunction or MXFunction");
+      throw CasadiException("IdasInterface::getJacB(): Not an SXFunction or MXFunction");
     }
   }
 
-  Function IdasInternal::getJac() {
+  Function IdasInterface::getJac() {
     if (is_a<SXFunction>(f_)) {
       return getJacGen<SXFunction>();
     } else if (is_a<MXFunction>(f_)) {
       return getJacGen<MXFunction>();
     } else {
-      throw CasadiException("IdasInternal::getJac(): Not an SXFunction or MXFunction");
+      throw CasadiException("IdasInterface::getJac(): Not an SXFunction or MXFunction");
     }
   }
 

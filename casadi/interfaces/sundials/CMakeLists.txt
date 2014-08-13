@@ -17,8 +17,8 @@ casadi_plugin_link_libraries(Integrator cvodes ${SUNDIALS_LIBRARIES})
 
 # IDAS
 casadi_plugin(Integrator idas
-  idas_internal.hpp      idas_internal.cpp
-  idas_internal_meta.cpp
+  idas_interface.hpp      idas_interface.cpp
+  idas_interface_meta.cpp
   )
 casadi_plugin_link_libraries(Integrator idas casadi_integrator_cvodes)
 

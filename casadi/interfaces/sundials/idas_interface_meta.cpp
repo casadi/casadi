@@ -21,10 +21,10 @@
  */
 
 
-      #include "idas_internal.hpp"
+      #include "idas_interface.hpp"
       #include <string>
 
-      const std::string casadi::IdasInternal::meta_doc=
+      const std::string casadi::IdasInterface::meta_doc=
       "\n"
 "Interface to IDAS from the Sundials suite.\n"
 "\n"
