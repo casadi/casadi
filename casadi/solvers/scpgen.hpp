@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_SCPGEN_INTERNAL_HPP
-#define CASADI_SCPGEN_INTERNAL_HPP
+#ifndef CASADI_SCPGEN_HPP
+#define CASADI_SCPGEN_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include "casadi/core/function/qp_solver.hpp"
@@ -49,15 +49,15 @@ namespace casadi {
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */
-  class CASADI_NLPSOLVER_SCPGEN_EXPORT SCPgenInternal : public NlpSolverInternal {
+  class CASADI_NLPSOLVER_SCPGEN_EXPORT Scpgen : public NlpSolverInternal {
   public:
-    explicit SCPgenInternal(const Function& nlp);
-    virtual ~SCPgenInternal();
-    virtual SCPgenInternal* clone() const { return new SCPgenInternal(*this);}
+    explicit Scpgen(const Function& nlp);
+    virtual ~Scpgen();
+    virtual Scpgen* clone() const { return new Scpgen(*this);}
 
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)
-    { return new SCPgenInternal(nlp);}
+    { return new Scpgen(nlp);}
 
     virtual void init();
     virtual void evaluate();
@@ -246,4 +246,4 @@ namespace casadi {
 
 /// \endcond
 
-#endif // CASADI_SCPGEN_INTERNAL_HPP
+#endif // CASADI_SCPGEN_HPP

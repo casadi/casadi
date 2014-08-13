@@ -20,7 +20,7 @@
  *
  */
 
-#include "scpgen_internal.hpp"
+#include "scpgen.hpp"
 #include "casadi/core/core.hpp"
 #include <ctime>
 #include <iomanip>
@@ -37,9 +37,9 @@ namespace casadi {
 
   extern "C"
   int CASADI_NLPSOLVER_SCPGEN_EXPORT casadi_register_nlpsolver_scpgen(NlpSolverInternal::Plugin* plugin){
-    plugin->creator = SCPgenInternal::creator;
+    plugin->creator = Scpgen::creator;
     plugin->name = "scpgen";
-    plugin->doc = SCPgenInternal::meta_doc.c_str();
+    plugin->doc = Scpgen::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -49,7 +49,7 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_scpgen);
   }
 
-  SCPgenInternal::SCPgenInternal(const Function& nlp) : NlpSolverInternal(nlp) {
+  Scpgen::Scpgen(const Function& nlp) : NlpSolverInternal(nlp) {
     casadi_warning("SCPgen is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
@@ -102,10 +102,10 @@ namespace casadi {
   }
 
 
-  SCPgenInternal::~SCPgenInternal() {
+  Scpgen::~Scpgen() {
   }
 
-  void SCPgenInternal::init() {
+  void Scpgen::init() {
     // Call the init method of the base class
     NlpSolverInternal::init();
 
@@ -649,7 +649,7 @@ namespace casadi {
     }
   }
 
-  void SCPgenInternal::evaluate() {
+  void Scpgen::evaluate() {
     if (inputs_check_) checkInputs();
     checkInitialBounds();
 
@@ -818,7 +818,7 @@ namespace casadi {
     cout << endl;
   }
 
-  double SCPgenInternal::primalInfeasibility() {
+  double Scpgen::primalInfeasibility() {
     // L1-norm of the primal infeasibility
     double pr_inf = 0;
 
@@ -838,7 +838,7 @@ namespace casadi {
     return pr_inf;
   }
 
-  double SCPgenInternal::dualInfeasibility() {
+  double Scpgen::dualInfeasibility() {
 
     // L1-norm of the dual infeasibility
     double du_inf = 0;
@@ -849,7 +849,7 @@ namespace casadi {
     return du_inf;
   }
 
-  void SCPgenInternal::printIteration(std::ostream &stream) {
+  void Scpgen::printIteration(std::ostream &stream) {
     stream << setw(4)  << "iter";
     stream << setw(14) << "objective";
     stream << setw(11) << "inf_pr";
@@ -869,7 +869,7 @@ namespace casadi {
     stream.unsetf(std::ios::floatfield);
   }
 
-  void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj,
+  void Scpgen::printIteration(std::ostream &stream, int iter, double obj,
                                       double pr_inf, double du_inf, double rg, int ls_trials,
                                       bool ls_success) {
     stream << setw(4) << iter;
@@ -905,7 +905,7 @@ namespace casadi {
     stream << endl;
   }
 
-  void SCPgenInternal::eval_mat() {
+  void Scpgen::eval_mat() {
     // Get current time
     double time1 = clock();
 
@@ -962,7 +962,7 @@ namespace casadi {
     t_eval_mat_ += (time2-time1)/CLOCKS_PER_SEC;
   }
 
-  void SCPgenInternal::eval_res() {
+  void Scpgen::eval_res() {
     // Get current time
     double time1 = clock();
 
@@ -1014,7 +1014,7 @@ namespace casadi {
     t_eval_res_ += (time2-time1)/CLOCKS_PER_SEC;
   }
 
-  void SCPgenInternal::eval_vec() {
+  void Scpgen::eval_vec() {
     // Get current time
     double time1 = clock();
 
@@ -1055,7 +1055,7 @@ namespace casadi {
     t_eval_vec_ += (time2-time1)/CLOCKS_PER_SEC;
   }
 
-  void SCPgenInternal::regularize() {
+  void Scpgen::regularize() {
     casadi_assert(nx_==2);
 
     // Regularization
@@ -1085,7 +1085,7 @@ namespace casadi {
     }
   }
 
-  void SCPgenInternal::solve_qp() {
+  void Scpgen::solve_qp() {
     // Get current time
     double time1 = clock();
 
@@ -1124,7 +1124,7 @@ namespace casadi {
     t_solve_qp_ += (time2-time1)/CLOCKS_PER_SEC;
   }
 
-  void SCPgenInternal::line_search(int& ls_iter, bool& ls_success) {
+  void Scpgen::line_search(int& ls_iter, bool& ls_success) {
     // Make sure that we have a decent direction
     if (!gauss_newton_) {
       // Get the curvature in the step direction
@@ -1238,7 +1238,7 @@ namespace casadi {
     du_step_ *= t;
   }
 
-  void SCPgenInternal::eval_exp() {
+  void Scpgen::eval_exp() {
     // Get current time
     double time1 = clock();
 

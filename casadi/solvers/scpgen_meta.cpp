@@ -21,10 +21,10 @@
  */
 
 
-      #include "scpgen_internal.hpp"
+      #include "scpgen.hpp"
       #include <string>
 
-      const std::string casadi::SCPgenInternal::meta_doc=
+      const std::string casadi::Scpgen::meta_doc=
       "\n"
 "A structure-exploiting sequential quadratic programming (to be come\n"
 "sequential convex programming) method for nonlinear programming.\n"
