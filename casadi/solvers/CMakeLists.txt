@@ -52,8 +52,8 @@ casadi_plugin(NlpSolver stabilizedsqp   stabilized_sqp_internal.hpp   stabilized
 casadi_plugin(QpSolver nlp qp_to_nlp.hpp   qp_to_nlp.cpp
 qp_to_nlp_meta.cpp
 )
-casadi_plugin(ImplicitFunction nlp   nlp_to_implicit.hpp   nlp_to_implicit.cpp
-nlp_to_implicit_meta.cpp
+casadi_plugin(ImplicitFunction nlp   implicit_to_nlp.hpp   implicit_to_nlp.cpp
+implicit_to_nlp_meta.cpp
 )
 casadi_plugin(LpSolver qp   qp_lp_internal.cpp   qp_lp_internal.hpp
 qp_lp_internal_meta.cpp

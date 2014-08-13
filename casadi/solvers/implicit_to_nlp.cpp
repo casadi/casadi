@@ -20,7 +20,7 @@
  *
  */
 
-#include "nlp_to_implicit.hpp"
+#include "implicit_to_nlp.hpp"
 
 #include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
@@ -31,9 +31,9 @@ namespace casadi {
   extern "C"
   int CASADI_IMPLICITFUNCTION_NLP_EXPORT
   casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin* plugin) {
-    plugin->creator = NlpToImplicit::creator;
+    plugin->creator = QpToImplicit::creator;
     plugin->name = "nlp";
-    plugin->doc = NlpToImplicit::meta_doc.c_str();
+    plugin->doc = QpToImplicit::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -43,7 +43,7 @@ namespace casadi {
     ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_nlp);
   }
 
-  NlpToImplicit::NlpToImplicit(const Function& f, const Function& jac,
+  QpToImplicit::QpToImplicit(const Function& f, const Function& jac,
                                            const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {
     addOption("nlp_solver",               OT_STRING,  GenericType(),
@@ -52,16 +52,16 @@ namespace casadi {
               "Options to be passed to the NlpSolver");
   }
 
-  NlpToImplicit::~NlpToImplicit() {
+  QpToImplicit::~QpToImplicit() {
   }
 
-  void NlpToImplicit::deepCopyMembers(
+  void QpToImplicit::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     ImplicitFunctionInternal::deepCopyMembers(already_copied);
     nlp_solver_ = deepcopy(nlp_solver_, already_copied);
   }
 
-  void NlpToImplicit::solveNonLinear() {
+  void QpToImplicit::solveNonLinear() {
 
     // Equality nonlinear constraints
     nlp_solver_.input(NLP_SOLVER_LBG).set(0.);
@@ -106,7 +106,7 @@ namespace casadi {
     }
   }
 
-  void NlpToImplicit::init() {
+  void QpToImplicit::init() {
 
     // Call the base class initializer
     ImplicitFunctionInternal::init();

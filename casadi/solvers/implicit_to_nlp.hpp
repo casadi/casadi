@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_NLP_TO_IMPLICIT_HPP
-#define CASADI_NLP_TO_IMPLICIT_HPP
+#ifndef CASADI_IMPLICIT_TO_NLP_HPP
+#define CASADI_IMPLICIT_TO_NLP_HPP
 
 #include "casadi/core/function/implicit_function_internal.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
@@ -45,30 +45,30 @@ namespace casadi {
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NLP_EXPORT NlpToImplicit : public ImplicitFunctionInternal {
+  class CASADI_IMPLICITFUNCTION_NLP_EXPORT QpToImplicit : public ImplicitFunctionInternal {
   public:
     /** \brief  Constructor */
-    explicit NlpToImplicit(const Function& f, const Function& jac,
+    explicit QpToImplicit(const Function& f, const Function& jac,
                                  const LinearSolver& linsol);
 
     /** \brief  Destructor */
-    virtual ~NlpToImplicit();
+    virtual ~QpToImplicit();
 
     /** \brief  Clone */
-    virtual NlpToImplicit* clone() const { return new NlpToImplicit(*this);}
+    virtual QpToImplicit* clone() const { return new QpToImplicit(*this);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual NlpToImplicit* create(const Function& f, const Function& jac,
+    virtual QpToImplicit* create(const Function& f, const Function& jac,
                                         const LinearSolver& linsol) const
-    { return new NlpToImplicit(f, jac, linsol);}
+    { return new QpToImplicit(f, jac, linsol);}
 
     /** \brief  Create a new ImplicitFunction */
     static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
                                              const LinearSolver& linsol)
-    { return new NlpToImplicit(f, jac, linsol);}
+    { return new QpToImplicit(f, jac, linsol);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -86,4 +86,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_NLP_TO_IMPLICIT_HPP
+#endif // CASADI_IMPLICIT_TO_NLP_HPP

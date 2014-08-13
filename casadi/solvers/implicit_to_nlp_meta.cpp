@@ -21,10 +21,10 @@
  */
 
 
-      #include "nlp_to_implicit.hpp"
+      #include "implicit_to_nlp.hpp"
       #include <string>
 
-      const std::string casadi::NlpToImplicit::meta_doc=
+      const std::string casadi::QpToImplicit::meta_doc=
       "\n"
 "Use an NlpSolver as ImplicitFunction solver\n"
 "\n"
