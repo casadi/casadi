@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_IPOPT_INTERNAL_HPP
-#define CASADI_IPOPT_INTERNAL_HPP
+#ifndef CASADI_IPOPT_INTERFACE_HPP
+#define CASADI_IPOPT_INTERFACE_HPP
 
 #include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
 #include "casadi/core/function/nlp_solver_internal.hpp"
@@ -60,17 +60,17 @@ namespace casadi {
 @copydoc NlpSolver_doc
 @copydoc plugin_NlpSolver_ipopt
 */
-class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInternal : public NlpSolverInternal {
+class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInterface : public NlpSolverInternal {
 friend class IpoptUserClass;
 
 public:
-  explicit IpoptInternal(const Function& nlp);
-  virtual ~IpoptInternal();
-  virtual IpoptInternal* clone() const { return new IpoptInternal(*this);}
+  explicit IpoptInterface(const Function& nlp);
+  virtual ~IpoptInterface();
+  virtual IpoptInterface* clone() const { return new IpoptInterface(*this);}
 
   /** \brief  Create a new NLP Solver */
   static NlpSolverInternal* creator(const Function& nlp)
-  { return new IpoptInternal(nlp);}
+  { return new IpoptInterface(nlp);}
 
   // Free Ipopt related memory
   void freeIpopt();
@@ -177,4 +177,4 @@ public:
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_IPOPT_INTERNAL_HPP
+#endif // CASADI_IPOPT_INTERFACE_HPP

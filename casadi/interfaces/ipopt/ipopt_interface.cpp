@@ -21,7 +21,7 @@
  */
 
 
-#include "ipopt_internal.hpp"
+#include "ipopt_interface.hpp"
 #include "ipopt_nlp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include <ctime>
@@ -44,9 +44,9 @@ namespace casadi {
   extern "C"
   int CASADI_NLPSOLVER_IPOPT_EXPORT
   casadi_register_nlpsolver_ipopt(NlpSolverInternal::Plugin* plugin) {
-    plugin->creator = IpoptInternal::creator;
+    plugin->creator = IpoptInterface::creator;
     plugin->name = "ipopt";
-    plugin->doc = IpoptInternal::meta_doc.c_str();
+    plugin->doc = IpoptInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -56,7 +56,7 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_ipopt);
   }
 
-  IpoptInternal::IpoptInternal(const Function& nlp) : NlpSolverInternal(nlp) {
+  IpoptInterface::IpoptInterface(const Function& nlp) : NlpSolverInternal(nlp) {
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
     addOption("print_time",               OT_BOOLEAN, true,
               "print information about execution time");
@@ -151,7 +151,7 @@ namespace casadi {
     }
   }
 
-  void IpoptInternal::freeIpopt() {
+  void IpoptInterface::freeIpopt() {
     // Free sensitivity application (or rather, the smart pointer holding it)
 #ifdef WITH_SIPOPT
     if (app_sens_ != 0) {
@@ -173,11 +173,11 @@ namespace casadi {
     }
   }
 
-  IpoptInternal::~IpoptInternal() {
+  IpoptInterface::~IpoptInterface() {
     freeIpopt();
   }
 
-  void IpoptInternal::init() {
+  void IpoptInterface::init() {
     // Free existing IPOPT instance
     freeIpopt();
 
@@ -259,7 +259,7 @@ namespace casadi {
         }
       }
 
-    if (!ret) casadi_error("IpoptInternal::Init: Invalid options were detected by Ipopt.");
+    if (!ret) casadi_error("IpoptInterface::Init: Invalid options were detected by Ipopt.");
 
     // Extra initialization required by sIPOPT
     //   #ifdef WITH_SIPOPT
@@ -282,7 +282,7 @@ namespace casadi {
 #endif // WITH_SIPOPT
   }
 
-  void IpoptInternal::evaluate() {
+  void IpoptInterface::evaluate() {
     if (inputs_check_) checkInputs();
 
     checkInitialBounds();
@@ -428,7 +428,7 @@ namespace casadi {
 
   }
 
-  bool IpoptInternal::intermediate_callback(
+  bool IpoptInterface::intermediate_callback(
       const double* x, const double* z_L, const double* z_U, const double* g,
       const double* lambda, double obj_value, int iter,
       double inf_pr, double inf_du, double mu, double d_norm,
@@ -504,7 +504,7 @@ namespace casadi {
     }
   }
 
-  void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U,
+  void IpoptInterface::finalize_solution(const double* x, const double* z_L, const double* z_U,
                                         const double* g, const double* lambda, double obj_value,
                                         int iter_count) {
     try {
@@ -534,7 +534,7 @@ namespace casadi {
     }
   }
 
-  bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor,
+  bool IpoptInterface::eval_h(const double* x, bool new_x, double obj_factor,
                              const double* lambda, bool new_lambda, int nele_hess,
                              int* iRow, int* jCol, double* values) {
     try {
@@ -570,7 +570,7 @@ namespace casadi {
         }
 
         if (regularity_check_ && !isRegular(hessLag_.output().data()))
-            casadi_error("IpoptInternal::h: NaN or Inf detected.");
+            casadi_error("IpoptInterface::h: NaN or Inf detected.");
 
       }
       double time2 = clock();
@@ -585,7 +585,7 @@ namespace casadi {
     }
   }
 
-  bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac, int* iRow,
+  bool IpoptInterface::eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac, int* iRow,
                                  int *jCol, double* values) {
     try {
       log("eval_jac_g started");
@@ -628,7 +628,7 @@ namespace casadi {
           jacG.output().printSparse();
         }
         if (regularity_check_ && !isRegular(jacG.output().data()))
-            casadi_error("IpoptInternal::jac_g: NaN or Inf detected.");
+            casadi_error("IpoptInterface::jac_g: NaN or Inf detected.");
       }
 
       double time2 = clock();
@@ -643,7 +643,7 @@ namespace casadi {
     }
   }
 
-  bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value) {
+  bool IpoptInterface::eval_f(int n, const double* x, bool new_x, double& obj_value) {
     try {
       log("eval_f started");
 
@@ -668,7 +668,7 @@ namespace casadi {
       }
 
       if (regularity_check_ && !isRegular(nlp_.output(NL_F).data()))
-          casadi_error("IpoptInternal::f: NaN or Inf detected.");
+          casadi_error("IpoptInterface::f: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -683,7 +683,7 @@ namespace casadi {
 
   }
 
-  bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g) {
+  bool IpoptInterface::eval_g(int n, const double* x, bool new_x, int m, double* g) {
     try {
       log("eval_g started");
       double time1 = clock();
@@ -707,7 +707,7 @@ namespace casadi {
       }
 
       if (regularity_check_ && !isRegular(nlp_.output(NL_G).data()))
-          casadi_error("IpoptInternal::g: NaN or Inf detected.");
+          casadi_error("IpoptInterface::g: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -721,7 +721,7 @@ namespace casadi {
     }
   }
 
-  bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad_f) {
+  bool IpoptInterface::eval_grad_f(int n, const double* x, bool new_x, double* grad_f) {
     try {
       log("eval_grad_f started");
       double time1 = clock();
@@ -744,7 +744,7 @@ namespace casadi {
       }
 
       if (regularity_check_ && !isRegular(gradF_.output().data()))
-          casadi_error("IpoptInternal::grad_f: NaN or Inf detected.");
+          casadi_error("IpoptInterface::grad_f: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -758,7 +758,7 @@ namespace casadi {
     }
   }
 
-  bool IpoptInternal::get_bounds_info(int n, double* x_l, double* x_u,
+  bool IpoptInterface::get_bounds_info(int n, double* x_l, double* x_u,
                                       int m, double* g_l, double* g_u) {
     try {
       casadi_assert(n == nx_);
@@ -774,7 +774,7 @@ namespace casadi {
     }
   }
 
-  bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
+  bool IpoptInterface::get_starting_point(int n, bool init_x, double* x,
                                          bool init_z, double* z_L, double* z_U,
                                          int m, bool init_lambda,
                                          double* lambda) {
@@ -811,7 +811,7 @@ namespace casadi {
     }
   }
 
-  void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag) {
+  void IpoptInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag) {
     try {
       n = nx_;               // number of variables
       m = ng_;               // number of constraints
@@ -832,7 +832,7 @@ namespace casadi {
     }
   }
 
-  int IpoptInternal::get_number_of_nonlinear_variables() {
+  int IpoptInterface::get_number_of_nonlinear_variables() {
     try {
       if (!static_cast<bool>(getOption("pass_nonlinear_variables"))) {
         // No Hessian has been interfaced
@@ -859,7 +859,7 @@ namespace casadi {
     }
   }
 
-  bool IpoptInternal::get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) {
+  bool IpoptInterface::get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) {
     try {
       // Running index
       int el = 0;
@@ -883,7 +883,7 @@ namespace casadi {
     }
   }
 
-  bool IpoptInternal::get_var_con_metadata(int n,
+  bool IpoptInterface::get_var_con_metadata(int n,
                                            map<string, vector<string> >& var_string_md,
                                            map<string, vector<int> >& var_integer_md,
                                            map<string, vector<double> >& var_numeric_md,
@@ -960,7 +960,7 @@ namespace casadi {
     return true;
   }
 
-  void IpoptInternal::finalize_metadata(int n,
+  void IpoptInterface::finalize_metadata(int n,
                                         const map<string, vector<string> >& var_string_md,
                                         const map<string, vector<int> >& var_integer_md,
                                         const map<string, vector<double> >& var_numeric_md,
@@ -1024,7 +1024,7 @@ namespace casadi {
     }
   }
 
-  void IpoptInternal::setQPOptions() {
+  void IpoptInterface::setQPOptions() {
     // Can be enabled when a new bugfixed version of Ipopt comes out
     //setOption("mehrotra_algorithm", "yes");
     //setOption("mu_oracle", "probing");
@@ -1035,7 +1035,7 @@ namespace casadi {
     setOption("hessian_constant", "yes");
   }
 
-  DMatrix IpoptInternal::getReducedHessian() {
+  DMatrix IpoptInterface::getReducedHessian() {
 #ifndef WITH_SIPOPT
     casadi_error("This feature requires sIPOPT support. Please consult the CasADi documentation.");
 #else // WITH_SIPOPT

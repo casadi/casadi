@@ -21,12 +21,12 @@
  */
 
 #include "ipopt_nlp.hpp"
-#include "ipopt_internal.hpp"
+#include "ipopt_interface.hpp"
 #include <ctime>
 
 namespace casadi {
 
-IpoptUserClass::IpoptUserClass(IpoptInternal* solver) {
+IpoptUserClass::IpoptUserClass(IpoptInterface* solver) {
   this->solver = solver;
   n_ = solver->nx_;
   m_ = solver->ng_;

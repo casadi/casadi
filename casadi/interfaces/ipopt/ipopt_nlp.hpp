@@ -46,7 +46,7 @@
 using namespace Ipopt;
 namespace casadi {
   // Forward declaration
-  class IpoptInternal;
+  class IpoptInterface;
 
   class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptUserClass : public TNLP {
 #ifdef WITH_IPOPT_CALLBACK
@@ -54,7 +54,7 @@ namespace casadi {
 #endif // WITH_IPOPT_CALLBACK
 
   public:
-    IpoptUserClass(IpoptInternal* ipoptInterface);
+    IpoptUserClass(IpoptInterface* ipoptInterface);
     virtual ~IpoptUserClass();
 
     /** Method to return some info about the nlp */
@@ -142,7 +142,7 @@ namespace casadi {
   private:
     IpoptUserClass(const IpoptUserClass&);
     IpoptUserClass& operator=(const IpoptUserClass&);
-    IpoptInternal* solver;
+    IpoptInterface* solver;
 
     double * x_;
     double * z_L_;

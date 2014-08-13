@@ -3,11 +3,11 @@ include_directories(${IPOPT_INCLUDE_DIRS})
 link_directories(${IPOPT_LIBRARY_DIRS})
 
 set(NLPSOLVER_IPOPT_SRCS
-  ipopt_internal.hpp
-  ipopt_internal.cpp
+  ipopt_interface.hpp
+  ipopt_interface.cpp
   ipopt_nlp.hpp
   ipopt_nlp.cpp
-  ipopt_internal_meta.cpp)
+  ipopt_interface_meta.cpp)
   
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 else()

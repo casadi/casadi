@@ -21,10 +21,10 @@
  */
 
 
-      #include "ipopt_internal.hpp"
+      #include "ipopt_interface.hpp"
       #include <string>
 
-      const std::string casadi::IpoptInternal::meta_doc=
+      const std::string casadi::IpoptInterface::meta_doc=
       "\n"
 "When in warmstart mode, output NLP_SOLVER_LAM_X may be used as input\n"
 "\n"
