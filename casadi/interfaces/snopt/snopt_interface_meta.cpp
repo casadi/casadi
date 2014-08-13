@@ -21,10 +21,10 @@
  */
 
 
-      #include "snopt_internal.hpp"
+      #include "snopt_interface.hpp"
       #include <string>
 
-      const std::string casadi::SnoptInternal::meta_doc=
+      const std::string casadi::SnoptInterface::meta_doc=
       "\n"
 "SNOPT interface\n"
 "\n"

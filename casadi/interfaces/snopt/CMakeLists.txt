@@ -4,10 +4,10 @@ include_directories(../)
 include_directories(${SNOPT_INCLUDE_DIR})
 
 casadi_plugin(NlpSolver snopt
-  snopt_internal.hpp
-  snopt_internal.cpp
+  snopt_interface.hpp
+  snopt_interface.cpp
   wsnopt.hpp
-  snopt_internal_meta.cpp)
+  snopt_interface_meta.cpp)
 
 if(WITH_SNOPT_FORCE_DUMMY)
   if(ENABLE_STATIC)

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_SNOPT_INTERNAL_HPP
-#define CASADI_SNOPT_INTERNAL_HPP
+#ifndef CASADI_SNOPT_INTERFACE_HPP
+#define CASADI_SNOPT_INTERFACE_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include "casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h"
@@ -40,21 +40,21 @@ namespace casadi {
      @copydoc NlpSolver_doc
      @copydoc plugin_NlpSolver_snopt
   */
-  class CASADI_NLPSOLVER_SNOPT_EXPORT SnoptInternal : public NlpSolverInternal {
+  class CASADI_NLPSOLVER_SNOPT_EXPORT SnoptInterface : public NlpSolverInternal {
 
   public:
     // Constructor
-    explicit SnoptInternal(const Function& nlp);
+    explicit SnoptInterface(const Function& nlp);
 
     // Destructor
-    virtual ~SnoptInternal();
+    virtual ~SnoptInterface();
 
     // Clone function
-    virtual SnoptInternal* clone() const;
+    virtual SnoptInterface* clone() const;
 
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)
-    { return new SnoptInternal(nlp);}
+    { return new SnoptInterface(nlp);}
 
     // Reset solver
     void reset();
@@ -207,4 +207,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_SNOPT_INTERNAL_HPP
+#endif // CASADI_SNOPT_INTERFACE_HPP
