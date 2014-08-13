@@ -20,7 +20,7 @@
  *
  */
 
-#include "qp_lp_internal.hpp"
+#include "lp_to_qp.hpp"
 
 #include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
@@ -31,9 +31,9 @@ namespace casadi {
   extern "C"
   int CASADI_LPSOLVER_QP_EXPORT
   casadi_register_lpsolver_qp(LpSolverInternal::Plugin* plugin) {
-    plugin->creator = QPLPInternal::creator;
+    plugin->creator = LpToQp::creator;
     plugin->name = "qp";
-    plugin->doc = QPLPInternal::meta_doc.c_str();;
+    plugin->doc = LpToQp::meta_doc.c_str();;
     plugin->version = 20;
     return 0;
   }
@@ -43,15 +43,15 @@ namespace casadi {
     LpSolverInternal::registerPlugin(casadi_register_lpsolver_qp);
   }
 
-  QPLPInternal* QPLPInternal::clone() const {
+  LpToQp* LpToQp::clone() const {
     // Return a deep copy
-    QPLPInternal* node = new QPLPInternal(st_);
+    LpToQp* node = new LpToQp(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  QPLPInternal::QPLPInternal(const std::vector<Sparsity> &st) : LpSolverInternal(st) {
+  LpToQp::LpToQp(const std::vector<Sparsity> &st) : LpSolverInternal(st) {
     addOption("qp_solver",       OT_STRING, GenericType(),
               "The QPSOlver used to solve the LPs.");
     addOption("qp_solver_options",       OT_DICTIONARY, GenericType(),
@@ -59,10 +59,10 @@ namespace casadi {
 
   }
 
-  QPLPInternal::~QPLPInternal() {
+  LpToQp::~LpToQp() {
   }
 
-  void QPLPInternal::evaluate() {
+  void LpToQp::evaluate() {
 
     // Pass inputs of LP to QP form
     qpsolver_.input(QP_SOLVER_A).set(input(LP_SOLVER_A));
@@ -87,7 +87,7 @@ namespace casadi {
     output(QP_SOLVER_LAM_X).set(qpsolver_.output(LP_SOLVER_LAM_X));
   }
 
-  void QPLPInternal::init() {
+  void LpToQp::init() {
 
     LpSolverInternal::init();
 

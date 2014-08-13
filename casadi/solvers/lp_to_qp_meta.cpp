@@ -21,10 +21,10 @@
  */
 
 
-      #include "qp_lp_internal.hpp"
+      #include "lp_to_qp.hpp"
       #include <string>
 
-      const std::string casadi::QPLPInternal::meta_doc=
+      const std::string casadi::LpToQp::meta_doc=
       "\n"
 "Solve LPs using a QpSolver\n"
 "\n"
