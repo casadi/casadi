@@ -21,10 +21,10 @@
  */
 
 
-      #include "knitro_internal.hpp"
+      #include "knitro_interface.hpp"
       #include <string>
 
-      const std::string casadi::KnitroInternal::meta_doc=
+      const std::string casadi::KnitroInterface::meta_doc=
       "\n"
 "KNITRO interface\n"
 "\n"

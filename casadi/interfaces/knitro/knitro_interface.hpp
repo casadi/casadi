@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_KNITRO_INTERNAL_HPP
-#define CASADI_KNITRO_INTERNAL_HPP
+#ifndef CASADI_KNITRO_INTERFACE_HPP
+#define CASADI_KNITRO_INTERFACE_HPP
 
 #include <casadi/interfaces/knitro/casadi_nlpsolver_knitro_export.h>
 #include <knitro.h>
@@ -40,16 +40,16 @@ namespace casadi {
      @copydoc NlpSolver_doc
      @copydoc plugin_NlpSolver_knitro
   */
-  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInternal : public NlpSolverInternal {
+  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInterface : public NlpSolverInternal {
 
   public:
-    explicit KnitroInternal(const Function& nlp);
-    virtual ~KnitroInternal();
-    virtual KnitroInternal* clone() const { return new KnitroInternal(*this);}
+    explicit KnitroInterface(const Function& nlp);
+    virtual ~KnitroInterface();
+    virtual KnitroInterface* clone() const { return new KnitroInterface(*this);}
 
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)
-    { return new KnitroInternal(nlp);}
+    { return new KnitroInterface(nlp);}
 
     virtual void init();
     virtual void evaluate();
@@ -86,4 +86,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_KNITRO_INTERNAL_HPP
+#endif // CASADI_KNITRO_INTERFACE_HPP

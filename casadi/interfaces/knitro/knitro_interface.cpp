@@ -20,7 +20,7 @@
  *
  */
 
-#include "knitro_internal.hpp"
+#include "knitro_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include <ctime>
@@ -33,9 +33,9 @@ namespace casadi {
   extern "C"
   int CASADI_NLPSOLVER_KNITRO_EXPORT
   casadi_register_nlpsolver_knitro(NlpSolverInternal::Plugin* plugin) {
-    plugin->creator = KnitroInternal::creator;
+    plugin->creator = KnitroInterface::creator;
     plugin->name = "knitro";
-    plugin->doc = KnitroInternal::meta_doc.c_str();
+    plugin->doc = KnitroInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -45,8 +45,8 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_knitro);
   }
 
-  KnitroInternal::KnitroInternal(const Function& nlp) : NlpSolverInternal(nlp) {
-    casadi_warning("KnitroInternal: the KNITRO interface is still experimental, "
+  KnitroInterface::KnitroInterface(const Function& nlp) : NlpSolverInternal(nlp) {
+    casadi_warning("KnitroInterface: the KNITRO interface is still experimental, "
                    "more tests are needed");
 
     // Monitors
@@ -118,7 +118,7 @@ namespace casadi {
   }
 
 
-  KnitroInternal::~KnitroInternal() {
+  KnitroInterface::~KnitroInterface() {
     // Free KNITRO memory
     if (kc_handle_) {
       /*    KTR_free(&kc_handle_);
@@ -126,7 +126,7 @@ namespace casadi {
     }
   }
 
-  void KnitroInternal::init() {
+  void KnitroInterface::init() {
     // Call the init method of the base class
     NlpSolverInternal::init();
 
@@ -177,7 +177,7 @@ namespace casadi {
 
   }
 
-  void KnitroInternal::evaluate() {
+  void KnitroInterface::evaluate() {
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert(kc_handle_==0);
     kc_handle_ = KTR_new();
@@ -216,14 +216,14 @@ namespace casadi {
         it!=double_param_.end(); ++it) {
       status = KTR_set_double_param_by_name(kc_handle_, it->first.c_str(), it->second);
       if (status!=0) {
-        throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
+        throw CasadiException("KnitroInterface::evaluate: cannot set " + it->first);
       }
     }
 
     for (std::map<std::string, int>::iterator it=int_param_.begin(); it!=int_param_.end(); ++it) {
       status = KTR_set_int_param_by_name(kc_handle_, it->first.c_str(), it->second);
       if (status!=0) {
-        throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
+        throw CasadiException("KnitroInterface::evaluate: cannot set " + it->first);
       }
     }
 
@@ -231,7 +231,7 @@ namespace casadi {
         it!=string_param_.end(); ++it) {
       status = KTR_set_char_param_by_name(kc_handle_, it->first.c_str(), it->second.c_str());
       if (status!=0) {
-        throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
+        throw CasadiException("KnitroInterface::evaluate: cannot set " + it->first);
       }
     }
 
@@ -310,31 +310,31 @@ namespace casadi {
   }
 
 
-  int KnitroInternal::callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
+  int KnitroInterface::callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
                                const int nnzH, const double* const x, const double* const lambda,
                                double* const obj, double* const c, double* const objGrad,
                                double* const jac, double* const hessian, double* const hessVector,
                                void *userParams) {
     try {
       // Get a pointer to the calling object
-      KnitroInternal* this_ = static_cast<KnitroInternal*>(userParams);
+      KnitroInterface* this_ = static_cast<KnitroInterface*>(userParams);
 
       // Direct to the correct function
       switch (evalRequestCode) {
       case KTR_RC_EVALFC: this_->evalfc(x, *obj, c); break;
       case KTR_RC_EVALGA: this_->evalga(x, objGrad, jac); break;
       case KTR_RC_EVALH:  this_->evalh(x, lambda, hessian); break;
-      default: casadi_assert_message(0, "KnitroInternal::callback: unknown method");
+      default: casadi_assert_message(0, "KnitroInterface::callback: unknown method");
       }
 
       return 0;
     } catch(exception& ex) {
-      cerr << "KnitroInternal::callback caugth exception: " << ex.what() << endl;
+      cerr << "KnitroInterface::callback caugth exception: " << ex.what() << endl;
       return -1;
     }
   }
 
-  void KnitroInternal::evalfc(const double* x, double& obj, double *c) {
+  void KnitroInterface::evalfc(const double* x, double& obj, double *c) {
     // Pass the argument to the function
     nlp_.setInput(x, NL_X);
     nlp_.setInput(input(NLP_SOLVER_P), NL_P);
@@ -357,7 +357,7 @@ namespace casadi {
     }
   }
 
-  void KnitroInternal::evalga(const double* x, double* objGrad, double* jac) {
+  void KnitroInterface::evalga(const double* x, double* objGrad, double* jac) {
     // Pass the argument to the function
     gradF_.setInput(x, NL_X);
     gradF_.setInput(input(NLP_SOLVER_P), NL_P);
@@ -391,7 +391,7 @@ namespace casadi {
     }
   }
 
-  void KnitroInternal::evalh(const double* x, const double* lambda, double* hessian) {
+  void KnitroInterface::evalh(const double* x, const double* lambda, double* hessian) {
     // Pass the argument to the function
     hessLag_.setInput(x, NL_X);
     hessLag_.setInput(input(NLP_SOLVER_P), NL_P);
