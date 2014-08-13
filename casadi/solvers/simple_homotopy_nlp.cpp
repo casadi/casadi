@@ -20,7 +20,7 @@
  *
  */
 
-#include "simple_homotopy_nlp_internal.hpp"
+#include "simple_homotopy_nlp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
@@ -39,9 +39,9 @@ namespace casadi {
   extern "C"
   int CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT
   casadi_register_homotopynlpsolver_simple(HomotopyNLPInternal::Plugin* plugin) {
-    plugin->creator = SimpleHomotopyNLPInternal::creator;
+    plugin->creator = SimpleHomotopyNlp::creator;
     plugin->name = "simple";
-    plugin->doc = SimpleHomotopyNLPInternal::meta_doc.c_str();
+    plugin->doc = SimpleHomotopyNlp::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -51,7 +51,7 @@ namespace casadi {
     HomotopyNLPInternal::registerPlugin(casadi_register_homotopynlpsolver_simple);
   }
 
-  SimpleHomotopyNLPInternal::SimpleHomotopyNLPInternal(const Function& nlp)
+  SimpleHomotopyNlp::SimpleHomotopyNlp(const Function& nlp)
       : HomotopyNLPInternal(nlp) {
     addOption("nlp_solver",         OT_STRING,   GenericType(),
               "The NLP solver to be used by the Homotopy solver");
@@ -66,10 +66,10 @@ namespace casadi {
   }
 
 
-  SimpleHomotopyNLPInternal::~SimpleHomotopyNLPInternal() {
+  SimpleHomotopyNlp::~SimpleHomotopyNlp() {
   }
 
-  void SimpleHomotopyNLPInternal::init() {
+  void SimpleHomotopyNlp::init() {
     casadi_warning("SimpleHomotopyNlpSolver is experimental");
     // Call the init method of the base class
     HomotopyNLPInternal::init();
@@ -103,7 +103,7 @@ namespace casadi {
 
   }
 
-  void SimpleHomotopyNLPInternal::evaluate() {
+  void SimpleHomotopyNlp::evaluate() {
     nlpsolver_.setInput(input(NLP_SOLVER_X0), NLP_SOLVER_X0);
     nlpsolver_.setInput(input(NLP_SOLVER_LAM_X0), NLP_SOLVER_LAM_X0);
     nlpsolver_.setInput(input(NLP_SOLVER_LBX), NLP_SOLVER_LBX);

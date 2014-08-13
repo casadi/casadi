@@ -21,10 +21,10 @@
  */
 
 
-      #include "simple_homotopy_nlp_internal.hpp"
+      #include "simple_homotopy_nlp.hpp"
       #include <string>
 
-      const std::string casadi::SimpleHomotopyNLPInternal::meta_doc=
+      const std::string casadi::SimpleHomotopyNlp::meta_doc=
       "\n"
 "\n"
 ">List of available options\n"

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP
-#define CASADI_SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP
+#ifndef CASADI_SIMPLE_HOMOTOPY_NLP_HPP
+#define CASADI_SIMPLE_HOMOTOPY_NLP_HPP
 
 #include "casadi/core/function/homotopy_nlp_internal.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
@@ -42,16 +42,16 @@ namespace casadi {
       \date 2014
   */
   class CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT
-  SimpleHomotopyNLPInternal : public HomotopyNLPInternal {
+  SimpleHomotopyNlp : public HomotopyNLPInternal {
 
   public:
-    explicit SimpleHomotopyNLPInternal(const Function& hnlp);
-    virtual ~SimpleHomotopyNLPInternal();
-    virtual SimpleHomotopyNLPInternal* clone() const { return new SimpleHomotopyNLPInternal(*this);}
+    explicit SimpleHomotopyNlp(const Function& hnlp);
+    virtual ~SimpleHomotopyNlp();
+    virtual SimpleHomotopyNlp* clone() const { return new SimpleHomotopyNlp(*this);}
 
     /** \brief  Create a new Homotopy NLP Solver */
     static HomotopyNLPInternal* creator(const Function& hnlp)
-    { return new SimpleHomotopyNLPInternal(hnlp);}
+    { return new SimpleHomotopyNlp(hnlp);}
 
     virtual void init();
     virtual void evaluate();
@@ -68,4 +68,4 @@ namespace casadi {
   /// \endcond
 } // namespace casadi
 
-#endif // CASADI_SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP
+#endif // CASADI_SIMPLE_HOMOTOPY_NLP_HPP
