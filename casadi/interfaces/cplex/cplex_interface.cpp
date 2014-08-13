@@ -19,7 +19,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#include "cplex_internal.hpp"
+#include "cplex_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include <ctime>
@@ -37,9 +37,9 @@ namespace casadi {
   extern "C"
   int CASADI_QPSOLVER_CPLEX_EXPORT
   casadi_register_qpsolver_cplex(QpSolverInternal::Plugin* plugin) {
-    plugin->creator = CplexInternal::creator;
+    plugin->creator = CplexInterface::creator;
     plugin->name = "cplex";
-    plugin->doc = CplexInternal::meta_doc.c_str();
+    plugin->doc = CplexInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -49,7 +49,7 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_cplex);
   }
 
-  CplexInternal::CplexInternal(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  CplexInterface::CplexInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
     // Options available
     addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
               "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
@@ -72,7 +72,7 @@ namespace casadi {
     env_ = 0;
     lp_ = 0;
   }
-  void CplexInternal::init() {
+  void CplexInterface::init() {
     // Free any existing Cplex instance
     freeCplex();
 
@@ -168,7 +168,7 @@ namespace casadi {
     lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
   }
 
-  void CplexInternal::evaluate() {
+  void CplexInterface::evaluate() {
 
     if (inputs_check_) checkInputs();
 
@@ -314,19 +314,19 @@ namespace casadi {
 
   }
 
-  CplexInternal* CplexInternal::clone() const {
+  CplexInterface* CplexInterface::clone() const {
     // Return a deepcopy
-    CplexInternal* node = new CplexInternal(st_);
+    CplexInterface* node = new CplexInterface(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  CplexInternal::~CplexInternal() {
+  CplexInterface::~CplexInterface() {
     freeCplex();
   }
 
-  void CplexInternal::freeCplex() {
+  void CplexInterface::freeCplex() {
     // Return flag
     int status;
 

@@ -21,10 +21,10 @@
  */
 
 
-      #include "cplex_internal.hpp"
+      #include "cplex_interface.hpp"
       #include <string>
 
-      const std::string casadi::CplexInternal::meta_doc=
+      const std::string casadi::CplexInterface::meta_doc=
       "\n"
 "Interface to Cplex solver for sparse Quadratic Programs\n"
 "\n"
