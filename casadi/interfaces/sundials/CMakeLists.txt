@@ -24,8 +24,8 @@ casadi_plugin_link_libraries(Integrator idas casadi_integrator_cvodes)
 
 # KINSOL
 casadi_plugin(ImplicitFunction kinsol 
-   kinsol_internal.hpp    kinsol_internal.cpp
-   kinsol_internal_meta.cpp
+   kinsol_interface.hpp    kinsol_interface.cpp
+   kinsol_interface_meta.cpp
    )
 casadi_plugin_link_libraries(ImplicitFunction kinsol  ${SUNDIALS_LIBRARIES})
 

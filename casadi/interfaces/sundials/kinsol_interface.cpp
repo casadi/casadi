@@ -20,7 +20,7 @@
  *
  */
 
-#include "kinsol_internal.hpp"
+#include "kinsol_interface.hpp"
 #include "casadi/core/function/sx_function_internal.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/sx/sx_tools.hpp"
@@ -32,9 +32,9 @@ namespace casadi {
   extern "C"
   int CASADI_IMPLICITFUNCTION_KINSOL_EXPORT
   casadi_register_implicitfunction_kinsol(ImplicitFunctionInternal::Plugin* plugin) {
-    plugin->creator = KinsolInternal::creator;
+    plugin->creator = KinsolInterface::creator;
     plugin->name = "kinsol";
-    plugin->doc = KinsolInternal::meta_doc.c_str();
+    plugin->doc = KinsolInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -63,7 +63,7 @@ namespace casadi {
    * \see ImplicitFunction for more information
    *
    */
-  KinsolInternal::KinsolInternal(const Function& f, const Function& jac,
+  KinsolInterface::KinsolInterface(const Function& f, const Function& jac,
                                  const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {
     addOption("max_iter",                 OT_INTEGER, 0,
@@ -93,20 +93,20 @@ namespace casadi {
     disable_internal_warnings_ = false;
   }
 
-  KinsolInternal* KinsolInternal::clone() const {
-    KinsolInternal* node = new KinsolInternal(f_, jac_, linsol_);
+  KinsolInterface* KinsolInterface::clone() const {
+    KinsolInterface* node = new KinsolInterface(f_, jac_, linsol_);
     node->setOption(dictionary());
     return node;
   }
 
-  KinsolInternal::~KinsolInternal() {
+  KinsolInterface::~KinsolInterface() {
     if (u_) N_VDestroy_Serial(u_);
     if (u_scale_) N_VDestroy_Serial(u_scale_);
     if (f_scale_) N_VDestroy_Serial(f_scale_);
     if (mem_) KINFree(&mem_);
   }
 
-  void KinsolInternal::init() {
+  void KinsolInterface::init() {
     ImplicitFunctionInternal::init();
 
     // Read options
@@ -278,13 +278,13 @@ namespace casadi {
     }
   }
 
-  void KinsolInternal::solveNonLinear() {
+  void KinsolInterface::solveNonLinear() {
     // Reset the counters
     t_func_ = 0;
     t_jac_ = 0;
 
     if (verbose()) {
-      cout << "KinsolInternal::solveNonLinear: Initial guess = " << output(0).data() << endl;
+      cout << "KinsolInterface::solveNonLinear: Initial guess = " << output(0).data() << endl;
     }
 
     // Get the initial guess
@@ -315,11 +315,11 @@ namespace casadi {
 
     // Print solution
     if (verbose()) {
-      cout << "KinsolInternal::solveNonLinear: solution = " << output(iout_).data() << endl;
+      cout << "KinsolInterface::solveNonLinear: solution = " << output(iout_).data() << endl;
     }
   }
 
-  void KinsolInternal::func(N_Vector u, N_Vector fval) {
+  void KinsolInterface::func(N_Vector u, N_Vector fval) {
     // Get time
     time1_ = clock();
 
@@ -370,10 +370,10 @@ namespace casadi {
     t_func_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::func_wrapper(N_Vector u, N_Vector fval, void *user_data) {
+  int KinsolInterface::func_wrapper(N_Vector u, N_Vector fval, void *user_data) {
     try {
       casadi_assert(user_data);
-      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
+      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
       this_->func(u, fval);
       return 0;
     } catch(exception& e) {
@@ -382,11 +382,11 @@ namespace casadi {
     }
   }
 
-  int KinsolInternal::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data,
+  int KinsolInterface::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data,
                                    N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
+      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
       this_->djac(N, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -395,7 +395,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInternal::djac(long N, N_Vector u, N_Vector fu, DlsMat J,
+  void KinsolInterface::djac(long N, N_Vector u, N_Vector fu, DlsMat J,
                             N_Vector tmp1, N_Vector tmp2) {
     // Get time
     time1_ = clock();
@@ -439,12 +439,12 @@ namespace casadi {
     t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu,
+  int KinsolInterface::bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu,
                                    DlsMat J, void *user_data,
                                    N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
+      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
       this_->bjac(N, mupper, mlower, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -453,7 +453,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInternal::bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
+  void KinsolInterface::bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
                             N_Vector tmp1, N_Vector tmp2) {
     // Get time
     time1_ = clock();
@@ -489,11 +489,11 @@ namespace casadi {
     t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u,
+  int KinsolInterface::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u,
                                      void *user_data) {
     try {
       casadi_assert(user_data);
-      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
+      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
       this_->jtimes(v, Jv, u, new_u);
       return 0;
     } catch(exception& e) {
@@ -502,7 +502,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInternal::jtimes(N_Vector v, N_Vector Jv, N_Vector u, int* new_u) {
+  void KinsolInterface::jtimes(N_Vector v, N_Vector Jv, N_Vector u, int* new_u) {
     // Get time
     time1_ = clock();
 
@@ -527,11 +527,11 @@ namespace casadi {
     t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+  int KinsolInterface::psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
                                      void* user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
+      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
       this_->psetup(u, uscale, fval, fscale, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -540,7 +540,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInternal::psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+  void KinsolInterface::psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
                               N_Vector tmp1, N_Vector tmp2) {
     // Get time
     time1_ = clock();
@@ -614,11 +614,11 @@ namespace casadi {
     t_lsetup_fac_ += static_cast<double>(time1_-time2_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval,
+  int KinsolInterface::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval,
                                      N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp) {
     try {
       casadi_assert(user_data);
-      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
+      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
       this_->psolve(u, uscale, fval, fscale, v, tmp);
       return 0;
     } catch(exception& e) {
@@ -627,7 +627,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInternal::psolve(N_Vector u, N_Vector uscale, N_Vector fval,
+  void KinsolInterface::psolve(N_Vector u, N_Vector uscale, N_Vector fval,
                               N_Vector fscale, N_Vector v, N_Vector tmp) {
     // Get time
     time1_ = clock();
@@ -640,9 +640,9 @@ namespace casadi {
     t_lsolve_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::lsetup_wrapper(KINMem kin_mem) {
+  int KinsolInterface::lsetup_wrapper(KINMem kin_mem) {
     try {
-      KinsolInternal *this_ = static_cast<KinsolInternal*>(kin_mem->kin_lmem);
+      KinsolInterface *this_ = static_cast<KinsolInterface*>(kin_mem->kin_lmem);
       casadi_assert(this_);
       this_->lsetup(kin_mem);
       return 0;
@@ -652,7 +652,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInternal::lsetup(KINMem kin_mem) {
+  void KinsolInterface::lsetup(KINMem kin_mem) {
     N_Vector u =  kin_mem->kin_uu;
     N_Vector uscale = kin_mem->kin_uscale;
     N_Vector fval = kin_mem->kin_fval;
@@ -662,9 +662,9 @@ namespace casadi {
     psetup(u, uscale, fval, fscale, tmp1, tmp2);
   }
 
-  int KinsolInternal::lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
+  int KinsolInterface::lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
     try {
-      KinsolInternal *this_ = static_cast<KinsolInternal*>(kin_mem->kin_lmem);
+      KinsolInterface *this_ = static_cast<KinsolInterface*>(kin_mem->kin_lmem);
       casadi_assert(this_);
       this_->lsolve(kin_mem, x, b, res_norm);
       return 0;
@@ -675,7 +675,7 @@ namespace casadi {
   }
 
 
-  void KinsolInternal::lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
+  void KinsolInterface::lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
     // Get vectors
     N_Vector u =  kin_mem->kin_uu;
     N_Vector uscale = kin_mem->kin_uscale;
@@ -696,26 +696,26 @@ namespace casadi {
     *res_norm = sqrt(N_VDotProd(tmp1, tmp1));
   }
 
-  void KinsolInternal::ehfun_wrapper(int error_code, const char *module, const char *function,
+  void KinsolInterface::ehfun_wrapper(int error_code, const char *module, const char *function,
                                      char *msg, void *eh_data) {
     try {
       casadi_assert(eh_data);
-      KinsolInternal *this_ = static_cast<KinsolInternal*>(eh_data);
+      KinsolInterface *this_ = static_cast<KinsolInterface*>(eh_data);
       this_->ehfun(error_code, module, function, msg);
     } catch(exception& e) {
       cerr << "ehfun failed: " << e.what() << endl;
     }
   }
 
-  void KinsolInternal::ehfun(int error_code, const char *module, const char *function, char *msg) {
+  void KinsolInterface::ehfun(int error_code, const char *module, const char *function, char *msg) {
     if (!disable_internal_warnings_) {
       cerr << msg << endl;
     }
   }
 
-  map<int, Message> KinsolInternal::flagmap = KinsolInternal::calc_flagmap();
+  map<int, Message> KinsolInterface::flagmap = KinsolInterface::calc_flagmap();
 
-  void KinsolInternal::kinsol_error(const string& module, int flag, bool fatal) {
+  void KinsolInterface::kinsol_error(const string& module, int flag, bool fatal) {
     // Find the error
     map<int, Message>::const_iterator it = flagmap.find(flag);
 
@@ -737,7 +737,7 @@ namespace casadi {
   }
 
 
-  map<int, Message> KinsolInternal::calc_flagmap() {
+  map<int, Message> KinsolInterface::calc_flagmap() {
 
     map<int, Message > f;
     f[KIN_SUCCESS] = Message(

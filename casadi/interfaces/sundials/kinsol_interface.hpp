@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_KINSOL_INTERNAL_HPP
-#define CASADI_KINSOL_INTERNAL_HPP
+#ifndef CASADI_KINSOL_INTERFACE_HPP
+#define CASADI_KINSOL_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_implicitfunction_kinsol_export.h>
 #include "casadi/core/function/implicit_function_internal.hpp"
@@ -52,26 +52,26 @@ namespace casadi {
   * @copydoc ImplicitFunction_doc
   * @copydoc plugin_ImplicitFunction_kinsol
   */
-  class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolInternal : public ImplicitFunctionInternal {
+  class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolInterface : public ImplicitFunctionInternal {
   public:
     /** \brief  Constructor */
-    explicit KinsolInternal(const Function& f, const Function& jac, const LinearSolver& linsol);
+    explicit KinsolInterface(const Function& f, const Function& jac, const LinearSolver& linsol);
 
     /** \brief  Destructor */
-    virtual ~KinsolInternal();
+    virtual ~KinsolInterface();
 
     /** \brief  Clone */
-    virtual KinsolInternal* clone() const;
+    virtual KinsolInterface* clone() const;
 
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
                                              const LinearSolver& linsol) const
-    { return new KinsolInternal(f, jac, linsol);}
+    { return new KinsolInterface(f, jac, linsol);}
 
     /** \brief  Create a new ImplicitFunction */
     static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
                                              const LinearSolver& linsol)
-    { return new KinsolInternal(f, jac, linsol);}
+    { return new KinsolInterface(f, jac, linsol);}
 
     /** \brief  Initialize stage */
     virtual void init();
@@ -155,5 +155,5 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_KINSOL_INTERNAL_HPP
+#endif // CASADI_KINSOL_INTERFACE_HPP
 

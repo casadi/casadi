@@ -21,10 +21,10 @@
  */
 
 
-      #include "kinsol_internal.hpp"
+      #include "kinsol_interface.hpp"
       #include <string>
 
-      const std::string casadi::KinsolInternal::meta_doc=
+      const std::string casadi::KinsolInterface::meta_doc=
       "\n"
 "KINSOL interface from the Sundials suite\n"
 "\n"
