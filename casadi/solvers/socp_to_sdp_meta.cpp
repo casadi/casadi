@@ -21,10 +21,10 @@
  */
 
 
-      #include "sdp_socp_internal.hpp"
+      #include "socp_to_sdp.hpp"
       #include <string>
 
-      const std::string casadi::SDPSOCPInternal::meta_doc=
+      const std::string casadi::SocpToSdp::meta_doc=
       "\n"
 "Solve SOCPs using an SdpSolver\n"
 "\n"

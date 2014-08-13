@@ -20,7 +20,7 @@
  *
  */
 
-#include "sdp_socp_internal.hpp"
+#include "socp_to_sdp.hpp"
 
 #include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
@@ -33,9 +33,9 @@ namespace casadi {
   extern "C"
   int CASADI_SOCPSOLVER_SDP_EXPORT
   casadi_register_socpsolver_sdp(SocpSolverInternal::Plugin* plugin) {
-    plugin->creator = SDPSOCPInternal::creator;
+    plugin->creator = SocpToSdp::creator;
     plugin->name = "sdp";
-    plugin->doc = SDPSOCPInternal::meta_doc.c_str();
+    plugin->doc = SocpToSdp::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -45,15 +45,15 @@ namespace casadi {
     SocpSolverInternal::registerPlugin(casadi_register_socpsolver_sdp);
   }
 
-  SDPSOCPInternal* SDPSOCPInternal::clone() const {
+  SocpToSdp* SocpToSdp::clone() const {
     // Return a deep copy
-    SDPSOCPInternal* node = new SDPSOCPInternal(st_);
+    SocpToSdp* node = new SocpToSdp(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  SDPSOCPInternal::SDPSOCPInternal(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
+  SocpToSdp::SocpToSdp(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
     addOption("sdp_solver",       OT_STRING, GenericType(),
               "The SdpSolver used to solve the SOCPs.");
     addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(),
@@ -61,10 +61,10 @@ namespace casadi {
 
   }
 
-  SDPSOCPInternal::~SDPSOCPInternal() {
+  SocpToSdp::~SocpToSdp() {
   }
 
-  void SDPSOCPInternal::evaluate() {
+  void SocpToSdp::evaluate() {
     if (print_problem_) printProblem();
 
     mapping_.setInput(input(SOCP_SOLVER_G), 0);
@@ -94,7 +94,7 @@ namespace casadi {
     setOutput(sdpsolver_.output(SDP_SOLVER_LAM_A), SOCP_SOLVER_LAM_A);
   }
 
-  void SDPSOCPInternal::init() {
+  void SocpToSdp::init() {
 
     SocpSolverInternal::init();
 
@@ -169,7 +169,7 @@ namespace casadi {
     mapping_ = MXFunction(syms, out);
     mapping_.init();
 
-    log("SDPSOCPInternal::init", "Created mapping function");
+    log("SocpToSdp::init", "Created mapping function");
 
     // Create an sdpsolver instance
     std::string sdpsolver_name = getOption("sdp_solver");
@@ -186,7 +186,7 @@ namespace casadi {
     // Initialize the SDP solver
     sdpsolver_.init();
 
-    log("SDPSOCPInternal::init", "Initialized SDP solver");
+    log("SocpToSdp::init", "Initialized SDP solver");
   }
 
 } // namespace casadi

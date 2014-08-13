@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_SDP_SOCP_INTERNAL_HPP
-#define CASADI_SDP_SOCP_INTERNAL_HPP
+#ifndef CASADI_SOCP_TO_SDP_HPP
+#define CASADI_SOCP_TO_SDP_HPP
 
 #include "casadi/core/function/socp_solver_internal.hpp"
 #include "casadi/core/function/sdp_solver.hpp"
@@ -46,21 +46,21 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SocpSolverInternal {
+  class CASADI_SOCPSOLVER_SDP_EXPORT SocpToSdp : public SocpSolverInternal {
   public:
 
     /** \brief  Create a new Solver */
-    explicit SDPSOCPInternal(const std::vector<Sparsity> &st);
+    explicit SocpToSdp(const std::vector<Sparsity> &st);
 
     /** \brief  Destructor */
-    virtual ~SDPSOCPInternal();
+    virtual ~SocpToSdp();
 
     /** \brief  Clone */
-    virtual SDPSOCPInternal* clone() const;
+    virtual SocpToSdp* clone() const;
   
     /** \brief  Create a new SOCP Solver */
     static SocpSolverInternal* creator(const SOCPStructure& st)
-    { return new SDPSOCPInternal(st);}
+    { return new SocpToSdp(st);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -81,4 +81,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_SDP_SOCP_INTERNAL_HPP
+#endif // CASADI_SOCP_TO_SDP_HPP
