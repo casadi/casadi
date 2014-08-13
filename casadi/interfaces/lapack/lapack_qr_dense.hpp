@@ -56,20 +56,20 @@ namespace casadi {
    @copydoc plugin_LinearSolver_lapackqr
    *
    */
-  class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQRDenseInternal : public LinearSolverInternal {
+  class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQrDense : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQRDenseInternal(const Sparsity& sparsity, int nrhs);
+    LapackQrDense(const Sparsity& sparsity, int nrhs);
 
     // Clone
-    virtual LapackQRDenseInternal* clone() const;
+    virtual LapackQrDense* clone() const;
 
     /** \brief  Create a new LinearSolver */
     static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new LapackQRDenseInternal(sp, nrhs);}
+    { return new LapackQrDense(sp, nrhs);}
 
     // Destructor
-    virtual ~LapackQRDenseInternal();
+    virtual ~LapackQrDense();
 
     // Initialize the solver
     virtual void init();

@@ -29,9 +29,9 @@ namespace casadi {
   extern "C"
   int CASADI_LINEARSOLVER_LAPACKQR_EXPORT
   casadi_register_linearsolver_lapackqr(LinearSolverInternal::Plugin* plugin) {
-    plugin->creator = LapackQRDenseInternal::creator;
+    plugin->creator = LapackQrDense::creator;
     plugin->name = "lapackqr";
-    plugin->doc = LapackQRDenseInternal::meta_doc.c_str();;
+    plugin->doc = LapackQrDense::meta_doc.c_str();;
     plugin->version = 20;
     return 0;
   }
@@ -41,14 +41,14 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapackqr);
   }
 
-  LapackQRDenseInternal::LapackQRDenseInternal(const Sparsity& sparsity, int nrhs) :
+  LapackQrDense::LapackQrDense(const Sparsity& sparsity, int nrhs) :
       LinearSolverInternal(sparsity, nrhs) {
   }
 
-  LapackQRDenseInternal::~LapackQRDenseInternal() {
+  LapackQrDense::~LapackQrDense() {
   }
 
-  void LapackQRDenseInternal::init() {
+  void LapackQrDense::init() {
     // Call the base class initializer
     LinearSolverInternal::init();
 
@@ -57,7 +57,7 @@ namespace casadi {
     nrow_ = nrow();
 
     // Currently only square matrices tested
-    if (ncol_!=nrow_) throw CasadiException("LapackQRDenseInternal::init: currently only "
+    if (ncol_!=nrow_) throw CasadiException("LapackQrDense::init: currently only "
                                            "square matrices implemented.");
 
     // Allocate matrix
@@ -66,7 +66,7 @@ namespace casadi {
     work_.resize(10*ncol_);
   }
 
-  void LapackQRDenseInternal::prepare() {
+  void LapackQrDense::prepare() {
     prepared_ = false;
 
     // Get the elements of the matrix, dense format
@@ -76,14 +76,14 @@ namespace casadi {
     int info = -100;
     int lwork = work_.size();
     dgeqrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(tau_), getPtr(work_), &lwork, &info);
-    if (info != 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeqrf_ "
+    if (info != 0) throw CasadiException("LapackQrDense::prepare: dgeqrf_ "
                                          "failed to factorize the Jacobian");
 
     // Success if reached this point
     prepared_ = true;
   }
 
-  void LapackQRDenseInternal::solve(double* x, int nrhs, bool transpose) {
+  void LapackQrDense::solve(double* x, int nrhs, bool transpose) {
     // Properties of R
     char uploR = 'U';
     char diagR = 'N';
@@ -107,7 +107,7 @@ namespace casadi {
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
               &ncol_, getPtr(work_), &lwork, &info);
-      if (info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed "
+      if (info != 0) throw CasadiException("LapackQrDense::solve: dormqr_ failed "
                                           "to solve the linear system");
 
     } else {
@@ -116,7 +116,7 @@ namespace casadi {
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
               &ncol_, getPtr(work_), &lwork, &info);
-      if (info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to "
+      if (info != 0) throw CasadiException("LapackQrDense::solve: dormqr_ failed to "
                                           "solve the linear system");
 
       // Solve for R
@@ -125,8 +125,8 @@ namespace casadi {
     }
   }
 
-  LapackQRDenseInternal* LapackQRDenseInternal::clone() const {
-    return new LapackQRDenseInternal(*this);
+  LapackQrDense* LapackQrDense::clone() const {
+    return new LapackQrDense(*this);
   }
 
 } // namespace casadi

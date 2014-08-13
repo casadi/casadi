@@ -32,9 +32,9 @@ namespace casadi {
   extern "C"
   int CASADI_LINEARSOLVER_LAPACKLU_EXPORT
   casadi_register_linearsolver_lapacklu(LinearSolverInternal::Plugin* plugin) {
-    plugin->creator = LapackLUDenseInternal::creator;
+    plugin->creator = LapackLuDense::creator;
     plugin->name = "lapacklu";
-    plugin->doc = LapackLUDenseInternal::meta_doc.c_str();
+    plugin->doc = LapackLuDense::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -44,17 +44,17 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapacklu);
   }
 
-  LapackLUDenseInternal::LapackLUDenseInternal(const Sparsity& sparsity, int nrhs)
+  LapackLuDense::LapackLuDense(const Sparsity& sparsity, int nrhs)
       : LinearSolverInternal(sparsity, nrhs) {
     // Equilibrate the matrix
     addOption("equilibration", OT_BOOLEAN, true);
     addOption("allow_equilibration_failure", OT_BOOLEAN, false);
   }
 
-  LapackLUDenseInternal::~LapackLUDenseInternal() {
+  LapackLuDense::~LapackLuDense() {
   }
 
-  void LapackLUDenseInternal::init() {
+  void LapackLuDense::init() {
     // Call the base class initializer
     LinearSolverInternal::init();
 
@@ -64,7 +64,7 @@ namespace casadi {
 
     // Currently only square matrices tested
     if (ncol_!=nrow_) throw CasadiException(
-      "LapackLUDenseInternal::LapackLUDenseInternal: currently only square matrices implemented.");
+      "LapackLuDense::LapackLuDense: currently only square matrices implemented.");
 
     // Allocate matrix
     mat_.resize(ncol_*ncol_);
@@ -90,7 +90,7 @@ namespace casadi {
     }
   }
 
-  void LapackLUDenseInternal::prepare() {
+  void LapackLuDense::prepare() {
     double time_start=0;
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
@@ -109,11 +109,11 @@ namespace casadi {
       dgeequ_(&ncol_, &nrow_, getPtr(mat_), &ncol_, getPtr(r_),
               getPtr(c_), &colcnd, &rowcnd, &amax, &info);
       if (info < 0)
-          throw CasadiException("LapackQRDenseInternal::prepare: "
+          throw CasadiException("LapackQrDense::prepare: "
                                 "dgeequ_ failed to calculate the scaling factors");
       if (info>0) {
         stringstream ss;
-        ss << "LapackLUDenseInternal::prepare: ";
+        ss << "LapackLuDense::prepare: ";
         if (info<=ncol_)  ss << (info-1) << "-th row (zero-based) is exactly zero";
         else             ss << (info-1-ncol_) << "-th col (zero-based) is exactly zero";
 
@@ -136,7 +136,7 @@ namespace casadi {
     // Factorize the matrix
     int info = -100;
     dgetrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(ipiv_), &info);
-    if (info != 0) throw CasadiException("LapackLUDenseInternal::prepare: "
+    if (info != 0) throw CasadiException("LapackLuDense::prepare: "
                                          "dgetrf_ failed to factorize the Jacobian");
 
     // Success if reached this point
@@ -150,7 +150,7 @@ namespace casadi {
     }
   }
 
-  void LapackLUDenseInternal::solve(double* x, int nrhs, bool transpose) {
+  void LapackLuDense::solve(double* x, int nrhs, bool transpose) {
     double time_start=0;
     if (CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
@@ -168,7 +168,7 @@ namespace casadi {
     int info = 100;
     char trans = transpose ? 'T' : 'N';
     dgetrs_(&trans, &ncol_, &nrhs, getPtr(mat_), &ncol_, getPtr(ipiv_), x, &ncol_, &info);
-    if (info != 0) throw CasadiException("LapackLUDenseInternal::solve: "
+    if (info != 0) throw CasadiException("LapackLuDense::solve: "
                                         "failed to solve the linear system");
 
     // Scale the solution
@@ -186,7 +186,7 @@ namespace casadi {
     }
   }
 
-  void LapackLUDenseInternal::colScaling(double* x, int nrhs) {
+  void LapackLuDense::colScaling(double* x, int nrhs) {
     // Scale result if this was done to the matrix
     if (equed_=='R' || equed_=='B')
       for (int rhs=0; rhs<nrhs; ++rhs)
@@ -194,7 +194,7 @@ namespace casadi {
           x[i+rhs*nrow_] *= r_[i];
   }
 
-  void LapackLUDenseInternal::rowScaling(double* x, int nrhs) {
+  void LapackLuDense::rowScaling(double* x, int nrhs) {
     // Scale right hand side if this was done to the matrix
     if (equed_=='C' || equed_=='B')
       for (int rhs=0; rhs<nrhs; ++rhs)
@@ -202,8 +202,8 @@ namespace casadi {
           x[i+rhs*nrow_] *= c_[i];
   }
 
-  LapackLUDenseInternal* LapackLUDenseInternal::clone() const {
-    return new LapackLUDenseInternal(*this);
+  LapackLuDense* LapackLuDense::clone() const {
+    return new LapackLuDense(*this);
   }
 
 } // namespace casadi
