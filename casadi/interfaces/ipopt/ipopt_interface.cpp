@@ -585,8 +585,8 @@ namespace casadi {
     }
   }
 
-  bool IpoptInterface::eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac, int* iRow,
-                                 int *jCol, double* values) {
+  bool IpoptInterface::eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
+                                  int* iRow, int *jCol, double* values) {
     try {
       log("eval_jac_g started");
 
