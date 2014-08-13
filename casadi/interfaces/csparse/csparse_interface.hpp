@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_CSPARSE_INTERNAL_HPP
-#define CASADI_CSPARSE_INTERNAL_HPP
+#ifndef CASADI_CSPARSE_INTERFACE_HPP
+#define CASADI_CSPARSE_INTERFACE_HPP
 
 /** \defgroup plugin_LinearSolver_csparse
  * LinearSolver with CSparse Interface
@@ -42,21 +42,21 @@ namespace casadi {
    * @copydoc LinearSolver_doc
    * @copydoc plugin_LinearSolver_csparse
    */
-  class CASADI_LINEARSOLVER_CSPARSE_EXPORT CSparseInternal : public LinearSolverInternal {
+  class CASADI_LINEARSOLVER_CSPARSE_EXPORT CsparseInterface : public LinearSolverInternal {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseInternal(const Sparsity& sp, int nrhs);
+    CsparseInterface(const Sparsity& sp, int nrhs);
 
     // Copy constructor
-    CSparseInternal(const CSparseInternal& linsol);
+    CsparseInterface(const CsparseInterface& linsol);
 
     /** \brief  Create a new LinearSolver */
     static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new CSparseInternal(sp, nrhs);}
+    { return new CsparseInterface(sp, nrhs);}
 
     // Destructor
-    virtual ~CSparseInternal();
+    virtual ~CsparseInterface();
 
     // Initialize the solver
     virtual void init();
@@ -68,7 +68,7 @@ namespace casadi {
     virtual void solve(double* x, int nrhs, bool transpose);
 
     // Clone
-    virtual CSparseInternal* clone() const;
+    virtual CsparseInterface* clone() const;
 
     // Has the solve function been called once
     bool called_once_;
@@ -94,4 +94,4 @@ namespace casadi {
 
 /// \endcond
 
-#endif // CASADI_CSPARSE_INTERNAL_HPP
+#endif // CASADI_CSPARSE_INTERFACE_HPP

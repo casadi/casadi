@@ -20,7 +20,7 @@
  *
  */
 
-#include "csparse_internal.hpp"
+#include "csparse_interface.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/profiling.hpp"
 #include "casadi/core/casadi_options.hpp"
@@ -31,9 +31,9 @@ namespace casadi {
   extern "C"
   int CASADI_LINEARSOLVER_CSPARSE_EXPORT
   casadi_register_linearsolver_csparse(LinearSolverInternal::Plugin* plugin) {
-    plugin->creator = CSparseInternal::creator;
+    plugin->creator = CsparseInterface::creator;
     plugin->name = "csparse";
-    plugin->doc = CSparseInternal::meta_doc.c_str();
+    plugin->doc = CsparseInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -43,24 +43,24 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_csparse);
   }
 
-  CSparseInternal::CSparseInternal(const Sparsity& sparsity, int nrhs)
+  CsparseInterface::CsparseInterface(const Sparsity& sparsity, int nrhs)
       : LinearSolverInternal(sparsity, nrhs) {
     N_ = 0;
     S_ = 0;
   }
 
-  CSparseInternal::CSparseInternal(const CSparseInternal& linsol) : LinearSolverInternal(linsol) {
+  CsparseInterface::CsparseInterface(const CsparseInterface& linsol) : LinearSolverInternal(linsol) {
     N_ = 0;
     S_ = 0;
     is_init_ = false;
   }
 
-  CSparseInternal::~CSparseInternal() {
+  CsparseInterface::~CsparseInterface() {
     if (S_) cs_sfree(S_);
     if (N_) cs_nfree(N_);
   }
 
-  void CSparseInternal::init() {
+  void CsparseInterface::init() {
     // Call the init method of the base class
     LinearSolverInternal::init();
 
@@ -88,7 +88,7 @@ namespace casadi {
     }
   }
 
-  void CSparseInternal::prepare() {
+  void CsparseInterface::prepare() {
     double time_start=0;
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
@@ -96,7 +96,7 @@ namespace casadi {
     }
     if (!called_once_) {
       if (verbose()) {
-        cout << "CSparseInternal::prepare: symbolic factorization" << endl;
+        cout << "CsparseInterface::prepare: symbolic factorization" << endl;
       }
 
       // ordering and symbolic analysis
@@ -118,7 +118,7 @@ namespace casadi {
     }
 
     if (verbose()) {
-      cout << "CSparseInternal::prepare: numeric factorization" << endl;
+      cout << "CsparseInterface::prepare: numeric factorization" << endl;
       cout << "linear system to be factorized = " << endl;
       input(0).printSparse();
     }
@@ -132,7 +132,7 @@ namespace casadi {
       temp.sparsify();
       if (temp.sparsity().isSingular()) {
         stringstream ss;
-        ss << "CSparseInternal::prepare: factorization failed due to matrix"
+        ss << "CsparseInterface::prepare: factorization failed due to matrix"
           " being singular. Matrix contains numerical zeros which are "
             "structurally non-zero. Promoting these zeros to be structural "
             "zeros, the matrix was found to be structurally rank deficient."
@@ -144,7 +144,7 @@ namespace casadi {
         throw CasadiException(ss.str());
       } else {
         stringstream ss;
-        ss << "CSparseInternal::prepare: factorization failed, check if Jacobian is singular"
+        ss << "CsparseInterface::prepare: factorization failed, check if Jacobian is singular"
            << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
@@ -166,7 +166,7 @@ namespace casadi {
     }
   }
 
-  void CSparseInternal::solve(double* x, int nrhs, bool transpose) {
+  void CsparseInterface::solve(double* x, int nrhs, bool transpose) {
     double time_start=0;
     if (CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
@@ -205,8 +205,8 @@ namespace casadi {
   }
 
 
-  CSparseInternal* CSparseInternal::clone() const {
-    return new CSparseInternal(input(LINSOL_A).sparsity(), input(LINSOL_B).size2());
+  CsparseInterface* CsparseInterface::clone() const {
+    return new CsparseInterface(input(LINSOL_A).sparsity(), input(LINSOL_B).size2());
   }
 
 } // namespace casadi

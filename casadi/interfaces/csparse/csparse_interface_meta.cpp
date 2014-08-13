@@ -21,10 +21,10 @@
  */
 
 
-      #include "csparse_internal.hpp"
+      #include "csparse_interface.hpp"
       #include <string>
 
-      const std::string casadi::CSparseInternal::meta_doc=
+      const std::string casadi::CsparseInterface::meta_doc=
       "\n"
 "LinearSolver with CSparse Interface\n"
 "\n"
