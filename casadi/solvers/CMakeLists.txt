@@ -58,8 +58,8 @@ implicit_to_nlp_meta.cpp
 casadi_plugin(LpSolver qp   qp_lp_internal.cpp   qp_lp_internal.hpp
 qp_lp_internal_meta.cpp
 )
-casadi_plugin(QpSolver qcqp   qcqp_qp_internal.cpp   qcqp_qp_internal.hpp
-qcqp_qp_internal_meta.cpp
+casadi_plugin(QpSolver qcqp   qp_to_qcqp.cpp   qp_to_qcqp.hpp
+qp_to_qcqp_meta.cpp
 )
 casadi_plugin(SocpSolver sdp   sdp_socp_internal.cpp   sdp_socp_internal.hpp
 sdp_socp_internal_meta.cpp

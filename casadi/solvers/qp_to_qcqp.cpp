@@ -20,7 +20,7 @@
  *
  */
 
-#include "qcqp_qp_internal.hpp"
+#include "qp_to_qcqp.hpp"
 
 #include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
@@ -31,9 +31,9 @@ namespace casadi {
   extern "C"
   int CASADI_QPSOLVER_QCQP_EXPORT
   casadi_register_qpsolver_qcqp(QpSolverInternal::Plugin* plugin) {
-    plugin->creator = QCQPQPInternal::creator;
+    plugin->creator = QpToQcqp::creator;
     plugin->name = "qcqp";
-    plugin->doc = QCQPQPInternal::meta_doc.c_str();
+    plugin->doc = QpToQcqp::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -43,15 +43,15 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_qcqp);
   }
 
-  QCQPQPInternal* QCQPQPInternal::clone() const {
+  QpToQcqp* QpToQcqp::clone() const {
     // Return a deep copy
-    QCQPQPInternal* node = new QCQPQPInternal(st_);
+    QpToQcqp* node = new QpToQcqp(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  QCQPQPInternal::QCQPQPInternal(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
+  QpToQcqp::QpToQcqp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
 
     addOption("qcqp_solver",       OT_STRING, GenericType(),
               "The QcqpSolver used to solve the QPs.");
@@ -60,10 +60,10 @@ namespace casadi {
 
   }
 
-  QCQPQPInternal::~QCQPQPInternal() {
+  QpToQcqp::~QpToQcqp() {
   }
 
-  void QCQPQPInternal::evaluate() {
+  void QpToQcqp::evaluate() {
 
     // Pass inputs of QP to QCQP form
     qcqpsolver_.input(QCQP_SOLVER_A).set(input(QP_SOLVER_A));
@@ -89,7 +89,7 @@ namespace casadi {
     output(QCQP_SOLVER_LAM_X).set(qcqpsolver_.output(QP_SOLVER_LAM_X));
   }
 
-  void QCQPQPInternal::init() {
+  void QpToQcqp::init() {
 
     QpSolverInternal::init();
 

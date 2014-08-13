@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_QCQP_QP_INTERNAL_HPP
-#define CASADI_QCQP_QP_INTERNAL_HPP
+#ifndef CASADI_QP_TO_QCQP_HPP
+#define CASADI_QP_TO_QCQP_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include "casadi/core/function/qcqp_solver.hpp"
@@ -44,21 +44,21 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QpSolverInternal {
+  class CASADI_QPSOLVER_QCQP_EXPORT QpToQcqp : public QpSolverInternal {
   public:
 
     /** \brief  Create a new Solver */
-    explicit QCQPQPInternal(const std::vector<Sparsity> &st);
+    explicit QpToQcqp(const std::vector<Sparsity> &st);
 
     /** \brief  Destructor */
-    virtual ~QCQPQPInternal();
+    virtual ~QpToQcqp();
 
     /** \brief  Clone */
-    virtual QCQPQPInternal* clone() const;
+    virtual QpToQcqp* clone() const;
 
     /** \brief  Create a new QP Solver */
     static QpSolverInternal* creator(const QPStructure& st)
-    { return new QCQPQPInternal(st);}
+    { return new QpToQcqp(st);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -75,4 +75,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_QCQP_QP_INTERNAL_HPP
+#endif // CASADI_QP_TO_QCQP_HPP

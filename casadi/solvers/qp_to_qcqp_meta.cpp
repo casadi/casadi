@@ -21,10 +21,10 @@
  */
 
 
-      #include "qcqp_qp_internal.hpp"
+      #include "qp_to_qcqp.hpp"
       #include <string>
 
-      const std::string casadi::QCQPQPInternal::meta_doc=
+      const std::string casadi::QpToQcqp::meta_doc=
       "\n"
 "Solve QP using a QcqpSolver\n"
 "\n"
