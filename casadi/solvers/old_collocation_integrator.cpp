@@ -20,7 +20,7 @@
  *
  */
 
-#include "old_collocation_integrator_internal.hpp"
+#include "old_collocation_integrator.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/polynomial.hpp"
 #include "casadi/core/matrix/sparsity_tools.hpp"
@@ -38,9 +38,9 @@ namespace casadi {
   extern "C"
   int CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT
   casadi_register_integrator_oldcollocation(IntegratorInternal::Plugin* plugin) {
-    plugin->creator = OldCollocationIntegratorInternal::creator;
+    plugin->creator = OldCollocationIntegrator::creator;
     plugin->name = "oldcollocation";
-    plugin->doc = OldCollocationIntegratorInternal::meta_doc.c_str();
+    plugin->doc = OldCollocationIntegrator::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -50,7 +50,7 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_oldcollocation);
   }
 
-  OldCollocationIntegratorInternal::OldCollocationIntegratorInternal(const Function& f,
+  OldCollocationIntegrator::OldCollocationIntegrator(const Function& f,
                                                                      const Function& g)
       : IntegratorInternal(f, g) {
     addOption("number_of_finite_elements",     OT_INTEGER,  20,
@@ -76,17 +76,17 @@ namespace casadi {
     setOption("name", "unnamed_old_collocation_integrator");
   }
 
-  void OldCollocationIntegratorInternal::deepCopyMembers(
+  void OldCollocationIntegrator::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     IntegratorInternal::deepCopyMembers(already_copied);
     startup_integrator_ = deepcopy(startup_integrator_, already_copied);
     implicit_solver_ = deepcopy(implicit_solver_, already_copied);
   }
 
-  OldCollocationIntegratorInternal::~OldCollocationIntegratorInternal() {
+  OldCollocationIntegrator::~OldCollocationIntegrator() {
   }
 
-  void OldCollocationIntegratorInternal::init() {
+  void OldCollocationIntegrator::init() {
 
     // Call the base class init
     IntegratorInternal::init();
@@ -419,7 +419,7 @@ namespace casadi {
     integrated_once_ = false;
   }
 
-  void OldCollocationIntegratorInternal::reset() {
+  void OldCollocationIntegrator::reset() {
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
@@ -530,13 +530,13 @@ namespace casadi {
     integrated_once_ = true;
   }
 
-  void OldCollocationIntegratorInternal::integrate(double t_out) {
+  void OldCollocationIntegrator::integrate(double t_out) {
     for (int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind) {
       output(oind).set(implicit_solver_.output(1+oind));
     }
   }
 
-  void OldCollocationIntegratorInternal::integrateB(double t_out) {
+  void OldCollocationIntegrator::integrateB(double t_out) {
   }
 
 } // namespace casadi

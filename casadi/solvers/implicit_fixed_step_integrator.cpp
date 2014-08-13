@@ -20,7 +20,7 @@
  *
  */
 
-#include "implicit_fixed_step_integrator_internal.hpp"
+#include "implicit_fixed_step_integrator.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
@@ -31,28 +31,28 @@
 using namespace std;
 namespace casadi {
 
-  ImplicitFixedStepIntegratorInternal::ImplicitFixedStepIntegratorInternal(const Function& f,
+  ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(const Function& f,
                                                                            const Function& g)
-      : FixedStepIntegratorInternal(f, g) {
+      : FixedStepIntegrator(f, g) {
     addOption("implicit_solver",               OT_STRING,  GenericType(),
               "An implicit function solver");
     addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the NLP Solver");
   }
 
-  void ImplicitFixedStepIntegratorInternal::deepCopyMembers(
+  void ImplicitFixedStepIntegrator::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FixedStepIntegratorInternal::deepCopyMembers(already_copied);
+    FixedStepIntegrator::deepCopyMembers(already_copied);
     implicit_solver_ = deepcopy(implicit_solver_, already_copied);
     backward_implicit_solver_ = deepcopy(backward_implicit_solver_, already_copied);
   }
 
-  ImplicitFixedStepIntegratorInternal::~ImplicitFixedStepIntegratorInternal() {
+  ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator() {
   }
 
-  void ImplicitFixedStepIntegratorInternal::init() {
+  void ImplicitFixedStepIntegrator::init() {
     // Call the base class init
-    FixedStepIntegratorInternal::init();
+    FixedStepIntegrator::init();
 
     // Get the NLP creator function
     std::string implicit_function_name = getOption("implicit_solver");

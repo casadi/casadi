@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP
-#define CASADI_OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_OLD_COLLOCATION_INTEGRATOR_HPP
+#define CASADI_OLD_COLLOCATION_INTEGRATOR_HPP
 
 #include "casadi/core/function/integrator_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
@@ -52,30 +52,30 @@ namespace casadi {
      \date 2011
   */
   class CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT
-  OldCollocationIntegratorInternal : public IntegratorInternal {
+  OldCollocationIntegrator : public IntegratorInternal {
 
   public:
 
     /// Constructor
-    explicit OldCollocationIntegratorInternal(const Function& f, const Function& g);
+    explicit OldCollocationIntegrator(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Clone
-    virtual OldCollocationIntegratorInternal* clone() const
-    { return new OldCollocationIntegratorInternal(*this);}
+    virtual OldCollocationIntegrator* clone() const
+    { return new OldCollocationIntegrator(*this);}
 
     /// Create a new integrator
-    virtual OldCollocationIntegratorInternal* create(const Function& f, const Function& g) const
-    { return new OldCollocationIntegratorInternal(f, g);}
+    virtual OldCollocationIntegrator* create(const Function& f, const Function& g) const
+    { return new OldCollocationIntegrator(f, g);}
 
     /** \brief  Create a new integrator */
     static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new OldCollocationIntegratorInternal(f, g);}
+    { return new OldCollocationIntegrator(f, g);}
 
     /// Destructor
-    virtual ~OldCollocationIntegratorInternal();
+    virtual ~OldCollocationIntegrator();
 
     /// Initialize stage
     virtual void init();
@@ -114,4 +114,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_OLD_COLLOCATION_INTEGRATOR_HPP

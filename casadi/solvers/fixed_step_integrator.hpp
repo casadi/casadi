@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
-#define CASADI_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_FIXED_STEP_INTEGRATOR_HPP
+#define CASADI_FIXED_STEP_INTEGRATOR_HPP
 
 #include "casadi/core/function/integrator_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
@@ -30,24 +30,24 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  class CASADI_INTEGRATOR_RK_EXPORT FixedStepIntegratorInternal
+  class CASADI_INTEGRATOR_RK_EXPORT FixedStepIntegrator
     : public IntegratorInternal {
   public:
 
     /// Constructor
-    explicit FixedStepIntegratorInternal(const Function& f, const Function& g);
+    explicit FixedStepIntegrator(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Clone
-    virtual FixedStepIntegratorInternal* clone() const = 0;
+    virtual FixedStepIntegrator* clone() const = 0;
 
     /// Create a new integrator
-    virtual FixedStepIntegratorInternal* create(const Function& f, const Function& g) const = 0;
+    virtual FixedStepIntegrator* create(const Function& f, const Function& g) const = 0;
 
     /// Destructor
-    virtual ~FixedStepIntegratorInternal();
+    virtual ~FixedStepIntegrator();
 
     /// Initialize stage
     virtual void init();
@@ -104,4 +104,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_FIXED_STEP_INTEGRATOR_HPP

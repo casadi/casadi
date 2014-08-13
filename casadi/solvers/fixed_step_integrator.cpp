@@ -20,7 +20,7 @@
  *
  */
 
-#include "fixed_step_integrator_internal.hpp"
+#include "fixed_step_integrator.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
@@ -31,23 +31,23 @@
 using namespace std;
 namespace casadi {
 
-  FixedStepIntegratorInternal::FixedStepIntegratorInternal(const Function& f,
+  FixedStepIntegrator::FixedStepIntegrator(const Function& f,
                                                            const Function& g)
       : IntegratorInternal(f, g) {
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
 
-  void FixedStepIntegratorInternal::deepCopyMembers(
+  void FixedStepIntegrator::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     IntegratorInternal::deepCopyMembers(already_copied);
     F_ = deepcopy(F_, already_copied);
     G_ = deepcopy(G_, already_copied);
   }
 
-  FixedStepIntegratorInternal::~FixedStepIntegratorInternal() {
+  FixedStepIntegrator::~FixedStepIntegrator() {
   }
 
-  void FixedStepIntegratorInternal::init() {
+  void FixedStepIntegrator::init() {
     // Call the base class init
     IntegratorInternal::init();
 
@@ -72,7 +72,7 @@ namespace casadi {
     }
   }
 
-  void FixedStepIntegratorInternal::integrate(double t_out) {
+  void FixedStepIntegrator::integrate(double t_out) {
     // Get discrete time sought
     int k_out = std::ceil((t_out-t0_)/h_);
     k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
@@ -109,7 +109,7 @@ namespace casadi {
     }
   }
 
-  void FixedStepIntegratorInternal::integrateB(double t_out) {
+  void FixedStepIntegrator::integrateB(double t_out) {
     // Get discrete time sought
     int k_out = std::floor((t_out-t0_)/h_);
     k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
@@ -143,7 +143,7 @@ namespace casadi {
     }
   }
 
-  void FixedStepIntegratorInternal::reset() {
+  void FixedStepIntegrator::reset() {
     // Reset the base classes
     IntegratorInternal::reset();
 
@@ -159,7 +159,7 @@ namespace casadi {
     }
   }
 
-  void FixedStepIntegratorInternal::resetB() {
+  void FixedStepIntegrator::resetB() {
     // Reset the base classes
     IntegratorInternal::resetB();
 
@@ -170,11 +170,11 @@ namespace casadi {
     calculateInitialConditionsB();
   }
 
-  void FixedStepIntegratorInternal::calculateInitialConditions() {
+  void FixedStepIntegrator::calculateInitialConditions() {
     Z_.set(numeric_limits<double>::quiet_NaN());
   }
 
-  void FixedStepIntegratorInternal::calculateInitialConditionsB() {
+  void FixedStepIntegrator::calculateInitialConditionsB() {
     RZ_.set(numeric_limits<double>::quiet_NaN());
   }
 

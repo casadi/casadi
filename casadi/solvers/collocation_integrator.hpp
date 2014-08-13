@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef CASADI_COLLOCATION_INTEGRATOR_INTERNAL_HPP
-#define CASADI_COLLOCATION_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_COLLOCATION_INTEGRATOR_HPP
+#define CASADI_COLLOCATION_INTEGRATOR_HPP
 
-#include "implicit_fixed_step_integrator_internal.hpp"
+#include "implicit_fixed_step_integrator.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/function/implicit_function.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
@@ -51,30 +51,30 @@ namespace casadi {
      \author Joel Andersson
      \date 2014
   */
-  class CASADI_INTEGRATOR_COLLOCATION_EXPORT CollocationIntegratorInternal :
-        public ImplicitFixedStepIntegratorInternal {
+  class CASADI_INTEGRATOR_COLLOCATION_EXPORT CollocationIntegrator :
+        public ImplicitFixedStepIntegrator {
   public:
 
     /// Constructor
-    explicit CollocationIntegratorInternal(const Function& f, const Function& g);
+    explicit CollocationIntegrator(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Clone
-    virtual CollocationIntegratorInternal* clone() const
-    { return new CollocationIntegratorInternal(*this);}
+    virtual CollocationIntegrator* clone() const
+    { return new CollocationIntegrator(*this);}
 
     /// Create a new integrator
-    virtual CollocationIntegratorInternal* create(const Function& f, const Function& g) const
-    { return new CollocationIntegratorInternal(f, g);}
+    virtual CollocationIntegrator* create(const Function& f, const Function& g) const
+    { return new CollocationIntegrator(f, g);}
 
     /** \brief  Create a new integrator */
     static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new CollocationIntegratorInternal(f, g);}
+    { return new CollocationIntegrator(f, g);}
 
     /// Destructor
-    virtual ~CollocationIntegratorInternal();
+    virtual ~CollocationIntegrator();
 
     /// Initialize stage
     virtual void init();
@@ -101,4 +101,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_COLLOCATION_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_COLLOCATION_INTEGRATOR_HPP

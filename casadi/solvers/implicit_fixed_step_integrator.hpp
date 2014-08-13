@@ -20,35 +20,35 @@
  *
  */
 
-#ifndef CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
-#define CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_HPP
+#define CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_HPP
 
-#include "fixed_step_integrator_internal.hpp"
+#include "fixed_step_integrator.hpp"
 #include "casadi/core/function/implicit_function.hpp"
 #include <casadi/solvers/casadi_integrator_collocation_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  class CASADI_INTEGRATOR_COLLOCATION_EXPORT ImplicitFixedStepIntegratorInternal
-      : public FixedStepIntegratorInternal {
+  class CASADI_INTEGRATOR_COLLOCATION_EXPORT ImplicitFixedStepIntegrator
+      : public FixedStepIntegrator {
   public:
 
     /// Constructor
-    explicit ImplicitFixedStepIntegratorInternal(const Function& f, const Function& g);
+    explicit ImplicitFixedStepIntegrator(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Clone
-    virtual ImplicitFixedStepIntegratorInternal* clone() const = 0;
+    virtual ImplicitFixedStepIntegrator* clone() const = 0;
 
     /// Create a new integrator
-    virtual ImplicitFixedStepIntegratorInternal* create(const Function& f,
+    virtual ImplicitFixedStepIntegrator* create(const Function& f,
                                                         const Function& g) const = 0;
 
     /// Destructor
-    virtual ~ImplicitFixedStepIntegratorInternal();
+    virtual ~ImplicitFixedStepIntegrator();
 
     /// Initialize stage
     virtual void init();
@@ -66,4 +66,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_HPP

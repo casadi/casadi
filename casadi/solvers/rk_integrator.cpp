@@ -20,7 +20,7 @@
  *
  */
 
-#include "rk_integrator_internal.hpp"
+#include "rk_integrator.hpp"
 #include "casadi/core/mx/mx_tools.hpp"
 
 using namespace std;
@@ -28,9 +28,9 @@ namespace casadi {
 
   extern "C"
   int CASADI_INTEGRATOR_RK_EXPORT casadi_register_integrator_rk(IntegratorInternal::Plugin* plugin) {
-    plugin->creator = RKIntegratorInternal::creator;
+    plugin->creator = RkIntegrator::creator;
     plugin->name = "rk";
-    plugin->doc = RKIntegratorInternal::meta_doc.c_str();
+    plugin->doc = RkIntegrator::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -40,28 +40,28 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_rk);
   }
 
-  RKIntegratorInternal::RKIntegratorInternal(const Function& f, const Function& g) :
-      FixedStepIntegratorInternal(f, g) {
+  RkIntegrator::RkIntegrator(const Function& f, const Function& g) :
+      FixedStepIntegrator(f, g) {
   }
 
-  void RKIntegratorInternal::deepCopyMembers(
+  void RkIntegrator::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    FixedStepIntegratorInternal::deepCopyMembers(already_copied);
+    FixedStepIntegrator::deepCopyMembers(already_copied);
   }
 
-  RKIntegratorInternal::~RKIntegratorInternal() {
+  RkIntegrator::~RkIntegrator() {
   }
 
-  void RKIntegratorInternal::init() {
+  void RkIntegrator::init() {
     // Call the base class init
-    FixedStepIntegratorInternal::init();
+    FixedStepIntegrator::init();
 
     // Algebraic variables not (yet?) supported
     casadi_assert_message(nz_==0 && nrz_==0,
                           "Explicit Runge-Kutta integrators do not support algebraic variables");
   }
 
-  void RKIntegratorInternal::setupFG() {
+  void RkIntegrator::setupFG() {
 
     // Symbolic inputs
     MX x0 = MX::sym("x0", f_.input(DAE_X).sparsity());

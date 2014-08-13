@@ -20,7 +20,7 @@
  *
  */
 
-#include "collocation_integrator_internal.hpp"
+#include "collocation_integrator.hpp"
 #include "casadi/core/polynomial.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/sparsity_tools.hpp"
@@ -34,9 +34,9 @@ namespace casadi {
 
   extern "C"
   int CASADI_INTEGRATOR_COLLOCATION_EXPORT casadi_register_integrator_collocation(IntegratorInternal::Plugin* plugin){
-    plugin->creator = CollocationIntegratorInternal::creator;
+    plugin->creator = CollocationIntegrator::creator;
     plugin->name = "collocation";
-    plugin->doc = CollocationIntegratorInternal::meta_doc.c_str();
+    plugin->doc = CollocationIntegrator::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -46,9 +46,9 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  CollocationIntegratorInternal::CollocationIntegratorInternal(const Function& f,
+  CollocationIntegrator::CollocationIntegrator(const Function& f,
                                                                const Function& g)
-      : ImplicitFixedStepIntegratorInternal(f, g) {
+      : ImplicitFixedStepIntegrator(f, g) {
     addOption("interpolation_order",           OT_INTEGER,  3,
               "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",
@@ -56,22 +56,22 @@ namespace casadi {
     setOption("name", "unnamed_collocation_integrator");
   }
 
-  void CollocationIntegratorInternal::deepCopyMembers(
+  void CollocationIntegrator::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    ImplicitFixedStepIntegratorInternal::deepCopyMembers(already_copied);
+    ImplicitFixedStepIntegrator::deepCopyMembers(already_copied);
   }
 
-  CollocationIntegratorInternal::~CollocationIntegratorInternal() {
+  CollocationIntegrator::~CollocationIntegrator() {
   }
 
-  void CollocationIntegratorInternal::init() {
+  void CollocationIntegrator::init() {
 
     // Call the base class init
-    ImplicitFixedStepIntegratorInternal::init();
+    ImplicitFixedStepIntegrator::init();
 
   }
 
-  void CollocationIntegratorInternal::setupFG() {
+  void CollocationIntegrator::setupFG() {
 
     // Interpolation order
     deg_ = getOption("interpolation_order");
@@ -285,11 +285,11 @@ namespace casadi {
   }
 
 
-  double CollocationIntegratorInternal::zeroIfSmall(double x) {
+  double CollocationIntegrator::zeroIfSmall(double x) {
     return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
   }
 
-  void CollocationIntegratorInternal::calculateInitialConditions() {
+  void CollocationIntegrator::calculateInitialConditions() {
     vector<double>::const_iterator x0_it = input(INTEGRATOR_X0).begin();
     vector<double>::const_iterator z_it = input(INTEGRATOR_Z0).begin();
     vector<double>::iterator Z_it = Z_.begin();
@@ -302,7 +302,7 @@ namespace casadi {
     casadi_assert(Z_it==Z_.end());
   }
 
-  void CollocationIntegratorInternal::calculateInitialConditionsB() {
+  void CollocationIntegrator::calculateInitialConditionsB() {
     vector<double>::const_iterator rx0_it = input(INTEGRATOR_RX0).begin();
     vector<double>::const_iterator rz_it = input(INTEGRATOR_RZ0).begin();
     vector<double>::iterator RZ_it = RZ_.begin();

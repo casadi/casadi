@@ -2,27 +2,27 @@ cmake_minimum_required(VERSION 2.6)
 
 # Explicit Runge-Kutta integrator
 casadi_plugin(Integrator rk
-  fixed_step_integrator_internal.hpp
-  fixed_step_integrator_internal.cpp
-  rk_integrator_internal.hpp
-  rk_integrator_internal.cpp
-  rk_integrator_internal_meta.cpp)
+  fixed_step_integrator.hpp
+  fixed_step_integrator.cpp
+  rk_integrator.hpp
+  rk_integrator.cpp
+  rk_integrator_meta.cpp)
 
 # Collocation integrator
 casadi_plugin(Integrator collocation
-  implicit_fixed_step_integrator_internal.hpp
-  implicit_fixed_step_integrator_internal.cpp
-  collocation_integrator_internal.hpp
-  collocation_integrator_internal.cpp
-  collocation_integrator_internal_meta.cpp
+  implicit_fixed_step_integrator.hpp
+  implicit_fixed_step_integrator.cpp
+  collocation_integrator.hpp
+  collocation_integrator.cpp
+  collocation_integrator_meta.cpp
   )
 target_link_libraries(casadi_integrator_collocation casadi_integrator_rk)
 
 # Old (all-at-once) collocation integrator
 casadi_plugin(Integrator oldcollocation
-  old_collocation_integrator_internal.hpp
-  old_collocation_integrator_internal.cpp
-  old_collocation_integrator_internal_meta.cpp)
+  old_collocation_integrator.hpp
+  old_collocation_integrator.cpp
+  old_collocation_integrator_meta.cpp)
 
 casadi_plugin(ImplicitFunction newton
   newton_implicit_internal.hpp   newton_implicit_internal.cpp

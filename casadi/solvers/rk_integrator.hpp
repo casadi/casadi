@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef CASADI_RK_INTEGRATOR_INTERNAL_HPP
-#define CASADI_RK_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_RK_INTEGRATOR_HPP
+#define CASADI_RK_INTEGRATOR_HPP
 
-#include "fixed_step_integrator_internal.hpp"
+#include "fixed_step_integrator.hpp"
 #include <casadi/solvers/casadi_integrator_rk_export.h>
 
 /** \defgroup plugin_Integrator_rk
@@ -46,28 +46,28 @@ namespace casadi {
       \author Joel Andersson
       \date 2011-2014
   */
-  class CASADI_INTEGRATOR_RK_EXPORT RKIntegratorInternal : public FixedStepIntegratorInternal {
+  class CASADI_INTEGRATOR_RK_EXPORT RkIntegrator : public FixedStepIntegrator {
   public:
 
     /// Constructor
-    explicit RKIntegratorInternal(const Function& f, const Function& g);
+    explicit RkIntegrator(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Clone
-    virtual RKIntegratorInternal* clone() const { return new RKIntegratorInternal(*this);}
+    virtual RkIntegrator* clone() const { return new RkIntegrator(*this);}
 
     /// Create a new integrator
-    virtual RKIntegratorInternal* create(const Function& f, const Function& g) const
-    { return new RKIntegratorInternal(f, g);}
+    virtual RkIntegrator* create(const Function& f, const Function& g) const
+    { return new RkIntegrator(f, g);}
 
     /** \brief  Create a new integrator */
     static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new RKIntegratorInternal(f, g);}
+    { return new RkIntegrator(f, g);}
 
     /// Destructor
-    virtual ~RKIntegratorInternal();
+    virtual ~RkIntegrator();
 
     /// Initialize stage
     virtual void init();
@@ -83,4 +83,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_RK_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_RK_INTEGRATOR_HPP

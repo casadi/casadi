@@ -21,10 +21,10 @@
  */
 
 
-      #include "old_collocation_integrator_internal.hpp"
+      #include "old_collocation_integrator.hpp"
       #include <string>
 
-      const std::string casadi::OldCollocationIntegratorInternal::meta_doc=
+      const std::string casadi::OldCollocationIntegrator::meta_doc=
       "\n"
 "Collocation integrator ODE/DAE integrator based on collocation\n"
 "\n"
