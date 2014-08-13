@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_STABILIZED_SQIC_INTERNAL_HPP
-#define CASADI_STABILIZED_SQIC_INTERNAL_HPP
+#ifndef CASADI_STABILIZED_SQIC_INTERFACE_HPP
+#define CASADI_STABILIZED_SQIC_INTERFACE_HPP
 
 #include "casadi/core/function/stabilized_qp_solver_internal.hpp"
 #include <casadi/interfaces/sqic/casadi_stabilizedqpsolver_sqic_export.h>
@@ -40,24 +40,24 @@ namespace casadi {
   *  @copydoc StabilizedQpSolver_doc
   *  @copydoc plugin_StabilizedQpSolver_sqic
   */
-  class CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT StabilizedSQICInternal
+  class CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT StabilizedSqicInterface
     : public StabilizedQpSolverInternal {
   public:
     /** \brief  Constructor */
-    explicit StabilizedSQICInternal();
+    explicit StabilizedSqicInterface();
 
     /** \brief  Clone */
-    virtual StabilizedSQICInternal* clone() const;
+    virtual StabilizedSqicInterface* clone() const;
 
     /** \brief  Create a new QP Solver */
     static StabilizedQpSolverInternal* creator(const QPStructure& st)
-    { return new StabilizedSQICInternal(st);}
+    { return new StabilizedSqicInterface(st);}
 
     /** \brief  Create a new Solver */
-    explicit StabilizedSQICInternal(const std::vector<Sparsity>& st);
+    explicit StabilizedSqicInterface(const std::vector<Sparsity>& st);
 
     /** \brief  Destructor */
-    virtual ~StabilizedSQICInternal();
+    virtual ~StabilizedSqicInterface();
 
     /** \brief  Initialize */
     virtual void init();
@@ -119,4 +119,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_STABILIZED_SQIC_INTERNAL_HPP
+#endif // CASADI_STABILIZED_SQIC_INTERFACE_HPP

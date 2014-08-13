@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_SQIC_INTERNAL_HPP
-#define CASADI_SQIC_INTERNAL_HPP
+#ifndef CASADI_SQIC_INTERFACE_HPP
+#define CASADI_SQIC_INTERFACE_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include <casadi/interfaces/sqic/casadi_qpsolver_sqic_export.h>
@@ -43,23 +43,23 @@ namespace casadi {
        \date 2013
 
   */
-  class CASADI_QPSOLVER_SQIC_EXPORT SQICInternal : public QpSolverInternal {
+  class CASADI_QPSOLVER_SQIC_EXPORT SqicInterface : public QpSolverInternal {
   public:
     /** \brief  Constructor */
-    explicit SQICInternal();
+    explicit SqicInterface();
 
     /** \brief  Clone */
-    virtual SQICInternal* clone() const;
+    virtual SqicInterface* clone() const;
 
     /** \brief  Create a new QP Solver */
     static QpSolverInternal* creator(const QPStructure& st)
-    { return new SQICInternal(st);}
+    { return new SqicInterface(st);}
 
     /** \brief  Create a new Solver */
-    explicit SQICInternal(const std::vector<Sparsity>& st);
+    explicit SqicInterface(const std::vector<Sparsity>& st);
 
     /** \brief  Destructor */
-    virtual ~SQICInternal();
+    virtual ~SqicInterface();
 
     /** \brief  Initialize */
     virtual void init();
@@ -120,4 +120,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_SQIC_INTERNAL_HPP
+#endif // CASADI_SQIC_INTERFACE_HPP

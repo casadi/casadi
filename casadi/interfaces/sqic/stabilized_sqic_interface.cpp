@@ -20,7 +20,7 @@
  *
  */
 
-#include "stabilized_sqic_internal.hpp"
+#include "stabilized_sqic_interface.hpp"
 
 #include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
@@ -38,9 +38,9 @@ namespace casadi {
   extern "C"
   int CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT
   casadi_register_stabilizedqpsolver_sqic(StabilizedQpSolverInternal::Plugin* plugin) {
-    plugin->creator = StabilizedSQICInternal::creator;
+    plugin->creator = StabilizedSqicInterface::creator;
     plugin->name = "sqic";
-    plugin->doc = StabilizedSQICInternal::meta_doc.c_str();
+    plugin->doc = StabilizedSqicInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -50,24 +50,24 @@ namespace casadi {
     StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_sqic);
   }
 
-  StabilizedSQICInternal* StabilizedSQICInternal::clone() const {
+  StabilizedSqicInterface* StabilizedSqicInterface::clone() const {
     // Return a deep copy
-    StabilizedSQICInternal* node = new StabilizedSQICInternal(st_);
+    StabilizedSqicInterface* node = new StabilizedSqicInterface(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  StabilizedSQICInternal::StabilizedSQICInternal(const std::vector<Sparsity>& st)
+  StabilizedSqicInterface::StabilizedSqicInterface(const std::vector<Sparsity>& st)
     : StabilizedQpSolverInternal(st) {
     is_init_ = false;
   }
 
-  StabilizedSQICInternal::~StabilizedSQICInternal() {
+  StabilizedSqicInterface::~StabilizedSqicInterface() {
     sqicDestroy();
   }
 
-  void StabilizedSQICInternal::evaluate() {
+  void StabilizedSqicInterface::evaluate() {
     if (inputs_check_) checkInputs();
 
     std::copy(input(STABILIZED_QP_SOLVER_X0).begin(),
@@ -116,7 +116,7 @@ namespace casadi {
     output(QP_SOLVER_COST)[0]+= x_[n_+nc_];
   }
 
-  void StabilizedSQICInternal::init() {
+  void StabilizedSqicInterface::init() {
     // Call the init method of the base class
     StabilizedQpSolverInternal::init();
 
@@ -178,15 +178,15 @@ namespace casadi {
          &input(STABILIZED_QP_SOLVER_H).data()[0]);
   }
 
-  map<int, string> StabilizedSQICInternal::calc_flagmap() {
+  map<int, string> StabilizedSqicInterface::calc_flagmap() {
     map<int, string> f;
 
     return f;
   }
 
-  map<int, string> StabilizedSQICInternal::flagmap = StabilizedSQICInternal::calc_flagmap();
+  map<int, string> StabilizedSqicInterface::flagmap = StabilizedSqicInterface::calc_flagmap();
 
-  void StabilizedSQICInternal::sqic_error(const string& module, int flag) {
+  void StabilizedSqicInterface::sqic_error(const string& module, int flag) {
     // Find the error
     map<int, string>::const_iterator it = flagmap.find(flag);
 
@@ -200,7 +200,7 @@ namespace casadi {
     casadi_error(ss.str());
   }
 
-  void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
+  void StabilizedSqicInterface::generateNativeCode(std::ostream& file) const {
 
     // Dump the contents of resource_sqic, but filter out the C bind stuff
     std::string resource_sqic_input(resource_sqic);

@@ -8,15 +8,15 @@ embed_resource("sqic" "wsqic.f90" resource_file)
 message("including: ${resource_file}")
 
 casadi_plugin(QpSolver sqic
-  sqic_internal.hpp
-  sqic_internal.cpp
-  sqic_internal_meta.cpp
+  sqic_interface.hpp
+  sqic_interface.cpp
+  sqic_interface_meta.cpp
   ${resource_file})
 
 casadi_plugin(StabilizedQpSolver sqic
-  stabilized_sqic_internal.hpp
-  stabilized_sqic_internal.cpp
-  stabilized_sqic_internal_meta.cpp
+  stabilized_sqic_interface.hpp
+  stabilized_sqic_interface.cpp
+  stabilized_sqic_interface_meta.cpp
   ${resource_file})
 casadi_plugin_link_libraries(StabilizedQpSolver sqic casadi_qpsolver_sqic)
 

@@ -20,7 +20,7 @@
  *
  */
 
-#include "sqic_internal.hpp"
+#include "sqic_interface.hpp"
 #include "casadi/core/function/qp_solver.hpp"
 
 #include "casadi/core/matrix/sparsity_tools.hpp"
@@ -39,9 +39,9 @@ namespace casadi {
   extern "C"
   int CASADI_QPSOLVER_SQIC_EXPORT
   casadi_register_qpsolver_sqic(QpSolverInternal::Plugin* plugin) {
-    plugin->creator = SQICInternal::creator;
+    plugin->creator = SqicInterface::creator;
     plugin->name = "sqic";
-    plugin->doc = SQICInternal::meta_doc.c_str();
+    plugin->doc = SqicInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -51,23 +51,23 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_sqic);
   }  
 
-  SQICInternal* SQICInternal::clone() const {
+  SqicInterface* SqicInterface::clone() const {
     // Return a deep copy
-    SQICInternal* node = new SQICInternal(st_);
+    SqicInterface* node = new SqicInterface(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  SQICInternal::SQICInternal(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  SqicInterface::SqicInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
     is_init_ = false;
   }
 
-  SQICInternal::~SQICInternal() {
+  SqicInterface::~SqicInterface() {
     sqicDestroy();
   }
 
-  void SQICInternal::evaluate() {
+  void SqicInterface::evaluate() {
     if (inputs_check_) checkInputs();
 
     std::copy(input(QP_SOLVER_X0).begin(), input(QP_SOLVER_X0).end(), x_.begin());
@@ -102,7 +102,7 @@ namespace casadi {
     output(QP_SOLVER_COST)[0]+= x_[n_+nc_];
   }
 
-  void SQICInternal::init() {
+  void SqicInterface::init() {
     // Call the init method of the base class
     QpSolverInternal::init();
 
@@ -164,15 +164,15 @@ namespace casadi {
 
   }
 
-  map<int, string> SQICInternal::calc_flagmap() {
+  map<int, string> SqicInterface::calc_flagmap() {
     map<int, string> f;
 
     return f;
   }
 
-  map<int, string> SQICInternal::flagmap = SQICInternal::calc_flagmap();
+  map<int, string> SqicInterface::flagmap = SqicInterface::calc_flagmap();
 
-  void SQICInternal::sqic_error(const string& module, int flag) {
+  void SqicInterface::sqic_error(const string& module, int flag) {
     // Find the error
     map<int, string>::const_iterator it = flagmap.find(flag);
 
@@ -186,7 +186,7 @@ namespace casadi {
     casadi_error(ss.str());
   }
 
-  void SQICInternal::generateNativeCode(std::ostream& file) const {
+  void SqicInterface::generateNativeCode(std::ostream& file) const {
     // Dump the contents of resource_sqic, but filter out the C bind stuff
     std::string resource_sqic_input(resource_sqic);
     std::istringstream stream(resource_sqic_input);

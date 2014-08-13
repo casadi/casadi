@@ -21,12 +21,12 @@
  */
 
 
-      #include "sqic_internal.hpp"
+      #include "stabilized_sqic_interface.hpp"
       #include <string>
 
-      const std::string casadi::SQICInternal::meta_doc=
+      const std::string casadi::StabilizedSqicInterface::meta_doc=
       "\n"
-"Interface to the SQIC solver for quadratic programming\n"
+"Interface to SQIC\n"
 "\n"
 "\n"
 ">List of available options\n"
