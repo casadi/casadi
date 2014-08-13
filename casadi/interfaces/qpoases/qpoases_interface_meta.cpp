@@ -21,10 +21,10 @@
  */
 
 
-      #include "qpoases_internal.hpp"
+      #include "qpoases_interface.hpp"
       #include <string>
 
-      const std::string casadi::QPOasesInternal::meta_doc=
+      const std::string casadi::QpoasesInterface::meta_doc=
       "\n"
 "Interface to QPOases Solver for quadratic programming\n"
 "\n"

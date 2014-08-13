@@ -20,7 +20,7 @@
  *
  */
 
-#include "qpoases_internal.hpp"
+#include "qpoases_interface.hpp"
 
 #include "../../core/std_vector_tools.hpp"
 #include "../../core/matrix/matrix_tools.hpp"
@@ -34,9 +34,9 @@ namespace casadi {
   extern "C"
   int CASADI_QPSOLVER_QPOASES_EXPORT
   casadi_register_qpsolver_qpoases(QpSolverInternal::Plugin* plugin) {
-    plugin->creator = QPOasesInternal::creator;
+    plugin->creator = QpoasesInterface::creator;
     plugin->name = "qpoases";
-    plugin->doc = QPOasesInternal::meta_doc.c_str();
+    plugin->doc = QpoasesInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -46,15 +46,15 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_qpoases);
   }
 
-  QPOasesInternal* QPOasesInternal::clone() const {
+  QpoasesInterface* QpoasesInterface::clone() const {
     // Return a deep copy
-    QPOasesInternal* node = new QPOasesInternal(st_);
+    QpoasesInterface* node = new QpoasesInterface(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  QPOasesInternal::QPOasesInternal(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  QpoasesInterface::QpoasesInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
     addOption("nWSR",                   OT_INTEGER,     GenericType(),
               "The maximum number of working set recalculations to be performed during "
               "the initial homotopy. Default is 5(nx + nc)");
@@ -136,11 +136,11 @@ namespace casadi {
     qp_ = 0;
   }
 
-  QPOasesInternal::~QPOasesInternal() {
+  QpoasesInterface::~QpoasesInterface() {
     if (qp_!=0) delete qp_;
   }
 
-  void QPOasesInternal::init() {
+  void QpoasesInterface::init() {
     QpSolverInternal::init();
 
     // Read options
@@ -217,7 +217,7 @@ namespace casadi {
 #endif // ALLOW_ALL_OPTIONS
   }
 
-  void QPOasesInternal::evaluate() {
+  void QpoasesInterface::evaluate() {
     if (inputs_check_) checkInputs();
 
     if (verbose()) {
@@ -296,7 +296,7 @@ namespace casadi {
     transform(dual_.begin()+n_, dual_.end(),     output(QP_SOLVER_LAM_A).begin(), negate<double>());
   }
 
-  std::string QPOasesInternal::getErrorMessage(int flag) {
+  std::string QpoasesInterface::getErrorMessage(int flag) {
     switch (flag) {
     case qpOASES::SUCCESSFUL_RETURN:
       return "Successful return.";
@@ -577,7 +577,7 @@ namespace casadi {
     return ss.str();
   }
 
-  bool QPOasesInternal::BooleanType_to_bool(qpOASES::BooleanType b) {
+  bool QpoasesInterface::BooleanType_to_bool(qpOASES::BooleanType b) {
     switch (b) {
     case qpOASES::BT_TRUE:              return true;
     case qpOASES::BT_FALSE:             return false;
@@ -585,11 +585,11 @@ namespace casadi {
     }
   }
 
-  qpOASES::BooleanType QPOasesInternal::bool_to_BooleanType(bool b) {
+  qpOASES::BooleanType QpoasesInterface::bool_to_BooleanType(bool b) {
     return b ? qpOASES::BT_TRUE : qpOASES::BT_FALSE;
   }
 
-  std::string QPOasesInternal::SubjectToStatus_to_string(qpOASES::SubjectToStatus b) {
+  std::string QpoasesInterface::SubjectToStatus_to_string(qpOASES::SubjectToStatus b) {
     switch (b) {
     case qpOASES::ST_INACTIVE:          return "inactive";
     case qpOASES::ST_LOWER:             return "lower";
@@ -600,7 +600,7 @@ namespace casadi {
     }
   }
 
-  qpOASES::SubjectToStatus QPOasesInternal::string_to_SubjectToStatus(std::string b) {
+  qpOASES::SubjectToStatus QpoasesInterface::string_to_SubjectToStatus(std::string b) {
     if (b.compare("inactive")==0) {
       return qpOASES::ST_INACTIVE;
     } else if (b.compare("lower")==0) {
@@ -616,7 +616,7 @@ namespace casadi {
     }
   }
 
-  std::string QPOasesInternal::PrintLevel_to_string(qpOASES::PrintLevel b) {
+  std::string QpoasesInterface::PrintLevel_to_string(qpOASES::PrintLevel b) {
     switch (b) {
     case qpOASES::PL_TABULAR:           return "tabular";
     case qpOASES::PL_NONE:              return "none";
@@ -627,7 +627,7 @@ namespace casadi {
     }
   }
 
-  qpOASES::PrintLevel QPOasesInternal::string_to_PrintLevel(std::string b) {
+  qpOASES::PrintLevel QpoasesInterface::string_to_PrintLevel(std::string b) {
     if (b.compare("tabular")==0) {
       return qpOASES::PL_TABULAR;
     } else if (b.compare("none")==0) {
