@@ -21,10 +21,10 @@
  */
 
 
-      #include "ooqp_internal.hpp"
+      #include "ooqp_interface.hpp"
       #include <string>
 
-      const std::string casadi::OOQPInternal::meta_doc=
+      const std::string casadi::OoqpInterface::meta_doc=
       "\n"
 "Interface to the OOQP Solver for quadratic programming The current\n"
 "implementation assumes that OOQP is configured with the MA27 sparse\n"

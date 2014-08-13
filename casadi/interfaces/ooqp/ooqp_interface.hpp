@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_OOQP_INTERNAL_HPP
-#define CASADI_OOQP_INTERNAL_HPP
+#ifndef CASADI_OOQP_INTERFACE_HPP
+#define CASADI_OOQP_INTERFACE_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include <casadi/interfaces/ooqp/casadi_qpsolver_ooqp_export.h>
@@ -44,24 +44,24 @@ namespace casadi {
       @copydoc plugin_QpSolver_ooqp
 
   */
-  class CASADI_QPSOLVER_OOQP_EXPORT OOQPInternal : public QpSolverInternal {
+  class CASADI_QPSOLVER_OOQP_EXPORT OoqpInterface : public QpSolverInternal {
   public:
 
     /** \brief  Constructor */
-    explicit OOQPInternal();
+    explicit OoqpInterface();
 
     /** \brief  Clone */
-    virtual OOQPInternal* clone() const { return new OOQPInternal(*this);}
+    virtual OoqpInterface* clone() const { return new OoqpInterface(*this);}
 
     /** \brief  Create a new Solver */
-    explicit OOQPInternal(const std::vector<Sparsity>& st);
+    explicit OoqpInterface(const std::vector<Sparsity>& st);
 
     /** \brief  Create a new QP Solver */
     static QpSolverInternal* creator(const QPStructure& st)
-    { return new OOQPInternal(st);}
+    { return new OoqpInterface(st);}
 
     /** \brief  Destructor */
-    virtual ~OOQPInternal();
+    virtual ~OoqpInterface();
 
     /** \brief  Initialize */
     virtual void init();
@@ -112,5 +112,5 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_OOQP_INTERNAL_HPP
+#endif // CASADI_OOQP_INTERFACE_HPP
 

@@ -4,9 +4,9 @@ include_directories(../)
 include_directories(${OOQP_INCLUDE_DIRS})
 
 casadi_plugin(QpSolver ooqp
-  ooqp_internal.hpp
-  ooqp_internal.cpp
-  ooqp_internal_meta.cpp)
+  ooqp_interface.hpp
+  ooqp_interface.cpp
+  ooqp_interface_meta.cpp)
 
 casadi_plugin_link_libraries(QpSolver ooqp ${OOQP_LIBRARIES})
 

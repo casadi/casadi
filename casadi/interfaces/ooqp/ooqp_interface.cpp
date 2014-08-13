@@ -20,7 +20,7 @@
  *
  */
 
-#include "ooqp_internal.hpp"
+#include "ooqp_interface.hpp"
 #include "casadi/core/function/qp_solver.hpp"
 #include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
@@ -42,9 +42,9 @@ namespace casadi {
   extern "C"
   int CASADI_QPSOLVER_OOQP_EXPORT
   casadi_register_qpsolver_ooqp(QpSolverInternal::Plugin* plugin) {
-    plugin->creator = OOQPInternal::creator;
+    plugin->creator = OoqpInterface::creator;
     plugin->name = "ooqp";
-    plugin->doc = OOQPInternal::meta_doc.c_str();
+    plugin->doc = OoqpInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -54,17 +54,17 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_ooqp);
   }
 
-  OOQPInternal::OOQPInternal(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
+  OoqpInterface::OoqpInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
     addOption("print_level", OT_INTEGER, 0,
               "Print level. OOQP listens to print_level 0, 10 and 100");
     addOption("mutol", OT_REAL, 1e-8, "tolerance as provided with setMuTol to OOQP");
     addOption("artol", OT_REAL, 1e-8, "tolerance as provided with setArTol to OOQP");
   }
 
-  OOQPInternal::~OOQPInternal() {
+  OoqpInterface::~OoqpInterface() {
   }
 
-  void OOQPInternal::init() {
+  void OoqpInterface::init() {
     // Initialize the base classes
     QpSolverInternal::init();
 
@@ -109,7 +109,7 @@ namespace casadi {
     pi_.resize(nc_);
   }
 
-  void OOQPInternal::evaluate() {
+  void OoqpInterface::evaluate() {
     // Check inputs for consistency
     if (inputs_check_) checkInputs();
 
@@ -428,7 +428,7 @@ namespace casadi {
     }
   }
 
-  const char* OOQPInternal::errFlag(int flag) {
+  const char* OoqpInterface::errFlag(int flag) {
     // Find the error
     //const char* msg;
     switch (flag) {
@@ -441,7 +441,7 @@ namespace casadi {
     }
   }
 
-  std::string OOQPInternal::printBounds(const std::vector<double>& b,
+  std::string OoqpInterface::printBounds(const std::vector<double>& b,
                                         const std::vector<char>& ib, int n, const char *sign) {
     stringstream ss;
     ss << "[";
