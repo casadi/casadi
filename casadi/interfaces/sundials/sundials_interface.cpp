@@ -20,7 +20,7 @@
  *
  */
 
-#include "sundials_internal.hpp"
+#include "sundials_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/mx/mx_tools.hpp"
@@ -34,7 +34,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-SundialsInternal::SundialsInternal(const Function& f, const Function& g)
+SundialsInterface::SundialsInterface(const Function& f, const Function& g)
     : IntegratorInternal(f, g) {
   addOption("max_num_steps",               OT_INTEGER,          10000,
             "Maximum number of integrator steps");
@@ -124,10 +124,10 @@ SundialsInternal::SundialsInternal(const Function& f, const Function& g)
             "[default: equal to linear_solver_options]");
 }
 
-SundialsInternal::~SundialsInternal() {
+SundialsInterface::~SundialsInterface() {
 }
 
-void SundialsInternal::init() {
+void SundialsInterface::init() {
   // Call the base class method
   IntegratorInternal::init();
 
@@ -235,12 +235,12 @@ void SundialsInternal::init() {
   if (!jac_.isNull()) {
     casadi_assert_message(
       jac_.output().size2()==jac_.output().size1(),
-      "SundialsInternal::init: the jacobian of the forward problem must "
+      "SundialsInterface::init: the jacobian of the forward problem must "
       "be square but got " << jac_.output().dimString());
 
     casadi_assert_message(
       !jac_.output().sparsity().isSingular(),
-      "SundialsInternal::init: singularity - the jacobian of the forward "
+      "SundialsInterface::init: singularity - the jacobian of the forward "
       "problem is structurally rank-deficient. sprank(J)="
       << sprank(jac_.output()) << " (in stead of "<< jac_.output().size2()
       << ")");
@@ -254,12 +254,12 @@ void SundialsInternal::init() {
   if (!jacB_.isNull()) {
     casadi_assert_message(
       jacB_.output().size2()==jacB_.output().size1(),
-      "SundialsInternal::init: the jacobian of the backward problem must be "
+      "SundialsInterface::init: the jacobian of the backward problem must be "
       "square but got " << jacB_.output().dimString());
 
     casadi_assert_message(
       !jacB_.output().sparsity().isSingular(),
-      "SundialsInternal::init: singularity - the jacobian of the backward"
+      "SundialsInterface::init: singularity - the jacobian of the backward"
       " problem is structurally rank-deficient. sprank(J)="
       << sprank(jacB_.output()) << " (instead of "
       << jacB_.output().size2() << ")");
@@ -291,7 +291,7 @@ void SundialsInternal::init() {
   }
 }
 
-void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
+void SundialsInterface::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
   IntegratorInternal::deepCopyMembers(already_copied);
   linsol_ = deepcopy(linsol_, already_copied);
   linsolB_ = deepcopy(linsolB_, already_copied);
@@ -301,7 +301,7 @@ void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>
   g_fwd_ = deepcopy(g_fwd_, already_copied);
 }
 
-void SundialsInternal::reset() {
+void SundialsInterface::reset() {
   // Reset the base classes
   IntegratorInternal::reset();
 }

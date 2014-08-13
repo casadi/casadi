@@ -24,7 +24,7 @@
 #define CASADI_IDAS_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_integrator_idas_export.h>
-#include "sundials_internal.hpp"
+#include "sundials_interface.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
 #include <idas/idas_dense.h>
@@ -53,7 +53,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInternal {
+  class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
 
   public:
 

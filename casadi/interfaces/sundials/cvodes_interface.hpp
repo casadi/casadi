@@ -24,7 +24,7 @@
 #define CASADI_CVODES_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_integrator_cvodes_export.h>
-#include "sundials_internal.hpp"
+#include "sundials_interface.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 #include <cvodes/cvodes.h>            /* prototypes for CVode fcts. and consts. */
 #include <cvodes/cvodes_dense.h>
@@ -56,7 +56,7 @@ namespace casadi {
       @copydoc plugin_Integrator_cvodes
 
   */
-  class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInternal {
+  class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface {
   public:
     /** \brief  Constructor */
     explicit CvodesInterface(const Function& f, const Function& g);

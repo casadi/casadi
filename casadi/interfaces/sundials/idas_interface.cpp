@@ -54,10 +54,10 @@ namespace casadi {
   }
 
   void IdasInterface::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    SundialsInternal::deepCopyMembers(already_copied);
+    SundialsInterface::deepCopyMembers(already_copied);
   }
 
-  IdasInterface::IdasInterface(const Function& f, const Function& g) : SundialsInternal(f, g) {
+  IdasInterface::IdasInterface(const Function& f, const Function& g) : SundialsInterface(f, g) {
     addOption("suppress_algebraic",          OT_BOOLEAN,          false,
               "Supress algebraic variables in the error testing");
     addOption("calc_ic",                     OT_BOOLEAN,          true,
@@ -131,7 +131,7 @@ namespace casadi {
     if (isInit()) freeIDAS();
 
     // Call the base class init
-    SundialsInternal::init();
+    SundialsInterface::init();
 
     // Get initial conditions for the state derivatives
     if (hasSetOption("init_xdot") && !getOption("init_xdot").isNull()) {
@@ -779,7 +779,7 @@ namespace casadi {
     log("IdasInterface::reset", "begin");
 
     // Reset the base classes
-    SundialsInternal::reset();
+    SundialsInterface::reset();
 
     if (nrx_>0 && !isInitTaping_)
       initTaping();

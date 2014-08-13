@@ -9,7 +9,7 @@ endif()
 
 # CVODES
 casadi_plugin(Integrator cvodes
-  sundials_internal.hpp  sundials_internal.cpp
+  sundials_interface.hpp  sundials_interface.cpp
   cvodes_interface.hpp    cvodes_interface.cpp
   cvodes_interface_meta.cpp
   )

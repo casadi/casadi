@@ -54,7 +54,7 @@ namespace casadi {
     return node;
   }
 
-  CvodesInterface::CvodesInterface(const Function& f, const Function& g) : SundialsInternal(f, g) {
+  CvodesInterface::CvodesInterface(const Function& f, const Function& g) : SundialsInterface(f, g) {
     addOption("linear_multistep_method",          OT_STRING,              "bdf",
               "Integrator scheme", "bdf|adams");
     addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",
@@ -108,7 +108,7 @@ namespace casadi {
     if (isInit()) freeCVodes();
 
     // Initialize the base classes
-    SundialsInternal::init();
+    SundialsInterface::init();
 
     // Read options
     monitor_rhsB_  = monitored("resB");
@@ -415,7 +415,7 @@ namespace casadi {
     casadi_log("CvodesInterface::reset begin");
 
     // Reset the base classes
-    SundialsInternal::reset();
+    SundialsInterface::reset();
 
     if (monitored("reset")) {
       cout << "initial state: " << endl;
@@ -532,7 +532,7 @@ namespace casadi {
     casadi_log("CvodesInterface::resetB begin");
 
     // Reset the base classes
-    SundialsInternal::resetB();
+    SundialsInterface::resetB();
 
     int flag;
     if (isInitAdj_) {
@@ -1902,7 +1902,7 @@ namespace casadi {
   }
 
   void CvodesInterface::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    SundialsInternal::deepCopyMembers(already_copied);
+    SundialsInterface::deepCopyMembers(already_copied);
   }
 
   template<typename FunctionType>
