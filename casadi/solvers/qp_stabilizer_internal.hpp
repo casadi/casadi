@@ -47,7 +47,6 @@ namespace casadi {
   */
   class CASADI_STABILIZEDQPSOLVER_QP_EXPORT QPStabilizerInternal
     : public StabilizedQpSolverInternal {
-    friend class QPStabilizer;
   public:
 
     /** \brief Constructor */

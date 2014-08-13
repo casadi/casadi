@@ -57,7 +57,6 @@ namespace casadi {
    \date 2013
   */
   class CASADI_SDQPSOLVER_SDP_EXPORT SDPSDQPInternal : public SdqpSolverInternal {
-    friend class SDPSdqpSolver;
   public:
 
     /** \brief Constructor */

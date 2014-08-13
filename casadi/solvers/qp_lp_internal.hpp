@@ -47,7 +47,6 @@ namespace casadi {
    \date 2013
   */
 class CASADI_LPSOLVER_QP_EXPORT QPLPInternal : public LpSolverInternal {
-  friend class QPLpSolver;
 public:
 
   /** \brief  Create a new Solver */

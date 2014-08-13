@@ -46,7 +46,6 @@ namespace casadi {
    \date 2012
   */
   class CASADI_IMPLICITFUNCTION_NLP_EXPORT NLPImplicitInternal : public ImplicitFunctionInternal {
-    friend class NLPImplicitSolver;
   public:
     /** \brief  Constructor */
     explicit NLPImplicitInternal(const Function& f, const Function& jac,

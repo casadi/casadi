@@ -47,7 +47,6 @@ namespace casadi {
       \date 2013
   */
   class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SocpSolverInternal {
-    friend class SDPSocpSolver;
   public:
 
     /** \brief  Create a new Solver */
