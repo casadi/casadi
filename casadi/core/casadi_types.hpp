@@ -71,6 +71,7 @@ namespace casadi {
   class SymbolicNLP;
   class Variable;
   class SymbolicOCP;
+  class XmlFile;
 
 #ifndef SWIG
   // The number of derivative directions for which the tool has been optimized

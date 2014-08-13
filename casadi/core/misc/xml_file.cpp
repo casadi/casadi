@@ -47,4 +47,12 @@ namespace casadi {
     return (*this)->parse(filename);
   }
 
+  void XmlFile::loadPlugin(const std::string& name) {
+    XmlFileInternal::loadPlugin(name);
+  }
+
+  std::string XmlFile::doc(const std::string& name) {
+    return XmlFileInternal::getPlugin(name).doc;
+  }
+
 } // namespace casadi

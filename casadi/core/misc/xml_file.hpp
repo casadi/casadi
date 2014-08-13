@@ -48,7 +48,14 @@ namespace casadi {
 
     // Destructor
     ~XmlFile();
+    
+    /// Load a plugin dynamically
+    static void loadPlugin(const std::string& name);
 
+    /// Get solver specific documentation
+    static std::string doc(const std::string& name);
+
+#ifndef SWIG
     /** \brief  Access functions of the node */
     XmlFileInternal* operator->();
 
@@ -57,6 +64,7 @@ namespace casadi {
 
     // Parse an XML file
     XmlNode parse(const std::string& filename);
+#endif // SWIG
   };
 
 } // namespace casadi
