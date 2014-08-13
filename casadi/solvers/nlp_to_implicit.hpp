@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_NLP_IMPLICIT_INTERNAL_HPP
-#define CASADI_NLP_IMPLICIT_INTERNAL_HPP
+#ifndef CASADI_NLP_TO_IMPLICIT_HPP
+#define CASADI_NLP_TO_IMPLICIT_HPP
 
 #include "casadi/core/function/implicit_function_internal.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
@@ -45,30 +45,30 @@ namespace casadi {
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NLP_EXPORT NLPImplicitInternal : public ImplicitFunctionInternal {
+  class CASADI_IMPLICITFUNCTION_NLP_EXPORT NlpToImplicit : public ImplicitFunctionInternal {
   public:
     /** \brief  Constructor */
-    explicit NLPImplicitInternal(const Function& f, const Function& jac,
+    explicit NlpToImplicit(const Function& f, const Function& jac,
                                  const LinearSolver& linsol);
 
     /** \brief  Destructor */
-    virtual ~NLPImplicitInternal();
+    virtual ~NlpToImplicit();
 
     /** \brief  Clone */
-    virtual NLPImplicitInternal* clone() const { return new NLPImplicitInternal(*this);}
+    virtual NlpToImplicit* clone() const { return new NlpToImplicit(*this);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual NLPImplicitInternal* create(const Function& f, const Function& jac,
+    virtual NlpToImplicit* create(const Function& f, const Function& jac,
                                         const LinearSolver& linsol) const
-    { return new NLPImplicitInternal(f, jac, linsol);}
+    { return new NlpToImplicit(f, jac, linsol);}
 
     /** \brief  Create a new ImplicitFunction */
     static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
                                              const LinearSolver& linsol)
-    { return new NLPImplicitInternal(f, jac, linsol);}
+    { return new NlpToImplicit(f, jac, linsol);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -86,4 +86,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_NLP_IMPLICIT_INTERNAL_HPP
+#endif // CASADI_NLP_TO_IMPLICIT_HPP
