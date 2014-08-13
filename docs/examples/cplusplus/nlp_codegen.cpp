@@ -26,8 +26,6 @@
 #include <iomanip>
 #include <casadi/casadi.hpp>
 
-extern "C" void casadi_load_nlpsolver_ipopt();
-
 using namespace casadi;
 using namespace std;
 /**
@@ -60,8 +58,6 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
 }
 
 int main(){
-  casadi_load_nlpsolver_ipopt();
-
   /** Test problem 
    * 
    *    min x0^2 + x1^2

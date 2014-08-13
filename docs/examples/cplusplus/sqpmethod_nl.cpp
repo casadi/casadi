@@ -22,8 +22,6 @@
 #include <casadi/casadi.hpp>
 #include <casadi/core/misc/symbolic_nlp.hpp>
 
-extern "C" void casadi_load_nlpsolver_sqpmethod();
- 
 /**
  * This example demonstrates how NL-files, which can be generated
  * by AMPl or Pyomo, can be imported in CasADi and solved using
@@ -37,8 +35,6 @@ extern "C" void casadi_load_nlpsolver_sqpmethod();
 using namespace casadi;
  
 int main(int argc, char **argv){
-  casadi_load_nlpsolver_sqpmethod();
-
   // Get the problem
   std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
 

@@ -40,10 +40,6 @@
 // CasADi core
 #include <casadi/casadi.hpp>
 
-// Declare solvers to be loaded manually
-extern "C" void casadi_load_integrator_cvodes();
-extern "C" void casadi_load_nlpsolver_ipopt();
-
 using namespace casadi;
 using namespace std;
 
@@ -51,9 +47,6 @@ using namespace std;
 double inf = numeric_limits<double>::infinity();
 
 int main(){
-  casadi_load_integrator_cvodes();
-  casadi_load_nlpsolver_ipopt();
-
   // Declare variables
   SX u = SX::sym("u"); // control
   SX r = SX::sym("r"), s = SX::sym("s"); // states

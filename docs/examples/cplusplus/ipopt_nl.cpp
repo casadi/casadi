@@ -31,14 +31,9 @@
  \date 2012
 */
 
-// Load manually
-extern "C" void casadi_load_nlpsolver_ipopt();
-
 using namespace casadi;
 
 int main(int argc, char **argv){
-  casadi_load_nlpsolver_ipopt();
-
   // Get the problem
   std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
   

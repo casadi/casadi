@@ -25,15 +25,6 @@
 #include <iostream>
 #include <iomanip>
 
-// Declare integrators to be loaded manually
-extern "C" void casadi_load_integrator_cvodes();
-extern "C" void casadi_load_integrator_idas();
-extern "C" void casadi_load_integrator_rk();
-extern "C" void casadi_load_integrator_collocation();
-extern "C" void casadi_load_integrator_oldcollocation();
-extern "C" void casadi_load_implicitfunction_kinsol();
-extern "C" void casadi_load_linearsolver_csparse();
-
 using namespace std;
 using namespace casadi;
 
@@ -117,15 +108,6 @@ void simpleDAE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
 
 
 int main(){
-
-  // Load integrators manually
-  casadi_load_integrator_cvodes();
-  casadi_load_integrator_idas();
-  casadi_load_integrator_rk();
-  casadi_load_integrator_collocation();
-  casadi_load_integrator_oldcollocation();
-  casadi_load_implicitfunction_kinsol();
-  casadi_load_linearsolver_csparse();
 
   // For all problems
   enum Problems{ODE,DAE,NUM_PROBLEMS};

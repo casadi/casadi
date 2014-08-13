@@ -23,8 +23,6 @@
 #include <iostream>
 #include <casadi/casadi.hpp>
 
-extern "C" void casadi_load_nlpsolver_ipopt();
-
 using namespace casadi;
 using namespace std;
 
@@ -73,8 +71,6 @@ Function create_integrator(int nj, int nu){
 
 
 int main(){
-  casadi_load_nlpsolver_ipopt();
-
   // Dimensions
   int nj = 1000; // Number of integration steps per control segment
   int nu = 1000; // Number of control segments

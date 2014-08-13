@@ -25,16 +25,11 @@
 #include <ctime>
 #include <casadi/casadi.hpp>
 
-// Load manually
-extern "C" void casadi_load_nlpsolver_ipopt();
-
 using namespace casadi;
 using namespace std;
 
 int main(){
-    
   cout << "program started" << endl;
-  casadi_load_nlpsolver_ipopt();
       
   // Dimensions
   int nu = 20;  // Number of control segments

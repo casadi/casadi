@@ -26,8 +26,6 @@
 #include <iomanip>
 #include <casadi/casadi.hpp>
 
-extern "C" void casadi_load_nlpsolver_ipopt();
-
 using namespace casadi;
 using namespace std;
 /**
@@ -40,8 +38,6 @@ using namespace std;
  */
 
 int main(){
-  casadi_load_nlpsolver_ipopt();
-    
   /** Test problem (Ganesh & Biegler, A reduced Hessian strategy for sensitivity analysis of optimal flowsheets, AIChE 33, 1987, pp. 282-296)
    * 
    *    min     x1^2 + x2^2 + x3^2
