@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_SDP_SDQP_INTERNAL_HPP
-#define CASADI_SDP_SDQP_INTERNAL_HPP
+#ifndef CASADI_SDQP_TO_SDP_HPP
+#define CASADI_SDQP_TO_SDP_HPP
 
 #include "casadi/core/function/sdqp_solver_internal.hpp"
 #include "casadi/core/function/sdp_solver.hpp"
@@ -56,24 +56,24 @@ namespace casadi {
    \author Joris Gillis
    \date 2013
   */
-  class CASADI_SDQPSOLVER_SDP_EXPORT SDPSDQPInternal : public SdqpSolverInternal {
+  class CASADI_SDQPSOLVER_SDP_EXPORT SdqpToSdp : public SdqpSolverInternal {
   public:
 
     /** \brief Constructor */
-    explicit SDPSDQPInternal(const std::vector<Sparsity> &st);
+    explicit SdqpToSdp(const std::vector<Sparsity> &st);
 
     /** \brief Clone */
-    virtual SDPSDQPInternal* clone() const { return new SDPSDQPInternal(*this);}
+    virtual SdqpToSdp* clone() const { return new SdqpToSdp(*this);}
 
     /** \brief  Create a new SDQP Solver */
     static SdqpSolverInternal* creator(const SDQPStructure& st)
-    { return new SDPSDQPInternal(st);}
+    { return new SdqpToSdp(st);}
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief Destructor */
-    virtual ~SDPSDQPInternal();
+    virtual ~SdqpToSdp();
 
     /** \brief Initialize */
     virtual void init();
@@ -98,4 +98,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_SDP_SDQP_INTERNAL_HPP
+#endif // CASADI_SDQP_TO_SDP_HPP

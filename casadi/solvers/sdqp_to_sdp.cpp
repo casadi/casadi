@@ -20,7 +20,7 @@
  *
  */
 
-#include "sdp_sdqp_internal.hpp"
+#include "sdqp_to_sdp.hpp"
 
 #include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
@@ -34,9 +34,9 @@ namespace casadi {
   extern "C"
   int CASADI_SDQPSOLVER_SDP_EXPORT
   casadi_register_sdqpsolver_sdp(SdqpSolverInternal::Plugin* plugin) {
-    plugin->creator = SDPSDQPInternal::creator;
+    plugin->creator = SdqpToSdp::creator;
     plugin->name = "sdp";
-    plugin->doc = SDPSDQPInternal::meta_doc.c_str();
+    plugin->doc = SdqpToSdp::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -46,24 +46,24 @@ namespace casadi {
     SdqpSolverInternal::registerPlugin(casadi_register_sdqpsolver_sdp);
   }
 
-  SDPSDQPInternal::SDPSDQPInternal(const std::vector<Sparsity> &st) : SdqpSolverInternal(st) {
+  SdqpToSdp::SdqpToSdp(const std::vector<Sparsity> &st) : SdqpSolverInternal(st) {
     addOption("sdp_solver",            OT_STRING, GenericType(),
               "The SdpSolver used to solve the SDQPs.");
     addOption("sdp_solver_options",    OT_DICTIONARY, GenericType(),
               "Options to be passed to the SDPSOlver");
   }
 
-  SDPSDQPInternal::~SDPSDQPInternal() {
+  SdqpToSdp::~SdqpToSdp() {
   }
 
-  void SDPSDQPInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
+  void SdqpToSdp::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     SdqpSolverInternal::deepCopyMembers(already_copied);
     sdpsolver_ = deepcopy(sdpsolver_, already_copied);
     cholesky_ = deepcopy(cholesky_, already_copied);
     mapping_ = deepcopy(mapping_, already_copied);
   }
 
-  void SDPSDQPInternal::init() {
+  void SdqpToSdp::init() {
     // Initialize the base classes
     SdqpSolverInternal::init();
 
@@ -138,7 +138,7 @@ namespace casadi {
     output(SDQP_SOLVER_LAM_A) = DMatrix::zeros(nc_, 1);
   }
 
-  void SDPSDQPInternal::evaluate() {
+  void SdqpToSdp::evaluate() {
     cholesky_.setInput(input(SDQP_SOLVER_H));
     for (int k=0;k<cholesky_.input(0).size();++k) {
       cholesky_.input().at(k)*=0.5;

@@ -21,10 +21,10 @@
  */
 
 
-      #include "sdp_sdqp_internal.hpp"
+      #include "sdqp_to_sdp.hpp"
       #include <string>
 
-      const std::string casadi::SDPSDQPInternal::meta_doc=
+      const std::string casadi::SdqpToSdp::meta_doc=
       "\n"
 "Solve an SQDP using an SdpSolver Note: this implementation relies on\n"
 "Cholesky decomposition: Chol(H) = L -> H = LL' with L lower triangular This requires Pi, H to be positive definite.\n"
