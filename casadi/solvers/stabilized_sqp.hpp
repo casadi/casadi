@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_STABILIZED_SQPMETHOD_HPP
-#define CASADI_STABILIZED_SQPMETHOD_HPP
+#ifndef CASADI_STABILIZED_SQP_HPP
+#define CASADI_STABILIZED_SQP_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
@@ -47,15 +47,15 @@ namespace casadi {
      \author Slava Kung
      \date 2013
   */
-  class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSqpmethod : public NlpSolverInternal {
+  class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSqp : public NlpSolverInternal {
   public:
-    explicit StabilizedSqpmethod(const Function& nlp);
-    virtual ~StabilizedSqpmethod();
-    virtual StabilizedSqpmethod* clone() const { return new StabilizedSqpmethod(*this);}
+    explicit StabilizedSqp(const Function& nlp);
+    virtual ~StabilizedSqp();
+    virtual StabilizedSqp* clone() const { return new StabilizedSqp(*this);}
 
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)
-    { return new StabilizedSqpmethod(nlp);}
+    { return new StabilizedSqp(nlp);}
 
     virtual void init();
     virtual void evaluate();
@@ -235,4 +235,4 @@ namespace casadi {
   /// \endcond
 } // namespace casadi
 
-#endif // CASADI_STABILIZED_SQPMETHOD_HPP
+#endif // CASADI_STABILIZED_SQP_HPP
