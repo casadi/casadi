@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_QP_STABILIZER_INTERNAL_HPP
-#define CASADI_QP_STABILIZER_INTERNAL_HPP
+#ifndef CASADI_STABILIZED_QP_TO_QP_HPP
+#define CASADI_STABILIZED_QP_TO_QP_HPP
 
 #include "casadi/core/function/stabilized_qp_solver_internal.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
@@ -45,22 +45,22 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_STABILIZEDQPSOLVER_QP_EXPORT QPStabilizerInternal
+  class CASADI_STABILIZEDQPSOLVER_QP_EXPORT StabilizedQpToQp
     : public StabilizedQpSolverInternal {
   public:
 
     /** \brief Constructor */
-    explicit QPStabilizerInternal(const std::vector<Sparsity> &st);
+    explicit StabilizedQpToQp(const std::vector<Sparsity> &st);
 
     /** \brief Destructor */
-    virtual ~QPStabilizerInternal();
+    virtual ~StabilizedQpToQp();
 
     /** \brief  Clone */
-    virtual QPStabilizerInternal* clone() const { return new QPStabilizerInternal(*this);}
+    virtual StabilizedQpToQp* clone() const { return new StabilizedQpToQp(*this);}
 
     /** \brief  Create a new Stabilized QP Solver */
     static StabilizedQpSolverInternal* creator(const QPStructure& st)
-    { return new QPStabilizerInternal(st);}
+    { return new StabilizedQpToQp(st);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
@@ -84,5 +84,5 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_QP_STABILIZER_INTERNAL_HPP
+#endif // CASADI_STABILIZED_QP_TO_QP_HPP
 

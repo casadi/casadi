@@ -21,10 +21,10 @@
  */
 
 
-      #include "qp_stabilizer_internal.hpp"
+      #include "stabilized_qp_to_qp.hpp"
       #include <string>
 
-      const std::string casadi::QPStabilizerInternal::meta_doc=
+      const std::string casadi::StabilizedQpToQp::meta_doc=
       "\n"
 "Solved a stabilized QP using a standard QP solver\n"
 "\n"

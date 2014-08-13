@@ -20,7 +20,7 @@
  *
  */
 
-#include "qp_stabilizer_internal.hpp"
+#include "stabilized_qp_to_qp.hpp"
 
 #include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
@@ -31,9 +31,9 @@ namespace casadi {
   extern "C"
   int CASADI_STABILIZEDQPSOLVER_QP_EXPORT
   casadi_register_stabilizedqpsolver_qp(StabilizedQpSolverInternal::Plugin* plugin) {
-    plugin->creator = QPStabilizerInternal::creator;
+    plugin->creator = StabilizedQpToQp::creator;
     plugin->name = "qp";
-    plugin->doc = QPStabilizerInternal::meta_doc.c_str();
+    plugin->doc = StabilizedQpToQp::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -43,7 +43,7 @@ namespace casadi {
     StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_qp);
   }
 
-  QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st)
+  StabilizedQpToQp::StabilizedQpToQp(const std::vector<Sparsity> &st)
       : StabilizedQpSolverInternal(st) {
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver used to solve the stabilized QPs.");
@@ -51,16 +51,16 @@ namespace casadi {
               "Options to be passed to the QP solver instance");
   }
 
-  QPStabilizerInternal::~QPStabilizerInternal() {
+  StabilizedQpToQp::~StabilizedQpToQp() {
   }
 
-  void QPStabilizerInternal::deepCopyMembers(
+  void StabilizedQpToQp::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     StabilizedQpSolverInternal::deepCopyMembers(already_copied);
     qp_solver_ = deepcopy(qp_solver_, already_copied);
   }
 
-  void QPStabilizerInternal::init() {
+  void StabilizedQpToQp::init() {
     // Initialize the base classes
     StabilizedQpSolverInternal::init();
 
@@ -81,7 +81,7 @@ namespace casadi {
     qp_solver_.init();
   }
 
-  void QPStabilizerInternal::evaluate() {
+  void StabilizedQpToQp::evaluate() {
     double muR = input(STABILIZED_QP_SOLVER_MUR).at(0);
     std::vector<double>& muE = input(STABILIZED_QP_SOLVER_MUE).data();
     std::vector<double>& mu = input(STABILIZED_QP_SOLVER_MU).data();
@@ -157,7 +157,7 @@ namespace casadi {
               output(QP_SOLVER_LAM_A).begin());
   }
 
-  void QPStabilizerInternal::generateNativeCode(std::ostream &file) const {
+  void StabilizedQpToQp::generateNativeCode(std::ostream &file) const {
     qp_solver_.generateNativeCode(file);
   }
 
