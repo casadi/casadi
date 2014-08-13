@@ -21,10 +21,10 @@
  */
 
 
-      #include "dsdp_internal.hpp"
+      #include "dsdp_interface.hpp"
       #include <string>
 
-      const std::string casadi::DSDPInternal::meta_doc=
+      const std::string casadi::DsdpInterface::meta_doc=
       "\n"
 "Interface to the SDP solver DSDP Warning: The solver DSDP is not good\n"
 "at handling linear equalities. There are several options if you notice\n"

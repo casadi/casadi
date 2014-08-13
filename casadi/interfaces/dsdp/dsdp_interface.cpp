@@ -20,7 +20,7 @@
  *
  */
 
-#include "dsdp_internal.hpp"
+#include "dsdp_interface.hpp"
 
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
@@ -37,9 +37,9 @@ namespace casadi {
   extern "C"
   int CASADI_SDPSOLVER_DSDP_EXPORT
   casadi_register_sdpsolver_dsdp(SdpSolverInternal::Plugin* plugin) {
-    plugin->creator = DSDPInternal::creator;
+    plugin->creator = DsdpInterface::creator;
     plugin->name = "dsdp";
-    plugin->doc = DSDPInternal::meta_doc.c_str();
+    plugin->doc = DsdpInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -49,15 +49,15 @@ namespace casadi {
     SdpSolverInternal::registerPlugin(casadi_register_sdpsolver_dsdp);
   }
 
-  DSDPInternal* DSDPInternal::clone() const {
+  DsdpInterface* DsdpInterface::clone() const {
     // Return a deep copy
-    DSDPInternal* node = new DSDPInternal(st_);
+    DsdpInterface* node = new DsdpInterface(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  DSDPInternal::DSDPInternal(const std::vector<Sparsity> &st) : SdpSolverInternal(st) {
+  DsdpInterface::DsdpInterface(const std::vector<Sparsity> &st) : SdpSolverInternal(st) {
     casadi_assert_message(
       static_cast<double>(m_)*(static_cast<double>(m_)+1)/2 < std::numeric_limits<int>::max(),
       "Your problem size m is too large to be handled by DSDP.");
@@ -96,14 +96,14 @@ namespace casadi {
     sdpcone_ = 0;
   }
 
-  DSDPInternal::~DSDPInternal() {
+  DsdpInterface::~DsdpInterface() {
     if (dsdp_!=0) {
       DSDPDestroy(dsdp_);
       dsdp_ = 0;
     }
   }
 
-  const char* DSDPInternal::terminationReason(int flag) {
+  const char* DsdpInterface::terminationReason(int flag) {
     switch (flag) {
     case DSDP_CONVERGED: return "DSDP_CONVERGED";
     case DSDP_MAX_IT: return "DSDP_MAX_IT";
@@ -118,7 +118,7 @@ namespace casadi {
     }
   }
 
-  const char* DSDPInternal::solutionType(int flag) {
+  const char* DsdpInterface::solutionType(int flag) {
     switch (flag) {
     case DSDP_PDFEASIBLE: return  "DSDP_PDFEASIBLE";
     case DSDP_UNBOUNDED: return  "DSDP_UNBOUNDED";
@@ -128,10 +128,10 @@ namespace casadi {
     }
   }
 
-  void DSDPInternal::init() {
+  void DsdpInterface::init() {
     // Initialize the base classes
     SdpSolverInternal::init();
-    log("DSDPInternal::init", "Enter");
+    log("DsdpInterface::init", "Enter");
 
     // Fill the data structures that hold DSDP-style sparse symmetric matrix
     pattern_.resize(n_+1);
@@ -196,7 +196,7 @@ namespace casadi {
 
   }
 
-  void DSDPInternal::evaluate() {
+  void DsdpInterface::evaluate() {
     if (inputs_check_) checkInputs();
     if (print_problem_) printProblem();
 
@@ -220,7 +220,7 @@ namespace casadi {
 
     DSDPCreateSDPCone(dsdp_, nb_, &sdpcone_);
     for (int j=0; j<nb_; ++j) {
-      log("DSDPInternal::init", "Setting");
+      log("DsdpInterface::init", "Setting");
       SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
       SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
     }
@@ -300,7 +300,7 @@ namespace casadi {
     DSDPSetup(dsdp_);
     int info = DSDPSolve(dsdp_);
 
-    casadi_assert_message(info==0, "DSDPInternal failed");
+    casadi_assert_message(info==0, "DsdpInterface failed");
 
     // Get termination reason
     DSDPTerminationReason reason;

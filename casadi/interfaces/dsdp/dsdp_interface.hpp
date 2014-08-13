@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_DSDP_INTERNAL_HPP
-#define CASADI_DSDP_INTERNAL_HPP
+#ifndef CASADI_DSDP_INTERFACE_HPP
+#define CASADI_DSDP_INTERFACE_HPP
 
 #include "casadi/core/function/sdp_solver_internal.hpp"
 #include <casadi/interfaces/dsdp/casadi_sdpsolver_dsdp_export.h>
@@ -49,21 +49,21 @@ namespace casadi {
    @copydoc SdpSolver_doc
    @copydoc plugin_SdpSolver_dsdp
    * */
-  class CASADI_SDPSOLVER_DSDP_EXPORT DSDPInternal : public SdpSolverInternal {
+  class CASADI_SDPSOLVER_DSDP_EXPORT DsdpInterface : public SdpSolverInternal {
   public:
 
     /** \brief Constructor */
-    explicit DSDPInternal(const std::vector<Sparsity> &st);
+    explicit DsdpInterface(const std::vector<Sparsity> &st);
 
     /** \brief Clone */
-    virtual DSDPInternal* clone() const;
+    virtual DsdpInterface* clone() const;
 
     /** \brief  Create a new SDP Solver */
     static SdpSolverInternal* creator(const SDPStructure& st)
-    { return new DSDPInternal(st);}
+    { return new DsdpInterface(st);}
 
     /** \brief Destructor */
-    virtual ~DSDPInternal();
+    virtual ~DsdpInterface();
 
     /** \brief Initialize */
     virtual void init();
@@ -102,4 +102,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_DSDP_INTERNAL_HPP
+#endif // CASADI_DSDP_INTERFACE_HPP
