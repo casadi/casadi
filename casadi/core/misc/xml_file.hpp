@@ -48,7 +48,7 @@ namespace casadi {
 
     // Destructor
     ~XmlFile();
-    
+
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
