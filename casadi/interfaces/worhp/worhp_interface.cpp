@@ -20,7 +20,7 @@
  *
  */
 
-#include "worhp_internal.hpp"
+#include "worhp_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/mx/mx_tools.hpp"
@@ -35,9 +35,9 @@ namespace casadi {
   extern "C"
   int CASADI_NLPSOLVER_WORHP_EXPORT
   casadi_register_nlpsolver_worhp(NlpSolverInternal::Plugin* plugin) {
-    plugin->creator = WorhpInternal::creator;
+    plugin->creator = WorhpInterface::creator;
     plugin->name = "worhp";
-    plugin->doc = WorhpInternal::meta_doc.c_str();
+    plugin->doc = WorhpInterface::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -47,7 +47,7 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_worhp);
   }
 
-  WorhpInternal::WorhpInternal(const Function& nlp) : NlpSolverInternal(nlp) {
+  WorhpInterface::WorhpInterface(const Function& nlp) : NlpSolverInternal(nlp) {
 
     // Monitors
     addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions",
@@ -178,15 +178,15 @@ namespace casadi {
     setOption("ScaleConIter", true);
   }
 
-  WorhpInternal::~WorhpInternal() {
+  WorhpInterface::~WorhpInterface() {
     if (worhp_p_.initialised || worhp_o_.initialised ||
         worhp_w_.initialised || worhp_c_.initialised)
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
   }
 
-  WorhpInternal* WorhpInternal::clone() const {
+  WorhpInterface* WorhpInterface::clone() const {
     // Use default copy routine
-    WorhpInternal* node = new WorhpInternal(*this);
+    WorhpInterface* node = new WorhpInterface(*this);
 
     // Mark Worhp datastructures not initialized to avoid double freeing
     node->worhp_o_.initialised = false;
@@ -197,7 +197,7 @@ namespace casadi {
     return node;
   }
 
-  void WorhpInternal::init() {
+  void WorhpInterface::init() {
 
     // Call the init method of the base class
     NlpSolverInternal::init();
@@ -257,7 +257,7 @@ namespace casadi {
     status_[FunctionErrorHM]="FunctionErrorHM";
   }
 
-  void WorhpInternal::reset() {
+  void WorhpInterface::reset() {
 
     // Number of (free) variables
     worhp_o_.n = nx_;
@@ -361,11 +361,11 @@ namespace casadi {
     }
   }
 
-  void WorhpInternal::setQPOptions() {
+  void WorhpInterface::setQPOptions() {
     setOption("UserHM", true);
   }
 
-  void WorhpInternal::passOptions() {
+  void WorhpInterface::passOptions() {
 
      for (int i=0;i<WorhpGetParamCount();++i) {
       WorhpType type = WorhpGetParamType(i+1);
@@ -424,7 +424,7 @@ namespace casadi {
     worhp_p_.initialised = true;
   }
 
-  std::string WorhpInternal::formatStatus(int status) const {
+  std::string WorhpInterface::formatStatus(int status) const {
     if (status_.find(status)==status_.end()) {
       std::stringstream ss;
       ss << "Unknown status: " << status;
@@ -434,8 +434,8 @@ namespace casadi {
     }
   }
 
-  void WorhpInternal::evaluate() {
-    log("WorhpInternal::evaluate");
+  void WorhpInterface::evaluate() {
+    log("WorhpInterface::evaluate");
 
     if (gather_stats_) {
       Dictionary iterations;
@@ -460,7 +460,7 @@ namespace casadi {
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
 
     // Get inputs
-    log("WorhpInternal::evaluate: Reading user inputs");
+    log("WorhpInterface::evaluate: Reading user inputs");
     const DMatrix& x0 = input(NLP_SOLVER_X0);
     const DMatrix& lbx = input(NLP_SOLVER_LBX);
     const DMatrix& ubx = input(NLP_SOLVER_UBX);
@@ -473,14 +473,14 @@ namespace casadi {
 
     for (int i=0;i<nx_;++i) {
       casadi_assert_message(lbx.at(i)!=ubx.at(i),
-      "WorhpInternal::evaluate: Worhp cannot handle the case when LBX == UBX."
+      "WorhpInterface::evaluate: Worhp cannot handle the case when LBX == UBX."
       "You have that case at non-zero " << i << " , which has value " << ubx.at(i) << "."
       "Reformulate your problem by using a parameter for the corresponding variable.");
     }
 
     for (int i=0;i<lbg.size();++i) {
       casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),
-      "WorhpInternal::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite."
+      "WorhpInterface::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite."
       "You have that case at non-zero " << i << "."
       "Reformulate your problem eliminating the corresponding constraint.");
     }
@@ -502,7 +502,7 @@ namespace casadi {
     for (int i=0; i<ng_; ++i) if (worhp_o_.GL[i]==-inf) worhp_o_.GL[i] = -worhp_p_.Infty;
     for (int i=0; i<ng_; ++i) if (worhp_o_.GU[i]== inf) worhp_o_.GU[i] =  worhp_p_.Infty;
 
-    log("WorhpInternal::starting iteration");
+    log("WorhpInterface::starting iteration");
 
     double time1 = clock();
 
@@ -657,7 +657,7 @@ namespace casadi {
 
   }
 
-  bool WorhpInternal::eval_h(const double* x, double obj_factor,
+  bool WorhpInterface::eval_h(const double* x, double obj_factor,
                              const double* lambda, double* values) {
     try {
       log("eval_h started");
@@ -714,7 +714,7 @@ namespace casadi {
       }
 
       if (regularity_check_ && !isRegular(hessLag.output(HESSLAG_HESS).data()))
-          casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
+          casadi_error("WorhpInterface::eval_h: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_h_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -727,7 +727,7 @@ namespace casadi {
     }
   }
 
-  bool WorhpInternal::eval_jac_g(const double* x, double* values) {
+  bool WorhpInterface::eval_jac_g(const double* x, double* values) {
     try {
       log("eval_jac_g started");
 
@@ -773,7 +773,7 @@ namespace casadi {
     }
   }
 
-  bool WorhpInternal::eval_f(const double* x, double scale, double& obj_value) {
+  bool WorhpInterface::eval_f(const double* x, double scale, double& obj_value) {
     try {
       log("eval_f started");
 
@@ -798,7 +798,7 @@ namespace casadi {
       obj_value *= scale;
 
       if (regularity_check_ && !isRegular(nlp_.output().data()))
-          casadi_error("WorhpInternal::eval_f: NaN or Inf detected.");
+          casadi_error("WorhpInterface::eval_f: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -811,7 +811,7 @@ namespace casadi {
     }
   }
 
-  bool WorhpInternal::eval_g(const double* x, double* g) {
+  bool WorhpInterface::eval_g(const double* x, double* g) {
     try {
       log("eval_g started");
       double time1 = clock();
@@ -835,7 +835,7 @@ namespace casadi {
       }
 
       if (regularity_check_ && !isRegular(nlp_.output(NL_G).data()))
-          casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
+          casadi_error("WorhpInterface::eval_g: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -848,7 +848,7 @@ namespace casadi {
     }
   }
 
-  bool WorhpInternal::eval_grad_f(const double* x, double scale , double* grad_f) {
+  bool WorhpInterface::eval_grad_f(const double* x, double scale , double* grad_f) {
     try {
       log("eval_grad_f started");
       double time1 = clock();
@@ -874,7 +874,7 @@ namespace casadi {
       }
 
       if (regularity_check_ && !isRegular(gradF_.output().data()))
-          casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
+          casadi_error("WorhpInterface::eval_grad_f: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -895,7 +895,7 @@ namespace casadi {
     }
   }
 
-  void WorhpInternal::setOptionsFromFile(const std::string & file) {
+  void WorhpInterface::setOptionsFromFile(const std::string & file) {
     int status;
     char *cpy = new char[file.size()+1] ;
     strcpy(cpy, file.c_str());
@@ -962,7 +962,7 @@ namespace casadi {
     std::cout << "readparams status: " << status << std::endl;
   }
 
-  map<int, string> WorhpInternal::calc_flagmap() {
+  map<int, string> WorhpInterface::calc_flagmap() {
   map<int, string> f;
   f[TerminateSuccess] = "TerminateSuccess";
   f[OptimalSolution] = "OptimalSolution";
@@ -1001,6 +1001,6 @@ namespace casadi {
   return f;
 }
 
-map<int, string> WorhpInternal::flagmap = WorhpInternal::calc_flagmap();
+map<int, string> WorhpInterface::flagmap = WorhpInterface::calc_flagmap();
 
 } // namespace casadi

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_WORHP_INTERNAL_HPP
-#define CASADI_WORHP_INTERNAL_HPP
+#ifndef CASADI_WORHP_INTERFACE_HPP
+#define CASADI_WORHP_INTERFACE_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include <casadi/interfaces/worhp/casadi_nlpsolver_worhp_export.h>
@@ -50,21 +50,21 @@ namespace casadi {
      @copydoc NlpSolver_doc
      @copydoc plugin_NlpSolver_worhp
   */
-  class CASADI_NLPSOLVER_WORHP_EXPORT WorhpInternal : public NlpSolverInternal {
+  class CASADI_NLPSOLVER_WORHP_EXPORT WorhpInterface : public NlpSolverInternal {
 
   public:
     // Constructor
-    explicit WorhpInternal(const Function& nlp);
+    explicit WorhpInterface(const Function& nlp);
 
     // Destructor
-    virtual ~WorhpInternal();
+    virtual ~WorhpInterface();
 
     // Clone function
-    virtual WorhpInternal* clone() const;
+    virtual WorhpInterface* clone() const;
 
     /** \brief  Create a new NLP Solver */
     static NlpSolverInternal* creator(const Function& nlp)
-    { return new WorhpInternal(nlp);}
+    { return new WorhpInterface(nlp);}
 
     // Reset solver
     void reset();
@@ -135,4 +135,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_WORHP_INTERNAL_HPP
+#endif // CASADI_WORHP_INTERFACE_HPP

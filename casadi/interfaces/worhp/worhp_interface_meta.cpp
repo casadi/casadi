@@ -21,10 +21,10 @@
  */
 
 
-      #include "worhp_internal.hpp"
+      #include "worhp_interface.hpp"
       #include <string>
 
-      const std::string casadi::WorhpInternal::meta_doc=
+      const std::string casadi::WorhpInterface::meta_doc=
       "\n"
 "WORHP interface\n"
 "\n"
