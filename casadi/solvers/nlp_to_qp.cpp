@@ -20,7 +20,7 @@
  *
  */
 
-#include "nlp_qp_internal.hpp"
+#include "nlp_to_qp.hpp"
 
 #include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
@@ -31,9 +31,9 @@ namespace casadi {
   extern "C"
   int CASADI_QPSOLVER_NLP_EXPORT
   casadi_register_qpsolver_nlp(QpSolverInternal::Plugin* plugin) {
-    plugin->creator = NLPQPInternal::creator;
+    plugin->creator = NlpToQp::creator;
     plugin->name = "nlp";
-    plugin->doc = NLPQPInternal::meta_doc.c_str();
+    plugin->doc = NlpToQp::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -43,15 +43,15 @@ namespace casadi {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_nlp);
   }
 
-  NLPQPInternal* NLPQPInternal::clone() const {
+  NlpToQp* NlpToQp::clone() const {
     // Return a deep copy
-    NLPQPInternal* node = new NLPQPInternal(st_);
+    NlpToQp* node = new NlpToQp(st_);
     if (!node->is_init_)
       node->init();
     return node;
   }
 
-  NLPQPInternal::NLPQPInternal(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
+  NlpToQp::NlpToQp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
 
     addOption("nlp_solver",       OT_STRING, GenericType(),
               "The NLPSOlver used to solve the QPs.");
@@ -60,10 +60,10 @@ namespace casadi {
 
   }
 
-  NLPQPInternal::~NLPQPInternal() {
+  NlpToQp::~NlpToQp() {
   }
 
-  void NLPQPInternal::evaluate() {
+  void NlpToQp::evaluate() {
     if (inputs_check_) checkInputs();
 
     int k = 0;
@@ -100,7 +100,7 @@ namespace casadi {
     output(QP_SOLVER_LAM_X).set(nlpsolver_.output(NLP_SOLVER_LAM_X));
   }
 
-  void NLPQPInternal::init() {
+  void NlpToQp::init() {
 
 
     QpSolverInternal::init();
