@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
-#define CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
+#ifndef CASADI_NEWTON_HPP
+#define CASADI_NEWTON_HPP
 
 #include "casadi/core/function/implicit_function_internal.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
@@ -46,28 +46,28 @@ namespace casadi {
       \author Joris Gillis
       \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT NewtonImplicitInternal
+  class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT Newton
       : public ImplicitFunctionInternal {
   public:
     /** \brief  Constructor */
-    explicit NewtonImplicitInternal(const Function& f, const Function& jac,
+    explicit Newton(const Function& f, const Function& jac,
                                     const LinearSolver& linsol);
 
     /** \brief  Destructor */
-    virtual ~NewtonImplicitInternal();
+    virtual ~Newton();
 
     /** \brief  Clone */
-    virtual NewtonImplicitInternal* clone() const { return new NewtonImplicitInternal(*this);}
+    virtual Newton* clone() const { return new Newton(*this);}
 
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
                                              const LinearSolver& linsol) const
-    { return new NewtonImplicitInternal(f, jac, linsol);}
+    { return new Newton(f, jac, linsol);}
 
     /** \brief  Create a new ImplicitFunction */
     static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
                                              const LinearSolver& linsol)
-    { return new NewtonImplicitInternal(f, jac, linsol);}
+    { return new Newton(f, jac, linsol);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -91,4 +91,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
+#endif // CASADI_NEWTON_HPP

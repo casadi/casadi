@@ -25,8 +25,8 @@ casadi_plugin(Integrator oldcollocation
   old_collocation_integrator_meta.cpp)
 
 casadi_plugin(ImplicitFunction newton
-  newton_implicit_internal.hpp   newton_implicit_internal.cpp
-  newton_implicit_internal_meta.cpp)
+  newton.hpp   newton.cpp
+  newton_meta.cpp)
 
 casadi_plugin(HomotopyNlpSolver simple
    simple_homotopy_nlp_internal.hpp   simple_homotopy_nlp_internal.cpp

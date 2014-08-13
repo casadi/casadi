@@ -21,10 +21,10 @@
  */
 
 
-      #include "newton_implicit_internal.hpp"
+      #include "newton.hpp"
       #include <string>
 
-      const std::string casadi::NewtonImplicitInternal::meta_doc=
+      const std::string casadi::Newton::meta_doc=
       "\n"
 "Implements simple newton iterations to solve an implicit function.\n"
 "\n"

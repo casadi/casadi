@@ -20,7 +20,7 @@
  *
  */
 
-#include "newton_implicit_internal.hpp"
+#include "newton.hpp"
 
 #include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
@@ -35,9 +35,9 @@ namespace casadi {
   extern "C"
   int CASADI_IMPLICITFUNCTION_NEWTON_EXPORT
   casadi_register_implicitfunction_newton(ImplicitFunctionInternal::Plugin* plugin) {
-    plugin->creator = NewtonImplicitInternal::creator;
+    plugin->creator = Newton::creator;
     plugin->name = "newton";
-    plugin->doc = NewtonImplicitInternal::meta_doc.c_str();
+    plugin->doc = Newton::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -47,7 +47,7 @@ namespace casadi {
     ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_newton);
   }
 
-  NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac,
+  Newton::Newton(const Function& f, const Function& jac,
                                                  const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {
     addOption("abstol",                      OT_REAL, 1e-12,
@@ -59,11 +59,11 @@ namespace casadi {
     addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F|normF", true);
   }
 
-  NewtonImplicitInternal::~NewtonImplicitInternal() {
+  Newton::~Newton() {
   }
 
-  void NewtonImplicitInternal::solveNonLinear() {
-    casadi_log("NewtonImplicitInternal::solveNonLinear:begin");
+  void Newton::solveNonLinear() {
+    casadi_log("Newton::solveNonLinear:begin");
 
     // Set up timers for profiling
     double time_zero=0;
@@ -215,18 +215,18 @@ namespace casadi {
     // Factorization up-to-date
     fact_up_to_date_ = true;
 
-    casadi_log("NewtonImplicitInternal::solveNonLinear():end after " << iter << " steps");
+    casadi_log("Newton::solveNonLinear():end after " << iter << " steps");
   }
 
-  void NewtonImplicitInternal::init() {
+  void Newton::init() {
 
     // Call the base class initializer
     ImplicitFunctionInternal::init();
 
     casadi_assert_message(f_.getNumInputs()>0,
-                          "NewtonImplicitInternal: the supplied f must have at least one input.");
+                          "Newton: the supplied f must have at least one input.");
     casadi_assert_message(!linsol_.isNull(),
-                          "NewtonImplicitInternal::init: linear_solver must be supplied");
+                          "Newton::init: linear_solver must be supplied");
 
     if (hasSetOption("max_iter"))
       max_iter_ = getOption("max_iter");
