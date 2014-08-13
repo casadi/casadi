@@ -21,10 +21,10 @@
  */
 
 
-      #include "symbolic_qr_internal.hpp"
+      #include "symbolic_qr.hpp"
       #include <string>
 
-      const std::string casadi::SymbolicQRInternal::meta_doc=
+      const std::string casadi::SymbolicQr::meta_doc=
       "\n"
 "LinearSolver based on QR factorization with sparsity pattern based\n"
 "reordering without partial pivoting\n"

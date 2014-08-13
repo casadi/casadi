@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_SYMBOLIC_QR_INTERNAL_HPP
-#define CASADI_SYMBOLIC_QR_INTERNAL_HPP
+#ifndef CASADI_SYMBOLIC_QR_HPP
+#define CASADI_SYMBOLIC_QR_HPP
 
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include <casadi/solvers/casadi_linearsolver_symbolicqr_export.h>
@@ -45,24 +45,24 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQRInternal
+  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQr
     : public LinearSolverInternal {
   public:
     // Constructor
-    SymbolicQRInternal(const Sparsity& sparsity, int nrhs);
+    SymbolicQr(const Sparsity& sparsity, int nrhs);
 
     // Destructor
-    virtual ~SymbolicQRInternal();
+    virtual ~SymbolicQr();
 
     /** \brief  Clone */
-    virtual SymbolicQRInternal* clone() const { return new SymbolicQRInternal(*this);}
+    virtual SymbolicQr* clone() const { return new SymbolicQr(*this);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new LinearSolver */
     static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new SymbolicQRInternal(sp, nrhs);}
+    { return new SymbolicQr(sp, nrhs);}
 
     // Initialize
     virtual void init();
@@ -101,5 +101,5 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_SYMBOLIC_QR_INTERNAL_HPP
+#endif // CASADI_SYMBOLIC_QR_HPP
 
