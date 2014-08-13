@@ -21,10 +21,10 @@
  */
 
 
-      #include "nlp_to_qp.hpp"
+      #include "qp_to_nlp.hpp"
       #include <string>
 
-      const std::string casadi::NlpToQp::meta_doc=
+      const std::string casadi::QpToNlp::meta_doc=
       "\n"
 "Solve QPs using an NlpSolver\n"
 "\n"

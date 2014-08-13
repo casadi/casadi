@@ -49,8 +49,8 @@ casadi_plugin(NlpSolver stabilizedsqp   stabilized_sqp_internal.hpp   stabilized
 )
 
 # Reformulations
-casadi_plugin(QpSolver nlp nlp_to_qp.hpp   nlp_to_qp.cpp
-nlp_to_qp_meta.cpp
+casadi_plugin(QpSolver nlp qp_to_nlp.hpp   qp_to_nlp.cpp
+qp_to_nlp_meta.cpp
 )
 casadi_plugin(ImplicitFunction nlp   nlp_to_implicit.hpp   nlp_to_implicit.cpp
 nlp_to_implicit_meta.cpp
