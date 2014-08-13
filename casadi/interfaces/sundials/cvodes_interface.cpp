@@ -20,7 +20,7 @@
  *
  */
 
-#include "cvodes_internal.hpp"
+#include "cvodes_interface.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
@@ -33,9 +33,9 @@ namespace casadi {
 
   extern "C"
   int CASADI_INTEGRATOR_CVODES_EXPORT casadi_register_integrator_cvodes(IntegratorInternal::Plugin* plugin){
-    plugin->creator = CVodesInternal::creator;
+    plugin->creator = CvodesInterface::creator;
     plugin->name = "cvodes";
-    plugin->doc = CVodesInternal::meta_doc.c_str();;
+    plugin->doc = CvodesInterface::meta_doc.c_str();;
     plugin->version = 20;
     return 0;
   }
@@ -45,16 +45,16 @@ namespace casadi {
     IntegratorInternal::registerPlugin(casadi_register_integrator_cvodes);
   }
 
-  CVodesInternal* CVodesInternal::clone() const {
+  CvodesInterface* CvodesInterface::clone() const {
     // Return a deep copy
-    CVodesInternal* node = new CVodesInternal(f_, g_);
+    CvodesInterface* node = new CvodesInterface(f_, g_);
     node->setOption(dictionary());
     node->jac_ = jac_;
     node->linsol_ = linsol_;
     return node;
   }
 
-  CVodesInternal::CVodesInternal(const Function& f, const Function& g) : SundialsInternal(f, g) {
+  CvodesInterface::CvodesInterface(const Function& f, const Function& g) : SundialsInternal(f, g) {
     addOption("linear_multistep_method",          OT_STRING,              "bdf",
               "Integrator scheme", "bdf|adams");
     addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",
@@ -75,7 +75,7 @@ namespace casadi {
     disable_internal_warnings_ = false;
   }
 
-  void CVodesInternal::freeCVodes() {
+  void CvodesInterface::freeCVodes() {
     if (mem_) { CVodeFree(&mem_); mem_ = 0;}
 
     // Forward integration
@@ -97,12 +97,12 @@ namespace casadi {
         if (*it) { N_VDestroy_Serial(*it); *it=0;}
   }
 
-  CVodesInternal::~CVodesInternal() {
+  CvodesInterface::~CvodesInterface() {
     freeCVodes();
   }
 
-  void CVodesInternal::init() {
-    log("CVodesInternal::init", "begin");
+  void CvodesInterface::init() {
+    log("CvodesInterface::init", "begin");
 
     // Free memory if already initialized
     if (isInit()) freeCVodes();
@@ -310,7 +310,7 @@ namespace casadi {
   }
 
 
-  void CVodesInternal::initAdj() {
+  void CvodesInterface::initAdj() {
 
     // Create backward problem (use the same lmm and iter)
     int flag = CVodeCreateB(mem_, lmm_, iter_, &whichB_);
@@ -365,8 +365,8 @@ namespace casadi {
     isInitAdj_ = true;
   }
 
-  void CVodesInternal::rhs(double t, const double* x, double* xdot) {
-    log("CVodesInternal::rhs", "begin");
+  void CvodesInterface::rhs(double t, const double* x, double* xdot) {
+    log("CvodesInterface::rhs", "begin");
 
     // Get time
     time1 = clock();
@@ -395,14 +395,14 @@ namespace casadi {
     time2 = clock();
     t_res += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
-    log("CVodesInternal::rhs", "end");
+    log("CvodesInterface::rhs", "end");
 
   }
 
-  int CVodesInternal::rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data) {
+  int CvodesInterface::rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->rhs(t, NV_DATA_S(x), NV_DATA_S(xdot));
       return 0;
     } catch(exception& e) {
@@ -411,8 +411,8 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::reset() {
-    casadi_log("CVodesInternal::reset begin");
+  void CvodesInterface::reset() {
+    casadi_log("CvodesInterface::reset begin");
 
     // Reset the base classes
     SundialsInternal::reset();
@@ -461,16 +461,16 @@ namespace casadi {
 
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(tf_);
-    casadi_log("CVodesInternal::reset end");
+    casadi_log("CvodesInterface::reset end");
   }
 
-  void CVodesInternal::integrate(double t_out) {
-    casadi_log("CVodesInternal::integrate(" << t_out << ") begin");
+  void CvodesInterface::integrate(double t_out) {
+    casadi_log("CvodesInterface::integrate(" << t_out << ") begin");
 
     casadi_assert_message(t_out>=t0_,
-                          "CVodesInternal::integrate(" << t_out << "): "
+                          "CvodesInterface::integrate(" << t_out << "): "
                           "Cannot integrate to a time earlier than t0 (" << t0_ << ")");
-    casadi_assert_message(t_out<=tf_ || !stop_at_end_, "CVodesInternal::integrate(" << t_out << "):"
+    casadi_assert_message(t_out<=tf_ || !stop_at_end_, "CvodesInterface::integrate(" << t_out << "):"
                           " Cannot integrate past a time later than tf (" << tf_ << ") "
                           "unless stop_at_end is set to False.");
 
@@ -525,11 +525,11 @@ namespace casadi {
 
     }
 
-    casadi_log("CVodesInternal::integrate(" << t_out << ") end");
+    casadi_log("CvodesInterface::integrate(" << t_out << ") end");
   }
 
-  void CVodesInternal::resetB() {
-    casadi_log("CVodesInternal::resetB begin");
+  void CvodesInterface::resetB() {
+    casadi_log("CvodesInterface::resetB begin");
 
     // Reset the base classes
     SundialsInternal::resetB();
@@ -548,11 +548,11 @@ namespace casadi {
       // Initialize the adjoint integration
       initAdj();
     }
-    casadi_log("CVodesInternal::resetB end");
+    casadi_log("CvodesInterface::resetB end");
   }
 
-  void CVodesInternal::integrateB(double t_out) {
-    casadi_log("CVodesInternal::integrateB(" << t_out << ") begin");
+  void CvodesInterface::integrateB(double t_out) {
+    casadi_log("CvodesInterface::integrateB(" << t_out << ") begin");
     int flag;
 
     // Integrate backward to t_out
@@ -585,10 +585,10 @@ namespace casadi {
       stats_["nlinsetupsB"] = 1.0*nlinsetups;
 
     }
-    casadi_log("CVodesInternal::integrateB(" << t_out << ") end");
+    casadi_log("CvodesInterface::integrateB(" << t_out << ") end");
   }
 
-  void CVodesInternal::printStats(std::ostream &stream) const {
+  void CvodesInterface::printStats(std::ostream &stream) const {
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
@@ -659,7 +659,7 @@ namespace casadi {
 #endif
   }
 
-  map<int, string> CVodesInternal::calc_flagmap() {
+  map<int, string> CvodesInterface::calc_flagmap() {
     map<int, string> f;
     f[CV_SUCCESS] = "CV_SUCCESS";
     f[CV_TSTOP_RETURN] = "CV_TSTOP_RETURN";
@@ -693,9 +693,9 @@ namespace casadi {
     return f;
   }
 
-  map<int, string> CVodesInternal::flagmap = CVodesInternal::calc_flagmap();
+  map<int, string> CvodesInterface::flagmap = CvodesInterface::calc_flagmap();
 
-  void CVodesInternal::cvodes_error(const string& module, int flag) {
+  void CvodesInterface::cvodes_error(const string& module, int flag) {
     // Find the error
     map<int, string>::const_iterator it = flagmap.find(flag);
 
@@ -709,24 +709,24 @@ namespace casadi {
     casadi_error(ss.str());
   }
 
-  void CVodesInternal::ehfun_wrapper(int error_code, const char *module, const char *function,
+  void CvodesInterface::ehfun_wrapper(int error_code, const char *module, const char *function,
                                      char *msg, void *user_data) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->ehfun(error_code, module, function, msg);
     } catch(exception& e) {
       cerr << "ehfun failed: " << e.what() << endl;
     }
   }
 
-  void CVodesInternal::ehfun(int error_code, const char *module, const char *function, char *msg) {
+  void CvodesInterface::ehfun(int error_code, const char *module, const char *function, char *msg) {
     if (!disable_internal_warnings_) {
       cerr << msg << endl;
     }
   }
 
-  void CVodesInternal::rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
+  void CvodesInterface::rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
                             N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2) {
     //    casadi_assert(Ns==nfdir_);
 
@@ -764,11 +764,11 @@ namespace casadi {
     t_fres += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
   }
 
-  int CVodesInternal::rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
+  int CvodesInterface::rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
                                    N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->rhsS(Ns, t, x, xdot, xF, xdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -777,7 +777,7 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF,
+  void CvodesInterface::rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF,
                              N_Vector xdotF, N_Vector tmp1, N_Vector tmp2) {
     //    casadi_assert(Ns==nfdir_);
 
@@ -801,12 +801,12 @@ namespace casadi {
     // f_.getFwdSens(NV_DATA_S(xdotF));
   }
 
-  int CVodesInternal::rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS,
+  int CvodesInterface::rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS,
                                     N_Vector xF, N_Vector xdotF, void *user_data,
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->rhsS1(Ns, t, x, xdot, iS, xF, xdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -815,10 +815,10 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data) {
+  int CvodesInterface::rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->rhsQ(t, NV_DATA_S(x), NV_DATA_S(qdot));
       return 0;
     } catch(exception& e) {
@@ -827,7 +827,7 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::rhsQ(double t, const double* x, double* qdot) {
+  void CvodesInterface::rhsQ(double t, const double* x, double* qdot) {
     // Pass input
     f_.setInput(&t, DAE_T);
     f_.setInput(x, DAE_X);
@@ -840,7 +840,7 @@ namespace casadi {
     f_.getOutput(qdot, DAE_QUAD);
   }
 
-  void CVodesInternal::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
+  void CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
                              N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2) {
     //    casadi_assert(Ns==nfdir_);
 
@@ -866,12 +866,12 @@ namespace casadi {
     // }
   }
 
-  int CVodesInternal::rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
+  int CvodesInterface::rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
                                     N_Vector *qdotF, void *user_data,
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
       //    casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       if (!this_) {
         // SUNDIALS BUG!!!
         for (int i=0; i<Ns; ++i) N_VConst(0.0, qdotF[i]);
@@ -885,8 +885,8 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* rxdot) {
-    log("CVodesInternal::rhsB", "begin");
+  void CvodesInterface::rhsB(double t, const double* x, const double *rx, double* rxdot) {
+    log("CvodesInterface::rhsB", "begin");
 
     // Pass inputs
     g_.setInput(&t, RDAE_T);
@@ -917,10 +917,10 @@ namespace casadi {
     for (int i=0; i<nrx_; ++i)
       rxdot[i] *= -1;
 
-    log("CVodesInternal::rhsB", "end");
+    log("CvodesInterface::rhsB", "end");
   }
 
-  void CVodesInternal::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector rx, N_Vector rxdot) {
+  void CvodesInterface::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector rx, N_Vector rxdot) {
 
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
@@ -961,11 +961,11 @@ namespace casadi {
     // }
   }
 
-  int CVodesInternal::rhsB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
+  int CvodesInterface::rhsB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
                                    void *user_data) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->rhsB(t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rxdot));
       return 0;
     } catch(exception& e) {
@@ -974,11 +974,11 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xB,
+  int CvodesInterface::rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xB,
                                     N_Vector xdotB, void *user_data) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->rhsBS(t, x, xF, xB, xdotB);
       return 0;
     } catch(exception& e) {
@@ -987,11 +987,11 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::rhsQB_wrapper(double t, N_Vector x, N_Vector rx,
+  int CvodesInterface::rhsQB_wrapper(double t, N_Vector x, N_Vector rx,
                                     N_Vector rqdot, void *user_data) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->rhsQB(t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rqdot));
       return 0;
     } catch(exception& e) {
@@ -1000,9 +1000,9 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::rhsQB(double t, const double* x, const double* rx, double* rqdot) {
+  void CvodesInterface::rhsQB(double t, const double* x, const double* rx, double* rqdot) {
     if (monitor_rhsQB_) {
-      cout << "CVodesInternal::rhsQB: begin" << endl;
+      cout << "CvodesInterface::rhsQB: begin" << endl;
     }
 
     // Pass inputs
@@ -1035,15 +1035,15 @@ namespace casadi {
       rqdot[i] *= -1;
 
     if (monitor_rhsQB_) {
-      cout << "CVodesInternal::rhsQB: end" << endl;
+      cout << "CvodesInterface::rhsQB: end" << endl;
     }
   }
 
-  int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x,
+  int CvodesInterface::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x,
                                      N_Vector xdot, void *user_data, N_Vector tmp) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->jtimes(v, Jv, t, x, xdot, tmp);
       return 0;
     } catch(exception& e) {
@@ -1052,12 +1052,12 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x,
+  int CvodesInterface::jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x,
                                       N_Vector xB, N_Vector xdotB, void *user_data ,
                                       N_Vector tmpB) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->jtimesB(vB, JvB, t, x, xB, xdotB, tmpB);
       return 0;
     } catch(exception& e) {
@@ -1066,9 +1066,9 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
+  void CvodesInterface::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
                               N_Vector xdot, N_Vector tmp) {
-    log("CVodesInternal::jtimes", "begin");
+    log("CvodesInterface::jtimes", "begin");
     // Get time
     time1 = clock();
 
@@ -1092,12 +1092,12 @@ namespace casadi {
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
-    log("CVodesInternal::jtimes", "end");
+    log("CvodesInterface::jtimes", "end");
   }
 
-  void CVodesInternal::jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
+  void CvodesInterface::jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
                                N_Vector xdotB, N_Vector tmpB) {
-    log("CVodesInternal::jtimesB", "begin");
+    log("CvodesInterface::jtimesB", "begin");
     // Get time
     time1 = clock();
 
@@ -1124,14 +1124,14 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("CVodesInternal::jtimesB", "end");
+    log("CvodesInterface::jtimesB", "end");
   }
 
-  int CVodesInternal::djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
+  int CvodesInterface::djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
                                    void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->djac(N, t, x, xdot, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -1140,12 +1140,12 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+  int CvodesInterface::djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                                     DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B,
                                     N_Vector tmp3B) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->djacB(NeqB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
@@ -1154,9 +1154,9 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
+  void CvodesInterface::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
                             N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
-    log("CVodesInternal::djac", "begin");
+    log("CvodesInterface::djac", "begin");
 
     // Get time
     time1 = clock();
@@ -1205,12 +1205,12 @@ namespace casadi {
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
-    log("CVodesInternal::djac", "end");
+    log("CvodesInterface::djac", "end");
   }
 
-  void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+  void CvodesInterface::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                              DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
-    log("CVodesInternal::djacB", "begin");
+    log("CvodesInterface::djacB", "begin");
     // Get time
     time1 = clock();
 
@@ -1261,15 +1261,15 @@ namespace casadi {
     // Log time duration
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
-    log("CVodesInternal::djacB", "end");
+    log("CvodesInterface::djacB", "end");
   }
 
-  int CVodesInternal::bjac_wrapper(long N, long mupper, long mlower, double t, N_Vector x,
+  int CvodesInterface::bjac_wrapper(long N, long mupper, long mlower, double t, N_Vector x,
                                    N_Vector xdot, DlsMat Jac, void *user_data,
                                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->bjac(N, mupper, mlower, t, x, xdot, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
@@ -1278,12 +1278,12 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
+  int CvodesInterface::bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
                                     N_Vector xB, N_Vector xdotB, DlsMat JacB, void *user_data,
                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
       casadi_assert(user_data);
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       this_->bjacB(NeqB, mupperB, mlowerB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
@@ -1292,9 +1292,9 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot,
+  void CvodesInterface::bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot,
                             DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
-    log("CVodesInternal::bjac", "begin");
+    log("CvodesInterface::bjac", "begin");
 
     // Get time
     time1 = clock();
@@ -1331,13 +1331,13 @@ namespace casadi {
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
-    log("CVodesInternal::bjac", "end");
+    log("CvodesInterface::bjac", "end");
   }
 
-  void CVodesInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
+  void CvodesInterface::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
                              N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B,
                              N_Vector tmp2B, N_Vector tmp3B) {
-    log("CVodesInternal::bjacB", "begin");
+    log("CvodesInterface::bjacB", "begin");
 
     // Get time
     time1 = clock();
@@ -1390,20 +1390,20 @@ namespace casadi {
     time2 = clock();
     t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
-    log("CVodesInternal::bjacB", "end");
+    log("CvodesInterface::bjacB", "end");
   }
 
-  void CVodesInternal::setStopTime(double tf) {
+  void CvodesInterface::setStopTime(double tf) {
     // Set the stop time of the integration -- don't integrate past this point
     int flag = CVodeSetStopTime(mem_, tf);
     if (flag != CV_SUCCESS) cvodes_error("CVodeSetStopTime", flag);
   }
 
-  int CVodesInternal::psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector r,
+  int CvodesInterface::psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector r,
                                      N_Vector z, double gamma, double delta, int lr,
                                      void *user_data, N_Vector tmp) {
     try {
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       casadi_assert(this_);
       this_->psolve(t, x, xdot, r, z, gamma, delta, lr, tmp);
       return 0;
@@ -1413,11 +1413,11 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::psolveB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+  int CvodesInterface::psolveB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                                       N_Vector rvecB, N_Vector zvecB, double gammaB,
                                       double deltaB, int lr, void *user_data, N_Vector tmpB) {
     try {
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       casadi_assert(this_);
       this_->psolveB(t, x, xB, xdotB, rvecB, zvecB, gammaB, deltaB, lr, tmpB);
       return 0;
@@ -1427,11 +1427,11 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok,
+  int CvodesInterface::psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok,
                                      booleantype *jcurPtr, double gamma, void *user_data,
                                      N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       casadi_assert(this_);
       this_->psetup(t, x, xdot, jok, jcurPtr, gamma, tmp1, tmp2, tmp3);
       return 0;
@@ -1441,12 +1441,12 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+  int CvodesInterface::psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                                       booleantype jokB, booleantype *jcurPtrB, double gammaB,
                                       void *user_data, N_Vector tmp1B, N_Vector tmp2B,
                                       N_Vector tmp3B) {
     try {
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       casadi_assert(this_);
       this_->psetupB(t, x, xB, xdotB, jokB, jcurPtrB, gammaB, tmp1B, tmp2B, tmp3B);
       return 0;
@@ -1456,7 +1456,7 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
+  void CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
                               double gamma, double delta, int lr, N_Vector tmp) {
     // Get time
     time1 = clock();
@@ -1475,7 +1475,7 @@ namespace casadi {
     t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
   }
 
-  void CVodesInternal::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
+  void CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
                                N_Vector zvecB, double gammaB, double deltaB,
                                int lr, N_Vector tmpB) {
     // Get time
@@ -1495,10 +1495,10 @@ namespace casadi {
     t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
   }
 
-  void CVodesInternal::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
+  void CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
                               booleantype *jcurPtr, double gamma, N_Vector tmp1,
                               N_Vector tmp2, N_Vector tmp3) {
-    log("CVodesInternal::psetup", "begin");
+    log("CvodesInterface::psetup", "begin");
     // Get time
     time1 = clock();
 
@@ -1527,13 +1527,13 @@ namespace casadi {
     time1 = clock();
     t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
 
-    log("CVodesInternal::psetup", "end");
+    log("CvodesInterface::psetup", "end");
   }
 
-  void CVodesInternal::psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+  void CvodesInterface::psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                                booleantype jokB, booleantype *jcurPtrB, double gammaB,
                                N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
-    log("CVodesInternal::psetupB", "begin");
+    log("CvodesInterface::psetupB", "begin");
     // Get time
     time1 = clock();
 
@@ -1576,10 +1576,10 @@ namespace casadi {
     // Log time duration
     time1 = clock();
     t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
-    log("CVodesInternal::psetupB", "end");
+    log("CvodesInterface::psetupB", "end");
   }
 
-  void CVodesInternal::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+  void CvodesInterface::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
                               booleantype *jcurPtr,
                               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     // Current time
@@ -1592,18 +1592,18 @@ namespace casadi {
     psetup(t, x, xdot, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
   }
 
-  void CVodesInternal::lsetupB(double t, double gamma, int convfail,
+  void CvodesInterface::lsetupB(double t, double gamma, int convfail,
                                N_Vector x, N_Vector xB, N_Vector xdotB, booleantype *jcurPtr,
                                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     // Call the preconditioner setup function (which sets up the linear solver)
     psetupB(t, x, xB, xdotB, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
   }
 
-  int CVodesInternal::lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+  int CvodesInterface::lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
                                      booleantype *jcurPtr,
                                      N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(cv_mem->cv_lmem);
       casadi_assert(this_);
       this_->lsetup(cv_mem, convfail, x, xdot, jcurPtr, vtemp1, vtemp2, vtemp3);
       return 0;
@@ -1613,11 +1613,11 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::lsetupB_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+  int CvodesInterface::lsetupB_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
                                       booleantype *jcurPtr,
                                       N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(cv_mem->cv_lmem);
       casadi_assert(this_);
       CVadjMem ca_mem;
       //CVodeBMem cvB_mem;
@@ -1645,9 +1645,9 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
+  void CvodesInterface::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                               N_Vector x, N_Vector xdot) {
-    log("CVodesInternal::lsolve", "begin");
+    log("CvodesInterface::lsolve", "begin");
 
     // Current time
     double t = cv_mem->cv_tn;
@@ -1664,12 +1664,12 @@ namespace casadi {
     // Call the preconditioner solve function (which solves the linear system)
     psolve(t, x, xdot, b, b, gamma, delta, lr, 0);
 
-    log("CVodesInternal::lsolve", "end");
+    log("CvodesInterface::lsolve", "end");
   }
 
-  void CVodesInternal::lsolveB(double t, double gamma, N_Vector b, N_Vector weight,
+  void CvodesInterface::lsolveB(double t, double gamma, N_Vector b, N_Vector weight,
                                N_Vector x, N_Vector xB, N_Vector xdotB) {
-    log("CVodesInternal::lsolveB", "begin");
+    log("CvodesInterface::lsolveB", "begin");
     // Accuracy
     double delta = 0.0;
 
@@ -1679,13 +1679,13 @@ namespace casadi {
     // Call the preconditioner solve function (which solves the linear system)
     psolveB(t, x, xB, xdotB, b, b, gamma, delta, lr, 0);
 
-    log("CVodesInternal::lsolveB", "end");
+    log("CvodesInterface::lsolveB", "end");
   }
 
-  int CVodesInternal::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
+  int CvodesInterface::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                                      N_Vector x, N_Vector xdot) {
     try {
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(cv_mem->cv_lmem);
       casadi_assert(this_);
       this_->lsolve(cv_mem, b, weight, x, xdot);
       return 0;
@@ -1695,10 +1695,10 @@ namespace casadi {
     }
   }
 
-  int CVodesInternal::lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
+  int CvodesInterface::lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                                       N_Vector x, N_Vector xdot) {
     try {
-      CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
+      CvodesInterface *this_ = static_cast<CvodesInterface*>(cv_mem->cv_lmem);
       casadi_assert(this_);
       CVadjMem ca_mem;
       //CVodeBMem cvB_mem;
@@ -1726,7 +1726,7 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::initDenseLinearSolver() {
+  void CvodesInterface::initDenseLinearSolver() {
     int flag = CVDense(mem_, nx_);
     if (flag!=CV_SUCCESS) cvodes_error("CVDense", flag);
     if (exact_jacobian_) {
@@ -1735,7 +1735,7 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::initBandedLinearSolver() {
+  void CvodesInterface::initBandedLinearSolver() {
     int flag = CVBand(mem_, nx_,
                       getOption("upper_bandwidth").toInt(),
                       getOption("lower_bandwidth").toInt());
@@ -1746,7 +1746,7 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::initIterativeLinearSolver() {
+  void CvodesInterface::initIterativeLinearSolver() {
     // Attach the sparse solver
     int flag;
     switch (itsol_f_) {
@@ -1777,11 +1777,11 @@ namespace casadi {
     if (use_preconditioner_) {
       // Make sure that a Jacobian has been provided
       if (jac_.isNull())
-          throw CasadiException("CVodesInternal::init(): No Jacobian has been provided.");
+          throw CasadiException("CvodesInterface::init(): No Jacobian has been provided.");
 
       // Make sure that a linear solver has been provided
       if (linsol_.isNull())
-          throw CasadiException("CVodesInternal::init(): "
+          throw CasadiException("CvodesInterface::init(): "
                                 "No user defined linear solver has been provided.");
 
       // Pass to IDA
@@ -1790,15 +1790,15 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::initUserDefinedLinearSolver() {
+  void CvodesInterface::initUserDefinedLinearSolver() {
     // Make sure that a Jacobian has been provided
     if (jac_.isNull())
-        throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): "
+        throw CasadiException("CvodesInterface::initUserDefinedLinearSolver(): "
                               "No Jacobian has been provided.");
 
     // Make sure that a linear solver has been provided
     if (linsol_.isNull())
-        throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): "
+        throw CasadiException("CvodesInterface::initUserDefinedLinearSolver(): "
                               "No user defined linear solver has been provided.");
 
     //  Set fields in the IDA memory
@@ -1809,7 +1809,7 @@ namespace casadi {
     cv_mem->cv_setupNonNull = TRUE;
   }
 
-  void CVodesInternal::initDenseLinearSolverB() {
+  void CvodesInterface::initDenseLinearSolverB() {
     int flag = CVDenseB(mem_, whichB_, nrx_);
     if (flag!=CV_SUCCESS) cvodes_error("CVDenseB", flag);
     if (exact_jacobianB_) {
@@ -1823,7 +1823,7 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::initBandedLinearSolverB() {
+  void CvodesInterface::initBandedLinearSolverB() {
     int flag = CVBandB(mem_, whichB_, nrx_,
                        getOption("upper_bandwidthB").toInt(),
                        getOption("lower_bandwidthB").toInt());
@@ -1835,7 +1835,7 @@ namespace casadi {
     }
   }
 
-  void CVodesInternal::initIterativeLinearSolverB() {
+  void CvodesInterface::initIterativeLinearSolverB() {
     int flag;
     switch (itsol_g_) {
     case SD_GMRES:
@@ -1865,11 +1865,11 @@ namespace casadi {
     if (use_preconditionerB_) {
       // Make sure that a Jacobian has been provided
       if (jacB_.isNull())
-          throw CasadiException("CVodesInternal::init(): No backwards Jacobian has been provided.");
+          throw CasadiException("CvodesInterface::init(): No backwards Jacobian has been provided.");
 
       // Make sure that a linear solver has been provided
       if (linsolB_.isNull())
-          throw CasadiException("CVodesInternal::init(): "
+          throw CasadiException("CvodesInterface::init(): "
                                 "No user defined backwards  linear solver has been provided.");
 
       // Pass to IDA
@@ -1879,15 +1879,15 @@ namespace casadi {
 
   }
 
-  void CVodesInternal::initUserDefinedLinearSolverB() {
+  void CvodesInterface::initUserDefinedLinearSolverB() {
     // Make sure that a Jacobian has been provided
     if (jacB_.isNull())
-        throw CasadiException("CVodesInternal::initUserDefinedLinearSolverB(): "
+        throw CasadiException("CvodesInterface::initUserDefinedLinearSolverB(): "
                               "No backwards Jacobian has been provided.");
 
     // Make sure that a linear solver has been provided
     if (linsolB_.isNull())
-        throw CasadiException("CVodesInternal::initUserDefinedLinearSolverB(): "
+        throw CasadiException("CvodesInterface::initUserDefinedLinearSolverB(): "
                               "No user defined backward linear solver has been provided.");
 
     CVodeMem cv_mem = static_cast<CVodeMem>(mem_);
@@ -1901,12 +1901,12 @@ namespace casadi {
     cvB_mem->cv_mem->cv_setupNonNull = TRUE;
   }
 
-  void CVodesInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
+  void CvodesInterface::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     SundialsInternal::deepCopyMembers(already_copied);
   }
 
   template<typename FunctionType>
-  FunctionType CVodesInternal::getJacGen() {
+  FunctionType CvodesInterface::getJacGen() {
     FunctionType f = shared_cast<FunctionType>(f_);
     casadi_assert(!f.isNull());
 
@@ -1926,7 +1926,7 @@ namespace casadi {
   }
 
   template<typename FunctionType>
-  FunctionType CVodesInternal::getJacGenB() {
+  FunctionType CvodesInterface::getJacGenB() {
     FunctionType g = shared_cast<FunctionType>(g_);
     casadi_assert(!g.isNull());
 
@@ -1945,24 +1945,24 @@ namespace casadi {
     return FunctionType(jac_in, jac);
   }
 
-  Function CVodesInternal::getJacB() {
+  Function CvodesInterface::getJacB() {
     if (is_a<SXFunction>(g_)) {
       return getJacGenB<SXFunction>();
     } else if (is_a<MXFunction>(g_)) {
       return getJacGenB<MXFunction>();
     } else {
-      throw CasadiException("CVodesInternal::getJacB(): Not an SXFunction or MXFunction");
+      throw CasadiException("CvodesInterface::getJacB(): Not an SXFunction or MXFunction");
     }
   }
 
 
-  Function CVodesInternal::getJac() {
+  Function CvodesInterface::getJac() {
     if (is_a<SXFunction>(f_)) {
       return getJacGen<SXFunction>();
     } else if (is_a<MXFunction>(f_)) {
       return getJacGen<MXFunction>();
     } else {
-      throw CasadiException("CVodesInternal::getJac(): Not an SXFunction or MXFunction");
+      throw CasadiException("CvodesInterface::getJac(): Not an SXFunction or MXFunction");
     }
   }
 

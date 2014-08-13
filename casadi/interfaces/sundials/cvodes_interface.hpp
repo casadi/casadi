@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_CVODES_INTERNAL_HPP
-#define CASADI_CVODES_INTERNAL_HPP
+#ifndef CASADI_CVODES_INTERFACE_HPP
+#define CASADI_CVODES_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_integrator_cvodes_export.h>
 #include "sundials_internal.hpp"
@@ -56,27 +56,27 @@ namespace casadi {
       @copydoc plugin_Integrator_cvodes
 
   */
-  class CASADI_INTEGRATOR_CVODES_EXPORT CVodesInternal : public SundialsInternal {
+  class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInternal {
   public:
     /** \brief  Constructor */
-    explicit CVodesInternal(const Function& f, const Function& g);
+    explicit CvodesInterface(const Function& f, const Function& g);
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Clone */
-    virtual CVodesInternal* clone() const;
+    virtual CvodesInterface* clone() const;
 
     /** \brief  Create a new integrator */
-    virtual CVodesInternal* create(const Function& f, const Function& g) const
-    { return new CVodesInternal(f, g);}
+    virtual CvodesInterface* create(const Function& f, const Function& g) const
+    { return new CvodesInterface(f, g);}
 
     /** \brief  Create a new integrator */
     static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new CVodesInternal(f, g);}
+    { return new CvodesInterface(f, g);}
 
     /** \brief  Destructor */
-    virtual ~CVodesInternal();
+    virtual ~CvodesInterface();
 
     /** \brief  Free all CVodes memory */
     virtual void freeCVodes();
@@ -301,5 +301,5 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_CVODES_INTERNAL_HPP
+#endif // CASADI_CVODES_INTERFACE_HPP
 

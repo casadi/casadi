@@ -10,8 +10,8 @@ endif()
 # CVODES
 casadi_plugin(Integrator cvodes
   sundials_internal.hpp  sundials_internal.cpp
-  cvodes_internal.hpp    cvodes_internal.cpp
-  cvodes_internal_meta.cpp
+  cvodes_interface.hpp    cvodes_interface.cpp
+  cvodes_interface_meta.cpp
   )
 casadi_plugin_link_libraries(Integrator cvodes ${SUNDIALS_LIBRARIES})
 

@@ -21,10 +21,10 @@
  */
 
 
-      #include "cvodes_internal.hpp"
+      #include "cvodes_interface.hpp"
       #include <string>
 
-      const std::string casadi::CVodesInternal::meta_doc=
+      const std::string casadi::CvodesInterface::meta_doc=
       "\n"
 "Interface to CVodes from the Sundials suite.\n"
 "\n"
