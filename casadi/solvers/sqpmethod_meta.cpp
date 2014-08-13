@@ -21,10 +21,10 @@
  */
 
 
-      #include "sqp_internal.hpp"
+      #include "sqpmethod.hpp"
       #include <string>
 
-      const std::string casadi::SQPInternal::meta_doc=
+      const std::string casadi::Sqpmethod::meta_doc=
       "\n"
 "A textbook SQPMethod\n"
 "\n"

@@ -21,10 +21,10 @@
  */
 
 
-      #include "stabilized_sqp_internal.hpp"
+      #include "stabilized_sqpmethod.hpp"
       #include <string>
 
-      const std::string casadi::StabilizedSQPInternal::meta_doc=
+      const std::string casadi::StabilizedSqpmethod::meta_doc=
       "\n"
 "Stabilized Sequential Quadratic Programming method.\n"
 "\n"

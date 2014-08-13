@@ -20,7 +20,7 @@
  *
  */
 
-#include "sqp_internal.hpp"
+#include "sqpmethod.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
@@ -38,9 +38,9 @@ namespace casadi {
 
   extern "C"
   int CASADI_NLPSOLVER_SQPMETHOD_EXPORT casadi_register_nlpsolver_sqpmethod(NlpSolverInternal::Plugin* plugin){
-    plugin->creator = SQPInternal::creator;
+    plugin->creator = Sqpmethod::creator;
     plugin->name = "sqpmethod";
-    plugin->doc = SQPInternal::meta_doc.c_str();
+    plugin->doc = Sqpmethod::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
@@ -50,7 +50,7 @@ namespace casadi {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_sqpmethod);
   }
 
-  SQPInternal::SQPInternal(const Function& nlp) : NlpSolverInternal(nlp) {
+  Sqpmethod::Sqpmethod(const Function& nlp) : NlpSolverInternal(nlp) {
     casadi_warning("The SQP method is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
@@ -89,10 +89,10 @@ namespace casadi {
   }
 
 
-  SQPInternal::~SQPInternal() {
+  Sqpmethod::~Sqpmethod() {
   }
 
-  void SQPInternal::init() {
+  void Sqpmethod::init() {
     // Call the init method of the base class
     NlpSolverInternal::init();
 
@@ -226,7 +226,7 @@ namespace casadi {
     }
   }
 
-  void SQPInternal::evaluate() {
+  void Sqpmethod::evaluate() {
     if (inputs_check_) checkInputs();
     checkInitialBounds();
 
@@ -612,7 +612,7 @@ namespace casadi {
     stats_["n_eval_h"] = n_eval_h_;
   }
 
-  void SQPInternal::printIteration(std::ostream &stream) {
+  void Sqpmethod::printIteration(std::ostream &stream) {
     stream << setw(4)  << "iter";
     stream << setw(15) << "objective";
     stream << setw(10) << "inf_pr";
@@ -624,7 +624,7 @@ namespace casadi {
     stream << endl;
   }
 
-  void SQPInternal::printIteration(std::ostream &stream, int iter, double obj,
+  void Sqpmethod::printIteration(std::ostream &stream, int iter, double obj,
                                    double pr_inf, double du_inf,
                                    double dx_norm, double rg, int ls_trials, bool ls_success) {
     stream << setw(4) << iter;
@@ -644,7 +644,7 @@ namespace casadi {
     stream << endl;
   }
 
-  double SQPInternal::quad_form(const std::vector<double>& x, const DMatrix& A) {
+  double Sqpmethod::quad_form(const std::vector<double>& x, const DMatrix& A) {
     // Assert dimensions
     casadi_assert(x.size()==A.size1() && x.size()==A.size2());
 
@@ -671,7 +671,7 @@ namespace casadi {
     return ret;
   }
 
-  void SQPInternal::reset_h() {
+  void Sqpmethod::reset_h() {
     // Initial Hessian approximation of BFGS
     if (!exact_hessian_) {
       Bk_.set(B_init_);
@@ -684,7 +684,7 @@ namespace casadi {
     }
   }
 
-  double SQPInternal::getRegularization(const Matrix<double>& H) {
+  double Sqpmethod::getRegularization(const Matrix<double>& H) {
     const vector<int>& colind = H.colind();
     const vector<int>& row = H.row();
     const vector<double>& data = H.data();
@@ -704,7 +704,7 @@ namespace casadi {
     return -reg_param;
   }
 
-  void SQPInternal::regularize(Matrix<double>& H, double reg) {
+  void Sqpmethod::regularize(Matrix<double>& H, double reg) {
     const vector<int>& colind = H.colind();
     const vector<int>& row = H.row();
     vector<double>& data = H.data();
@@ -720,7 +720,7 @@ namespace casadi {
   }
 
 
-  void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda,
+  void Sqpmethod::eval_h(const std::vector<double>& x, const std::vector<double>& lambda,
                            double sigma, Matrix<double>& H) {
     try {
       // Get function
@@ -758,7 +758,7 @@ namespace casadi {
     }
   }
 
-  void SQPInternal::eval_g(const std::vector<double>& x, std::vector<double>& g) {
+  void Sqpmethod::eval_g(const std::vector<double>& x, std::vector<double>& g) {
     try {
       double time1 = clock();
 
@@ -790,7 +790,7 @@ namespace casadi {
     }
   }
 
-  void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g,
+  void Sqpmethod::eval_jac_g(const std::vector<double>& x, std::vector<double>& g,
                                Matrix<double>& J) {
     try {
       double time1 = clock();
@@ -829,7 +829,7 @@ namespace casadi {
     }
   }
 
-  void SQPInternal::eval_grad_f(const std::vector<double>& x, double& f,
+  void Sqpmethod::eval_grad_f(const std::vector<double>& x, double& f,
                                 std::vector<double>& grad_f) {
     try {
       double time1 = clock();
@@ -868,7 +868,7 @@ namespace casadi {
     }
   }
 
-  void SQPInternal::eval_f(const std::vector<double>& x, double& f) {
+  void Sqpmethod::eval_f(const std::vector<double>& x, double& f) {
     try {
        // Log time
       double time1 = clock();
@@ -898,7 +898,7 @@ namespace casadi {
     }
   }
 
-  void SQPInternal::solve_QP(const Matrix<double>& H, const std::vector<double>& g,
+  void Sqpmethod::solve_QP(const Matrix<double>& H, const std::vector<double>& g,
                              const std::vector<double>& lbx, const std::vector<double>& ubx,
                              const Matrix<double>& A, const std::vector<double>& lbA,
                              const std::vector<double>& ubA,
@@ -950,7 +950,7 @@ namespace casadi {
     }
   }
 
-  double SQPInternal::primalInfeasibility(const std::vector<double>& x,
+  double Sqpmethod::primalInfeasibility(const std::vector<double>& x,
                                           const std::vector<double>& lbx,
                                           const std::vector<double>& ubx,
                                           const std::vector<double>& g,
