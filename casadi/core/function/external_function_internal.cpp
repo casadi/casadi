@@ -58,7 +58,10 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
 
   // Load symbols
   initPtr init = (initPtr)dlsym(handle_, "init");
-  if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
+  if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"init\" found. "
+                                       "Possible cause: If the function was generated from CasADi, "
+                                       "make sure that it was compiled with a C compiler. If the "
+                                       "function is C++, make sure to use extern \"C\" linkage.");
   getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "getSparsity");
   if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
   evaluate_ = (evaluatePtr) dlsym(handle_, "evaluateWrap");
