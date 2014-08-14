@@ -100,6 +100,116 @@ warnings.filterwarnings("default",".*This CasADi function.*",DeprecationWarning)
 
 import contextlib
 
+
+import inspect
+import re
+
+
+def pythonify(s):
+  s = s.replace("C/C++ prototypes","Python usages")
+  s = s.replace("casadi::","")
+  s = s.replace("std::string","str")
+  s = s.replace(" const &","")
+  s = re.sub("(const )?Matrix< SXElement >( &)?",r"SX",s)
+  s = re.sub("(const )?Matrix< ?(\w+) ?>( ?&)?",r"array(\2) ",s)
+  s = re.sub(r"const (\w+) &",r"\1 ",s)
+  s = re.sub(r"< \w+ >\(",r"(",s)
+  s = re.sub(r"\b(\w+)::\1",r"\1",s)
+  for i in range(5):
+    s = re.sub(r"(const )? ?std::vector< ?([\w\(\) ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2,...] ",s)
+  s = re.sub(r"IOSchemeVector< (\w+) >",r"scheme(\1)",s)
+  s = s.replace("casadi::","")
+  s = s.replace("IOInterface< Function >","Function")
+  s = s.replace("::",".")
+  s = s.replace(".operator ()","")
+  s = re.sub(r"([A-Z]\w+)Vector",r"[\1,...]",s)
+  return s
+  
+def type_descr(a):
+  if isinstance(a,list):
+    if len(a)>0:
+      return "[%s]" % ",".join(set([type_descr(i) for i in a]))
+    else:
+      return "[]"
+  if type(a).__name__.startswith("IOSchemeVector"):
+    return "scheme(%s)" % type(a).__name__[len("IOSchemeVector"):]
+  else:
+    return type(a).__name__
+
+def monkeypatch(v,cl=True):
+  def foo(*args,**kwargs):
+    try:
+      return v(*args,**kwargs)
+    except NotImplementedError as e:
+      import sys
+      exc_info = sys.exc_info()
+      if e.message.startswith("Wrong number or type of arguments for overloaded function"):
+
+        s = e.args[0]
+        s = s.replace("'new_","'")
+        s = re.sub(r"overloaded function '(\w+)_(\w+)'",r"overloaded function '\1.\2'",s)
+        m = re.search("overloaded function '([\w\.]+)'",s)
+        if m:
+          name = m.group(1)
+        else:
+          name = "method"
+        ne = NotImplementedError(pythonify(s)+"You have: %s(%s)\n" % (name,", ".join(map(type_descr,args[1:] if cl else args))))
+        raise ne.__class__, ne, exc_info[2].tb_next
+      else:
+        raise exc_info[1], None, exc_info[2].tb_next
+    except TypeError as e:
+      import sys
+      exc_info = sys.exc_info()
+      
+      methodname = "method"
+      try:
+        methodname = exc_info[2].tb_next.tb_frame.f_code.co_name
+      except:
+        pass
+
+      if e.message.startswith("in method '"):
+        s = e.args[0]
+        s = re.sub(r"method '(\w+)_(\w+)'",r"method '\1.\2'",s)
+        m = re.search("method '([\w\.]+)'",s)
+        if m:
+          name = m.group(1)
+        else:
+          name = "method"
+        ne = TypeError(pythonify(s)+" expected.\nYou have: %s(%s)\n" % (name,", ".join(map(type_descr,args[1:] if cl else args))))
+        raise ne.__class__, ne, exc_info[2].tb_next
+      elif e.message.startswith("Expecting one of"):
+        s = e.args[0]
+        conversion = {"mul": "*", "div": "/", "add": "+", "sub": "-","le":"<=","ge":">=","lt":"<","gt":">","eq":"==","pow":"**"}
+        if methodname.startswith("__") and methodname[2:-2] in conversion:
+          ne = TypeError(pythonify(s)+"\nYou try to do: %s %s %s.\n" % (  type_descr(args[0]),conversion[methodname[2:-2]] ,type_descr(args[1]) ))
+        elif methodname.startswith("__r") and methodname[3:-2] in conversion:
+          ne = TypeError(pythonify(s)+"\nYou try to do: %s %s %s.\n" % ( type_descr(args[1]),  conversion[methodname[3:-2]], type_descr(args[0]) ))
+        else:
+          ne = TypeError(pythonify(s)+"\nYou have: (%s)\n" % (", ".join(map(type_descr,args[1:] if cl else args))))
+        raise ne.__class__, ne, exc_info[2].tb_next
+      else:
+        s = e.args[0]
+        ne = TypeError(s+"\nYou have: (%s)\n" % (", ".join(map(type_descr,args[1:] if cl else args) + ["%s=%s" % (k,type_descr(vv)) for k,vv in kwargs.items()]  )))
+        raise ne.__class__, ne, exc_info[2].tb_next
+        
+  if v.__doc__ is not None:
+    foo.__doc__ = pythonify(v.__doc__)
+  foo.__name__ = v.__name__
+  return foo
+
+
+for name,cl in inspect.getmembers(casadi, inspect.isclass):
+  for k,v in inspect.getmembers(cl, inspect.ismethod):
+    setattr(cl,k,monkeypatch(v))
+  for k,v in inspect.getmembers(cl, inspect.isfunction):
+    setattr(cl,k,staticmethod(monkeypatch(v,cl=False)))
+    
+for name,v in inspect.getmembers(casadi, inspect.isfunction):
+  p = monkeypatch(v,cl=False)
+  setattr(casadi,name,p)
+  import sys
+  setattr(sys.modules[__name__], name, p)
+
 @contextlib.contextmanager
 def internalAPI():
     backup = CasadiOptions.getAllowedInternalAPI()

@@ -355,7 +355,69 @@ class Misctests(casadiTestCase):
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
+    
+  def test_exceptions(self):
+    try:
+      NlpSolver(123)
+    except NotImplementedError as e:
+      assert "NlpSolver(str,Function)" in e.message
+      assert "You have: NlpSolver(int)" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
 
+    try:
+      vertcat(123)
+    except NotImplementedError as e:
+      assert "vertcat([SX,...]" in e.message
+      assert "vertcat([array(double)" in e.message
+      assert "You have: vertcat(int)" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
+      
+    try:
+      substitute(123)
+    except NotImplementedError as e:
+      assert "substitute(SX,SX,SX)" in e.message
+      assert "substitute([SX,...] ,[SX,...] ,[SX,...] )" in e.message
+      assert "You have: substitute(int)" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
+      
+    try:
+      SXFunction(daeIn(x=SX.sym("x")))
+    except NotImplementedError as e:
+      assert "SXFunction(scheme(SX),[SX,...] )" in e.message
+      assert "You have: SXFunction(scheme(SX))" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
+
+    try:
+      NlpSolver.loadPlugin(132)
+    except TypeError as e:
+      assert "type 'str' expected" in e.message
+      assert "NlpSolver.loadPlugin" in e.message
+      assert "You have: NlpSolver.loadPlugin(int)" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
+
+    x=SX.sym("x")
+      
+    try:
+      [x]+ x
+    except TypeError as e:
+      assert "You try to do: [SX] + SX" in e.message
+
+    try:
+      x + [x]
+    except TypeError as e:
+      assert "You try to do: SX + [SX]" in e.message
+
+
+    try:
+      daeIn(x=x,p=[x])
+    except TypeError as e:
+      assert "You have: (x=SX, p=[SX])" in e.message
+      
   def test_assertions(self):
     
     x = MX.sym("x") 
