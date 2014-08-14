@@ -202,9 +202,9 @@ def monkeypatch(v,cl=True):
   foo.__monkeypatched__ = True
   return foo
 
-
 for name,cl in inspect.getmembers(casadi, inspect.isclass):
   for k,v in inspect.getmembers(cl, inspect.ismethod):
+    if k == "__del__": continue
     setattr(cl,k,monkeypatch(v))
   for k,v in inspect.getmembers(cl, inspect.isfunction):
     setattr(cl,k,staticmethod(monkeypatch(v,cl=False)))
