@@ -889,7 +889,7 @@ def lpStruct(*dummy,**kwargs):
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LPStruct,n)] for n in dummy[1:]]
-  a = []
+  a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
   for k in kwargs.keys():
@@ -1607,13 +1607,13 @@ def qcqpStruct(*dummy,**kwargs):
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPStruct,n)] for n in dummy[1:]]
-  h = []
+  h = Sparsity()
   if 'h' in kwargs:
     h = kwargs['h']
-  p = []
+  p = Sparsity()
   if 'p' in kwargs:
     p = kwargs['p']
-  a = []
+  a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
   for k in kwargs.keys():
@@ -1780,10 +1780,10 @@ def qpStruct(*dummy,**kwargs):
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPStruct,n)] for n in dummy[1:]]
-  h = []
+  h = Sparsity()
   if 'h' in kwargs:
     h = kwargs['h']
-  a = []
+  a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
   for k in kwargs.keys():
@@ -1959,13 +1959,13 @@ def sdpStruct(*dummy,**kwargs):
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPStruct,n)] for n in dummy[1:]]
-  f = []
+  f = Sparsity()
   if 'f' in kwargs:
     f = kwargs['f']
-  g = []
+  g = Sparsity()
   if 'g' in kwargs:
     g = kwargs['g']
-  a = []
+  a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
   for k in kwargs.keys():
@@ -2146,16 +2146,16 @@ def sdqpStruct(*dummy,**kwargs):
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPStruct,n)] for n in dummy[1:]]
-  h = []
+  h = Sparsity()
   if 'h' in kwargs:
     h = kwargs['h']
-  f = []
+  f = Sparsity()
   if 'f' in kwargs:
     f = kwargs['f']
-  g = []
+  g = Sparsity()
   if 'g' in kwargs:
     g = kwargs['g']
-  a = []
+  a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
   for k in kwargs.keys():
@@ -2326,10 +2326,10 @@ def socpStruct(*dummy,**kwargs):
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPStruct,n)] for n in dummy[1:]]
-  g = []
+  g = Sparsity()
   if 'g' in kwargs:
     g = kwargs['g']
-  a = []
+  a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
   for k in kwargs.keys():
