@@ -156,6 +156,11 @@ class NZproxy:
 %enddef
 #endif
 
+#ifdef SWIGMATLAB
+%define %matrix_helpers(Type)
+%enddef
+#endif
+
 #ifndef SWIGPYTHON
 %define %matrix_convertors
 %enddef

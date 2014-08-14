@@ -15,10 +15,13 @@ cmake_policy(SET CMP0011 OLD)
 endif()
 endif()
 
-find_package(PythonLibs)
-find_package(NUMPY)
-
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
+
+# Find packages
+find_package(PythonLibs)
+find_package(PythonInterp)
+find_package(NUMPY)
+find_package(MATLAB)
 
 set(CASADI_SWIG_FLAGS "")
 
@@ -115,6 +118,13 @@ foreach(my_module ${CASADI_SWIG_MODULES})
   list(APPEND modules_python _${my_module})
 endforeach()
 add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
+
+set(modules_matlab)
+foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
+  list(APPEND modules_matlab ${my_module}_matlab)
+endforeach()
+add_custom_target(_matlab_modules DEPENDS ${modules_matlab}) # the matlab interface is created with the command "make matlab"
+
 set(modules_json)
 foreach(my_module ${CASADI_SWIG_MODULES})
   list(APPEND modules_json ${my_module}_json)
@@ -146,8 +156,6 @@ add_custom_command(
   ARGS -E copy ${PYTHONLIBPATH_${my_module}} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_${my_module}}
 )
 endforeach()
-
-find_package(PythonInterp)
 
 if(NOT DEFINED PYTHON_PREFIX)
   if(PYTHONINTERP_FOUND)
@@ -246,6 +254,11 @@ foreach(my_module ${CASADI_SWIG_MODULES})
 add_dependencies(install_python DEPENDS _${my_module})
 endforeach()
 
+# MATLAB interface
+foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
+  swig_add_module(${my_module}_matlab matlab ${my_module}.i)
+endforeach()
+  
 # json interface
 foreach(my_module ${CASADI_SWIG_MODULES})
   swig_add_module_xml(${my_module}_xml ${my_module}.i)
@@ -326,5 +339,3 @@ set(CPACK_PACKAGE_VERSION_PATCH "99")
 endif()
 
 include(CPack)
-
-
