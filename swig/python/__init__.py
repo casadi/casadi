@@ -106,6 +106,7 @@ import re
 
 
 def pythonify(s):
+
   s = s.replace("C/C++ prototypes","Python usages")
   s = s.replace("casadi::","")
   s = s.replace("std::string","str")
@@ -114,10 +115,11 @@ def pythonify(s):
   s = re.sub("(const )?Matrix< ?(\w+) ?>( ?&)?",r"array(\2) ",s)
   s = re.sub(r"const (\w+) &",r"\1 ",s)
   s = re.sub(r"< \w+ >\(",r"(",s)
-  s = re.sub(r"\b(\w+)::\1",r"\1",s)
+  s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
   for i in range(5):
     s = re.sub(r"(const )? ?std::vector< ?([\w\(\) ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2,...] ",s)
-  s = re.sub(r"IOSchemeVector< (\w+) >",r"scheme(\1)",s)
+  s = re.sub(r"StructIOSchemeVector(< ?(\w+) ?>)?",r"Structure",s)
+  s = re.sub(r"IOSchemeVector< ?(\w+) ?>",r"scheme(\1)",s)
   s = s.replace("casadi::","")
   s = s.replace("IOInterface< Function >","Function")
   s = s.replace("::",".")
@@ -155,7 +157,7 @@ def monkeypatch(v,cl=True):
           name = m.group(1)
         else:
           name = "method"
-        ne = NotImplementedError(pythonify(s)+"You have: %s(%s)\n" % (name,", ".join(map(type_descr,args[1:] if cl else args))))
+        ne = NotImplementedError(pythonify(s)+"You have: %s(%s)\n" % (name,", ".join(map(type_descr,args[1:] if cl else args)+ ["%s=%s" % (k,type_descr(vv)) for k,vv in kwargs.items()])))
         raise ne.__class__, ne, exc_info[2].tb_next
       else:
         raise exc_info[1], None, exc_info[2].tb_next
