@@ -559,7 +559,7 @@
 %exception  casadi::FunctionInternal::generateBody(std::ostream &stream, const std::string &type, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::FunctionInternal::generateCode(std::ostream &cfile) {
+%exception  casadi::FunctionInternal::generateCode(std::ostream &cfile, bool generate_main) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::FunctionInternal::generateDeclarations(std::ostream &stream, const std::string &type, CodeGenerator &gen) const  {
