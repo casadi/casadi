@@ -247,10 +247,10 @@ namespace casadi {
     (*this)->setDerivative(fcn, nfwd, nadj);
   }
 
-  void Function::generateCode(const string& filename) {
+  void Function::generateCode(const string& filename, bool generate_main) {
     std::ofstream cfile;
     cfile.open(filename.c_str());
-    generateCode(cfile);
+    generateCode(cfile, generate_main);
     cfile.close();
   }
 
@@ -260,8 +260,8 @@ namespace casadi {
     return cfile.str();
   }
 
-  void Function::generateCode(std::ostream &stream) {
-    (*this)->generateCode(stream);
+  void Function::generateCode(std::ostream &stream, bool generate_main) {
+    (*this)->generateCode(stream, generate_main);
   }
 
   const IOScheme& Function::inputScheme() const {

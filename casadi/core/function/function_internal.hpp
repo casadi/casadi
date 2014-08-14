@@ -209,7 +209,7 @@ namespace casadi {
     MXFunction wrapMXFunction();
 
     /** \brief  Print to a stream */
-    virtual void generateCode(std::ostream &cfile);
+    virtual void generateCode(std::ostream &cfile, bool generate_main);
 
     /** \brief Generate code for function inputs and outputs */
     void generateIO(CodeGenerator& gen);

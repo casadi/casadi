@@ -2086,7 +2086,7 @@ namespace casadi {
 
   }
 
-  void FunctionInternal::generateCode(std::ostream &cfile) {
+  void FunctionInternal::generateCode(std::ostream &cfile, bool generate_main) {
     assertInit();
 
     // set stream parameters
@@ -2137,7 +2137,7 @@ namespace casadi {
     cfile << "}" << std::endl << std::endl;
 
     // Create a main for debugging and profiling: TODO: Cleanup and expose to user, see #617
-    if (true) {
+    if (generate_main) {
       int n_in = getNumInputs();
       int n_out = getNumOutputs();
 
