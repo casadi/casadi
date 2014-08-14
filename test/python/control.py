@@ -145,8 +145,8 @@ class ControlTests(casadiTestCase):
           
   @requires("slicot_periodic_schur")
   def test_slicot_periodic_schur(self):
-    for K in ([1,2,3,4,5] if args.run_slow else [1,2,3]):
-      for n in ([2,3,4,8,16,32] if args.run_slow else [2,3,4]):
+    for K in ([1,2,3,4,5] if args.run_slow and not args.ignore_memory_heavy else [1,2,3]):
+      for n in ([2,3,4,8,16,32] if args.run_slow and not args.ignore_memory_heavy else [2,3,4]):
         numpy.random.seed(1)
         A = [DMatrix(numpy.random.random((n,n))) for i in range(K)]
         T,Z,er,ec = slicot_periodic_schur(A)
