@@ -201,7 +201,7 @@ class CASADI_CORE_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     s+="""  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of %s. Either use keywords or non-keywords ")\n""" % self.name
     s+="""  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_%s,n)] for n in dummy[1:]]\n""" % self.enum
     for name, doc, enum in self.entries:
-      s+="  %s = []\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,name,name,name)
+      s+="  %s = %s\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,"Sparsity()" if self.enum.endswith("Struct") else "[]",name,name,name)
     s+="""  for k in kwargs.keys():\n    if not(k in [%s]):\n      raise Exception("Keyword error in %s: '%%s' is not recognized. Available keywords are: %s" %% k )\n""" % (",".join(["'%s'" % name for name, doc, enum in self.entries]),self.name,", ".join([name for name, doc, enum in self.entries]))
 
     if (self.enum.endswith("Struct")):
