@@ -34,6 +34,11 @@ namespace casadi {
     s << includes_.str();
     s << endl;
 
+    // Add C++ guards
+    // s << "#ifdef __cplusplus" << endl;
+    // s << "extern \“C\” {" << endl;
+    // s << "#endif" << endl;
+
     // Space saving macro
     s << "#define d double" << endl << endl;
 
@@ -57,6 +62,11 @@ namespace casadi {
     s << dependencies_.str();
     s << function_.str();
     s << finalization_.str();
+
+    // Close C++ guards
+    // s << "#ifdef __cplusplus" << endl;
+    // s << "}" << endl;
+    // s << "#endif" << endl;
   }
 
   std::string CodeGenerator::numToString(int n) {
