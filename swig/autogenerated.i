@@ -42,7 +42,7 @@ def IOSchemeVector(arg,io_scheme):
     return IOSchemeVectorSparsity(arg,io_scheme)
   except:
     pass
-  raise Exception("IOSchemeVector called with faulty arguments. Individual values must be SX, MX or Sparsity.")
+  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX or Sparsity.")
 %}
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
