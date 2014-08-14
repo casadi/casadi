@@ -360,6 +360,7 @@ class Misctests(casadiTestCase):
     try:
       NlpSolver(123)
     except NotImplementedError as e:
+      print e.message
       assert "NlpSolver(str,Function)" in e.message
       assert "You have: NlpSolver(int)" in e.message
       assert "::" not in e.message
@@ -368,6 +369,7 @@ class Misctests(casadiTestCase):
     try:
       vertcat(123)
     except NotImplementedError as e:
+      print e.message
       assert "vertcat([SX,...]" in e.message
       assert "vertcat([array(double)" in e.message
       assert "You have: vertcat(int)" in e.message
@@ -377,6 +379,7 @@ class Misctests(casadiTestCase):
     try:
       substitute(123)
     except NotImplementedError as e:
+      print e.message
       assert "substitute(SX,SX,SX)" in e.message
       assert "substitute([SX,...] ,[SX,...] ,[SX,...] )" in e.message
       assert "You have: substitute(int)" in e.message
@@ -386,6 +389,7 @@ class Misctests(casadiTestCase):
     try:
       SXFunction(daeIn(x=SX.sym("x")))
     except NotImplementedError as e:
+      print e.message
       assert "SXFunction(scheme(SX),[SX,...] )" in e.message
       assert "You have: SXFunction(scheme(SX))" in e.message
       assert "::" not in e.message
@@ -394,6 +398,7 @@ class Misctests(casadiTestCase):
     try:
       NlpSolver.loadPlugin(132)
     except TypeError as e:
+      print e.message
       assert "type 'str' expected" in e.message
       assert "NlpSolver.loadPlugin" in e.message
       assert "You have: NlpSolver.loadPlugin(int)" in e.message
@@ -405,18 +410,27 @@ class Misctests(casadiTestCase):
     try:
       [x]+ x
     except TypeError as e:
+      print e.message
       assert "You try to do: [SX] + SX" in e.message
 
     try:
       x + [x]
     except TypeError as e:
+      print e.message
       assert "You try to do: SX + [SX]" in e.message
 
 
     try:
       daeIn(x=x,p=[x])
     except TypeError as e:
+      print e.message
       assert "You have: (x=SX, p=[SX])" in e.message
+
+    try:
+      QpSolver("qp",123)
+    except NotImplementedError as e:
+      print e.message
+      assert "QpSolver(str,QPStructure)" in e.message
       
   def test_assertions(self):
     
