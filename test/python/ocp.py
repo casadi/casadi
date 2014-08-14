@@ -194,6 +194,7 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[0],0,8,"Constraint is supposed to be unactive")
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[1],0,8,"Constraint is supposed to be unactive") 
     
+  @requiresPlugin(XmlFile,"tinyxml")
   def test_XML(self):
     self.message("JModelica XML parsing")
     ocp = SymbolicOCP()
