@@ -137,6 +137,8 @@ def type_descr(a):
     return type(a).__name__
 
 def monkeypatch(v,cl=True):
+  if hasattr(v,"__monkeypatched__"):
+    return v
   def foo(*args,**kwargs):
     try:
       return v(*args,**kwargs)
@@ -195,6 +197,7 @@ def monkeypatch(v,cl=True):
   if v.__doc__ is not None:
     foo.__doc__ = pythonify(v.__doc__)
   foo.__name__ = v.__name__
+  foo.__monkeypatched__ = True
   return foo
 
 
