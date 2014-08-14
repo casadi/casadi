@@ -204,11 +204,12 @@ def monkeypatch(v,cl=True):
 
 for name,cl in inspect.getmembers(casadi, inspect.isclass):
   for k,v in inspect.getmembers(cl, inspect.ismethod):
-    if k == "__del__": continue
+    if k=="__init__" and  "SchemeVectorSX" in name: continue
+    if k == "__del__" or v.__name__ == "<lambda>": continue
     setattr(cl,k,monkeypatch(v))
   for k,v in inspect.getmembers(cl, inspect.isfunction):
     setattr(cl,k,staticmethod(monkeypatch(v,cl=False)))
-    
+  
 for name,v in inspect.getmembers(casadi, inspect.isfunction):
   p = monkeypatch(v,cl=False)
   setattr(casadi,name,p)
