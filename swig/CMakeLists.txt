@@ -21,8 +21,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
 find_package(PythonLibs)
 find_package(PythonInterp)
 find_package(NUMPY)
-find_package(MATLAB)
-
+if(WITH_MATLAB)
+  find_package(MATLAB)
+endif()
 set(CASADI_SWIG_FLAGS "")
 
 # Include the use swig file
@@ -119,11 +120,13 @@ foreach(my_module ${CASADI_SWIG_MODULES})
 endforeach()
 add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
 
-set(modules_matlab)
-foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
-  list(APPEND modules_matlab ${my_module}_matlab)
-endforeach()
-add_custom_target(_matlab_modules DEPENDS ${modules_matlab}) # the matlab interface is created with the command "make matlab"
+if(WITH_MATLAB)
+  set(modules_matlab)
+  foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
+    list(APPEND modules_matlab ${my_module}_matlab)
+  endforeach()
+  add_custom_target(_matlab_modules DEPENDS ${modules_matlab}) # the matlab interface is created with the command "make matlab"
+endif()
 
 set(modules_json)
 foreach(my_module ${CASADI_SWIG_MODULES})
@@ -255,9 +258,11 @@ add_dependencies(install_python DEPENDS _${my_module})
 endforeach()
 
 # MATLAB interface
-foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
-  swig_add_module(${my_module}_matlab matlab ${my_module}.i)
-endforeach()
+if(WITH_MATLAB)
+  foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
+    swig_add_module(${my_module}_matlab matlab ${my_module}.i)
+  endforeach()
+endif()
   
 # json interface
 foreach(my_module ${CASADI_SWIG_MODULES})

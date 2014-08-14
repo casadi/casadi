@@ -122,6 +122,7 @@ option(WITH_OPENCL "Compile with OpenCL support" OFF)
 option(WITH_TINYXML "Compile the interface to TinyXML (the source code is included)" ON)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
+option(WITH_MATLAB "Compile with support for MATLAB front-end (experimental)" OFF)
 
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -392,7 +393,9 @@ find_package(SWIG)
   if(SWIG_FOUND)
     add_subdirectory(swig)
     add_custom_target(python DEPENDS _python_modules)
-    add_custom_target(matlab DEPENDS _matlab_modules)
+    if(WITH_MATLAB)
+        add_custom_target(matlab DEPENDS _matlab_modules)
+    endif()
     add_custom_target(json DEPENDS _json_modules)
 endif()
 
