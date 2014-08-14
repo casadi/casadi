@@ -432,6 +432,14 @@ class Misctests(casadiTestCase):
       print e.message
       assert "QpSolver(str,QPStructure)" in e.message
       
+    try:
+      SXFunction(qpStruct(a=12),[x])
+    except NotImplementedError as e:
+      print e.message
+      assert "QPStructure([Sparsity,...] )" in e.message
+      assert "You have: QPStructure([int,Sparsity])" in e.message
+      assert "QPStructure(a=int)" in e.message
+      
   def test_assertions(self):
     
     x = MX.sym("x") 
