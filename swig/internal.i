@@ -154,6 +154,24 @@
 %exception  casadi::CodeGenerator::getSparsity(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::CollocationIntegrator::calculateInitialConditions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CollocationIntegrator::calculateInitialConditionsB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CollocationIntegrator::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CollocationIntegrator::create(const Function &f, const Function &g) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CollocationIntegrator::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CollocationIntegrator::setupFG() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::Concat::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -301,6 +319,72 @@
 %exception  casadi::ConstantSX::isConstant() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::CplexInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CplexInterface::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CplexInterface::freeCplex() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CplexInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CsparseInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CsparseInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CsparseInterface::prepare() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::create(const Function &f, const Function &g) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::freeCVodes() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::getJac() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::getJacB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::getJacGen() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::getJacGenB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::initAdj() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::integrate(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::integrateB(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::printStats(std::ostream &stream) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::reset() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::resetB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::CvodesInterface::setStopTime(double tf) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::DenseMultiplication< TrX, TrY >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -338,6 +422,51 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Determinant::printPart(std::ostream &stream, int part) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::DsdpInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::DsdpInterface::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::DsdpInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::calculateInitialConditions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::calculateInitialConditionsB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::create(const Function &f, const Function &g) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::getExplicit() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::getExplicitB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::integrate(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::integrateB(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::reset() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::resetB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FixedStepIntegrator::setupFG() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Function::callDerivative(const DMatrixVector &arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed, DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed, DMatrixVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
@@ -386,6 +515,222 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Function::spInit(bool fwd) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::call(const DMatrixVector &arg, DMatrixVector &res, const DMatrixVectorVector &fseed, DMatrixVectorVector &fsens, const DMatrixVectorVector &aseed, DMatrixVectorVector &asens, bool always_inline, bool never_inline) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::call(const MXVector &arg, MXVector &res, const MXVectorVector &fseed, MXVectorVector &fsens, const MXVectorVector &aseed, MXVectorVector &asens, bool always_inline, bool never_inline) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::call(const SXVector &arg, SXVector &res, const SXVectorVector &fseed, SXVectorVector &fsens, const SXVectorVector &aseed, SXVectorVector &asens, bool always_inline, bool never_inline) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::callSelf(const std::vector< MX > &arg) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::checkInputs() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::createCall(const std::vector< MX > &arg, std::vector< MX > &res, const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::createCallDerivative(const std::vector< MX > &arg, std::vector< MX > &res, const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::derivative(int nfwd, int nadj) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr, std::string compiler) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::evalMX(const std::vector< MX > &arg, std::vector< MX > &res, const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::evalSX(const std::vector< SX > &arg, std::vector< SX > &res, const std::vector< std::vector< SX > > &fseed, std::vector< std::vector< SX > > &fsens, const std::vector< std::vector< SX > > &aseed, std::vector< std::vector< SX > > &asens) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::evalSXsparse(const std::vector< SX > &arg, std::vector< SX > &res, const std::vector< std::vector< SX > > &fseed, std::vector< std::vector< SX > > &fsens, const std::vector< std::vector< SX > > &aseed, std::vector< std::vector< SX > > &asens) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::fullJacobian() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::generateBody(std::ostream &stream, const std::string &type, CodeGenerator &gen) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::generateCode(std::ostream &cfile) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::generateDeclarations(std::ostream &stream, const std::string &type, CodeGenerator &gen) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::generateFunction(std::ostream &stream, const std::string &fname, const std::string &input_type, const std::string &output_type, const std::string &type, CodeGenerator &gen) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::generateIO(CodeGenerator &gen) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getDerivative(int nfwd, int nadj) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getDerivativeViaJac(int nfwd, int nadj) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getFullJacobian() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getGradient(int iind, int oind) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getHessian(int iind, int oind) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getJacSparsity(int iind, int oind, bool symmetric) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getJacSparsityPlain(int iind, int oind) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getJacobian(int iind, int oind, bool compact, bool symmetric) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getNumInputElements() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getNumInputNonzeros() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getNumOutputElements() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getNumOutputNonzeros() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getPartition(int iind, int oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getSanitizedName() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getStat(const std::string &name) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getStats() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::getTangent(int iind, int oind) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::gradient(int iind, int oind) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::hessian(int iind, int oind) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::inputNoCheck(int iind=0) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::inputNoCheck(int iind=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::inputScheme() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::inputScheme() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::input_struct() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::input_struct() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::jacSparsity(int iind, int oind, bool compact, bool symmetric) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::jacobian(int iind, int oind, bool compact, bool symmetric) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::log(const std::string &msg) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::monitored(const std::string &mod) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::outputNoCheck(int oind=0) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::outputNoCheck(int oind=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::outputScheme() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::outputScheme() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::output_struct() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::output_struct() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::print(std::ostream &stream) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::repr(std::ostream &stream) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::setDerivative(const Function &fcn, int nfwd, int nadj) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::setJacSparsity(const Sparsity &sp, int iind, int oind, bool compact) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::setJacobian(const Function &jac, int iind, int oind, bool compact) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::spCanEvaluate(bool fwd) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::spEvaluate(bool fwd) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::spEvaluateViaJacSparsity(bool fwd) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::spInit(bool fwd) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::symbolicInput() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::symbolicInputSX() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::symbolicOutput(const std::vector< MX > &arg) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::tangent(int iind, int oind) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::verbose() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::FunctionInternal::wrapMXFunction() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::GenericMatrix< MX  >::shape() const {
@@ -604,6 +949,111 @@
 %exception  casadi::IOInterface< Function  >::schemeEntry(const casadi::IOScheme &scheme, const std::string &name, bool input) const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::IOInterface< FunctionInternal  >::getInput(T val, const std::string &iname) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getInput(T val, int iind=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getInput(const std::string &iname) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getInput(int iind=0) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getInputScheme() const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getNumInputs() const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getNumOutputs() const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getOutput(T val, const std::string &oname) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getOutput(T val, int oind=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getOutput(const std::string &oname) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getOutput(int oind=0) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::getOutputScheme() const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::input(const std::string &iname) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::input(const std::string &iname) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::input(int iind=0) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::input(int iind=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::inputS(int i) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::inputS(int i) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::inputSchemeEntry(const std::string &name) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::output(const std::string &oname) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::output(const std::string &oname) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::output(int oind=0) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::output(int oind=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::outputS(int i) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::outputS(int i) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::outputSchemeEntry(const std::string &name) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::schemeEntry(const casadi::IOScheme &scheme, const std::string &name, bool input) const {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::setInput(T val, const std::string &iname) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::setInput(T val, int iind=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::setInputScheme(const casadi::IOScheme &scheme) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::setNumInputs(int num_in) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::setNumOutputs(int num_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::setOutput(T val, const std::string &oname) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::setOutput(T val, int oind=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IOInterface< FunctionInternal  >::setOutputScheme(const casadi::IOScheme &scheme) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::IOScheme::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -623,6 +1073,105 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::IOSchemeVector< T >::repr(std::ostream &stream=std::cout) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::correctInitialConditions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::create(const Function &f, const Function &g) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::freeIDAS() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::getJac() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::getJacB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::getJacGen() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::getJacGenB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initAdj() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initBandedLinearSolver() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initBandedLinearSolverB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initDenseLinearSolver() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initDenseLinearSolverB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initIterativeLinearSolver() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initIterativeLinearSolverB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initTaping() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initUserDefinedLinearSolver() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::initUserDefinedLinearSolverB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::integrate(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::integrateB(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::printStats(std::ostream &stream) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::reset() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::resetB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IdasInterface::setStopTime(double tf) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ImplicitFixedStepIntegrator::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ImplicitFixedStepIntegrator::create(const Function &f, const Function &g) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ImplicitFixedStepIntegrator::getExplicit() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ImplicitFixedStepIntegrator::getExplicitB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ImplicitFixedStepIntegrator::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ImplicitFunctionInternal::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ImplicitFunctionInternal::spCanEvaluate(bool fwd) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ImplicitFunctionInternal::spEvaluate(bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::IndexList::getAll(int len) const  {
@@ -670,6 +1219,93 @@
 %exception  casadi::IntegerSX::isInteger() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::IntegratorInternal::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::create(const Function &f, const Function &g) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::getAugOffset(int nfwd, int nadj) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::getAugmented(int nfwd, int nadj, AugOffset &offset) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::getDerivative(int nfwd, int nadj) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::getJacobian(int iind, int oind, bool compact, bool symmetric) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::integrate(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::integrateB(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::p() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::printStats(std::ostream &stream) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::qf() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::resetB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::rp() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::rqf() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::rx0() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::rxf() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::rz0() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::rzf() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::setDerivativeOptions(Integrator &integrator, const AugOffset &offset) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::setStopTime(double tf) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::spCanEvaluate(bool fwd) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::spEvaluate(bool fwd) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::spJacF() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::spJacG() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::x0() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::xf() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::z0() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IntegratorInternal::zf() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::Inverse::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -680,6 +1316,36 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Inverse::printPart(std::ostream &stream, int part) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::finalize_metadata(int n, const std::map< std::string, std::vector< std::string > > &var_string_md, const std::map< std::string, std::vector< int > > &var_integer_md, const std::map< std::string, std::vector< double > > &var_numeric_md, int m, const std::map< std::string, std::vector< std::string > > &con_string_md, const std::map< std::string, std::vector< int > > &con_integer_md, const std::map< std::string, std::vector< double > > &con_numeric_md) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::freeIpopt() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::getReducedHessian() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::get_nlp_info(int &n, int &m, int &nnz_jac_g, int &nnz_h_lag) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::get_number_of_nonlinear_variables() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::get_var_con_metadata(int n, std::map< std::string, std::vector< std::string > > &var_string_md, std::map< std::string, std::vector< int > > &var_integer_md, std::map< std::string, std::vector< double > > &var_numeric_md, int m, std::map< std::string, std::vector< std::string > > &con_string_md, std::map< std::string, std::vector< int > > &con_integer_md, std::map< std::string, std::vector< double > > &con_numeric_md) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::IpoptInterface::setQPOptions() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::IpoptUserClass::finalize_metadata(Index n, const StringMetaDataMapType &var_string_md, const IntegerMetaDataMapType &var_integer_md, const NumericMetaDataMapType &var_numeric_md, Index m, const StringMetaDataMapType &con_string_md, const IntegerMetaDataMapType &con_integer_md, const NumericMetaDataMapType &con_numeric_md) {
@@ -694,7 +1360,127 @@
 %exception  casadi::IpoptUserClass::get_var_con_metadata(Index n, StringMetaDataMapType &var_string_md, IntegerMetaDataMapType &var_integer_md, NumericMetaDataMapType &var_numeric_md, Index m, StringMetaDataMapType &con_string_md, IntegerMetaDataMapType &con_integer_md, NumericMetaDataMapType &con_numeric_md) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::KinsolInterface::bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::create(const Function &f, const Function &jac, const LinearSolver &linsol) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::djac(long N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::func(N_Vector u, N_Vector fval) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::kinsol_error(const std::string &module, int flag, bool fatal=true) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::lsetup(KINMem kin_mem) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector tmp1, N_Vector tmp2) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::psolve(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, N_Vector tmp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KinsolInterface::solveNonLinear() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KnitroInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KnitroInterface::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::KnitroInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LapackLuDense::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LapackLuDense::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LapackLuDense::prepare() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LapackQrDense::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LapackQrDense::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LapackQrDense::prepare() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::LinearSolver::spSolve(DMatrix &X, const DMatrix &B, bool transpose=false) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::colind() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::evaluateDGen(const DMatrixPtrV &input, DMatrixPtrV &output, bool tr) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::evaluateMXGen(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given, bool tr) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::evaluateSXGen(const SXPtrV &input, SXPtrV &output, bool tr) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::getFactorization(bool transpose) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::getFactorizationSparsity(bool transpose) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::ncol() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::nnz() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::nrow() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::propagateSparsityGen(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd, bool transpose) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::row() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::solve(bool transpose) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::solve(const MX &A, const MX &B, bool transpose) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LinearSolverInternal::spSolve(DMatrix &X, const DMatrix &B, bool transpose) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LpSolverInternal::checkInputs() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LpSolverInternal::solve() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LpToQp::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LpToQp::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::LpToQp::init() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::MX::T() const  {
@@ -1756,6 +2542,72 @@
 %exception  casadi::NanSX::isNan() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::Newton::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Newton::create(const Function &f, const Function &jac, const LinearSolver &linsol) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Newton::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Newton::solveNonLinear() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::checkInitialBounds() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::checkInputs() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::getGradF() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::getGradLag() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::getHessLag() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::getJacF() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::getJacG() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::getReducedHessian() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::getSpHessLag() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::gradF() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::gradLag() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::hessLag() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::jacF() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::jacG() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::reportConstraints(std::ostream &stream=std::cout) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::setOptionsFromFile(const std::string &file) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::setQPOptions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::NlpSolverInternal::spHessLag() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::NonZeroIterator< DataType >::begin() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -1813,6 +2665,27 @@
 %exception  casadi::NormInf::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::OldCollocationIntegrator::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::OldCollocationIntegrator::create(const Function &f, const Function &g) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::OldCollocationIntegrator::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::OldCollocationIntegrator::integrate(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::OldCollocationIntegrator::integrateB(double t_out) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::OldCollocationIntegrator::reset() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::OldCollocationIntegrator::resetB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::OneSX::getIntValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -1823,6 +2696,15 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::OneSX::isOne() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::OoqpInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::OoqpInterface::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::OoqpInterface::init() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::OptionsFunctionality::checkNode() const  {
@@ -1966,6 +2848,75 @@
 %exception  casadi::ProfilingType< ProfilingData_TIMELINE >() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::QcqpSolverInternal::checkInputs() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QcqpSolverInternal::setQPOptions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QcqpSolverInternal::solve() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QcqpToSocp::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QcqpToSocp::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QcqpToSocp::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpSolverInternal::checkInputs() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpSolverInternal::generateNativeCode(std::ostream &file) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpSolverInternal::setLPOptions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpSolverInternal::solve() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToImplicit::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToImplicit::create(const Function &f, const Function &jac, const LinearSolver &linsol) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToImplicit::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToImplicit::solveNonLinear() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToNlp::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToNlp::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToNlp::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToQcqp::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToQcqp::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpToQcqp::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpoasesInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpoasesInterface::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::QpoasesInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::RealtypeSX::getIntValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2006,6 +2957,18 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Reshape::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::RkIntegrator::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::RkIntegrator::create(const Function &f, const Function &g) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::RkIntegrator::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::RkIntegrator::setupFG() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::SXElement::assignIfDuplicate(const SXElement &scalar, int depth=1) {
@@ -2108,6 +3071,81 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::SXNode::print(std::ostream &stream, long &remaining_calls) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::dualInfeasibility() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::eval_exp() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::eval_mat() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::eval_res() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::eval_vec() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::getQpSolver() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::line_search(int &ls_iter, bool &ls_success) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::primalInfeasibility() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::printIteration(std::ostream &stream) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, double reg, int ls_trials, bool ls_success) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::regularize() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Scpgen::solve_qp() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdpSolverInternal::checkInputs() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdpSolverInternal::printProblem(std::ostream &stream=std::cout) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdpSolverInternal::setSOCPOptions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdpSolverInternal::solve() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdqpSolverInternal::printProblem(std::ostream &stream=std::cout) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdqpSolverInternal::setSOCQPOptions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdqpSolverInternal::solve() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdqpToSdp::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdqpToSdp::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SdqpToSdp::init() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::SetNonzeros< Add >::clone() const  {
@@ -2290,7 +3328,58 @@
 %exception  casadi::SharedObjectNode::weak() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::SimpleHomotopyNlp::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SimpleHomotopyNlp::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SimpleHomotopyNlp::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::Slice::print(std::ostream &stream=std::cout) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SnoptInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SnoptInterface::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SnoptInterface::formatStatus(int status) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SnoptInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SnoptInterface::passOptions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SnoptInterface::reset() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SnoptInterface::setOptionsFromFile(const std::string &file) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SnoptInterface::setQPOptions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SocpSolverInternal::checkInputs() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SocpSolverInternal::printProblem(std::ostream &stream=std::cout) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SocpSolverInternal::solve() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SocpToSdp::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SocpToSdp::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SocpToSdp::init() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Solve< Tr >::clone() const  {
@@ -2344,6 +3433,21 @@
 %exception  casadi::SparseStorage< DataType >::begin() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::SparseStorage< DataType >::clear() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::colind() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::colind(int col) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::data() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::data() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::SparseStorage< DataType >::elem(int rr, int cc=0) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2362,6 +3466,12 @@
 %exception  casadi::SparseStorage< DataType >::front() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::SparseStorage< DataType >::getElement(int rr, int cc=0) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::hasNZ(int rr, int cc) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::SparseStorage< DataType >::rbegin() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2372,6 +3482,33 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::SparseStorage< DataType >::rend() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::reserve(int nnz) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::reserve(int nnz, int ncol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::resize(int nrow, int ncol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::row() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::row(int el) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::sanityCheck(bool complete=false) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::sparsity() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::sparsityRef() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::toScalar() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Sparsity::T() const  {
@@ -2408,6 +3545,159 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Split::sparsity(int oind) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SqicInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SqicInterface::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SqicInterface::generateNativeCode(std::ostream &file) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SqicInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::eval_f(const std::vector< double > &x, double &f) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::eval_g(const std::vector< double > &x, std::vector< double > &g) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::eval_grad_f(const std::vector< double > &x, double &f, std::vector< double > &grad_f) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::eval_h(const std::vector< double > &x, const std::vector< double > &lambda, double sigma, Matrix< double > &H) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::eval_jac_g(const std::vector< double > &x, std::vector< double > &g, Matrix< double > &J) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::getQpSolver() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::getRegularization(const Matrix< double > &H) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::primalInfeasibility(const std::vector< double > &x, const std::vector< double > &lbx, const std::vector< double > &ubx, const std::vector< double > &g, const std::vector< double > &lbg, const std::vector< double > &ubg) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::printIteration(std::ostream &stream) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, int ls_trials, bool ls_success) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::regularize(Matrix< double > &H, double reg) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::reset_h() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Sqpmethod::solve_QP(const Matrix< double > &H, const std::vector< double > &g, const std::vector< double > &lbx, const std::vector< double > &ubx, const Matrix< double > &A, const std::vector< double > &lbA, const std::vector< double > &ubA, std::vector< double > &x_opt, std::vector< double > &lambda_x_opt, std::vector< double > &lambda_A_opt) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedQpSolverInternal::checkInputs() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedQpSolverInternal::setLPOptions() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedQpSolverInternal::solve() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedQpToQp::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedQpToQp::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedQpToQp::generateNativeCode(std::ostream &file) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedQpToQp::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqicInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqicInterface::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqicInterface::generateNativeCode(std::ostream &file) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqicInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::eval_f(const std::vector< double > &x, double &f) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::eval_g(const std::vector< double > &x, std::vector< double > &g) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::eval_grad_f(const std::vector< double > &x, double &f, std::vector< double > &grad_f) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::eval_h(const std::vector< double > &x, const std::vector< double > &lambda, double sigma, Matrix< double > &H) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::eval_jac_g(const std::vector< double > &x, std::vector< double > &g, Matrix< double > &J) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::evaluate() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::getRegularization(const Matrix< double > &H) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::getStabilizedQpSolver() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::mat_vec(const std::vector< double > &x, const DMatrix &A, std::vector< double > &y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::mat_vectran(const std::vector< double > &x, const DMatrix &A, std::vector< double > &y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::meritfg() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::norm1matrix(const DMatrix &A) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::primalInfeasibility(const std::vector< double > &x, const std::vector< double > &lbx, const std::vector< double > &ubx, const std::vector< double > &g, const std::vector< double > &lbg, const std::vector< double > &ubg) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::printIteration(std::ostream &stream) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, double TRdelta, int ls_trials, bool ls_success, char info) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::regularize(Matrix< double > &H, double reg) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::reset_h() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::StabilizedSqp::solve_QP(const Matrix< double > &H, const std::vector< double > &g, const std::vector< double > &lbx, const std::vector< double > &ubx, const Matrix< double > &A, const std::vector< double > &lbA, const std::vector< double > &ubA, std::vector< double > &x_opt, std::vector< double > &lambda_x_opt, std::vector< double > &lambda_A_opt, double muR, const std::vector< double > &mu, const std::vector< double > &muE) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::SubAssign::clone() const  {
@@ -2464,6 +3754,21 @@
 %exception  casadi::SubRef::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::SundialsInterface::getJac() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SundialsInterface::getJacB() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SundialsInterface::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SundialsInterface::reset() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SundialsInterface::setStopTime(double tf) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::SymbolicMX::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2500,6 +3805,24 @@
 %exception  casadi::SymbolicOCP::repr(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::SymbolicQr::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SymbolicQr::evaluateSXGen(const SXPtrV &input, SXPtrV &output, bool tr) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SymbolicQr::generateBody(std::ostream &stream, const std::string &type, CodeGenerator &gen) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SymbolicQr::generateDeclarations(std::ostream &stream, const std::string &type, CodeGenerator &gen) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SymbolicQr::init() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SymbolicQr::prepare() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::SymbolicSX::getName() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2507,6 +3830,12 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::SymbolicSX::isSymbolic() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::TinyXmlInterface::clone() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::TinyXmlInterface::parse(const std::string &filename) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Transpose::clone() const  {
@@ -2632,40 +3961,70 @@
 %exception  casadi::WeakRef::shared() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::checkName(const std::string &str) const  {
+%exception  casadi::WorhpInterface::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::dump(std::ostream &stream, int indent=0) const  {
+%exception  casadi::WorhpInterface::evaluate() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::getAttribute(const std::string &attribute_name) const  {
+%exception  casadi::WorhpInterface::formatStatus(int status) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::getName() const  {
+%exception  casadi::WorhpInterface::init() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::getText() const  {
+%exception  casadi::WorhpInterface::passOptions() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::getText(T &val) const  {
+%exception  casadi::WorhpInterface::reset() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::hasAttribute(const std::string &attribute_name) const  {
+%exception  casadi::WorhpInterface::setOptionsFromFile(const std::string &file) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::hasChild(const std::string &childname) const  {
+%exception  casadi::WorhpInterface::setQPOptions() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::readAttribute(const std::string &attribute_name, T &val, bool assert_existance=true) const  {
+%exception  casadi::XmlFile::parse(const std::string &filename) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::setAttribute(const std::string &attribute_name, const std::string &attribute) {
+%exception  casadi::XmlFileInternal::print(std::ostream &stream) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::setName(const std::string &name) {
+%exception  casadi::XmlNode::checkName(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::XMLNode::size() const  {
+%exception  casadi::XmlNode::dump(std::ostream &stream, int indent=0) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::getAttribute(const std::string &attribute_name) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::getName() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::getText() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::getText(T &val) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::hasAttribute(const std::string &attribute_name) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::hasChild(const std::string &childname) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::readAttribute(const std::string &attribute_name, T &val, bool assert_existance=true) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::setAttribute(const std::string &attribute_name, const std::string &attribute) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::setName(const std::string &name) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::XmlNode::size() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::ZeroByZero::clone() const  {
@@ -3109,6 +4468,9 @@
 %exception casadi::CallFunction::CallFunction(const Function &fcn, std::vector< MX > arg) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::CollocationIntegrator::CollocationIntegrator(const Function &f, const Function &g) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::Concat::Concat(const std::vector< MX > &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -3125,6 +4487,21 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::ControlledDAEInputIOSchemeVector< M >::ControlledDAEInputIOSchemeVector(const std::vector< M > &t) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::CplexInterface::CplexInterface() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::CplexInterface::CplexInterface(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::CsparseInterface::CsparseInterface(const CsparseInterface &linsol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::CsparseInterface::CsparseInterface(const Sparsity &sp, int nrhs) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::CvodesInterface::CvodesInterface(const Function &f, const Function &g) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::DAEInputIOSchemeVector< M >::DAEInputIOSchemeVector(const std::vector< M > &t) {
@@ -3148,7 +4525,13 @@
 %exception casadi::Determinant::Determinant(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::DsdpInterface::DsdpInterface(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::EmptySparsity::EmptySparsity() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::FixedStepIntegrator::FixedStepIntegrator(const Function &f, const Function &g) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::GetNonzeros::GetNonzeros(const Sparsity &sp, const MX &x) {
@@ -3184,6 +4567,12 @@
 %exception casadi::Horzsplit::Horzsplit(const MX &x, const std::vector< int > &offset) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::IdasInterface::IdasInterface(const Function &f, const Function &g) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(const Function &f, const Function &g) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::IndexList::IndexList() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -3211,13 +4600,28 @@
 %exception casadi::Inverse::Inverse(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::IpoptInterface::IpoptInterface(const Function &nlp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::JacGInputIOSchemeVector< M >::JacGInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::JacGOutputIOSchemeVector< M >::JacGOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::KinsolInterface::KinsolInterface(const Function &f, const Function &jac, const LinearSolver &linsol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::KnitroInterface::KnitroInterface(const Function &nlp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::LPStructIOSchemeVector< T >::LPStructIOSchemeVector(const std::vector< M > &t) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::LapackLuDense::LapackLuDense(const Sparsity &sparsity, int nrhs) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::LapackQrDense::LapackQrDense(const Sparsity &sparsity, int nrhs) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::LinearSolver::LinearSolver() {
@@ -3233,6 +4637,9 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::LpSolverOutputIOSchemeVector< M >::LpSolverOutputIOSchemeVector(const std::vector< M > &t) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::LpToQp::LpToQp(const std::vector< Sparsity > &st) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::MXFunction::MXFunction(const MX &input, const MX &output) {
@@ -3271,9 +4678,6 @@
 %exception casadi::Matrix< DataType >::Matrix(double val) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::MayerInputIOSchemeVector< M >::MayerInputIOSchemeVector(const std::vector< M > &t) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
 %exception casadi::MinusInfSX::MinusInfSX() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -3293,6 +4697,9 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::NanSX::NanSX() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::Newton::Newton(const Function &f, const Function &jac, const LinearSolver &linsol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::NlpSolverInputIOSchemeVector< M >::NlpSolverInputIOSchemeVector(const std::vector< M > &t) {
@@ -3319,13 +4726,16 @@
 %exception casadi::NormInf::NormInf(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::OCPInputIOSchemeVector< M >::OCPInputIOSchemeVector(const std::vector< M > &t) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception casadi::OCPOutputIOSchemeVector< M >::OCPOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::OldCollocationIntegrator::OldCollocationIntegrator(const Function &f, const Function &g) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::OneSX::OneSX() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::OoqpInterface::OoqpInterface() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::OoqpInterface::OoqpInterface(const std::vector< Sparsity > &st) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::OptionsFunctionalityNode::OptionsFunctionalityNode() {
@@ -3346,10 +4756,31 @@
 %exception casadi::QcqpSolverOutputIOSchemeVector< M >::QcqpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::QcqpToSocp::QcqpToSocp(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::QpSolverInputIOSchemeVector< M >::QpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::QpSolverOutputIOSchemeVector< M >::QpSolverOutputIOSchemeVector(const std::vector< M > &t) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::QpToImplicit::QpToImplicit(const Function &f, const Function &jac, const LinearSolver &linsol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::QpToNlp::QpToNlp() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::QpToNlp::QpToNlp(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::QpToQcqp::QpToQcqp(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::QpoasesInterface::QpoasesInterface() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::QpoasesInterface::QpoasesInterface(const std::vector< Sparsity > &st) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::RDAEInputIOSchemeVector< M >::RDAEInputIOSchemeVector(const std::vector< M > &t) {
@@ -3359,6 +4790,9 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::Reshape::Reshape(const MX &x, Sparsity sp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::RkIntegrator::RkIntegrator(const Function &f, const Function &g) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::RuntimeConst< T >::RuntimeConst() {
@@ -3424,6 +4858,12 @@
 %exception casadi::ScalarSparsity::ScalarSparsity() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::Scpgen::Scpgen(const Function &nlp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SdqpToSdp::SdqpToSdp(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::SetNonzeros< Add >::SetNonzeros(const MX &y, const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -3451,13 +4891,73 @@
 %exception casadi::SharedObjectNode::SharedObjectNode(const SharedObjectNode &node) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::SimpleHomotopyNlp::SimpleHomotopyNlp(const Function &hnlp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SnoptInterface::SnoptInterface(const Function &nlp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SocpToSdp::SocpToSdp(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::Solve< Tr >::Solve(const MX &r, const MX &A, const LinearSolver &linear_solver) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< A > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< DataType > &m) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const DataType &val=DataType(0)) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const std::vector< DataType > &d) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x, int nrow, int ncol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x, int nrow, int ncol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< std::vector< DataType > > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::Split::Split(const MX &x, const std::vector< int > &offset) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::SqicInterface::SqicInterface() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SqicInterface::SqicInterface(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::Sqpmethod::Sqpmethod(const Function &nlp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::StabilizedQpSolverInputIOSchemeVector< M >::StabilizedQpSolverInputIOSchemeVector(const std::vector< M > &t) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::StabilizedQpToQp::StabilizedQpToQp(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::StabilizedSqicInterface::StabilizedSqicInterface() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::StabilizedSqicInterface::StabilizedSqicInterface(const std::vector< Sparsity > &st) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::StabilizedSqp::StabilizedSqp(const Function &nlp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::SubAssign::SubAssign(const MX &x, const MX &y, const Slice &i, const Slice &j) {
@@ -3466,13 +4966,22 @@
 %exception casadi::SubRef::SubRef(const MX &x, const Slice &i, const Slice &j) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::SundialsInterface::SundialsInterface(const Function &f, const Function &g) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::SymbolicMX::SymbolicMX(const std::string &name, const Sparsity &sp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::SymbolicMX::SymbolicMX(const std::string &name, int nrow=1, int ncol=1) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::SymbolicQr::SymbolicQr(const Sparsity &sparsity, int nrhs) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::SymbolicSX::SymbolicSX(const std::string &name) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::TinyXmlInterface::TinyXmlInterface() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::Transpose::Transpose(const MX &x) {
@@ -3493,7 +5002,10 @@
 %exception casadi::WeakRef::WeakRef(int dummy=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::XMLNode::XMLNode() {
+%exception casadi::WorhpInterface::WorhpInterface(const Function &nlp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::XmlNode::XmlNode() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::ZeroSX::ZeroSX() {

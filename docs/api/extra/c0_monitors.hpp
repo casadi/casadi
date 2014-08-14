@@ -1,18 +1,18 @@
 /// \cond INTERNAL
-/** \class casadi::CVodesInternal
+/** \class casadi::CvodesInterface
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>djacB</td><td>casadi::CVodesInternal</td></tr>
+<tr><td>djacB</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>psetupB</td><td>casadi::CVodesInternal</td></tr>
-<tr><td>res</td><td>casadi::CVodesInternal</td></tr>
-<tr><td>resB</td><td>casadi::CVodesInternal</td></tr>
-<tr><td>resQB</td><td>casadi::CVodesInternal</td></tr>
-<tr><td>reset</td><td>casadi::CVodesInternal</td></tr>
+<tr><td>psetupB</td><td>casadi::CvodesInterface</td></tr>
+<tr><td>res</td><td>casadi::CvodesInterface</td></tr>
+<tr><td>resB</td><td>casadi::CvodesInterface</td></tr>
+<tr><td>resQB</td><td>casadi::CvodesInterface</td></tr>
+<tr><td>reset</td><td>casadi::CvodesInterface</td></tr>
 </table>
 */
 /// \endcond
@@ -53,24 +53,24 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::IdasInternal
+/** \class casadi::IdasInterface
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>bjacB</td><td>casadi::IdasInternal</td></tr>
-<tr><td>correctInitialConditions</td><td>casadi::IdasInternal</td></tr>
+<tr><td>bjacB</td><td>casadi::IdasInterface</td></tr>
+<tr><td>correctInitialConditions</td><td>casadi::IdasInterface</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jtimesB</td><td>casadi::IdasInternal</td></tr>
+<tr><td>jtimesB</td><td>casadi::IdasInterface</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>psetup</td><td>casadi::IdasInternal</td></tr>
-<tr><td>psetupB</td><td>casadi::IdasInternal</td></tr>
-<tr><td>psolveB</td><td>casadi::IdasInternal</td></tr>
-<tr><td>res</td><td>casadi::IdasInternal</td></tr>
-<tr><td>resB</td><td>casadi::IdasInternal</td></tr>
-<tr><td>resS</td><td>casadi::IdasInternal</td></tr>
-<tr><td>rhsQB</td><td>casadi::IdasInternal</td></tr>
+<tr><td>psetup</td><td>casadi::IdasInterface</td></tr>
+<tr><td>psetupB</td><td>casadi::IdasInterface</td></tr>
+<tr><td>psolveB</td><td>casadi::IdasInterface</td></tr>
+<tr><td>res</td><td>casadi::IdasInterface</td></tr>
+<tr><td>resB</td><td>casadi::IdasInterface</td></tr>
+<tr><td>resS</td><td>casadi::IdasInterface</td></tr>
+<tr><td>rhsQB</td><td>casadi::IdasInterface</td></tr>
 </table>
 */
 /// \endcond
@@ -93,17 +93,17 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::IpoptInternal
+/** \class casadi::IpoptInterface
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>eval_f</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>eval_g</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>eval_grad_f</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>eval_h</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>eval_jac_g</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -123,14 +123,14 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::KinsolInternal
+/** \class casadi::KinsolInterface
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_djac</td><td>casadi::KinsolInternal</td></tr>
-<tr><td>eval_f</td><td>casadi::KinsolInternal</td></tr>
+<tr><td>eval_djac</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>eval_f</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -147,17 +147,17 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::KnitroInternal
+/** \class casadi::KnitroInterface
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::KnitroInternal</td></tr>
+<tr><td>eval_f</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>eval_g</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>eval_grad_f</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>eval_h</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>eval_jac_g</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -177,19 +177,19 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::NewtonImplicitInternal
+/** \class casadi::Newton
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>F</td><td>casadi::NewtonImplicitInternal</td></tr>
-<tr><td>J</td><td>casadi::NewtonImplicitInternal</td></tr>
+<tr><td>F</td><td>casadi::Newton</td></tr>
+<tr><td>J</td><td>casadi::Newton</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>normF</td><td>casadi::NewtonImplicitInternal</td></tr>
+<tr><td>normF</td><td>casadi::Newton</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>step</td><td>casadi::NewtonImplicitInternal</td></tr>
-<tr><td>stepsize</td><td>casadi::NewtonImplicitInternal</td></tr>
+<tr><td>step</td><td>casadi::Newton</td></tr>
+<tr><td>stepsize</td><td>casadi::Newton</td></tr>
 </table>
 */
 /// \endcond
@@ -207,21 +207,21 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::SCPgenInternal
+/** \class casadi::Scpgen
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>dx</td><td>casadi::SCPgenInternal</td></tr>
-<tr><td>eval_f</td><td>casadi::SCPgenInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::SCPgenInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::SCPgenInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::SCPgenInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::SCPgenInternal</td></tr>
+<tr><td>dx</td><td>casadi::Scpgen</td></tr>
+<tr><td>eval_f</td><td>casadi::Scpgen</td></tr>
+<tr><td>eval_g</td><td>casadi::Scpgen</td></tr>
+<tr><td>eval_grad_f</td><td>casadi::Scpgen</td></tr>
+<tr><td>eval_h</td><td>casadi::Scpgen</td></tr>
+<tr><td>eval_jac_g</td><td>casadi::Scpgen</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>qp</td><td>casadi::SCPgenInternal</td></tr>
+<tr><td>qp</td><td>casadi::Scpgen</td></tr>
 </table>
 */
 /// \endcond
@@ -231,42 +231,6 @@
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th></tr>
-<tr><td>dx</td></tr>
-<tr><td>eval_f</td></tr>
-<tr><td>eval_g</td></tr>
-<tr><td>eval_grad_f</td></tr>
-<tr><td>eval_h</td></tr>
-<tr><td>eval_jac_g</td></tr>
-<tr><td>qp</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::SQPInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>bfgs</td><td>casadi::SQPInternal</td></tr>
-<tr><td>dx</td><td>casadi::SQPInternal</td></tr>
-<tr><td>eval_f</td><td>casadi::SQPInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::SQPInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::SQPInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::SQPInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::SQPInternal</td></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>qp</td><td>casadi::SQPInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_NlpSolver_sqpmethod
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th></tr>
-<tr><td>bfgs</td></tr>
 <tr><td>dx</td></tr>
 <tr><td>eval_f</td></tr>
 <tr><td>eval_g</td></tr>
@@ -303,16 +267,16 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::SnoptInternal
+/** \class casadi::SnoptInterface
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_nlp</td><td>casadi::SnoptInternal</td></tr>
+<tr><td>eval_nlp</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>setup_nlp</td><td>casadi::SnoptInternal</td></tr>
+<tr><td>setup_nlp</td><td>casadi::SnoptInterface</td></tr>
 </table>
 */
 /// \endcond
@@ -327,21 +291,57 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::StabilizedSQPInternal
+/** \class casadi::Sqpmethod
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>dx</td><td>casadi::StabilizedSQPInternal</td></tr>
-<tr><td>eval_f</td><td>casadi::StabilizedSQPInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::StabilizedSQPInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::StabilizedSQPInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::StabilizedSQPInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::StabilizedSQPInternal</td></tr>
+<tr><td>bfgs</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>dx</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>eval_f</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>eval_g</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>eval_grad_f</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>eval_h</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>eval_jac_g</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>qp</td><td>casadi::StabilizedSQPInternal</td></tr>
+<tr><td>qp</td><td>casadi::Sqpmethod</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_NlpSolver_sqpmethod
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th></tr>
+<tr><td>bfgs</td></tr>
+<tr><td>dx</td></tr>
+<tr><td>eval_f</td></tr>
+<tr><td>eval_g</td></tr>
+<tr><td>eval_grad_f</td></tr>
+<tr><td>eval_h</td></tr>
+<tr><td>eval_jac_g</td></tr>
+<tr><td>qp</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::StabilizedSqp
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dx</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>eval_f</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>eval_g</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>eval_grad_f</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>eval_h</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>eval_jac_g</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp</td><td>casadi::StabilizedSqp</td></tr>
 </table>
 */
 /// \endcond
@@ -361,17 +361,17 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::WorhpInternal
+/** \class casadi::WorhpInterface
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>eval_f</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>eval_g</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>eval_grad_f</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>eval_h</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>eval_jac_g</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
 </table>

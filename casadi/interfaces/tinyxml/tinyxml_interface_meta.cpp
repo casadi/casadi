@@ -26,6 +26,7 @@
 
       const std::string casadi::TinyXmlInterface::meta_doc=
       "\n"
-"Interface to TinyXml\n"
+"XmlFile using TinyXml\n"
+"\n"
 "\n"
 ;
