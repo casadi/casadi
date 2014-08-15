@@ -42,15 +42,19 @@
 
 #ifdef SWIGPYTHON
 #define GUESTOBJECT PyObject * p
-#endif // SWIGPYTHON
+#endif
 
-#ifdef  SWIGPYTHON
+#ifdef SWIGMATLAB
+#define GUESTOBJECT mxArray * p
+#endif
+
+#ifndef SWIGXML
 /** Check if Guest object is of a particular SWIG type */
 bool istype(GUESTOBJECT, swig_type_info *type) {
 	void *dummy = 0 ; 
   return SWIG_IsOK(SWIG_ConvertPtr(p, &dummy, type, 0)); 
 }
-#endif // SWIGPYTHON
+#endif
 
 template<class T>
 class meta {
@@ -59,7 +63,10 @@ class meta {
     static bool isa(GUESTOBJECT) {
       #ifdef SWIGPYTHON
       if (p == Py_None) return false;
-      #endif // SWIGPYTHON
+      #endif
+      #ifdef SWIGMATLAB
+      if (p == 0) return false;
+      #endif
       return istype(p,*meta<T>::name);
     };
     /// Convert Python object to pointer of type T

@@ -380,12 +380,12 @@ class Doxy2SWIG_X(Doxy2SWIG):
             # self.internal.add("%rename(\"_internal_%s\") " + swigname + ";")
             #  print swigname
               #self.internal.add("%pythonprepend " + swigname + " %{\n _mark_internal() \n%}")
-              self.internal[swigname] = "%exception " + swigname + " {\n  START INTERNAL_MSG() $action STOP { $action } \n}"
+              self.internal[swigname] = "%exception " + swigname + " {\n try { INTERNAL_MSG() $action } CATCH_OR_RETHROW \n}"
           else:
             self.internal[swigname] = ""
             
           if deprecated is not None:
-            self.deprecated[swigname] = "%exception " + swigname + " {\n START DEPRECATED_MSG(\"%s\") $action STOP { $action } \n}" % deprecated
+            self.deprecated[swigname] = "%exception " + swigname + " {\n try { DEPRECATED_MSG(\"%s\") $action } CATCH_OR_RETHROW \n}" % deprecated
           else:
             self.deprecated[swigname] = ""
               

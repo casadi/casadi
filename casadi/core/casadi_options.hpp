@@ -48,16 +48,16 @@ namespace casadi {
     public:
 
 #ifndef SWIG
-      /** \brief Catch CasADi errors when they reach the python layer
+      /** \brief Catch CasADi errors when they reach the SWIG layer
       *  If set to true (which will always be the default), any CasADi errors are caught in the SWIG interface
-      *  and converted to python exceptions. This allows the user to obtain python stacktraces, use try/except, etc...
+      *  and converted to swig exceptions. This allows the user to obtain stacktraces, use try/except, etc...
       *
-      *  If set to false, CasADi errors crash the python interface. This allows a CasADi developer
+      *  If set to false, CasADi errors crash the swig interface. This allows a CasADi developer
       *  to obtain a full C++ stacktrace with a debugger such as 'gdb'.
       *
       *  Default: true
       */
-      static bool catch_errors_python;
+      static bool catch_errors_swig;
       /** \brief Indicates whether simplifications should be made on the fly.
       * e.g.   cos(-x) -> cos(x)
       * Default: true
@@ -77,9 +77,9 @@ namespace casadi {
       static bool allowed_internal_api;
 
 #endif //SWIG
-      // Setter and getter for catch_errors_python
-      static void setCatchErrorsPython(bool flag) { catch_errors_python = flag; }
-      static bool getCatchErrorsPython() { return catch_errors_python; }
+      // Setter and getter for catch_errors_swig
+      static void setCatchErrorsSwig(bool flag) { catch_errors_swig = flag; }
+      static bool getCatchErrorsSwig() { return catch_errors_swig; }
 
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }

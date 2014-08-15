@@ -25,7 +25,7 @@
 
 namespace casadi {
 
-  bool CasadiOptions::catch_errors_python = true;
+  bool CasadiOptions::catch_errors_swig = true;
   bool CasadiOptions::simplification_on_the_fly = true;
   bool CasadiOptions::profiling = false;
   std::ofstream CasadiOptions::profilingLog;

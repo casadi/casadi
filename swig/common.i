@@ -425,10 +425,10 @@ int internal(const std::string & c) {
 %}
 #endif
 
-#ifdef SWIGPYTHON
+#ifndef SWIGXML
 %{
 #define START \
-  if (casadi::CasadiOptions::catch_errors_python){ \
+  if (casadi::CasadiOptions::catch_errors_swig) { \
   try {
   
 #define STOP \
@@ -436,13 +436,22 @@ int internal(const std::string & c) {
   SWIG_exception(SWIG_RuntimeError, e.what()); \
   } \
 } else
+
+#define CATCH_OR_RETHROW \
+  catch (const std::exception& e) { \
+    if (casadi::CasadiOptions::catch_errors_swig) { \
+      SWIG_exception(SWIG_RuntimeError, e.what()); \
+    } else { \
+      throw e; \
+    } \
+  } \
 %}
 #endif
 
 // Exceptions handling
 %include "exception.i"
 %exception {
-  START $action STOP { $action }
+  try{ $action } CATCH_OR_RETHROW
 }
 
 // Python sometimes takes an approach to not check, but just try.
