@@ -565,10 +565,10 @@ int meta< casadi::SX >::as(GUESTOBJECT * p,casadi::SX &m) {
   return true;
  }
 
-/* meta_vector(std::vector<casadi::SXElement>); */
-/* meta_vector(casadi::SXElement); */
-/* meta_vector(casadi::Matrix< casadi::SXElement >); */
-/* meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >); */
+meta_vector(std::vector<casadi::SXElement>);
+meta_vector(casadi::SXElement);
+meta_vector(casadi::Matrix< casadi::SXElement >);
+meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
 
 /// casadi::MX
 template<> char meta< casadi::MX >::expected_message[] = "Expecting (MX, numberarray)";
@@ -584,8 +584,8 @@ int meta< casadi::MX >::as(GUESTOBJECT * p,casadi::MX &m) {
   return false;
 }
 
-/* meta_vector(casadi::MX); */
-/* meta_vector(std::vector< casadi::MX >); */
+meta_vector(casadi::MX);
+meta_vector(std::vector< casadi::MX >);
 %}
 
 

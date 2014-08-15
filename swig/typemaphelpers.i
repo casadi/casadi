@@ -125,9 +125,9 @@ class meta {
     #endif // SWIGPYTHON
     
     // Assumes that p is a PYTHON sequence
-    #ifdef SWIGPYTHON
-    static int as_vector(PyObject * p, std::vector<T> &m) {
-      if(PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
+    static int as_vector(GUESTOBJECT * p, std::vector<T> &m) {
+#ifdef SWIGPYTHON
+      if (PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) { PyErr_Clear();  return false;}
         PyObject *pe;
@@ -146,11 +146,21 @@ class meta {
         Py_DECREF(it);
         return true;
       }
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
+        int sz = mxGetN(p);
+        m.resize(sz);
+        for (int i=0; i<sz; ++i) {
+          GUESTOBJECT *pi = mxGetCell(p,i);
+          if (pi==0 || !meta< T >::as(pi, m[i])) return false;
+        }
+        return true;
+      }
+#endif // SWIGMATLAB
       return false;
     }
-    #endif // SWIGPYTHON
-    
-    
+
     #ifdef SWIGPYTHON
     // Would love to make this const T&, but looks like not allowed
     static bool toPython(const T &, PyObject *&p);
