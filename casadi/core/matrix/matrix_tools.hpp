@@ -120,17 +120,17 @@ namespace casadi {
                             const Matrix<DataType> &C, const Matrix<DataType> &D);
 #endif // SWIG
 
-  /** \brief Concatenate a list of matrices vertically
-   * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
+  /** \brief Concatenate a list of matrices horizontally
+   * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
    *
    *   horzcat(horzsplit(x, ...)) = x
    */
   template<typename DataType>
   Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
 
-  /** \brief  split vertically, retaining groups of cols
-   * \param offset List of all start cols for each group
-   *      the last col group will run to the end.
+  /** \brief  split horizontally, retaining groups of columns
+   * \param offset List of all start columns for each group
+   *      the last column group will run to the end.
    *
    *   horzcat(horzsplit(x, ...)) = x
    */
@@ -138,23 +138,23 @@ namespace casadi {
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v,
                                            const std::vector<int>& offset);
 
-  /** \brief  split vertically, retaining fixed-sized groups of cols
-   * \param incr Size of each group of cols
+  /** \brief  split horizontally, retaining fixed-sized groups of columns
+   * \param incr Size of each group of columns
    *
    *   horzcat(horzsplit(x, ...)) = x
    */
   template<typename DataType>
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1);
 
-  /** \brief Concatenate a list of matrices horizontally
-   * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
+  /** \brief Concatenate a list of matrices vertically
+   * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
    *
    *   vertcat(vertsplit(x, ...)) = x
    */
   template<typename DataType>
   Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
 
-  /** \brief  split horizontally, retaining groups of rows
+  /** \brief  split vertically, retaining groups of rows
    * \param output_offset List of all start rows for each group
    *      the last row group will run to the end.
    *
@@ -164,7 +164,7 @@ namespace casadi {
   std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v,
                                            const std::vector<int>& offset);
 
-  /** \brief  split horizontally, retaining fixed-sized groups of rows
+  /** \brief  split vertically, retaining fixed-sized groups of rows
    * \param incr Size of each group of rows
    *
    *   vertcat(vertsplit(x, ...)) = x
