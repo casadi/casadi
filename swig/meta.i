@@ -70,10 +70,10 @@ template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__ve
 template<> swig_type_info** meta< casadi::GenericType >::name = &SWIGTYPE_p_casadi__GenericType;
 template<> swig_type_info** meta< casadi::GenericType::Dictionary >::name = &SWIGTYPE_p_Dictionary;
 template<> swig_type_info** meta< casadi::SXElement >::name = &SWIGTYPE_p_casadi__SXElement;
-template<> swig_type_info** meta< casadi::Matrix<casadi::SXElement> >::name = &SWIGTYPE_p_casadi__MatrixT_casadi__SXElement_t;
-template<> swig_type_info** meta< std::vector< casadi::Matrix<casadi::SXElement> > >::name = &SWIGTYPE_p_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t;
+template<> swig_type_info** meta< casadi::SX >::name = &SWIGTYPE_p_casadi__MatrixT_casadi__SXElement_t;
+template<> swig_type_info** meta< std::vector< casadi::SX > >::name = &SWIGTYPE_p_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t;
 
-template<> swig_type_info** meta< std::vector< std::vector< casadi::Matrix<casadi::SXElement> > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_std__allocatorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_t_t;
+template<> swig_type_info** meta< std::vector< std::vector< casadi::SX > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_std__allocatorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_t_t;
 template<> swig_type_info** meta< std::vector< casadi::SXElement > >::name = &SWIGTYPE_p_std__vectorT_casadi__SXElement_std__allocatorT_casadi__SXElement_t_t;
 template<> swig_type_info** meta< std::vector< std::vector< casadi::SXElement > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__SXElement_std__allocatorT_casadi__SXElement_t_t_std__allocatorT_std__vectorT_casadi__SXElement_std__allocatorT_casadi__SXElement_t_t_t_t;
 
@@ -97,4 +97,8 @@ template<> swig_type_info** meta< casadi::CustomEvaluate >::name = & SWIGTYPE_p_
 template<> swig_type_info** meta< casadi::Callback >::name = & SWIGTYPE_p_casadi__Callback;
 %}
 %include "meta_python.i"
+#endif
+
+#ifdef SWIGMATLAB
+%include "meta_matlab.i"
 #endif

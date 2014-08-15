@@ -291,7 +291,7 @@ PyObject* arrayView() {
 %}
 
 binopsrFull(casadi::Matrix<double>)
-binopsFull(const casadi::Matrix<casadi::SXElement> & b,,casadi::Matrix<casadi::SXElement>,casadi::Matrix<casadi::SXElement>)
+binopsFull(const casadi::SX & b,,casadi::SX,casadi::SX)
 binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 
 }; // extend Matrix<double>
@@ -329,7 +329,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
   %}
 
   binopsrFull(casadi::Matrix<int>)
-  binopsFull(const casadi::Matrix<casadi::SXElement> & b,,casadi::Matrix<casadi::SXElement>,casadi::Matrix<casadi::SXElement>)
+  binopsFull(const casadi::SX & b,,casadi::SX,casadi::SX)
   binopsFull(const casadi::Matrix<double> & b,,casadi::Matrix<double>,casadi::Matrix<double>)
   binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
   %pythoncode %{
@@ -394,13 +394,15 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 namespace casadi{
 
 %{
-#ifdef SWIGPYTHON
+
+#ifndef SWIGXML
+
 /// casadi::Slice
 template<> char meta< casadi::Slice >::expected_message[] = "Expecting Slice or number";
 template <>
-int meta< casadi::Slice >::as(PyObject * p,casadi::Slice &m) {
+int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice &m) {
   NATIVERETURN(casadi::Slice,m)
-
+#ifdef SWIGPYTHON
   if (PyInt_Check(p)) {
     m.start_ = PyInt_AsLong(p);
     m.stop_ = m.start_+1;
@@ -415,13 +417,15 @@ int meta< casadi::Slice >::as(PyObject * p,casadi::Slice &m) {
   } else {
     return false;
   }
-
+#else
+  return false;
+#endif
 }
 
 /// casadi::IndexList
 template<> char meta< casadi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 template <>
-int meta< casadi::IndexList >::as(PyObject * p,casadi::IndexList &m) {
+int meta< casadi::IndexList >::as(GUESTOBJECT *p, casadi::IndexList &m) {
   NATIVERETURN(casadi::IndexList,m)
   if (meta< int >::couldbe(p)) {
     m.type = casadi::IndexList::INT;
@@ -438,7 +442,9 @@ int meta< casadi::IndexList >::as(PyObject * p,casadi::IndexList &m) {
   return true;
 }
 
-#endif //SWIGPYTHON
+#endif // SWIGXML
+
+
 
 %}
 
