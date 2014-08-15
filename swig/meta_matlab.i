@@ -206,8 +206,7 @@ template <>
 int meta< int >::as(GUESTOBJECT * p, int &m) {
   NATIVERETURN(int,m)
   if (meta< casadi::Matrix<int> >::isa(p)) {
-    casadi::Matrix<int> *temp = 0;
-    meta< casadi::Matrix<int> >::get_ptr(p,temp);
+    casadi::Matrix<int> *temp = meta< casadi::Matrix<int> >::get_ptr(p);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
@@ -241,16 +240,14 @@ template <>
 int meta< double >::as(GUESTOBJECT * p, double &m) {
   NATIVERETURN(double,m)
   if (meta< casadi::Matrix<double> >::isa(p)) {
-    casadi::Matrix<double> *temp = 0;
-    meta< casadi::Matrix<double> >::get_ptr(p,temp);
+    casadi::Matrix<double> *temp = meta< casadi::Matrix<double> >::get_ptr(p);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
     }
     return false;
   } else if (meta< casadi::Matrix<int> >::isa(p)) {
-    casadi::Matrix<int> *temp = 0;
-    meta< casadi::Matrix<int> >::get_ptr(p,temp);
+    casadi::Matrix<int> *temp = meta< casadi::Matrix<int> >::get_ptr(p);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;

@@ -71,19 +71,19 @@ class meta {
       return istype(p,*meta<T>::name);
     };
     /// Convert Python object to pointer of type T
-    static bool get_ptr(GUESTOBJECT *p, T*& m) {
+    static T* get_ptr(GUESTOBJECT *p) {
       void *pd = 0 ;
-      int res = SWIG_ConvertPtr(p, &pd,*meta<T>::name, 0 );
+      int res = SWIG_ConvertPtr(p, &pd, *meta<T>::name, 0 );
       if (!SWIG_IsOK(res)) {
-        return false;
+        return 0;
+      } else {
+        return reinterpret_cast< T *>(pd);
       }
-      m = reinterpret_cast< T*  >(pd);
-      return true;
     };
     /// Convert Guest object to type T
     /// This function must work when isa(GUESTOBJECT *p) too
     static int as(GUESTOBJECT *p, T& m) {
-        T *t = (T *)(0);
+        T *t = 0;
         int res = swig::asptr(p, &t);
         bool succes = SWIG_CheckState(res) && t;
         if (succes) m=*t;
@@ -160,13 +160,14 @@ class meta {
 %}
 
 %inline %{
-#define NATIVERETURN(Type, m) if (meta<Type>::isa(p)) { Type *mp; int result = meta<Type>::get_ptr(p,mp); if (!result) return false; m=*mp; return true;}
+#define NATIVERETURN(Type, m) if (meta<Type>::isa(p)) { Type *mp = meta< Type >::get_ptr(p); if (mp==0) return false; m=*mp; return true;}
 %}
 
 
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
-  if (!meta< Type >::get_ptr($input,$1)) {
+  $1 = meta< Type >::get_ptr($input);
+  if ($1 == 0) {
     if (!meta< Type >::as($input,m)) SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
     $1 = &m;
   }
@@ -312,10 +313,9 @@ int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > &m) { \
 %define %meta_pair(TypeA,TypeB) 
 %inline %{
 template <>
-int meta< std::pair< TypeA, TypeB > >::as(PyObject * p,std::pair< TypeA, TypeB > &m) {
-  std::pair< TypeA, TypeB > * tm;
-  int res1 = meta< std::pair< TypeA, TypeB > >::get_ptr(p,tm); 
-  if (res1) {
+int meta< std::pair<TypeA, TypeB> >::as(PyObject * p,std::pair< TypeA, TypeB > &m) {
+  std::pair< TypeA, TypeB > *tm = meta< std::pair< TypeA, TypeB > >::get_ptr(p);
+  if (tm!=0) {
     m = *tm;
     return true;
   }
