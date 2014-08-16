@@ -1,0 +1,5 @@
+usr/lib/libcasadi_linearsolver_lapackqr.so.*
+usr/lib/libcasadi_linearsolver_lapacklu.so.*
+
+usr/lib/libcasadi_linearsolver_lapackqr.so
+usr/lib/libcasadi_linearsolver_lapacklu.so

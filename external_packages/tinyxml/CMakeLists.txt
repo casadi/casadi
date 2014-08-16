@@ -20,6 +20,7 @@ install(DIRECTORY ./
   DESTINATION include/casadi/external_packages/tinyxml
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE)
+set_target_properties(casadi_tinyxml PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
 
 add_executable(test_dump test_dump.cpp)
 target_link_libraries(test_dump ${TINYXML_LIBRARIES})

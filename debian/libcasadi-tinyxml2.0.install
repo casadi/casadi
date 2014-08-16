@@ -1,0 +1,5 @@
+usr/lib/libcasadi_xmlfile_tinyxml.so.*
+usr/lib/libcasadi_tinyxml.so.*
+
+usr/lib/libcasadi_xmlfile_tinyxml.so
+usr/lib/libcasadi_tinyxml.so

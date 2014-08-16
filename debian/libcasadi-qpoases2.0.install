@@ -1,0 +1,5 @@
+usr/lib/libcasadi_qpsolver_qpoases.so.*
+usr/lib/libcasadi_qpoases.so.*
+
+usr/lib/libcasadi_qpsolver_qpoases.so
+usr/lib/libcasadi_qpoases.so

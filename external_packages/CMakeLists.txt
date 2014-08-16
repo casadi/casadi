@@ -16,6 +16,11 @@ macro(casadi_external_library name)
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
   )
+  set_target_properties(
+    ${name}
+  PROPERTIES
+    SOVERSION ${PACKAGE_SO_VERSION}
+  )
 endmacro()
 
 add_subdirectory(tinyxml)

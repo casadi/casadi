@@ -1,0 +1,9 @@
+usr/lib/libcasadi_sundials.so.*
+usr/lib/libcasadi_integrator_cvodes.so.*
+usr/lib/libcasadi_integrator_idas.so.*
+usr/lib/libcasadi_implicitfunction_kinsol.so.*
+
+usr/lib/libcasadi_sundials.so
+usr/lib/libcasadi_integrator_cvodes.so
+usr/lib/libcasadi_integrator_idas.so
+usr/lib/libcasadi_implicitfunction_kinsol.so

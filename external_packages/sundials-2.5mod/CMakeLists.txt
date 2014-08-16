@@ -142,3 +142,5 @@ install(TARGETS casadi_sundials
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 set_target_properties(casadi_sundials PROPERTIES COMPILE_FLAGS "-Wno-format-security")
 endif()
+
+set_target_properties(casadi_sundials PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
