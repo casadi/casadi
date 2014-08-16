@@ -122793,7 +122793,7 @@ double *A, const double *B, double *C) " [INTERNAL] ";
 %feature("docstring")  casadi::vertsplit(const Matrix< DataType > &v, const
 std::vector< int > &offset) "
 
-split horizontally, retaining groups of rows
+split vertically, retaining groups of rows
 
 Parameters:
 -----------
@@ -122808,7 +122808,7 @@ vertcat(vertsplit(x, ...)) = x
 %feature("docstring")  casadi::vertsplit(const Matrix< DataType > &v, int
 incr=1) "
 
-split horizontally, retaining fixed-sized groups of rows
+split vertically, retaining fixed-sized groups of rows
 
 Parameters:
 -----------
@@ -123623,13 +123623,13 @@ double *a, int lda1, int lda2, double *tau, int ldtau, double *dwork) "
 %feature("docstring")  casadi::horzsplit(const Matrix< DataType > &v, const
 std::vector< int > &offset) "
 
-split vertically, retaining groups of cols
+split horizontally, retaining groups of columns
 
 Parameters:
 -----------
 
-offset:  List of all start cols for each group the last col group will run
-to the end.
+offset:  List of all start columns for each group the last column group will
+run to the end.
 
 horzcat(horzsplit(x, ...)) = x
 
@@ -123638,12 +123638,12 @@ horzcat(horzsplit(x, ...)) = x
 %feature("docstring")  casadi::horzsplit(const Matrix< DataType > &v, int
 incr=1) "
 
-split vertically, retaining fixed-sized groups of cols
+split horizontally, retaining fixed-sized groups of columns
 
 Parameters:
 -----------
 
-incr:  Size of each group of cols
+incr:  Size of each group of columns
 
 horzcat(horzsplit(x, ...)) = x
 
@@ -123840,8 +123840,8 @@ Extract shared subexpressions from an set of expressions.
 %feature("docstring")  casadi::vertcat(const std::vector< Matrix< DataType >
 > &v) "
 
-Concatenate a list of matrices horizontally Alternative terminology:
-horizontal stack, hstack, horizontal append, [a b].
+Concatenate a list of matrices vertically Alternative terminology: vertical
+stack, vstack, vertical append, [a;b].
 
 vertcat(vertsplit(x, ...)) = x
 
@@ -126509,8 +126509,8 @@ calls to this function.
 %feature("docstring")  casadi::horzcat(const std::vector< Matrix< DataType >
 > &v) "
 
-Concatenate a list of matrices vertically Alternative terminology: vertical
-stack, vstack, vertical append, [a;b].
+Concatenate a list of matrices horizontally Alternative terminology:
+horizontal stack, hstack, horizontal append, [a b].
 
 horzcat(horzsplit(x, ...)) = x
 

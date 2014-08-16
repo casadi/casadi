@@ -105089,6 +105089,34 @@ as tval)
 %feature("docstring") casadi::vertsplit "
 
 >  std::vector< Matrix< DataType > > casadi::vertsplit(const Matrix< DataType > &v, const std::vector< int > &offset)
+------------------------------------------------------------------------
+
+split vertically, retaining groups of rows
+
+Parameters:
+-----------
+
+output_offset:  List of all start rows for each group the last row group
+will run to the end.
+
+vertcat(vertsplit(x, ...)) = x
+
+>  std::vector< Matrix< DataType > > casadi::vertsplit(const Matrix< DataType > &v, int incr=1)
+------------------------------------------------------------------------
+
+split vertically, retaining fixed-sized groups of rows
+
+Parameters:
+-----------
+
+incr:  Size of each group of rows
+
+vertcat(vertsplit(x, ...)) = x
+
+>  std::vector< Sparsity > casadi::vertsplit(const Sparsity &sp, const std::vector< int > &output_offset)
+------------------------------------------------------------------------
+
+Split up a sparsity pattern vertically.
 
 >  std::vector< MX > casadi::vertsplit(const MX &x, const std::vector< int > &output_offset)
 ------------------------------------------------------------------------
@@ -105103,8 +105131,6 @@ will run to the end.
 
 vertcat(vertsplit(x, ...)) = x
 
->  std::vector< Matrix< DataType > > casadi::vertsplit(const Matrix< DataType > &v, int incr=1)
-
 >  std::vector< MX > casadi::vertsplit(const MX &x, int incr=1)
 ------------------------------------------------------------------------
 
@@ -105116,11 +105142,6 @@ Parameters:
 incr:  Size of each group of rows
 
 vertcat(vertsplit(x, ...)) = x
-
->  std::vector< Sparsity > casadi::vertsplit(const Sparsity &sp, const std::vector< int > &output_offset)
-------------------------------------------------------------------------
-
-Split up a sparsity pattern vertically.
 
 ";
 
@@ -105789,27 +105810,25 @@ number of other expressions piggyback (vector version)
 >  std::vector< Matrix< DataType > > casadi::horzsplit(const Matrix< DataType > &v, const std::vector< int > &offset)
 ------------------------------------------------------------------------
 
-split vertically, retaining groups of cols
+split horizontally, retaining groups of columns
 
 Parameters:
 -----------
 
-offset:  List of all start cols for each group the last col group will run
-to the end.
+offset:  List of all start columns for each group the last column group will
+run to the end.
 
 horzcat(horzsplit(x, ...)) = x
 
 >  std::vector< Matrix< DataType > > casadi::horzsplit(const Matrix< DataType > &v, int incr=1)
-
->  std::vector< MX > casadi::horzsplit(const MX &x, int incr=1)
 ------------------------------------------------------------------------
 
-split vertically, retaining fixed-sized groups of cols
+split horizontally, retaining fixed-sized groups of columns
 
 Parameters:
 -----------
 
-incr:  Size of each group of cols
+incr:  Size of each group of columns
 
 horzcat(horzsplit(x, ...)) = x
 
@@ -105828,6 +105847,18 @@ Parameters:
 
 output_offset:  List of all start cols for each group the last col group
 will run to the end.
+
+horzcat(horzsplit(x, ...)) = x
+
+>  std::vector< MX > casadi::horzsplit(const MX &x, int incr=1)
+------------------------------------------------------------------------
+
+split vertically, retaining fixed-sized groups of cols
+
+Parameters:
+-----------
+
+incr:  Size of each group of cols
 
 horzcat(horzsplit(x, ...)) = x
 
@@ -105967,8 +105998,8 @@ Extract shared subexpressions from an set of expressions.
 >  Matrix< DataType > casadi::vertcat(const std::vector< Matrix< DataType > > &v)
 ------------------------------------------------------------------------
 
-Concatenate a list of matrices horizontally Alternative terminology:
-horizontal stack, hstack, horizontal append, [a b].
+Concatenate a list of matrices vertically Alternative terminology: vertical
+stack, vstack, vertical append, [a;b].
 
 vertcat(vertsplit(x, ...)) = x
 
@@ -108277,8 +108308,8 @@ calls to this function.
 >  Matrix< DataType > casadi::horzcat(const std::vector< Matrix< DataType > > &v)
 ------------------------------------------------------------------------
 
-Concatenate a list of matrices vertically Alternative terminology: vertical
-stack, vstack, vertical append, [a;b].
+Concatenate a list of matrices horizontally Alternative terminology:
+horizontal stack, hstack, horizontal append, [a b].
 
 horzcat(horzsplit(x, ...)) = x
 
