@@ -359,6 +359,7 @@ class Misctests(casadiTestCase):
   def test_exceptions(self):
     try:
       NlpSolver(123)
+      self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
       assert "NlpSolver(str,Function)" in e.message
@@ -368,6 +369,7 @@ class Misctests(casadiTestCase):
 
     try:
       vertcat(123)
+      self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
       assert "vertcat([SX,...]" in e.message
@@ -378,6 +380,7 @@ class Misctests(casadiTestCase):
       
     try:
       substitute(123)
+      self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
       assert "substitute(SX,SX,SX)" in e.message
@@ -388,6 +391,7 @@ class Misctests(casadiTestCase):
       
     try:
       SXFunction(daeIn(x=SX.sym("x")))
+      self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
       assert "SXFunction(scheme(SX),[SX,...] )" in e.message
@@ -397,6 +401,7 @@ class Misctests(casadiTestCase):
 
     try:
       NlpSolver.loadPlugin(132)
+      self.assertTrue(False)
     except TypeError as e:
       print e.message
       assert "type 'str' expected" in e.message
@@ -409,12 +414,14 @@ class Misctests(casadiTestCase):
       
     try:
       [x]+ x
+      self.assertTrue(False)
     except TypeError as e:
       print e.message
       assert "You try to do: [SX] + SX" in e.message
 
     try:
       x + [x]
+      self.assertTrue(False)
     except TypeError as e:
       print e.message
       assert "You try to do: SX + [SX]" in e.message
@@ -422,24 +429,57 @@ class Misctests(casadiTestCase):
 
     try:
       daeIn(x=x,p=[x])
+      self.assertTrue(False)
     except TypeError as e:
       print e.message
       assert "You have: (x=SX, p=[SX])" in e.message
 
     try:
       QpSolver("qp",123)
+      self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
       assert "QpSolver(str,QPStructure)" in e.message
       
     try:
       SXFunction(qpStruct(a=12),[x])
+      self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
       assert "QPStructure([Sparsity,...] )" in e.message
       assert "You have: QPStructure([int,Sparsity])" in e.message
       assert "QPStructure(a=int)" in e.message
+  
+  def test_callkw(self):
+      x = SX.sym("x")
+
+      f = SXFunction(nlpIn(x=x),nlpOut(g=x**2))
+      f.init()
+
+      [f_,g_] = f(x=4)
+      self.checkarray(g_,DMatrix(16))
+
+      with self.assertRaises(RuntimeError):
+        [f_,g_] = f(m=4)
       
+      try:
+        [f_,g_] = f(x=Sparsity.dense(2))
+        self.assertTrue(False)
+      except RuntimeError as e:
+        self.assertTrue("Function(scheme(SX))" in e.message)
+        self.assertTrue("Function([SX,...] )" in e.message)
+        self.assertTrue("You have: Function(scheme(Sparsity))" in e.message)
+
+      with self.assertRaises(RuntimeError):
+        [f_,g_] = f(x=[x])
+
+
+      f = SXFunction([x],nlpOut(g=x**2))
+      f.init()
+
+      with self.assertRaises(Exception):
+        [f_,g_] = f(x=4)
+
   def test_assertions(self):
     
     x = MX.sym("x") 
