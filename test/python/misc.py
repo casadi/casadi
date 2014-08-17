@@ -439,7 +439,31 @@ class Misctests(casadiTestCase):
       assert "QPStructure([Sparsity,...] )" in e.message
       assert "You have: QPStructure([int,Sparsity])" in e.message
       assert "QPStructure(a=int)" in e.message
+  
+  def test_callkw(self):
+      x = SX.sym("x")
+
+      f = SXFunction(nlpIn(x=x),nlpOut(g=x**2))
+      f.init()
+
+      [f_,g_] = f(x=4)
+      self.checkarray(g_,DMatrix(16))
+
+      with self.assertRaises(RuntimeError):
+        [f_,g_] = f(m=4)
       
+      with self.assertRaises(RuntimeError):
+        [f_,g_] = f(x=Sparsity.dense(2))
+      with self.assertRaises(RuntimeError):
+        [f_,g_] = f(x=[x])
+
+
+      f = SXFunction([x],nlpOut(g=x**2))
+      f.init()
+
+      with self.assertRaises(Exception):
+        [f_,g_] = f(x=4)
+
   def test_assertions(self):
     
     x = MX.sym("x") 

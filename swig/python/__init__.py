@@ -151,10 +151,11 @@ def monkeypatch(v,cl=True):
 
         s = e.args[0]
         s = s.replace("'new_","'")
-        s = re.sub(r"overloaded function '(\w+)_(\w+)'",r"overloaded function '\1.\2'",s)
+        s = re.sub(r"overloaded function '(\w+?)_(\w+)'",r"overloaded function '\1.\2'",s)
         m = re.search("overloaded function '([\w\.]+)'",s)
         if m:
           name = m.group(1)
+          name = name.replace(".__call__","")
         else:
           name = "method"
         ne = NotImplementedError(pythonify(s)+"You have: %s(%s)\n" % (name,", ".join(map(type_descr,args[1:] if cl else args)+ ["%s=%s" % (k,type_descr(vv)) for k,vv in kwargs.items()])))
@@ -173,10 +174,11 @@ def monkeypatch(v,cl=True):
 
       if e.message.startswith("in method '"):
         s = e.args[0]
-        s = re.sub(r"method '(\w+)_(\w+)'",r"method '\1.\2'",s)
+        s = re.sub(r"method '(\w+?)_(\w+)'",r"method '\1.\2'",s)
         m = re.search("method '([\w\.]+)'",s)
         if m:
           name = m.group(1)
+          name = name.replace(".__call__","")
         else:
           name = "method"
         ne = TypeError(pythonify(s)+" expected.\nYou have: %s(%s)\n" % (name,", ".join(map(type_descr,args[1:] if cl else args))))
@@ -203,9 +205,29 @@ def monkeypatch(v,cl=True):
   return foo
 
 
+def improvedcall(v):
+  def newcall(self,*args,**kwargs):
+    if len(args)>0 and len(kwargs)>0:
+      raise Exception("You cannot mix positional and keyword arguments in __call__")
+    if len(kwargs)>0:
+      scheme = self.getInputScheme()
+      if scheme.known():
+        return v(self,scheme(**kwargs))
+      else:
+        raise Exception("The CasADi Function that you call has no known input scheme. You cannot use keyword arguments, just possitional arguments.")
+    else:
+      return v(self,*args)
+
+  newcall.__name__ = v.__name__
+  newcall.__doc__ = v.__doc__ + "\nYou can also call with keyword arguments if the Function has a known scheme\nExample: nlp(x=x)\n"
+  return newcall
+  
 for name,cl in inspect.getmembers(casadi, inspect.isclass):
   for k,v in inspect.getmembers(cl, inspect.ismethod):
-    setattr(cl,k,monkeypatch(v))
+    vv = v
+    if k=="__call__" and issubclass(cl,Function):
+      vv = improvedcall(v)
+    setattr(cl,k,monkeypatch(vv))
   for k,v in inspect.getmembers(cl, inspect.isfunction):
     setattr(cl,k,staticmethod(monkeypatch(v,cl=False)))
     
