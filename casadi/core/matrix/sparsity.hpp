@@ -218,6 +218,7 @@ namespace casadi {
     /// Compress a sparsity pattern
     std::vector<int> compress() const;
 
+#ifndef SWIG
     /// @{
     /// Access a member function or object
     SparsityInternal* operator->();
@@ -229,6 +230,7 @@ namespace casadi {
     SparsityInternal& operator*();
     const SparsityInternal& operator*() const;
     /// @}
+#endif // SWIG
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

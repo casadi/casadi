@@ -66,13 +66,6 @@ namespace casadi {
     std::string getDescription() const;
   };
 
-#ifdef SWIG
-  %extend PrintableObject {
-    std::string __str__()  { return $self->getDescription(); }
-    std::string __repr__()  { return $self->getRepresentation(); }
-  }
-#endif // SWIG
-
 } // namespace casadi
 
 

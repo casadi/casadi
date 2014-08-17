@@ -20,6 +20,59 @@
  *
  */
 
+
+#ifdef SWIGMATLAB
+%rename(plus) __add__;
+%rename(minus) __sub__;
+%rename(uminus) operator-;
+%rename(uplus) operator+;
+%rename(times) __mul__;
+%rename(mtimes) mul;
+%rename(rdivide) __div__;
+%rename(ldivide) __rdiv__;
+%rename(mrdivide) __mrdivide__;
+%rename(mldivide) __mldivide__;
+%rename(power) __pow__;
+%rename(mpower) __mpower__;
+%rename(lt) __lt__;
+%rename(gt) __gt__;
+%rename(le) __le__;
+%rename(ge) __ge__;
+%rename(ne) __ne__;
+%rename(eq) __eq__;
+//%rename(and) logic_and;
+//%rename(or) logic_or;
+//%rename(not) logic_not;
+%rename(trans) transpose;
+
+
+// Workarounds, pending proper fix
+%rename(truediv) __truediv__;
+%rename(nonzero) __nonzero__;
+%rename(constpow) __constpow__;
+%rename(copysign) __copysign__;
+%rename(rpow) __rpow__;
+%rename(radd) __radd__;
+%rename(rsub) __rsub__;
+%rename(rmul) __rmul__;
+%rename(rtruediv) __rtruediv__;
+%rename(rmldivide) __rmldivide__;
+%rename(rmrdivide) __rmrdivide__;
+%rename(rmpower) __rmpower__;
+%rename(rconstpow) __rconstpow__;
+%rename(rge) __rge__;
+%rename(rgt) __rgt__;
+%rename(rle) __rle__;
+%rename(rlt) __rlt__;
+%rename(req) __req__;
+%rename(rne) __rne__;
+%rename(rfmin) __rfmin__;
+%rename(rfmax) __rfmax__;
+%rename(rarctan2) __rarctan2__;
+%rename(rcopysign) __rcopysign__;
+%rename(hash) __hash__;
+#endif // SWIGMATLAB
+
 %{
 #include "casadi/core/matrix/sparsity.hpp"
 #include "casadi/core/matrix/matrix.hpp"

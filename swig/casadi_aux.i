@@ -37,12 +37,17 @@ VECTOR_TOOLS_TEMPLATES(double)
 
 %define VECTOR_REPR(type)
 %extend std::vector< type >{
-  std::string __repr__(){ return casadi::getRepresentation(*$self); }
-  std::string __str__(){ return casadi::getDescription(*$self); }
+  std::string SWIG_REPR(){ return casadi::getRepresentation(*$self); }
+  std::string SWIG_STR(){ return casadi::getDescription(*$self); }
 };
 %enddef
 
 %include "casadi/core/printable_object.hpp"
+%extend PrintableObject {
+  std::string SWIG_STR()  { return $self->getDescription(); }
+  std::string SWIG_REPR()  { return $self->getRepresentation(); }
+}
+
 %include "casadi/core/shared_object.hpp"
 %include "casadi/core/weak_ref.hpp"
 %include "casadi/core/casadi_types.hpp"

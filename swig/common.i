@@ -43,6 +43,24 @@
 #define SWIG_PYTHON_OUTPUT_TUPLE
 %}
 
+// Print representation
+#ifdef SWIGMATLAB
+#define SWIG_REPR disp
+#else
+#define SWIG_REPR __repr__
+#endif
+
+// Print description
+#ifdef SWIGMATLAB
+#define SWIG_STR description
+#else
+#define SWIG_STR __str__
+#endif
+
+
+//#endif // SWIGPYTHON
+
+
 #ifdef SWIGPYTHON
 %pythoncode %{
 
@@ -329,11 +347,10 @@ namespace std {
 %template() std::vector< std::pair<int,int> >;*/
 //#endif //SWIG_MAIN_MODULE
 
-
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
 // nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code
 %extend std::vector<double>{  
-  std::string __repr__(){
+  std::string SWIG_REPR(){
     char buffer[32];
     std::string ret;
     ret += "[";
@@ -347,7 +364,7 @@ namespace std {
     ret += "]";
     return ret;
   }
-  std::string __str__(){
+  std::string SWIG_STR(){
     char buffer[32];
     std::string ret;
     
@@ -369,7 +386,7 @@ namespace std {
 
 // The same workaround for vector<double>
 %extend std::vector<int>{  
-  std::string __repr__(){
+  std::string SWIG_REPR(){
     char buffer[32];
     std::string ret;
     ret += "[";
@@ -383,7 +400,7 @@ namespace std {
     ret += "]";
     return ret;
   }
-  std::string __str__(){
+  std::string SWIG_STR(){
     char buffer[32];
     std::string ret;
     

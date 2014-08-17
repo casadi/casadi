@@ -58,9 +58,11 @@ namespace casadi {
     }
     T operator[](const std::string& name) const { return (*this)[this->scheme.index(name)]; }
 #endif // SWIG
+#ifndef SWIGMATLAB
     T __getitem__(int i) const { if (i<0) i+= this->data.size(); return (*this)[i]; }
     T __getitem__(const std::string& name) const { return (*this)[name]; }
     int __len__() const { return this->data.size(); }
+#endif // SWIGMATLAB
     std::vector<T> vector() const { return this->data; }
 
 #ifndef SWIG

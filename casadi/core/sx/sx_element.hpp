@@ -299,15 +299,6 @@ namespace casadi {
 
   };
 
-#ifdef SWIG
-  %extend SXElement {
-    std::string __str__()  { return $self->toString(); }
-    std::string __repr__() { return $self->toString(); }
-    double __float__() { return $self->getValue();}
-    int __int__() { return $self->getIntValue();}
-  }
-#endif // SWIG
-
 /// \cond INTERNAL
 #ifndef SWIG
   // Template specializations
