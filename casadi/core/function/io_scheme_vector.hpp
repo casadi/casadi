@@ -33,7 +33,7 @@ namespace casadi {
   A class
 */
   template<typename T>
-  class CASADI_CORE_EXPORT IOSchemeVector : public PrintableObject {
+  class CASADI_CORE_EXPORT IOSchemeVector : public PrintableObject<IOSchemeVector<T> > {
     // Data members (all public)
   public:
     /// Vector of data
@@ -67,7 +67,7 @@ namespace casadi {
 
 #ifndef SWIG
     /// Print a description of the object
-    virtual void print(std::ostream &stream=std::cout) const {
+    void print(std::ostream &stream=std::cout) const {
       stream << "IOSchemeVector(" ;
       for (int i=0;i<this->data.size();++i) {
         stream << this->scheme.entry(i) << "=" << this->data[i];
@@ -78,7 +78,7 @@ namespace casadi {
     }
 
     /// Print a representation of the object
-    virtual void repr(std::ostream &stream=std::cout) const { print(stream); }
+    void repr(std::ostream &stream=std::cout) const { print(stream); }
 
 #endif // SWIG
 

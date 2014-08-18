@@ -52,8 +52,8 @@ namespace casadi {
       \date 2010-2011
   */
   class CASADI_CORE_EXPORT MX : public GenericExpression<MX>,
-                                    public GenericMatrix<MX>,
-                                    public SharedObject {
+                                public GenericMatrix<MX>,
+                                public SharedObject {
   public:
 
     /** \brief  Default constructor */
@@ -80,7 +80,7 @@ namespace casadi {
 
 /// \cond INTERNAL
     /** \brief  Destructor */
-    virtual ~MX();
+    ~MX();
 /// \endcond
 
 #ifndef SWIG

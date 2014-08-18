@@ -47,6 +47,7 @@ VECTOR_TOOLS_TEMPLATES(double)
   std::string SWIG_STR()  { return $self->getDescription(); }
   std::string SWIG_REPR()  { return $self->getRepresentation(); }
 }
+%template(PrintSharedObject)           casadi::PrintableObject<casadi::SharedObject>;
 
 %include "casadi/core/shared_object.hpp"
 %include "casadi/core/weak_ref.hpp"

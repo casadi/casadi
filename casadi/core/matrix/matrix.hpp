@@ -103,7 +103,7 @@ namespace casadi {
   class CASADI_CORE_EXPORT Matrix :
         public GenericExpression<Matrix<DataType> >,
         public GenericMatrix<Matrix<DataType> >,
-        public PrintableObject {
+        public PrintableObject<Matrix<DataType> > {
   public:
 
     /** \brief  constructors */
@@ -674,8 +674,8 @@ namespace casadi {
     ///@{
     /// Printing
 #ifndef SWIG
-    virtual void print(std::ostream &stream=std::cout) const; // print print description
-    virtual void repr(std::ostream &stream=std::cout) const; // print representation
+    void print(std::ostream &stream=std::cout) const; // print print description
+    void repr(std::ostream &stream=std::cout) const; // print representation
 #endif
     static std::string className(); // name of the class
     void printScalar(std::ostream &stream=std::cout) const; // print scalar

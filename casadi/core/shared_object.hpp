@@ -75,7 +75,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT SharedObject : public PrintableObject {
+  class CASADI_CORE_EXPORT SharedObject : public PrintableObject<SharedObject> {
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
     template<class B> friend const B shared_cast(const SharedObject& A);
@@ -128,10 +128,10 @@ namespace casadi {
     /// \endcond
 
     /// Print a representation of the object
-    virtual void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream) const;
 
     /// Print a description of the object
-    virtual void print(std::ostream &stream=std::cout) const;
+    void print(std::ostream &stream=std::cout) const;
 
 #endif // SWIG
 

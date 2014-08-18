@@ -81,7 +81,7 @@ namespace casadi {
       \date 2012
       \author Joel Andersson
   */
-  class CASADI_CORE_EXPORT SymbolicOCP : public PrintableObject {
+  class CASADI_CORE_EXPORT SymbolicOCP : public PrintableObject<SymbolicOCP> {
   public:
 
     /// Default constructor
@@ -418,10 +418,10 @@ namespace casadi {
 
 #ifndef SWIG
     ///  Print representation
-    virtual void repr(std::ostream &stream=std::cout) const;
+    void repr(std::ostream &stream) const;
 
     /// Print description
-    virtual void print(std::ostream &stream=std::cout) const;
+    void print(std::ostream &stream=std::cout) const;
 
     // Internal methods
   protected:

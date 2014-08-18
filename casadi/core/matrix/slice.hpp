@@ -36,7 +36,7 @@ namespace casadi {
    * Note that Python or Octave do not need to use this class.
    * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
    */
-  class CASADI_CORE_EXPORT Slice : public PrintableObject {
+  class CASADI_CORE_EXPORT Slice : public PrintableObject<Slice> {
   public:
     /// Default constructor - all elements
     Slice();
@@ -73,8 +73,11 @@ namespace casadi {
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
 #ifndef SWIG
-    /// Print a representation of the object to a stream
-    virtual void print(std::ostream& stream=std::cout) const;
+    /// Print a representation of the object
+    void repr(std::ostream &stream) const;
+
+    /// Print a description of the object
+    void print(std::ostream &stream=std::cout) const;
 #endif // SWIG
 
     /// start value: negative values will get added to length

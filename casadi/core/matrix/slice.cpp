@@ -79,6 +79,10 @@ namespace casadi {
     }
   }
 
+  void Slice::repr(std::ostream& stream) const {
+    print(stream);
+  }
+
   void Slice::print(std::ostream& stream) const {
     bool from_beginning = start_ == 0;
     bool till_end = stop_ == std::numeric_limits<int>::max();

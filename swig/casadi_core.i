@@ -61,7 +61,14 @@
 #include "casadi/core/misc/xml_file.hpp"
 %}
 %include "casadi/core/misc/integration_tools.hpp"
+
+%template(PrintSymbolicNLP)        casadi::PrintableObject<casadi::SymbolicNLP>;
 %include "casadi/core/misc/symbolic_nlp.hpp"
+
+%template(PrintVariable)        casadi::PrintableObject<casadi::Variable>;
 %include "casadi/core/misc/variable.hpp"
+
+%template(PrintSymbolicOCP)        casadi::PrintableObject<casadi::SymbolicOCP>;
 %include "casadi/core/misc/symbolic_ocp.hpp"
+
 %include "casadi/core/misc/xml_file.hpp"

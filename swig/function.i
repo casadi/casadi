@@ -160,7 +160,11 @@ def PyFunction(obj,inputs,outputs):
 }
 #endif
 
+%template(PrintIOSchemeVectorMX)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::MX> >;
+%template(PrintIOSchemeVectorSX)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> > >;
+%template(PrintIOSchemeVectorSparsity)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Sparsity> >;
 %include "casadi/core/function/io_scheme_vector.hpp"
+
 %template(IOSchemeVectorMX) casadi::IOSchemeVector< casadi::MX >;
 %template(IOSchemeVectorSX) casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> >;
 %template(IOSchemeVectorSparsity) casadi::IOSchemeVector< casadi::Sparsity >;
