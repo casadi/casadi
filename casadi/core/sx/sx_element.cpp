@@ -126,9 +126,12 @@ namespace casadi {
     return *this = SXElement(scalar);
   }
 
-  std::ostream &operator<<(std::ostream &stream, const SXElement &scalar) {
-    scalar.node->print(stream);
-    return stream;
+  void SXElement::repr(std::ostream &stream) const {
+    print(stream);
+  }
+
+  void SXElement::print(std::ostream &stream) const {
+    node->print(stream);
   }
 
   void SXElement::print(std::ostream &stream, long& remaining_calls) const {
@@ -401,18 +404,6 @@ namespace casadi {
 
   SXElement SXElement::unary(int op, const SXElement& x) {
     return UnarySX::create(Operation(op), x);
-  }
-
-  // SXElement::operator vector<SXElement>() const {
-  //   vector<SXElement> ret(1);
-  //   ret[0] = *this;
-  //   return ret;
-  // }
-
-  string SXElement::toString() const {
-    stringstream ss;
-    ss << *this;
-    return ss.str();
   }
 
   bool SXElement::isLeaf() const {

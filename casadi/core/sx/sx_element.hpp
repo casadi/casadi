@@ -24,6 +24,7 @@
 #define CASADI_SX_ELEMENT_HPP
 
 // exception class
+#include "../printable_object.hpp"
 #include "../casadi_exception.hpp"
 #include "../casadi_limits.hpp"
 #include "../matrix/matrix.hpp"
@@ -37,14 +38,10 @@
 #include <cmath>
 #include <vector>
 
-
-
 namespace casadi {
 
   /** \brief  forward declaration of Node and Matrix */
   class SXNode; // include will follow in the end
-
-
 
 #ifdef SWIG
 #ifdef WITH_IMPLICITCONV
@@ -54,9 +51,10 @@ namespace casadi {
 
   /** \brief The basic scalar symbolic class of CasADi
       \author Joel Andersson
-      \date 2010
+      \date 2010-2014
   */
-  class CASADI_CORE_EXPORT SXElement : public GenericExpression<SXElement>{
+  class CASADI_CORE_EXPORT SXElement : public GenericExpression<SXElement>,
+                                       public PrintableObject<SXElement> {
     friend class SXNode;
     friend class BinarySXNode;
     friend class Matrix<SXElement>;
@@ -109,15 +107,14 @@ namespace casadi {
     /// Convert to a 1-by-1 Matrix
     operator Matrix<SXElement>() const;
 
-    /** \brief  print to stream */
-    CASADI_CORE_EXPORT friend std::ostream& operator<<(std::ostream &stream,
-                                                           const SXElement &scalar);
+    /// Print a representation of the object
+    void repr(std::ostream &stream) const;
+
+    /// Print a description of the object
+    void print(std::ostream &stream=std::cout) const;
 
     /** \brief  print to stream, limited */
     void print(std::ostream &stream, long& remaining_calls) const;
-
-    /** \brief  string representation (SWIG workaround) */
-    std::string toString() const;
 
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */

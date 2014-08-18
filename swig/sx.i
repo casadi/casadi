@@ -67,16 +67,11 @@
    %template(DMatrix) Matrix<int>;
 };
 
+%template(PrintSXElement)    casadi::PrintableObject<casadi::SXElement>;
 %include "casadi/core/sx/sx_element.hpp"
 
-#ifdef SWIGMATLAB
+#ifndef SWIGMATLAB
 %extend SXElement {
-  std::string disp()  { return $self->toString(); }
-}
-#else
-%extend SXElement {
-  std::string __str__()  { return $self->toString(); }
-  std::string __repr__() { return $self->toString(); }
   double __float__() { return $self->getValue();}
   int __int__() { return $self->getIntValue();}
 }

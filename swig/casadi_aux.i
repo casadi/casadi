@@ -42,13 +42,13 @@ VECTOR_TOOLS_TEMPLATES(double)
 };
 %enddef
 
+#ifndef SWIGPYTHON
+%rename(SWIG_REPR) getRepresentation;
+#endif // SWIGPYTHON
+%rename(SWIG_STR) getDescription;
 %include "casadi/core/printable_object.hpp"
-%extend PrintableObject {
-  std::string SWIG_STR()  { return $self->getDescription(); }
-  std::string SWIG_REPR()  { return $self->getRepresentation(); }
-}
-%template(PrintSharedObject)           casadi::PrintableObject<casadi::SharedObject>;
 
+%template(PrintSharedObject)           casadi::PrintableObject<casadi::SharedObject>;
 %include "casadi/core/shared_object.hpp"
 %include "casadi/core/weak_ref.hpp"
 %include "casadi/core/casadi_types.hpp"
