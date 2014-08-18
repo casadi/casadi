@@ -23,6 +23,7 @@
 #include "qp_solver_internal.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
+#include <typeinfo>
 
 INPUTSCHEME(QpSolverInput)
 OUTPUTSCHEME(QpSolverOutput)
@@ -111,6 +112,11 @@ namespace casadi {
                             << ". Got LBA[i]=" << input(QP_SOLVER_LBA).at(i)
                             << " and UBA[i]=" << input(QP_SOLVER_UBA).at(i));
     }
+  }
+
+  void QpSolverInternal::generateNativeCode(std::ostream& file) const {
+    casadi_error("QpSolverInternal::generateNativeCode not defined for class "
+                 << typeid(*this).name());
   }
 
   std::map<std::string, QpSolverInternal::Plugin> QpSolverInternal::solvers_;

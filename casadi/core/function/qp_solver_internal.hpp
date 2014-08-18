@@ -58,7 +58,7 @@ namespace casadi {
     virtual void checkInputs() const;
 
     /** Generate native code in the interfaced language for debugging */
-    virtual void generateNativeCode(std::ostream& file) const {}
+    virtual void generateNativeCode(std::ostream& file) const;
 
     // Creator function for internal class
     typedef QpSolverInternal* (*Creator)(const QPStructure& st);
