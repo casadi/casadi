@@ -39,6 +39,13 @@
 
 %ignore *::operator->;
 
+#ifdef SWIGMATLAB
+%rename(disp) repr;
+#else
+%ignore print;
+%ignore repr;
+#endif
+
 %begin %{
 #define SWIG_PYTHON_OUTPUT_TUPLE
 %}

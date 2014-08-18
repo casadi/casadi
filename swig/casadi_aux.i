@@ -42,10 +42,9 @@ VECTOR_TOOLS_TEMPLATES(double)
 };
 %enddef
 
-#ifndef SWIGPYTHON
-%rename(SWIG_REPR) getRepresentation;
-#endif // SWIGPYTHON
+#ifdef SWIGPYTHON
 %rename(SWIG_STR) getDescription;
+#endif // SWIGPYTHON
 %include "casadi/core/printable_object.hpp"
 
 %template(PrintSharedObject)           casadi::PrintableObject<casadi::SharedObject>;
