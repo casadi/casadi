@@ -114,11 +114,10 @@ class CASADI_CORE_EXPORT IOScheme : public SharedObject {
 
     #ifndef SWIG
     /// Print a description of the object
-    virtual void print(std::ostream &stream=std::cout) const;
+    void print(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object
-    virtual void repr(std::ostream &stream=std::cout) const;
-
+    void repr(std::ostream &stream) const;
     #endif // SWIG
 
     #ifndef SWIGPYTHON

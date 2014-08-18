@@ -43,10 +43,7 @@ namespace casadi {
       \date 2013
   */
   class CASADI_CORE_EXPORT Functor : public SharedObject {
-    //Callback();
-
   };
-
 
   /** \brief Derivative Generator Functor
   *
@@ -66,11 +63,13 @@ namespace casadi {
   class CASADI_CORE_EXPORT DerivativeGenerator : public Functor {
     public:
       /// Default constructor
-      DerivativeGenerator() {}
+      DerivativeGenerator() { }
+
       /// Construct from C pointer
       DerivativeGenerator(DerivativeGeneratorCPtr ptr);
+
       /// Call
-      virtual Function operator() (Function& fcn, int nfwd, int nadj, void* user_data);
+      Function operator() (Function& fcn, int nfwd, int nadj, void* user_data);
   };
 
   /** \brief CustomEvaluate
@@ -92,10 +91,12 @@ namespace casadi {
     public:
       /// Default constructor
       CustomEvaluate() {}
+
       /// Construct from C pointer
       CustomEvaluate(CustomEvaluateCPtr ptr);
+
       /// Call
-      virtual void operator() (CustomFunction& fcn, void* user_data);
+      void operator() (CustomFunction& fcn, void* user_data);
   };
 
   /** \brief Callback
@@ -120,10 +121,12 @@ namespace casadi {
     public:
       /// Default constructor
       Callback() {}
+
       /// Construct from C pointer
       Callback(CallbackCPtr ptr);
+
       /// Call
-      virtual int operator() (Function& fcn, void* user_data);
+      int operator() (Function& fcn, void* user_data);
   };
 
 } // namespace casadi
