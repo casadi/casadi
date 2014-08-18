@@ -479,6 +479,25 @@ class Misctests(casadiTestCase):
 
       with self.assertRaises(Exception):
         [f_,g_] = f(x=4)
+        
+  def test_getscheme(self):
+    x = SX.sym("x")
+    p = SX.sym("p")
+
+    F = SXFunction(nlpIn(x=x,p=p),nlpOut(g=x**2,f=x+p))
+    F.init()
+    
+    fc = F(x=3,p=4)
+    [f] = fc.get.f
+    self.checkarray(f,DMatrix([7]))
+    [g] = fc.get.g
+    self.checkarray(g,DMatrix([9]))
+    [f,g] = fc.get.f.g
+    self.checkarray(f,DMatrix([7]))
+    self.checkarray(g,DMatrix([9]))
+    [g,f] = fc.get.g.f
+    self.checkarray(f,DMatrix([7]))
+    self.checkarray(g,DMatrix([9]))
 
   def test_assertions(self):
     

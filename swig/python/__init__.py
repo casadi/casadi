@@ -197,7 +197,11 @@ def monkeypatch(v,cl=True):
         s = e.args[0]
         ne = TypeError(s+"\nYou have: (%s)\n" % (", ".join(map(type_descr,args[1:] if cl else args) + ["%s=%s" % (k,type_descr(vv)) for k,vv in kwargs.items()]  )))
         raise ne.__class__, ne, exc_info[2].tb_next
-        
+    except Exception as e:
+      import sys
+      exc_info = sys.exc_info()
+      raise exc_info[1], None, exc_info[2].tb_next
+      
   if v.__doc__ is not None:
     foo.__doc__ = pythonify(v.__doc__)
   foo.__name__ = v.__name__
@@ -237,7 +241,46 @@ for name,v in inspect.getmembers(casadi, inspect.isfunction):
   setattr(casadi,name,p)
   import sys
   setattr(sys.modules[__name__], name, p)
+  
+  
+class IOSchemeVectorExtractor(object):
+  def __init__(self,schemevector):
+    self._list = []
+    self._schemevector = schemevector
+    
+  def __getattr__(self, name):
+    self._list.append(name)
+    return self
+  
+  def __iter__(self):
+    for k in self._list:
+      try:
+        yield self._schemevector[k]
+      except:
+        import sys
+        exc_info = sys.exc_info()
+        raise exc_info[1], None, exc_info[2].tb_next
+    
+def extract(self):
+  """
+    This is a convenience function to extract multiple outputs from a scheme.
+    
+    Use::
+      
+      [xf,qf] = integrator(x0=x).get.xf.qf
+      
+    If you need just a single output, you could also use the slicing approach::
+    
+      xf = integrator(x0=x)["xf"]
+    
+  """
+  return IOSchemeVectorExtractor(self)
 
+for name,cl in inspect.getmembers(casadi, inspect.isclass):
+  if "IOSchemeVector" in name:
+    setattr(cl,"get",property(extract))
+    getattr(cl,"__swig_getmethods__")["get"] = extract
+    
 @contextlib.contextmanager
 def internalAPI():
     backup = CasadiOptions.getAllowedInternalAPI()
