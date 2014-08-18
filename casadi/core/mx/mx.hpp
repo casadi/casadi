@@ -561,6 +561,9 @@ namespace casadi {
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int getEqualityCheckingDepth();
 
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
+
 #ifndef SWIG
   private:
 

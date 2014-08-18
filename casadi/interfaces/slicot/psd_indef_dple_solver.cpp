@@ -44,8 +44,8 @@ namespace casadi {
     return static_cast<const PsdIndefDpleInternal*>(Function::operator->());
   }
 
-  bool PsdIndefDpleSolver::checkNode() const {
-    return dynamic_cast<const PsdIndefDpleInternal*>(get())!=0;
+  bool PsdIndefDpleSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const PsdIndefDpleInternal*>(ptr)!=0;
   }
 
 } // namespace casadi

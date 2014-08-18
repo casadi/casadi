@@ -101,8 +101,8 @@ SXFunctionInternal* SXFunction::operator->() {
   return static_cast<SXFunctionInternal*>(Function::operator->());
 }
 
-bool SXFunction::checkNode() const {
-  return dynamic_cast<const SXFunctionInternal*>(get())!=0;
+bool SXFunction::testCast(const SharedObjectNode* ptr) {
+  return dynamic_cast<const SXFunctionInternal*>(ptr)!=0;
 }
 
 SX SXFunction::jac(int iind, int oind, bool compact, bool symmetric) {

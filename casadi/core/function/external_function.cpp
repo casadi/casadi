@@ -32,24 +32,23 @@ namespace casadi {
 
 using namespace std;
 
-ExternalFunction::ExternalFunction() {
-}
+  ExternalFunction::ExternalFunction() {
+  }
 
-ExternalFunction::ExternalFunction(const std::string& bin_name) {
-  assignNode(new ExternalFunctionInternal(bin_name));
-}
+  ExternalFunction::ExternalFunction(const std::string& bin_name) {
+    assignNode(new ExternalFunctionInternal(bin_name));
+  }
 
-ExternalFunctionInternal* ExternalFunction::operator->() {
-  return static_cast<ExternalFunctionInternal*>(Function::operator->());
-}
+  ExternalFunctionInternal* ExternalFunction::operator->() {
+    return static_cast<ExternalFunctionInternal*>(Function::operator->());
+  }
 
-const ExternalFunctionInternal* ExternalFunction::operator->() const {
-   return static_cast<const ExternalFunctionInternal*>(Function::operator->());
-}
+  const ExternalFunctionInternal* ExternalFunction::operator->() const {
+    return static_cast<const ExternalFunctionInternal*>(Function::operator->());
+  }
 
-bool ExternalFunction::checkNode() const {
-  return dynamic_cast<const ExternalFunctionInternal*>(get())!=0;
-}
-
+  bool ExternalFunction::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const ExternalFunctionInternal*>(ptr)!=0;
+  }
 
 } // namespace casadi

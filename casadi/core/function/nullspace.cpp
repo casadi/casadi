@@ -37,8 +37,8 @@ namespace casadi {
     return static_cast<const NullspaceInternal*>(Function::operator->());
   }
 
-  bool Nullspace::checkNode() const {
-    return dynamic_cast<const NullspaceInternal*>(get())!=0;
+  bool Nullspace::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const NullspaceInternal*>(ptr)!=0;
   }
 
 } // namespace casadi

@@ -1028,4 +1028,8 @@ namespace casadi {
     }
   }
 
+  bool MX::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const MXNode*>(ptr)!=0;
+  }
+
 } // namespace casadi

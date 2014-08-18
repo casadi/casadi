@@ -33,8 +33,8 @@ using namespace std;
 
 namespace casadi {
 
-bool MXFunction::checkNode() const {
-  return dynamic_cast<const MXFunctionInternal*>(get())!=0;
+bool MXFunction::testCast(const SharedObjectNode* ptr) {
+  return dynamic_cast<const MXFunctionInternal*>(ptr)!=0;
 }
 
 MXFunction::MXFunction() {

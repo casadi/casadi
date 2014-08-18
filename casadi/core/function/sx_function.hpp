@@ -151,9 +151,6 @@ namespace casadi {
     { return hess(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
     ///@}
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
-
     /** \brief Get function input */
     const SX& inputExpr(int iind) const;
     const SX& inputExpr(const std::string& iname) const
@@ -209,8 +206,10 @@ namespace casadi {
 
     /** \brief Get the corresponding matrix type */
     typedef SX MatType;
-  };
 
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
+  };
 
 } // namespace casadi
 

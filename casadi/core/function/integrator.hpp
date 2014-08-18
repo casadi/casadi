@@ -222,9 +222,6 @@ namespace casadi {
     /// Integrate backward until a specified time point
     void integrateB(double t_out);
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
-
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
@@ -241,8 +238,10 @@ namespace casadi {
 
     /// Set a stop time for the forward integration
     void setStopTime(double tf);
-  };
 
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
+  };
 } // namespace casadi
 
 #endif // CASADI_INTEGRATOR_HPP

@@ -42,22 +42,22 @@ namespace casadi {
     return static_cast<const ImplicitFunctionInternal*>(Function::operator->());
   }
 
-  bool ImplicitFunction::checkNode() const {
-    return dynamic_cast<const ImplicitFunctionInternal*>(get())!=0;
+  bool ImplicitFunction::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const ImplicitFunctionInternal*>(ptr)!=0;
   }
 
   Function& ImplicitFunction::getF() {
-    casadi_assert(checkNode());
+    casadi_assert(!isNull());
     return (*this)->f_;
   }
 
   Function& ImplicitFunction::getJac() {
-    casadi_assert(checkNode());
+    casadi_assert(!isNull());
     return (*this)->jac_;
   }
 
   LinearSolver& ImplicitFunction::getLinsol() {
-    casadi_assert(checkNode());
+    casadi_assert(!isNull());
     return (*this)->linsol_;
   }
 

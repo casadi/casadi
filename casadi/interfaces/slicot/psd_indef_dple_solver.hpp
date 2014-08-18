@@ -61,8 +61,8 @@ namespace casadi {
     /// Access functions of the node
     const PsdIndefDpleInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
     /// Static creator function
     #ifdef SWIG

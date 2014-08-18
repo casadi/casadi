@@ -97,8 +97,8 @@ namespace casadi {
     return *static_cast<const SparsityInternal*>(get());
   }
 
-  bool Sparsity::checkNode() const {
-    return dynamic_cast<const SparsityInternal*>(get())!=0;
+  bool Sparsity::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const SparsityInternal*>(ptr)!=0;
   }
 
   int Sparsity::size1() const {

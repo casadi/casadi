@@ -36,8 +36,8 @@ namespace casadi {
     return static_cast<const SocpSolverInternal*>(Function::operator->());
   }
 
-  bool SocpSolver::checkNode() const {
-    return dynamic_cast<const SocpSolverInternal*>(get())!=0;
+  bool SocpSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const SocpSolverInternal*>(ptr)!=0;
   }
 
   SocpSolver::SocpSolver(const std::string& name, const SOCPStructure& st) {

@@ -391,8 +391,8 @@ NOTE: Does _not_ take ownership, only weak references to the derivatives are kep
     /** \brief  Const access functions of the node */
     const FunctionInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
     /// \endcond
 
     /// Get all statistics obtained at the end of the last evaluate call

@@ -63,12 +63,12 @@ namespace casadi {
     return static_cast<const ControlSimulatorInternal*>(Function::operator->());
   }
 
-  bool ControlSimulator::checkNode() const {
-    return dynamic_cast<const ControlSimulatorInternal*>(get())!=0;
+  bool ControlSimulator::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const ControlSimulatorInternal*>(ptr)!=0;
   }
 
   std::vector<double> ControlSimulator::getMinorT() const {
-    casadi_assert(checkNode());
+    casadi_assert(!isNull());
     return dynamic_cast<const ControlSimulatorInternal*>(get())->grid_;
   }
 

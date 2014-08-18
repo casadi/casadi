@@ -157,12 +157,6 @@ namespace casadi {
     /// Is a null pointer?
     bool isNull() const;
 
-    /// \cond INTERNAL
-    /// Assert that the node is pointing to the right type of object
-    virtual bool checkNode() const;
-    /// \endcond
-
-
     ///@{
     /// \cond SWIGINTERNAL
     /** \brief Make unique
@@ -285,13 +279,11 @@ namespace casadi {
     /// Create a return object
     B ret;
 
+    /// Quick return if not allowed
+    if (!B::testCast(ptr)) return ret;
+
     /// Assign node of B and return
     ret.assignNode(ptr);
-
-    /// Null pointer if not pointing towards the right type of object
-    if (ptr && !ret.checkNode())
-      ret.assignNode(0);
-
     return ret;
   }
 
@@ -358,23 +350,17 @@ namespace casadi {
   /// Template function implementations
   template<class B>
   B SharedObjectNode::shared_from_this() {
+    casadi_assert(B::testCast(this));
     B ret;
     ret.assignNode(this);
-
-    // Assert that the object is valid
-    casadi_assert(ret.checkNode());
-
     return ret;
   }
 
   template<class B>
   const B SharedObjectNode::shared_from_this() const {
+    casadi_assert(B::testCast(this));
     B ret;
     ret.assignNode(const_cast<SharedObjectNode*>(this));
-
-    // Assert that the object is valid
-    casadi_assert(ret.checkNode());
-
     return ret;
   }
   /// \endcond

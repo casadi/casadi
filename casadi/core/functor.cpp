@@ -31,18 +31,15 @@ using namespace std;
 namespace casadi {
 
   Function DerivativeGenerator::operator()(Function& fcn, int nfwd, int nadj, void* user_data) {
-    checkNode();
     return static_cast<DerivativeGeneratorInternal*>(
       SharedObject::operator->())->call(fcn, nfwd, nadj, user_data);
   }
 
 void CustomEvaluate::operator()(CustomFunction& fcn, void* user_data) {
-  checkNode();
   static_cast<CustomEvaluateInternal*>(SharedObject::operator->())->call(fcn, user_data);
 }
 
 int Callback::operator()(Function& fcn, void* user_data) {
-  checkNode();
   return static_cast<CallbackInternal*>(SharedObject::operator->())->call(fcn, user_data);
 }
 

@@ -60,8 +60,8 @@ namespace casadi {
     (*this)->integrate(t_out);
   }
 
-  bool Integrator::checkNode() const {
-    return dynamic_cast<const IntegratorInternal*>(get())!=0;
+  bool Integrator::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const IntegratorInternal*>(ptr)!=0;
   }
 
   void Integrator::resetB() {

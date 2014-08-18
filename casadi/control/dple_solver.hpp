@@ -105,8 +105,8 @@ namespace casadi {
     /// Access functions of the node
     const DpleInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);

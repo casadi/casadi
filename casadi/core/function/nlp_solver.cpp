@@ -45,8 +45,8 @@ namespace casadi {
     return static_cast<const NlpSolverInternal*>(Function::operator->());
   }
 
-  bool NlpSolver::checkNode() const {
-    return dynamic_cast<const NlpSolverInternal*>(get())!=0;
+  bool NlpSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const NlpSolverInternal*>(ptr)!=0;
   }
 
   void NlpSolver::reportConstraints(std::ostream &stream) {

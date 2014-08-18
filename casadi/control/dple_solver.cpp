@@ -49,8 +49,8 @@ namespace casadi {
     return static_cast<const DpleInternal*>(Function::operator->());
   }
 
-  bool DpleSolver::checkNode() const {
-    return dynamic_cast<const DpleInternal*>(get())!=0;
+  bool DpleSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const DpleInternal*>(ptr)!=0;
   }
 
   void DpleSolver::loadPlugin(const std::string& name) {

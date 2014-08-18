@@ -138,8 +138,8 @@ public:
   /** \brief Number of nodes in the algorithm */
   int countNodes() const;
 
-  /// Check if the node is pointing to the right type of object
-  virtual bool checkNode() const;
+  /// Check if a particular cast is allowed
+  static bool testCast(const SharedObjectNode* ptr);
 
   ///@{
   /** \brief Jacobian via source code transformation */

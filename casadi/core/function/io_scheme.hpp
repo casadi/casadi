@@ -71,8 +71,8 @@ class CASADI_CORE_EXPORT IOScheme : public SharedObject {
     IOSchemeInternal* operator->();
     const IOSchemeInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
     /// Name of the scheme
     std::string name() const;

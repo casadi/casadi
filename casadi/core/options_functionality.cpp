@@ -475,8 +475,8 @@ void OptionsFunctionality::printOptions(ostream &stream) const {
   (*this)->printOptions(stream);
 }
 
-bool OptionsFunctionality::checkNode() const {
-  return dynamic_cast<const OptionsFunctionalityNode*>(get())!=0;
+bool OptionsFunctionality::testCast(const SharedObjectNode* ptr) {
+  return dynamic_cast<const OptionsFunctionalityNode*>(ptr)!=0;
 }
 
 void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj, bool skipUnknown) {

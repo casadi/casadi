@@ -125,8 +125,8 @@ namespace casadi {
     /// Const access functions of the node.
     const ControlSimulatorInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
     /** Get the (minor) time grid
      *  The length is (ns-1)*nf + 1

@@ -116,9 +116,6 @@ namespace casadi {
     SdqpSolverInternal* operator->();
     const SdqpSolverInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
-
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
@@ -127,6 +124,9 @@ namespace casadi {
 
     /// Set options that make the SDQP solver more suitable for solving SOCPs
     void setSOCQPOptions();
+
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
   };
 
 } // namespace casadi

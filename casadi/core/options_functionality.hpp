@@ -101,12 +101,6 @@ class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
     const Dictionary& dictionary() const;
 
 /// @}
-
-    /// \cond INTERNAL
-    /// Assert that the node is pointing to the right type of object
-    virtual bool checkNode() const;
-    /// \endcond INTERNAL
-
     /** \brief Get a list of all option names */
     std::vector<std::string> getOptionNames() const;
 
@@ -139,6 +133,8 @@ class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
     /** \brief Get the default of a certain option */
     GenericType getOptionDefault(const std::string &str) const;
 
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 };
 
 /// \cond INTERNAL

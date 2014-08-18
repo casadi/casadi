@@ -68,8 +68,8 @@ namespace casadi {
     return static_cast<const SimulatorInternal*>(Function::operator->());
   }
 
-  bool Simulator::checkNode() const {
-    return dynamic_cast<const SimulatorInternal*>(get())!=0;
+  bool Simulator::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const SimulatorInternal*>(ptr)!=0;
   }
 
 

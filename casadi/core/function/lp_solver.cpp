@@ -36,8 +36,8 @@ namespace casadi {
     return static_cast<const LpSolverInternal*>(Function::operator->());
   }
 
-  bool LpSolver::checkNode() const {
-    return dynamic_cast<const LpSolverInternal*>(get())!=0;
+  bool LpSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const LpSolverInternal*>(ptr)!=0;
   }
 
   LpSolver::LpSolver(const std::string& name, const LPStructure& st) {

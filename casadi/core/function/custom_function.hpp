@@ -74,8 +74,8 @@ public:
   /** \brief  Const access functions of the node */
   const CustomFunctionInternal* operator->() const;
 
-  /** \brief  Check if the pointer points towards a valid object */
-  virtual bool checkNode() const;
+  /// Check if a particular cast is allowed
+  static bool testCast(const SharedObjectNode* ptr);
 
 }; // class CustomFunction
 

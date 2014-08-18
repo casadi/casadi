@@ -80,8 +80,8 @@ namespace casadi {
     return static_cast<const IOSchemeInternal*>(SharedObject::operator->());
   }
 
-  bool IOScheme::checkNode() const {
-    return dynamic_cast<const IOScheme*>(get())!=0;
+  bool IOScheme::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const IOScheme*>(ptr)!=0;
   }
 
   std::string IOScheme::name() const {

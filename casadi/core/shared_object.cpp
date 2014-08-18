@@ -134,10 +134,6 @@ void SharedObject::init(bool allow_reinit) {
 void SharedObjectNode::init() {
 }
 
-bool SharedObject::checkNode() const {
-  return dynamic_cast<const SharedObjectNode*>(get());
-}
-
 void SharedObject::repr(std::ostream &stream) const {
   if (isNull())
     stream << 0;

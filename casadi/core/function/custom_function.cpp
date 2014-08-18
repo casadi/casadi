@@ -30,51 +30,49 @@ namespace casadi {
 
 using namespace std;
 
-CustomFunction::CustomFunction() {
-}
+  CustomFunction::CustomFunction() {
+  }
 
-CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
-                               const  vector<Sparsity> &outputscheme) {
-  assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
-}
+  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
+                                 const  vector<Sparsity> &outputscheme) {
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
+  }
 
-CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                               const IOSchemeVector< Sparsity > &inputscheme,
-                               const  vector<Sparsity> &outputscheme) {
-  assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
-  setInputScheme(inputscheme.scheme);
-}
+  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
+                                 const IOSchemeVector< Sparsity > &inputscheme,
+                                 const  vector<Sparsity> &outputscheme) {
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
+    setInputScheme(inputscheme.scheme);
+  }
 
-CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
-                               const  IOSchemeVector< Sparsity > &outputscheme) {
-  assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
-  setOutputScheme(outputscheme.scheme);
-}
+  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
+                                 const  IOSchemeVector< Sparsity > &outputscheme) {
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
+    setOutputScheme(outputscheme.scheme);
+  }
 
-CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                               const IOSchemeVector< Sparsity > &inputscheme,
-                               const IOSchemeVector< Sparsity > &outputscheme) {
-  assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
-  setInputScheme(inputscheme.scheme);
-  setOutputScheme(outputscheme.scheme);
-}
+  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
+                                 const IOSchemeVector< Sparsity > &inputscheme,
+                                 const IOSchemeVector< Sparsity > &outputscheme) {
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme));
+    setInputScheme(inputscheme.scheme);
+    setOutputScheme(outputscheme.scheme);
+  }
 
-CustomFunction::CustomFunction(const CustomEvaluate &c_fcn) {
-  assignNode(new CustomFunctionInternal(c_fcn, vector<Sparsity>(), vector<Sparsity>()));
-}
+  CustomFunction::CustomFunction(const CustomEvaluate &c_fcn) {
+    assignNode(new CustomFunctionInternal(c_fcn, vector<Sparsity>(), vector<Sparsity>()));
+  }
 
-CustomFunctionInternal* CustomFunction::operator->() {
-  return static_cast<CustomFunctionInternal*>(Function::operator->());
-}
+  CustomFunctionInternal* CustomFunction::operator->() {
+    return static_cast<CustomFunctionInternal*>(Function::operator->());
+  }
 
-const CustomFunctionInternal* CustomFunction::operator->() const {
-   return static_cast<const CustomFunctionInternal*>(Function::operator->());
-}
+  const CustomFunctionInternal* CustomFunction::operator->() const {
+    return static_cast<const CustomFunctionInternal*>(Function::operator->());
+  }
 
-bool CustomFunction::checkNode() const {
-  return dynamic_cast<const CustomFunctionInternal*>(get())!=0;
-}
-
-
+  bool CustomFunction::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const CustomFunctionInternal*>(ptr)!=0;
+  }
 
 } // namespace casadi
