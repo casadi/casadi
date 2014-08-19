@@ -1380,13 +1380,9 @@ In python, supply a callable, annotated with pycallback decorator
 
 C++ includes: functor.hpp ";
 
-%feature("docstring") casadi::Callback::checkNode "[INTERNAL]  Assert that
-the node is pointing to the right type of object
+%feature("docstring") casadi::Callback::repr "
 
-";
-
-%feature("docstring") casadi::Callback::repr "[INTERNAL]  Print a
-representation of the object.
+Print a representation of the object.
 
 ";
 
@@ -1431,8 +1427,9 @@ node to a node class pointer (or null)
 
 ";
 
-%feature("docstring") casadi::Callback::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::Callback::print "
+
+Print a description of the object.
 
 ";
 
@@ -5262,6 +5259,12 @@ properties of a node
 // File: classcasadi_1_1ControlledDAEInputIOSchemeVector.xml
 %feature("docstring") casadi::ControlledDAEInputIOSchemeVector::vector "[INTERNAL] ";
 
+%feature("docstring")
+casadi::ControlledDAEInputIOSchemeVector::getRepresentation "[INTERNAL]
+Return a string with a representation (for SWIG)
+
+";
+
 %feature("docstring") casadi::ControlledDAEInputIOSchemeVector::__getitem__
 "[INTERNAL] ";
 
@@ -5270,17 +5273,11 @@ properties of a node
 ";
 
 %feature("docstring")
-casadi::ControlledDAEInputIOSchemeVector::getDescription "[INTERNAL]
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")
 casadi::ControlledDAEInputIOSchemeVector::ControlledDAEInputIOSchemeVector "[INTERNAL] ";
 
 %feature("docstring")
-casadi::ControlledDAEInputIOSchemeVector::getRepresentation "[INTERNAL]
-Return a string with a representation (for SWIG)
+casadi::ControlledDAEInputIOSchemeVector::getDescription "[INTERNAL]
+Return a string with a description (for SWIG)
 
 ";
 
@@ -5556,8 +5553,9 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::ControlSimulator::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::ControlSimulator::print "
+
+Print a description of the object.
 
 ";
 
@@ -5791,12 +5789,6 @@ Is initialized?
 
 ";
 
-%feature("docstring") casadi::ControlSimulator::setOutputScheme "
-
-Set output scheme.
-
-";
-
 %feature("docstring") casadi::ControlSimulator::generateCode "
 
 >  void casadi::Function::generateCode(const std::string &filename, bool generate_main=false)
@@ -5932,8 +5924,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::ControlSimulator::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::ControlSimulator::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -6369,9 +6362,7 @@ Check if the numerical values of the supplied bounds make sense.
 
 %feature("docstring") casadi::ControlSimulator::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -6414,9 +6405,9 @@ Get the type name of a certain option.
 
 ";
 
-%feature("docstring") casadi::ControlSimulator::checkNode "
+%feature("docstring") casadi::ControlSimulator::setOutputScheme "
 
-Check if the node is pointing to the right type of object.
+Set output scheme.
 
 ";
 
@@ -8666,11 +8657,6 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::CustomEvaluate::checkNode "[INTERNAL]  Assert
-that the node is pointing to the right type of object
-
-";
-
 %feature("docstring") casadi::CustomEvaluate::CustomEvaluate "
 
 >  casadi::CustomEvaluate::CustomEvaluate()
@@ -8729,8 +8715,9 @@ the pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::CustomEvaluate::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::CustomEvaluate::print "
+
+Print a description of the object.
 
 ";
 
@@ -8784,8 +8771,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::CustomEvaluate::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::CustomEvaluate::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -8813,20 +8801,19 @@ scheme.
 
 %feature("docstring") casadi::CustomFunction::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
-%feature("docstring") casadi::CustomFunction::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::CustomFunction::repr "
+
+Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::CustomFunction::checkNode "
+%feature("docstring") casadi::CustomFunction::getStats "
 
-Check if the pointer points towards a valid object.
+Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
@@ -8921,12 +8908,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
 
 There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring") casadi::CustomFunction::getStats "
-
-Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
@@ -9553,8 +9534,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::CustomFunction::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::CustomFunction::print "
+
+Print a description of the object.
 
 ";
 
@@ -12533,19 +12515,15 @@ Assert that it is initialized
 
 ";
 
-%feature("docstring") casadi::DerivativeGenerator::repr "[INTERNAL]  Print
-a representation of the object.
+%feature("docstring") casadi::DerivativeGenerator::repr "
+
+Print a representation of the object.
 
 ";
 
 %feature("docstring") casadi::DerivativeGenerator::isInit "
 
 Is initialized?
-
-";
-
-%feature("docstring") casadi::DerivativeGenerator::checkNode "[INTERNAL]
-Assert that the node is pointing to the right type of object
 
 ";
 
@@ -12614,8 +12592,9 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::DerivativeGenerator::print "[INTERNAL]  Print
-a description of the object.
+%feature("docstring") casadi::DerivativeGenerator::print "
+
+Print a description of the object.
 
 ";
 
@@ -13199,8 +13178,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::DpleSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::DpleSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -13351,9 +13331,7 @@ iname:  input name. Only allowed when an input scheme is set.
 
 %feature("docstring") casadi::DpleSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -14254,20 +14232,15 @@ Get a pointer to the node.
 
 ";
 
-%feature("docstring") casadi::DpleSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::DpleSolver::repr "
+
+Print a representation of the object.
 
 ";
 
 %feature("docstring") casadi::DpleSolver::getOptionType "
 
 Get the type of a certain option.
-
-";
-
-%feature("docstring") casadi::DpleSolver::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -15922,11 +15895,6 @@ sparsity pattern for a unit vector of length n and a nonzero on position el.
 
 ";
 
-%feature("docstring") casadi::EmptySparsity::checkNode "[INTERNAL]  Check
-if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring") casadi::EmptySparsity::transpose "
 
 >  Sparsity casadi::Sparsity::transpose() const 
@@ -17079,8 +17047,9 @@ get an option value
 
 ";
 
-%feature("docstring") casadi::ExternalFunction::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::ExternalFunction::print "
+
+Print a description of the object.
 
 ";
 
@@ -17194,9 +17163,7 @@ Get the default of a certain option
 
 %feature("docstring") casadi::ExternalFunction::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -17253,8 +17220,9 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::ExternalFunction::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::ExternalFunction::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -17280,12 +17248,6 @@ Remove modules to be monitored.
 %feature("docstring") casadi::ExternalFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring") casadi::ExternalFunction::checkNode "
-
-Check if the pointer points towards a valid object.
 
 ";
 
@@ -18619,7 +18581,8 @@ Create sparsity pattern of the extended Jacobian (backward problem)
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring") casadi::Function::repr "
-[INTERNAL]  Print a representation of the object.
+
+Print a representation of the object.
 
 ";
 
@@ -18958,9 +18921,7 @@ sparsity propagation.
 
 %feature("docstring") casadi::Function::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -19031,8 +18992,9 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::Function::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::Function::print "
+
+Print a description of the object.
 
 ";
 
@@ -19126,11 +19088,6 @@ the output elements).
 
 %feature("docstring") casadi::Function::getCount "[INTERNAL]  Get the
 reference count.
-
-";
-
-%feature("docstring") casadi::Function::checkNode "[INTERNAL]  Check if the
-node is pointing to the right type of object.
 
 ";
 
@@ -19616,11 +19573,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::Functor::checkNode "[INTERNAL]  Assert that
-the node is pointing to the right type of object
-
-";
-
 %feature("docstring") casadi::Functor::swap "[INTERNAL]  Swap content with
 another instance.
 
@@ -19644,8 +19596,9 @@ reference count.
 
 ";
 
-%feature("docstring") casadi::Functor::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::Functor::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -19681,8 +19634,9 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::Functor::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::Functor::print "
+
+Print a description of the object.
 
 ";
 
@@ -20046,17 +20000,13 @@ the node to a node class pointer (or null)
 
 ";
 
-%feature("docstring") casadi::GenericType::checkNode "[INTERNAL]  Assert
-that the node is pointing to the right type of object
-
-";
-
 %feature("docstring") casadi::GenericType::clone "[INTERNAL]  Deep copy.
 
 ";
 
-%feature("docstring") casadi::GenericType::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::GenericType::print "
+
+Print a description of the object.
 
 ";
 
@@ -20217,8 +20167,9 @@ Convert to int.
 
 ";
 
-%feature("docstring") casadi::GenericType::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::GenericType::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -22548,8 +22499,9 @@ Access input/output scheme.
 
 ";
 
-%feature("docstring") casadi::HomotopyNlpSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::HomotopyNlpSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -22824,8 +22776,9 @@ Evaluate.
 
 ";
 
-%feature("docstring") casadi::HomotopyNlpSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::HomotopyNlpSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -22973,12 +22926,6 @@ kept internally
 
 %feature("docstring") casadi::HomotopyNlpSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
 values.
-
-";
-
-%feature("docstring") casadi::HomotopyNlpSolver::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -23355,9 +23302,7 @@ Get the default of a certain option
 
 %feature("docstring") casadi::HomotopyNlpSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -27583,8 +27528,9 @@ Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::ImplicitFunction::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::ImplicitFunction::print "
+
+Print a description of the object.
 
 ";
 
@@ -28116,8 +28062,9 @@ Access input/output scheme.
 
 ";
 
-%feature("docstring") casadi::ImplicitFunction::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::ImplicitFunction::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -28413,9 +28360,7 @@ adheres to SCHEME_NLPINput
 
 %feature("docstring") casadi::ImplicitFunction::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -28429,12 +28374,6 @@ the output elements).
 %feature("docstring") casadi::ImplicitFunction::getOutputScheme "
 
 Get output scheme.
-
-";
-
-%feature("docstring") casadi::ImplicitFunction::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -29349,8 +29288,9 @@ Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::Integrator::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::Integrator::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -30646,12 +30586,6 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::Integrator::getOutputScheme "
-
-Get output scheme.
-
-";
-
 %feature("docstring") casadi::Integrator::removeMonitor "
 
 Remove modules to be monitored.
@@ -31082,9 +31016,7 @@ SWIGINTERNAL
 
 %feature("docstring") casadi::Integrator::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -31117,9 +31049,9 @@ input(INTEGRATOR_X0)
 
 ";
 
-%feature("docstring") casadi::Integrator::checkNode "
+%feature("docstring") casadi::Integrator::getOutputScheme "
 
-Check if the node is pointing to the right type of object.
+Get output scheme.
 
 ";
 
@@ -31182,8 +31114,9 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring") casadi::Integrator::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::Integrator::print "
+
+Print a description of the object.
 
 ";
 
@@ -32065,9 +31998,10 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::IOScheme::checkNode "
+%feature("docstring") casadi::IOScheme::assignNodeNoCount "[INTERNAL]
+Assign the node to a node class pointer without reference counting.
 
-Check if the node is pointing to the right type of object.
+improper use will cause memory leaks!
 
 ";
 
@@ -32100,8 +32034,17 @@ reference to the object.
 
 ";
 
-%feature("docstring") casadi::IOScheme::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::IOScheme::repr "
+
+>  void casadi::IOScheme::repr(std::ostream &stream) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print a representation of the object.
+
+>  void casadi::SharedObject::repr(std::ostream &stream=std::cout, bool trailing_newline=true) const 
+------------------------------------------------------------------------
+
+Print a representation of the object.
 
 ";
 
@@ -32147,8 +32090,19 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::IOScheme::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::IOScheme::fromVector "";
+
+%feature("docstring") casadi::IOScheme::print "
+
+>  void casadi::IOScheme::print(std::ostream &stream=std::cout) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print a description of the object.
+
+>  void casadi::SharedObject::print(std::ostream &stream=std::cout, bool trailing_newline=true) const 
+------------------------------------------------------------------------
+
+Print a description of the object.
 
 ";
 
@@ -32206,13 +32160,6 @@ List available entries.
 
 ";
 
-%feature("docstring") casadi::IOScheme::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
-
-";
-
 %feature("docstring") casadi::IOScheme::swap "[INTERNAL]  Swap content with
 another instance.
 
@@ -32241,8 +32188,9 @@ string.
 // File: classcasadi_1_1IOSchemeVector.xml
 %feature("docstring") casadi::IOSchemeVector::__len__ "";
 
-%feature("docstring") casadi::IOSchemeVector::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::IOSchemeVector::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -32266,8 +32214,9 @@ A vector container with associated IOScheme A class.
 
 C++ includes: io_scheme_vector.hpp ";
 
-%feature("docstring") casadi::IOSchemeVector::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::IOSchemeVector::print "
+
+Print a description of the object.
 
 ";
 
@@ -38870,12 +38819,6 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::getInputScheme "
-
-Get input scheme.
-
-";
-
 %feature("docstring") casadi::LinearSolver::getOptionDescription "
 
 Get the description of a certain option.
@@ -38887,8 +38830,9 @@ Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::LinearSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::LinearSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -39023,8 +38967,9 @@ Set input scheme.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::LinearSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -39034,9 +38979,9 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::LinearSolver::checkNode "
+%feature("docstring") casadi::LinearSolver::getInputScheme "
 
-Check if the node is pointing to the right type of object.
+Get input scheme.
 
 ";
 
@@ -39665,9 +39610,7 @@ if the numerical values of the supplied bounds make sense.
 
 %feature("docstring") casadi::LinearSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -39868,8 +39811,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::LpSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::LpSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -39970,14 +39914,6 @@ Get a const pointer to the node.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Get a pointer to the node.
-
-";
-
-%feature("docstring") casadi::LpSolver::output "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
 
 ";
 
@@ -40385,9 +40321,7 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 %feature("docstring") casadi::LpSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -40640,9 +40574,11 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::LpSolver::checkNode "
+%feature("docstring") casadi::LpSolver::output "
 
-Check if the node is pointing to the right type of object.
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
 
 ";
 
@@ -40677,8 +40613,9 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::LpSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::LpSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -42076,7 +42013,8 @@ in the standard namespace for unambiguous access and Numpy compatibility
 
 ";
 
-%feature("docstring") casadi::Matrix::repr "[INTERNAL]  Printing
+%feature("docstring") casadi::Matrix::trans "[INTERNAL]   Transpose the
+matrix.
 
 ";
 
@@ -42170,6 +42108,11 @@ in the standard namespace for unambiguous access and Numpy compatibility
 
 ";
 
+%feature("docstring") casadi::Matrix::repr "[INTERNAL]  Print a
+representation of the object.
+
+";
+
 %feature("docstring") casadi::Matrix::__copysign__ "[INTERNAL]  Operations
 defined in the standard namespace for unambiguous access and Numpy
 compatibility
@@ -42203,7 +42146,8 @@ matrix is 0 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring") casadi::Matrix::printDense "[INTERNAL]  Printing
+%feature("docstring") casadi::Matrix::printDense "[INTERNAL]  Print dense
+matrix-stype.
 
 ";
 
@@ -42287,10 +42231,6 @@ the non-zero elements, array.
 %feature("docstring") casadi::Matrix::numel "
 
 Get the number of elements.
-
-";
-
-%feature("docstring") casadi::Matrix::className "[INTERNAL]  Printing
 
 ";
 
@@ -42409,7 +42349,8 @@ Indexing for interfaced languages get a non-zero
 
 ";
 
-%feature("docstring") casadi::Matrix::printSparse "[INTERNAL]  Printing
+%feature("docstring") casadi::Matrix::printSparse "[INTERNAL]  Print sparse
+matrix style.
 
 ";
 
@@ -42502,7 +42443,8 @@ operations Octave/Python naming
 
 ";
 
-%feature("docstring") casadi::Matrix::printScalar "[INTERNAL]  Printing
+%feature("docstring") casadi::Matrix::printScalar "[INTERNAL]  Print
+scalar.
 
 ";
 
@@ -42697,7 +42639,8 @@ matrix is -1 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring") casadi::Matrix::printVector "[INTERNAL]  Printing
+%feature("docstring") casadi::Matrix::printVector "[INTERNAL]  Print
+vector-style.
 
 ";
 
@@ -43243,11 +43186,6 @@ Matrix division from left.
 
 ";
 
-%feature("docstring") casadi::Matrix::trans "[INTERNAL]   Transpose the
-matrix.
-
-";
-
 %feature("docstring") casadi::Matrix::sizeL "
 
 Get the number of non-zeros in the lower triangular half.
@@ -43289,7 +43227,8 @@ Get iterators to beginning and end.
 
 %feature("docstring") casadi::Matrix::rbegin "[INTERNAL] ";
 
-%feature("docstring") casadi::Matrix::print "[INTERNAL]  Printing
+%feature("docstring") casadi::Matrix::print "[INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -44903,8 +44842,9 @@ isSymbolic)
 
 %feature("docstring") casadi::MX::constpow "";
 
-%feature("docstring") casadi::MX::print "[INTERNAL]  Print a description of
-the object.
+%feature("docstring") casadi::MX::print "
+
+Print a description of the object.
 
 ";
 
@@ -45205,8 +45145,9 @@ check if zero (note that false negative answers are possible)
 
 %feature("docstring") casadi::MX::__ne__ "";
 
-%feature("docstring") casadi::MX::repr "[INTERNAL]  Print a representation
-of the object.
+%feature("docstring") casadi::MX::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -45331,11 +45272,6 @@ Create sparse matrix constant (also implicit type conversion)
 %feature("docstring") casadi::MX::isBinary "
 
 Is binary operation.
-
-";
-
-%feature("docstring") casadi::MX::checkNode "[INTERNAL]  Assert that the
-node is pointing to the right type of object
 
 ";
 
@@ -45686,9 +45622,7 @@ Get the default of a certain option
 
 %feature("docstring") casadi::MXFunction::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -45717,8 +45651,9 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::MXFunction::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::MXFunction::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -45867,12 +45802,6 @@ Generate C code for the function.
 %feature("docstring") casadi::MXFunction::grad "
 
 Gradient via source code transformation.
-
-";
-
-%feature("docstring") casadi::MXFunction::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -46207,8 +46136,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::MXFunction::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::MXFunction::print "
+
+Print a description of the object.
 
 ";
 
@@ -48887,9 +48817,7 @@ Get total number of elements in all of the matrix-valued outputs.
 
 %feature("docstring") casadi::NlpSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -48918,8 +48846,9 @@ check if there is an option str
 
 ";
 
-%feature("docstring") casadi::NlpSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::NlpSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -50404,8 +50333,9 @@ Diagrams
 
 C++ includes: nlp_solver.hpp ";
 
-%feature("docstring") casadi::NlpSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::NlpSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -50553,12 +50483,6 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 %feature("docstring") casadi::NlpSolver::printPtr "[INTERNAL]  Print the
 pointer to the internal class
-
-";
-
-%feature("docstring") casadi::NlpSolver::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -53425,9 +53349,7 @@ corresponding to the Hessian and the gradients.
 
 %feature("docstring") casadi::Nullspace::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -53783,54 +53705,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::Nullspace::getOutput "
-
->  Matrix<double> casadi::IOInterface< Function  >::getOutput(int oind=0) const
-------------------------------------------------------------------------
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
->  Matrix<double> casadi::IOInterface< Function  >::getOutput(const std::string &oname) const
-------------------------------------------------------------------------
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
->  void casadi::IOInterface< Function  >::getOutput(T val, int oind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
->  void casadi::IOInterface< Function  >::getOutput(T val, const std::string &oname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
 %feature("docstring") casadi::Nullspace::schemeEntry "[INTERNAL]  Find the
 index for a string describing a particular entry of a scheme.
 
@@ -53866,8 +53740,9 @@ returned.
 
 ";
 
-%feature("docstring") casadi::Nullspace::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::Nullspace::print "
+
+Print a description of the object.
 
 ";
 
@@ -54058,9 +53933,51 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::Nullspace::checkNode "
+%feature("docstring") casadi::Nullspace::getOutput "
 
-Check if the node is pointing to the right type of object.
+>  Matrix<double> casadi::IOInterface< Function  >::getOutput(int oind=0) const
+------------------------------------------------------------------------
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+>  Matrix<double> casadi::IOInterface< Function  >::getOutput(const std::string &oname) const
+------------------------------------------------------------------------
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+>  void casadi::IOInterface< Function  >::getOutput(T val, int oind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+>  void casadi::IOInterface< Function  >::getOutput(T val, const std::string &oname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -54094,8 +54011,9 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::Nullspace::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::Nullspace::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -56509,7 +56427,8 @@ values.
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality::print "[INTERNAL]
+%feature("docstring") casadi::OptionsFunctionality::print "
+
 Print a description of the object.
 
 ";
@@ -56689,11 +56608,6 @@ Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality::checkNode "[INTERNAL]
-Assert that the node is pointing to the right type of object
-
-";
-
 %feature("docstring") casadi::OptionsFunctionality::copyOptions "
 
 Copy all options from another object.
@@ -56720,9 +56634,7 @@ content with another instance.
 
 %feature("docstring") casadi::OptionsFunctionality::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -56738,8 +56650,9 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality::repr "[INTERNAL]  Print
-a representation of the object.
+%feature("docstring") casadi::OptionsFunctionality::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -57910,9 +57823,7 @@ input/output scheme.
 
 %feature("docstring") casadi::Parallelizer::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -57936,8 +57847,9 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::Parallelizer::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::Parallelizer::print "
+
+Print a description of the object.
 
 ";
 
@@ -57958,8 +57870,9 @@ Get input scheme.
 
 ";
 
-%feature("docstring") casadi::Parallelizer::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::Parallelizer::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -58239,11 +58152,6 @@ Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::Parallelizer::checkNode "[INTERNAL]  Check if
-the node is pointing to the right type of object.
-
-";
-
 %feature("docstring") casadi::Parallelizer::setOption "
 
 >  void casadi::OptionsFunctionality::setOption(const std::string &str, const GenericType &val)
@@ -58429,8 +58337,9 @@ Construct from a vector of polynomial coefficients.
 
 ";
 
-%feature("docstring") casadi::Polynomial::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::Polynomial::print "
+
+Print a description of the object.
 
 ";
 
@@ -58464,8 +58373,9 @@ Remove excess zeros.
 
 ";
 
-%feature("docstring") casadi::Polynomial::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::Polynomial::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -58483,13 +58393,9 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::PrintableObject::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::PrintableObject::getDescription "
 
-";
-
-%feature("docstring") casadi::PrintableObject::repr "[INTERNAL]  Print a
-representation of the object.
+Return a string with a description (for SWIG)
 
 ";
 
@@ -58500,12 +58406,6 @@ Base class for objects that have a natural string representation.
 Joel Andersson
 
 C++ includes: printable_object.hpp ";
-
-%feature("docstring") casadi::PrintableObject::getDescription "
-
-Return a string with a description (for SWIG)
-
-";
 
 
 // File: structcasadi_1_1ProfilingData__ENTRY.xml
@@ -58835,9 +58735,11 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::PsdIndefDpleSolver::getOutputScheme "
+%feature("docstring") casadi::PsdIndefDpleSolver::symbolicInput "
 
-Get output scheme.
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
 
 ";
 
@@ -59016,9 +58918,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::PsdIndefDpleSolver::checkNode "
+%feature("docstring") casadi::PsdIndefDpleSolver::getOutputScheme "
 
-Check if the node is pointing to the right type of object.
+Get output scheme.
 
 ";
 
@@ -59201,14 +59103,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::PsdIndefDpleSolver::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
 %feature("docstring") casadi::PsdIndefDpleSolver::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
@@ -59257,9 +59151,7 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 %feature("docstring") casadi::PsdIndefDpleSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -59531,8 +59423,9 @@ Diagrams
 
 C++ includes: psd_indef_dple_solver.hpp ";
 
-%feature("docstring") casadi::PsdIndefDpleSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::PsdIndefDpleSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -59549,8 +59442,9 @@ weak reference to the object.
 
 ";
 
-%feature("docstring") casadi::PsdIndefDpleSolver::print "[INTERNAL]  Print
-a description of the object.
+%feature("docstring") casadi::PsdIndefDpleSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -60014,9 +59908,7 @@ the node to a node class pointer (or null)
 
 %feature("docstring") casadi::QcqpSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -60098,12 +59990,6 @@ check if there is an option str
 %feature("docstring") casadi::QcqpSolver::getOptionAllowed "
 
 Get the allowed values of a certain option.
-
-";
-
-%feature("docstring") casadi::QcqpSolver::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -60215,8 +60101,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::QcqpSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::QcqpSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -60320,8 +60207,9 @@ reference to the object.
 
 ";
 
-%feature("docstring") casadi::QcqpSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::QcqpSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -63147,9 +63035,7 @@ Get the number of function inputs.
 
 %feature("docstring") casadi::QpSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -64290,8 +64176,9 @@ Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::QpSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::QpSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -64426,8 +64313,9 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::QpSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::QpSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -64454,12 +64342,6 @@ internally
 %feature("docstring") casadi::QpSolver::evaluate "
 
 Evaluate.
-
-";
-
-%feature("docstring") casadi::QpSolver::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -70256,11 +70138,6 @@ Compress a sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::ScalarSparseSparsity::checkNode "[INTERNAL]
-Check if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring") casadi::ScalarSparseSparsity::getTril "[INTERNAL]
 Get lower triangular part.
 
@@ -70655,11 +70532,6 @@ Enlarge the matrix along the second dimension (i.e. insert columns)
 
 %feature("docstring") casadi::ScalarSparsity::dense "[INTERNAL]  Create a
 dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring") casadi::ScalarSparsity::checkNode "[INTERNAL]  Check
-if the node is pointing to the right type of object.
 
 ";
 
@@ -72416,8 +72288,9 @@ Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring") casadi::SdpSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::SdpSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -72504,8 +72377,9 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::SdpSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::SdpSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -72605,9 +72479,20 @@ Set options that make the SDP solver more suitable for solving SOCPs.
 
 ";
 
-%feature("docstring") casadi::SdpSolver::getNumOutputNonzeros "
+%feature("docstring") casadi::SdpSolver::makeUnique "
 
-Get total number of nonzeros in all of the matrix-valued outputs.
+>  void casadi::SharedObject::makeUnique(bool clone_members=true)
+------------------------------------------------------------------------
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+>  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+------------------------------------------------------------------------
+[INTERNAL] 
+SWIGINTERNAL
 
 ";
 
@@ -73303,20 +73188,9 @@ Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring") casadi::SdpSolver::makeUnique "
+%feature("docstring") casadi::SdpSolver::getNumOutputNonzeros "
 
->  void casadi::SharedObject::makeUnique(bool clone_members=true)
-------------------------------------------------------------------------
-
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
->  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-------------------------------------------------------------------------
-[INTERNAL] 
-SWIGINTERNAL
+Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
@@ -73396,9 +73270,7 @@ Get total number of elements in all of the matrix-valued inputs.
 
 %feature("docstring") casadi::SdpSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -73596,9 +73468,8 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::SdpSolver::checkNode "
-
-Check if the node is pointing to the right type of object.
+%feature("docstring") casadi::SdpSolver::swap "[INTERNAL]  Swap content
+with another instance.
 
 ";
 
@@ -73695,11 +73566,6 @@ Generate the sparsity of a Jacobian block
 %feature("docstring") casadi::SdpSolver::isInit "
 
 Is initialized?
-
-";
-
-%feature("docstring") casadi::SdpSolver::swap "[INTERNAL]  Swap content
-with another instance.
 
 ";
 
@@ -74352,16 +74218,15 @@ Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::SdqpSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::SdqpSolver::print "
+
+Print a description of the object.
 
 ";
 
 %feature("docstring") casadi::SdqpSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -74734,8 +74599,9 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::SdqpSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::SdqpSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -74821,12 +74687,6 @@ Get input scheme.
 %feature("docstring") casadi::SdqpSolver::getOptionTypeName "
 
 Get the type name of a certain option.
-
-";
-
-%feature("docstring") casadi::SdqpSolver::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -78378,8 +78238,9 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::SharedObject::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::SharedObject::print "
+
+Print a description of the object.
 
 ";
 
@@ -78441,13 +78302,9 @@ with another instance.
 
 ";
 
-%feature("docstring") casadi::SharedObject::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::SharedObject::repr "
 
-";
-
-%feature("docstring") casadi::SharedObject::checkNode "[INTERNAL]  Assert
-that the node is pointing to the right type of object
+Print a representation of the object.
 
 ";
 
@@ -79684,12 +79541,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::Simulator::checkNode "
-
-Check if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring") casadi::Simulator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
@@ -80161,8 +80012,9 @@ Evaluate.
 
 ";
 
-%feature("docstring") casadi::Simulator::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::Simulator::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -80541,9 +80393,7 @@ sparsity propagation.
 
 %feature("docstring") casadi::Simulator::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -80619,8 +80469,9 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::Simulator::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::Simulator::print "
+
+Print a description of the object.
 
 ";
 
@@ -80640,8 +80491,9 @@ Get a vector of indices (nested slice)
 
 ";
 
-%feature("docstring") casadi::Slice::print "[INTERNAL]  Print a
-representation of the object to a stream.
+%feature("docstring") casadi::Slice::print "
+
+Print a description of the object.
 
 ";
 
@@ -80690,8 +80542,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Slice::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::Slice::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -82120,7 +81973,7 @@ function for 'SOCPOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring") casadi::SOCPOutputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring") casadi::SOCPOutputIOSchemeVector::getRepresentation "[INTERNAL]  Return a string with a representation (for SWIG)
 
 ";
 
@@ -82130,7 +81983,7 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::SOCPOutputIOSchemeVector::vector "[INTERNAL]
 ";
 
-%feature("docstring") casadi::SOCPOutputIOSchemeVector::getRepresentation "[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring") casadi::SOCPOutputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -82839,12 +82692,6 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::SocpSolver::checkNode "
-
-Check if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring") casadi::SocpSolver::getOptionType "
 
 Get the type of a certain option.
@@ -82922,8 +82769,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::SocpSolver::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::SocpSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -82940,8 +82788,9 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::SocpSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::SocpSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -83069,9 +82918,7 @@ Input/output structures of the function
 
 %feature("docstring") casadi::SocpSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -83302,10 +83149,6 @@ Print a representation of the object.
 %feature("docstring") casadi::SOCPStructIOSchemeVector::__len__ "[INTERNAL]
 ";
 
-%feature("docstring") casadi::SOCPStructIOSchemeVector::getRepresentation "[INTERNAL]  Return a string with a representation (for SWIG)
-
-";
-
 %feature("docstring") casadi::SOCPStructIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
 
 ";
@@ -83314,6 +83157,10 @@ Print a representation of the object.
 function for 'SOCPStruct'
 
 C++ includes: casadi_types.hpp ";
+
+%feature("docstring") casadi::SOCPStructIOSchemeVector::getRepresentation "[INTERNAL]  Return a string with a representation (for SWIG)
+
+";
 
 
 // File: classcasadi_1_1SocpToSdp.xml
@@ -85226,8 +85073,9 @@ another instance.
 
 ";
 
-%feature("docstring") casadi::Sparsity::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::Sparsity::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -85531,8 +85379,9 @@ Is scalar?
 
 ";
 
-%feature("docstring") casadi::Sparsity::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::Sparsity::print "
+
+Print a description of the object.
 
 ";
 
@@ -85679,12 +85528,6 @@ be nonzero)
 %feature("docstring") casadi::Sparsity::dimString "
 
 Get the dimension as a string.
-
-";
-
-%feature("docstring") casadi::Sparsity::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -89694,8 +89537,9 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::StabilizedQpSolver::print "[INTERNAL]  Print
-a description of the object.
+%feature("docstring") casadi::StabilizedQpSolver::print "
+
+Print a description of the object.
 
 ";
 
@@ -89884,8 +89728,9 @@ paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring") casadi::StabilizedQpSolver::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::StabilizedQpSolver::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -89919,12 +89764,6 @@ Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::StabilizedQpSolver::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -90002,9 +89841,7 @@ Const access an input.
 
 %feature("docstring") casadi::StabilizedQpSolver::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -96043,6 +95880,12 @@ Get the number of dependencies of a binary SXElement.
 
 ";
 
+%feature("docstring") casadi::SXElement::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
 %feature("docstring") casadi::SXElement::logic_and "";
 
 %feature("docstring") casadi::SXElement::isAlmostZero "";
@@ -96107,8 +95950,17 @@ temporary variable
 
 ";
 
-%feature("docstring") casadi::SXElement::print "[INTERNAL]  print to
-stream, limited
+%feature("docstring") casadi::SXElement::print "
+
+>  void casadi::SXElement::print(std::ostream &stream=std::cout, bool trailing_newline=true) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print a description of the object.
+
+>  void casadi::SXElement::print(std::ostream &stream, long &remaining_calls) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+print to stream, limited
 
 ";
 
@@ -96129,6 +95981,11 @@ stream, limited
 %feature("docstring") casadi::SXElement::__pow__ "";
 
 %feature("docstring") casadi::SXElement::fmax "";
+
+%feature("docstring") casadi::SXElement::repr "[INTERNAL]  Print a
+representation of the object.
+
+";
 
 %feature("docstring") casadi::SXElement::log10 "";
 
@@ -96204,6 +96061,12 @@ Check whether a binary SXElement is commutative.
 
 %feature("docstring") casadi::SXElement::__rsub__ "";
 
+%feature("docstring") casadi::SXElement::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
 %feature("docstring") casadi::SXElement::isRegular "
 
 Checks if expression does not contain NaN or Inf.
@@ -96239,11 +96102,6 @@ the node.
 ";
 
 %feature("docstring") casadi::SXElement::__mpower__ "";
-
-%feature("docstring") casadi::SXElement::toString "[INTERNAL]  string
-representation (SWIG workaround)
-
-";
 
 %feature("docstring") casadi::SXElement::logic_or "";
 
@@ -96463,8 +96321,9 @@ Get the number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::SXFunction::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::SXFunction::print "
+
+Print a description of the object.
 
 ";
 
@@ -96816,9 +96675,7 @@ Get the enum value corresponding to th certain option.
 
 %feature("docstring") casadi::SXFunction::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -97199,8 +97056,9 @@ input/output scheme.
 
 ";
 
-%feature("docstring") casadi::SXFunction::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::SXFunction::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -97333,12 +97191,6 @@ C++ includes: sx_function.hpp ";
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
 internally
-
-";
-
-%feature("docstring") casadi::SXFunction::checkNode "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -98048,13 +97900,15 @@ Joel Andersson
 
 C++ includes: symbolic_nlp.hpp ";
 
-%feature("docstring") casadi::SymbolicNLP::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::SymbolicNLP::print "
+
+Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::SymbolicNLP::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::SymbolicNLP::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -98189,8 +98043,9 @@ Get the (optionally normalized) derivative value(s) at time 0 by expression.
 
 ";
 
-%feature("docstring") casadi::SymbolicOCP::print "[INTERNAL]  Print
-description.
+%feature("docstring") casadi::SymbolicOCP::print "
+
+Print description.
 
 ";
 
@@ -98409,8 +98264,9 @@ Get a derivative expression by non-differentiated expression.
 
 ";
 
-%feature("docstring") casadi::SymbolicOCP::repr "[INTERNAL]  Print
-representation.
+%feature("docstring") casadi::SymbolicOCP::repr "
+
+Print representation.
 
 ";
 
@@ -101218,6 +101074,18 @@ scpgen.hpp ";
 
 
 // File: structcasadi_1_1Variable.xml
+%feature("docstring") casadi::Variable::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Variable::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
 %feature("docstring") casadi::Variable "
 
 Holds expressions and meta-data corresponding to a physical quantity
@@ -101233,12 +101101,6 @@ Set the variable name (and corresponding expressions)
 
 ";
 
-%feature("docstring") casadi::Variable::getRepresentation "
-
-Return a string with a representation (for SWIG)
-
-";
-
 %feature("docstring") casadi::Variable::name "
 
 Variable name.
@@ -101248,6 +101110,12 @@ Variable name.
 %feature("docstring") casadi::Variable::Variable "
 
 Default constructor.
+
+";
+
+%feature("docstring") casadi::Variable::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -102200,12 +102068,8 @@ the nonzeros of a matrix to another matrix.
 
 
 // File: classcasadi_1_1WeakRef.xml
-%feature("docstring") casadi::WeakRef::clone "[INTERNAL]  Deep copy.
-
-";
-
-%feature("docstring") casadi::WeakRef::getDescription "[INTERNAL]  Return a
-string with a description (for SWIG)
+%feature("docstring") casadi::WeakRef::isNull "[INTERNAL]  Is a null
+pointer?
 
 ";
 
@@ -102214,75 +102078,8 @@ it is initialized
 
 ";
 
-%feature("docstring") casadi::WeakRef::swap "[INTERNAL]  Swap content with
-another instance.
-
-";
-
-%feature("docstring") casadi::WeakRef::shared "[INTERNAL]  Get a shared
-(owning) reference.
-
-";
-
-%feature("docstring") casadi::WeakRef::init "[INTERNAL]  Initialize or re-
-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
-
-";
-
-%feature("docstring") casadi::WeakRef::print "[INTERNAL]  Print a
-description of the object.
-
-";
-
-%feature("docstring") casadi::WeakRef::alive "[INTERNAL]  Check if alive.
-
-";
-
-%feature("docstring") casadi::WeakRef::assignNode "[INTERNAL]  Assign the
-node to a node class pointer (or null)
-
-";
-
-%feature("docstring") casadi::WeakRef::makeUnique "
-
->  void casadi::SharedObject::makeUnique(bool clone_members=true)
-------------------------------------------------------------------------
-[INTERNAL] 
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
->  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-------------------------------------------------------------------------
-[INTERNAL] 
-SWIGINTERNAL
-
-";
-
-%feature("docstring") casadi::WeakRef::checkNode "[INTERNAL]  Assert that
-the node is pointing to the right type of object
-
-";
-
-%feature("docstring") casadi::WeakRef::getCount "[INTERNAL]  Get the
-reference count.
-
-";
-
-%feature("docstring") casadi::WeakRef::get "
-
->  const SharedObjectNode * casadi::SharedObject::get() const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Get a const pointer to the node.
-
->  SharedObjectNode * casadi::SharedObject::get()
-------------------------------------------------------------------------
-[INTERNAL] 
-Get a pointer to the node.
+%feature("docstring") casadi::WeakRef::weak "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
@@ -102293,7 +102090,25 @@ Joel Andersson
 
 C++ includes: weak_ref.hpp ";
 
-%feature("docstring") casadi::WeakRef::isInit "[INTERNAL]  Is initialized?
+%feature("docstring") casadi::WeakRef::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::WeakRef::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::WeakRef::assignNodeNoCount "[INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
+
+";
+
+%feature("docstring") casadi::WeakRef::shared "[INTERNAL]  Get a shared
+(owning) reference.
 
 ";
 
@@ -102302,18 +102117,13 @@ representation of the object.
 
 ";
 
-%feature("docstring") casadi::WeakRef::weak "[INTERNAL]  Get a weak
-reference to the object.
+%feature("docstring") casadi::WeakRef::print "[INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring") casadi::WeakRef::isNull "[INTERNAL]  Is a null
-pointer?
-
-";
-
-%feature("docstring") casadi::WeakRef::printPtr "[INTERNAL]  Print the
-pointer to the internal class
+%feature("docstring") casadi::WeakRef::getDescription "[INTERNAL]  Return a
+string with a description (for SWIG)
 
 ";
 
@@ -102336,10 +102146,63 @@ Construct from a shared object (also implicit type conversion)
 
 ";
 
-%feature("docstring") casadi::WeakRef::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting.
+%feature("docstring") casadi::WeakRef::get "
 
-improper use will cause memory leaks!
+>  const SharedObjectNode * casadi::SharedObject::get() const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get a const pointer to the node.
+
+>  SharedObjectNode * casadi::SharedObject::get()
+------------------------------------------------------------------------
+[INTERNAL] 
+Get a pointer to the node.
+
+";
+
+%feature("docstring") casadi::WeakRef::assignNode "[INTERNAL]  Assign the
+node to a node class pointer (or null)
+
+";
+
+%feature("docstring") casadi::WeakRef::init "[INTERNAL]  Initialize or re-
+initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring") casadi::WeakRef::isInit "[INTERNAL]  Is initialized?
+
+";
+
+%feature("docstring") casadi::WeakRef::clone "[INTERNAL]  Deep copy.
+
+";
+
+%feature("docstring") casadi::WeakRef::makeUnique "
+
+>  void casadi::SharedObject::makeUnique(bool clone_members=true)
+------------------------------------------------------------------------
+[INTERNAL] 
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+>  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+------------------------------------------------------------------------
+[INTERNAL] 
+SWIGINTERNAL
+
+";
+
+%feature("docstring") casadi::WeakRef::alive "[INTERNAL]  Check if alive.
+
+";
+
+%feature("docstring") casadi::WeakRef::swap "[INTERNAL]  Swap content with
+another instance.
 
 ";
 
@@ -104271,9 +104134,7 @@ Is initialized?
 
 %feature("docstring") casadi::XmlFile::getOptionNames "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -104349,8 +104210,9 @@ reference to the object.
 
 ";
 
-%feature("docstring") casadi::XmlFile::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") casadi::XmlFile::repr "
+
+Print a representation of the object.
 
 ";
 
@@ -104367,8 +104229,9 @@ Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::XmlFile::print "[INTERNAL]  Print a
-description of the object.
+%feature("docstring") casadi::XmlFile::print "
+
+Print a description of the object.
 
 ";
 
@@ -104401,11 +104264,6 @@ get an option value
 
 %feature("docstring") casadi::XmlFile::setOptionByAllowedIndex "[INTERNAL]
 Set a certain option by giving its index into the allowed values.
-
-";
-
-%feature("docstring") casadi::XmlFile::checkNode "[INTERNAL]  Assert that
-the node is pointing to the right type of object
 
 ";
 
@@ -105906,8 +105764,6 @@ Example usage:
 
 %feature("docstring") casadi::casadi_register_qpsolver_sqic "";
 
-%feature("docstring") casadi::str "";
-
 %feature("docstring") casadi::isEqual "
 
 Check if two expressions are equal, assuming that they are comparable.
@@ -106257,12 +106113,7 @@ and 0 otherwise.
 
 ";
 
-%feature("docstring") casadi::repr "
-
->  void casadi::repr(const std::vector< T > &v, std::ostream &stream=std::cout)
-------------------------------------------------------------------------
-[INTERNAL] 
-Print representation.
+%feature("docstring") casadi::repr "[INTERNAL]  Print representation.
 
 ";
 
@@ -106775,9 +106626,9 @@ Get a pointer to the node
 
 Create a return object
 
-Assign node of B and return
+Quick return if not allowed
 
-Null pointer if not pointing towards the right type of object
+Assign node of B and return
 
 >  const B casadi::shared_cast(const SharedObject &A)
 ------------------------------------------------------------------------
@@ -109533,9 +109384,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: polynomial_8hpp.xml
-
-
-// File: printable__object_8cpp.xml
 
 
 // File: printable__object_8hpp.xml

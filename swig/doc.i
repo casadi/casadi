@@ -1357,7 +1357,8 @@ Is initialized?
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -1385,13 +1386,10 @@ In python, supply a callable, annotated with pycallback decorator
 
 C++ includes: functor.hpp ";
 
-%feature("docstring")  casadi::SharedObject::checkNode() const  " [INTERNAL]
-Assert that the node is pointing to the right type of object
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
 
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+Print a representation of the object.
 
 ";
 
@@ -1437,7 +1435,9 @@ Deep copy.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -1465,7 +1465,8 @@ Get the reference count.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -5508,6 +5509,12 @@ check properties of a node
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
+
+";
+
 %feature("docstring") casadi::ControlledDAEInputIOSchemeVector::__getitem__
 "[INTERNAL] ";
 
@@ -5515,12 +5522,8 @@ check properties of a node
 "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -5528,13 +5531,14 @@ check properties of a node
 >::ControlledDAEInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL]
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -5964,7 +5968,8 @@ Access input argument
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -6091,7 +6096,9 @@ improper use will cause memory leaks!
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -6354,13 +6361,6 @@ int v) " [INTERNAL]  Set a certain option by giving an enum value.
 
 ";
 
-%feature("docstring")  casadi::Function::setOutputScheme(const
-casadi::IOScheme &scheme) "
-
-Set output scheme.
-
-";
-
 %feature("docstring")  casadi::Function::generateCode(const std::string
 &filename, bool generate_main=false) "
 
@@ -6430,7 +6430,8 @@ Access output argument
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -6534,8 +6535,10 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -7045,9 +7048,7 @@ Check if the numerical values of the supplied bounds make sense.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -7092,9 +7093,10 @@ Get the type name of a certain option.
 
 ";
 
-%feature("docstring")  casadi::ControlSimulator::checkNode() const  "
+%feature("docstring")  casadi::Function::setOutputScheme(const
+casadi::IOScheme &scheme) "
 
-Check if the node is pointing to the right type of object.
+Set output scheme.
 
 ";
 
@@ -7153,7 +7155,8 @@ SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 
 // File: classcasadi_1_1ControlSimulatorInputIOSchemeVector.xml
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -7171,17 +7174,19 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::ControlSimulatorInputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -9672,11 +9677,6 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring")  casadi::SharedObject::checkNode() const  " [INTERNAL]
-Assert that the node is pointing to the right type of object
-
-";
-
 %feature("docstring") casadi::CustomEvaluate::CustomEvaluate() "
 
 Default constructor.
@@ -9735,7 +9735,9 @@ class
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -9754,7 +9756,8 @@ C++ includes: functor.hpp ";
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -9780,14 +9783,17 @@ Deep copy.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -9821,20 +9827,20 @@ input/output scheme.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::CustomFunction::checkNode() const  "
+%feature("docstring")  casadi::Function::getStats() const  "
 
-Check if the pointer points towards a valid object.
+Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
@@ -9934,12 +9940,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
 
 There is no guarantee that consecutive calls return identical objects
-
-";
-
-%feature("docstring")  casadi::Function::getStats() const  "
-
-Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
@@ -10894,7 +10894,9 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -10905,7 +10907,8 @@ the allowed values.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -11034,7 +11037,8 @@ Add modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -13081,13 +13085,14 @@ function for 'DAEInput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -13098,7 +13103,8 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -13106,8 +13112,9 @@ C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring") casadi::DAEInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -13116,13 +13123,14 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::DAEOutputIOSchemeVector< M
 >::DAEOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -13131,12 +13139,14 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::DAEOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -14147,7 +14157,8 @@ Get the reference count.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -14158,19 +14169,16 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
 %feature("docstring")  casadi::SharedObject::isInit() const  "
 
 Is initialized?
-
-";
-
-%feature("docstring")  casadi::SharedObject::checkNode() const  " [INTERNAL]
-Assert that the node is pointing to the right type of object
 
 ";
 
@@ -14206,7 +14214,8 @@ pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -14237,7 +14246,9 @@ improper use will cause memory leaks!
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -14737,13 +14748,15 @@ function for 'DPLEInput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -14755,12 +14768,13 @@ C++ includes: schemes_helpers.hpp ";
 >::DPLEInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -14771,7 +14785,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::DPLEOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -14780,13 +14795,14 @@ function for 'DPLEOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -14794,7 +14810,8 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -14827,7 +14844,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -14839,7 +14858,8 @@ Get the description of a certain option.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -14920,7 +14940,8 @@ Get the reference count.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -15010,9 +15031,7 @@ iname:  input name. Only allowed when an input scheme is set.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -16236,8 +16255,10 @@ pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -16245,12 +16266,6 @@ const  " [INTERNAL]  Print a representation of the object.
 std::string &str) const  "
 
 Get the type of a certain option.
-
-";
-
-%feature("docstring")  casadi::DpleSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -18127,18 +18142,14 @@ Is initialized?
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+description of the object.
 
 ";
 
 %feature("docstring")  casadi::Sparsity::unit(int n, int el) " [INTERNAL]
 Create the sparsity pattern for a unit vector of length n and a nonzero on
 position el.
-
-";
-
-%feature("docstring")  casadi::Sparsity::checkNode() const  " [INTERNAL]
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -18170,8 +18181,9 @@ etree(A, 'row').
 
 %feature("docstring") casadi::EmptySparsity "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -18247,8 +18259,9 @@ sparsity in sparse triplet format.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const " [INTERNAL]  Return a string with a description
+(for SWIG)
 
 ";
 
@@ -18531,8 +18544,9 @@ sparsity in compressed column storage (CCS) format.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -18790,7 +18804,8 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -19521,7 +19536,8 @@ Copy all options from another object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -19714,7 +19730,9 @@ get an option value
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -19843,9 +19861,7 @@ Get the default of a certain option
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -19907,8 +19923,10 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -19958,12 +19976,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 &iind, const std::string &oind, bool compact=false, bool symmetric=false) "
 
 Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::ExternalFunction::checkNode() const  "
-
-Check if the pointer points towards a valid object.
 
 ";
 
@@ -21470,8 +21482,10 @@ Create sparsity pattern of the extended Jacobian (backward problem)
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::SharedObject::repr(std::ostream &stream) const  " [INTERNAL]  Print
-a representation of the object.
+casadi::SharedObject::repr(std::ostream &stream=std::cout, bool
+trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -21988,9 +22002,7 @@ Reset the sparsity propagation.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -22065,7 +22077,9 @@ oname:  output name. Only allowed when an output scheme is set.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -22233,18 +22247,14 @@ Get the reference count.
 
 ";
 
-%feature("docstring")  casadi::Function::checkNode() const  " [INTERNAL]
-Check if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring")  casadi::Function::evaluate() "
 
 Evaluate.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -22849,7 +22859,8 @@ Get the type of a certain option.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -22885,11 +22896,6 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::SharedObject::checkNode() const  " [INTERNAL]
-Assert that the node is pointing to the right type of object
-
-";
-
 %feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
 [INTERNAL]  Swap content with another instance.
 
@@ -22913,8 +22919,10 @@ Get the reference count.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -22951,7 +22959,9 @@ improper use will cause memory leaks!
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -22961,7 +22971,8 @@ class
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -22993,7 +23004,8 @@ reference to the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -23381,28 +23393,27 @@ reference to the object.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::checkNode() const  " [INTERNAL]
-Assert that the node is pointing to the right type of object
-
-";
-
 %feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
 Deep copy.
 
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -23558,8 +23569,10 @@ Convert to int.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -25598,13 +25611,14 @@ Check if binary operation.
 
 
 // File: classcasadi_1_1GradFInputIOSchemeVector.xml
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -25612,7 +25626,8 @@ Check if binary operation.
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -25629,7 +25644,8 @@ function for 'GradFInput'
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -25645,18 +25661,20 @@ function for 'GradFOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -25671,7 +25689,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::GradFOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -25684,21 +25703,23 @@ Helper function for 'HessLagInput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring") casadi::HessLagInputIOSchemeVector< M
 >::HessLagInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -25710,7 +25731,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::HessLagInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -25728,7 +25750,8 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -25736,32 +25759,35 @@ C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring") casadi::HessLagOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring") casadi::HessLagOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
 
 // File: classcasadi_1_1HNLPInputIOSchemeVector.xml
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -25769,8 +25795,9 @@ C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring") casadi::HNLPInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -25778,7 +25805,8 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -25878,7 +25906,8 @@ reference to the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -26099,8 +26128,10 @@ input/output scheme.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -26423,7 +26454,8 @@ Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -26458,7 +26490,9 @@ Evaluate.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -26728,12 +26762,6 @@ kept internally
 casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
 &name, int i) " [INTERNAL]  Set a certain option by giving its index into
 the allowed values.
-
-";
-
-%feature("docstring")  casadi::HomotopyNlpSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -27188,9 +27216,7 @@ Get the default of a certain option
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -31932,7 +31958,9 @@ Input/output structures of the function
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -32530,8 +32558,10 @@ input/output scheme.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -32540,7 +32570,8 @@ Deep copy.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -32917,7 +32948,8 @@ the allowed values.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -33020,9 +33052,7 @@ adheres to SCHEME_NLPINput
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -33036,12 +33066,6 @@ the output elements).
 %feature("docstring")  casadi::Function::getOutputScheme() const  "
 
 Get output scheme.
-
-";
-
-%feature("docstring")  casadi::ImplicitFunction::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -34170,8 +34194,10 @@ Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -34513,7 +34539,8 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -35579,7 +35606,8 @@ Diagrams
 
 C++ includes: integrator.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -35601,12 +35629,6 @@ Get input scheme.
 std::string &str) const  "
 
 check if the user has there is an option str
-
-";
-
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
-
-Get output scheme.
 
 ";
 
@@ -36159,9 +36181,7 @@ SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -36194,9 +36214,9 @@ input(INTEGRATOR_X0)
 
 ";
 
-%feature("docstring")  casadi::Integrator::checkNode() const  "
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
 
-Check if the node is pointing to the right type of object.
+Get output scheme.
 
 ";
 
@@ -36264,7 +36284,9 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -36281,12 +36303,14 @@ Helper function for 'IntegratorInput'
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -36298,12 +36322,13 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::IntegratorInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -36319,13 +36344,15 @@ Helper function for 'IntegratorOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -36334,8 +36361,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::IntegratorOutputIOSchemeVector< M
 >::IntegratorOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -36347,7 +36374,8 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -37208,9 +37236,11 @@ class
 
 ";
 
-%feature("docstring")  casadi::IOScheme::checkNode() const  "
+%feature("docstring")
+casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
+Assign the node to a node class pointer without reference counting.
 
-Check if the node is pointing to the right type of object.
+improper use will cause memory leaks!
 
 ";
 
@@ -37245,9 +37275,15 @@ reference to the object.
 
 ";
 
-%feature("docstring")  casadi::IOScheme::repr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a representation of the
-object.
+%feature("docstring")  casadi::IOScheme::repr(std::ostream &stream) const  "
+[INTERNAL]  Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -37287,14 +37323,25 @@ Is initialized?
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
 ";
 
+%feature("docstring")  casadi::IOScheme::fromVector(const std::vector< M >
+&arg_m) " ";
+
 %feature("docstring")  casadi::IOScheme::print(std::ostream
 &stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -37364,20 +37411,13 @@ List available entries.
 
 ";
 
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
-
-";
-
 %feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
 [INTERNAL]  Swap content with another instance.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -37401,21 +37441,24 @@ string.
 %feature("docstring") casadi::IOSchemeVector::__len__ "";
 
 %feature("docstring")  casadi::IOSchemeVector< T >::repr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a representation of the
-object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
 %feature("docstring") casadi::IOSchemeVector< T >::IOSchemeVector(const
 std::vector< T > &d=std::vector< T >(), const IOScheme &s=IOScheme()) " ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< IOSchemeVector< T >
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< IOSchemeVector< T >
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -37428,7 +37471,9 @@ A vector container with associated IOScheme A class.
 C++ includes: io_scheme_vector.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< T >::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -39236,12 +39281,14 @@ or.org/pipermail/ipopt/2010-July/002078.html ";
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -39252,8 +39299,8 @@ or.org/pipermail/ipopt/2010-July/002078.html ";
 
 %feature("docstring") casadi::JacGInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -39262,8 +39309,9 @@ function for 'JacGInput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -39273,7 +39321,8 @@ C++ includes: schemes_helpers.hpp ";
 
 // File: classcasadi_1_1JacGOutputIOSchemeVector.xml
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -39282,13 +39331,14 @@ function for 'JacGOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -39299,7 +39349,8 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -44976,7 +45027,8 @@ Set the number of function outputs.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -45068,12 +45120,6 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring")  casadi::Function::getInputScheme() const  "
-
-Get input scheme.
-
-";
-
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionDescription(const std::string &str)
 const  "
@@ -45093,7 +45139,9 @@ Input/output structures of the function
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -45344,8 +45392,10 @@ Set input scheme.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -45355,9 +45405,9 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::LinearSolver::checkNode() const  "
+%feature("docstring")  casadi::Function::getInputScheme() const  "
 
-Check if the node is pointing to the right type of object.
+Get input scheme.
 
 ";
 
@@ -45811,7 +45861,8 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -46134,9 +46185,7 @@ Check if the numerical values of the supplied bounds make sense.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -46231,8 +46280,8 @@ C++ includes: sundials_interface.hpp ";
 
 
 // File: classcasadi_1_1LinsolInputIOSchemeVector.xml
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -46242,19 +46291,22 @@ function for 'LinsolInput'
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring") casadi::LinsolInputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -46271,7 +46323,8 @@ C++ includes: schemes_helpers.hpp ";
 
 // File: classcasadi_1_1LinsolOutputIOSchemeVector.xml
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -46280,8 +46333,9 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::LinsolOutputIOSchemeVector< M
 >::LinsolOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -46295,12 +46349,13 @@ Helper function for 'LinsolOutput'
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -46394,7 +46449,9 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -46566,42 +46623,6 @@ a const pointer to the node.
 
 %feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
 pointer to the node.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) const "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
-"
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::output(const
-std::string &oname) "
-
-[UNSAFE] Obtain reference to outputs  getOutput, getOutput
-
-Access output argument
 
 ";
 
@@ -47105,13 +47126,12 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -47367,9 +47387,39 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring")  casadi::LpSolver::checkNode() const  "
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+const "
 
-Check if the node is pointing to the right type of object.
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) const "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(int oind=0)
+"
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::output(const
+std::string &oname) "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
 
 ";
 
@@ -47406,8 +47456,10 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -47450,7 +47502,8 @@ Input/output structures of the function
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -47817,22 +47870,25 @@ Get a single statistic obtained at the end of the last evaluate call.
 %feature("docstring") casadi::LpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -47856,22 +47912,25 @@ Helper function for 'LpSolverOutput'
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -47893,22 +47952,25 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -49120,8 +49182,8 @@ access and Numpy compatibility
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::repr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Printing
+%feature("docstring")  casadi::Matrix< DataType >::trans() const  "
+[INTERNAL]   Transpose the matrix.
 
 ";
 
@@ -49223,6 +49285,12 @@ access and Numpy compatibility
 
 ";
 
+%feature("docstring")  casadi::Matrix< DataType >::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+representation of the object.
+
+";
+
 %feature("docstring") casadi::Matrix::__copysign__ "[INTERNAL]  Operations
 defined in the standard namespace for unambiguous access and Numpy
 compatibility
@@ -49278,7 +49346,8 @@ possible)
 ";
 
 %feature("docstring")  casadi::Matrix< DataType >::printDense(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Printing
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print
+dense matrix-stype.
 
 ";
 
@@ -49290,7 +49359,8 @@ negative answers are possible)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< Matrix< DataType >
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -49434,11 +49504,6 @@ Get the number of elements.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::className() " [INTERNAL]
-Printing
-
-";
-
 %feature("docstring")  casadi::Matrix< T >::end() " [INTERNAL] ";
 
 %feature("docstring")  casadi::Matrix< T >::end() const  " [INTERNAL] ";
@@ -49567,7 +49632,8 @@ interfaced languages get a non-zero
 ";
 
 %feature("docstring")  casadi::Matrix< DataType >::printSparse(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Printing
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print
+sparse matrix style.
 
 ";
 
@@ -49760,7 +49826,8 @@ int dummy=0) const  " [INTERNAL]  Get a submatrix
 ";
 
 %feature("docstring")  casadi::Matrix< DataType >::printScalar(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Printing
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print
+scalar.
 
 ";
 
@@ -50013,7 +50080,8 @@ possible)
 ";
 
 %feature("docstring")  casadi::Matrix< DataType >::printVector(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Printing
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print
+vector-style.
 
 ";
 
@@ -50111,7 +50179,8 @@ allocation)
 
 %feature("docstring") casadi::Matrix::__rgt__ "";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< Matrix< DataType >
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -50740,11 +50809,6 @@ Matrix division from left.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::trans() const  "
-[INTERNAL]   Transpose the matrix.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::sizeL()
 const "
 
@@ -50787,7 +50851,8 @@ iterators to beginning and end.
 %feature("docstring")  casadi::Matrix< T >::rbegin() const  " [INTERNAL] ";
 
 %feature("docstring")  casadi::Matrix< DataType >::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Printing
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -52483,7 +52548,8 @@ Lift an expression.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -52632,7 +52698,8 @@ check if zero (note that false negative answers are possible)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -52668,7 +52735,9 @@ isSymbolic)
 %feature("docstring")  casadi::MX::constpow(const MX &y) const  " ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -53077,8 +53146,10 @@ check if zero (note that false negative answers are possible)
 
 %feature("docstring") casadi::MX::__ne__ "";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -53232,11 +53303,6 @@ Create sparse matrix constant (also implicit type conversion)
 %feature("docstring")  casadi::MX::isBinary() const  "
 
 Is binary operation.
-
-";
-
-%feature("docstring")  casadi::SharedObject::checkNode() const  " [INTERNAL]
-Assert that the node is pointing to the right type of object
 
 ";
 
@@ -53665,9 +53731,7 @@ Get the default of a certain option
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -53683,7 +53747,8 @@ reference to the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -53697,8 +53762,10 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -53980,12 +54047,6 @@ Gradient via source code transformation.
 const std::string &oname) "
 
 Gradient via source code transformation.
-
-";
-
-%feature("docstring")  casadi::MXFunction::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -54436,7 +54497,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -54575,7 +54638,8 @@ Get the reference count.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -56754,13 +56818,15 @@ option str
 
 
 // File: classcasadi_1_1NLPInputIOSchemeVector.xml
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -56774,7 +56840,8 @@ function for 'NLPInput'
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -56784,8 +56851,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -56795,12 +56862,14 @@ C++ includes: schemes_helpers.hpp ";
 
 // File: classcasadi_1_1NLPOutputIOSchemeVector.xml
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -56813,7 +56882,8 @@ function for 'NLPOutput'
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -56827,8 +56897,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::NLPOutputIOSchemeVector::__len__ "[INTERNAL]
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -57733,9 +57803,7 @@ Get total number of elements in all of the matrix-valued outputs.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -57767,7 +57835,9 @@ check if there is an option str
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -57794,7 +57864,8 @@ Get input scheme.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -59259,8 +59330,10 @@ Diagrams
 
 C++ includes: nlp_solver.hpp ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -59491,12 +59564,6 @@ class
 
 ";
 
-%feature("docstring")  casadi::NlpSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring")  casadi::Function::evaluate() "
 
 Evaluate.
@@ -59533,7 +59600,8 @@ changes, the init function should be called again.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -59731,13 +59799,14 @@ Generate the sparsity of a Jacobian block
 // File: classcasadi_1_1NlpSolverInputIOSchemeVector.xml
 %feature("docstring") casadi::NlpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -59752,7 +59821,8 @@ Generate the sparsity of a Jacobian block
 %feature("docstring") casadi::NlpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -59761,15 +59831,17 @@ Helper function for 'NlpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 
 // File: classcasadi_1_1NlpSolverOutputIOSchemeVector.xml
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -59781,13 +59853,14 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -59796,7 +59869,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::NlpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -62714,9 +62788,7 @@ corresponding to the Hessian and the gradients.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -62738,7 +62810,8 @@ Evaluate.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -62948,7 +63021,8 @@ internally
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -63230,54 +63304,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-int oind=0) " [INTERNAL]  Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0.. getNumOutputs()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
-const std::string &oname) " [INTERNAL]  Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
 %feature("docstring")  casadi::IOInterface< Function  >::schemeEntry(const
 casadi::IOScheme &scheme, const std::string &name, bool input) const "
 [INTERNAL]  Find the index for a string describing a particular entry of a
@@ -63317,7 +63343,9 @@ returned.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -63508,9 +63536,51 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Nullspace::checkNode() const  "
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
+oind=0) const "
 
-Check if the node is pointing to the right type of object.
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
+std::string &oname) const "
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+int oind=0) " [INTERNAL]  Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+";
+
+%feature("docstring")  casadi::IOInterface< Function  >::getOutput(T val,
+const std::string &oname) " [INTERNAL]  Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -63547,8 +63617,10 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -66326,7 +66398,9 @@ the allowed values.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -66378,7 +66452,8 @@ pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -66413,7 +66488,8 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -66509,11 +66585,6 @@ Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::checkNode() const  "
-[INTERNAL]  Assert that the node is pointing to the right type of object
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
 OptionsFunctionality &obj, bool skipUnknown=false) "
 
@@ -66546,9 +66617,7 @@ reference to the object.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -66565,8 +66634,10 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -67971,9 +68042,7 @@ input/output scheme.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -67999,11 +68068,14 @@ check if the user has there is an option str
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -68025,8 +68097,10 @@ Get input scheme.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -68452,11 +68526,6 @@ Get the description of a certain option.
 
 ";
 
-%feature("docstring")  casadi::Function::checkNode() const  " [INTERNAL]
-Check if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::setOption(const
 std::string &str, const GenericType &val) "
 
@@ -68479,7 +68548,8 @@ changes, the init function should be called again.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -68710,7 +68780,9 @@ Construct from a vector of polynomial coefficients.
 ";
 
 %feature("docstring")  casadi::Polynomial::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -68720,7 +68792,8 @@ Create a new polynomial for the anti-derivative (primitive function)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< Polynomial
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -68745,12 +68818,14 @@ Remove excess zeros.
 ";
 
 %feature("docstring")  casadi::Polynomial::repr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a representation of the
-object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< Polynomial
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -68758,20 +68833,17 @@ Return a string with a representation (for SWIG)
 
 
 // File: classcasadi_1_1PrintableObject.xml
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  "
 
 Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  "
 
-";
-
-%feature("docstring")  casadi::PrintableObject::repr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a representation of the
-object.
+Return a string with a description (for SWIG)
 
 ";
 
@@ -68782,12 +68854,6 @@ Base class for objects that have a natural string representation.
 Joel Andersson
 
 C++ includes: printable_object.hpp ";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-
-Return a string with a description (for SWIG)
-
-";
 
 
 // File: structcasadi_1_1ProfilingData__ENTRY.xml
@@ -68832,8 +68898,8 @@ profiling.hpp ";
 
 /*  Advanced Getters  */
 
-/*  Option Functionality  */ %feature("docstring")
-casadi::PrintableObject::getDescription() const  "
+/*  Option Functionality  */ %feature("docstring")  casadi::PrintableObject<
+SharedObject  >::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -69281,7 +69347,8 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -69315,9 +69382,11 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::Function::getOutputScheme() const  "
+%feature("docstring")  casadi::Function::symbolicInput() const  "
 
-Get output scheme.
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
 
 ";
 
@@ -69586,9 +69655,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::PsdIndefDpleSolver::checkNode() const  "
+%feature("docstring")  casadi::Function::getOutputScheme() const  "
 
-Check if the node is pointing to the right type of object.
+Get output scheme.
 
 ";
 
@@ -69784,14 +69853,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::Function::symbolicInput() const  "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
-
-";
-
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
@@ -69917,9 +69978,7 @@ Get, if necessary generate, the sparsity of a Jacobian block
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -70190,8 +70249,10 @@ Diagrams
 
 C++ includes: psd_indef_dple_solver.hpp ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -70209,7 +70270,9 @@ reference to the object.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -70759,9 +70822,7 @@ paropt:  Set of options to be passed to the Parallelizer
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -70966,12 +71027,6 @@ Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring")  casadi::QcqpSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring")  casadi::Function::outputScheme() const  " [INTERNAL]
 Access input/output scheme.
 
@@ -71087,14 +71142,17 @@ Deep copy.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -71197,7 +71255,9 @@ reference to the object.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -71214,7 +71274,8 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -71910,13 +71971,14 @@ There is no guarantee that consecutive calls return identical objects
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -71925,13 +71987,15 @@ Helper function for 'QcqpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -71947,25 +72011,28 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring") casadi::QcqpSolverOutputIOSchemeVector< M
 >::QcqpSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -71986,15 +72053,17 @@ C++ includes: casadi_types.hpp ";
 %feature("docstring") casadi::QCQPStructIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -72002,15 +72071,16 @@ C++ includes: casadi_types.hpp ";
 >::QCQPStructIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
 %feature("docstring") casadi::QCQPStructIOSchemeVector::__len__ "[INTERNAL]
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -74565,9 +74635,7 @@ Get the number of function inputs.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -75763,7 +75831,8 @@ Diagrams
 
 C++ includes: qp_solver.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -76036,8 +76105,10 @@ Get the description of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -76051,7 +76122,8 @@ const  " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -76246,7 +76318,9 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -76276,12 +76350,6 @@ internally
 %feature("docstring")  casadi::Function::evaluate() "
 
 Evaluate.
-
-";
-
-%feature("docstring")  casadi::QpSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -76378,7 +76446,8 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -76389,20 +76458,22 @@ C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring") casadi::QpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring") casadi::QpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -76415,22 +76486,25 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::QpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -76451,7 +76525,8 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -76467,8 +76542,8 @@ C++ includes: casadi_types.hpp ";
 
 %feature("docstring") casadi::QPStructIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -76476,12 +76551,14 @@ C++ includes: casadi_types.hpp ";
 >::QPStructIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -80036,13 +80113,15 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::RDAEInputIOSchemeVector< M
 >::RDAEInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -80056,20 +80135,21 @@ C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring") casadi::RDAEInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
 
 // File: classcasadi_1_1RDAEOutputIOSchemeVector.xml
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -80085,17 +80165,20 @@ function for 'RDAEOutput'
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -82382,8 +82465,9 @@ Get a reference to the colindex of col i (see class description)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -82408,8 +82492,9 @@ the number of rows.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const " [INTERNAL]  Return a string with a description
+(for SWIG)
 
 ";
 
@@ -82418,8 +82503,9 @@ scalar_and_dense=false) const  " [INTERNAL]  Is scalar?
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -82629,7 +82715,8 @@ Is initialized?
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -82800,11 +82887,6 @@ Compress a sparsity pattern.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::checkNode() const  " [INTERNAL]
-Check if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring")  casadi::Sparsity::getTril(bool includeDiagonal=true)
 const  " [INTERNAL]  Get lower triangular part.
 
@@ -82870,8 +82952,9 @@ Systems by Davis (2006).
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -82900,7 +82983,8 @@ improper use will cause memory leaks!
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -83109,8 +83193,9 @@ Returns the sparsity of the submatrix, with a mapping such that submatrix[k]
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const " [INTERNAL]  Return a string with a description
+(for SWIG)
 
 ";
 
@@ -83219,11 +83304,6 @@ dimension (i.e. insert columns)
 
 %feature("docstring")  casadi::Sparsity::dense(const std::pair< int, int >
 &rc) " [INTERNAL]  Create a dense rectangular sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Sparsity::checkNode() const  " [INTERNAL]
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -83392,8 +83472,9 @@ pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -85094,12 +85175,14 @@ ls_trials, bool ls_success) " [INTERNAL] ";
 
 // File: classcasadi_1_1SDPInputIOSchemeVector.xml
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -85107,15 +85190,16 @@ ls_trials, bool ls_success) " [INTERNAL] ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
 %feature("docstring") casadi::SDPInputIOSchemeVector::__len__ "[INTERNAL]
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -85136,8 +85220,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::SDPOutputIOSchemeVector::__len__ "[INTERNAL]
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -85146,13 +85230,15 @@ function for 'SDPOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -85164,7 +85250,8 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -85192,8 +85279,10 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -85280,14 +85369,17 @@ paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -85398,9 +85490,19 @@ Set options that make the SDP solver more suitable for solving SOCPs.
 
 ";
 
-%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
+%feature("docstring")  casadi::SharedObject::makeUnique(bool
+clone_members=true) "
 
-Get total number of nonzeros in all of the matrix-valued outputs.
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+";
+
+%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
+SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+" [INTERNAL]  SWIGINTERNAL
 
 ";
 
@@ -85997,7 +86099,8 @@ Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -86331,19 +86434,9 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::makeUnique(bool
-clone_members=true) "
+%feature("docstring")  casadi::Function::getNumOutputNonzeros() const  "
 
-Make unique.
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object
-
-";
-
-%feature("docstring")  casadi::SharedObject::makeUnique(std::map<
-SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
-" [INTERNAL]  SWIGINTERNAL
+Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
@@ -86425,9 +86518,7 @@ Get total number of elements in all of the matrix-valued inputs.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -86756,9 +86847,8 @@ Deep copy.
 
 ";
 
-%feature("docstring")  casadi::SdpSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
 
 ";
 
@@ -86882,11 +86972,6 @@ Is initialized?
 
 ";
 
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
-
-";
-
 %feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
 
@@ -86910,17 +86995,19 @@ Input/output structures of the function
 >::SDPStructIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -86937,7 +87024,8 @@ function for 'SDPStruct'
 C++ includes: casadi_types.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -86947,7 +87035,8 @@ C++ includes: casadi_types.hpp ";
 
 // File: classcasadi_1_1SDQPInputIOSchemeVector.xml
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -86967,27 +87056,30 @@ C++ includes: schemes_helpers.hpp ";
 >::SDQPInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 
 // File: classcasadi_1_1SDQPOutputIOSchemeVector.xml
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -87000,7 +87092,8 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -87009,7 +87102,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::SDQPOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -87019,8 +87113,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::SDQPOutputIOSchemeVector::__len__ "[INTERNAL]
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -87325,7 +87419,8 @@ Set the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -87661,16 +87756,16 @@ Get the description of a certain option.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -87721,7 +87816,8 @@ Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -88337,8 +88433,10 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -88423,12 +88521,6 @@ Get input scheme.
 std::string &str) const  "
 
 Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::SdqpSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -88568,18 +88660,20 @@ returned.
 %feature("docstring") casadi::SDQPStructIOSchemeVector::__len__ "[INTERNAL]
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -88599,7 +88693,8 @@ function for 'SDQPStruct'
 C++ includes: casadi_types.hpp ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -92202,7 +92297,9 @@ Is a null pointer?
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -92222,13 +92319,15 @@ SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -92266,13 +92365,10 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
 
-";
-
-%feature("docstring")  casadi::SharedObject::checkNode() const  " [INTERNAL]
-Assert that the node is pointing to the right type of object
+Print a representation of the object.
 
 ";
 
@@ -93643,7 +93739,8 @@ paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -93652,12 +93749,6 @@ Return a string with a representation (for SWIG)
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
 Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::Simulator::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -94271,7 +94362,8 @@ Set output scheme.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -94292,8 +94384,10 @@ Evaluate.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -94858,9 +94952,7 @@ Reset the sparsity propagation.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -95013,7 +95105,9 @@ corresponding to the Hessian and the gradients.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -95032,8 +95126,10 @@ Get a vector of indices (nested slice)
 
 ";
 
-%feature("docstring")  casadi::Slice::print(std::ostream &stream=std::cout)
-const  " [INTERNAL]  Print a representation of the object to a stream.
+%feature("docstring")  casadi::Slice::print(std::ostream &stream=std::cout,
+bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -95079,19 +95175,22 @@ true)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< Slice  >::getDescription()
+const "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::repr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a representation of the
-object.
+%feature("docstring")  casadi::Slice::repr(std::ostream &stream=std::cout,
+bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< Slice
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -96659,20 +96758,22 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::SOCPInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring") casadi::SOCPInputIOSchemeVector< M
 >::SOCPInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -96680,7 +96781,8 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -96691,8 +96793,9 @@ function for 'SOCPOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
@@ -96702,8 +96805,8 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -96711,12 +96814,14 @@ C++ includes: schemes_helpers.hpp ";
 >::SOCPOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -96987,7 +97092,8 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -97153,7 +97259,8 @@ Problem structure.>Struct scheme: casadi::SOCPStruct ( = 2) [socpStruct]
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -97518,12 +97625,6 @@ class
 
 ";
 
-%feature("docstring")  casadi::SocpSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::getOptionType(const
 std::string &str) const  "
 
@@ -97656,7 +97757,9 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -97675,8 +97778,10 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -97860,9 +97965,7 @@ Input/output structures of the function
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -98280,25 +98383,22 @@ Get the number of function outputs.
 >::SOCPStructIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
 %feature("docstring") casadi::SOCPStructIOSchemeVector::__len__ "[INTERNAL]
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -98306,6 +98406,12 @@ Get the number of function outputs.
 function for 'SOCPStruct'
 
 C++ includes: casadi_types.hpp ";
+
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
+
+";
 
 
 // File: classcasadi_1_1SocpToSdp.xml
@@ -100396,8 +100502,10 @@ Get nonzeros in upper triangular part.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -100676,7 +100784,8 @@ Make a patten dense.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -100760,11 +100869,14 @@ Is scalar?
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -100919,12 +101031,6 @@ be nonzero)
 %feature("docstring")  casadi::Sparsity::dimString() const  "
 
 Get the dimension as a string.
-
-";
-
-%feature("docstring")  casadi::Sparsity::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -104907,7 +105013,8 @@ changes, the init function should be called again.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -104949,7 +105056,8 @@ Generate C code for the function.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -105619,7 +105727,9 @@ corresponding to the Hessian and the gradients.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -105844,8 +105954,10 @@ paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -105907,12 +106019,6 @@ Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
-
-";
-
-%feature("docstring")  casadi::StabilizedQpSolver::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -105993,9 +106099,7 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -106019,13 +106123,15 @@ Set input scheme.
 
 
 // File: classcasadi_1_1StabilizedQpSolverInputIOSchemeVector.xml
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived
+>::getRepresentation() const  " [INTERNAL]  Return a string with a
+representation (for SWIG)
 
 ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+description of the object.
 
 ";
 
@@ -106043,7 +106149,8 @@ casadi::StabilizedQpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 casadi::StabilizedQpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
-&stream=std::cout) const " [INTERNAL]  Print a representation of the object.
+&stream=std::cout, bool trailing_newline=true) const " [INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -106054,8 +106161,8 @@ casadi::StabilizedQpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 %feature("docstring") casadi::StabilizedQpSolverInputIOSchemeVector::__len__
 "[INTERNAL] ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::PrintableObject< Derived >::getDescription()
+const  " [INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
@@ -112746,6 +112853,13 @@ Get the number of dependencies of a binary SXElement.
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< SXElement
+>::getDescription() const "
+
+Return a string with a description (for SWIG)
+
+";
+
 %feature("docstring")  casadi::SXElement::logic_and(const SXElement &y)
 const  " ";
 
@@ -112814,6 +112928,12 @@ the temporary variable
 
 ";
 
+%feature("docstring")  casadi::SXElement::print(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+description of the object.
+
+";
+
 %feature("docstring")  casadi::SXElement::print(std::ostream &stream, long
 &remaining_calls) const  " [INTERNAL]  print to stream, limited
 
@@ -112846,6 +112966,12 @@ the temporary variable
 
 %feature("docstring")  casadi::SXElement::fmax(const Matrix< SXElement > &b)
 const  " ";
+
+%feature("docstring")  casadi::SXElement::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+representation of the object.
+
+";
 
 %feature("docstring")  casadi::SXElement::log10() const  " ";
 
@@ -112926,6 +113052,13 @@ Check whether a binary SXElement is commutative.
 
 %feature("docstring") casadi::SXElement::__rsub__ "";
 
+%feature("docstring")  casadi::PrintableObject< SXElement
+>::getRepresentation() const "
+
+Return a string with a representation (for SWIG)
+
+";
+
 %feature("docstring")  casadi::SXElement::isRegular() const  "
 
 Checks if expression does not contain NaN or Inf.
@@ -112962,11 +113095,6 @@ pointer to the node.
 ";
 
 %feature("docstring") casadi::SXElement::__mpower__ "";
-
-%feature("docstring")  casadi::SXElement::toString() const  " [INTERNAL]
-string representation (SWIG workaround)
-
-";
 
 %feature("docstring")  casadi::SXElement::logic_or(const SXElement &y) const
 " ";
@@ -113068,7 +113196,8 @@ Get all function outputs.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -113298,7 +113427,9 @@ Get the number of atomic operations.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -113921,9 +114052,7 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -114202,7 +114331,8 @@ Set input scheme.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -114423,8 +114553,10 @@ input/output scheme.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -114558,12 +114690,6 @@ int iind=0, int oind=0, bool compact=false) "
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
 internally
-
-";
-
-%feature("docstring")  casadi::SXFunction::checkNode() const  "
-
-Check if the node is pointing to the right type of object.
 
 ";
 
@@ -115308,13 +115434,15 @@ Parse an AMPL och PyOmo NL-file.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SymbolicNLP
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SymbolicNLP
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -115329,13 +115457,16 @@ Joel Andersson
 C++ includes: symbolic_nlp.hpp ";
 
 %feature("docstring")  casadi::SymbolicNLP::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
 %feature("docstring")  casadi::SymbolicNLP::repr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a representation of the
-object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -115472,11 +115603,14 @@ Get the (optionally normalized) derivative value(s) at time 0 by expression.
 ";
 
 %feature("docstring")  casadi::SymbolicOCP::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print description.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print description.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SymbolicOCP
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -115569,7 +115703,8 @@ Set the (optionally normalized) derivative value(s) at time 0 by expression.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SymbolicOCP
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -115697,7 +115832,9 @@ Get a derivative expression by non-differentiated expression.
 ";
 
 %feature("docstring")  casadi::SymbolicOCP::repr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print representation.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print representation.
 
 ";
 
@@ -118697,6 +118834,20 @@ scpgen.hpp ";
 
 
 // File: structcasadi_1_1Variable.xml
+%feature("docstring")  casadi::Variable::print(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< Variable
+>::getRepresentation() const "
+
+Return a string with a representation (for SWIG)
+
+";
+
 %feature("docstring") casadi::Variable "
 
 Holds expressions and meta-data corresponding to a physical quantity
@@ -118712,12 +118863,6 @@ Set the variable name (and corresponding expressions)
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-
-Return a string with a representation (for SWIG)
-
-";
-
 %feature("docstring")  casadi::Variable::name() const  "
 
 Variable name.
@@ -118730,7 +118875,15 @@ Default constructor.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::Variable::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< Variable
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -119701,13 +119854,8 @@ another matrix.
 
 
 // File: classcasadi_1_1WeakRef.xml
-%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
-Deep copy.
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
-[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring")  casadi::SharedObject::isNull() const  " [INTERNAL]
+Is a null pointer?
 
 ";
 
@@ -119716,13 +119864,88 @@ Deep copy.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
-[INTERNAL]  Swap content with another instance.
+%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::WeakRef "[INTERNAL]  Weak reference type A
+weak reference to a SharedObject.
+
+Joel Andersson
+
+C++ includes: weak_ref.hpp ";
+
+%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
+Get the reference count.
+
+";
+
+%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
+&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
+class
+
+";
+
+%feature("docstring")
+casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
 
 ";
 
 %feature("docstring")  casadi::WeakRef::shared() "[INTERNAL]  Get a shared
 (owning) reference.
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+representation of the object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  " [INTERNAL]  Print a
+description of the object.
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const " [INTERNAL]  Return a string with a description
+(for SWIG)
+
+";
+
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const " [INTERNAL]  Return a string with a
+representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::WeakRef::WeakRef(int dummy=0) " [INTERNAL]
+Default constructor.
+
+";
+
+%feature("docstring") casadi::WeakRef::WeakRef(SharedObject shared) "
+[INTERNAL]  Construct from a shared object (also implicit type conversion)
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
+a const pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
+pointer to the node.
+
+";
+
+%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
+*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
 
 ";
 
@@ -119733,18 +119956,13 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+%feature("docstring")  casadi::SharedObject::isInit() const  " [INTERNAL]
+Is initialized?
 
 ";
 
-%feature("docstring")  casadi::WeakRef::alive() const  " [INTERNAL]  Check
-if alive.
-
-";
-
-%feature("docstring")  casadi::SharedObject::assignNode(SharedObjectNode
-*node) " [INTERNAL]  Assign the node to a node class pointer (or null)
+%feature("docstring")  casadi::SharedObject::clone() const  " [INTERNAL]
+Deep copy.
 
 ";
 
@@ -119762,79 +119980,13 @@ SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::checkNode() const  " [INTERNAL]
-Assert that the node is pointing to the right type of object
+%feature("docstring")  casadi::WeakRef::alive() const  " [INTERNAL]  Check
+if alive.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::getCount() const  " [INTERNAL]
-Get the reference count.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() const  " [INTERNAL]  Get
-a const pointer to the node.
-
-";
-
-%feature("docstring")  casadi::SharedObject::get() "[INTERNAL]  Get a
-pointer to the node.
-
-";
-
-%feature("docstring") casadi::WeakRef "[INTERNAL]  Weak reference type A
-weak reference to a SharedObject.
-
-Joel Andersson
-
-C++ includes: weak_ref.hpp ";
-
-%feature("docstring")  casadi::SharedObject::isInit() const  " [INTERNAL]
-Is initialized?
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::weak() "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  " [INTERNAL]
-Is a null pointer?
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print the pointer to the internal
-class
-
-";
-
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
-[INTERNAL]  Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::WeakRef::WeakRef(int dummy=0) " [INTERNAL]
-Default constructor.
-
-";
-
-%feature("docstring") casadi::WeakRef::WeakRef(SharedObject shared) "
-[INTERNAL]  Construct from a shared object (also implicit type conversion)
-
-";
-
-%feature("docstring")
-casadi::SharedObject::assignNodeNoCount(SharedObjectNode *node) " [INTERNAL]
-Assign the node to a node class pointer without reference counting.
-
-improper use will cause memory leaks!
+%feature("docstring")  casadi::SharedObject::swap(SharedObject &other) "
+[INTERNAL]  Swap content with another instance.
 
 ";
 
@@ -121861,7 +122013,8 @@ pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getDescription() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getDescription() const "
 
 Return a string with a description (for SWIG)
 
@@ -121912,7 +122065,8 @@ Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
 
@@ -121934,9 +122088,7 @@ Is initialized?
 %feature("docstring")  casadi::OptionsFunctionality::getOptionNames() const
 "
 
-INTERNAL.
-
-Get a list of all option names
+Get a list of all option names.
 
 ";
 
@@ -122016,8 +122168,10 @@ reference to the object.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream &stream)
-const  " [INTERNAL]  Print a representation of the object.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a representation of the object.
 
 ";
 
@@ -122038,7 +122192,9 @@ Get the description of a certain option.
 ";
 
 %feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=std::cout) const  " [INTERNAL]  Print a description of the object.
+&stream=std::cout, bool trailing_newline=true) const  "
+
+Print a description of the object.
 
 ";
 
@@ -122077,11 +122233,6 @@ get an option value
 casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
 &name, int i) " [INTERNAL]  Set a certain option by giving its index into
 the allowed values.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::checkNode() const  "
-[INTERNAL]  Assert that the node is pointing to the right type of object
 
 ";
 
@@ -123729,8 +123880,6 @@ Example usage:
 %feature("docstring")
 casadi::casadi_register_qpsolver_sqic(QpSolverInternal::Plugin *plugin) " ";
 
-%feature("docstring")  casadi::str(const PrintableObject &obj) " ";
-
 %feature("docstring")  casadi::isEqual(const GenericMatrix< MatType > &x,
 const GenericMatrix< MatType > &y) "
 
@@ -124138,8 +124287,6 @@ Logical not, returns (an expression evaluating to) 1 if expression is zero
 and 0 otherwise.
 
 ";
-
-%feature("docstring")  casadi::repr(const PrintableObject &obj) " ";
 
 %feature("docstring")  casadi::repr(const std::vector< T > &v, std::ostream
 &stream=std::cout) " [INTERNAL]  Print representation.
@@ -124752,9 +124899,9 @@ Get a pointer to the node
 
 Create a return object
 
-Assign node of B and return
+Quick return if not allowed
 
-Null pointer if not pointing towards the right type of object ";
+Assign node of B and return ";
 
 %feature("docstring")  casadi::shared_cast(const SharedObject &A) "
 [INTERNAL]  Typecast a shared object to a base class to a shared object to a
@@ -127802,9 +127949,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: polynomial_8hpp.xml
-
-
-// File: printable__object_8cpp.xml
 
 
 // File: printable__object_8hpp.xml

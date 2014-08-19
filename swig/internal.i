@@ -481,9 +481,6 @@
 %exception  casadi::Function::checkInputs() const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::Function::checkNode() const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
 %exception  casadi::Function::inputScheme() const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
@@ -1057,22 +1054,16 @@
 %exception  casadi::IOScheme::print(std::ostream &stream=std::cout) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::IOScheme::repr(std::ostream &stream=std::cout) const  {
+%exception  casadi::IOScheme::repr(std::ostream &stream) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::IOSchemeVector< M  >::print(std::ostream &stream=std::cout) const {
+%exception  casadi::IOSchemeVector< M  >::print(std::ostream &stream=std::cout, bool trailing_newline=true) const {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::IOSchemeVector< M  >::repr(std::ostream &stream=std::cout) const {
+%exception  casadi::IOSchemeVector< M  >::repr(std::ostream &stream=std::cout, bool trailing_newline=true) const {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::IOSchemeVector< M  >::vector() const {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::IOSchemeVector< T >::print(std::ostream &stream=std::cout) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::IOSchemeVector< T >::repr(std::ostream &stream=std::cout) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::IdasInterface::clone() const  {
@@ -1882,9 +1873,6 @@
 %exception  casadi::Matrix< DataType >::ceil() const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::Matrix< DataType >::className() {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
 %exception  casadi::Matrix< DataType >::clear() {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
@@ -2050,19 +2038,19 @@
 %exception  casadi::Matrix< DataType >::nan(int nrow=1, int ncol=1) {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::Matrix< DataType >::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::print(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::Matrix< DataType >::printDense(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::printDense(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::Matrix< DataType >::printScalar(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::printScalar(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::Matrix< DataType >::printSparse(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::printSparse(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::Matrix< DataType >::printVector(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::printVector(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::Matrix< DataType >::printme(const Matrix< DataType > &y) const  {
@@ -2083,7 +2071,7 @@
 %exception  casadi::Matrix< DataType >::repmat(const Matrix< DataType > &x, int nrow, int ncol=1) {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::Matrix< DataType >::repr(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::repr(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::Matrix< DataType >::reserve(int nnz) {
@@ -2707,9 +2695,6 @@
 %exception  casadi::OoqpInterface::init() {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::OptionsFunctionality::checkNode() const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
 %exception  casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
@@ -2813,18 +2798,6 @@
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::OutputNode::printPart(std::ostream &stream, int part) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::Polynomial::print(std::ostream &stream=std::cout) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::Polynomial::repr(std::ostream &stream=std::cout) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::PrintableObject::print(std::ostream &stream=std::cout) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::PrintableObject::repr(std::ostream &stream=std::cout) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::ProfilingType() {
@@ -2992,10 +2965,13 @@
 %exception  casadi::SXElement::print(std::ostream &stream, long &remaining_calls) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::SXElement::setTemp(int t) {
+%exception  casadi::SXElement::print(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::SXElement::toString() const  {
+%exception  casadi::SXElement::repr(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
+%exception  casadi::SXElement::setTemp(int t) {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::SXFunction::algorithm() const  {
@@ -3274,9 +3250,6 @@
 %exception  casadi::SharedObject::assertInit() const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::SharedObject::checkNode() const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
 %exception  casadi::SharedObject::clone() const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
@@ -3289,13 +3262,7 @@
 %exception  casadi::SharedObject::getCount() const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
-%exception  casadi::SharedObject::print(std::ostream &stream=std::cout) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
 %exception  casadi::SharedObject::printPtr(std::ostream &stream=std::cout) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::SharedObject::repr(std::ostream &stream) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::SharedObject::swap(SharedObject &other) {
@@ -3335,9 +3302,6 @@
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::SimpleHomotopyNlp::init() {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::Slice::print(std::ostream &stream=std::cout) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::SnoptInterface::clone() const  {
@@ -3791,18 +3755,6 @@
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::SymbolicMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::SymbolicNLP::print(std::ostream &stream=std::cout) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::SymbolicNLP::repr(std::ostream &stream=std::cout) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::SymbolicOCP::print(std::ostream &stream=std::cout) const  {
- try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
-}
-%exception  casadi::SymbolicOCP::repr(std::ostream &stream=std::cout) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception  casadi::SymbolicQr::clone() const  {
