@@ -463,16 +463,6 @@ int internal(const std::string & c) {
 
 #ifndef SWIGXML
 %{
-#define START \
-  if (casadi::CasadiOptions::catch_errors_swig) { \
-  try {
-  
-#define STOP \
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } \
-} else
-
 #define CATCH_OR_RETHROW \
   catch (const std::exception& e) { \
     if (casadi::CasadiOptions::catch_errors_swig) { \
