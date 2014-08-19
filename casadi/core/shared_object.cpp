@@ -220,7 +220,8 @@ namespace casadi {
     return count;
   }
 
-  void SharedObjectNode::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
+  void SharedObjectNode::deepCopyMembers(std::map<SharedObjectNode*,
+                                         SharedObject>& already_copied) {
   }
 
   bool SharedObject::isInit() const {

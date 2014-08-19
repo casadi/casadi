@@ -671,16 +671,26 @@ namespace casadi {
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int getEqualityCheckingDepth();
 
-    ///@{
-    /// Printing
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print print description
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print representation
-    static std::string className(); // name of the class
-    void printScalar(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print scalar
-    void printVector(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print vector-style
-    void printDense(std::ostream &stream=std::cout, bool trailing_newline=true) const; // Print dense matrix-stype
-    void printSparse(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print sparse matrix style
-    ///@}
+    /// Get name of the class
+    static std::string className();
+
+    /// Print a description of the object
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print a representation of the object
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print scalar
+    void printScalar(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print vector-style
+    void printVector(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print dense matrix-stype
+    void printDense(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print sparse matrix style
+    void printSparse(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     // Get the sparsity pattern
     const std::vector<int>& row() const;
