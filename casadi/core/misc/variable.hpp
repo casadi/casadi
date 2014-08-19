@@ -144,11 +144,13 @@ namespace casadi {
     /// Timed variable (allocate if necessary)
     SXElement atTime(double t, bool allocate=false);
 
-#ifndef SWIG
-    // Print
-    void repr(std::ostream &stream) const;
-    void print(std::ostream &stream=std::cout) const;
+    /// Print a description of the object
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
+    /// Print a representation of the object
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+#ifndef SWIG
   private:
     // Timed variables
     std::map<double, SXElement> timed_;

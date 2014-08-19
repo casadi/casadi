@@ -126,14 +126,13 @@ namespace casadi {
     /// Const access a member function or object
     const SharedObjectNode* operator->() const;
     /// \endcond
+#endif // SWIG
 
     /// Print a representation of the object
-    void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout) const;
-
-#endif // SWIG
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class

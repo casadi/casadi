@@ -65,9 +65,8 @@ namespace casadi {
 #endif // SWIGMATLAB
     std::vector<T> vector() const { return this->data; }
 
-#ifndef SWIG
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout) const {
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const {
       stream << "IOSchemeVector(" ;
       for (int i=0;i<this->data.size();++i) {
         stream << this->scheme.entry(i) << "=" << this->data[i];
@@ -75,13 +74,13 @@ namespace casadi {
       }
 
       stream << ";" << this->scheme.name() <<  ")";
+      if (trailing_newline) stream << std::endl;
     }
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout) const { print(stream); }
-
-#endif // SWIG
-
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const {
+      print(stream, trailing_newline);
+    }
   };
 
 

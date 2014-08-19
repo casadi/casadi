@@ -535,11 +535,12 @@ namespace casadi {
 
   }
 
-  void SymbolicOCP::repr(std::ostream &stream) const {
+  void SymbolicOCP::repr(std::ostream &stream, bool trailing_newline) const {
     stream << "Flat OCP";
+    if (trailing_newline) stream << endl;
   }
 
-  void SymbolicOCP::print(ostream &stream) const {
+  void SymbolicOCP::print(ostream &stream, bool trailing_newline) const {
     stream << "Dimensions: ";
     stream << "#s = " << this->s.size() << ", ";
     stream << "#x = " << this->x.size() << ", ";
@@ -683,6 +684,7 @@ namespace casadi {
     stream << "t0 = " << this->t0 << endl;
     stream << "tf = " << this->tf << endl;
     stream << "tp = " << this->tp << endl;
+    if (trailing_newline) stream << endl;
   }
 
   void SymbolicOCP::eliminateLagrangeTerms() {

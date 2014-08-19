@@ -126,12 +126,13 @@ namespace casadi {
     return *this = SXElement(scalar);
   }
 
-  void SXElement::repr(std::ostream &stream) const {
-    print(stream);
+  void SXElement::repr(std::ostream &stream, bool trailing_newline) const {
+    print(stream, trailing_newline);
   }
 
-  void SXElement::print(std::ostream &stream) const {
+  void SXElement::print(std::ostream &stream, bool trailing_newline) const {
     node->print(stream);
+    if (trailing_newline) stream << std::endl;
   }
 
   void SXElement::print(std::ostream &stream, long& remaining_calls) const {

@@ -108,10 +108,10 @@ namespace casadi {
     operator Matrix<SXElement>() const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout) const;
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /** \brief  print to stream, limited */
     void print(std::ostream &stream, long& remaining_calls) const;

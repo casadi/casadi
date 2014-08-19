@@ -673,13 +673,13 @@ namespace casadi {
 
     ///@{
     /// Printing
-    void print(std::ostream &stream=std::cout) const; // print print description
-    void repr(std::ostream &stream=std::cout) const; // print representation
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print print description
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print representation
     static std::string className(); // name of the class
-    void printScalar(std::ostream &stream=std::cout) const; // print scalar
-    void printVector(std::ostream &stream=std::cout) const; // print vector-style
-    void printDense(std::ostream &stream=std::cout) const; // Print dense matrix-stype
-    void printSparse(std::ostream &stream=std::cout) const; // print sparse matrix style
+    void printScalar(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print scalar
+    void printVector(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print vector-style
+    void printDense(std::ostream &stream=std::cout, bool trailing_newline=true) const; // Print dense matrix-stype
+    void printSparse(std::ostream &stream=std::cout, bool trailing_newline=true) const; // print sparse matrix style
     ///@}
 
     // Get the sparsity pattern

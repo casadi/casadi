@@ -416,13 +416,13 @@ namespace casadi {
     /// Timed variable (allocate if necessary)
     SX atTime(const std::string& name, double t, bool allocate=false);
 
-#ifndef SWIG
     ///  Print representation
-    void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// Print description
-    void print(std::ostream &stream=std::cout) const;
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
+#ifndef SWIG
     // Internal methods
   protected:
 

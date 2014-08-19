@@ -72,13 +72,11 @@ namespace casadi {
     /// Check inequality
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
-#ifndef SWIG
     /// Print a representation of the object
-    void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout) const;
-#endif // SWIG
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// start value: negative values will get added to length
     int start_;

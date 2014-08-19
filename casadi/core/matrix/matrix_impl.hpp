@@ -548,7 +548,7 @@ namespace casadi {
   std::string Matrix<DataType>::className() { return matrixName<DataType>(); }
 
   template<typename DataType>
-  void Matrix<DataType>::printScalar(std::ostream &stream) const {
+  void Matrix<DataType>::printScalar(std::ostream &stream, bool trailing_newline) const {
     casadi_assert_message(numel()==1, "Not a scalar");
 
     std::streamsize precision = stream.precision();
@@ -569,6 +569,7 @@ namespace casadi {
       stream << toScalar();
     }
 
+    if (trailing_newline) stream << std::endl;
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
@@ -576,7 +577,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::printVector(std::ostream &stream) const {
+  void Matrix<DataType>::printVector(std::ostream &stream, bool trailing_newline) const {
     casadi_assert_message(isVector(), "Not a vector");
 
     std::streamsize precision = stream.precision();
@@ -612,6 +613,7 @@ namespace casadi {
     }
     stream << "]";
 
+    if (trailing_newline) stream << std::endl;
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
@@ -619,7 +621,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::printDense(std::ostream &stream) const {
+  void Matrix<DataType>::printDense(std::ostream &stream, bool trailing_newline) const {
     // Print as a single line
     bool oneliner=this->size1()<=1;
 
@@ -670,6 +672,7 @@ namespace casadi {
       }
     }
 
+    if (trailing_newline) stream << std::endl;
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
@@ -677,42 +680,46 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::printSparse(std::ostream &stream) const {
+  void Matrix<DataType>::printSparse(std::ostream &stream, bool trailing_newline) const {
     if (size()==0) {
       stream << "all zero sparse: " << size1() << "-by-" << size2();
     } else {
-      stream << "sparse: " << size1() << "-by-" << size2() << ", " << size() << " nnz" << std::endl;
+      stream << "sparse: " << size1() << "-by-" << size2() << ", " << size() << " nnz";
       for (int cc=0; cc<size2(); ++cc) {
         for (int el=colind(cc); el<colind(cc+1); ++el) {
           int rr=row(el);
-          stream << " (" << rr << ", " << cc << ") -> " << at(el) << std::endl;
+          stream << std::endl << " (" << rr << ", " << cc << ") -> " << at(el);
         }
       }
     }
+    if (trailing_newline) stream << std::endl;
     stream << std::flush;
   }
 
   template<typename DataType>
-  void Matrix<DataType>::print(std::ostream &stream) const {
+  void Matrix<DataType>::print(std::ostream &stream, bool trailing_newline) const {
     if (isEmpty()) {
       stream << "[]";
     } else if (numel()==1) {
-      printScalar(stream);
+      printScalar(stream, false);
     } else if (isVector()) {
-      printVector(stream);
+      printVector(stream, false);
     } else if (std::max(size1(), size2())<=10 || static_cast<double>(size())/numel()>=0.5) {
       // if "small" or "dense"
-      printDense(stream);
+      printDense(stream, false);
     } else {
-      printSparse(stream);
+      printSparse(stream, false);
     }
+    if (trailing_newline) stream << std::endl;
   }
 
   template<typename DataType>
-  void Matrix<DataType>::repr(std::ostream &stream) const {
+  void Matrix<DataType>::repr(std::ostream &stream, bool trailing_newline) const {
     stream << className() << "(";
-    print(stream);
-    stream << ")" << std::flush;
+    print(stream, false);
+    stream << ")";
+    if (trailing_newline) stream << std::endl;
+    stream << std::flush;
   }
 
   template<typename DataType>

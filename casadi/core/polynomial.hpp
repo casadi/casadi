@@ -79,13 +79,11 @@ namespace casadi {
     /// Remove excess zeros
     void trim();
 
-#ifndef SWIG
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout) const;
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout) const;
-#endif // SWIG
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     // Add
     Polynomial operator+(const Polynomial& b) const;

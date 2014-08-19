@@ -586,15 +586,17 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
   throw CasadiException("Error in SymbolicNLP::readExpressionNL: " + msg.str());
 }
 
-void SymbolicNLP::print(std::ostream &stream) const {
+void SymbolicNLP::print(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP:" << endl;
   stream << "x = " << x << endl;
   stream << "#f=" << f.size() << endl;
   stream << "#g=" << g.size() << endl;
+  if (trailing_newline) stream << endl;
 }
 
-void SymbolicNLP::repr(std::ostream &stream) const {
+void SymbolicNLP::repr(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP(#f=" << f.size() << ",#g="<< g.size() << ")";
+  if (trailing_newline) stream << endl;
 }
 
 } // namespace casadi
