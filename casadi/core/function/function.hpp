@@ -271,6 +271,15 @@ namespace casadi {
     std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg) { return call(arg);}
     std::vector<SX> operator()(const std::vector<SX>& arg) { return call(arg);}
     std::vector<MX> operator()(const std::vector<MX>& arg) { return call(arg);}
+    IOSchemeVector<DMatrix> operator()(const IOSchemeVector<DMatrix>& arg) {
+      return outputScheme().fromVector(call(arg));
+    }
+    IOSchemeVector<SX> operator()(const IOSchemeVector<SX>& arg) {
+      return outputScheme().fromVector(call(arg));
+    }
+    IOSchemeVector<MX> operator()(const IOSchemeVector<MX>& arg) {
+      return outputScheme().fromVector(call(arg));
+    }
     ///@}
 
 #ifndef SWIG

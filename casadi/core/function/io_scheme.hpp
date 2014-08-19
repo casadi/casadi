@@ -234,6 +234,11 @@ class CASADI_CORE_EXPORT IOScheme : public SharedObject {
     return IOSchemeVector<M>(v, *this);
   }
 
+  template<class M>
+    IOSchemeVector<M> fromVector(const std::vector<M> & arg_m) {
+    casadi_assert(size()==arg_m.size());
+    return IOSchemeVector<M>(arg_m, *this);
+  }
 };
 
 } // namespace casadi
