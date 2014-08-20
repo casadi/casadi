@@ -28,7 +28,7 @@ from testsuite import TestSuite
 
     
 t = TestSuite(dirname=src,
-  suffix="py",
+  suffix="m",
   command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-r","run('%s');" % fn] + opt,
   skipdirs=[".svn","ctemplate"],
     args=sys.argv[2:]
