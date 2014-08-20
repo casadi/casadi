@@ -123,6 +123,7 @@ add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interf
 if(WITH_MATLAB)
   set(modules_matlab) 
   include_directories(${MATLAB_INCLUDE_DIR})
+  add_definitions(${MATLAB_EXTRA_CXXFLAGS})
   foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
     list(APPEND modules_matlab ${my_module}_matlab)
   endforeach()
