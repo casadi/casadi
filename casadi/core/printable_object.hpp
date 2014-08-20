@@ -57,19 +57,19 @@ namespace casadi {
 
 #ifndef SWIG
     /// Print a representation of the object to a stream (shorthand)
-    CASADI_CORE_EXPORT friend
+    inline friend
       std::ostream& operator<<(std::ostream &stream, const PrintableObject<Derived>& obj) {
       static_cast<const Derived&>(obj).repr(stream, false);
       return stream;
     }
 
     /// Return a string with a description of the object, cf. str(Object) in Python
-    CASADI_CORE_EXPORT friend std::string str(const PrintableObject<Derived>& obj) {
+    inline friend std::string str(const PrintableObject<Derived>& obj) {
       return obj.getDescription();
     }
 
     /// Return a string with a representation of the object, cf. repr(Object) in Python
-    CASADI_CORE_EXPORT friend std::string repr(const PrintableObject<Derived>& obj) {
+    inline friend std::string repr(const PrintableObject<Derived>& obj) {
       return obj.getRepresentation();
     }
 #endif // SWIG
