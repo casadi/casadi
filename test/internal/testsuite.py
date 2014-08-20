@@ -216,9 +216,12 @@ class TestSuite:
     self.stats['numtests']+=1
     print ("%02d. " % self.stats['numtests']) + fn
     t0 = time.clock()
+
     p=Popen(self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
 
     inp = None
+    if callable(self.inputs):
+      self.inputs = self.inputs(dir,fn)
     if fn in self.inputs:
       inp = self.inputs[fn]
       

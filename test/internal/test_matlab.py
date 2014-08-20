@@ -29,9 +29,11 @@ from testsuite import TestSuite
     
 t = TestSuite(dirname=src,
   suffix="m",
-  command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-r","run('%s');" % fn] + opt,
+  command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-nojvm"] + opt,
   skipdirs=[".svn","ctemplate"],
-    args=sys.argv[2:]
+   inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
+    args=sys.argv[2:],
+   stderr_trigger=["Error"],
   )
   
 t.run()
