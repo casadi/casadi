@@ -50,6 +50,9 @@ examples_indoc: examples_indoc_py examples_indoc_cpp examples_indoc_oct
 
 examples_code: examples_code_py examples_code_cpp
 
+unittests_matlab:
+	python internal/test_matlab.py matlab
+	
 # No memchecks because there is a memory leak in SuperLU
 examples_indoc_py:
 	python internal/test_py.py '../docs/api/examples'
