@@ -121,7 +121,8 @@ endforeach()
 add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
 
 if(WITH_MATLAB)
-  set(modules_matlab)
+  set(modules_matlab) 
+  include_directories(${MATLAB_INCLUDE_DIR})
   foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
     list(APPEND modules_matlab ${my_module}_matlab)
   endforeach()
