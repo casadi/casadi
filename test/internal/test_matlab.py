@@ -33,7 +33,7 @@ t = TestSuite(dirname=src,
   skipdirs=[".svn","ctemplate"],
    inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
     args=sys.argv[2:],
-   stderr_trigger=["Error"],
+   stderr_trigger=["Error",r"\?\?\?"],
   )
   
 t.run()
