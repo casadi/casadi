@@ -28,6 +28,8 @@ std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
     case SCHEME_ControlledDAEInput: return "ControlledDAEInput";
     case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
+    case SCHEME_DPLEInput: return "DPLEInput";
+    case SCHEME_DPLEOutput: return "DPLEOutput";
     case SCHEME_HNLPInput: return "HNLPInput";
     case SCHEME_DAEInput: return "DAEInput";
     case SCHEME_DAEOutput: return "DAEOutput";
@@ -75,6 +77,10 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "t, x, z, p, u, u_interp, x_major, t0, tf";
     case SCHEME_ControlSimulatorInput:
       return "x0, p, u";
+    case SCHEME_DPLEInput:
+      return "a, v";
+    case SCHEME_DPLEOutput:
+      return "p";
     case SCHEME_HNLPInput:
       return "x, p, tau";
     case SCHEME_DAEInput:
@@ -171,6 +177,13 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==0) return "x0";
       if (i==1) return "p";
       if (i==2) return "u";
+      break;
+    case SCHEME_DPLEInput:
+      if (i==0) return "a";
+      if (i==1) return "v";
+      break;
+    case SCHEME_DPLEOutput:
+      if (i==0) return "p";
       break;
     case SCHEME_HNLPInput:
       if (i==0) return "x";
@@ -454,6 +467,13 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";  // NOLINT(whitespace/line_length)
       if (i==2) return "Parameters that change over the integration intervals (dimension nu-by-(ns-1))";  // NOLINT(whitespace/line_length)
       break;
+    case SCHEME_DPLEInput:
+      if (i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
+      break;
+    case SCHEME_DPLEOutput:
+      if (i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
+      break;
     case SCHEME_HNLPInput:
       if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
       if (i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
@@ -736,6 +756,13 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==1) return "CONTROLSIMULATOR_P";
       if (i==2) return "CONTROLSIMULATOR_U";
       break;
+    case SCHEME_DPLEInput:
+      if (i==0) return "DPLE_A";
+      if (i==1) return "DPLE_V";
+      break;
+    case SCHEME_DPLEOutput:
+      if (i==0) return "DPLE_P";
+      break;
     case SCHEME_HNLPInput:
       if (i==0) return "HNL_X";
       if (i==1) return "HNL_P";
@@ -1009,6 +1036,12 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_ControlSimulatorInput:
       return 3;
       break;
+    case SCHEME_DPLEInput:
+      return 2;
+      break;
+    case SCHEME_DPLEOutput:
+      return 1;
+      break;
     case SCHEME_HNLPInput:
       return 3;
       break;
@@ -1143,6 +1176,13 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="x0") return 0;
       if (name=="p") return 1;
       if (name=="u") return 2;
+      break;
+    case SCHEME_DPLEInput:
+      if (name=="a") return 0;
+      if (name=="v") return 1;
+      break;
+    case SCHEME_DPLEOutput:
+      if (name=="p") return 0;
       break;
     case SCHEME_HNLPInput:
       if (name=="x") return 0;

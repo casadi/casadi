@@ -34,6 +34,8 @@ class IOSchemeVector;class Sparsity;
 enum InputOutputScheme {
   SCHEME_ControlledDAEInput,
   SCHEME_ControlSimulatorInput,
+  SCHEME_DPLEInput,
+  SCHEME_DPLEOutput,
   SCHEME_HNLPInput,
   SCHEME_DAEInput,
   SCHEME_DAEOutput,
