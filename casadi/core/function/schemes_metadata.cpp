@@ -26,8 +26,6 @@
 namespace casadi {
 std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_DPLEInput: return "DPLEInput";
-    case SCHEME_DPLEOutput: return "DPLEOutput";
     case SCHEME_ControlledDAEInput: return "ControlledDAEInput";
     case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
     case SCHEME_HNLPInput: return "HNLPInput";
@@ -73,10 +71,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_DPLEInput:
-      return "a, v";
-    case SCHEME_DPLEOutput:
-      return "p";
     case SCHEME_ControlledDAEInput:
       return "t, x, z, p, u, u_interp, x_major, t0, tf";
     case SCHEME_ControlSimulatorInput:
@@ -162,13 +156,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_DPLEInput:
-      if (i==0) return "a";
-      if (i==1) return "v";
-      break;
-    case SCHEME_DPLEOutput:
-      if (i==0) return "p";
-      break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "t";
       if (i==1) return "x";
@@ -451,13 +438,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_DPLEInput:
-      if (i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
-      break;
-    case SCHEME_DPLEOutput:
-      if (i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
-      break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "Global physical time. (1-by-1)";  // NOLINT(whitespace/line_length)
       if (i==1) return "non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
@@ -740,13 +720,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_DPLEInput:
-      if (i==0) return "DPLE_A";
-      if (i==1) return "DPLE_V";
-      break;
-    case SCHEME_DPLEOutput:
-      if (i==0) return "DPLE_P";
-      break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "CONTROL_DAE_T";
       if (i==1) return "CONTROL_DAE_X";
@@ -1030,12 +1003,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
 }
 int getSchemeSize(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_DPLEInput:
-      return 2;
-      break;
-    case SCHEME_DPLEOutput:
-      return 1;
-      break;
     case SCHEME_ControlledDAEInput:
       return 9;
       break;
@@ -1161,13 +1128,6 @@ int getSchemeSize(InputOutputScheme scheme) {
 }
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
   switch (scheme) {
-    case SCHEME_DPLEInput:
-      if (name=="a") return 0;
-      if (name=="v") return 1;
-      break;
-    case SCHEME_DPLEOutput:
-      if (name=="p") return 0;
-      break;
     case SCHEME_ControlledDAEInput:
       if (name=="t") return 0;
       if (name=="x") return 1;
