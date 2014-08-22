@@ -62,7 +62,6 @@ endmacro()
 add_subdirectory(core)  # needed by all except external_packages
 add_subdirectory(interfaces)             # needs external_packages
 add_subdirectory(solvers)                # needs interfaces
-add_subdirectory(control)
 
 # add a dummy custom target which does nothing but
 # depend on the other lint targets

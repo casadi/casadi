@@ -42,6 +42,11 @@ casadi_plugin(NlpSolver scpgen
 casadi_plugin(NlpSolver stabilizedsqp
   stabilized_sqp.hpp stabilized_sqp.cpp stabilized_sqp_meta.cpp)
 
+casadi_plugin(DpleSolver simple
+  simple_indef_dple_internal.hpp
+  simple_indef_dple_internal.cpp
+  simple_indef_dple_internal_meta.cpp)
+
 # Reformulations
 casadi_plugin(QpSolver nlp
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)

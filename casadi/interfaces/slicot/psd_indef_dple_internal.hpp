@@ -23,7 +23,7 @@
 #ifndef CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
 #define CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
 
-#include "../../control/dple_internal.hpp"
+#include "../../core/function/dple_internal.hpp"
 #include <casadi/interfaces/slicot/casadi_dplesolver_slicot_export.h>
 
 /** \defgroup plugin_DpleSolver_slicot

@@ -24,12 +24,12 @@
 
 %include "common.i"
 
-%import "casadi_control.i"
+%import "casadi_core.i"
 
 #define CASADI_SLICOT_INTERFACE_EXPORT
 
 %{
-#include "casadi/control/dple_solver.hpp"
+#include "casadi/core/function/dple_solver.hpp"
 #include "casadi/interfaces/slicot/slicot_tools.hpp"
 %}
 

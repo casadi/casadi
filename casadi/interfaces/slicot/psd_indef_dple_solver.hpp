@@ -23,7 +23,7 @@
 #ifndef CASADI_PSD_INDEF_DPLE_SOLVER_HPP
 #define CASADI_PSD_INDEF_DPLE_SOLVER_HPP
 
-#include "../../control/dple_solver.hpp"
+#include "../../core/function/dple_solver.hpp"
 #include <casadi/interfaces/slicot/casadi_dplesolver_slicot_export.h>
 
 namespace casadi {
