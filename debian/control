@@ -81,65 +81,6 @@ Description: development files for CasADi core module
  More information about CasADi can be found on the project website,
  http://casadi.org.
 
-Package: libcasadi-control2.0
-Section: libs
-Architecture: any
-Depends: ${shlibs:Depends},
-         ${misc:Depends},
-         libcasadi-core2.0 (= ${binary:Version})
-Description: control module for CasADi optimization framework
- CasADi is a numerical optimization / algorithmic differentiation framework.
- It can be used from C++ or Python.
- .
- It provides users with a set of building blocks that simplify the process of
- implementing highly efficient gradient-based solvers for numerical optimization
- problems in general and simulation-based nonlinear programs (optimal control)
- in particular. This can be done with a range of different methods including
- direct collocation, direct multiple shooting and indirect methods.
- .
- Contained in the package is a symbolic framework that allows constructing
- large computational graphs made up by matrix-valued operations and a
- state-of-the-art framework for algorithmic differentiation (AD) - also known
- as automatic differentiation - that operates on these computational graphs.
- Also contained is a set of solvers and interfaces to third-party solvers for
- nonlinear programming (NLP), quadratic programming (QP) and initial-value
- problems in ordinary differential equations (ODE) or diffential-algebraic
- equations (DAE). Other features of interest include generation of
- self-contained C-code and symbolic import of models from the Modelica physical
- modeling language and the AMPL algebraic modeling language.
- .
- More information about CasADi can be found on the project website,
- http://casadi.org.
-
-Package: libcasadi-control-dev
-Section: libdevel
-Architecture: any
-Depends: ${misc:Depends},
-         libcasadi-core-dev (= ${binary:Version})
-Description: development files for CasADi control module
- CasADi is a numerical optimization / algorithmic differentiation framework.
- It can be used from C++ or Python.
- .
- It provides users with a set of building blocks that simplify the process of
- implementing highly efficient gradient-based solvers for numerical optimization
- problems in general and simulation-based nonlinear programs (optimal control)
- in particular. This can be done with a range of different methods including
- direct collocation, direct multiple shooting and indirect methods.
- .
- Contained in the package is a symbolic framework that allows constructing
- large computational graphs made up by matrix-valued operations and a
- state-of-the-art framework for algorithmic differentiation (AD) - also known
- as automatic differentiation - that operates on these computational graphs.
- Also contained is a set of solvers and interfaces to third-party solvers for
- nonlinear programming (NLP), quadratic programming (QP) and initial-value
- problems in ordinary differential equations (ODE) or diffential-algebraic
- equations (DAE). Other features of interest include generation of
- self-contained C-code and symbolic import of models from the Modelica physical
- modeling language and the AMPL algebraic modeling language.
- .
- More information about CasADi can be found on the project website,
- http://casadi.org.
-
 Package: libcasadi-ipopt2.0
 Section: libs
 Architecture: any
