@@ -16045,43 +16045,14 @@ List of plugins
 
 
 
-- <a href='#plugin_DpleSolver_simple'>simple</a>
-
 - <a href='#plugin_DpleSolver_slicot'>slicot</a>
+
+- <a href='#plugin_DpleSolver_simple'>simple</a>
 
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 DpleSolver.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-simple
-------
-
-
-
-Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
-
->List of available options
-
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| linear_solver   | OT_STRING       | GenericType()   | User-defined    |
-|                 |                 |                 | linear solver   |
-|                 |                 |                 | class. Needed   |
-|                 |                 |                 | for             |
-|                 |                 |                 | sensitivities.  |
-+-----------------+-----------------+-----------------+-----------------+
-| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ptions          |                 |                 | passed to the   |
-|                 |                 |                 | linear solver.  |
-+-----------------+-----------------+-----------------+-----------------+
-
---------------------------------------------------------------------------------
 
 
 
@@ -16139,6 +16110,35 @@ new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
 +----------------+
 | t_total        |
 +----------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+simple
+------
+
+
+
+Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| linear_solver   | OT_STRING       | GenericType()   | User-defined    |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | class. Needed   |
+|                 |                 |                 | for             |
+|                 |                 |                 | sensitivities.  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ptions          |                 |                 | passed to the   |
+|                 |                 |                 | linear solver.  |
++-----------------+-----------------+-----------------+-----------------+
 
 --------------------------------------------------------------------------------
 
@@ -16211,9 +16211,9 @@ name:
 
 Name of a solver. It might be one of:
 
-- <a href='#plugin_DpleSolver_simple'>simple</a>
-
 - <a href='#plugin_DpleSolver_slicot'>slicot</a>
+
+- <a href='#plugin_DpleSolver_simple'>simple</a>
 
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
@@ -128553,10 +128553,6 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__DPLE__doc.xml
 
 
-// File: group__plugin__DpleSolver__simple.xml
-
-
-
 // File: group__HomotopyNlpSolver__doc.xml
 
 
@@ -128737,6 +128733,10 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 
 
 
+// File: group__plugin__DpleSolver__simple.xml
+
+
+
 // File: group__plugin__SocpSolver__sdp.xml
 
 
@@ -128886,12 +128886,6 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__HNLPInput.xml
 
 
-// File: group__pluginlist__DpleSolver.xml
-
-
-// File: group__plugins__DpleSolver.xml
-
-
 // File: group__pluginlist__QpSolver.xml
 
 
@@ -128914,6 +128908,12 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 
 
 // File: group__plugins__NlpSolver.xml
+
+
+// File: group__pluginlist__DpleSolver.xml
+
+
+// File: group__plugins__DpleSolver.xml
 
 
 // File: group__pluginlist__StabilizedQpSolver.xml
@@ -129038,9 +129038,6 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 
 
 // File: dir_173fa14f8112bf6d4fa5fb60c663b079.xml
-
-
-// File: dir_cc00533f663a868a74a94bae6d243fa8.xml
 
 
 // File: dir_84ec18459fb5686aa61a50c9a4a5f1ce.xml
