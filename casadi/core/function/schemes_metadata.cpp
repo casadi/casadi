@@ -28,6 +28,8 @@ std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
     case SCHEME_ControlledDAEInput: return "ControlledDAEInput";
     case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
+    case SCHEME_DLEInput: return "DLEInput";
+    case SCHEME_DLEOutput: return "DLEOutput";
     case SCHEME_DPLEInput: return "DPLEInput";
     case SCHEME_DPLEOutput: return "DPLEOutput";
     case SCHEME_HNLPInput: return "HNLPInput";
@@ -77,6 +79,10 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "t, x, z, p, u, u_interp, x_major, t0, tf";
     case SCHEME_ControlSimulatorInput:
       return "x0, p, u";
+    case SCHEME_DLEInput:
+      return "a, v";
+    case SCHEME_DLEOutput:
+      return "p";
     case SCHEME_DPLEInput:
       return "a, v";
     case SCHEME_DPLEOutput:
@@ -177,6 +183,13 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==0) return "x0";
       if (i==1) return "p";
       if (i==2) return "u";
+      break;
+    case SCHEME_DLEInput:
+      if (i==0) return "a";
+      if (i==1) return "v";
+      break;
+    case SCHEME_DLEOutput:
+      if (i==0) return "p";
       break;
     case SCHEME_DPLEInput:
       if (i==0) return "a";
@@ -467,6 +480,13 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";  // NOLINT(whitespace/line_length)
       if (i==2) return "Parameters that change over the integration intervals (dimension nu-by-(ns-1))";  // NOLINT(whitespace/line_length)
       break;
+    case SCHEME_DLEInput:
+      if (i==0) return "A matrix";  // NOLINT(whitespace/line_length)
+      if (i==1) return "V matrix";  // NOLINT(whitespace/line_length)
+      break;
+    case SCHEME_DLEOutput:
+      if (i==0) return "Lyapunov matrix";  // NOLINT(whitespace/line_length)
+      break;
     case SCHEME_DPLEInput:
       if (i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
       if (i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
@@ -756,6 +776,13 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==1) return "CONTROLSIMULATOR_P";
       if (i==2) return "CONTROLSIMULATOR_U";
       break;
+    case SCHEME_DLEInput:
+      if (i==0) return "DLE_A";
+      if (i==1) return "DLE_V";
+      break;
+    case SCHEME_DLEOutput:
+      if (i==0) return "DLE_P";
+      break;
     case SCHEME_DPLEInput:
       if (i==0) return "DPLE_A";
       if (i==1) return "DPLE_V";
@@ -1036,6 +1063,12 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_ControlSimulatorInput:
       return 3;
       break;
+    case SCHEME_DLEInput:
+      return 2;
+      break;
+    case SCHEME_DLEOutput:
+      return 1;
+      break;
     case SCHEME_DPLEInput:
       return 2;
       break;
@@ -1176,6 +1209,13 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="x0") return 0;
       if (name=="p") return 1;
       if (name=="u") return 2;
+      break;
+    case SCHEME_DLEInput:
+      if (name=="a") return 0;
+      if (name=="v") return 1;
+      break;
+    case SCHEME_DLEOutput:
+      if (name=="p") return 0;
       break;
     case SCHEME_DPLEInput:
       if (name=="a") return 0;

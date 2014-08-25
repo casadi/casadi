@@ -147,6 +147,86 @@ std::vector<M> controlsimulatorIn(const std::vector<M>& args,
 
 }
 /// \cond INTERNAL
+/// Helper function for 'DLEInput'
+
+template<class M>
+class CASADI_CORE_EXPORT DLEInputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit DLEInputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_DLEInput) {}
+};
+/// \endcond
+/// Input arguments of a \e dple solver
+///
+/// \copydoc scheme_DLEInput
+template<class M>
+DLEInputIOSchemeVector<M> dleIn(
+    const std::string &arg_s0 ="", const M &arg_m0 =M(),
+    const std::string &arg_s1 ="", const M &arg_m1 =M()) {
+  std::vector<M> ret(2);
+  std::map<std::string, M> arg;
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  typedef typename std::map<std::string, M>::const_iterator it_type;
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_DLEInput, it->first);
+    if (n==-1)
+      casadi_error("Keyword error in DLEInput: '" << it->first
+        << "' is not recognized. Available keywords are: "
+        "a, v");  // NOLINT(whitespace/line_length)
+    ret[n] = it->second;
+  }
+  return DLEInputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> dleIn(const std::vector<M>& args,
+    const std::string &arg_s0="",
+    const std::string &arg_s1="") {
+  std::vector<M> ret;
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DLEInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DLEInput, arg_s1))); // NOLINT(whitespace/line_length)
+  return ret;
+
+}
+/// \cond INTERNAL
+/// Helper function for 'DLEOutput'
+
+template<class M>
+class CASADI_CORE_EXPORT DLEOutputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit DLEOutputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_DLEOutput) {}
+};
+/// \endcond
+/// Output arguments of a \e dple solver
+///
+/// \copydoc scheme_DLEOutput
+template<class M>
+DLEOutputIOSchemeVector<M> dleOut(
+    const std::string &arg_s0 ="", const M &arg_m0 =M()) {
+  std::vector<M> ret(1);
+  std::map<std::string, M> arg;
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  typedef typename std::map<std::string, M>::const_iterator it_type;
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_DLEOutput, it->first);
+    if (n==-1)
+      casadi_error("Keyword error in DLEOutput: '" << it->first
+        << "' is not recognized. Available keywords are: "
+        "p");  // NOLINT(whitespace/line_length)
+    ret[n] = it->second;
+  }
+  return DLEOutputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> dleOut(const std::vector<M>& args,
+    const std::string &arg_s0="") {
+  std::vector<M> ret;
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  return ret;
+
+}
+/// \cond INTERNAL
 /// Helper function for 'DPLEInput'
 
 template<class M>
@@ -2253,6 +2333,8 @@ std::vector<M> stabilizedQpIn(const std::vector<M>& args,
 #define INSTANTIATE_IOSCHEME_HELPERS(T) \
 template class ControlledDAEInputIOSchemeVector<T>;\
 template class ControlSimulatorInputIOSchemeVector<T>;\
+template class DLEInputIOSchemeVector<T>;\
+template class DLEOutputIOSchemeVector<T>;\
 template class DPLEInputIOSchemeVector<T>;\
 template class DPLEOutputIOSchemeVector<T>;\
 template class HNLPInputIOSchemeVector<T>;\
