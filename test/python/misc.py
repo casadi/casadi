@@ -498,7 +498,7 @@ class Misctests(casadiTestCase):
     [g,f] = fc.get.g.f
     self.checkarray(f,DMatrix([7]))
     self.checkarray(g,DMatrix([9]))
-
+    
   def test_assertions(self):
     
     x = MX.sym("x") 
