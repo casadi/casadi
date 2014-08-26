@@ -116,6 +116,7 @@ def pythonify(s):
   s = re.sub(r"const (\w+) &",r"\1 ",s)
   s = re.sub(r"< \w+ >\(",r"(",s)
   s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
+  s = re.sub(r"(const )? ?std::pair< ?([\w\(\) ]+?) ?, ?([\w\(\) ]+?) ?> ?&?",r"(\2,\3) ",s)
   for i in range(5):
     s = re.sub(r"(const )? ?std::vector< ?([\w\(\) ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2,...] ",s)
   s = re.sub(r"StructIOSchemeVector(< ?(\w+) ?>)?",r"Structure",s)
@@ -133,6 +134,8 @@ def type_descr(a):
       return "[%s]" % ",".join(set([type_descr(i) for i in a]))
     else:
       return "[]"
+  elif isinstance(a,tuple):
+    return "(%s)" % ",".join([type_descr(i) for i in a])
   if type(a).__name__.startswith("IOSchemeVector"):
     return "scheme(%s)" % type(a).__name__[len("IOSchemeVector"):]
   else:

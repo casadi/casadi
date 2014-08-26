@@ -455,14 +455,14 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "reshape(SX,tuple(int))" in e.message
+      assert "reshape(SX,(int,int) )" in e.message
 
     try:
-      x.reshape(2,(2,2))
+      x.reshape(("a",2))
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "You have: reshape(int,tuple(int)])" in e.message
+      assert "You have: reshape((str,int))" in e.message
       
   def test_callkw(self):
       x = SX.sym("x")
