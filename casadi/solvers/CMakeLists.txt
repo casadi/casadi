@@ -61,7 +61,11 @@ casadi_plugin(DleSolver dple
   dple_to_dle.hpp
   dple_to_dle.cpp
   dple_to_dle_meta.cpp)
-  
+
+casadi_plugin(CleSolver simple
+  simple_indef_cle_internal.hpp
+  simple_indef_cle_internal.cpp
+  simple_indef_cle_internal_meta.cpp)  
 
 # Reformulations
 casadi_plugin(QpSolver nlp

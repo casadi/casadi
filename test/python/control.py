@@ -28,6 +28,15 @@ from helpers import *
 import random
 import time
 
+clesolvers = []
+try:
+  LinearSolver.loadPlugin("csparse")
+  CleSolver.loadPlugin("simple")
+  clesolvers.append(("simple",{"linear_solver": "csparse"}))
+except:
+  pass
+
+
 dlesolvers = []
 try:
   LinearSolver.loadPlugin("csparse")
@@ -73,8 +82,8 @@ except:
   pass
   
 print "DpleSolvers", dplesolvers
-
 print "DleSolvers", dlesolvers
+print "CleSolvers", clesolvers
 
 class ControlTests(casadiTestCase):
 
@@ -128,6 +137,56 @@ class ControlTests(casadiTestCase):
           
           self.checkarray(a0ref,a1ref)
           self.checkarray(a0,a1)
+
+          self.checkfunction(solver,refsol,sens_der=True,hessian=True,evals=2)
+
+  @memory_heavy()
+  def test_cle_small(self):
+    
+    for Solver, options in clesolvers:
+        for n in [2,3,4]:
+          numpy.random.seed(1)
+          print (n)
+          A_ = DMatrix(numpy.random.random((n,n)))
+          
+          v = DMatrix(numpy.random.random((n,n)))
+          V_ = mul(v,v.T)
+          
+          
+          solver = CleSolver(Solver,Sparsity.dense(n,n),Sparsity.dense(n,n))
+          solver.setOption(options)
+          solver.init()
+          solver.setInput(A_,DLE_A)
+          solver.setInput(V_,DLE_V)
+          
+          As = MX.sym("A",n,n)
+          Vs = MX.sym("V",n,n)
+          
+          Vss = (Vs+Vs.T)/2
+          
+          e = DMatrix.eye(n)
+          
+          A_total = - c.kron(e,As) - c.kron(As,e)
+          
+          
+          Pf = solve(A_total,vec(Vss),"csparse")
+          
+          refsol = MXFunction([As,Vs],[Pf.reshape((n,n))])
+          refsol.init()
+          
+          refsol.setInput(A_,DLE_A)
+          refsol.setInput(V_,DLE_V)
+          
+          solver.evaluate()
+          X = solver.getOutput()
+          refsol.evaluate()
+          Xref = refsol.getOutput()
+          
+          a0 = mul([A_,X]) + mul([X,A_.T])+V_
+          a0ref = mul([A_,Xref]) + mul([Xref,A_.T])+V_
+          
+          self.checkarray(a0,a0ref)
+          self.checkarray(a0,DMatrix.zeros(n,n))
 
           self.checkfunction(solver,refsol,sens_der=True,hessian=True,evals=2)
 
