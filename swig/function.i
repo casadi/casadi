@@ -44,6 +44,8 @@
 #include "casadi/core/function/custom_function.hpp"
 #include "casadi/core/function/nullspace.hpp"
 #include "casadi/core/function/dple_solver.hpp"
+#include "casadi/core/function/dle_solver.hpp"
+#include "casadi/core/function/cle_solver.hpp"
 %}
 
 #ifdef SWIGOCTAVE
@@ -221,6 +223,8 @@ def PyFunction(obj,inputs,outputs):
 %include "casadi/core/functor.hpp"
 %include "casadi/core/function/nullspace.hpp"
 %include "casadi/core/function/dple_solver.hpp"
+%include "casadi/core/function/dle_solver.hpp"
+%include "casadi/core/function/cle_solver.hpp"
 
 %template(IntegratorVector) std::vector<casadi::Integrator>;
 %template(Pair_Function_Function) std::pair<casadi::Function,casadi::Function>;

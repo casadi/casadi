@@ -47,6 +47,22 @@ casadi_plugin(DpleSolver simple
   simple_indef_dple_internal.cpp
   simple_indef_dple_internal_meta.cpp)
 
+casadi_plugin(DpleSolver condensing
+  condensing_indef_dple_internal.hpp
+  condensing_indef_dple_internal.cpp
+  condensing_indef_dple_internal_meta.cpp)
+  
+casadi_plugin(DleSolver simple
+  simple_indef_dle_internal.hpp
+  simple_indef_dle_internal.cpp
+  simple_indef_dle_internal_meta.cpp)
+  
+casadi_plugin(DleSolver dple
+  dple_to_dle.hpp
+  dple_to_dle.cpp
+  dple_to_dle_meta.cpp)
+  
+
 # Reformulations
 casadi_plugin(QpSolver nlp
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)

@@ -28,6 +28,25 @@ from helpers import *
 import random
 import time
 
+dlesolvers = []
+try:
+  LinearSolver.loadPlugin("csparse")
+  DleSolver.loadPlugin("simple")
+  dlesolvers.append(("simple",{"linear_solver": "csparse"}))
+except:
+  pass
+
+try:
+  LinearSolver.loadPlugin("csparse")
+  DleSolver.loadPlugin("dple")
+  dlesolvers.append(("dple",{"dple_solver": "simple", "dple_solver_options": {"linear_solver": "csparse"}}))
+except:
+  pass
+  
+LinearSolver.loadPlugin("csparse")
+DleSolver.loadPlugin("simple")
+dlesolvers.append(("simple",{"linear_solver": "csparse"}))
+
 dplesolvers = []
 try:
   LinearSolver.loadPlugin("csparse")
@@ -44,10 +63,74 @@ try:
 except:
   pass
   
+DpleSolver.loadPlugin("condensing")
+
+try:
+  LinearSolver.loadPlugin("csparse")
+  DpleSolver.loadPlugin("condensing")
+  dplesolvers.append(("condensing",{"dle_solver": "simple","dle_solver_options": {"linear_solver": "csparse"}}))
+except:
+  pass
   
-print dplesolvers
+print "DpleSolvers", dplesolvers
+
+print "DleSolvers", dlesolvers
 
 class ControlTests(casadiTestCase):
+
+  @memory_heavy()
+  def test_dle_small(self):
+    
+    for Solver, options in dlesolvers:
+        for n in [2,3,4]:
+          numpy.random.seed(1)
+          print (n)
+          A_ = DMatrix(numpy.random.random((n,n)))
+          
+          v = DMatrix(numpy.random.random((n,n)))
+          V_ = mul(v,v.T)
+          
+          
+          solver = DleSolver(Solver,Sparsity.dense(n,n),Sparsity.dense(n,n))
+          solver.setOption(options)
+          solver.init()
+          solver.setInput(A_,DLE_A)
+          solver.setInput(V_,DLE_V)
+          
+          As = MX.sym("A",n,n)
+          Vs = MX.sym("V",n,n)
+          
+          Vss = (Vs+Vs.T)/2
+          
+          A_total = DMatrix.eye(n*n) - c.kron(As,As)
+          
+          
+          Pf = solve(A_total,vec(Vss),"csparse")
+          
+          refsol = MXFunction([As,Vs],[Pf.reshape((n,n))])
+          refsol.init()
+          
+          refsol.setInput(A_,DLE_A)
+          refsol.setInput(V_,DLE_V)
+          
+          solver.evaluate()
+          X = solver.getOutput()
+          refsol.evaluate()
+          Xref = refsol.getOutput()
+          
+          a0 = (mul([A_,X,A_.T])+V_)
+          a0ref = (mul([A_,Xref,A_.T])+V_)
+          
+
+            
+          a1 = X
+          a1ref = Xref
+          
+          self.checkarray(a0ref,a1ref)
+          self.checkarray(a0,a1)
+
+          self.checkfunction(solver,refsol,sens_der=True,hessian=True,evals=2)
+
   
   @memory_heavy()
   def test_dple_small(self):
@@ -116,7 +199,7 @@ class ControlTests(casadiTestCase):
   def test_dple_large(self):
     
     for Solver, options in dplesolvers:
-      if "simple" in str(Solver): continue
+      if "simple" in str(Solver) or "simple" in str(options): continue
       for K in ([1,2,3,4,5] if args.run_slow else [1,2,3]):
         for n in ([2,3,4,8,16,32] if args.run_slow else [2,3,4]):
           numpy.random.seed(1)

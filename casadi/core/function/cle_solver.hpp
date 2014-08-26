@@ -20,12 +20,12 @@
  *
  */
 
-#ifndef CASADI_DLE_SOLVER_HPP
-#define CASADI_DLE_SOLVER_HPP
+#ifndef CASADI_CLE_SOLVER_HPP
+#define CASADI_CLE_SOLVER_HPP
 
 #include "function.hpp"
 
-/** \defgroup DLE_doc Discrete periodic Lyapunov Equation solver
+/** \defgroup CLE_doc Discrete periodic Lyapunov Equation solver
 
 
     Given matrices \f$A\f$ and symmetric \f$V\f$
@@ -38,58 +38,58 @@
     finds \f$P\f$ that satisfies:
 
     \verbatim
-    P = A P A' + V
+    0 = A P  + P A' + V
     \endverbatim
 
 
 */
 namespace casadi {
 
-  /// Input arguments of a \e dle solver [dleIn]
-  enum DLEInput {
+  /// Input arguments of a \e cle solver [cleIn]
+  enum CLEInput {
     /// A matrix [a]
-    DLE_A,
+    CLE_A,
     /// V matrix [v]
-    DLE_V,
-    DLE_NUM_IN
+    CLE_V,
+    CLE_NUM_IN
   };
 
-  /// Output arguments of a \e dle solver [dleOut]
-  enum DLEOutput {
+  /// Output arguments of a \e cle solver [cleOut]
+  enum CLEOutput {
     /// Lyapunov matrix [p]
-    DLE_P,
+    CLE_P,
     /// Number of arguments.
-    DLE_NUM_OUT
+    CLE_NUM_OUT
   };
 
   /// Forward declaration of internal class
-  class DleInternal;
+  class CleInternal;
 
   /**  \brief Base class for Discrete Lyapunov Equation Solvers
 
-     @copydoc DLE_doc
+     @copydoc CLE_doc
      
-      \generalsection{DleSolver}
-      \pluginssection{DleSolver}
+      \generalsection{CleSolver}
+      \pluginssection{CleSolver}
       
        \author Joris Gillis
       \date 2014
 
   */
-  class CASADI_CORE_EXPORT DleSolver : public Function {
+  class CASADI_CORE_EXPORT CleSolver : public Function {
   public:
     /// Default constructor
-    DleSolver();
+    CleSolver();
 
     /// Clone
-    DleSolver clone() const;
+    CleSolver clone() const;
 
-    /** \brief DleSolver solver factory
-    * \param name \pluginargument{DleSolver}
+    /** \brief CleSolver solver factory
+    * \param name \pluginargument{CleSolver}
     * \param[in] A Matrix A
     * \param[in] V Matrix V
     */
-    DleSolver(const std::string& name,
+    CleSolver(const std::string& name,
                const Sparsity & A,
                const Sparsity & V);
 
@@ -97,10 +97,10 @@ namespace casadi {
     void printStats(std::ostream &stream=std::cout) const;
 
     /// Access functions of the node
-    DleInternal* operator->();
+    CleInternal* operator->();
 
     /// Access functions of the node
-    const DleInternal* operator->() const;
+    const CleInternal* operator->() const;
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
@@ -114,4 +114,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_DLE_SOLVER_HPP
+#endif // CASADI_CLE_SOLVER_HPP
