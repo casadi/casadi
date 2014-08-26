@@ -4462,6 +4462,12 @@
 %exception casadi::DAEOutputIOSchemeVector< M >::DAEOutputIOSchemeVector(const std::vector< M > &t) {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
+%exception casadi::DLEInputIOSchemeVector< M >::DLEInputIOSchemeVector(const std::vector< M > &t) {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
+%exception casadi::DLEOutputIOSchemeVector< M >::DLEOutputIOSchemeVector(const std::vector< M > &t) {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
 %exception casadi::DPLEInputIOSchemeVector< M >::DPLEInputIOSchemeVector(const std::vector< M > &t) {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }

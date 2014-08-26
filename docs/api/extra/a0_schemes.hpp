@@ -42,16 +42,6 @@
 <tr><td>LINSOL_B</td><td>B</td><td>The right-hand-side matrix b: dense, (n x m) .</td></tr>
 </table>
 */
-/** \defgroup scheme_SOCPOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::SOCPOutput  (SOCP_SOLVER_NUM_OUT = 4) [socpOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SOCP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
-</table>
-*/
 /** \defgroup scheme_QpSolverInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::QpSolverInput  (QP_SOLVER_NUM_IN = 9) [qpIn]</caption>
@@ -67,12 +57,27 @@
 <tr><td>QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
 </table>
 */
+/** \defgroup scheme_DLEInput
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::DLEInput  (DLE_NUM_IN = 2) [dleIn]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>DLE_A</td><td>a</td><td>A matrix .</td></tr>
+<tr><td>DLE_V</td><td>v</td><td>V matrix .</td></tr>
+</table>
+*/
 /** \defgroup scheme_SOCPStruct
 <a name='schemes'></a><table>
 <caption>Struct scheme: casadi::SOCPStruct  ( = 2) [socpStruct]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>SOCP_STRUCT_G</td><td>g</td><td>The horizontal stack of all matrices Gi: ( n x N) .</td></tr>
 <tr><td>SOCP_STRUCT_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
+</table>
+*/
+/** \defgroup scheme_DLEOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::DLEOutput  (DLE_NUM_OUT = 1) [dleOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>DLE_P</td><td>p</td><td>Lyapunov matrix .</td></tr>
 </table>
 */
 /** \defgroup scheme_SDPInput
@@ -156,13 +161,13 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::InputOutputScheme  ( = 41) []</caption>
+<caption>Input scheme: casadi::InputOutputScheme  ( = 43) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::InputOutputScheme  ( = 41) []</caption>
+<caption>Output scheme: casadi::InputOutputScheme  ( = 43) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
@@ -202,6 +207,16 @@
 <tr><td>SDQP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
 <tr><td>SDQP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
 <tr><td>SDQP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
+</table>
+*/
+/** \defgroup scheme_SOCPOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::SOCPOutput  (SOCP_SOLVER_NUM_OUT = 4) [socpOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>SOCP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
 </table>
 */
 /** \defgroup scheme_SDQPInput
@@ -517,6 +532,22 @@
 @copydoc scheme_IntegratorOutput
 */
 /// \endcond
+/// \cond INTERNAL
+/** \class casadi::DleInternal
+\n
+\par
+@copydoc scheme_DLEInput
+<br/>
+@copydoc scheme_DLEOutput
+*/
+/// \endcond
+/** \addtogroup general_DleSolver
+\n
+\par
+@copydoc scheme_DLEInput
+<br/>
+@copydoc scheme_DLEOutput
+*/
 /// \cond INTERNAL
 /** \class casadi::DpleInternal
 \n
