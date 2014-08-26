@@ -26,6 +26,8 @@
 namespace casadi {
 std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
+    case SCHEME_CLEInput: return "CLEInput";
+    case SCHEME_CLEOutput: return "CLEOutput";
     case SCHEME_ControlledDAEInput: return "ControlledDAEInput";
     case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
     case SCHEME_DLEInput: return "DLEInput";
@@ -75,6 +77,10 @@ std::string getSchemeName(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
   switch (scheme) {
+    case SCHEME_CLEInput:
+      return "a, v";
+    case SCHEME_CLEOutput:
+      return "p";
     case SCHEME_ControlledDAEInput:
       return "t, x, z, p, u, u_interp, x_major, t0, tf";
     case SCHEME_ControlSimulatorInput:
@@ -168,6 +174,13 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
   switch (scheme) {
+    case SCHEME_CLEInput:
+      if (i==0) return "a";
+      if (i==1) return "v";
+      break;
+    case SCHEME_CLEOutput:
+      if (i==0) return "p";
+      break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "t";
       if (i==1) return "x";
@@ -464,6 +477,13 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
+    case SCHEME_CLEInput:
+      if (i==0) return "A matrix";  // NOLINT(whitespace/line_length)
+      if (i==1) return "V matrix";  // NOLINT(whitespace/line_length)
+      break;
+    case SCHEME_CLEOutput:
+      if (i==0) return "Lyapunov matrix";  // NOLINT(whitespace/line_length)
+      break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "Global physical time. (1-by-1)";  // NOLINT(whitespace/line_length)
       if (i==1) return "non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
@@ -760,6 +780,13 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
+    case SCHEME_CLEInput:
+      if (i==0) return "CLE_A";
+      if (i==1) return "CLE_V";
+      break;
+    case SCHEME_CLEOutput:
+      if (i==0) return "CLE_P";
+      break;
     case SCHEME_ControlledDAEInput:
       if (i==0) return "CONTROL_DAE_T";
       if (i==1) return "CONTROL_DAE_X";
@@ -1057,6 +1084,12 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
 }
 int getSchemeSize(InputOutputScheme scheme) {
   switch (scheme) {
+    case SCHEME_CLEInput:
+      return 2;
+      break;
+    case SCHEME_CLEOutput:
+      return 1;
+      break;
     case SCHEME_ControlledDAEInput:
       return 9;
       break;
@@ -1194,6 +1227,13 @@ int getSchemeSize(InputOutputScheme scheme) {
 }
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
   switch (scheme) {
+    case SCHEME_CLEInput:
+      if (name=="a") return 0;
+      if (name=="v") return 1;
+      break;
+    case SCHEME_CLEOutput:
+      if (name=="p") return 0;
+      break;
     case SCHEME_ControlledDAEInput:
       if (name=="t") return 0;
       if (name=="x") return 1;

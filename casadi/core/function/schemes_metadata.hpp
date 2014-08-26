@@ -32,6 +32,8 @@ namespace casadi {
 template <class T>
 class IOSchemeVector;class Sparsity;
 enum InputOutputScheme {
+  SCHEME_CLEInput,
+  SCHEME_CLEOutput,
   SCHEME_ControlledDAEInput,
   SCHEME_ControlSimulatorInput,
   SCHEME_DLEInput,

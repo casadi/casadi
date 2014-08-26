@@ -47,6 +47,96 @@ def IOSchemeVector(arg,io_scheme):
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
+def cleIn(*dummy,**kwargs):
+  """
+  Helper function for 'CLEInput'
+
+  Two use cases:
+     a) arg = cleIn(a=my_a, v=my_v)
+          all arguments optional
+     b) a, v = cleIn(arg,"a", "v")
+          all arguments after the first optional
+  Input arguments of a \e cle solver
+  
+  Keyword arguments::
+
+    a -- A matrix [CLE_A]
+    v -- V matrix [CLE_V]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of cleIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_CLEInput,n)] for n in dummy[1:]]
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = []
+  if 'v' in kwargs:
+    v = kwargs['v']
+  for k in kwargs.keys():
+    if not(k in ['a','v']):
+      raise Exception("Keyword error in cleIn: '%s' is not recognized. Available keywords are: a, v" % k )
+  return IOSchemeVector([a,v], IOScheme(SCHEME_CLEInput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(cleIn) cleIn<casadi::SX>;
+%template(cleIn) cleIn<casadi::MX>;
+%template(cleIn) cleIn<casadi::Sparsity>;
+%template(IOSchemeVectorCLEInputSX) CLEInputIOSchemeVector<SX>;
+%template(IOSchemeVectorCLEInputMX) CLEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorCLEInputSparsity) CLEInputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorCLEInput) IOSchemeVectorCLEInputSX;
+%rename(IOSchemeVectorCLEInput) IOSchemeVectorCLEInputMX;
+%rename(IOSchemeVectorCLEInput) IOSchemeVectorCLEInputSparsity;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def cleOut(*dummy,**kwargs):
+  """
+  Helper function for 'CLEOutput'
+
+  Two use cases:
+     a) arg = cleOut(p=my_p)
+          all arguments optional
+     b) p = cleOut(arg,"p")
+          all arguments after the first optional
+  Output arguments of a \e cle solver
+  
+  Keyword arguments::
+
+    p -- Lyapunov matrix [CLE_P]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of cleOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_CLEOutput,n)] for n in dummy[1:]]
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  for k in kwargs.keys():
+    if not(k in ['p']):
+      raise Exception("Keyword error in cleOut: '%s' is not recognized. Available keywords are: p" % k )
+  return IOSchemeVector([p], IOScheme(SCHEME_CLEOutput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(cleOut) cleOut<casadi::SX>;
+%template(cleOut) cleOut<casadi::MX>;
+%template(cleOut) cleOut<casadi::Sparsity>;
+%template(IOSchemeVectorCLEOutputSX) CLEOutputIOSchemeVector<SX>;
+%template(IOSchemeVectorCLEOutputMX) CLEOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorCLEOutputSparsity) CLEOutputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorCLEOutput) IOSchemeVectorCLEOutputSX;
+%rename(IOSchemeVectorCLEOutput) IOSchemeVectorCLEOutputMX;
+%rename(IOSchemeVectorCLEOutput) IOSchemeVectorCLEOutputSparsity;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
 def controldaeIn(*dummy,**kwargs):
   """
   Helper function for 'ControlledDAEInput'
@@ -182,7 +272,7 @@ def dleIn(*dummy,**kwargs):
           all arguments optional
      b) a, v = dleIn(arg,"a", "v")
           all arguments after the first optional
-  Input arguments of a \e dple solver
+  Input arguments of a \e dle solver
   
   Keyword arguments::
 
@@ -229,7 +319,7 @@ def dleOut(*dummy,**kwargs):
           all arguments optional
      b) p = dleOut(arg,"p")
           all arguments after the first optional
-  Output arguments of a \e dple solver
+  Output arguments of a \e dle solver
   
   Keyword arguments::
 
