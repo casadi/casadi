@@ -114,12 +114,23 @@
 <tr><td>LP_STRUCT_A</td><td>a</td><td>The matrix A: sparse .</td></tr>
 </table>
 */
-/** \defgroup scheme_NLPOutput
+/** \defgroup scheme_QcqpSolverOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::NLPOutput  (NL_NUM_OUT = 2) [nlpOut]</caption>
+<caption>Output scheme: casadi::QcqpSolverOutput  (QCQP_SOLVER_NUM_OUT = 4) [qcqpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NL_F</td><td>f</td><td>Objective function .</td></tr>
-<tr><td>NL_G</td><td>g</td><td>Constraint function .</td></tr>
+<tr><td>QCQP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
+<tr><td>QCQP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
+<tr><td>QCQP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
+<tr><td>QCQP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
+</table>
+*/
+/** \defgroup scheme_DAEOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::DAEOutput  (DAE_NUM_OUT = 3) [daeOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>DAE_ODE</td><td>ode</td><td>Right hand side of the implicit ODE .</td></tr>
+<tr><td>DAE_ALG</td><td>alg</td><td>Right hand side of algebraic equations .</td></tr>
+<tr><td>DAE_QUAD</td><td>quad</td><td>Right hand side of quadratures equations .</td></tr>
 </table>
 */
 /** \defgroup scheme_DPLEInput
@@ -128,6 +139,13 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>DPLE_A</td><td>a</td><td>A matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
 <tr><td>DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
+</table>
+*/
+/** \defgroup scheme_CLEOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::CLEOutput  (CLE_NUM_OUT = 1) [cleOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>CLE_P</td><td>p</td><td>Lyapunov matrix .</td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput
@@ -140,13 +158,12 @@
 <tr><td>DAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
 </table>
 */
-/** \defgroup scheme_DAEOutput
+/** \defgroup scheme_NLPOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::DAEOutput  (DAE_NUM_OUT = 3) [daeOut]</caption>
+<caption>Output scheme: casadi::NLPOutput  (NL_NUM_OUT = 2) [nlpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DAE_ODE</td><td>ode</td><td>Right hand side of the implicit ODE .</td></tr>
-<tr><td>DAE_ALG</td><td>alg</td><td>Right hand side of algebraic equations .</td></tr>
-<tr><td>DAE_QUAD</td><td>quad</td><td>Right hand side of quadratures equations .</td></tr>
+<tr><td>NL_F</td><td>f</td><td>Objective function .</td></tr>
+<tr><td>NL_G</td><td>g</td><td>Constraint function .</td></tr>
 </table>
 */
 /** \defgroup scheme_QpSolverOutput
@@ -161,13 +178,13 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::InputOutputScheme  ( = 43) []</caption>
+<caption>Input scheme: casadi::InputOutputScheme  ( = 45) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::InputOutputScheme  ( = 43) []</caption>
+<caption>Output scheme: casadi::InputOutputScheme  ( = 45) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
@@ -297,14 +314,12 @@
 <tr><td>SDQP_STRUCT_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
 </table>
 */
-/** \defgroup scheme_QcqpSolverOutput
+/** \defgroup scheme_CLEInput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::QcqpSolverOutput  (QCQP_SOLVER_NUM_OUT = 4) [qcqpOut]</caption>
+<caption>Input scheme: casadi::CLEInput  (CLE_NUM_IN = 2) [cleIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QCQP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
-<tr><td>QCQP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
-<tr><td>QCQP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
-<tr><td>QCQP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
+<tr><td>CLE_A</td><td>a</td><td>A matrix .</td></tr>
+<tr><td>CLE_V</td><td>v</td><td>V matrix .</td></tr>
 </table>
 */
 /** \defgroup scheme_RDAEOutput
@@ -485,12 +500,37 @@
 */
 /// \endcond
 /// \cond INTERNAL
+/** \class casadi::CleInternal
+\n
+\par
+@copydoc scheme_CLEInput
+<br/>
+@copydoc scheme_CLEOutput
+*/
+/// \endcond
+/** \addtogroup general_CleSolver
+\n
+\par
+@copydoc scheme_CLEInput
+<br/>
+@copydoc scheme_CLEOutput
+*/
+/// \cond INTERNAL
 /** \class casadi::CollocationIntegrator
 \n
 \par
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::CondensingIndefDpleInternal
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -564,6 +604,15 @@
 <br/>
 @copydoc scheme_DPLEOutput
 */
+/// \cond INTERNAL
+/** \class casadi::DpleToDle
+\n
+\par
+@copydoc scheme_DLEInput
+<br/>
+@copydoc scheme_DLEOutput
+*/
+/// \endcond
 /// \cond INTERNAL
 /** \class casadi::DsdpInterface
 \n
@@ -893,6 +942,24 @@
 @copydoc scheme_NlpSolverInput
 <br/>
 @copydoc scheme_NlpSolverOutput
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::SimpleIndefCleInternal
+\n
+\par
+@copydoc scheme_CLEInput
+<br/>
+@copydoc scheme_CLEOutput
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::SimpleIndefDleInternal
+\n
+\par
+@copydoc scheme_DLEInput
+<br/>
+@copydoc scheme_DLEOutput
 */
 /// \endcond
 /// \cond INTERNAL

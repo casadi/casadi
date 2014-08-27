@@ -424,6 +424,24 @@
 %exception  casadi::Determinant::printPart(std::ostream &stream, int part) const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
+%exception  casadi::DpleToDle::clone() const  {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
+%exception  casadi::DpleToDle::create(const Sparsity &A, const Sparsity &V) const  {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
+%exception  casadi::DpleToDle::evaluate() {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
+%exception  casadi::DpleToDle::getDerivative(int nfwd, int nadj) {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
+%exception  casadi::DpleToDle::init() {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
+%exception  casadi::DpleToDle::printStats(std::ostream &stream) const  {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
 %exception  casadi::DsdpInterface::clone() const  {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
@@ -4417,6 +4435,12 @@
 %exception casadi::BinaryMX< ScX, ScY >::BinaryMX(Operation op, const MX &x, const MX &y) {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
+%exception casadi::CLEInputIOSchemeVector< M >::CLEInputIOSchemeVector(const std::vector< M > &t) {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
+%exception casadi::CLEOutputIOSchemeVector< M >::CLEOutputIOSchemeVector(const std::vector< M > &t) {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
 %exception casadi::CallFunction::CallFunction(const Function &fcn, std::vector< MX > arg) {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
@@ -4481,6 +4505,9 @@
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception casadi::Determinant::Determinant(const MX &x) {
+ try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
+}
+%exception casadi::DpleToDle::DpleToDle(const Sparsity &A, const Sparsity &V) {
  try { INTERNAL_MSG() $action } CATCH_OR_RETHROW 
 }
 %exception casadi::DsdpInterface::DsdpInterface(const std::vector< Sparsity > &st) {

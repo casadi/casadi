@@ -2042,6 +2042,1007 @@ Joris Gillis
 C++ includes: casadi_options.hpp ";
 
 
+// File: classcasadi_1_1CLEInputIOSchemeVector.xml
+%feature("docstring") casadi::CLEInputIOSchemeVector::getRepresentation "[INTERNAL]  Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::CLEInputIOSchemeVector::repr "[INTERNAL]
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::CLEInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+
+%feature("docstring") casadi::CLEInputIOSchemeVector "[INTERNAL]  Helper
+function for 'CLEInput'
+
+C++ includes: schemes_helpers.hpp ";
+
+%feature("docstring") casadi::CLEInputIOSchemeVector::CLEInputIOSchemeVector
+"[INTERNAL] ";
+
+%feature("docstring") casadi::CLEInputIOSchemeVector::print "[INTERNAL]
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::CLEInputIOSchemeVector::__len__ "[INTERNAL]
+";
+
+%feature("docstring") casadi::CLEInputIOSchemeVector::vector "[INTERNAL] ";
+
+%feature("docstring") casadi::CLEInputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
+
+";
+
+
+// File: classcasadi_1_1CLEOutputIOSchemeVector.xml
+%feature("docstring") casadi::CLEOutputIOSchemeVector::print "[INTERNAL]
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::CLEOutputIOSchemeVector::getRepresentation "[INTERNAL]  Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::CLEOutputIOSchemeVector::vector "[INTERNAL]
+";
+
+%feature("docstring") casadi::CLEOutputIOSchemeVector "[INTERNAL]  Helper
+function for 'CLEOutput'
+
+C++ includes: schemes_helpers.hpp ";
+
+%feature("docstring") casadi::CLEOutputIOSchemeVector::repr "[INTERNAL]
+Print a representation of the object.
+
+";
+
+%feature("docstring")
+casadi::CLEOutputIOSchemeVector::CLEOutputIOSchemeVector "[INTERNAL] ";
+
+%feature("docstring") casadi::CLEOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+
+%feature("docstring") casadi::CLEOutputIOSchemeVector::__len__ "[INTERNAL]
+";
+
+%feature("docstring") casadi::CLEOutputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
+
+";
+
+
+// File: classcasadi_1_1CleSolver.xml
+
+
+/*  Simple Getters & Setters  */
+
+/*  Advanced Getters  */
+
+/*  Option Functionality  */ %feature("docstring")
+casadi::CleSolver::checkInputs " [INTERNAL]  Check if the numerical values
+of the supplied bounds make sense.
+
+";
+
+%feature("docstring") casadi::CleSolver::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::CleSolver::evaluate "
+
+Evaluate.
+
+";
+
+%feature("docstring") casadi::CleSolver::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring") casadi::CleSolver::getOptionDescription "
+
+Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::CleSolver::getDescription "
+
+Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::CleSolver::printOptions "
+
+Print options to a stream.
+
+";
+
+%feature("docstring") casadi::CleSolver::get "
+
+>  const SharedObjectNode * casadi::SharedObject::get() const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get a const pointer to the node.
+
+>  SharedObjectNode * casadi::SharedObject::get()
+------------------------------------------------------------------------
+[INTERNAL] 
+Get a pointer to the node.
+
+";
+
+%feature("docstring") casadi::CleSolver::getOptionEnumValue "[INTERNAL]
+Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::CleSolver::spCanEvaluate "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::CleSolver::setJacobian "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
+
+";
+
+%feature("docstring") casadi::CleSolver::setNumOutputs "
+
+Set the number of function outputs.
+
+";
+
+%feature("docstring") casadi::CleSolver::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::CleSolver::getOptionAllowedIndex "[INTERNAL]
+Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::CleSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+values.
+
+";
+
+%feature("docstring") casadi::CleSolver::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring") casadi::CleSolver::generateCode "
+
+>  void casadi::Function::generateCode(const std::string &filename, bool generate_main=false)
+------------------------------------------------------------------------
+
+Export / Generate C code for the function.
+
+>  std::string casadi::Function::generateCode()
+
+>  void casadi::Function::generateCode(std::ostream &filename, bool generate_main=false)
+------------------------------------------------------------------------
+
+Generate C code for the function.
+
+";
+
+%feature("docstring") casadi::CleSolver::inputScheme "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring") casadi::CleSolver::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::CleSolver::spInit "[INTERNAL]  Reset the
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::CleSolver::outputS "
+
+>  DMatrix& casadi::IOInterface< Function  >::outputS(int i)
+------------------------------------------------------------------------
+[INTERNAL] 
+Access an output.
+
+>  const DMatrix& casadi::IOInterface< Function  >::outputS(int i) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Const access an output.
+
+";
+
+%feature("docstring") casadi::CleSolver::setJacSparsity "
+
+Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::CleSolver::assignNode "[INTERNAL]  Assign the
+node to a node class pointer (or null)
+
+";
+
+%feature("docstring") casadi::CleSolver::hasOption "
+
+check if there is an option str
+
+";
+
+%feature("docstring") casadi::CleSolver::getInput "
+
+>  Matrix<double> casadi::IOInterface< Function  >::getInput(int iind=0) const
+------------------------------------------------------------------------
+
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+>  Matrix<double> casadi::IOInterface< Function  >::getInput(const std::string &iname) const
+------------------------------------------------------------------------
+
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+>  void casadi::IOInterface< Function  >::getInput(T val, int iind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+>  void casadi::IOInterface< Function  >::getInput(T val, const std::string &iname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::CleSolver::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::CleSolver::callParallel "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
+
+";
+
+%feature("docstring") casadi::CleSolver::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") casadi::CleSolver::input "
+
+[UNSAFE] Obtain reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring") casadi::CleSolver::printStats "
+
+Print solver statistics.
+
+";
+
+%feature("docstring") casadi::CleSolver::setInput "
+
+>  void casadi::IOInterface< Function  >::setInput(T val, int iind=0)
+------------------------------------------------------------------------
+
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+>  void casadi::IOInterface< Function  >::setInput(T val, const std::string &iname)
+------------------------------------------------------------------------
+
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::CleSolver::getOutputScheme "
+
+Get output scheme.
+
+";
+
+%feature("docstring") casadi::CleSolver::setOutputScheme "
+
+Set output scheme.
+
+";
+
+%feature("docstring") casadi::CleSolver::schemeEntry "[INTERNAL]  Find the
+index for a string describing a particular entry of a scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::CleSolver::setInputScheme "
+
+Set input scheme.
+
+";
+
+%feature("docstring") casadi::CleSolver::makeUnique "
+
+>  void casadi::SharedObject::makeUnique(bool clone_members=true)
+------------------------------------------------------------------------
+
+Make unique.
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object
+
+>  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
+------------------------------------------------------------------------
+[INTERNAL] 
+SWIGINTERNAL
+
+";
+
+%feature("docstring") casadi::CleSolver::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::CleSolver::outputSchemeEntry "[INTERNAL]
+Find the index for a string describing a particular entry of an output
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::CleSolver::addMonitor "
+
+Add modules to be monitored.
+
+";
+
+%feature("docstring") casadi::CleSolver::getNumOutputs "
+
+Get the number of function outputs.
+
+";
+
+%feature("docstring") casadi::CleSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::CleSolver::assignNodeNoCount "[INTERNAL]
+Assign the node to a node class pointer without reference counting.
+
+improper use will cause memory leaks!
+
+";
+
+%feature("docstring") casadi::CleSolver::CleSolver "
+
+>  casadi::CleSolver::CleSolver()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  casadi::CleSolver::CleSolver(const std::string &name, const Sparsity &A, const Sparsity &V)
+------------------------------------------------------------------------
+
+CleSolver solver factory.
+
+Parameters:
+-----------
+
+name:
+
+Name of a solver. It might be one of:
+
+- <a href='#plugin_CleSolver_simple'>simple</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+CleSolver.doc(\"myextraplugin\")
+
+Parameters:
+-----------
+
+A:   Matrix A
+
+V:   Matrix V
+
+";
+
+%feature("docstring") casadi::CleSolver::getNumInputNonzeros "
+
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::CleSolver::setFullJacobian "
+
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
+
+";
+
+%feature("docstring") casadi::CleSolver::getNumOutputNonzeros "
+
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::CleSolver::setOption "
+
+>  void casadi::OptionsFunctionality::setOption(const std::string &str, const GenericType &val)
+------------------------------------------------------------------------
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+>  void casadi::OptionsFunctionality::setOption(const Dictionary &dict, bool skipUnknown=false)
+------------------------------------------------------------------------
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again.
+
+";
+
+%feature("docstring") casadi::CleSolver::setNumInputs "
+
+Set the number of function inputs.
+
+";
+
+%feature("docstring") casadi::CleSolver::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::CleSolver::init "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
+%feature("docstring") casadi::CleSolver::getNumInputElements "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::CleSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::CleSolver::isInit "
+
+Is initialized?
+
+";
+
+%feature("docstring") casadi::CleSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::CleSolver::outputScheme "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring") casadi::CleSolver::getNumInputs "
+
+Get the number of function inputs.
+
+";
+
+%feature("docstring") casadi::CleSolver::getOptionType "
+
+Get the type of a certain option.
+
+";
+
+%feature("docstring") casadi::CleSolver::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring") casadi::CleSolver::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::CleSolver::getOptionDefault "
+
+INTERNAL.
+
+Get the default of a certain option
+
+";
+
+%feature("docstring") casadi::CleSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph.
+
+There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring") casadi::CleSolver::getNumOutputElements "
+
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::CleSolver::getOptionNames "
+
+Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::CleSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring") casadi::CleSolver::getStats "
+
+Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::CleSolver::swap "[INTERNAL]  Swap content
+with another instance.
+
+";
+
+%feature("docstring") casadi::CleSolver::clone "
+
+Clone.
+
+";
+
+%feature("docstring") casadi::CleSolver::input_struct "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring") casadi::CleSolver::getInputScheme "
+
+Get input scheme.
+
+";
+
+%feature("docstring") casadi::CleSolver::copyOptions "
+
+Copy all options from another object.
+
+";
+
+%feature("docstring") casadi::CleSolver::hasSetOption "
+
+check if the user has there is an option str
+
+";
+
+%feature("docstring") casadi::CleSolver "
+
+Base class for Discrete Lyapunov Equation Solvers.
+
+Given matrices $A$ and symmetric $V$
+
+
+
+::
+
+  A in R^(n x n)
+  V in S^n
+  
+
+
+
+finds $P$ that satisfies:
+
+
+
+::
+
+  0 = A P  + P A' + V
+  
+
+
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+- <a href='#plugin_CleSolver_simple'>simple</a>
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+CleSolver.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+simple
+------
+
+
+
+Solving the Discrete Lyapunov Equations with a regular LinearSolver
+
+--------------------------------------------------------------------------------
+
+
+
+Joris Gillis
+Diagrams
+--------
+
+
+
+C++ includes: cle_solver.hpp ";
+
+%feature("docstring") casadi::CleSolver::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::CleSolver::spEvaluate "[INTERNAL]  Propagate
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::CleSolver::inputS "
+
+>  DMatrix& casadi::IOInterface< Function  >::inputS(int i)
+------------------------------------------------------------------------
+[INTERNAL] 
+Access an input.
+
+>  const DMatrix& casadi::IOInterface< Function  >::inputS(int i) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Const access an input.
+
+";
+
+%feature("docstring") casadi::CleSolver::getOutput "
+
+>  Matrix<double> casadi::IOInterface< Function  >::getOutput(int oind=0) const
+------------------------------------------------------------------------
+
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+>  Matrix<double> casadi::IOInterface< Function  >::getOutput(const std::string &oname) const
+------------------------------------------------------------------------
+
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+>  void casadi::IOInterface< Function  >::getOutput(T val, int oind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+>  void casadi::IOInterface< Function  >::getOutput(T val, const std::string &oname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::CleSolver::isNull "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::CleSolver::tangent "
+
+Generate a tangent function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the input must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::CleSolver::inputSchemeEntry "[INTERNAL]  Find
+the index for a string describing a particular entry of an input scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::CleSolver::getOptionAllowed "
+
+Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::CleSolver::setDerivative "
+
+Set a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
+
+";
+
+%feature("docstring") casadi::CleSolver::output "
+
+[UNSAFE] Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring") casadi::CleSolver::output_struct "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring") casadi::CleSolver::removeMonitor "
+
+Remove modules to be monitored.
+
+";
+
+%feature("docstring") casadi::CleSolver::callDerivative "[INTERNAL]
+Evaluate the function symbolically or numerically with directional
+derivatives The first two arguments are the nondifferentiated inputs and
+results of the evaluation, the next two arguments are a set of forward
+directional seeds and the resulting forward directional derivatives, the
+length of the vector being the number of forward directions. The next two
+arguments are a set of adjoint directional seeds and the resulting adjoint
+directional derivatives, the length of the vector being the number of
+adjoint directions.
+
+";
+
+%feature("docstring") casadi::CleSolver::setOutput "
+
+>  void casadi::IOInterface< Function  >::setOutput(T val, int oind=0)
+------------------------------------------------------------------------
+
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+>  void casadi::IOInterface< Function  >::setOutput(T val, const std::string &oname)
+------------------------------------------------------------------------
+
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::CleSolver::assertInit "[INTERNAL]  Assert
+that it is initialized
+
+";
+
+%feature("docstring") casadi::CleSolver::getOption "
+
+get an option value
+
+";
+
+%feature("docstring") casadi::CleSolver::dictionary "
+
+Get the dictionary.
+
+";
+
+%feature("docstring") casadi::CleSolver::getOptionTypeName "
+
+Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::CleSolver::call "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+
 // File: classcasadi_1_1CodeGenerator.xml
 %feature("docstring") casadi::CodeGenerator::flush "[INTERNAL]  Flush
 generated file to a stream.
@@ -14005,17 +15006,180 @@ General information
 
 
 
+>Input scheme: casadi::DLEInput (DLE_NUM_IN = 2) [dleIn]
+
++-----------+-------+-------------+
+| Full name | Short | Description |
++===========+=======+=============+
+| DLE_A     | a     | A matrix .  |
++-----------+-------+-------------+
+| DLE_V     | v     | V matrix .  |
++-----------+-------+-------------+
+
+>Output scheme: casadi::DLEOutput (DLE_NUM_OUT = 1) [dleOut]
+
++-----------+-------+-------------------+
+| Full name | Short |    Description    |
++===========+=======+===================+
+| DLE_P     | p     | Lyapunov matrix . |
++-----------+-------+-------------------+
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivative,  |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines.    |              |
+|              |              |              | Check docume |              |
+|              |              |              | ntation of D |              |
+|              |              |              | erivativeGen |              |
+|              |              |              | erator .     |              |
++--------------+--------------+--------------+--------------+--------------+
+| eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::DleI |
+|              |              |              | unstability  | nternal      |
+|              |              |              | detection    |              |
++--------------+--------------+--------------+--------------+--------------+
+| error_unstab | OT_BOOLEAN   | false        | Throw an     | casadi::DleI |
+| le           |              |              | exception    | nternal      |
+|              |              |              | when it is   |              |
+|              |              |              | detected     |              |
+|              |              |              | that         |              |
+|              |              |              | Product(A_i, |              |
+|              |              |              | i=N..1) has  |              |
+|              |              |              | eigenvalues  |              |
+|              |              |              | greater than |              |
+|              |              |              | 1-eps_unstab |              |
+|              |              |              | le           |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| pos_def      | OT_BOOLEAN   | false        | Assume P     | casadi::DleI |
+|              |              |              | positive     | nternal      |
+|              |              |              | definite     |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
 List of plugins
 ===============
 
 
+
+- <a href='#plugin_DleSolver_dple'>dple</a>
+
+- <a href='#plugin_DleSolver_simple'>simple</a>
 
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 DleSolver.doc(\"myextraplugin\")
 
+
+
+--------------------------------------------------------------------------------
+
+dple
+----
+
+
+
+Solving the Discrete Lyapunov Equations with Periodic Solver
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+simple
+------
+
+
+
+Solving the Discrete Lyapunov Equations with a regular LinearSolver
+
+--------------------------------------------------------------------------------
+
+
+
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: dle_solver.hpp ";
 
@@ -14029,7 +15193,7 @@ Default constructor.
 >  casadi::DleSolver::DleSolver(const std::string &name, const Sparsity &A, const Sparsity &V)
 ------------------------------------------------------------------------
 
-DpleSolver solver factory.
+DleSolver solver factory.
 
 Parameters:
 -----------
@@ -14037,6 +15201,10 @@ Parameters:
 name:
 
 Name of a solver. It might be one of:
+
+- <a href='#plugin_DleSolver_dple'>dple</a>
+
+- <a href='#plugin_DleSolver_simple'>simple</a>
 
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
@@ -15003,6 +16171,8 @@ List of plugins
 
 - <a href='#plugin_DpleSolver_slicot'>slicot</a>
 
+- <a href='#plugin_DpleSolver_condensing'>condensing</a>
+
 - <a href='#plugin_DpleSolver_simple'>simple</a>
 
 Note: some of the plugins in this list might not be available on your
@@ -15068,6 +16238,22 @@ new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
 +----------------+
 
 --------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+condensing
+----------
+
+
+
+Solving the Discrete Periodic Lyapunov Equations by condensing the entire
+period to a single Discrete Lyapunov Equation
+
+--------------------------------------------------------------------------------
+
+
 
 
 
@@ -15164,6 +16350,8 @@ name:
 Name of a solver. It might be one of:
 
 - <a href='#plugin_DpleSolver_slicot'>slicot</a>
+
+- <a href='#plugin_DpleSolver_condensing'>condensing</a>
 
 - <a href='#plugin_DpleSolver_simple'>simple</a>
 
@@ -15281,6 +16469,878 @@ Get the default of a certain option
 %feature("docstring") casadi::DpleSolver::getNumOutputs "
 
 Get the number of function outputs.
+
+";
+
+
+// File: classcasadi_1_1DpleToDle.xml
+
+
+/*  Simple Getters & Setters  */
+
+/*  Advanced Getters  */ %feature("docstring") casadi::DpleToDle::generateIO
+" [INTERNAL]  Generate code for function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::setInputScheme "[INTERNAL]  Set
+input scheme.
+
+";
+
+%feature("docstring") casadi::DpleToDle::spEvaluateViaJacSparsity "[INTERNAL]  Propagate the sparsity pattern through a set of directional
+derivatives forward or backward, using the sparsity patterns.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getBestMatches "[INTERNAL]  Get th
+ebest suggestions of option names.
+
+";
+
+%feature("docstring") casadi::DpleToDle::generateOperation "[INTERNAL]  The
+following functions are called internally from EvaluateMX. For
+documentation, see the MXNode class
+
+";
+
+%feature("docstring") casadi::DpleToDle::setOutput "
+
+>  void casadi::IOInterface< FunctionInternal  >::setOutput(T val, int oind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set an output by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+>  void casadi::IOInterface< FunctionInternal  >::setOutput(T val, const std::string &oname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set an output by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getInput "
+
+>  Matrix<double> casadi::IOInterface< FunctionInternal  >::getInput(int iind=0) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by index.
+
+Parameters:
+-----------
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+>  Matrix<double> casadi::IOInterface< FunctionInternal  >::getInput(const std::string &iname) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+>  void casadi::IOInterface< FunctionInternal  >::getInput(T val, int iind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+>  void casadi::IOInterface< FunctionInternal  >::getInput(T val, const std::string &iname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::DpleToDle::schemeEntry "[INTERNAL]  Find the
+index for a string describing a particular entry of a scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::DpleToDle::deepCopyMembers "[INTERNAL]  Deep
+copy data members.
+
+";
+
+%feature("docstring") casadi::DpleToDle::isInit "[INTERNAL]  Check if the
+object has been initialized.
+
+";
+
+%feature("docstring") casadi::DpleToDle::verbose "[INTERNAL]  Verbose mode?
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOptionTypeName "[INTERNAL]  Get
+the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::DpleToDle::printPart "[INTERNAL]  The
+following functions are called internally from EvaluateMX. For
+documentation, see the MXNode class
+
+";
+
+%feature("docstring") casadi::DpleToDle::generateCode "[INTERNAL]  Print to
+a stream.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOptionDefault "[INTERNAL]  Get
+the default of a certain option.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getInputScheme "[INTERNAL]  Get
+input scheme.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOptionAllowed "[INTERNAL]  Get
+the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOptionNames "[INTERNAL]  Get a
+list of all option names.
+
+";
+
+%feature("docstring") casadi::DpleToDle::create "[INTERNAL]  Create a new
+solver.
+
+";
+
+%feature("docstring") casadi::DpleToDle::evaluate "[INTERNAL]  evaluate
+
+";
+
+%feature("docstring") casadi::DpleToDle::gradient "[INTERNAL]  Return
+gradient function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::repr "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::DpleToDle::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getNumInputNonzeros "[INTERNAL]
+Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::checkInputs "[INTERNAL]  Check if
+the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring") casadi::DpleToDle::generateFunction "[INTERNAL]
+Generate code the function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::inputNoCheck "[INTERNAL]
+Input/output access without checking (faster, but unsafe)
+
+";
+
+%feature("docstring") casadi::DpleToDle::generateDeclarations "[INTERNAL]
+Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::DpleToDle::outputScheme "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOptionDescription "[INTERNAL]
+Get the description of a certain option.
+
+";
+
+%feature("docstring") casadi::DpleToDle::evaluateSX "[INTERNAL]  The
+following functions are called internally from EvaluateMX. For
+documentation, see the MXNode class
+
+";
+
+%feature("docstring") casadi::DpleToDle::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+Decide which ad_mode to take ";
+
+%feature("docstring") casadi::DpleToDle::output_struct "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring") casadi::DpleToDle::setInput "
+
+>  void casadi::IOInterface< FunctionInternal  >::setInput(T val, int iind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set an input by index.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+>  void casadi::IOInterface< FunctionInternal  >::setInput(T val, const std::string &iname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set an input by name.
+
+Parameters:
+-----------
+
+val:  can be double, const std::vector<double>&, const Matrix<double>&,
+double *
+
+iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::DpleToDle::tangent "[INTERNAL]  Return
+tangent function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOptionType "[INTERNAL]  Get the
+type of a certain option.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getNumInputs "[INTERNAL]  Get the
+number of function inputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::inputScheme "[INTERNAL]  Access
+input/output scheme.
+
+";
+
+%feature("docstring") casadi::DpleToDle::spCanEvaluate "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::DpleToDle::getPartition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::DpleToDle::evaluateD "[INTERNAL]  The
+following functions are called internally from EvaluateMX. For
+documentation, see the MXNode class
+
+";
+
+%feature("docstring") casadi::DpleToDle::propagateSparsity "[INTERNAL]  The
+following functions are called internally from EvaluateMX. For
+documentation, see the MXNode class
+
+";
+
+%feature("docstring") casadi::DpleToDle::assertInit "[INTERNAL]  Assert
+that the object has been initialized.
+
+";
+
+%feature("docstring") casadi::DpleToDle::spInit "[INTERNAL]  Reset the
+sparsity propagation.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getHessian "[INTERNAL]  Return
+Hessian function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::setOption "
+
+>  void casadi::OptionsFunctionalityNode::setOption(const std::string &str, const GenericType &val)
+------------------------------------------------------------------------
+[INTERNAL] 
+set an option. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function
+should be called again. (Ticket #54)
+
+>  void casadi::OptionsFunctionalityNode::setOption(const Dictionary &dict, bool skipUnknown=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+set a set of options. The setOptions are in general only considered
+before the init function, if any. If properties changes, the init
+function should be called again. (Ticket #54)
+
+";
+
+%feature("docstring") casadi::DpleToDle::printStats "[INTERNAL]  Print
+solver statistics.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOutput "
+
+>  Matrix<double> casadi::IOInterface< FunctionInternal  >::getOutput(int oind=0) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by index.
+
+Parameters:
+-----------
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+>  Matrix<double> casadi::IOInterface< FunctionInternal  >::getOutput(const std::string &oname) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by name.
+
+Parameters:
+-----------
+
+oname:  output name. Only allowed when an output scheme is set.
+
+>  void casadi::IOInterface< FunctionInternal  >::getOutput(T val, int oind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oind:  index within the range [0.. getNumOutputs()-1]
+
+>  void casadi::IOInterface< FunctionInternal  >::getOutput(T val, const std::string &oname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an output by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::DpleToDle::derivative "[INTERNAL]  Return
+function that calculates forward derivatives.
+
+This method returns a cached instance if available, and calls  Function
+getDerivative(int nfwd, int nadj) if no cached version is available.
+
+User-provided derivative generator function ";
+
+%feature("docstring") casadi::DpleToDle::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
+
+";
+
+%feature("docstring") casadi::DpleToDle::setNumOutputs "[INTERNAL]  Set the
+number of function outputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getJacSparsityPlain "[INTERNAL]  A
+flavor of getJacSparsity without any magic.
+
+";
+
+%feature("docstring") casadi::DpleToDle::dynamicCompilation "[INTERNAL]
+Codegen function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::log "
+
+>  void casadi::FunctionInternal::log(const std::string &msg) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Log the status of the solver.
+
+>  void casadi::FunctionInternal::log(const std::string &fcn, const std::string &msg) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Log the status of the solver, function given.
+
+";
+
+%feature("docstring") casadi::DpleToDle::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+values.
+
+";
+
+%feature("docstring") casadi::DpleToDle::call "
+
+>  void casadi::FunctionInternal::call(const DMatrixVector &arg, DMatrixVector &res, const DMatrixVectorVector &fseed, DMatrixVectorVector &fsens, const DMatrixVectorVector &aseed, DMatrixVectorVector &asens, bool always_inline, bool never_inline)
+------------------------------------------------------------------------
+[INTERNAL] 
+Call a function, DMatrix type (overloaded)
+
+>  void casadi::FunctionInternal::call(const MXVector &arg, MXVector &res, const MXVectorVector &fseed, MXVectorVector &fsens, const MXVectorVector &aseed, MXVectorVector &asens, bool always_inline, bool never_inline)
+------------------------------------------------------------------------
+[INTERNAL] 
+Call a function, MX type (overloaded)
+
+>  void casadi::FunctionInternal::call(const SXVector &arg, SXVector &res, const SXVectorVector &fseed, SXVectorVector &fsens, const SXVectorVector &aseed, SXVectorVector &asens, bool always_inline, bool never_inline)
+------------------------------------------------------------------------
+[INTERNAL] 
+Call a function, SX type (overloaded)
+
+";
+
+%feature("docstring") casadi::DpleToDle::setJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOption "[INTERNAL]  get an
+option value
+
+";
+
+%feature("docstring") casadi::DpleToDle::evalMX "[INTERNAL]  Evaluate
+symbolically, MX type.
+
+";
+
+%feature("docstring") casadi::DpleToDle::dictionary "[INTERNAL]  Get the
+dictionary.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getGradient "[INTERNAL]  Return
+gradient function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::jacSparsity "[INTERNAL]  Get, if
+necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::DpleToDle::setOutputScheme "[INTERNAL]  Set
+output scheme.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getJacobian "[INTERNAL]  Return
+Jacobian function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::wrapMXFunction "[INTERNAL]  Create
+a helper MXFunction with some properties copied.
+
+Copied properties:
+
+input/outputscheme ad_mode
+
+The function is not initialized
+
+";
+
+%feature("docstring") casadi::DpleToDle::copyOptions "[INTERNAL]  Copy all
+options from another object.
+
+";
+
+%feature("docstring") casadi::DpleToDle::outputSchemeEntry "[INTERNAL]
+Find the index for a string describing a particular entry of an output
+scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::DpleToDle::printOption "[INTERNAL]  Print all
+information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getDerivativeViaJac "[INTERNAL]
+Constructs and returns a function that calculates forward derivatives.
+
+by creating the Jacobian then multiplying
+
+";
+
+%feature("docstring") casadi::DpleToDle::hessian "[INTERNAL]  Return
+Hessian function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::jacobian "[INTERNAL]  Return
+Jacobian function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::createCallDerivative "[INTERNAL]
+Create derivative node.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getNumInputElements "[INTERNAL]
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::setDerivative "[INTERNAL]  Set a
+function that calculates nfwd forward derivatives and nadj adjoint
+derivatives
+
+";
+
+%feature("docstring") casadi::DpleToDle::clone "[INTERNAL]  Clone.
+
+";
+
+%feature("docstring") casadi::DpleToDle::symbolicOutput "[INTERNAL]  Get a
+vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle "[INTERNAL]  'dple' plugin for
+DleSolver
+
+Given matrices $A$ and symmetric $V$
+
+
+
+::
+
+  A in R^(n x n)
+  V in S^n
+  
+
+
+
+finds $P$ that satisfies:
+
+
+
+::
+
+  P = A P A' + V
+  
+
+
+
+Solving the Discrete Lyapunov Equations with Periodic Solver
+
+::
+
+  \\\\author Joris Gillis
+  
+
+Diagrams
+--------
+
+
+
+C++ includes: dple_to_dle.hpp ";
+
+%feature("docstring") casadi::DpleToDle::printOptions "[INTERNAL]  Print
+options to a stream.
+
+";
+
+%feature("docstring") casadi::DpleToDle::generateBody "[INTERNAL]  Generate
+code for the function body.
+
+";
+
+%feature("docstring") casadi::DpleToDle::output "[INTERNAL]  [UNSAFE]
+Obtain reference to outputs  getOutput, getOutput
+
+Access output argument
+
+";
+
+%feature("docstring") casadi::DpleToDle::hasOption "[INTERNAL]  check if
+there is an option str
+
+";
+
+%feature("docstring") casadi::DpleToDle::monitored "[INTERNAL]  Is function
+fcn being monitored.
+
+";
+
+%feature("docstring") casadi::DpleToDle::hasSetOption "[INTERNAL]  check if
+the user has there is an option str
+
+";
+
+%feature("docstring") casadi::DpleToDle::getDerivative "[INTERNAL]
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::DpleToDle::inputSchemeEntry "[INTERNAL]  Find
+the index for a string describing a particular entry of an input scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::DpleToDle::getNumericJacobian "[INTERNAL]
+Return Jacobian function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getStats "[INTERNAL]  Get all
+statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::DpleToDle::~DpleToDle "[INTERNAL]
+Destructor.
+
+";
+
+%feature("docstring") casadi::DpleToDle::symbolicInputSX "[INTERNAL]  Get a
+vector of symbolic variables with the same dimensions as the inputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::evalSXsparse "[INTERNAL]  Evaluate
+symbolically, SXElement type, matching sparsity patterns.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getStat "[INTERNAL]  Get single
+statistic obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::DpleToDle::nTmp "[INTERNAL]  The following
+functions are called internally from EvaluateMX. For documentation, see the
+MXNode class
+
+";
+
+%feature("docstring") casadi::DpleToDle::getSanitizedName "[INTERNAL]  get
+function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") casadi::DpleToDle::evalSX "[INTERNAL]  Evaluate
+symbolically, SXElement type, possibly nonmatching sparsity patterns.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOutputScheme "[INTERNAL]  Get
+output scheme.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getFullJacobian "[INTERNAL]
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::DpleToDle::createCall "[INTERNAL]  Create
+function call node.
+
+";
+
+%feature("docstring") casadi::DpleToDle::input_struct "[INTERNAL]
+Input/output structures of the function
+
+";
+
+%feature("docstring") casadi::DpleToDle::input "[INTERNAL]  [UNSAFE] Obtain
+reference to inputs  getInput, setInput
+
+Access input argument
+
+";
+
+%feature("docstring") casadi::DpleToDle::callSelf "[INTERNAL]  Create a
+call to this.
+
+";
+
+%feature("docstring") casadi::DpleToDle::evaluateMX "[INTERNAL]  The
+following functions are called internally from EvaluateMX. For
+documentation, see the MXNode class
+
+";
+
+%feature("docstring") casadi::DpleToDle::getTangent "[INTERNAL]  Return
+tangent function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getNumOutputs "[INTERNAL]  Get the
+number of function outputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::inputS "
+
+>  DMatrix& casadi::IOInterface< FunctionInternal  >::inputS(int i)
+------------------------------------------------------------------------
+[INTERNAL] 
+Access an input.
+
+>  const DMatrix& casadi::IOInterface< FunctionInternal  >::inputS(int i) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Const access an input.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOptionAllowedIndex "[INTERNAL]
+Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getNumOutputNonzeros "[INTERNAL]
+Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::DpleToDle::symbolicInput "[INTERNAL]  Get a
+vector of symbolic variables with the same dimensions as the inputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::fullJacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::DpleToDle::outputS "
+
+>  DMatrix& casadi::IOInterface< FunctionInternal  >::outputS(int i)
+------------------------------------------------------------------------
+[INTERNAL] 
+Access an output.
+
+>  const DMatrix& casadi::IOInterface< FunctionInternal  >::outputS(int i) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Const access an output.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getNumOutputElements "[INTERNAL]
+Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::DpleToDle::spEvaluate "[INTERNAL]  Propagate
+the sparsity pattern through a set of directional derivatives forward or
+backward.
+
+";
+
+%feature("docstring") casadi::DpleToDle::getOptionEnumValue "[INTERNAL]
+Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::DpleToDle::setJacobian "[INTERNAL]  Return
+Jacobian function.
+
+";
+
+%feature("docstring") casadi::DpleToDle::DpleToDle "[INTERNAL]
+Constructor.
+
+Parameters:
+-----------
+
+A:   Sparsity of A
+
+V:   Sparsity of V
+
+";
+
+%feature("docstring") casadi::DpleToDle::print "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::DpleToDle::outputNoCheck "[INTERNAL]
+Input/output access without checking (faster, but unsafe)
+
+";
+
+%feature("docstring") casadi::DpleToDle::setNumInputs "[INTERNAL]  Set the
+number of function inputs.
 
 ";
 
@@ -106115,6 +108175,15 @@ Get all the free variables in an expression.
 
 ";
 
+%feature("docstring") casadi::cleIn "
+
+>  CLEInputIOSchemeVector<M> casadi::cleIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M())
+------------------------------------------------------------------------
+
+Input arguments of a cle solver
+
+";
+
 %feature("docstring") casadi::sumRows "
 
 Return a row-wise summation of elements.
@@ -106218,6 +108287,8 @@ Get the lower triangular part of a matrix.
 Get lower triangular part.
 
 ";
+
+%feature("docstring") casadi::casadi_register_clesolver_simple "";
 
 %feature("docstring") casadi::casadi_register_nlpsolver_stabilizedsqp "";
 
@@ -107063,6 +109134,15 @@ functions from the 'math.h' ('cmath') header.
 
 %feature("docstring") casadi::profileWriteName "[INTERNAL] ";
 
+%feature("docstring") casadi::cleOut "
+
+>  CLEOutputIOSchemeVector<M> casadi::cleOut(const std::string &arg_s0=\"\", const M &arg_m0=M())
+------------------------------------------------------------------------
+
+Output arguments of a cle solver
+
+";
+
 %feature("docstring") casadi::get_bvec_t "
 
 >  bvec_t * casadi::get_bvec_t(std::vector< double > &v)
@@ -107096,6 +109176,8 @@ and 0 otherwise.
 ";
 
 %feature("docstring") casadi::casadi_load_stabilizedqpsolver_qp "";
+
+%feature("docstring") casadi::casadi_load_dlesolver_simple "";
 
 %feature("docstring") casadi::jacobian "
 
@@ -107201,6 +109283,8 @@ Read matrix, matlab style.
 Check if the vector is strictly monotone.
 
 ";
+
+%feature("docstring") casadi::casadi_register_dlesolver_simple "";
 
 %feature("docstring") casadi::casadi_register_sdqpsolver_sdp "";
 
@@ -107330,6 +109414,8 @@ Transpose of a matrix.
 ";
 
 %feature("docstring") casadi::casadi_load_integrator_idas "";
+
+%feature("docstring") casadi::casadi_load_dlesolver_dple "";
 
 %feature("docstring") casadi::sin "[INTERNAL]  Pre-C99 elementary functions
 from the 'math.h' ('cmath') header.
@@ -108074,7 +110160,15 @@ y <- x.
 >  DLEOutputIOSchemeVector<M> casadi::dleOut(const std::string &arg_s0=\"\", const M &arg_m0=M())
 ------------------------------------------------------------------------
 
-Output arguments of a dple solver
+Output arguments of a dle solver
+
+>Output scheme: casadi::DLEOutput (DLE_NUM_OUT = 1) [dleOut]
+
++-----------+-------+-------------------+
+| Full name | Short |    Description    |
++===========+=======+===================+
+| DLE_P     | p     | Lyapunov matrix . |
++-----------+-------+-------------------+
 
 ";
 
@@ -108294,6 +110388,8 @@ Remove identical calculations.
 ";
 
 %feature("docstring") casadi::casadi_load_stabilizedqpsolver_sqic "";
+
+%feature("docstring") casadi::casadi_load_clesolver_simple "";
 
 %feature("docstring") casadi::rank "
 
@@ -108526,6 +110622,8 @@ matrix (lapack)
 
 ";
 
+%feature("docstring") casadi::casadi_load_dplesolver_condensing "";
+
 %feature("docstring") casadi::profileWriteBare "[INTERNAL] ";
 
 %feature("docstring") casadi::dleIn "
@@ -108533,7 +110631,17 @@ matrix (lapack)
 >  DLEInputIOSchemeVector<M> casadi::dleIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M())
 ------------------------------------------------------------------------
 
-Input arguments of a dple solver
+Input arguments of a dle solver
+
+>Input scheme: casadi::DLEInput (DLE_NUM_IN = 2) [dleIn]
+
++-----------+-------+-------------+
+| Full name | Short | Description |
++===========+=======+=============+
+| DLE_A     | a     | A matrix .  |
++-----------+-------+-------------+
+| DLE_V     | v     | V matrix .  |
++-----------+-------+-------------+
 
 ";
 
@@ -108895,6 +111003,8 @@ with Z_k Z_k' = eye(n) = Z_k' Z_k
 ";
 
 %feature("docstring") casadi::casadi_register_nlpsolver_scpgen "";
+
+%feature("docstring") casadi::casadi_register_dlesolver_dple "";
 
 %feature("docstring") casadi::cos "[INTERNAL]  Pre-C99 elementary functions
 from the 'math.h' ('cmath') header.
@@ -109505,6 +111615,8 @@ Construct a matrix with given blocks on the diagonal.
 
 ";
 
+%feature("docstring") casadi::casadi_register_dplesolver_condensing "";
+
 %feature("docstring") casadi::triu2symm "
 
 Convert a upper triangular matrix to a symmetric one.
@@ -109786,6 +111898,18 @@ Structure specification of a QP
 // File: casadi__types_8hpp.xml
 
 
+// File: cle__internal_8cpp.xml
+
+
+// File: cle__internal_8hpp.xml
+
+
+// File: cle__solver_8cpp.xml
+
+
+// File: cle__solver_8hpp.xml
+
+
 // File: code__generator_8cpp.xml
 
 
@@ -109808,6 +111932,15 @@ Structure specification of a QP
 
 
 // File: concat_8hpp.xml
+
+
+// File: condensing__indef__dple__internal_8cpp.xml
+
+
+// File: condensing__indef__dple__internal_8hpp.xml
+
+
+// File: condensing__indef__dple__internal__meta_8cpp.xml
 
 
 // File: constant__mx_8cpp.xml
@@ -109936,6 +112069,15 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: dple__solver_8hpp.xml
+
+
+// File: dple__to__dle_8cpp.xml
+
+
+// File: dple__to__dle_8hpp.xml
+
+
+// File: dple__to__dle__meta_8cpp.xml
 
 
 // File: dsdp__interface_8cpp.xml
@@ -110580,6 +112722,24 @@ This file does absolutely nothing but including all headers ";
 // File: simple__homotopy__nlp__meta_8cpp.xml
 
 
+// File: simple__indef__cle__internal_8cpp.xml
+
+
+// File: simple__indef__cle__internal_8hpp.xml
+
+
+// File: simple__indef__cle__internal__meta_8cpp.xml
+
+
+// File: simple__indef__dle__internal_8cpp.xml
+
+
+// File: simple__indef__dle__internal_8hpp.xml
+
+
+// File: simple__indef__dle__internal__meta_8cpp.xml
+
+
 // File: simple__indef__dple__internal_8cpp.xml
 
 
@@ -110958,6 +113118,9 @@ This file does absolutely nothing but including all headers ";
 // File: xml__node_8hpp.xml
 
 
+// File: group__CLE__doc.xml
+
+
 // File: group__DLE__doc.xml
 
 
@@ -111104,6 +113267,14 @@ This file does absolutely nothing but including all headers ";
 
 
 
+// File: group__plugin__DpleSolver__condensing.xml
+
+
+
+// File: group__plugin__DleSolver__dple.xml
+
+
+
 // File: group__plugin__ImplicitFunction__nlp.xml
 
 
@@ -111144,6 +113315,14 @@ This file does absolutely nothing but including all headers ";
 
 
 
+// File: group__plugin__CleSolver__simple.xml
+
+
+
+// File: group__plugin__DleSolver__simple.xml
+
+
+
 // File: group__plugin__DpleSolver__simple.xml
 
 
@@ -111180,13 +113359,16 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__LinsolInput.xml
 
 
-// File: group__scheme__SOCPOutput.xml
-
-
 // File: group__scheme__QpSolverInput.xml
 
 
+// File: group__scheme__DLEInput.xml
+
+
 // File: group__scheme__SOCPStruct.xml
+
+
+// File: group__scheme__DLEOutput.xml
 
 
 // File: group__scheme__SDPInput.xml
@@ -111226,6 +113408,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: group__scheme__SDQPOutput.xml
+
+
+// File: group__scheme__SOCPOutput.xml
 
 
 // File: group__scheme__SDQPInput.xml
@@ -111351,6 +113536,12 @@ This file does absolutely nothing but including all headers ";
 // File: group__plugins__XmlFile.xml
 
 
+// File: group__pluginlist__DleSolver.xml
+
+
+// File: group__plugins__DleSolver.xml
+
+
 // File: group__pluginlist__LpSolver.xml
 
 
@@ -111375,10 +113566,19 @@ This file does absolutely nothing but including all headers ";
 // File: group__plugins__HomotopyNlpSolver.xml
 
 
+// File: group__pluginlist__CleSolver.xml
+
+
+// File: group__plugins__CleSolver.xml
+
+
 // File: group__pluginlist__SocpSolver.xml
 
 
 // File: group__plugins__SocpSolver.xml
+
+
+// File: group__general__DleSolver.xml
 
 
 // File: group__general__DpleSolver.xml
