@@ -2795,6 +2795,131 @@ General information
 
 
 
+>Input scheme: casadi::CLEInput (CLE_NUM_IN = 2) [cleIn]
+
++-----------+-------+-------------+
+| Full name | Short | Description |
++===========+=======+=============+
+| CLE_A     | a     | A matrix .  |
++-----------+-------+-------------+
+| CLE_V     | v     | V matrix .  |
++-----------+-------+-------------+
+
+>Output scheme: casadi::CLEOutput (CLE_NUM_OUT = 1) [cleOut]
+
++-----------+-------+-------------------+
+| Full name | Short |    Description    |
++===========+=======+===================+
+| CLE_P     | p     | Lyapunov matrix . |
++-----------+-------+-------------------+
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivative,  |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines.    |              |
+|              |              |              | Check docume |              |
+|              |              |              | ntation of D |              |
+|              |              |              | erivativeGen |              |
+|              |              |              | erator .     |              |
++--------------+--------------+--------------+--------------+--------------+
+| eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::CleI |
+|              |              |              | unstability  | nternal      |
+|              |              |              | detection    |              |
++--------------+--------------+--------------+--------------+--------------+
+| error_unstab | OT_BOOLEAN   | false        | Throw an     | casadi::CleI |
+| le           |              |              | exception    | nternal      |
+|              |              |              | when it is   |              |
+|              |              |              | detected     |              |
+|              |              |              | that         |              |
+|              |              |              | Product(A_i, |              |
+|              |              |              | i=N..1) has  |              |
+|              |              |              | eigenvalues  |              |
+|              |              |              | greater than |              |
+|              |              |              | 1-eps_unstab |              |
+|              |              |              | le           |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| pos_def      | OT_BOOLEAN   | false        | Assume P     | casadi::CleI |
+|              |              |              | positive     | nternal      |
+|              |              |              | definite     |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
 List of plugins
 ===============
 
@@ -2817,6 +2942,22 @@ simple
 
 
 Solving the Discrete Lyapunov Equations with a regular LinearSolver
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| linear_solver   | OT_STRING       | GenericType()   | User-defined    |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | class. Needed   |
+|                 |                 |                 | for             |
+|                 |                 |                 | sensitivities.  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ptions          |                 |                 | passed to the   |
+|                 |                 |                 | linear solver.  |
++-----------------+-----------------+-----------------+-----------------+
 
 --------------------------------------------------------------------------------
 
@@ -15156,9 +15297,21 @@ dple
 
 Solving the Discrete Lyapunov Equations with Periodic Solver
 
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| dple_solver     | OT_STRING       | GenericType()   | User-defined    |
+|                 |                 |                 | DPLE solver     |
+|                 |                 |                 | class.          |
++-----------------+-----------------+-----------------+-----------------+
+| dple_solver_opt | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ions            |                 |                 | passed to the   |
+|                 |                 |                 | DPLE solver.    |
++-----------------+-----------------+-----------------+-----------------+
+
 --------------------------------------------------------------------------------
-
-
 
 
 
@@ -15170,6 +15323,22 @@ simple
 
 
 Solving the Discrete Lyapunov Equations with a regular LinearSolver
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| linear_solver   | OT_STRING       | GenericType()   | User-defined    |
+|                 |                 |                 | linear solver   |
+|                 |                 |                 | class. Needed   |
+|                 |                 |                 | for             |
+|                 |                 |                 | sensitivities.  |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ptions          |                 |                 | passed to the   |
+|                 |                 |                 | linear solver.  |
++-----------------+-----------------+-----------------+-----------------+
 
 --------------------------------------------------------------------------------
 
@@ -16251,9 +16420,23 @@ condensing
 Solving the Discrete Periodic Lyapunov Equations by condensing the entire
 period to a single Discrete Lyapunov Equation
 
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| dle_solver      | OT_STRING       | GenericType()   | User-defined    |
+|                 |                 |                 | Dle solver      |
+|                 |                 |                 | class. Needed   |
+|                 |                 |                 | for             |
+|                 |                 |                 | sensitivities.  |
++-----------------+-----------------+-----------------+-----------------+
+| dle_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ons             |                 |                 | passed to the   |
+|                 |                 |                 | Dle solver.     |
++-----------------+-----------------+-----------------+-----------------+
+
 --------------------------------------------------------------------------------
-
-
 
 
 
@@ -17092,10 +17275,160 @@ finds $P$ that satisfies:
 
 Solving the Discrete Lyapunov Equations with Periodic Solver
 
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |     Default     |   Description   |
++=================+=================+=================+=================+
+| dple_solver     | OT_STRING       | GenericType()   | User-defined    |
+|                 |                 |                 | DPLE solver     |
+|                 |                 |                 | class.          |
++-----------------+-----------------+-----------------+-----------------+
+| dple_solver_opt | OT_DICTIONARY   | GenericType()   | Options to be   |
+| ions            |                 |                 | passed to the   |
+|                 |                 |                 | DPLE solver.    |
++-----------------+-----------------+-----------------+-----------------+
+
 ::
 
   \\\\author Joris Gillis
   
+
+
+
+>Input scheme: casadi::DLEInput (DLE_NUM_IN = 2) [dleIn]
+
++-----------+-------+-------------+
+| Full name | Short | Description |
++===========+=======+=============+
+| DLE_A     | a     | A matrix .  |
++-----------+-------+-------------+
+| DLE_V     | v     | V matrix .  |
++-----------+-------+-------------+
+
+>Output scheme: casadi::DLEOutput (DLE_NUM_OUT = 1) [dleOut]
+
++-----------+-------+-------------------+
+| Full name | Short |    Description    |
++===========+=======+===================+
+| DLE_P     | p     | Lyapunov matrix . |
++-----------+-------+-------------------+
+
+>List of available options
+
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivative,  |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines.    |              |
+|              |              |              | Check docume |              |
+|              |              |              | ntation of D |              |
+|              |              |              | erivativeGen |              |
+|              |              |              | erator .     |              |
++--------------+--------------+--------------+--------------+--------------+
+| dple_solver  | OT_STRING    | GenericType( | User-defined | casadi::Dple |
+|              |              | )            | DPLE solver  | ToDle        |
+|              |              |              | class.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| dple_solver_ | OT_DICTIONAR | GenericType( | Options to   | casadi::Dple |
+| options      | Y            | )            | be passed to | ToDle        |
+|              |              |              | the DPLE     |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::DleI |
+|              |              |              | unstability  | nternal      |
+|              |              |              | detection    |              |
++--------------+--------------+--------------+--------------+--------------+
+| error_unstab | OT_BOOLEAN   | false        | Throw an     | casadi::DleI |
+| le           |              |              | exception    | nternal      |
+|              |              |              | when it is   |              |
+|              |              |              | detected     |              |
+|              |              |              | that         |              |
+|              |              |              | Product(A_i, |              |
+|              |              |              | i=N..1) has  |              |
+|              |              |              | eigenvalues  |              |
+|              |              |              | greater than |              |
+|              |              |              | 1-eps_unstab |              |
+|              |              |              | le           |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| pos_def      | OT_BOOLEAN   | false        | Assume P     | casadi::DleI |
+|              |              |              | positive     | nternal      |
+|              |              |              | definite     |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
 --------
@@ -108182,6 +108515,16 @@ Get all the free variables in an expression.
 
 Input arguments of a cle solver
 
+>Input scheme: casadi::CLEInput (CLE_NUM_IN = 2) [cleIn]
+
++-----------+-------+-------------+
+| Full name | Short | Description |
++===========+=======+=============+
+| CLE_A     | a     | A matrix .  |
++-----------+-------+-------------+
+| CLE_V     | v     | V matrix .  |
++-----------+-------+-------------+
+
 ";
 
 %feature("docstring") casadi::sumRows "
@@ -109140,6 +109483,14 @@ functions from the 'math.h' ('cmath') header.
 ------------------------------------------------------------------------
 
 Output arguments of a cle solver
+
+>Output scheme: casadi::CLEOutput (CLE_NUM_OUT = 1) [cleOut]
+
++-----------+-------+-------------------+
+| Full name | Short |    Description    |
++===========+=======+===================+
+| CLE_P     | p     | Lyapunov matrix . |
++-----------+-------+-------------------+
 
 ";
 
@@ -113380,16 +113731,22 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__LPStruct.xml
 
 
-// File: group__scheme__NLPOutput.xml
+// File: group__scheme__QcqpSolverOutput.xml
+
+
+// File: group__scheme__DAEOutput.xml
 
 
 // File: group__scheme__DPLEInput.xml
 
 
+// File: group__scheme__CLEOutput.xml
+
+
 // File: group__scheme__DAEInput.xml
 
 
-// File: group__scheme__DAEOutput.xml
+// File: group__scheme__NLPOutput.xml
 
 
 // File: group__scheme__QpSolverOutput.xml
@@ -113431,7 +113788,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__SDQPStruct.xml
 
 
-// File: group__scheme__QcqpSolverOutput.xml
+// File: group__scheme__CLEInput.xml
 
 
 // File: group__scheme__RDAEOutput.xml
@@ -113576,6 +113933,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: group__plugins__SocpSolver.xml
+
+
+// File: group__general__CleSolver.xml
 
 
 // File: group__general__DleSolver.xml
