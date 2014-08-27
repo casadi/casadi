@@ -52,10 +52,6 @@ try:
 except:
   pass
   
-LinearSolver.loadPlugin("csparse")
-DleSolver.loadPlugin("simple")
-dlesolvers.append(("simple",{"linear_solver": "csparse"}))
-
 dplesolvers = []
 try:
   LinearSolver.loadPlugin("csparse")
@@ -72,8 +68,6 @@ try:
 except:
   pass
   
-DpleSolver.loadPlugin("condensing")
-
 try:
   LinearSolver.loadPlugin("csparse")
   DpleSolver.loadPlugin("condensing")
