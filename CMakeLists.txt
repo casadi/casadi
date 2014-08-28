@@ -125,6 +125,7 @@ option(WITH_TINYXML "Compile the interface to TinyXML (the source code is includ
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
 option(WITH_MATLAB "Compile with support for MATLAB front-end (experimental)" OFF)
+option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)
@@ -164,6 +165,10 @@ add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loadi
 
 if(WITH_PRINTME)
   add_definitions(-DWITH_PRINTME)
+endif()
+
+if(WITH_DEBIAN_BUILD)
+  add_definitions(-DWITH_DEBIAN_BUILD)
 endif()
 
 include_directories(.)
