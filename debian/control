@@ -8,8 +8,8 @@ Build-Depends: debhelper (>= 9),
                libblas-dev,
                liblapack-dev,
                swig2.0,
-               python-dev,
-               python-support (>= 0.4.1),
+               dh-python,
+               python-dev (>= 2.6.6),
                python-numpy
 Standards-Version: 3.9.5
 Section: libs
