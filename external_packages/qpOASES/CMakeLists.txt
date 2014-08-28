@@ -25,6 +25,3 @@ install(TARGETS casadi_qpoases
 set_target_properties(
   casadi_qpoases PROPERTIES SOVERSION ${PACKAGE_SO_VERSION}
 )
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-set_target_properties(casadi_qpoases PROPERTIES COMPILE_FLAGS "-Wno-overloaded-virtual")
-endif()
