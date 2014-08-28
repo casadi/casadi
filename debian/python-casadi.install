@@ -1,0 +1,5 @@
+usr/lib/python*/dist-packages/casadi/__init__.py
+usr/lib/python*/dist-packages/casadi/casadi.py
+usr/lib/python*/dist-packages/casadi/casadi_core.py
+usr/lib/python*/dist-packages/casadi/_casadi_core.so
+usr/lib/python*/dist-packages/casadi/tools
