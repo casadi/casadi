@@ -114,7 +114,7 @@ class NestedDictLiteral:
   
 nesteddict = NestedDictLiteral()
 
-# Casadi-independant Structure framework
+# Casadi-independent Structure framework
 
 def payloadUnpack(payload,i):
   if isString(i):
@@ -401,7 +401,7 @@ class Structure(object):
         new_exc = Exception("Error occured in struct context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
         raise new_exc.__class__, new_exc, tb
       
-# Casadi-dependant Structure framework
+# Casadi-dependent Structure framework
     
 class Dispatcher:
   def __init__(self,**args):

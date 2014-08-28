@@ -374,7 +374,7 @@ namespace casadi {
             snSet(snopt_name, value);
             }; break;
           default:
-            casadi_error("Unkown type " << it->second.first);
+            casadi_error("Unknown type " << it->second.first);
         }
         casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
       }
@@ -405,7 +405,7 @@ namespace casadi {
       //       setOption(it->first, std::string(value));
       //       }; break;
       //     default:
-      //       casadi_error("Unkown type " << it->second.first);
+      //       casadi_error("Unknown type " << it->second.first);
       //   }
       //   casadi_assert_message(Error == 0, "snopt error getting option \"" + snopt_name + "\"")
       // }

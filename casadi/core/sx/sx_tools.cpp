@@ -1103,7 +1103,7 @@ namespace casadi {
       mult*=i+1;
     }
 
-    if (!success) casadi_error("poly: suplied expression does not appear to be polynomial.");
+    if (!success) casadi_error("poly: supplied expression does not appear to be polynomial.");
 
     std::reverse(ret.data().begin(), ret.data().end());
 
@@ -1114,7 +1114,7 @@ namespace casadi {
 
   SX poly_roots(const SX& p) {
     casadi_assert_message(p.size2()==1,
-                          "poly_root(): supplied paramter must be column vector but got "
+                          "poly_root(): supplied parameter must be column vector but got "
                           << p.dimString() << ".");
     casadi_assert(p.isDense());
     if (p.size1()==2) { // a*x + b

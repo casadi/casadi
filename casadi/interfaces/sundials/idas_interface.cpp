@@ -59,7 +59,7 @@ namespace casadi {
 
   IdasInterface::IdasInterface(const Function& f, const Function& g) : SundialsInterface(f, g) {
     addOption("suppress_algebraic",          OT_BOOLEAN,          false,
-              "Supress algebraic variables in the error testing");
+              "Suppress algebraic variables in the error testing");
     addOption("calc_ic",                     OT_BOOLEAN,          true,
               "Use IDACalcIC to get consistent initial conditions.");
     addOption("calc_icB",                    OT_BOOLEAN,          GenericType(),

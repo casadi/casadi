@@ -424,7 +424,7 @@ namespace casadi {
 
     for (int i=0;i<k.size();i++) {
       casadi_assert_message(k[i] < size(), "Mapping::assign: index vector reaches " << k[i]
-                            << ", while dependant is only of size " << size());
+                            << ", while dependent is only of size " << size());
     }
 
     MX ret = (*this)->getGetNonzeros(sp, k);
@@ -460,7 +460,7 @@ namespace casadi {
     for (int i=0; i<k.size(); ++i) {
       casadi_assert_message(k[i] < size(),
                             "Mapping::assign: index vector reaches " << k[i]
-                            << ", while dependant is only of size " << size());
+                            << ", while dependent is only of size " << size());
     }
 
     // Quick return if no assignments to be made

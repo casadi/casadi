@@ -951,7 +951,7 @@ namespace casadi {
     // Substitute symbols for boundary nodes
     std::vector<MX> ret = graph_substitute(e, boundary, syms);
 
-    // Obtain list of dependants
+    // Obtain list of dependents
     std::vector<MX> v = getSymbols(ret);
 
     // Construct an MXFunction with it
