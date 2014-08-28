@@ -20,7 +20,6 @@ Vcs-Git: git://github.com/casadi/casadi.git
 Vcs-Browser: https://github.com/casadi/casadi
 
 Package: libcasadi-core2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends}
@@ -78,7 +77,6 @@ Description: development files for CasADi core module
 
 
 Package: libcasadi-ipopt2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -109,7 +107,6 @@ Description: IPOPT plugin for CasADi optimization framework
 
 
 Package: libcasadi-snopt2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -139,7 +136,6 @@ Description: SNOPT plugin for CasADi optimization framework
 
 
 Package: libcasadi-solvers2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -169,7 +165,6 @@ Description: CasADi's suite of numerical solvers
 
 
 Package: libcasadi-csparse2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -199,7 +194,6 @@ Description: CSparse plugin for CasADi
 
 
 Package: libcasadi-dsdp2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -229,7 +223,6 @@ Description: DSDP plugin for CasADi
 
 
 Package: libcasadi-slicot2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -259,7 +252,6 @@ Description: SLICOT plugin for CasADi
 
 
 Package: libcasadi-qpoases2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -289,7 +281,6 @@ Description: qpOASES plugin for CasADi
 
 
 Package: libcasadi-lapack2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -319,7 +310,6 @@ Description: LAPACK linear solver plugin for CasADi
 
 
 Package: libcasadi-sundials2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
@@ -349,7 +339,6 @@ Description: SUNDIALS integrators plugin for CasADi
 
 
 Package: libcasadi-tinyxml2.0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
