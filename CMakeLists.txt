@@ -323,7 +323,7 @@ add_feature_info(csparse-interface CSPARSE_FOUND "Interface to the sparse direct
 if(WITH_TINYXML)
   if(WITH_BUILD_TINYXML)
     # build the included tinyxml
-    set(TINYXML_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/tinyxml)
+    set(TINYXML_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/tinyxml-2.6.2)
     set(TINYXML_LIBRARIES casadi_tinyxml)
     set(TINYXML_FOUND ON)
   else()

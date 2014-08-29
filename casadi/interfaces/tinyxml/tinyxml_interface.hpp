@@ -30,7 +30,7 @@
 /** \pluginsection{XmlFile,tinyxml} */
 
 /// \cond INTERNAL
-#include "external_packages/tinyxml/tinyxml.h"
+#include <tinyxml.h>
 #include "casadi/core/misc/xml_file_internal.hpp"
 #include <casadi/interfaces/tinyxml/casadi_xmlfile_tinyxml_export.h>
 

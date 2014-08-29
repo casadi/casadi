@@ -1,28 +1,5 @@
 /*
- *    This file is part of CasADi.
- *
- *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
- *
- *    CasADi is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 3 of the License, or (at your option) any later version.
- *
- *    CasADi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with CasADi; if not, write to the Free Software
- *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- *
- */
-
-/*
 www.sourceforge.net/projects/tinyxml
-Original file by Yves Berquin.
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any
@@ -44,17 +21,6 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
-/*
- * THIS FILE WAS ALTERED BY Tyge Lovset, 7. April 2005.
- *
- * - completely rewritten. compact, clean, and fast implementation.
- * - sizeof(TiXmlString) = pointer size (4 bytes on 32-bit systems)
- * - fixed reserve() to work as per specification.
- * - fixed buggy compares operator==(), operator<(), and operator>()
- * - fixed operator+=() to take a const ref argument, following spec.
- * - added "copy" constructor with length, and most compare operators.
- * - added swap(), clear(), size(), capacity(), operator+().
- */
 
 #ifndef TIXML_USE_STL
 
@@ -128,13 +94,11 @@ class TiXmlString
 		quit();
 	}
 
-	// = operator
 	TiXmlString& operator = (const char * copy)
 	{
 		return assign( copy, (size_type)strlen(copy));
 	}
 
-	// = operator
 	TiXmlString& operator = (const TiXmlString & copy)
 	{
 		return assign(copy.start(), copy.length());

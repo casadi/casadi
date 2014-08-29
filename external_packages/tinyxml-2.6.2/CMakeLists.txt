@@ -4,7 +4,6 @@ set(TINYXML_SRC
   tinyxml.cpp
   tinyxmlerror.cpp
   tinyxmlparser.cpp
-  dump.cpp
 )
 
 if(ENABLE_STATIC)
@@ -17,10 +16,7 @@ install(TARGETS casadi_tinyxml
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 install(DIRECTORY ./
-  DESTINATION include/casadi/external_packages/tinyxml
+  DESTINATION include/casadi/external_packages/tinyxml-2.6.2
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE)
 set_target_properties(casadi_tinyxml PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})
-
-add_executable(test_dump test_dump.cpp)
-target_link_libraries(test_dump ${TINYXML_LIBRARIES})

@@ -65,7 +65,7 @@ namespace casadi {
 
     // Save attributes
     int type = n->Type();
-    if (type == TiXmlNode::ELEMENT) {
+    if (type == TiXmlNode::TINYXML_ELEMENT) {
       if (n->ToElement()!=0) {
         for (TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
              pAttrib;
@@ -73,7 +73,7 @@ namespace casadi {
           ret.setAttribute(pAttrib->Name(), pAttrib->Value());
         }
       }
-    } else if (type == TiXmlNode::DOCUMENT) {
+    } else if (type == TiXmlNode::TINYXML_DOCUMENT) {
       // do nothing
     } else {
       throw CasadiException("TinyXmlInterface::addNode");
@@ -91,16 +91,16 @@ namespace casadi {
     for (TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling(), ++ch) {
       int childtype = child->Type();
 
-      if (childtype == TiXmlNode::ELEMENT) {
+      if (childtype == TiXmlNode::TINYXML_ELEMENT) {
         XmlNode newnode = addNode(child);
         ret.children_.push_back(newnode);
         ret.child_indices_[newnode.getName()] = ch;
-      } else if (childtype == TiXmlNode::COMMENT) {
+      } else if (childtype == TiXmlNode::TINYXML_COMMENT) {
         ret.comment_ = child->Value();
-      } else if (childtype == TiXmlNode::TEXT) {
+      } else if (childtype == TiXmlNode::TINYXML_TEXT) {
         ret.text_ = child->ToText()->Value();
-      } else if (childtype == TiXmlNode::DECLARATION) {
-        cout << "Warning: Skipped TiXmlNode::DECLARATION" << endl;
+      } else if (childtype == TiXmlNode::TINYXML_DECLARATION) {
+        cout << "Warning: Skipped TiXmlNode::TINYXML_DECLARATION" << endl;
       } else {
         throw CasadiException("Error in TinyXmlInterface::addNode: Unknown node type");
       }
