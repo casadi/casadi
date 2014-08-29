@@ -30,9 +30,7 @@
 /** \pluginsection{LinearSolver,csparsecholesky} */
 
 /// \cond INTERNAL
-extern "C" {
-#include "external_packages/CSparse/Include/cs.h"
-}
+#include <cs.h>
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include <casadi/interfaces/csparse/casadi_linearsolver_csparsecholesky_export.h>
 

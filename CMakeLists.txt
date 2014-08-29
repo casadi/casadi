@@ -116,7 +116,8 @@ option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.5" O
 option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
-option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
+option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
+option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
 option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
@@ -293,7 +294,7 @@ endif()
 
 if(WITH_SUNDIALS)
   if(WITH_BUILD_SUNDIALS)
-    # build sundials
+    # build the included sundials
     set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
     set(SUNDIALS_LIBRARIES casadi_sundials)
     set(SUNDIALS_OK ON)
@@ -307,12 +308,21 @@ if(WITH_SUNDIALS)
 endif()
 add_feature_info(sundials-interface SUNDIALS_OK "Interface to the ODE/DAE integrator suite SUNDIALS.")
 
-# Use the included csparse
 if(WITH_CSPARSE)
-  set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
-  set(CSPARSE_LIBRARIES casadi_csparse)
+  if(WITH_BUILD_CSPARSE)
+    # build the included csparse
+    set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
+    set(CSPARSE_LIBRARIES casadi_csparse)
+    set(CSPARSE_OK ON)
+  else()
+    # try to find system csparse
+    find_package(CSPARSE)
+    if(CSPARSE_FOUND)
+      set(CSPARSE_OK ON)
+    endif()
+  endif()
 endif()
-add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct linear solver CSparse.")
+add_feature_info(csparse-interface CSPARSE_OK "Interface to the sparse direct linear solver CSparse.")
 
 # TinyXML
 set(TINYXML_LIBRARIES casadi_tinyxml)

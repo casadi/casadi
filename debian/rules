@@ -17,6 +17,7 @@ CMAKE_FLAGS = \
 	-DWITH_DEBIAN_BUILD=ON \
 	-DWITH_SLICOT=ON \
 	-DWITH_BUILD_SUNDIALS=OFF \
+	-DWITH_BUILD_CSPARSE=OFF \
 	-DWITH_SNOPT_FORCE_DUMMY=ON
 #	-DCMAKE_INSTALL_PREFIX=/usr \
 #	-DCMAKE_C_FLAGS_RELEASE="$(CFLAGS)" \
@@ -32,3 +33,4 @@ override_dh_auto_configure:
 
 override_dh_install:
 	dh_install -O--buildsystem=cmake --list-missing
+	make test
