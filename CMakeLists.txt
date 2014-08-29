@@ -123,7 +123,8 @@ option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
-option(WITH_TINYXML "Compile the interface to TinyXML (the source code is included)" ON)
+option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
+option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
 option(WITH_MATLAB "Compile with support for MATLAB front-end (experimental)" OFF)
@@ -318,8 +319,20 @@ if(WITH_CSPARSE)
 endif()
 add_feature_info(csparse-interface CSPARSE_FOUND "Interface to the sparse direct linear solver CSparse.")
 
-# TinyXML
-set(TINYXML_LIBRARIES casadi_tinyxml)
+# Use the included TinyXML
+if(WITH_TINYXML)
+  if(WITH_BUILD_TINYXML)
+    # build the included tinyxml
+    set(TINYXML_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/tinyxml)
+    set(TINYXML_LIBRARIES casadi_tinyxml)
+    set(TINYXML_FOUND ON)
+  else()
+    # try to find system tinyxml
+    find_package(TINYXML)
+  endif()
+endif()
+add_feature_info(tinyxml-interface TINYXML_FOUND "Interface to the XML parser TinyXML.")
+
 
 # enabling openmp support if requesed
 if(WITH_OPENMP)
@@ -384,14 +397,6 @@ if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
   set(QPOASES_FOUND true)
 endif()
 add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
-
-# Use the included TinyXML
-if(WITH_TINYXML)
-  set(TINYXML_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/tinyxml)
-  set(TINYXML_LIBRARIES casadi_tinyxml)
-  set(TINYXML_FOUND true)
-endif()
-add_feature_info(tinyxml-interface TINYXML_FOUND "Interface to the XML parser TinyXML.")
 
 if(WITH_OOQP AND BLAS_FOUND AND HSL_FOUND)
   find_package(OOQP)
