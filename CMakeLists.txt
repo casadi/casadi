@@ -335,20 +335,6 @@ endif()
 add_feature_info(tinyxml-interface TINYXML_FOUND "Interface to the XML parser TinyXML.")
 
 
-# DSDP
-if(WITH_DSDP)
-  if(WITH_BUILD_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
-    # build the included dsdp
-    set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
-    set(DSDP_LIBRARIES casadi_dsdp)
-    set(DSDP_FOUND true)
-  else()
-    # try to find system dsdp
-    find_package(DSDP)
-  endif()
-endif()
-add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
-
 
 
 # enabling openmp support if requesed
@@ -383,6 +369,22 @@ if(WITH_LAPACK)
   find_package(LAPACK)
 endif()
 add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
+
+
+# DSDP
+if(WITH_DSDP)
+  if(WITH_BUILD_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
+    # build the included dsdp
+    set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
+    set(DSDP_LIBRARIES casadi_dsdp)
+    set(DSDP_FOUND true)
+  else()
+    # try to find system dsdp
+    find_package(DSDP)
+  endif()
+endif()
+add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
+
 
 if(WITH_IPOPT)
   find_package(IPOPT)
