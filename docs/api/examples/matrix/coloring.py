@@ -38,12 +38,12 @@ color(Sparsity.dense(5,10))
 #! each column correspond to a row of the original matrix.
 
 color(A+Sparsity.triplet(5,5,[0],[4]))
-#! First 4 rows can be taken together, the fifth row is taken seperately
+#! First 4 rows can be taken together, the fifth row is taken separately
 color(A+Sparsity.triplet(5,5,[4],[0]))
-#! First 4 rows can be taken together, the fifth row is taken seperately
+#! First 4 rows can be taken together, the fifth row is taken separately
 
 color(A+Sparsity.triplet(5,5,[0]*5,range(5)))
-#! The first row is taken seperately.
+#! The first row is taken separately.
 #! The remainding rows are lumped together in one direction.
 
 color(A+Sparsity.triplet(5,5,range(5),[0]*5))
@@ -65,7 +65,7 @@ color(Sparsity.dense(5,5))
 #! We need 5 directions.
 
 color(A+Sparsity.triplet(5,5,[0]*5,range(5))+Sparsity.triplet(5,5,range(5),[0]*5))
-#! The first row/col is taken seperately.
+#! The first row/col is taken separately.
 #! The remainding rows/cols are lumped together in one direction.
 
 #! Let's take an example from the paper

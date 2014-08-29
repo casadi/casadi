@@ -1208,7 +1208,7 @@ namespace casadi {
 
     SX ret;
 
-    /// Bring m in block diagonal form, calculating eigenvalues of each block seperately
+    /// Bring m in block diagonal form, calculating eigenvalues of each block separately
     std::vector<int> offset;
     std::vector<int> index;
     int nb = m.sparsity().stronglyConnectedComponents(offset, index);

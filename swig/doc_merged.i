@@ -110373,7 +110373,7 @@ Attempts to find the eigenvalues of a symbolic matrix This will only work
 for up to 3x3 matrices.
 
 Bring m in block diagonal form, calculating eigenvalues of each block
-seperately ";
+separately ";
 
 %feature("docstring") casadi::casadi_load_xmlfile_tinyxml "";
 
