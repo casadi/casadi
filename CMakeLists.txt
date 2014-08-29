@@ -297,32 +297,26 @@ if(WITH_SUNDIALS)
     # build the included sundials
     set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
     set(SUNDIALS_LIBRARIES casadi_sundials)
-    set(SUNDIALS_OK ON)
+    set(SUNDIALS_FOUND ON)
   else()
     # try to find system sundials
     find_package(SUNDIALS)
-    if(SUNDIALS_FOUND)
-      set(SUNDIALS_OK ON)
-    endif()
   endif()
 endif()
-add_feature_info(sundials-interface SUNDIALS_OK "Interface to the ODE/DAE integrator suite SUNDIALS.")
+add_feature_info(sundials-interface SUNDIALS_FOUND "Interface to the ODE/DAE integrator suite SUNDIALS.")
 
 if(WITH_CSPARSE)
   if(WITH_BUILD_CSPARSE)
     # build the included csparse
     set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
     set(CSPARSE_LIBRARIES casadi_csparse)
-    set(CSPARSE_OK ON)
+    set(CSPARSE_FOUND ON)
   else()
     # try to find system csparse
     find_package(CSPARSE)
-    if(CSPARSE_FOUND)
-      set(CSPARSE_OK ON)
-    endif()
   endif()
 endif()
-add_feature_info(csparse-interface CSPARSE_OK "Interface to the sparse direct linear solver CSparse.")
+add_feature_info(csparse-interface CSPARSE_FOUND "Interface to the sparse direct linear solver CSparse.")
 
 # TinyXML
 set(TINYXML_LIBRARIES casadi_tinyxml)

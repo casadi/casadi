@@ -2,7 +2,7 @@ if(LAPACK_FOUND)
   add_subdirectory(lapack)
 endif()
 
-if(WITH_SUNDIALS)
+if(SUNDIALS_FOUND)
   add_subdirectory(sundials)
 endif()
 
@@ -22,7 +22,7 @@ if(CPLEX_FOUND)
   add_subdirectory(cplex)
 endif()
 
-if(WITH_CSPARSE)
+if(CSPARSE_FOUND)
   add_subdirectory(csparse)
 endif()
 
