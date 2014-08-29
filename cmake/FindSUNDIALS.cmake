@@ -36,10 +36,10 @@ endif()
 
 # libraries
 set(SUNDIALS_LIBS_LIST
-  sundials_cvode
+#  sundials_cvode
   sundials_cvodes
-  sundials_fnvecserial
-  sundials_ida
+#  sundials_fnvecserial
+#  sundials_ida
   sundials_idas
   sundials_kinsol
   sundials_nvecserial
