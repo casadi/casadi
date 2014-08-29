@@ -1,7 +1,3 @@
 usr/lib/libcasadi_linearsolver_csparse.so.*
 usr/lib/libcasadi_linearsolver_csparsecholesky.so.*
 usr/lib/libcasadi_csparse.so.*
-
-usr/lib/libcasadi_linearsolver_csparse.so
-usr/lib/libcasadi_linearsolver_csparsecholesky.so
-usr/lib/libcasadi_csparse.so
