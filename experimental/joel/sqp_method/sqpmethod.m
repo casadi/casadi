@@ -83,7 +83,7 @@ while true
     % minimize:   1/2*p'*Bk*p + Jfk*p
     % subject to: Jgk*p + gk == 0
     %             Jhk*p + hk >= 0
-    cvx_quiet(true); % Supress output
+    cvx_quiet(true); % Suppress output
     cvx_begin
     variable p(n)
     if ~isempty(gfun) dual variable lambda_hat;  end

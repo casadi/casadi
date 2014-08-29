@@ -27929,7 +27929,7 @@ Interface to IDAS from the Sundials suite.
 |                 |                 |                 | the end of the  |
 |                 |                 |                 | interval        |
 +-----------------+-----------------+-----------------+-----------------+
-| suppress_algebr | OT_BOOLEAN      | false           | Supress         |
+| suppress_algebr | OT_BOOLEAN      | false           | Suppress        |
 | aic             |                 |                 | algebraic       |
 |                 |                 |                 | variables in    |
 |                 |                 |                 | the error       |
@@ -28446,7 +28446,7 @@ Joel Andersson
 |              |              |              | of the       |              |
 |              |              |              | interval     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| suppress_alg | OT_BOOLEAN   | false        | Supress      | casadi::Idas |
+| suppress_alg | OT_BOOLEAN   | false        | Suppress     | casadi::Idas |
 | ebraic       |              |              | algebraic    | Interface    |
 |              |              |              | variables in |              |
 |              |              |              | the error    |              |
@@ -33716,7 +33716,7 @@ Interface to IDAS from the Sundials suite.
 |                 |                 |                 | the end of the  |
 |                 |                 |                 | interval        |
 +-----------------+-----------------+-----------------+-----------------+
-| suppress_algebr | OT_BOOLEAN      | false           | Supress         |
+| suppress_algebr | OT_BOOLEAN      | false           | Suppress        |
 | aic             |                 |                 | algebraic       |
 |                 |                 |                 | variables in    |
 |                 |                 |                 | the error       |
