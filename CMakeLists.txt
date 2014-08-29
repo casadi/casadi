@@ -112,7 +112,8 @@ option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" 
 option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy library (for Debian distribution; breaks normal snopt build)" OFF)
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF)
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
-option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
+option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.5" ON)
+option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
@@ -290,12 +291,21 @@ if(MINGW)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-ipa-cp-clone")
 endif()
 
-# Use the included Sundials
 if(WITH_SUNDIALS)
-  set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
-  set(SUNDIALS_LIBRARIES casadi_sundials)
+  if(WITH_BUILD_SUNDIALS)
+    # build sundials
+    set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
+    set(SUNDIALS_LIBRARIES casadi_sundials)
+    set(SUNDIALS_OK ON)
+  else()
+    # try to find system sundials
+    find_package(SUNDIALS)
+    if(SUNDIALS_FOUND)
+      set(SUNDIALS_OK ON)
+    endif()
+  endif()
 endif()
-add_feature_info(sundials-interface WITH_SUNDIALS "Interface to the ODE/DAE integrator suite SUNDIALS.")
+add_feature_info(sundials-interface SUNDIALS_OK "Interface to the ODE/DAE integrator suite SUNDIALS.")
 
 # Use the included csparse
 if(WITH_CSPARSE)

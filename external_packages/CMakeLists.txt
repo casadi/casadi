@@ -29,7 +29,7 @@ if(WITH_CSPARSE)
   add_subdirectory(CSparse)
 endif()
 
-if(WITH_SUNDIALS)
+if(WITH_BUILD_SUNDIALS)
   add_subdirectory(sundials-2.5mod)
 endif()
 
