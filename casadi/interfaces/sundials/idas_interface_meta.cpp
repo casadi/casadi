@@ -265,7 +265,7 @@
 "|                 |                 |                 | the end of the  |\n"
 "|                 |                 |                 | interval        |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
-"| suppress_algebr | OT_BOOLEAN      | false           | Suppress        |\n"
+"| suppress_algebr | OT_BOOLEAN      | false           | Supress         |\n"
 "| aic             |                 |                 | algebraic       |\n"
 "|                 |                 |                 | variables in    |\n"
 "|                 |                 |                 | the error       |\n"
