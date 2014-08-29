@@ -115,7 +115,8 @@ option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
 option(WITH_BUILD_SUNDIALS "Compile the included source code for Sundials 2.5" ON)
 option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
-option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
+option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
+option(WITH_DSDP "Compile the interface to DSDP" ON)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
@@ -319,7 +320,7 @@ if(WITH_CSPARSE)
 endif()
 add_feature_info(csparse-interface CSPARSE_FOUND "Interface to the sparse direct linear solver CSparse.")
 
-# Use the included TinyXML
+# TinyXML
 if(WITH_TINYXML)
   if(WITH_BUILD_TINYXML)
     # build the included tinyxml
@@ -332,6 +333,22 @@ if(WITH_TINYXML)
   endif()
 endif()
 add_feature_info(tinyxml-interface TINYXML_FOUND "Interface to the XML parser TinyXML.")
+
+
+# DSDP
+if(WITH_DSDP)
+  if(WITH_BUILD_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
+    # build the included dsdp
+    set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
+    set(DSDP_LIBRARIES casadi_dsdp)
+    set(DSDP_FOUND true)
+  else()
+    # try to find system dsdp
+    find_package(DSDP)
+  endif()
+endif()
+add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
+
 
 
 # enabling openmp support if requesed
@@ -418,14 +435,6 @@ if(WITH_WORHP AND LIBXML2_FOUND  AND WSMP_FOUND AND METIS_FOUND AND BLAS_FOUND A
   find_package(WORHP)
 endif()
 add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2, wsmp, metis, blas, lapack).")
-
-# Use the included dsdp
-if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
-  set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
-  set(DSDP_LIBRARIES casadi_dsdp)
-  set(DSDP_FOUND true)
-endif()
-add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
 
 if(WITH_PROFILING)
   find_library(RT rt)
