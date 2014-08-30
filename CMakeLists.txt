@@ -371,21 +371,6 @@ endif()
 add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
 
 
-# DSDP
-if(WITH_DSDP)
-  if(WITH_BUILD_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
-    # build the included dsdp
-    set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
-    set(DSDP_LIBRARIES casadi_dsdp)
-    set(DSDP_FOUND true)
-  else()
-    # try to find system dsdp
-    find_package(DSDP)
-  endif()
-endif()
-add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
-
-
 if(WITH_IPOPT)
   find_package(IPOPT)
 endif()
@@ -437,6 +422,22 @@ if(WITH_WORHP AND LIBXML2_FOUND  AND WSMP_FOUND AND METIS_FOUND AND BLAS_FOUND A
   find_package(WORHP)
 endif()
 add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2, wsmp, metis, blas, lapack).")
+
+
+# DSDP
+if(WITH_DSDP)
+  if(WITH_BUILD_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
+    # build the included dsdp
+    set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
+    set(DSDP_LIBRARIES casadi_dsdp)
+    set(DSDP_FOUND true)
+  else()
+    # try to find system dsdp
+    find_package(DSDP)
+  endif()
+endif()
+add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
+
 
 if(WITH_PROFILING)
   find_library(RT rt)
