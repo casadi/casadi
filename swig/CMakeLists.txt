@@ -256,7 +256,7 @@ COMMAND ${CMAKE_COMMAND}
   -P cmake_install.cmake
 )
 foreach(my_module ${CASADI_SWIG_MODULES})
-add_dependencies(install_python DEPENDS _${my_module})
+add_dependencies(install_python _${my_module})
 endforeach()
 
 # MATLAB interface
@@ -276,7 +276,9 @@ add_custom_target(${my_module}_json
   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
   COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml
 )
-add_dependencies(${my_module}_json ${my_module}_xml DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml)
+add_dependencies(${my_module}_json ${my_module}_xml
+                 ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py
+                 ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml)
 endforeach()
 
 #foreach(my_module ${CASADI_SWIG_MODULES})
