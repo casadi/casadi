@@ -110147,6 +110147,11 @@ Construct a matrix from a list of list of blocks.
 [INTERNAL] 
 Construct a matrix from 4 blocks.
 
+>  Sparsity casadi::blockcat(const std::vector< std::vector< Sparsity > > &v)
+------------------------------------------------------------------------
+
+Construct a sparsity from a list of list of sparsities.
+
 >  MX casadi::blockcat(const std::vector< std::vector< MX > > &v)
 ------------------------------------------------------------------------
 
@@ -110951,6 +110956,11 @@ Matrix product of n matrices.
 ------------------------------------------------------------------------
 
 Get the sparsity resulting from a matrix multiplication.
+
+>  Sparsity casadi::mul(const std::vector< Sparsity > &s)
+------------------------------------------------------------------------
+
+Get the sparsity resulting from a series of matrix multiplication.
 
 >  MX casadi::mul(const MX &x, const MX &y, const Sparsity &sp_z=Sparsity())
 ------------------------------------------------------------------------
