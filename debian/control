@@ -173,7 +173,7 @@ Section: libdevel
 Architecture: any
 Depends: ${misc:Depends},
          libcasadi-nlpsolver-snopt2.0 (= ${binary:Version})
-Description: SNOPT plugin for CasADi optimization framework
+Description: SNOPT plugin for CasADi optimization framework (development files)
  CasADi is a numerical optimization and algorithmic differentiation framework.
  It can be used from C++ or Python.
  .
@@ -194,7 +194,7 @@ Description: SNOPT plugin for CasADi optimization framework
  self-contained C-code and symbolic import of models from the Modelica physical
  modeling language and the AMPL algebraic modeling language.
  .
- This package contains the SNOPT NLP solver interface plugin.
+ This package contains the SNOPT NLP solver interface plugin development files.
 
 
 Package: libcasadi-solvers2.0
@@ -522,7 +522,7 @@ Section: libdevel
 Architecture: any
 Depends: ${misc:Depends},
          libcasadi-linearsolver-lapack2.0 (= ${binary:Version})
-Description: LAPACK linear solver plugin for CasADi
+Description: LAPACK linear solver plugin for CasADi (development files)
  CasADi is a numerical optimization and algorithmic differentiation framework.
  It can be used from C++ or Python.
  .
