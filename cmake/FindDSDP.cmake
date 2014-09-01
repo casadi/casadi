@@ -8,7 +8,7 @@ find_path(DSDP_INCLUDE_DIR
 if(DSDP_INCLUDE_DIR)
   message(STATUS "Found dsdp include directory: ${DSDP_INCLUDE_DIR}")
 else()
-  message(STATUS "Could not fund dsdp include dir")
+  message(STATUS "Could not find dsdp include dir")
 endif()
 
 # libraries
@@ -34,11 +34,13 @@ if(DSDP_LIBRARIES)
   message(STATUS "Found dsdp libraries ${DSDP_LIBRARIES}")
   set(DSDP_FOUND_LIBS TRUE)
 else()
-  message(STATUS "Could not find dsdp libraries")
+  set(DSDP_FOUND_LIBS FALSE)
+  message(STATUS "Could not find dsdp libraries ${DSDP_LIBRARIES}")
 endif()
 
 if(DSDP_INCLUDE_DIR AND DSDP_FOUND_LIBS)
   set(DSDP_FOUND TRUE)
 else()
+  set(DSDP_FOUND FALSE)
   message(STATUS "DSDP: Cound not find dsdp. Try setting DSDP env var.")
 endif()
