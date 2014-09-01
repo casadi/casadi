@@ -106,7 +106,7 @@ namespace casadi {
     std::string regName = "casadi_register_" + Derived::infix_ + "_" + name;
 
     // Error string
-    std::string errors = "PluginInterface::loadPlugin: Cannot open function:";
+    std::string errors = "PluginInterface::loadPlugin: Cannot load shared library:";
 #ifdef _WIN32
     HINSTANCE handle = LoadLibrary(TEXT(lib.c_str()));
     if (!handle) {
