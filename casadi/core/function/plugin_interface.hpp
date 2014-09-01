@@ -96,19 +96,39 @@ namespace casadi {
     std::string lib = SHARED_LIBRARY_PREFIX "casadi_"
       + Derived::infix_ + "_" + name + SHARED_LIBRARY_SUFFIX;
 
+    // the name of the backup library to try
+    std::string lib2 = PLUGIN_EXTRA_SEARCH_PATH + lib;
+
     // Load the dll
     std::string regName = "casadi_register_" + Derived::infix_ + "_" + name;
+
+    // error string
+    std::string errors = "PluginInterface::loadPlugin: Cannot open function:";
 #ifdef _WIN32
     HINSTANCE handle = LoadLibrary(TEXT(lib.c_str()));
-    casadi_assert_message(handle!=0, "PluginInterface::loadPlugin: Cannot open function: "
-                        << lib << ". error code (WIN32): "<< GetLastError());
+    if (NULL==handle) {
+        errors += "\n  " + lib + "\n  (error code (WIN32): " + GetLastError() + ")";
+        // try the backup
+        handle = LoadLibrary(TEXT(lib2.c_str()));
+        if (NULL==handle)
+            errors += "\n  " + lib2 + "\n  (error code (WIN32): " + GetLastError() + ")";
+    }
+
+    casadi_assert_message(handle!=0, errors);
 
     reg = (RegFcn)GetProcAddress(handle, TEXT(regName.c_str()));
     if (reg==0) throw CasadiException("PluginInterface::loadPlugin: no \"" + regName + "\" found");
 #else // _WIN32
     void* handle = dlopen(lib.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-    casadi_assert_message(handle!=0, "PluginInterface::loadPlugin: Cannot open function: "
-                          << lib << ". error code: "<< dlerror());
+    if (NULL==handle) {
+        errors += "\n  " + lib + "\n  (error code: " + dlerror() + ")";
+        // try the backup
+        handle = dlopen(lib2.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+        if (NULL==handle)
+            errors += "\n  " + lib2 + "\n  (error code: " + dlerror() + ")";
+    }
+    casadi_assert_message(handle!=0, errors);
+
     // reset error
     dlerror();
 
