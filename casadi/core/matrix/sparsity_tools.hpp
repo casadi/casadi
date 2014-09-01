@@ -60,6 +60,10 @@ namespace casadi {
   */
   CASADI_CORE_EXPORT Sparsity horzcat(const std::vector<Sparsity > &v);
 
+  /** \brief Construct a sparsity from a list of list of sparsities.
+   */
+  CASADI_CORE_EXPORT Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
+
   /** \brief   Construct a Sparsity with given blocks on the diagonal */
   CASADI_CORE_EXPORT Sparsity blkdiag(const std::vector< Sparsity > &v);
 
