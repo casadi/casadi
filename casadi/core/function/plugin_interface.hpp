@@ -127,7 +127,7 @@ namespace casadi {
     void* handle = dlopen(lib.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if (!handle) {
       errors += "\n  Tried " + lib + ":\n    Error code: " + dlerror();
-        
+
       // Try the second search path
       lib = PLUGIN_EXTRA_SEARCH_PATH "/" + lib;
       handle = dlopen(lib.c_str(), RTLD_LAZY | RTLD_GLOBAL);
