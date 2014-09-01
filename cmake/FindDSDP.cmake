@@ -8,7 +8,7 @@ find_path(DSDP_INCLUDE_DIR
 if(DSDP_INCLUDE_DIR)
   message(STATUS "Found dsdp include directory: ${DSDP_INCLUDE_DIR}")
 else()
-  message(STATUS "Could not fund dsdp include dir")
+  message(STATUS "Could not find dsdp include dir")
 endif()
 
 # libraries
