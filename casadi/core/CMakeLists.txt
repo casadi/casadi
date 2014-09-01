@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 2.6)
 add_definitions(-DSHARED_LIBRARY_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 add_definitions(-DSHARED_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
+# Look for plugins in the installation directory
+file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/lib/casadi PLUGIN_EXTRA_SEARCH_PATH)
+add_definitions(-DPLUGIN_EXTRA_SEARCH_PATH="${PLUGIN_EXTRA_SEARCH_PATH}")
+
 add_subdirectory(runtime)
 
 set(CASADI_SRCS

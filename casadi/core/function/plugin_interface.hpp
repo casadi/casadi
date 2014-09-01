@@ -45,6 +45,12 @@
 #ifndef SHARED_LIBRARY_SUFFIX
 #define SHARED_LIBRARY_SUFFIX ".so"
 #endif // SHARED_LIBRARY_SUFFIX
+
+// Set default plugin search path
+#ifndef PLUGIN_EXTRA_SEARCH_PATH
+#define PLUGIN_EXTRA_SEARCH_PATH "."
+#endif // PLUGIN_EXTRA_SEARCH_PATH
+
 #endif // WITH_DL
 
 namespace casadi {
@@ -96,46 +102,47 @@ namespace casadi {
     std::string lib = SHARED_LIBRARY_PREFIX "casadi_"
       + Derived::infix_ + "_" + name + SHARED_LIBRARY_SUFFIX;
 
-    // the name of the backup library to try
-    std::string lib2 = PLUGIN_EXTRA_SEARCH_PATH + lib;
-
     // Load the dll
     std::string regName = "casadi_register_" + Derived::infix_ + "_" + name;
 
-    // error string
+    // Error string
     std::string errors = "PluginInterface::loadPlugin: Cannot open function:";
 #ifdef _WIN32
     HINSTANCE handle = LoadLibrary(TEXT(lib.c_str()));
-    if (NULL==handle) {
-        errors += "\n  " + lib + "\n  (error code (WIN32): " + GetLastError() + ")";
-        // try the backup
-        handle = LoadLibrary(TEXT(lib2.c_str()));
-        if (NULL==handle)
-            errors += "\n  " + lib2 + "\n  (error code (WIN32): " + GetLastError() + ")";
-    }
+    if (!handle) {
+      errors += "\n  Tried " + lib + ":\n    Error code (WIN32): " + GetLastError();
 
+      // Try the second search path
+      lib = PLUGIN_EXTRA_SEARCH_PATH "\\" + lib;
+      handle = LoadLibrary(TEXT(lib.c_str()));
+      if (!handle) {
+        errors += "\n  Tried: " + lib + ":\n    Error code (WIN32): " + GetLastError();
+      }
+    }
     casadi_assert_message(handle!=0, errors);
 
     reg = (RegFcn)GetProcAddress(handle, TEXT(regName.c_str()));
-    if (reg==0) throw CasadiException("PluginInterface::loadPlugin: no \"" + regName + "\" found");
+    casadi_assert_message(reg!=0, "PluginInterface::loadPlugin: no \"" + regName + "\" found");
 #else // _WIN32
     void* handle = dlopen(lib.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-    if (NULL==handle) {
-        errors += "\n  " + lib + "\n  (error code: " + dlerror() + ")";
-        // try the backup
-        handle = dlopen(lib2.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-        if (NULL==handle)
-            errors += "\n  " + lib2 + "\n  (error code: " + dlerror() + ")";
+    if (!handle) {
+      errors += "\n  Tried " + lib + ":\n    Error code: " + dlerror();
+        
+      // Try the second search path
+      lib = PLUGIN_EXTRA_SEARCH_PATH "/" + lib;
+      handle = dlopen(lib.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+      if (!handle) {
+        errors += "\n  Tried " + lib + ":\n    Error code: " + dlerror();
+      }
     }
     casadi_assert_message(handle!=0, errors);
 
-    // reset error
+    // Reset error
     dlerror();
 
     // Load creator
     reg = (RegFcn)dlsym(handle, regName.c_str());
-    if (dlerror())
-      throw CasadiException("PluginInterface::loadPlugin: no \""+regName+"\" found");
+    casadi_assert_message(!dlerror(), "PluginInterface::loadPlugin: no \""+regName+"\" found");
 #endif // _WIN32
 
     // Register the plugin

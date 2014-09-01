@@ -165,8 +165,6 @@ add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 
 if(WITH_DL)
   add_definitions(-DWITH_DL)
-  # TODO: this won't work on windows:
-  add_definitions(-DPLUGIN_EXTRA_SEARCH_PATH="\\"${CMAKE_INSTALL_PREFIX}/lib/casadi/\\"")
 endif()
 add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loading of generated functions (needed for ExternalFunction)")
 
