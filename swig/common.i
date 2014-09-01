@@ -463,6 +463,7 @@ int internal(const std::string & c) {
 
 #ifndef SWIGXML
 %{
+// TODO(jgillis): remove after internal.i was updated
 #define CATCH_OR_RETHROW \
   catch (const std::exception& e) { \
     if (casadi::CasadiOptions::catch_errors_swig) { \
@@ -470,14 +471,25 @@ int internal(const std::string & c) {
     } else { \
       throw e; \
     } \
+  }
+#define CATCH_OR_NOT(ARG...) \
+if (casadi::CasadiOptions::catch_errors_swig) { \
+  try { \
+    ARG \
+  } catch(const std::exception& e) { \
+    SWIG_exception(SWIG_RuntimeError, e.what()); \
   } \
+} else { \
+  ARG\
+}
+
 %}
 #endif
 
 // Exceptions handling
 %include "exception.i"
 %exception {
-  try{ $action } CATCH_OR_RETHROW
+  CATCH_OR_NOT($action)
 }
 
 // Python sometimes takes an approach to not check, but just try.

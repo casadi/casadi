@@ -46,6 +46,10 @@ namespace casadi {
    */
   CASADI_CORE_EXPORT Sparsity mul(const Sparsity& a, const Sparsity &b);
 
+  /** \brief Get the sparsity resulting from a series of matrix multiplication
+   */
+  CASADI_CORE_EXPORT Sparsity mul(const std::vector<Sparsity>& s);
+
   /** \brief Concatenate a list of sparsities vertically
   * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
   */
@@ -55,6 +59,10 @@ namespace casadi {
   * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
   */
   CASADI_CORE_EXPORT Sparsity horzcat(const std::vector<Sparsity > &v);
+
+  /** \brief Construct a sparsity from a list of list of sparsities.
+   */
+  CASADI_CORE_EXPORT Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
 
   /** \brief   Construct a Sparsity with given blocks on the diagonal */
   CASADI_CORE_EXPORT Sparsity blkdiag(const std::vector< Sparsity > &v);
