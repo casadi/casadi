@@ -1,0 +1,27 @@
+usr/lib/casadi/libcasadi_implicitfunction_newton.so
+usr/lib/casadi/libcasadi_implicitfunction_nlp.so
+
+usr/lib/casadi/libcasadi_integrator_collocation.so
+usr/lib/casadi/libcasadi_integrator_rk.so
+
+usr/lib/casadi/libcasadi_linearsolver_symbolicqr.so
+usr/lib/casadi/libcasadi_lpsolver_qp.so
+
+usr/lib/casadi/libcasadi_qpsolver_nlp.so
+usr/lib/casadi/libcasadi_qpsolver_qcqp.so
+
+
+usr/lib/casadi/libcasadi_socpsolver_sdp.so
+usr/lib/casadi/libcasadi_dplesolver_simple.so
+
+usr/lib/casadi/libcasadi_stabilizedqpsolver_qp.so
+
+# these need cholesky right now:
+#usr/lib/casadi/libcasadi_qcqpsolver_socp.so
+#usr/lib/casadi/libcasadi_sdqpsolver_sdp.so
+
+# these aren't ready for outside use as far as I know:
+#usr/lib/casadi/libcasadi_nlpsolver_sqpmethod.so
+#usr/lib/casadi/libcasadi_homotopynlpsolver_simple.so
+#usr/lib/casadi/libcasadi_nlpsolver_stabilizedsqp.so
+#usr/lib/casadi/libcasadi_nlpsolver_scpgen.so
