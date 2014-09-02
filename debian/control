@@ -400,4 +400,4 @@ Description: Python bindings for CasADi
  self-contained C-code and symbolic import of models from the Modelica physical
  modeling language and the AMPL algebraic modeling language.
  .
- This package contains the python bindings.
+ This package contains the Python bindings.
