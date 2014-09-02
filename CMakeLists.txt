@@ -8,6 +8,10 @@ set(PACKAGE_AUTHOR "Joel Andersson")
 set(PACKAGE_MAINTAINER "Joris Gillis")
 set(PACKAGE_URL "http://casadi.org")
 
+
+#############################################################
+########################## Version ##########################
+#############################################################
 # For systems with git installed, find out revsion and description.
 execute_process(COMMAND git rev-parse HEAD
 OUTPUT_VARIABLE git_revision
@@ -37,69 +41,15 @@ if((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
 endif()
 
 
-# begin workaround for
-# http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-include(language_support)
-workaround_9220(Fortran Fortran_language_works)
-if(Fortran_language_works)
-  enable_language(Fortran OPTIONAL)
-endif()
-#end workaround
 
-include(CppLint)
-include(SpellCheck)
-include(embed_resources)
-include (GenerateExportHeader)
-
-# find the macports python libs if they exist
-if(APPLE)
-  set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
-endif()
-
-# Enforce cmake2.4+ style behaviour for
-# mixed filename/full path linker directives
-if(COMMAND cmake_policy)
-cmake_policy(SET CMP0003 NEW)
-endif()
-
-# cmake_policy propagation rules
-if(COMMAND cmake_policy)
-if(POLICY CMP0011)
-cmake_policy(SET CMP0011 OLD)
-endif()
-endif()
-
-# cmake_policy avoid escaping in add_definitions
-if(COMMAND cmake_policy)
-cmake_policy(SET CMP0005 OLD)
-endif()
-
-# We use the FeatureSummary module to get a more readable CMake output
-include(FeatureSummary)
-if(NOT COMMAND add_feature_info)
-  function(add_feature_info _name _enabled _description)
-    message(STATUS "Detected: ${_name} ${_description}")
-  endfunction()
-  function(feature_summary)
-  endfunction()
-endif()
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
-  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
-else()
-  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
-  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
-endif()
-  
-# Options:
+##################################################################
+########################## Options ###############################
+##################################################################
 option(WITH_EXTRA_WARNINGS "Add extra warnings (like -Wall -Wextra)" OFF)
 option(WITH_WERROR "Add -Werror" OFF)
 option(WITH_DL "Enable dynamic loading of functions" ON)
 option(WITH_DOC "Enable documentation generation" OFF)
 option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
-
 option(WITH_EXAMPLES "Build examples" ON)
 option(WITH_PYTHON "make and install python bindings by default" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
@@ -131,7 +81,78 @@ option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
 option(WITH_MATLAB "Compile with support for MATLAB front-end (experimental)" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
+# static on windows, shared on linux/osx by default
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
+  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
+else()
+  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
+  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
+endif()
 
+
+
+
+############################################################
+####################### Fortran ############################
+############################################################
+# begin workaround for
+# http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+include(language_support)
+workaround_9220(Fortran Fortran_language_works)
+if(Fortran_language_works)
+  enable_language(Fortran OPTIONAL)
+endif()
+#end workaround
+
+include(CppLint)
+include(SpellCheck)
+include(embed_resources)
+include(GenerateExportHeader)
+
+############################################################
+####################### Policies ###########################
+############################################################
+# Enforce cmake2.4+ style behaviour for
+# mixed filename/full path linker directives
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0003 NEW)
+endif()
+
+# cmake_policy propagation rules
+if(COMMAND cmake_policy)
+if(POLICY CMP0011)
+cmake_policy(SET CMP0011 OLD)
+endif()
+endif()
+
+# cmake_policy avoid escaping in add_definitions
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0005 OLD)
+endif()
+
+############################################################
+####################### macports python ####################
+############################################################
+# find the macports python libs if they exist
+if(APPLE)
+  set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
+endif()
+
+# We use the FeatureSummary module to get a more readable CMake output
+include(FeatureSummary)
+if(NOT COMMAND add_feature_info)
+  function(add_feature_info _name _enabled _description)
+    message(STATUS "Detected: ${_name} ${_description}")
+  endfunction()
+  function(feature_summary)
+  endfunction()
+endif()
+
+############################################################
+######################## rpath #############################
+############################################################
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
@@ -151,6 +172,8 @@ if("${isSystemDir}" STREQUAL "-1")
    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif("${isSystemDir}" STREQUAL "-1")
 
+
+
 # For code optimization
 if(CMAKE_BUILD_TYPE)
 else()
@@ -159,26 +182,9 @@ else()
 endif()
 string(TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 
-# Necessary for Visual C++
-add_definitions(-D_USE_MATH_DEFINES)
-add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-
-if(WITH_DL)
-  add_definitions(-DWITH_DL)
-endif()
-add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loading of generated functions (needed for ExternalFunction)")
-
-if(WITH_PRINTME)
-  add_definitions(-DWITH_PRINTME)
-endif()
-
-if(WITH_DEBIAN_BUILD)
-  add_definitions(-DWITH_DEBIAN_BUILD)
-endif()
-
-include_directories(.)
-include_directories(${CMAKE_BINARY_DIR})
-
+########################################################################
+############################# C++11 ####################################
+########################################################################
 # Check if the compiler supports C++11
 foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x" "-std=c++11 --DUSE_TR1_HASHMAP" "-std=c++0x -DUSE_TR1_HASHMAP")
   if(NOT USE_CXX11)
@@ -238,8 +244,9 @@ if(CXX11FLAG)
 endif()
 
 
-# set(CMAKE_VERBOSE_MAKEFILE 0)
-
+################################################################################
+############################### compiler warnings ##############################
+################################################################################
 # add compiler warnings
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   if(WITH_EXTRA_WARNINGS)
@@ -275,6 +282,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # I don't know the MSVC warnings, so do nothing for now
 endif()
 
+#######################################################################
+############################# -fPIC ###################################
+#######################################################################
 # the following commands are needed to fix a problem with the libraries
 # for linux 64 bits
 if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
@@ -284,6 +294,10 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
 endif()
 
+
+#######################################################################
+########################### code coverage #############################
+#######################################################################
 if(WITH_COVERAGE)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
@@ -295,6 +309,46 @@ if(MINGW)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-ipa-cp-clone")
 endif()
 
+
+# Necessary for Visual C++
+add_definitions(-D_USE_MATH_DEFINES)
+add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+
+if(WITH_DL)
+  add_definitions(-DWITH_DL)
+endif()
+add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loading of generated functions (needed for ExternalFunction)")
+
+if(WITH_PRINTME)
+  add_definitions(-DWITH_PRINTME)
+endif()
+
+if(WITH_DEBIAN_BUILD)
+  add_definitions(-DWITH_DEBIAN_BUILD)
+endif()
+
+include_directories(.)
+include_directories(${CMAKE_BINARY_DIR})
+
+
+#######################################################################
+########################### find packages ############################
+#######################################################################
+# Optional auxillary dependencies
+find_package(BLAS QUIET)
+find_package(HSL QUIET)
+find_package(WSMP QUIET)
+find_package(METIS QUIET)
+find_package(LibXml2 QUIET)
+if(WITH_LAPACK)
+  find_package(LAPACK)
+endif()
+add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
+
+#######################################################################
+################# third-party libraries we can build ##################
+#######################################################################
+# sundials
 if(WITH_SUNDIALS)
   if(WITH_BUILD_SUNDIALS)
     # build the included sundials
@@ -308,6 +362,7 @@ if(WITH_SUNDIALS)
 endif()
 add_feature_info(sundials-interface SUNDIALS_FOUND "Interface to the ODE/DAE integrator suite SUNDIALS.")
 
+# CSparse
 if(WITH_CSPARSE)
   if(WITH_BUILD_CSPARSE)
     # build the included csparse
@@ -335,9 +390,31 @@ if(WITH_TINYXML)
 endif()
 add_feature_info(tinyxml-interface TINYXML_FOUND "Interface to the XML parser TinyXML.")
 
+# DSDP
+if(WITH_DSDP)
+  if(WITH_BUILD_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
+    # build the included dsdp
+    set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
+    set(DSDP_LIBRARIES casadi_dsdp)
+    set(DSDP_FOUND true)
+  else()
+    # try to find system dsdp
+    find_package(DSDP)
+  endif()
+endif()
+add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
 
+# Use the included qpOASES
+if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
+  set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
+  set(QPOASES_LIBRARIES casadi_qpoases)
+  set(QPOASES_FOUND true)
+endif()
+add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
 
-
+#######################################################################
+############### third-party libraries we don't build ##################
+#######################################################################
 # enabling openmp support if requesed
 if(WITH_OPENMP)
   find_package(OpenMP)
@@ -346,10 +423,6 @@ if(WITH_OPENMP)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -DWITH_OPENMP")
   endif()
 endif()
-
-#set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
 # OpenCL
 if(WITH_OPENCL)
@@ -360,16 +433,6 @@ if(WITH_OPENCL)
 endif()
 add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to CPUs and GPUs with OpenCL.")
 
-# Optional auxillary dependencies
-find_package(BLAS QUIET)
-find_package(HSL QUIET)
-find_package(WSMP QUIET)
-find_package(METIS QUIET)
-find_package(LibXml2 QUIET)
-if(WITH_LAPACK)
-  find_package(LAPACK)
-endif()
-add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
 
 
 if(WITH_IPOPT)
@@ -395,14 +458,6 @@ endif()
 #   find_package (GSL)
 # endif()
 
-# Use the included qpOASES
-if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
-  set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
-  set(QPOASES_LIBRARIES casadi_qpoases)
-  set(QPOASES_FOUND true)
-endif()
-add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
-
 if(WITH_OOQP AND BLAS_FOUND AND HSL_FOUND)
   find_package(OOQP)
 endif()
@@ -425,26 +480,21 @@ endif()
 add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2, wsmp, metis, blas, lapack).")
 
 
-# DSDP
-if(WITH_DSDP)
-  if(WITH_BUILD_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
-    # build the included dsdp
-    set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
-    set(DSDP_LIBRARIES casadi_dsdp)
-    set(DSDP_FOUND true)
-  else()
-    # try to find system dsdp
-    find_package(DSDP)
-  endif()
-endif()
-add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
-
-
 if(WITH_PROFILING)
   find_library(RT rt)
   add_definitions(-DWITH_PROFILING)
 endif()
 
+######################################################
+##################### paths ##########################
+######################################################
+#set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
+
+#####################################################
+################# include the rest ##################
+#####################################################
 add_subdirectory(external_packages)
 add_subdirectory(casadi)
 add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
@@ -452,6 +502,14 @@ add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 #add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
 add_subdirectory(misc)
 
+if(WITH_EXAMPLES)
+  add_subdirectory(docs/examples)
+  add_subdirectory(docs/api/examples/ctemplate)
+endif()
+
+#####################################################
+######################### swig ######################
+#####################################################
 find_package(SWIG)
   if(SWIG_FOUND)
     if(WITH_PYTHON)
@@ -461,12 +519,16 @@ find_package(SWIG)
       add_subdirectory(swig EXCLUDE_FROM_ALL)
       add_custom_target(python     DEPENDS _python_modules)
     endif()
+
     if(WITH_MATLAB)
         add_custom_target(matlab DEPENDS _matlab_modules)
     endif()
     add_custom_target(json DEPENDS _json_modules)
 endif()
 
+#####################################################
+######################### docs ######################
+#####################################################
 if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
   set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/docs/api)
@@ -477,10 +539,7 @@ if(WITH_DOC)
   add_custom_target(tutor)
 endif()
 
-if(WITH_EXAMPLES)
-  add_subdirectory(docs/examples)
-  add_subdirectory(docs/api/examples/ctemplate)
-endif()
+
 
 # Print a summary
 feature_summary(WHAT ALL)
@@ -495,6 +554,7 @@ configure_file(
   ESCAPE_QUOTES
 )
 
+# what is this?
 if(EXTRA_CMAKE)
   include(${EXTRA_CMAKE})
 endif()
