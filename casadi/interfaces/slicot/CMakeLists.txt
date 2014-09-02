@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
-casadi_library(casadi_slicot_interface
+# the TRUE installs this to lib/casadi
+casadi_library_or_plugin(casadi_slicot_interface TRUE
   slicot_tools.hpp
   slicot_tools.cpp)
 target_link_libraries(casadi_slicot_interface ${SLICOT_LIBRARIES})
