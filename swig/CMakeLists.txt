@@ -223,13 +223,6 @@ install(FILES ${dlls}
   COMPONENT install_python
 )
 
-# From the CMAKE_INSTALL_RPATH_USE_LINK_PATH wiki:
-# The only directories which may then still be missing from the RPATH are the directories
-# where the libraries from the same project (i.e. libbar.so) are installed to.
-# If the install directory for the libraries is not one of the systems default library directories,
-# you have to add this directory yourself to the install RPATH by setting CMAKE_INSTALL_RPATH accordingly. 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/casadi")
-
 foreach(my_module ${modules_python})
   install(TARGETS ${my_module}
     DESTINATION "${PYTHON_PREFIX}/casadi"
