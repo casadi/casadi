@@ -46,11 +46,6 @@
 #define SHARED_LIBRARY_SUFFIX ".so"
 #endif // SHARED_LIBRARY_SUFFIX
 
-// Set default plugin search path
-#ifndef PLUGIN_EXTRA_SEARCH_PATH
-#define PLUGIN_EXTRA_SEARCH_PATH "."
-#endif // PLUGIN_EXTRA_SEARCH_PATH
-
 #endif // WITH_DL
 
 namespace casadi {
@@ -112,12 +107,14 @@ namespace casadi {
     if (!handle) {
       errors += "\n  Tried " + lib + ":\n    Error code (WIN32): " + GetLastError();
 
+      #ifdef PLUGIN_EXTRA_SEARCH_PATH
       // Try the second search path
       lib = PLUGIN_EXTRA_SEARCH_PATH "\\" + lib;
       handle = LoadLibrary(TEXT(lib.c_str()));
       if (!handle) {
         errors += "\n  Tried: " + lib + ":\n    Error code (WIN32): " + GetLastError();
       }
+      #endif // PLUGIN_EXTRA_SEARCH_PATH
     }
     casadi_assert_message(handle!=0, errors);
 
@@ -128,12 +125,14 @@ namespace casadi {
     if (!handle) {
       errors += "\n  Tried " + lib + ":\n    Error code: " + dlerror();
 
+      #ifdef PLUGIN_EXTRA_SEARCH_PATH
       // Try the second search path
       lib = PLUGIN_EXTRA_SEARCH_PATH "/" + lib;
       handle = dlopen(lib.c_str(), RTLD_LAZY | RTLD_GLOBAL);
       if (!handle) {
         errors += "\n  Tried " + lib + ":\n    Error code: " + dlerror();
       }
+      #endif // PLUGIN_EXTRA_SEARCH_PATH
     }
     casadi_assert_message(handle!=0, errors);
 
