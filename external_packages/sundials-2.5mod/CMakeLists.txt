@@ -9,7 +9,9 @@ include_directories(.)
 
 # cmake_policy use MACOSX_RPATH=ON by default
 if(COMMAND cmake_policy)
-cmake_policy(SET CMP0042 NEW)
+  if(CMAKE_MAJOR_VERSION GREATER 2)
+    cmake_policy(SET CMP0042 NEW)
+  endif()
 endif()
 
 set(SUNDIALS_INCLUDES

@@ -4,7 +4,9 @@ include_directories(include src/bounds src/lp src/sdp src/solver src/sys src/vec
 
 # cmake_policy use MACOSX_RPATH=ON by default
 if(COMMAND cmake_policy)
-cmake_policy(SET CMP0042 NEW)
+  if(CMAKE_MAJOR_VERSION GREATER 2)
+    cmake_policy(SET CMP0042 NEW)
+  endif()
 endif()
 
 file(GLOB DSDP_SRC "src/bounds/*.c"  "src/bounds/*.h" "src/lp/*.c" "src/lp/*.h" "src/sdp/*.c" "src/sdp/*.h" "src/solver/*.c" "src/solver/*.h" "src/sys/*.c" "src/sys/*.h" "src/vecmat/*.c" "src/vecmat/*.h")
