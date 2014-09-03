@@ -46,9 +46,6 @@ namespace casadi {
   }
 
   KnitroInterface::KnitroInterface(const Function& nlp) : NlpSolverInternal(nlp) {
-    casadi_warning("KnitroInterface: the KNITRO interface is still experimental, "
-                   "more tests are needed");
-
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
               "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
