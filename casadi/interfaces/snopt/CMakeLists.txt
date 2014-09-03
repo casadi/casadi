@@ -16,9 +16,9 @@ if(WITH_SNOPT_FORCE_DUMMY)
   if(ENABLE_SHARED)
   add_library(snopt7 SHARED empty_lib.cpp)
   endif()
-  casadi_plugin_link_libraries(NlpSolver snopt ${CMAKE_DL_LIBS} snopt7)
+  casadi_plugin_link_libraries(NlpSolver snopt snopt7)
 else()
-  casadi_plugin_link_libraries(NlpSolver snopt ${CMAKE_DL_LIBS} ${SNOPT_LIBRARIES})
+  casadi_plugin_link_libraries(NlpSolver snopt ${SNOPT_LIBRARIES})
 endif()
 
 install(DIRECTORY ./
