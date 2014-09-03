@@ -82,7 +82,7 @@ namespace casadi {
     addOption("NewPoint", OT_BOOLEAN, 0, "Select new-point feature");
     addOption("GradOpt", OT_INTEGER, 1, "Gradient calculation method");
     addOption("HessOpt", OT_INTEGER, 1, "Hessian calculation method");
-    addOption("Feasible", OT_BOOLEAN, 0, "Allow infeasible iterations");
+    addOption("Feasible", OT_BOOLEAN, 1, "Allow infeasible iterations");
     addOption("HonorBnds", OT_BOOLEAN, 0, "Enforce bounds");
     addOption("LpSolver", OT_BOOLEAN, 0, "Use LpSolver");
     addOption("Multistart", OT_BOOLEAN, 0, "Use multistart");
@@ -98,15 +98,15 @@ namespace casadi {
     addOption("Soc", OT_INTEGER, 1, "Second order correction");
     addOption("InitPt", OT_BOOLEAN, 0, "Use initial point strategy");
     addOption("Delta", OT_REAL, 1.0, "Initial region scaling factor");
-    addOption("FeasModeTol", OT_REAL, 0.0001, "Feasible mode tolerance");
+    addOption("FeasModeTol", OT_REAL, 1e-4, "Feasible mode tolerance");
     addOption("FeasTol", OT_REAL, 1e-6, "Feasible tolerance");
-    addOption("FeasTolAbs", OT_REAL, 1, "Absolute feasible tolerance");
+    addOption("FeasTolAbs", OT_REAL, 0, "Absolute feasible tolerance");
     addOption("OptTol", OT_REAL, 1e-6, "Relative optimality tolerance");
     addOption("OptTolAbs", OT_REAL, 0, "Absolute optimality tolerance");
     addOption("Pivot", OT_REAL, 1e-8, "Initial pivot threshold");
     addOption("XTol", OT_REAL, 1e-15, "Relative solution change tolerance");
     addOption("Mu", OT_REAL, 0.1, "Initial barrier parameter");
-    addOption("ObjRange", OT_REAL, 1e-8, "Maximum objective value");
+    addOption("ObjRange", OT_REAL, 1e20, "Maximum objective value");
     addOption("OutLev", OT_INTEGER, 2, "Log output level");
     addOption("Debug", OT_INTEGER, 0, "Debug level");
 
@@ -185,8 +185,11 @@ namespace casadi {
     int status;
 
     // Jacobian sparsity
-    vector<int> Jcol = jacG_.output().sparsity().getCol();
-    vector<int> Jrow = jacG_.output().row();
+    vector<int> Jcol, Jrow;
+    if (!jacG_.isNull()){
+      Jcol = jacG_.output().sparsity().getCol();
+      Jrow = jacG_.output().row();
+    }
 
     // Hessian sparsity
     int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().sizeL();
@@ -258,15 +261,23 @@ namespace casadi {
       if (isinf(*it)) *it =  KTR_INFBOUND;
 
     // Initialize KNITRO
-    status = KTR_init_problem(kc_handle_, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
-                              &input(NLP_SOLVER_LBX).front(), &input(NLP_SOLVER_UBX).front(),
-                              ng_, &cType.front(), &input(NLP_SOLVER_LBG).front(),
-                              &input(NLP_SOLVER_UBG).front(),
-                              Jcol.size(), &Jcol.front(), &Jrow.front(),
+    status = KTR_init_problem(kc_handle_,
+                              nx_,
+                              KTR_OBJGOAL_MINIMIZE,
+                              KTR_OBJTYPE_GENERAL,
+                              input(NLP_SOLVER_LBX).ptr(),
+                              input(NLP_SOLVER_UBX).ptr(),
+                              ng_,
+                              getPtr(cType),
+                              input(NLP_SOLVER_LBG).ptr(),
+                              input(NLP_SOLVER_UBG).ptr(),
+                              Jcol.size(),
+                              getPtr(Jcol),
+                              getPtr(Jrow),
                               nnzH,
                               getPtr(Hrow),
                               getPtr(Hcol),
-                              &input(NLP_SOLVER_X0).front(),
+                              input(NLP_SOLVER_X0).ptr(),
                               0); // initial lambda
     casadi_assert_message(status==0, "KTR_init_problem failed");
 
@@ -287,21 +298,24 @@ namespace casadi {
 
     // Solve NLP
     status = KTR_solve(kc_handle_,
-                       &output(NLP_SOLVER_X).front(),
+                       output(NLP_SOLVER_X).ptr(),
                        getPtr(lambda),
                        0,  // not used
-                       &output(NLP_SOLVER_F).front(),
+                       output(NLP_SOLVER_F).ptr(),
                        0,  // not used
                        0,  // not used
                        0,  // not used
                        0,  // not used
                        0,  // not used
-                       this); // to be retrieved in the callback function
-    casadi_assert(status<=0); // make sure the NLP finished solving
+                       static_cast<void*>(this)); // to be retrieved in the callback function
+    stats_["return_status"] = status;
+
+    // Copy constraints
+    nlp_.output(NL_G).get(output(NLP_SOLVER_G));
 
     // Copy lagrange multipliers
     output(NLP_SOLVER_LAM_G).set(getPtr(lambda));
-    output(NLP_SOLVER_LAM_X).set(&lambda[ng_]);
+    output(NLP_SOLVER_LAM_X).set(getPtr(lambda)+ng_);
 
     // Free memory (move to destructor!)
     KTR_free(&kc_handle_);
@@ -374,20 +388,22 @@ namespace casadi {
       cout << "grad_f = " << gradF_.output() << endl;
     }
 
-    // Pass the argument to the Jacobian function
-    jacG_.setInput(x, NL_X);
-    jacG_.setInput(input(NLP_SOLVER_P), NL_P);
+    if (!jacG_.isNull()) {
+      // Pass the argument to the Jacobian function
+      jacG_.setInput(x, NL_X);
+      jacG_.setInput(input(NLP_SOLVER_P), NL_P);
 
-    // Evaluate the Jacobian function
-    jacG_.evaluate();
+      // Evaluate the Jacobian function
+      jacG_.evaluate();
 
-    // Get the result
-    jacG_.output().get(jac);
+      // Get the result
+      jacG_.output().get(jac);
 
-    // Printing
-    if (monitored("eval_jac_g")) {
-      cout << "x = " << jacG_.input(NL_X) << endl;
-      cout << "jac_g = " << jacG_.output() << endl;
+      // Printing
+      if (monitored("eval_jac_g")) {
+        cout << "x = " << jacG_.input(NL_X) << endl;
+        cout << "jac_g = " << jacG_.output() << endl;
+      }
     }
   }
 

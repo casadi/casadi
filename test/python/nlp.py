@@ -76,12 +76,12 @@ try:
 except:
   pass
 
-#try:
-#NlpSolver.loadPlugin("knitro")
-#  solvers.append(("knitro",{}))
-#  print "Will test knitro"
-#except:
-#  pass
+# try:
+#   NlpSolver.loadPlugin("knitro")
+#   solvers.append(("knitro",{}))
+#   print "Will test knitro"
+# except:
+#   pass
 
 class NLPtests(casadiTestCase):
 
@@ -185,7 +185,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-Inf],"lbg")
       solver.setInput([Inf],"ubg")
 
-      if 'worhp' in str(Solver):
+      if Solver in ("worhp","knitro"):
         with self.assertRaises(Exception):
           solver.evaluate()
         return
@@ -927,7 +927,7 @@ class NLPtests(casadiTestCase):
       self.message(Solver)
       solver = NlpSolver(Solver, nlp)
       solver.setOption(solver_options)
-      for k,v in ({"tol":1e-8,"TolOpti":1e-20,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order", "hessian_approximation": "exact", "UserHM": True}).iteritems():
+      for k,v in ({"tol":1e-8,"TolOpti":1e-20,"max_iter":100, "MaxIter": 100, "MaxIt" : 100, "print_level":0,"derivative_test":"first-order", "hessian_approximation": "exact", "UserHM": True, "OptTolAbs":1e-10, "OptTol":1e-10}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.init()
@@ -937,12 +937,20 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
       solver.evaluate()
-      self.assertAlmostEqual(solver.getOutput("f")[0],9.0908263002590e-3,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[0],1.0952466252248,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[1],1.2,5,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],-8.6963632695079e-2,4,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
+      if float(solver.getOutput("x")[0])<0: # JOEL: There appears to be two local minima
+        self.assertAlmostEqual(solver.getOutput("f")[0],4.3817250416084308,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("x")[0],-1.0910624688699295,6,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("x")[1],1.2,5,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
+        self.assertAlmostEqual(solver.getOutput("lam_x")[1],-1.9165378046901287,4,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
+      else:
+        self.assertAlmostEqual(solver.getOutput("f")[0],9.0908263002590e-3,6,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("x")[0],1.0952466252248,6,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("x")[1],1.2,5,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
+        self.assertAlmostEqual(solver.getOutput("lam_x")[1],-8.6963632695079e-2,4,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
 
   def testactiveLBG(self):
     self.message("active LBG")
@@ -1123,15 +1131,15 @@ class NLPtests(casadiTestCase):
       solver.setInput(UBA,"ubg")
       if 'sqic' in str(solver_options):
         continue
-      if 'worhp' in str(Solver):
+      if Solver=='worhp':
         with self.assertRaises(Exception):
           solver.evaluate()
         return
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],0.5,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1.25,6,str(Solver))
     
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
@@ -1194,8 +1202,8 @@ class NLPtests(casadiTestCase):
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(solver))
-      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],2.0/3,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],4.0/3,6,str(solver))
     
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(solver))
