@@ -25,12 +25,12 @@
 
 #include "fixed_step_integrator.hpp"
 #include "casadi/core/function/implicit_function.hpp"
-#include <casadi/solvers/casadi_integrator_collocation_export.h>
+#include <casadi/solvers/casadi_integrators_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  class CASADI_INTEGRATOR_COLLOCATION_EXPORT ImplicitFixedStepIntegrator
+  class CASADI_INTEGRATORS_EXPORT ImplicitFixedStepIntegrator
       : public FixedStepIntegrator {
   public:
 

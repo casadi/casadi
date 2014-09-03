@@ -25,12 +25,12 @@
 
 #include "casadi/core/function/integrator_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
-#include <casadi/solvers/casadi_integrator_rk_export.h>
+#include <casadi/solvers/casadi_integrators_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  class CASADI_INTEGRATOR_RK_EXPORT FixedStepIntegrator
+  class CASADI_INTEGRATORS_EXPORT FixedStepIntegrator
     : public IntegratorInternal {
   public:
 
