@@ -18,7 +18,6 @@ casadi_plugin(StabilizedQpSolver sqic
   stabilized_sqic_interface.cpp
   stabilized_sqic_interface_meta.cpp
   ${resource_file})
-casadi_plugin_link_libraries(StabilizedQpSolver sqic casadi_qpsolver_sqic)
 
 if(ENABLE_STATIC)
 add_library(sqic_fortran_c_bridge STATIC wsqic.f90)
