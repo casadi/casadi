@@ -272,7 +272,9 @@ endif()
 # These files are dependencies of json outputs, but they don't exist according to cmake.
 # So we silence these warnings. THIS IS A HACK AND WE NEED A BETTER SOLUTION
 if(COMMAND cmake_policy)
-cmake_policy(SET CMP0046 OLD)
+  if(CMAKE_MAJOR_VERSION GREATER 2)
+    cmake_policy(SET CMP0046 OLD)
+  endif()
 endif()
 
 foreach(my_module ${CASADI_SWIG_MODULES})
