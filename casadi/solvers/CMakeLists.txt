@@ -89,11 +89,8 @@ casadi_plugin(LinearSolver symbolicqr
 if(WITH_CSPARSE)
   casadi_plugin(QcqpSolver socp
     qcqp_to_socp.cpp qcqp_to_socp.hpp qcqp_to_socp_meta.cpp)
-  target_link_libraries(casadi_qcqpsolver_socp casadi_linearsolver_csparsecholesky)
   casadi_plugin(SdqpSolver sdp
     sdqp_to_sdp.cpp sdqp_to_sdp.hpp sdqp_to_sdp_meta.cpp)
-  target_link_libraries(casadi_sdqpsolver_sdp
-    casadi_linearsolver_csparsecholesky)
 endif()
 
 install(DIRECTORY ./
