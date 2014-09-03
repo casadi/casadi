@@ -267,6 +267,16 @@ if(WITH_MATLAB)
 endif()
   
 # json interface
+
+# fooXML_wrap.xml are a big files which Joris wants to delete immedately after using.
+# These files are dependencies of json outputs, but they don't exist according to cmake.
+# So we silence these warnings. THIS IS A HACK AND WE NEED A BETTER SOLUTION
+if(COMMAND cmake_policy)
+  if(CMAKE_MAJOR_VERSION GREATER 2)
+    cmake_policy(SET CMP0046 OLD)
+  endif()
+endif()
+
 foreach(my_module ${CASADI_SWIG_MODULES})
   swig_add_module_xml(${my_module}_xml ${my_module}.i)
 endforeach()
