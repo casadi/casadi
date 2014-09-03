@@ -132,6 +132,11 @@ if(COMMAND cmake_policy)
 cmake_policy(SET CMP0005 OLD)
 endif()
 
+# cmake_policy use MACOSX_RPATH=ON by default
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0042 NEW)
+endif()
+
 ############################################################
 ####################### macports python ####################
 ############################################################
@@ -497,7 +502,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 #####################################################
 add_subdirectory(external_packages)
 add_subdirectory(casadi)
-add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
+#add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
 add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 #add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
 add_subdirectory(misc)

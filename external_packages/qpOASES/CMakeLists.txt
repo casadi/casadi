@@ -6,6 +6,11 @@ cmake_minimum_required(VERSION 2.6)
 
 project(qpOASES CXX)
 
+# cmake_policy use MACOSX_RPATH=ON by default
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0042 NEW)
+endif()
+
 include_directories(include)
 set(QPOASES_LIBRARIES ${QPOASES_LIBRARIES})
 file(GLOB SRC src/*.cpp)

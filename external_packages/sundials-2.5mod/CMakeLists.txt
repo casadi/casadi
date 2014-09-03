@@ -7,6 +7,11 @@ cmake_minimum_required(VERSION 2.6)
 project(sundials-2.5mod C)
 include_directories(.)
 
+# cmake_policy use MACOSX_RPATH=ON by default
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0042 NEW)
+endif()
+
 set(SUNDIALS_INCLUDES
   nvector/nvector_serial.h
 

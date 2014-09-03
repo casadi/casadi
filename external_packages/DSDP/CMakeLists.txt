@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 2.6)
 
 include_directories(include src/bounds src/lp src/sdp src/solver src/sys src/vecmat)
 
+# cmake_policy use MACOSX_RPATH=ON by default
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0042 NEW)
+endif()
+
 file(GLOB DSDP_SRC "src/bounds/*.c"  "src/bounds/*.h" "src/lp/*.c" "src/lp/*.h" "src/sdp/*.c" "src/sdp/*.h" "src/solver/*.c" "src/solver/*.h" "src/sys/*.c" "src/sys/*.h" "src/vecmat/*.c" "src/vecmat/*.h")
 
 set(DSDP_LIBRARIES ${DSDP_LIBRARIES})

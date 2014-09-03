@@ -1,4 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
+
+# cmake_policy use MACOSX_RPATH=ON by default
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0042 NEW)
+endif()
+
 set(TINYXML_SRC
   tinystr.cpp
   tinyxml.cpp

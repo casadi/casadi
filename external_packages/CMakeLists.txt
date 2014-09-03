@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 
 macro(casadi_external_library name)
+  # cmake_policy use MACOSX_RPATH=ON by default
+  if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0042 NEW)
+  endif()
+
   if(ENABLE_STATIC)
     add_library(${name} STATIC ${ARGN})
   endif()
