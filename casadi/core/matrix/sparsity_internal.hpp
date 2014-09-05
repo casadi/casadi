@@ -251,7 +251,9 @@ namespace casadi {
     /// Sparsity pattern for a matrix-matrix product (details in public class)
     Sparsity patternProduct(const Sparsity& x_trans,
                             std::vector< std::vector< std::pair<int, int> > >& mapping) const;
-    Sparsity patternProduct(const Sparsity& x_trans) const;
+
+    /// New implementation, multiplies with y from the right
+    Sparsity patternProductNew(const Sparsity& y) const;
     ///@}
 
     ///@{

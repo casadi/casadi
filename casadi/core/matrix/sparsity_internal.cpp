@@ -1922,71 +1922,62 @@ namespace casadi {
     return ss.str();
   }
 
-  Sparsity SparsityInternal::patternProduct(const Sparsity& x_trans) const {
-    // Dimensions
-    int x_nrow = x_trans.size2();
-    int y_ncol = ncol_;
+  Sparsity SparsityInternal::patternProductNew(const Sparsity& y) const {
+    // Dimensions of the result
+    int d1 = nrow_;
+    int d2 = y.size2();
 
     // Quick return if both are dense
-    if (isDense() && x_trans.isDense()) {
-      return !isEmpty() && !x_trans.isEmpty() ? Sparsity::dense(x_nrow, y_ncol) :
-          Sparsity::sparse(x_nrow, y_ncol);
+    if (isDense() && y.isDense()) {
+      return !isEmpty() && !y.isEmpty() ? Sparsity::dense(d1, d2) :
+        Sparsity::sparse(d1, d2);
     }
 
     // Quick return if first factor is diagonal
-    if (x_trans.isDiagonal()) return shared_from_this<Sparsity>();
+    if (isDiagonal()) return y;
 
     // Quick return if second factor is diagonal
-    if (isDiagonal()) return x_trans.T();
+    if (y.isDiagonal()) return shared_from_this<Sparsity>();
 
-    // Direct access to the arrays
-    const vector<int> &x_col = x_trans.row();
-    const vector<int> &x_rowind = x_trans.colind();
-    const vector<int> &y_row = row_;
-    const vector<int> &y_colind = colind_;
-
-    // Temporary vector holding a column at a time
-    std::vector<bool> tmp(nrow_, false);
+    // Direct access to the vectors
+    const vector<int> &x_row = row_;
+    const vector<int> &x_colind = colind_;
+    const vector<int> &y_row = y.row();
+    const vector<int> &y_colind = y.colind();
 
     // Sparsity pattern of the result
-    vector<int> res_row, res_colind(y_ncol+1);
-    res_colind[0]=0;
+    vector<int> row, col;
 
-    // Loop over the columns of the resulting matrix
-    for (int cc=0; cc<y_ncol; ++cc) {
+    // Temporary vector for avoiding duplicate nonzeros
+    vector<int> tmp(d1, -1);
 
-      // Get the nonzeros of column cc of y for quick access
-      for (int el=y_colind[cc]; el<y_colind[cc+1]; ++el)
-        tmp[y_row[el]] = true;
+    // Loop over the nonzeros of y
+    for (int cc=0; cc<d2; ++cc) {
+      for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
+        int rr = y_row[kk];
 
-      // Loop over the rows of the resulting matrix
-      for (int rr=0; rr<x_nrow; ++rr) {
-        // Check if any intersection
-        for (int el=x_rowind[rr]; el<x_rowind[rr+1]; ++el) {
-          if (tmp[x_col[el]]) {
-            // Intersection found, add to sparsity pattern
-            res_row.push_back(rr);
-            break;
+        // Loop over corresponding columns of x
+        for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
+          int rr1 = x_row[kk1];
+
+          // Add to pattern if not already encountered
+          if (tmp[rr1]!=cc) {
+            tmp[rr1] = cc;
+            row.push_back(rr1);
+            col.push_back(cc);
           }
         }
       }
-
-      // Save column offset
-      res_colind[cc+1]=res_row.size();
-
-      // Clear tmp vector
-      for (int el=y_colind[cc]; el<y_colind[cc+1]; ++el)
-        tmp[y_row[el]] = false;
     }
 
     // Assemble sparsity pattern and return
-    return Sparsity(x_nrow, y_ncol, res_colind, res_row);
+    return Sparsity::triplet(d1, d2, row, col);
   }
 
   Sparsity SparsityInternal::patternProduct(const Sparsity& x_trans,
                                             vector< vector< pair<int, int> > >& mapping) const {
     // return object
-    Sparsity ret = patternProduct(x_trans);
+    Sparsity ret = shared_from_this<Sparsity>().patternProduct(x_trans);
 
     // Get the vectors for the return pattern
     const vector<int>& ret_row = ret.row();
