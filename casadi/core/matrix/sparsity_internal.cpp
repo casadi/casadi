@@ -1933,83 +1933,48 @@ namespace casadi {
           Sparsity::sparse(x_nrow, y_ncol);
     }
 
-    // return object
-    Sparsity ret = Sparsity::sparse(x_nrow, y_ncol);
-
-    // Get the vectors for the return pattern
-    vector<int>& ret_row = ret.rowRef();
-    vector<int>& ret_colind = ret.colindRef();
-
     // Direct access to the arrays
     const vector<int> &x_col = x_trans.row();
     const vector<int> &x_rowind = x_trans.colind();
     const vector<int> &y_row = row_;
     const vector<int> &y_colind = colind_;
 
-    // If the compiler supports C99, we shall use the long long datatype,
-    // which is 64 bit, otherwise long
-#if __STDC_VERSION__ >= 199901L
-    typedef unsigned long long int_t;
-#else
-    typedef unsigned long int_t;
-#endif
+    // Temporary vector holding a column at a time
+    std::vector<bool> tmp(nrow_, false);
 
-    // Number of directions we can deal with at a time
-    // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
-    int nr = CHAR_BIT*sizeof(int_t);
+    // Sparsity pattern of the result
+    vector<int> res_row, res_colind(y_ncol+1);
+    res_colind[0]=0;
 
-    // Number of such groups needed
-    int ng = y_ncol/nr;
-    if (ng*nr != y_ncol) ng++;
+    // Loop over the columns of the resulting matrix
+    for (int cc=0; cc<y_ncol; ++cc) {
 
-    // Which rows exist in a col of the first factor
-    vector<int_t> in_y_col(nrow_);
-    vector<int_t> in_res_row(x_nrow);
+      // Get the nonzeros of column cc of y for quick access
+      for (int el=y_colind[cc]; el<y_colind[cc+1]; ++el)
+        tmp[y_row[el]] = true;
 
-    // Loop over the cols of the resulting matrix, nr cols at a time
-    for (int rr=0; rr<ng; ++rr) {
-
-      // Mark the elements in the x col
-      fill(in_y_col.begin(), in_y_col.end(), 0); // NOTE: expensive?
-      int_t b=1;
-      for (int i=rr*nr; i<rr*nr+nr && i<y_ncol; ++i) {
-        for (int el1=y_colind[i]; el1<y_colind[i+1]; ++el1) {
-          in_y_col[y_row[el1]] |= b;
-        }
-        b <<= 1;
-      }
-
-      // Get the sparsity pattern for the set of cols
-      fill(in_res_row.begin(), in_res_row.end(), 0); // NOTE: expensive?
-      for (int j=0; j<x_nrow; ++j) {
-
-        // Loop over the nonzeros of the row of the second factor
-        for (int el2=x_rowind[j]; el2<x_rowind[j+1]; ++el2) {
-
-          // Get the col
-          int i_y = x_col[el2];
-
-          // Add nonzero if the element matches an element in the x col
-          in_res_row[j] |= in_y_col[i_y];
-        }
-      }
-
-      b = 1;
-      for (int i=rr*nr; i<rr*nr+nr && i<y_ncol; ++i) {
-
-        // loop over the rows of the resulting matrix
-        for (int j=0; j<x_nrow; ++j) {
-
-          // Save nonzero, if any
-          if (in_res_row[j] & b) {
-            ret_row.push_back(j);
+      // Loop over the rows of the resulting matrix
+      for (int rr=0; rr<x_nrow; ++rr) {
+        // Check if any intersection
+        for (int el=x_rowind[rr]; el<x_rowind[rr+1]; ++el) {
+          if (tmp[x_col[el]]) {
+            // Intersection found, add to sparsity pattern
+            res_row.push_back(rr);
+            break;
           }
         }
-        ret_colind[i+1] = ret_row.size();
-        b <<=1;
       }
+
+      // Save column offset
+      res_colind[cc+1]=res_row.size();
+
+      // Clear tmp vector
+      for (int el=y_colind[cc]; el<y_colind[cc+1]; ++el)
+        tmp[y_row[el]] = false;
     }
-    return ret;
+
+    // Assemble sparsity pattern and return
+    return Sparsity(x_nrow, y_ncol, res_colind, res_row);
   }
 
   Sparsity SparsityInternal::patternProduct(const Sparsity& x_trans,
