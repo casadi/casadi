@@ -1933,6 +1933,12 @@ namespace casadi {
           Sparsity::sparse(x_nrow, y_ncol);
     }
 
+    // Quick return if first factor is diagonal
+    if (x_trans.isDiagonal()) return shared_from_this<Sparsity>();
+
+    // Quick return if second factor is diagonal
+    if (isDiagonal()) return x_trans.T();
+
     // Direct access to the arrays
     const vector<int> &x_col = x_trans.row();
     const vector<int> &x_rowind = x_trans.colind();
