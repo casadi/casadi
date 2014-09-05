@@ -1457,15 +1457,9 @@ namespace casadi {
 
     // Return object (assure RVO)
     Matrix<DataType> ret;
-
-    // Matrix multiplication
-
-    // Form the transpose of x
-    Matrix<DataType> x_trans = x.trans();
-
     if (sp_z.isNull()) {
       // Create the sparsity pattern for the matrix-matrix product
-      Sparsity spres = y.sparsity().patternProduct(x_trans.sparsity());
+      Sparsity spres = x.sparsity().patternProductNew(y.sparsity());
 
       // Create the return object
       ret = Matrix<DataType>::zeros(spres);
@@ -1474,7 +1468,7 @@ namespace casadi {
     }
 
     // Carry out the matrix product
-    mul_no_alloc_tn(x_trans, y, ret);
+    mul_no_alloc_nn(x, y, ret);
 
     return ret;
   }

@@ -345,7 +345,7 @@ namespace casadi {
     // Form result of the right sparsity
     MX z;
     if (sp_z.isNull()) {
-      Sparsity sp_z_ = y.sparsity().patternProduct(trans_x.sparsity());
+      Sparsity sp_z_ = sparsity().patternProductNew(y.sparsity());
       z = MX::zeros(sp_z_);
     } else {
       z = MX::zeros(sp_z);
