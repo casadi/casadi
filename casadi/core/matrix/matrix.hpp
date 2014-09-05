@@ -585,6 +585,10 @@ namespace casadi {
     static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y,
                                 Matrix<DataType>& z);
 
+    /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
+    static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y,
+                                Matrix<DataType>& z, std::vector<DataType>& work);
+
     /// Matrix-matrix product, no memory allocation: z += mul(trans(x), y)
     static void mul_no_alloc_tn(const Matrix<DataType> &trans_x, const Matrix<DataType> &y,
                                 Matrix<DataType>& z);
