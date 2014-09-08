@@ -1076,6 +1076,46 @@ class Matrixtests(casadiTestCase):
     self.checkarray(a.nz[:-1], IMatrix([1,3,2]) )
     self.checkarray(a.nz[0], IMatrix([1]) )
     
+  def test_norm_inf_mul_nn(self):
+    numpy.random.seed(0)
+    
+    A = numpy.random.random((10,2))
+    B = numpy.random.random((2,8))
+    
+    dwork = DVector(range(10))
+    iwork = IVector(range(10+1+8))
+    
+    self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
+    
+    # Sparse
+    for i in range(5):
+      A[numpy.random.randint(A.shape[0]),numpy.random.randint(A.shape[1])] = 0
+      B[numpy.random.randint(B.shape[0]),numpy.random.randint(B.shape[1])] = 0
+    
+    A = sparse(A)
+    B = sparse(B)
+    
+    self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
+    
+    
+    
+    A = numpy.random.random((8,2))
+    B = numpy.random.random((2,10))
+    
+    dwork = DVector(range(8))
+    iwork = IVector(range(10+1+8))
+    
+    self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
+    
+    # Sparse
+    for i in range(5):
+      A[numpy.random.randint(A.shape[0]),numpy.random.randint(A.shape[1])] = 0
+      B[numpy.random.randint(B.shape[0]),numpy.random.randint(B.shape[1])] = 0
+    
+    A = sparse(A)
+    B = sparse(B)
+    
+    self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
 if __name__ == '__main__':
     unittest.main()
 

@@ -301,6 +301,19 @@ namespace casadi {
   CASADI_CORE_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
                                              const Dictionary& dict = Dictionary());
 
+  /** Inf-norm of a Matrix-matrix product, no memory allocation
+  *   mul(x, y)     
+  *
+  * \param Dwork  A double work vector that you must allocate
+  *               Minimum size: y.size1()   
+  * \param Iwork  A integer work vector that you must allocate
+  *               Minimum size: y.size1()+x.size2()+1        
+  */
+  CASADI_CORE_EXPORT double norm_inf_mul_nn(const Matrix<double> &x,
+                              const Matrix<double> &y,
+                              std::vector<double>& Dwork,
+                              std::vector<int>& Iwork);
+
   /** \brief Kronecker tensor product
   *
   * Creates a block matrix in which each element (i, j) is a_ij*b
