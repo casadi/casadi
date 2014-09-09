@@ -37,6 +37,14 @@
 
 /** \defgroup plugin_Integrator_idas
       Interface to IDAS from the Sundials suite.
+      
+      Note: depending on the dimension and structure of your problem,
+      you may experience a dramatic speed-up by using a sparse linear solver:
+      
+      \verbatim
+       intg.setOption("linear_solver","csparse")
+       intg.setOption("linear_solver_type","user_defined")
+      \endverbatim
 */
 
 /** \pluginsection{Integrator,idas} */
