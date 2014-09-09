@@ -43,6 +43,14 @@
 
       You can retrieve the entire state trajectory as follows, after the evaluate call: 
       Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
+      
+      Note: depending on the dimension and structure of your problem,
+      you may experience a dramatic speed-up by using a sparse linear solver:
+      
+      \verbatim
+       intg.setOption("linear_solver","csparse")
+       intg.setOption("linear_solver_type","user_defined")
+      \endverbatim
 */
 
 /** \pluginsection{Integrator,cvodes} */
@@ -54,14 +62,6 @@ namespace casadi {
 
       @copydoc DAE_doc
       @copydoc plugin_Integrator_cvodes
-      
-      Note: depending on the dimension and structure of your problem,
-      you may experience a dramatic speed-up by using a sparse linear solver:
-      
-      \verbatim
-       intg.setOption("linear_solver","csparse")
-       intg.setOption("linear_solver_type","user_defined")
-      \endverbatim
 
   */
   class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface {
