@@ -523,7 +523,7 @@ find_package(SWIG)
       add_subdirectory(swig)
       add_custom_target(python ALL DEPENDS _python_modules)
     else()
-      add_subdirectory(swig EXCLUDE_FROM_ALL)
+      add_subdirectory(swig)
       add_custom_target(python     DEPENDS _python_modules)
     endif()
 
