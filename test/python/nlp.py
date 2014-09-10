@@ -76,12 +76,14 @@ try:
 except:
   pass
 
+"""
 try:
   NlpSolver.loadPlugin("knitro")
   solvers.append(("knitro",{}))
   print "Will test knitro"
 except:
   pass
+"""
 
 class NLPtests(casadiTestCase):
 
