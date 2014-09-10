@@ -1099,10 +1099,10 @@
 <tr><td>BarRule</td><td>OT_INTEGER</td><td>0</td><td>Barrier Rule</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>Debug</td><td>OT_INTEGER</td><td>0</td><td>Debug level</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>Delta</td><td>OT_REAL</td><td>1.0</td><td>Initial region scaling factor</td><td>casadi::KnitroInterface</td></tr>
-<tr><td>FeasModeTol</td><td>OT_REAL</td><td>0.0001</td><td>Feasible mode tolerance</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>FeasModeTol</td><td>OT_REAL</td><td>1e-4</td><td>Feasible mode tolerance</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>FeasTol</td><td>OT_REAL</td><td>1e-6</td><td>Feasible tolerance</td><td>casadi::KnitroInterface</td></tr>
-<tr><td>FeasTolAbs</td><td>OT_REAL</td><td>1</td><td>Absolute feasible tolerance</td><td>casadi::KnitroInterface</td></tr>
-<tr><td>Feasible</td><td>OT_BOOLEAN</td><td>0</td><td>Allow infeasible iterations</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>FeasTolAbs</td><td>OT_REAL</td><td>0</td><td>Absolute feasible tolerance</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>Feasible</td><td>OT_BOOLEAN</td><td>1</td><td>Allow infeasible iterations</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>GradOpt</td><td>OT_INTEGER</td><td>1</td><td>Gradient calculation method</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>HessOpt</td><td>OT_INTEGER</td><td>1</td><td>Hessian calculation method</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>HonorBnds</td><td>OT_BOOLEAN</td><td>0</td><td>Enforce bounds</td><td>casadi::KnitroInterface</td></tr>
@@ -1114,7 +1114,7 @@
 <tr><td>Mu</td><td>OT_REAL</td><td>0.1</td><td>Initial barrier parameter</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>Multistart</td><td>OT_BOOLEAN</td><td>0</td><td>Use multistart</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>NewPoint</td><td>OT_BOOLEAN</td><td>0</td><td>Select new-point feature</td><td>casadi::KnitroInterface</td></tr>
-<tr><td>ObjRange</td><td>OT_REAL</td><td>1e-8</td><td>Maximum objective value</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>ObjRange</td><td>OT_REAL</td><td>1e20</td><td>Maximum objective value</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>OptTol</td><td>OT_REAL</td><td>1e-6</td><td>Relative optimality tolerance</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>OptTolAbs</td><td>OT_REAL</td><td>0</td><td>Absolute optimality tolerance</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>OutLev</td><td>OT_INTEGER</td><td>2</td><td>Log output level</td><td>casadi::KnitroInterface</td></tr>
@@ -1157,10 +1157,10 @@
 <tr><td>BarRule</td><td>OT_INTEGER</td><td>0</td><td>Barrier Rule</td></tr>
 <tr><td>Debug</td><td>OT_INTEGER</td><td>0</td><td>Debug level</td></tr>
 <tr><td>Delta</td><td>OT_REAL</td><td>1.0</td><td>Initial region scaling factor</td></tr>
-<tr><td>FeasModeTol</td><td>OT_REAL</td><td>0.0001</td><td>Feasible mode tolerance</td></tr>
+<tr><td>FeasModeTol</td><td>OT_REAL</td><td>1e-4</td><td>Feasible mode tolerance</td></tr>
 <tr><td>FeasTol</td><td>OT_REAL</td><td>1e-6</td><td>Feasible tolerance</td></tr>
-<tr><td>FeasTolAbs</td><td>OT_REAL</td><td>1</td><td>Absolute feasible tolerance</td></tr>
-<tr><td>Feasible</td><td>OT_BOOLEAN</td><td>0</td><td>Allow infeasible iterations</td></tr>
+<tr><td>FeasTolAbs</td><td>OT_REAL</td><td>0</td><td>Absolute feasible tolerance</td></tr>
+<tr><td>Feasible</td><td>OT_BOOLEAN</td><td>1</td><td>Allow infeasible iterations</td></tr>
 <tr><td>GradOpt</td><td>OT_INTEGER</td><td>1</td><td>Gradient calculation method</td></tr>
 <tr><td>HessOpt</td><td>OT_INTEGER</td><td>1</td><td>Hessian calculation method</td></tr>
 <tr><td>HonorBnds</td><td>OT_BOOLEAN</td><td>0</td><td>Enforce bounds</td></tr>
@@ -1172,7 +1172,7 @@
 <tr><td>Mu</td><td>OT_REAL</td><td>0.1</td><td>Initial barrier parameter</td></tr>
 <tr><td>Multistart</td><td>OT_BOOLEAN</td><td>0</td><td>Use multistart</td></tr>
 <tr><td>NewPoint</td><td>OT_BOOLEAN</td><td>0</td><td>Select new-point feature</td></tr>
-<tr><td>ObjRange</td><td>OT_REAL</td><td>1e-8</td><td>Maximum objective value</td></tr>
+<tr><td>ObjRange</td><td>OT_REAL</td><td>1e20</td><td>Maximum objective value</td></tr>
 <tr><td>OptTol</td><td>OT_REAL</td><td>1e-6</td><td>Relative optimality tolerance</td></tr>
 <tr><td>OptTolAbs</td><td>OT_REAL</td><td>0</td><td>Absolute optimality tolerance</td></tr>
 <tr><td>OutLev</td><td>OT_INTEGER</td><td>2</td><td>Log output level</td></tr>

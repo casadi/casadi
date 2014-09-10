@@ -137,6 +137,26 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::KnitroInterface
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>return_status</td><td>casadi::KnitroInterface</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_NlpSolver_knitro
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th></tr>
+<tr><td>return_status</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::LpToQp
 \n
 \par
