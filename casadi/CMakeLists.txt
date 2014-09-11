@@ -74,7 +74,11 @@ macro(casadi_library_or_plugin name is_plugin)
   add_spell_check_target(${name} "${ARGN}")
   set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
 
-  set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
+  if(${is_plugin})
+    set_property(GLOBAL APPEND PROPERTY CASADI_PLUGINS ${name})
+  else()
+    set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
+  endif()
 endmacro()
 
 add_subdirectory(core)  # needed by all except external_packages
