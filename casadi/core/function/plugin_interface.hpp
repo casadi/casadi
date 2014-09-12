@@ -105,14 +105,14 @@ namespace casadi {
 #ifdef _WIN32
     HINSTANCE handle = LoadLibrary(TEXT(lib.c_str()));
     if (!handle) {
-      errors += "\n  Tried " + lib + ":\n    Error code (WIN32): " + GetLastError();
+      errors += std::string("\n  Tried ") + lib + ":\n    Error code (WIN32): " + GetLastError();
 
       #ifdef PLUGIN_EXTRA_SEARCH_PATH
       // Try the second search path
       lib = PLUGIN_EXTRA_SEARCH_PATH "\\" + lib;
       handle = LoadLibrary(TEXT(lib.c_str()));
       if (!handle) {
-        errors += "\n  Tried: " + lib + ":\n    Error code (WIN32): " + GetLastError();
+        errors += std::string("\n  Tried: ") + lib + ":\n    Error code (WIN32): " + GetLastError();
       }
       #endif // PLUGIN_EXTRA_SEARCH_PATH
     }
