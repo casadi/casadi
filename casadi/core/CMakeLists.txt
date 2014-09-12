@@ -6,7 +6,8 @@ add_definitions(-DSHARED_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
 # Look for plugins in the installation directory
 file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/lib/casadi PLUGIN_EXTRA_SEARCH_PATH)
-add_definitions(-DPLUGIN_EXTRA_SEARCH_PATH="${PLUGIN_EXTRA_SEARCH_PATH}")
+string(REPLACE "\\" "\\\\" PLUGIN_EXTRA_SEARCH_PATH ${PLUGIN_EXTRA_SEARCH_PATH})
+add_definitions(-DPLUGIN_EXTRA_SEARCH_PATH="\"${PLUGIN_EXTRA_SEARCH_PATH}\"")
 
 add_subdirectory(runtime)
 
