@@ -69,7 +69,7 @@
 
 //#ifdef SWIG_MAIN_MODULE
 %template(SXElementVector) std::vector< casadi::SXElement > ;
-%template(SparistyVector) std::vector< casadi::Sparsity > ;
+%template(SparsityVector) std::vector< casadi::Sparsity > ;
 %template(SparsityVectorVector) std::vector< std::vector< casadi::Sparsity> > ;
 %template(SXVector) std::vector<casadi::Matrix<casadi::SXElement> > ;
 %template(SXVectorVector) std::vector< std::vector<casadi::Matrix<casadi::SXElement> > > ;
