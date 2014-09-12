@@ -472,7 +472,7 @@ int internal(const std::string & c) {
       throw e; \
     } \
   }
-#define CATCH_OR_NOT(ARG...) \
+#define CATCH_OR_NOT(ARG,...) \
 if (casadi::CasadiOptions::catch_errors_swig) { \
   try { \
     ARG \
