@@ -109,12 +109,21 @@ namespace casadi {
 
       #ifdef PLUGIN_EXTRA_SEARCH_PATH
       // Try the second search path
-      lib = PLUGIN_EXTRA_SEARCH_PATH "\\" + lib;
-      handle = LoadLibrary(TEXT(lib.c_str()));
+      std::string lib2 = PLUGIN_EXTRA_SEARCH_PATH "\\" + lib;
+      handle = LoadLibrary(TEXT(lib2.c_str()));
       if (!handle) {
-        errors += "\n  Tried: " + lib + ":\n    Error code (WIN32): " + STRING(GetLastError());
+        errors += "\n  Tried: " + lib2 + ":\n    Error code (WIN32): " + STRING(GetLastError());
       }
       #endif // PLUGIN_EXTRA_SEARCH_PATH
+      
+      if (!handle) {
+        // Try current directory
+        std::string lib3 = ".\\" + lib;
+        handle = LoadLibrary(TEXT(lib3.c_str()));
+        if (!handle) {
+          errors += "\n  Tried: " + lib3 + ":\n    Error code (WIN32): " + STRING(GetLastError());
+        }
+      }
     }
     casadi_assert_message(handle!=0, errors);
 
