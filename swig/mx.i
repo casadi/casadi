@@ -27,13 +27,6 @@
 
 %include "casadi/core/mx/mx.hpp"
 
-
-
-
-%template(SparsityVector) std::vector<casadi::Sparsity>;
-
-
-
 %extend casadi::MX{
   
   %matrix_helpers(casadi::MX)
