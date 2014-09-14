@@ -104,6 +104,37 @@ namespace casadi {
     virtual MX getHorzcat(const std::vector<MX>& x) const;
   };
 
+  /** \brief Diag split, x -> x0, x1, ...
+      \author Joris Gillis
+      \date 2014
+  */
+  class CASADI_CORE_EXPORT Diagsplit : public Split {
+  public:
+
+    /// Constructor
+    Diagsplit(const MX& x, const std::vector<int>& offset1, const std::vector<int>& offset2);
+
+    /// Destructor
+    virtual ~Diagsplit() {}
+
+    /// Clone function
+    virtual Diagsplit* clone() const { return new Diagsplit(*this);}
+
+    /// Evaluate the function symbolically (MX)
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                            bool output_given);
+
+    /// Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
+
+    /** \brief Get the operation */
+    virtual int getOp() const { return OP_DIAGSPLIT;}
+
+    /// Create a diagonal concatenation node
+    virtual MX getDiagcat(const std::vector<MX>& x) const;
+  };
+
   /** \brief Vertical split of vectors, x -> x0, x1, ...
       \author Joel Andersson
       \date 2014

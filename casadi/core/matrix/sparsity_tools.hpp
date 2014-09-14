@@ -83,6 +83,36 @@ namespace casadi {
   CASADI_CORE_EXPORT
     std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& output_offset);
 
+  /** \brief Split up a sparsity pattern diagonally */
+  CASADI_CORE_EXPORT
+    std::vector<Sparsity> diagsplit(const Sparsity& sp,
+      const std::vector<int>& output_offset1,
+      const std::vector<int>& output_offset2);
+
+  /** \brief  split diagonally, retaining groups of square matrices
+  * \param incr Size of each matrix
+  *
+  *  diagsplit(diagsplit(x, ...)) = x
+  */
+  CASADI_CORE_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x, int incr=1);
+
+  /** \brief  split diagonally, retaining fixed-sized matrices
+  * \param incr1 Row dimension of each matrix
+  * \param incr2 Column dimension of each matrix
+  *
+  *  diagsplit(diagsplit(x, ...)) = x
+  */
+  CASADI_CORE_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x, int incr1, int incr2);
+
+  /** \brief  split diagonally, retaining square matrices
+  * \param output_offset List of all start locations for each group
+  *      the last matrix will run to the end.
+  *
+  *   diagcat(diagsplit(x, ...)) = x
+  */
+  CASADI_CORE_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x,
+                                                   const std::vector<int>& output_offset);
+
   /// Obtain the structural rank of a sparsity-pattern
   CASADI_CORE_EXPORT int rank(const Sparsity& a);
 

@@ -95,11 +95,17 @@ namespace casadi {
     // Vertical concatenation of vectors
     OP_VERTCAT,
 
+    // Diagonal concatenation
+    OP_DIAGCAT,
+
     // Horizontal split
     OP_HORZSPLIT,
 
     // Vertical split of vectors
     OP_VERTSPLIT,
+
+    // Diagonal split
+    OP_DIAGSPLIT,
 
     // Reshape an expression
     OP_RESHAPE,

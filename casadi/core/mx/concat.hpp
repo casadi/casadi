@@ -126,6 +126,34 @@ namespace casadi {
     virtual int getOp() const { return OP_VERTCAT;}
   };
 
+  /** \brief Diagonal concatenation of matrices
+      \author Joris Gillis
+      \date 2014
+  */
+  class CASADI_CORE_EXPORT Diagcat : public Concat {
+  public:
+
+    /// Constructor
+    Diagcat(const std::vector<MX>& x);
+
+    /// Clone function
+    virtual Diagcat* clone() const { return new Diagcat(*this);}
+
+    /// Destructor
+    virtual ~Diagcat() {}
+
+    /// Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
+
+    /// Evaluate the function symbolically (MX)
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                            bool output_given);
+
+    /** \brief Get the operation */
+    virtual int getOp() const { return OP_DIAGCAT;}
+  };
+
 } // namespace casadi
 /// \endcond
 

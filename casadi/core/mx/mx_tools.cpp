@@ -59,6 +59,18 @@ namespace casadi {
     }
   }
 
+  MX diagcat(const vector<MX>& x) {
+    if (x.empty()) {
+      return MX();
+    } else if (x.size()==1) {
+      return x.front();
+    } else if (has_empty(x)) {
+      return diagcat(trim_empty(x));
+    } else {
+      return x.front()->getDiagcat(x);
+    }
+  }
+
   MX vertcat(const vector<MX>& x) {
     if (x.empty()) {
       return MX();
@@ -98,6 +110,23 @@ namespace casadi {
     vector<int> offset2 = range(0, x.size2(), incr);
     offset2.push_back(x.size2());
     return horzsplit(x, offset2);
+  }
+
+  std::vector<MX> diagsplit(const MX& x,
+    const std::vector<int>& offset1, const std::vector<int>& offset2) {
+    // Consistency check
+    casadi_assert(offset1.size()>=1);
+    casadi_assert(offset1.front()==0);
+    casadi_assert(offset1.back()==x.size1());
+    casadi_assert(isMonotone(offset1));
+
+    // Consistency check
+    casadi_assert(offset2.size()>=1);
+    casadi_assert(offset2.front()==0);
+    casadi_assert(offset2.back()==x.size2());
+    casadi_assert(isMonotone(offset2));
+
+    return x->getDiagsplit(offset1, offset2);
   }
 
   std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset) {
@@ -414,24 +443,7 @@ namespace casadi {
   }
 
   MX blkdiag(const std::vector<MX> &A) {
-    // This implementation does not pretend to be efficient
-    int nrow=0, ncol=0;
-    for (int i=0;i<A.size();++i) {
-      nrow += A[i].size1();
-      ncol += A[i].size2();
-    }
-
-    MX ret = MX::sparse(nrow, ncol);
-    nrow = 0;
-    ncol = 0;
-
-    for (int i=0;i<A.size();++i) {
-      ret(range(nrow, nrow+A[i].size1()), range(ncol, ncol+A[i].size2())) = A[i];
-      nrow += A[i].size1();
-      ncol += A[i].size2();
-    }
-
-    return ret;
+    return diagcat(A);
   }
 
   MX blkdiag(const MX &A, const MX& B) {

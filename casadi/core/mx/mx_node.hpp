@@ -287,6 +287,13 @@ namespace casadi {
     /// Create a vertical split node (vectors only)
     virtual std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
 
+    /// Create a diagonal concatenation node
+    virtual MX getDiagcat(const std::vector<MX>& x) const;
+
+    /// Create a diagonal split node
+    virtual std::vector<MX> getDiagsplit(const std::vector<int>& offset1,
+                                         const std::vector<int>& offset2) const;
+
     /// Transpose
     virtual MX getTranspose() const;
 

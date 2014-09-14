@@ -708,6 +708,11 @@ namespace casadi {
     return MX::create(new Horzcat(x));
   }
 
+  MX MXNode::getDiagcat(const std::vector<MX>& x) const {
+    // Create a Horzcat node
+    return MX::create(new Diagcat(x));
+  }
+
   MX MXNode::getVertcat(const std::vector<MX>& x) const {
     // Check if there is any existing vertcat operation
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
@@ -757,6 +762,22 @@ namespace casadi {
         }
       }
     }
+    return ret;
+  }
+
+  std::vector<MX> MXNode::getDiagsplit(const std::vector<int>& offset1,
+                                       const std::vector<int>& offset2) const {
+    if (isZero()) {
+      std::vector<MX> ret =
+          MX::createMultipleOutput(new Diagsplit(shared_from_this<MX>(), offset1, offset2));
+      for (int i=0;i<ret.size();++i) {
+        ret[i]=MX::zeros(ret[i].sparsity());
+      }
+      return ret;
+    }
+    std::vector<MX> ret =
+        MX::createMultipleOutput(new Diagsplit(shared_from_this<MX>(), offset1, offset2));
+
     return ret;
   }
 

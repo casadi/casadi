@@ -88,7 +88,7 @@ namespace casadi {
     // Pass 1
 
     // method that uses O(n) temp storage
-    std:fill(mask, mask+n_col, -1);
+    std::fill(mask, mask+n_col, -1);
 
     Cp[0] = 0;
     int nnz = 0;

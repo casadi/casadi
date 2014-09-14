@@ -372,7 +372,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "vertcat([SX,...]" in e.message
+      assert "vertcat([SX]" in e.message
       assert "vertcat([array(double)" in e.message
       assert "You have: vertcat(int)" in e.message
       assert "::" not in e.message
@@ -384,7 +384,7 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "substitute(SX,SX,SX)" in e.message
-      assert "substitute([SX,...] ,[SX,...] ,[SX,...] )" in e.message
+      assert "substitute([SX] ,[SX] ,[SX] )" in e.message
       assert "You have: substitute(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
@@ -394,7 +394,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "SXFunction(scheme(SX),[SX,...] )" in e.message
+      assert "SXFunction(scheme(SX),[SX] )" in e.message
       assert "You have: SXFunction(scheme(SX))" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
@@ -446,7 +446,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "QPStructure([Sparsity,...] )" in e.message
+      assert "QPStructure([Sparsity] )" in e.message
       assert "You have: QPStructure([int,Sparsity])" in e.message
       assert "QPStructure(a=int)" in e.message
   
@@ -463,6 +463,14 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "You have: reshape((str,int))" in e.message
+      
+    try:
+      diagsplit("s")
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "diagsplit(SX ,int)" in e.message
+      assert "diagsplit(array(double) ,int)" in e.message
       
   def test_callkw(self):
       x = SX.sym("x")
@@ -481,7 +489,7 @@ class Misctests(casadiTestCase):
         self.assertTrue(False)
       except RuntimeError as e:
         self.assertTrue("Function(scheme(SX))" in e.message)
-        self.assertTrue("Function([SX,...] )" in e.message)
+        self.assertTrue("Function([SX] )" in e.message)
         self.assertTrue("You have: Function(scheme(Sparsity))" in e.message)
 
       with self.assertRaises(RuntimeError):

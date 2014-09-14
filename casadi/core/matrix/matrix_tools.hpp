@@ -174,8 +174,8 @@ namespace casadi {
 
 
   /** \brief  chop up into blocks
-   * \brief vert_offset Defines the boundaries of the block rows
-   * \brief horz_offset Defines the boundaries of the block columns
+   * \param vert_offset Defines the boundaries of the block rows
+   * \param horz_offset Defines the boundaries of the block columns
    *
    *   blockcat(blocksplit(x,..., ...)) = x
    */
@@ -185,8 +185,8 @@ namespace casadi {
                                                             const std::vector<int>& horz_offset);
 
   /** \brief  chop up into blocks
-   * \brief vert_incr Defines the increment for block boundaries in row dimension
-   * \brief horz_incr Defines the increment for block boundaries in column dimension
+   * \param vert_incr Defines the increment for block boundaries in row dimension
+   * \param horz_incr Defines the increment for block boundaries in column dimension
    *
    *   blockcat(blocksplit(x,..., ...)) = x
    */
@@ -194,6 +194,16 @@ namespace casadi {
   std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
                                                             int vert_incr = 1,
                                                             int horz_incr = 1);
+
+  /** \brief  split diagonally, retaining matrices
+  * \param output_offset1 List of all start locations (row) for each matrix
+  *      the last matrix will run to the end.
+  *   diagcat(diagsplit(x, ...)) = x
+  */
+  template<typename DataType>
+  std::vector< Matrix<DataType> > diagsplit(const Matrix<DataType>& x,
+                                                   const std::vector<int>& output_offset1,
+                                                   const std::vector<int>& output_offset2);
 
 #ifndef SWIG
   template<typename DataType>
@@ -733,6 +743,39 @@ namespace casadi {
     std::vector<int> offset2 = range(0, x.size2(), horz_incr);
     offset2.push_back(x.size2());
     return blocksplit(x, offset1, offset2);
+  }
+
+  template<typename DataType>
+  std::vector< Matrix<DataType> > diagsplit(const Matrix<DataType>& x,
+                                                   const std::vector<int>& offset1,
+                                                   const std::vector<int>& offset2) {
+    // Consistency check
+    casadi_assert(offset1.size()>=1);
+    casadi_assert(offset1.front()==0);
+    casadi_assert(offset1.back()==x.size1());
+    casadi_assert(isMonotone(offset1));
+
+    // Consistency check
+    casadi_assert(offset2.size()>=1);
+    casadi_assert(offset2.front()==0);
+    casadi_assert(offset2.back()==x.size2());
+    casadi_assert(isMonotone(offset2));
+
+    // Number of outputs
+    int n = offset1.size()-1;
+
+    // Return value
+    std::vector< Matrix<DataType> > ret;
+
+    // Caveat: this is a very silly implementation
+    for (int i=0;i<n;++i) {
+      ret.push_back(x(
+        Slice(offset1[i], offset1[i+1]),
+        Slice(offset2[i], offset2[i+1])));
+    }
+
+    return ret;
+
   }
 
   template<typename DataType>

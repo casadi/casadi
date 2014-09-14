@@ -112,20 +112,23 @@ def pythonify(s):
   s = s.replace("std::string","str")
   s = s.replace(" const &","")
   s = re.sub("(const )?Matrix< SXElement >( &)?",r"SX",s)
-  s = re.sub("(const )?Matrix< ?(\w+) ?>( ?&)?",r"array(\2) ",s)
+  s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
+  s = re.sub("(const )?Matrix< ?(\w+) *>( ?&)?",r"array(\2) ",s)
+  s = re.sub("(const )?GenericMatrix< ?([\w\(\)]+) *>( ?&)?",r"\2 ",s)
   s = re.sub(r"const (\w+) &",r"\1 ",s)
-  s = re.sub(r"< \w+ >\(",r"(",s)
+  s = re.sub(r"< [\w\(\)]+ +>\(",r"(",s)
   s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
   s = re.sub(r"(const )? ?std::pair< ?([\w\(\) ]+?) ?, ?([\w\(\) ]+?) ?> ?&?",r"(\2,\3) ",s)
   for i in range(5):
-    s = re.sub(r"(const )? ?std::vector< ?([\w\(\) ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2,...] ",s)
-  s = re.sub(r"StructIOSchemeVector(< ?(\w+) ?>)?",r"Structure",s)
+    s = re.sub(r"(const )? ?std::vector< ?([\w\(\)\[\] ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2] ",s)
+  s = re.sub(r"StructIOSchemeVector(< ?([\w\[\] ]+) ?>)?",r"Structure",s)
   s = re.sub(r"IOSchemeVector< ?(\w+) ?>",r"scheme(\1)",s)
+  s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
   s = s.replace("casadi::","")
   s = s.replace("IOInterface< Function >","Function")
   s = s.replace("::",".")
   s = s.replace(".operator ()","")
-  s = re.sub(r"([A-Z]\w+)Vector",r"[\1,...]",s)
+  s = re.sub(r"([A-Z]\w+)Vector",r"[\1]",s)
   return s
   
 def type_descr(a):

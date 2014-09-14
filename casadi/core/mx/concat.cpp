@@ -132,6 +132,68 @@ namespace casadi {
     }
   }
 
+
+  Diagcat::Diagcat(const std::vector<MX>& x) : Concat(x) {
+    // Construct the sparsity
+    casadi_assert(!x.empty());
+    std::vector<Sparsity> sp;
+    for (int i=0;i<x.size(); ++i) {
+      sp.push_back(x[i].sparsity());
+    }
+
+    setSparsity(blkdiag(sp));
+  }
+
+  void Diagcat::printPart(std::ostream &stream, int part) const {
+    if (part==0) {
+      stream << "diagcat(";
+    } else if (part==ndep()) {
+      stream << ")";
+    } else {
+      stream << ", ";
+    }
+  }
+
+  void Diagcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                           bool output_given) {
+    int nfwd = fwdSens.size();
+    int nadj = adjSeed.size();
+
+    // Non-differentiated output
+    if (!output_given) {
+      *output[0] = diagcat(getVector(input));
+    }
+
+    // Forward sensitivities
+    for (int d = 0; d<nfwd; ++d) {
+      *fwdSens[d][0] = diagcat(getVector(fwdSeed[d]));
+    }
+
+    // Quick return?
+    if (nadj==0) return;
+
+    // Get offsets for each row and column
+    vector<int> offset1(ndep()+1, 0);
+    vector<int> offset2(ndep()+1, 0);
+    for (int i=0; i<ndep(); ++i) {
+      int ncol = dep(i).sparsity().size2();
+      int nrow = dep(i).sparsity().size1();
+      offset2[i+1] = offset2[i] + ncol;
+      offset1[i+1] = offset1[i] + nrow;
+    }
+
+    // Adjoint sensitivities
+    for (int d=0; d<nadj; ++d) {
+      MX& aseed = *adjSeed[d][0];
+      vector<MX> s = diagsplit(aseed, offset1, offset2);
+      aseed = MX();
+      for (int i=0; i<ndep(); ++i) {
+        adjSens[d][i]->addToSum(s[i]);
+      }
+    }
+  }
+
   Horzcat::Horzcat(const std::vector<MX>& x) : Concat(x) {
     // Construct the sparsity
     casadi_assert(!x.empty());
