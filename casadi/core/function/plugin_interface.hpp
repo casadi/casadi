@@ -115,7 +115,7 @@ namespace casadi {
         errors += "\n  Tried: " + lib2 + ":\n    Error code (WIN32): " + STRING(GetLastError());
       }
       #endif // PLUGIN_EXTRA_SEARCH_PATH
-      
+
       if (!handle) {
         // Try current directory
         std::string lib3 = ".\\" + lib;
