@@ -424,6 +424,33 @@
 %exception  casadi::Determinant::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Diagcat::clone() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagcat::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagcat::getOp() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagcat::printPart(std::ostream &stream, int part) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagsplit::clone() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagsplit::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagsplit::getDiagcat(const std::vector< MX > &x) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagsplit::getOp() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagsplit::printPart(std::ostream &stream, int part) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DpleToDle::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1664,6 +1691,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getDeterminant() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXNode::getDiagcat(const std::vector< MX > &x) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXNode::getDiagsplit(const std::vector< int > &offset1, const std::vector< int > &offset2) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getFunction() const  {
@@ -4505,6 +4538,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Determinant::Determinant(const MX &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::Diagcat::Diagcat(const std::vector< MX > &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::Diagsplit::Diagsplit(const MX &x, const std::vector< int > &offset1, const std::vector< int > &offset2) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::DpleToDle::DpleToDle(const Sparsity &A, const Sparsity &V) {

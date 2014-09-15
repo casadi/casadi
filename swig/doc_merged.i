@@ -37,8 +37,8 @@ the function symbolically (SX)
 
 ";
 
-%feature("docstring") casadi::Assertion::getInnerProd "[INTERNAL]  Inner
-product.
+%feature("docstring") casadi::Assertion::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -74,6 +74,16 @@ the nonzeros of matrix.
 
 %feature("docstring") casadi::Assertion::getHorzsplit "[INTERNAL]  Create a
 horizontal split node.
+
+";
+
+%feature("docstring") casadi::Assertion::init "[INTERNAL]  Initialize the
+object.
+
+";
+
+%feature("docstring") casadi::Assertion::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -123,8 +133,7 @@ reference to the object.
 
 ";
 
-%feature("docstring") casadi::Assertion::init "[INTERNAL]  Initialize the
-object.
+%feature("docstring") casadi::Assertion::getNorm1 "[INTERNAL]  1-norm
 
 ";
 
@@ -255,7 +264,8 @@ A->getSolve(b)
 
 ";
 
-%feature("docstring") casadi::Assertion::getNorm1 "[INTERNAL]  1-norm
+%feature("docstring") casadi::Assertion::getInnerProd "[INTERNAL]  Inner
+product.
 
 ";
 
@@ -577,8 +587,8 @@ object has been initialized.
 
 ";
 
-%feature("docstring") casadi::BinaryMX::init "[INTERNAL]  Initialize the
-object.
+%feature("docstring") casadi::BinaryMX::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -662,6 +672,11 @@ vertical split node (vectors only)
 
 %feature("docstring") casadi::BinaryMX::getTranspose "[INTERNAL]
 Transpose.
+
+";
+
+%feature("docstring") casadi::BinaryMX::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -937,6 +952,11 @@ the expression (ex is a reference to the node)
 
 %feature("docstring") casadi::BinaryMX::evaluateGen "[INTERNAL]  Evaluate
 the function (template)
+
+";
+
+%feature("docstring") casadi::BinaryMX::init "[INTERNAL]  Initialize the
+object.
 
 ";
 
@@ -1486,6 +1506,11 @@ if binary operation.
 
 ";
 
+%feature("docstring") casadi::CallFunction::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
+
+";
+
 %feature("docstring") casadi::CallFunction::setDependencies "
 
 >  void casadi::MXNode::setDependencies(const MX &dep)
@@ -1668,6 +1693,11 @@ Evaluate symbolically ( MX), no derivatives.
 
 %feature("docstring") casadi::CallFunction::getNormF "[INTERNAL]  Frobenius
 norm.
+
+";
+
+%feature("docstring") casadi::CallFunction::getDiagcat "[INTERNAL]  Create
+a diagonal concatenation node.
 
 ";
 
@@ -4528,6 +4558,11 @@ binary operation.
 
 ";
 
+%feature("docstring") casadi::Concat::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
 %feature("docstring") casadi::Concat::getVertsplit "[INTERNAL]  Create a
 vertical split node (vectors only)
 
@@ -4554,6 +4589,11 @@ dependencies.
 
 %feature("docstring") casadi::Concat::isIdentity "[INTERNAL]  Check if
 identity matrix.
+
+";
+
+%feature("docstring") casadi::Concat::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -4940,6 +4980,11 @@ representation of a GetNonzeros or SetNonzeros node.
 
 ";
 
+%feature("docstring") casadi::Constant::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::Constant::getName "[INTERNAL]  Get the name.
 
 ";
@@ -5173,6 +5218,11 @@ A->getSolve(b)
 
 ";
 
+%feature("docstring") casadi::Constant::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
 %feature("docstring") casadi::Constant::assign "
 
 >  void casadi::MXNode::assign(const MX &d, const std::vector< int > &inz, const std::vector< int > &onz, bool add=false)
@@ -5379,6 +5429,11 @@ Evaluate symbolically ( MX), no derivatives.
 
 %feature("docstring") casadi::ConstantDMatrix::getNorm2 "[INTERNAL]
 Spectral norm.
+
+";
+
+%feature("docstring") casadi::ConstantDMatrix::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
 
 ";
 
@@ -5745,6 +5800,11 @@ Get submatrix assignment.
 
 %feature("docstring") casadi::ConstantDMatrix::getAssertion "[INTERNAL]
 Assertion.
+
+";
+
+%feature("docstring") casadi::ConstantDMatrix::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
 
 ";
 
@@ -6152,6 +6212,11 @@ value (only for scalar constant nodes)
 
 ";
 
+%feature("docstring") casadi::ConstantMX::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::ConstantMX::shape "[INTERNAL] ";
 
 %feature("docstring") casadi::ConstantMX::getDeterminant "[INTERNAL]
@@ -6273,6 +6338,11 @@ C++ includes: constant_mx.hpp ";
 
 %feature("docstring") casadi::ConstantMX::setSparsity "[INTERNAL]  Set the
 sparsity.
+
+";
+
+%feature("docstring") casadi::ConstantMX::getDiagsplit "[INTERNAL]  Create
+a diagonal split node.
 
 ";
 
@@ -12686,6 +12756,11 @@ C++ includes: schemes_helpers.hpp ";
 
 
 // File: classcasadi_1_1DenseMultiplication.xml
+%feature("docstring") casadi::DenseMultiplication::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::DenseMultiplication::getNormF "[INTERNAL]
 Frobenius norm.
 
@@ -12956,8 +13031,8 @@ the name.
 
 ";
 
-%feature("docstring") casadi::DenseMultiplication::getInnerProd "[INTERNAL]
-Inner product.
+%feature("docstring") casadi::DenseMultiplication::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
 
 ";
 
@@ -12971,6 +13046,11 @@ Inner product.
 
 %feature("docstring") casadi::DenseMultiplication::evaluateSX "[INTERNAL]
 Evaluate the function symbolically (SX)
+
+";
+
+%feature("docstring") casadi::DenseMultiplication::getInnerProd "[INTERNAL]
+Inner product.
 
 ";
 
@@ -13440,6 +13520,11 @@ Propagate sparsity, no work.
 
 ";
 
+%feature("docstring") casadi::DenseTranspose::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::DenseTranspose::evaluateMX "
 
 >  void casadi::Transpose::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given)
@@ -13534,6 +13619,11 @@ Inverse.
 
 ";
 
+%feature("docstring") casadi::DenseTranspose::getDeterminant "[INTERNAL]
+Determinant.
+
+";
+
 %feature("docstring") casadi::DenseTranspose::getName "[INTERNAL]  Get the
 name.
 
@@ -13570,8 +13660,8 @@ the sparsity.
 
 ";
 
-%feature("docstring") casadi::DenseTranspose::getDeterminant "[INTERNAL]
-Determinant.
+%feature("docstring") casadi::DenseTranspose::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
 
 ";
 
@@ -13790,8 +13880,8 @@ Get function output.
 
 ";
 
-%feature("docstring") casadi::Determinant::getSubRef "[INTERNAL]  Get
-submatrix reference.
+%feature("docstring") casadi::Determinant::getDiagsplit "[INTERNAL]  Create
+a diagonal split node.
 
 ";
 
@@ -13885,6 +13975,11 @@ binary operation operation (matrix-matrix)
 
 %feature("docstring") casadi::Determinant::getBinarySwitch "[INTERNAL]  Get
 a binary operation operation.
+
+";
+
+%feature("docstring") casadi::Determinant::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -14148,6 +14243,11 @@ two nodes are equivalent up to a given depth.
 
 ";
 
+%feature("docstring") casadi::Determinant::getInnerProd "[INTERNAL]  Inner
+product.
+
+";
+
 %feature("docstring") casadi::Determinant::shape "[INTERNAL] ";
 
 %feature("docstring") casadi::Determinant::getSolve "[INTERNAL]   Solve a
@@ -14215,8 +14315,8 @@ up to a given depth.
 
 ";
 
-%feature("docstring") casadi::Determinant::getInnerProd "[INTERNAL]  Inner
-product.
+%feature("docstring") casadi::Determinant::getSubRef "[INTERNAL]  Get
+submatrix reference.
 
 ";
 
@@ -14236,6 +14336,953 @@ Assign nonzeros (mapping matrix)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Assign nonzeros (mapping matrix), output indices sequential.
+
+";
+
+
+// File: classcasadi_1_1Diagcat.xml
+%feature("docstring") casadi::Diagcat::getNumOutputs "[INTERNAL]  Number of
+outputs.
+
+";
+
+%feature("docstring") casadi::Diagcat::setDependencies "
+
+>  void casadi::MXNode::setDependencies(const MX &dep)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set unary dependency.
+
+>  void casadi::MXNode::setDependencies(const MX &dep1, const MX &dep2)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set binary dependencies.
+
+>  void casadi::MXNode::setDependencies(const MX &dep1, const MX &dep2, const MX &dep3)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set ternary dependencies.
+
+>  void casadi::MXNode::setDependencies(const std::vector< MX > &dep)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set multiple dependencies.
+
+";
+
+%feature("docstring") casadi::Diagcat::clone "[INTERNAL]  Clone function.
+
+";
+
+%feature("docstring") casadi::Diagcat::getNormInf "[INTERNAL]  Infinity
+norm.
+
+";
+
+%feature("docstring") casadi::Diagcat::getGetNonzeros "[INTERNAL]  Get the
+nonzeros of matrix.
+
+";
+
+%feature("docstring") casadi::Diagcat::getVertsplit "[INTERNAL]  Create a
+vertical split node (vectors only)
+
+";
+
+%feature("docstring") casadi::Diagcat::evaluateSX "[INTERNAL]  Evaluate the
+function symbolically (SX)
+
+";
+
+%feature("docstring") casadi::Diagcat::assign "
+
+>  void casadi::MXNode::assign(const MX &d, const std::vector< int > &inz, const std::vector< int > &onz, bool add=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Assign nonzeros (mapping matrix)
+
+>  void casadi::MXNode::assign(const MX &d, const std::vector< int > &inz, bool add=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Assign nonzeros (mapping matrix), output indices sequential.
+
+";
+
+%feature("docstring") casadi::Diagcat::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::Diagcat::getInnerProd "[INTERNAL]  Inner
+product.
+
+";
+
+%feature("docstring") casadi::Diagcat::getFunction "[INTERNAL]  Get
+function reference.
+
+";
+
+%feature("docstring") casadi::Diagcat::getFunctionInput "[INTERNAL]  Get
+function input.
+
+";
+
+%feature("docstring") casadi::Diagcat::getDeterminant "[INTERNAL]
+Determinant.
+
+";
+
+%feature("docstring") casadi::Diagcat::getTranspose "[INTERNAL]
+Transpose.
+
+";
+
+%feature("docstring") casadi::Diagcat::isIdentity "[INTERNAL]  Check if
+identity matrix.
+
+";
+
+%feature("docstring") casadi::Diagcat::size "[INTERNAL] ";
+
+%feature("docstring") casadi::Diagcat::setSparsity "[INTERNAL]  Set the
+sparsity.
+
+";
+
+%feature("docstring") casadi::Diagcat::evaluateMX "
+
+>  void casadi::Diagcat::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given)
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate the function symbolically ( MX)
+
+>  void casadi::MXNode::evaluateMX(const MXPtrV &input, MXPtrV &output)
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate symbolically ( MX), no derivatives.
+
+";
+
+%feature("docstring") casadi::Diagcat::getBinarySwitch "[INTERNAL]  Get a
+binary operation operation.
+
+";
+
+%feature("docstring") casadi::Diagcat::sameOpAndDeps "[INTERNAL]  Checks if
+two nodes have the same operation and have equivalent dependencies up to a
+given depth.
+
+";
+
+%feature("docstring") casadi::Diagcat::isOne "[INTERNAL]  Check if
+identically one.
+
+";
+
+%feature("docstring") casadi::Diagcat "[INTERNAL]  Diagonal concatenation
+of matrices.
+
+Joris Gillis
+
+C++ includes: concat.hpp ";
+
+%feature("docstring") casadi::Diagcat::getSolve "[INTERNAL]   Solve a
+system of linear equations.
+
+For system Ax = b:
+
+A->getSolve(b)
+
+";
+
+%feature("docstring") casadi::Diagcat::numel "[INTERNAL]  Get shape.
+
+";
+
+%feature("docstring") casadi::Diagcat::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
+%feature("docstring") casadi::Diagcat::getOp "[INTERNAL]  Get the
+operation.
+
+";
+
+%feature("docstring") casadi::Diagcat::getVertcat "[INTERNAL]  Create a
+vertical concatenation node (vectors only)
+
+";
+
+%feature("docstring") casadi::Diagcat::getMatrixValue "[INTERNAL]  Get the
+value (only for constant nodes)
+
+";
+
+%feature("docstring") casadi::Diagcat::mapping "[INTERNAL]  Get an IMatrix
+representation of a GetNonzeros or SetNonzeros node.
+
+";
+
+%feature("docstring") casadi::Diagcat::isInit "[INTERNAL]  Check if the
+object has been initialized.
+
+";
+
+%feature("docstring") casadi::Diagcat::printPart "[INTERNAL]  Print a part
+of the expression */.
+
+";
+
+%feature("docstring") casadi::Diagcat::hasDep "[INTERNAL]  Does the node
+depend on other nodes.
+
+";
+
+%feature("docstring") casadi::Diagcat::getValue "[INTERNAL]  Get the value
+(only for scalar constant nodes)
+
+";
+
+%feature("docstring") casadi::Diagcat::getMultiplication "[INTERNAL]
+Matrix multiplication.
+
+The optimal argument sp_z will be used as the sparsity pattern of the result
+
+";
+
+%feature("docstring") casadi::Diagcat::isUnaryOp "[INTERNAL]  Check if
+unary operation.
+
+";
+
+%feature("docstring") casadi::Diagcat::size2 "[INTERNAL] ";
+
+%feature("docstring") casadi::Diagcat::getName "[INTERNAL]  Get the name.
+
+";
+
+%feature("docstring") casadi::Diagcat::isNonLinear "[INTERNAL]  Is the node
+nonlinear.
+
+";
+
+%feature("docstring") casadi::Diagcat::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::Diagcat::getOutput "[INTERNAL]  Get an
+output.
+
+";
+
+%feature("docstring") casadi::Diagcat::getHorzcat "[INTERNAL]  Create a
+horizontal concatenation node.
+
+";
+
+%feature("docstring") casadi::Diagcat::getFunctionOutput "[INTERNAL]  Get
+function output.
+
+";
+
+%feature("docstring") casadi::Diagcat::getUnary "[INTERNAL]  Get a unary
+operation.
+
+";
+
+%feature("docstring") casadi::Diagcat::generateOperation "[INTERNAL]
+Generate code for the operation.
+
+";
+
+%feature("docstring") casadi::Diagcat::getNorm2 "[INTERNAL]  Spectral norm.
+
+";
+
+%feature("docstring") casadi::Diagcat::deepCopyMembers "[INTERNAL]  Deep
+copy data members.
+
+";
+
+%feature("docstring") casadi::Diagcat::Diagcat "[INTERNAL]  Constructor.
+
+";
+
+%feature("docstring") casadi::Diagcat::~Diagcat "[INTERNAL]  Destructor.
+
+";
+
+%feature("docstring") casadi::Diagcat::evaluateD "[INTERNAL]  Evaluate the
+function numerically.
+
+";
+
+%feature("docstring") casadi::Diagcat::size1 "[INTERNAL] ";
+
+%feature("docstring") casadi::Diagcat::nTmp "[INTERNAL]  Get number of
+temporary variables needed.
+
+";
+
+%feature("docstring") casadi::Diagcat::isZero "[INTERNAL]  Check if
+identically zero.
+
+";
+
+%feature("docstring") casadi::Diagcat::isOutputNode "[INTERNAL]  Check if
+evaluation output.
+
+";
+
+%feature("docstring") casadi::Diagcat::evaluateGen "[INTERNAL]  Evaluate
+the function (template)
+
+";
+
+%feature("docstring") casadi::Diagcat::getNorm1 "[INTERNAL]  1-norm
+
+";
+
+%feature("docstring") casadi::Diagcat::getInverse "[INTERNAL]   Inverse.
+
+";
+
+%feature("docstring") casadi::Diagcat::isEqual "[INTERNAL]  Check if two
+nodes are equivalent up to a given depth.
+
+";
+
+%feature("docstring") casadi::Diagcat::assertInit "[INTERNAL]  Assert that
+the object has been initialized.
+
+";
+
+%feature("docstring") casadi::Diagcat::getSetNonzeros "[INTERNAL]  Assign
+the nonzeros of a matrix to another matrix.
+
+";
+
+%feature("docstring") casadi::Diagcat::repr "[INTERNAL]  Print a
+representation.
+
+";
+
+%feature("docstring") casadi::Diagcat::getNormF "[INTERNAL]  Frobenius
+norm.
+
+";
+
+%feature("docstring") casadi::Diagcat::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
+%feature("docstring") casadi::Diagcat::dep "
+
+>  const MX & casadi::MXNode::dep(int ind=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+dependencies - functions that have to be evaluated before this one
+
+>  MX & casadi::MXNode::dep(int ind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+%feature("docstring") casadi::Diagcat::numInplace "[INTERNAL]  Can the
+operation be performed inplace (i.e. overwrite the result)
+
+";
+
+%feature("docstring") casadi::Diagcat::isValue "[INTERNAL]  Check if a
+certain value.
+
+";
+
+%feature("docstring") casadi::Diagcat::simplifyMe "[INTERNAL]  Simplify the
+expression (ex is a reference to the node)
+
+";
+
+%feature("docstring") casadi::Diagcat::getAssertion "[INTERNAL]
+Assertion.
+
+";
+
+%feature("docstring") casadi::Diagcat::getHorzsplit "[INTERNAL]  Create a
+horizontal split node.
+
+";
+
+%feature("docstring") casadi::Diagcat::shape "[INTERNAL] ";
+
+%feature("docstring") casadi::Diagcat::print "
+
+>  void casadi::MXNode::print(std::ostream &stream) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print a description.
+
+>  void casadi::MXNode::print(std::ostream &stream, long &remaining_calls) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print expression (make sure number of calls is not exceeded)
+
+";
+
+%feature("docstring") casadi::Diagcat::isBinaryOp "[INTERNAL]  Check if
+binary operation.
+
+";
+
+%feature("docstring") casadi::Diagcat::init "[INTERNAL]  Initialize the
+object.
+
+";
+
+%feature("docstring") casadi::Diagcat::getAddNonzeros "[INTERNAL]  Add the
+nonzeros of a matrix to another matrix.
+
+";
+
+%feature("docstring") casadi::Diagcat::addDependency "[INTERNAL]  Add a
+dependency.
+
+";
+
+%feature("docstring") casadi::Diagcat::getSubRef "[INTERNAL]  Get submatrix
+reference.
+
+";
+
+%feature("docstring") casadi::Diagcat::ndep "[INTERNAL]  Number of
+dependencies.
+
+";
+
+%feature("docstring") casadi::Diagcat::getReshape "[INTERNAL]   Reshape.
+
+";
+
+%feature("docstring") casadi::Diagcat::propagateSparsity "[INTERNAL]
+Propagate sparsity.
+
+";
+
+%feature("docstring") casadi::Diagcat::__nonzero__ "[INTERNAL]  Check the
+truth value of this node.
+
+";
+
+%feature("docstring") casadi::Diagcat::sparsity "
+
+>  const Sparsity& casadi::MXNode::sparsity() const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get the sparsity.
+
+>  const Sparsity & casadi::MXNode::sparsity(int oind) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get the sparsity of output oind.
+
+";
+
+%feature("docstring") casadi::Diagcat::getSubAssign "[INTERNAL]  Get
+submatrix assignment.
+
+";
+
+%feature("docstring") casadi::Diagcat::getBinary "[INTERNAL]  Get a binary
+operation operation (matrix-matrix)
+
+";
+
+%feature("docstring") casadi::Diagcat::isMultipleOutput "[INTERNAL]  Check
+if a multiple output node.
+
+";
+
+%feature("docstring") casadi::Diagcat::getSetSparse "[INTERNAL]  Create set
+sparse.
+
+";
+
+
+// File: classcasadi_1_1Diagsplit.xml
+%feature("docstring") casadi::Diagsplit::getNorm1 "[INTERNAL]  1-norm
+
+";
+
+%feature("docstring") casadi::Diagsplit::isValue "[INTERNAL]  Check if a
+certain value.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isEqual "[INTERNAL]  Check if two
+nodes are equivalent up to a given depth.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getFunctionInput "[INTERNAL]  Get
+function input.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getBinarySwitch "[INTERNAL]  Get a
+binary operation operation.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getMatrixValue "[INTERNAL]  Get
+the value (only for constant nodes)
+
+";
+
+%feature("docstring") casadi::Diagsplit::getOp "[INTERNAL]  Get the
+operation.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getFunction "[INTERNAL]  Get
+function reference.
+
+";
+
+%feature("docstring") casadi::Diagsplit::hasDep "[INTERNAL]  Does the node
+depend on other nodes.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getOutput "[INTERNAL]  Get an
+output.
+
+";
+
+%feature("docstring") casadi::Diagsplit::size1 "[INTERNAL] ";
+
+%feature("docstring") casadi::Diagsplit::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isBinaryOp "[INTERNAL]  Check if
+binary operation.
+
+";
+
+%feature("docstring") casadi::Diagsplit::sameOpAndDeps "[INTERNAL]  Checks
+if two nodes have the same operation and have equivalent dependencies up to
+a given depth.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getNormInf "[INTERNAL]  Infinity
+norm.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getGetNonzeros "[INTERNAL]  Get
+the nonzeros of matrix.
+
+";
+
+%feature("docstring") casadi::Diagsplit::mapping "[INTERNAL]  Get an
+IMatrix representation of a GetNonzeros or SetNonzeros node.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isNonLinear "[INTERNAL]  Is the
+node nonlinear.
+
+";
+
+%feature("docstring") casadi::Diagsplit::nTmp "[INTERNAL]  Get number of
+temporary variables needed.
+
+";
+
+%feature("docstring") casadi::Diagsplit::~Diagsplit "[INTERNAL]
+Destructor.
+
+";
+
+%feature("docstring") casadi::Diagsplit::clone "[INTERNAL]  Clone function.
+
+";
+
+%feature("docstring") casadi::Diagsplit::evaluateD "[INTERNAL]  Evaluate
+the function numerically.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isOne "[INTERNAL]  Check if
+identically one.
+
+";
+
+%feature("docstring") casadi::Diagsplit::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getNumOutputs "[INTERNAL]  Number
+of outputs.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getAddNonzeros "[INTERNAL]  Add
+the nonzeros of a matrix to another matrix.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getReshape "[INTERNAL]   Reshape.
+
+";
+
+%feature("docstring") casadi::Diagsplit::ndep "[INTERNAL]  Number of
+dependencies.
+
+";
+
+%feature("docstring") casadi::Diagsplit::numel "[INTERNAL]  Get shape.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getHorzcat "[INTERNAL]  Create a
+horizontal concatenation node.
+
+";
+
+%feature("docstring") casadi::Diagsplit::repr "[INTERNAL]  Print a
+representation.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getBinary "[INTERNAL]  Get a
+binary operation operation (matrix-matrix)
+
+";
+
+%feature("docstring") casadi::Diagsplit::generateOperation "[INTERNAL]
+Generate code for the operation.
+
+";
+
+%feature("docstring") casadi::Diagsplit::printPart "[INTERNAL]  Print a
+part of the expression */.
+
+";
+
+%feature("docstring") casadi::Diagsplit::numInplace "[INTERNAL]  Can the
+operation be performed inplace (i.e. overwrite the result)
+
+";
+
+%feature("docstring") casadi::Diagsplit::getHorzsplit "[INTERNAL]  Create a
+horizontal split node.
+
+";
+
+%feature("docstring") casadi::Diagsplit::evaluateSX "[INTERNAL]  Evaluate
+the function symbolically (SX)
+
+";
+
+%feature("docstring") casadi::Diagsplit::getNorm2 "[INTERNAL]  Spectral
+norm.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isZero "[INTERNAL]  Check if
+identically zero.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isOutputNode "[INTERNAL]  Check if
+evaluation output.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getVertsplit "[INTERNAL]  Create a
+vertical split node (vectors only)
+
+";
+
+%feature("docstring") casadi::Diagsplit::evaluateGen "[INTERNAL]  Evaluate
+the function (template)
+
+";
+
+%feature("docstring") casadi::Diagsplit::size "[INTERNAL] ";
+
+%feature("docstring") casadi::Diagsplit::getInnerProd "[INTERNAL]  Inner
+product.
+
+";
+
+%feature("docstring") casadi::Diagsplit::assign "
+
+>  void casadi::MXNode::assign(const MX &d, const std::vector< int > &inz, const std::vector< int > &onz, bool add=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Assign nonzeros (mapping matrix)
+
+>  void casadi::MXNode::assign(const MX &d, const std::vector< int > &inz, bool add=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Assign nonzeros (mapping matrix), output indices sequential.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getNormF "[INTERNAL]  Frobenius
+norm.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isUnaryOp "[INTERNAL]  Check if
+unary operation.
+
+";
+
+%feature("docstring") casadi::Diagsplit::deepCopyMembers "[INTERNAL]  Deep
+copy data members.
+
+";
+
+%feature("docstring") casadi::Diagsplit::simplifyMe "[INTERNAL]  Simplify
+the expression (ex is a reference to the node)
+
+";
+
+%feature("docstring") casadi::Diagsplit::getSetNonzeros "[INTERNAL]  Assign
+the nonzeros of a matrix to another matrix.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getInverse "[INTERNAL]   Inverse.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getSubRef "[INTERNAL]  Get
+submatrix reference.
+
+";
+
+%feature("docstring") casadi::Diagsplit::__nonzero__ "[INTERNAL]  Check the
+truth value of this node.
+
+";
+
+%feature("docstring") casadi::Diagsplit::addDependency "[INTERNAL]  Add a
+dependency.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isIdentity "[INTERNAL]  Check if
+identity matrix.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getDeterminant "[INTERNAL]
+Determinant.
+
+";
+
+%feature("docstring") casadi::Diagsplit::print "
+
+>  void casadi::MXNode::print(std::ostream &stream) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print a description.
+
+>  void casadi::MXNode::print(std::ostream &stream, long &remaining_calls) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print expression (make sure number of calls is not exceeded)
+
+";
+
+%feature("docstring") casadi::Diagsplit::setSparsity "[INTERNAL]  Set the
+sparsity.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isMultipleOutput "[INTERNAL]
+Check if a multiple output node.
+
+";
+
+%feature("docstring") casadi::Diagsplit::Diagsplit "[INTERNAL]
+Constructor.
+
+";
+
+%feature("docstring") casadi::Diagsplit::dep "
+
+>  const MX & casadi::MXNode::dep(int ind=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+dependencies - functions that have to be evaluated before this one
+
+>  MX & casadi::MXNode::dep(int ind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+%feature("docstring") casadi::Diagsplit::getTranspose "[INTERNAL]
+Transpose.
+
+";
+
+%feature("docstring") casadi::Diagsplit::evaluateMX "
+
+>  void casadi::Diagsplit::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given)
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate the function symbolically ( MX)
+
+>  void casadi::MXNode::evaluateMX(const MXPtrV &input, MXPtrV &output)
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate symbolically ( MX), no derivatives.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::Diagsplit::init "[INTERNAL]  Initialize the
+object.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getAssertion "[INTERNAL]
+Assertion.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getSetSparse "[INTERNAL]  Create
+set sparse.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getUnary "[INTERNAL]  Get a unary
+operation.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getMultiplication "[INTERNAL]
+Matrix multiplication.
+
+The optimal argument sp_z will be used as the sparsity pattern of the result
+
+";
+
+%feature("docstring") casadi::Diagsplit::getFunctionOutput "[INTERNAL]  Get
+function output.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getName "[INTERNAL]  Get the name.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getSubAssign "[INTERNAL]  Get
+submatrix assignment.
+
+";
+
+%feature("docstring") casadi::Diagsplit::size2 "[INTERNAL] ";
+
+%feature("docstring") casadi::Diagsplit::propagateSparsity "[INTERNAL]
+Propagate sparsity.
+
+";
+
+%feature("docstring") casadi::Diagsplit "[INTERNAL]  Diag split, x -> x0,
+x1, ...
+
+Joris Gillis
+
+C++ includes: split.hpp ";
+
+%feature("docstring") casadi::Diagsplit::getVertcat "[INTERNAL]  Create a
+vertical concatenation node (vectors only)
+
+";
+
+%feature("docstring") casadi::Diagsplit::shape "[INTERNAL] ";
+
+%feature("docstring") casadi::Diagsplit::getValue "[INTERNAL]  Get the
+value (only for scalar constant nodes)
+
+";
+
+%feature("docstring") casadi::Diagsplit::assertInit "[INTERNAL]  Assert
+that the object has been initialized.
+
+";
+
+%feature("docstring") casadi::Diagsplit::isInit "[INTERNAL]  Check if the
+object has been initialized.
+
+";
+
+%feature("docstring") casadi::Diagsplit::sparsity "
+
+>  virtual const Sparsity& casadi::Split::sparsity(int oind) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get the sparsity of output oind.
+
+>  const Sparsity& casadi::MXNode::sparsity() const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get the sparsity.
+
+";
+
+%feature("docstring") casadi::Diagsplit::getSolve "[INTERNAL]   Solve a
+system of linear equations.
+
+For system Ax = b:
+
+A->getSolve(b)
+
+";
+
+%feature("docstring") casadi::Diagsplit::setDependencies "
+
+>  void casadi::MXNode::setDependencies(const MX &dep)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set unary dependency.
+
+>  void casadi::MXNode::setDependencies(const MX &dep1, const MX &dep2)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set binary dependencies.
+
+>  void casadi::MXNode::setDependencies(const MX &dep1, const MX &dep2, const MX &dep3)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set ternary dependencies.
+
+>  void casadi::MXNode::setDependencies(const std::vector< MX > &dep)
+------------------------------------------------------------------------
+[INTERNAL] 
+Set multiple dependencies.
 
 ";
 
@@ -23649,8 +24696,8 @@ to vector of ints.
 
 
 // File: classcasadi_1_1GetNonzeros.xml
-%feature("docstring") casadi::GetNonzeros::getSubAssign "[INTERNAL]  Get
-submatrix assignment.
+%feature("docstring") casadi::GetNonzeros::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -23688,6 +24735,11 @@ reference to the object.
 
 ";
 
+%feature("docstring") casadi::GetNonzeros::getDiagsplit "[INTERNAL]  Create
+a diagonal split node.
+
+";
+
 %feature("docstring") casadi::GetNonzeros::isIdentity "[INTERNAL]  Check if
 identity matrix.
 
@@ -23716,6 +24768,11 @@ up to a given depth.
 
 %feature("docstring") casadi::GetNonzeros::getBinary "[INTERNAL]  Get a
 binary operation operation (matrix-matrix)
+
+";
+
+%feature("docstring") casadi::GetNonzeros::getSubAssign "[INTERNAL]  Get
+submatrix assignment.
 
 ";
 
@@ -24331,6 +25388,11 @@ identically one.
 
 ";
 
+%feature("docstring") casadi::GetNonzerosSlice::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::GetNonzerosSlice::getName "[INTERNAL]  Get
 the name.
 
@@ -24558,6 +25620,11 @@ Frobenius norm.
 
 %feature("docstring") casadi::GetNonzerosSlice::getReshape "[INTERNAL]
 Reshape.
+
+";
+
+%feature("docstring") casadi::GetNonzerosSlice::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
 
 ";
 
@@ -24916,8 +25983,8 @@ if the object has been initialized.
 
 ";
 
-%feature("docstring") casadi::GetNonzerosSlice2::getSubAssign "[INTERNAL]
-Get submatrix assignment.
+%feature("docstring") casadi::GetNonzerosSlice2::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
 
 ";
 
@@ -25019,6 +26086,11 @@ Check if binary operation.
 
 ";
 
+%feature("docstring") casadi::GetNonzerosSlice2::getSubAssign "[INTERNAL]
+Get submatrix assignment.
+
+";
+
 %feature("docstring") casadi::GetNonzerosSlice2::~GetNonzerosSlice2 "[INTERNAL]  Destructor.
 
 ";
@@ -25052,6 +26124,11 @@ Get the nonzeros of matrix.
 
 ";
 
+%feature("docstring") casadi::GetNonzerosSlice2::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
+
+";
+
 
 // File: classcasadi_1_1GetNonzerosVector.xml
 %feature("docstring") casadi::GetNonzerosVector::propagateSparsity "[INTERNAL]  Propagate sparsity.
@@ -25070,6 +26147,11 @@ Get the value (only for constant nodes)
 
 %feature("docstring") casadi::GetNonzerosVector::init "[INTERNAL]
 Initialize the object.
+
+";
+
+%feature("docstring") casadi::GetNonzerosVector::getCount "[INTERNAL]  Get
+the reference count.
 
 ";
 
@@ -25378,8 +26460,8 @@ Infinity norm.
 
 ";
 
-%feature("docstring") casadi::GetNonzerosVector::getCount "[INTERNAL]  Get
-the reference count.
+%feature("docstring") casadi::GetNonzerosVector::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
 
 ";
 
@@ -25497,6 +26579,11 @@ Print expression (make sure number of calls is not exceeded)
 
 %feature("docstring") casadi::GetNonzerosVector::getSubAssign "[INTERNAL]
 Get submatrix assignment.
+
+";
+
+%feature("docstring") casadi::GetNonzerosVector::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
 
 ";
 
@@ -26861,6 +27948,11 @@ operation be performed inplace (i.e. overwrite the result)
 
 ";
 
+%feature("docstring") casadi::Horzcat::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
 %feature("docstring") casadi::Horzcat::getCount "[INTERNAL]  Get the
 reference count.
 
@@ -27097,6 +28189,11 @@ identically zero.
 ";
 
 %feature("docstring") casadi::Horzcat::size "[INTERNAL] ";
+
+%feature("docstring") casadi::Horzcat::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
 
 %feature("docstring") casadi::Horzcat::getNorm2 "[INTERNAL]  Spectral norm.
 
@@ -27389,6 +28486,11 @@ dependencies - functions that have to be evaluated before this one
 [INTERNAL] 
 ";
 
+%feature("docstring") casadi::Horzsplit::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
 %feature("docstring") casadi::Horzsplit::isBinaryOp "[INTERNAL]  Check if
 binary operation.
 
@@ -27527,6 +28629,11 @@ that the object has been initialized.
 
 ";
 
+%feature("docstring") casadi::Horzsplit::getAddNonzeros "[INTERNAL]  Add
+the nonzeros of a matrix to another matrix.
+
+";
+
 %feature("docstring") casadi::Horzsplit::getOutput "[INTERNAL]  Get an
 output.
 
@@ -27647,8 +28754,8 @@ operation.
 
 ";
 
-%feature("docstring") casadi::Horzsplit::getAddNonzeros "[INTERNAL]  Add
-the nonzeros of a matrix to another matrix.
+%feature("docstring") casadi::Horzsplit::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -32134,6 +33241,11 @@ horizontal concatenation node.
 
 ";
 
+%feature("docstring") casadi::InnerProd::getUnary "[INTERNAL]  Get a unary
+operation.
+
+";
+
 %feature("docstring") casadi::InnerProd::isZero "[INTERNAL]  Check if
 identically zero.
 
@@ -32144,8 +33256,8 @@ copy data members.
 
 ";
 
-%feature("docstring") casadi::InnerProd::getUnary "[INTERNAL]  Get a unary
-operation.
+%feature("docstring") casadi::InnerProd::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -32320,6 +33432,11 @@ Destructor.
 
 ";
 
+%feature("docstring") casadi::InnerProd::getNormInf "[INTERNAL]  Infinity
+norm.
+
+";
+
 %feature("docstring") casadi::InnerProd::nTmp "[INTERNAL]  Get number of
 temporary variables needed.
 
@@ -32421,8 +33538,8 @@ the function symbolically (SX)
 
 ";
 
-%feature("docstring") casadi::InnerProd::getNormInf "[INTERNAL]  Infinity
-norm.
+%feature("docstring") casadi::InnerProd::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -34704,6 +35821,11 @@ operation be performed inplace (i.e. overwrite the result)
 
 ";
 
+%feature("docstring") casadi::Inverse::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::Inverse::getBinary "[INTERNAL]  Get a binary
 operation operation (matrix-matrix)
 
@@ -34891,8 +36013,8 @@ binary operation operation.
 
 ";
 
-%feature("docstring") casadi::Inverse::getDeterminant "[INTERNAL]
-Determinant.
+%feature("docstring") casadi::Inverse::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -34947,6 +36069,11 @@ function reference.
 
 %feature("docstring") casadi::Inverse::isEqual "[INTERNAL]  Check if two
 nodes are equivalent up to a given depth.
+
+";
+
+%feature("docstring") casadi::Inverse::getDeterminant "[INTERNAL]
+Determinant.
 
 ";
 
@@ -47014,6 +48141,16 @@ the operation be performed inplace (i.e. overwrite the result)
 
 ";
 
+%feature("docstring") casadi::MultipleOutput::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
+
+";
+
+%feature("docstring") casadi::MultipleOutput::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::MultipleOutput::getFunction "[INTERNAL]  Get
 function reference.
 
@@ -47741,6 +48878,11 @@ Create a vertical split node (vectors only)
 
 ";
 
+%feature("docstring") casadi::Multiplication::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::Multiplication::numInplace "[INTERNAL]  Can
 the operation be performed inplace (i.e. overwrite the result)
 
@@ -47763,6 +48905,11 @@ reference count.
 
 %feature("docstring") casadi::Multiplication::getInverse "[INTERNAL]
 Inverse.
+
+";
+
+%feature("docstring") casadi::Multiplication::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
 
 ";
 
@@ -50195,6 +51342,11 @@ representation of a GetNonzeros or SetNonzeros node.
 
 ";
 
+%feature("docstring") casadi::MXNode::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::MXNode::assign "
 
 >  void casadi::MXNode::assign(const MX &d, const std::vector< int > &inz, const std::vector< int > &onz, bool add=false)
@@ -50272,6 +51424,11 @@ operation be performed inplace (i.e. overwrite the result)
 
 %feature("docstring") casadi::MXNode::isOne "[INTERNAL]  Check if
 identically one.
+
+";
+
+%feature("docstring") casadi::MXNode::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -54268,6 +55425,11 @@ C++ includes: nonzeros.hpp ";
 
 
 // File: classcasadi_1_1Norm.xml
+%feature("docstring") casadi::Norm::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::Norm::getOutput "[INTERNAL]  Get an output.
 
 ";
@@ -54302,6 +55464,11 @@ representation of a GetNonzeros or SetNonzeros node.
 
 %feature("docstring") casadi::Norm::getSubRef "[INTERNAL]  Get submatrix
 reference.
+
+";
+
+%feature("docstring") casadi::Norm::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -54862,6 +56029,11 @@ product.
 
 ";
 
+%feature("docstring") casadi::Norm1::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
 %feature("docstring") casadi::Norm1::getBinarySwitch "[INTERNAL]  Get a
 binary operation operation.
 
@@ -55011,6 +56183,11 @@ vertical split node (vectors only)
 
 %feature("docstring") casadi::Norm1::getSetNonzeros "[INTERNAL]  Assign the
 nonzeros of a matrix to another matrix.
+
+";
+
+%feature("docstring") casadi::Norm1::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -55372,6 +56549,11 @@ binary operation operation.
 
 ";
 
+%feature("docstring") casadi::Norm2::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::Norm2::getGetNonzeros "[INTERNAL]  Get the
 nonzeros of matrix.
 
@@ -55406,6 +56588,11 @@ Propagate sparsity.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Propagate sparsity, no work.
+
+";
+
+%feature("docstring") casadi::Norm2::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -55871,6 +57058,13 @@ nonzeros of matrix.
 
 ";
 
+%feature("docstring") casadi::NormF::getMultiplication "[INTERNAL]   Matrix
+multiplication.
+
+The optimal argument sp_z will be used as the sparsity pattern of the result
+
+";
+
 %feature("docstring") casadi::NormF::__nonzero__ "[INTERNAL]  Check the
 truth value of this node.
 
@@ -56072,6 +57266,11 @@ nonzeros of a matrix to another matrix.
 
 ";
 
+%feature("docstring") casadi::NormF::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
 %feature("docstring") casadi::NormF::getFunctionInput "[INTERNAL]  Get
 function input.
 
@@ -56081,10 +57280,8 @@ function input.
 
 ";
 
-%feature("docstring") casadi::NormF::getMultiplication "[INTERNAL]   Matrix
-multiplication.
-
-The optimal argument sp_z will be used as the sparsity pattern of the result
+%feature("docstring") casadi::NormF::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -56183,6 +57380,11 @@ representation.
 
 %feature("docstring") casadi::NormInf::isIdentity "[INTERNAL]  Check if
 identity matrix.
+
+";
+
+%feature("docstring") casadi::NormInf::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -56458,6 +57660,11 @@ expression (ex is a reference to the node)
 
 %feature("docstring") casadi::NormInf::__nonzero__ "[INTERNAL]  Check the
 truth value of this node.
+
+";
+
+%feature("docstring") casadi::NormInf::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -60534,6 +61741,11 @@ IMatrix representation of a GetNonzeros or SetNonzeros node.
 
 ";
 
+%feature("docstring") casadi::OutputNode::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::OutputNode::getNumOutputs "[INTERNAL]  Number
 of outputs.
 
@@ -60608,6 +61820,11 @@ Transpose.
 ";
 
 %feature("docstring") casadi::OutputNode::size2 "[INTERNAL] ";
+
+%feature("docstring") casadi::OutputNode::getDiagsplit "[INTERNAL]  Create
+a diagonal split node.
+
+";
 
 %feature("docstring") casadi::OutputNode::evaluateMX "
 
@@ -71379,7 +72596,12 @@ nonzeros of a matrix to another matrix.
 
 ";
 
-%feature("docstring") casadi::Reshape::getNorm1 "[INTERNAL]  1-norm
+%feature("docstring") casadi::Reshape::getSolve "[INTERNAL]   Solve a
+system of linear equations.
+
+For system Ax = b:
+
+A->getSolve(b)
 
 ";
 
@@ -71452,6 +72674,10 @@ dependencies.
 
 ";
 
+%feature("docstring") casadi::Reshape::getNorm1 "[INTERNAL]  1-norm
+
+";
+
 %feature("docstring") casadi::Reshape::generateOperation "[INTERNAL]
 Generate code for the operation.
 
@@ -71459,6 +72685,11 @@ Generate code for the operation.
 
 %feature("docstring") casadi::Reshape::evaluateSX "[INTERNAL]  Evaluate the
 function symbolically (SX)
+
+";
+
+%feature("docstring") casadi::Reshape::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -71496,12 +72727,8 @@ norm.
 
 ";
 
-%feature("docstring") casadi::Reshape::getSolve "[INTERNAL]   Solve a
-system of linear equations.
-
-For system Ax = b:
-
-A->getSolve(b)
+%feature("docstring") casadi::Reshape::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -79480,6 +80707,11 @@ Set multiple dependencies.
 
 ";
 
+%feature("docstring") casadi::SetNonzeros::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::SetNonzeros::getOp "[INTERNAL]  Get the
 operation.
 
@@ -79598,6 +80830,11 @@ Get function output.
 
 ";
 
+%feature("docstring") casadi::SetNonzeros::getDeterminant "[INTERNAL]
+Determinant.
+
+";
+
 %feature("docstring") casadi::SetNonzeros::getNormInf "[INTERNAL]  Infinity
 norm.
 
@@ -79704,8 +80941,8 @@ submatrix reference.
 
 ";
 
-%feature("docstring") casadi::SetNonzeros::getDeterminant "[INTERNAL]
-Determinant.
+%feature("docstring") casadi::SetNonzeros::getUnary "[INTERNAL]  Get a
+unary operation.
 
 ";
 
@@ -79773,8 +81010,8 @@ binary operation operation (matrix-matrix)
 
 ";
 
-%feature("docstring") casadi::SetNonzeros::getUnary "[INTERNAL]  Get a
-unary operation.
+%feature("docstring") casadi::SetNonzeros::getDiagsplit "[INTERNAL]  Create
+a diagonal split node.
 
 ";
 
@@ -79841,6 +81078,276 @@ C++ includes: setnonzeros.hpp ";
 
 
 // File: classcasadi_1_1SetNonzerosSlice.xml
+%feature("docstring") casadi::SetNonzerosSlice::mapping "[INTERNAL]  Get an
+IMatrix representation of a GetNonzeros or SetNonzeros node.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::isOne "[INTERNAL]  Check if
+identically one.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::addDependency "[INTERNAL]
+Add a dependency.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getOutput "[INTERNAL]  Get
+an output.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getSubAssign "[INTERNAL]
+Get submatrix assignment.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getSetSparse "[INTERNAL]
+Create set sparse.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getVertcat "[INTERNAL]
+Create a vertical concatenation node (vectors only)
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getGetNonzeros "[INTERNAL]
+Get the nonzeros of matrix.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getVertsplit "[INTERNAL]
+Create a vertical split node (vectors only)
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::SetNonzerosSlice "[INTERNAL]  Constructor.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::init "[INTERNAL]
+Initialize the object.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::isNonLinear "[INTERNAL]  Is
+the node nonlinear.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::nTmp "[INTERNAL]  Get
+number of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::evaluateD "[INTERNAL]
+Evaluate the function numerically.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::isUnaryOp "[INTERNAL]
+Check if unary operation.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::size "[INTERNAL] ";
+
+%feature("docstring") casadi::SetNonzerosSlice::print "
+
+>  void casadi::MXNode::print(std::ostream &stream) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print a description.
+
+>  void casadi::MXNode::print(std::ostream &stream, long &remaining_calls) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print expression (make sure number of calls is not exceeded)
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getNumOutputs "[INTERNAL]
+Number of outputs.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getSetNonzeros "[INTERNAL]
+Assign the nonzeros of a matrix to another matrix.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::isOutputNode "[INTERNAL]
+Check if evaluation output.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::isEqual "[INTERNAL]  Check
+if two nodes are equivalent up to a given depth.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::setSparsity "[INTERNAL]
+Set the sparsity.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getUnary "[INTERNAL]  Get a
+unary operation.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::~SetNonzerosSlice "[INTERNAL]  Destructor.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getOp "[INTERNAL]  Get the
+operation.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getHorzsplit "[INTERNAL]
+Create a horizontal split node.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getAll "[INTERNAL]  Get all
+the nonzeros.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::simplifyMe "[INTERNAL]
+Simplify.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getValue "[INTERNAL]  Get
+the value (only for scalar constant nodes)
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getTranspose "[INTERNAL]
+Transpose.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice "[INTERNAL] C++ includes:
+setnonzeros.hpp ";
+
+%feature("docstring") casadi::SetNonzerosSlice::repr "[INTERNAL]  Print a
+representation.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::isAssignment "[INTERNAL]
+Check if the instance is in fact a simple assignment.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::numel "[INTERNAL]  Get
+shape.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::evaluateSX "[INTERNAL]
+Evaluate the function symbolically (SX)
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getNorm1 "[INTERNAL]
+1-norm
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getFunction "[INTERNAL]
+Get function reference.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getNorm2 "[INTERNAL]
+Spectral norm.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::propagateSparsity "[INTERNAL]  Propagate sparsity.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getAddNonzeros "[INTERNAL]
+Add the nonzeros of a matrix to another matrix.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::sameOpAndDeps "[INTERNAL]
+Checks if two nodes have the same operation and have equivalent dependencies
+up to a given depth.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getBinary "[INTERNAL]  Get
+a binary operation operation (matrix-matrix)
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getMatrixValue "[INTERNAL]
+Get the value (only for constant nodes)
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::evaluateGen "[INTERNAL]
+Evaluate the function (template)
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getNormF "[INTERNAL]
+Frobenius norm.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::printPart "[INTERNAL]
+Print a part of the expression */.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::generateOperation "[INTERNAL]  Generate code for the operation.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getSubRef "[INTERNAL]  Get
+submatrix reference.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::isIdentity "[INTERNAL]
+Check if identity matrix.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getInnerProd "[INTERNAL]
+Inner product.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::dep "
+
+>  const MX & casadi::MXNode::dep(int ind=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+dependencies - functions that have to be evaluated before this one
+
+>  MX & casadi::MXNode::dep(int ind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::shape "[INTERNAL] ";
+
 %feature("docstring") casadi::SetNonzerosSlice::evaluateMX "
 
 >  void casadi::SetNonzeros< Add >::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given)
@@ -79855,66 +81362,8 @@ Evaluate symbolically ( MX), no derivatives.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::isInit "[INTERNAL]  Check
-if the object has been initialized.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice "[INTERNAL] C++ includes:
-setnonzeros.hpp ";
-
-%feature("docstring") casadi::SetNonzerosSlice::repr "[INTERNAL]  Print a
-representation.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::mapping "[INTERNAL]  Get an
-IMatrix representation of a GetNonzeros or SetNonzeros node.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::propagateSparsity "[INTERNAL]  Propagate sparsity.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::addDependency "[INTERNAL]
-Add a dependency.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getOutput "[INTERNAL]  Get
-an output.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::size2 "[INTERNAL] ";
-
-%feature("docstring") casadi::SetNonzerosSlice::getSubAssign "[INTERNAL]
-Get submatrix assignment.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getSetSparse "[INTERNAL]
-Create set sparse.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::isAssignment "[INTERNAL]
-Check if the instance is in fact a simple assignment.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::numel "[INTERNAL]  Get
-shape.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getSolve "[INTERNAL]
-Solve a system of linear equations.
-
-For system Ax = b:
-
-A->getSolve(b)
+%feature("docstring") casadi::SetNonzerosSlice::isValue "[INTERNAL]  Check
+if a certain value.
 
 ";
 
@@ -79923,47 +81372,13 @@ dependencies.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::getReshape "[INTERNAL]
-Reshape.
+%feature("docstring") casadi::SetNonzerosSlice::isZero "[INTERNAL]  Check
+if identically zero.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::getHorzcat "[INTERNAL]
-Create a horizontal concatenation node.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::__nonzero__ "[INTERNAL]
-Check the truth value of this node.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::SetNonzerosSlice "[INTERNAL]  Constructor.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::evaluateSX "[INTERNAL]
-Evaluate the function symbolically (SX)
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getMultiplication "[INTERNAL]   Matrix multiplication.
-
-The optimal argument sp_z will be used as the sparsity pattern of the result
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::shape "[INTERNAL] ";
-
-%feature("docstring") casadi::SetNonzerosSlice::size1 "[INTERNAL] ";
-
-%feature("docstring") casadi::SetNonzerosSlice::getCount "[INTERNAL]  Get
-the reference count.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getFunction "[INTERNAL]
-Get function reference.
+%feature("docstring") casadi::SetNonzerosSlice::weak "[INTERNAL]  Get a
+weak reference to the object.
 
 ";
 
@@ -79972,64 +81387,12 @@ function.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::getNorm2 "[INTERNAL]
-Spectral norm.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getSubRef "[INTERNAL]  Get
-submatrix reference.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::isOne "[INTERNAL]  Check if
-identically one.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getInnerProd "[INTERNAL]
-Inner product.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getFunctionInput "[INTERNAL]  Get function input.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::isZero "[INTERNAL]  Check
-if identically zero.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::size "[INTERNAL] ";
-
-%feature("docstring") casadi::SetNonzerosSlice::getAssertion "[INTERNAL]
-Assertion.
+%feature("docstring") casadi::SetNonzerosSlice::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
 
 ";
 
 %feature("docstring") casadi::SetNonzerosSlice::isMultipleOutput "[INTERNAL]  Check if a multiple output node.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getUnary "[INTERNAL]  Get a
-unary operation.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getAddNonzeros "[INTERNAL]
-Add the nonzeros of a matrix to another matrix.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::isValue "[INTERNAL]  Check
-if a certain value.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::sameOpAndDeps "[INTERNAL]
-Checks if two nodes have the same operation and have equivalent dependencies
-up to a given depth.
 
 ";
 
@@ -80052,76 +81415,8 @@ Get the sparsity of output oind.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::weak "[INTERNAL]  Get a
-weak reference to the object.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::isNonLinear "[INTERNAL]  Is
-the node nonlinear.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::nTmp "[INTERNAL]  Get
-number of temporary variables needed.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::evaluateD "[INTERNAL]
-Evaluate the function numerically.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getNorm1 "[INTERNAL]
-1-norm
-
-";
-
 %feature("docstring") casadi::SetNonzerosSlice::getNormInf "[INTERNAL]
 Infinity norm.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getBinary "[INTERNAL]  Get
-a binary operation operation (matrix-matrix)
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::isUnaryOp "[INTERNAL]
-Check if unary operation.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::print "
-
->  void casadi::MXNode::print(std::ostream &stream) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Print a description.
-
->  void casadi::MXNode::print(std::ostream &stream, long &remaining_calls) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Print expression (make sure number of calls is not exceeded)
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getNumOutputs "[INTERNAL]
-Number of outputs.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getFunctionOutput "[INTERNAL]  Get function output.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getSetNonzeros "[INTERNAL]
-Assign the nonzeros of a matrix to another matrix.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getMatrixValue "[INTERNAL]
-Get the value (only for constant nodes)
 
 ";
 
@@ -80130,43 +81425,13 @@ Determinant.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::numInplace "[INTERNAL]  Can
-the operation be performed inplace (i.e. overwrite the result)
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::isOutputNode "[INTERNAL]
-Check if evaluation output.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::deepCopyMembers "[INTERNAL]
-Deep copy data members.
-
-";
-
 %feature("docstring") casadi::SetNonzerosSlice::hasDep "[INTERNAL]  Does
 the node depend on other nodes.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::evaluateGen "[INTERNAL]
-Evaluate the function (template)
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getNormF "[INTERNAL]
-Frobenius norm.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::isEqual "[INTERNAL]  Check
-if two nodes are equivalent up to a given depth.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::setSparsity "[INTERNAL]
-Set the sparsity.
+%feature("docstring") casadi::SetNonzerosSlice::getAssertion "[INTERNAL]
+Assertion.
 
 ";
 
@@ -80181,11 +81446,6 @@ Assign nonzeros (mapping matrix)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Assign nonzeros (mapping matrix), output indices sequential.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::printPart "[INTERNAL]
-Print a part of the expression */.
 
 ";
 
@@ -80213,27 +81473,8 @@ Set multiple dependencies.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::~SetNonzerosSlice "[INTERNAL]  Destructor.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getVertcat "[INTERNAL]
-Create a vertical concatenation node (vectors only)
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getOp "[INTERNAL]  Get the
-operation.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getHorzsplit "[INTERNAL]
-Create a horizontal split node.
-
-";
-
-%feature("docstring") casadi::SetNonzerosSlice::getAll "[INTERNAL]  Get all
-the nonzeros.
+%feature("docstring") casadi::SetNonzerosSlice::deepCopyMembers "[INTERNAL]
+Deep copy data members.
 
 ";
 
@@ -80242,49 +81483,47 @@ Inverse.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::getBinarySwitch "[INTERNAL]
-Get a binary operation operation.
+%feature("docstring") casadi::SetNonzerosSlice::isBinaryOp "[INTERNAL]
+Check if binary operation.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::getGetNonzeros "[INTERNAL]
-Get the nonzeros of matrix.
+%feature("docstring") casadi::SetNonzerosSlice::getReshape "[INTERNAL]
+Reshape.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::generateOperation "[INTERNAL]  Generate code for the operation.
+%feature("docstring") casadi::SetNonzerosSlice::isInit "[INTERNAL]  Check
+if the object has been initialized.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::simplifyMe "[INTERNAL]
-Simplify.
+%feature("docstring") casadi::SetNonzerosSlice::getHorzcat "[INTERNAL]
+Create a horizontal concatenation node.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::isIdentity "[INTERNAL]
-Check if identity matrix.
+%feature("docstring") casadi::SetNonzerosSlice::__nonzero__ "[INTERNAL]
+Check the truth value of this node.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::getValue "[INTERNAL]  Get
-the value (only for scalar constant nodes)
+%feature("docstring") casadi::SetNonzerosSlice::getMultiplication "[INTERNAL]   Matrix multiplication.
+
+The optimal argument sp_z will be used as the sparsity pattern of the result
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::dep "
+%feature("docstring") casadi::SetNonzerosSlice::size1 "[INTERNAL] ";
 
->  const MX & casadi::MXNode::dep(int ind=0) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-dependencies - functions that have to be evaluated before this one
+%feature("docstring") casadi::SetNonzerosSlice::size2 "[INTERNAL] ";
 
->  MX & casadi::MXNode::dep(int ind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-";
+%feature("docstring") casadi::SetNonzerosSlice::getSolve "[INTERNAL]
+Solve a system of linear equations.
 
-%feature("docstring") casadi::SetNonzerosSlice::getTranspose "[INTERNAL]
-Transpose.
+For system Ax = b:
+
+A->getSolve(b)
 
 ";
 
@@ -80293,18 +81532,26 @@ the name.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::getVertsplit "[INTERNAL]
-Create a vertical split node (vectors only)
+%feature("docstring") casadi::SetNonzerosSlice::getFunctionOutput "[INTERNAL]  Get function output.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::init "[INTERNAL]
-Initialize the object.
+%feature("docstring") casadi::SetNonzerosSlice::getFunctionInput "[INTERNAL]  Get function input.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice::isBinaryOp "[INTERNAL]
-Check if binary operation.
+%feature("docstring") casadi::SetNonzerosSlice::numInplace "[INTERNAL]  Can
+the operation be performed inplace (i.e. overwrite the result)
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getBinarySwitch "[INTERNAL]
+Get a binary operation operation.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice::getCount "[INTERNAL]  Get
+the reference count.
 
 ";
 
@@ -80373,6 +81620,11 @@ dependencies - functions that have to be evaluated before this one
 ";
 
 %feature("docstring") casadi::SetNonzerosSlice2::size2 "[INTERNAL] ";
+
+%feature("docstring") casadi::SetNonzerosSlice2::getUnary "[INTERNAL]  Get
+a unary operation.
+
+";
 
 %feature("docstring") casadi::SetNonzerosSlice2::deepCopyMembers "[INTERNAL]  Deep copy data members.
 
@@ -80471,8 +81723,8 @@ if identically zero.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice2::getUnary "[INTERNAL]  Get
-a unary operation.
+%feature("docstring") casadi::SetNonzerosSlice2::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
 
 ";
 
@@ -80514,6 +81766,11 @@ Print expression (make sure number of calls is not exceeded)
 
 %feature("docstring") casadi::SetNonzerosSlice2::numel "[INTERNAL]  Get
 shape.
+
+";
+
+%feature("docstring") casadi::SetNonzerosSlice2::getCount "[INTERNAL]  Get
+the reference count.
 
 ";
 
@@ -80691,8 +81948,8 @@ Check if identity matrix.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosSlice2::getCount "[INTERNAL]  Get
-the reference count.
+%feature("docstring") casadi::SetNonzerosSlice2::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
 
 ";
 
@@ -80784,6 +82041,11 @@ of dependencies.
 
 %feature("docstring") casadi::SetNonzerosVector::evaluateD "[INTERNAL]
 Evaluate the function numerically.
+
+";
+
+%feature("docstring") casadi::SetNonzerosVector::getDiagsplit "[INTERNAL]
+Create a diagonal split node.
 
 ";
 
@@ -81112,8 +82374,8 @@ submatrix reference.
 
 ";
 
-%feature("docstring") casadi::SetNonzerosVector::init "[INTERNAL]
-Initialize the object.
+%feature("docstring") casadi::SetNonzerosVector::getDiagcat "[INTERNAL]
+Create a diagonal concatenation node.
 
 ";
 
@@ -81136,6 +82398,11 @@ Transpose.
 
 %feature("docstring") casadi::SetNonzerosVector::getCount "[INTERNAL]  Get
 the reference count.
+
+";
+
+%feature("docstring") casadi::SetNonzerosVector::init "[INTERNAL]
+Initialize the object.
 
 ";
 
@@ -81262,6 +82529,11 @@ reference count.
 
 %feature("docstring") casadi::SetSparse::generateOperation "[INTERNAL]
 Generate code for the operation.
+
+";
+
+%feature("docstring") casadi::SetSparse::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -81654,6 +82926,11 @@ operation.
 
 %feature("docstring") casadi::SetSparse::isNonLinear "[INTERNAL]  Is the
 node nonlinear.
+
+";
+
+%feature("docstring") casadi::SetSparse::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -87776,6 +89053,11 @@ identity matrix.
 
 ";
 
+%feature("docstring") casadi::Solve::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
 %feature("docstring") casadi::Solve::~Solve "[INTERNAL]  Destructor.
 
 ";
@@ -87950,6 +89232,11 @@ submatrix assignment.
 
 %feature("docstring") casadi::Solve::assertInit "[INTERNAL]  Assert that
 the object has been initialized.
+
+";
+
+%feature("docstring") casadi::Solve::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -89234,6 +90521,11 @@ nonzeros of a matrix to another matrix.
 
 ";
 
+%feature("docstring") casadi::Split::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::Split::numel "[INTERNAL]  Get shape.
 
 ";
@@ -89534,6 +90826,11 @@ representation.
 
 %feature("docstring") casadi::Split::evaluateGen "[INTERNAL]  Evaluate the
 function (template)
+
+";
+
+%feature("docstring") casadi::Split::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -97203,6 +98500,11 @@ the nonzeros of matrix.
 
 ";
 
+%feature("docstring") casadi::SubAssign::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::SubAssign::isValue "[INTERNAL]  Check if a
 certain value.
 
@@ -97409,6 +98711,11 @@ Print expression (make sure number of calls is not exceeded)
 
 ";
 
+%feature("docstring") casadi::SubAssign::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
 %feature("docstring") casadi::SubAssign::assertInit "[INTERNAL]  Assert
 that the object has been initialized.
 
@@ -97593,6 +98900,11 @@ operation.
 
 %feature("docstring") casadi::SubRef::simplifyMe "[INTERNAL]  Simplify the
 expression (ex is a reference to the node)
+
+";
+
+%feature("docstring") casadi::SubRef::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -97880,6 +99192,11 @@ function numerically.
 
 %feature("docstring") casadi::SubRef::isOne "[INTERNAL]  Check if
 identically one.
+
+";
+
+%feature("docstring") casadi::SubRef::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -101054,6 +102371,11 @@ Destructor.
 
 ";
 
+%feature("docstring") casadi::SymbolicMX::getDiagsplit "[INTERNAL]  Create
+a diagonal split node.
+
+";
+
 %feature("docstring") casadi::SymbolicMX::getUnary "[INTERNAL]  Get a unary
 operation.
 
@@ -101071,6 +102393,11 @@ object.
 
 %feature("docstring") casadi::SymbolicMX::getSetNonzeros "[INTERNAL]
 Assign the nonzeros of a matrix to another matrix.
+
+";
+
+%feature("docstring") casadi::SymbolicMX::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -103363,6 +104690,11 @@ product.
 
 ";
 
+%feature("docstring") casadi::Transpose::isInit "[INTERNAL]  Check if the
+object has been initialized.
+
+";
+
 %feature("docstring") casadi::Transpose::init "[INTERNAL]  Initialize the
 object.
 
@@ -103398,6 +104730,11 @@ Propagate sparsity, no work.
 
 %feature("docstring") casadi::Transpose::getFunctionInput "[INTERNAL]  Get
 function input.
+
+";
+
+%feature("docstring") casadi::Transpose::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -103702,8 +105039,8 @@ identity matrix.
 
 ";
 
-%feature("docstring") casadi::Transpose::isInit "[INTERNAL]  Check if the
-object has been initialized.
+%feature("docstring") casadi::Transpose::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -103894,8 +105231,8 @@ private, use \"create\" below.
 
 ";
 
-%feature("docstring") casadi::UnaryMX::getSubAssign "[INTERNAL]  Get
-submatrix assignment.
+%feature("docstring") casadi::UnaryMX::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -103940,6 +105277,11 @@ norm.
 
 %feature("docstring") casadi::UnaryMX::getVertsplit "[INTERNAL]  Create a
 vertical split node (vectors only)
+
+";
+
+%feature("docstring") casadi::UnaryMX::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -104171,6 +105513,11 @@ value (only for constant nodes)
 
 %feature("docstring") casadi::UnaryMX::getUnary "[INTERNAL]  Get a unary
 operation.
+
+";
+
+%feature("docstring") casadi::UnaryMX::getSubAssign "[INTERNAL]  Get
+submatrix assignment.
 
 ";
 
@@ -104765,6 +106112,11 @@ object.
 
 ";
 
+%feature("docstring") casadi::Vertcat::getBinary "[INTERNAL]  Get a binary
+operation operation (matrix-matrix)
+
+";
+
 %feature("docstring") casadi::Vertcat::isBinaryOp "[INTERNAL]  Check if
 binary operation.
 
@@ -104868,6 +106220,11 @@ temporary variables needed.
 
 ";
 
+%feature("docstring") casadi::Vertcat::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
+
+";
+
 %feature("docstring") casadi::Vertcat::isOutputNode "[INTERNAL]  Check if
 evaluation output.
 
@@ -104912,12 +106269,8 @@ object has been initialized.
 
 ";
 
-%feature("docstring") casadi::Vertcat::getSolve "[INTERNAL]   Solve a
-system of linear equations.
-
-For system Ax = b:
-
-A->getSolve(b)
+%feature("docstring") casadi::Vertcat::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -104992,8 +106345,12 @@ operation.
 
 ";
 
-%feature("docstring") casadi::Vertcat::getBinary "[INTERNAL]  Get a binary
-operation operation (matrix-matrix)
+%feature("docstring") casadi::Vertcat::getSolve "[INTERNAL]   Solve a
+system of linear equations.
+
+For system Ax = b:
+
+A->getSolve(b)
 
 ";
 
@@ -105109,8 +106466,8 @@ copy data members.
 
 ";
 
-%feature("docstring") casadi::Vertsplit::weak "[INTERNAL]  Get a weak
-reference to the object.
+%feature("docstring") casadi::Vertsplit::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
 
 ";
 
@@ -105145,6 +106502,11 @@ identically zero.
 
 %feature("docstring") casadi::Vertsplit::isMultipleOutput "[INTERNAL]
 Check if a multiple output node.
+
+";
+
+%feature("docstring") casadi::Vertsplit::weak "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
@@ -105363,7 +106725,8 @@ Print expression (make sure number of calls is not exceeded)
 
 ";
 
-%feature("docstring") casadi::Vertsplit::getNorm1 "[INTERNAL]  1-norm
+%feature("docstring") casadi::Vertsplit::getDiagsplit "[INTERNAL]  Create a
+diagonal split node.
 
 ";
 
@@ -105437,6 +106800,10 @@ Set ternary dependencies.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Set multiple dependencies.
+
+";
+
+%feature("docstring") casadi::Vertsplit::getNorm1 "[INTERNAL]  1-norm
 
 ";
 
@@ -107883,6 +109250,11 @@ Print expression (make sure number of calls is not exceeded)
 
 ";
 
+%feature("docstring") casadi::ZeroByZero::getDiagcat "[INTERNAL]  Create a
+diagonal concatenation node.
+
+";
+
 %feature("docstring") casadi::ZeroByZero::getGetNonzeros "[INTERNAL]  Get
 the nonzeros of matrix.
 
@@ -108073,6 +109445,11 @@ the function symbolically (SX)
 
 %feature("docstring") casadi::ZeroByZero::printPart "[INTERNAL]  Print a
 part of the expression.
+
+";
+
+%feature("docstring") casadi::ZeroByZero::getDiagsplit "[INTERNAL]  Create
+a diagonal split node.
 
 ";
 
@@ -108429,6 +109806,8 @@ as tval)
 %feature("docstring") casadi::vertsplit "
 
 >  std::vector< Matrix< DataType > > casadi::vertsplit(const Matrix< DataType > &v, const std::vector< int > &offset)
+
+>  std::vector< MX > casadi::vertsplit(const MX &x, const std::vector< int > &output_offset)
 ------------------------------------------------------------------------
 
 split vertically, retaining groups of rows
@@ -108442,6 +109821,8 @@ will run to the end.
 vertcat(vertsplit(x, ...)) = x
 
 >  std::vector< Matrix< DataType > > casadi::vertsplit(const Matrix< DataType > &v, int incr=1)
+
+>  std::vector< MX > casadi::vertsplit(const MX &x, int incr=1)
 ------------------------------------------------------------------------
 
 split vertically, retaining fixed-sized groups of rows
@@ -108457,31 +109838,6 @@ vertcat(vertsplit(x, ...)) = x
 ------------------------------------------------------------------------
 
 Split up a sparsity pattern vertically.
-
->  std::vector< MX > casadi::vertsplit(const MX &x, const std::vector< int > &output_offset)
-------------------------------------------------------------------------
-
-split horizontally, retaining groups of rows
-
-Parameters:
------------
-
-output_offset:  List of all start rows for each group the last row group
-will run to the end.
-
-vertcat(vertsplit(x, ...)) = x
-
->  std::vector< MX > casadi::vertsplit(const MX &x, int incr=1)
-------------------------------------------------------------------------
-
-split horizontally, retaining fixed-sized groups of rows
-
-Parameters:
------------
-
-incr:  Size of each group of rows
-
-vertcat(vertsplit(x, ...)) = x
 
 ";
 
@@ -108572,8 +109928,12 @@ interval
 
 chop up into blocks
 
-vert_offset Defines the boundaries of the block rows horz_offset Defines the
-boundaries of the block columns
+Parameters:
+-----------
+
+vert_offset:  Defines the boundaries of the block rows
+
+horz_offset:  Defines the boundaries of the block columns
 
 blockcat(blocksplit(x,..., ...)) = x
 
@@ -108582,8 +109942,12 @@ blockcat(blocksplit(x,..., ...)) = x
 
 chop up into blocks
 
-vert_incr Defines the increment for block boundaries in row dimension
-horz_incr Defines the increment for block boundaries in column dimension
+Parameters:
+-----------
+
+vert_incr:  Defines the increment for block boundaries in row dimension
+
+horz_incr:  Defines the increment for block boundaries in column dimension
 
 blockcat(blocksplit(x,..., ...)) = x
 
@@ -109063,6 +110427,8 @@ Pre-C99 elementary functions from the 'math.h' ('cmath') header.
 
 ";
 
+%feature("docstring") casadi::casadi_load_homotopynlpsolver_simple "";
+
 %feature("docstring") casadi::getSchemeEntryEnum "";
 
 %feature("docstring") casadi::poly_coeff "
@@ -109201,7 +110567,7 @@ Split up a sparsity pattern horizontally.
 >  std::vector< MX > casadi::horzsplit(const MX &x, const std::vector< int > &output_offset)
 ------------------------------------------------------------------------
 
-split vertically, retaining groups of cols
+split horizontally, retaining groups of cols
 
 Parameters:
 -----------
@@ -109214,7 +110580,7 @@ horzcat(horzsplit(x, ...)) = x
 >  std::vector< MX > casadi::horzsplit(const MX &x, int incr=1)
 ------------------------------------------------------------------------
 
-split vertically, retaining fixed-sized groups of cols
+split horizontally, retaining fixed-sized groups of cols
 
 Parameters:
 -----------
@@ -109386,7 +110752,7 @@ concatenate horizontally, two matrices
 >  MX casadi::vertcat(const std::vector< MX > &comp)
 ------------------------------------------------------------------------
 
-concatenate horizontally
+concatenate vertically
 
 vertcat(vertsplit(x, ...)) = x
 
@@ -109674,46 +111040,17 @@ functions from the 'math.h' ('cmath') header.
 
 %feature("docstring") casadi::casadi_register_nlpsolver_ipopt "";
 
-%feature("docstring") casadi::sdqpIn "
+%feature("docstring") casadi::norm_inf_mul_nn "
 
->  SDQPInputIOSchemeVector<M> casadi::sdqpIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M(), const std::string &arg_s6=\"\", const M &arg_m6=M(), const std::string &arg_s7=\"\", const M &arg_m7=M(), const std::string &arg_s8=\"\", const M &arg_m8=M())
-------------------------------------------------------------------------
+Inf-norm of a Matrix-matrix product, no memory allocation mul(x, y)
 
-Input arguments of a SDQP problem
+Parameters:
+-----------
 
->Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 9) [sdqpIn]
+Dwork:  A double work vector that you must allocate Minimum size: y.size1()
 
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| SDQP_SOLVER_H          | h                      | The matrix H: sparse ( |
-|                        |                        | n x n) .               |
-+------------------------+------------------------+------------------------+
-| SDQP_SOLVER_C          | c                      | The vector c: ( n x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-| SDQP_SOLVER_F          | f                      | The horizontal stack   |
-|                        |                        | of all matrices F_i: ( |
-|                        |                        | m x nm) .              |
-+------------------------+------------------------+------------------------+
-| SDQP_SOLVER_G          | g                      | The matrix G: ( m x m) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-| SDQP_SOLVER_A          | a                      | The matrix A: ( nc x   |
-|                        |                        | n) .                   |
-+------------------------+------------------------+------------------------+
-| SDQP_SOLVER_LBA        | lba                    | Lower bounds on Ax (   |
-|                        |                        | nc x 1) .              |
-+------------------------+------------------------+------------------------+
-| SDQP_SOLVER_UBA        | uba                    | Upper bounds on Ax (   |
-|                        |                        | nc x 1) .              |
-+------------------------+------------------------+------------------------+
-| SDQP_SOLVER_LBX        | lbx                    | Lower bounds on x ( n  |
-|                        |                        | x 1 ) .                |
-+------------------------+------------------------+------------------------+
-| SDQP_SOLVER_UBX        | ubx                    | Upper bounds on x ( n  |
-|                        |                        | x 1 ) .                |
-+------------------------+------------------------+------------------------+
+Iwork:  A integer work vector that you must allocate Minimum size:
+y.size1()+x.size2()+1
 
 ";
 
@@ -109930,35 +111267,6 @@ convert vectors to vectors of pointers.
 
 %feature("docstring") casadi::sq "[INTERNAL] ";
 
-%feature("docstring") casadi::controlsimulatorIn "
-
->  ControlSimulatorInputIOSchemeVector<M> casadi::controlsimulatorIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M())
-------------------------------------------------------------------------
-
-Input arguments of a control simulator
-
->Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3) [controlsimulatorIn]
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| CONTROLSIMULATOR_X0    | x0                     | Differential or        |
-|                        |                        | algebraic state at t0  |
-|                        |                        | (dimension nx-by-1) .  |
-+------------------------+------------------------+------------------------+
-| CONTROLSIMULATOR_P     | p                      | Parameters that are    |
-|                        |                        | fixed over the entire  |
-|                        |                        | horizon (dimension np- |
-|                        |                        | by-1) .                |
-+------------------------+------------------------+------------------------+
-| CONTROLSIMULATOR_U     | u                      | Parameters that change |
-|                        |                        | over the integration   |
-|                        |                        | intervals (dimension   |
-|                        |                        | nu-by-(ns-1)) .        |
-+------------------------+------------------------+------------------------+
-
-";
-
 %feature("docstring") casadi::slicot_mb03wd "[INTERNAL] ";
 
 %feature("docstring") casadi::hessLagIn "
@@ -110033,6 +111341,17 @@ code, always use SXFunction.
 
 Evaluate an SX graph numerically Note: this is not efficient. For critical
 parts (loops) of your code, always use SXFunction.
+
+";
+
+%feature("docstring") casadi::diagcat "
+
+>  MX casadi::diagcat(const std::vector< MX > &x)
+------------------------------------------------------------------------
+
+concatenate diagonally
+
+diagcat(diagsplit(x, ...)) = x
 
 ";
 
@@ -110477,7 +111796,34 @@ Evaluate a polynomial with coefficients p in x.
 
 ";
 
-%feature("docstring") casadi::casadi_load_homotopynlpsolver_simple "";
+%feature("docstring") casadi::controlsimulatorIn "
+
+>  ControlSimulatorInputIOSchemeVector<M> casadi::controlsimulatorIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M())
+------------------------------------------------------------------------
+
+Input arguments of a control simulator
+
+>Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3) [controlsimulatorIn]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| CONTROLSIMULATOR_X0    | x0                     | Differential or        |
+|                        |                        | algebraic state at t0  |
+|                        |                        | (dimension nx-by-1) .  |
++------------------------+------------------------+------------------------+
+| CONTROLSIMULATOR_P     | p                      | Parameters that are    |
+|                        |                        | fixed over the entire  |
+|                        |                        | horizon (dimension np- |
+|                        |                        | by-1) .                |
++------------------------+------------------------+------------------------+
+| CONTROLSIMULATOR_U     | u                      | Parameters that change |
+|                        |                        | over the integration   |
+|                        |                        | intervals (dimension   |
+|                        |                        | nu-by-(ns-1)) .        |
++------------------------+------------------------+------------------------+
+
+";
 
 %feature("docstring") casadi::casadi_load_sdpsolver_dsdp "";
 
@@ -110513,7 +111859,7 @@ Also called: slope function
 >  MX casadi::tangent(const MX &ex, const MX &arg)
 ------------------------------------------------------------------------
 
-split vertically, retaining groups of cols
+split horizontally, retaining groups of cols
 
 Parameters:
 -----------
@@ -111658,6 +113004,84 @@ preserving nodes.
 
 ";
 
+%feature("docstring") casadi::diagsplit "
+
+>  std::vector< MatType > casadi::diagsplit(const GenericMatrix< MatType > &x, int incr=1)
+
+>  std::vector< Sparsity > casadi::diagsplit(const Sparsity &x, int incr=1)
+------------------------------------------------------------------------
+
+split diagonally, retaining groups of square matrices
+
+Parameters:
+-----------
+
+incr:  Size of each matrix
+
+diagsplit(diagsplit(x, ...)) = x
+
+>  std::vector< MatType > casadi::diagsplit(const GenericMatrix< MatType > &x, int incr1, int incr2)
+
+>  std::vector< Sparsity > casadi::diagsplit(const Sparsity &x, int incr1, int incr2)
+------------------------------------------------------------------------
+
+split diagonally, retaining fixed-sized matrices
+
+Parameters:
+-----------
+
+incr1:  Row dimension of each matrix
+
+incr2:  Column dimension of each matrix
+
+diagsplit(diagsplit(x, ...)) = x
+
+>  std::vector< MatType > casadi::diagsplit(const GenericMatrix< MatType > &x, const std::vector< int > &output_offset)
+
+>  std::vector< Sparsity > casadi::diagsplit(const Sparsity &x, const std::vector< int > &output_offset)
+------------------------------------------------------------------------
+
+split diagonally, retaining square matrices
+
+Parameters:
+-----------
+
+output_offset:  List of all start locations for each group the last matrix
+will run to the end.
+
+diagcat(diagsplit(x, ...)) = x
+
+>  std::vector< Matrix< DataType > > casadi::diagsplit(const Matrix< DataType > &x, const std::vector< int > &output_offset1, const std::vector< int > &output_offset2)
+------------------------------------------------------------------------
+
+split diagonally, retaining matrices
+
+Parameters:
+-----------
+
+output_offset1:  List of all start locations (row) for each matrix the last
+matrix will run to the end. diagcat(diagsplit(x, ...)) = x
+
+>  std::vector< Sparsity > casadi::diagsplit(const Sparsity &sp, const std::vector< int > &output_offset1, const std::vector< int > &output_offset2)
+------------------------------------------------------------------------
+
+Split up a sparsity pattern diagonally.
+
+>  std::vector< MX > casadi::diagsplit(const MX &x, const std::vector< int > &output_offset1, const std::vector< int > &output_offset2)
+------------------------------------------------------------------------
+
+split diagonally, retaining matrices
+
+Parameters:
+-----------
+
+output_offset1:  List of all start locations (row) for each matrix
+
+output_offset1:  List of all start locations (column) for each matrix the
+last matrix will run to the end. diagcat(diagsplit(x, ...)) = x
+
+";
+
 %feature("docstring") casadi::write_matlab "
 
 >  void casadi::write_matlab(std::ostream &stream, const std::vector< T > &v)
@@ -111766,7 +113190,7 @@ concatenate vertically, two matrices
 >  MX casadi::horzcat(const std::vector< MX > &x)
 ------------------------------------------------------------------------
 
-concatenate vertically
+concatenate horizontally
 
 horzcat(horzsplit(x, ...)) = x
 
@@ -111853,7 +113277,7 @@ from the 'math.h' ('cmath') header.
 >  MX casadi::gradient(const MX &ex, const MX &arg)
 ------------------------------------------------------------------------
 
-split vertically, retaining groups of cols
+split horizontally, retaining groups of cols
 
 Parameters:
 -----------
@@ -112092,6 +113516,49 @@ Construct a matrix with given blocks on the diagonal.
 %feature("docstring") casadi::triu2symm "
 
 Convert a upper triangular matrix to a symmetric one.
+
+";
+
+%feature("docstring") casadi::sdqpIn "
+
+>  SDQPInputIOSchemeVector<M> casadi::sdqpIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M(), const std::string &arg_s6=\"\", const M &arg_m6=M(), const std::string &arg_s7=\"\", const M &arg_m7=M(), const std::string &arg_s8=\"\", const M &arg_m8=M())
+------------------------------------------------------------------------
+
+Input arguments of a SDQP problem
+
+>Input scheme: casadi::SDQPInput (SDQP_SOLVER_NUM_IN = 9) [sdqpIn]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| SDQP_SOLVER_H          | h                      | The matrix H: sparse ( |
+|                        |                        | n x n) .               |
++------------------------+------------------------+------------------------+
+| SDQP_SOLVER_C          | c                      | The vector c: ( n x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| SDQP_SOLVER_F          | f                      | The horizontal stack   |
+|                        |                        | of all matrices F_i: ( |
+|                        |                        | m x nm) .              |
++------------------------+------------------------+------------------------+
+| SDQP_SOLVER_G          | g                      | The matrix G: ( m x m) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| SDQP_SOLVER_A          | a                      | The matrix A: ( nc x   |
+|                        |                        | n) .                   |
++------------------------+------------------------+------------------------+
+| SDQP_SOLVER_LBA        | lba                    | Lower bounds on Ax (   |
+|                        |                        | nc x 1) .              |
++------------------------+------------------------+------------------------+
+| SDQP_SOLVER_UBA        | uba                    | Upper bounds on Ax (   |
+|                        |                        | nc x 1) .              |
++------------------------+------------------------+------------------------+
+| SDQP_SOLVER_LBX        | lbx                    | Lower bounds on x ( n  |
+|                        |                        | x 1 ) .                |
++------------------------+------------------------+------------------------+
+| SDQP_SOLVER_UBX        | ubx                    | Upper bounds on x ( n  |
+|                        |                        | x 1 ) .                |
++------------------------+------------------------+------------------------+
 
 ";
 
