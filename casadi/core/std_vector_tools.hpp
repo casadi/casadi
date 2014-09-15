@@ -63,7 +63,7 @@ namespace std {
 namespace casadi {
 
 #ifndef SWIG
-  /** Range function
+  /**  \brief Range function
   * \param start
   * \param stop
   * \param step
@@ -76,7 +76,7 @@ namespace casadi {
   CASADI_CORE_EXPORT std::vector<int> range(int start, int stop, int step=1,
                                                 int len=std::numeric_limits<int>::max());
 
-  /** Range function
+  /**  \brief Range function
   * \param stop
   *
   * \return list [0, 1, 2...stop-1]
