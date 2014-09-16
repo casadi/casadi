@@ -940,6 +940,11 @@ class typemaptests(casadiTestCase):
       self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))
       d.set(D)
       self.checkarray(d,DMatrix([[1,2],[3,4]]))
-    
+
+  def test_issue1217(self):
+    a = numpy.matrix([0,SX.sym("x")])
+
+    print if_else(0,a,a)
+
 if __name__ == '__main__':
     unittest.main()
