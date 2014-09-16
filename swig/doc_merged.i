@@ -110489,10 +110489,7 @@ scheme:  'radau' or 'legendre'
 
 ";
 
-%feature("docstring") casadi::sinh "[INTERNAL]  Pre-C99 elementary
-functions from the 'math.h' ('cmath') header.
-
-";
+%feature("docstring") casadi::casadi_load_qpsolver_cplex "";
 
 %feature("docstring") casadi::bvec_toggle "[INTERNAL] ";
 
@@ -110851,6 +110848,17 @@ functions from the 'math.h' ('cmath') header.
 ------------------------------------------------------------------------
 [INTERNAL] 
 copysign function
+
+";
+
+%feature("docstring") casadi::vector_slice "[INTERNAL]  Slicing vector.
+
+Parameters:
+-----------
+
+v:  Vector to slice
+
+i:  List of indices
 
 ";
 
@@ -111828,6 +111836,10 @@ Input arguments of a control simulator
 %feature("docstring") casadi::casadi_load_sdpsolver_dsdp "";
 
 %feature("docstring") casadi::casadi_register_integrator_collocation "";
+
+%feature("docstring") casadi::reverse "[INTERNAL]  Reverse a list.
+
+";
 
 %feature("docstring") casadi::eig_symbolic "
 
@@ -112833,10 +112845,10 @@ from the 'math.h' ('cmath') header.
 
 %feature("docstring") casadi::range "
 
->  std::vector< int > casadi::range(int start, int stop, int step, int len)
+>  std::vector< int > casadi::range(int start, int stop, int step=1, int len=std::numeric_limits< int >::max())
 ------------------------------------------------------------------------
 [INTERNAL] 
-Range function
+Range function.
 
 Parameters:
 -----------
@@ -112853,7 +112865,7 @@ Elements larger than or equal to stop are chopped off.
 >  std::vector< int > casadi::range(int stop)
 ------------------------------------------------------------------------
 [INTERNAL] 
-Range function
+Range function.
 
 Parameters:
 -----------
@@ -113661,7 +113673,10 @@ Make the matrix dense if not already
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::casadi_load_qpsolver_cplex "";
+%feature("docstring") casadi::sinh "[INTERNAL]  Pre-C99 elementary
+functions from the 'math.h' ('cmath') header.
+
+";
 
 %feature("docstring") casadi::socpStruct "
 

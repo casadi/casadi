@@ -4369,7 +4369,7 @@
 %exception  casadi::qr(const Matrix< DataType > &A, Matrix< DataType > &Q, Matrix< DataType > &R) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::range(int start, int stop, int step, int len) {
+%exception  casadi::range(int start, int stop, int step=1, int len=std::numeric_limits< int >::max()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::range(int stop) {
@@ -4379,6 +4379,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::reshape(const MX &x, int nrow, int ncol) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::reverse(const std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::shared_cast(SharedObject &A) {
@@ -4439,6 +4442,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::twice(const T &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::vector_slice(const std::vector< T > &v, const std::vector< int > &i) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::vertcat(const MX &a, const MX &b) {
