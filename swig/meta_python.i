@@ -602,7 +602,20 @@ template<> char meta< casadi::SXElement >::expected_message[] = "Expecting SXEle
 template <>
 int meta< casadi::SXElement >::as(PyObject * p,casadi::SXElement &s) {
   NATIVERETURN(casadi::SXElement, s)
-  if (meta< double >::couldbe(p)) {
+  if (meta< casadi::SX >::isa(p)) {
+    casadi::SX res;
+    int result = meta< casadi::SX >::as(p,res);
+    if (res.size1()==1 && res.size2()==1) {
+      if (res.size()==0) {
+        s = 0;
+      } else {
+        s = res.at(0);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  } else if (meta< double >::couldbe(p)) {
     double res;
     int result = meta< double >::as(p,res);
     if (!result)
