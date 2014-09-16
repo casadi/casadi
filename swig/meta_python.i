@@ -605,6 +605,7 @@ int meta< casadi::SXElement >::as(PyObject * p,casadi::SXElement &s) {
   if (meta< casadi::SX >::isa(p)) {
     casadi::SX res;
     int result = meta< casadi::SX >::as(p,res);
+    if (!result) return false;
     if (res.size1()==1 && res.size2()==1) {
       if (res.size()==0) {
         s = 0;
