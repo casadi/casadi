@@ -45,13 +45,14 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DLESOLVER_DPLE_EXPORT DpleToDle : public DleInternal {
+  class CASADI_DLESOLVER_DPLE_EXPORT DpleToDle : public DleInternal,
+    public Adaptor<DpleToDle, DpleSolver> {
   public:
     /** \brief  Constructor
      *  \param[in] A  Sparsity of A
      *  \param[in] V  Sparsity of V
      */
-    DpleToDle(const Sparsity & A, const Sparsity &V);
+    DpleToDle(const DleStructure& st);
 
     /** \brief  Destructor */
     virtual ~DpleToDle();
@@ -63,14 +64,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual DpleToDle* create(const Sparsity & A,
-                                            const Sparsity &V) const {
-        return new DpleToDle(A, V);}
+    virtual DpleToDle* create(const DleStructure& st) const {
+        return new DpleToDle(st);}
 
     /** \brief  Create a new DLE Solver */
-    static DleInternal* creator(const Sparsity & A,
-                                 const Sparsity & V)
-    { return new DpleToDle(A, V);}
+    static DleInternal* creator(const DleStructure& st)
+    { return new DpleToDle(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -88,11 +87,6 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-
-  private:
-    
-    /// The solver used internally 
-    DpleSolver dplesolver_;
 
   };
 

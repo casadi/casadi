@@ -62,9 +62,8 @@ namespace casadi {
   }
 
   CleSolver::CleSolver(const std::string& name,
-                         const Sparsity & A,
-                         const Sparsity &V) {
-    assignNode(CleInternal::getPlugin(name).creator(A, V));
+                         const CleStructure& st) {
+    assignNode(CleInternal::getPlugin(name).creator(st));
   }
 
 } // namespace casadi

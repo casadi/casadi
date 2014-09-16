@@ -36,10 +36,10 @@
 namespace casadi {
 
   /** \brief \pluginbrief{DpleSolver,simple}
-  
+
    @copydoc DPLE_doc
    @copydoc plugin_DpleSolver_simple
-   
+
        \author Joris Gillis
       \date 2014
 
@@ -47,10 +47,9 @@ namespace casadi {
   class CASADI_DPLESOLVER_SIMPLE_EXPORT SimpleIndefDpleInternal : public DpleInternal {
   public:
     /** \brief  Constructor
-     *  \param[in] A  List of sparsities of A_i
-     *  \param[in] V  List of sparsities of V_i
+     * \param st \structargument{Dple}
      */
-    SimpleIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V);
+    SimpleIndefDpleInternal(const DpleStructure& st);
 
     /** \brief  Destructor */
     virtual ~SimpleIndefDpleInternal();
@@ -62,14 +61,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual SimpleIndefDpleInternal* create(const std::vector< Sparsity > & A,
-                                            const std::vector< Sparsity > &V) const {
-        return new SimpleIndefDpleInternal(A, V);}
+    virtual SimpleIndefDpleInternal* create(const DpleStructure& st) const {
+        return new SimpleIndefDpleInternal(st);}
 
     /** \brief  Create a new DPLE Solver */
-    static DpleInternal* creator(const std::vector< Sparsity >& A,
-                                 const std::vector< Sparsity >& V)
-    { return new SimpleIndefDpleInternal(A, V);}
+    static DpleInternal* creator(const DpleStructure& st)
+    { return new SimpleIndefDpleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

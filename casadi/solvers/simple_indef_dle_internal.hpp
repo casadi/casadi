@@ -36,10 +36,10 @@
 namespace casadi {
 
   /** \brief \pluginbrief{DleSolver,simple}
-  
+
    @copydoc DLE_doc
    @copydoc plugin_DleSolver_simple
-   
+
        \author Joris Gillis
       \date 2014
 
@@ -47,10 +47,9 @@ namespace casadi {
   class CASADI_DLESOLVER_SIMPLE_EXPORT SimpleIndefDleInternal : public DleInternal {
   public:
     /** \brief  Constructor
-     *  \param[in] A  Sparsity of A
-     *  \param[in] V  Sparsity of V
+      * \param st \structargument{Dle}
      */
-    SimpleIndefDleInternal(const Sparsity & A, const Sparsity &V);
+    SimpleIndefDleInternal(const DleStructure& st);
 
     /** \brief  Destructor */
     virtual ~SimpleIndefDleInternal();
@@ -62,14 +61,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual SimpleIndefDleInternal* create(const Sparsity & A,
-                                            const Sparsity &V) const {
-        return new SimpleIndefDleInternal(A, V);}
+    virtual SimpleIndefDleInternal* create(const DleStructure& st) const {
+        return new SimpleIndefDleInternal(st);}
 
     /** \brief  Create a new DLE Solver */
-    static DleInternal* creator(const Sparsity & A,
-                                 const Sparsity & V)
-    { return new SimpleIndefDleInternal(A, V);}
+    static DleInternal* creator(const DleStructure& st)
+    { return new SimpleIndefDleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -94,6 +91,9 @@ namespace casadi {
 
     /// State space dimension
     int n_;
+
+    /// Function to extract the required non-zeros from the solve node
+    Function EP_;
 
   };
 

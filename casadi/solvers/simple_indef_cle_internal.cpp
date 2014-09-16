@@ -53,8 +53,7 @@ namespace casadi {
   }
 
   SimpleIndefCleInternal::SimpleIndefCleInternal(
-      const Sparsity & A,
-      const Sparsity &V) : CleInternal(A, V) {
+      const CleStructure& st) : CleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_simple_indef_cle_solver"); // name of the function
@@ -86,13 +85,13 @@ namespace casadi {
 
     DMatrix e = DMatrix::eye(n_);
 
-    MX A_total = -kron(As,e)-kron(e,As);
+    MX A_total = -kron(As, e)-kron(e, As);
     MX Pf = solve(A_total, vec(Vss), getOption("linear_solver"));
 
     std::vector<MX> v_in;
     v_in.push_back(As);
     v_in.push_back(Vs);
-    f_ = MXFunction(v_in, reshape(Pf,n_,n_));
+    f_ = MXFunction(v_in, reshape(Pf, n_, n_));
     f_.setInputScheme(SCHEME_CLEInput);
     f_.setOutputScheme(SCHEME_CLEOutput);
     f_.init();
@@ -122,7 +121,7 @@ namespace casadi {
 
   SimpleIndefCleInternal* SimpleIndefCleInternal::clone() const {
     // Return a deep copy
-    SimpleIndefCleInternal* node = new SimpleIndefCleInternal(A_, V_);
+    SimpleIndefCleInternal* node = new SimpleIndefCleInternal(st_);
     node->setOption(dictionary());
     return node;
   }

@@ -45,6 +45,11 @@ namespace casadi {
   template<class T> class SDPStructIOSchemeVector;
   template<class T> class SOCPStructIOSchemeVector;
   template<class T> class SDQPStructIOSchemeVector;
+  template<class T> class DleStructIOSchemeVector;
+  template<class T> class DpleVecStructIOSchemeVector;
+  template<class T> class LrDleStructIOSchemeVector;
+  template<class T> class LrDpleVecStructIOSchemeVector;
+  template<class T> class CleStructIOSchemeVector;
   /// \endcond
   typedef LPStructIOSchemeVector<Sparsity> LPStructure;
   typedef QPStructIOSchemeVector<Sparsity> QPStructure;
@@ -52,6 +57,11 @@ namespace casadi {
   typedef SDPStructIOSchemeVector<Sparsity> SDPStructure;
   typedef SOCPStructIOSchemeVector<Sparsity> SOCPStructure;
   typedef SDQPStructIOSchemeVector<Sparsity> SDQPStructure;
+  typedef DleStructIOSchemeVector<Sparsity> DleStructure;
+  typedef LrDleStructIOSchemeVector<Sparsity> LrDleStructure;
+  typedef CleStructIOSchemeVector<Sparsity> CleStructure;
+  typedef DpleVecStructIOSchemeVector< std::vector<Sparsity> > DpleStructure;
+  typedef LrDpleVecStructIOSchemeVector< std::vector<Sparsity> > LrDpleStructure;
   class NlpSolver;
   class LinearSolver;
   class Integrator;

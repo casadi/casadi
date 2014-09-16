@@ -55,16 +55,56 @@ casadi_plugin(DpleSolver condensing
   condensing_indef_dple_internal.cpp
   condensing_indef_dple_internal_meta.cpp)
   
+casadi_plugin(DpleSolver lifting
+  lifting_indef_dple_internal.hpp
+  lifting_indef_dple_internal.cpp
+  lifting_indef_dple_internal_meta.cpp)  
+
 casadi_plugin(DleSolver simple
   simple_indef_dle_internal.hpp
   simple_indef_dle_internal.cpp
   simple_indef_dle_internal_meta.cpp)
+  
+casadi_plugin(LrDleSolver smith
+  smith_lr_dle_internal.hpp
+  smith_lr_dle_internal.cpp
+  smith_lr_dle_internal_meta.cpp)
+
+casadi_plugin(LrDpleSolver lifting
+  lifting_lr_dple_internal.hpp
+  lifting_lr_dple_internal.cpp
+  lifting_lr_dple_internal_meta.cpp)  
+  
+casadi_plugin(LrDleSolver fixed_smith
+  fixed_smith_lr_dle_internal.hpp
+  fixed_smith_lr_dle_internal.cpp
+  fixed_smith_lr_dle_internal_meta.cpp)
+  
+casadi_plugin(LrDpleSolver dple
+  dple_to_lr_dple.hpp
+  dple_to_lr_dple.cpp
+  dple_to_lr_dple_meta.cpp) 
+  
+casadi_plugin(LrDleSolver dle
+  dle_to_lr_dle.hpp
+  dle_to_lr_dle.cpp
+  dle_to_lr_dle_meta.cpp) 
+  
+casadi_plugin(DleSolver lrdle
+  lr_dle_to_dle.hpp
+  lr_dle_to_dle.cpp
+  lr_dle_to_dle_meta.cpp)
   
 casadi_plugin(DleSolver dple
   dple_to_dle.hpp
   dple_to_dle.cpp
   dple_to_dle_meta.cpp)
 
+casadi_plugin(DpleSolver lrdple
+  lr_dple_to_dple.hpp
+  lr_dple_to_dple.cpp
+  lr_dple_to_dple_meta.cpp)
+  
 casadi_plugin(CleSolver simple
   simple_indef_cle_internal.hpp
   simple_indef_cle_internal.cpp

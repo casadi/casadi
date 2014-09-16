@@ -28,6 +28,9 @@ from helpers import *
 import random
 import time
 
+import __builtin__
+import scipy.linalg
+
 clesolvers = []
 try:
   LinearSolver.loadPlugin("csparse")
@@ -38,21 +41,94 @@ except:
 
 
 dlesolvers = []
+
 try:
   LinearSolver.loadPlugin("csparse")
   DleSolver.loadPlugin("simple")
   dlesolvers.append(("simple",{"linear_solver": "csparse"}))
 except:
   pass
+  
+try:
+  DleSolver.loadPlugin("lrdle.smith")
+  dlesolvers.append(("lrdle.smith",{"target_options": {"max_iter":100,"tol": 1e-13}}))
+except:
+  pass
 
 try:
-  LinearSolver.loadPlugin("csparse")
-  DleSolver.loadPlugin("dple")
-  dlesolvers.append(("dple",{"dple_solver": "simple", "dple_solver_options": {"linear_solver": "csparse"}}))
+  DleSolver.loadPlugin("lrdle.fixed_smith")
+  dlesolvers.append(("lrdle.fixed_smith",{"target_options": {"iter":100}}))
 except:
   pass
   
+lrdlesolvers = []
+
+try:
+  LrDleSolver.loadPlugin("smith")
+  lrdlesolvers.append(("smith",{"max_iter":100,"tol": 1e-13}))
+except:
+  pass
+
+try:
+  LrDleSolver.loadPlugin("fixed_smith")
+  lrdlesolvers.append(("fixed_smith",{"iter":100}))
+except:
+  pass
+
+try:
+  LrDleSolver.loadPlugin("dle.simple")
+  LinearSolver.loadPlugin("csparse")
+  lrdlesolvers.append(("dle.simple",{"target_options": {"linear_solver": "csparse"}}))
+except:
+  pass
+
+try:
+  LrDleSolver.loadPlugin("dle.lrdle.smith")
+  lrdlesolvers.append(("dle.lrdle.smith",{"target_options": {"max_iter":100,"tol": 1e-13}}))
+except:
+  pass
+
+lrdplesolvers = []
+
+try:
+  LrDpleSolver.loadPlugin("lifting")
+  LrDleSolver.loadPlugin("smith")
+  lrdplesolvers.append(("lifting",{"lrdle_solver": "smith", "form": "B", "lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
+except Exception as e:
+  print e
+  pass
+
+
+try:
+  LrDpleSolver.loadPlugin("lifting.smith")
+  lrdplesolvers.append(("lifting.smith",{"target_options": {"max_iter":100,"tol": 1e-13}}))
+except Exception as e:
+  print e
+  pass
+
+
+try:
+  LrDpleSolver.loadPlugin("dple.slicot")
+  LinearSolver.loadPlugin("csparse")
+  lrdplesolvers.append(("dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
+except:
+  pass
+
+try:
+  LrDpleSolver.loadPlugin("dple.lrdple.lifting")
+  LrDleSolver.loadPlugin("smith")
+  lrdplesolvers.append(("dple.lrdple.lifting",{ "target_options": {"lrdle_solver":"smith","lrdle_solver_options": {"max_iter":100,"tol": 1e-13}} }))
+except:
+  pass
+
+try:
+  LrDpleSolver.loadPlugin("dple.lrdple.lifting.smith")
+  lrdplesolvers.append(("dple.lrdple.lifting.smith",{ "target_options": {"max_iter":100,"tol": 1e-13}} ))
+except:
+  pass
+
 dplesolvers = []
+
 try:
   LinearSolver.loadPlugin("csparse")
   DpleSolver.loadPlugin("slicot")
@@ -67,20 +143,284 @@ try:
   dplesolvers.append(("simple",{"linear_solver": "csparse"}))
 except:
   pass
-  
+
 try:
   LinearSolver.loadPlugin("csparse")
-  DpleSolver.loadPlugin("condensing")
-  dplesolvers.append(("condensing",{"dle_solver": "simple","dle_solver_options": {"linear_solver": "csparse"}}))
+  DpleSolver.loadPlugin("condensing.simple")
+  dplesolvers.append(("condensing.simple",{"target_options": {"linear_solver": "csparse"}}))
+except:
+  pass
+
+try:
+  LinearSolver.loadPlugin("csparse")
+  DpleSolver.loadPlugin("condensing.dple.slicot")
+  dplesolvers.append(("condensing.dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
+except:
+  pass
+
+try:
+  DpleSolver.loadPlugin("lrdple.lifting.dle.dple.slicot")
+  dplesolvers.append(("lrdple.lifting.dle.dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
+except:
+  pass
+
+try:
+  DpleSolver.loadPlugin("lifting.dple.slicot")
+  dplesolvers.append(("lifting.dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
 except:
   pass
   
-print "DpleSolvers", dplesolvers
-print "DleSolvers", dlesolvers
-print "CleSolvers", clesolvers
+try:
+  LinearSolver.loadPlugin("csparse")
+  DpleSolver.loadPlugin("lifting")
+  dplesolvers.append(("lifting",{"form":"B","dle_solver": "dple.slicot","dle_solver_options": {"target_options": {"linear_solver": "csparse"}}}))
+except:
+  pass
+
+  
+print "DpleSolvers", len(dplesolvers), dplesolvers
+print "DleSolvers", len(dlesolvers), dlesolvers
+print "CleSolvers", len(clesolvers), clesolvers
+
+
+print "LrDpleSolvers", len(lrdplesolvers),  lrdplesolvers
+print "LrDleSolvers", len(lrdlesolvers), lrdlesolvers
+
+if not args.run_slow:
+  dplesolvers = dplesolvers[:1]
+  dlesolvers = dlesolvers[:1]
+  clesolvers = clesolvers[:1]
+  lrdplesolvers = lrdplesolvers[:1]
+  lrdlesolvers = lrdlesolvers[:1]
+  
+def randstable(n,margin=0.8):
+  r = margin
+  A_ = tril(DMatrix(numpy.random.random((n,n))))
+  for i in range(n): A_[i,i] = numpy.random.random()*r*2-r
+
+  Q = scipy.linalg.orth(numpy.random.random((n,n)))
+  return mul([Q,A_,Q.T])
 
 class ControlTests(casadiTestCase):
+  
+  @slow()
+  @memory_heavy()
+  def test_dple_CH(self):
 
+    for with_C in [True]:
+      for with_H in [True]:
+        print "with_C", with_C
+        print "with_H", with_H
+        
+        numpy.random.seed(1)
+        
+        n = 5
+        
+        m = 3 if with_C else n
+        h = [3,1]
+        
+        Ls = [0]+list(numpy.cumsum(h))
+         
+        K = 3
+
+        H_ = [DMatrix(numpy.random.random((n,__builtin__.sum(h))))  if with_H else DMatrix() for i in range(K)]
+
+        A_ = [ randstable(n,margin=0.2) for i in range(K) ]
+  
+        C_ = [ DMatrix(numpy.random.random((n,m))) if with_C else DMatrix() for i in range(K) ]
+        V_ = [ DMatrix(numpy.random.random((m,m))) for i in range(K) ]
+        V_ = [ (i+i.T)/2 for i in V_ ] 
+        
+        H = MX.sym("H",horzcat(H_).sparsity())
+        Hs_ = horzsplit(H,__builtin__.sum(h))
+        Hss_ = [ horzsplit(i,Ls) for i in Hs_]
+        
+        A = MX.sym("A",horzcat(A_).sparsity())
+        As_ = horzsplit(A,n)
+        
+        C = MX.sym("C",horzcat(C_).sparsity())
+        Cs_ = horzsplit(C,m)
+        
+        Vs = V = MX.sym("V",horzcat(V_).sparsity())
+        Vs_ = [(i+i.T)/2 for i in horzsplit(V,m)]
+        
+        print "Vs_", [i.dimString() for i in Vs_]
+        #V = horzcat([ (i+i.T)/2 for i in Vs_])
+
+        N = 100
+        
+        V = blkdiag([Vs_[-1],blkdiag(Vs_[:-1])])
+        
+        Hn = blkdiag(Hs_)
+        An = blockcat([[MX.sparse(n,(K-1)*n),As_[-1]],[blkdiag(As_[:-1]),MX.sparse((K-1)*n,n)]])
+        Cn = blkdiag([Cs_[-1],blkdiag(Cs_[:-1])]) if with_C else None
+        Vn = blkdiag([Vs_[-1],blkdiag(Vs_[:-1])])
+
+        D = [Cn if with_C else DMatrix.eye(n*K)]
+        for i in range(N):
+          D.append(mul(An,D[-1]))
+
+        DD = horzcat(D)
+        
+        Ls2 = [i*K for i in Ls]
+        
+        Ls2 = [0]+list(numpy.cumsum(h*K))
+
+      
+        if with_H:
+          Y = [ blkdiag([ mul([mul(Li.T,DD),blkdiag([Vn]*(N+1)),mul(DD.T,Li)]) for Li in horzsplit(Hnn,Ls)]) for Hnn in horzsplit(Hn,__builtin__.sum(h))]
+        else: 
+          Y = diagsplit(mul([DD,blkdiag([Vn]*(N+1)),DD.T]),n)
+        
+        
+        if with_C:
+          if with_H:
+            for i in Y:
+              i.sparsity().spy()
+            f = MXFunction(lrdpleIn(a=A,c=C,v=Vs,h=H),[horzcat(Y)])
+          else:
+            f = MXFunction(lrdpleIn(a=A,c=C,v=Vs),[horzcat(Y)])
+        else:
+          if with_H:
+            f = MXFunction(lrdpleIn(a=A,v=Vs,h=H),[horzcat(Y)])
+          else:
+            f = MXFunction(lrdpleIn(a=A,v=Vs),[horzcat(Y)])
+        f.setOption("name","reference")
+        f.init()
+        
+        print "f",f
+        
+        
+        temp = MXFunction([A],[An])
+        temp.init()
+        Af_ = temp([horzcat(A_)])[0]
+        print "Af"
+        Af_.printDense()
+        E = numpy.linalg.eig(Af_)[0]
+        
+        assert max(abs(E))<=0.95, str(max(abs(E)))
+        
+        
+        
+        print [ numpy.linalg.eig(i)[0] for i in A_ ] 
+        
+        print numpy.linalg.eig(mul([i.T for i in reversed(A_)]))[0]
+        print numpy.linalg.eig(mul([i for i in reversed(A_)]))[0]
+        print numpy.linalg.eig(mul([i.T for i in A_]))[0]
+        print numpy.linalg.eig(mul([i for i in A_]))[0]
+        
+        
+        for Solver, options in lrdplesolvers:
+          print Solver, options
+          print "c", [i.sparsity() for i in Cs_]
+          g = LrDpleSolver(Solver,lrdpleStruct(a=[i.sparsity() for i in As_],c=[i.sparsity() for i in Cs_],v=[ i.sparsity() for i in Vs_],h=[i.sparsity() for i in Hs_]if with_H else [])  ,[h]*K)
+          
+          print g.dictionary()
+          g.setOption(options)
+          g.init()
+          
+          for i in [f,g]:
+            i.setInput(horzcat(A_),"a")
+            i.setInput(horzcat(V_),"v")
+            if with_C:
+              i.setInput(horzcat(C_),"c")
+            if with_H:
+              i.setInput(horzcat(H_),"h")
+              
+            i.evaluate()
+                 
+                    
+          try:
+            self.checkfunction(g,f,sens_der=True,hessian=True,evals=2)
+          except Exception as e:
+            if "second order derivatives are not supported" in str(e):
+              self.checkfunction(g,f,evals=1,hessian=False,sens_der=False)
+            else:
+              raise e
+
+  @memory_heavy()
+  def test_custom2(self):
+    numpy.random.seed(1)
+    
+    for with_C in [True]:
+      for with_H in [True]:
+        print "with_C", with_C
+        print "with_H", with_H
+        
+        n = 5
+        
+        m = 3 if with_C else n
+        h = [2,3]
+        h = [3,1]
+
+        H_ = DMatrix(numpy.random.random((n,__builtin__.sum(h))))  if with_H else DMatrix()
+        P_ = numpy.random.random((n,n))
+        R_ = numpy.random.random((n,3))
+
+        A_ = randstable(n)
+
+        C_ = DMatrix(numpy.random.random((n,m))) if with_C else DMatrix()
+        V_ = DMatrix(numpy.random.random((m,m)))
+        V_ = (V_+V_.T)/2
+        
+        H = MX.sym("H",H_.sparsity())
+
+        A = MX.sym("A",A_.sparsity())
+        C = MX.sym("C",C_.sparsity())
+
+        Vs = V = MX.sym("V",V_.sparsity())
+        V = (V+V.T)/2
+
+        N = 100
+
+        D = [C if with_C else DMatrix.eye(n)]
+        for i in range(N):
+          D.append(mul(A,D[-1]))
+
+        DD = horzcat(D)
+        Ls = [0]+list(numpy.cumsum(h))
+      
+        if with_H:
+          Y = [ mul([mul(Li.T,DD),blkdiag([V]*(N+1)),mul(DD.T,Li)]) for Li in horzsplit(H,Ls)]
+        else: 
+          Y = [ mul([DD,blkdiag([V]*(N+1)),DD.T]) ]
+        
+        if with_C:
+          if with_H:
+            f = MXFunction(lrdleIn(a=A,c=C,v=Vs,h=H),[blkdiag(Y)])
+          else:
+            f = MXFunction(lrdleIn(a=A,c=C,v=Vs),[blkdiag(Y)])
+        else:
+          if with_H:
+            f = MXFunction(lrdleIn(a=A,v=Vs,h=H),[blkdiag(Y)])
+          else:
+            f = MXFunction(lrdleIn(a=A,v=Vs),[blkdiag(Y)])
+        f.init()
+        
+        
+        for Solver, options in lrdlesolvers:
+          print Solver
+          g = LrDleSolver(Solver,lrdleStruct(a=A.sparsity(),c=C.sparsity(),v=Vs.sparsity(),h=H.sparsity()),h  if with_H else [])
+          g.setOption(options)
+          g.init()
+          
+          for i in [f,g]:
+            i.setInput(A_,"a")
+            i.setInput(V_,"v")
+            if with_C:
+              i.setInput(C_,"c")
+            if with_H:
+              i.setInput(H_,"h")
+          
+          self.checkfunction(g,f,evals=1,hessian=False,sens_der=False,digits=7)
+          
+          try:
+            self.checkfunction(g,f,sens_der=True,hessian=True,evals=2,digits=7)
+          except Exception as e:
+            if "second order derivatives are not supported" in str(e):
+              self.checkfunction(g,f,evals=1,hessian=False,sens_der=False,digits=7)
+            else:
+              raise e
   @memory_heavy()
   def test_dle_small(self):
     
@@ -88,17 +428,23 @@ class ControlTests(casadiTestCase):
         for n in [2,3,4]:
           numpy.random.seed(1)
           print (n)
-          A_ = DMatrix(numpy.random.random((n,n)))
+          
+          r = 0.8
+          A_ = tril(DMatrix(numpy.random.random((n,n))))
+          for i in range(n): A_[i,i] = numpy.random.random()*r*2-r
+          
+          Q = scipy.linalg.orth(numpy.random.random((n,n)))
+          A_ = mul([Q,A_,Q.T])
           
           v = DMatrix(numpy.random.random((n,n)))
           V_ = mul(v,v.T)
           
           
-          solver = DleSolver(Solver,Sparsity.dense(n,n),Sparsity.dense(n,n))
+          solver = DleSolver(Solver,dleStruct(a=Sparsity.dense(n,n),v=Sparsity.dense(n,n)))
           solver.setOption(options)
           solver.init()
-          solver.setInput(A_,DLE_A)
-          solver.setInput(V_,DLE_V)
+          solver.setInput(A_,"a")
+          solver.setInput(V_,"v")
           
           As = MX.sym("A",n,n)
           Vs = MX.sym("V",n,n)
@@ -110,11 +456,11 @@ class ControlTests(casadiTestCase):
           
           Pf = solve(A_total,vec(Vss),"csparse")
           
-          refsol = MXFunction([As,Vs],[Pf.reshape((n,n))])
+          refsol = MXFunction(dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
           refsol.init()
           
-          refsol.setInput(A_,DLE_A)
-          refsol.setInput(V_,DLE_V)
+          refsol.setInput(A_,"a")
+          refsol.setInput(V_,"v")
           
           solver.evaluate()
           X = solver.getOutput()
@@ -131,9 +477,15 @@ class ControlTests(casadiTestCase):
           
           self.checkarray(a0ref,a1ref)
           self.checkarray(a0,a1)
-
-          self.checkfunction(solver,refsol,sens_der=True,hessian=True,evals=2)
-
+          
+          try:
+            self.checkfunction(solver,refsol,sens_der=True,hessian=True,evals=2,failmessage=str(Solver))
+          except Exception as e:
+            if "second order derivatives are not supported" in str(e):
+              self.checkfunction(solver,refsol,evals=1,hessian=False,sens_der=False,failmessage=str(Solver))
+            else:
+              raise e
+       
   @memory_heavy()
   def test_cle_small(self):
     
@@ -147,11 +499,11 @@ class ControlTests(casadiTestCase):
           V_ = mul(v,v.T)
           
           
-          solver = CleSolver(Solver,Sparsity.dense(n,n),Sparsity.dense(n,n))
+          solver = CleSolver(Solver,cleStruct(a=Sparsity.dense(n,n),v=Sparsity.dense(n,n)))
           solver.setOption(options)
           solver.init()
-          solver.setInput(A_,DLE_A)
-          solver.setInput(V_,DLE_V)
+          solver.setInput(A_,"a")
+          solver.setInput(V_,"v")
           
           As = MX.sym("A",n,n)
           Vs = MX.sym("V",n,n)
@@ -165,11 +517,11 @@ class ControlTests(casadiTestCase):
           
           Pf = solve(A_total,vec(Vss),"csparse")
           
-          refsol = MXFunction([As,Vs],[Pf.reshape((n,n))])
+          refsol = MXFunction(dleIn(a=As,v=Vs),dleOut(p=Pf.reshape((n,n))))
           refsol.init()
           
-          refsol.setInput(A_,DLE_A)
-          refsol.setInput(V_,DLE_V)
+          refsol.setInput(A_,"a")
+          refsol.setInput(V_,"v")
           
           solver.evaluate()
           X = solver.getOutput()
@@ -184,25 +536,25 @@ class ControlTests(casadiTestCase):
 
           self.checkfunction(solver,refsol,sens_der=True,hessian=True,evals=2)
 
-  
   @memory_heavy()
   def test_dple_small(self):
     
     for Solver, options in dplesolvers:
       for K in ([1,2,3,4] if args.run_slow else [1,2,3]):
         for n in [2,3]:
+          print Solver, options
           numpy.random.seed(1)
           print (n,K)
-          A_ = [DMatrix(numpy.random.random((n,n))) for i in range(K)]
+          A_ = [randstable(n) for i in range(K)]
           
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = DpleSolver(Solver,[Sparsity.dense(n,n) for i in range(K)],[Sparsity.dense(n,n) for i in range(K)])
+          solver = DpleSolver(Solver,dpleStruct(a=[Sparsity.dense(n,n) for i in range(K)],v=[Sparsity.dense(n,n) for i in range(K)]))
           solver.setOption(options)
           solver.init()
-          solver.setInput(horzcat(A_),DPLE_A)
-          solver.setInput(horzcat(V_),DPLE_V)
+          solver.setInput(horzcat(A_),"a")
+          solver.setInput(horzcat(V_),"v")
           
           As = MX.sym("A",n,K*n)
           Vs = MX.sym("V",n,K*n)
@@ -224,11 +576,11 @@ class ControlTests(casadiTestCase):
           Pf = solve(A_total,vec(Vss),"csparse")
           P = Pf.reshape((n,K*n))
           
-          refsol = MXFunction([As,Vs],[P])
+          refsol = MXFunction(dpleIn(a=As,v=Vs),dpleOut(p=P))
           refsol.init()
           
-          refsol.setInput(horzcat(A_),DPLE_A)
-          refsol.setInput(horzcat(V_),DPLE_V)
+          refsol.setInput(horzcat(A_),"a")
+          refsol.setInput(horzcat(V_),"v")
           
           solver.evaluate()
           X = list(horzsplit(solver.getOutput(),n))
@@ -243,10 +595,16 @@ class ControlTests(casadiTestCase):
           a1 = blkdiag(sigma(X))
           a1ref = blkdiag(sigma(Xref))
 
-          self.checkarray(a0ref,a1ref)
-          self.checkarray(a0,a1)
-
-          self.checkfunction(solver,refsol,sens_der=True,hessian=True,evals=2)
+          self.checkarray(a0ref,a1ref,failmessage=str(Solver))
+          self.checkarray(a0,a1,failmessage=str(Solver))
+          
+          try:
+            self.checkfunction(solver,refsol,sens_der=True,hessian=True,evals=2,failmessage=str(Solver))
+          except Exception as e:
+            if "second order derivatives are not supported" in str(e):
+              self.checkfunction(solver,refsol,evals=1,hessian=False,sens_der=False,failmessage=str(Solver))
+            else:
+              raise e
   
   @memory_heavy()
   def test_dple_large(self):
@@ -262,11 +620,11 @@ class ControlTests(casadiTestCase):
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = DpleSolver(Solver,[Sparsity.dense(n,n) for i in range(K)],[Sparsity.dense(n,n) for i in range(K)])
+          solver = DpleSolver(Solver,dpleStruct(a=[Sparsity.dense(n,n) for i in range(K)],v=[Sparsity.dense(n,n) for i in range(K)]))
           solver.setOption(options)
           solver.init()
-          solver.setInput(horzcat(A_),DPLE_A)
-          solver.setInput(horzcat(V_),DPLE_V)
+          solver.setInput(horzcat(A_),"a")
+          solver.setInput(horzcat(V_),"v")
           
           t0 = time.time()
           solver.evaluate()
@@ -305,4 +663,5 @@ class ControlTests(casadiTestCase):
           self.checkarray(mul(z.T,z),DMatrix.eye(n))
           
 if __name__ == '__main__':
+    print sys.argv
     unittest.main()

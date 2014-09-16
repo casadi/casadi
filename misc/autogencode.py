@@ -158,7 +158,9 @@ class CASADI_CORE_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
   def swigcode(self):
     s="namespace casadi {\n"
     #s+= "%warnfilter(302) " + self.name+ ";\n" -- does not seem to work
-    if self.enum.endswith('Struct'):
+    if self.enum.endswith('VecStruct'):
+      s+="%template(" + self.name + ") " + self.name + "< std::vector<casadi::Sparsity> >;\n"
+    elif self.enum.endswith('Struct'):
       s+="%template(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
     else:
       s+="%template(" + self.name + ") " + self.name + "<casadi::SX>;\n"
@@ -178,7 +180,9 @@ class CASADI_CORE_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
 
   def pureswigcode(self):
     s="namespace casadi {\n"
-    if self.enum.endswith('Struct'):
+    if self.enum.endswith('VecStruct'):
+      s+="%template(" + self.enum + "ure) " + self.enum + "IOSchemeVector< std::vector<Sparsity> >;\n"
+    elif self.enum.endswith('Struct'):
       s+="%template(" + self.enum + "ure) " + self.enum + "IOSchemeVector<Sparsity>;\n"
     s+="}\n"
     return s
@@ -201,7 +205,7 @@ class CASADI_CORE_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     s+="""  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of %s. Either use keywords or non-keywords ")\n""" % self.name
     s+="""  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_%s,n)] for n in dummy[1:]]\n""" % self.enum
     for name, doc, enum in self.entries:
-      s+="  %s = %s\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,"Sparsity()" if self.enum.endswith("Struct") else "[]",name,name,name)
+      s+="  %s = %s\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,"Sparsity()" if self.enum.endswith("Struct") and not self.enum.endswith("VecStruct") else "[]",name,name,name)
     s+="""  for k in kwargs.keys():\n    if not(k in [%s]):\n      raise Exception("Keyword error in %s: '%%s' is not recognized. Available keywords are: %s" %% k )\n""" % (",".join(["'%s'" % name for name, doc, enum in self.entries]),self.name,", ".join([name for name, doc, enum in self.entries]))
 
     if (self.enum.endswith("Struct")):
@@ -293,7 +297,7 @@ autogenpy.write("""%include "casadi/core/function/schemes_metadata.hpp"\n%includ
 
 schemes = []
 
-for h in locate("*.hpp",os.path.join(os.curdir,"..")):
+for h in locate("*.hpp",os.path.join(os.curdir,"../casadi/core")):
   f =  file(h,'r')
   while 1:
     line = f.readline()

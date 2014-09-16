@@ -43,10 +43,9 @@ namespace casadi {
                  public PluginInterface<CleInternal> {
   public:
     /** \brief  Constructor
-     *  \param[in] A  Sparsity of A
-     *  \param[in] V  Sparsity of V
+     *  \param st \structargument{Cle}
      */
-    CleInternal(const Sparsity & A, const Sparsity &V,
+    CleInternal(const CleStructure& st,
                  int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
@@ -59,8 +58,7 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual CleInternal* create(const Sparsity & A,
-                                 const Sparsity &V) const = 0;
+    virtual CleInternal* create(const CleStructure& st) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -76,10 +74,13 @@ namespace casadi {
      */
     virtual Function getDerivative(int nfwd, int nadj)=0;
 
-    /// List of sparsities of A_i
+    /// Structure of Cle
+    CleStructure st_;
+
+    /// Sparsities of A
     Sparsity A_;
 
-    /// List of sparsities of V_i
+    /// Sparsities of V
     Sparsity V_;
 
     /// Assume positive definiteness of P_i
@@ -98,8 +99,7 @@ namespace casadi {
     bool transp_;
 
     // Creator function for internal class
-    typedef CleInternal* (*Creator)(const Sparsity & A,
-                                     const Sparsity & V);
+    typedef CleInternal* (*Creator)(const CleStructure& st);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

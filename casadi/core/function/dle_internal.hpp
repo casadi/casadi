@@ -25,6 +25,7 @@
 
 #include "dle_solver.hpp"
 #include "dle_internal.hpp"
+#include "lr_dle_internal.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 
@@ -43,10 +44,9 @@ namespace casadi {
                  public PluginInterface<DleInternal> {
   public:
     /** \brief  Constructor
-     *  \param[in] A  Sparsity of A
-     *  \param[in] V  Sparsity of V
+     *  \param st \structargument{Dle}
      */
-    DleInternal(const Sparsity & A, const Sparsity &V,
+    DleInternal(const DleStructure& st,
                  int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
@@ -59,8 +59,7 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual DleInternal* create(const Sparsity & A,
-                                 const Sparsity &V) const = 0;
+    virtual DleInternal* create(const DleStructure& st) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -76,7 +75,10 @@ namespace casadi {
      */
     virtual Function getDerivative(int nfwd, int nadj)=0;
 
-    /// List of sparsities of A_i
+    /// Problem structure
+    DleStructure st_;
+
+    /// Sparsity of A
     Sparsity A_;
 
     /// List of sparsities of V_i
@@ -98,14 +100,17 @@ namespace casadi {
     bool transp_;
 
     // Creator function for internal class
-    typedef DleInternal* (*Creator)(const Sparsity & A,
-                                     const Sparsity & V);
+    typedef DleInternal* (*Creator)(const DleStructure& st);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
     /// Infix
     static const std::string infix_;
+
+    /// Get the resulting sparsity
+    static Sparsity getSparsity(const DleStructure& st);
+
   };
 
 } // namespace casadi

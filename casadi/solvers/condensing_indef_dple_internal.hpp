@@ -46,13 +46,14 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DPLESOLVER_CONDENSING_EXPORT CondensingIndefDpleInternal : public DpleInternal {
+  class CASADI_DPLESOLVER_CONDENSING_EXPORT CondensingIndefDpleInternal : public DpleInternal,
+    public Adaptor<CondensingIndefDpleInternal, DleSolver>,
+    public Wrapper<CondensingIndefDpleInternal> {
   public:
     /** \brief  Constructor
-     *  \param[in] A  List of sparsities of A_i
-     *  \param[in] V  List of sparsities of V_i
+     * \param st \structargument{Dple}
      */
-    CondensingIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V);
+    CondensingIndefDpleInternal(const DpleStructure& st);
 
     /** \brief  Destructor */
     virtual ~CondensingIndefDpleInternal();
@@ -64,14 +65,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual CondensingIndefDpleInternal* create(const std::vector< Sparsity > & A,
-                                            const std::vector< Sparsity > &V) const {
-        return new CondensingIndefDpleInternal(A, V);}
+    virtual CondensingIndefDpleInternal* create(const DpleStructure& st) const {
+        return new CondensingIndefDpleInternal(st);}
 
     /** \brief  Create a new DPLE Solver */
-    static DpleInternal* creator(const std::vector< Sparsity >& A,
-                                 const std::vector< Sparsity >& V)
-    { return new CondensingIndefDpleInternal(A, V);}
+    static DpleInternal* creator(const DpleStructure& st) {
+        return new CondensingIndefDpleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -91,12 +90,7 @@ namespace casadi {
     static const std::string meta_doc;
 
   private:
-    /// Main implementation as MXFunction
-    Function f_;
-    
-    /// DleSolver solving the condensed Lyapunov form
-    DleSolver dlesolver_;
-    
+
     /// State space dimension
     int n_;
 

@@ -36,10 +36,10 @@
 namespace casadi {
 
   /** \brief \pluginbrief{CleSolver,simple}
-  
+
    @copydoc CLE_doc
    @copydoc plugin_CleSolver_simple
-   
+
        \author Joris Gillis
       \date 2014
 
@@ -47,10 +47,9 @@ namespace casadi {
   class CASADI_CLESOLVER_SIMPLE_EXPORT SimpleIndefCleInternal : public CleInternal {
   public:
     /** \brief  Constructor
-     *  \param[in] A  Sparsity of A
-     *  \param[in] V  Sparsity of V
+     * \param st \structargument{Cle}
      */
-    SimpleIndefCleInternal(const Sparsity & A, const Sparsity &V);
+    SimpleIndefCleInternal(const CleStructure& st);
 
     /** \brief  Destructor */
     virtual ~SimpleIndefCleInternal();
@@ -62,14 +61,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual SimpleIndefCleInternal* create(const Sparsity & A,
-                                            const Sparsity &V) const {
-        return new SimpleIndefCleInternal(A, V);}
+    virtual SimpleIndefCleInternal* create(const CleStructure& st) const {
+        return new SimpleIndefCleInternal(st);}
 
     /** \brief  Create a new CLE Solver */
-    static CleInternal* creator(const Sparsity & A,
-                                 const Sparsity & V)
-    { return new SimpleIndefCleInternal(A, V);}
+    static CleInternal* creator(const CleStructure& st)
+    { return new SimpleIndefCleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

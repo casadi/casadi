@@ -57,11 +57,10 @@ namespace casadi {
     DpleInternal::registerPlugin(casadi_register_dplesolver_slicot);
   }
 
-  PsdIndefDpleInternal::PsdIndefDpleInternal(const std::vector< Sparsity > & A,
-                                             const std::vector< Sparsity > &V,
+  PsdIndefDpleInternal::PsdIndefDpleInternal(const DpleStructure & st,
                                              int nrhs,
                                              bool transp)
-      : DpleInternal(A, V, nrhs, transp) {
+      : DpleInternal(st, nrhs, transp) {
 
     // set default options
     setOption("name", "unnamed_psd_indef_dple_solver"); // name of the function
@@ -91,11 +90,13 @@ namespace casadi {
                           "pos_def option set to True: Solver only handles the indefinite case.");
     casadi_assert_message(const_dim_,
                           "const_dim option set to False: Solver only handles the True case.");
+                          
+    DenseIO::init();         
 
-    for (int k=0;k<K_;k++) {
-      casadi_assert_message(A_[k].isDense(), "Solver requires arguments to be dense.");
-      casadi_assert_message(V_[k].isDense(), "Solver requires arguments to be dense.");
-    }
+    //for (int k=0;k<K_;k++) {
+    //  casadi_assert_message(A_[k].isDense(), "Solver requires arguments to be dense.");
+    //  casadi_assert_message(V_[k].isDense(), "Solver requires arguments to be dense.");
+    //}
 
     n_ = A_[0].size1();
 
@@ -240,6 +241,8 @@ namespace casadi {
 
   void PsdIndefDpleInternal::evaluate() {
     // Obtain a periodic Schur form
+    
+    DenseIO::readInputs();
 
     double t_linear_solve_ = 0; // Time spent in linear solve
     double t_psd_ = 0;          // Time spent in Periodic Schur decomposition
@@ -264,7 +267,7 @@ namespace casadi {
     for (int k=0;k<K_;++k) {
       for (int i=0;i<n_;++i) {
         for (int j=0;j<n_;++j) {
-          X_[k*n_*n_+i*n_+j] = input(DPLE_A).data()[k*n_*n_+n_*j+i];
+          X_[k*n_*n_+i*n_+j] = inputD(DPLE_A).data()[k*n_*n_+n_*j+i];
         }
       }
     }
@@ -387,7 +390,7 @@ namespace casadi {
           // nnKa[k] <- V[k]*Z[k+1]
           // n^3 K
           dense_mul_nt(n_, n_, n_,
-            &input(1+d).data()[k*n_*n_], &Z_[((k+1) % K_)*n_*n_], &nnKa_[k].data()[0]);
+            &inputD(1+d).data()[k*n_*n_], &Z_[((k+1) % K_)*n_*n_], &nnKa_[k].data()[0]);
           nnKb_[k].set(0.0);
           // nnKb[k] <- Z[k+1]'*V[k]*Z[k+1]
           dense_mul_nn(n_, n_, n_,
@@ -567,7 +570,7 @@ namespace casadi {
           }
 
           // n^3 K
-          output(d).set(0.0);
+          outputD(d).set(0.0);
         }
 
         for (int k=0;k<K_;++k) {
@@ -578,7 +581,7 @@ namespace casadi {
           dense_mul_nn(n_, n_, n_, &X_[k*n_*n_], &Z_[k*n_*n_], &nnKa_[k].data()[0]);
           // output <- Z[k]*V[k]*Z[k]'
           dense_mul_tn(n_, n_, n_, &Z_[k*n_*n_], &nnKa_[k].data()[0],
-                       &output(d).data()[k*n_*n_]);
+                       &outputD(d).data()[k*n_*n_]);
         }
 
         if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
@@ -596,8 +599,8 @@ namespace casadi {
           time_start = getRealTime(); // Start timer
         }
 
-        DMatrix &P_bar = input(1+d);
-        std::vector<double> &Vbar = output(d).data();
+        DMatrix &P_bar = inputD(1+d);
+        std::vector<double> &Vbar = outputD(d).data();
         std::fill(Vbar.begin(), Vbar.end(), 0);
         std::fill(Xbar_.begin(), Xbar_.end(), 0);
 
@@ -845,6 +848,8 @@ namespace casadi {
       stats_["t_total"] = t_total_;
       stats_["t_linear_solve"] = t_linear_solve_;
     }
+    
+    DenseIO::writeOutputs();
 
   }
 
@@ -876,10 +881,31 @@ namespace casadi {
     */
     std::vector<MX> ins_new((nrhs_+1)*(nfwd+1)+nrhs_*nadj);
 
-    for (int i=0; i<ins_new.size(); ++i) {
-      ins_new[i] = MX::sym("in", input().sparsity());
+    // Part 1
+    ins_new[0] = MX::sym("A", input(DPLE_A).sparsity());
+    for (int i=0; i<nrhs_; ++i) {
+      ins_new[i+1] = MX::sym("Q", input(DPLE_V).sparsity());
     }
-
+    
+    // Part 2 
+    for (int q=0; q<nrhs_; ++q) {
+      for (int k=0;k<nfwd;++k) {
+        MX& Qf  = ins_new.at((nrhs_+1)*(k+1)+q+1);
+        MX& Af  = ins_new.at((nrhs_+1)*(k+1));
+        
+        Qf = MX::sym("Qf", input(DPLE_V).sparsity());
+        Af = MX::sym("Af", input(DPLE_A).sparsity());
+      }
+    }
+    
+    // Part 3
+    for (int q=0; q<nrhs_; ++q) {
+      for (int k=0;k<nadj;++k) {
+          MX& Pb  = ins_new.at((nrhs_+1)*(nfwd+1)+nrhs_*k+q);
+          
+          Pb = MX::sym("Pb", output(DPLE_P).sparsity());
+      }
+    }
     // Create a call to yourself
     //
     // P_0 .. P_{nrhs-1} = f( A Q_0 .. Q_{nrhs-1})
@@ -892,7 +918,7 @@ namespace casadi {
     }
 
     // Prepare a solver for forward seeds
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(A_, V_, nfwd, transp_);
+    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(st_, nfwd, transp_);
     node->setOption(dictionary());
 
     DpleSolver f;
@@ -900,7 +926,7 @@ namespace casadi {
     f.init();
 
     // Prepare a solver for adjoint seeds
-    PsdIndefDpleInternal* node2 = new PsdIndefDpleInternal(A_, V_, nadj, !transp_);
+    PsdIndefDpleInternal* node2 = new PsdIndefDpleInternal(st_, nadj, !transp_);
     node2->setOption(dictionary());
 
     DpleSolver b;
@@ -1005,7 +1031,7 @@ namespace casadi {
 
   PsdIndefDpleInternal* PsdIndefDpleInternal::clone() const {
     // Return a deep copy
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(A_, V_, nrhs_, transp_);
+    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(st_, nrhs_, transp_);
     node->setOption(dictionary());
     return node;
   }

@@ -53,12 +53,14 @@ namespace casadi {
   }
 
   SimpleIndefDleInternal::SimpleIndefDleInternal(
-      const Sparsity & A,
-      const Sparsity &V) : DleInternal(A, V) {
+      const DleStructure& st) : DleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_simple_indef_dle_solver"); // name of the function
 
+    addOption("compressed_solve",         OT_BOOLEAN, true,
+              "When a system with sparse rhs arises, compress to"
+              "a smaller system with dense rhs.");
     addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
@@ -83,18 +85,29 @@ namespace casadi {
     MX Vs = MX::sym("V", V_);
 
     MX Vss = (Vs+Vs.T())/2;
-    
-    MX A_total = DMatrix::eye(n_*n_) - kron(As,As);
+
+    MX A_total = DMatrix::eye(n_*n_) - kron(As, As);
 
     MX Pf = solve(A_total, vec(Vss), getOption("linear_solver"));
-   
-    std::vector<MX> v_in;
-    v_in.push_back(As);
-    v_in.push_back(Vs);
-    f_ = MXFunction(v_in, reshape(Pf,n_,n_));
-    f_.setInputScheme(SCHEME_DLEInput);
-    f_.setOutputScheme(SCHEME_DLEOutput);
+
+    MX P = reshape(Pf, n_, n_);
+
+    f_ = MXFunction(dleIn("a", As, "v", Vs),
+      dleOut("p", MX(P(output().sparsity()))));
+
     f_.init();
+
+    casadi_assert(getNumOutputs()==f_.getNumOutputs());
+    for (int i=0;i<getNumInputs();++i) {
+      casadi_assert_message(input(i).sparsity()==f_.input(i).sparsity(),
+        "Sparsity mismatch for input " << i << ":" <<
+        input(i).dimString() << " <-> " << f_.input(i).dimString() << ".");
+    }
+    for (int i=0;i<getNumOutputs();++i) {
+      casadi_assert_message(output(i).sparsity()==f_.output(i).sparsity(),
+        "Sparsity mismatch for output " << i << ":" <<
+        output(i).dimString() << " <-> " << f_.output(i).dimString() << ".");
+    }
   }
 
 
@@ -121,7 +134,7 @@ namespace casadi {
 
   SimpleIndefDleInternal* SimpleIndefDleInternal::clone() const {
     // Return a deep copy
-    SimpleIndefDleInternal* node = new SimpleIndefDleInternal(A_, V_);
+    SimpleIndefDleInternal* node = new SimpleIndefDleInternal(st_);
     node->setOption(dictionary());
     return node;
   }

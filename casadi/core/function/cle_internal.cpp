@@ -35,11 +35,10 @@ OUTPUTSCHEME(CLEOutput)
 using namespace std;
 namespace casadi {
 
-  CleInternal::CleInternal(const Sparsity & A,
-                             const  Sparsity &V,
+  CleInternal::CleInternal(const CleStructure& st,
                              int nrhs,
                              bool transp) :
-      A_(A), V_(V), nrhs_(nrhs), transp_(transp) {
+      st_(st), nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -68,6 +67,8 @@ namespace casadi {
     error_unstable_ = getOption("error_unstable");
     eps_unstable_ = getOption("eps_unstable");
 
+    A_ = st_[Cle_STRUCT_A];
+    V_ = st_[Cle_STRUCT_V];
 
     casadi_assert_message(V_.isSymmetric(), "V must be symmetric but got "
                           << V_.dimString() << ".");

@@ -137,6 +137,50 @@ namespace casadi {
 }
 #ifdef SWIGPYTHON
 %pythoncode %{
+def cleStruct(*dummy,**kwargs):
+  """
+  Helper function for 'CleStruct'
+
+  Two use cases:
+     a) arg = cleStruct(a=my_a, v=my_v, c=my_c)
+          all arguments optional
+     b) a, v, c = cleStruct(arg,"a", "v", "c")
+          all arguments after the first optional
+  Structure specification of a CLE
+  
+  Keyword arguments::
+
+    a -- The matrix A [Cle_STRUCT_A]
+    v -- The matrix V [Cle_STRUCT_V]
+    c -- The matrix C (defaults to unity) [Cle_STRUCT_C]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of cleStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_CleStruct,n)] for n in dummy[1:]]
+  a = Sparsity()
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = Sparsity()
+  if 'v' in kwargs:
+    v = kwargs['v']
+  c = Sparsity()
+  if 'c' in kwargs:
+    c = kwargs['c']
+  for k in kwargs.keys():
+    if not(k in ['a','v','c']):
+      raise Exception("Keyword error in cleStruct: '%s' is not recognized. Available keywords are: a, v, c" % k )
+  return CleStructure([a,v,c])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(cleStruct) cleStruct<casadi::Sparsity>;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+%template(CleStructure) CleStructIOSchemeVector<Sparsity>;
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
 def controldaeIn(*dummy,**kwargs):
   """
   Helper function for 'ControlledDAEInput'
@@ -323,7 +367,7 @@ def dleOut(*dummy,**kwargs):
   
   Keyword arguments::
 
-    p -- Lyapunov matrix [DLE_P]
+    p -- P matrix [DLE_P]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dleOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DLEOutput,n)] for n in dummy[1:]]
@@ -350,6 +394,46 @@ namespace casadi {
 }
 #endif //SWIGPYTHON
 namespace casadi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def dleStruct(*dummy,**kwargs):
+  """
+  Helper function for 'DleStruct'
+
+  Two use cases:
+     a) arg = dleStruct(a=my_a, v=my_v)
+          all arguments optional
+     b) a, v = dleStruct(arg,"a", "v")
+          all arguments after the first optional
+  Structure specification of a DLE
+  
+  Keyword arguments::
+
+    a -- The matrix A [Dle_STRUCT_A]
+    v -- The matrix V [Dle_STRUCT_V]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dleStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DleStruct,n)] for n in dummy[1:]]
+  a = Sparsity()
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = Sparsity()
+  if 'v' in kwargs:
+    v = kwargs['v']
+  for k in kwargs.keys():
+    if not(k in ['a','v']):
+      raise Exception("Keyword error in dleStruct: '%s' is not recognized. Available keywords are: a, v" % k )
+  return DleStructure([a,v])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(dleStruct) dleStruct<casadi::Sparsity>;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+%template(DleStructure) DleStructIOSchemeVector<Sparsity>;
 }
 #ifdef SWIGPYTHON
 %pythoncode %{
@@ -440,6 +524,46 @@ namespace casadi {
 }
 #endif //SWIGPYTHON
 namespace casadi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def dpleStruct(*dummy,**kwargs):
+  """
+  Helper function for 'DpleVecStruct'
+
+  Two use cases:
+     a) arg = dpleStruct(a=my_a, v=my_v)
+          all arguments optional
+     b) a, v = dpleStruct(arg,"a", "v")
+          all arguments after the first optional
+  Structure specification of a DPLE
+  
+  Keyword arguments::
+
+    a -- Sparsities for A_i, blkdiag form [Dple_STRUCT_A]
+    v -- Sparsities for V_i, blkdiag form [Dple_STRUCT_V]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DpleVecStruct,n)] for n in dummy[1:]]
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = []
+  if 'v' in kwargs:
+    v = kwargs['v']
+  for k in kwargs.keys():
+    if not(k in ['a','v']):
+      raise Exception("Keyword error in dpleStruct: '%s' is not recognized. Available keywords are: a, v" % k )
+  return DpleVecStructure([a,v])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(dpleStruct) dpleStruct< std::vector<casadi::Sparsity> >;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+%template(DpleVecStructure) DpleVecStructIOSchemeVector< std::vector<Sparsity> >;
 }
 #ifdef SWIGPYTHON
 %pythoncode %{
@@ -1085,6 +1209,298 @@ namespace casadi {
 #endif //SWIGPYTHON
 namespace casadi {
 %template(LPStructure) LPStructIOSchemeVector<Sparsity>;
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def lrdleIn(*dummy,**kwargs):
+  """
+  Helper function for 'LR_DLEInput'
+
+  Two use cases:
+     a) arg = lrdleIn(a=my_a, v=my_v, c=my_c, h=my_h)
+          all arguments optional
+     b) a, v, c, h = lrdleIn(arg,"a", "v", "c", "h")
+          all arguments after the first optional
+  Input arguments of a \e dle solver
+  
+  Keyword arguments::
+
+    a -- A matrix [LR_DLE_A]
+    v -- V matrix [LR_DLE_V]
+    c -- C matrix [LR_DLE_C]
+    h -- H matrix: horizontal stack of all Hi [LR_DLE_H]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DLEInput,n)] for n in dummy[1:]]
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = []
+  if 'v' in kwargs:
+    v = kwargs['v']
+  c = []
+  if 'c' in kwargs:
+    c = kwargs['c']
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  for k in kwargs.keys():
+    if not(k in ['a','v','c','h']):
+      raise Exception("Keyword error in lrdleIn: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
+  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LR_DLEInput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(lrdleIn) lrdleIn<casadi::SX>;
+%template(lrdleIn) lrdleIn<casadi::MX>;
+%template(lrdleIn) lrdleIn<casadi::Sparsity>;
+%template(IOSchemeVectorLR_DLEInputSX) LR_DLEInputIOSchemeVector<SX>;
+%template(IOSchemeVectorLR_DLEInputMX) LR_DLEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorLR_DLEInputSparsity) LR_DLEInputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorLR_DLEInput) IOSchemeVectorLR_DLEInputSX;
+%rename(IOSchemeVectorLR_DLEInput) IOSchemeVectorLR_DLEInputMX;
+%rename(IOSchemeVectorLR_DLEInput) IOSchemeVectorLR_DLEInputSparsity;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def lrdleOut(*dummy,**kwargs):
+  """
+  Helper function for 'LR_DLEOutput'
+
+  Two use cases:
+     a) arg = lrdleOut(y=my_y)
+          all arguments optional
+     b) y = lrdleOut(arg,"y")
+          all arguments after the first optional
+  Output arguments of a \e dle solver
+  
+  Keyword arguments::
+
+    y -- Y matrix, blkdiag form [LR_DLE_Y]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DLEOutput,n)] for n in dummy[1:]]
+  y = []
+  if 'y' in kwargs:
+    y = kwargs['y']
+  for k in kwargs.keys():
+    if not(k in ['y']):
+      raise Exception("Keyword error in lrdleOut: '%s' is not recognized. Available keywords are: y" % k )
+  return IOSchemeVector([y], IOScheme(SCHEME_LR_DLEOutput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(lrdleOut) lrdleOut<casadi::SX>;
+%template(lrdleOut) lrdleOut<casadi::MX>;
+%template(lrdleOut) lrdleOut<casadi::Sparsity>;
+%template(IOSchemeVectorLR_DLEOutputSX) LR_DLEOutputIOSchemeVector<SX>;
+%template(IOSchemeVectorLR_DLEOutputMX) LR_DLEOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorLR_DLEOutputSparsity) LR_DLEOutputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorLR_DLEOutput) IOSchemeVectorLR_DLEOutputSX;
+%rename(IOSchemeVectorLR_DLEOutput) IOSchemeVectorLR_DLEOutputMX;
+%rename(IOSchemeVectorLR_DLEOutput) IOSchemeVectorLR_DLEOutputSparsity;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def lrdleStruct(*dummy,**kwargs):
+  """
+  Helper function for 'LrDleStruct'
+
+  Two use cases:
+     a) arg = lrdleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
+          all arguments optional
+     b) a, v, c, h = lrdleStruct(arg,"a", "v", "c", "h")
+          all arguments after the first optional
+  Structure specification of a DLE
+  
+  Keyword arguments::
+
+    a -- The matrix A [LR_DLE_STRUCT_A]
+    v -- The matrix V [LR_DLE_STRUCT_V]
+    c -- The matrix C (defaults to unity) [LR_DLE_STRUCT_C]
+    h -- H matrix: horizontal stack of all Hi [LR_DLE_STRUCT_H]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LrDleStruct,n)] for n in dummy[1:]]
+  a = Sparsity()
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = Sparsity()
+  if 'v' in kwargs:
+    v = kwargs['v']
+  c = Sparsity()
+  if 'c' in kwargs:
+    c = kwargs['c']
+  h = Sparsity()
+  if 'h' in kwargs:
+    h = kwargs['h']
+  for k in kwargs.keys():
+    if not(k in ['a','v','c','h']):
+      raise Exception("Keyword error in lrdleStruct: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
+  return LrDleStructure([a,v,c,h])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(lrdleStruct) lrdleStruct<casadi::Sparsity>;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+%template(LrDleStructure) LrDleStructIOSchemeVector<Sparsity>;
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def lrdpleIn(*dummy,**kwargs):
+  """
+  Helper function for 'LR_DPLEInput'
+
+  Two use cases:
+     a) arg = lrdpleIn(a=my_a, v=my_v, c=my_c, h=my_h)
+          all arguments optional
+     b) a, v, c, h = lrdpleIn(arg,"a", "v", "c", "h")
+          all arguments after the first optional
+  Input arguments of a \e dple solver
+  
+  Keyword arguments::
+
+    a -- A matrices (horzcat when const_dim, blkdiag otherwise) [LR_DPLE_A]
+    v -- V matrices (horzcat when const_dim, blkdiag otherwise) [LR_DPLE_V]
+    c -- C matrix [LR_DPLE_C]
+    h -- H matrix: horizontal stack of all Hi [LR_DPLE_H]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DPLEInput,n)] for n in dummy[1:]]
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = []
+  if 'v' in kwargs:
+    v = kwargs['v']
+  c = []
+  if 'c' in kwargs:
+    c = kwargs['c']
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  for k in kwargs.keys():
+    if not(k in ['a','v','c','h']):
+      raise Exception("Keyword error in lrdpleIn: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
+  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LR_DPLEInput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(lrdpleIn) lrdpleIn<casadi::SX>;
+%template(lrdpleIn) lrdpleIn<casadi::MX>;
+%template(lrdpleIn) lrdpleIn<casadi::Sparsity>;
+%template(IOSchemeVectorLR_DPLEInputSX) LR_DPLEInputIOSchemeVector<SX>;
+%template(IOSchemeVectorLR_DPLEInputMX) LR_DPLEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorLR_DPLEInputSparsity) LR_DPLEInputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorLR_DPLEInput) IOSchemeVectorLR_DPLEInputSX;
+%rename(IOSchemeVectorLR_DPLEInput) IOSchemeVectorLR_DPLEInputMX;
+%rename(IOSchemeVectorLR_DPLEInput) IOSchemeVectorLR_DPLEInputSparsity;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def lrdpleOut(*dummy,**kwargs):
+  """
+  Helper function for 'LR_DPLEOutput'
+
+  Two use cases:
+     a) arg = lrdpleOut(y=my_y)
+          all arguments optional
+     b) y = lrdpleOut(arg,"y")
+          all arguments after the first optional
+  Output arguments of a \e dple solver
+  
+  Keyword arguments::
+
+    y -- Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [LR_DPLE_Y]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DPLEOutput,n)] for n in dummy[1:]]
+  y = []
+  if 'y' in kwargs:
+    y = kwargs['y']
+  for k in kwargs.keys():
+    if not(k in ['y']):
+      raise Exception("Keyword error in lrdpleOut: '%s' is not recognized. Available keywords are: y" % k )
+  return IOSchemeVector([y], IOScheme(SCHEME_LR_DPLEOutput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(lrdpleOut) lrdpleOut<casadi::SX>;
+%template(lrdpleOut) lrdpleOut<casadi::MX>;
+%template(lrdpleOut) lrdpleOut<casadi::Sparsity>;
+%template(IOSchemeVectorLR_DPLEOutputSX) LR_DPLEOutputIOSchemeVector<SX>;
+%template(IOSchemeVectorLR_DPLEOutputMX) LR_DPLEOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorLR_DPLEOutputSparsity) LR_DPLEOutputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorLR_DPLEOutput) IOSchemeVectorLR_DPLEOutputSX;
+%rename(IOSchemeVectorLR_DPLEOutput) IOSchemeVectorLR_DPLEOutputMX;
+%rename(IOSchemeVectorLR_DPLEOutput) IOSchemeVectorLR_DPLEOutputSparsity;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def lrdpleStruct(*dummy,**kwargs):
+  """
+  Helper function for 'LrDpleVecStruct'
+
+  Two use cases:
+     a) arg = lrdpleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
+          all arguments optional
+     b) a, v, c, h = lrdpleStruct(arg,"a", "v", "c", "h")
+          all arguments after the first optional
+  Structure specification of a DPLE
+  
+  Keyword arguments::
+
+    a -- Sparsities for A_i, blkdiag form [LR_Dple_STRUCT_A]
+    v -- Sparsities for V_i, blkdiag form [LR_Dple_STRUCT_V]
+    c -- Sparsities for C_i (defaults to unity), blkdiag form [LR_Dple_STRUCT_C]
+    h -- Sparsities for H_i (defaults to unity), blkdiag form [LR_Dple_STRUCT_H]
+  """
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LrDpleVecStruct,n)] for n in dummy[1:]]
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = []
+  if 'v' in kwargs:
+    v = kwargs['v']
+  c = []
+  if 'c' in kwargs:
+    c = kwargs['c']
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  for k in kwargs.keys():
+    if not(k in ['a','v','c','h']):
+      raise Exception("Keyword error in lrdpleStruct: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
+  return LrDpleVecStructure([a,v,c,h])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace casadi {
+%template(lrdpleStruct) lrdpleStruct< std::vector<casadi::Sparsity> >;
+}
+#endif //SWIGPYTHON
+namespace casadi {
+%template(LrDpleVecStructure) LrDpleVecStructIOSchemeVector< std::vector<Sparsity> >;
 }
 #ifdef SWIGPYTHON
 %pythoncode %{

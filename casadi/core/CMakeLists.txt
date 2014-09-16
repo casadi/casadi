@@ -117,9 +117,11 @@ set(CASADI_SRCS
   function/nullspace.hpp           function/nullspace.cpp           function/nullspace_internal.hpp           function/nullspace_internal.cpp
   function/dple_solver.hpp         function/dple_solver.cpp         function/dple_internal.hpp     function/dple_internal.cpp
   function/dle_solver.hpp          function/dle_solver.cpp          function/dle_internal.hpp      function/dle_internal.cpp
+  function/lr_dple_solver.hpp      function/lr_dple_solver.cpp      function/lr_dple_internal.hpp  function/lr_dple_internal.cpp
+  function/lr_dle_solver.hpp       function/lr_dle_solver.cpp       function/lr_dle_internal.hpp   function/lr_dle_internal.cpp
   function/cle_solver.hpp          function/cle_solver.cpp          function/cle_internal.hpp      function/cle_internal.cpp
-  function/wrapper.hpp             function/adaptor.hpp
-  
+  function/wrapper.hpp             function/adaptor.hpp             function/dense_io.hpp
+
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
   misc/symbolic_nlp.hpp            misc/symbolic_nlp.cpp

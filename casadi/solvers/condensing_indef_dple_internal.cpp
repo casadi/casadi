@@ -44,6 +44,7 @@ namespace casadi {
     plugin->name = "condensing";
     plugin->doc = CondensingIndefDpleInternal::meta_doc.c_str();
     plugin->version = 20;
+    plugin->adaptorLoader = CondensingIndefDpleInternal::adaptorLoader;
     return 0;
   }
 
@@ -53,16 +54,12 @@ namespace casadi {
   }
 
   CondensingIndefDpleInternal::CondensingIndefDpleInternal(
-      const std::vector< Sparsity > & A,
-      const std::vector< Sparsity > &V) : DpleInternal(A, V) {
+      const DpleStructure& st) : DpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_condensing_indef_dple_solver"); // name of the function
 
-    addOption("dle_solver",            OT_STRING, GenericType(),
-              "User-defined Dle solver class. Needed for sensitivities.");
-    addOption("dle_solver_options",    OT_DICTIONARY,   GenericType(),
-              "Options to be passed to the Dle solver.");
+    Adaptor::addOptions();
 
   }
 
@@ -73,6 +70,7 @@ namespace casadi {
   void CondensingIndefDpleInternal::init() {
 
     DpleInternal::init();
+    Adaptor::init();
 
     casadi_assert_message(!pos_def_,
       "pos_def option set to True: Solver only handles the indefinite case.");
@@ -91,58 +89,52 @@ namespace casadi {
     for (int k=0;k<K_;++k) {
       Vss[k] = (Vss[k]+Vss[k].T())/2;
     }
-    
-    MX R = MX::zeros(n_,n_);
-    
+
+    MX R = MX::zeros(n_, n_);
+
     for (int k=0;k<K_;++k) {
-      R = mul(mul(Ass[k],R),Ass[k].T()) + Vss[k];
+      R = mul(mul(Ass[k], R), Ass[k].T()) + Vss[k];
     }
-    
-    std::vector< MX > Assr(K_);    
-    std::reverse_copy (Ass.begin(), Ass.end(), Assr.begin());
+
+    std::vector< MX > Assr(K_);
+    std::reverse_copy(Ass.begin(), Ass.end(), Assr.begin());
 
     MX Ap = mul(Assr);
-    
-    // Create an dlesolver instance
-    std::string dlesolver_name = getOption("dle_solver");
-    dlesolver_ = DleSolver(dlesolver_name, Ap.sparsity(), R.sparsity());
 
-    if (hasSetOption("dle_solver_options")) {
-      dlesolver_.setOption(getOption("dle_solver_options"));
-    }
+    // Create an dlesolver instance
+    solver_ = DleSolver(Adaptor::targetName(), dleStruct("a", Ap.sparsity(), "v", R.sparsity()));
+
+    Adaptor::setTargetOptions();
 
     // Initialize the NLP solver
-    dlesolver_.init();
+    solver_.init();
 
     std::vector<MX> v_in;
     v_in.push_back(As);
     v_in.push_back(Vs);
-    
-    std::vector<MX> Pr = dlesolver_.call(dpleIn("a",Ap,"v",R));
-    
+
+    std::vector<MX> Pr = solver_.call(dpleIn("a", Ap, "v", R));
+
     std::vector<MX> Ps(K_);
     Ps[0] = Pr[0];
-    
+
     for (int k=0;k<K_-1;++k) {
-      Ps[k+1] = mul(mul(Ass[k],Ps[k]),Ass[k].T()) + Vss[k];
+      Ps[k+1] = mul(mul(Ass[k], Ps[k]), Ass[k].T()) + Vss[k];
     }
 
     f_ = MXFunction(v_in, horzcat(Ps));
     f_.setInputScheme(SCHEME_DPLEInput);
     f_.setOutputScheme(SCHEME_DPLEOutput);
     f_.init();
+
+    Wrapper::checkDimensions();
+
   }
 
 
 
   void CondensingIndefDpleInternal::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
-      std::copy(input(i).begin(), input(i).end(), f_.input(i).begin());
-    }
-    f_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
-      std::copy(f_.output(i).begin(), f_.output(i).end(), output(i).begin());
-    }
+    Wrapper::evaluate();
   }
 
   Function CondensingIndefDpleInternal::getDerivative(int nfwd, int nadj) {
@@ -157,7 +149,7 @@ namespace casadi {
 
   CondensingIndefDpleInternal* CondensingIndefDpleInternal::clone() const {
     // Return a deep copy
-    CondensingIndefDpleInternal* node = new CondensingIndefDpleInternal(A_, V_);
+    CondensingIndefDpleInternal* node = new CondensingIndefDpleInternal(st_);
     node->setOption(dictionary());
     return node;
   }

@@ -45,6 +45,8 @@
 #include "casadi/core/function/nullspace.hpp"
 #include "casadi/core/function/dple_solver.hpp"
 #include "casadi/core/function/dle_solver.hpp"
+#include "casadi/core/function/lr_dple_solver.hpp"
+#include "casadi/core/function/lr_dle_solver.hpp"
 #include "casadi/core/function/cle_solver.hpp"
 %}
 
@@ -224,6 +226,8 @@ def PyFunction(obj,inputs,outputs):
 %include "casadi/core/function/nullspace.hpp"
 %include "casadi/core/function/dple_solver.hpp"
 %include "casadi/core/function/dle_solver.hpp"
+%include "casadi/core/function/lr_dple_solver.hpp"
+%include "casadi/core/function/lr_dle_solver.hpp"
 %include "casadi/core/function/cle_solver.hpp"
 
 %template(IntegratorVector) std::vector<casadi::Integrator>;

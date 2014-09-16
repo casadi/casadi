@@ -53,8 +53,7 @@ namespace casadi {
   }
 
   SimpleIndefDpleInternal::SimpleIndefDpleInternal(
-      const std::vector< Sparsity > & A,
-      const std::vector< Sparsity > &V) : DpleInternal(A, V) {
+      const DpleStructure& st) : DpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_simple_indef_dple_solver"); // name of the function
@@ -143,7 +142,7 @@ namespace casadi {
 
   SimpleIndefDpleInternal* SimpleIndefDpleInternal::clone() const {
     // Return a deep copy
-    SimpleIndefDpleInternal* node = new SimpleIndefDpleInternal(A_, V_);
+    SimpleIndefDpleInternal* node = new SimpleIndefDpleInternal(st_);
     node->setOption(dictionary());
     return node;
   }

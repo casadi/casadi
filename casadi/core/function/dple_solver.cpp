@@ -62,9 +62,19 @@ namespace casadi {
   }
 
   DpleSolver::DpleSolver(const std::string& name,
-                         const std::vector< Sparsity > & A,
-                         const std::vector< Sparsity > &V) {
-    assignNode(DpleInternal::getPlugin(name).creator(A, V));
+               const std::vector<Sparsity> & A,
+               const std::vector<Sparsity> & V) {
+    DpleStructure st = dpleStruct("a", A, "v", V);
+    assignNode(DpleInternal::getPlugin(name).creator(st)->adaptor(name));
+  }
+
+  DpleSolver::DpleSolver(const std::string& name,
+                         const DpleStructure & st) {
+    assignNode(DpleInternal::getPlugin(name).creator(st)->adaptor(name));
+  }
+
+  std::string DpleSolver::infix() {
+    return DpleInternal::infix_;
   }
 
 } // namespace casadi

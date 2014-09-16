@@ -21,6 +21,7 @@
  */
 
 #include "dple_internal.hpp"
+#include "dle_internal.hpp"
 #include <cassert>
 #include "../std_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
@@ -35,11 +36,10 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace casadi {
 
-  DpleInternal::DpleInternal(const std::vector< Sparsity > & A,
-                             const std::vector< Sparsity > &V,
+  DpleInternal::DpleInternal(const DpleStructure & st,
                              int nrhs,
                              bool transp) :
-      A_(A), V_(V), nrhs_(nrhs), transp_(transp) {
+      st_(st), nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -69,6 +69,8 @@ namespace casadi {
     pos_def_ = getOption("pos_def");
     error_unstable_ = getOption("error_unstable");
     eps_unstable_ = getOption("eps_unstable");
+    A_ = st_[Dple_STRUCT_A];
+    V_ = st_[Dple_STRUCT_V];
 
     // Dimension sanity checks
     casadi_assert_message(A_.size()==V_.size(), "A and V arguments must be of same length, but got "
@@ -110,10 +112,8 @@ namespace casadi {
     }
 
     // Allocate outputs
-    std::vector<Sparsity> P;
-    for (int k=0;k<K_;++k) {
-      P.push_back(Sparsity::dense(V_[k].size1(), V_[k].size1()));
-    }
+    std::vector<Sparsity> P = LrDpleInternal::getSparsity(lrdpleStruct("a", A_, "v", V_));
+
     setNumOutputs(nrhs_);
     for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
@@ -134,7 +134,6 @@ namespace casadi {
   std::map<std::string, DpleInternal::Plugin> DpleInternal::solvers_;
 
   const std::string DpleInternal::infix_ = "dplesolver";
-
 
 } // namespace casadi
 

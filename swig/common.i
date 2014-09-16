@@ -684,6 +684,8 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "casadi/core/function/parallelizer.hpp"
 #include "casadi/core/function/custom_function.hpp"
 #include "casadi/core/function/nullspace.hpp"
+#include "casadi/core/function/lr_dle_solver.hpp"
+#include "casadi/core/function/lr_dple_solver.hpp"
 #include "casadi/core/functor.hpp"
 
 using namespace casadi;

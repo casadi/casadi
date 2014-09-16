@@ -56,11 +56,18 @@ namespace casadi {
 
   /// Output arguments of a \e dle solver [dleOut]
   enum DLEOutput {
-    /// Lyapunov matrix [p]
+    /// P matrix [p]
     DLE_P,
-    /// Number of arguments.
     DLE_NUM_OUT
   };
+
+  /// Structure specification of a DLE [dleStruct]
+  enum DleStruct {
+    /// The matrix A [a]
+    Dle_STRUCT_A,
+    /// The matrix V [v]
+    Dle_STRUCT_V,
+    Dle_STRUCT_NUM};
 
   /// Forward declaration of internal class
   class DleInternal;
@@ -68,10 +75,10 @@ namespace casadi {
   /**  \brief Base class for Discrete Lyapunov Equation Solvers
 
      @copydoc DLE_doc
-     
+
       \generalsection{DleSolver}
       \pluginssection{DleSolver}
-      
+
        \author Joris Gillis
       \date 2014
 
@@ -86,12 +93,9 @@ namespace casadi {
 
     /** \brief DleSolver solver factory
     * \param name \pluginargument{DleSolver}
-    * \param[in] A Matrix A
-    * \param[in] V Matrix V
+    * \param st \structargument{Dle}
     */
-    DleSolver(const std::string& name,
-               const Sparsity & A,
-               const Sparsity & V);
+    DleSolver(const std::string& name, const DleStructure& st);
 
     /// Print solver statistics
     void printStats(std::ostream &stream=std::cout) const;
@@ -110,6 +114,13 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
+
+    /// Get the resulting sparsity
+    static Sparsity getSparsity(const DleStructure& st);
+
+    /// Infix
+    static std::string infix();
+
   };
 
 } // namespace casadi

@@ -32,7 +32,6 @@
 #include <numeric>
 
 INPUTSCHEME(DLEInput)
-OUTPUTSCHEME(DLEOutput)
 
 using namespace std;
 namespace casadi {
@@ -44,6 +43,7 @@ namespace casadi {
     plugin->name = "dple";
     plugin->doc = DpleToDle::meta_doc.c_str();
     plugin->version = 20;
+    plugin->adaptorLoader = DpleToDle::adaptorLoader;
     return 0;
   }
 
@@ -53,16 +53,12 @@ namespace casadi {
   }
 
   DpleToDle::DpleToDle(
-      const Sparsity & A,
-      const Sparsity &V) : DleInternal(A, V) {
+         const DleStructure& st) : DleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_dple_to_dle"); // name of the function
 
-    addOption("dple_solver",            OT_STRING, GenericType(),
-              "User-defined DPLE solver class.");
-    addOption("dple_solver_options",    OT_DICTIONARY,   GenericType(),
-              "Options to be passed to the DPLE solver.");
+    Adaptor::addOptions();
 
   }
 
@@ -73,17 +69,17 @@ namespace casadi {
   void DpleToDle::init() {
 
     DleInternal::init();
+    Adaptor::init();
 
     // Create an dplesolver instance
-    std::string dplesolver_name = getOption("dple_solver");
-    dplesolver_ = DpleSolver(dplesolver_name, std::vector<Sparsity>(1,A_), std::vector<Sparsity>(1,V_));
+    solver_ = DpleSolver(Adaptor::targetName(),
+      dpleStruct("a", std::vector<Sparsity>(1, A_),
+                 "v", std::vector<Sparsity>(1, V_)));
 
-    if (hasSetOption("dple_solver_options")) {
-      dplesolver_.setOption(getOption("dple_solver_options"));
-    }
+    Adaptor::setTargetOptions();
 
     // Initialize the NLP solver
-    dplesolver_.init();
+    solver_.init();
 
   }
 
@@ -91,16 +87,16 @@ namespace casadi {
 
   void DpleToDle::evaluate() {
     for (int i=0;i<getNumInputs();++i) {
-      std::copy(input(i).begin(), input(i).end(), dplesolver_.input(i).begin());
+      std::copy(input(i).begin(), input(i).end(), solver_.input(i).begin());
     }
-    dplesolver_.evaluate();
+    solver_.evaluate();
     for (int i=0;i<getNumOutputs();++i) {
-      std::copy(dplesolver_.output(i).begin(), dplesolver_.output(i).end(), output(i).begin());
+      std::copy(solver_.output(i).begin(), solver_.output(i).end(), output(i).begin());
     }
   }
 
   Function DpleToDle::getDerivative(int nfwd, int nadj) {
-    return dplesolver_.derivative(nfwd, nadj);
+    return solver_.derivative(nfwd, nadj);
   }
 
 
@@ -111,7 +107,7 @@ namespace casadi {
 
   DpleToDle* DpleToDle::clone() const {
     // Return a deep copy
-    DpleToDle* node = new DpleToDle(A_, V_);
+    DpleToDle* node = new DpleToDle(st_);
     node->setOption(dictionary());
     return node;
   }

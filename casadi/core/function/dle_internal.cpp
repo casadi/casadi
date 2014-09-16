@@ -35,11 +35,10 @@ OUTPUTSCHEME(DLEOutput)
 using namespace std;
 namespace casadi {
 
-  DleInternal::DleInternal(const Sparsity & A,
-                             const  Sparsity &V,
+  DleInternal::DleInternal(const DleStructure& st,
                              int nrhs,
                              bool transp) :
-      A_(A), V_(V), nrhs_(nrhs), transp_(transp) {
+      st_(st), nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -53,6 +52,9 @@ namespace casadi {
 
     if (nrhs_==1) {
       input_.scheme = SCHEME_DLEInput;
+    }
+
+    if (nrhs_==1) {
       output_.scheme = SCHEME_DLEOutput;
     }
 
@@ -68,6 +70,8 @@ namespace casadi {
     error_unstable_ = getOption("error_unstable");
     eps_unstable_ = getOption("eps_unstable");
 
+    A_ = st_[Dle_STRUCT_A];
+    V_ = st_[Dle_STRUCT_V];
 
     casadi_assert_message(V_.isSymmetric(), "V must be symmetric but got "
                           << V_.dimString() << ".");
@@ -91,7 +95,7 @@ namespace casadi {
     }
 
     // Allocate outputs
-    Sparsity P = Sparsity::dense(V_.size1(), V_.size1());
+    Sparsity P = LrDleInternal::getSparsity(lrdleStruct("a", A_, "v", V_));
 
     setNumOutputs(nrhs_);
     for (int i=0;i<nrhs_;++i) {
@@ -100,6 +104,30 @@ namespace casadi {
 
     FunctionInternal::init();
 
+  }
+
+
+  Sparsity DleInternal::getSparsity(const DleStructure& st) {
+
+    // Compute output sparsity by Smith iteration with frequency doubling
+    Sparsity A = st[Dle_STRUCT_A];
+
+    int n = A.size1();
+    Sparsity V = st[Dle_STRUCT_V];
+    Sparsity C = Sparsity::diag(n);
+
+    Sparsity P = mul(mul(C, V), C.T());
+    Sparsity Pprev = Sparsity::sparse(n, n);
+
+    while (Pprev.size()!=P.size()) {
+      Pprev = P;
+      C = horzcat(C, mul(A, C));
+      V = blkdiag(V, V);
+      A = mul(A, A);
+      P = mul(mul(C, V), C.T());
+    }
+
+    return P;
   }
 
   void DleInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {

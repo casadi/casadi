@@ -25,6 +25,7 @@
 
 #include "dple_solver.hpp"
 #include "dple_internal.hpp"
+#include "lr_dple_internal.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 
@@ -43,10 +44,9 @@ namespace casadi {
                  public PluginInterface<DpleInternal> {
   public:
     /** \brief  Constructor
-     *  \param[in] A  List of sparsities of A_i
-     *  \param[in] V  List of sparsities of V_i
+     * \param st \structargument{Dple}
      */
-    DpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V,
+    DpleInternal(const DpleStructure & st,
                  int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
@@ -59,8 +59,7 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual DpleInternal* create(const std::vector< Sparsity > & A,
-                                 const std::vector< Sparsity > &V) const = 0;
+    virtual DpleInternal* create(const DpleStructure & st) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -75,6 +74,9 @@ namespace casadi {
      and \a nadj adjoint derivatives
      */
     virtual Function getDerivative(int nfwd, int nadj)=0;
+
+    /// Structure of Dple
+    DpleStructure st_;
 
     /// List of sparsities of A_i
     std::vector< Sparsity > A_;
@@ -104,14 +106,19 @@ namespace casadi {
     bool transp_;
 
     // Creator function for internal class
-    typedef DpleInternal* (*Creator)(const std::vector< Sparsity >& A,
-                                     const std::vector< Sparsity >& V);
+    typedef DpleInternal* (*Creator)(const DpleStructure & st);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
     /// Infix
     static const std::string infix_;
+
+    /// Get the resulting sparsity
+    static std::vector<Sparsity> getSparsity(
+      const DpleStructure& st);
+
+
   };
 
 } // namespace casadi

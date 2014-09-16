@@ -63,16 +63,24 @@ namespace casadi {
     DPLE_NUM_OUT
   };
 
+  /// Structure specification of a DPLE [dpleStruct]
+  enum DpleVecStruct {
+    /// Sparsities for A_i, blkdiag form [a]
+    Dple_STRUCT_A,
+    /// Sparsities for V_i, blkdiag form [v]
+    Dple_STRUCT_V,
+    Dple_STRUCT_NUM};
+
   /// Forward declaration of internal class
   class DpleInternal;
 
   /**  \brief Base class for Discrete Periodic Lyapunov Equation Solvers
 
      @copydoc DPLE_doc
-     
+
       \generalsection{DpleSolver}
       \pluginssection{DpleSolver}
-      
+
        \author Joris Gillis
       \date 2014
 
@@ -87,12 +95,16 @@ namespace casadi {
 
     /** \brief DpleSolver solver factory
     * \param name \pluginargument{DpleSolver}
-    * \param[in] A List of sparsities of A_i
-    * \param[in] V List of sparsities of V_i
+    * \param st \structargument{Dple}
     */
     DpleSolver(const std::string& name,
-               const std::vector< Sparsity > & A,
-               const std::vector< Sparsity > & V);
+               const DpleStructure & st);
+
+
+    /// Older constructor
+    DpleSolver(const std::string& name,
+               const std::vector<Sparsity> & A,
+               const std::vector<Sparsity> & V);
 
     /// Print solver statistics
     void printStats(std::ostream &stream=std::cout) const;
@@ -111,6 +123,10 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
+
+    /// Infix
+    static std::string infix();
+
   };
 
 } // namespace casadi
