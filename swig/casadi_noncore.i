@@ -20,7 +20,7 @@
  *
  */
 
-%module casadi_noncore
+%module(package="casadi") casadi_noncore
 
 %include "common.i"
 
