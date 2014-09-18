@@ -35,6 +35,7 @@ namespace casadi {
     plugin->name = "socp";
     plugin->doc = QcqpToSocp::meta_doc.c_str();;
     plugin->version = 20;
+    plugin->adaptorLoader = QcqpToSocp::adaptorLoader;
     return 0;
   }
 
@@ -52,11 +53,7 @@ namespace casadi {
   }
 
   QcqpToSocp::QcqpToSocp(const std::vector<Sparsity> &st) : QcqpSolverInternal(st) {
-    addOption("socp_solver",       OT_STRING, GenericType(),
-              "The SocpSolver used to solve the QCQPs.");
-    addOption("socp_solver_options",       OT_DICTIONARY, GenericType(),
-              "Options to be passed to the SOCPSOlver");
-
+    Adaptor::addOptions();
   }
 
   QcqpToSocp::~QcqpToSocp() {
@@ -68,7 +65,7 @@ namespace casadi {
     // Pass inputs of QCQP to SOCP form
     std::copy(input(QCQP_SOLVER_A).begin(),
               input(QCQP_SOLVER_A).end(),
-              socpsolver_.input(SOCP_SOLVER_A).begin());
+              solver_.input(SOCP_SOLVER_A).begin());
 
     // Transform QCQP_SOLVER_P to SOCP_SOLVER_G
     // G = chol(H/2)
@@ -89,13 +86,13 @@ namespace casadi {
     for (int i=0;i<nq_+1;++i) {
       cholesky_[i].prepare();
       DMatrix G = cholesky_[i].getFactorization(true);
-      std::copy(G.begin(), G.end(), socpsolver_.input(SOCP_SOLVER_G).begin()+socp_g_offset);
+      std::copy(G.begin(), G.end(), solver_.input(SOCP_SOLVER_G).begin()+socp_g_offset);
       socp_g_offset += G.size()+1;
     }
 
     // Transform QCQP_SOLVER_Q to SOCP_SOLVER_H (needs SOCP_SOLVER_G)
     //   2h'G = Q   -> 2G'h = Q  ->  solve for h
-    double *x = &socpsolver_.input(SOCP_SOLVER_H).data().front();
+    double *x = &solver_.input(SOCP_SOLVER_H).data().front();
     std::copy(input(QCQP_SOLVER_G).begin(), input(QCQP_SOLVER_G).begin()+n_, x);
     cholesky_[0].solveL(x, 1, true);
     int x_offset = n_+1;
@@ -107,69 +104,70 @@ namespace casadi {
       x_offset += n_+1;
     }
 
-    for (int k=0;k<socpsolver_.input(SOCP_SOLVER_H).size();++k) {
-      socpsolver_.input(SOCP_SOLVER_H).at(k)*= 0.5;
+    for (int k=0;k<solver_.input(SOCP_SOLVER_H).size();++k) {
+      solver_.input(SOCP_SOLVER_H).at(k)*= 0.5;
     }
 
     // Transform QCQP_SOLVER_R to SOCP_SOLVER_F (needs SOCP_SOLVER_H)
     // f = sqrt(h'h-r)
 
     for (int i=0;i<nq_;++i) {
-      socpsolver_.input(SOCP_SOLVER_F)[i+1] = -input(QCQP_SOLVER_R)[i];
+      solver_.input(SOCP_SOLVER_F)[i+1] = -input(QCQP_SOLVER_R)[i];
     }
-    socpsolver_.input(SOCP_SOLVER_F)[0] = 0;
+    solver_.input(SOCP_SOLVER_F)[0] = 0;
 
     for (int i=0;i<nq_+1;++i) {
       for (int k=0;k<n_+1;++k) {
-        double v = socpsolver_.input(SOCP_SOLVER_H).at(i*(n_+1)+k);
-        socpsolver_.input(SOCP_SOLVER_F)[i]+=v*v;
+        double v = solver_.input(SOCP_SOLVER_H).at(i*(n_+1)+k);
+        solver_.input(SOCP_SOLVER_F)[i]+=v*v;
       }
-      socpsolver_.input(SOCP_SOLVER_F).at(i) = sqrt(socpsolver_.input(SOCP_SOLVER_F).at(i));
+      solver_.input(SOCP_SOLVER_F).at(i) = sqrt(solver_.input(SOCP_SOLVER_F).at(i));
     }
 
-    socpsolver_.input(SOCP_SOLVER_E)[n_] = 0.5/socpsolver_.input(SOCP_SOLVER_F)[0];
+    solver_.input(SOCP_SOLVER_E)[n_] = 0.5/solver_.input(SOCP_SOLVER_F)[0];
 
     // Fix the first qc arising from epigraph reformulation: we must make use of e here.
-    socpsolver_.input(SOCP_SOLVER_G)[cholesky_[0].getFactorization().size()] =
-      socpsolver_.input(SOCP_SOLVER_E)[n_];
+    solver_.input(SOCP_SOLVER_G)[cholesky_[0].getFactorization().size()] =
+      solver_.input(SOCP_SOLVER_E)[n_];
 
     /// Objective of the epigraph form
-    socpsolver_.input(SOCP_SOLVER_C)[n_] = 1;
+    solver_.input(SOCP_SOLVER_C)[n_] = 1;
 
     std::copy(input(QCQP_SOLVER_LBX).begin(),
               input(QCQP_SOLVER_LBX).end(),
-              socpsolver_.input(SOCP_SOLVER_LBX).begin());
+              solver_.input(SOCP_SOLVER_LBX).begin());
     std::copy(input(QCQP_SOLVER_UBX).begin(),
               input(QCQP_SOLVER_UBX).end(),
-              socpsolver_.input(SOCP_SOLVER_UBX).begin());
+              solver_.input(SOCP_SOLVER_UBX).begin());
 
     std::copy(input(QCQP_SOLVER_LBA).begin(),
               input(QCQP_SOLVER_LBA).end(),
-              socpsolver_.input(SOCP_SOLVER_LBA).begin());
+              solver_.input(SOCP_SOLVER_LBA).begin());
     std::copy(input(QCQP_SOLVER_UBA).begin(),
               input(QCQP_SOLVER_UBA).end(),
-              socpsolver_.input(SOCP_SOLVER_UBA).begin());
+              solver_.input(SOCP_SOLVER_UBA).begin());
 
     // Delegate computation to SOCP Solver
-    socpsolver_.evaluate();
+    solver_.evaluate();
 
     // Pass the stats
-    stats_["socp_solver_stats"] = socpsolver_.getStats();
+    stats_["socp_solver_stats"] = solver_.getStats();
 
     // Read the outputs from SOCP Solver
-    output(SOCP_SOLVER_COST).set(socpsolver_.output(QCQP_SOLVER_COST));
-    output(SOCP_SOLVER_LAM_A).set(socpsolver_.output(QCQP_SOLVER_LAM_A));
-    std::copy(socpsolver_.output(QCQP_SOLVER_X).begin(),
-              socpsolver_.output(QCQP_SOLVER_X).begin()+n_,
+    output(SOCP_SOLVER_COST).set(solver_.output(QCQP_SOLVER_COST));
+    output(SOCP_SOLVER_LAM_A).set(solver_.output(QCQP_SOLVER_LAM_A));
+    std::copy(solver_.output(QCQP_SOLVER_X).begin(),
+              solver_.output(QCQP_SOLVER_X).begin()+n_,
               output(SOCP_SOLVER_X).begin());
-    std::copy(socpsolver_.output(QCQP_SOLVER_LAM_X).begin(),
-              socpsolver_.output(QCQP_SOLVER_LAM_X).begin()+n_,
+    std::copy(solver_.output(QCQP_SOLVER_LAM_X).begin(),
+              solver_.output(QCQP_SOLVER_LAM_X).begin()+n_,
               output(SOCP_SOLVER_LAM_X).begin());
   }
 
   void QcqpToSocp::init() {
 
     QcqpSolverInternal::init();
+    Adaptor::init();
 
     // Collection of sparsities that will make up SOCP_SOLVER_G
     std::vector<Sparsity> socp_g;
@@ -191,23 +189,21 @@ namespace casadi {
     }
 
     // Create an socpsolver instance
-    std::string socpsolver_name = getOption("socp_solver");
-    socpsolver_ = SocpSolver(socpsolver_name,
+    solver_ = SocpSolver(Adaptor::targetName(),
                              socpStruct("g", horzcat(socp_g),
                                         "a", horzcat(input(QCQP_SOLVER_A).sparsity(), Sparsity::sparse(nc_, 1))));
 
-    //socpsolver_.setQCQPOptions();
-    if (hasSetOption("socp_solver_options")) {
-      socpsolver_.setOption(getOption("socp_solver_options"));
-    }
+    //solver_.setQCQPOptions();
+    Adaptor::setTargetOptions();
+
     std::vector<int> ni(nq_+1);
     for (int i=0;i<nq_+1;++i) {
       ni[i] = n_+1;
     }
-    socpsolver_.setOption("ni", ni);
+    solver_.setOption("ni", ni);
 
     // Initialize the SOCP solver
-    socpsolver_.init();
+    solver_.init();
 
   }
 

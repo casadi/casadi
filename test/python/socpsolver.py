@@ -29,7 +29,13 @@ from helpers import *
 socpsolvers = []
 try:
   SdpSolver.loadPlugin("dsdp")
-  socpsolvers.append((SDPSocpSolver,{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
+  socpsolvers.append(("sdp",{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
+except:
+  pass
+
+try:
+  SocpSolver.loadPlugin("sdp.dsdp")
+  socpsolvers.append(("sdp.dsdp",{ "target_options": {"verbose":True}},False))
 except:
   pass
   
@@ -58,7 +64,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -97,7 +103,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -137,7 +143,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -181,7 +187,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2,2])
       solver.init()
@@ -221,7 +227,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2,3])
       solver.init()

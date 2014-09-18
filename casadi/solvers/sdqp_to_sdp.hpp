@@ -56,7 +56,8 @@ namespace casadi {
    \author Joris Gillis
    \date 2013
   */
-  class CASADI_SDQPSOLVER_SDP_EXPORT SdqpToSdp : public SdqpSolverInternal {
+  class CASADI_SDQPSOLVER_SDP_EXPORT SdqpToSdp : public SdqpSolverInternal,
+    public Adaptor<SdqpToSdp, SdpSolver> {
   public:
 
     /** \brief Constructor */

@@ -46,7 +46,8 @@ namespace casadi {
    \author Joris Gillis
    \date 2011
   */
-class CASADI_QPSOLVER_NLP_EXPORT QpToNlp : public QpSolverInternal {
+class CASADI_QPSOLVER_NLP_EXPORT QpToNlp : public QpSolverInternal,
+  public Adaptor<QpToNlp, NlpSolver> {
 public:
   /** \brief  Constructor */
   explicit QpToNlp();
@@ -71,9 +72,6 @@ public:
 
   /// A documentation string
   static const std::string meta_doc;
-
-  protected:
-    NlpSolver nlpsolver_;
 
 };
 

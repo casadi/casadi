@@ -39,6 +39,17 @@ try:
 except:
   pass
 
+try:
+  LpSolver.loadPlugin("qp.nlp.ipopt")
+  lpsolvers.append(("qp.nlp.ipopt",{},False))
+except:
+  pass
+
+try:
+  LpSolver.loadPlugin("qp.ooqp")
+  lpsolvers.append(("qp.ooqp",{},False))
+except:
+  pass
 
 # try:  
 #   QpSolver.loadPlugin("dsdp")
@@ -47,6 +58,8 @@ except:
 #   lpsolvers.append((SDPLpSolver,{},False))
 # except:
 #  pass
+
+print lpsolvers
 
 class LpSolverTests(casadiTestCase):
 

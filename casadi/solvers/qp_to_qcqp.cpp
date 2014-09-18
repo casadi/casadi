@@ -35,6 +35,7 @@ namespace casadi {
     plugin->name = "qcqp";
     plugin->doc = QpToQcqp::meta_doc.c_str();
     plugin->version = 20;
+    plugin->adaptorLoader = QpToQcqp::adaptorLoader;
     return 0;
   }
 
@@ -53,10 +54,7 @@ namespace casadi {
 
   QpToQcqp::QpToQcqp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
 
-    addOption("qcqp_solver",       OT_STRING, GenericType(),
-              "The QcqpSolver used to solve the QPs.");
-    addOption("qcqp_solver_options",       OT_DICTIONARY, GenericType(),
-              "Options to be passed to the QCQPSOlver");
+    Adaptor::addOptions();
 
   }
 
@@ -66,46 +64,44 @@ namespace casadi {
   void QpToQcqp::evaluate() {
 
     // Pass inputs of QP to QCQP form
-    qcqpsolver_.input(QCQP_SOLVER_A).set(input(QP_SOLVER_A));
-    qcqpsolver_.input(QCQP_SOLVER_G).set(input(QP_SOLVER_G));
-    qcqpsolver_.input(QCQP_SOLVER_H).set(input(QP_SOLVER_H));
+    solver_.input(QCQP_SOLVER_A).set(input(QP_SOLVER_A));
+    solver_.input(QCQP_SOLVER_G).set(input(QP_SOLVER_G));
+    solver_.input(QCQP_SOLVER_H).set(input(QP_SOLVER_H));
 
-    qcqpsolver_.input(QCQP_SOLVER_LBX).set(input(QP_SOLVER_LBX));
-    qcqpsolver_.input(QCQP_SOLVER_UBX).set(input(QP_SOLVER_UBX));
+    solver_.input(QCQP_SOLVER_LBX).set(input(QP_SOLVER_LBX));
+    solver_.input(QCQP_SOLVER_UBX).set(input(QP_SOLVER_UBX));
 
-    qcqpsolver_.input(QCQP_SOLVER_LBA).set(input(QP_SOLVER_LBA));
-    qcqpsolver_.input(QCQP_SOLVER_UBA).set(input(QP_SOLVER_UBA));
+    solver_.input(QCQP_SOLVER_LBA).set(input(QP_SOLVER_LBA));
+    solver_.input(QCQP_SOLVER_UBA).set(input(QP_SOLVER_UBA));
 
     // Delegate computation to QCQP Solver
-    qcqpsolver_.evaluate();
+    solver_.evaluate();
 
     // Pass the stats
-    stats_["qcqp_solver_stats"] = qcqpsolver_.getStats();
+    stats_["qcqp_solver_stats"] = solver_.getStats();
 
     // Read the outputs from Ipopt
-    output(QCQP_SOLVER_X).set(qcqpsolver_.output(QP_SOLVER_X));
-    output(QCQP_SOLVER_COST).set(qcqpsolver_.output(QP_SOLVER_COST));
-    output(QCQP_SOLVER_LAM_A).set(qcqpsolver_.output(QP_SOLVER_LAM_A));
-    output(QCQP_SOLVER_LAM_X).set(qcqpsolver_.output(QP_SOLVER_LAM_X));
+    output(QCQP_SOLVER_X).set(solver_.output(QP_SOLVER_X));
+    output(QCQP_SOLVER_COST).set(solver_.output(QP_SOLVER_COST));
+    output(QCQP_SOLVER_LAM_A).set(solver_.output(QP_SOLVER_LAM_A));
+    output(QCQP_SOLVER_LAM_X).set(solver_.output(QP_SOLVER_LAM_X));
   }
 
   void QpToQcqp::init() {
 
     QpSolverInternal::init();
+    Adaptor::init();
 
     // Create an qcqpsolver instance
-    std::string qcqpsolver_name = getOption("qcqp_solver");
-    qcqpsolver_ = QcqpSolver(qcqpsolver_name,
+    solver_ = QcqpSolver(Adaptor::targetName(),
                              qcqpStruct("h", input(QP_SOLVER_H).sparsity(),
                                         "p", Sparsity::sparse(n_, 0),
                                         "a", input(QP_SOLVER_A).sparsity()));
-    qcqpsolver_.setQPOptions();
-    if (hasSetOption("qcqp_solver_options")) {
-      qcqpsolver_.setOption(getOption("qcqp_solver_options"));
-    }
+    solver_.setQPOptions();
+    Adaptor::setTargetOptions();
 
     // Initialize the NLP solver
-    qcqpsolver_.init();
+    solver_.init();
 
   }
 

@@ -37,6 +37,7 @@ namespace casadi {
     plugin->name = "sdp";
     plugin->doc = SocpToSdp::meta_doc.c_str();
     plugin->version = 20;
+    plugin->adaptorLoader = SocpToSdp::adaptorLoader;
     return 0;
   }
 
@@ -54,10 +55,8 @@ namespace casadi {
   }
 
   SocpToSdp::SocpToSdp(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
-    addOption("sdp_solver",       OT_STRING, GenericType(),
-              "The SdpSolver used to solve the SOCPs.");
-    addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(),
-              "Options to be passed to the SDPSOlver");
+
+    Adaptor::addOptions();
 
   }
 
@@ -74,24 +73,24 @@ namespace casadi {
 
     mapping_.evaluate();
 
-    sdpsolver_.setInput(mapping_.output(0), SDP_SOLVER_F);
-    sdpsolver_.setInput(mapping_.output(1), SDP_SOLVER_G);
-    sdpsolver_.setInput(input(SOCP_SOLVER_A), SDP_SOLVER_A);
-    sdpsolver_.setInput(input(SOCP_SOLVER_C), SDP_SOLVER_C);
-    sdpsolver_.setInput(input(SOCP_SOLVER_LBX), SDP_SOLVER_LBX);
-    sdpsolver_.setInput(input(SOCP_SOLVER_UBX), SDP_SOLVER_UBX);
-    sdpsolver_.setInput(input(SOCP_SOLVER_LBA), SDP_SOLVER_LBA);
-    sdpsolver_.setInput(input(SOCP_SOLVER_UBA), SDP_SOLVER_UBA);
+    solver_.setInput(mapping_.output(0), SDP_SOLVER_F);
+    solver_.setInput(mapping_.output(1), SDP_SOLVER_G);
+    solver_.setInput(input(SOCP_SOLVER_A), SDP_SOLVER_A);
+    solver_.setInput(input(SOCP_SOLVER_C), SDP_SOLVER_C);
+    solver_.setInput(input(SOCP_SOLVER_LBX), SDP_SOLVER_LBX);
+    solver_.setInput(input(SOCP_SOLVER_UBX), SDP_SOLVER_UBX);
+    solver_.setInput(input(SOCP_SOLVER_LBA), SDP_SOLVER_LBA);
+    solver_.setInput(input(SOCP_SOLVER_UBA), SDP_SOLVER_UBA);
 
-    sdpsolver_.evaluate();
+    solver_.evaluate();
 
     // Pass the stats
-    stats_["sdp_solver_stats"] = sdpsolver_.getStats();
+    stats_["sdp_solver_stats"] = solver_.getStats();
 
-    setOutput(sdpsolver_.output(SDP_SOLVER_X), SOCP_SOLVER_X);
-    setOutput(sdpsolver_.output(SDP_SOLVER_COST), SOCP_SOLVER_COST);
-    setOutput(sdpsolver_.output(SDP_SOLVER_LAM_X), SOCP_SOLVER_LAM_X);
-    setOutput(sdpsolver_.output(SDP_SOLVER_LAM_A), SOCP_SOLVER_LAM_A);
+    setOutput(solver_.output(SDP_SOLVER_X), SOCP_SOLVER_X);
+    setOutput(solver_.output(SDP_SOLVER_COST), SOCP_SOLVER_COST);
+    setOutput(solver_.output(SDP_SOLVER_LAM_X), SOCP_SOLVER_LAM_X);
+    setOutput(solver_.output(SDP_SOLVER_LAM_A), SOCP_SOLVER_LAM_A);
   }
 
   void SocpToSdp::init() {
@@ -172,19 +171,17 @@ namespace casadi {
     log("SocpToSdp::init", "Created mapping function");
 
     // Create an sdpsolver instance
-    std::string sdpsolver_name = getOption("sdp_solver");
-    sdpsolver_ = SdpSolver(sdpsolver_name,
+    solver_ = SdpSolver(Adaptor::targetName(),
                            sdpStruct("a", input(SOCP_SOLVER_A).sparsity(),
                                      "f", mapping_.output(0).sparsity(),
                                      "g", mapping_.output(1).sparsity()));
 
-    sdpsolver_.setSOCPOptions();
-    if (hasSetOption("sdp_solver_options")) {
-      sdpsolver_.setOption(getOption("sdp_solver_options"));
-    }
+    solver_.setSOCPOptions();
+    
+    Adaptor::setTargetOptions();
 
     // Initialize the SDP solver
-    sdpsolver_.init();
+    solver_.init();
 
     log("SocpToSdp::init", "Initialized SDP solver");
   }

@@ -44,7 +44,8 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_QPSOLVER_QCQP_EXPORT QpToQcqp : public QpSolverInternal {
+  class CASADI_QPSOLVER_QCQP_EXPORT QpToQcqp : public QpSolverInternal,
+    public Adaptor<QpToQcqp, QcqpSolver> {
   public:
 
     /** \brief  Create a new Solver */
@@ -67,9 +68,6 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-
-  protected:
-    QcqpSolver qcqpsolver_;
 
   };
 

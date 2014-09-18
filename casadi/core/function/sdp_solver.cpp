@@ -45,7 +45,7 @@ namespace casadi {
   }
 
   SdpSolver::SdpSolver(const std::string& name, const SDPStructure& st) {
-    assignNode(SdpSolverInternal::getPlugin(name).creator(st));
+    assignNode(SdpSolverInternal::getPlugin(name).creator(st)->adaptor(name));
   }
 
   void SdpSolver::loadPlugin(const std::string& name) {
@@ -54,6 +54,10 @@ namespace casadi {
 
   std::string SdpSolver::doc(const std::string& name) {
     return SdpSolverInternal::getPlugin(name).doc;
+  }
+
+  std::string SdpSolver::infix() {
+    return SdpSolverInternal::infix_;
   }
 
 } // namespace casadi

@@ -46,7 +46,8 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_SOCPSOLVER_SDP_EXPORT SocpToSdp : public SocpSolverInternal {
+  class CASADI_SOCPSOLVER_SDP_EXPORT SocpToSdp : public SocpSolverInternal,
+    public Adaptor<SocpToSdp, SdpSolver> {
   public:
 
     /** \brief  Create a new Solver */
@@ -71,7 +72,6 @@ namespace casadi {
     static const std::string meta_doc;
 
   protected:
-    SdpSolver sdpsolver_;
 
     /// Mapping from G, H, E, F to P, G
     Function mapping_;

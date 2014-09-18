@@ -147,6 +147,9 @@ namespace casadi {
 
     /** Generate native code in the interfaced language for debugging */
     void generateNativeCode(std::ostream &file) const;
+
+    /// Infix
+    static std::string infix();
   };
 
 } // namespace casadi

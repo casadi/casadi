@@ -247,7 +247,6 @@ virtual ~OptionsFunctionalityNode();
   /** \brief A distance metric between two words */
   static double wordDistance(const std::string &a, const std::string &b);
 
-protected:
 
 
   void addOption(
@@ -267,6 +266,9 @@ protected:
   **/
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val,
                  const std::string& desc, const std::string &allowed_vals, bool inherit = false);
+
+
+protected:
 
 void assert_exists(const std::string &str) const;
 

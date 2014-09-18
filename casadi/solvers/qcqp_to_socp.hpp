@@ -75,7 +75,8 @@ namespace casadi {
    \author Joris Gillis
    \date 2013
   */
-  class CASADI_QCQPSOLVER_SOCP_EXPORT QcqpToSocp : public QcqpSolverInternal {
+  class CASADI_QCQPSOLVER_SOCP_EXPORT QcqpToSocp : public QcqpSolverInternal,
+    public Adaptor<QcqpToSocp, SocpSolver> {
   public:
 
     /** \brief  Create a new Solver */
@@ -100,7 +101,6 @@ namespace casadi {
     static const std::string meta_doc;
 
   protected:
-    SocpSolver socpsolver_;
     std::vector<LinearSolver> cholesky_;
   };
   /// \endcond

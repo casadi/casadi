@@ -35,6 +35,7 @@ namespace casadi {
     plugin->name = "nlp";
     plugin->doc = QpToImplicit::meta_doc.c_str();
     plugin->version = 20;
+    plugin->adaptorLoader = QpToImplicit::adaptorLoader;
     return 0;
   }
 
@@ -46,10 +47,9 @@ namespace casadi {
   QpToImplicit::QpToImplicit(const Function& f, const Function& jac,
                                            const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {
-    addOption("nlp_solver",               OT_STRING,  GenericType(),
-              "The NlpSolver used to solve the implicit system.");
-    addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
-              "Options to be passed to the NlpSolver");
+
+    Adaptor::addOptions();
+
   }
 
   QpToImplicit::~QpToImplicit() {
@@ -58,28 +58,28 @@ namespace casadi {
   void QpToImplicit::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     ImplicitFunctionInternal::deepCopyMembers(already_copied);
-    nlp_solver_ = deepcopy(nlp_solver_, already_copied);
+    solver_ = deepcopy(solver_, already_copied);
   }
 
   void QpToImplicit::solveNonLinear() {
 
     // Equality nonlinear constraints
-    nlp_solver_.input(NLP_SOLVER_LBG).set(0.);
-    nlp_solver_.input(NLP_SOLVER_UBG).set(0.);
+    solver_.input(NLP_SOLVER_LBG).set(0.);
+    solver_.input(NLP_SOLVER_UBG).set(0.);
 
     // Simple constraints
-    vector<double>& lbx = nlp_solver_.input(NLP_SOLVER_LBX).data();
-    vector<double>& ubx = nlp_solver_.input(NLP_SOLVER_UBX).data();
+    vector<double>& lbx = solver_.input(NLP_SOLVER_LBX).data();
+    vector<double>& ubx = solver_.input(NLP_SOLVER_UBX).data();
     for (int k=0; k<u_c_.size(); ++k) {
       lbx[k] = u_c_[k] <= 0 ? -std::numeric_limits<double>::infinity() : 0;
       ubx[k] = u_c_[k] >= 0 ?  std::numeric_limits<double>::infinity() : 0;
     }
 
     // Pass initial guess
-    nlp_solver_.input(NLP_SOLVER_X0).set(output(iout_));
+    solver_.input(NLP_SOLVER_X0).set(output(iout_));
 
     // Add auxiliary inputs
-    vector<double>::iterator nlp_p = nlp_solver_.input(NLP_SOLVER_P).begin();
+    vector<double>::iterator nlp_p = solver_.input(NLP_SOLVER_P).begin();
     for (int i=0; i<getNumInputs(); ++i) {
       if (i!=iin_) {
         std::copy(input(i).begin(), input(i).end(), nlp_p);
@@ -88,11 +88,11 @@ namespace casadi {
     }
 
     // Solve the NLP
-    nlp_solver_.evaluate();
-    stats_["nlp_solver_stats"] = nlp_solver_.getStats();
+    solver_.evaluate();
+    stats_["solver_stats"] = solver_.getStats();
 
     // Get the implicit variable
-    output(iout_).set(nlp_solver_.output(NLP_SOLVER_X));
+    output(iout_).set(solver_.output(NLP_SOLVER_X));
 
     // Evaluate auxilary outputs, if necessary
     if (getNumOutputs()>0) {
@@ -110,6 +110,7 @@ namespace casadi {
 
     // Call the base class initializer
     ImplicitFunctionInternal::init();
+    Adaptor::init();
 
     // Free variable in the NLP
     MX u = MX::sym("u", input(iin_).sparsity());
@@ -137,14 +138,13 @@ namespace casadi {
     MXFunction nlp(nlpIn("x", u, "p", p), nlpOut("f", nlp_f, "g", nlp_g));
 
     // Create an nlpsolver instance
-    std::string solver_name = getOption("nlp_solver");
-    nlp_solver_ = NlpSolver(solver_name, nlp);
-    if (hasSetOption("nlp_solver_options")) {
-      nlp_solver_.setOption(getOption("nlp_solver_options"));
-    }
+
+    solver_ = NlpSolver(Adaptor::targetName(), nlp);
+
+    Adaptor::setTargetOptions();
 
     // Initialize the NLP solver
-    nlp_solver_.init();
+    solver_.init();
   }
 
 } // namespace casadi

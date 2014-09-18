@@ -46,7 +46,8 @@ namespace casadi {
    \author Joris Gillis
    \date 2013
   */
-class CASADI_LPSOLVER_QP_EXPORT LpToQp : public LpSolverInternal {
+class CASADI_LPSOLVER_QP_EXPORT LpToQp : public LpSolverInternal,
+  public Adaptor<LpToQp, QpSolver> {
 public:
 
   /** \brief  Create a new Solver */
@@ -69,9 +70,6 @@ public:
 
   /// A documentation string
   static const std::string meta_doc;
-    
-  protected:
-    QpSolver qpsolver_;
 
 };
 

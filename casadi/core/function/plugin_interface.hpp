@@ -24,6 +24,8 @@
 #define CASADI_PLUGIN_INTERFACE_HPP
 
 #include "../function/function_internal.hpp"
+#include "../function/adaptor.hpp"
+#include "../function/wrapper.hpp"
 
 /// \cond INTERNAL
 
@@ -50,6 +52,8 @@
 
 namespace casadi {
 
+  typedef void (*AdaptorLoader)(const std::string& name);
+
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
       \date 2013
@@ -61,6 +65,7 @@ namespace casadi {
     /// Fields
     struct Plugin{
       typename Derived::Creator creator;
+      AdaptorLoader adaptorLoader;
       const char* name;
       const char* doc;
       int version;
@@ -73,15 +78,32 @@ namespace casadi {
     static void loadPlugin(const std::string& name);
 
     /// Register an integrator in the factory
-    static void registerPlugin(RegFcn regfcn);
+    static void registerPlugin(RegFcn regfcn, const std::string& suffix = std::string());
 
     /// Load and get the creator function
     static Plugin& getPlugin(const std::string& name);
+
+    /// Modifies the Derived object by setting Adaptor options when needed
+    Derived* adaptor(const std::string &name_);
+
   };
 
   template<class Derived>
-  void PluginInterface<Derived>::loadPlugin(const std::string& name) {
-    // Issue warning and quick return if already loaded
+  void PluginInterface<Derived>::loadPlugin(const std::string& name_) {
+
+    std::string::size_type dotpos = name_.find(".");
+
+    std::string name;
+    std::string suffix;
+
+    if (dotpos == std::string::npos) {
+      name = name_;
+    } else {
+      name = name_.substr(0, dotpos);
+      suffix = name_.substr(dotpos+1);
+    }
+
+    // Issue warning aRegFcn reg;nd quick return if already loaded
     if (Derived::solvers_.find(name) != Derived::solvers_.end()) {
       casadi_warning("PluginInterface: Solver " + name + " is already in use. Ignored.");
       return;
@@ -154,14 +176,15 @@ namespace casadi {
 #endif // _WIN32
 
     // Register the plugin
-    registerPlugin(reg);
+    registerPlugin(reg, suffix);
 #endif // WITH_DL
   }
 
   template<class Derived>
-  void PluginInterface<Derived>::registerPlugin(RegFcn regfcn) {
+  void PluginInterface<Derived>::registerPlugin(RegFcn regfcn, const std::string& suffix) {
     // Create a temporary struct
     Plugin plugin;
+    plugin.adaptorLoader = 0;
 
     // Set the fields
     int flag = regfcn(&plugin);
@@ -172,8 +195,18 @@ namespace casadi {
     casadi_assert_message(it==Derived::solvers_.end(),
                           "Solver " << plugin.name << " is already in use");
 
-    // Add to list of solvers
-    Derived::solvers_[plugin.name] = plugin;
+    if (suffix.size()>0) {
+      casadi_assert(plugin.adaptorLoader);
+      plugin.adaptorLoader(suffix);
+
+      // Add to list of solvers
+      Derived::solvers_[std::string(plugin.name) + "." + suffix] = plugin;
+    } else {
+
+      // Add to list of solvers
+      Derived::solvers_[plugin.name] = plugin;
+    }
+
   }
 
   template<class Derived>
@@ -190,6 +223,41 @@ namespace casadi {
     }
     casadi_assert(it!=Derived::solvers_.end());
     return it->second;
+  }
+
+  template<class Derived>
+  Derived* PluginInterface<Derived>::adaptor(const std::string &name_) {
+
+    Derived* s = static_cast< Derived *>(this);
+    AdaptorBase* dd = dynamic_cast< AdaptorBase *>(s);
+
+    // Quick return if Derived instance is not an Adaptor
+    if (!dd) {
+      return s;
+    }
+
+    // Split name_ into: name + '.' + suffix
+    std::string::size_type dotpos = name_.find(".");
+
+    std::string name;
+    std::string suffix;
+
+    if (dotpos == std::string::npos) {
+      name = name_;
+    } else {
+      name = name_.substr(0, dotpos);
+      suffix = name_.substr(dotpos+1);
+    }
+
+    if (suffix.size()>0) {
+      // If there is a suffix, use it to set the target Solver
+      s->setOption(dd->prefix()+"_solver", suffix);
+      s->setOption("target", false);
+    } else {
+      s->setOption("target", true);
+    }
+
+    return s;
   }
 
 } // namespace casadi

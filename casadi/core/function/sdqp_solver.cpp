@@ -45,7 +45,7 @@ namespace casadi {
   }
 
   SdqpSolver::SdqpSolver(const std::string& name, const SDQPStructure& st) {
-    assignNode(SdqpSolverInternal::getPlugin(name).creator(st));
+    assignNode(SdqpSolverInternal::getPlugin(name).creator(st)->adaptor(name));
   }
 
   void SdqpSolver::loadPlugin(const std::string& name) {

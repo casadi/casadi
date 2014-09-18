@@ -118,6 +118,7 @@ set(CASADI_SRCS
   function/dple_solver.hpp         function/dple_solver.cpp         function/dple_internal.hpp     function/dple_internal.cpp
   function/dle_solver.hpp          function/dle_solver.cpp          function/dle_internal.hpp      function/dle_internal.cpp
   function/cle_solver.hpp          function/cle_solver.cpp          function/cle_internal.hpp      function/cle_internal.cpp
+  function/wrapper.hpp             function/adaptor.hpp
   
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp

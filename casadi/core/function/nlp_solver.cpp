@@ -34,7 +34,7 @@ namespace casadi {
   }
 
   NlpSolver::NlpSolver(const std::string& name, const Function& nlp) {
-    assignNode(NlpSolverInternal::getPlugin(name).creator(nlp));
+    assignNode(NlpSolverInternal::getPlugin(name).creator(nlp)->adaptor(name));
   }
 
   NlpSolverInternal* NlpSolver::operator->() {
@@ -205,6 +205,10 @@ namespace casadi {
 
   void NlpSolver::setOptionsFromFile(const std::string & file) {
     (*this)->setOptionsFromFile(file);
+  }
+
+  std::string NlpSolver::infix() {
+    return NlpSolverInternal::infix_;
   }
 
 } // namespace casadi

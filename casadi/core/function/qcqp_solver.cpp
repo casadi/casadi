@@ -45,7 +45,7 @@ namespace casadi {
   }
 
   QcqpSolver::QcqpSolver(const std::string& name, const QCQPStructure& st) {
-    assignNode(QcqpSolverInternal::getPlugin(name).creator(st));
+    assignNode(QcqpSolverInternal::getPlugin(name).creator(st)->adaptor(name));
   }
 
   void QcqpSolver::loadPlugin(const std::string& name) {
@@ -54,6 +54,10 @@ namespace casadi {
 
   std::string QcqpSolver::doc(const std::string& name) {
     return QcqpSolverInternal::getPlugin(name).doc;
+  }
+
+  std::string QcqpSolver::infix() {
+    return QcqpSolverInternal::infix_;
   }
 
 } // namespace casadi

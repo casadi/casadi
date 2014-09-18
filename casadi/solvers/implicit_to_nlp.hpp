@@ -45,7 +45,8 @@ namespace casadi {
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NLP_EXPORT QpToImplicit : public ImplicitFunctionInternal {
+  class CASADI_IMPLICITFUNCTION_NLP_EXPORT QpToImplicit : public ImplicitFunctionInternal,
+    public Adaptor<QpToImplicit, NlpSolver> {
   public:
     /** \brief  Constructor */
     explicit QpToImplicit(const Function& f, const Function& jac,
@@ -75,9 +76,6 @@ namespace casadi {
 
     /** \brief  Solve the nonlinear system of equations */
     virtual void solveNonLinear();
-
-    // NLP solver instance
-    NlpSolver nlp_solver_;
 
     /// A documentation string
     static const std::string meta_doc;
