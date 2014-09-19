@@ -1,6 +1,46 @@
 
 // File: index.xml
 
+// File: classcasadi_1_1Adaptor.xml
+%feature("docstring") casadi::Adaptor::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::Adaptor::addOptions "[INTERNAL]  Add options
+that are common to all Adaptor classes.
+
+";
+
+%feature("docstring") casadi::Adaptor::setTargetOptions "[INTERNAL]  Copy
+the necessary options to the target solver.
+
+";
+
+%feature("docstring") casadi::Adaptor "[INTERNAL]  A helper class for a
+Solver that delegates work to another solver.
+
+Joris Gillis
+
+C++ includes: adaptor.hpp ";
+
+%feature("docstring") casadi::Adaptor::targetName "[INTERNAL]  Get the name
+of the target solver.
+
+";
+
+%feature("docstring") casadi::Adaptor::prefix "[INTERNAL]  Get the prefix
+of the target solver.
+
+";
+
+
+// File: classcasadi_1_1AdaptorBase.xml
+%feature("docstring") casadi::AdaptorBase "[INTERNAL] C++ includes:
+adaptor.hpp ";
+
+%feature("docstring") casadi::AdaptorBase::prefix "[INTERNAL] ";
+
+
 // File: classcasadi_1_1Assertion.xml
 %feature("docstring") casadi::Assertion::getNorm2 "[INTERNAL]  Spectral
 norm.
@@ -2994,10 +3034,6 @@ Solving the Discrete Lyapunov Equations with a regular LinearSolver
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: cle_solver.hpp ";
 
@@ -3350,6 +3386,11 @@ User-provided derivative generator function ";
 ";
 
 %feature("docstring") casadi::CollocationIntegrator::setOutputScheme "[INTERNAL]  Set output scheme.
+
+";
+
+%feature("docstring") casadi::CollocationIntegrator::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -3781,6 +3822,25 @@ Create a new integrator.
 
 ";
 
+%feature("docstring") casadi::CollocationIntegrator::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
+
 %feature("docstring") casadi::CollocationIntegrator "[INTERNAL]
 'collocation' plugin for Integrator
 
@@ -4038,11 +4098,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: collocation_integrator.hpp ";
 
@@ -6984,11 +7039,6 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: control_simulator.hpp ";
 
 %feature("docstring") casadi::ControlSimulator::isInit "
@@ -8083,6 +8133,25 @@ the object has been initialized.
 
 ";
 
+%feature("docstring") casadi::CplexInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
+
 %feature("docstring") casadi::CplexInterface::getOptionDefault "[INTERNAL]
 Get the default of a certain option.
 
@@ -8242,6 +8311,11 @@ Parameters:
 val:  can be double&, std::vector<double>&, Matrix<double>&, double *
 
 iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") casadi::CplexInterface::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -8546,11 +8620,6 @@ Attila Kozma, Joel Andersson
 |              |              |              | simplex      |              |
 |              |              |              | methods).    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: cplex_interface.hpp ";
 
@@ -9024,6 +9093,11 @@ adheres to SCHEME_NLPINput
 
 ";
 
+%feature("docstring") casadi::CsparseInterface::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::CsparseInterface::getNumOutputNonzeros "[INTERNAL]  Get total number of nonzeros in all of the matrix-valued
 outputs.
 
@@ -9196,6 +9270,25 @@ an option value
 
 %feature("docstring") casadi::CsparseInterface::checkInputs "[INTERNAL]
 Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring") casadi::CsparseInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -9535,11 +9628,6 @@ LinearSolver with CSparse Interface
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: csparse_interface.hpp ";
 
@@ -10464,11 +10552,6 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: custom_function.hpp ";
 
 %feature("docstring") casadi::CustomFunction::setInput "
@@ -11027,6 +11110,11 @@ tangent function.
 ";
 
 %feature("docstring") casadi::CvodesInterface::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring") casadi::CvodesInterface::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -12100,11 +12188,6 @@ experience a dramatic speed-up by using a sparse linear solver:
 | nstepsB     | casadi::CvodesInterface |
 +-------------+-------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: cvodes_interface.hpp ";
 
 %feature("docstring") casadi::CvodesInterface::qf "[INTERNAL] ";
@@ -12219,6 +12302,25 @@ reference to the object.
 
 %feature("docstring") casadi::CvodesInterface::verbose "[INTERNAL]  Verbose
 mode?
+
+";
+
+%feature("docstring") casadi::CvodesInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -16404,10 +16506,6 @@ Solving the Discrete Lyapunov Equations with a regular LinearSolver
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: dle_solver.hpp ";
 
@@ -17529,10 +17627,6 @@ Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: dple_solver.hpp ";
 
@@ -17887,6 +17981,25 @@ solver.
 
 ";
 
+%feature("docstring") casadi::DpleToDle::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
+
 %feature("docstring") casadi::DpleToDle::evaluate "[INTERNAL]  evaluate
 
 ";
@@ -18040,6 +18153,11 @@ that the object has been initialized.
 
 %feature("docstring") casadi::DpleToDle::spInit "[INTERNAL]  Reset the
 sparsity propagation.
+
+";
+
+%feature("docstring") casadi::DpleToDle::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -18489,11 +18607,6 @@ Solving the Discrete Lyapunov Equations with Periodic Solver
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: dple_to_dle.hpp ";
 
 %feature("docstring") casadi::DpleToDle::printOptions "[INTERNAL]  Print
@@ -18796,6 +18909,25 @@ Copied properties:
 input/outputscheme ad_mode
 
 The function is not initialized
+
+";
+
+%feature("docstring") casadi::DsdpInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -19548,11 +19680,6 @@ manually switch to another SDP Solver
 | termination_reason | casadi::DsdpInterface |
 +--------------------+-----------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: dsdp_interface.hpp ";
 
 %feature("docstring") casadi::DsdpInterface::generateFunction "[INTERNAL]
@@ -19944,6 +20071,11 @@ Access input argument
 
 %feature("docstring") casadi::DsdpInterface::getGradient "[INTERNAL]
 Return gradient function.
+
+";
+
+%feature("docstring") casadi::DsdpInterface::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -21224,11 +21356,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: external_function.hpp ";
 
@@ -22635,11 +22762,6 @@ Clone.
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: fixed_step_integrator.hpp ";
 
 %feature("docstring") casadi::FixedStepIntegrator::getTangent "[INTERNAL]
@@ -22673,6 +22795,25 @@ Assert that the object has been initialized.
 
 %feature("docstring") casadi::FixedStepIntegrator::print "[INTERNAL]
 Print.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -22778,6 +22919,11 @@ outputs.
 %feature("docstring") casadi::FixedStepIntegrator::evalSX "[INTERNAL]
 Evaluate symbolically, SXElement type, possibly nonmatching sparsity
 patterns.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -23765,11 +23911,6 @@ Joel Andersson
 +---------+--------------------------+
 | outputs | casadi::FunctionInternal |
 +---------+--------------------------+
-
-Diagrams
---------
-
-
 
 C++ includes: function.hpp ";
 
@@ -27687,10 +27828,6 @@ simple
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: homotopy_nlp_solver.hpp ";
 
@@ -29693,11 +29830,6 @@ Joel Andersson
 | nstepsB     | casadi::IdasInterface |
 +-------------+-----------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: idas_interface.hpp ";
 
 %feature("docstring") casadi::IdasInterface::getInputScheme "[INTERNAL]
@@ -30061,6 +30193,25 @@ Get output scheme.
 
 %feature("docstring") casadi::IdasInterface::inputNoCheck "[INTERNAL]
 Input/output access without checking (faster, but unsafe)
+
+";
+
+%feature("docstring") casadi::IdasInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -30447,6 +30598,11 @@ option value
 ";
 
 %feature("docstring") casadi::IdasInterface::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::IdasInterface::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -31006,11 +31162,6 @@ problem)
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: implicit_fixed_step_integrator.hpp ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::getFullJacobian "[INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -31123,6 +31274,11 @@ the index into allowed options of a certain option.
 
 %feature("docstring")
 casadi::ImplicitFixedStepIntegrator::calculateInitialConditionsB "[INTERNAL]  Get initial guess for the algebraic variable (backward problem)
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::adaptor "[INTERNAL]  Modifies the Derived object by setting Adaptor options when
+needed.
 
 ";
 
@@ -31427,6 +31583,25 @@ Generate code for the declarations of the C function.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::x0 "[INTERNAL]
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::fullJacobian "[INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -32461,10 +32636,6 @@ Implements simple newton iterations to solve an implicit function.
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: implicit_function.hpp ";
 
@@ -35101,10 +35272,6 @@ The method is still under development
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: integrator.hpp ";
 
@@ -37924,11 +38091,6 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 | var_string_md      | casadi::IpoptInterface |
 +--------------------+------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: ipopt_interface.hpp ";
 
 %feature("docstring") casadi::IpoptInterface::getJacSparsityHierarchicalSymm
@@ -38107,6 +38269,11 @@ all constraints.
 
 ";
 
+%feature("docstring") casadi::IpoptInterface::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring")
 casadi::IpoptInterface::get_list_of_nonlinear_variables "[INTERNAL] ";
 
@@ -38240,6 +38407,25 @@ oname:  output name. Only allowed when an output scheme is set.
 
 %feature("docstring") casadi::IpoptInterface::printOptions "[INTERNAL]
 Print options to a stream.
+
+";
+
+%feature("docstring") casadi::IpoptInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -38829,6 +39015,11 @@ reference to the object.
 
 ";
 
+%feature("docstring") casadi::KinsolInterface::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::KinsolInterface::spInit "[INTERNAL]  Reset
 the sparsity propagation.
 
@@ -38924,6 +39115,25 @@ stage.
 
 %feature("docstring") casadi::KinsolInterface::setNumInputs "[INTERNAL]
 Set the number of function inputs.
+
+";
+
+%feature("docstring") casadi::KinsolInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -39368,11 +39578,6 @@ KINSOL interface from the Sundials suite
 +-----------+--------------------------+
 | outputs   | casadi::FunctionInternal |
 +-----------+--------------------------+
-
-Diagrams
---------
-
-
 
 C++ includes: kinsol_interface.hpp ";
 
@@ -40848,11 +41053,6 @@ KNITRO interface
 | return_status | casadi::KnitroInterface |
 +---------------+-------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: knitro_interface.hpp ";
 
 %feature("docstring") casadi::KnitroInterface::copyOptions "[INTERNAL]
@@ -40901,6 +41101,11 @@ Get the type of a certain option.
 
 ";
 
+%feature("docstring") casadi::KnitroInterface::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::KnitroInterface::dictionary "[INTERNAL]  Get
 the dictionary.
 
@@ -40915,6 +41120,25 @@ Print options to a stream.
 casadi::KnitroInterface::getJacSparsityHierarchicalSymm "[INTERNAL]  A
 flavor of getJacSparsity that does hierarchical block structure recognition
 for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::KnitroInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -41090,6 +41314,25 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::LapackLuDense::getHessian "[INTERNAL]  Return
 Hessian function.
+
+";
+
+%feature("docstring") casadi::LapackLuDense::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -41286,11 +41529,6 @@ A: A = L.U, with L lower and U upper triangular
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: lapack_lu_dense.hpp ";
 
@@ -41985,6 +42223,11 @@ values.
 ";
 
 %feature("docstring") casadi::LapackLuDense::print "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::LapackLuDense::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -42752,11 +42995,6 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: lapack_qr_dense.hpp ";
 
 %feature("docstring") casadi::LapackQrDense::getCount "[INTERNAL]  Get the
@@ -43008,6 +43246,30 @@ Hessian function.
 
 %feature("docstring") casadi::LapackQrDense::getOptionAllowed "[INTERNAL]
 Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::LapackQrDense::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
+
+";
+
+%feature("docstring") casadi::LapackQrDense::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -43829,10 +44091,6 @@ reordering without partial pivoting
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: linear_solver.hpp ";
 
@@ -45112,10 +45370,6 @@ Solve LPs using a QpSolver
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: lp_solver.hpp ";
 
@@ -45621,10 +45875,34 @@ function call node.
 
 ";
 
+%feature("docstring") casadi::LpToQp::targetName "[INTERNAL]  Get the name
+of the target solver.
+
+";
+
 %feature("docstring") casadi::LpToQp::getDerivativeViaJac "[INTERNAL]
 Constructs and returns a function that calculates forward derivatives.
 
 by creating the Jacobian then multiplying
+
+";
+
+%feature("docstring") casadi::LpToQp::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -45888,6 +46166,11 @@ reference count.
 
 ";
 
+%feature("docstring") casadi::LpToQp::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::LpToQp::evaluateD "[INTERNAL]  The following
 functions are called internally from EvaluateMX. For documentation, see the
 MXNode class
@@ -45903,6 +46186,11 @@ necessary generate, the sparsity of a Jacobian block.
 reference to inputs  getInput, setInput
 
 Access input argument
+
+";
+
+%feature("docstring") casadi::LpToQp::prefix "[INTERNAL]  Get the prefix of
+the target solver.
 
 ";
 
@@ -46036,6 +46324,11 @@ Input/output access without checking (faster, but unsafe)
 
 %feature("docstring") casadi::LpToQp::getDerivative "[INTERNAL]  Constructs
 and returns a function that calculates forward derivatives.
+
+";
+
+%feature("docstring") casadi::LpToQp::setTargetOptions "[INTERNAL]  Copy
+the necessary options to the target solver.
 
 ";
 
@@ -46340,11 +46633,6 @@ Joris Gillis
 | qp_solver_stats | casadi::LpToQp |
 +-----------------+----------------+
 
-Diagrams
---------
-
-
-
 C++ includes: lp_to_qp.hpp ";
 
 %feature("docstring") casadi::LpToQp::printOption "[INTERNAL]  Print all
@@ -46488,6 +46776,11 @@ symbolically, SXElement type, matching sparsity patterns.
 
 %feature("docstring") casadi::LpToQp::generateCode "[INTERNAL]  Print to a
 stream.
+
+";
+
+%feature("docstring") casadi::LpToQp::addOptions "[INTERNAL]  Add options
+that are common to all Adaptor classes.
 
 ";
 
@@ -50677,11 +50970,6 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: mx_function.hpp ";
 
 %feature("docstring") casadi::MXFunction::getNumInputElements "
@@ -51771,6 +52059,25 @@ information there is to know about a certain option.
 
 ";
 
+%feature("docstring") casadi::Newton::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
+
 %feature("docstring") casadi::Newton::getNumericJacobian "[INTERNAL]
 Return Jacobian function.
 
@@ -52229,11 +52536,6 @@ Joris Gillis
 | return_status | casadi::Newton |
 +---------------+----------------+
 
-Diagrams
---------
-
-
-
 C++ includes: newton.hpp ";
 
 %feature("docstring") casadi::Newton::schemeEntry "[INTERNAL]  Find the
@@ -52495,6 +52797,11 @@ the index for a string describing a particular entry of an output scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::Newton::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -54936,10 +55243,6 @@ Stabilized Sequential Quadratic Programming method.
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: nlp_solver.hpp ";
 
@@ -58519,11 +58822,6 @@ basis Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: nullspace.hpp ";
 
 %feature("docstring") casadi::Nullspace::setNumOutputs "
@@ -58987,6 +59285,11 @@ inputs.
 
 ";
 
+%feature("docstring") casadi::OldCollocationIntegrator::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::OldCollocationIntegrator::getOptionType "[INTERNAL]  Get the type of a certain option.
 
 ";
@@ -59365,11 +59668,6 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: old_collocation_integrator.hpp ";
 
 %feature("docstring") casadi::OldCollocationIntegrator::getPartition "[INTERNAL]  Get the unidirectional or bidirectional partition.
@@ -59476,6 +59774,25 @@ call.
 %feature("docstring")
 casadi::OldCollocationIntegrator::setOptionByAllowedIndex "[INTERNAL]  Set
 a certain option by giving its index into the allowed values.
+
+";
+
+%feature("docstring") casadi::OldCollocationIntegrator::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -60408,6 +60725,11 @@ gradient function.
 
 ";
 
+%feature("docstring") casadi::OoqpInterface::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::OoqpInterface::checkInputs "[INTERNAL]  Check
 if the numerical values of the supplied bounds make sense.
 
@@ -60743,6 +61065,11 @@ Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
+%feature("docstring") casadi::OoqpInterface::setInputScheme "[INTERNAL]
+Set input scheme.
+
+";
+
 %feature("docstring") casadi::OoqpInterface "[INTERNAL]  'ooqp' plugin for
 QpSolver
 
@@ -60955,11 +61282,6 @@ reInit();
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: ooqp_interface.hpp ";
 
 %feature("docstring") casadi::OoqpInterface::inputSchemeEntry "[INTERNAL]
@@ -61046,8 +61368,22 @@ structure recognition.
 
 Decide which ad_mode to take ";
 
-%feature("docstring") casadi::OoqpInterface::setInputScheme "[INTERNAL]
-Set input scheme.
+%feature("docstring") casadi::OoqpInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -61255,11 +61591,6 @@ Joel Andersson
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: options_functionality.hpp ";
 
 %feature("docstring") casadi::OptionsFunctionality::getOptionAllowed "
@@ -61357,6 +61688,25 @@ Destructor.
 ";
 
 %feature("docstring") casadi::OptionsFunctionalityNode::printOption "[INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::OptionsFunctionalityNode::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -61478,11 +61828,6 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: options_functionality.hpp ";
 
@@ -62663,11 +63008,6 @@ Joel Andersson
 | task_starttime  | casadi::ParallelizerInternal |
 +-----------------+------------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: parallelizer.hpp ";
 
 %feature("docstring") casadi::Parallelizer::input "
@@ -62961,6 +63301,11 @@ accessing input and output data structures.
 Joel Andersson
 
 C++ includes: plugin_interface.hpp ";
+
+%feature("docstring") casadi::PluginInterface::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
+
+";
 
 
 // File: classcasadi_1_1Polynomial.xml
@@ -64086,11 +64431,6 @@ Joris Gillis
 | t_total        | casadi::PsdIndefDpleInternal |
 +----------------+------------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: psd_indef_dple_solver.hpp ";
 
 %feature("docstring") casadi::PsdIndefDpleSolver::repr "
@@ -64454,10 +64794,6 @@ epigraph reformulation and e==0 for all other quadratic constraints.
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: qcqp_solver.hpp ";
 
@@ -65465,6 +65801,25 @@ all information there is to know about a certain option.
 
 ";
 
+%feature("docstring") casadi::QcqpToSocp::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
+
 %feature("docstring") casadi::QcqpToSocp::repr "[INTERNAL]  Print.
 
 ";
@@ -65486,6 +65841,11 @@ dictionary.
 
 %feature("docstring") casadi::QcqpToSocp::getNumInputElements "[INTERNAL]
 Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::QcqpToSocp::prefix "[INTERNAL]  Get the
+prefix of the target solver.
 
 ";
 
@@ -65861,11 +66221,6 @@ Joris Gillis
 | socp_solver_stats | casadi::QcqpToSocp |
 +-------------------+--------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: qcqp_to_socp.hpp ";
 
 %feature("docstring") casadi::QcqpToSocp::getNumOutputs "[INTERNAL]  Get
@@ -66129,6 +66484,11 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::QcqpToSocp::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::QcqpToSocp::generateIO "[INTERNAL]  Generate
 code for function inputs and outputs.
 
@@ -66190,6 +66550,11 @@ Const access an input.
 Constructs and returns a function that calculates forward derivatives.
 
 by creating the Jacobian then multiplying
+
+";
+
+%feature("docstring") casadi::QcqpToSocp::addOptions "[INTERNAL]  Add
+options that are common to all Adaptor classes.
 
 ";
 
@@ -66347,6 +66712,11 @@ A flavor of getJacSparsity without any magic.
 
 ";
 
+%feature("docstring") casadi::QcqpToSocp::targetName "[INTERNAL]  Get the
+name of the target solver.
+
+";
+
 %feature("docstring") casadi::QcqpToSocp::getOptionDefault "[INTERNAL]  Get
 the default of a certain option.
 
@@ -66464,6 +66834,11 @@ mode?
 
 %feature("docstring") casadi::QcqpToSocp::createCall "[INTERNAL]  Create
 function call node.
+
+";
+
+%feature("docstring") casadi::QcqpToSocp::setTargetOptions "[INTERNAL]
+Copy the necessary options to the target solver.
 
 ";
 
@@ -66650,8 +67025,22 @@ Create function call node.
 
 ";
 
-%feature("docstring") casadi::QpoasesInterface::setNumInputs "[INTERNAL]
-Set the number of function inputs.
+%feature("docstring") casadi::QpoasesInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -67017,11 +67406,6 @@ Joris Gillis, Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: qpoases_interface.hpp ";
 
 %feature("docstring") casadi::QpoasesInterface::getOptionAllowed "[INTERNAL]  Get the allowed values of a certain option.
@@ -67102,6 +67486,11 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::QpoasesInterface::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -67677,6 +68066,11 @@ documentation, see the MXNode class
 ";
 
 %feature("docstring") casadi::QpoasesInterface::solve "[INTERNAL] ";
+
+%feature("docstring") casadi::QpoasesInterface::setNumInputs "[INTERNAL]
+Set the number of function inputs.
+
+";
 
 %feature("docstring") casadi::QpoasesInterface::setOutputScheme "[INTERNAL]
 Set output scheme.
@@ -68640,10 +69034,6 @@ Solve QP using a QcqpSolver
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: qp_solver.hpp ";
 
@@ -69199,6 +69589,25 @@ call to this.
 
 ";
 
+%feature("docstring") casadi::QpToImplicit::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
+
 %feature("docstring") casadi::QpToImplicit::assertInit "[INTERNAL]  Assert
 that the object has been initialized.
 
@@ -69206,6 +69615,11 @@ that the object has been initialized.
 
 %feature("docstring") casadi::QpToImplicit::getOptionType "[INTERNAL]  Get
 the type of a certain option.
+
+";
+
+%feature("docstring") casadi::QpToImplicit::targetName "[INTERNAL]  Get the
+name of the target solver.
 
 ";
 
@@ -69328,6 +69742,11 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
+%feature("docstring") casadi::QpToImplicit::setTargetOptions "[INTERNAL]
+Copy the necessary options to the target solver.
+
+";
+
 %feature("docstring") casadi::QpToImplicit::symbolicOutput "[INTERNAL]  Get
 a vector of symbolic variables corresponding to the outputs.
 
@@ -69394,6 +69813,11 @@ Input/output structures of the function
 
 %feature("docstring") casadi::QpToImplicit::evaluate "[INTERNAL]   Solve
 the system of equations and calculate derivatives.
+
+";
+
+%feature("docstring") casadi::QpToImplicit::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -69495,6 +69919,11 @@ Generate code for the function body.
 
 %feature("docstring") casadi::QpToImplicit::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
+
+";
+
+%feature("docstring") casadi::QpToImplicit::addOptions "[INTERNAL]  Add
+options that are common to all Adaptor classes.
 
 ";
 
@@ -69933,11 +70362,6 @@ Joris Gillis
 | nlp_solver_stats | casadi::QpToImplicit |
 +------------------+----------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: implicit_to_nlp.hpp ";
 
 %feature("docstring") casadi::QpToImplicit::output "[INTERNAL]  [UNSAFE]
@@ -70092,6 +70516,11 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 %feature("docstring") casadi::QpToImplicit::setOutputScheme "[INTERNAL]
 Set output scheme.
+
+";
+
+%feature("docstring") casadi::QpToImplicit::prefix "[INTERNAL]  Get the
+prefix of the target solver.
 
 ";
 
@@ -70646,11 +71075,6 @@ Joris Gillis
 | nlp_solver_stats | casadi::QpToNlp |
 +------------------+-----------------+
 
-Diagrams
---------
-
-
-
 C++ includes: qp_to_nlp.hpp ";
 
 %feature("docstring") casadi::QpToNlp::copyOptions "[INTERNAL]  Copy all
@@ -70675,6 +71099,11 @@ Access output argument
 
 ";
 
+%feature("docstring") casadi::QpToNlp::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::QpToNlp::log "
 
 >  void casadi::FunctionInternal::log(const std::string &msg) const 
@@ -70691,6 +71120,11 @@ Log the status of the solver, function given.
 
 %feature("docstring") casadi::QpToNlp::getNumInputs "[INTERNAL]  Get the
 number of function inputs.
+
+";
+
+%feature("docstring") casadi::QpToNlp::setTargetOptions "[INTERNAL]  Copy
+the necessary options to the target solver.
 
 ";
 
@@ -70790,6 +71224,25 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 oname:  output name. Only allowed when an output scheme is set.
+
+";
+
+%feature("docstring") casadi::QpToNlp::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -70905,6 +71358,11 @@ vector of symbolic variables with the same dimensions as the inputs.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::prefix "[INTERNAL]  Get the prefix
+of the target solver.
+
+";
+
 %feature("docstring") casadi::QpToNlp::getNumOutputs "[INTERNAL]  Get the
 number of function outputs.
 
@@ -70913,6 +71371,11 @@ number of function outputs.
 %feature("docstring") casadi::QpToNlp::generateOperation "[INTERNAL]  The
 following functions are called internally from EvaluateMX. For
 documentation, see the MXNode class
+
+";
+
+%feature("docstring") casadi::QpToNlp::addOptions "[INTERNAL]  Add options
+that are common to all Adaptor classes.
 
 ";
 
@@ -71162,6 +71625,11 @@ Generate code the function.
 
 %feature("docstring") casadi::QpToNlp::tangent "[INTERNAL]  Return tangent
 function.
+
+";
+
+%feature("docstring") casadi::QpToNlp::targetName "[INTERNAL]  Get the name
+of the target solver.
 
 ";
 
@@ -71450,6 +71918,11 @@ function.
 
 ";
 
+%feature("docstring") casadi::QpToQcqp::setTargetOptions "[INTERNAL]  Copy
+the necessary options to the target solver.
+
+";
+
 %feature("docstring") casadi::QpToQcqp::outputScheme "[INTERNAL]  Access
 input/output scheme.
 
@@ -71697,11 +72170,6 @@ Joris Gillis
 | qcqp_solver_stats | casadi::QpToQcqp |
 +-------------------+------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: qp_to_qcqp.hpp ";
 
 %feature("docstring") casadi::QpToQcqp::getNumInputElements "[INTERNAL]
@@ -71846,6 +72314,11 @@ Log the status of the solver, function given.
 
 ";
 
+%feature("docstring") casadi::QpToQcqp::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::QpToQcqp::spInit "[INTERNAL]  Reset the
 sparsity propagation.
 
@@ -71892,6 +72365,11 @@ ebest suggestions of option names.
 
 ";
 
+%feature("docstring") casadi::QpToQcqp::targetName "[INTERNAL]  Get the
+name of the target solver.
+
+";
+
 %feature("docstring") casadi::QpToQcqp::getOutputScheme "[INTERNAL]  Get
 output scheme.
 
@@ -71926,6 +72404,25 @@ index for a string describing a particular entry of a scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::QpToQcqp::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -71975,6 +72472,11 @@ oname:  output name. Only allowed when an output scheme is set.
 
 %feature("docstring") casadi::QpToQcqp::dynamicCompilation "[INTERNAL]
 Codegen function.
+
+";
+
+%feature("docstring") casadi::QpToQcqp::prefix "[INTERNAL]  Get the prefix
+of the target solver.
 
 ";
 
@@ -72233,6 +72735,11 @@ Generate native code in the interfaced language for debugging
 
 %feature("docstring") casadi::QpToQcqp::copyOptions "[INTERNAL]  Copy all
 options from another object.
+
+";
+
+%feature("docstring") casadi::QpToQcqp::addOptions "[INTERNAL]  Add options
+that are common to all Adaptor classes.
 
 ";
 
@@ -73626,6 +74133,11 @@ derivatives
 
 ";
 
+%feature("docstring") casadi::RkIntegrator::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::RkIntegrator::getNumInputs "[INTERNAL]  Get
 the number of function inputs.
 
@@ -73638,6 +74150,25 @@ get function name with all non alphanumeric characters converted to '_'
 
 %feature("docstring") casadi::RkIntegrator::integrate "[INTERNAL]
 Integrate until a specified time point.
+
+";
+
+%feature("docstring") casadi::RkIntegrator::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -73944,11 +74475,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: rk_integrator.hpp ";
 
@@ -75840,6 +76366,11 @@ MXNode class
 
 %feature("docstring") casadi::Scpgen::Scpgen "[INTERNAL] ";
 
+%feature("docstring") casadi::Scpgen::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::Scpgen::getOptionEnumValue "[INTERNAL]  Get
 the enum value corresponding to th certain option.
 
@@ -76856,12 +77387,26 @@ Joel Andersson, Attila Kozma and Joris Gillis
 | iter_count | casadi::Scpgen |
 +------------+----------------+
 
-Diagrams
---------
-
-
-
 C++ includes: scpgen.hpp ";
+
+%feature("docstring") casadi::Scpgen::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
 
 %feature("docstring") casadi::Scpgen::setJacSparsity "[INTERNAL]  Generate
 the sparsity of a Jacobian block.
@@ -77636,10 +78181,6 @@ manually switch to another SDP Solver
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: sdp_solver.hpp ";
 
@@ -78637,10 +79178,6 @@ singular value decomposition to implement that.
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: sdqp_solver.hpp ";
 
@@ -79548,9 +80085,13 @@ Print a representation of the object.
 
 /*  Simple Getters & Setters  */
 
-/*  Advanced Getters  */ %feature("docstring")
-casadi::SdqpToSdp::symbolicInput " [INTERNAL]  Get a vector of symbolic
-variables with the same dimensions as the inputs.
+/*  Advanced Getters  */ %feature("docstring") casadi::SdqpToSdp::addOptions
+" [INTERNAL]  Add options that are common to all Adaptor classes.
+
+";
+
+%feature("docstring") casadi::SdqpToSdp::symbolicInput "[INTERNAL]  Get a
+vector of symbolic variables with the same dimensions as the inputs.
 
 ";
 
@@ -79600,6 +80141,11 @@ backward.
 
 %feature("docstring") casadi::SdqpToSdp::output_struct "[INTERNAL]
 Input/output structures of the function
+
+";
+
+%feature("docstring") casadi::SdqpToSdp::targetName "[INTERNAL]  Get the
+name of the target solver.
 
 ";
 
@@ -80092,6 +80638,16 @@ values.
 
 ";
 
+%feature("docstring") casadi::SdqpToSdp::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
+
+";
+
+%feature("docstring") casadi::SdqpToSdp::prefix "[INTERNAL]  Get the prefix
+of the target solver.
+
+";
+
 %feature("docstring") casadi::SdqpToSdp::setSOCQPOptions "[INTERNAL]  Set
 options that make the SDQP solver more suitable for solving SOCPs.
 
@@ -80143,6 +80699,25 @@ function name with all non alphanumeric characters converted to '_'
 reference to inputs  getInput, setInput
 
 Access input argument
+
+";
+
+%feature("docstring") casadi::SdqpToSdp::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -80422,11 +80997,6 @@ Joris Gillis
 | sdp_solver_stats | casadi::SdqpToSdp |
 +------------------+-------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: sdqp_to_sdp.hpp ";
 
 %feature("docstring") casadi::SdqpToSdp::getInputScheme "[INTERNAL]  Get
@@ -80446,6 +81016,11 @@ input scheme.
 
 %feature("docstring") casadi::SdqpToSdp::weak "[INTERNAL]  Get a weak
 reference to the object.
+
+";
+
+%feature("docstring") casadi::SdqpToSdp::setTargetOptions "[INTERNAL]  Copy
+the necessary options to the target solver.
 
 ";
 
@@ -83337,6 +83912,11 @@ Access input/output scheme.
 
 ";
 
+%feature("docstring") casadi::SimpleHomotopyNlp::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::SimpleHomotopyNlp::generateFunction "[INTERNAL]  Generate code the function.
 
 ";
@@ -83857,11 +84437,6 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: simple_homotopy_nlp.hpp ";
 
 %feature("docstring") casadi::SimpleHomotopyNlp::getOutputScheme "[INTERNAL]  Get output scheme.
@@ -84078,6 +84653,25 @@ Return tangent function.
 
 %feature("docstring") casadi::SimpleHomotopyNlp::jacSparsity "[INTERNAL]
 Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::SimpleHomotopyNlp::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -84538,11 +85132,6 @@ Joel Andersson
 +---------+---------------------------+
 | step    | casadi::SimulatorInternal |
 +---------+---------------------------+
-
-Diagrams
---------
-
-
 
 C++ includes: simulator.hpp ";
 
@@ -85446,6 +86035,25 @@ derivatives
 
 ";
 
+%feature("docstring") casadi::SnoptInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
+
 %feature("docstring") casadi::SnoptInterface::getGradLag "[INTERNAL]  Get
 or generate a function to calculate the gradient of the Lagrangian function.
 
@@ -86231,6 +86839,11 @@ Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
+%feature("docstring") casadi::SnoptInterface::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::SnoptInterface "[INTERNAL]  'snopt' plugin
 for NlpSolver
 
@@ -86634,11 +87247,6 @@ SNOPT interface
 +----------------+------------------------+
 | t_mainloop     | casadi::SnoptInterface |
 +----------------+------------------------+
-
-Diagrams
---------
-
-
 
 C++ includes: snopt_interface.hpp ";
 
@@ -87368,10 +87976,6 @@ Solve SOCPs using an SdpSolver
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: socp_solver.hpp ";
 
@@ -88395,11 +88999,6 @@ Joris Gillis
 | sdp_solver_stats | casadi::SocpToSdp |
 +------------------+-------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: socp_to_sdp.hpp ";
 
 %feature("docstring") casadi::SocpToSdp::wrapMXFunction "[INTERNAL]  Create
@@ -88462,6 +89061,11 @@ there is an option str
 
 ";
 
+%feature("docstring") casadi::SocpToSdp::setTargetOptions "[INTERNAL]  Copy
+the necessary options to the target solver.
+
+";
+
 %feature("docstring") casadi::SocpToSdp::inputScheme "[INTERNAL]  Access
 input/output scheme.
 
@@ -88498,6 +89102,11 @@ Generate code for the declarations of the C function.
 ";
 
 %feature("docstring") casadi::SocpToSdp::verbose "[INTERNAL]  Verbose mode?
+
+";
+
+%feature("docstring") casadi::SocpToSdp::addOptions "[INTERNAL]  Add
+options that are common to all Adaptor classes.
 
 ";
 
@@ -88545,6 +89154,11 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 %feature("docstring") casadi::SocpToSdp::evaluateD "[INTERNAL]  The
 following functions are called internally from EvaluateMX. For
 documentation, see the MXNode class
+
+";
+
+%feature("docstring") casadi::SocpToSdp::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -88636,6 +89250,11 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
+%feature("docstring") casadi::SocpToSdp::prefix "[INTERNAL]  Get the prefix
+of the target solver.
+
+";
+
 %feature("docstring") casadi::SocpToSdp::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
 
@@ -88648,6 +89267,11 @@ type of a certain option.
 
 %feature("docstring") casadi::SocpToSdp::setJacSparsity "[INTERNAL]
 Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::SocpToSdp::targetName "[INTERNAL]  Get the
+name of the target solver.
 
 ";
 
@@ -88823,6 +89447,25 @@ dictionary.
 Constructs and returns a function that calculates forward derivatives.
 
 by creating the Jacobian then multiplying
+
+";
+
+%feature("docstring") casadi::SocpToSdp::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -91380,11 +92023,6 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: sqic_interface.hpp ";
 
 %feature("docstring") casadi::SqicInterface::getDerivative "[INTERNAL]
@@ -91678,6 +92316,11 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
+%feature("docstring") casadi::SqicInterface::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::SqicInterface::getPartition "[INTERNAL]  Get
 the unidirectional or bidirectional partition.
 
@@ -91694,6 +92337,25 @@ Generate code the function.
 
 %feature("docstring") casadi::SqicInterface::evalMX "[INTERNAL]  Evaluate
 symbolically, MX type.
+
+";
+
+%feature("docstring") casadi::SqicInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -92849,11 +93511,6 @@ A textbook SQPMethod
 | t_mainloop         | casadi::Sqpmethod |
 +--------------------+-------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: sqpmethod.hpp ";
 
 %feature("docstring") casadi::Sqpmethod::spInit "[INTERNAL]  Reset the
@@ -93170,17 +93827,22 @@ number of function inputs.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::inputS "
+%feature("docstring") casadi::Sqpmethod::addOption "
 
->  DMatrix& casadi::IOInterface< FunctionInternal  >::inputS(int i)
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
 ------------------------------------------------------------------------
 [INTERNAL] 
-Access an input.
+Add an option.
 
->  const DMatrix& casadi::IOInterface< FunctionInternal  >::inputS(int i) const
-------------------------------------------------------------------------
-[INTERNAL] 
-Const access an input.
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -93467,11 +94129,30 @@ output scheme.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::Sqpmethod "[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::printPart "[INTERNAL]  The
 following functions are called internally from EvaluateMX. For
 documentation, see the MXNode class
+
+";
+
+%feature("docstring") casadi::Sqpmethod::inputS "
+
+>  DMatrix& casadi::IOInterface< FunctionInternal  >::inputS(int i)
+------------------------------------------------------------------------
+[INTERNAL] 
+Access an input.
+
+>  const DMatrix& casadi::IOInterface< FunctionInternal  >::inputS(int i) const
+------------------------------------------------------------------------
+[INTERNAL] 
+Const access an input.
 
 ";
 
@@ -94092,10 +94773,6 @@ Solved a stabilized QP using a standard QP solver
 
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: stabilized_qp_solver.hpp ";
 
@@ -94748,6 +95425,11 @@ values.
 
 ";
 
+%feature("docstring") casadi::StabilizedQpToQp::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::StabilizedQpToQp::~StabilizedQpToQp "[INTERNAL]  Destructor.
 
 ";
@@ -95054,11 +95736,6 @@ Joris Gillis
 | qp_solver_stats | casadi::StabilizedQpToQp |
 +-----------------+--------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: stabilized_qp_to_qp.hpp ";
 
 %feature("docstring") casadi::StabilizedQpToQp::evaluateSX "[INTERNAL]  The
@@ -95281,6 +95958,25 @@ Is the class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::StabilizedQpToQp::getOption "[INTERNAL]  get
 an option value
+
+";
+
+%feature("docstring") casadi::StabilizedQpToQp::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -96137,11 +96833,6 @@ Interface to SQIC
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: stabilized_sqic_interface.hpp ";
 
 %feature("docstring") casadi::StabilizedSqicInterface::output_struct "[INTERNAL]  Input/output structures of the function
@@ -96692,6 +97383,25 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
+%feature("docstring") casadi::StabilizedSqicInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
+
 %feature("docstring")
 casadi::StabilizedSqicInterface::getJacSparsityHierarchicalSymm "[INTERNAL]
 A flavor of getJacSparsity that does hierarchical block structure
@@ -96720,6 +97430,11 @@ Create a call to this.
 
 %feature("docstring") casadi::StabilizedSqicInterface::weak "[INTERNAL]
 Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::StabilizedSqicInterface::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -97188,6 +97903,11 @@ if there is an option str
 
 %feature("docstring") casadi::StabilizedSqp::checkInputs "[INTERNAL]  Check
 if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring") casadi::StabilizedSqp::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -98145,11 +98865,6 @@ Slava Kung
 | return_status | casadi::StabilizedSqp |
 +---------------+-----------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: stabilized_sqp.hpp ";
 
 %feature("docstring") casadi::StabilizedSqp::symbolicInputSX "[INTERNAL]
@@ -98282,6 +98997,25 @@ Set input scheme.
 
 %feature("docstring") casadi::StabilizedSqp::getNumInputs "[INTERNAL]  Get
 the number of function inputs.
+
+";
+
+%feature("docstring") casadi::StabilizedSqp::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -99800,6 +100534,25 @@ to '_'
 
 ";
 
+%feature("docstring") casadi::SundialsInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
+
 %feature("docstring") casadi::SundialsInterface::printOption "[INTERNAL]
 Print all information there is to know about a certain option.
 
@@ -100238,11 +100991,6 @@ Print all information there is to know about a certain option.
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: sundials_interface.hpp ";
 
 %feature("docstring") casadi::SundialsInterface::jacobian "[INTERNAL]
@@ -100473,6 +101221,11 @@ Evaluate symbolically, SXElement type, matching sparsity patterns.
 ";
 
 %feature("docstring") casadi::SundialsInterface::rqf "[INTERNAL] ";
+
+%feature("docstring") casadi::SundialsInterface::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
+
+";
 
 %feature("docstring") casadi::SundialsInterface::generateCode "[INTERNAL]
 Print to a stream.
@@ -101978,11 +102731,6 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: sx_function.hpp ";
 
 %feature("docstring") casadi::SXFunction::setJacobian "
@@ -103394,13 +104142,32 @@ the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::setNumInputs "[INTERNAL]  Set the
-number of function inputs.
+%feature("docstring") casadi::SymbolicQr::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
 %feature("docstring") casadi::SymbolicQr::spSolve "[INTERNAL]  Propagate
 sparsity through a linear solve
+
+";
+
+%feature("docstring") casadi::SymbolicQr::setNumInputs "[INTERNAL]  Set the
+number of function inputs.
 
 ";
 
@@ -103920,6 +104687,11 @@ The function is not initialized
 
 ";
 
+%feature("docstring") casadi::SymbolicQr::adaptor "[INTERNAL]  Modifies the
+Derived object by setting Adaptor options when needed.
+
+";
+
 %feature("docstring") casadi::SymbolicQr::getNumericJacobian "[INTERNAL]
 Return Jacobian function.
 
@@ -104128,11 +104900,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: symbolic_qr.hpp ";
 
@@ -104510,11 +105277,6 @@ XmlFile using TinyXml
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 
-Diagrams
---------
-
-
-
 C++ includes: tinyxml_interface.hpp ";
 
 %feature("docstring") casadi::TinyXmlInterface::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
@@ -104522,6 +105284,25 @@ C++ includes: tinyxml_interface.hpp ";
 ";
 
 %feature("docstring") casadi::TinyXmlInterface::parse "[INTERNAL] ";
+
+%feature("docstring") casadi::TinyXmlInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
+
+";
 
 %feature("docstring") casadi::TinyXmlInterface::assertInit "[INTERNAL]
 Assert that the object has been initialized.
@@ -104603,6 +105384,11 @@ function should be called again. (Ticket #54)
 ";
 
 %feature("docstring") casadi::TinyXmlInterface::getOptionAllowed "[INTERNAL]  Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") casadi::TinyXmlInterface::adaptor "[INTERNAL]
+Modifies the Derived object by setting Adaptor options when needed.
 
 ";
 
@@ -107230,8 +108016,22 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::WorhpInterface::getNumInputs "[INTERNAL]  Get
-the number of function inputs.
+%feature("docstring") casadi::WorhpInterface::addOption "
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val=GenericType(), const std::string &desc=\"n/a\", const std::vector< GenericType > &allowed_vals=std::vector< GenericType >(), bool inherit=false, std::vector< int > enum_values=std::vector< int >(), std::vector< std::string > enum_descr=std::vector< std::string >())
+------------------------------------------------------------------------
+[INTERNAL]
+
+>  void casadi::OptionsFunctionalityNode::addOption(const std::string &str, const opt_type &type, const GenericType &def_val, const std::string &desc, const std::string &allowed_vals, bool inherit=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Add an option.
+
+allowed_vals can take multiple forms: \"foo|bar\" -> specifies that the
+values \"foo\" and \"bar\" are allowed \"foo:5|bar:6\" -> specifies that the
+values \"foo\" and \"bar\" are allowed and map to 5 and 6 respectively
+\"foo:5:description_foo|bar:6:description_bar|\" -> same as above, but
+specifies documentation
 
 ";
 
@@ -107247,6 +108047,11 @@ Get output scheme.
 
 %feature("docstring") casadi::WorhpInterface::symbolicInput "[INTERNAL]
 Get a vector of symbolic variables with the same dimensions as the inputs.
+
+";
+
+%feature("docstring") casadi::WorhpInterface::getNumInputs "[INTERNAL]  Get
+the number of function inputs.
 
 ";
 
@@ -107335,6 +108140,11 @@ statistics obtained at the end of the last evaluate call.
 structure recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring") casadi::WorhpInterface::adaptor "[INTERNAL]  Modifies
+the Derived object by setting Adaptor options when needed.
+
+";
 
 %feature("docstring") casadi::WorhpInterface::getDerivative "[INTERNAL]
 Constructs and returns a function that calculates forward derivatives.
@@ -108780,11 +109590,6 @@ WORHP interface
 | t_mainloop         | casadi::WorhpInterface |
 +--------------------+------------------------+
 
-Diagrams
---------
-
-
-
 C++ includes: worhp_interface.hpp ";
 
 %feature("docstring") casadi::WorhpInterface::eval_jac_g "[INTERNAL] ";
@@ -108869,6 +109674,25 @@ Get the type name of a certain option.
 ";
 
 
+// File: classcasadi_1_1Wrapper.xml
+%feature("docstring") casadi::Wrapper::checkDimensions "[INTERNAL]  Check
+the dimensions of the internal function after initialization.
+
+";
+
+%feature("docstring") casadi::Wrapper::evaluate "[INTERNAL]  Evaluate the
+internal function and make it external.
+
+";
+
+%feature("docstring") casadi::Wrapper "[INTERNAL]  A helper class for a
+Function that wrap another Function.
+
+Joris Gillis
+
+C++ includes: wrapper.hpp ";
+
+
 // File: classcasadi_1_1XmlFile.xml
 
 
@@ -108877,10 +109701,6 @@ Get the type name of a certain option.
 XML parser Can be used for parsing XML files into CasADi data structures.
 
 Joel Andersson
-Diagrams
---------
-
-
 
 C++ includes: xml_file.hpp ";
 
@@ -113777,6 +114597,9 @@ Structure specification of a QP
 // File: a0__schemes_8hpp.xml
 
 
+// File: adaptor_8hpp.xml
+
+
 // File: all_8hpp.xml
 
 
@@ -114044,9 +114867,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: dulmageMendelsohn_8hpp.xml
-
-
-// File: e0__diagram_8hpp.xml
 
 
 // File: empty__lib_8cpp.xml
@@ -115012,6 +115832,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: worhp__interface__meta_8cpp.xml
+
+
+// File: wrapper_8hpp.xml
 
 
 // File: wsnopt_8hpp.xml

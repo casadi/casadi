@@ -292,7 +292,7 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>nlp_solver_stats</td><td>casadi::QpToImplicit</td></tr>
+<tr><td>solver_stats</td><td>casadi::QpToImplicit</td></tr>
 </table>
 */
 /// \endcond
@@ -302,7 +302,7 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th></tr>
-<tr><td>nlp_solver_stats</td></tr>
+<tr><td>solver_stats</td></tr>
 </table>
 */
 /// \cond INTERNAL

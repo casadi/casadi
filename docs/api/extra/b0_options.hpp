@@ -1327,8 +1327,6 @@
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QPSOlver used to solve the LPs.</td><td>casadi::LpToQp</td></tr>
-<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QPSOlver</td><td>casadi::LpToQp</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1341,8 +1339,6 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QPSOlver used to solve the LPs.</td></tr>
-<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QPSOlver</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1771,8 +1767,6 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>socp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SocpSolver used to solve the QCQPs.</td><td>casadi::QcqpToSocp</td></tr>
-<tr><td>socp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SOCPSOlver</td><td>casadi::QcqpToSocp</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1784,8 +1778,6 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>socp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SocpSolver used to solve the QCQPs.</td></tr>
-<tr><td>socp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SOCPSOlver</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1842,8 +1834,6 @@
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>nlp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The NlpSolver used to solve the implicit system.</td><td>casadi::QpToImplicit</td></tr>
-<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NlpSolver</td><td>casadi::QpToImplicit</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1856,8 +1846,6 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>nlp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The NlpSolver used to solve the implicit system.</td></tr>
-<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NlpSolver</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1873,8 +1861,6 @@
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>nlp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The NLPSOlver used to solve the QPs.</td><td>casadi::QpToNlp</td></tr>
-<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLPSOlver</td><td>casadi::QpToNlp</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1887,8 +1873,6 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>nlp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The NLPSOlver used to solve the QPs.</td></tr>
-<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLPSOlver</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1904,8 +1888,6 @@
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qcqp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QcqpSolver used to solve the QPs.</td><td>casadi::QpToQcqp</td></tr>
-<tr><td>qcqp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QCQPSOlver</td><td>casadi::QpToQcqp</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1918,8 +1900,6 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>qcqp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QcqpSolver used to solve the QPs.</td></tr>
-<tr><td>qcqp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QCQPSOlver</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -2224,8 +2204,8 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdpSolver used to solve the SDQPs.</td><td>casadi::SdqpToSdp</td></tr>
-<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpToSdp</td></tr>
+<tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
+<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2237,8 +2217,6 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdpSolver used to solve the SDQPs.</td></tr>
-<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -2519,8 +2497,6 @@
 <tr><td>ni</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Provide the size of each SOC constraint. Must sum up to N.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdpSolver used to solve the SOCPs.</td><td>casadi::SocpToSdp</td></tr>
-<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SocpToSdp</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2532,8 +2508,6 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdpSolver used to solve the SOCPs.</td></tr>
-<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td></tr>
 </table>
 */
 /// \cond INTERNAL
