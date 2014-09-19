@@ -39,7 +39,7 @@ namespace casadi {
 
   /** \brief A helper class for a Solver that delegates work to another solver
   *
-  * 
+  *
   *    \author Joris Gillis
   *    \date 2014
   */

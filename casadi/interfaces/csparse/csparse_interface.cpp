@@ -49,7 +49,8 @@ namespace casadi {
     S_ = 0;
   }
 
-  CsparseInterface::CsparseInterface(const CsparseInterface& linsol) : LinearSolverInternal(linsol) {
+  CsparseInterface::CsparseInterface(const CsparseInterface& linsol)
+      : LinearSolverInternal(linsol) {
     N_ = 0;
     S_ = 0;
     is_init_ = false;

@@ -271,7 +271,7 @@ namespace casadi {
     /// Mark by flipping the sign of the temporary and decreasing by one
     void mark();
 
-    /** \brief Assign to another expression, if a duplicate. 
+    /** \brief Assign to another expression, if a duplicate.
      * Check for equality up to a given depth */
     void assignIfDuplicate(const SXElement& scalar, int depth=1);
 

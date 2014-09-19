@@ -42,7 +42,7 @@
    *
    *
    * This implementation makes use of the epigraph reformulation:
-   * \verbatim 
+   * \verbatim
    *  min f(x)
    *    x
    *
@@ -57,7 +57,7 @@
    *  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0
    * \endverbatim
    *    where we put e = [0 0 ... 1]  for the quadratic constraint
-   *    arising from the epigraph reformulation and e==0 for all other 
+   *    arising from the epigraph reformulation and e==0 for all other
    *    quadratic constraints.
 
 */
@@ -68,10 +68,10 @@
 namespace casadi {
 
   /** \brief \pluginbrief{QcqpSolver,socp}
-  
+
    @copydoc QcqpSolver_doc
    @copydoc plugin_QcqpSolver_socp
-   
+
    \author Joris Gillis
    \date 2013
   */

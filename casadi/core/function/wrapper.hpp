@@ -31,7 +31,7 @@ namespace casadi {
 
   /** \brief A helper class for a Function that wrap another Function
   *
-  * 
+  *
   *    \author Joris Gillis
   *    \date 2014
   */

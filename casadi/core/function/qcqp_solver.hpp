@@ -120,7 +120,7 @@ namespace casadi {
 
       \generalsection{QcqpSolver}
       \pluginssection{QcqpSolver}
-      
+
       \author Joris Gillis
       \date 2013
   */
@@ -131,7 +131,7 @@ namespace casadi {
     QcqpSolver();
 
     /** \brief Constructor
-     *  \param name \pluginargument{QcqpSolver} 
+     *  \param name \pluginargument{QcqpSolver}
      *  \param st \structargument{QCQP}
      */
     QcqpSolver(const std::string& name, const QCQPStructure& st);

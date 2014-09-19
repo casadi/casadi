@@ -30,7 +30,7 @@
 /** \defgroup plugin_QpSolver_qpoases
 Interface to QPOases Solver for quadratic programming
 
-*/ 
+*/
 
 /** \pluginsection{QpSolver,qpoases} */
 
@@ -38,10 +38,10 @@ Interface to QPOases Solver for quadratic programming
 namespace casadi {
 
   /** \brief \pluginbrief{QpSolver,qpoases}
-   * 
+   *
    * @copydoc QPSolver_doc
    * @copydoc plugin_QpSolver_qpoases
-   * 
+   *
    * \author Joris Gillis, Joel Andersson
    * \date 2011
    *

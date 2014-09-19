@@ -38,7 +38,7 @@
 namespace casadi {
 
   /** \brief \pluginbrief{StabilizedQpSolver,qp}
-     
+
       @copydoc StabilizedQpSolver_doc
       @copydoc plugin_StabilizedQpSolver_qp
 
@@ -76,7 +76,7 @@ namespace casadi {
 
     /// Data members
     QpSolver qp_solver_;
-    
+
     /// A documentation string
     static const std::string meta_doc;
 

@@ -185,7 +185,7 @@ namespace casadi {
   /** \brief NlpSolver
 
       @copydoc NlpSolver_doc
-      
+
       \generalsection{NlpSolver}
       \pluginssection{NlpSolver}
 
@@ -201,7 +201,7 @@ namespace casadi {
     /// NLP solver factory
     NlpSolver(
       const std::string& name,
-      /**< \pluginargument{NlpSolver} 
+      /**< \pluginargument{NlpSolver}
       */
       const Function& nlp
       /**< \parblock

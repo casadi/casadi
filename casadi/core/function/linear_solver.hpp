@@ -68,10 +68,10 @@ namespace casadi {
   /** \brief Base class for the linear solver classes
 
    *  @copydoc LinearSolver_doc
-   
+
       \generalsection{LinearSolver}
       \pluginssection{LinearSolver}
-      
+
    \author Joel Andersson
    \date 2010-2013
   */

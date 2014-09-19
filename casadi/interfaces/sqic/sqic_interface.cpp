@@ -49,7 +49,7 @@ namespace casadi {
   extern "C"
   void CASADI_QPSOLVER_SQIC_EXPORT casadi_load_qpsolver_sqic() {
     QpSolverInternal::registerPlugin(casadi_register_qpsolver_sqic);
-  }  
+  }
 
   SqicInterface* SqicInterface::clone() const {
     // Return a deep copy

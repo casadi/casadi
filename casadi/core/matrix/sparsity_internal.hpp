@@ -117,7 +117,7 @@ namespace casadi {
     void augmentingPath(int k, std::vector<int>& jmatch,
                         int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const;
 
-    /** 
+    /**
      * return a random permutation vector, the identity perm, or p = n-1:-1:0.
      * seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.
      * otherwise p = random permutation. See cs_randperm in CSparse
@@ -369,7 +369,7 @@ namespace casadi {
     Sparsity starColoring(int ordering, int cutoff) const;
 
     /** \brief Perform a star coloring of a symmetric matrix
-     * 
+     *
      * An improved distance-2 coloring algorithm
      * (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
      */

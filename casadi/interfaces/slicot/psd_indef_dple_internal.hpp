@@ -29,7 +29,7 @@
 /** \defgroup plugin_DpleSolver_slicot
  *
  * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
- 
+
  * Uses Periodic Schur Decomposition ('psd') and does not assume positive definiteness.
  * Based on Periodic Lyapunov equations: some applications and new algorithms.
  * Int. J. Control, vol. 67, pp. 69-87, 1997.
@@ -41,12 +41,12 @@
 namespace casadi {
 
   /** \brief \pluginbrief{DpleSolver,slicot}
-   * 
+   *
    * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
    *
    * @copydoc DPLE_doc
    * @copydoc plugin_DpleSolver_slicot
-   
+
        \author Joris Gillis
       \date 2014
 

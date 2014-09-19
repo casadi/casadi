@@ -354,7 +354,7 @@ namespace casadi {
 
     /** \brief Set a function that calculates \a nfwd forward derivatives
         and \a nadj adjoint derivatives
-        
+
 NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
     void setDerivative(const Function& fcn, int nfwd, int nadj);
 

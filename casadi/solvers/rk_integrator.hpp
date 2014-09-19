@@ -38,7 +38,7 @@
 namespace casadi {
 
   /** \brief \pluginbrief{Integrator,rk}
-  
+
 
       @copydoc DAE_doc
       @copydoc plugin_Integrator_rk
@@ -77,7 +77,7 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-  
+
   };
 
 } // namespace casadi

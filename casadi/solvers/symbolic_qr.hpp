@@ -39,7 +39,7 @@
 namespace casadi {
 
   /** \brief \pluginbrief{LinearSolver,symbolicqr}
-      
+
       @copydoc LinearSolver_doc
       @copydoc plugin_LinearSolver_symbolicqr
       \author Joel Andersson

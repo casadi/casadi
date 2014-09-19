@@ -30,7 +30,7 @@
 *
 * This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
 * <tt>A = Q.R</tt>, with Q orthogonal and R upper triangular
-*/ 
+*/
 
 /** \pluginsection{LinearSolver,lapackqr} */
 

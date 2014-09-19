@@ -110,7 +110,7 @@ namespace casadi {
 
       \generalsection{QpSolver}
       \pluginssection{QpSolver}
-      
+
       \author Joel Andersson
       \date 2010
   */

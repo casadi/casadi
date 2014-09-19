@@ -855,10 +855,10 @@ namespace casadi {
 
     /* Allocate output list for derivative
     *
-    * Three parts: 
+    * Three parts:
     *
-    * 1)  [P_0 .. P_{nrhs-1}] 
-    * 2)  [P_0^f0 .. P_{nrhs-1}^f0] ... 
+    * 1)  [P_0 .. P_{nrhs-1}]
+    * 2)  [P_0^f0 .. P_{nrhs-1}^f0] ...
     *       [P_0^f{nfwd-1} .. P_{nrhs-1}^f{nfwd-1}]
     * 3)  [A^b0 Q_0^b0 .. Q_{nrhs-1}^b0] ...
     *       [A^b{nadj-1} Q_0^b{nadj-1} .. Q_{nrhs-1}^b{nadj-1}]
@@ -866,12 +866,12 @@ namespace casadi {
     std::vector<MX> outs_new((nrhs_+1)*nadj+nrhs_*(nfwd+1), 0);
 
     /* Allocate input list for derivative and populate with symbolics
-    * Three parts: 
+    * Three parts:
     *
-    * 1)  [A Q_0 .. Q_{nrhs-1}] 
+    * 1)  [A Q_0 .. Q_{nrhs-1}]
     * 2)  [A^f0 Q_0^f0 .. Q_{nrhs-1}^f0] ...
     *       [A^f{nfwd-1} Q_0^f{nfwd-1} .. Q_{nrhs-1}^f{nfwd-1}]
-    * 3)  [P_0^b0 .. P_{nrhs-1}^b0] ... 
+    * 3)  [P_0^b0 .. P_{nrhs-1}^b0] ...
     *       [P_0^b{nadj-1} .. P_{nrhs-1}^b{nadj-1}]
     */
     std::vector<MX> ins_new((nrhs_+1)*(nfwd+1)+nrhs_*nadj);
@@ -910,7 +910,7 @@ namespace casadi {
     for (int q=0; q<nrhs_; ++q) {
 
       // Forward
-      /* P_q^f0 .. P_q^f{nfwd-1} = f(A, 
+      /* P_q^f0 .. P_q^f{nfwd-1} = f(A,
       *          Q_q^f0 + A P_q (A^f0)^T + A^f0 P_q A^T,
       *          ...
       *          Q_q^f{nfwd-1} + A P_q (A^f{nfwd-1})^T + A^f{nfwd-1} P_q A^T)
@@ -949,7 +949,7 @@ namespace casadi {
       }
 
       // Adjoint
-      /* rev(Q_b^b0) .. rev(Q_b^b{nadj-1}) += f(rev(A), 
+      /* rev(Q_b^b0) .. rev(Q_b^b{nadj-1}) += f(rev(A),
       *          rev(P_q^b0) ... rev(P_q^b{nadj-1})
       *         )
       *

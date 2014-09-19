@@ -32,7 +32,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_INTEGRATOR_CVODES_EXPORT casadi_register_integrator_cvodes(IntegratorInternal::Plugin* plugin){
+  int CASADI_INTEGRATOR_CVODES_EXPORT
+      casadi_register_integrator_cvodes(IntegratorInternal::Plugin* plugin) {
     plugin->creator = CvodesInterface::creator;
     plugin->name = "cvodes";
     plugin->doc = CvodesInterface::meta_doc.c_str();;
@@ -41,7 +42,7 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_INTEGRATOR_CVODES_EXPORT casadi_load_integrator_cvodes(){
+  void CASADI_INTEGRATOR_CVODES_EXPORT casadi_load_integrator_cvodes() {
     IntegratorInternal::registerPlugin(casadi_register_integrator_cvodes);
   }
 
@@ -469,8 +470,10 @@ namespace casadi {
 
     casadi_assert_message(t_out>=t0_,
                           "CvodesInterface::integrate(" << t_out << "): "
-                          "Cannot integrate to a time earlier than t0 (" << t0_ << ")");
-    casadi_assert_message(t_out<=tf_ || !stop_at_end_, "CvodesInterface::integrate(" << t_out << "):"
+                          "Cannot integrate to a time earlier than t0 ("
+                          << t0_ << ")");
+    casadi_assert_message(t_out<=tf_ || !stop_at_end_, "CvodesInterface::integrate("
+                          << t_out << "):"
                           " Cannot integrate past a time later than tf (" << tf_ << ") "
                           "unless stop_at_end is set to False.");
 
@@ -1865,12 +1868,12 @@ namespace casadi {
     if (use_preconditionerB_) {
       // Make sure that a Jacobian has been provided
       if (jacB_.isNull())
-          throw CasadiException("CvodesInterface::init(): No backwards Jacobian has been provided.");
+        casadi_error("CvodesInterface::init(): No backwards Jacobian has been provided.");
 
       // Make sure that a linear solver has been provided
       if (linsolB_.isNull())
-          throw CasadiException("CvodesInterface::init(): "
-                                "No user defined backwards  linear solver has been provided.");
+        casadi_error("CvodesInterface::init(): "
+                     "No user defined backwards  linear solver has been provided.");
 
       // Pass to IDA
       flag = CVSpilsSetPreconditionerB(mem_, whichB_, psetupB_wrapper, psolveB_wrapper);

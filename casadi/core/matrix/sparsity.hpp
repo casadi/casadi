@@ -369,7 +369,7 @@ namespace casadi {
 #endif
 
     /** \brief Transpose the matrix and get the reordering of the non-zero entries
-    * 
+    *
     *  \param[out] mapping the non-zeros of the original matrix
     *              for each non-zero of the new matrix
     */
@@ -432,7 +432,7 @@ namespace casadi {
     /** \brief Sparsity pattern for a matrix-matrix product
         Returns the sparsity pattern resulting from multiplying the pattern with
         another pattern y from the right.
-        
+
         This will replace patternProduct after deprecation.
     */
     Sparsity patternProductNew(const Sparsity& y) const;

@@ -36,7 +36,7 @@
 namespace casadi {
 
   /**  \brief \pluginbrief{QpSolver,sqic}
-  
+
        @copydoc QpSolver_doc
        @copydoc plugin_QpSolver_sqic
        \author Joris Gillis

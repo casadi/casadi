@@ -30,7 +30,7 @@
 #include <casadi/solvers/casadi_integrator_oldcollocation_export.h>
 
 /** \defgroup plugin_Integrator_oldcollocation
-     
+
      Collocation integrator
      ODE/DAE integrator based on collocation
 

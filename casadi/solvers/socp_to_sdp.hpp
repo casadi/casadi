@@ -58,7 +58,7 @@ namespace casadi {
 
     /** \brief  Clone */
     virtual SocpToSdp* clone() const;
-  
+
     /** \brief  Create a new SOCP Solver */
     static SocpSolverInternal* creator(const SOCPStructure& st)
     { return new SocpToSdp(st);}

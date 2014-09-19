@@ -37,7 +37,7 @@
 namespace casadi {
 
   /** \brief \pluginbrief{QpSolver,qcqp}
-  
+
       @copydoc QpSolver_doc
       @copydoc plugin_QpSolver_qcqp
 

@@ -96,7 +96,7 @@ namespace casadi {
 
       \generalsection{SdqpSolver}
       \pluginssection{SdqpSolver}
-      
+
       \author Joel Andersson
       \date 2010
   */

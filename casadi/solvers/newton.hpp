@@ -39,10 +39,10 @@
 namespace casadi {
 
   /** \brief \pluginbrief{ImplicitFunction,newton}
-  
+
       @copydoc ImplicitFunction_doc
       @copydoc plugin_ImplicitFunction_newton
-         
+
       \author Joris Gillis
       \date 2012
   */

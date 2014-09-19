@@ -109,7 +109,7 @@ namespace casadi {
     SX x;
 
     /** \brief Algebraic equations and corresponding algebraic variables
-     * \a alg and \a z have matching dimensions and 
+     * \a alg and \a z have matching dimensions and
      * <tt>0 == alg(z, ...)</tt> implicitly defines \a z.
      */
     SX z, alg;
@@ -309,9 +309,9 @@ namespace casadi {
     /// Set an binding expression by non-differentiated expression
     void setBeq(const SX& var, const SX& val);
 
-    /** \brief Get a derivative binding equation (i.e. ordinary differential equation, ODE) 
+    /** \brief Get a derivative binding equation (i.e. ordinary differential equation, ODE)
      * by name.
-     * 
+     *
      * Returns variable expression if unknown.
      */
     SX ode(const std::string& name) const;

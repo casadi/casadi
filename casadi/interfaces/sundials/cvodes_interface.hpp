@@ -36,17 +36,17 @@
 #include <ctime>
 
 /** \defgroup plugin_Integrator_cvodes
-  
+
       Interface to CVodes from the Sundials suite.
 
       A call to evaluate will integrate to the end.
 
-      You can retrieve the entire state trajectory as follows, after the evaluate call: 
+      You can retrieve the entire state trajectory as follows, after the evaluate call:
       Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
-      
+
       Note: depending on the dimension and structure of your problem,
       you may experience a dramatic speed-up by using a sparse linear solver:
-      
+
       \verbatim
        intg.setOption("linear_solver","csparse")
        intg.setOption("linear_solver_type","user_defined")
@@ -200,27 +200,29 @@ namespace casadi {
                               void *user_data, N_Vector tmp);
     static int jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
                                N_Vector xdotB, void *user_data , N_Vector tmpB);
-    static int djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,
-                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    static int djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
+                            void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
     static int djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                              DlsMat JacB, void *user_data,
                              N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
     static int bjac_wrapper(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot,
-                            DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB,
+                            DlsMat Jac, void *user_data,
+                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    static int bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t,
+                             N_Vector x, N_Vector xB,
                              N_Vector xdotB, DlsMat JacB, void *user_data,
                              N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
     static int psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
                               double gamma, double delta, int lr, void *user_data, N_Vector tmp);
     static int psolveB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
-                               N_Vector zvecB, double gammaB, double deltaB, int lr, void *user_data,
-                               N_Vector tmpB);
+                               N_Vector zvecB, double gammaB, double deltaB,
+                               int lr, void *user_data, N_Vector tmpB);
     static int psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok,
                               booleantype *jcurPtr, double gamma, void *user_data,
                               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB, booleantype jokB,
-                               booleantype *jcurPtrB, double gammaB, void *user_data,
-                               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+    static int psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+                               booleantype jokB, booleantype *jcurPtrB, double gammaB,
+                               void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
     static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
                               booleantype *jcurPtr,
                               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
@@ -303,7 +305,7 @@ namespace casadi {
     bool monitor_rhsQB_;
 
     bool disable_internal_warnings_;
-    
+
   };
 
 } // namespace casadi

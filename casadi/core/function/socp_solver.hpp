@@ -112,7 +112,7 @@ namespace casadi {
 
       \generalsection{SocpSolver}
       \pluginssection{SocpSolver}
-      
+
       \author Joris Gillis
       \date 2013
   */

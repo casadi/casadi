@@ -38,10 +38,10 @@
 namespace casadi {
 
   /** \brief \pluginbrief{DpleSolver,condensing}
-  
+
    @copydoc DPLE_doc
    @copydoc plugin_DpleSolver_condensing
-   
+
        \author Joris Gillis
       \date 2014
 

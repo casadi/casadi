@@ -176,7 +176,8 @@ namespace casadi {
     cholesky_.push_back(LinearSolver("csparsecholesky", st_[QCQP_STRUCT_H]));
     for (int i=0;i<nq_;++i) {
       cholesky_.push_back(
-                          LinearSolver("csparsecholesky", DMatrix(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_), ALL).sparsity()));
+        LinearSolver("csparsecholesky",
+          DMatrix(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_), ALL).sparsity()));
     }
 
     for (int i=0;i<nq_+1;++i) {
@@ -185,13 +186,15 @@ namespace casadi {
 
       // Harvest Cholsesky sparsity patterns
       // Note that we add extra scalar to make room for the epigraph-reformulation variable
-      socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(false), Sparsity::dense(1, 1)));
+      socp_g.push_back(blkdiag(
+        cholesky_[i].getFactorizationSparsity(false), Sparsity::dense(1, 1)));
     }
 
     // Create an socpsolver instance
     solver_ = SocpSolver(Adaptor::targetName(),
                              socpStruct("g", horzcat(socp_g),
-                                        "a", horzcat(input(QCQP_SOLVER_A).sparsity(), Sparsity::sparse(nc_, 1))));
+                                        "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
+                                              Sparsity::sparse(nc_, 1))));
 
     //solver_.setQCQPOptions();
     Adaptor::setTargetOptions();

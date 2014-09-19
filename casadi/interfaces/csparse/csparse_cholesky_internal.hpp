@@ -37,7 +37,7 @@
 namespace casadi {
 
   /** \brief \pluginbrief{LinearSolver,csparsecholesky}
-   * 
+   *
    *
    @copydoc LinearSolver_doc
    @copydoc plugin_LinearSolver_csparsecholesky

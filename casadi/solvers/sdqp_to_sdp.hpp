@@ -52,7 +52,7 @@ namespace casadi {
    *
    @copydoc SdqpSolver_doc
    @copydoc plugin_SdqpSolver_sdp
-   
+
    \author Joris Gillis
    \date 2013
   */

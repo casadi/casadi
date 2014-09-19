@@ -547,7 +547,7 @@ namespace casadi {
     /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;
 
-    /** \brief Set or reset the maximum number of calls to the 
+    /** \brief Set or reset the maximum number of calls to the
      * printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);
 

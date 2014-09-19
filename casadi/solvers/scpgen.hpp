@@ -42,10 +42,10 @@
 namespace casadi {
 
   /**  \brief \pluginbrief{NlpSolver,scpgen}
-     
+
      @copy_doc NLPSolver_doc
      @copy_doc plugin_NlpSolver_scpgen
-     
+
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */

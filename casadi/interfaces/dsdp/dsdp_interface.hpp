@@ -28,7 +28,7 @@
 #include <dsdp5.h>
 
 /** \defgroup plugin_SdpSolver_dsdp
-      Interface to the SDP solver DSDP      
+      Interface to the SDP solver DSDP
       Warning: The solver DSDP is not good at handling linear equalities.
       There are several options if you notice difficulties:
       * play around with the parameter "_penalty"

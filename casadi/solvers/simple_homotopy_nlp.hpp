@@ -33,9 +33,9 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  /** 
+  /**
       \brief \pluginbrief{HomotopyNlpSolver,simple}
-       
+
        Solving an NLP homotopy with regular NLP solvers
 
       \author Joris Gillis

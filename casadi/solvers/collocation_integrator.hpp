@@ -30,7 +30,7 @@
 #include <casadi/solvers/casadi_integrator_collocation_export.h>
 
 /** \defgroup plugin_Integrator_collocation
-     
+
      Fixed-step implicit Runge-Kutta integrator
      ODE/DAE integrator based on collocation schemes
 

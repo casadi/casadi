@@ -248,7 +248,6 @@ virtual ~OptionsFunctionalityNode();
   static double wordDistance(const std::string &a, const std::string &b);
 
 
-
   void addOption(
     const std::string &str, const opt_type& type,
     const GenericType &def_val=GenericType(), const std::string& desc="n/a",
@@ -266,7 +265,6 @@ virtual ~OptionsFunctionalityNode();
   **/
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val,
                  const std::string& desc, const std::string &allowed_vals, bool inherit = false);
-
 
 protected:
 

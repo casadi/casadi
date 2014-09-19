@@ -37,7 +37,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_SQPMETHOD_EXPORT casadi_register_nlpsolver_sqpmethod(NlpSolverInternal::Plugin* plugin){
+  int CASADI_NLPSOLVER_SQPMETHOD_EXPORT
+      casadi_register_nlpsolver_sqpmethod(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = Sqpmethod::creator;
     plugin->name = "sqpmethod";
     plugin->doc = Sqpmethod::meta_doc.c_str();
@@ -46,7 +47,7 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_SQPMETHOD_EXPORT casadi_load_nlpsolver_sqpmethod(){
+  void CASADI_NLPSOLVER_SQPMETHOD_EXPORT casadi_load_nlpsolver_sqpmethod() {
     NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_sqpmethod);
   }
 

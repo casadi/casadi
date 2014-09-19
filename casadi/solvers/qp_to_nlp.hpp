@@ -39,10 +39,10 @@
 namespace casadi {
 
   /** \brief \pluginbrief{QpSolver,nlp}
-  
+
    @copydoc QpSolver_doc
    @copydoc plugin_QpSolver_nlp
-   
+
    \author Joris Gillis
    \date 2011
   */

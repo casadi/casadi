@@ -177,7 +177,7 @@ namespace casadi {
                                      "g", mapping_.output(1).sparsity()));
 
     solver_.setSOCPOptions();
-    
+
     Adaptor::setTargetOptions();
 
     // Initialize the SDP solver

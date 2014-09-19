@@ -69,7 +69,7 @@ namespace casadi {
 
       \generalsection{HomotopyNlpSolver}
       \pluginssection{HomotopyNlpSolver}
-      
+
       \author Joris Gillis
       \date 2014
   */

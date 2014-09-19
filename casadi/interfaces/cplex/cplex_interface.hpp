@@ -29,7 +29,7 @@
 #include <string>
 
 /** \defgroup plugin_QpSolver_cplex
-     
+
       Interface to Cplex solver for sparse Quadratic Programs
 */
 
@@ -43,7 +43,7 @@ namespace casadi {
 
       @copydoc QpSolver_doc
       @copydoc plugin_QpSolver_cplex
-      
+
       \author Attila Kozma, Joel Andersson
       \date 2012
   */

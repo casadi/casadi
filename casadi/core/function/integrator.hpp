@@ -168,7 +168,7 @@ namespace casadi {
 
       \generalsection{Integrator}
       \pluginssection{Integrator}
-      
+
       \author Joel Andersson
       \date 2010
   */

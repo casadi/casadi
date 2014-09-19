@@ -37,10 +37,10 @@
 
 /** \defgroup plugin_Integrator_idas
       Interface to IDAS from the Sundials suite.
-      
+
       Note: depending on the dimension and structure of your problem,
       you may experience a dramatic speed-up by using a sparse linear solver:
-      
+
       \verbatim
        intg.setOption("linear_solver","csparse")
        intg.setOption("linear_solver_type","user_defined")
@@ -203,7 +203,8 @@ namespace casadi {
     static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg,
                               void *eh_data);
     static int jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
-                              N_Vector Jv, double cj, void *user_data, N_Vector tmp1, N_Vector tmp2);
+                              N_Vector Jv, double cj, void *user_data,
+                              N_Vector tmp1, N_Vector tmp2);
     static int jtimesB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                                N_Vector resvalB, N_Vector vB, N_Vector JvB, double cjB,
                                void *user_data, N_Vector tmp1B, N_Vector tmp2B);
@@ -217,13 +218,16 @@ namespace casadi {
                              N_Vector *xzF, N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF,
                              void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
     static int psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
-                              N_Vector zvec, double cj, double delta, void *user_data, N_Vector tmp);
+                              N_Vector zvec, double cj, double delta, void *user_data,
+                              N_Vector tmp);
     static int psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
                               void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int psolveB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+    static int psolveB_wrapper(double t,
+                               N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                                N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB,
                                double deltaB, void *user_dataB, N_Vector tmpB);
-    static int psetupB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+    static int psetupB_wrapper(double t,
+                               N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                                N_Vector resvalB, double cjB, void *user_dataB,
                                N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
     static int djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,

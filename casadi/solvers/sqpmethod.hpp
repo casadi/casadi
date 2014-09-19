@@ -152,7 +152,8 @@ namespace casadi {
     virtual void eval_g(const std::vector<double>& x, std::vector<double>& g);
 
     // Evaluate the Jacobian of the constraints
-    virtual void eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J);
+    virtual void eval_jac_g(const std::vector<double>& x, std::vector<double>& g,
+      Matrix<double>& J);
 
     // Evaluate the Hessian of the Lagrangian
     virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda,

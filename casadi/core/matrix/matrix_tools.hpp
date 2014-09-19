@@ -45,7 +45,7 @@ namespace casadi {
    *
    * With optional sp_z you can specify the sparsity of the result
    * A typical use case might be where the product is only constructed to
-   * inspect the trace of it. sp_z diagonal will be more efficient 
+   * inspect the trace of it. sp_z diagonal will be more efficient
    * in that case.
    */
   template<typename DataType>
@@ -312,12 +312,12 @@ namespace casadi {
                                              const Dictionary& dict = Dictionary());
 
   /** Inf-norm of a Matrix-matrix product, no memory allocation
-  *   mul(x, y)     
+  *   mul(x, y)
   *
   * \param Dwork  A double work vector that you must allocate
-  *               Minimum size: y.size1()   
+  *               Minimum size: y.size1()
   * \param Iwork  A integer work vector that you must allocate
-  *               Minimum size: y.size1()+x.size2()+1        
+  *               Minimum size: y.size1()+x.size2()+1
   */
   CASADI_CORE_EXPORT double norm_inf_mul_nn(const Matrix<double> &x,
                               const Matrix<double> &y,
