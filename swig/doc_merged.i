@@ -3034,6 +3034,10 @@ Solving the Discrete Lyapunov Equations with a regular LinearSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: cle_solver.hpp ";
 
@@ -4098,6 +4102,11 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: collocation_integrator.hpp ";
 
@@ -7039,6 +7048,11 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: control_simulator.hpp ";
 
 %feature("docstring") casadi::ControlSimulator::isInit "
@@ -8621,6 +8635,11 @@ Attila Kozma, Joel Andersson
 |              |              |              | methods).    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: cplex_interface.hpp ";
 
 %feature("docstring") casadi::CplexInterface::generateDeclarations "[INTERNAL]  Generate code for the declarations of the C function.
@@ -9629,6 +9648,11 @@ LinearSolver with CSparse Interface
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: csparse_interface.hpp ";
 
 %feature("docstring") casadi::CsparseInterface::solveL "[INTERNAL]   Solve
@@ -10551,6 +10575,11 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: custom_function.hpp ";
 
@@ -12187,6 +12216,11 @@ experience a dramatic speed-up by using a sparse linear solver:
 +-------------+-------------------------+
 | nstepsB     | casadi::CvodesInterface |
 +-------------+-------------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: cvodes_interface.hpp ";
 
@@ -16506,6 +16540,10 @@ Solving the Discrete Lyapunov Equations with a regular LinearSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: dle_solver.hpp ";
 
@@ -17627,6 +17665,10 @@ Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: dple_solver.hpp ";
 
@@ -18606,6 +18648,11 @@ Solving the Discrete Lyapunov Equations with Periodic Solver
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: dple_to_dle.hpp ";
 
@@ -19679,6 +19726,11 @@ manually switch to another SDP Solver
 +--------------------+-----------------------+
 | termination_reason | casadi::DsdpInterface |
 +--------------------+-----------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: dsdp_interface.hpp ";
 
@@ -21357,6 +21409,11 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: external_function.hpp ";
 
 %feature("docstring") casadi::ExternalFunction::fullJacobian "
@@ -22762,6 +22819,11 @@ Clone.
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: fixed_step_integrator.hpp ";
 
 %feature("docstring") casadi::FixedStepIntegrator::getTangent "[INTERNAL]
@@ -23911,6 +23973,11 @@ Joel Andersson
 +---------+--------------------------+
 | outputs | casadi::FunctionInternal |
 +---------+--------------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: function.hpp ";
 
@@ -27828,6 +27895,10 @@ simple
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: homotopy_nlp_solver.hpp ";
 
@@ -29830,6 +29901,11 @@ Joel Andersson
 | nstepsB     | casadi::IdasInterface |
 +-------------+-----------------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: idas_interface.hpp ";
 
 %feature("docstring") casadi::IdasInterface::getInputScheme "[INTERNAL]
@@ -31161,6 +31237,11 @@ problem)
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: implicit_fixed_step_integrator.hpp ";
 
@@ -32549,26 +32630,18 @@ Use an NlpSolver as ImplicitFunction solver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| nlp_solver      | OT_STRING       | GenericType()   | The NlpSolver   |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the implicit    |
-|                 |                 |                 | system.         |
-+-----------------+-----------------+-----------------+-----------------+
-| nlp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ons             |                 |                 | passed to the   |
-|                 |                 |                 | NlpSolver       |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
-+------------------+
-|        Id        |
-+==================+
-| nlp_solver_stats |
-+------------------+
++--------------+
+|      Id      |
++==============+
+| solver_stats |
++--------------+
 
 --------------------------------------------------------------------------------
 
@@ -32636,6 +32709,10 @@ Implements simple newton iterations to solve an implicit function.
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: implicit_function.hpp ";
 
@@ -35272,6 +35349,10 @@ The method is still under development
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: integrator.hpp ";
 
@@ -38091,6 +38172,11 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 | var_string_md      | casadi::IpoptInterface |
 +--------------------+------------------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: ipopt_interface.hpp ";
 
 %feature("docstring") casadi::IpoptInterface::getJacSparsityHierarchicalSymm
@@ -39579,6 +39665,11 @@ KINSOL interface from the Sundials suite
 | outputs   | casadi::FunctionInternal |
 +-----------+--------------------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: kinsol_interface.hpp ";
 
 %feature("docstring") casadi::KinsolInterface::getFullJacobian "[INTERNAL]
@@ -41053,6 +41144,11 @@ KNITRO interface
 | return_status | casadi::KnitroInterface |
 +---------------+-------------------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: knitro_interface.hpp ";
 
 %feature("docstring") casadi::KnitroInterface::copyOptions "[INTERNAL]
@@ -41529,6 +41625,11 @@ A: A = L.U, with L lower and U upper triangular
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: lapack_lu_dense.hpp ";
 
@@ -42995,6 +43096,11 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: lapack_qr_dense.hpp ";
 
 %feature("docstring") casadi::LapackQrDense::getCount "[INTERNAL]  Get the
@@ -44091,6 +44197,10 @@ reordering without partial pivoting
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: linear_solver.hpp ";
 
@@ -45345,17 +45455,10 @@ Solve LPs using a QpSolver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| qp_solver       | OT_STRING       | GenericType()   | The QPSOlver    |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the LPs.        |
-+-----------------+-----------------+-----------------+-----------------+
-| qp_solver_optio | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ns              |                 |                 | passed to the   |
-|                 |                 |                 | QPSOlver        |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -45370,6 +45473,10 @@ Solve LPs using a QpSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: lp_solver.hpp ";
 
@@ -46467,17 +46574,10 @@ Solve LPs using a QpSolver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| qp_solver       | OT_STRING       | GenericType()   | The QPSOlver    |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the LPs.        |
-+-----------------+-----------------+-----------------+-----------------+
-| qp_solver_optio | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ns              |                 |                 | passed to the   |
-|                 |                 |                 | QPSOlver        |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -46593,15 +46693,6 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_solver    | OT_STRING    | GenericType( | The QPSOlver | casadi::LpTo |
-|              |              | )            | used to      | Qp           |
-|              |              |              | solve the    |              |
-|              |              |              | LPs.         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| qp_solver_op | OT_DICTIONAR | GenericType( | Options to   | casadi::LpTo |
-| tions        | Y            | )            | be passed to | Qp           |
-|              |              |              | the QPSOlver |              |
-+--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
 |              |              |              | when NaN or  |              |
@@ -46632,6 +46723,11 @@ Joris Gillis
 +=================+================+
 | qp_solver_stats | casadi::LpToQp |
 +-----------------+----------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: lp_to_qp.hpp ";
 
@@ -50970,6 +51066,11 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: mx_function.hpp ";
 
 %feature("docstring") casadi::MXFunction::getNumInputElements "
@@ -52535,6 +52636,11 @@ Joris Gillis
 +---------------+----------------+
 | return_status | casadi::Newton |
 +---------------+----------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: newton.hpp ";
 
@@ -55243,6 +55349,10 @@ Stabilized Sequential Quadratic Programming method.
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: nlp_solver.hpp ";
 
@@ -58822,6 +58932,11 @@ basis Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: nullspace.hpp ";
 
 %feature("docstring") casadi::Nullspace::setNumOutputs "
@@ -59667,6 +59782,11 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: old_collocation_integrator.hpp ";
 
@@ -61282,6 +61402,11 @@ reInit();
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: ooqp_interface.hpp ";
 
 %feature("docstring") casadi::OoqpInterface::inputSchemeEntry "[INTERNAL]
@@ -61591,6 +61716,11 @@ Joel Andersson
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: options_functionality.hpp ";
 
 %feature("docstring") casadi::OptionsFunctionality::getOptionAllowed "
@@ -61828,6 +61958,11 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: options_functionality.hpp ";
 
@@ -63007,6 +63142,11 @@ Joel Andersson
 +-----------------+------------------------------+
 | task_starttime  | casadi::ParallelizerInternal |
 +-----------------+------------------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: parallelizer.hpp ";
 
@@ -64431,6 +64571,11 @@ Joris Gillis
 | t_total        | casadi::PsdIndefDpleInternal |
 +----------------+------------------------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: psd_indef_dple_solver.hpp ";
 
 %feature("docstring") casadi::PsdIndefDpleSolver::repr "
@@ -64769,17 +64914,10 @@ epigraph reformulation and e==0 for all other quadratic constraints.
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| socp_solver     | OT_STRING       | GenericType()   | The SocpSolver  |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the QCQPs.      |
-+-----------------+-----------------+-----------------+-----------------+
-| socp_solver_opt | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ions            |                 |                 | passed to the   |
-|                 |                 |                 | SOCPSOlver      |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -64794,6 +64932,10 @@ epigraph reformulation and e==0 for all other quadratic constraints.
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: qcqp_solver.hpp ";
 
@@ -66026,17 +66168,10 @@ epigraph reformulation and e==0 for all other quadratic constraints.
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| socp_solver     | OT_STRING       | GenericType()   | The SocpSolver  |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the QCQPs.      |
-+-----------------+-----------------+-----------------+-----------------+
-| socp_solver_opt | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ions            |                 |                 | passed to the   |
-|                 |                 |                 | SOCPSOlver      |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -66186,17 +66321,6 @@ Joris Gillis
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| socp_solver  | OT_STRING    | GenericType( | The          | casadi::Qcqp |
-|              |              | )            | SocpSolver   | ToSocp       |
-|              |              |              | used to      |              |
-|              |              |              | solve the    |              |
-|              |              |              | QCQPs.       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| socp_solver_ | OT_DICTIONAR | GenericType( | Options to   | casadi::Qcqp |
-| options      | Y            | )            | be passed to | ToSocp       |
-|              |              |              | the          |              |
-|              |              |              | SOCPSOlver   |              |
-+--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -66220,6 +66344,11 @@ Joris Gillis
 +===================+====================+
 | socp_solver_stats | casadi::QcqpToSocp |
 +-------------------+--------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: qcqp_to_socp.hpp ";
 
@@ -67405,6 +67534,11 @@ Joris Gillis, Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: qpoases_interface.hpp ";
 
@@ -68974,17 +69108,10 @@ Solve QPs using an NlpSolver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| nlp_solver      | OT_STRING       | GenericType()   | The NLPSOlver   |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the QPs.        |
-+-----------------+-----------------+-----------------+-----------------+
-| nlp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ons             |                 |                 | passed to the   |
-|                 |                 |                 | NLPSOlver       |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -69009,17 +69136,10 @@ Solve QP using a QcqpSolver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| qcqp_solver     | OT_STRING       | GenericType()   | The QcqpSolver  |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the QPs.        |
-+-----------------+-----------------+-----------------+-----------------+
-| qcqp_solver_opt | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ions            |                 |                 | passed to the   |
-|                 |                 |                 | QCQPSOlver      |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -69034,6 +69154,10 @@ Solve QP using a QcqpSolver
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: qp_solver.hpp ";
 
@@ -70192,26 +70316,18 @@ Use an NlpSolver as ImplicitFunction solver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| nlp_solver      | OT_STRING       | GenericType()   | The NlpSolver   |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the implicit    |
-|                 |                 |                 | system.         |
-+-----------------+-----------------+-----------------+-----------------+
-| nlp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ons             |                 |                 | passed to the   |
-|                 |                 |                 | NlpSolver       |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
-+------------------+
-|        Id        |
-+==================+
-| nlp_solver_stats |
-+------------------+
++--------------+
+|      Id      |
++==============+
+| solver_stats |
++--------------+
 
 Joris Gillis
 
@@ -70319,18 +70435,6 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_STRING    | GenericType( | The          | casadi::QpTo |
-|              |              | )            | NlpSolver    | Implicit     |
-|              |              |              | used to      |              |
-|              |              |              | solve the    |              |
-|              |              |              | implicit     |              |
-|              |              |              | system.      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::QpTo |
-| ptions       | Y            | )            | be passed to | Implicit     |
-|              |              |              | the          |              |
-|              |              |              | NlpSolver    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
 |              |              |              | when NaN or  |              |
@@ -70356,11 +70460,16 @@ Joris Gillis
 
 >List of available stats
 
-+------------------+----------------------+
-|        Id        |       Used in        |
-+==================+======================+
-| nlp_solver_stats | casadi::QpToImplicit |
-+------------------+----------------------+
++--------------+----------------------+
+|      Id      |       Used in        |
++==============+======================+
+| solver_stats | casadi::QpToImplicit |
++--------------+----------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: implicit_to_nlp.hpp ";
 
@@ -70896,17 +71005,10 @@ Solve QPs using an NlpSolver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| nlp_solver      | OT_STRING       | GenericType()   | The NLPSOlver   |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the QPs.        |
-+-----------------+-----------------+-----------------+-----------------+
-| nlp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ons             |                 |                 | passed to the   |
-|                 |                 |                 | NLPSOlver       |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -71033,17 +71135,6 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_STRING    | GenericType( | The          | casadi::QpTo |
-|              |              | )            | NLPSOlver    | Nlp          |
-|              |              |              | used to      |              |
-|              |              |              | solve the    |              |
-|              |              |              | QPs.         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::QpTo |
-| ptions       | Y            | )            | be passed to | Nlp          |
-|              |              |              | the          |              |
-|              |              |              | NLPSOlver    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
 |              |              |              | when NaN or  |              |
@@ -71074,6 +71165,11 @@ Joris Gillis
 +==================+=================+
 | nlp_solver_stats | casadi::QpToNlp |
 +------------------+-----------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: qp_to_nlp.hpp ";
 
@@ -71991,17 +72087,10 @@ Solve QP using a QcqpSolver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| qcqp_solver     | OT_STRING       | GenericType()   | The QcqpSolver  |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the QPs.        |
-+-----------------+-----------------+-----------------+-----------------+
-| qcqp_solver_opt | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ions            |                 |                 | passed to the   |
-|                 |                 |                 | QCQPSOlver      |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -72128,17 +72217,6 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qcqp_solver  | OT_STRING    | GenericType( | The          | casadi::QpTo |
-|              |              | )            | QcqpSolver   | Qcqp         |
-|              |              |              | used to      |              |
-|              |              |              | solve the    |              |
-|              |              |              | QPs.         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| qcqp_solver_ | OT_DICTIONAR | GenericType( | Options to   | casadi::QpTo |
-| options      | Y            | )            | be passed to | Qcqp         |
-|              |              |              | the          |              |
-|              |              |              | QCQPSOlver   |              |
-+--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
 |              |              |              | when NaN or  |              |
@@ -72169,6 +72247,11 @@ Joris Gillis
 +===================+==================+
 | qcqp_solver_stats | casadi::QpToQcqp |
 +-------------------+------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: qp_to_qcqp.hpp ";
 
@@ -74475,6 +74558,11 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: rk_integrator.hpp ";
 
@@ -77387,6 +77475,11 @@ Joel Andersson, Attila Kozma and Joris Gillis
 | iter_count | casadi::Scpgen |
 +------------+----------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: scpgen.hpp ";
 
 %feature("docstring") casadi::Scpgen::addOption "
@@ -78181,6 +78274,10 @@ manually switch to another SDP Solver
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: sdp_solver.hpp ";
 
@@ -79153,17 +79250,10 @@ singular value decomposition to implement that.
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| sdp_solver      | OT_STRING       | GenericType()   | The SdpSolver   |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the SDQPs.      |
-+-----------------+-----------------+-----------------+-----------------+
-| sdp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ons             |                 |                 | passed to the   |
-|                 |                 |                 | SDPSOlver       |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -79178,6 +79268,10 @@ singular value decomposition to implement that.
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: sdqp_solver.hpp ";
 
@@ -80801,17 +80895,10 @@ singular value decomposition to implement that.
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| sdp_solver      | OT_STRING       | GenericType()   | The SdpSolver   |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the SDQPs.      |
-+-----------------+-----------------+-----------------+-----------------+
-| sdp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ons             |                 |                 | passed to the   |
-|                 |                 |                 | SDPSOlver       |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -80963,14 +81050,14 @@ Joris Gillis
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sdp_solver   | OT_STRING    | GenericType( | The          | casadi::Sdqp |
-|              |              | )            | SdpSolver    | ToSdp        |
-|              |              |              | used to      |              |
+|              |              | )            | SdqpSolver   | SolverIntern |
+|              |              |              | used to      | al           |
 |              |              |              | solve the    |              |
-|              |              |              | SDQPs.       |              |
+|              |              |              | SDPs.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sdp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Sdqp |
-| ptions       | Y            | )            | be passed to | ToSdp        |
-|              |              |              | the          |              |
+| ptions       | Y            | )            | be passed to | SolverIntern |
+|              |              |              | the          | al           |
 |              |              |              | SDPSOlver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
@@ -80996,6 +81083,11 @@ Joris Gillis
 +==================+===================+
 | sdp_solver_stats | casadi::SdqpToSdp |
 +------------------+-------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: sdqp_to_sdp.hpp ";
 
@@ -84437,6 +84529,11 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: simple_homotopy_nlp.hpp ";
 
 %feature("docstring") casadi::SimpleHomotopyNlp::getOutputScheme "[INTERNAL]  Get output scheme.
@@ -85132,6 +85229,11 @@ Joel Andersson
 +---------+---------------------------+
 | step    | casadi::SimulatorInternal |
 +---------+---------------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: simulator.hpp ";
 
@@ -87248,6 +87350,11 @@ SNOPT interface
 | t_mainloop     | casadi::SnoptInterface |
 +----------------+------------------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: snopt_interface.hpp ";
 
 %feature("docstring") casadi::SnoptInterface::symbolicInputSX "[INTERNAL]
@@ -87951,17 +88058,10 @@ Solve SOCPs using an SdpSolver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| sdp_solver      | OT_STRING       | GenericType()   | The SdpSolver   |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the SOCPs.      |
-+-----------------+-----------------+-----------------+-----------------+
-| sdp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ons             |                 |                 | passed to the   |
-|                 |                 |                 | SDPSOlver       |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -87976,6 +88076,10 @@ Solve SOCPs using an SdpSolver
 
 
 Joris Gillis
+Diagrams
+--------
+
+
 
 C++ includes: socp_solver.hpp ";
 
@@ -88796,17 +88900,10 @@ Solve SOCPs using an SdpSolver
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| sdp_solver      | OT_STRING       | GenericType()   | The SdpSolver   |
-|                 |                 |                 | used to solve   |
-|                 |                 |                 | the SOCPs.      |
-+-----------------+-----------------+-----------------+-----------------+
-| sdp_solver_opti | OT_DICTIONARY   | GenericType()   | Options to be   |
-| ons             |                 |                 | passed to the   |
-|                 |                 |                 | SDPSOlver       |
-+-----------------+-----------------+-----------------+-----------------+
++----+------+---------+-------------+
+| Id | Type | Default | Description |
++====+======+=========+=============+
++----+------+---------+-------------+
 
 >List of available stats
 
@@ -88964,17 +89061,6 @@ Joris Gillis
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| sdp_solver   | OT_STRING    | GenericType( | The          | casadi::Socp |
-|              |              | )            | SdpSolver    | ToSdp        |
-|              |              |              | used to      |              |
-|              |              |              | solve the    |              |
-|              |              |              | SOCPs.       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| sdp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Socp |
-| ptions       | Y            | )            | be passed to | ToSdp        |
-|              |              |              | the          |              |
-|              |              |              | SDPSOlver    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -88998,6 +89084,11 @@ Joris Gillis
 +==================+===================+
 | sdp_solver_stats | casadi::SocpToSdp |
 +------------------+-------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: socp_to_sdp.hpp ";
 
@@ -92023,6 +92114,11 @@ Joris Gillis
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: sqic_interface.hpp ";
 
 %feature("docstring") casadi::SqicInterface::getDerivative "[INTERNAL]
@@ -93511,6 +93607,11 @@ A textbook SQPMethod
 | t_mainloop         | casadi::Sqpmethod |
 +--------------------+-------------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: sqpmethod.hpp ";
 
 %feature("docstring") casadi::Sqpmethod::spInit "[INTERNAL]  Reset the
@@ -94773,6 +94874,10 @@ Solved a stabilized QP using a standard QP solver
 
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: stabilized_qp_solver.hpp ";
 
@@ -95735,6 +95840,11 @@ Joris Gillis
 +=================+==========================+
 | qp_solver_stats | casadi::StabilizedQpToQp |
 +-----------------+--------------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: stabilized_qp_to_qp.hpp ";
 
@@ -96832,6 +96942,11 @@ Interface to SQIC
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: stabilized_sqic_interface.hpp ";
 
@@ -98864,6 +98979,11 @@ Slava Kung
 +---------------+-----------------------+
 | return_status | casadi::StabilizedSqp |
 +---------------+-----------------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: stabilized_sqp.hpp ";
 
@@ -100991,6 +101111,11 @@ Print all information there is to know about a certain option.
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: sundials_interface.hpp ";
 
 %feature("docstring") casadi::SundialsInterface::jacobian "[INTERNAL]
@@ -102730,6 +102855,11 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: sx_function.hpp ";
 
@@ -104901,6 +105031,11 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: symbolic_qr.hpp ";
 
 %feature("docstring") casadi::SymbolicQr::getNumInputNonzeros "[INTERNAL]
@@ -105276,6 +105411,11 @@ XmlFile using TinyXml
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
+--------
+
+
 
 C++ includes: tinyxml_interface.hpp ";
 
@@ -109590,6 +109730,11 @@ WORHP interface
 | t_mainloop         | casadi::WorhpInterface |
 +--------------------+------------------------+
 
+Diagrams
+--------
+
+
+
 C++ includes: worhp_interface.hpp ";
 
 %feature("docstring") casadi::WorhpInterface::eval_jac_g "[INTERNAL] ";
@@ -109701,6 +109846,10 @@ C++ includes: wrapper.hpp ";
 XML parser Can be used for parsing XML files into CasADi data structures.
 
 Joel Andersson
+Diagrams
+--------
+
+
 
 C++ includes: xml_file.hpp ";
 
@@ -114867,6 +115016,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: dulmageMendelsohn_8hpp.xml
+
+
+// File: e0__diagram_8hpp.xml
 
 
 // File: empty__lib_8cpp.xml
