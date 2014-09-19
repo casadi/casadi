@@ -105,7 +105,13 @@ namespace casadi {
 
     // Issue warning aRegFcn reg;nd quick return if already loaded
     if (Derived::solvers_.find(name) != Derived::solvers_.end()) {
-      casadi_warning("PluginInterface: Solver " + name + " is already in use. Ignored.");
+      if (suffix.size()>0) {
+        Plugin &plugin = Derived::solvers_.find(name)->second;
+        casadi_assert(plugin.adaptorLoader);
+        plugin.adaptorLoader(suffix);
+      } else {
+        casadi_warning("PluginInterface: Solver " + name + " is already in use. Ignored.");
+      }
       return;
     }
 
@@ -198,20 +204,27 @@ namespace casadi {
     if (suffix.size()>0) {
       casadi_assert(plugin.adaptorLoader);
       plugin.adaptorLoader(suffix);
-
-      // Add to list of solvers
-      Derived::solvers_[std::string(plugin.name) + "." + suffix] = plugin;
-    } else {
-
-      // Add to list of solvers
-      Derived::solvers_[plugin.name] = plugin;
     }
 
+    // Add to list of solvers
+    Derived::solvers_[plugin.name] = plugin;
   }
 
   template<class Derived>
   typename PluginInterface<Derived>::Plugin&
-  PluginInterface<Derived>::getPlugin(const std::string& name) {
+  PluginInterface<Derived>::getPlugin(const std::string& name_) {
+
+    std::string::size_type dotpos = name_.find(".");
+
+    std::string name;
+    std::string suffix;
+
+    if (dotpos == std::string::npos) {
+      name = name_;
+    } else {
+      name = name_.substr(0, dotpos);
+      suffix = name_.substr(dotpos+1);
+    }
 
     // Check if the solver has been loaded
     typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(name);
