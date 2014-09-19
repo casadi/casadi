@@ -20,15 +20,15 @@
  *
  */
 
-#include "symbolic/mx/mx.hpp"
-#include "symbolic/std_vector_tools.hpp"
-#include "symbolic/function/sx_function.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/function/function.hpp"
+#include "core/mx/mx.hpp"
+#include "core/std_vector_tools.hpp"
+#include "core/function/sx_function.hpp"
+#include "core/sx/sx_tools.hpp"
+#include "core/function/function.hpp"
 #include <ctime>
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 /** Determinant example from ADOL-C */
 

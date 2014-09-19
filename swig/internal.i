@@ -1,3369 +1,3579 @@
-%exception  CasADi::Assertion::clone() const  {
+%exception  casadi::Assertion::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Assertion::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::Assertion::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Assertion::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::Assertion::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Assertion::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::Assertion::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Assertion::getOp() const  {
+%exception  casadi::Assertion::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Assertion::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Assertion::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Assertion::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::Assertion::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::clone() const  {
+%exception  casadi::BinaryMX< ScX, ScY >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::BinaryMX< ScX, ScY >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::BinaryMX< ScX, ScY >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::BinaryMX< ScX, ScY >::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::BinaryMX< ScX, ScY >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::BinaryMX< ScX, ScY >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::getBinary(int op, const MX &y, bool scX, bool scY) const  {
+%exception  casadi::BinaryMX< ScX, ScY >::getBinary(int op, const MX &y, bool scX, bool scY) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::getOp() const  {
+%exception  casadi::BinaryMX< ScX, ScY >::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::getUnary(int op) const  {
+%exception  casadi::BinaryMX< ScX, ScY >::getUnary(int op) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::isBinaryOp() const  {
+%exception  casadi::BinaryMX< ScX, ScY >::isBinaryOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::numInplace() const  {
+%exception  casadi::BinaryMX< ScX, ScY >::numInplace() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::BinaryMX< ScX, ScY >::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinaryMX< ScX, ScY >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::BinaryMX< ScX, ScY >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinarySX::dep(int i) const  {
+%exception  casadi::BinarySX::dep(int i) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinarySX::dep(int i) {
+%exception  casadi::BinarySX::dep(int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinarySX::getOp() const  {
+%exception  casadi::BinarySX::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinarySX::hasDep() const  {
+%exception  casadi::BinarySX::hasDep() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinarySX::isSmooth() const  {
+%exception  casadi::BinarySX::isSmooth() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinarySX::ndep() const  {
+%exception  casadi::BinarySX::ndep() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::BinarySX::print(std::ostream &stream, long &remaining_calls) const  {
+%exception  casadi::BinarySX::print(std::ostream &stream, long &remaining_calls) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::clone() const  {
+%exception  casadi::CallFunction::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::CallFunction::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::CallFunction::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::CallFunction::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::CallFunction::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::getFunction() {
+%exception  casadi::CallFunction::getFunction() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::getFunctionInput() const  {
+%exception  casadi::CallFunction::getFunctionInput() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::getFunctionOutput() const  {
+%exception  casadi::CallFunction::getFunctionOutput() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::getNumOutputs() const  {
+%exception  casadi::CallFunction::getNumOutputs() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::getOp() const  {
+%exception  casadi::CallFunction::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::nTmp(size_t &ni, size_t &nr) {
+%exception  casadi::CallFunction::nTmp(size_t &ni, size_t &nr) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::CallFunction::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
+%exception  casadi::CallFunction::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CallFunction::sparsity(int oind) const  {
+%exception  casadi::CallFunction::sparsity(int oind) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::addAuxiliary(Auxiliary f) {
+%exception  casadi::CodeGenerator::addAuxiliary(Auxiliary f) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::addDependency(const Function &f) {
+%exception  casadi::CodeGenerator::addDependency(const Function &f) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::addInclude(const std::string &new_include, bool relative_path=false) {
+%exception  casadi::CodeGenerator::addInclude(const std::string &new_include, bool relative_path=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::addSparsity(const Sparsity &sp) {
+%exception  casadi::CodeGenerator::addSparsity(const Sparsity &sp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::casadi_dot(int n, const std::string &x, int inc_x, const std::string &y, int inc_y) {
+%exception  casadi::CodeGenerator::casadi_dot(int n, const std::string &x, int inc_x, const std::string &y, int inc_y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::copyVector(std::ostream &s, const std::string &arg, std::size_t n, const std::string &res, const std::string &it="i", bool only_if_exists=false) const  {
+%exception  casadi::CodeGenerator::copyVector(std::ostream &s, const std::string &arg, std::size_t n, const std::string &res, const std::string &it="i", bool only_if_exists=false) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::flush(std::ostream &s) const  {
+%exception  casadi::CodeGenerator::flush(std::ostream &s) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::getConstant(const std::vector< double > &v, bool allow_adding=false) {
+%exception  casadi::CodeGenerator::getConstant(const std::vector< double > &v, bool allow_adding=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::getConstant(const std::vector< int > &v, bool allow_adding=false) {
+%exception  casadi::CodeGenerator::getConstant(const std::vector< int > &v, bool allow_adding=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::getDependency(const Function &f) const  {
+%exception  casadi::CodeGenerator::getDependency(const Function &f) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::CodeGenerator::getSparsity(const Sparsity &sp) const  {
+%exception  casadi::CodeGenerator::getSparsity(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Concat::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::Concat::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Concat::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::Concat::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Concat::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::Concat::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Concat::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::Concat::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Concat::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
+%exception  casadi::Concat::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Concat::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::Concat::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::clone() const  {
+%exception  casadi::Constant< Value >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::Constant< Value >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::Constant< Value >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::Constant< Value >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getBinary(int op, const MX &y, bool ScX, bool ScY) const  {
+%exception  casadi::Constant< Value >::getBinary(int op, const MX &y, bool ScX, bool ScY) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
+%exception  casadi::Constant< Value >::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getHorzcat(const std::vector< MX > &x) const  {
+%exception  casadi::Constant< Value >::getHorzcat(const std::vector< MX > &x) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getMatrixValue() const  {
+%exception  casadi::Constant< Value >::getMatrixValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getReshape(const Sparsity &sp) const  {
+%exception  casadi::Constant< Value >::getReshape(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getSetNonzeros(const MX &y, const std::vector< int > &nz) const  {
+%exception  casadi::Constant< Value >::getSetNonzeros(const MX &y, const std::vector< int > &nz) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getSetSparse(const Sparsity &sp) const  {
+%exception  casadi::Constant< Value >::getSetSparse(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getTranspose() const  {
+%exception  casadi::Constant< Value >::getTranspose() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getUnary(int op) const  {
+%exception  casadi::Constant< Value >::getUnary(int op) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getValue() const  {
+%exception  casadi::Constant< Value >::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::getVertcat(const std::vector< MX > &x) const  {
+%exception  casadi::Constant< Value >::getVertcat(const std::vector< MX > &x) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::isIdentity() const  {
+%exception  casadi::Constant< Value >::isIdentity() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::isOne() const  {
+%exception  casadi::Constant< Value >::isOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::isValue(double val) const  {
+%exception  casadi::Constant< Value >::isValue(double val) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::isZero() const  {
+%exception  casadi::Constant< Value >::isZero() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Constant< Value >::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Constant< Value >::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::clone() const  {
+%exception  casadi::ConstantDMatrix::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::ConstantDMatrix::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::ConstantDMatrix::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::getMatrixValue() const  {
+%exception  casadi::ConstantDMatrix::getMatrixValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::getValue() const  {
+%exception  casadi::ConstantDMatrix::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::isIdentity() const  {
+%exception  casadi::ConstantDMatrix::isIdentity() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::isMinusOne() const  {
+%exception  casadi::ConstantDMatrix::isMinusOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::isOne() const  {
+%exception  casadi::ConstantDMatrix::isOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::isZero() const  {
+%exception  casadi::ConstantDMatrix::isZero() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantDMatrix::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::ConstantDMatrix::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantMX::clone() const  {
+%exception  casadi::ConstantMX::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantMX::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::ConstantMX::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantMX::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::ConstantMX::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantMX::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::ConstantMX::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantMX::getInnerProd(const MX &y) const  {
+%exception  casadi::ConstantMX::getInnerProd(const MX &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantMX::getMatrixValue() const  {
+%exception  casadi::ConstantMX::getMatrixValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantMX::getOp() const  {
+%exception  casadi::ConstantMX::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantMX::getValue() const  {
+%exception  casadi::ConstantMX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::ConstantMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantSX::getOp() const  {
+%exception  casadi::ConstantSX::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantSX::getValue() const  {
+%exception  casadi::ConstantSX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ConstantSX::isConstant() const  {
+%exception  casadi::ConstantSX::isConstant() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::DenseMultiplication< TrX, TrY >::clone() const  {
+%exception  casadi::DenseMultiplication< TrX, TrY >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::DenseMultiplication< TrX, TrY >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::DenseMultiplication< TrX, TrY >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::DenseTranspose::clone() const  {
+%exception  casadi::DenseTranspose::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::DenseTranspose::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::DenseTranspose::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::DenseTranspose::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::DenseTranspose::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::DenseTranspose::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::DenseTranspose::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::DenseTranspose::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::DenseTranspose::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::DenseTranspose::nTmp(size_t &ni, size_t &nr) {
+%exception  casadi::DenseTranspose::nTmp(size_t &ni, size_t &nr) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::DenseTranspose::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
+%exception  casadi::DenseTranspose::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Determinant::clone() const  {
+%exception  casadi::Determinant::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Determinant::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::Determinant::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Determinant::getOp() const  {
+%exception  casadi::Determinant::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Determinant::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Determinant::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::callDerivative(const DMatrixVector &arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed, DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed, DMatrixVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
+%exception  casadi::Function::callDerivative(const DMatrixVector &arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed, DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed, DMatrixVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::callDerivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
+%exception  casadi::Function::callDerivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::callDerivative(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
+%exception  casadi::Function::callDerivative(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::checkInputs() const  {
+%exception  casadi::Function::checkInputs() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::checkNode() const  {
+%exception  casadi::Function::checkNode() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::inputScheme() const  {
+%exception  casadi::Function::inputScheme() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::inputScheme() {
+%exception  casadi::Function::inputScheme() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::input_struct() const  {
+%exception  casadi::Function::input_struct() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::input_struct() {
+%exception  casadi::Function::input_struct() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::outputScheme() const  {
+%exception  casadi::Function::outputScheme() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::outputScheme() {
+%exception  casadi::Function::outputScheme() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::output_struct() const  {
+%exception  casadi::Function::output_struct() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::output_struct() {
+%exception  casadi::Function::output_struct() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::spCanEvaluate(bool fwd) {
+%exception  casadi::Function::spCanEvaluate(bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::spEvaluate(bool fwd) {
+%exception  casadi::Function::spEvaluate(bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Function::spInit(bool fwd) {
+%exception  casadi::Function::spInit(bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericMatrix< MX  >::shape() const {
+%exception  casadi::GenericMatrix< MX  >::shape() const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericMatrix< MatType >::shape() const  {
+%exception  casadi::GenericMatrix< MatType >::shape() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericMatrix< Matrix< DataType >  >::shape() const {
+%exception  casadi::GenericMatrix< Matrix< DataType >  >::shape() const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericType::is_a() const  {
+%exception  casadi::GenericType::is_a() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericType::toDictionary() const  {
+%exception  casadi::GenericType::toDictionary() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericType::toDictionary() {
+%exception  casadi::GenericType::toDictionary() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericType::toDoubleVector() const  {
+%exception  casadi::GenericType::toDoubleVector() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericType::toDoubleVector() {
+%exception  casadi::GenericType::toDoubleVector() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericType::toIntVector() const  {
+%exception  casadi::GenericType::toIntVector() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GenericType::toIntVector() {
+%exception  casadi::GenericType::toIntVector() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzeros::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::GetNonzeros::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzeros::getAll() const  {
+%exception  casadi::GetNonzeros::getAll() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzeros::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
+%exception  casadi::GetNonzeros::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzeros::getOp() const  {
+%exception  casadi::GetNonzeros::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzeros::mapping() const  {
+%exception  casadi::GetNonzeros::mapping() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice2::clone() const  {
+%exception  casadi::GetNonzerosSlice2::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice2::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::GetNonzerosSlice2::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice2::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::GetNonzerosSlice2::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice2::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::GetNonzerosSlice2::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice2::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::GetNonzerosSlice2::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice2::getAll() const  {
+%exception  casadi::GetNonzerosSlice2::getAll() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice2::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::GetNonzerosSlice2::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice2::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::GetNonzerosSlice2::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::clone() const  {
+%exception  casadi::GetNonzerosSlice::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::GetNonzerosSlice::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::GetNonzerosSlice::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::GetNonzerosSlice::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::GetNonzerosSlice::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::getAll() const  {
+%exception  casadi::GetNonzerosSlice::getAll() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::isIdentity() const  {
+%exception  casadi::GetNonzerosSlice::isIdentity() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::GetNonzerosSlice::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::GetNonzerosSlice::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosSlice::simplifyMe(MX &ex) {
+%exception  casadi::GetNonzerosSlice::simplifyMe(MX &ex) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosVector::clone() const  {
+%exception  casadi::GetNonzerosVector::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosVector::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::GetNonzerosVector::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosVector::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::GetNonzerosVector::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosVector::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::GetNonzerosVector::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosVector::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::GetNonzerosVector::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosVector::getAll() const  {
+%exception  casadi::GetNonzerosVector::getAll() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosVector::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::GetNonzerosVector::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::GetNonzerosVector::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::GetNonzerosVector::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Horzcat::clone() const  {
+%exception  casadi::Horzcat::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Horzcat::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::Horzcat::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Horzcat::getOp() const  {
+%exception  casadi::Horzcat::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Horzcat::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Horzcat::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Horzsplit::clone() const  {
+%exception  casadi::Horzsplit::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Horzsplit::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::Horzsplit::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Horzsplit::getHorzcat(const std::vector< MX > &x) const  {
+%exception  casadi::Horzsplit::getHorzcat(const std::vector< MX > &x) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Horzsplit::getOp() const  {
+%exception  casadi::Horzsplit::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Horzsplit::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Horzsplit::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::getInput(T val, const std::string &iname) {
+%exception  casadi::IOInterface< Derived >::getInput(T val, const std::string &iname) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::getInput(T val, int iind=0) {
+%exception  casadi::IOInterface< Derived >::getInput(T val, int iind=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::getOutput(T val, const std::string &oname) {
+%exception  casadi::IOInterface< Derived >::getOutput(T val, const std::string &oname) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::getOutput(T val, int oind=0) {
+%exception  casadi::IOInterface< Derived >::getOutput(T val, int oind=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::inputS(int i) const  {
+%exception  casadi::IOInterface< Derived >::inputS(int i) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::inputS(int i) {
+%exception  casadi::IOInterface< Derived >::inputS(int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::inputSchemeEntry(const std::string &name) const  {
+%exception  casadi::IOInterface< Derived >::inputSchemeEntry(const std::string &name) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::outputS(int i) const  {
+%exception  casadi::IOInterface< Derived >::outputS(int i) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::outputS(int i) {
+%exception  casadi::IOInterface< Derived >::outputS(int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::outputSchemeEntry(const std::string &name) const  {
+%exception  casadi::IOInterface< Derived >::outputSchemeEntry(const std::string &name) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Derived >::schemeEntry(const CasADi::IOScheme &scheme, const std::string &name, bool input) const  {
+%exception  casadi::IOInterface< Derived >::schemeEntry(const casadi::IOScheme &scheme, const std::string &name, bool input) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::getInput(T val, const std::string &iname) {
+%exception  casadi::IOInterface< Function  >::getInput(T val, const std::string &iname) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::getInput(T val, int iind=0) {
+%exception  casadi::IOInterface< Function  >::getInput(T val, int iind=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::getOutput(T val, const std::string &oname) {
+%exception  casadi::IOInterface< Function  >::getOutput(T val, const std::string &oname) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::getOutput(T val, int oind=0) {
+%exception  casadi::IOInterface< Function  >::getOutput(T val, int oind=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::inputS(int i) const {
+%exception  casadi::IOInterface< Function  >::inputS(int i) const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::inputS(int i) {
+%exception  casadi::IOInterface< Function  >::inputS(int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::inputSchemeEntry(const std::string &name) const {
+%exception  casadi::IOInterface< Function  >::inputSchemeEntry(const std::string &name) const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::outputS(int i) const {
+%exception  casadi::IOInterface< Function  >::outputS(int i) const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::outputS(int i) {
+%exception  casadi::IOInterface< Function  >::outputS(int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::outputSchemeEntry(const std::string &name) const {
+%exception  casadi::IOInterface< Function  >::outputSchemeEntry(const std::string &name) const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOInterface< Function  >::schemeEntry(const CasADi::IOScheme &scheme, const std::string &name, bool input) const {
+%exception  casadi::IOInterface< Function  >::schemeEntry(const casadi::IOScheme &scheme, const std::string &name, bool input) const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOScheme::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::IOScheme::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOScheme::repr(std::ostream &stream=std::cout) const  {
+%exception  casadi::IOScheme::repr(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOSchemeVector< M  >::print(std::ostream &stream=std::cout) const {
+%exception  casadi::IOSchemeVector< M  >::print(std::ostream &stream=std::cout) const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOSchemeVector< M  >::repr(std::ostream &stream=std::cout) const {
+%exception  casadi::IOSchemeVector< M  >::repr(std::ostream &stream=std::cout) const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOSchemeVector< M  >::vector() const {
+%exception  casadi::IOSchemeVector< M  >::vector() const {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOSchemeVector< T >::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::IOSchemeVector< T >::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IOSchemeVector< T >::repr(std::ostream &stream=std::cout) const  {
+%exception  casadi::IOSchemeVector< T >::repr(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IndexList::getAll(int len) const  {
+%exception  casadi::IndexList::getAll(int len) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InfSX::getValue() const  {
+%exception  casadi::InfSX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InfSX::isInf() const  {
+%exception  casadi::InfSX::isInf() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InnerProd::clone() const  {
+%exception  casadi::InnerProd::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InnerProd::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::InnerProd::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InnerProd::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::InnerProd::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InnerProd::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::InnerProd::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InnerProd::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::InnerProd::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InnerProd::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::InnerProd::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InnerProd::getOp() const  {
+%exception  casadi::InnerProd::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InnerProd::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::InnerProd::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::InnerProd::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::InnerProd::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IntegerSX::getIntValue() const  {
+%exception  casadi::IntegerSX::getIntValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IntegerSX::getValue() const  {
+%exception  casadi::IntegerSX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IntegerSX::isInteger() const  {
+%exception  casadi::IntegerSX::isInteger() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Inverse::clone() const  {
+%exception  casadi::Inverse::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Inverse::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::Inverse::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Inverse::getOp() const  {
+%exception  casadi::Inverse::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Inverse::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Inverse::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IpoptUserClass::finalize_metadata(Index n, const StringMetaDataMapType &var_string_md, const IntegerMetaDataMapType &var_integer_md, const NumericMetaDataMapType &var_numeric_md, Index m, const StringMetaDataMapType &con_string_md, const IntegerMetaDataMapType &con_integer_md, const NumericMetaDataMapType &con_numeric_md) {
+%exception  casadi::IpoptUserClass::finalize_metadata(Index n, const StringMetaDataMapType &var_string_md, const IntegerMetaDataMapType &var_integer_md, const NumericMetaDataMapType &var_numeric_md, Index m, const StringMetaDataMapType &con_string_md, const IntegerMetaDataMapType &con_integer_md, const NumericMetaDataMapType &con_numeric_md) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IpoptUserClass::get_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz_h_lag, IndexStyleEnum &index_style) {
+%exception  casadi::IpoptUserClass::get_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz_h_lag, IndexStyleEnum &index_style) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IpoptUserClass::get_number_of_nonlinear_variables() {
+%exception  casadi::IpoptUserClass::get_number_of_nonlinear_variables() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::IpoptUserClass::get_var_con_metadata(Index n, StringMetaDataMapType &var_string_md, IntegerMetaDataMapType &var_integer_md, NumericMetaDataMapType &var_numeric_md, Index m, StringMetaDataMapType &con_string_md, IntegerMetaDataMapType &con_integer_md, NumericMetaDataMapType &con_numeric_md) {
+%exception  casadi::IpoptUserClass::get_var_con_metadata(Index n, StringMetaDataMapType &var_string_md, IntegerMetaDataMapType &var_integer_md, NumericMetaDataMapType &var_numeric_md, Index m, StringMetaDataMapType &con_string_md, IntegerMetaDataMapType &con_integer_md, NumericMetaDataMapType &con_numeric_md) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::LinearSolver::spSolve(DMatrix &X, const DMatrix &B, bool transpose=false) const  {
+%exception  casadi::LinearSolver::spSolve(DMatrix &X, const DMatrix &B, bool transpose=false) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::T() const  {
+%exception  casadi::MX::T() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::at(int k) const  {
+%exception  casadi::MX::at(int k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::at(int k) {
+%exception  casadi::MX::at(int k) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::getNZ(const Matrix< int > &k) const  {
+%exception  casadi::MX::getNZ(const Matrix< int > &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::getNZ(const Slice &k) const  {
+%exception  casadi::MX::getNZ(const Slice &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::getNZ(const std::vector< int > &k) const  {
+%exception  casadi::MX::getNZ(const std::vector< int > &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::getNZ(int k) const  {
+%exception  casadi::MX::getNZ(int k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::getTemp() const  {
+%exception  casadi::MX::getTemp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setNZ(const Matrix< int > &k, const MX &m) {
+%exception  casadi::MX::setNZ(const Matrix< int > &k, const MX &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setNZ(const Slice &k, const MX &m) {
+%exception  casadi::MX::setNZ(const Slice &k, const MX &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setNZ(const std::vector< int > &k, const MX &el) {
+%exception  casadi::MX::setNZ(const std::vector< int > &k, const MX &el) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setNZ(int k, const MX &el) {
+%exception  casadi::MX::setNZ(int k, const MX &el) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, const Matrix< int > &k) {
+%exception  casadi::MX::setSub(const MX &m, const Matrix< int > &rr, const Matrix< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, const Matrix< int > &rr, const Matrix< int > &cc) {
+%exception  casadi::MX::setSub(const MX &m, const Matrix< int > &rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, const Matrix< int > &rr, const std::vector< int > &cc) {
+%exception  casadi::MX::setSub(const MX &m, const Matrix< int > &rr, int cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, const Slice &rr, const Slice &cc) {
+%exception  casadi::MX::setSub(const MX &m, const Slice &rr, const Slice &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, const Sparsity &sp, int dummy) {
+%exception  casadi::MX::setSub(const MX &m, const Sparsity &sp, int dummy) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, const std::vector< int > &rr, const Matrix< int > &cc) {
+%exception  casadi::MX::setSub(const MX &m, const std::vector< int > &rr, Slice cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, const std::vector< int > &rr, const std::vector< int > &cc) {
+%exception  casadi::MX::setSub(const MX &m, const std::vector< int > &rr, const Matrix< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, const std::vector< int > &rr, int cc) {
+%exception  casadi::MX::setSub(const MX &m, const std::vector< int > &rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, int rr, const std::vector< int > &cc) {
+%exception  casadi::MX::setSub(const MX &m, const std::vector< int > &rr, int cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setSub(const MX &m, int rr, int cc) {
+%exception  casadi::MX::setSub(const MX &m, int rr, const Matrix< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::setTemp(int t) {
+%exception  casadi::MX::setSub(const MX &m, int rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const Matrix< int > &k, int dummy=0) const  {
+%exception  casadi::MX::setSub(const MX &m, int rr, int cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const Matrix< int > &rr, const Matrix< int > &cc) const  {
+%exception  casadi::MX::setTemp(int t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const Matrix< int > &rr, const Slice &cc) const  {
+%exception  casadi::MX::sub(const Matrix< int > &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const Matrix< int > &rr, const std::vector< int > &cc) const  {
+%exception  casadi::MX::sub(const Matrix< int > &rr, const Slice &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const Slice &rr, const Matrix< int > &cc) const  {
+%exception  casadi::MX::sub(const Matrix< int > &rr, const std::vector< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const Slice &rr, const Slice &cc) const  {
+%exception  casadi::MX::sub(const Matrix< int > &rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const Slice &rr, int cc) const  {
+%exception  casadi::MX::sub(const Slice &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const Sparsity &sp, int dummy=0) const  {
+%exception  casadi::MX::sub(const Slice &rr, const Slice &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const std::vector< int > &rr, const Matrix< int > &cc) const  {
+%exception  casadi::MX::sub(const Slice &rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const std::vector< int > &rr, const std::vector< int > &cc) const  {
+%exception  casadi::MX::sub(const Sparsity &sp, int dummy=0) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(const std::vector< int > &rr, int cc) const  {
+%exception  casadi::MX::sub(const std::vector< int > &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(int rr, const Slice &cc) const  {
+%exception  casadi::MX::sub(const std::vector< int > &rr, const std::vector< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(int rr, const std::vector< int > &cc) const  {
+%exception  casadi::MX::sub(const std::vector< int > &rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MX::sub(int rr, int cc) const  {
+%exception  casadi::MX::sub(int rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXFunction::algorithm() const  {
+%exception  casadi::MX::sub(int rr, const Slice &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXFunction::generateLiftingFunctions(MXFunction &vdef_fcn, MXFunction &vinit_fcn) {
+%exception  casadi::MX::sub(int rr, const std::vector< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::addDependency(const MX &dep) {
+%exception  casadi::MX::sub(int rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::assign(const MX &d, const std::vector< int > &inz, bool add=false) {
+%exception  casadi::MXFunction::algorithm() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::assign(const MX &d, const std::vector< int > &inz, const std::vector< int > &onz, bool add=false) {
+%exception  casadi::MXFunction::generateLiftingFunctions(MXFunction &vdef_fcn, MXFunction &vinit_fcn) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::clone() const  {
+%exception  casadi::MXNode::addDependency(const MX &dep) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::dep(int ind=0) const  {
+%exception  casadi::MXNode::assign(const MX &d, const std::vector< int > &inz, bool add=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::dep(int ind=0) {
+%exception  casadi::MXNode::assign(const MX &d, const std::vector< int > &inz, const std::vector< int > &onz, bool add=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::MXNode::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::evaluateMX(const MXPtrV &input, MXPtrV &output) {
+%exception  casadi::MXNode::dep(int ind=0) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::MXNode::dep(int ind=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::MXNode::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::MXNode::evaluateMX(const MXPtrV &input, MXPtrV &output) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getAddNonzeros(const MX &y, const std::vector< int > &nz) const  {
+%exception  casadi::MXNode::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getAssertion(const MX &y, const std::string &fail_message="") const  {
+%exception  casadi::MXNode::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getBinary(int op, const MX &y, bool scX, bool scY) const  {
+%exception  casadi::MXNode::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getBinarySwitch(int op, const MX &y) const  {
+%exception  casadi::MXNode::getAddNonzeros(const MX &y, const std::vector< int > &nz) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getDeterminant() const  {
+%exception  casadi::MXNode::getAssertion(const MX &y, const std::string &fail_message="") const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getFunction() const  {
+%exception  casadi::MXNode::getBinary(int op, const MX &y, bool scX, bool scY) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getFunction() {
+%exception  casadi::MXNode::getBinarySwitch(int op, const MX &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getFunctionInput() const  {
+%exception  casadi::MXNode::getDeterminant() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getFunctionOutput() const  {
+%exception  casadi::MXNode::getFunction() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
+%exception  casadi::MXNode::getFunction() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getHorzcat(const std::vector< MX > &x) const  {
+%exception  casadi::MXNode::getFunctionInput() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getHorzsplit(const std::vector< int > &output_offset) const  {
+%exception  casadi::MXNode::getFunctionOutput() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getInnerProd(const MX &y) const  {
+%exception  casadi::MXNode::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getInverse() const  {
+%exception  casadi::MXNode::getHorzcat(const std::vector< MX > &x) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getMatrixValue() const  {
+%exception  casadi::MXNode::getHorzsplit(const std::vector< int > &output_offset) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getMultiplication(const MX &y, const Sparsity &sp_z=Sparsity()) const  {
+%exception  casadi::MXNode::getInnerProd(const MX &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getName() const  {
+%exception  casadi::MXNode::getInverse() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getNorm1() const  {
+%exception  casadi::MXNode::getMatrixValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getNorm2() const  {
+%exception  casadi::MXNode::getMultiplication(const MX &y, const Sparsity &sp_z=Sparsity()) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getNormF() const  {
+%exception  casadi::MXNode::getName() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getNormInf() const  {
+%exception  casadi::MXNode::getNorm1() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getNumOutputs() const  {
+%exception  casadi::MXNode::getNorm2() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getOp() const  {
+%exception  casadi::MXNode::getNormF() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getOutput(int oind) const  {
+%exception  casadi::MXNode::getNormInf() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getReshape(const Sparsity &sp) const  {
+%exception  casadi::MXNode::getNumOutputs() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getSetNonzeros(const MX &y, const std::vector< int > &nz) const  {
+%exception  casadi::MXNode::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getSetSparse(const Sparsity &sp) const  {
+%exception  casadi::MXNode::getOutput(int oind) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getSolve(const MX &r, bool tr, const LinearSolver &linear_solver) const  {
+%exception  casadi::MXNode::getReshape(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getSubAssign(const MX &y, const Slice &i, const Slice &j) const  {
+%exception  casadi::MXNode::getSetNonzeros(const MX &y, const std::vector< int > &nz) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getSubRef(const Slice &i, const Slice &j) const  {
+%exception  casadi::MXNode::getSetSparse(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getTranspose() const  {
+%exception  casadi::MXNode::getSolve(const MX &r, bool tr, const LinearSolver &linear_solver) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getUnary(int op) const  {
+%exception  casadi::MXNode::getSubAssign(const MX &y, const Slice &i, const Slice &j) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getValue() const  {
+%exception  casadi::MXNode::getSubRef(const Slice &i, const Slice &j) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getVertcat(const std::vector< MX > &x) const  {
+%exception  casadi::MXNode::getTranspose() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::getVertsplit(const std::vector< int > &output_offset) const  {
+%exception  casadi::MXNode::getUnary(int op) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::hasDep() const  {
+%exception  casadi::MXNode::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::isBinaryOp() const  {
+%exception  casadi::MXNode::getVertcat(const std::vector< MX > &x) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::isIdentity() const  {
+%exception  casadi::MXNode::getVertsplit(const std::vector< int > &output_offset) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::isMultipleOutput() const  {
+%exception  casadi::MXNode::hasDep() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::isNonLinear() {
+%exception  casadi::MXNode::isBinaryOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::isOne() const  {
+%exception  casadi::MXNode::isIdentity() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::isOutputNode() const  {
+%exception  casadi::MXNode::isMultipleOutput() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::isUnaryOp() const  {
+%exception  casadi::MXNode::isNonLinear() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::isValue(double val) const  {
+%exception  casadi::MXNode::isOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::isZero() const  {
+%exception  casadi::MXNode::isOutputNode() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::mapping() const  {
+%exception  casadi::MXNode::isUnaryOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::nTmp(size_t &ni, size_t &nr) {
+%exception  casadi::MXNode::isValue(double val) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::ndep() const  {
+%exception  casadi::MXNode::isZero() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::numInplace() const  {
+%exception  casadi::MXNode::mapping() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::numel() const  {
+%exception  casadi::MXNode::nTmp(size_t &ni, size_t &nr) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::print(std::ostream &stream) const  {
+%exception  casadi::MXNode::ndep() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::print(std::ostream &stream, long &remaining_calls) const  {
+%exception  casadi::MXNode::numInplace() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::MXNode::numel() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::MXNode::print(std::ostream &stream) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
+%exception  casadi::MXNode::print(std::ostream &stream, long &remaining_calls) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::repr(std::ostream &stream) const  {
+%exception  casadi::MXNode::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::setDependencies(const MX &dep) {
+%exception  casadi::MXNode::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::setDependencies(const MX &dep1, const MX &dep2) {
+%exception  casadi::MXNode::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::setDependencies(const MX &dep1, const MX &dep2, const MX &dep3) {
+%exception  casadi::MXNode::repr(std::ostream &stream) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::setDependencies(const std::vector< MX > &dep) {
+%exception  casadi::MXNode::setDependencies(const MX &dep) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::setSparsity(const Sparsity &sparsity) {
+%exception  casadi::MXNode::setDependencies(const MX &dep1, const MX &dep2) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::shape() const  {
+%exception  casadi::MXNode::setDependencies(const MX &dep1, const MX &dep2, const MX &dep3) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::simplifyMe(MX &ex) {
+%exception  casadi::MXNode::setDependencies(const std::vector< MX > &dep) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::size() const  {
+%exception  casadi::MXNode::setSparsity(const Sparsity &sparsity) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::size1() const  {
+%exception  casadi::MXNode::shape() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::size2() const  {
+%exception  casadi::MXNode::simplifyMe(MX &ex) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::sparsity() const  {
+%exception  casadi::MXNode::size() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MXNode::sparsity(int oind) const  {
+%exception  casadi::MXNode::size1() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::append(const Matrix< DataType > &y) {
+%exception  casadi::MXNode::size2() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::appendColumns(const Matrix< DataType > &y) {
+%exception  casadi::MXNode::sparsity() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::arccos() const  {
+%exception  casadi::MXNode::sparsity(int oind) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::arccosh() const  {
+%exception  casadi::Matrix< DataType >::append(const Matrix< DataType > &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::arcsin() const  {
+%exception  casadi::Matrix< DataType >::appendColumns(const Matrix< DataType > &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::arcsinh() const  {
+%exception  casadi::Matrix< DataType >::arccos() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::arctan() const  {
+%exception  casadi::Matrix< DataType >::arccosh() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::arctan2(const Matrix< DataType > &y) const  {
+%exception  casadi::Matrix< DataType >::arcsin() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::arctanh() const  {
+%exception  casadi::Matrix< DataType >::arcsinh() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::binary(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
+%exception  casadi::Matrix< DataType >::arctan() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::borBV(const Matrix< DataType > &val) {
+%exception  casadi::Matrix< DataType >::arctan2(const Matrix< DataType > &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::ceil() const  {
+%exception  casadi::Matrix< DataType >::arctanh() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::className() {
+%exception  casadi::Matrix< DataType >::binary(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::clear() {
+%exception  casadi::Matrix< DataType >::borBV(const Matrix< DataType > &val) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::colind() const  {
+%exception  casadi::Matrix< DataType >::ceil() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::colind(int col) const  {
+%exception  casadi::Matrix< DataType >::className() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::cos() const  {
+%exception  casadi::Matrix< DataType >::clear() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::cosh() const  {
+%exception  casadi::Matrix< DataType >::colind() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::data() const  {
+%exception  casadi::Matrix< DataType >::colind(int col) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::data() {
+%exception  casadi::Matrix< DataType >::cos() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::densify(const DataType &val=0) {
+%exception  casadi::Matrix< DataType >::cosh() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::elem(int rr, int cc=0) const  {
+%exception  casadi::Matrix< DataType >::data() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::elem(int rr, int cc=0) {
+%exception  casadi::Matrix< DataType >::data() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::enlarge(int nrow, int ncol, const std::vector< int > &rr, const std::vector< int > &cc) {
+%exception  casadi::Matrix< DataType >::densify(const DataType &val=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::erase(const std::vector< int > &rr, const std::vector< int > &cc) {
+%exception  casadi::Matrix< DataType >::elem(int rr, int cc=0) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::erf() const  {
+%exception  casadi::Matrix< DataType >::elem(int rr, int cc=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::erfinv() const  {
+%exception  casadi::Matrix< DataType >::enlarge(int nrow, int ncol, const std::vector< int > &rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::exp() const  {
+%exception  casadi::Matrix< DataType >::erase(const std::vector< int > &rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::fabs() const  {
+%exception  casadi::Matrix< DataType >::erf() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::floor() const  {
+%exception  casadi::Matrix< DataType >::erfinv() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::fmax(const Matrix< DataType > &y) const  {
+%exception  casadi::Matrix< DataType >::exp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::fmin(const Matrix< DataType > &y) const  {
+%exception  casadi::Matrix< DataType >::fabs() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::get(DataType &val, SparsityType sp=SPARSE) const  {
+%exception  casadi::Matrix< DataType >::floor() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::get(Matrix< DataType > &val, SparsityType sp=SPARSE) const  {
+%exception  casadi::Matrix< DataType >::fmax(const Matrix< DataType > &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::get(std::vector< DataType > &val, SparsityType sp=SPARSE) const  {
+%exception  casadi::Matrix< DataType >::fmin(const Matrix< DataType > &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::getNZ(const Matrix< int > &k) const  {
+%exception  casadi::Matrix< DataType >::fmod(const Matrix< DataType > &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::getNZ(const std::vector< int > &k) const  {
+%exception  casadi::Matrix< DataType >::get(DataType &val, SparsityType sp=SPARSE) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::getName() const  {
+%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &val, SparsityType sp=SPARSE) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::getValue() const  {
+%exception  casadi::Matrix< DataType >::get(std::vector< DataType > &val, SparsityType sp=SPARSE) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::hasNonStructuralZeros() const  {
+%exception  casadi::Matrix< DataType >::getNZ(const Matrix< int > &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::if_else_zero(const Matrix< DataType > &y) const  {
+%exception  casadi::Matrix< DataType >::getNZ(const std::vector< int > &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::inf(const Sparsity &sp) {
+%exception  casadi::Matrix< DataType >::getName() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::inf(const std::pair< int, int > &rc) {
+%exception  casadi::Matrix< DataType >::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::inf(int nrow=1, int ncol=1) {
+%exception  casadi::Matrix< DataType >::hasNonStructuralZeros() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isConstant() const  {
+%exception  casadi::Matrix< DataType >::if_else_zero(const Matrix< DataType > &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isEqual(const Matrix< DataType > &ex2) const  {
+%exception  casadi::Matrix< DataType >::inf(const Sparsity &sp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isIdentity() const  {
+%exception  casadi::Matrix< DataType >::inf(const std::pair< int, int > &rc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isInteger() const  {
+%exception  casadi::Matrix< DataType >::inf(int nrow=1, int ncol=1) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isMinusOne() const  {
+%exception  casadi::Matrix< DataType >::isConstant() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isOne() const  {
+%exception  casadi::Matrix< DataType >::isEqual(const Matrix< DataType > &ex2) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isRegular() const  {
+%exception  casadi::Matrix< DataType >::isIdentity() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isSmooth() const  {
+%exception  casadi::Matrix< DataType >::isInteger() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isSymbolic() const  {
+%exception  casadi::Matrix< DataType >::isMinusOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isSymbolicSparse() const  {
+%exception  casadi::Matrix< DataType >::isOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::isZero() const  {
+%exception  casadi::Matrix< DataType >::isRegular() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::log() const  {
+%exception  casadi::Matrix< DataType >::isSmooth() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::log10() const  {
+%exception  casadi::Matrix< DataType >::isSymbolic() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::logic_and(const Matrix< DataType > &y) const  {
+%exception  casadi::Matrix< DataType >::isSymbolicSparse() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::logic_not() const  {
+%exception  casadi::Matrix< DataType >::isZero() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::logic_or(const Matrix< DataType > &y) const  {
+%exception  casadi::Matrix< DataType >::log() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::matrix_matrix(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
+%exception  casadi::Matrix< DataType >::log10() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::matrix_scalar(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
+%exception  casadi::Matrix< DataType >::logic_and(const Matrix< DataType > &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::mul(const Matrix< DataType > &y, const Sparsity &sp_z=Sparsity()) const  {
+%exception  casadi::Matrix< DataType >::logic_not() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::mul_full(const Matrix< DataType > &y, const Sparsity &sp_z=Sparsity()) const  {
+%exception  casadi::Matrix< DataType >::logic_or(const Matrix< DataType > &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::nan(const Sparsity &sp) {
+%exception  casadi::Matrix< DataType >::matrix_matrix(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::nan(const std::pair< int, int > &rc) {
+%exception  casadi::Matrix< DataType >::matrix_scalar(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::nan(int nrow=1, int ncol=1) {
+%exception  casadi::Matrix< DataType >::mul(const Matrix< DataType > &y, const Sparsity &sp_z=Sparsity()) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::mul_full(const Matrix< DataType > &y, const Sparsity &sp_z=Sparsity()) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::printDense(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::nan(const Sparsity &sp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::printScalar(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::nan(const std::pair< int, int > &rc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::printSparse(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::nan(int nrow=1, int ncol=1) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::printVector(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::printme(const Matrix< DataType > &y) const  {
+%exception  casadi::Matrix< DataType >::printDense(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::remove(const std::vector< int > &rr, const std::vector< int > &cc) {
+%exception  casadi::Matrix< DataType >::printScalar(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::repmat(const DataType &x, const Sparsity &sp) {
+%exception  casadi::Matrix< DataType >::printSparse(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::repmat(const Matrix< DataType > &x, const Sparsity &sp) {
+%exception  casadi::Matrix< DataType >::printVector(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::repmat(const Matrix< DataType > &x, const std::pair< int, int > &rc) {
+%exception  casadi::Matrix< DataType >::printme(const Matrix< DataType > &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::repmat(const Matrix< DataType > &x, int nrow, int ncol=1) {
+%exception  casadi::Matrix< DataType >::remove(const std::vector< int > &rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::repr(std::ostream &stream=std::cout) const  {
+%exception  casadi::Matrix< DataType >::repmat(const DataType &x, const Sparsity &sp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::reserve(int nnz) {
+%exception  casadi::Matrix< DataType >::repmat(const Matrix< DataType > &x, const Sparsity &sp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::reserve(int nnz, int ncol) {
+%exception  casadi::Matrix< DataType >::repmat(const Matrix< DataType > &x, const std::pair< int, int > &rc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::resize(int nrow, int ncol) {
+%exception  casadi::Matrix< DataType >::repmat(const Matrix< DataType > &x, int nrow, int ncol=1) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::row() const  {
+%exception  casadi::Matrix< DataType >::repr(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::row(int el) const  {
+%exception  casadi::Matrix< DataType >::reserve(int nnz) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sanityCheck(bool complete=false) const  {
+%exception  casadi::Matrix< DataType >::reserve(int nnz, int ncol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::scalar_matrix(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
+%exception  casadi::Matrix< DataType >::resize(int nrow, int ncol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::set(DataType val, SparsityType sp=SPARSE) {
+%exception  casadi::Matrix< DataType >::row() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::set(const Matrix< DataType > &val, SparsityType sp=SPARSE) {
+%exception  casadi::Matrix< DataType >::row(int el) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::set(const std::vector< DataType > &val, SparsityType sp=SPARSE) {
+%exception  casadi::Matrix< DataType >::sanityCheck(bool complete=false) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setAll(const DataType &val) {
+%exception  casadi::Matrix< DataType >::scalar_matrix(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setBV(const Matrix< DataType > &val) {
+%exception  casadi::Matrix< DataType >::set(DataType val, SparsityType sp=SPARSE) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setNZ(const Matrix< int > &k, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &val, SparsityType sp=SPARSE) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setNZ(const std::vector< int > &k, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< DataType >::set(const std::vector< DataType > &val, SparsityType sp=SPARSE) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setNZ(int k, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< DataType >::setAll(const DataType &val) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setSparse(const Sparsity &sp, bool intersect=false) const  {
+%exception  casadi::Matrix< DataType >::setBV(const Matrix< DataType > &val) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const Matrix< int > &rr, const Matrix< int > &cc) {
+%exception  casadi::Matrix< DataType >::setNZ(const Matrix< int > &k, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const Matrix< int > &rr, const std::vector< int > &cc) {
+%exception  casadi::Matrix< DataType >::setNZ(const std::vector< int > &k, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const Sparsity &sp, int dummy) {
+%exception  casadi::Matrix< DataType >::setNZ(int k, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const std::vector< int > &rr, const Matrix< int > &cc) {
+%exception  casadi::Matrix< DataType >::setSparse(const Sparsity &sp, bool intersect=false) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const std::vector< int > &rr, const std::vector< int > &cc) {
+%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const Matrix< int > &rr, const Matrix< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setSub(const Matrix< DataType > &m, int rr, int cc) {
+%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const Matrix< int > &rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setZero() {
+%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const Sparsity &sp, int dummy) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::setZeroBV() {
+%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const std::vector< int > &rr, const Matrix< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sign() const  {
+%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, const std::vector< int > &rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sin() const  {
+%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, int rr, int cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sinh() const  {
+%exception  casadi::Matrix< DataType >::setZero() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sparsify(double tol=0) {
+%exception  casadi::Matrix< DataType >::setZeroBV() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sparsityRef() {
+%exception  casadi::Matrix< DataType >::sign() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sqrt() const  {
+%exception  casadi::Matrix< DataType >::sin() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sub(const Matrix< int > &rr, const Matrix< int > &cc) const  {
+%exception  casadi::Matrix< DataType >::sinh() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sub(const Matrix< int > &rr, const std::vector< int > &cc) const  {
+%exception  casadi::Matrix< DataType >::sparsify(double tol=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sub(const Sparsity &sp, int dummy=0) const  {
+%exception  casadi::Matrix< DataType >::sparsityRef() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sub(const std::vector< int > &rr, const Matrix< int > &cc) const  {
+%exception  casadi::Matrix< DataType >::sqrt() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sub(const std::vector< int > &rr, const std::vector< int > &cc) const  {
+%exception  casadi::Matrix< DataType >::sub(const Matrix< int > &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::sub(int rr, int cc) const  {
+%exception  casadi::Matrix< DataType >::sub(const Matrix< int > &rr, const std::vector< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::tan() const  {
+%exception  casadi::Matrix< DataType >::sub(const Sparsity &sp, int dummy=0) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::tanh() const  {
+%exception  casadi::Matrix< DataType >::sub(const std::vector< int > &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::toScalar() const  {
+%exception  casadi::Matrix< DataType >::sub(const std::vector< int > &rr, const std::vector< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::trans() const  {
+%exception  casadi::Matrix< DataType >::sub(int rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const std::vector< DataType > &d) {
+%exception  casadi::Matrix< DataType >::tan() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const std::vector< DataType > &d, const std::pair< int, int > &rc) {
+%exception  casadi::Matrix< DataType >::tanh() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const std::vector< DataType > &d, int nrow, int ncol) {
+%exception  casadi::Matrix< DataType >::toScalar() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< DataType >::unary(int op, const Matrix< DataType > &x) {
+%exception  casadi::Matrix< DataType >::trans() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::T() const  {
+%exception  casadi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const std::vector< DataType > &d) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::addSub(const Matrix< DataType > &m, RR rr, CC cc) {
+%exception  casadi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const std::vector< DataType > &d, const std::pair< int, int > &rc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::at(int k) const  {
+%exception  casadi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const std::vector< DataType > &d, int nrow, int ncol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::at(int k) {
+%exception  casadi::Matrix< DataType >::unary(int op, const Matrix< DataType > &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::back() const  {
+%exception  casadi::Matrix< T >::T() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::back() {
+%exception  casadi::Matrix< T >::addSub(const Matrix< DataType > &m, RR rr, CC cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::begin() const  {
+%exception  casadi::Matrix< T >::at(int k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::begin() {
+%exception  casadi::Matrix< T >::at(int k) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::end() const  {
+%exception  casadi::Matrix< T >::back() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::end() {
+%exception  casadi::Matrix< T >::back() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::front() const  {
+%exception  casadi::Matrix< T >::begin() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::front() {
+%exception  casadi::Matrix< T >::begin() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::getBV(Matrix< DataType > &val) const  {
+%exception  casadi::Matrix< T >::end() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::getSub(Matrix< DataType > &m, RR rr, CC cc) {
+%exception  casadi::Matrix< T >::end() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const IndexList &rr) const  {
+%exception  casadi::Matrix< T >::front() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const IndexList &rr, const IndexList &cc) const  {
+%exception  casadi::Matrix< T >::front() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const IndexList &rr, const Matrix< int > &cc) const  {
+%exception  casadi::Matrix< T >::getBV(Matrix< DataType > &val) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const Matrix< int > &rr, const IndexList &cc) const  {
+%exception  casadi::Matrix< T >::getSub(Matrix< DataType > &m, RR rr, CC cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const Matrix< int > &rr, const Matrix< int > &cc) const  {
+%exception  casadi::Matrix< T >::indexed(const IndexList &rr) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const Matrix< int > &rr, const Slice &cc) const  {
+%exception  casadi::Matrix< T >::indexed(const IndexList &rr, const IndexList &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const Slice &rr) const  {
+%exception  casadi::Matrix< T >::indexed(const IndexList &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const Slice &rr, const Matrix< int > &cc) const  {
+%exception  casadi::Matrix< T >::indexed(const Matrix< int > &rr, const IndexList &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const Slice &rr, const Slice &cc) const  {
+%exception  casadi::Matrix< T >::indexed(const Matrix< int > &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed(const Sparsity &sp) const  {
+%exception  casadi::Matrix< T >::indexed(const Matrix< int > &rr, const Slice &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const IndexList &rr, const IndexList &cc, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed(const Slice &rr) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const IndexList &rr, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed(const Slice &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const IndexList &rr, const Matrix< int > &cc, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed(const Slice &rr, const Slice &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const Matrix< int > &rr, const IndexList &cc, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const Matrix< int > &rr, const Matrix< int > &cc, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_assignment(const IndexList &rr, const IndexList &cc, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const Matrix< int > &rr, const Slice &cc, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_assignment(const IndexList &rr, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const Slice &rr, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_assignment(const IndexList &rr, const Matrix< int > &cc, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const Slice &rr, const Matrix< int > &cc, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_assignment(const Matrix< int > &rr, const IndexList &cc, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const Slice &rr, const Slice &cc, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_assignment(const Matrix< int > &rr, const Matrix< int > &cc, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_assignment(const Sparsity &sp, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_assignment(const Matrix< int > &rr, const Slice &cc, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_one_based(const Matrix< int > &k) const  {
+%exception  casadi::Matrix< T >::indexed_assignment(const Slice &rr, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_one_based(int rr) const  {
+%exception  casadi::Matrix< T >::indexed_assignment(const Slice &rr, const Matrix< int > &cc, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_one_based(int rr, int cc) const  {
+%exception  casadi::Matrix< T >::indexed_assignment(const Slice &rr, const Slice &cc, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_one_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_assignment(const Sparsity &sp, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_one_based_assignment(int rr, const DataType &m) {
+%exception  casadi::Matrix< T >::indexed_one_based(const Matrix< int > &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_one_based_assignment(int rr, int cc, const DataType &m) {
+%exception  casadi::Matrix< T >::indexed_one_based(int rr) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_zero_based(const Matrix< int > &k) const  {
+%exception  casadi::Matrix< T >::indexed_one_based(int rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_zero_based(int rr) const  {
+%exception  casadi::Matrix< T >::indexed_one_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_zero_based(int rr, int cc) const  {
+%exception  casadi::Matrix< T >::indexed_one_based_assignment(int rr, const DataType &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_zero_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_one_based_assignment(int rr, int cc, const DataType &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_zero_based_assignment(int rr, const DataType &m) {
+%exception  casadi::Matrix< T >::indexed_zero_based(const Matrix< int > &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::indexed_zero_based_assignment(int rr, int cc, const DataType &m) {
+%exception  casadi::Matrix< T >::indexed_zero_based(int rr) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed(const IndexList &k) const  {
+%exception  casadi::Matrix< T >::indexed_zero_based(int rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed(const Slice &k) const  {
+%exception  casadi::Matrix< T >::indexed_zero_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_assignment(const IndexList &k, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_zero_based_assignment(int rr, const DataType &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_assignment(const Slice &k, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::indexed_zero_based_assignment(int rr, int cc, const DataType &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_one_based(const Matrix< int > &k) const  {
+%exception  casadi::Matrix< T >::nz_indexed(const IndexList &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_one_based(int k) const  {
+%exception  casadi::Matrix< T >::nz_indexed(const Slice &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_one_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::nz_indexed_assignment(const IndexList &k, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_one_based_assignment(int k, const DataType &m) {
+%exception  casadi::Matrix< T >::nz_indexed_assignment(const Slice &k, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_zero_based(const Matrix< int > &k) const  {
+%exception  casadi::Matrix< T >::nz_indexed_one_based(const Matrix< int > &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_zero_based(int k) const  {
+%exception  casadi::Matrix< T >::nz_indexed_one_based(int k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_zero_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m) {
+%exception  casadi::Matrix< T >::nz_indexed_one_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::nz_indexed_zero_based_assignment(int k, const DataType &m) {
+%exception  casadi::Matrix< T >::nz_indexed_one_based_assignment(int k, const DataType &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::ptr() const  {
+%exception  casadi::Matrix< T >::nz_indexed_zero_based(const Matrix< int > &k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::ptr() {
+%exception  casadi::Matrix< T >::nz_indexed_zero_based(int k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::rbegin() const  {
+%exception  casadi::Matrix< T >::nz_indexed_zero_based_assignment(const Matrix< int > &k, const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::rbegin() {
+%exception  casadi::Matrix< T >::nz_indexed_zero_based_assignment(int k, const DataType &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::rend() const  {
+%exception  casadi::Matrix< T >::ptr() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::rend() {
+%exception  casadi::Matrix< T >::ptr() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::setSub(const Matrix< DataType > &m, const Matrix< int > &rr, const Slice &cc) {
+%exception  casadi::Matrix< T >::rbegin() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::setSub(const Matrix< DataType > &m, const Slice &rr, const Matrix< int > &cc) {
+%exception  casadi::Matrix< T >::rbegin() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::setSub(const Matrix< DataType > &m, const Slice &rr, const Slice &cc) {
+%exception  casadi::Matrix< T >::rend() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::setSub(const Matrix< DataType > &m, const Slice &rr, const std::vector< int > &cc) {
+%exception  casadi::Matrix< T >::rend() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::setSub(const Matrix< DataType > &m, const Slice &rr, int cc) {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const Matrix< int > &rr, const Slice &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::setSub(const Matrix< DataType > &m, const int rr, const Slice &cc) {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const Matrix< int > &rr, int cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::setSub(const Matrix< DataType > &m, const std::vector< int > &rr, const Slice &cc) {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const Slice &rr, const Matrix< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::setSub(const Matrix< DataType > &m, const std::vector< int > &rr, int cc) {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const Slice &rr, const Slice &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::setSub(const Matrix< DataType > &m, int rr, const std::vector< int > &cc) {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const Slice &rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::sub(const Matrix< int > &rr, const Slice &cc) const  {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const Slice &rr, int cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::sub(const Slice &rr, const Matrix< int > &cc) const  {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const int rr, const Slice &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::sub(const Slice &rr, const Slice &cc) const  {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const std::vector< int > &rr, const Slice &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::sub(const Slice &rr, const std::vector< int > &cc) const  {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const std::vector< int > &rr, int cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::sub(const Slice &rr, int cc) const  {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, int rr, const Matrix< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::sub(const std::vector< int > &rr, const Slice &cc) const  {
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, int rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::sub(const std::vector< int > &rr, int cc) const  {
+%exception  casadi::Matrix< T >::sub(const Matrix< int > &rr, const Slice &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::sub(int rr, const Slice &cc) const  {
+%exception  casadi::Matrix< T >::sub(const Matrix< int > &rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Matrix< T >::sub(int rr, const std::vector< int > &cc) const  {
+%exception  casadi::Matrix< T >::sub(const Slice &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MinusInfSX::getValue() const  {
+%exception  casadi::Matrix< T >::sub(const Slice &rr, const Slice &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MinusInfSX::isMinusInf() const  {
+%exception  casadi::Matrix< T >::sub(const Slice &rr, const std::vector< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MinusOneSX::getIntValue() const  {
+%exception  casadi::Matrix< T >::sub(const Slice &rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MinusOneSX::getValue() const  {
+%exception  casadi::Matrix< T >::sub(const std::vector< int > &rr, const Slice &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MinusOneSX::isInteger() const  {
+%exception  casadi::Matrix< T >::sub(const std::vector< int > &rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MinusOneSX::isMinusOne() const  {
+%exception  casadi::Matrix< T >::sub(int rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MultipleOutput::getNumOutputs() const  {
+%exception  casadi::Matrix< T >::sub(int rr, const Slice &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MultipleOutput::getOutput(int oind) const  {
+%exception  casadi::Matrix< T >::sub(int rr, const std::vector< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MultipleOutput::isMultipleOutput() const  {
+%exception  casadi::MinusInfSX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::MultipleOutput::sparsity(int oind) const  {
+%exception  casadi::MinusInfSX::isMinusInf() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::clone() const  {
+%exception  casadi::MinusOneSX::getIntValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::MinusOneSX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::MinusOneSX::isInteger() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::MinusOneSX::isMinusOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::MultipleOutput::getNumOutputs() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::MultipleOutput::getOutput(int oind) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::getOp() const  {
+%exception  casadi::MultipleOutput::isMultipleOutput() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::numInplace() const  {
+%exception  casadi::MultipleOutput::sparsity(int oind) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Multiplication< TrX, TrY >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Multiplication< TrX, TrY >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::Multiplication< TrX, TrY >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NanSX::getValue() const  {
+%exception  casadi::Multiplication< TrX, TrY >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NanSX::isNan() const  {
+%exception  casadi::Multiplication< TrX, TrY >::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NonZeroIterator< DataType >::begin() {
+%exception  casadi::Multiplication< TrX, TrY >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NonZeroIterator< DataType >::end() {
+%exception  casadi::Multiplication< TrX, TrY >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Norm1::clone() const  {
+%exception  casadi::Multiplication< TrX, TrY >::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Norm1::getOp() const  {
+%exception  casadi::Multiplication< TrX, TrY >::numInplace() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Norm1::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Multiplication< TrX, TrY >::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Norm2::clone() const  {
+%exception  casadi::Multiplication< TrX, TrY >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Norm2::getOp() const  {
+%exception  casadi::NanSX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Norm2::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::NanSX::isNan() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormF::clone() const  {
+%exception  casadi::NonZeroIterator< DataType >::begin() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormF::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::NonZeroIterator< DataType >::end() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormF::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::Norm1::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormF::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::Norm1::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormF::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::Norm1::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormF::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::Norm2::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormF::getOp() const  {
+%exception  casadi::Norm2::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormF::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Norm2::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormInf::clone() const  {
+%exception  casadi::NormF::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormInf::getOp() const  {
+%exception  casadi::NormF::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::NormInf::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::NormF::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OneSX::getIntValue() const  {
+%exception  casadi::NormF::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OneSX::getValue() const  {
+%exception  casadi::NormF::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OneSX::isInteger() const  {
+%exception  casadi::NormF::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OneSX::isOne() const  {
+%exception  casadi::NormF::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionality::checkNode() const  {
+%exception  casadi::NormF::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name) const  {
+%exception  casadi::NormInf::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionality::getOptionEnumValue(const std::string &name) const  {
+%exception  casadi::NormInf::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionality::setOptionByAllowedIndex(const std::string &name, int i) {
+%exception  casadi::NormInf::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionality::setOptionByEnumValue(const std::string &name, int v) {
+%exception  casadi::OneSX::getIntValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::copyOptions(const OptionsFunctionality &obj, bool skipUnknown=false) {
+%exception  casadi::OneSX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::dictionary() const  {
+%exception  casadi::OneSX::isInteger() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getBestMatches(const std::string &name, std::vector< std::string > &suggestions, int amount=5) const  {
+%exception  casadi::OneSX::isOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getOption(const std::string &str) const  {
+%exception  casadi::OptionsFunctionality::checkNode() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getOptionAllowed(const std::string &str) const  {
+%exception  casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getOptionAllowedIndex(const std::string &name) const  {
+%exception  casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getOptionDefault(const std::string &str) const  {
+%exception  casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string &name, int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getOptionDescription(const std::string &str) const  {
+%exception  casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name, int v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getOptionEnumValue(const std::string &name) const  {
+%exception  casadi::OptionsFunctionalityNode::copyOptions(const OptionsFunctionality &obj, bool skipUnknown=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getOptionNames() const  {
+%exception  casadi::OptionsFunctionalityNode::dictionary() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getOptionType(const std::string &str) const  {
+%exception  casadi::OptionsFunctionalityNode::getBestMatches(const std::string &name, std::vector< std::string > &suggestions, int amount=5) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::getOptionTypeName(const std::string &str) const  {
+%exception  casadi::OptionsFunctionalityNode::getOption(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::hasOption(const std::string &str) const  {
+%exception  casadi::OptionsFunctionalityNode::getOptionAllowed(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::hasSetOption(const std::string &str) const  {
+%exception  casadi::OptionsFunctionalityNode::getOptionAllowedIndex(const std::string &name) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::print(std::ostream &stream) const  {
+%exception  casadi::OptionsFunctionalityNode::getOptionDefault(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::printOption(const std::string &name, std::ostream &stream=std::cout) const  {
+%exception  casadi::OptionsFunctionalityNode::getOptionDescription(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::printOptions(std::ostream &stream=std::cout) const  {
+%exception  casadi::OptionsFunctionalityNode::getOptionEnumValue(const std::string &name) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::repr(std::ostream &stream) const  {
+%exception  casadi::OptionsFunctionalityNode::getOptionNames() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::setOption(const Dictionary &dict, bool skipUnknown=false) {
+%exception  casadi::OptionsFunctionalityNode::getOptionType(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::setOption(const std::string &str, const GenericType &val) {
+%exception  casadi::OptionsFunctionalityNode::getOptionTypeName(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::setOptionByAllowedIndex(const std::string &name, int i) {
+%exception  casadi::OptionsFunctionalityNode::hasOption(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OptionsFunctionalityNode::setOptionByEnumValue(const std::string &name, int v) {
+%exception  casadi::OptionsFunctionalityNode::hasSetOption(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OutputNode::clone() const  {
+%exception  casadi::OptionsFunctionalityNode::print(std::ostream &stream) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OutputNode::getFunctionInput() const  {
+%exception  casadi::OptionsFunctionalityNode::printOption(const std::string &name, std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OutputNode::getFunctionOutput() const  {
+%exception  casadi::OptionsFunctionalityNode::printOptions(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OutputNode::getHorzcat(const std::vector< MX > &x) const  {
+%exception  casadi::OptionsFunctionalityNode::repr(std::ostream &stream) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OutputNode::getOp() const  {
+%exception  casadi::OptionsFunctionalityNode::setOption(const Dictionary &dict, bool skipUnknown=false) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OutputNode::getVertcat(const std::vector< MX > &x) const  {
+%exception  casadi::OptionsFunctionalityNode::setOption(const std::string &str, const GenericType &val) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OutputNode::isNonLinear() {
+%exception  casadi::OptionsFunctionalityNode::setOptionByAllowedIndex(const std::string &name, int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OutputNode::isOutputNode() const  {
+%exception  casadi::OptionsFunctionalityNode::setOptionByEnumValue(const std::string &name, int v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::OutputNode::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::OutputNode::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Polynomial::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::OutputNode::getFunctionInput() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Polynomial::repr(std::ostream &stream=std::cout) const  {
+%exception  casadi::OutputNode::getFunctionOutput() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::PrintableObject::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::OutputNode::getHorzcat(const std::vector< MX > &x) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::PrintableObject::repr(std::ostream &stream=std::cout) const  {
+%exception  casadi::OutputNode::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::RealtypeSX::getIntValue() const  {
+%exception  casadi::OutputNode::getVertcat(const std::vector< MX > &x) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::RealtypeSX::getValue() const  {
+%exception  casadi::OutputNode::isNonLinear() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::RealtypeSX::isAlmostZero(double tol) const  {
+%exception  casadi::OutputNode::isOutputNode() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::clone() const  {
+%exception  casadi::OutputNode::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::Polynomial::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::Polynomial::repr(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::PrintableObject::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::PrintableObject::repr(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::ProfilingType() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::getOp() const  {
+%exception  casadi::ProfilingType< ProfilingData_ENTRY >() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::getReshape(const Sparsity &sp) const  {
+%exception  casadi::ProfilingType< ProfilingData_EXIT >() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::numInplace() const  {
+%exception  casadi::ProfilingType< ProfilingData_IO >() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::ProfilingType< ProfilingData_NAME >() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Reshape::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::ProfilingType< ProfilingData_SOURCE >() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXElement::assignIfDuplicate(const SXElement &scalar, int depth=1) {
+%exception  casadi::ProfilingType< ProfilingData_TIMELINE >() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXElement::assignNoDelete(const SXElement &scalar) {
+%exception  casadi::RealtypeSX::getIntValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXElement::get() const  {
+%exception  casadi::RealtypeSX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXElement::getTemp() const  {
+%exception  casadi::RealtypeSX::isAlmostZero(double tol) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXElement::mark() {
+%exception  casadi::Reshape::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXElement::marked() const  {
+%exception  casadi::Reshape::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXElement::print(std::ostream &stream, long &remaining_calls) const  {
+%exception  casadi::Reshape::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXElement::setTemp(int t) {
+%exception  casadi::Reshape::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXElement::toString() const  {
+%exception  casadi::Reshape::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXFunction::algorithm() const  {
+%exception  casadi::Reshape::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::dep(int i) const  {
+%exception  casadi::Reshape::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::dep(int i) {
+%exception  casadi::Reshape::getReshape(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::getIntValue() const  {
+%exception  casadi::Reshape::numInplace() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::getName() const  {
+%exception  casadi::Reshape::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::getOp() const  {
+%exception  casadi::Reshape::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::getValue() const  {
+%exception  casadi::SXElement::assignIfDuplicate(const SXElement &scalar, int depth=1) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::hasDep() const  {
+%exception  casadi::SXElement::assignNoDelete(const SXElement &scalar) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::init() {
+%exception  casadi::SXElement::get() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isAlmostZero(double tol) const  {
+%exception  casadi::SXElement::getTemp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isConstant() const  {
+%exception  casadi::SXElement::mark() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isInf() const  {
+%exception  casadi::SXElement::marked() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isInteger() const  {
+%exception  casadi::SXElement::print(std::ostream &stream, long &remaining_calls) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isMinusInf() const  {
+%exception  casadi::SXElement::setTemp(int t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isMinusOne() const  {
+%exception  casadi::SXElement::toString() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isNan() const  {
+%exception  casadi::SXFunction::algorithm() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isOne() const  {
+%exception  casadi::SXNode::dep(int i) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isSmooth() const  {
+%exception  casadi::SXNode::dep(int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isSymbolic() const  {
+%exception  casadi::SXNode::getIntValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::isZero() const  {
+%exception  casadi::SXNode::getName() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::mark() {
+%exception  casadi::SXNode::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::marked() const  {
+%exception  casadi::SXNode::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::ndep() const  {
+%exception  casadi::SXNode::hasDep() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::print(std::ostream &stream) const  {
+%exception  casadi::SXNode::init() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SXNode::print(std::ostream &stream, long &remaining_calls) const  {
+%exception  casadi::SXNode::isAlmostZero(double tol) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzeros< Add >::clone() const  {
+%exception  casadi::SXNode::isConstant() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzeros< Add >::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::SXNode::isInf() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzeros< Add >::getAll() const  {
+%exception  casadi::SXNode::isInteger() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzeros< Add >::getOp() const  {
+%exception  casadi::SXNode::isMinusInf() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzeros< Add >::mapping() const  {
+%exception  casadi::SXNode::isMinusOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzeros< Add >::numInplace() const  {
+%exception  casadi::SXNode::isNan() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice2< Add >::clone() const  {
+%exception  casadi::SXNode::isOne() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice2< Add >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::SXNode::isSmooth() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice2< Add >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::SXNode::isSymbolic() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice2< Add >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::SXNode::isZero() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice2< Add >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::SXNode::mark() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice2< Add >::getAll() const  {
+%exception  casadi::SXNode::marked() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice2< Add >::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SXNode::ndep() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice2< Add >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::SXNode::print(std::ostream &stream) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::clone() const  {
+%exception  casadi::SXNode::print(std::ostream &stream, long &remaining_calls) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::SetNonzeros< Add >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::SetNonzeros< Add >::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::SetNonzeros< Add >::getAll() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::SetNonzeros< Add >::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::getAll() const  {
+%exception  casadi::SetNonzeros< Add >::mapping() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::isAssignment() const  {
+%exception  casadi::SetNonzeros< Add >::numInplace() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SetNonzerosSlice2< Add >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::SetNonzerosSlice2< Add >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosSlice< Add >::simplifyMe(MX &ex) {
+%exception  casadi::SetNonzerosSlice2< Add >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosVector< Add >::clone() const  {
+%exception  casadi::SetNonzerosSlice2< Add >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosVector< Add >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::SetNonzerosSlice2< Add >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosVector< Add >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::SetNonzerosSlice2< Add >::getAll() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosVector< Add >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::SetNonzerosSlice2< Add >::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosVector< Add >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::SetNonzerosSlice2< Add >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosVector< Add >::getAll() const  {
+%exception  casadi::SetNonzerosSlice< Add >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosVector< Add >::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SetNonzerosSlice< Add >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetNonzerosVector< Add >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::SetNonzerosSlice< Add >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetSparse::clone() const  {
+%exception  casadi::SetNonzerosSlice< Add >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetSparse::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::SetNonzerosSlice< Add >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetSparse::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::SetNonzerosSlice< Add >::getAll() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetSparse::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::SetNonzerosSlice< Add >::isAssignment() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetSparse::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::SetNonzerosSlice< Add >::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetSparse::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::SetNonzerosSlice< Add >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetSparse::getOp() const  {
+%exception  casadi::SetNonzerosSlice< Add >::simplifyMe(MX &ex) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetSparse::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SetNonzerosVector< Add >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SetSparse::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::SetNonzerosVector< Add >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::assertInit() const  {
+%exception  casadi::SetNonzerosVector< Add >::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::checkNode() const  {
+%exception  casadi::SetNonzerosVector< Add >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::clone() const  {
+%exception  casadi::SetNonzerosVector< Add >::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::get() const  {
+%exception  casadi::SetNonzerosVector< Add >::getAll() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::get() {
+%exception  casadi::SetNonzerosVector< Add >::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::getCount() const  {
+%exception  casadi::SetNonzerosVector< Add >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::SetSparse::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::printPtr(std::ostream &stream=std::cout) const  {
+%exception  casadi::SetSparse::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::repr(std::ostream &stream) const  {
+%exception  casadi::SetSparse::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::swap(SharedObject &other) {
+%exception  casadi::SetSparse::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObject::weak() {
+%exception  casadi::SetSparse::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObjectNode::assertInit() const  {
+%exception  casadi::SetSparse::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObjectNode::clone() const  {
+%exception  casadi::SetSparse::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObjectNode::getCount() const  {
+%exception  casadi::SetSparse::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObjectNode::init() {
+%exception  casadi::SetSparse::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObjectNode::isInit() const  {
+%exception  casadi::SharedObject::assertInit() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObjectNode::print(std::ostream &stream) const  {
+%exception  casadi::SharedObject::checkNode() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObjectNode::repr(std::ostream &stream) const  {
+%exception  casadi::SharedObject::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SharedObjectNode::weak() {
+%exception  casadi::SharedObject::get() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Slice::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::SharedObject::get() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::clone() const  {
+%exception  casadi::SharedObject::getCount() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::SharedObject::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::SharedObject::printPtr(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::SharedObject::repr(std::ostream &stream) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::getFunction() {
+%exception  casadi::SharedObject::swap(SharedObject &other) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::getOp() const  {
+%exception  casadi::SharedObject::weak() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::nTmp(size_t &ni, size_t &nr) {
+%exception  casadi::SharedObjectNode::assertInit() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::numInplace() const  {
+%exception  casadi::SharedObjectNode::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::print(std::ostream &stream, long &remaining_calls) const  {
+%exception  casadi::SharedObjectNode::getCount() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SharedObjectNode::init() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Solve< Tr >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
+%exception  casadi::SharedObjectNode::isInit() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::T() const  {
+%exception  casadi::SharedObjectNode::print(std::ostream &stream) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::colindRef() {
+%exception  casadi::SharedObjectNode::repr(std::ostream &stream) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::reCache() {
+%exception  casadi::SharedObjectNode::weak() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::rowRef() {
+%exception  casadi::Slice::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::shape() const  {
+%exception  casadi::Solve< Tr >::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Split::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::Solve< Tr >::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Split::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::Solve< Tr >::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Split::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::Solve< Tr >::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Split::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::Solve< Tr >::getFunction() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Split::getNumOutputs() const  {
+%exception  casadi::Solve< Tr >::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Split::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::Solve< Tr >::nTmp(size_t &ni, size_t &nr) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Split::sparsity(int oind) const  {
+%exception  casadi::Solve< Tr >::numInplace() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubAssign::clone() const  {
+%exception  casadi::Solve< Tr >::print(std::ostream &stream, long &remaining_calls) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubAssign::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::Solve< Tr >::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubAssign::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::Solve< Tr >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubAssign::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::SparseStorage< DataType >::at(int k) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubAssign::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::SparseStorage< DataType >::at(int k) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubAssign::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::SparseStorage< DataType >::back() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubAssign::getOp() const  {
+%exception  casadi::SparseStorage< DataType >::back() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubAssign::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SparseStorage< DataType >::begin() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubAssign::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::SparseStorage< DataType >::begin() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubRef::clone() const  {
+%exception  casadi::SparseStorage< DataType >::clear() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubRef::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::SparseStorage< DataType >::colind() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubRef::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::SparseStorage< DataType >::colind(int col) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubRef::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::SparseStorage< DataType >::data() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubRef::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::SparseStorage< DataType >::data() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubRef::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::SparseStorage< DataType >::elem(int rr, int cc=0) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubRef::getOp() const  {
+%exception  casadi::SparseStorage< DataType >::elem(int rr, int cc=0) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubRef::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SparseStorage< DataType >::end() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SubRef::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::SparseStorage< DataType >::end() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicMX::clone() const  {
+%exception  casadi::SparseStorage< DataType >::front() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicMX::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::SparseStorage< DataType >::front() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicMX::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::SparseStorage< DataType >::getElement(int rr, int cc=0) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicMX::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::SparseStorage< DataType >::hasNZ(int rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicMX::getName() const  {
+%exception  casadi::SparseStorage< DataType >::rbegin() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicMX::getOp() const  {
+%exception  casadi::SparseStorage< DataType >::rbegin() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicMX::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SparseStorage< DataType >::rend() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::SparseStorage< DataType >::rend() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicNLP::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::SparseStorage< DataType >::reserve(int nnz) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicNLP::repr(std::ostream &stream=std::cout) const  {
+%exception  casadi::SparseStorage< DataType >::reserve(int nnz, int ncol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicOCP::print(std::ostream &stream=std::cout) const  {
+%exception  casadi::SparseStorage< DataType >::resize(int nrow, int ncol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicOCP::repr(std::ostream &stream=std::cout) const  {
+%exception  casadi::SparseStorage< DataType >::row() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicSX::getName() const  {
+%exception  casadi::SparseStorage< DataType >::row(int el) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicSX::getOp() const  {
+%exception  casadi::SparseStorage< DataType >::sanityCheck(bool complete=false) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::SymbolicSX::isSymbolic() const  {
+%exception  casadi::SparseStorage< DataType >::sparsity() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::clone() const  {
+%exception  casadi::SparseStorage< DataType >::sparsityRef() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::SparseStorage< DataType >::toScalar() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
+%exception  casadi::Sparsity::T() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::Sparsity::colindRef() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::Sparsity::reCache() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::Sparsity::rowRef() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::getOp() const  {
+%exception  casadi::Sparsity::shape() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::getTranspose() const  {
+%exception  casadi::Split::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::nTmp(size_t &ni, size_t &nr) {
+%exception  casadi::Split::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::Split::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Transpose::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
+%exception  casadi::Split::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::clone() const  {
+%exception  casadi::Split::getNumOutputs() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::Split::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::Split::sparsity(int oind) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::SubAssign::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::SubAssign::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::getBinary(int op, const MX &y, bool scX, bool scY) const  {
+%exception  casadi::SubAssign::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::getOp() const  {
+%exception  casadi::SubAssign::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::getUnary(int op) const  {
+%exception  casadi::SubAssign::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::isUnaryOp() const  {
+%exception  casadi::SubAssign::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::numInplace() const  {
+%exception  casadi::SubAssign::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SubAssign::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnaryMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
+%exception  casadi::SubAssign::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnarySX::dep(int i) const  {
+%exception  casadi::SubRef::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnarySX::dep(int i) {
+%exception  casadi::SubRef::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnarySX::getOp() const  {
+%exception  casadi::SubRef::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnarySX::hasDep() const  {
+%exception  casadi::SubRef::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnarySX::isSmooth() const  {
+%exception  casadi::SubRef::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnarySX::ndep() const  {
+%exception  casadi::SubRef::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::UnarySX::print(std::ostream &stream, long &remaining_calls) const  {
+%exception  casadi::SubRef::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Vertcat::clone() const  {
+%exception  casadi::SubRef::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Vertcat::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::SubRef::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Vertcat::getOp() const  {
+%exception  casadi::SymbolicMX::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Vertcat::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SymbolicMX::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Vertsplit::clone() const  {
+%exception  casadi::SymbolicMX::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Vertsplit::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
+%exception  casadi::SymbolicMX::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Vertsplit::getOp() const  {
+%exception  casadi::SymbolicMX::getName() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Vertsplit::getVertcat(const std::vector< MX > &x) const  {
+%exception  casadi::SymbolicMX::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::Vertsplit::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::SymbolicMX::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::WeakRef::alive() const  {
+%exception  casadi::SymbolicMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::WeakRef::shared() {
+%exception  casadi::SymbolicNLP::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::checkName(const std::string &str) const  {
+%exception  casadi::SymbolicNLP::repr(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::dump(std::ostream &stream, int indent=0) const  {
+%exception  casadi::SymbolicOCP::print(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::getAttribute(const std::string &attribute_name) const  {
+%exception  casadi::SymbolicOCP::repr(std::ostream &stream=std::cout) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::getName() const  {
+%exception  casadi::SymbolicSX::getName() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::getText() const  {
+%exception  casadi::SymbolicSX::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::getText(T &val) const  {
+%exception  casadi::SymbolicSX::isSymbolic() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::hasAttribute(const std::string &attribute_name) const  {
+%exception  casadi::Transpose::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::hasChild(const std::string &childname) const  {
+%exception  casadi::Transpose::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::readAttribute(const std::string &attribute_name, T &val, bool assert_existance=true) const  {
+%exception  casadi::Transpose::evaluateGen(const MatV &input, MatV &output, std::vector< int > &itmp, std::vector< T > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::setAttribute(const std::string &attribute_name, const std::string &attribute) {
+%exception  casadi::Transpose::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::setName(const std::string &name) {
+%exception  casadi::Transpose::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::XMLNode::size() const  {
+%exception  casadi::Transpose::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::clone() const  {
+%exception  casadi::Transpose::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
+%exception  casadi::Transpose::getTranspose() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
+%exception  casadi::Transpose::nTmp(size_t &ni, size_t &nr) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
+%exception  casadi::Transpose::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::getBinary(int op, const MX &y, bool ScX, bool ScY) const  {
+%exception  casadi::Transpose::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
+%exception  casadi::UnaryMX::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::getMatrixValue() const  {
+%exception  casadi::UnaryMX::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::getReshape(const Sparsity &sp) const  {
+%exception  casadi::UnaryMX::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::getSetNonzeros(const MX &y, const std::vector< int > &nz) const  {
+%exception  casadi::UnaryMX::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::getSetSparse(const Sparsity &sp) const  {
+%exception  casadi::UnaryMX::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::getTranspose() const  {
+%exception  casadi::UnaryMX::getBinary(int op, const MX &y, bool scX, bool scY) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::getUnary(int op) const  {
+%exception  casadi::UnaryMX::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::getValue() const  {
+%exception  casadi::UnaryMX::getUnary(int op) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroByZero::printPart(std::ostream &stream, int part) const  {
+%exception  casadi::UnaryMX::isUnaryOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroSX::getIntValue() const  {
+%exception  casadi::UnaryMX::numInplace() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroSX::getValue() const  {
+%exception  casadi::UnaryMX::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroSX::isAlmostZero(double tol) const  {
+%exception  casadi::UnaryMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroSX::isInteger() const  {
+%exception  casadi::UnarySX::dep(int i) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ZeroSX::isZero() const  {
+%exception  casadi::UnarySX::dep(int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::abs(const T &x) {
+%exception  casadi::UnarySX::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::acos(const T &x) {
+%exception  casadi::UnarySX::hasDep() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::acosh(const T &x) {
+%exception  casadi::UnarySX::isSmooth() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::acosh(double x) {
+%exception  casadi::UnarySX::ndep() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::asin(const T &x) {
+%exception  casadi::UnarySX::print(std::ostream &stream, long &remaining_calls) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::asinh(const T &x) {
+%exception  casadi::Vertcat::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::asinh(double x) {
+%exception  casadi::Vertcat::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::atan(const T &x) {
+%exception  casadi::Vertcat::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::atan2(const T &x, const T &n) {
+%exception  casadi::Vertcat::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::atan2(const T &x, double n) {
+%exception  casadi::Vertsplit::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::atan2(double x, const T &n) {
+%exception  casadi::Vertsplit::evaluateMX(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::atanh(const T &x) {
+%exception  casadi::Vertsplit::getOp() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::atanh(double x) {
+%exception  casadi::Vertsplit::getVertcat(const std::vector< MX > &x) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::blockcat(const Matrix< DataType > &A, const Matrix< DataType > &B, const Matrix< DataType > &C, const Matrix< DataType > &D) {
+%exception  casadi::Vertsplit::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::blockmatrix(SX array[n]) {
+%exception  casadi::WeakRef::alive() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::blockmatrix(SX array[n][m]) {
+%exception  casadi::WeakRef::shared() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ceil(const T &x) {
+%exception  casadi::XMLNode::checkName(const std::string &str) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::collocationInterpolators(const std::vector< double > &tau_root, std::vector< std::vector< double > > &C, std::vector< double > &D) {
+%exception  casadi::XMLNode::dump(std::ostream &stream, int indent=0) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::constpow(const T &x, const T &n) {
+%exception  casadi::XMLNode::getAttribute(const std::string &attribute_name) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::copysign(const T &x, const T &y) {
+%exception  casadi::XMLNode::getName() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::copysign(double x, double y) {
+%exception  casadi::XMLNode::getText() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::cos(const T &x) {
+%exception  casadi::XMLNode::getText(T &val) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::cosh(const T &x) {
+%exception  casadi::XMLNode::hasAttribute(const std::string &attribute_name) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::deepcopy(const A &a) {
+%exception  casadi::XMLNode::hasChild(const std::string &childname) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::erf(const T &x) {
+%exception  casadi::XMLNode::readAttribute(const std::string &attribute_name, T &val, bool assert_existance=true) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::erf(double x) {
+%exception  casadi::XMLNode::setAttribute(const std::string &attribute_name, const std::string &attribute) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::erfinv(const T &x) {
+%exception  casadi::XMLNode::setName(const std::string &name) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::erfinv(double x) {
+%exception  casadi::XMLNode::size() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::exp(const T &x) {
+%exception  casadi::ZeroByZero::clone() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fabs(const T &x) {
+%exception  casadi::ZeroByZero::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::floor(const T &x) {
+%exception  casadi::ZeroByZero::evaluateSX(const SXPtrV &input, SXPtrV &output, std::vector< int > &itmp, std::vector< SXElement > &rtmp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmax(const T &x, const T &n) {
+%exception  casadi::ZeroByZero::generateOperation(std::ostream &stream, const std::vector< std::string > &arg, const std::vector< std::string > &res, CodeGenerator &gen) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmax(const T &x, double n) {
+%exception  casadi::ZeroByZero::getBinary(int op, const MX &y, bool ScX, bool ScY) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmax(double x, const T &n) {
+%exception  casadi::ZeroByZero::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmax(double x, double y) {
+%exception  casadi::ZeroByZero::getMatrixValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmax(int x, int y) {
+%exception  casadi::ZeroByZero::getReshape(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmin(const T &x, const T &n) {
+%exception  casadi::ZeroByZero::getSetNonzeros(const MX &y, const std::vector< int > &nz) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmin(const T &x, double n) {
+%exception  casadi::ZeroByZero::getSetSparse(const Sparsity &sp) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmin(double x, const T &n) {
+%exception  casadi::ZeroByZero::getTranspose() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmin(double x, double y) {
+%exception  casadi::ZeroByZero::getUnary(int op) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::fmin(int x, int y) {
+%exception  casadi::ZeroByZero::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::getDescription(const std::vector< T > &v) {
+%exception  casadi::ZeroByZero::printPart(std::ostream &stream, int part) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::getPtr(Matrix< DataType > &v) {
+%exception  casadi::ZeroSX::getIntValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::getPtr(const Matrix< DataType > &v) {
+%exception  casadi::ZeroSX::getValue() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::getPtr(const std::vector< T > &v) {
+%exception  casadi::ZeroSX::isAlmostZero(double tol) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::getPtr(std::vector< T > &v) {
+%exception  casadi::ZeroSX::isInteger() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::getRepresentation(const std::vector< T > &v) {
+%exception  casadi::ZeroSX::isZero() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::get_bvec_t(const std::vector< T > &v) {
+%exception  casadi::abs(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::get_bvec_t(std::vector< T > &v) {
+%exception  casadi::acos(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::hash_combine(std::size_t &seed, T v) {
+%exception  casadi::acosh(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::hash_combine(std::size_t &seed, const std::vector< int > &v) {
+%exception  casadi::acosh(double x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::hash_value(T v) {
+%exception  casadi::asin(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::horzcat(const Matrix< DataType > &x, const Matrix< DataType > &y) {
+%exception  casadi::asinh(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::if_else(const SXElement &cond, const T &if_true, const T &if_false) {
+%exception  casadi::asinh(double x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::if_else_zero(const T &x, const T &y) {
+%exception  casadi::atan(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::if_else_zero(double x, double y) {
+%exception  casadi::atan2(const T &x, const T &n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::inner_prod(const std::vector< T > &a, const std::vector< T > &b) {
+%exception  casadi::atan2(const T &x, double n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::isEqual(const MX &ex1, const MX &ex2) {
+%exception  casadi::atan2(double x, const T &n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::is_a(const SharedObject &A) {
+%exception  casadi::atanh(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::isinf(double x) {
+%exception  casadi::atanh(double x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::isnan(double x) {
+%exception  casadi::blkdiag(const MX &A, const MX &B) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::linspace(std::vector< T > &v, const F &first, const L &last) {
+%exception  casadi::blkdiag(const Sparsity &a, const Sparsity &b) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::log(const T &x) {
+%exception  casadi::blockcat(const MX &A, const MX &B, const MX &C, const MX &D) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::log10(const T &x) {
+%exception  casadi::blockcat(const Matrix< DataType > &A, const Matrix< DataType > &B, const Matrix< DataType > &C, const Matrix< DataType > &D) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::makeVector(int size, int ind0=-1, const T &val0=T(), int ind1=-1, const T &val1=T(), int ind2=-1, const T &val2=T(), int ind3=-1, const T &val3=T(), int ind4=-1, const T &val4=T(), int ind5=-1, const T &val5=T(), int ind6=-1, const T &val6=T(), int ind7=-1, const T &val7=T(), int ind8=-1, const T &val8=T(), int ind9=-1, const T &val9=T(), int ind10=-1, const T &val10=T(), int ind11=-1, const T &val11=T(), int ind12=-1, const T &val12=T(), int ind13=-1, const T &val13=T(), int ind14=-1, const T &val14=T(), int ind15=-1, const T &val15=T(), int ind16=-1, const T &val16=T(), int ind17=-1, const T &val17=T(), int ind18=-1, const T &val18=T(), int ind19=-1, const T &val19=T()) {
+%exception  casadi::blockmatrix(SX array[n]) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::matrixName< SXElement >() {
+%exception  casadi::blockmatrix(SX array[n][m]) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::norm_1(const std::vector< T > &x) {
+%exception  casadi::casadi_load_linearsolver_csparsecholesky() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::norm_2(const std::vector< T > &x) {
+%exception  casadi::ceil(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::norm_inf(const std::vector< T > &x) {
+%exception  casadi::collocationInterpolators(const std::vector< double > &tau_root, std::vector< std::vector< double > > &C, std::vector< double > &D) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::operation_checker(unsigned int op) {
+%exception  casadi::collocationPointsL(int order, const std::string &scheme) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::pow(const T &x, const T &n) {
+%exception  casadi::constpow(const T &x, const T &n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::pow(const T &x, double n) {
+%exception  casadi::copysign(const T &x, const T &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::pow(double x, const T &n) {
+%exception  casadi::copysign(double x, double y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::print(const std::vector< T > &v, std::ostream &stream=std::cout) {
+%exception  casadi::cos(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::printme(const T &x, const T &y) {
+%exception  casadi::cosh(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::printme(double x, double y) {
+%exception  casadi::deepcopy(const A &a) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ptrVec(const std::vector< T > &v) {
+%exception  casadi::erf(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ptrVec(const std::vector< std::vector< T > > &v) {
+%exception  casadi::erf(double x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ptrVec(std::vector< T > &v) {
+%exception  casadi::erfinv(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::ptrVec(std::vector< std::vector< T > > &v) {
+%exception  casadi::erfinv(double x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::qr(const Matrix< DataType > &A, Matrix< DataType > &Q, Matrix< DataType > &R) {
+%exception  casadi::exp(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::repr(const std::vector< T > &v, std::ostream &stream=std::cout) {
+%exception  casadi::fabs(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::shared_cast(SharedObject &A) {
+%exception  casadi::floor(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::shared_cast(const SharedObject &A) {
+%exception  casadi::fmax(const T &x, const T &n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::sign(const T &x) {
+%exception  casadi::fmax(const T &x, double n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::sign(double x) {
+%exception  casadi::fmax(double x, const T &n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::sin(const T &x) {
+%exception  casadi::fmax(double x, double y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::sinh(const T &x) {
+%exception  casadi::fmax(int x, int y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &dwork, std::vector< double > &eig_real, std::vector< double > &eig_imag) {
+%exception  casadi::fmin(const T &x, const T &n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &eig_real, std::vector< double > &eig_imag) {
+%exception  casadi::fmin(const T &x, double n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::sort(const std::vector< T > &values, std::vector< T > &sorted_values, std::vector< int > &indices, bool invert_indices=false) {
+%exception  casadi::fmin(double x, const T &n) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::sq(const T &x) {
+%exception  casadi::fmin(double x, double y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::sqrt(const T &x) {
+%exception  casadi::fmin(int x, int y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::substituteInPlace(const std::vector< MX > &v, std::vector< MX > &vdef, bool reverse=false) {
+%exception  casadi::fmod(const T &x, const T &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::substituteInPlace(const std::vector< MX > &v, std::vector< MX > &vdef, std::vector< MX > &ex, bool reverse=false) {
+%exception  casadi::getDescription(const std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::tan(const T &x) {
+%exception  casadi::getPtr(Matrix< DataType > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::tanh(const T &x) {
+%exception  casadi::getPtr(const Matrix< DataType > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::toVector(const T &v0) {
+%exception  casadi::getPtr(const std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::toVector(const T &v0, const T &v1) {
+%exception  casadi::getPtr(std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::toVector(const T &v0, const T &v1, const T &v2) {
+%exception  casadi::getRealTime() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::twice(const T &x) {
+%exception  casadi::getRepresentation(const std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  CasADi::vertcat(const Matrix< DataType > &x, const Matrix< DataType > &y) {
+%exception  casadi::get_bvec_t(const std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  ProfilingType() {
+%exception  casadi::get_bvec_t(const std::vector< double > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  ProfilingType< ProfilingData_ENTRY >() {
+%exception  casadi::get_bvec_t(std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  ProfilingType< ProfilingData_EXIT >() {
+%exception  casadi::get_bvec_t(std::vector< double > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  ProfilingType< ProfilingData_IO >() {
+%exception  casadi::hash_combine(std::size_t &seed, T v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  ProfilingType< ProfilingData_NAME >() {
+%exception  casadi::hash_combine(std::size_t &seed, const std::vector< int > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  ProfilingType< ProfilingData_SOURCE >() {
+%exception  casadi::hash_sparsity(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  ProfilingType< ProfilingData_TIMELINE >() {
+%exception  casadi::hash_value(T v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  profileWrite(std::ofstream &f, const T &s) {
+%exception  casadi::horzcat(const MX &a, const MX &b) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  profileWriteBare(std::ofstream &f, const T &s) {
+%exception  casadi::horzcat(const Matrix< DataType > &x, const Matrix< DataType > &y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::horzcat(const Sparsity &a, const Sparsity &b) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::if_else(const SXElement &cond, const T &if_true, const T &if_false) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::if_else_zero(const T &x, const T &y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::if_else_zero(double x, double y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::inner_prod(const std::vector< T > &a, const std::vector< T > &b) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::is_a(const SharedObject &A) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::isinf(double x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::isnan(double x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::linspace(std::vector< T > &v, const F &first, const L &last) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::log(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::log10(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::makeVector(int size, int ind0=-1, const T &val0=T(), int ind1=-1, const T &val1=T(), int ind2=-1, const T &val2=T(), int ind3=-1, const T &val3=T(), int ind4=-1, const T &val4=T(), int ind5=-1, const T &val5=T(), int ind6=-1, const T &val6=T(), int ind7=-1, const T &val7=T(), int ind8=-1, const T &val8=T(), int ind9=-1, const T &val9=T(), int ind10=-1, const T &val10=T(), int ind11=-1, const T &val11=T(), int ind12=-1, const T &val12=T(), int ind13=-1, const T &val13=T(), int ind14=-1, const T &val14=T(), int ind15=-1, const T &val15=T(), int ind16=-1, const T &val16=T(), int ind17=-1, const T &val17=T(), int ind18=-1, const T &val18=T(), int ind19=-1, const T &val19=T()) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::matrixName< SXElement >() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::norm_1(const std::vector< T > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::norm_2(const std::vector< T > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::norm_inf(const std::vector< T > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::operation_checker(unsigned int op) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::pow(const T &x, const T &n) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::pow(const T &x, double n) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::pow(double x, const T &n) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::print(const std::vector< T > &v, std::ostream &stream=std::cout) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::printme(const T &x, const T &y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::printme(double x, double y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::profileWrite(std::ofstream &f, const T &s) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::profileWriteBare(std::ofstream &f, const T &s) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ptrVec(const std::vector< T > &v) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ptrVec(const std::vector< std::vector< T > > &v) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ptrVec(std::vector< T > &v) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ptrVec(std::vector< std::vector< T > > &v) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::qr(const Matrix< DataType > &A, Matrix< DataType > &Q, Matrix< DataType > &R) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::range(int start, int stop, int step, int len) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::range(int stop) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::repr(const std::vector< T > &v, std::ostream &stream=std::cout) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::reshape(const MX &x, int nrow, int ncol) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::shared_cast(SharedObject &A) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::shared_cast(const SharedObject &A) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::sign(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::sign(double x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::simplify(SXElement &ex) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::sin(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::sinh(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &dwork, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::sort(const std::vector< T > &values, std::vector< T > &sorted_values, std::vector< int > &indices, bool invert_indices=false) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::sq(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::sqrt(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::substituteInPlace(const std::vector< MX > &v, std::vector< MX > &vdef, bool reverse=false) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::substituteInPlace(const std::vector< MX > &v, std::vector< MX > &vdef, std::vector< MX > &ex, bool reverse=false) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::tan(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::tanh(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::toVector(const T &v0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::toVector(const T &v0, const T &v1) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::toVector(const T &v0, const T &v1, const T &v2) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::twice(const T &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::vertcat(const MX &a, const MX &b) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::vertcat(const Matrix< DataType > &x, const Matrix< DataType > &y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::vertcat(const Sparsity &a, const Sparsity &b) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  snlog2_() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  snlog_() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  sqicDestroy() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Assertion::Assertion(const MX &x, const MX &y, const std::string &s) {
+%exception  sqlog_() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::BinaryMX< ScX, ScY >::BinaryMX(Operation op, const MX &x, const MX &y) {
+%exception casadi::Assertion::Assertion(const MX &x, const MX &y, const std::string &s) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::CallFunction::CallFunction(const Function &fcn, std::vector< MX > arg) {
+%exception casadi::BinaryMX< ScX, ScY >::BinaryMX(Operation op, const MX &x, const MX &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Concat::Concat(const std::vector< MX > &x) {
+%exception casadi::CallFunction::CallFunction(const Function &fcn, std::vector< MX > arg) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Constant< Value >::Constant(const Sparsity &sp, Value v=Value()) {
+%exception casadi::Concat::Concat(const std::vector< MX > &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::ConstantDMatrix::ConstantDMatrix(const Matrix< double > &x) {
+%exception casadi::Constant< Value >::Constant(const Sparsity &sp, Value v=Value()) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::ConstantMX::ConstantMX(const Sparsity &sp) {
+%exception casadi::ConstantDMatrix::ConstantDMatrix(const Matrix< double > &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::ControlSimulatorInputIOSchemeVector< M >::ControlSimulatorInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::ConstantMX::ConstantMX(const Sparsity &sp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::ControlledDAEInputIOSchemeVector< M >::ControlledDAEInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::ControlSimulatorInputIOSchemeVector< M >::ControlSimulatorInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::DAEInputIOSchemeVector< M >::DAEInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::ControlledDAEInputIOSchemeVector< M >::ControlledDAEInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::DAEOutputIOSchemeVector< M >::DAEOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::DAEInputIOSchemeVector< M >::DAEInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::DPLEInputIOSchemeVector< M >::DPLEInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::DAEOutputIOSchemeVector< M >::DAEOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::DPLEOutputIOSchemeVector< M >::DPLEOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::DPLEInputIOSchemeVector< M >::DPLEInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::DenseMultiplication< TrX, TrY >::DenseMultiplication(const MX &z, const MX &x, const MX &y) {
+%exception casadi::DPLEOutputIOSchemeVector< M >::DPLEOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::DenseTranspose::DenseTranspose(const MX &x) {
+%exception casadi::DenseMultiplication< TrX, TrY >::DenseMultiplication(const MX &z, const MX &x, const MX &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Determinant::Determinant(const MX &x) {
+%exception casadi::DenseTranspose::DenseTranspose(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::EmptySparsity::EmptySparsity() {
+%exception casadi::Determinant::Determinant(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::GetNonzeros::GetNonzeros(const Sparsity &sp, const MX &x) {
+%exception casadi::EmptySparsity::EmptySparsity() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::GetNonzerosSlice2::GetNonzerosSlice2(const Sparsity &sp, const MX &x, const Slice &inner, const Slice &outer) {
+%exception casadi::GetNonzeros::GetNonzeros(const Sparsity &sp, const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::GetNonzerosSlice::GetNonzerosSlice(const Sparsity &sp, const MX &x, const Slice &s) {
+%exception casadi::GetNonzerosSlice2::GetNonzerosSlice2(const Sparsity &sp, const MX &x, const Slice &inner, const Slice &outer) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::GetNonzerosVector::GetNonzerosVector(const Sparsity &sp, const MX &x, const std::vector< int > &nz) {
+%exception casadi::GetNonzerosSlice::GetNonzerosSlice(const Sparsity &sp, const MX &x, const Slice &s) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::GradFInputIOSchemeVector< M >::GradFInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::GetNonzerosVector::GetNonzerosVector(const Sparsity &sp, const MX &x, const std::vector< int > &nz) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::GradFOutputIOSchemeVector< M >::GradFOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::GradFInputIOSchemeVector< M >::GradFInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::HNLPInputIOSchemeVector< M >::HNLPInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::GradFOutputIOSchemeVector< M >::GradFOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::HessLagInputIOSchemeVector< M >::HessLagInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::HNLPInputIOSchemeVector< M >::HNLPInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::HessLagOutputIOSchemeVector< M >::HessLagOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::HessLagInputIOSchemeVector< M >::HessLagInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Horzcat::Horzcat(const std::vector< MX > &x) {
+%exception casadi::HessLagOutputIOSchemeVector< M >::HessLagOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Horzsplit::Horzsplit(const MX &x, const std::vector< int > &offset) {
+%exception casadi::Horzcat::Horzcat(const std::vector< MX > &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::IndexList::IndexList() {
+%exception casadi::Horzsplit::Horzsplit(const MX &x, const std::vector< int > &offset) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::IndexList::IndexList(const Slice &i) {
+%exception casadi::IndexList::IndexList() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::IndexList::IndexList(const std::vector< int > &i) {
+%exception casadi::IndexList::IndexList(const Slice &i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::IndexList::IndexList(int i) {
+%exception casadi::IndexList::IndexList(const std::vector< int > &i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::InfSX::InfSX() {
+%exception casadi::IndexList::IndexList(int i) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::InnerProd::InnerProd(const MX &x, const MX &y) {
+%exception casadi::InfSX::InfSX() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::IntegratorInputIOSchemeVector< M >::IntegratorInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::InnerProd::InnerProd(const MX &x, const MX &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::IntegratorOutputIOSchemeVector< M >::IntegratorOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::IntegratorInputIOSchemeVector< M >::IntegratorInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Inverse::Inverse(const MX &x) {
+%exception casadi::IntegratorOutputIOSchemeVector< M >::IntegratorOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::JacGInputIOSchemeVector< M >::JacGInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::Inverse::Inverse(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::JacGOutputIOSchemeVector< M >::JacGOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::JacGInputIOSchemeVector< M >::JacGInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::LPSolverInputIOSchemeVector< M >::LPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::JacGOutputIOSchemeVector< M >::JacGOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::LPSolverOutputIOSchemeVector< M >::LPSolverOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::LPStructIOSchemeVector< T >::LPStructIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::LPStructIOSchemeVector< T >::LPStructIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::LinearSolver::LinearSolver() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::LinearSolver::LinearSolver() {
+%exception casadi::LinsolInputIOSchemeVector< M >::LinsolInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::LinsolInputIOSchemeVector< M >::LinsolInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::LinsolOutputIOSchemeVector< M >::LinsolOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::LinsolOutputIOSchemeVector< M >::LinsolOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::LpSolverInputIOSchemeVector< M >::LpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::MXFunction::MXFunction(const MX &input, const MX &output) {
+%exception casadi::LpSolverOutputIOSchemeVector< M >::LpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::MXFunction::MXFunction(const MX &input, const std::vector< MX > &output) {
+%exception casadi::MXFunction::MXFunction(const MX &input, const MX &output) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::MXFunction::MXFunction(const std::vector< MX > &input, const MX &output) {
+%exception casadi::MXFunction::MXFunction(const MX &input, const std::vector< MX > &output) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::MXNode::MXNode() {
+%exception casadi::MXFunction::MXFunction(const std::vector< MX > &input, const MX &output) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix() {
+%exception casadi::MXNode::MXNode() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(const Matrix< DataType > &m) {
+%exception casadi::Matrix< DataType >::Matrix() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(const Sparsity &sparsity, const DataType &val=DataType(0)) {
+%exception casadi::Matrix< DataType >::Matrix(const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(const Sparsity &sparsity, const std::vector< DataType > &d) {
+%exception casadi::Matrix< DataType >::Matrix(const Sparsity &sparsity, const DataType &val=DataType(0)) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(const std::vector< DataType > &x) {
+%exception casadi::Matrix< DataType >::Matrix(const Sparsity &sparsity, const std::vector< DataType > &d) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(const std::vector< DataType > &x, int nrow, int ncol) {
+%exception casadi::Matrix< DataType >::Matrix(const std::vector< DataType > &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(const std::vector< std::vector< DataType > > &m) {
+%exception casadi::Matrix< DataType >::Matrix(const std::vector< DataType > &x, int nrow, int ncol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(double val) {
+%exception casadi::Matrix< DataType >::Matrix(const std::vector< std::vector< DataType > > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::MayerInputIOSchemeVector< M >::MayerInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::Matrix< DataType >::Matrix(double val) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::MinusInfSX::MinusInfSX() {
+%exception casadi::MayerInputIOSchemeVector< M >::MayerInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::MinusOneSX::MinusOneSX() {
+%exception casadi::MinusInfSX::MinusInfSX() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::MultipleOutput::MultipleOutput() {
+%exception casadi::MinusOneSX::MinusOneSX() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Multiplication< TrX, TrY >::Multiplication(const MX &z, const MX &x, const MX &y) {
+%exception casadi::MultipleOutput::MultipleOutput() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::NLPInputIOSchemeVector< M >::NLPInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::Multiplication< TrX, TrY >::Multiplication(const MX &z, const MX &x, const MX &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::NLPOutputIOSchemeVector< M >::NLPOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::NLPInputIOSchemeVector< M >::NLPInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::NLPSolverInputIOSchemeVector< M >::NLPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::NLPOutputIOSchemeVector< M >::NLPOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::NLPSolverOutputIOSchemeVector< M >::NLPSolverOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::NanSX::NanSX() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::NanSX::NanSX() {
+%exception casadi::NlpSolverInputIOSchemeVector< M >::NlpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::NonZeroIterator< DataType >::NonZeroIterator(const Matrix< DataType > &m) {
+%exception casadi::NlpSolverOutputIOSchemeVector< M >::NlpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Norm1::Norm1(const MX &x) {
+%exception casadi::NonZeroIterator< DataType >::NonZeroIterator(const Matrix< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Norm2::Norm2(const MX &x) {
+%exception casadi::Norm1::Norm1(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Norm::Norm(const MX &x) {
+%exception casadi::Norm2::Norm2(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::NormF::NormF(const MX &x) {
+%exception casadi::Norm::Norm(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::NormInf::NormInf(const MX &x) {
+%exception casadi::NormF::NormF(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::OCPInputIOSchemeVector< M >::OCPInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::NormInf::NormInf(const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::OCPOutputIOSchemeVector< M >::OCPOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::OCPInputIOSchemeVector< M >::OCPInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::OneSX::OneSX() {
+%exception casadi::OCPOutputIOSchemeVector< M >::OCPOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::OptionsFunctionalityNode::OptionsFunctionalityNode() {
+%exception casadi::OneSX::OneSX() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::OutputNode::OutputNode(const MX &parent, int oind) {
+%exception casadi::OptionsFunctionalityNode::OptionsFunctionalityNode() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::QCQPSolverInputIOSchemeVector< M >::QCQPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::OutputNode::OutputNode(const MX &parent, int oind) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::QCQPSolverOutputIOSchemeVector< M >::QCQPSolverOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QCQPStructIOSchemeVector< T >::QCQPStructIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::QCQPStructIOSchemeVector< T >::QCQPStructIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QPStructIOSchemeVector< T >::QPStructIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::QPSolverInputIOSchemeVector< M >::QPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QcqpSolverInputIOSchemeVector< M >::QcqpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::QPSolverOutputIOSchemeVector< M >::QPSolverOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QcqpSolverOutputIOSchemeVector< M >::QcqpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::QPStructIOSchemeVector< T >::QPStructIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QpSolverInputIOSchemeVector< M >::QpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::RDAEInputIOSchemeVector< M >::RDAEInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QpSolverOutputIOSchemeVector< M >::QpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::RDAEOutputIOSchemeVector< M >::RDAEOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::RDAEInputIOSchemeVector< M >::RDAEInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Reshape::Reshape(const MX &x, Sparsity sp) {
+%exception casadi::RDAEOutputIOSchemeVector< M >::RDAEOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::RuntimeConst< T >::RuntimeConst() {
+%exception casadi::Reshape::Reshape(const MX &x, Sparsity sp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::RuntimeConst< T >::RuntimeConst(T v) {
+%exception casadi::RuntimeConst< T >::RuntimeConst() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SDPInputIOSchemeVector< M >::SDPInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::RuntimeConst< T >::RuntimeConst(T v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SDPOutputIOSchemeVector< M >::SDPOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::SDPInputIOSchemeVector< M >::SDPInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SDPStructIOSchemeVector< T >::SDPStructIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::SDPOutputIOSchemeVector< M >::SDPOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SDQPInputIOSchemeVector< M >::SDQPInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::SDPStructIOSchemeVector< T >::SDPStructIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SDQPOutputIOSchemeVector< M >::SDQPOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::SDQPInputIOSchemeVector< M >::SDQPInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SDQPStructIOSchemeVector< T >::SDQPStructIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::SDQPOutputIOSchemeVector< M >::SDQPOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SOCPInputIOSchemeVector< M >::SOCPInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::SDQPStructIOSchemeVector< T >::SDQPStructIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SOCPOutputIOSchemeVector< M >::SOCPOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::SOCPInputIOSchemeVector< M >::SOCPInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SOCPStructIOSchemeVector< T >::SOCPStructIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::SOCPOutputIOSchemeVector< M >::SOCPOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SXElement::SXElement(const SXElement &scalar) {
+%exception casadi::SOCPStructIOSchemeVector< T >::SOCPStructIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SXFunction::SXFunction(const SX &arg, const SX &res) {
+%exception casadi::SXElement::SXElement(const SXElement &scalar) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SXFunction::SXFunction(const SX &arg, const std::vector< SX > &res) {
+%exception casadi::SXFunction::SXFunction(const SX &arg, const SX &res) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SXFunction::SXFunction(const SX &arg, const std::vector< std::vector< SXElement > > &res) {
+%exception casadi::SXFunction::SXFunction(const SX &arg, const std::vector< SX > &res) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SXFunction::SXFunction(const std::vector< SX > &arg, const SX &res) {
+%exception casadi::SXFunction::SXFunction(const SX &arg, const std::vector< std::vector< SXElement > > &res) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SXFunction::SXFunction(const std::vector< std::vector< SXElement > > &arg, const SX &res) {
+%exception casadi::SXFunction::SXFunction(const std::vector< SX > &arg, const SX &res) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SXFunction::SXFunction(const std::vector< std::vector< SXElement > > &arg, const std::vector< std::vector< SXElement > > &res) {
+%exception casadi::SXFunction::SXFunction(const std::vector< std::vector< SXElement > > &arg, const SX &res) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SXNode::SXNode() {
+%exception casadi::SXFunction::SXFunction(const std::vector< std::vector< SXElement > > &arg, const std::vector< std::vector< SXElement > > &res) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::ScalarSparseSparsity::ScalarSparseSparsity() {
+%exception casadi::SXNode::SXNode() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::ScalarSparsity::ScalarSparsity() {
+%exception casadi::ScalarSparseSparsity::ScalarSparseSparsity() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SetNonzeros< Add >::SetNonzeros(const MX &y, const MX &x) {
+%exception casadi::ScalarSparsity::ScalarSparsity() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SetNonzerosSlice2< Add >::SetNonzerosSlice2(const MX &y, const MX &x, const Slice &inner, const Slice &outer) {
+%exception casadi::SetNonzeros< Add >::SetNonzeros(const MX &y, const MX &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SetNonzerosSlice< Add >::SetNonzerosSlice(const MX &y, const MX &x, const Slice &s) {
+%exception casadi::SetNonzerosSlice2< Add >::SetNonzerosSlice2(const MX &y, const MX &x, const Slice &inner, const Slice &outer) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SetNonzerosVector< Add >::SetNonzerosVector(const MX &y, const MX &x, const std::vector< int > &nz) {
+%exception casadi::SetNonzerosSlice< Add >::SetNonzerosSlice(const MX &y, const MX &x, const Slice &s) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SetSparse::SetSparse(const MX &x, const Sparsity &sp) {
+%exception casadi::SetNonzerosVector< Add >::SetNonzerosVector(const MX &y, const MX &x, const std::vector< int > &nz) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SharedObject::SharedObject() {
+%exception casadi::SetSparse::SetSparse(const MX &x, const Sparsity &sp) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SharedObject::SharedObject(const SharedObject &ref) {
+%exception casadi::SharedObject::SharedObject() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SharedObjectNode::SharedObjectNode() {
+%exception casadi::SharedObject::SharedObject(const SharedObject &ref) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SharedObjectNode::SharedObjectNode(const SharedObjectNode &node) {
+%exception casadi::SharedObjectNode::SharedObjectNode() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Solve< Tr >::Solve(const MX &r, const MX &A, const LinearSolver &linear_solver) {
+%exception casadi::SharedObjectNode::SharedObjectNode(const SharedObjectNode &node) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Split::Split(const MX &x, const std::vector< int > &offset) {
+%exception casadi::Solve< Tr >::Solve(const MX &r, const MX &A, const LinearSolver &linear_solver) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::StabilizedQPSolverInputIOSchemeVector< M >::StabilizedQPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::SparseStorage< DataType >::SparseStorage() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SubAssign::SubAssign(const MX &x, const MX &y, const Slice &i, const Slice &j) {
+%exception casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< A > &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SubRef::SubRef(const MX &x, const Slice &i, const Slice &j) {
+%exception casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< DataType > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SymbolicMX::SymbolicMX(const std::string &name, const Sparsity &sp) {
+%exception casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const DataType &val=DataType(0)) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SymbolicMX::SymbolicMX(const std::string &name, int nrow=1, int ncol=1) {
+%exception casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const std::vector< DataType > &d) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::SymbolicSX::SymbolicSX(const std::string &name) {
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Transpose::Transpose(const MX &x) {
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x, int nrow, int ncol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::UnaryMX::UnaryMX(Operation op, MX x) {
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Vertcat::Vertcat(const std::vector< MX > &x) {
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x, int nrow, int ncol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::Vertsplit::Vertsplit(const MX &x, const std::vector< int > &offset) {
+%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< std::vector< DataType > > &m) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::WeakRef::WeakRef(SharedObject shared) {
+%exception casadi::Split::Split(const MX &x, const std::vector< int > &offset) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::WeakRef::WeakRef(int dummy=0) {
+%exception casadi::StabilizedQpSolverInputIOSchemeVector< M >::StabilizedQpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::XMLNode::XMLNode() {
+%exception casadi::SubAssign::SubAssign(const MX &x, const MX &y, const Slice &i, const Slice &j) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception CasADi::ZeroSX::ZeroSX() {
+%exception casadi::SubRef::SubRef(const MX &x, const Slice &i, const Slice &j) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SymbolicMX::SymbolicMX(const std::string &name, const Sparsity &sp) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SymbolicMX::SymbolicMX(const std::string &name, int nrow=1, int ncol=1) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::SymbolicSX::SymbolicSX(const std::string &name) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::Transpose::Transpose(const MX &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::UnaryMX::UnaryMX(Operation op, MX x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::Vertcat::Vertcat(const std::vector< MX > &x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::Vertsplit::Vertsplit(const MX &x, const std::vector< int > &offset) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::WeakRef::WeakRef(SharedObject shared) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::WeakRef::WeakRef(int dummy=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::XMLNode::XMLNode() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::ZeroSX::ZeroSX() {
   START INTERNAL_MSG() $action STOP { $action } 
 }

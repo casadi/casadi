@@ -24,15 +24,15 @@
 #define GSL_INTERNAL_HPP
 
 #include "gsl_integrator.hpp"
-#include "symbolic/function/integrator_internal.hpp"
-#include "symbolic/function/linear_solver.hpp"
+#include "core/function/integrator_internal.hpp"
+#include "core/function/linear_solver.hpp"
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_odeiv.h>
 
 #include <ctime>
 
-namespace CasADi{
+namespace casadi{
 namespace GSL {
   
 /**
@@ -137,7 +137,7 @@ public:
 
 
 } // namespace GSL
-} // namespace CasADi
+} // namespace casadi
 
 #endif //GSL_INTERNAL_HPP
 

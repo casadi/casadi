@@ -1,8 +1,8 @@
-#include "symbolic/casadi.hpp"
+#include "core/casadi.hpp"
 #include "integration/irk_integrator.hpp"
 #include "interfaces/sundials/kinsol_solver.hpp"
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 // Print a (typically 64-bit) unsigned integer

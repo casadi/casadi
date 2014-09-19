@@ -629,7 +629,7 @@ class MXtests(casadiTestCase):
       else:
         x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toArray()
         
-        self.numpyEvaluationCheckPool(self.pool,[x],x0,name="MX",setx0=x0)
+        self.numpyEvaluationCheckPool(self.pool,[x],x0,name="MX",setx0=x0,excludeflags={'nozero'})
         self.numpyEvaluationCheckPool(self.matrixpool,[x],x0,name="MX",setx0=x0)
       
   def test_MXbinarySparse(self):
@@ -693,7 +693,7 @@ class MXtests(casadiTestCase):
   def test_imatrix_index(self):
     self.message("IMatrix indexing")
     X = MX.sym("x",2,2)
-    Y = X[IMatrix([[0,2],[1,1],[3,3]])]
+    Y = X.nz[IMatrix([[0,2],[1,1],[3,3]])]
     
     f = MXFunction([X],[Y])
     f.init()
@@ -703,7 +703,7 @@ class MXtests(casadiTestCase):
     self.checkarray(f.getOutput(),array([[1,3],[2,2],[4,4]]),"IMatrix indexing")
     
     Y = X[:,:]
-    Y[IMatrix([[0,2]])] = DMatrix([[9,8]])
+    Y.nz[IMatrix([[0,2]])] = DMatrix([[9,8]])
     
     f = MXFunction([X],[Y])
     f.init()
@@ -2281,7 +2281,7 @@ class MXtests(casadiTestCase):
     self.checkarray(f.getOutput(3),A)
     self.checkarray(f.getOutput(4),A)
       
-  @requires("CSparse")
+  @requiresPlugin(LinearSolver,"csparse")
   def test_bizarre_bug(self):
 
     A = [[-26.9091,00,00,1,00,00,00,00,00,00,00,00,00,00,00],
@@ -2311,9 +2311,9 @@ class MXtests(casadiTestCase):
 
     Ast = As.T
 
-    r= MXFunction([As,Bs],[solve(Ast,Bs,CSparse)])
+    r= MXFunction([As,Bs],[solve(Ast,Bs,"csparse")])
     r.init()
-    R= MXFunction([As,Bs],[solve(dense(Ast),Bs,CSparse)])
+    R= MXFunction([As,Bs],[solve(dense(Ast),Bs,"csparse")])
     R.init()
 
     for i in [r,R]:

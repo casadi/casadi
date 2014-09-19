@@ -1,0 +1,425 @@
+/*! \page chapter3 Symbolic core
+
+<table style="width: 100%;">
+   <tr><td style="text-align: left;">Previous chapter: \ref chapter2</td>
+       <td style="text-align: right;">Next chapter: \ref chapter4</td>
+   </tr>
+</table>
+\b Contents
+<ol>
+<li> \ref section3_1
+<li> \ref section3_2
+<ul>
+<li> \ref subsection3_2_1
+<li> \ref subsection3_2_2
+</ul>
+<li> \ref section3_3
+<ul>
+<li> \ref subsection3_3_1
+<li> \ref subsection3_3_2
+<li> \ref subsection3_3_3
+</ul>
+</ol>
+   In CasADi a very powerful symbolic abstraction of mathematical functions is implemented.
+   In this chapter we will learn how to create general functions out of our model equations, 
+   how to evaluate them and optionally their derivatives. We also give some instructional
+   examples to make it more easily understandable.
+\section section3_1 Symbolic expressions
+   Normally, mathematical expressions represent operations between variables and parameters.
+   In order to build up our models, we need to have a computer-based abstraction of these. In CasADi
+   the casadi::SX class provides us exactly these building blocks. We create a simple expression:
+<table border="0" style="border-style: dotted; border-width: 1px;">
+   <tr><td>Example:</td><td>Output:</td>
+   <tr style="vertical-align: top;"><td>
+\code
+     1  #include "casadi/sx/sx.hpp"
+     2  using namespace casadi;
+     3  int main(int argc, char* argv[]){
+     4     SX x("x");
+     5     SX expr;
+     6     cout << "x: " << x << endl;
+     7     cout << "expr: " << expr << endl;
+     8     expr = 3.0 * x + pow(x, 2) - sin(x);
+     9     cout << "expr: " << expr << endl;
+    10     SX y("y");
+    11     expr += y / 2 / x;
+    12     cout << "expr: " << expr << endl;
+    13  }
+\endcode
+   </td>
+   <td>
+\code
+x: x
+expr: nan
+expr: (((3*x)+(x*x))-sin(x))
+expr: ((((3*x)+(x*x))-sin(x))+((y/2)/x))
+\endcode
+   </td>
+   </tr>
+</table>
+On the 1st line we include the header file containing the casadi::SX class, on the 4th the \c x object
+is created and from here on the string \c "x" is assigned to this variable. We can also create 
+casadi::SX objects by invoking the default constructor (line 5), although this variable is not initialized to any symbolic
+expression at this time. The \c expr object is initialized on line 8, while from the line 10 on we extend our expression
+with a \c y variable. One can always check whether an expression is correct by simply printing it to the standard output.
+With the use of casadi::SX objects and the <tt>+ - * / += -= *= /= exp log sqrt sin pow</tt> etc. operations we can build up a
+wide range of mathemetical expressions.
+We can also create a vector of expressions if needed, although each element must be initialized that may be
+carried out by the casadi::make_symbolic() function. Now we demonstrate how this works.
+<table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
+   <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
+   <tr style="vertical-align: top;"><td>
+\code
+     1  #include "casadi/sx/sx.hpp"
+     2  #include "casadi/sx/sx_tools.hpp"
+     3  
+     4  ...
+     5  vector<SX> z(10);
+     6  make_symbolic(z.begin(), z.end(), "z");
+     7  cout << "z[4]: " << z[4] << endl;
+     8  ...
+\endcode
+   </td> 
+   <td>
+\code
+z[4]: z_4
+\endcode
+   </td>
+   </tr>
+   </table>
+After invoking make_symbolic (line 6) the elements of \c z are assigned to <tt>z_0, z_1, ...</tt>  and can be used later on in modelling.
+\section section3_2 Functions 
+Now that we can build up mathematical expressions we would like to evaluate them symbolically or numerically. We will see how this can be
+done with the casadi::SXFunction object, which can represent mathematical functions that has prototype
+ \f$\mathbb{R} \rightarrow \mathbb{R}\f$, \f$\mathbb{R}^n \rightarrow \mathbb{R}\f$,
+\f$\mathbb{R}^n \rightarrow \mathbb{R}^m \f$ or \f$\mathbb{R}^{n_1 \times n_2} \rightarrow \mathbb{R}^{m_1 \times m_2}\f$.
+In the constructor of casadi::SXFunction one has to give two arguments. The first argument should contain all the variables
+that the function will depend on, and the second argument stores the function definition itself. The data type of the arguments may be various
+depending on the prototype of the function that is to be represented. Let's see some examples.
+\subsection subsection3_2_1 Numerical evaluation
+Most often we would like to compute the value of a function in a certain point. In this subsection we will learn how to do that
+ in case of different function prototypes.
+First we create and evaluate a simple scalar-scalar function numerically.
+<table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
+   <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
+   <tr style="vertical-align: top;"><td>
+\code
+     1  #include "casadi/sx/sx.hpp"
+     2  ...
+     3  SX x("x");
+     4  SX f_expr = x * x - 3 * x + 2;
+     5  SXFunction f(x, f_expr);
+     6  f.init();
+     7  double d = 10.0;
+     8  f.setInput(d);
+     9  f.evaluate();
+    10  cout << "Function value in x = " << d << " : " << f.output() << "\n";
+\endcode
+   </td>                                                                                                                                                                                                       
+   <td>
+\code
+Function value in x = 10 : 72
+\endcode
+   </td>
+   </tr>
+   </table>
+On line 4 we create the expression that will represent our function. The SXFunction
+object is created (line 5) with the variable \c x and the \c f_expr object.
+Before passing any input to the function, we have to initialize it (see line 6). Then we set the input
+of the function, evaluate it and finally print the result.
+
+Now we create a vector-scalar function that calculates the 2-norm of its argument.
+<table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
+   <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
+   <tr style="vertical-align: top;"><td>
+\code
+     1  vector<SX> x(4);
+     2  make_symbolic(x.begin(), x.end(), "x");
+     3  SX f_expr = 0;
+     4  for(int i = 0; i < x.size(); ++i){
+     5     f_expr += x[i] * x[i];
+     6  }
+     7  f_expr = sqrt(f_expr);
+     8  SXFunction f(x, f_expr);
+     9  f.init();
+    10  vector<double> d(x.size());
+    11  fill(d.begin(), d.end(), 3);
+    12  f.setInput(d);
+    13  f.evaluate();
+    14  cout << "Function value: " << f.output() << "\n";
+\endcode
+   </td>                                                                                                                                                                                                       
+   <td>
+\code
+Function value: 6
+\endcode
+   </td>
+   </tr>
+   </table>
+The principle is exactly the same, the only difference is that now we pass a \c std::vector<SX> in the first argument
+on line 8 and we provide a \c std::vector<double> as an input on line 12.
+
+Now we define and evaluate a vector-vector function.
+<table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
+   <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
+   <tr style="vertical-align: top;"><td>
+\code
+     1  vector<SX> x(3);
+     2  make_symbolic(x.begin(), x.end(), "x");
+     3  vector<SX> f_expr(2);
+     4  fill(f_expr.begin(), f_expr.end(), 0);
+     5  f_expr[0] = x[0] + 2 * x[1];
+     6  f_expr[1] = x[1] + 4 * exp(x[2]);
+     7  SXFunction f(x, f_expr);
+     8  f.init();
+     9  vector<double> d(3);
+    10  fill(d.begin(), d.end(), 2);
+    11  f.setInput(d);
+    12  f.evaluate();
+    13  vector<double> value = f.output().data();
+    14  cout << "[" << value.size() << "](";
+    15  for(int i = 0; i < value.size(); ++i){
+    16     cout << value[i] << ",";
+    17  }
+    18  cout << "\b)\n";
+\endcode
+   </td>                                                                                                                                                                                                       
+   <td>
+\code
+[2](6,31.5562)
+\endcode
+   </td>
+   </tr>
+   </table>
+This time both arguments of the constructor on line 7 are \c std::vector<SX>
+ and the function value is accessible via
+ SXFunction.output().data() (line 13).
+
+As the last example let's see a piece of code, where the function depends on a  <tt> std::vector<std::vector<SX> > </tt>. 
+Note that this covers the case when our function depends on a matrix.
+<table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
+   <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
+   <tr style="vertical-align: top;"><td>
+\code
+     1  vector<vector<SX> > variables;
+     2  vector<SX> x(3);
+     3  make_symbolic(x.begin(), x.end(), "x");
+     4  variables.push_back(x);
+     5  vector<SX> y(2);
+     6  make_symbolic(y.begin(), y.end(), "y");
+     7  variables.push_back(y);
+     8  vector<SX> f_expr(2);
+     9  f_expr[0] = x[0] + x[2] - sin(y[0]);
+    10  f_expr[1] = cos(x[1] - y[1]);
+    11  SXFunction f(variables, f_expr);
+    12  f.init();
+    13  vector<double> d0(3);
+    14  fill(d0.begin(), d0.end(), 6.0);
+    15  vector<double> d1(2);
+    16  fill(d1.begin(), d1.end(), 3.0);
+    17  f.setInput(d0, 0);
+    18  f.setInput(d1, 1);
+    19  f.evaluate();
+    20  vector<double> value = f.output().data();
+    21  cout << "[" << value.size() << "](";
+    22  for(int i = 0; i < value.size(); ++i){
+    23     cout << value[i] << ",";
+    24  }
+    25  cout << "\b)\n";
+\endcode
+   </td>                                                                                                                                                                                                       
+   <td>
+\code
+[2](11.8589,-0.989992)
+\endcode
+   </td>
+   </tr>
+   </table>
+In variable \c variables we collect vectors of SX objects. On line 17 and 18 you can notice
+a new argument (which was always 0 until now) that addresses an input vector. In this example on the first coordinate
+we have a 3 long vector, on the second we have a 2 long vector, which correspond to the function definition (line 11).
+It is important to understand the concept of functions depending on matrices, because, as it will be shown later on (see
+\ref chapter4), integrators are exactly of this type.
+
+\subsection subsection3_2_2 Symbolic evaluation
+One might also wish to replace certain variables in a symbolic expression with some other variables
+  or with more complex expressions. This may be carried out easily by the use of symbolic evaluation, we use
+  the casadi::SXFunction::eval() member function.
+<table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
+   <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
+   <tr style="vertical-align: top;"><td>
+\code
+     1  vector<SX> x(3);
+     2  make_symbolic(x.begin(), x.end(), "x");
+     3  vector<SX> f_expr(2);
+     4  f_expr[0] = x[0] + 5 * x[1];
+     5  f_expr[1] = x[0] + cos(x[2]);
+     6  SXFunction f(x, f_expr);
+     7  f.init();
+     8  vector<SX> y = x;
+     9  y[0] = x[1] + pow(x[2], 3);
+    10  vector<SX> f_expr_subs = f.eval(y);
+    11  cout << f_expr[0] << " --> " << f_expr_subs[0] << endl;
+    12  cout << f_expr[1] << " --> " << f_expr_subs[1] << endl;
+\endcode
+   </td>                                                                                                                                                                                                       
+   <td>
+\code
+(x_0+(5*x_1)) --> ((x_1+(x_2*(x_2*x_2)))+(5*x_1))
+(x_0+cos(x_2)) --> ((x_1+(x_2*(x_2*x_2)))+cos(x_2))
+\endcode
+   </td>
+   </tr>
+   </table>
+First we create a function depending on the vector \c x (line 1-7), then we create a vector of SX objects, whose
+size correspond to the function definition and we modify the first element by an arbitrary expression (line 9). As a result we get
+back the function expression in which the substitution has already been committed.
+\section section3_3 Calculating derivatives
+In this section we will learn how to calculate first-order derivatives of general functions. Within CasADi derivatives of general
+functions may be calculated in two ways. First, the derivatives are calculated numerically based on automatic differentiation,
+ which has two modes forward and backward. Second, knowing the symbolic representation of the functions one may differentiate
+ symbolically.
+\subsection subsection3_3_1 Forward differentiation
+ In the forward mode one can calculate the directional derivative
+\f$J p\f$, where \f$J\f$ is the Jacobian of a \f$f: \mathbb{R}^n \rightarrow \mathbb{R}^m\f$ and \f$p \in \mathbb{R}^m\f$ is the direction.
+In the following code we calculate the full Jacobian providing multiple directions.
+<table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
+   <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
+   <tr style="vertical-align: top;"><td>
+\code
+     1  vector<SX> x(3);
+     2  make_symbolic(x.begin(), x.end(), "x");
+     3  vector<SX> f_expr(2);
+     4  f_expr[0] = x[0] + 5 * x[1];
+     5  f_expr[1] = x[0] + cos(x[2]);
+     6  SXFunction f(x, f_expr);
+     7  f.setOption("number_of_fwd_dir", (int)x.size());
+     8  f.init();
+     9  vector<double> d(x.size());
+    10  fill(d.begin(), d.end(), 4.0);
+    11  f.setInput(d);
+    12  vector<double> fwd_seed(x.size());
+    13  fill(fwd_seed.begin(), fwd_seed.end(), 0);
+    14  for(int i = 0; i < x.size(); ++i){
+    15     fwd_seed[i] = 1;
+    16     f.setFwdSeed(fwd_seed, 0, i);
+    17     fwd_seed[i] = 0;
+    18  }
+    19  f.evaluate(x.size(), 0);
+    20  cout << "Function value: " << f.output() << endl;
+    21  vector<double> jacobian_column;
+    22  for(int i = 0; i < x.size(); ++i){
+    23     jacobian_column = f.fwdSens(0, i).data();
+    24     cout << "[" << jacobian_column.size() << "](";
+    25     for(int j = 0; j < jacobian_column.size(); ++j){
+    26        cout << jacobian_column[j] << ",";
+    27     }
+    28     cout << "\b)\n";
+    29  }
+\endcode
+   </td>                                                                                                                                                                                                       
+   <td>
+\code
+Function value: [24,3.34636]
+[2](1,1)
+[2](5,0)
+[2](0,0.756802)
+\endcode
+   </td>
+   </tr>
+   </table>
+ The first new thing is on line 7, we set an option called \c number_of_fwd_dir to the number
+of the forward directions in which we would like to differentiate. On line 16 we are inside a for loop
+and we provide the directions; now only columns of the identity matrix. The way of evaluation is also
+slightly different (line 19), so far we haven't given any arguments. The first argument indicates the number of
+forward derivatives to be evaluated, the second is just the same,
+ but with adjoint derivatives. In any case, the function itself is evaluated. We can collect our
+directional derivatives by the casadi::SXFunction::fwdSens() member function (line 23). Note that the first argument addresses
+the the matrix input. Since we have only vector input now, this is always zero.
+
+
+\subsection subsection3_3_2 Backward (adjoint) differentiation
+In this mode of derivative calculation one can calculate \f$J^T p\f$. Mutiple directions are not yet supported by CasADi.
+The code is as follows:
+
+<table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
+   <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
+   <tr style="vertical-align: top;"><td>
+\code
+     1  vector<SX> x(3);
+     2  make_symbolic(x.begin(), x.end(), "x");
+     3  vector<SX> f_expr(2);
+     4  f_expr[0] = x[0] + 5 * x[1];
+     5  f_expr[1] = x[0] + cos(x[2]);
+     6  SXFunction f(x, f_expr);
+     7  f.setOption("number_of_adj_dir", 1);
+     8  f.init();
+     9  vector<double> d(x.size());
+    10  fill(d.begin(), d.end(), 4.0);
+    11  f.setInput(d);
+    12  vector<double> adj_seed(f_expr.size());
+    13  fill(adj_seed.begin(), adj_seed.end(), 1);
+    14  f.setAdjSeed(adj_seed, 0, 0);
+    15  f.evaluate(0, 1);
+    16  cout << "Function value: " << f.output() << endl;
+    17  cout << "Adjoint derivative: " << f.adjSens(0, 0) << endl;
+\endcode
+   </td>                                                                                                                                                                                                       
+   <td>
+\code
+Function value: [24,3.34636]
+Adjoint derivative: [2,5,0.756802]
+\endcode
+   </td>
+   </tr>
+   </table>
+This time we set the option \c number_of_adj_dir (greater than 1 throws an error) and we invoke SXFunction::evaluate(0, 1).
+The adjoint derivative we can access by the casadi::SXFunction::adjSens(...) method.
+
+\subsection subsection3_3_3 Symbolic differentiation
+The second way one can differentiate is by symbolic manipulation. The result of this approach is nothing else than a
+function symbolically representing the first derivative of the original function. The following example demonstrates this.
+<table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
+   <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
+   <tr style="vertical-align: top;"><td>
+\code
+     1  vector<SX> variables;
+     2  vector<SX> x(3);
+     3  make_symbolic(x, "x");
+     4  variables = x;
+     5  vector<SX> f_expr(2);
+     6  f_expr[0] = x[0] + x[2] - sin(x[0]);
+     7  f_expr[1] = cos(x[1] - x[2] * x[0]);
+     8  SXFunction f(variables, f_expr);
+     9  f.init();
+    10  SXFunction f_der = f.jacobian();
+    11  cout << "f: " << f.outputExpr() << "\n"; 
+    12  cout << "f_der: " << f_der.outputExpr() << "\n";
+    13  vector<double> d0(3);
+    14  fill(d0.begin(), d0.end(), 6.0);
+    15  f_der.init();
+    16  f_der.setInput(d0);
+    17  f_der.evaluate();
+    18  cout << "Jacobian: " << f_der.output() << "\n"; 
+\endcode
+   </td>                                                                                                                                                                                                       
+   <td>
+\code
+f: [((x_0+x_2)-sin(x_0)),cos((x_1-(x_2*x_0)))]
+f_der: [[((-cos(x_0))+1),0,1],[(x_2*sin((x_1-(x_2*x_0)))),(-sin((x_1-(x_2*x_0)))),(x_0*sin((x_1-(x_2*x_0))))]]
+Jacobian: [[0.0398297,0,1],[5.92819,-0.988032,5.92819]]
+\endcode
+   </td>
+   </tr>
+   </table>
+The code is very self-explanatory, we create a vector-vector function (line 1-9) and invoke the SXFunction::jacobian() method, which
+returns an SXFunction object. This object, since it's a function itself, can be evaluated and differentiated again.
+This way one may calculate higher-order derivatives.
+<table style="width: 100%;">
+   <tr><td style="text-align: left;">Previous chapter: \ref chapter2</td>
+       <td style="text-align: right;">Next chapter: \ref chapter4</td>
+   </tr>
+</table>
+
+ */
+

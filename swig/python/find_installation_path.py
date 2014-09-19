@@ -21,6 +21,7 @@
 # 
 # -*- coding: utf-8 -*-
 import distutils.sysconfig
+import sys
 
-print distutils.sysconfig.get_python_lib()
+sys.stdout.write(distutils.sysconfig.get_python_lib())
 

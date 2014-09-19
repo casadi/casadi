@@ -1,0 +1,344 @@
+/*! \page chapter4 Integrators
+<table style="width: 100%;">
+   <tr><td style="text-align: left;">Previous chapter: \ref chapter3</td>
+       <td style="text-align: right;">Next chapter: \ref chapter5</td>
+   </tr>
+</table>
+\b Contents
+<ol>
+<li>\ref section4_1
+<ul>
+<li>\ref subsection4_1_1
+<li>\ref subsection4_1_2
+<!--<li>\ref subsection4_1_2-->
+</ul>
+<li>\ref section4_2
+</ol>
+In this chapter we will discuss a special family of functions: integrators. We would like to solve explicit and implicit 
+Ordinary Differential Equations (ODE), quadrature formulas together with sensitivities. CasADi comes with well established
+interface to state-of-the-art ODE solvers like CVODES and IDAS from the Sundials suite.
+
+\section section4_1 Integration of explicit ODEs
+In this section we will study how to use integrators and calculate sensitivites. Most of the things are already known from previous sections
+since integrators transparently behave like functions. We are concerned with the following explicit ODE.
+\f{align}{
+\noindent\dot{x} &= f(x(t), p)\\
+\dot{y} &= g(x(t), p)\\
+x(0) &= x_0
+\f}
+In the following piece of code we show how easy it is to solve ODEs with quadratures.
+<table border="0" style="border-style: dotted; border-width: 1px;">
+        <tr><td>Example:</td><td>Output:</td> 
+        <tr style="vertical-align: top;"><td>
+\code
+     1  SX t("t"); SX u("u"); SX s("s"); SX v("v"); SX m("v");
+     2  vector<SX> ode(3);
+     3  ode[0] = v;
+     4  ode[1] = (u - 0.02 * v * v) / m;
+     5  ode[2] = -0.01 * u * u;
+     6  vector<SX> quad(2);
+     7  quad[0] = s;
+     8  quad[1] = 0.45 * m * v * v;
+     9  vector<vector<SX> > ode_vars(DAE_NUM_IN);
+    10  ode_vars[DAE_T].push_back(t);
+    11  ode_vars[DAE_Y].push_back(s); ode_vars[DAE_Y].push_back(v); ode_vars[DAE_Y].push_back(m);
+    12  ode_vars[DAE_P].push_back(u);
+    13  SXFunction ode_func(ode_vars, ode);
+    14  SXFunction quad_func(ode_vars, quad);
+    15  CVodesIntegrator integrator(ode_func, quad_func);
+    16  integrator.setOption("t0", 0.0);
+    17  integrator.setOption("tf", 1.0);
+    18  integrator.init();
+    19  vector<double> x0(3 + 2);
+    20  fill(x0.begin(), x0.end(), 0.0);
+    21  x0[0] = 0; x0[1] = 1; x0[2] = 10;
+    22  integrator.setInput(x0, INTEGRATOR_X0);
+    23  vector<double> p(1);
+    24  p[0] = 0.15;
+    25  integrator.setInput(p, INTEGRATOR_P);
+    26  integrator.evaluate();
+    27  vector<double> xf = integrator.output(INTEGRATOR_XF);
+    28  cout << "Solution of ODE: (";
+    29     for(int j = 0; j < 3; ++j){
+    30        cout << xf[j] << ",";
+    31     }
+    32     cout << "\b)\n";
+    33  cout << "Solution of quadrature: (";
+    34     for(int j = 3; j < 5; ++j){
+    35        cout << xf[j] << ",";
+    36     }
+    37     cout << "\b)\n";
+\endcode
+</td>
+<td>
+\code
+Solution of ODE: (1.00649,1.01297,9.99978)
+Solution of quadrature: (0.50229,4.55863)
+\endcode
+</td>
+</tr>
+</table>
+First of all we introduce a time variable (\c t), a control parameter (\c u ) and three dynamic variables(<tt>s, v, m</tt>).
+Their data type do not differ, but their use will give them different meaning. We build up our ODE equations (line 2-5) and quadrature formula
+(line 6-8). Then we collect all our variables in a vector of vectors. In case of integrators one must respect the following rules regarding the
+function variables. The element addressed by DAE_T
+is a vector containing only the time variable (line 10). The element addressed by DAE_Y is always the vector of all dynamic variables (line 11).
+The element, which is addressed by DAE_P, contains the parameters (now we have only one control variable, line 12). Afterwards, we have to define two functions corresponding
+to our ODE (line 13) and quadrature equations (line 14). Now everything is ready to instantiate the casadi::Sundials::CVodesIntegrator class, which is an interface
+to the CVODES algorithm. If we have no quadratures then we simply pass only the ODE equations (line 15). If we don't set any options a BDF method is used
+to carry out integration. After instantiation, we set the initial time and the final time (line 16-17) of the integration. 
+For a detailed description of the available options consult \c casadi::Sundials::CVodesIntegrator class. .
+
+The initial value of the dynamic
+variables must be set by the use of \c INTERGRATOR_X0 enum type in the \c casadi::Sundials::CVodesIntegrator::setInput(...) function. 
+Note that CVODES handles quadratures by introducing dummy dynamic variables and thus the initial
+value must have length of 3 + 2 = 5 in our example (line 19-22). The parameters (in our case \c u) should also be assigned a value, this may be done
+using the \c INTEGRATOR_P enum type (line 25). After evaluation we can access the solution of the ODE and quadratures by the casadi::Sundials::CVodesIntegrator::output(...) method
+saying that we would like the value of the dynamic variables at the final time \c INTEGRATOR_XF (see line 27).
+
+\subsection subsection4_1_1 Evaluation of forward and backward sensitivities
+As CVodesIntegrator is actually a special function, it is natural to expect first-order derivatives from it. Of course the underlying CVODES integrator must
+provide sensitivities with respect to the initial value and the parameters used in the equations. We extend our previous source code and explain only the relevant parts.
+
+<table border="0" style="border-style: dotted; border-width: 1px;">
+        <tr><td>Example:</td> 
+        <tr style="vertical-align: top;"><td>
+\code
+     1  CVodesIntegrator integrator(ode_func, quad_func);
+     2  integrator.setOption("number_of_fwd_dir", 1);
+     3  integrator.setOption("number_of_adj_dir", 1);
+     4  integrator.setOption("t0", 0.0);
+     5  integrator.setOption("tf", 2.4);
+     6  integrator.init();
+     7  vector<double> x0(3 + 2);
+     8  fill(x0.begin(), x0.end(), 0.0);
+     9  x0[0] = 0; x0[1] = 1; x0[2] = 10;
+    10  integrator.setInput(x0, INTEGRATOR_X0);
+    11  vector<double> p(1);
+    12  p[0] = 0.15;
+    13  integrator.setInput(p, INTEGRATOR_P);
+    14  vector<double> fwd_seed_x(3 + 2);
+    15  fill(fwd_seed_x.begin(), fwd_seed_x.end(), 1);
+    16  vector<double> fwd_seed_p(1);
+    17  fwd_seed_p[0] = 10;
+    18  integrator.setFwdSeed(fwd_seed_x, INTEGRATOR_X0);
+    19  integrator.setFwdSeed(fwd_seed_p, INTEGRATOR_P);
+    20  vector<double> adj_seed(3 + 2);
+    21  fill(adj_seed.begin(), adj_seed.end(), 4.0);
+    22  integrator.setAdjSeed(adj_seed, INTEGRATOR_XF);
+    23  integrator.evaluate(1, 1);
+    24  vector<double> xf = integrator.output(INTEGRATOR_XF);
+    25  vector<double> forward_derivative = integrator.fwdSens(INTEGRATOR_XF).data();
+    26  vector<double> adjoint_derivative_x = integrator.adjSens(INTEGRATOR_X0).data();
+    27  vector<double> adjoint_derivative_p = integrator.adjSens(INTEGRATOR_P).data();
+\endcode
+</td>
+<td>
+Output:
+\code
+Forward derivative: (6.25543,3.37566,0.928,8.57645,50.2412)
+Adjoint derivative_x: (13.6,112.312,8.27986,4,4)
+Adjoint derivative_p: (13.5293)
+\endcode
+</td>
+</tr>
+</table>
+Similary as we did in case of plain functions, we have to set the number of directional derivatives (line 2-3). In
+forward mode more than one direction is supported. The forward seed we have to set with respect to the dynamic variables and the parameters as well 
+(see line 18-19). The way that the adjoint seed must be set comes from the behaviour of CVODES, namely that it does not give possibility to 
+calculate adjoint derivatives, but the feature of integrating backwards. Thus, the adjoint seed is an "initial value" at the final time 
+and should be indexed with \c INTEGRATOR_XF (see line 22). Gathering the derivatives is just the other way around. Forward derivatives can
+be collected at the final time (line 25), while adjoints are available at the initial time in two pieces corresponding to dynamic variables and parameters.
+
+
+\subsection subsection4_1_2 Getting intermediate values
+It is often the case that the end-value of the ODE is not sufficient, but the the whole trajectory of the states is of interest (e.g. simulation).
+<table border="0" style="border-style: dotted; border-width: 1px;">
+<tr><td>Example:</td><td>Output:</td>
+<tr  style="vertical-align: top;"><td>
+\code
+     1  SX t("t");
+     2  SX u("u");
+     3  SX s("s");
+     4  SX v("v");
+     5  SX m("m");
+     6  vector<SX> ode(3);
+     7  ode[0] = v;
+     8  ode[1] = (u - 0.02 * v * v) / m;
+     9  ode[2] = -0.01 * u * u;
+    10  vector<SX> quad(2);
+    11  quad[0] = s;
+    12  quad[1] = 0.45 * m * v * v;
+    13  vector<vector<SX> > ode_vars(DAE_NUM_IN);
+    14  ode_vars[DAE_T].push_back(t);
+    15  ode_vars[DAE_Y].push_back(s); ode_vars[DAE_Y].push_back(v); ode_vars[DAE_Y].push_back(m);
+    16  ode_vars[DAE_P].push_back(u);
+    17  SXFunction ode_func(ode_vars, ode);
+    18  SXFunction quad_func(ode_vars, quad);
+    19  CVodesIntegrator integrator(ode_func, quad_func);
+    20  double t0 = 0.0;
+    21  double tf = 1.0;
+    22  integrator.setOption("t0", t0);
+    23  integrator.setOption("tf", tf);
+    24  integrator.init();
+    25  vector<double> x0(3 + 2);
+    26  fill(x0.begin(), x0.end(), 0.0);
+    27  x0[0] = 0; x0[1] = 1; x0[2] = 10;
+    28  integrator.setInput(x0, INTEGRATOR_X0);
+    29  vector<double> p(1);
+    30  p[0] = 0.15;
+    31  integrator.setInput(p, INTEGRATOR_P);
+    32  integrator.reset();
+    33  int n_points = 10;
+    34  double act_t;
+    35  for(int i = 1; i <= n_points; ++i){
+    36     act_t = t0 + i * (tf - t0) / n_points;
+    37     integrator.integrate(act_t);
+    38     cout << "Intermediate value at t=" <<
+    39        act_t << " is " << integrator.output(INTEGRATOR_XF) << "\n";
+    40  }
+\endcode
+</td>
+<td>
+\code
+Intermediate value at t=0.1 is [0.100065,1.0013,9.99998,0.00500364,0.450585]
+Intermediate value at t=0.2 is [0.20026,1.0026,9.99995,0.0200261,0.90234]
+Intermediate value at t=0.3 is [0.300585,1.0039,9.99993,0.0450802,1.35527]
+Intermediate value at t=0.4 is [0.401039,1.0052,9.99991,0.0801727,1.80937]
+Intermediate value at t=0.5 is [0.501624,1.00649,9.99989,0.12532,2.26464]
+Intermediate value at t=0.6 is [0.602338,1.00779,9.99987,0.180532,2.72108]
+Intermediate value at t=0.7 is [0.703182,1.00909,9.99984,0.245829,3.17871]
+Intermediate value at t=0.8 is [0.804155,1.01038,9.99982,0.32121,3.63751]
+Intermediate value at t=0.9 is [0.905258,1.01168,9.9998,0.40669,4.09748]
+Intermediate value at t=1 is [1.00649,1.01297,9.99978,0.502289,4.55863]
+\endcode
+</td></tr>
+</table>
+Until line 31 just the usual routines are invoked to set the integrator up, while on line 32 we reset set the time to <i>t0</i> and reset the solvers.
+Inside the for loop (line 35-39), the integrate(...) method is used to get the actual value of the states at the given time.
+
+<!--
+\subsection subsection4_1_2 Integrator options
+In the following subsection we would like to introduce the most important integrator options. Most of the options are directly available and usable
+ known from the CVODES documentation, altough this is very detailed and quite often one cannot find what he is looking for. One can get the 
+ list of actual options by invoking the casadi::Sundials::CVodesIntegrator::printOptions() method.
+<center>
+<table style="border-style: solid; border-width: 1px; width: 80%;" cellpadding="3" cellspacing="3">
+        <tr>
+                <td><b>Option</b></td>
+                <td><b>Value</b></td>
+                <td><b>Description</b></td>
+        </tr>
+        <tr>
+                <td>linear_multistep_method</td>
+                <td>bdf, adams</td>
+                <td>Defines which implicit integration approach to be used. BDF is the default, adams means Adams-Moulton method.</td>
+        </tr>
+        <tr>
+                <td>number_of_fwd_dir</td>
+                <td>int</td>
+                <td>Sets the number of forward directional derivatives.</td>
+        </tr>
+        <tr>
+                <td>number_of_adj_dir</td>
+                <td>int</td>
+                <td>Sets the number of backward directional derivatives (can't be more than 1).</td>
+        </tr>
+        <tr>
+                <td>fsens_err_con</td>
+                <td>bool</td>
+                <td>Activates forward sensitivity error control, if false sensitivity equations are not considered while determining the step size. By default it is disabled.</td>
+        </tr>
+        <tr>
+                <td>quad_err_con</td>
+                <td>bool</td>
+                <td>Activates quadrature error control, if false quadrature equations are not considered while determining the step size. By default it is disabled.</td>
+        </tr>
+        <tr>
+                <td>linear_solver</td>
+                <td>dense, iterative, banded, user_defined</td>
+                <td>Determines linear solver and Jacobian approximation to be used in Newton iterations. Default is dense, whereas iterative is one of the Krylov solvers (see option iterative_solver for details) and banded approxmiation or user_defined are also possible.</td>
+        </tr>
+        <tr>
+                <td>iterative_solver</td>
+                <td>gmres, bcgstab, tfqmr</td>
+                <td>Sets which iterative Krylov solver to be used (see option linear_solver). The default is gmres.</td>
+        </tr>
+        <tr>
+                <td>exact_jacobian</td>
+                <td>bool</td>
+                <td>Activates exact Jacobian computation in Newton iterations. If false, which is the default, an approximation is deployed.</td>
+        </tr>
+        <tr>
+                <td>max_num_steps</td>
+                <td>int</td>
+                <td>Defines the maximum number of steps that the integrator may take (default: 10000).</td>
+        </tr>
+        <tr>
+                <td>abstol</td>
+                <td>double</td>
+                <td>Sets the absolute tolerance (default: 1E-08).</td>
+        </tr>
+        <tr>
+                <td>reltol</td>
+                <td>double</td>
+                <td>Sets the relative tolerance (default: 1E-06).</td>
+        </tr>
+        <tr>
+                <td>nonlinear_solver_iteration</td>
+                <td>newton, functional</td>
+                <td>Choose nonlinear solver, either Newton's method, which is the default or Functional iteration.</td>
+        </tr>
+        <tr>
+                <td>fsens_all_at_once</td>
+                <td>bool</td>
+                <td>If true the right-hand side of all sensitivity equations are evaluated, default is true.</td>
+        </tr>
+        <tr>
+                <td>pretype</td>
+                <td>none, left, right, both</td>
+                <td>Determines the type of preconditioning of linear systems, by default it is none.</td>
+        </tr>
+        <tr>
+                <td>sensitivity_method</td>
+                <td>simultaneous, staggered</td>
+                <td>Determines how forward sensitivities are calculated. Simultaneous corrector method is the default, staggered corrector approach is an option.</td>
+        </tr>
+        <tr>
+                <td>interpolation_type</td>
+                <td>hermite, polynomial</td>
+                <td>Determines interpolation method for backward derivatives, candidates are variable-degree polynomial and cubic Hermite interpolation (default).</td>
+        </tr>
+        <tr>
+                <td>asens_linear_solver</td>
+                <td>dense, banded, iterative</td>
+                <td>Determines linear solver and Jacobian approximation to be used in Newton iterations for backward sensitivities.</td>
+        </tr>
+        <tr>
+                <td>asens_iterative_solver</td>
+                <td>gmres, bcgstab, tfqmr</td>
+                <td>Sets which iterative Krylov solver to be used for backward sensitivities.</td>
+        </tr>
+        <tr>
+                <td>asens_reltol</td>
+                <td>double</td>
+                <td>Sets the absolute tolerance of backward integration</td>
+        </tr>
+        <tr>
+                <td>asens_abstol</td>
+                <td>double</td>
+                <td>Sets the relative tolerance of backward integration</td>
+        </tr>
+</table>
+</center>
+-->
+\section section4_2 Integration of implicit ODEs
+
+<table style="width: 100%;">
+   <tr><td style="text-align: left;">Previous chapter: \ref chapter3</td>
+       <td style="text-align: right;">Next chapter: \ref chapter5</td>
+   </tr>
+</table>
+ */
+
+

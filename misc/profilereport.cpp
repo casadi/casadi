@@ -4,9 +4,9 @@
 #include <map>
 #include <fstream>
 
-#include "symbolic/profiling.hpp"
-#include "symbolic/casadi_math.hpp"
-#include "symbolic/casadi_calculus.hpp"
+#include "casadi/core/profiling.hpp"
+#include "casadi/core/casadi_math.hpp"
+#include "casadi/core/casadi_calculus.hpp"
 
 /**float(m.group(1))*1e-6, float(m.group(2))*1e-3, m.group(3), int(m.group(4)), m.group(5) , m.group(6)
 linereg = re.compile("^([\d\.]+) ns \| ([\d\.]+) ms \| (0x[\w\d]+:[\w_]+):(\d+)\|(0x[\w\d]+:[\w_]+)?\|(.*)$")
@@ -14,6 +14,7 @@ linereg = re.compile("^([\d\.]+) ns \| ([\d\.]+) ms \| (0x[\w\d]+:[\w_]+):(\d+)\
 void parseline(const std::string& line,double& ns,double &ms, std::string &id, std::string &name, int & line_number, )
 */
 
+using namespace casadi;
 
 
 struct linestat {
@@ -280,8 +281,8 @@ int main(int argc, char* argv[])
   
   
   //Binning
-  std::vector<int> type_binning_ncalls(CasADi::NUM_BUILT_IN_OPS);
-  std::vector<double> type_binning_time(CasADi::NUM_BUILT_IN_OPS);
+  std::vector<int> type_binning_ncalls(casadi::NUM_BUILT_IN_OPS);
+  std::vector<double> type_binning_time(casadi::NUM_BUILT_IN_OPS);
   
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
@@ -316,11 +317,11 @@ int main(int argc, char* argv[])
 "</script>";
   
   report << "<table><thead><tr><th>Operation code</th><th>Operation</th><th>total (s)</th><th>ncalls</th></tr></thead>\n";
-  for (int i=0;i<CasADi::NUM_BUILT_IN_OPS;++i) {
+  for (int i=0;i<casadi::NUM_BUILT_IN_OPS;++i) {
     report << "<tr><td>" << i << "</td><td>";
-    CasADi::casadi_math<double>::printPre(i,report);
-    CasADi::casadi_math<double>::printSep(i,report);
-    CasADi::casadi_math<double>::printPost(i,report);
+    casadi::casadi_math<double>::printPre(i,report);
+    casadi::casadi_math<double>::printSep(i,report);
+    casadi::casadi_math<double>::printPost(i,report);
     report << "</td><td>" << type_binning_time[i] << "</td><td>" << type_binning_ncalls[i] <<  "</td><td>";
   }
   report << "</table>";

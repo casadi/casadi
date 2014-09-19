@@ -28,20 +28,27 @@ from helpers import *
 
 lpsolvers = []
 try:
-  lpsolvers.append((QPLPSolver,{"qp_solver": OOQPSolver },False))
+  QpSolver.loadPlugin("ooqp")
+  lpsolvers.append(("qp",{"qp_solver": "ooqp" },False))
+except:
+  pass
+
+try:
+  NlpSolver.loadPlugin("ipopt")
+  lpsolvers.append(("qp",{"qp_solver": "nlp", "qp_solver_options":{"nlp_solver":"ipopt"}},False))
 except:
   pass
 
 
-try:  
-  DSDPSolver
-  def SDPLPSolver(st):
-    return DSDPSolver(sdpStruct(a=st["a"],f=Sparsity.sparse(0,0),g=Sparsity.sparse(0,0)))
-  lpsolvers.append((SDPLPSolver,{},False))
-except:
-  pass
+# try:  
+#   QpSolver.loadPlugin("dsdp")
+#   def SDPLpSolver(st):
+#     return DSdpSolver(sdpStruct(a=st["a"],f=Sparsity.sparse(0,0),g=Sparsity.sparse(0,0)))
+#   lpsolvers.append((SDPLpSolver,{},False))
+# except:
+#  pass
 
-class LPSolverTests(casadiTestCase):
+class LpSolverTests(casadiTestCase):
 
   def testboundsviol(self):
     A = DMatrix([[-1,1],[1,1],[1,-2]])
@@ -54,7 +61,7 @@ class LPSolverTests(casadiTestCase):
     for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = lpsolver(lpStruct(a=A.sparsity()))
+      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
       solver.setOption(lp_options)
       solver.init()
 
@@ -67,7 +74,7 @@ class LPSolverTests(casadiTestCase):
       
     
       with self.assertRaises(Exception):
-        solver.solve()
+        solver.evaluate()
 
     A = DMatrix([[-1,1],[1,1],[1,-2]])
     LBA = DMatrix([ -inf, 2, -inf ])
@@ -79,7 +86,7 @@ class LPSolverTests(casadiTestCase):
     for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = lpsolver(lpStruct(a=A.sparsity()))
+      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
       solver.setOption(lp_options)
       solver.init()
 
@@ -92,7 +99,7 @@ class LPSolverTests(casadiTestCase):
       
     
       with self.assertRaises(Exception):
-        solver.solve()
+        solver.evaluate()
         
   def test_bounds(self):
     #  min  2 x +y
@@ -108,7 +115,7 @@ class LPSolverTests(casadiTestCase):
     for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = lpsolver(lpStruct(a=A.sparsity()))
+      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
       solver.setOption(lp_options)
       solver.init()
 
@@ -116,7 +123,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput([0,0],"lbx")
       solver.setInput([10,10],"ubx")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([0,0]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([-2,-1]),str(lpsolver),digits=5)
@@ -134,7 +141,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput([-1,3],"lbx")
       solver.setInput([10,10],"ubx")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([-1,3]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([-2,-1]),str(lpsolver),digits=5)
@@ -152,7 +159,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput([-1,3],"lbx")
       solver.setInput([inf,inf],"ubx")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([-1,3]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([-2,-1]),str(lpsolver),digits=5)
@@ -170,7 +177,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput([-10,-10],"lbx")
       solver.setInput([0,0],"ubx")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([0,0]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([2,1]),str(lpsolver),digits=5)
@@ -188,7 +195,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput([-10,-10],"lbx")
       solver.setInput([-1,3],"ubx")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([-1,3]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([2,1]),str(lpsolver),digits=5)
@@ -206,7 +213,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput([-inf,-inf],"lbx")
       solver.setInput([-1,3],"ubx")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([-1,3]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([2,1]),str(lpsolver),digits=5)
@@ -237,7 +244,7 @@ class LPSolverTests(casadiTestCase):
     for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = lpsolver(lpStruct(a=A.sparsity()))
+      solver = LpSolver(lpsolver,lpStruct(a=A.sparsity()))
       solver.setOption(lp_options)
       solver.init()
 
@@ -248,7 +255,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([0.5,1.5]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(lpsolver),digits=5)
@@ -270,7 +277,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([1,2]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-3]),str(lpsolver),digits=5)
@@ -292,7 +299,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([1,1]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,1]),str(lpsolver),digits=5)
@@ -313,7 +320,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([2,3]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-3]),str(lpsolver),digits=5)
@@ -334,7 +341,7 @@ class LPSolverTests(casadiTestCase):
       solver.setInput([1, 2, -inf ],"lba")
       solver.setInput([1,inf,4],"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([0.5,1.5]),str(lpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(lpsolver),digits=5)

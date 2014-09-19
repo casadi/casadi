@@ -202,3 +202,19 @@
    fun:dsyevr_
    fun:DSDPGetEigs
 }
+
+{
+   False positive suspected by Joel
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:_dl_map_object_deps
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_ZN6casadi15PluginInterfaceINS_16QpSolverInternalEE10loadPluginERKSs
+}

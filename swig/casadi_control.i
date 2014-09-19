@@ -20,5 +20,16 @@
  *
  */
 
-// control
-%include "control.i"
+%module casadi_control
+
+%include "common.i"
+
+%import "casadi_core.i"
+
+#define CASADI_CONTROL_EXPORT
+
+%{
+#include "casadi/control/dple_solver.hpp"
+%}
+
+%include "casadi/control/dple_solver.hpp"

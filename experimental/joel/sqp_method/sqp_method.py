@@ -117,7 +117,7 @@ sqp_solver.setOption("qp_solver",QPOasesSolver)
 sqp_solver.setOption("qp_solver_options",{"printLevel" : "low"})
 
 # OOQP
-#sqp_solver.setOption("qp_solver",OOQPSolver)
+#sqp_solver.setOption("qp_solver",OOQpSolver)
 
 sqp_solver.init()
 sqp_solver.setInput(umin,     "lbx")
@@ -180,11 +180,11 @@ qp_solver = QPOasesSolver(H_sparsity,A_sparsity)
 qp_solver.setOption("printLevel","low")
 
 # IPOPT
-#qp_solver =  NLPQPSolver(H_sparsity,A_sparsity)
+#qp_solver =  NLPQpSolver(H_sparsity,A_sparsity)
 #qp_solver.setOption("nlp_solver", IpoptSolver)
 
 # OOQP
-#qp_solver = OOQPSolver(H_sparsity,A_sparsity)
+#qp_solver = OOQpSolver(H_sparsity,A_sparsity)
 
 qp_solver.init()
 

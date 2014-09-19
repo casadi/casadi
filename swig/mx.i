@@ -21,42 +21,44 @@
  */
 
 %{
-#include "symbolic/mx/mx.hpp"
-#include "symbolic/mx/mx_tools.hpp"
+#include "casadi/core/mx/mx.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
 %}
 
-%include "symbolic/mx/mx.hpp"
+%include "casadi/core/mx/mx.hpp"
 
 
 
 
-%template(SparsityVector) std::vector<CasADi::Sparsity>;
+%template(SparsityVector) std::vector<casadi::Sparsity>;
 
 
 
-%extend CasADi::MX{
+%extend casadi::MX{
   
-  %matrix_helpers(CasADi::MX)
+  %matrix_helpers(casadi::MX)
   
   #ifdef SWIGPYTHON
   %python_array_wrappers(1002.0)
   
   %pythoncode %{
   def __array_custom__(self,*args,**kwargs):
+    import numpy as np
+    if np.__version__=="1.8.1": #1083
+      return np.array(np.nan)
     raise Exception("MX cannot be converted to an array. MX.__array__ purely exists to allow ufunc/numpy goodies")
     
   def __iter__(self):
-    for i in range(self.size()):
-      yield self[i]
+    return self.nz.__iter__()
     
   %}
   #endif //SWIGPYTHON
   
-  binopsrFull(CasADi::MX)
+  binopsrFull(casadi::MX)
 };
 
 
 
-VECTOR_REPR(CasADi::MX)
-VECTOR_REPR(std::vector<CasADi::MX>)
+VECTOR_REPR(casadi::MX)
+VECTOR_REPR(std::vector<casadi::MX>)
 

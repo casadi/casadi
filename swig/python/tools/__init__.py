@@ -31,19 +31,8 @@ def print_subclasses(myclass, depth=0):
   for s in myclass.__subclasses__():
     print_subclasses(s,depth=depth+1)
     
-def deprecatedfun(func,message):
-
-    def depfun(*args, **kwargs):
-        if not func._fired:
-          warnings.warn(message,SyntaxWarning,stacklevel=2)
-          func._fired = True
-        return func(*args, **kwargs)
-    func._fired = False
-    depfun.__dict__.update(func.__dict__)
-    depfun.__name__ = func.__name__
-    depfun.__doc__ = func.__doc__
-    return depfun
-
-struct_ssym = deprecatedfun(struct_symSX,"struct_ssym will soon be replaced by struct_symSX")
-struct_msym = deprecatedfun(struct_symMX,"struct_msym will soon be replaced by struct_symMX")
-
+def loadAllCompiledPlugins():
+  for k in CasadiMeta.getPlugins().split(";"):
+    cls, name = k.split("::")
+    print "Testing: ", cls, name
+    getattr(casadi,cls).loadPlugin(name)

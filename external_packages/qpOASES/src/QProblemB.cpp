@@ -1527,7 +1527,7 @@ returnValue QProblemB::obtainAuxiliaryWorkingSet(	const real_t* const xOpt, cons
 	if ( guessedBounds != 0 )
 	{
 		/* If an initial working set is specific, use it!
-		 * Moreover, add all implictly fixed variables if specified. */
+		 * Moreover, add all implicitly fixed variables if specified. */
 		for( i=0; i<nV; ++i )
 		{
 			#ifdef __ALWAYS_INITIALISE_WITH_ALL_EQUALITIES__
@@ -1565,7 +1565,7 @@ returnValue QProblemB::obtainAuxiliaryWorkingSet(	const real_t* const xOpt, cons
 					continue;
 				}
 
-				/* Moreover, add all implictly fixed variables if specified. */
+				/* Moreover, add all implicitly fixed variables if specified. */
 				#ifdef __ALWAYS_INITIALISE_WITH_ALL_EQUALITIES__
 				if ( bounds.getType( i ) == ST_EQUALITY )
 				{
@@ -1600,7 +1600,7 @@ returnValue QProblemB::obtainAuxiliaryWorkingSet(	const real_t* const xOpt, cons
 					continue;
 				}
 
-				/* Moreover, add all implictly fixed variables if specified. */
+				/* Moreover, add all implicitly fixed variables if specified. */
 				#ifdef __ALWAYS_INITIALISE_WITH_ALL_EQUALITIES__
 				if ( bounds.getType( i ) == ST_EQUALITY )
 				{
@@ -1630,7 +1630,7 @@ returnValue QProblemB::obtainAuxiliaryWorkingSet(	const real_t* const xOpt, cons
 							return THROWERROR( RET_OBTAINING_WORKINGSET_FAILED );
 						break;
 
-					/* Only add all implictly fixed variables if specified. */
+					/* Only add all implicitly fixed variables if specified. */
 					#ifdef __ALWAYS_INITIALISE_WITH_ALL_EQUALITIES__
 					case ST_EQUALITY:
 						if ( auxiliaryBounds->setupBound( i,ST_LOWER ) != SUCCESSFUL_RETURN )

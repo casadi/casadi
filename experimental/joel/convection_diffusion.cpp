@@ -21,17 +21,17 @@
  */
 
 #include <iostream>
-#include "symbolic/std_vector_tools.hpp"
+#include "core/std_vector_tools.hpp"
 #include "interfaces/ipopt/ipopt_solver.hpp"
 #include "interfaces/sundials/cvodes_integrator.hpp"
 #include "optimal_control/ocp_tools.hpp"
-#include "symbolic/function/simulator.hpp"
-#include "symbolic/function/simulator_internal.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/function/sx_function.hpp"
+#include "core/function/simulator.hpp"
+#include "core/function/simulator_internal.hpp"
+#include "core/sx/sx_tools.hpp"
+#include "core/function/sx_function.hpp"
 
-using namespace CasADi;
-using namespace CasADi::OptimalControl;
+using namespace casadi;
+using namespace casadi::OptimalControl;
 using namespace std;
 
 // Symbolc representation of the optimal control problem

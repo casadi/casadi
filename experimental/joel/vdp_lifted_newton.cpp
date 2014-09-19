@@ -24,14 +24,14 @@
 #include <fstream>
 #include <ctime>
 #include <iomanip>
-#include <symbolic/casadi.hpp>
+#include <core/casadi.hpp>
 #include <nonlinear_programming/sqp_method.hpp>
 #include <interfaces/qpoases/qpoases_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/std_vector_tools.hpp>
+#include <core/std_vector_tools.hpp>
 #include <nonlinear_programming/lifted_sqp.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 int main(){
@@ -130,7 +130,7 @@ int main(){
   enum Tests{IPOPT, LIFTED_SQP, FULLSPACE_SQP, OLD_SQP_METHOD, NUM_TESTS};
   for(int test=0; test<NUM_TESTS; ++test){
     // Get the nlp solver and NLP solver options
-    NLPSolver nlp_solver;
+    NlpSolver nlp_solver;
     switch(test){
       case IPOPT:
 	cout << "Testing IPOPT" << endl;

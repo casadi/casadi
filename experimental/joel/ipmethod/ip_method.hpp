@@ -23,9 +23,9 @@
 #ifndef IP_METHOD_HPP
 #define IP_METHOD_HPP
 
-#include "symbolic/function/nlp_solver.hpp"
+#include "core/function/nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   
 class IPInternal;
   
@@ -38,7 +38,7 @@ class IPInternal;
   \author Joel Andersson
   \date 2012
 */
-class IPMethod : public NLPSolver {
+class IPMethod : public NlpSolver {
   public:
     /// Default constructor
     IPMethod();
@@ -59,12 +59,12 @@ class IPMethod : public NLPSolver {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static NLPSolver creator(const Function& F, const Function& G, int dummy){ return IPMethod(F,G);}
+    static NlpSolver creator(const Function& F, const Function& G, int dummy){ return IPMethod(F,G);}
     #ifdef SWIG
     %nocallback;
     #endif
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //IP_METHOD_HPP

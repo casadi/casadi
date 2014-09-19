@@ -28,12 +28,13 @@ from helpers import *
 
 qcqpsolvers = []
 try:
-  qcqpsolvers.append((SOCPQCQPSolver,{"socp_solver": SDPSOCPSolver, "socp_solver_options": {"sdp_solver": DSDPSolver} },False))
+  SdpSolver.loadPlugin("dsdp")
+  qcqpsolvers.append(("socp",{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },False))
 except:
   pass
 
 
-class QCQPSolverTests(casadiTestCase):
+class QcqpSolverTests(casadiTestCase):
 
   def testboundsviol(self):
     H = 1e-6*DMatrix([[1,0],[0,1]])
@@ -46,7 +47,7 @@ class QCQPSolverTests(casadiTestCase):
     UBX = DMatrix([ inf, -inf ])
     
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
-      solver = qcqpsolver(qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
       solver.setOption(qcqp_options)
       solver.init()
 
@@ -60,7 +61,7 @@ class QCQPSolverTests(casadiTestCase):
       solver.setInput(UBX,"ubx")
 
       with self.assertRaises(Exception):
-        solver.solve()
+        solver.evaluate()
       
   def test_bounds(self):
     #  min  1/2 x' H x + 2 x + y
@@ -79,7 +80,7 @@ class QCQPSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = qcqpsolver(qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
       solver.setOption(qcqp_options)
       solver.init()
 
@@ -92,9 +93,9 @@ class QCQPSolverTests(casadiTestCase):
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
 
-      solver.solve()
+      solver.evaluate()
       
-      socp = solver.getSolver()
+      #socp = solver.getSolver()
         
       self.checkarray(solver.getOutput(),DMatrix([-(sqrt(73)+3)/3,-(sqrt(73)+9)/12]),str(qcqpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=5)
@@ -119,7 +120,7 @@ class QCQPSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = qcqpsolver(qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
       solver.setOption(qcqp_options)
       solver.init()
 
@@ -132,9 +133,9 @@ class QCQPSolverTests(casadiTestCase):
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
 
-      solver.solve()
+      solver.evaluate()
       
-      socp = solver.getSolver()
+      #socp = solver.getSolver()
         
       self.checkarray(solver.getOutput(),DMatrix([-2,-1]),str(qcqpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=5)

@@ -24,12 +24,12 @@
 #define IP_INTERNAL_HPP
 
 #include "ip_method.hpp"
-#include "symbolic/function/nlp_solver_internal.hpp"
-#include "symbolic/function/linear_solver.hpp"
+#include "core/function/nlp_solver_internal.hpp"
+#include "core/function/linear_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
     
-class IPInternal : public NLPSolverInternal{
+class IPInternal : public NlpSolverInternal{
 
 public:
   explicit IPInternal(const Function& F, const Function& G);
@@ -48,6 +48,6 @@ public:
   LinearSolver linear_solver_;
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //IP_INTERNAL_HPP

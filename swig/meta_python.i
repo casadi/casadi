@@ -20,90 +20,6 @@
  *
  */
 
-%pythoncode %{
-def attach_return_type(f,t):
-  if not(hasattr(f,'func_annotations')):
-    f.func_annotations = {}
-  if not(isinstance(getattr(f,'func_annotations'),dict)):
-    raise Exception("Cannot annotate this python Method to be a sparsitygenerator. Method has func_annotations attribute with unknown type.")
-  f.func_annotations["return"] = t
-  return f
-
-def pyderivativegenerator(f):
-  return attach_return_type(f,Function)
-
-def pyevaluate(f):
-  return attach_return_type(f,None)
-  
-def pycallback(f):
-  return attach_return_type(f,int)
-  
-
-def pyfunction(inputs,outputs):
-  def wrap(f):
-    
-    @pyevaluate
-    def fcustom(f2):
-      res = f([f2.getInput(i) for i in range(f2.getNumInputs())])
-      if not isinstance(res,list):
-        res = [res]
-      for i in range(f2.getNumOutputs()):
-        f2.setOutput(res[i],i)
-    Fun = CustomFunction(fcustom,inputs,outputs)
-    Fun.setOption("name","CustomFunction")
-    return Fun
-  return wrap
-  
-def PyFunction(obj,inputs,outputs):
-    @pyevaluate
-    def fcustom(f):
-      obj.evaluate([f.input(i) for i in range(f.getNumInputs())],[f.output(i) for i in range(f.getNumOutputs())])
-      
-    Fun = CustomFunction(fcustom,inputs,outputs)
-    Fun.setOption("name","CustomFunction")
-    if hasattr(obj,'getDerivative'):
-      @pyderivativegenerator
-      def derivativewrap(f,nfwd,nadj):
-        return obj.getDerivative(f,nfwd,nadj)
-      Fun.setOption("derivative_generator",derivativewrap)
-      
-    elif hasattr(obj,'fwd') or hasattr(obj,'adj'):
-      @pyderivativegenerator
-      def derivativewrap(f,nfwd,nadj):
-        num_in = f.getNumInputs()
-        num_out = f.getNumOutputs()
-        
-        @pyevaluate
-        def der(f2):
-          all_inputs = [f2.input(i) for i in range(f2.getNumInputs())]
-          all_outputs = [f2.output(i) for i in range(f2.getNumOutputs())]
-          inputs=all_inputs[:num_in]
-          outputs=all_outputs[:num_out]
-          fwd_seeds=zip(*[iter(all_inputs[num_in:num_in*(nfwd+1)])]*num_in)
-          fwd_sens=zip(*[iter(all_outputs[num_out:num_out*(nfwd+1)])]*num_out)
-          adj_seeds=zip(*[iter(all_inputs[num_in*(nfwd+1):])]*num_out)
-          adj_sens=zip(*[iter(all_outputs[num_out*(nfwd+1):])]*num_in)
-          if hasattr(obj,'fwd') and nfwd>0:
-            obj.fwd(inputs,outputs,fwd_seeds,fwd_sens)
-          if hasattr(obj,'adj') and nadj>0:
-            obj.adj(inputs,outputs,adj_seeds,adj_sens)
-          
-        DerFun = CustomFunction(der,inputs+nfwd*inputs+nadj*outputs,outputs+nfwd*outputs+nadj*inputs)
-        DerFun.setOption("name","CustomFunction_derivative")
-        DerFun.init()
-        return DerFun
- 
-      Fun.setOption("derivative_generator",derivativewrap)
-    
-    if not(hasattr(obj,'getDerivative')) and hasattr(obj,'fwd') and not hasattr(obj,'adj'):
-      Fun.setOption("ad_mode","forward")
-    if not(hasattr(obj,'getDerivative')) and not hasattr(obj,'fwd') and hasattr(obj,'adj'):
-      Fun.setOption("ad_mode","reverse")
-    return Fun
-  
-%}
-
-
 %{
 
 
@@ -147,11 +63,11 @@ PyObject * getCasadiObject(const std::string &s) {
   return ret;
 }
 
-#include "symbolic/functor_internal.hpp"
-#include "symbolic/function/custom_function.hpp"
+#include "casadi/core/functor_internal.hpp"
+#include "casadi/core/function/custom_function.hpp"
 
-namespace CasADi {
-  //using namespace CasADi;
+namespace casadi {
+  //using namespace casadi;
 
   class FunctorPythonInternal {
     public:
@@ -205,13 +121,13 @@ namespace CasADi {
 
 %wrapper %{  
 
-namespace CasADi {
+namespace casadi {
 
   Function DerivativeGeneratorPythonInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
     casadi_assert(p_!=0);
     PyObject * nfwd_py = PyInt_FromLong(nfwd);
     PyObject * nadj_py = PyInt_FromLong(nadj);
-    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_CasADi__Function, SWIG_POINTER_OWN |  0 );
+    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_casadi__Function, SWIG_POINTER_OWN |  0 );
     if(!fcn_py) {
       Py_DECREF(nfwd_py);
       Py_DECREF(nadj_py);
@@ -237,7 +153,7 @@ namespace CasADi {
 
   void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
     casadi_assert(p_!=0);
-    PyObject * fcn_py = SWIG_NewPointerObj((new CustomFunction(static_cast< const CustomFunction& >(fcn))), SWIGTYPE_p_CasADi__CustomFunction, SWIG_POINTER_OWN |  0 );
+    PyObject * fcn_py = SWIG_NewPointerObj((new CustomFunction(static_cast< const CustomFunction& >(fcn))), SWIGTYPE_p_casadi__CustomFunction, SWIG_POINTER_OWN |  0 );
     if(!fcn_py) {
       throw CasadiException("CustomEvaluatePythonInternal: failed to convert CustomFunction to python");
     }
@@ -256,7 +172,7 @@ namespace CasADi {
   int CallbackPythonInternal::call(Function& fcn, void* user_data) {
     casadi_assert(p_!=0);
 
-    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_CasADi__CustomFunction, SWIG_POINTER_OWN |  0 );
+    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_casadi__CustomFunction, SWIG_POINTER_OWN |  0 );
     if(!fcn_py) {
       throw CasadiException("CallbackPythonInternal: failed to convert CustomFunction to python");
     }
@@ -311,9 +227,9 @@ int meta< int >::as(PyObject * p, int &m) {
     }
     Py_DECREF(mm);
     return result;
-  } else if (meta< CasADi::Matrix<int> >::isa(p)) {
-    CasADi::Matrix<int> *temp = 0;
-    meta< CasADi::Matrix<int> >::get_ptr(p,temp);
+  } else if (meta< casadi::Matrix<int> >::isa(p)) {
+    casadi::Matrix<int> *temp = 0;
+    meta< casadi::Matrix<int> >::get_ptr(p,temp);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
@@ -430,17 +346,17 @@ int meta< double >::as(PyObject * p, double &m) {
     }
     Py_DECREF(mm);
     return result;
-  } else if (meta< CasADi::Matrix<double> >::isa(p)) {
-    CasADi::Matrix<double> *temp = 0;
-    meta< CasADi::Matrix<double> >::get_ptr(p,temp);
+  } else if (meta< casadi::Matrix<double> >::isa(p)) {
+    casadi::Matrix<double> *temp = 0;
+    meta< casadi::Matrix<double> >::get_ptr(p,temp);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
     }
     return false;
-  } else if (meta< CasADi::Matrix<int> >::isa(p)) {
-    CasADi::Matrix<int> *temp = 0;
-    meta< CasADi::Matrix<int> >::get_ptr(p,temp);
+  } else if (meta< casadi::Matrix<int> >::isa(p)) {
+    casadi::Matrix<int> *temp = 0;
+    meta< casadi::Matrix<int> >::get_ptr(p,temp);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
@@ -466,15 +382,15 @@ int meta< std::string >::as(PyObject * p, std::string &m) {
 meta_vector(std::string);
 
 // Forward declarations
-template<> int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::GenericType::Dictionary &s);
-template<> bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::GenericType::Dictionary &a, PyObject *&p);
+template<> int meta< casadi::GenericType::Dictionary >::as(PyObject * p,casadi::GenericType::Dictionary &s);
+template<> bool meta< casadi::GenericType::Dictionary >::toPython(const casadi::GenericType::Dictionary &a, PyObject *&p);
 
-/// CasADi::DerivativeGenerator
- template<> char meta< CasADi::DerivativeGenerator >::expected_message[] = "Expecting sparsity generator";
+/// casadi::DerivativeGenerator
+ template<> char meta< casadi::DerivativeGenerator >::expected_message[] = "Expecting sparsity generator";
 
  template <>
-   int meta< CasADi::DerivativeGenerator >::as(PyObject * p, CasADi::DerivativeGenerator &s) {
-   NATIVERETURN(CasADi::DerivativeGenerator, s)
+   int meta< casadi::DerivativeGenerator >::as(PyObject * p, casadi::DerivativeGenerator &s) {
+   NATIVERETURN(casadi::DerivativeGenerator, s)
    PyObject* return_type = getReturnType(p);
    if (!return_type) return false;
    PyObject* function = getCasadiObject("Function");
@@ -482,78 +398,78 @@ template<> bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::
    bool res = PyClass_IsSubclass(return_type,function);
    Py_DECREF(return_type);Py_DECREF(function);
    if (res) {
-     s = CasADi::DerivativeGeneratorPython(p);
+     s = casadi::DerivativeGeneratorPython(p);
      return true;
    }
    return false;
  }
 
-/// CasADi::CustomEvaluate
-template<> char meta< CasADi::CustomEvaluate >::expected_message[] = "Expecting CustomFunction wrapper generator";
+/// casadi::CustomEvaluate
+template<> char meta< casadi::CustomEvaluate >::expected_message[] = "Expecting CustomFunction wrapper generator";
 
 template <>
-int meta< CasADi::CustomEvaluate >::as(PyObject * p, CasADi::CustomEvaluate &s) {
-  NATIVERETURN(CasADi::CustomEvaluate, s)
+int meta< casadi::CustomEvaluate >::as(PyObject * p, casadi::CustomEvaluate &s) {
+  NATIVERETURN(casadi::CustomEvaluate, s)
   PyObject* return_type = getReturnType(p);
   bool res = (return_type==Py_None) || !return_type;
   if (return_type) Py_DECREF(return_type);
   if (res) {
-    s = CasADi::CustomEvaluatePython(p);
+    s = casadi::CustomEvaluatePython(p);
   }
   return res;
 }
 
-/// CasADi::Callback
-template<> char meta< CasADi::Callback >::expected_message[] = "Expecting Callback";
+/// casadi::Callback
+template<> char meta< casadi::Callback >::expected_message[] = "Expecting Callback";
 
 template <>
-int meta< CasADi::Callback >::as(PyObject * p, CasADi::Callback &s) {
-  NATIVERETURN(CasADi::Callback, s)
+int meta< casadi::Callback >::as(PyObject * p, casadi::Callback &s) {
+  NATIVERETURN(casadi::Callback, s)
   PyObject* return_type = getReturnType(p);
   if (!return_type) return false;
   bool res = PyType_IsSubtype((PyTypeObject *)return_type,&PyInt_Type) || PyType_IsSubtype((PyTypeObject *)return_type,&PyLong_Type);
   Py_DECREF(return_type);
   if (res) {
-    s = CasADi::CallbackPython(p);
+    s = casadi::CallbackPython(p);
     return true;
   }
   return false;
 }
 
-/// CasADi::GenericType
-template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting any type (None might be an exception)";
+/// casadi::GenericType
+template<> char meta< casadi::GenericType >::expected_message[] = "Expecting any type (None might be an exception)";
 
 template <>
-int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
-  NATIVERETURN(CasADi::GenericType, s)
+int meta< casadi::GenericType >::as(PyObject * p,casadi::GenericType &s) {
+  NATIVERETURN(casadi::GenericType, s)
   if (p==Py_None) {
-    s=CasADi::GenericType();
+    s=casadi::GenericType();
   } else if (PyBool_Check(p)) {
-    s=CasADi::GenericType((bool) PyInt_AsLong(p));
+    s=casadi::GenericType((bool) PyInt_AsLong(p));
   } else if (PyInt_Check(p)) {
-    s=CasADi::GenericType((int) PyInt_AsLong(p));
+    s=casadi::GenericType((int) PyInt_AsLong(p));
   } else if (PyFloat_Check(p)) {
-    s=CasADi::GenericType(PyFloat_AsDouble(p));
+    s=casadi::GenericType(PyFloat_AsDouble(p));
   } else if (meta< std::string >::couldbe(p)) {
     std::string temp;
     int ret = meta< std::string >::as(p,temp); 
     if (!ret) return false;
-    s = CasADi::GenericType(temp);
+    s = casadi::GenericType(temp);
   } else if (meta< std::vector<int> >::couldbe(p)) {
     std::vector<int> temp;
     int ret = meta< std::vector<int> >::as(p,temp); 
     if (!ret) return false;
-    s = CasADi::GenericType(temp);
+    s = casadi::GenericType(temp);
   } else if (meta< std::vector<double> >::couldbe(p)) {
     std::vector<double> temp;
     int ret = meta< std::vector<double> >::as(p,temp); 
     if (!ret) return false;
-    s = CasADi::GenericType(temp);
+    s = casadi::GenericType(temp);
   } else if (meta< std::vector<std::string> >::couldbe(p)) {
     std::vector<std::string> temp;
     int ret = meta< std::vector<std::string> >::as(p,temp); 
     if (!ret) return false;
-    s = CasADi::GenericType(temp);
+    s = casadi::GenericType(temp);
   } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
     PyObject *c = PyObject_GetAttrString(p,"creator");
     if (!c) return false;
@@ -569,18 +485,18 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     Py_DECREF(gt);
     
     if (g) {
-      int result = meta< CasADi::GenericType >::as(g,s);
+      int result = meta< casadi::GenericType >::as(g,s);
       Py_DECREF(g);
       return result;
     }
     if (!g) { PyErr_Clear();  return false;}
     
-  } else if (meta< CasADi::Function >::couldbe(p)) {
-    CasADi::Function temp;
-    int ret = meta< CasADi::Function >::as(p,temp); 
+  } else if (meta< casadi::Function >::couldbe(p)) {
+    casadi::Function temp;
+    int ret = meta< casadi::Function >::as(p,temp); 
     if (!ret) return false;
-    s = CasADi::GenericType(temp);
-  } else if (meta< CasADi::GenericType::Dictionary >::couldbe(p) || meta< CasADi::DerivativeGenerator >::couldbe(p) || meta< CasADi::Callback >::couldbe(p)) {
+    s = casadi::GenericType(temp);
+  } else if (meta< casadi::GenericType::Dictionary >::couldbe(p) || meta< casadi::DerivativeGenerator >::couldbe(p) || meta< casadi::Callback >::couldbe(p)) {
     PyObject* gt = getCasadiObject("GenericType");
     if (!gt) return false;
 
@@ -594,7 +510,7 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     Py_DECREF(gt);
     
     if (g) {
-      int result = meta< CasADi::GenericType >::as(g,s);
+      int result = meta< casadi::GenericType >::as(g,s);
       Py_DECREF(g);
       return result;
     }
@@ -608,7 +524,7 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
 }
 
 template <>
-bool meta< CasADi::GenericType >::toPython(const CasADi::GenericType &a, PyObject *&p) {
+bool meta< casadi::GenericType >::toPython(const casadi::GenericType &a, PyObject *&p) {
   if (a.isBool()) {
     p=PyBool_FromLong(a.toBool());
   } else if (a.isInt()) {
@@ -624,7 +540,7 @@ bool meta< CasADi::GenericType >::toPython(const CasADi::GenericType &a, PyObjec
   }  else if (a.isStringVector()) {
     p = swig::from(a.toStringVector());
   } else if (a.isDictionary()) {
-    meta< CasADi::GenericType::Dictionary >::toPython(a.toDictionary(),p);
+    meta< casadi::GenericType::Dictionary >::toPython(a.toDictionary(),p);
   } else if (a.isNull()) {
     p = Py_None;
   } else {
@@ -633,21 +549,21 @@ bool meta< CasADi::GenericType >::toPython(const CasADi::GenericType &a, PyObjec
   return true;
 }
 
-/// CasADi::GenericType::Dictionary
-template<> char meta< CasADi::GenericType::Dictionary >::expected_message[] = "Expecting dictionary of GenericTypes";
+/// casadi::GenericType::Dictionary
+template<> char meta< casadi::GenericType::Dictionary >::expected_message[] = "Expecting dictionary of GenericTypes";
 
 template <>
-int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::GenericType::Dictionary &s) {
-  NATIVERETURN(CasADi::GenericType::Dictionary, s)
+int meta< casadi::GenericType::Dictionary >::as(PyObject * p,casadi::GenericType::Dictionary &s) {
+  NATIVERETURN(casadi::GenericType::Dictionary, s)
   if (!PyDict_Check(p))
     return false;
   PyObject *key, *value;
   Py_ssize_t pos = 0;
-  CasADi::GenericType gt;
+  casadi::GenericType gt;
   while (PyDict_Next(p, &pos, &key, &value)) {
     if (!PyString_Check(key))
       return false;
-    bool ret=meta< CasADi::GenericType >::as(value,gt);
+    bool ret=meta< casadi::GenericType >::as(value,gt);
     if (!ret)
       return false;
     s[std::string(PyString_AsString(key))] = gt;
@@ -657,14 +573,14 @@ int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::GenericType
 }
 
 template <>
-bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::GenericType::Dictionary &a, PyObject *&p) {
+bool meta< casadi::GenericType::Dictionary >::toPython(const casadi::GenericType::Dictionary &a, PyObject *&p) {
   p = PyDict_New();
-  //CasADi::Dictionary::const_iterator end = a.end(); 
-  CasADi::GenericType::Dictionary::const_iterator end = a.end();
-  for (CasADi::GenericType::Dictionary::const_iterator it = a.begin(); it != end; ++it)
+  //casadi::Dictionary::const_iterator end = a.end(); 
+  casadi::GenericType::Dictionary::const_iterator end = a.end();
+  for (casadi::GenericType::Dictionary::const_iterator it = a.begin(); it != end; ++it)
   {
     PyObject * e;
-    bool ret=meta< CasADi::GenericType >::toPython(it->second,e);
+    bool ret=meta< casadi::GenericType >::toPython(it->second,e);
     if (!ret) {
       Py_DECREF(p);
       return false;
@@ -676,34 +592,48 @@ bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::GenericType
 }
 
 
-// Explicit intialization of these two member functions, so we can use them in meta< CasADi::SXElement >
-template<> int meta< CasADi::Matrix<CasADi::SXElement> >::as(GUESTOBJECT,CasADi::Matrix<CasADi::SXElement> &);
-//template<> bool meta< CasADi::Matrix<CasADi::SXElement> >::couldbe(GUESTOBJECT);
+// Explicit intialization of these two member functions, so we can use them in meta< casadi::SXElement >
+template<> int meta< casadi::Matrix<casadi::SXElement> >::as(GUESTOBJECT,casadi::Matrix<casadi::SXElement> &);
+//template<> bool meta< casadi::Matrix<casadi::SXElement> >::couldbe(GUESTOBJECT);
 
-/// CasADi::SX
-template<> char meta< CasADi::SXElement >::expected_message[] = "Expecting SXElement or number";
+/// casadi::SX
+template<> char meta< casadi::SXElement >::expected_message[] = "Expecting SXElement or number";
 
 template <>
-int meta< CasADi::SXElement >::as(PyObject * p,CasADi::SXElement &s) {
-  NATIVERETURN(CasADi::SXElement, s)
-  if (meta< double >::couldbe(p)) {
+int meta< casadi::SXElement >::as(PyObject * p,casadi::SXElement &s) {
+  NATIVERETURN(casadi::SXElement, s)
+  if (meta< casadi::SX >::isa(p)) {
+    casadi::SX res;
+    int result = meta< casadi::SX >::as(p,res);
+    if (!result) return false;
+    if (res.size1()==1 && res.size2()==1) {
+      if (res.size()==0) {
+        s = 0;
+      } else {
+        s = res.at(0);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  } else if (meta< double >::couldbe(p)) {
     double res;
     int result = meta< double >::as(p,res);
     if (!result)
       return false;
-    s=CasADi::SXElement(res);
+    s=casadi::SXElement(res);
   } else {
     return false;
   }
   return true;
 }
 
-/// CasADi::Matrix<int>
-template<> char meta< CasADi::Matrix<int> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csc_matrix, IMatrix";
+/// casadi::Matrix<int>
+template<> char meta< casadi::Matrix<int> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csc_matrix, IMatrix";
 
 template <>
-int meta< CasADi::Matrix<int> >::as(PyObject * p,CasADi::Matrix<int> &m) {
-  NATIVERETURN(CasADi::Matrix<int>,m)
+int meta< casadi::Matrix<int> >::as(PyObject * p,casadi::Matrix<int> &m) {
+  NATIVERETURN(casadi::Matrix<int>,m)
   if (meta< int >::couldbe(p)) {
     int t;
     int res = meta< int >::as(p,t);
@@ -712,13 +642,13 @@ int meta< CasADi::Matrix<int> >::as(PyObject * p,CasADi::Matrix<int> &m) {
   } else if ( meta< int >::couldbe_sequence(p)) {
     std::vector <int> t;
     int res = meta< int >::as_vector(p,t);
-    m = CasADi::Matrix<int>(t,t.size(),1);
+    m = casadi::Matrix<int>(t,t.size(),1);
     return res;
   } else if (PyObject_HasAttrString(p,"__IMatrix__")) {
     char name[] = "__IMatrix__";
     PyObject *cr = PyObject_CallMethod(p, name,0);
     if (!cr) { return false; }
-    int result = meta< CasADi::Matrix<int> >::as(cr,m);
+    int result = meta< casadi::Matrix<int> >::as(cr,m);
     Py_DECREF(cr);
     return result;
   } else {
@@ -728,21 +658,21 @@ int meta< CasADi::Matrix<int> >::as(PyObject * p,CasADi::Matrix<int> &m) {
   return true;
 }
 
-meta_vector(CasADi::Matrix<int>)
-meta_vector(std::vector< CasADi::Matrix<int> >)
+meta_vector(casadi::Matrix<int>)
+meta_vector(std::vector< casadi::Matrix<int> >)
 
-/// CasADi::Matrix<double>
-template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csc_matrix, DMatrix";
+/// casadi::Matrix<double>
+template<> char meta< casadi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csc_matrix, DMatrix";
 
 template <>
-int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
-  NATIVERETURN(CasADi::Matrix<double>,m)
-  NATIVERETURN(CasADi::Matrix<int>,m)
+int meta< casadi::Matrix<double> >::as(PyObject * p,casadi::Matrix<double> &m) {
+  NATIVERETURN(casadi::Matrix<double>,m)
+  NATIVERETURN(casadi::Matrix<int>,m)
   if (PyObject_HasAttrString(p,"__DMatrix__")) {
     char name[] = "__DMatrix__";
     PyObject *cr = PyObject_CallMethod(p, name,0);
     if (!cr) { return false; }
-    int result = meta< CasADi::Matrix<double> >::as(cr,m);
+    int result = meta< casadi::Matrix<double> >::as(cr,m);
     Py_DECREF(cr);
     return result;
   } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
@@ -750,7 +680,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
       double d;
       int result = meta< double >::as(p,d);
       if (!result) return result;
-      m = CasADi::Matrix<double>(d);
+      m = casadi::Matrix<double>(d);
       return result;
     }
     if (array_numdims(p)>2 || array_numdims(p)<1) {
@@ -783,8 +713,8 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
     
-    m = CasADi::Matrix<double>::zeros(nrows,ncols);
-    m.set(d,CasADi::DENSETRANS);
+    m = casadi::Matrix<double>::zeros(nrows,ncols);
+    m.set(d,casadi::DENSETRANS);
                   
     // Free memory
     if (array_is_new_object)
@@ -850,7 +780,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
       int* colindd=(int*) array_data(array_colind);
       std::vector<int> colindv(colindd,colindd+(ncols+1));
       
-      m = CasADi::Matrix<double>(CasADi::Sparsity(nrows,ncols,colindv,rowv), v);
+      m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v);
       
       ret = true;
     }
@@ -871,7 +801,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     char name[] = "tocsc";
     PyObject *cr = PyObject_CallMethod(p, name,0);
     if (!cr) { return false; }
-    int result = meta< CasADi::Matrix<double> >::as(cr,m);
+    int result = meta< casadi::Matrix<double> >::as(cr,m);
     Py_DECREF(cr);
     return result;
   } else if (meta< double >::couldbe(p)) {
@@ -883,9 +813,9 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     std::vector <double> t;
     int res = meta< double >::as_vector(p,t);
     if (t.size()>0) {
-      m = CasADi::Matrix<double>(t,t.size(),1);
+      m = casadi::Matrix<double>(t,t.size(),1);
     } else {
-      m = CasADi::Matrix<double>(t,t.size(),0);
+      m = casadi::Matrix<double>(t,t.size(),0);
     }
     return res;
   } else {
@@ -895,19 +825,19 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
   return true;
 }
 
-meta_vector(CasADi::Matrix<double>)
-meta_vector(std::vector< CasADi::Matrix<double> >)
+meta_vector(casadi::Matrix<double>)
+meta_vector(std::vector< casadi::Matrix<double> >)
 
-/// CasADi::Matrix<CasADi::SXElement>
-template<> char meta< CasADi::Matrix<CasADi::SXElement> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SX, SX, number, sequence(SX/number)";
+/// casadi::Matrix<casadi::SXElement>
+template<> char meta< casadi::Matrix<casadi::SXElement> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SX, SX, number, sequence(SX/number)";
 
 template <>
-int meta< CasADi::Matrix<CasADi::SXElement> >::as(PyObject * p,CasADi::Matrix<CasADi::SXElement> &m) {
-  NATIVERETURN(CasADi::Matrix<CasADi::SXElement>, m)
-  NATIVERETURN(CasADi::SXElement, m)
-  CasADi::DMatrix mt;
-  if(meta< CasADi::Matrix<double> >::as(p,mt)) {
-    m = CasADi::SX(mt);
+int meta< casadi::Matrix<casadi::SXElement> >::as(PyObject * p,casadi::Matrix<casadi::SXElement> &m) {
+  NATIVERETURN(casadi::Matrix<casadi::SXElement>, m)
+  NATIVERETURN(casadi::SXElement, m)
+  casadi::DMatrix mt;
+  if(meta< casadi::Matrix<double> >::as(p,mt)) {
+    m = casadi::SX(mt);
   } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SXElement>
 		if (array_type(p)!=NPY_OBJECT) {
 			//SWIG_Error(SWIG_TypeError, "asSX: numpy.ndarray must be of dtype object");
@@ -922,24 +852,24 @@ int meta< CasADi::Matrix<CasADi::SXElement> >::as(PyObject * p,CasADi::Matrix<Ca
 		if (array_numdims(p)==2)
 			ncols=array_size(p,1); 
 		int size=nrows*ncols; // number of elements in the dense matrix
-		std::vector<CasADi::SXElement> v(size);
+		std::vector<casadi::SXElement> v(size);
     PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
     PyObject *pe;
     int i=0;
 		while (it->index < it->size) { 
 		  pe = *((PyObject**) PyArray_ITER_DATA(it));
-      bool result=meta< CasADi::SXElement >::as(pe,v[i++]);
+      bool result=meta< casadi::SXElement >::as(pe,v[i++]);
       if (!result)
         return false;
 		  PyArray_ITER_NEXT(it);
 		}
     Py_DECREF(it);
-		m = CasADi::transpose(CasADi::Matrix< CasADi::SXElement >(v, ncols, nrows));
+		m = casadi::transpose(casadi::Matrix< casadi::SXElement >(v, ncols, nrows));
   } else if (PyObject_HasAttrString(p,"__SX__")) {
     char name[] = "__SX__";
     PyObject *cr = PyObject_CallMethod(p, name,0);
     if (!cr) { return false; }
-    int result = meta< CasADi::Matrix<CasADi::SXElement> >::as(cr,m);
+    int result = meta< casadi::Matrix<casadi::SXElement> >::as(cr,m);
     Py_DECREF(cr);
     return result;
 	} else {
@@ -950,34 +880,34 @@ int meta< CasADi::Matrix<CasADi::SXElement> >::as(PyObject * p,CasADi::Matrix<Ca
 }
 
 
-meta_vector(std::vector<CasADi::SXElement>);
-meta_vector(CasADi::SXElement);
-meta_vector(CasADi::Matrix< CasADi::SXElement >);
-meta_vector(std::vector< CasADi::Matrix< CasADi::SXElement > >);
+meta_vector(std::vector<casadi::SXElement>);
+meta_vector(casadi::SXElement);
+meta_vector(casadi::Matrix< casadi::SXElement >);
+meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
 
-/// CasADi::MX
-template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, numberarray)";
+/// casadi::MX
+template<> char meta< casadi::MX >::expected_message[] = "Expecting (MX, numberarray)";
 
 template <>
-int meta< CasADi::MX >::as(PyObject * p,CasADi::MX &m) {
-  NATIVERETURN(CasADi::MX,m)
-  CasADi::DMatrix mt;
-  if(meta< CasADi::Matrix<double> >::as(p,mt)) {
-    m = CasADi::MX(mt);
+int meta< casadi::MX >::as(PyObject * p,casadi::MX &m) {
+  NATIVERETURN(casadi::MX,m)
+  casadi::DMatrix mt;
+  if(meta< casadi::Matrix<double> >::as(p,mt)) {
+    m = casadi::MX(mt);
     return true;
   } else if (PyObject_HasAttrString(p,"__MX__")) {
     char name[] = "__MX__";
     PyObject *cr = PyObject_CallMethod(p, name,0);
     if (!cr) { return false; }
-    int result = meta< CasADi::MX >::as(cr,m);
+    int result = meta< casadi::MX >::as(cr,m);
     Py_DECREF(cr);
     return result;
   }
   return false;
 }
 
-meta_vector(CasADi::MX);
-meta_vector(std::vector< CasADi::MX >);
+meta_vector(casadi::MX);
+meta_vector(std::vector< casadi::MX >);
 %}
 
 

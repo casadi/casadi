@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/function/function_tools.hpp>
-#include <symbolic/std_vector_tools.hpp>
-#include <symbolic/function/sx_function.hpp>
+#include <core/sx/sx_tools.hpp>
+#include <core/function/function_tools.hpp>
+#include <core/std_vector_tools.hpp>
+#include <core/function/sx_function.hpp>
 
 #include <experimental/greg/cppocp/Ocp.hpp>
 
@@ -29,20 +29,20 @@ class SnoptInterface
 {
 public:
 	~SnoptInterface(void);
-	// SnoptInterface(const CasADi::SXFunction& user_F);
+	// SnoptInterface(const casadi::SXFunction& user_F);
 	SnoptInterface( Ocp& ocp );
 
 	// objective/constraints
-	CasADi::SX ftotal;
+	casadi::SX ftotal;
 
 	// function for nonlinear part of ftotal
-	CasADi::SXFunction Fnonlinear;
+	casadi::SXFunction Fnonlinear;
 
 	// function for jacobian of Fnonlinear
-	CasADi::SXFunction Gfcn;
+	casadi::SXFunction Gfcn;
 
 	// design variables reference
-	const CasADi::SX & designVariables;
+	const casadi::SX & designVariables;
 
 	void init(void);
 	void run(void);
