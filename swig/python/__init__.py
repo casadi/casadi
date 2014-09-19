@@ -139,6 +139,8 @@ def type_descr(a):
       return "[]"
   elif isinstance(a,tuple):
     return "(%s)" % ",".join([type_descr(i) for i in a])
+  elif isinstance(a,np.ndarray):
+    return "np.array(%s)" % ",".join(set([type_descr(i) for i in np.array(a).flatten().tolist()])) 
   if type(a).__name__.startswith("IOSchemeVector"):
     return "scheme(%s)" % type(a).__name__[len("IOSchemeVector"):]
   else:
