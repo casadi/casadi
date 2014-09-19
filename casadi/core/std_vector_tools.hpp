@@ -237,6 +237,20 @@ namespace casadi {
   template<typename T>
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,
             bool invert_indices =false);
+
+
+  /** \brief cumulative sum
+  *
+  */
+  template<typename T>
+  std::vector<T> cumsum(const std::vector<T> &values);
+
+  /** \brief cumulative sum, starting with zero
+  *
+  */
+  template<typename T>
+  std::vector<T> cumsum0(const std::vector<T> &values);
+
 #endif //SWIG
 
   /** \brief Make a vector of a certain length with its entries specified
@@ -627,6 +641,28 @@ namespace casadi {
 
 
 
+  }
+
+  template<typename T>
+  std::vector<T> cumsum(const std::vector<T> &values) {
+    std::vector<T> ret(values.size());
+    T acc = 0;
+    for (int i=0;i<values.size();++i) {
+      acc+= values[i];
+      ret[i] = acc;
+    }
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> cumsum0(const std::vector<T> &values) {
+    std::vector<T> ret(values.size()+1, 0);
+    T acc = 0;
+    for (int i=0;i<values.size();++i) {
+      acc+= values[i];
+      ret[i+1] = acc;
+    }
+    return ret;
   }
 
   template<typename T>
