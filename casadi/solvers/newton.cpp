@@ -29,6 +29,8 @@
 #include "casadi/core/profiling.hpp"
 #include "casadi/core/casadi_options.hpp"
 
+#include <iomanip>
+
 using namespace std;
 namespace casadi {
 
@@ -57,6 +59,9 @@ namespace casadi {
     addOption("max_iter",  OT_INTEGER, 1000,
               "Maximum number of Newton iterations to perform before returning.");
     addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F|normF", true);
+
+    addOption("print_iteration", OT_BOOLEAN, false,
+              "Print information about each iteration");
   }
 
   Newton::~Newton() {
@@ -139,12 +144,13 @@ namespace casadi {
                   << ", " << sumAll(fabs(F)) << ", " << sqrt(sumAll(F*F)) << std::endl;
       if (monitored("J")) std::cout << "  J = " << J << std::endl;
 
+      double abstol = 0;
       if (numeric_limits<double>::infinity() != abstol_) {
-        double maxF = std::max((*std::max_element(F.data().begin(),
+        abstol = std::max((*std::max_element(F.data().begin(),
                                                   F.data().end())),
                                -(*std::min_element(F.data().begin(),
                                                    F.data().end())));
-        if (maxF <= abstol_) {
+        if (abstol <= abstol_) {
           casadi_log("Converged to acceptable tolerance - abstol: " << abstol_);
           break;
         }
@@ -184,18 +190,29 @@ namespace casadi {
         std::cout << "  step = " << F << std::endl;
       }
 
+      double abstolStep=0;
       if (numeric_limits<double>::infinity() != abstolStep_) {
-        double maxF = std::max((*std::max_element(F.data().begin(),
+        abstolStep = std::max((*std::max_element(F.data().begin(),
                                                   F.data().end())),
                                -(*std::min_element(F.data().begin(),
                                                    F.data().end())));
         if (monitored("stepsize")) {
-          std::cout << "  stepsize = " << maxF << std::endl;
+          std::cout << "  stepsize = " << abstolStep << std::endl;
         }
-        if (maxF <= abstolStep_) {
+        if (abstolStep <= abstolStep_) {
           casadi_log("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
           break;
         }
+      }
+
+      if (print_iteration_) {
+        // Only print iteration header once in a while
+        if (iter % 10==0) {
+          printIteration(std::cout);
+        }
+
+        // Print iteration information
+        printIteration(std::cout, iter, abstol, abstolStep);
       }
 
       // Update Xk+1 = Xk - J^(-1) F
@@ -237,6 +254,27 @@ namespace casadi {
     if (hasSetOption("abstolStep"))
       abstolStep_ = getOption("abstolStep");
 
+    print_iteration_ = getOption("print_iteration");
+
   }
+
+  void Newton::printIteration(std::ostream &stream) {
+    stream << setw(5) << "iter";
+    stream << setw(10) << "res";
+    stream << setw(10) << "step";
+    stream << std::endl;
+    stream.unsetf(std::ios::floatfield);
+  }
+
+  void Newton::printIteration(std::ostream &stream, int iter, double abstol, double abstolStep) {
+    stream << setw(5) << iter;
+    stream << setw(10) << scientific << setprecision(2) << abstol;
+    stream << setw(10) << scientific << setprecision(2) << abstolStep;
+
+    stream << fixed;
+    stream << std::endl;
+    stream.unsetf(std::ios::floatfield);
+  }
+
 
 } // namespace casadi
