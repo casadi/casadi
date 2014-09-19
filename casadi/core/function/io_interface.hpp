@@ -29,6 +29,8 @@
 #include "../function/schemes_helpers.hpp"
 #include "../function/io_scheme.hpp"
 
+#include <exception>
+
 namespace casadi {
 
   /** \brief Interface for accessing input and output data structures
@@ -337,7 +339,12 @@ namespace casadi {
 
 #define SETTERS(T)                                                              \
     void setInput(T val, int iind=0)                                            \
-    { static_cast<const Derived*>(this)->assertInit(); input(iind).set(val);  } \
+    { static_cast<const Derived*>(this)->assertInit();                          \
+      try { input(iind).set(val); }                                             \
+      catch(std::exception& e) {                                                \
+        casadi_error(e.what() << "Occurred at iind = " << iind << ".");         \
+      }                                                                         \
+    }                                                                           \
     void setOutput(T val, int oind=0)                                           \
     { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
     void setInput(T val, const std::string &iname)                              \
