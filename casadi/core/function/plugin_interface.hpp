@@ -107,7 +107,8 @@ namespace casadi {
     if (Derived::solvers_.find(name) != Derived::solvers_.end()) {
       if (suffix.size()>0) {
         Plugin &plugin = Derived::solvers_.find(name)->second;
-        casadi_assert(plugin.adaptorLoader);
+        casadi_assert_message(plugin.adaptorLoader,
+          "PluginInterface: could not find adaptor for " << name);
         plugin.adaptorLoader(suffix);
       } else {
         casadi_warning("PluginInterface: Solver " + name + " is already in use. Ignored.");
@@ -202,7 +203,8 @@ namespace casadi {
                           "Solver " << plugin.name << " is already in use");
 
     if (suffix.size()>0) {
-      casadi_assert(plugin.adaptorLoader);
+      casadi_assert_message(plugin.adaptorLoader,
+        "PluginInterface::registerPlugin: adaptor required for '" << plugin.name << "'.");
       plugin.adaptorLoader(suffix);
     }
 
