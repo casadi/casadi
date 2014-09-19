@@ -2567,6 +2567,10 @@ namespace casadi {
   void SparsityInternal::append(const SparsityInternal& sp) {
     // NOTE: Works also if this == &sp
 
+    casadi_assert_message(ncol_ == sp.ncol_,
+      "SparsityInternal::append(sp): column sizes must match but got " << ncol_ <<
+      " for lhs, and " << sp.ncol_ << " for rhs.");
+
     // Get current number of non-zeros
     int sz = row_.size();
 
@@ -2584,6 +2588,10 @@ namespace casadi {
 
   void SparsityInternal::appendColumns(const SparsityInternal& sp) {
     // NOTE: Works also if this == &sp
+
+    casadi_assert_message(nrow_== sp.nrow_,
+      "SparsityInternal::appendColumns(sp): row sizes must match but got " << nrow_ <<
+      " for lhs, and " << sp.nrow_ << " for rhs.");
 
     // Get current number of non-zeros
     int sz = row_.size();
