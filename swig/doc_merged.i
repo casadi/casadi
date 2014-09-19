@@ -111871,6 +111871,10 @@ CasADi additions.
 
 %feature("docstring") casadi::casadi_register_qpsolver_nlp "";
 
+%feature("docstring") casadi::cumsum "[INTERNAL]  cumulative sum
+
+";
+
 %feature("docstring") casadi::profileWriteEntry "[INTERNAL] ";
 
 %feature("docstring") casadi::gradFIn "
@@ -113655,6 +113659,11 @@ Matlab's linspace command.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Matlab's linspace.
+
+";
+
+%feature("docstring") casadi::cumsum0 "[INTERNAL]  cumulative sum, starting
+with zero
 
 ";
 

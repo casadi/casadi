@@ -4330,6 +4330,12 @@
 %exception  casadi::cosh(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::cumsum(const std::vector< T > &values) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::cumsum0(const std::vector< T > &values) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::deepcopy(const A &a) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
