@@ -32677,6 +32677,11 @@ Implements simple newton iterations to solve an implicit function.
 |                 |                 |                 | perform before  |
 |                 |                 |                 | returning.      |
 +-----------------+-----------------+-----------------+-----------------+
+| print_iteration | OT_BOOLEAN      | false           | Print           |
+|                 |                 |                 | information     |
+|                 |                 |                 | about each      |
+|                 |                 |                 | iteration       |
++-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
 
@@ -52431,6 +52436,11 @@ Implements simple newton iterations to solve an implicit function.
 |                 |                 |                 | perform before  |
 |                 |                 |                 | returning.      |
 +-----------------+-----------------+-----------------+-----------------+
+| print_iteration | OT_BOOLEAN      | false           | Print           |
+|                 |                 |                 | information     |
+|                 |                 |                 | about each      |
+|                 |                 |                 | iteration       |
++-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
 
@@ -52583,6 +52593,11 @@ Joris Gillis
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| print_iterat | OT_BOOLEAN   | false        | Print        | casadi::Newt |
+| ion          |              |              | information  | on           |
+|              |              |              | about each   |              |
+|              |              |              | iteration    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
