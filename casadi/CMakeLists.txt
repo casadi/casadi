@@ -4,8 +4,6 @@
 #  FULL_DOCS "add requires info for target"
 #)
 
-set(LINT_TARGETS)
-set(SPELL_TARGETS)
 
 macro(casadi_plugin_link_libraries Type name)
   string(TOLOWER ${Type} type)
@@ -70,8 +68,10 @@ macro(casadi_library_or_plugin name is_plugin)
     )
   endif()
   add_style_check_target(${name} "${ARGN}")
-  set(LINT_TARGETS ${LINT_TARGETS} "lint_${name}" PARENT_SCOPE)
+  set_property(GLOBAL APPEND PROPERTY LINT_TARGETS  "lint_${name}")
   add_spell_check_target(${name} "${ARGN}")
+  set_property(GLOBAL APPEND PROPERTY SPELL_TARGETS  "spell_${name}")
+  message("lint name: ${name}")
   set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
 
   set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
@@ -80,6 +80,9 @@ endmacro()
 add_subdirectory(core)  # needed by all except external_packages
 add_subdirectory(interfaces)             # needs external_packages
 add_subdirectory(solvers)                # needs interfaces
+
+get_property(LINT_TARGETS GLOBAL PROPERTY LINT_TARGETS)
+get_property(SPELL_TARGETS GLOBAL PROPERTY SPELL_TARGETS)
 
 # add a dummy custom target which does nothing but
 # depend on the other lint targets
