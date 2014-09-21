@@ -105,16 +105,8 @@ namespace casadi {
 
     // Issue warning aRegFcn reg;nd quick return if already loaded
     if (Derived::solvers_.find(name) != Derived::solvers_.end()) {
-      if (suffix.size()>0) {
-        Plugin &plugin = Derived::solvers_.find(name)->second;
-        casadi_assert_message(plugin.adaptorLoader,
-          "PluginInterface: could not find adaptor for " << name);
-        plugin.adaptorLoader(suffix);
-      } else {
-        casadi_warning("PluginInterface: Solver " + name + " is already in use. Ignored.");
-      }
-      return;
-    }
+      casadi_warning("PluginInterface: Solver " + name + " is already in use. Ignored.");
+    } else {
 
 #ifndef WITH_DL
     casadi_error("WITH_DL option needed for dynamic loading");
@@ -185,6 +177,14 @@ namespace casadi {
     // Register the plugin
     registerPlugin(reg, suffix);
 #endif // WITH_DL
+    }
+
+    if (suffix.size()>0) {
+      Plugin &plugin = Derived::solvers_.find(name)->second;
+      casadi_assert_message(plugin.adaptorLoader,
+        "PluginInterface: could not find adaptor for " << name);
+      plugin.adaptorLoader(suffix);
+    }
   }
 
   template<class Derived>
@@ -201,12 +201,6 @@ namespace casadi {
     typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(plugin.name);
     casadi_assert_message(it==Derived::solvers_.end(),
                           "Solver " << plugin.name << " is already in use");
-
-    if (suffix.size()>0) {
-      casadi_assert_message(plugin.adaptorLoader,
-        "PluginInterface::registerPlugin: adaptor required for '" << plugin.name << "'.");
-      plugin.adaptorLoader(suffix);
-    }
 
     // Add to list of solvers
     Derived::solvers_[plugin.name] = plugin;
