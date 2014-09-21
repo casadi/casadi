@@ -90,8 +90,8 @@ namespace casadi {
                           "pos_def option set to True: Solver only handles the indefinite case.");
     casadi_assert_message(const_dim_,
                           "const_dim option set to False: Solver only handles the True case.");
-                          
-    DenseIO::init();         
+
+    DenseIO::init();
 
     //for (int k=0;k<K_;k++) {
     //  casadi_assert_message(A_[k].isDense(), "Solver requires arguments to be dense.");
@@ -241,7 +241,7 @@ namespace casadi {
 
   void PsdIndefDpleInternal::evaluate() {
     // Obtain a periodic Schur form
-    
+
     DenseIO::readInputs();
 
     double t_linear_solve_ = 0; // Time spent in linear solve
@@ -848,7 +848,7 @@ namespace casadi {
       stats_["t_total"] = t_total_;
       stats_["t_linear_solve"] = t_linear_solve_;
     }
-    
+
     DenseIO::writeOutputs();
 
   }
@@ -886,23 +886,23 @@ namespace casadi {
     for (int i=0; i<nrhs_; ++i) {
       ins_new[i+1] = MX::sym("Q", input(DPLE_V).sparsity());
     }
-    
+
     // Part 2 
     for (int q=0; q<nrhs_; ++q) {
       for (int k=0;k<nfwd;++k) {
         MX& Qf  = ins_new.at((nrhs_+1)*(k+1)+q+1);
         MX& Af  = ins_new.at((nrhs_+1)*(k+1));
-        
+
         Qf = MX::sym("Qf", input(DPLE_V).sparsity());
         Af = MX::sym("Af", input(DPLE_A).sparsity());
       }
     }
-    
+
     // Part 3
     for (int q=0; q<nrhs_; ++q) {
       for (int k=0;k<nadj;++k) {
           MX& Pb  = ins_new.at((nrhs_+1)*(nfwd+1)+nrhs_*k+q);
-          
+
           Pb = MX::sym("Pb", output(DPLE_P).sparsity());
       }
     }
