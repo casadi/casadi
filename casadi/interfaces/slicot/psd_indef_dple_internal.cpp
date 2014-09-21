@@ -887,7 +887,7 @@ namespace casadi {
       ins_new[i+1] = MX::sym("Q", input(DPLE_V).sparsity());
     }
 
-    // Part 2 
+    // Part 2
     for (int q=0; q<nrhs_; ++q) {
       for (int k=0;k<nfwd;++k) {
         MX& Qf  = ins_new.at((nrhs_+1)*(k+1)+q+1);
