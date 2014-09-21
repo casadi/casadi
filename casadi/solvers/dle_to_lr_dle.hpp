@@ -25,7 +25,6 @@
 
 #include "../core/function/lr_dle_internal.hpp"
 #include "../core/function/dle_solver.hpp"
-#include "../core/function/function_wrapper.hpp"
 #include <casadi/solvers/casadi_lrdlesolver_dle_export.h>
 
 /** \defgroup plugin_LrDleSolver_dle

@@ -539,7 +539,7 @@ namespace casadi {
   }
 
   Function SmithLrDleInternal::getDerivative(int nfwd, int nadj) {
-    casadi_assert_message(nfwd_==0 && nadj_==0 || (nfwd==0 && nadj==0),
+    casadi_assert_message((nfwd_==0 && nadj_==0) || (nfwd==0 && nadj==0),
       "SmithLrDleInternal::second order derivatives are not supported");
     // Return a deep copy
     SmithLrDleInternal* node = new SmithLrDleInternal(st_, Hs_, nfwd, nadj);

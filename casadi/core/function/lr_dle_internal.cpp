@@ -38,7 +38,7 @@ namespace casadi {
   LrDleInternal::LrDleInternal(const LrDleStructure& st, const std::vector<int> &Hs,
                              int nrhs,
                              bool transp) :
-      st_(st), Hs_(Hs), nrhs_(nrhs), transp_(transp) {
+      st_(st), nrhs_(nrhs), transp_(transp), Hs_(Hs) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -192,8 +192,6 @@ namespace casadi {
     int n = A.size1();
     Sparsity V = st[LR_DLE_STRUCT_V];
     Sparsity C = st[LR_DLE_STRUCT_C];
-
-    bool with_C =! (C.isNull() || C.isEmpty());
 
     if (C.isNull() || C.isEmpty()) C = Sparsity::diag(n);
 
