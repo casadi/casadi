@@ -46,6 +46,22 @@ sys.argv[1:] = ['-v'] + args.unittest_args
 
 from StringIO import StringIO
 
+
+class LazyString(object):
+  def __init__(self,f):
+     self.f = f
+     self.context = dict(sys._getframe(1).f_locals)
+
+  def __add__(self, other):
+     return LazyString('str(self) + other')
+  def __radd__(self, other):
+     return LazyString('other + str(self)')
+     
+  def __str__(self):
+    d = self.context
+    exec "ret = " + self.f.replace("\n","\\n") in d
+    return str(d["ret"])
+
 class TeeString(StringIO):
   def __init__(self,stream):
     StringIO.__init__(self)
@@ -183,13 +199,15 @@ class casadiTestCase(unittest.TestCase):
             float(zt[i,j])
             float(zr[i,j])
           except:
-            self.assertTrue(isEqual(zt[i,j],zr[i,j]),"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j])))
+            self.assertTrue(isEqual(zt[i,j],zr[i,j]),LazyString('"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j]))'))
+            #self.assertTrue(isEqual(zt[i,j],zr[i,j]),"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j])))
             continue
           if zt[i,j]==zr[i,j]:
             continue
           #if (isnan(zt[i,j]) or isinf(zt[i,j])) and  (isinf(zt[i,j]) or isnan(zt[i,j])):
           #  continue
-          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, ))
+          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,LazyString('"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, )'))
+          #self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, ))
 
   def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi evaluation against a reference solution.
