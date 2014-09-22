@@ -13,6 +13,42 @@
 %exception  casadi::Adaptor< Derived, Solver >::targetName() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Adaptor< DleToLrDle , DleSolver  >::addOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DleToLrDle , DleSolver  >::prefix() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DleToLrDle , DleSolver  >::setTargetOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DleToLrDle , DleSolver  >::targetName() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DpleToDle , DpleSolver  >::addOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DpleToDle , DpleSolver  >::prefix() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DpleToDle , DpleSolver  >::setTargetOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DpleToDle , DpleSolver  >::targetName() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DpleToLrDple , DpleSolver  >::addOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DpleToLrDple , DpleSolver  >::prefix() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DpleToLrDple , DpleSolver  >::setTargetOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< DpleToLrDple , DpleSolver  >::targetName() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Adaptor< LpToQp , QpSolver  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -23,6 +59,30 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Adaptor< LpToQp , QpSolver  >::targetName() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< LrDleToDle , LrDleSolver  >::addOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< LrDleToDle , LrDleSolver  >::prefix() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< LrDleToDle , LrDleSolver  >::setTargetOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< LrDleToDle , LrDleSolver  >::targetName() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< LrDpleToDple , LrDpleSolver  >::addOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< LrDpleToDple , LrDpleSolver  >::prefix() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< LrDpleToDple , LrDpleSolver  >::setTargetOptions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Adaptor< LrDpleToDple , LrDpleSolver  >::targetName() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Adaptor< QcqpToSocp , SocpSolver  >::addOptions() {
@@ -487,6 +547,27 @@
 %exception  casadi::CvodesInterface::setStopTime(double tf) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DenseIO< Derived >::init() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DenseIO< Derived >::inputD(int i) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DenseIO< Derived >::inputD(int i) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DenseIO< Derived >::outputD(int i) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DenseIO< Derived >::outputD(int i) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DenseIO< Derived >::readInputs() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DenseIO< Derived >::writeOutputs() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DenseMultiplication< TrX, TrY >::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -553,10 +634,31 @@
 %exception  casadi::Diagsplit::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DleToLrDle::clone() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DleToLrDle::create(const LrDleStructure &st, const std::vector< int > &Hs) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DleToLrDle::evaluate() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DleToLrDle::getDerivative(int nfwd, int nadj) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DleToLrDle::init() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DleToLrDle::printStats(std::ostream &stream) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DpleToDle::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DpleToDle::create(const Sparsity &A, const Sparsity &V) const  {
+%exception  casadi::DpleToDle::create(const DleStructure &st) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DpleToDle::create(const DleStructure &st, const std::vector< int > &Hs) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DpleToDle::evaluate() {
@@ -569,6 +671,24 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DpleToDle::printStats(std::ostream &stream) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DpleToLrDple::clone() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DpleToLrDple::create(const LrDpleStructure &st, const std::vector< std::vector< int > > &Hs) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DpleToLrDple::evaluate() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DpleToLrDple::getDerivative(int nfwd, int nadj) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DpleToLrDple::init() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DpleToLrDple::printStats(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DsdpInterface::clone() const  {
@@ -1619,6 +1739,42 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LpToQp::init() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDleToDle::clone() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDleToDle::create(const DleStructure &st) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDleToDle::evaluate() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDleToDle::getDerivative(int nfwd, int nadj) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDleToDle::init() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDleToDle::printStats(std::ostream &stream) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDpleToDple::clone() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDpleToDple::create(const DpleStructure &st) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDpleToDple::evaluate() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDpleToDple::getDerivative(int nfwd, int nadj) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDpleToDple::init() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LrDpleToDple::printStats(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::T() const  {
@@ -2965,6 +3121,9 @@
 %exception  casadi::PluginInterface< DleInternal  >::adaptor(const std::string &name_) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::PluginInterface< DpleInternal  >::adaptor(const std::string &name_) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::PluginInterface< HomotopyNLPInternal  >::adaptor(const std::string &name_) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2978,6 +3137,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::PluginInterface< LpSolverInternal  >::adaptor(const std::string &name_) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::PluginInterface< LrDleInternal  >::adaptor(const std::string &name_) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::PluginInterface< LrDpleInternal  >::adaptor(const std::string &name_) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::PluginInterface< NlpSolverInternal  >::adaptor(const std::string &name_) {
@@ -4147,6 +4312,18 @@
 %exception  casadi::Wrapper< Derived >::evaluate() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Wrapper< DleToLrDle  >::checkDimensions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Wrapper< DpleToLrDple  >::checkDimensions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Wrapper< LrDleToDle  >::checkDimensions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Wrapper< LrDpleToDple  >::checkDimensions() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::XmlFile::parse(const std::string &filename) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4648,6 +4825,9 @@
 %exception casadi::CallFunction::CallFunction(const Function &fcn, std::vector< MX > arg) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::CleStructIOSchemeVector< T >::CleStructIOSchemeVector(const std::vector< M > &t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::CollocationIntegrator::CollocationIntegrator(const Function &f, const Function &g) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4717,7 +4897,22 @@
 %exception casadi::Diagsplit::Diagsplit(const MX &x, const std::vector< int > &offset1, const std::vector< int > &offset2) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::DpleToDle::DpleToDle(const Sparsity &A, const Sparsity &V) {
+%exception casadi::DleStructIOSchemeVector< T >::DleStructIOSchemeVector(const std::vector< M > &t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::DleToLrDle::DleToLrDle(const LrDleStructure &st, const std::vector< int > &Hs) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::DpleToDle::DpleToDle(const DleStructure &st) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::DpleToDle::DpleToDle(const DleStructure &st, const std::vector< int > &Hs) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::DpleToLrDple::DpleToLrDple(const LrDpleStructure &st, const std::vector< std::vector< int > > &Hs) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::DpleVecStructIOSchemeVector< T >::DpleVecStructIOSchemeVector(const std::vector< M > &t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::DsdpInterface::DsdpInterface(const std::vector< Sparsity > &st) {
@@ -4813,6 +5008,18 @@
 %exception casadi::LPStructIOSchemeVector< T >::LPStructIOSchemeVector(const std::vector< M > &t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::LR_DLEInputIOSchemeVector< M >::LR_DLEInputIOSchemeVector(const std::vector< M > &t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::LR_DLEOutputIOSchemeVector< M >::LR_DLEOutputIOSchemeVector(const std::vector< M > &t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::LR_DPLEInputIOSchemeVector< M >::LR_DPLEInputIOSchemeVector(const std::vector< M > &t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::LR_DPLEOutputIOSchemeVector< M >::LR_DPLEOutputIOSchemeVector(const std::vector< M > &t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::LapackLuDense::LapackLuDense(const Sparsity &sparsity, int nrhs) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4835,6 +5042,18 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LpToQp::LpToQp(const std::vector< Sparsity > &st) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::LrDleStructIOSchemeVector< T >::LrDleStructIOSchemeVector(const std::vector< M > &t) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::LrDleToDle::LrDleToDle(const DleStructure &st) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::LrDpleToDple::LrDpleToDple(const DpleStructure &st) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::LrDpleVecStructIOSchemeVector< T >::LrDpleVecStructIOSchemeVector(const std::vector< M > &t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::MXFunction::MXFunction(const MX &input, const MX &output) {

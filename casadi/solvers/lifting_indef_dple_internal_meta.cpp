@@ -26,8 +26,8 @@
 
       const std::string casadi::LiftingIndefDpleInternal::meta_doc=
       "\n"
-"Solving the Discrete Periodic Lyapunov Equations by lifting the\n"
-"entire period to a single Discrete Lyapunov Equation\n"
+"Solving the Discrete Periodic Lyapunov Equations by lifting the entire\n"
+"period to a single Discrete Lyapunov Equation\n"
 "\n"
 "\n"
 ;
