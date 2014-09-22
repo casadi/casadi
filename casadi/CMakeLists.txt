@@ -71,7 +71,6 @@ macro(casadi_library_or_plugin name is_plugin)
   set_property(GLOBAL APPEND PROPERTY LINT_TARGETS  "lint_${name}")
   add_spell_check_target(${name} "${ARGN}")
   set_property(GLOBAL APPEND PROPERTY SPELL_TARGETS  "spell_${name}")
-  message("lint name: ${name}")
   set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
 
   set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
