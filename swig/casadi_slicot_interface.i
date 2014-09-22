@@ -20,7 +20,7 @@
  *
  */
 
-%module casadi_slicot_interface
+%module(package="casadi") casadi_slicot_interface
 
 %include "common.i"
 

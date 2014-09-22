@@ -20,7 +20,7 @@
  *
  */
 
-%module casadi_core
+%module(package="casadi") casadi_core
 
 //  The things needed to make each casadi_*.i  compilable by itself: typemaps
 %include "common.i"

@@ -692,6 +692,7 @@ using namespace casadi;
 
 %}
 
+#ifdef CASADI_MODULE
 #ifndef SWIGXML
 %traits_swigtype(casadi::DerivativeGenerator);
 %fragment(SWIG_Traits_frag(casadi::DerivativeGenerator));
@@ -707,6 +708,7 @@ using namespace casadi;
 %traits_swigtype(casadi::Function);
 %fragment(SWIG_Traits_frag(casadi::Function));
 
+#endif
 #endif
 
 
