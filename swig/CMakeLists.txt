@@ -195,9 +195,9 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
 endif()
 
 # Construct a dynamic loader for python
-file(WRITE "${PROJECT_BINARY_DIR}/python/casadi/casadi.py" "failed_modules={}\nloaded_modules=[]\n")
+file(WRITE "${PROJECT_BINARY_DIR}/python/casadi/casadi_loader.py" "failed_modules={}\nloaded_modules=[]\n")
 foreach(my_module ${CASADI_SWIG_MODULES})
-file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi.py"
+file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi_loader.py"
 "try:\n"
 "  from ${my_module} import *\n"
 "  loaded_modules.append('${my_module}')\n"
