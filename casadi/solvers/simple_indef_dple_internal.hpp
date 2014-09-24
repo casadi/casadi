@@ -44,7 +44,8 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DPLESOLVER_SIMPLE_EXPORT SimpleIndefDpleInternal : public DpleInternal {
+  class CASADI_DPLESOLVER_SIMPLE_EXPORT SimpleIndefDpleInternal : public DpleInternal,
+    public Wrapper<SimpleIndefDpleInternal> {
   public:
     /** \brief  Constructor
      * \param st \structargument{Dple}
@@ -86,8 +87,6 @@ namespace casadi {
     static const std::string meta_doc;
 
   private:
-    /// Main implementation as MXFunction
-    Function f_;
 
     /// State space dimension
     int n_;

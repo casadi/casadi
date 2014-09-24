@@ -113,8 +113,6 @@ namespace casadi {
       }
     }
 
-    A.sparsity().spy();
-
     MX V;
 
     if (form_==0) {
@@ -131,11 +129,7 @@ namespace casadi {
     // Initialize the NLP solver
     solver_.init();
 
-    std::vector<MX> v_in(DPLE_NUM_IN);
-    v_in[DLE_A] = As;
-    v_in[DLE_V] = Vs;
-
-    std::vector<MX> Pr = solver_.call(dpleIn("a", A, "v" , V));
+    std::vector<MX> Pr = solver_.call(dleIn("a", A, "v" , V));
 
     MX Pf = Pr[0];
 
@@ -145,9 +139,7 @@ namespace casadi {
       Ps = reverse(Ps);
     }
 
-    f_ = MXFunction(v_in, dpleOut("p", horzcat(Ps)));
-    f_.setInputScheme(SCHEME_DPLEInput);
-    f_.setOutputScheme(SCHEME_DPLEOutput);
+    f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)));
     f_.init();
 
     Wrapper::checkDimensions();

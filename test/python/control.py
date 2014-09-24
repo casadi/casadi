@@ -49,6 +49,14 @@ try:
 except:
   pass
   
+  
+try:
+  LinearSolver.loadPlugin("csparse")
+  DleSolver.loadPlugin("dple.slicot")
+  dlesolvers.append(("dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
+except:
+  pass
+  
 try:
   DleSolver.loadPlugin("lrdle.smith")
   dlesolvers.append(("lrdle.smith",{"target_options": {"max_iter":100,"tol": 1e-13}}))
@@ -161,6 +169,12 @@ except:
 try:
   DpleSolver.loadPlugin("lrdple.lifting.dle.dple.slicot")
   dplesolvers.append(("lrdple.lifting.dle.dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
+except:
+  pass
+
+try:
+  DpleSolver.loadPlugin("lifting.dple.simple")
+  dplesolvers.append(("lifting.dple.simple",{"target_options": {"linear_solver": "csparse"}}))
 except:
   pass
 
@@ -607,16 +621,17 @@ class ControlTests(casadiTestCase):
   @memory_heavy()
   def test_dple_large(self):
     
-    for Solver, options in dplesolvers:
-      if "simple" in str(Solver) or "simple" in str(options): continue
+    for Solver, options in dplesolvers:  
       for K in ([1,2,3,4,5] if args.run_slow else [1,2,3]):
         for n in ([2,3,4,8,16,32] if args.run_slow else [2,3,4]):
-          if "lifting" in str(Solver) and K>3:
-            continue # bug
+          if ("simple" in str(Solver) or "simple" in str(options)) and n*K > 40 : continue
+          if "lifting" in Solver and "dple.slicot" in Solver+str(options)  and K>4: continue
+          # Somehow, for K>4 we are constructing a system that slicot fails to solve properly
+          
           print Solver, options
           numpy.random.seed(1)
           print (n,K)
-          A_ = [DMatrix(numpy.random.random((n,n))) for i in range(K)]
+          A_ = [randstable(n) for i in range(K)]
           
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           

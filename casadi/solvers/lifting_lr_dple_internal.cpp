@@ -72,7 +72,6 @@ namespace casadi {
   }
 
   void LiftingLrDpleInternal::init() {
-    std::cout << "heredsfsdf" << std::endl;
 
     form_ = getOptionEnumValue("form");
 
@@ -122,8 +121,6 @@ namespace casadi {
       }
     }
 
-    A.sparsity().spy();
-
     MX V;
     MX C;
 
@@ -144,13 +141,6 @@ namespace casadi {
     if (with_H_) {
       H = blkdiag(form_==0? Hs_ : reverse(Hs_));
     }
-
-    std::cout << Vs_ << std::endl;
-
-    std::cout << "here" << std::endl;
-    V.sparsity().spy();
-
-    std::cout << "C:" << C << std::endl;
 
     // Create an dlesolver instance
 

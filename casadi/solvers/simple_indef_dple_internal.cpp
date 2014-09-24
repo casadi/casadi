@@ -81,8 +81,8 @@ namespace casadi {
     n_ = A_[0].size1();
 
 
-    MX As = MX::sym("A", n_, K_*n_);
-    MX Vs = MX::sym("V", n_, K_*n_);
+    MX As = MX::sym("A", horzcat(A_));
+    MX Vs = MX::sym("V", horzcat(V_));
 
     std::vector< MX > Vss = horzsplit(Vs, n_);
     std::vector< MX > Ass = horzsplit(As, n_);
@@ -109,25 +109,18 @@ namespace casadi {
     MX Pf = solve(A_total, vec(horzcat(Vss_shift)), getOption("linear_solver"));
     MX P = reshape(Pf, n_, K_*n_);
 
-    std::vector<MX> v_in;
-    v_in.push_back(As);
-    v_in.push_back(Vs);
-    f_ = MXFunction(v_in, P);
-    f_.setInputScheme(SCHEME_DPLEInput);
-    f_.setOutputScheme(SCHEME_DPLEOutput);
+    P = P(output(DPLE_P).sparsity());
+
+    f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", P));
     f_.init();
+
+    Wrapper::checkDimensions();
   }
 
 
 
   void SimpleIndefDpleInternal::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
-      std::copy(input(i).begin(), input(i).end(), f_.input(i).begin());
-    }
-    f_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
-      std::copy(f_.output(i).begin(), f_.output(i).end(), output(i).begin());
-    }
+    Wrapper::evaluate();
   }
 
   Function SimpleIndefDpleInternal::getDerivative(int nfwd, int nadj) {

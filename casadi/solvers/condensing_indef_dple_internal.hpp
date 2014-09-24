@@ -39,6 +39,40 @@ namespace casadi {
 
   /** \brief \pluginbrief{DpleSolver,condensing}
 
+    The condensing approach transforms the discrete periodic Lyapunov equations
+    into one small and dense discrete Lyapunov equation.
+
+    An example for a period K=3  is given below.
+
+    The discrete periodic Lyapunov equations:
+
+    \verbatim
+      P1 = A0 P0 A0^T + V0
+      P2 = A1 P1 A1^T + V1
+      P0 = A2 P2 A2^T + V2
+    \endverbatim
+
+    Substitute the equations to obtain:
+
+    \verbatim
+    P0 = A2 ( A1 ( A0 P0 A0^T + V0 ) A1^T + V1 ) A2^T + V2
+    \endverbatim
+
+    Hence, we have
+    \verbatim
+    P = A P A^T +R
+
+     A = A2 A1 A0
+     R = A2 A1 V0 A1^T A2^T + A2 V1 A2^T + V2
+    \endverbatim
+
+    The desired outputs are reconstructed as:
+    \verbatim
+    P0 = P
+    P1 = A0 P0 A0^T + V0
+    P2 = A1 P1 A1^T + V1
+    \endverbatim
+
    @copydoc DPLE_doc
    @copydoc plugin_DpleSolver_condensing
 

@@ -80,8 +80,8 @@ namespace casadi {
     n_ = A_[0].size1();
 
 
-    MX As = MX::sym("A", n_, K_*n_);
-    MX Vs = MX::sym("V", n_, K_*n_);
+    MX As = MX::sym("A", horzcat(A_));
+    MX Vs = MX::sym("V", horzcat(V_));
 
     std::vector< MX > Vss = horzsplit(Vs, n_);
     std::vector< MX > Ass = horzsplit(As, n_);
@@ -109,10 +109,6 @@ namespace casadi {
     // Initialize the NLP solver
     solver_.init();
 
-    std::vector<MX> v_in;
-    v_in.push_back(As);
-    v_in.push_back(Vs);
-
     std::vector<MX> Pr = solver_.call(dpleIn("a", Ap, "v", R));
 
     std::vector<MX> Ps(K_);
@@ -122,9 +118,7 @@ namespace casadi {
       Ps[k+1] = mul(mul(Ass[k], Ps[k]), Ass[k].T()) + Vss[k];
     }
 
-    f_ = MXFunction(v_in, horzcat(Ps));
-    f_.setInputScheme(SCHEME_DPLEInput);
-    f_.setOutputScheme(SCHEME_DPLEOutput);
+    f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)));
     f_.init();
 
     Wrapper::checkDimensions();

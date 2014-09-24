@@ -69,7 +69,6 @@ namespace casadi {
 
   void LrDpleToDple::init() {
 
-    std::cout << "adaptor here" << std::endl;
     DpleInternal::init();
     Adaptor::init();
 
