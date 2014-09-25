@@ -97,6 +97,10 @@ namespace casadi {
     // Allocate outputs
     Sparsity P = LrDleInternal::getSparsity(lrdleStruct("a", A_, "v", V_));
 
+    Sparsity P2 = DleInternal::getSparsity(dleStruct("a", A_, "v", V_));
+
+    casadi_assert(P==P2);
+
     setNumOutputs(nrhs_);
     for (int i=0;i<nrhs_;++i) {
       output(i) = DMatrix::zeros(P);
@@ -114,17 +118,14 @@ namespace casadi {
 
     int n = A.size1();
     Sparsity V = st[Dle_STRUCT_V];
-    Sparsity C = Sparsity::diag(n);
-
-    Sparsity P = mul(mul(C, V), C.T());
+    Sparsity P = V;
     Sparsity Pprev = Sparsity::sparse(n, n);
 
     while (Pprev.size()!=P.size()) {
       Pprev = P;
-      C = horzcat(C, mul(A, C));
-      V = blkdiag(V, V);
+      P = mul(mul(A, P), A.T()) + V;
+      V = mul(mul(A, V), A.T()) + V;
       A = mul(A, A);
-      P = mul(mul(C, V), C.T());
     }
 
     return P;

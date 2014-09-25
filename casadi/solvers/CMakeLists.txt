@@ -79,6 +79,11 @@ casadi_plugin(LrDleSolver fixed_smith
   fixed_smith_lr_dle_internal.hpp
   fixed_smith_lr_dle_internal.cpp
   fixed_smith_lr_dle_internal_meta.cpp)
+
+casadi_plugin(DleSolver fixed_smith
+  fixed_smith_dle_internal.hpp
+  fixed_smith_dle_internal.cpp
+  fixed_smith_dle_internal_meta.cpp)
   
 casadi_plugin(LrDpleSolver dple
   dple_to_lr_dple.hpp

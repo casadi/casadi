@@ -20,22 +20,68 @@
  *
  */
 
-#ifndef CASADI_FIXED_SMITH_LR_DLE_INTERNAL_HPP
-#define CASADI_FIXED_SMITH_LR_DLE_INTERNAL_HPP
+#ifndef CASADI_FIXED_SMITH_DLE_INTERNAL_HPP
+#define CASADI_FIXED_SMITH_DLE_INTERNAL_HPP
 
-#include "../core/function/lr_dle_internal.hpp"
-#include <casadi/solvers/casadi_lrdlesolver_fixed_smith_export.h>
+#include "../core/function/dle_internal.hpp"
+#include <casadi/solvers/casadi_dlesolver_fixed_smith_export.h>
 
-/** \defgroup plugin_LrDleSolver_fixed_smith
- Solving the Discrete Lyapunov Equations with a regular LinearSolver
+/** \defgroup plugin_DleSolver_fixed_smith
+ Solving the Discrete Lyapunov Equations
+ with a fixed number of smith iterations.
 
 */
-/** \pluginsection{LrDleSolver,fixed_smith} */
+/** \defgroup DleSolversmith
+
+ This plugin uses Smith iterations.
+ 
+ Th basic idea is to exploit the fact that the discrete 
+ algebraic Lyapunov operator
+ f(X) = AXA^T + V
+ has a fixed point when A is stable.
+ 
+ The pure Smith iterations are:
+ 
+ \verbatim
+ 
+ X_{-1} = 0
+ X_0 = V
+ k = 0
+ while ||X_k − X_{k−1} || < do
+   X_{k+1} = A X_k A^T + V
+   k += 1
+ end
+ 
+ P = X_k
+ \endverbatim
+ 
+ With frequency doubling, we have:
+ 
+ \verbatim
+ 
+ X_{-1} = 0
+ X_0 = V
+ V_0 = V
+ A_0 = A
+ k = 0
+ while ||X_k − X_{k−1} || < do
+   X_{k+1} = A_k X_k A_k^T + V_k
+   V_{k+1} = A_k V_k A_k^T + V_k
+   A_{k+1} = A_k A_k
+   k += 1
+ end
+ 
+ P = X_k
+ \endverbatim
+
+
+*/
+/** \pluginsection{DleSolver,fixed_smith} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{LrDleSolver,fixed_smith}
+  /** \brief \pluginbrief{DleSolver,fixed_smith}
 
    @copydoc DLE_doc
    @copdyoc DleSolversmith
@@ -45,32 +91,31 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_LRDLESOLVER_FIXED_SMITH_EXPORT FixedSmithLrDleInternal : public LrDleInternal,
-    public Wrapper<FixedSmithLrDleInternal> {
+  class CASADI_DLESOLVER_FIXED_SMITH_EXPORT FixedSmithDleInternal : public DleInternal,
+    public Wrapper<FixedSmithDleInternal> {
   public:
     /** \brief  Constructor
      * \param st \structargument{Dle}
      * \param Hs Column-sizes of H_i
      */
-    FixedSmithLrDleInternal(const LrDleStructure& st, const std::vector<int> &Hs);
+    FixedSmithDleInternal(const DleStructure& st);
 
     /** \brief  Destructor */
-    virtual ~FixedSmithLrDleInternal();
+    virtual ~FixedSmithDleInternal();
 
     /** \brief  Clone */
-    virtual FixedSmithLrDleInternal* clone() const;
+    virtual FixedSmithDleInternal* clone() const;
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual FixedSmithLrDleInternal* create(const LrDleStructure& st,
-      const std::vector<int> &Hs) const {
-        return new FixedSmithLrDleInternal(st, Hs);}
+    virtual FixedSmithDleInternal* create(const DleStructure& st) const {
+        return new FixedSmithDleInternal(st);}
 
     /** \brief  Create a new DLE Solver */
-    static LrDleInternal* creator(const LrDleStructure& st, const std::vector<int> &Hs)
-    { return new FixedSmithLrDleInternal(st, Hs);}
+    static DleInternal* creator(const DleStructure& st)
+    { return new FixedSmithDleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -91,14 +136,14 @@ namespace casadi {
 
   private:
 
-    /// State space dimension
-    int n_;
-
     /// Number of Smith iterations
     int iter_;
+
+    /// Frequency doubling?
+    bool freq_doubling_;
 
   };
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_FIXED_SMITH_LR_DLE_INTERNAL_HPP
+#endif // CASADI_FIXED_SMITH_DLE_INTERNAL_HPP

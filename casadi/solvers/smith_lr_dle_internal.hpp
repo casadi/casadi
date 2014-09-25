@@ -38,6 +38,7 @@ namespace casadi {
   /** \brief \pluginbrief{LrDleSolver,smith}
 
    @copydoc LR_DLE_doc
+   @copdyoc DleSolversmith
    @copydoc plugin_LrDleSolver_smith
 
        \author Joris Gillis

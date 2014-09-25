@@ -69,6 +69,18 @@ try:
 except:
   pass
   
+try:
+  DleSolver.loadPlugin("fixed_smith")
+  dlesolvers.append(("fixed_smith",{"iter":100, "freq_doubling": False}))
+except:
+  pass
+  
+try:
+  DleSolver.loadPlugin("fixed_smith")
+  dlesolvers.append(("fixed_smith",{"iter":100, "freq_doubling": True}))
+except:
+  pass
+  
 lrdlesolvers = []
 
 try:
