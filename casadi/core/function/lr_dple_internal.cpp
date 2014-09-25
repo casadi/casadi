@@ -201,7 +201,6 @@ namespace casadi {
     for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
         output(i) = DMatrix::zeros(horzcat(P));
-        horzcat(P).spy();
       } else {
         output(i) = DMatrix::zeros(blkdiag(P));
       }
