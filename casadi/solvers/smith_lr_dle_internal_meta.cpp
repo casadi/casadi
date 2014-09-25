@@ -28,6 +28,8 @@
       "\n"
 "Solving the Low-rank Discrete Lyapunov Equations with Smith iterations\n"
 "\n"
+"DleSolversmith\n"
+"\n"
 "\n"
 ">List of available options\n"
 "\n"

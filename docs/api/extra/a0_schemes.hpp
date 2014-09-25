@@ -720,6 +720,15 @@
 */
 /// \endcond
 /// \cond INTERNAL
+/** \class casadi::FixedSmithDleInternal
+\n
+\par
+@copydoc scheme_DLEInput
+<br/>
+@copydoc scheme_DLEOutput
+*/
+/// \endcond
+/// \cond INTERNAL
 /** \class casadi::FixedSmithLrDleInternal
 \n
 \par

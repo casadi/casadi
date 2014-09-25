@@ -16547,6 +16547,8 @@ List of plugins
 
 - <a href='#plugin_DleSolver_dple'>dple</a>
 
+- <a href='#plugin_DleSolver_fixed_smith'>fixed_smith</a>
+
 - <a href='#plugin_DleSolver_lrdle'>lrdle</a>
 
 - <a href='#plugin_DleSolver_simple'>simple</a>
@@ -16575,6 +16577,24 @@ Solving the Discrete Lyapunov Equations with Periodic Solver
 +----+------+---------+-------------+
 
 --------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+fixed_smith
+-----------
+
+
+
+Solving the Discrete Lyapunov Equations with a fixed number of smith
+iterations.
+
+DleSolversmith
+
+--------------------------------------------------------------------------------
+
+
 
 
 
@@ -16660,6 +16680,8 @@ name:
 Name of a solver. It might be one of:
 
 - <a href='#plugin_DleSolver_dple'>dple</a>
+
+- <a href='#plugin_DleSolver_fixed_smith'>fixed_smith</a>
 
 - <a href='#plugin_DleSolver_lrdle'>lrdle</a>
 
@@ -50434,6 +50456,7 @@ fixed_smith
 
 
 Solving the Discrete Lyapunov Equations with a regular LinearSolver
+DleSolversmith
 
 >List of available options
 
@@ -50455,6 +50478,8 @@ smith
 
 
 Solving the Low-rank Discrete Lyapunov Equations with Smith iterations
+
+DleSolversmith
 
 >List of available options
 
@@ -121792,6 +121817,8 @@ Repeat matrix A n times vertically and m times horizontally.
 
 %feature("docstring") casadi::casadi_load_linearsolver_lapacklu "";
 
+%feature("docstring") casadi::casadi_load_dlesolver_fixed_smith "";
+
 %feature("docstring") casadi::qr "[INTERNAL]  QR factorization using the
 modified Gram-Schmidt algorithm More stable than the classical Gram-Schmidt,
 but may break down if the rows of A are nearly linearly dependent See J.
@@ -121799,6 +121826,8 @@ Demmel: Applied Numerical Linear Algebra (algorithm 3.1.). Note that in
 SWIG, Q and R are returned by value.
 
 ";
+
+%feature("docstring") casadi::casadi_register_dlesolver_fixed_smith "";
 
 %feature("docstring") casadi::tan "[INTERNAL]  Pre-C99 elementary functions
 from the 'math.h' ('cmath') header.
@@ -122322,6 +122351,15 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: external__function__internal_8hpp.xml
+
+
+// File: fixed__smith__dle__internal_8cpp.xml
+
+
+// File: fixed__smith__dle__internal_8hpp.xml
+
+
+// File: fixed__smith__dle__internal__meta_8cpp.xml
 
 
 // File: fixed__smith__lr__dle__internal_8cpp.xml
@@ -123594,6 +123632,13 @@ This file does absolutely nothing but including all headers ";
 
 // File: group__plugin__LrDpleSolver__dple.xml
 
+
+
+// File: group__plugin__DleSolver__fixed__smith.xml
+
+
+
+// File: group__DleSolversmith.xml
 
 
 // File: group__plugin__LrDleSolver__fixed__smith.xml
