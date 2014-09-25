@@ -67,6 +67,7 @@ Biegler
 Krylov
 Betts
 indices
+plugin
 
 'radau'
 'legendre'

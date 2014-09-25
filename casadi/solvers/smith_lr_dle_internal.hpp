@@ -29,6 +29,7 @@
 /** \defgroup plugin_LrDleSolver_smith
  Solving the Low-rank Discrete Lyapunov Equations with Smith iterations
 
+   @copdyoc DleSolversmith
 */
 /** \pluginsection{LrDleSolver,smith} */
 
@@ -38,7 +39,6 @@ namespace casadi {
   /** \brief \pluginbrief{LrDleSolver,smith}
 
    @copydoc LR_DLE_doc
-   @copdyoc DleSolversmith
    @copydoc plugin_LrDleSolver_smith
 
        \author Joris Gillis

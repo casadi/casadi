@@ -28,7 +28,8 @@
 
 /** \defgroup plugin_LrDleSolver_fixed_smith
  Solving the Discrete Lyapunov Equations with a regular LinearSolver
-
+   @copdyoc DleSolversmith
+   
 */
 /** \pluginsection{LrDleSolver,fixed_smith} */
 
@@ -38,7 +39,6 @@ namespace casadi {
   /** \brief \pluginbrief{LrDleSolver,fixed_smith}
 
    @copydoc DLE_doc
-   @copdyoc DleSolversmith
    @copydoc plugin_DleSolver_fixed_smith
 
        \author Joris Gillis

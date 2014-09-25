@@ -29,6 +29,8 @@
 /** \defgroup plugin_DleSolver_fixed_smith
  Solving the Discrete Lyapunov Equations
  with a fixed number of smith iterations.
+ 
+ @copdyoc DleSolversmith
 
 */
 /** \defgroup DleSolversmith
@@ -84,7 +86,6 @@ namespace casadi {
   /** \brief \pluginbrief{DleSolver,fixed_smith}
 
    @copydoc DLE_doc
-   @copdyoc DleSolversmith
    @copydoc plugin_DleSolver_fixed_smith
 
        \author Joris Gillis
