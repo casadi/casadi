@@ -37,6 +37,10 @@ namespace casadi {
 @{
 */
 
+  /** \brief Calculate quadratic form AXA^T*/
+  template<typename MatType>
+  MatType quad_form(const GenericMatrix<MatType> &X, const GenericMatrix<MatType> &A);
+
   /** \brief Matlab's \c linspace command
    */
   template<typename MatType>
@@ -223,6 +227,13 @@ namespace casadi {
     return diagsplit(x, output_offset, output_offset);
   }
 
+  template<typename MatType>
+  MatType quad_form(const GenericMatrix<MatType> &X_, const GenericMatrix<MatType> &A_) {
+    const MatType& X = static_cast<const MatType&>(X_);
+    const MatType& A = static_cast<const MatType&>(A_);
+    return mul(A, mul(X, A.T()));
+  }
+
 #endif // SWIG
 
 /**
@@ -240,6 +251,7 @@ namespace casadi {
 // Define template instantiations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType) \
 GMTT_INST(MatType, cross) \
+GMTT_INST(MatType, quad_form) \
 GMTT_INST(MatType, tril2symm) \
 GMTT_INST(MatType, triu2symm) \
 GMTT_INST(MatType, triu) \
