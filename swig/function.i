@@ -153,6 +153,7 @@ def PyFunction(obj,inputs,outputs):
 %template(__call__original__) operator()< casadi::Sparsity >;
 %template(__call__original__) operator()< casadi::MX> ;
 %template(__call__original__) operator()< casadi::Matrix<casadi::SXElement> >;
+%template(__call__original__) operator()< casadi::Matrix<double> >;
 
 %pythoncode %{
   def __call__(self,*dummy,**kwargs):
@@ -167,11 +168,13 @@ def PyFunction(obj,inputs,outputs):
 
 %template(PrintIOSchemeVectorMX)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::MX> >;
 %template(PrintIOSchemeVectorSX)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> > >;
+%template(PrintIOSchemeVectorD)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<double> > >;
 %template(PrintIOSchemeVectorSparsity)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Sparsity> >;
 %include "casadi/core/function/io_scheme_vector.hpp"
 
 %template(IOSchemeVectorMX) casadi::IOSchemeVector< casadi::MX >;
 %template(IOSchemeVectorSX) casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> >;
+%template(IOSchemeVectorD) casadi::IOSchemeVector< casadi::Matrix<double> >;
 %template(IOSchemeVectorSparsity) casadi::IOSchemeVector< casadi::Sparsity >;
 #ifdef SWIGPYTHON
 %extend casadi::IOSchemeVector< casadi::MX > {
@@ -181,6 +184,12 @@ def PyFunction(obj,inputs,outputs):
 %}
 }
 %extend casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> > {
+%pythoncode %{
+  def __iter__(self):
+    return iter(self.data)
+%}
+}
+%extend casadi::IOSchemeVector< casadi::Matrix<double> > {
 %pythoncode %{
   def __iter__(self):
     return iter(self.data)
