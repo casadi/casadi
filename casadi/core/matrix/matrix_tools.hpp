@@ -334,7 +334,7 @@ namespace casadi {
   *               Minimum size: y.size1()+x.size2()+1
   */
   template<typename DataType>
-  CASADI_CORE_EXPORT int norm_0_mul_nn(const Matrix<DataType> &x,
+  int norm_0_mul_nn(const Matrix<DataType> &x,
                               const Matrix<DataType> &y,
                               std::vector<bool>& Bwork,
                               std::vector<int>& Iwork);
