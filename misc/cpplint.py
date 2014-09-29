@@ -4739,6 +4739,11 @@ def ParseArguments(args):
 
 def main():
   filenames = ParseArguments(sys.argv[1:])
+  # Filter files we don't want to lint.
+  # This should really be done in cmake.
+  # -Greg
+  nolint = ['snopt.h', 'snoptProblem.hpp']
+  filenames = filter(lambda x: x not in nolint, filenames)
 
   # Change stderr to write with replacement characters so we don't die
   # if we try to print something containing non-ASCII characters.
