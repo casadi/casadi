@@ -4660,6 +4660,9 @@
 %exception  casadi::matrixName< SXElement >() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::norm_0_mul_nn(const Matrix< DataType > &B, const Matrix< DataType > &A, std::vector< bool > &Bwork, std::vector< int > &Iwork) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::norm_1(const std::vector< T > &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
