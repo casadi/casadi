@@ -311,7 +311,7 @@ namespace casadi {
   CASADI_CORE_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
                                              const Dictionary& dict = Dictionary());
 
-  
+
   /** Inf-norm of a Matrix-matrix product, no memory allocation
   *   mul(x, y)
   *
