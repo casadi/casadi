@@ -524,10 +524,10 @@ namespace casadi {
 
     snoptProbC.setProblemSize(m_, nx_, nnCon_, nnJac_, nnObj_);
     snoptProbC.setObjective(iObj_, ObjAdd);
-    snoptProbC.setJ( nea, getPtr(A_data_), getPtr(row), getPtr(col) );
-    snoptProbC.setX( getPtr(bl_), getPtr(bu_), getPtr(x_), getPtr(pi_), getPtr(rc_), getPtr(hs_) );
-    snoptProbC.setUserFun( userfunPtr );
-    snoptProbC.setSTOP( snStopPtr );
+    snoptProbC.setJ(nea, getPtr(A_data_), getPtr(row), getPtr(col));
+    snoptProbC.setX(getPtr(bl_), getPtr(bu_), getPtr(x_), getPtr(pi_), getPtr(rc_), getPtr(hs_));
+    snoptProbC.setUserFun(userfunPtr);
+    snoptProbC.setSTOP(snStopPtr);
     passOptions(snoptProbC);
 
     // user data
@@ -535,11 +535,11 @@ namespace casadi {
     std::vector<int> iu(iulen);
     SnoptInterface* source = this;
     memcpy(&(iu[0]), &source, sizeof(SnoptInterface*));
-    snoptProbC.setUserI( getPtr(iu), iulen );
+    snoptProbC.setUserI(getPtr(iu), iulen);
 
     // Run SNOPT
     double time0 = clock();
-    int info = snoptProbC.solve( getOptionEnumValue("_start") );
+    int info = snoptProbC.solve(getOptionEnumValue("_start"));
     t_mainloop_ = static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
 
     stats_["return_status"] = info;

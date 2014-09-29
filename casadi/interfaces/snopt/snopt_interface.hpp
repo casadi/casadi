@@ -25,7 +25,7 @@
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include "casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h"
-#include "snopt.h"
+#include "casadi/interfaces/snopt/snopt.h"
 #include "snoptProblem.hpp"
 
 /** \defgroup plugin_NlpSolver_snopt
