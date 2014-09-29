@@ -165,15 +165,18 @@ class CASADI_CORE_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     else:
       s+="%template(" + self.name + ") " + self.name + "<casadi::SX>;\n"
       s+="%template(" + self.name + ") " + self.name + "<casadi::MX>;\n"
+      s+="%template(" + self.name + ") " + self.name + "<casadi::Matrix<double> >;\n"
       s+="%template(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
       s+="%template(" +  "IOSchemeVector" + self.enum + "SX) " + self.enum + "IOSchemeVector<SX>;\n"
       s+="%template(" +  "IOSchemeVector" + self.enum + "MX) " + self.enum + "IOSchemeVector<MX>;\n"
+      s+="%template(" +  "IOSchemeVector" + self.enum + "D) " + self.enum + "IOSchemeVector< Matrix<double> >;\n"
       s+="%template(" +  "IOSchemeVector" + self.enum + "Sparsity) " + self.enum + "IOSchemeVector<Sparsity>;\n"
       #s+="%rename(" + self.name + ") " + self.name + "<casadi::SX>;\n"
       #s+="%rename(" + self.name + ") " + self.name + "<casadi::MX>;\n"
       #s+="%rename(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
       s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "SX;\n"
       s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "MX;\n"
+      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "D;\n"
       s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum+ "Sparsity;\n"
     s+="}\n"
     return s
@@ -347,6 +350,10 @@ autogenpy.write("#ifdef SWIGPYTHON\n")
 autogenpy.write("%pythoncode %{\n")
 autogenpy.write("""
 def IOSchemeVector(arg,io_scheme):
+  try:
+    return IOSchemeVectorD(arg,io_scheme)
+  except:
+    pass
   try:
     return IOSchemeVectorSX(arg,io_scheme)
   except:

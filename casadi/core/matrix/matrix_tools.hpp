@@ -311,6 +311,7 @@ namespace casadi {
   CASADI_CORE_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
                                              const Dictionary& dict = Dictionary());
 
+
   /** Inf-norm of a Matrix-matrix product, no memory allocation
   *   mul(x, y)
   *
@@ -322,6 +323,20 @@ namespace casadi {
   CASADI_CORE_EXPORT double norm_inf_mul_nn(const Matrix<double> &x,
                               const Matrix<double> &y,
                               std::vector<double>& Dwork,
+                              std::vector<int>& Iwork);
+
+  /** 0-norm (nonzero count) of a Matrix-matrix product, no memory allocation
+  *   mul(x, y)
+  *
+  * \param Bwork  A boolean work vector that you must allocate
+  *               Minimum size: y.size1()
+  * \param Iwork  A integer work vector that you must allocate
+  *               Minimum size: y.size1()+x.size2()+1
+  */
+  template<typename DataType>
+  int norm_0_mul_nn(const Matrix<DataType> &x,
+                              const Matrix<DataType> &y,
+                              std::vector<bool>& Bwork,
                               std::vector<int>& Iwork);
 
   /** \brief Kronecker tensor product
@@ -1264,6 +1279,119 @@ namespace casadi {
     return rank(A.sparsity());
   }
 
+  template<typename DataType>
+  int norm_0_mul_nn(const Matrix<DataType> &B,
+                         const Matrix<DataType> &A,
+                         std::vector<bool>& Bwork,
+                         std::vector<int>& Iwork) {
+
+    // Note: because the algorithm works with compressed row storage,
+    // we have x=B and y=A
+
+    casadi_assert_message(A.size1()==B.size2(), "Dimension error. Got " << B.dimString()
+                          << " times " << A.dimString() << ".");
+
+
+    int n_row = A.size2();
+    int n_col = B.size1();
+
+    casadi_assert_message(Bwork.size()>=n_col,
+      "We need a bigger work vector (>=" << n_col << "), but got "<< Bwork.size() <<".");
+    casadi_assert_message(Iwork.size()>=n_row+1+n_col,
+      "We need a bigger work vector (>=" << n_row+1+n_col << "), but got "<< Iwork.size() <<".");
+
+    const std::vector<int> &Aj = A.row();
+    const std::vector<int> &Ap = A.colind();
+
+    const std::vector<int> &Bj = B.row();
+    const std::vector<int> &Bp = B.colind();
+
+    int *Cp = &Iwork[0];
+    int *mask = &Iwork[n_row+1];
+
+    // Implementation borrowed from Scipy's sparsetools/csr.h
+
+    // Pass 1
+
+    // method that uses O(n) temp storage
+    std::fill(mask, mask+n_col, -1);
+
+    Cp[0] = 0;
+    int nnz = 0;
+
+    for (int i = 0; i < n_row; i++) {
+      int row_nnz = 0;
+      for (int jj = Ap[i]; jj < Ap[i+1]; jj++) {
+        int j = Aj[jj];
+        for (int kk = Bp[j]; kk < Bp[j+1]; kk++) {
+          int k = Bj[kk];
+          if (mask[k] != i) {
+            mask[k] = i;
+            row_nnz++;
+          }
+        }
+      }
+      int next_nnz = nnz + row_nnz;
+
+      nnz = next_nnz;
+      Cp[i+1] = nnz;
+    }
+
+    // Pass 2
+    int *next = &Iwork[n_row+1];
+    std::fill(next, next+n_col, -1);
+
+    std::vector<bool> & sums = Bwork;
+    std::fill(sums.begin(), sums.end(), false);
+
+    nnz = 0;
+
+    Cp[0] = 0;
+
+    for (int i = 0; i < n_row; i++) {
+        int head   = -2;
+        int length =  0;
+
+        int jj_start = Ap[i];
+        int jj_end   = Ap[i+1];
+        for (int jj = jj_start; jj < jj_end; jj++) {
+            int j = Aj[jj];
+
+            int kk_start = Bp[j];
+            int kk_end   = Bp[j+1];
+            for (int kk = kk_start; kk < kk_end; kk++) {
+                int k = Bj[kk];
+
+                sums[k] = true;
+
+                if (next[k] == -1) {
+                    next[k] = head;
+                    head  = k;
+                    length++;
+                }
+            }
+        }
+
+        for (int jj = 0; jj < length; jj++) {
+
+            if (sums[head]) {
+                nnz++;
+            }
+
+            int temp = head;
+            head = next[head];
+
+            next[temp] = -1; //clear arrays
+            sums[temp] =  0;
+        }
+
+        Cp[i+1] = nnz;
+    }
+
+    return nnz;
+
+  }
+
 } // namespace casadi
 
 
@@ -1302,6 +1430,7 @@ namespace casadi {
   MTT_INST(DataType, norm_2)                            \
   MTT_INST(DataType, norm_inf)                          \
   MTT_INST(DataType, norm_F)                            \
+  MTT_INST(DataType, norm_0_mul_nn)                     \
   MTT_INST(DataType, qr)                                \
   MTT_INST(DataType, nullspace)                         \
   MTT_INST(DataType, solve)                             \

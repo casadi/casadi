@@ -1103,9 +1103,11 @@ class Matrixtests(casadiTestCase):
     B = numpy.random.random((2,8))
     
     dwork = DVector(range(10))
+    bwork = BVector([0]*10)
     iwork = IVector(range(10+1+8))
     
     self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
+    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).size())
     
     # Sparse
     for i in range(5):
@@ -1116,7 +1118,7 @@ class Matrixtests(casadiTestCase):
     B = sparse(B)
     
     self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
-    
+    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).size())
     
     
     A = numpy.random.random((8,2))
@@ -1126,6 +1128,7 @@ class Matrixtests(casadiTestCase):
     iwork = IVector(range(10+1+8))
     
     self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
+    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).size())
     
     # Sparse
     for i in range(5):
@@ -1136,6 +1139,8 @@ class Matrixtests(casadiTestCase):
     B = sparse(B)
     
     self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
+    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).size())
+    
 if __name__ == '__main__':
     unittest.main()
 

@@ -118238,41 +118238,7 @@ Get upper triangular part.
 
 ";
 
-%feature("docstring") casadi::integratorOut "
-
->  IntegratorOutputIOSchemeVector<M> casadi::integratorOut(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M())
-------------------------------------------------------------------------
-
-Output arguments of an integrator
-
->Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6) [integratorOut]
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| INTEGRATOR_XF          | xf                     | Differential state at  |
-|                        |                        | the final time .       |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_QF          | qf                     | Quadrature state at    |
-|                        |                        | the final time .       |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_ZF          | zf                     | Algebraic variable at  |
-|                        |                        | the final time .       |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_RXF         | rxf                    | Backward differential  |
-|                        |                        | state at the initial   |
-|                        |                        | time .                 |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_RQF         | rqf                    | Backward quadrature    |
-|                        |                        | state at the initial   |
-|                        |                        | time .                 |
-+------------------------+------------------------+------------------------+
-| INTEGRATOR_RZF         | rzf                    | Backward algebraic     |
-|                        |                        | variable at the        |
-|                        |                        | initial time .         |
-+------------------------+------------------------+------------------------+
-
-";
+%feature("docstring") casadi::casadi_register_lrdlesolver_fixed_smith "";
 
 %feature("docstring") casadi::cofactor "
 
@@ -118608,7 +118574,39 @@ scheme:  'radau' or 'legendre'
 
 %feature("docstring") casadi::bvec_toggle "[INTERNAL] ";
 
-%feature("docstring") casadi::casadi_load_lrdlesolver_fixed_smith "";
+%feature("docstring") casadi::substituteInPlace "
+
+>  void casadi::substituteInPlace(const std::vector< MX > &v, std::vector< MX > &vdef, bool reverse=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Inplace substitution Substitute variables v out of the expressions
+vdef sequentially.
+
+>  void casadi::substituteInPlace(const std::vector< MX > &v, std::vector< MX > &vdef, std::vector< MX > &ex, bool reverse=false)
+------------------------------------------------------------------------
+[INTERNAL] 
+Inplace substitution with piggyback expressions Substitute variables v
+out of the expressions vdef sequentially, as well as out of a number
+of other expressions piggyback.
+
+>  void casadi::substituteInPlace(const SX &v, SX &vdef, bool reverse=false)
+------------------------------------------------------------------------
+
+Substitute variable var out of or into an expression expr.
+
+>  void casadi::substituteInPlace(const SX &v, SX &vdef, std::vector< SX > &ex, bool reverse=false)
+------------------------------------------------------------------------
+
+Substitute variable var out of or into an expression expr, with an arbitrary
+number of other expressions piggyback.
+
+>  void casadi::substituteInPlace(const std::vector< SX > &v, std::vector< SX > &vdef, std::vector< SX > &ex, bool reverse=false)
+------------------------------------------------------------------------
+
+Substitute variable var out of or into an expression expr, with an arbitrary
+number of other expressions piggyback (vector version)
+
+";
 
 %feature("docstring") casadi::slicot_mb03vd "[INTERNAL] ";
 
@@ -119101,41 +119099,41 @@ functions from the 'math.h' ('cmath') header.
 
 ";
 
-%feature("docstring") casadi::substituteInPlace "
+%feature("docstring") casadi::quad_form "
 
->  void casadi::substituteInPlace(const std::vector< MX > &v, std::vector< MX > &vdef, bool reverse=false)
-------------------------------------------------------------------------
-[INTERNAL] 
-Inplace substitution Substitute variables v out of the expressions
-vdef sequentially.
-
->  void casadi::substituteInPlace(const std::vector< MX > &v, std::vector< MX > &vdef, std::vector< MX > &ex, bool reverse=false)
-------------------------------------------------------------------------
-[INTERNAL] 
-Inplace substitution with piggyback expressions Substitute variables v
-out of the expressions vdef sequentially, as well as out of a number
-of other expressions piggyback.
-
->  void casadi::substituteInPlace(const SX &v, SX &vdef, bool reverse=false)
-------------------------------------------------------------------------
-
-Substitute variable var out of or into an expression expr.
-
->  void casadi::substituteInPlace(const SX &v, SX &vdef, std::vector< SX > &ex, bool reverse=false)
-------------------------------------------------------------------------
-
-Substitute variable var out of or into an expression expr, with an arbitrary
-number of other expressions piggyback.
-
->  void casadi::substituteInPlace(const std::vector< SX > &v, std::vector< SX > &vdef, std::vector< SX > &ex, bool reverse=false)
-------------------------------------------------------------------------
-
-Substitute variable var out of or into an expression expr, with an arbitrary
-number of other expressions piggyback (vector version)
+Calculate quadratic form AXA^T.
 
 ";
 
-%feature("docstring") casadi::constpow "[INTERNAL]  CasADi additions.
+%feature("docstring") casadi::norm_0_mul_nn "
+
+>  int casadi::norm_0_mul_nn(const Matrix< DataType > &x, const Matrix< DataType > &y, std::vector< bool > &Bwork, std::vector< int > &Iwork)
+------------------------------------------------------------------------
+
+0-norm (nonzero count) of a Matrix-matrix product, no memory allocation
+mul(x, y)
+
+Parameters:
+-----------
+
+Bwork:  A boolean work vector that you must allocate Minimum size: y.size1()
+
+Iwork:  A integer work vector that you must allocate Minimum size:
+y.size1()+x.size2()+1
+
+>  int casadi::norm_0_mul_nn(const Matrix< DataType > &B, const Matrix< DataType > &A, std::vector< bool > &Bwork, std::vector< int > &Iwork)
+------------------------------------------------------------------------
+[INTERNAL] 
+0-norm (nonzero count) of a Matrix-matrix product, no memory
+allocation mul(x, y)
+
+Parameters:
+-----------
+
+Bwork:  A boolean work vector that you must allocate Minimum size: y.size1()
+
+Iwork:  A integer work vector that you must allocate Minimum size:
+y.size1()+x.size2()+1
 
 ";
 
@@ -119370,7 +119368,41 @@ with Q-transpose (lapack)
 
 %feature("docstring") casadi::casadi_load_nlpsolver_knitro "";
 
-%feature("docstring") casadi::casadi_register_lrdlesolver_fixed_smith "";
+%feature("docstring") casadi::integratorOut "
+
+>  IntegratorOutputIOSchemeVector<M> casadi::integratorOut(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M())
+------------------------------------------------------------------------
+
+Output arguments of an integrator
+
+>Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6) [integratorOut]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| INTEGRATOR_XF          | xf                     | Differential state at  |
+|                        |                        | the final time .       |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_QF          | qf                     | Quadrature state at    |
+|                        |                        | the final time .       |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_ZF          | zf                     | Algebraic variable at  |
+|                        |                        | the final time .       |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RXF         | rxf                    | Backward differential  |
+|                        |                        | state at the initial   |
+|                        |                        | time .                 |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RQF         | rqf                    | Backward quadrature    |
+|                        |                        | state at the initial   |
+|                        |                        | time .                 |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RZF         | rzf                    | Backward algebraic     |
+|                        |                        | variable at the        |
+|                        |                        | initial time .         |
++------------------------+------------------------+------------------------+
+
+";
 
 %feature("docstring") casadi::ProfilingType< ProfilingData_NAME > "
 [INTERNAL] ";
@@ -120801,6 +120833,10 @@ functions from the 'math.h' ('cmath') header.
 
 ";
 
+%feature("docstring") casadi::constpow "[INTERNAL]  CasADi additions.
+
+";
+
 %feature("docstring") casadi::print "[INTERNAL]  Print description.
 
 ";
@@ -121361,6 +121397,8 @@ functions from the 'math.h' header.
 Return summation of all elements.
 
 ";
+
+%feature("docstring") casadi::casadi_load_lrdlesolver_fixed_smith "";
 
 %feature("docstring") casadi::vecNZcat "
 
