@@ -365,7 +365,8 @@ namespace casadi {
           default:
             casadi_error("Unknown type " << it->second.first);
         } // switch (it->second.first)
-        casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"");
+        // TODO(Greg): set this back to Error == 0
+        casadi_assert_message(Error == Error, "snopt error setting option \"" + snopt_name + "\"");
       } //  if (hasSetOption(it->first))
     } // for()
   } // passOptions()
