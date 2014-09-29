@@ -36,7 +36,6 @@
 #include "casadi/core/function/mx_function.hpp"
 
 #include "snopt_interface.hpp"
-#include "wsnopt.hpp"
 
 namespace casadi {
 
@@ -62,20 +61,25 @@ namespace casadi {
     // Monitors
     addOption("monitor", OT_STRINGVECTOR, GenericType(),  "", "eval_nlp|setup_nlp", true);
 
+    // casadi options
     addOption("print_time", OT_BOOLEAN, true, "print information about execution time");
-    addOption("_start",  OT_STRING, "Cold",  "", "Cold|Warm");
-    addOption("_iprint",  OT_INTEGER, 0);
-    addOption("_isumm",   OT_INTEGER, 6);
+
+    // options which are handled seperately
+    addOption("_start",  OT_STRING, "Cold",  "", "Cold|Basis|Warm");
+    addOption("_print_file",  OT_STRING);
+    addOption("_specs_file",  OT_STRING);
+    addOption("_summary", OT_BOOLEAN, true);
 
     // Snopt options
     typedef std::pair<opt_type, std::string> optPair;
-    // optionsmap_["_major_print_level"]     = optPair(OT_INTEGER, "Major print level");
-    // optionsmap_["_minor_print_level"]     = optPair(OT_INTEGER, "Minor print level");
+    optionsmap_["_major_print_level"]     = optPair(OT_INTEGER, "Major print level");
+    optionsmap_["_minor_print_level"]     = optPair(OT_INTEGER, "Minor print level");
     optionsmap_["_verify_level"]          = optPair(OT_INTEGER, "Verify level");
     optionsmap_["_major_iteration_limit"] = optPair(OT_INTEGER, "Major iteration limit");
     optionsmap_["_minor_iteration_limit"] = optPair(OT_INTEGER, "Minor iteration limit");
-    optionsmap_["_feasibility_tolerance"] = optPair(OT_REAL,    "Feasibility tolerance");
-    optionsmap_["_optimality_tolerance"]  = optPair(OT_REAL,    "Optimality tolerance");
+    optionsmap_["_major_feasibility_tolerance"] = optPair(OT_REAL, "Major feasibility tolerance");
+    optionsmap_["_minor_feasibility_tolerance"] = optPair(OT_REAL, "Minor feasibility tolerance");
+    optionsmap_["_major_optimality_tolerance"]  = optPair(OT_REAL, "Major optimality tolerance");
     optionsmap_["_scale_option"]          = optPair(OT_INTEGER, "Scale option");
 
     // Add the Snopt Options
@@ -298,7 +302,7 @@ namespace casadi {
       A_structure_ = vertcat(A_structure_, d);
       m_ +=1;
     }
-    iObj_ = jacF_row_ ? m_ : 0;
+    iObj_ = jacF_row_ ? (m_ - 1) : -1;
 
     // Is the A matrix completely empty?
     dummyrow_ = A_structure_.size() == 0;  // Then we need a dummy row
@@ -318,99 +322,6 @@ namespace casadi {
       std::cout << "iObj: " << iObj_ << std::endl;
     }
 
-    // The following section deals with querying SNOPT upfront
-    // how much memory it needs
-
-    int iPrint = 0;
-    int iSumm = 0;
-
-    // Manual says 500 is a bare minimum, which we will correct later
-    int clen = 500; int rlen = 500; int ilen = 500;
-    snopt_cw_.resize(clen*8, 'a');
-    snopt_iw_.resize(ilen, 0);
-    snopt_rw_.resize(rlen, 0);
-
-    snInit(iPrint, iSumm);
-
-    int mincw = 0;
-    int miniw = 0;
-    int minrw = 0;
-    int INFO = 0;
-    // Number of nonzeros in entire A
-    int neA = A_structure_.size();
-    // Number of nonzeros in nonlinear part of A
-    int negCon = std::max(A_structure_(Slice(0, nnCon_), Slice(0, nnJac_)).size(), 1);
-    snMemb(&INFO, &m_, &nx_, &neA, &negCon, &nnCon_, &nnJac_, &nnObj_, &mincw, &miniw, &minrw);
-
-    casadi_assert(INFO == 104);
-
-    snopt_cw_.resize(mincw*8, 'a');
-    snopt_iw_.resize(miniw, 0);
-    snopt_rw_.resize(minrw, 0);
-    clen = mincw;
-    ilen = miniw;
-    rlen = minrw;
-
-    iPrint = getOption("_iprint");
-    iSumm = getOption("_isumm");;
-    snInit(iPrint, iSumm);
-
-    for (OptionsMap::const_iterator it = optionsmap_.begin(); it != optionsmap_.end(); it++) {
-      int Error = 0;
-      const std::string & snopt_name = it->second.second;
-      //int bufferlen = snopt_name.size();
-      if (hasSetOption(it->first)) {
-        switch (it->second.first) {
-          case OT_INTEGER: {
-            int value = getOption(it->first);
-            snSeti(snopt_name, value);
-          }; break;
-          case OT_REAL: {
-            double value = getOption(it->first);
-            snSetr(snopt_name, value);
-          }; break;
-          case OT_STRING: {
-            std::string value = getOption(it->first);
-            snSet(snopt_name, value);
-            }; break;
-          default:
-            casadi_error("Unknown type " << it->second.first);
-        }
-        casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
-      }
-      // else {
-      //   switch (it->second.first) {
-      //     case OT_INTEGER: {
-      //       int value = 0;
-      //       snopt_geti(snopt_name.c_str(), &bufferlen, &value, &Error,
-      //                  getPtr(snopt_cw_), &clen,
-      //                  getPtr(snopt_iw_), &ilen,
-      //                  getPtr(snopt_rw_), &rlen);
-      //       setOption(it->first, value);
-      //     }; break;
-      //     case OT_REAL: {
-      //       double value = 0;
-      //       snopt_getr(snopt_name.c_str(), &bufferlen, &value, &Error,
-      //                  getPtr(snopt_cw_), &clen,
-      //                  getPtr(snopt_iw_), &ilen,
-      //                  getPtr(snopt_rw_), &rlen);
-      //       setOption(it->first, value);
-      //     }; break;
-      //     case OT_STRING: {
-      //       char value[8];
-      //       snopt_getc(snopt_name.c_str(), &bufferlen, value, &Error,
-      //                  getPtr(snopt_cw_), &clen,
-      //                  getPtr(snopt_iw_), &ilen,
-      //                  getPtr(snopt_rw_), &rlen);
-      //       setOption(it->first, std::string(value));
-      //       }; break;
-      //     default:
-      //       casadi_error("Unknown type " << it->second.first);
-      //   }
-      //   casadi_assert_message(Error == 0, "snopt error getting option \"" + snopt_name + "\"")
-      // }
-    }
-
     // Allocate data structures needed in evaluate
     bl_.resize(nx_+m_);
     bu_.resize(nx_+m_);
@@ -425,14 +336,39 @@ namespace casadi {
     n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
   }
 
-  void SnoptInterface::reset() {
-  }
-
   void SnoptInterface::setQPOptions() {
   }
 
-  void SnoptInterface::passOptions() {
-  }
+  void SnoptInterface::passOptions(snoptProblemC &probC) {
+    for (OptionsMap::const_iterator it = optionsmap_.begin(); it != optionsmap_.end(); it++) {
+      int Error = 0;
+      const std::string & snopt_name = it->second.second;
+      if (hasSetOption(it->first)) {
+        switch (it->second.first) {
+          case OT_INTEGER: {
+            int value = getOption(it->first);
+            Error = probC.setIntParameter(snopt_name.c_str(), value);
+          }; break;
+          case OT_REAL: {
+            double value = getOption(it->first);
+            Error = probC.setRealParameter(snopt_name.c_str(), value);
+          }; break;
+          case OT_STRING: {
+            std::string value = getOption(it->first);
+            assert(value.size() <= 8);
+            value.append(8-value.size(), ' ');
+            std::string buffer = snopt_name;
+            buffer.append(" = ");
+            buffer.append(value);
+            Error = probC.setParameter(buffer.c_str());
+            }; break;
+          default:
+            casadi_error("Unknown type " << it->second.first);
+        } // switch (it->second.first)
+        casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"");
+      } //  if (hasSetOption(it->first))
+    } // for()
+  } // passOptions()
 
   std::string SnoptInterface::formatStatus(int status) const {
     if (status_.find(status) == status_.end()) {
@@ -462,8 +398,6 @@ namespace casadi {
       iterations["qp_num_iter"] = std::vector<int>();
       stats_["iterations"] = iterations;
     }
-
-    std::string start = getOption("_start");
 
     // Evaluate gradF and jacG at initial value
     if (!jacG_.isNull()) {
@@ -498,22 +432,15 @@ namespace casadi {
       nlp_.evaluate();
     }
 
-    int n = nx_;
-    int nea = A_structure_.size();
-    double ObjAdd = 0;
-
-    // Problem name
-    std::string prob = "  CasADi";
-
-    // Obtain sparsity pattern of A (fortan is Index-1 based)
+    // Obtain sparsity pattern of A (Fortran is Index-1 based, but the C++ wrappers are Index-0)
     std::vector<int> row(A_structure_.size());
     for (int k = 0; k < A_structure_.size(); ++k) {
-      row[k] = 1+A_structure_.row()[k];
+      row[k] = A_structure_.row()[k];
     }
 
     std::vector<int> col(nx_+1);
     for (int k = 0; k < nx_+1; ++k) {
-      col[k] = 1+A_structure_.colind()[k];
+      col[k] = A_structure_.colind()[k];
     }
 
     // Obtain initial guess and bounds through the mapping
@@ -542,14 +469,9 @@ namespace casadi {
       bu_.back() = 1e20;  // std::numeric_limits<double>::infinity();
     }
 
-    int nS = 0;
-    int info = 0;
-
-    // Outputs
-    int miniw = 0, minrw = 0, mincw = 0;
-    int nInf = 0;
-    double Obj = 0;
-    double sInf = 0;
+    int n = nx_;
+    int nea = A_structure_.size();
+    double ObjAdd = 0;
 
     casadi_assert(m_ > 0);
     casadi_assert(n > 0);
@@ -562,15 +484,10 @@ namespace casadi {
     casadi_assert(bu_.size() == n+m_);
     casadi_assert(pi_.size() == m_);
     casadi_assert(x_.size() == n+m_);
-    casadi_assert(col.at(0) == 1);
-    casadi_assert(col.at(n) == nea+1);
+    casadi_assert(col.at(0) == 0);
+    casadi_assert(col.at(n) == nea);
 
     // Pointer magic, courtesy of Greg
-    int iulen = 8;
-    std::vector<int> iu(iulen);
-    SnoptInterface* source = this;
-    memcpy(&(iu[0]), &source, sizeof(SnoptInterface*));
-
     casadi_assert_message(!jacF_.isNull(), "blaasssshc");
 
     if (monitored("setup_nlp")) {
@@ -586,17 +503,42 @@ namespace casadi {
       std::cout << "bu_:" << bu_ << std::endl;
     }
 
+    // Outputs
+    double Obj = 0; // TODO(Greg): get this from snopt
+
+    if (getOption("_summary"))
+        summaryOn();
+    else
+        summaryOff();
+    snoptProblemC snoptProbC = snoptProblemC();
+    if (hasSetOption("_specs_file")) {
+        std::cout << "specs file!!!!!! \"" << getOption("_specs_file") << "\"" << std::endl;
+        std::string specs_file = getOption("_specs_file");
+        snoptProbC.setSpecsFile(specs_file.c_str());
+    }
+    if (hasSetOption("_print_file")) {
+        std::string print_file = getOption("_print_file");
+        snoptProbC.setPrintFile(print_file.c_str());
+    }
+
+    snoptProbC.setProblemSize(m_, nx_, nnCon_, nnJac_, nnObj_);
+    snoptProbC.setObjective(iObj_, ObjAdd);
+    snoptProbC.setJ( nea, getPtr(A_data_), getPtr(row), getPtr(col) );
+    snoptProbC.setX( getPtr(bl_), getPtr(bu_), getPtr(x_), getPtr(pi_), getPtr(rc_), getPtr(hs_) );
+    snoptProbC.setUserFun( userfunPtr );
+    snoptProbC.setSTOP( snStopPtr );
+    passOptions(snoptProbC);
+
+    // user data
+    int iulen = 8;
+    std::vector<int> iu(iulen);
+    SnoptInterface* source = this;
+    memcpy(&(iu[0]), &source, sizeof(SnoptInterface*));
+    snoptProbC.setUserI( getPtr(iu), iulen );
+
     // Run SNOPT
     double time0 = clock();
-    snoptC(start, &m_, &n, &nea,
-           &nnCon_, &nnObj_, &nnJac_, &iObj_, &ObjAdd,
-           prob, userfunPtr, snStopPtr,
-           A_data_, row, col, bl_, bu_,
-           // Initial values
-           getPtr(hs_), getPtr(x_), getPtr(pi_), getPtr(rc_),
-           // Outputs
-           &info, &mincw, &miniw, &minrw, &nS, &nInf, &sInf, &Obj,
-           iu);
+    int info = snoptProbC.solve( getOptionEnumValue("_start") );
     t_mainloop_ = static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
 
     stats_["return_status"] = info;
@@ -617,6 +559,14 @@ namespace casadi {
       // mul_no_alloc
     }
 
+    // todo(Greg): get these from snopt
+    // we overwrite F and G for now because the current snopt interface
+    // doesn't provide F, and the above comment suggests that G is wrong
+    nlp_.setInput(output(NLP_SOLVER_X), NL_X);
+    nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+    nlp_.evaluate();
+    setOutput(nlp_.output(NL_F), NLP_SOLVER_F);
+    setOutput(nlp_.output(NL_G), NLP_SOLVER_G);
 
     // print timing information
     // save state
@@ -815,7 +765,7 @@ namespace casadi {
       int ne, int nlocJ, int* locJ, int* indJ, double* Jcol, int negCon,
       double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
       double* yCon, double* pi, double* rc, double* rg, double* x,
-      double*  cu, int lencu, int* iu, int leniu, double* ru, int lenru,
+      char*   cu, int lencu, int* iu, int leniu, double* ru, int lenru,
       char*   cw, int lencw,  int* iw, int leniw, double* rw, int lenrw) {
     try {
       n_iter_+=1;
@@ -882,7 +832,7 @@ namespace casadi {
     int* ne, int* nlocJ, int* locJ, int* indJ, double* Jcol, int* negCon,
     double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
     double* yCon, double* pi, double* rc, double* rg, double* x,
-    double*  cu, int * lencu, int* iu, int* leniu, double* ru, int *lenru,
+    char*   cu, int * lencu, int* iu, int* leniu, double* ru, int *lenru,
     char*   cw, int* lencw,  int* iw, int *leniw, double* rw, int* lenrw) {
     SnoptInterface* interface;  // = reinterpret_cast<SnoptInterface*>(iu);
     memcpy(&interface, &(iu[0]), sizeof(SnoptInterface*));
@@ -898,173 +848,4 @@ namespace casadi {
      cu, *lencu, iu, *leniu, ru, *lenru,
     cw, *lencw,  iw, *leniw, rw, *lenrw);
   }
-
-  void SnoptInterface::snMemb(int *INFO, const int *m_, const int *nx_,
-                             const int *neA, const int * negCon, const int * nnCon_,
-                             const int *nnJac_, const int *nnObj_,
-                             int *mincw, int *miniw, int *minrw) {
-      int clen = snopt_cw_.size()/8;
-      int ilen = snopt_iw_.size();
-      int rlen = snopt_rw_.size();
-      snmemb_(INFO, m_, nx_, neA, negCon, nnCon_, nnJac_, nnObj_,
-              mincw, miniw, minrw,
-              getPtr(snopt_cw_), &clen,
-              getPtr(snopt_iw_), &ilen,
-              getPtr(snopt_rw_), &rlen,
-              clen*8);
-      //snopt_memb(INFO, m_, nx_, neA, negCon, nnCon_, nnJac_, nnObj_,
-      //           mincw, miniw, minrw,
-      //           getPtr(snopt_cw_), &clen,
-      //           getPtr(snopt_iw_), &ilen,
-      //           getPtr(snopt_rw_), &rlen);
-  }
-  void SnoptInterface::snInit(int iPrint, int iSumm) {
-      int clen = snopt_cw_.size()/8;
-      int ilen = snopt_iw_.size();
-      int rlen = snopt_rw_.size();
-      sninit_(&iPrint, &iSumm,
-              getPtr(snopt_cw_), &clen,
-              getPtr(snopt_iw_), &ilen,
-              getPtr(snopt_rw_), &rlen,
-              clen*8);
-      //snopt_init(&iPrint, &iSumm,
-      //           getPtr(snopt_cw_), &clen,
-      //           getPtr(snopt_iw_), &ilen,
-      //           getPtr(snopt_rw_), &rlen);
-  }
-
-  void SnoptInterface::snSeti(const std::string &snopt_name, int value) {
-      int bufferlen = snopt_name.size();
-      int clen = snopt_cw_.size()/8;
-      int ilen = snopt_iw_.size();
-      int rlen = snopt_rw_.size();
-      int iSumm = getOption("_isumm");
-      int iPrint = getOption("_iprint");
-      int Error = 0;
-      snseti_(snopt_name.c_str(), &value, &iPrint, &iSumm, &Error,
-              getPtr(snopt_cw_), &clen,
-              getPtr(snopt_iw_), &ilen,
-              getPtr(snopt_rw_), &rlen,
-              bufferlen, clen*8);
-      //snopt_seti(snopt_name.c_str(), &bufferlen, &value, &iPrint, &iSumm, &Error,
-      //           getPtr(snopt_cw_), &clen,
-      //           getPtr(snopt_iw_), &ilen,
-      //           getPtr(snopt_rw_), &rlen);
-      casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
-  }
-
-  void SnoptInterface::snSetr(const std::string &snopt_name, double value) {
-      int bufferlen = snopt_name.size();
-      int clen = snopt_cw_.size()/8;
-      int ilen = snopt_iw_.size();
-      int rlen = snopt_rw_.size();
-      int iSumm = getOption("_isumm");
-      int iPrint = getOption("_iprint");
-      int Error = 0;
-      snsetr_(snopt_name.c_str(), &value, &iPrint, &iSumm, &Error,
-              getPtr(snopt_cw_), &clen,
-              getPtr(snopt_iw_), &ilen,
-              getPtr(snopt_rw_), &rlen,
-              bufferlen, clen*8);
-      //snopt_setr(snopt_name.c_str(), &bufferlen, &value, &iPrint, &iSumm, &Error,
-      //           getPtr(snopt_cw_), &clen,
-      //           getPtr(snopt_iw_), &ilen,
-      //           getPtr(snopt_rw_), &rlen);
-      casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
-  }
-
-  void SnoptInterface::snSet(const std::string &snopt_name, const std::string &value0) {
-      std::string value = value0;
-      assert(value.size() <= 8);
-      value.append(8-value.size(), ' ');
-      std::string buffer = snopt_name;
-      buffer.append(" = ");
-      buffer.append(value);
-      int bufferlen = buffer.size();
-
-      int clen = snopt_cw_.size()/8;
-      int ilen = snopt_iw_.size();
-      int rlen = snopt_rw_.size();
-      int iSumm = getOption("_isumm");
-      int iPrint = getOption("_iprint");
-      int Error = 0;
-
-      snset_(buffer.c_str(), &iPrint, &iSumm, &Error,
-             getPtr(snopt_cw_), &clen,
-             getPtr(snopt_iw_), &ilen,
-             getPtr(snopt_rw_), &rlen,
-             bufferlen, clen*8);
-      //snopt_set(buffer.c_str(), &bufferlen, &iPrint, &iSumm, &Error,
-      //          getPtr(snopt_cw_), &clen,
-      //          getPtr(snopt_iw_), &ilen,
-      //          getPtr(snopt_rw_), &rlen);
-
-      casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
-  }
-
-  void SnoptInterface::snoptC(
-         const std::string & start, const int * m_, const int * n, const int * neA,
-         const int *nnCon, const int *nnObj, const int *nnJac,
-         const int *iObj, const double *ObjAdd,
-         const std::string & prob, UserFun userfunPtr, snStop snStopPtr,
-         const std::vector<double>& A_data_, const std::vector<int>& row,
-         const std::vector<int>& col,
-         std::vector<double>& bl_, std::vector<double>& bu_,
-         // Initial values
-         int* hs, double* x, double* pi, double * rc,
-         // Outputs
-         int *info, int* mincw, int* miniw, int* minrw, int * nS,
-         int* nInf, double* sInf, double* Obj,
-         std::vector<int>&iu) {
-      const int lenstart = start.size();
-      const int clen = snopt_cw_.size()/8;
-      const int rlen = snopt_rw_.size();
-      const int ilen = snopt_iw_.size();
-
-      const int iulen = iu.size();
-      const int nName = 1;
-
-      const int prob_len = prob.size();
-      casadi_assert_message(prob_len==8, "snopt bindings: problem name must be 8 chars, your name: "
-                            "\"" << prob << "\"");
-//      snopt_c(
-//        start.c_str(), &lenstart, m_, n, neA, &nName,
-//        nnCon, nnObj, nnJac, iObj, ObjAdd,
-//        prob.c_str(), userfunPtr,
-//        getPtr(A_data_), getPtr(row), getPtr(col), getPtr(bl_), getPtr(bu_),
-//        0,
-//        // Initial values
-//        getPtr(hs_), getPtr(x_), getPtr(pi_), getPtr(rc_),
-//        // Outputs
-//        info, mincw, miniw, minrw, nS, nInf, sInf, Obj,
-//        // Working spaces for usrfun
-//        getPtr(snopt_cw_), &clen,
-//        getPtr(iu), &iulen,
-//        getPtr(snopt_rw_), &rlen,
-//        // Working spaces for SNOPT
-//        getPtr(snopt_cw_), &clen,
-//        getPtr(snopt_iw_), &ilen,
-//        getPtr(snopt_rw_), &rlen);
-      snkerc_(
-          start.c_str(), m_, n, neA, &nName,
-          nnCon, nnObj, nnJac, iObj, ObjAdd,
-          prob.c_str(), userfunPtr, snlog_, snlog2_, sqlog_, snStopPtr,
-          getPtr(A_data_), getPtr(row), getPtr(col), getPtr(bl_), getPtr(bu_),
-          0,
-          // Initial values
-          getPtr(hs_), getPtr(x_), getPtr(pi_), getPtr(rc_),
-          // Outputs
-          info, mincw, miniw, minrw, nS, nInf, sInf, Obj,
-          // Working spaces for usrfun
-          getPtr(snopt_cw_), &clen,
-          getPtr(iu), &iulen,
-          getPtr(snopt_rw_), &rlen,
-          // Working spaces for SNOPT
-          getPtr(snopt_cw_), &clen,
-          getPtr(snopt_iw_), &ilen,
-          getPtr(snopt_rw_), &rlen,
-          lenstart, prob_len, 0,
-          clen*8, clen*8);
-  }
-
 }  // namespace casadi

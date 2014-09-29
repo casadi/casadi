@@ -25,7 +25,8 @@
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include "casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h"
-#include "wsnopt.hpp"
+#include "snopt.h"
+#include "snoptProblem.hpp"
 
 /** \defgroup plugin_NlpSolver_snopt
   SNOPT interface
@@ -56,9 +57,6 @@ namespace casadi {
     static NlpSolverInternal* creator(const Function& nlp)
     { return new SnoptInterface(nlp);}
 
-    // Reset solver
-    void reset();
-
     // (Re)initialize
     virtual void init();
 
@@ -79,14 +77,6 @@ namespace casadi {
 
     std::string formatStatus(int status) const;
 
-    /// Pass the supplied options to Snopt
-    void passOptions();
-
-    /// Work arrays for SNOPT
-    std::vector<char> snopt_cw_;
-    std::vector<int> snopt_iw_;
-    std::vector<double> snopt_rw_;
-
     void userfun(int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
                  double* x, double* fObj, double*gObj, double* fCon, double* gCon,
                  int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru);
@@ -100,8 +90,8 @@ namespace casadi {
         int ne, int nlocJ, int* locJ, int* indJ, double* Jcol, int negCon,
         double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
         double* yCon, double* pi, double* rc, double* rg, double* x,
-        double*  cu, int lencu, int* iu, int leniu, double* ru, int lenru,
-        char*   cw, int lencw,  int* iw, int leniw, double* rw, int lenrw);
+        char* cu, int lencu, int* iu, int leniu, double* ru, int lenru,
+        char* cw, int lencw, int* iw, int leniw, double* rw, int lenrw);
 
     int nnJac_;
     int nnObj_;
@@ -152,8 +142,8 @@ namespace casadi {
         int* ne, int* nlocJ, int* locJ, int* indJ, double* Jcol, int* negCon,
         double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
         double* yCon, double* pi, double* rc, double* rg, double* x,
-        double*  cu, int * lencu, int* iu, int* leniu, double* ru, int *lenru,
-        char*   cw, int* lencw,  int* iw, int *leniw, double* rw, int* lenrw);
+        char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru,
+        char* cw, int* lencw, int* iw, int *leniw, double* rw, int* lenrw);
 
     typedef std::map< std::string, std::pair< opt_type, std::string> > OptionsMap;
 
@@ -168,27 +158,8 @@ namespace casadi {
     static const std::string meta_doc;
 
   private:
-      void snInit(int iPrint, int iSumm);
-      void snSeti(const std::string &snopt_name, int value);
-      void snSetr(const std::string &snopt_name, double value);
-      void snSet(const std::string &snopt_name, const std::string &value);
-      void snMemb(int *INFO, const int *m_, const int *nx_,
-                  const int *neA, const int * negCon, const int * nnCon_,
-                  const int *nnJac_, const int *nnObj_,
-                  int *mincw, int *miniw, int *minrw);
-      void snoptC(
-        const std::string & start, const int * m_, const int * n, const int * neA,
-        const int *nnCon, const int *nnObj, const int *nnJac, const int *iObj, const double *ObjAdd,
-        const std::string & prob, UserFun userfunPtr, snStop snStopPtr,
-        const std::vector<double>& A_data_, const std::vector<int>& row,
-        const std::vector<int>& col,
-        std::vector<double>& bl_, std::vector<double>& bu_,
-        // Initial values
-        int* hs, double* x, double* pi, double * rc,
-        // Outputs
-        int *info, int* mincw, int* miniw, int* minrw, int * nS,
-        int* nInf, double* sInf, double* Obj,
-        std::vector<int>&iu);
+      /// Pass the supplied options to Snopt
+      void passOptions(snoptProblemC &probC);
 
       // Accumulated time in last evaluate():
       double t_eval_grad_f_; // time spent in eval_grad_f
