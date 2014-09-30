@@ -8,22 +8,22 @@ if(PRECOND_TEST)
 endif()
 
 # SUNDIALS commons
-casadi_library(casadi_sundials_interface sundials_interface.hpp sundials_interface.cpp)
-target_link_libraries(casadi_sundials_interface ${SUNDIALS_LIBRARIES})
+casadi_library(casadi_sundials_common sundials_interface.hpp sundials_interface.cpp)
+target_link_libraries(casadi_sundials_common ${SUNDIALS_LIBRARIES})
 
 # CVODES
 casadi_plugin(Integrator cvodes
   cvodes_interface.hpp    cvodes_interface.cpp
   cvodes_interface_meta.cpp
   )
-casadi_plugin_link_libraries(Integrator cvodes casadi_sundials_interface)
+casadi_plugin_link_libraries(Integrator cvodes casadi_sundials_common)
 
 # IDAS
 casadi_plugin(Integrator idas
   idas_interface.hpp      idas_interface.cpp
   idas_interface_meta.cpp
   )
-casadi_plugin_link_libraries(Integrator idas casadi_sundials_interface)
+casadi_plugin_link_libraries(Integrator idas casadi_sundials_common)
 
 # KINSOL
 casadi_plugin(ImplicitFunction kinsol 

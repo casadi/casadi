@@ -23,7 +23,7 @@
 #ifndef CASADI_SUNDIALS_INTERFACE_HPP
 #define CASADI_SUNDIALS_INTERFACE_HPP
 
-#include <casadi/interfaces/sundials/casadi_sundials_interface_export.h>
+#include <casadi/interfaces/sundials/casadi_sundials_common_export.h>
 #include "casadi/core/function/integrator_internal.hpp"
 
 #include <nvector/nvector_serial.h>
@@ -34,7 +34,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
-class CASADI_SUNDIALS_INTERFACE_EXPORT SundialsInterface : public IntegratorInternal {
+class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public IntegratorInternal {
 public:
   /** \brief  Constructor */
   SundialsInterface(const Function& f, const Function& g);
