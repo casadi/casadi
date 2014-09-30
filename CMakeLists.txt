@@ -363,6 +363,7 @@ if(WITH_SUNDIALS)
     set(SUNDIALS_FOUND ON)
   else()
     # try to find system sundials
+    add_definitions(-DWITH_SYSTEM_SUNDIALS)
     find_package(SUNDIALS)
   endif()
 endif()
