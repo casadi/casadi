@@ -80,6 +80,35 @@ Description: CasADi core module (development files)
  This package contains the core library development files.
 
 
+Package: libcasadi-sundials-common2.0
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libcasadi-core2.0 (= ${binary:Version}),
+Description: numerical optimization and algorithmic differentiation framework
+ CasADi is a numerical optimization and algorithmic differentiation framework.
+ It can be used from C++ or Python.
+ .
+ It provides users with a set of building blocks that simplify the process of
+ implementing efficient gradient-based solvers for numerical optimization
+ problems in general, and simulation-based nonlinear programs (optimal control)
+ in particular. This can be done with a range of different methods including
+ direct collocation, direct multiple shooting and indirect methods.
+ .
+ CasADi is designed as a symbolic framework that allows construction of
+ large computational graphs made up of matrix-valued operations, and a
+ state-of-the-art framework for algorithmic differentiation (AD) - also known
+ as automatic differentiation - that operates on these computational graphs.
+ Also contained is a set of solvers and interfaces to third-party solvers for
+ nonlinear programming (NLP), quadratic programming (QP) and initial-value
+ problems in ordinary differential equations (ODE) or diffential-algebraic
+ equations (DAE). Other features of interest include generation of
+ self-contained C-code and symbolic import of models from the Modelica physical
+ modeling language and the AMPL algebraic modeling language.
+ .
+ This package contains a common library for the SUNDIALS plugins.
+
+
 Package: libcasadi-nlpsolver-ipopt
 Architecture: any
 Depends: ${shlibs:Depends},
@@ -317,7 +346,8 @@ Package: libcasadi-sundials
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         libcasadi-core2.0 (= ${binary:Version})
+         libcasadi-core2.0 (= ${binary:Version}),
+         libcasadi-sundials-common2.0 (= ${binary:Version})
 Description: SUNDIALS integrators plugin for CasADi
  CasADi is a numerical optimization and algorithmic differentiation framework.
  It can be used from C++ or Python.
