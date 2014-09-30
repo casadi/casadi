@@ -20,11 +20,7 @@
  *
  */
 
-#include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/qpoases/qpoases_solver.hpp>
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/nonlinear_programming/nlp_qp_solver.hpp>
-#include <casadi/nonlinear_programming/scpgen.hpp>
+#include <casadi/casadi.hpp>
 
 #include <iomanip>
 #include <ctime>
@@ -335,7 +331,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   cout << "Generated single-shooting NLP" << endl;
   
   // NLP Solver
-  nlp_solver_ = SCPgen(nlp);
+  nlp_solver_ = NlpSolver("scpgen",nlp);
   nlp_solver_.setOption("verbose",true);
   nlp_solver_.setOption("regularize",regularize);
   nlp_solver_.setOption("codegen",codegen);
@@ -361,8 +357,8 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
 
   Dictionary qp_solver_options;
   if(ipopt_as_qp_solver){
-    nlp_solver_.setOption("qp_solver",NLPQpSolver::creator);
-    qp_solver_options["nlp_solver"] = IpoptSolver::creator;
+    nlp_solver_.setOption("qp_solver","nlp");
+    qp_solver_options["nlp_solver"] = "ipopt";
     Dictionary nlp_solver_options;
     nlp_solver_options["tol"] = 1e-12;
     nlp_solver_options["print_level"] = 0;
@@ -370,7 +366,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     qp_solver_options["nlp_solver_options"] = nlp_solver_options;
     
   } else {
-    nlp_solver_.setOption("qp_solver",QPOasesSolver::creator);
+    nlp_solver_.setOption("qp_solver","qpoases");
     qp_solver_options["printLevel"] = "none";
   }
   nlp_solver_.setOption("qp_solver_options",qp_solver_options);
@@ -402,7 +398,7 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   nlp_solver_.setInput( spheight_, "ubg");
 
   clock_t time1 = clock();
-  nlp_solver_.solve();
+  nlp_solver_.evaluate();
   clock_t time2 = clock();
   
   // Solution statistics  

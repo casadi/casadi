@@ -90,7 +90,7 @@ endif()
 
 if(WITH_QPOASES AND WITH_IPOPT)
   add_executable(shallow_water shallow_water.cpp)
-  target_link_libraries(shallow_water casadi_qpoases_interface casadi_nonlinear_programming casadi_ipopt_interface casadi ${QPOASES_LIBRARIES} ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
+  target_link_libraries(shallow_water casadi_core)
 endif()
 
 if(WITH_QPOASES AND WITH_IPOPT)
