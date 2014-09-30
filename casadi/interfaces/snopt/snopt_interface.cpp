@@ -461,6 +461,7 @@ namespace casadi {
          it != intOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
           int value = getOption(it->first);
+          assert(it->first.size() <= 55);
           int Error = probC.setIntParameter(it->first.c_str(), value);
           // TODO(Greg): set this back to Error == 0
           casadi_assert_message(Error == Error, "snopt error setting option \"" + it->first + "\"");
@@ -469,6 +470,7 @@ namespace casadi {
          it != realOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
           double value = getOption(it->first);
+          assert(it->first.size() <= 55);
           int Error = probC.setRealParameter(it->first.c_str(), value);
           // TODO(Greg): set this back to Error == 0
           casadi_assert_message(Error == Error, "snopt error setting option \"" + it->first + "\"");
@@ -477,11 +479,10 @@ namespace casadi {
              it = strOpts_.begin(); it != strOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
           std::string value = getOption(it->first);
-          assert(value.size() <= 8);
-          value.append(8-value.size(), ' ');
           std::string buffer = it->first;
-          buffer.append(" = ");
+          buffer.append(" ");
           buffer.append(value);
+          assert(buffer.size() <= 72);
           int Error = probC.setParameter(buffer.c_str());
           // TODO(Greg): set this back to Error == 0
           casadi_assert_message(Error == Error, "snopt error setting option \"" + it->first + "\"");
