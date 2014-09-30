@@ -51,8 +51,11 @@ SundialsInterface::SundialsInterface(const Function& f, const Function& g)
             "Upper band-width of banded Jacobian (estimations)");
   addOption("lower_bandwidth",             OT_INTEGER,          GenericType(),
             "Lower band-width of banded Jacobian (estimations)");
+  // todo(Greg/Joel): add back banded solver
+  //addOption("linear_solver_type",          OT_STRING,           "dense",
+  //          "", "user_defined|dense|banded|iterative");
   addOption("linear_solver_type",          OT_STRING,           "dense",
-            "", "user_defined|dense|banded|iterative");
+            "", "user_defined|dense|iterative");
   addOption("iterative_solver",            OT_STRING,           "gmres",
             "", "gmres|bcgstab|tfqmr");
   addOption("pretype",                     OT_STRING,           "none",
@@ -100,8 +103,11 @@ SundialsInterface::SundialsInterface(const Function& f, const Function& g)
   addOption("lower_bandwidthB",            OT_INTEGER,          GenericType(),
             "lower band-width of banded jacobians for backward integration "
             "[default: equal to lower_bandwidth]");
+  // todo(Greg/Joel): add back banded dolver
+  //addOption("linear_solver_typeB",         OT_STRING,           GenericType(),
+  //          "", "user_defined|dense|banded|iterative");
   addOption("linear_solver_typeB",         OT_STRING,           GenericType(),
-            "", "user_defined|dense|banded|iterative");
+            "", "user_defined|dense|iterative");
   addOption("iterative_solverB",           OT_STRING,           GenericType(),
             "", "gmres|bcgstab|tfqmr");
   addOption("pretypeB",                    OT_STRING,           GenericType(),
