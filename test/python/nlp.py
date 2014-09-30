@@ -47,7 +47,7 @@ except:
 
 try:
   NlpSolver.loadPlugin("snopt")
-  solvers.append(("snopt",{"_verify_level": 3,"detect_linear": True,"_major_optimality_tolerance":1e-12,"_minor_feasibility_tolerance":1e-12,"_major_feasibility_tolerance":1e-12}))
+  solvers.append(("snopt",{"Verify level": 3,"detect_linear": True,"Major optimality tolerance":1e-12,"Minor feasibility tolerance":1e-12,"Major feasibility tolerance":1e-12}))
   print "Will test snopt"
 except:
   pass
@@ -1400,7 +1400,7 @@ class NLPtests(casadiTestCase):
     #solver.setOption("detect_linear",False)
     solver.setOption("verbose",True)
     solver.setOption("monitor",["setup_nlp","eval_nlp"])
-    solver.setOption("_verify_level",3)
+    solver.setOption("Verify level",3)
     #solver.setOption("_iteration_limit",1000)
 
     solver.init()

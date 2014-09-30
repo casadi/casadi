@@ -65,27 +65,144 @@ namespace casadi {
     addOption("print_time", OT_BOOLEAN, true, "print information about execution time");
 
     // options which are handled seperately
-    addOption("_start",  OT_STRING, "Cold",  "", "Cold|Basis|Warm");
-    addOption("_print_file",  OT_STRING);
-    addOption("_specs_file",  OT_STRING);
-    addOption("_summary", OT_BOOLEAN, true);
+    addOption("start",  OT_STRING, "Cold",  "", "Cold|Basis|Warm");
+    addOption("print file",  OT_STRING);
+    addOption("specs file",  OT_STRING);
+    addOption("summary", OT_BOOLEAN, true);
 
     // Snopt options
-    typedef std::pair<opt_type, std::string> optPair;
-    optionsmap_["_major_print_level"]     = optPair(OT_INTEGER, "Major print level");
-    optionsmap_["_minor_print_level"]     = optPair(OT_INTEGER, "Minor print level");
-    optionsmap_["_verify_level"]          = optPair(OT_INTEGER, "Verify level");
-    optionsmap_["_major_iteration_limit"] = optPair(OT_INTEGER, "Major iteration limit");
-    optionsmap_["_minor_iteration_limit"] = optPair(OT_INTEGER, "Minor iteration limit");
-    optionsmap_["_major_feasibility_tolerance"] = optPair(OT_REAL, "Major feasibility tolerance");
-    optionsmap_["_minor_feasibility_tolerance"] = optPair(OT_REAL, "Minor feasibility tolerance");
-    optionsmap_["_major_optimality_tolerance"]  = optPair(OT_REAL, "Major optimality tolerance");
-    optionsmap_["_scale_option"]          = optPair(OT_INTEGER, "Scale option");
+    typedef std::pair<std::string, std::string> spair;
+
+    // Printing
+    intOpts_["Major print level"] = "1 * 1-line major iteration log";
+    intOpts_["Minor print level"] = "1 * 1-line minor iteration log";
+    // special om["Print file"] = OT_S; //  * specified by subroutine snInit
+    // special om["Summary file"] = OT_S; //  * specified by subroutine snInit
+    intOpts_["Print frequency"] = "100 * minor iterations log on Print file";
+    intOpts_["Summary frequency"] = "100 * minor iterations log on Summary file";
+    strOpts_["Solution"] = spair("Yes|No|If Optimal|If Infeasible|If Unbounded",
+                                 "Yes * on the Print file");
+
+    // * Suppress options listing * options are normally listed
+    strOpts_["System information"] =
+        spair("No|Yes", "No * Yes prints more system information");
+
+    // * Problem specification
+    // special Minimize * (opposite of Maximize)
+
+    // * Feasible point * (alternative to Max or Min)
+    // Objective row 1 * has precedence over ObjRow (snOptA)
+    // Infinite bound 1.0e+20 *
+
+    // * Convergence Tolerances
+    realOpts_["Major feasibility tolerance"] = "1.0e-6 * target nonlinear constraint violation";
+    realOpts_["Major optimality tolerance"] = "1.0e-6 * target complementarity gap";
+    realOpts_["Minor feasibility tolerance"] = "1.0e-6 * for satisfying the QP bounds";
+
+    // * Derivative checking
+    intOpts_["Verify level"] = "0 * cheap check on gradients";
+    // Start objective check at col 1 * NOT ALLOWED IN snOptA
+    // Stop objective check at col n'1 * NOT ALLOWED IN snOptA
+    // Start constraint check at col 1 * NOT ALLOWED IN snOptA
+    // Stop constraint check at col n''1 * NOT ALLOWED IN snOptA
+
+    // * Scaling
+    intOpts_["Scale option"] = "1 * linear constraints and variables";
+    realOpts_["Scale tolerance"] = "0.9";
+    // SPECIAL // * Scale Print * default: scales are not printed
+
+    // * Other Tolerances
+    realOpts_["Crash tolerance"] = "0.1";
+    realOpts_["Linesearch tolerance"] = "0.9 * smaller for more accurate search";
+    realOpts_["Pivot tolerance"] = "3.7e-11 * e^2/3";
+
+    // * QP subproblems
+    strOpts_["QPSolver"] = spair("Cholesky|CG|QN", "Cholesky * default");
+    intOpts_["Crash option"] = "3 * first basis is essentially triangular";
+    realOpts_["Elastic weight"] = "1.0e+4 * used only during elastic mode";
+    intOpts_["Iterations limit"] = "10000 * or 20m if that is more";
+    intOpts_["Partial price"] = "1 * 10 for large LPs";
+
+    //* SQP method
+    // special * Cold start * has precedence over argument start
+    // special * Warm start * (alternative to a cold start)
+    intOpts_["Major iterations limit"] = "1000 * or m if that is more";
+    intOpts_["Minor iterations limit"] = "500 * or 3m if that is more";
+    realOpts_["Major step limit"] = "2.0";
+    intOpts_["Superbasics limit"] = "n1 + 1 * n1 = number of nonlinear variables";
+    intOpts_["Derivative level"] = "3";
+    // Derivative option 1 * ONLY FOR snOptA
+//?????    om["Derivative linesearch"] *
+
+    // * Nonderivative linesearch *
+    realOpts_["Function precision"] = "3.0e-13 * e^0.8 (almost full accuracy)";
+    realOpts_["Difference interval"] = "5.5e-7 * (Function precision)^1/2";
+    realOpts_["Central difference interval"] = "6.7e-5 * (Function precision)^1/3";
+    intOpts_["New superbasics limit"] = "99 * controls early termination of QPs";
+    // Objective row ObjRow * row number of objective in F(x)
+    realOpts_["Penalty parameter"] = "0.0 * initial penalty parameter";
+    intOpts_["Proximal point method"] = "1 * satisfies linear constraints near x0";
+    intOpts_["Reduced Hessian dimension"] = "2000 * or Superbasics limit if that is less";
+    realOpts_["Violation limit"] = "10.0 * unscaled constraint violation limit";
+    realOpts_["Unbounded step size"] = "1.0e+18";
+    realOpts_["Unbounded objective"] = "1.0e+15";
+
+    // * Hessian approximation
+    strOpts_["Hessian"] = spair("full memory|limited memory",
+                                "   full memory * default if n1 ≤ 75\n"
+                                "limited memory * default if n1 > 75");
+    intOpts_["Hessian frequency"] = "999999 * for full Hessian (never reset)";
+    intOpts_["Hessian updates"] = "10 * for limited memory Hessian";
+    intOpts_["Hessian flush"] = "999999 * no flushing";
+
+    // * Frequencies
+    intOpts_["Check frequency"] = "60 * test row residuals kAx − sk";
+    intOpts_["Expand frequency"] = "10000 * for anti-cycling procedure";
+    intOpts_["Factorization frequency"] = "50 * 100 for LPs";
+    intOpts_["Save frequency"] = "100 * save basis map";
+
+    // * LUSOL options
+    realOpts_["LU factor tolerance"] = "3.99 * for NP (100.0 for LP)";
+    realOpts_["LU update tolerance"] = "3.99 * for NP ( 10.0 for LP)";
+    realOpts_["LU singularity tolerance"] = "3.2e-11";
+    strOpts_["LU"] = spair("partial pivoting|rook pivoting|complete pivoting",
+                           "LU partial pivoting * default threshold pivoting strategy\n"
+                           "LU rook pivoting * threshold rook pivoting\n"
+                           "LU complete pivoting * threshold complete pivoting");
+
+    // * Basis files
+    intOpts_["Old basis file"] = "0 * input basis map";
+    intOpts_["New basis file"] = "0 * output basis map";
+    intOpts_["Backup basis file"] = "0 * output extra basis map";
+    intOpts_["Insert file"] = "0 * input in industry format";
+    intOpts_["Punch file"] = "0 * output Insert data";
+    intOpts_["Load file"] = "0 * input names and values";
+    intOpts_["Dump file"] = "0 * output Load data";
+    intOpts_["Solution file"] = "0 * different from printed solution";
+
+    // * Partitions of cw, iw, rw
+    // Total character workspace lencw *
+    // Total integer workspace leniw *
+    // Total real workspace lenrw *
+    // User character workspace 500 *
+    // User integer workspace 500 *
+    // User real workspace 500 *
+
+    // * Miscellaneous
+    intOpts_["Debug level"] = "0 * for developers";
+    strOpts_["Sticky parameters"] = spair("No|Yes", "No * Yes makes parameter values persist");
+    intOpts_["Timing level"] = "3 * print cpu times";
 
     // Add the Snopt Options
-    for (OptionsMap::const_iterator it = optionsmap_.begin(); it != optionsmap_.end(); it++) {
-      addOption(it->first, it->second.first, GenericType(), it->second.second);
-    }
+    for (std::map<std::string, std::string>::const_iterator it = intOpts_.begin();
+         it != intOpts_.end(); ++it)
+        addOption(it->first, OT_INTEGER, GenericType(), it->second);
+    for (std::map<std::string, std::string>::const_iterator it = realOpts_.begin();
+         it != realOpts_.end(); ++it)
+        addOption(it->first, OT_REAL, GenericType(), it->second);
+    for (std::map<std::string, std::pair<std::string, std::string> >::const_iterator
+             it = strOpts_.begin(); it != strOpts_.end(); ++it)
+        addOption(it->first, OT_STRING, GenericType(), it->second.second, it->second.first);
   }
 
   SnoptInterface::~SnoptInterface() {
@@ -340,35 +457,35 @@ namespace casadi {
   }
 
   void SnoptInterface::passOptions(snoptProblemC &probC) {
-    for (OptionsMap::const_iterator it = optionsmap_.begin(); it != optionsmap_.end(); it++) {
-      int Error = 0;
-      const std::string & snopt_name = it->second.second;
+    for (std::map<std::string, std::string>::const_iterator it = intOpts_.begin();
+         it != intOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
-        switch (it->second.first) {
-          case OT_INTEGER: {
-            int value = getOption(it->first);
-            Error = probC.setIntParameter(snopt_name.c_str(), value);
-          }; break;
-          case OT_REAL: {
-            double value = getOption(it->first);
-            Error = probC.setRealParameter(snopt_name.c_str(), value);
-          }; break;
-          case OT_STRING: {
-            std::string value = getOption(it->first);
-            assert(value.size() <= 8);
-            value.append(8-value.size(), ' ');
-            std::string buffer = snopt_name;
-            buffer.append(" = ");
-            buffer.append(value);
-            Error = probC.setParameter(buffer.c_str());
-            }; break;
-          default:
-            casadi_error("Unknown type " << it->second.first);
-        } // switch (it->second.first)
-        // TODO(Greg): set this back to Error == 0
-        casadi_assert_message(Error == Error, "snopt error setting option \"" + snopt_name + "\"");
-      } //  if (hasSetOption(it->first))
-    } // for()
+          int value = getOption(it->first);
+          int Error = probC.setIntParameter(it->first.c_str(), value);
+          // TODO(Greg): set this back to Error == 0
+          casadi_assert_message(Error == Error, "snopt error setting option \"" + it->first + "\"");
+      }
+    for (std::map<std::string, std::string>::const_iterator it = realOpts_.begin();
+         it != realOpts_.end(); ++it)
+      if (hasSetOption(it->first)) {
+          double value = getOption(it->first);
+          int Error = probC.setRealParameter(it->first.c_str(), value);
+          // TODO(Greg): set this back to Error == 0
+          casadi_assert_message(Error == Error, "snopt error setting option \"" + it->first + "\"");
+      }
+    for (std::map<std::string, std::pair<std::string, std::string> >::const_iterator
+             it = strOpts_.begin(); it != strOpts_.end(); ++it)
+      if (hasSetOption(it->first)) {
+          std::string value = getOption(it->first);
+          assert(value.size() <= 8);
+          value.append(8-value.size(), ' ');
+          std::string buffer = it->first;
+          buffer.append(" = ");
+          buffer.append(value);
+          int Error = probC.setParameter(buffer.c_str());
+          // TODO(Greg): set this back to Error == 0
+          casadi_assert_message(Error == Error, "snopt error setting option \"" + it->first + "\"");
+      }
   } // passOptions()
 
   std::string SnoptInterface::formatStatus(int status) const {
@@ -507,18 +624,17 @@ namespace casadi {
     // Outputs
     double Obj = 0; // TODO(Greg): get this from snopt
 
-    if (getOption("_summary"))
+    if (getOption("summary"))
         summaryOn();
     else
         summaryOff();
     snoptProblemC snoptProbC = snoptProblemC();
-    if (hasSetOption("_specs_file")) {
-        std::cout << "specs file!!!!!! \"" << getOption("_specs_file") << "\"" << std::endl;
-        std::string specs_file = getOption("_specs_file");
+    if (hasSetOption("specs file")) {
+        std::string specs_file = getOption("specs file");
         snoptProbC.setSpecsFile(specs_file.c_str());
     }
-    if (hasSetOption("_print_file")) {
-        std::string print_file = getOption("_print_file");
+    if (hasSetOption("print file")) {
+        std::string print_file = getOption("print file");
         snoptProbC.setPrintFile(print_file.c_str());
     }
 
@@ -539,7 +655,7 @@ namespace casadi {
 
     // Run SNOPT
     double time0 = clock();
-    int info = snoptProbC.solve(getOptionEnumValue("_start"));
+    int info = snoptProbC.solve(getOptionEnumValue("start"));
     t_mainloop_ = static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
 
     stats_["return_status"] = info;

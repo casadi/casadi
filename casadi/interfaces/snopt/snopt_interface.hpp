@@ -145,10 +145,6 @@ namespace casadi {
         char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru,
         char* cw, int* lencw, int* iw, int *leniw, double* rw, int* lenrw);
 
-    typedef std::map< std::string, std::pair< opt_type, std::string> > OptionsMap;
-
-    OptionsMap optionsmap_;
-
     // Matrix A has a linear objective row
     bool jacF_row_;
     // Matrix A has a dummy row
@@ -158,6 +154,11 @@ namespace casadi {
     static const std::string meta_doc;
 
   private:
+      // options
+      std::map<std::string, std::string> intOpts_;
+      std::map<std::string, std::string> realOpts_;
+      std::map<std::string, std::pair<std::string, std::string> > strOpts_;
+
       /// Pass the supplied options to Snopt
       void passOptions(snoptProblemC &probC);
 
