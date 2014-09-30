@@ -54,6 +54,7 @@ except:
 
 try:
   NlpSolver.loadPlugin("ipopt")
+  NlpSolver.loadPlugin("sqpmethod")
   qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12} }
   solvers.append(("sqpmethod",{"qp_solver": "nlp","qp_solver_options": qp_solver_options}))
   print "Will test sqpmethod"
@@ -62,6 +63,7 @@ except:
   
 try:
   NlpSolver.loadPlugin("ipopt")
+  NlpSolver.loadPlugin("stabilizedsqp")
   qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12, "print_level": 0, "print_time": False} }
   solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": "qp", "stabilized_qp_solver_options": {"qp_solver": "nlp", "qp_solver_options": qp_solver_options}}))
   print "Will test stabilizedsqp"
@@ -71,6 +73,7 @@ except:
 try:
   qp_solver_options = {}
   QpSolver.loadPlugin("sqic")
+  NlpSolver.loadPlugin("stabilizedsqp")
   solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": "qp", "stabilized_qp_solver_options": {"qp_solver": "sqic"}}))
   print "Will test stabilizedsqp"
 except:
