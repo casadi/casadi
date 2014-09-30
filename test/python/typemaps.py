@@ -946,5 +946,19 @@ class typemaptests(casadiTestCase):
 
     print if_else(0,a,a)
 
+  def test_vector_generic_return(self):
+
+    states = SX.sym("x",2)
+
+    ode = SXFunction([states],[states**2])
+    ode.init()
+
+    sol = Integrator("idas",ode);
+    a = sol.getOptionAllowed("linear_solver_type")
+    
+    self.assertTrue(isinstance(a,list))
+    for i in a:
+      self.assertTrue(isinstance(i,str))
+      
 if __name__ == '__main__':
     unittest.main()

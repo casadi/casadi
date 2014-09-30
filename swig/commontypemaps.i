@@ -133,6 +133,20 @@ if (!ret) {
 }
 }
 
+%typemap(out) std::vector< casadi::GenericType > {
+  PyObject* ret = PyList_New(0);
+  std::vector< casadi::GenericType > & in = $1;
+  for (int k=0 ; k < in.size(); ++k) {
+    PyObject* rete;
+    bool retv = meta< casadi::GenericType >::toPython(in[k],rete);
+    if (!retv) {
+      SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
+    }
+    PyList_Append(ret, rete);
+  }
+  $result = ret;
+}
+
 %typemap(out) const casadi::GenericType::Dictionary&  {
 bool ret=meta<  casadi::GenericType::Dictionary >::toPython(*$1,$result);
 if (!ret) {
@@ -142,6 +156,7 @@ if (!ret) {
 #endif // SWIGPYTHON
 
 %my_generic_const_typemap(PRECEDENCE_GENERICTYPE,casadi::GenericType)
+%my_generic_const_typemap(PRECEDENCE_GENERICTYPE,std::vector< casadi::GenericType >)
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(PRECEDENCE_DICTIONARY ,casadi::GenericType::Dictionary)
 #endif
