@@ -29,9 +29,9 @@ python_knownbugs: unittests_py_knownbugs examples_indoc_py examples_code_py user
 
 cpp: examples_indoc_cpp  examples_code_cpp
 
-unittests: unittests_py unittests_oct
+unittests: unittests_py
 
-unittests_knownbugs: unittests_py_knownbugs unittests_oct
+unittests_knownbugs: unittests_py_knownbugs
 
 unittests_py:
 ifdef MEMCHECK
@@ -46,7 +46,7 @@ unittests_py_knownbugs:
 
 examples: examples_indoc examples_code
 
-examples_indoc: examples_indoc_py examples_indoc_cpp examples_indoc_oct
+examples_indoc: examples_indoc_py examples_indoc_cpp
 
 examples_code: examples_code_py examples_code_cpp
 
