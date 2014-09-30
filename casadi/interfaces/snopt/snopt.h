@@ -1,4 +1,4 @@
-// Used with permission by the SNOPT devs
+// Used with permission from the SNOPT developers
 
 #ifndef SNOPT_H
 #define SNOPT_H

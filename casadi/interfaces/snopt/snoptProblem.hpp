@@ -1,3 +1,5 @@
+// Used with permission from the SNOPT developers
+
 #ifndef SNOPTPROBLEM_H
 #define SNOPTPROBLEM_H
 
