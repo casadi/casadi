@@ -215,6 +215,7 @@ class Integrationtests(casadiTestCase):
       for p_features, din, dout, rdin, rdout,  solutionin, solution, point, (tstart_, tend_) in variations(*tt):
         for Integrator, features, options in integrators:
           self.message(Integrator)
+          dummyIntegrator = c.Integrator(Integrator,c.SXFunction())
           if p_features[0] in features:
             g = Function()
             if len(rdin)>1:
@@ -238,11 +239,14 @@ class Integrationtests(casadiTestCase):
              
             def solveroptions(post=""):
               yield {"linear_solver_type" +post: "dense" }
-              #for it in itoptions(post):
-              #  d = {"linear_solver_type" +post: "iterative" }
-              #  d.update(it)
-              #  yield d
-              #yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
+              allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
+              if "iterative" in allowedOpts:
+                  for it in itoptions(post):
+                      d = {"linear_solver_type" +post: "iterative" }
+                      d.update(it)
+                      yield d
+              if "banded" in allowedOpts:
+                  yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
               yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
                 
             for a_options in solveroptions("B"):
@@ -326,6 +330,7 @@ class Integrationtests(casadiTestCase):
 
       for Integrator, features, options in integrators:
         self.message(Integrator)
+        dummyIntegrator = c.Integrator(Integrator,SXFunction())
         if p_features[0] in features:
           g = Function()
           if len(rdin)>1:
@@ -348,11 +353,14 @@ class Integrationtests(casadiTestCase):
            
           def solveroptions(post=""):
             yield {"linear_solver_type" +post: "dense" }
-            for it in itoptions(post):
-              d = {"linear_solver_type" +post: "iterative" }
-              d.update(it)
-              yield d
-            #yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
+            allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
+            if "iterative" in allowedOpts:
+                for it in itoptions(post):
+                    d = {"linear_solver_type" +post: "iterative" }
+                    d.update(it)
+                    yield d
+            if "banded" in allowedOpts:
+                yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
             yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
               
           for a_options in solveroptions("B"):
