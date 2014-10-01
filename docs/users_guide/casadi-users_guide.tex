@@ -943,7 +943,7 @@ This might speed up the calculations significantly, but might also cause extra m
 
 \chapter{ODE/DAE integration and sensitivity analysis} \label{ch:integrators}
 \section{ODE/DAE formulation}
-The integrators interfaced with \CasADi assumes a DAE residual function of semi-implicit form with quadratures:
+The integrators interfaced with \CasADi assumes a DAE residual function of semi-explicit form with quadratures:
 \begin{subequations}
 \begin{align}
  \dot{x} &= f_{\text{ode}}(t,x,z,p), \qquad x(0) = x_0 \\
