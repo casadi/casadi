@@ -26,7 +26,6 @@
 #include <fstream>
 #include <sstream>
 //#include <dlfcn.h>
-#include <cassert>
 
 namespace casadi {
 

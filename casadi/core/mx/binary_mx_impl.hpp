@@ -27,7 +27,6 @@
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
-#include <cassert>
 #include "../matrix/sparsity_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"

@@ -21,7 +21,6 @@
  */
 
 #include "lr_dle_internal.hpp"
-#include <cassert>
 #include "../std_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../mx/mx_tools.hpp"
@@ -140,7 +139,7 @@ namespace casadi {
                             << V_.size1() << ")" << ".");
     }
 
-    assert(nrhs_==1);
+    casadi_assert(nrhs_==1);
 
     // Allocate inputs
     setNumInputs(LR_DLE_NUM_IN);

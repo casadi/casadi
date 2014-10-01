@@ -27,7 +27,6 @@
 
 #include <stack>
 #include <typeinfo>
-#include <cassert>
 
 using namespace std;
 

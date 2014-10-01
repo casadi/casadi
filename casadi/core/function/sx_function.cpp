@@ -21,7 +21,6 @@
  */
 
 #include "sx_function_internal.hpp"
-#include <cassert>
 #include <limits>
 #include <stack>
 #include <deque>
