@@ -21,7 +21,6 @@
  */
 
 #include "constant_mx.hpp"
-#include <cassert>
 #include <vector>
 #include <algorithm>
 #include "../std_vector_tools.hpp"

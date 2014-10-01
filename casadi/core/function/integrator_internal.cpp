@@ -21,7 +21,6 @@
  */
 
 #include "integrator_internal.hpp"
-#include <cassert>
 #include "../std_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../mx/mx_tools.hpp"

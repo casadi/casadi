@@ -23,7 +23,6 @@
 #include "mx_node.hpp"
 #include "mx_tools.hpp"
 #include "../std_vector_tools.hpp"
-#include <cassert>
 #include <typeinfo>
 #include "../matrix/matrix_tools.hpp"
 #include "transpose.hpp"

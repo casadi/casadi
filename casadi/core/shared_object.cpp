@@ -25,7 +25,6 @@
 #include "weak_ref.hpp"
 
 #include <typeinfo>
-#include <cassert>
 
 using namespace std;
 namespace casadi {
@@ -118,7 +117,9 @@ namespace casadi {
   }
 
   SharedObjectNode::~SharedObjectNode() {
-    assert(count==0);
+    casadi_assert_warning(count==0,
+                          "Reference counting failure. "
+                          "Possible cause: Circular dependency in user code.");
     if (weak_ref_!=0) {
       weak_ref_->kill();
       delete weak_ref_;

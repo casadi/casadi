@@ -22,7 +22,6 @@
 
 #include "lr_dle_solver.hpp"
 #include "lr_dle_internal.hpp"
-#include <cassert>
 
 using namespace std;
 namespace casadi {

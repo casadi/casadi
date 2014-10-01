@@ -24,7 +24,6 @@
 #define CASADI_CASADI_TYPES_HPP
 
 #include <climits>
-#include <cassert>
 #include <vector>
 #include <utility>
 

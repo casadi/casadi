@@ -22,7 +22,6 @@
 
 #include "lr_dple_solver.hpp"
 #include "lr_dple_internal.hpp"
-#include <cassert>
 
 using namespace std;
 namespace casadi {

@@ -23,7 +23,6 @@
 #include "sx_node.hpp"
 #include <limits>
 #include <typeinfo>
-#include <cassert>
 
 using namespace std;
 namespace casadi {
@@ -35,7 +34,9 @@ namespace casadi {
 
   SXNode::~SXNode() {
     // Make sure that this is there are no scalar expressions pointing to it when it is destroyed
-    assert(count==0);
+    casadi_assert_warning(count==0,
+                          "Reference counting failure. "
+                          "Possible cause: Circular dependency in user code.");
   }
 
   double SXNode::getValue() const {

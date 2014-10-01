@@ -22,7 +22,6 @@
 
 #include "cle_solver.hpp"
 #include "cle_internal.hpp"
-#include <cassert>
 
 using namespace std;
 namespace casadi {
