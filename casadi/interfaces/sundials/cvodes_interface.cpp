@@ -1815,11 +1815,6 @@ namespace casadi {
     int flag = CVDenseB(mem_, whichB_, nrx_);
     if (flag!=CV_SUCCESS) cvodes_error("CVDenseB", flag);
     if (exact_jacobianB_) {
-      // Generate jacobians if not already provided
-      if (jacB_.isNull()) jacB_ = getJac();
-      if (!jacB_.isInit()) jacB_.init();
-
-      // Pass to CVodes
       flag = CVDlsSetDenseJacFnB(mem_, whichB_, djacB_wrapper);
       if (flag!=CV_SUCCESS) cvodes_error("CVDlsSetDenseJacFnB", flag);
     }

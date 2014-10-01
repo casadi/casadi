@@ -2057,11 +2057,6 @@ namespace casadi {
     int flag = IDADense(mem_, nx_+nz_);
     if (flag != IDA_SUCCESS) idas_error("IDADense", flag);
     if (exact_jacobian_) {
-      // Generate jacobians if not already provided
-      if (jac_.isNull()) jac_ = getJac();
-      if (!jac_.isInit()) jac_.init();
-
-      // Pass to IDA
       flag = IDADlsSetDenseJacFn(mem_, djac_wrapper);
       if (flag!=IDA_SUCCESS) idas_error("IDADlsSetDenseJacFn", flag);
     }
