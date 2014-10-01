@@ -170,12 +170,14 @@ def PyFunction(obj,inputs,outputs):
 %template(PrintIOSchemeVectorSX)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> > >;
 %template(PrintIOSchemeVectorD)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<double> > >;
 %template(PrintIOSchemeVectorSparsity)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Sparsity> >;
+%template(PrintIOSchemeVectorSparsityVector)        casadi::PrintableObject<casadi::IOSchemeVector< std::vector< casadi::Sparsity> > >;
 %include "casadi/core/function/io_scheme_vector.hpp"
 
 %template(IOSchemeVectorMX) casadi::IOSchemeVector< casadi::MX >;
 %template(IOSchemeVectorSX) casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> >;
 %template(IOSchemeVectorD) casadi::IOSchemeVector< casadi::Matrix<double> >;
 %template(IOSchemeVectorSparsity) casadi::IOSchemeVector< casadi::Sparsity >;
+%template(IOSchemeVectorSparsityVector) casadi::IOSchemeVector< std::vector< casadi::Sparsity > >;
 #ifdef SWIGPYTHON
 %extend casadi::IOSchemeVector< casadi::MX > {
 %pythoncode %{
