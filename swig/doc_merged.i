@@ -93317,8 +93317,6 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::SnoptInterface::reset "[INTERNAL] ";
-
 %feature("docstring") casadi::SnoptInterface::setNumInputs "[INTERNAL]  Set
 the number of function inputs.
 
@@ -93617,11 +93615,6 @@ Generate the sparsity of a Jacobian block.
 structure recognition.
 
 Decide which ad_mode to take ";
-
-%feature("docstring") casadi::SnoptInterface::passOptions "[INTERNAL]  Pass
-the supplied options to Snopt.
-
-";
 
 %feature("docstring") casadi::SnoptInterface::getHessLag "[INTERNAL]  Get
 or generate a function to calculate the Hessian of the Lagrangian function.
@@ -94442,6 +94435,204 @@ the Hessian of the Lagrangian function.
 symbolically, MX type.
 
 ";
+
+
+// File: classsnoptProblem.xml
+%feature("docstring") snoptProblem::setParameter "";
+
+%feature("docstring") snoptProblem::setLog "";
+
+%feature("docstring") snoptProblem::getIntParameter "";
+
+%feature("docstring") snoptProblem::setSpecsFile "";
+
+%feature("docstring") snoptProblem::setIntParameter "";
+
+%feature("docstring") snoptProblem::getRealParameter "";
+
+%feature("docstring") snoptProblem::setPrintFile "";
+
+%feature("docstring") snoptProblem::getParameter "";
+
+%feature("docstring") snoptProblem::setUserR "";
+
+%feature("docstring") snoptProblem::setSTOP "";
+
+%feature("docstring") snoptProblem::setRealParameter "";
+
+%feature("docstring") snoptProblem::setUserI "";
+
+%feature("docstring") snoptProblem::setProbName "";
+
+%feature("docstring") snoptProblem::solve "";
+
+%feature("docstring") snoptProblem::setUserspace "";
+
+%feature("docstring") snoptProblem "C++ includes: snoptProblem.hpp ";
+
+
+// File: classsnoptProblemA.xml
+%feature("docstring") snoptProblemA::getIntParameter "";
+
+%feature("docstring") snoptProblemA::computeJac "";
+
+%feature("docstring") snoptProblemA::snoptProblemA "";
+
+%feature("docstring") snoptProblemA::getRealParameter "";
+
+%feature("docstring") snoptProblemA::setSpecsFile "";
+
+%feature("docstring") snoptProblemA::setRealParameter "";
+
+%feature("docstring") snoptProblemA::setWorkspace "";
+
+%feature("docstring") snoptProblemA::setNeG "";
+
+%feature("docstring") snoptProblemA::setNeA "";
+
+%feature("docstring") snoptProblemA::setSTOP "";
+
+%feature("docstring") snoptProblemA::setUserspace "";
+
+%feature("docstring") snoptProblemA::setIntParameter "";
+
+%feature("docstring") snoptProblemA::setG "";
+
+%feature("docstring") snoptProblemA::setF "";
+
+%feature("docstring") snoptProblemA::~snoptProblemA "";
+
+%feature("docstring") snoptProblemA::setPrintFile "";
+
+%feature("docstring") snoptProblemA::setA "";
+
+%feature("docstring") snoptProblemA::solve "";
+
+%feature("docstring") snoptProblemA "C++ includes: snoptProblem.hpp ";
+
+%feature("docstring") snoptProblemA::setX "";
+
+%feature("docstring") snoptProblemA::setUserFun "";
+
+%feature("docstring") snoptProblemA::getParameter "";
+
+%feature("docstring") snoptProblemA::setProblemSize "";
+
+%feature("docstring") snoptProblemA::setParameter "";
+
+%feature("docstring") snoptProblemA::setLog "";
+
+%feature("docstring") snoptProblemA::setUserI "";
+
+%feature("docstring") snoptProblemA::setObjective "";
+
+%feature("docstring") snoptProblemA::setUserR "";
+
+%feature("docstring") snoptProblemA::setProbName "";
+
+
+// File: classsnoptProblemB.xml
+%feature("docstring") snoptProblemB::setPrintFile "";
+
+%feature("docstring") snoptProblemB::getRealParameter "";
+
+%feature("docstring") snoptProblemB::setFuncon "";
+
+%feature("docstring") snoptProblemB::setParameter "";
+
+%feature("docstring") snoptProblemB::setObjective "";
+
+%feature("docstring") snoptProblemB::setWorkspace "";
+
+%feature("docstring") snoptProblemB::setSTOP "";
+
+%feature("docstring") snoptProblemB::getIntParameter "";
+
+%feature("docstring") snoptProblemB::setFunobj "";
+
+%feature("docstring") snoptProblemB::setUserspace "";
+
+%feature("docstring") snoptProblemB::snoptProblemB "";
+
+%feature("docstring") snoptProblemB::getParameter "";
+
+%feature("docstring") snoptProblemB::setUserFun "";
+
+%feature("docstring") snoptProblemB::setIntParameter "";
+
+%feature("docstring") snoptProblemB::setLog "";
+
+%feature("docstring") snoptProblemB::setUserI "";
+
+%feature("docstring") snoptProblemB::setJ "";
+
+%feature("docstring") snoptProblemB::setProbName "";
+
+%feature("docstring") snoptProblemB::setUserR "";
+
+%feature("docstring") snoptProblemB "C++ includes: snoptProblem.hpp ";
+
+%feature("docstring") snoptProblemB::setProblemSize "";
+
+%feature("docstring") snoptProblemB::setX "";
+
+%feature("docstring") snoptProblemB::setSpecsFile "";
+
+%feature("docstring") snoptProblemB::setRealParameter "";
+
+%feature("docstring") snoptProblemB::solve "";
+
+%feature("docstring") snoptProblemB::~snoptProblemB "";
+
+
+// File: classsnoptProblemC.xml
+%feature("docstring") snoptProblemC::setPrintFile "";
+
+%feature("docstring") snoptProblemC "C++ includes: snoptProblem.hpp ";
+
+%feature("docstring") snoptProblemC::getRealParameter "";
+
+%feature("docstring") snoptProblemC::setRealParameter "";
+
+%feature("docstring") snoptProblemC::solve "";
+
+%feature("docstring") snoptProblemC::setParameter "";
+
+%feature("docstring") snoptProblemC::setUserR "";
+
+%feature("docstring") snoptProblemC::getIntParameter "";
+
+%feature("docstring") snoptProblemC::getParameter "";
+
+%feature("docstring") snoptProblemC::snoptProblemC "";
+
+%feature("docstring") snoptProblemC::setUserspace "";
+
+%feature("docstring") snoptProblemC::setUserI "";
+
+%feature("docstring") snoptProblemC::setWorkspace "";
+
+%feature("docstring") snoptProblemC::setJ "";
+
+%feature("docstring") snoptProblemC::setProbName "";
+
+%feature("docstring") snoptProblemC::setSpecsFile "";
+
+%feature("docstring") snoptProblemC::setSTOP "";
+
+%feature("docstring") snoptProblemC::setX "";
+
+%feature("docstring") snoptProblemC::setUserFun "";
+
+%feature("docstring") snoptProblemC::~snoptProblemC "";
+
+%feature("docstring") snoptProblemC::setObjective "";
+
+%feature("docstring") snoptProblemC::setLog "";
+
+%feature("docstring") snoptProblemC::setProblemSize "";
+
+%feature("docstring") snoptProblemC::setIntParameter "";
 
 
 // File: classcasadi_1_1SOCPInputIOSchemeVector.xml
@@ -119107,25 +119298,8 @@ Calculate quadratic form AXA^T.
 
 %feature("docstring") casadi::norm_0_mul_nn "
 
->  int casadi::norm_0_mul_nn(const Matrix< DataType > &x, const Matrix< DataType > &y, std::vector< bool > &Bwork, std::vector< int > &Iwork)
-------------------------------------------------------------------------
-
 0-norm (nonzero count) of a Matrix-matrix product, no memory allocation
 mul(x, y)
-
-Parameters:
------------
-
-Bwork:  A boolean work vector that you must allocate Minimum size: y.size1()
-
-Iwork:  A integer work vector that you must allocate Minimum size:
-y.size1()+x.size2()+1
-
->  int casadi::norm_0_mul_nn(const Matrix< DataType > &B, const Matrix< DataType > &A, std::vector< bool > &Bwork, std::vector< int > &Iwork)
-------------------------------------------------------------------------
-[INTERNAL] 
-0-norm (nonzero count) of a Matrix-matrix product, no memory
-allocation mul(x, y)
 
 Parameters:
 -----------
@@ -123181,6 +123355,12 @@ This file does absolutely nothing but including all headers ";
 // File: snopt__interface__meta_8cpp.xml
 
 
+// File: snoptProblem_8hpp.xml
+%feature("docstring") summaryOn  "
+";
+%feature("docstring") summaryOff  "";
+
+
 // File: socp__solver_8cpp.xml
 
 
@@ -123452,28 +123632,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: wrapper_8hpp.xml
-
-
-// File: wsnopt_8hpp.xml
-%feature("docstring") snkerc_  "
-[INTERNAL] ";
-%feature("docstring") sqlog_  "[INTERNAL] ";
-
-%feature("docstring") sninit_  "[INTERNAL] ";
-
-%feature("docstring") snlog2_  "[INTERNAL] ";
-
-%feature("docstring") snseti_  "[INTERNAL] ";
-
-%feature("docstring") snsetr_  "[INTERNAL] ";
-
-%feature("docstring") snlog_  "[INTERNAL] ";
-
-%feature("docstring") snset_  "[INTERNAL] ";
-
-%feature("docstring") snoptc_  "[INTERNAL] ";
-
-%feature("docstring") snmemb_  "[INTERNAL] ";
 
 
 // File: wsqic_8cpp.xml
