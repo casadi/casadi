@@ -201,6 +201,12 @@ namespace casadi {
     /// Number of non-zeros on the diagonal
     int sizeD() const;
 
+    /** \brief Upper half-bandwidth */
+    int bandwidthU() const;
+
+    /** \brief Lower half-bandwidth */
+    int bandwidthL() const;
+
     /// Shape
     std::pair<int, int> shape() const;
 

@@ -3698,6 +3698,28 @@ namespace casadi {
     return ret;
   }
 
+  int SparsityInternal::bandwidthU() const {
+    int bw = 0;
+    for (int cc=0; cc<ncol_; ++cc) {
+      if (colind_[cc] != colind_[cc+1]) { // if there are any elements of the column
+        int rr = row_[colind_[cc]];
+        bw = std::max(bw,cc-rr);
+      }
+    }
+    return bw;
+  }
+
+  int SparsityInternal::bandwidthL() const {
+    int bw = 0;
+    for (int cc=0; cc<ncol_; ++cc) {
+      if (colind_[cc] != colind_[cc+1]) { // if there are any elements of the column
+        int rr = row_[colind_[cc+1]-1];
+        bw = std::max(bw,rr-cc);
+      }
+    }
+    return bw;
+  }
+
 } // namespace casadi
 
 

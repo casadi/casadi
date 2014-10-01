@@ -148,16 +148,16 @@ namespace casadi {
 
     /** \brief Create a single band in a square sparsity pattern
      *
-     * sp_band(n, 0) is equivalent to sp_diag(n) \n
-     * sp_band(n, -1) has a band below the diagonal \n
+     * band(n, 0) is equivalent to diag(n) \n
+     * band(n, -1) has a band below the diagonal \n
      * \param p indicate
      **/
     static Sparsity band(int n, int p);
 
     /** \brief Create banded square sparsity pattern
      *
-     * sp_band(n, 0) is equivalent to sp_diag(n) \n
-     * sp_band(n, 1) is tri-diagonal matrix \n
+     * band(n, 0) is equivalent to diag(n) \n
+     * band(n, 1) is tri-diagonal matrix \n
      **/
     static Sparsity banded(int n, int p);
 
@@ -276,6 +276,12 @@ namespace casadi {
 
     /** \brief Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i */
     int sizeD() const;
+
+    /** \brief Upper half-bandwidth */
+    int bandwidthU() const;
+
+    /** \brief Lower half-bandwidth */
+    int bandwidthL() const;
 
 #ifndef SWIG
     /** \brief  Get the shape */

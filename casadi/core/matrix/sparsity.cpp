@@ -1069,4 +1069,12 @@ namespace casadi {
     (*this)->printCompact(stream);
   }
 
+  int Sparsity::bandwidthU() const {
+    return (*this)->bandwidthU();
+  }
+
+  int Sparsity::bandwidthL() const {
+    return (*this)->bandwidthL();
+  }
+
 } // namespace casadi
