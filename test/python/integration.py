@@ -245,7 +245,6 @@ class Integrationtests(casadiTestCase):
             def solveroptions(post=""):
               yield {"linear_solver_type" +post: "dense" }
               allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
-              allowedOpts.remove("banded") # disabled, see #1231
               allowedOpts.remove("iterative") # disabled, see #1231
               if "iterative" in allowedOpts:
                   for it in itoptions(post):
@@ -253,7 +252,7 @@ class Integrationtests(casadiTestCase):
                       d.update(it)
                       yield d
               if "banded" in allowedOpts:
-                  yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
+                  yield {"linear_solver_type" +post: "banded" }
               yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
                 
             for a_options in solveroptions("B"):
@@ -361,7 +360,6 @@ class Integrationtests(casadiTestCase):
           def solveroptions(post=""):
             yield {"linear_solver_type" +post: "dense" }
             allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
-            allowedOpts.remove("banded") # disabled, see #1231
             allowedOpts.remove("iterative")  # disabled, see #1231
             if "iterative" in allowedOpts:
                 for it in itoptions(post):
@@ -369,7 +367,7 @@ class Integrationtests(casadiTestCase):
                     d.update(it)
                     yield d
             if "banded" in allowedOpts:
-                yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
+                yield {"linear_solver_type" +post: "banded" }
             yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
               
           for a_options in solveroptions("B"):

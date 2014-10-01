@@ -3703,7 +3703,7 @@ namespace casadi {
     for (int cc=0; cc<ncol_; ++cc) {
       if (colind_[cc] != colind_[cc+1]) { // if there are any elements of the column
         int rr = row_[colind_[cc]];
-        bw = std::max(bw,cc-rr);
+        bw = std::max(bw, cc-rr);
       }
     }
     return bw;
@@ -3714,7 +3714,7 @@ namespace casadi {
     for (int cc=0; cc<ncol_; ++cc) {
       if (colind_[cc] != colind_[cc+1]) { // if there are any elements of the column
         int rr = row_[colind_[cc+1]-1];
-        bw = std::max(bw,rr-cc);
+        bw = std::max(bw, rr-cc);
       }
     }
     return bw;

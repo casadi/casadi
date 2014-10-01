@@ -107,6 +107,11 @@ public:
   /** \brief  Get the integrator Jacobian for the backward problem */
   virtual Function getJacB()=0;
 
+  // Get bandwidth for forward problem
+  std::pair<int, int> getBandwidth() const;
+
+  // Get bandwidth for backward problem
+  std::pair<int, int> getBandwidthB() const;
 };
 
 } // namespace casadi

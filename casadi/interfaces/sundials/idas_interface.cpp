@@ -2069,9 +2069,8 @@ namespace casadi {
 
   void IdasInterface::initBandedLinearSolver() {
     // Banded jacobian
-    int flag = IDABand(mem_, nx_+nz_,
-                       getOption("upper_bandwidth").toInt(),
-                       getOption("lower_bandwidth").toInt());
+    pair<int, int> bw = getBandwidth();
+    int flag = IDABand(mem_, nx_+nz_, bw.first, bw.second);
     if (flag != IDA_SUCCESS) idas_error("IDABand", flag);
 
     // Banded Jacobian information
@@ -2153,9 +2152,8 @@ namespace casadi {
   }
 
   void IdasInterface::initBandedLinearSolverB() {
-    int flag = IDABandB(mem_, whichB_, nrx_+nrz_,
-                        getOption("upper_bandwidthB").toInt(),
-                        getOption("lower_bandwidthB").toInt());
+    pair<int, int> bw = getBandwidthB();
+    int flag = IDABandB(mem_, whichB_, nrx_+nrz_, bw.first, bw.second);
     if (flag != IDA_SUCCESS) idas_error("IDABand", flag);
     if (exact_jacobianB_) {
       // Pass to IDA
