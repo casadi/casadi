@@ -83,15 +83,30 @@ set_source_files_properties(${CASADI_SWIG_MAIN_MODULE}.i  PROPERTIES SWIG_FLAGS 
 
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
+if(WITH_WERROR)
+  # This will make the swig command return an error so that "make" will fail,
+  # but swig will emit the output files anyways so subsequent calls to "make"
+  # will succeed. At least buildbot will report failures.
+  #
+  # I'm pretty sure this is also OK also in windows, see:
+  # http://www.swig.org/Doc3.0/Warnings.html#Warnings_nn7
+  set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-Werror")
+endif()
 
 # PYTHON interface
+if(WITH_WERROR)
+  set(MAYBE_WERROR "-Werror")
+else()
+  set(MAYBE_WERROR "")
+endif()
+
 foreach(my_module ${CASADI_SWIG_MODULES})
 swig_add_module(${my_module} python ${my_module}.i)
 swig_link_libraries(${my_module} ${PYTHON_LIBRARIES} ${my_module})
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign")
+  set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized")
+  set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
 endif()
 endforeach()
 
