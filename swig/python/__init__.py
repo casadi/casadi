@@ -33,12 +33,7 @@ try:
 except:
     pass
 
-import sys
 import ctypes
-
-if hasattr(sys,"getdlopenflags"):
-    flags0 = sys.getdlopenflags() # get the original flags
-    sys.setdlopenflags( flags0 | ctypes.RTLD_GLOBAL ) # set our workaround flags
 
 # add to PATH to make dlopen find the libraries
 if "PATH" in os.environ:
@@ -57,9 +52,6 @@ import casadi_loader as casadi # import everything
 if 'casadi_core' in failed_modules:
     raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_core"]))
 
-if hasattr(sys,"getdlopenflags"):
-    sys.setdlopenflags( flags0 ) # set the old flags back
-  
 import os
 import types
   
