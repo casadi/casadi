@@ -245,7 +245,7 @@ class Integrationtests(casadiTestCase):
             def solveroptions(post=""):
               yield {"linear_solver_type" +post: "dense" }
               allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
-              allowedOpts.remove("iterative") # disabled, see #1231
+              #allowedOpts.remove("iterative") # disabled, see #1231
               if "iterative" in allowedOpts:
                   for it in itoptions(post):
                       d = {"linear_solver_type" +post: "iterative" }
@@ -360,7 +360,7 @@ class Integrationtests(casadiTestCase):
           def solveroptions(post=""):
             yield {"linear_solver_type" +post: "dense" }
             allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
-            allowedOpts.remove("iterative")  # disabled, see #1231
+            #allowedOpts.remove("iterative")  # disabled, see #1231
             if "iterative" in allowedOpts:
                 for it in itoptions(post):
                     d = {"linear_solver_type" +post: "iterative" }

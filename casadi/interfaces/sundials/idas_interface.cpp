@@ -27,6 +27,10 @@
 #include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/mx/mx_tools.hpp"
 
+#ifdef WITH_SYSTEM_SUNDIALS
+#include <idas/idas_spils_impl.h>
+#endif
+
 using namespace std;
 namespace casadi {
 
@@ -2157,6 +2161,111 @@ namespace casadi {
     }
   }
 
+  // Workaround for bug in Sundials, to be removed when Debian/Homebrew
+  // Sundials have been patched
+#ifdef WITH_SYSTEM_SUNDIALS
+  extern "C" {
+
+#define yyTmp        (IDAADJ_mem->ia_yyTmp)
+#define ypTmp        (IDAADJ_mem->ia_ypTmp)
+#define noInterp     (IDAADJ_mem->ia_noInterp)
+
+    static int IDAAspilsJacTimesVecPatched(realtype tt,
+                                    N_Vector yyB, N_Vector ypB, N_Vector rrB,
+                                    N_Vector vB, N_Vector JvB,
+                                    realtype c_jB, void *ida_mem,
+                                    N_Vector tmp1B, N_Vector tmp2B) {
+      IDAMem IDA_mem;
+      IDAadjMem IDAADJ_mem;
+      IDASpilsMemB idaspilsB_mem;
+      IDABMem IDAB_mem;
+      int flag;
+
+      IDA_mem = (IDAMem) ida_mem;
+      IDAADJ_mem = IDA_mem->ida_adj_mem;
+      IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+      idaspilsB_mem = (IDASpilsMemB)IDAB_mem->ida_lmem;
+
+      /* Get FORWARD solution from interpolation. */
+      if (noInterp==FALSE) {
+        flag = IDAADJ_mem->ia_getY(IDA_mem, tt, yyTmp, ypTmp, NULL, NULL);
+        if (flag != IDA_SUCCESS) {
+          IDAProcessError(IDA_mem, -1, "IDASSPILS", "IDAAspilsJacTimesVec", MSGS_BAD_T);
+          return(-1);
+        }
+      }
+      /* Call user's adjoint psolveB routine */
+      flag = idaspilsB_mem->s_jtimesB(tt, yyTmp, ypTmp,
+                                      yyB, ypB, rrB,
+                                      vB, JvB,
+                                      c_jB, IDAB_mem->ida_user_data,
+                                      tmp1B, tmp2B);
+      return(flag);
+    }
+
+    int IDASpilsSetJacTimesVecFnBPatched(void *ida_mem, int which, IDASpilsJacTimesVecFnB jtvB) {
+      IDAadjMem IDAADJ_mem;
+      IDAMem IDA_mem;
+      IDABMem IDAB_mem;
+      IDASpilsMemB idaspilsB_mem;
+      void *ida_memB;
+      int flag;
+
+      /* Check if ida_mem is allright. */
+      if (ida_mem == NULL) {
+        IDAProcessError(NULL, IDASPILS_MEM_NULL, "IDASSPILS",
+                        "IDASpilsSetJacTimesVecFnB", MSGS_IDAMEM_NULL);
+        return(IDASPILS_MEM_NULL);
+      }
+      IDA_mem = (IDAMem) ida_mem;
+
+      /* Is ASA initialized? */
+      if (IDA_mem->ida_adjMallocDone == FALSE) {
+        IDAProcessError(IDA_mem, IDASPILS_NO_ADJ, "IDASSPILS",
+                        "IDASpilsSetJacTimesVecFnB",  MSGS_NO_ADJ);
+        return(IDASPILS_NO_ADJ);
+      }
+      IDAADJ_mem = IDA_mem->ida_adj_mem;
+
+      /* Check the value of which */
+      if ( which >= IDAADJ_mem->ia_nbckpbs ) {
+        IDAProcessError(IDA_mem, IDASPILS_ILL_INPUT, "IDASSPILS",
+                        "IDASpilsSetJacTimesVecFnB", MSGS_BAD_WHICH);
+        return(IDASPILS_ILL_INPUT);
+      }
+
+      /* Find the IDABMem entry in the linked list corresponding to 'which'. */
+      IDAB_mem = IDAADJ_mem->IDAB_mem;
+      while (IDAB_mem != NULL) {
+        if ( which == IDAB_mem->ida_index ) break;
+        /* advance */
+        IDAB_mem = IDAB_mem->ida_next;
+      }
+      /* ida_mem corresponding to 'which' problem. */
+      ida_memB = reinterpret_cast<void *>(IDAB_mem->IDA_mem);
+
+      if (IDAB_mem->ida_lmem == NULL) {
+        IDAProcessError(IDA_mem, IDASPILS_LMEMB_NULL, "IDASSPILS",
+                        "IDASpilsSetJacTimesVecFnB", MSGS_LMEMB_NULL);
+        return(IDASPILS_ILL_INPUT);
+      }
+
+      idaspilsB_mem = (IDASpilsMemB) IDAB_mem->ida_lmem;
+
+      /* Call the corresponding Set* function for the backward problem. */
+
+      idaspilsB_mem->s_jtimesB   = jtvB;
+
+      if (jtvB != NULL) {
+        flag = IDASpilsSetJacTimesVecFn(ida_memB, IDAAspilsJacTimesVecPatched);
+      } else {
+        flag = IDASpilsSetJacTimesVecFn(ida_memB, NULL);
+      }
+      return(flag);
+    }
+  }
+#endif // WITH_SYSTEM_SUNDIALS
+
   void IdasInterface::initIterativeLinearSolverB() {
     int flag;
     switch (itsol_g_) {
@@ -2180,7 +2289,11 @@ namespace casadi {
       // Form the Jacobian-times-vector function
       g_fwd_ = g_.derivative(1, 0);
 
+#ifdef WITH_SYSTEM_SUNDIALS
+      flag = IDASpilsSetJacTimesVecFnBPatched(mem_, whichB_, jtimesB_wrapper);
+#else
       flag = IDASpilsSetJacTimesVecFnB(mem_, whichB_, jtimesB_wrapper);
+#endif
       if (flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFnB", flag);
     }
 
