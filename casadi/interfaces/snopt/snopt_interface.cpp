@@ -463,8 +463,7 @@ namespace casadi {
           int value = getOption(it->first);
           casadi_assert(it->first.size() <= 55);
           int Error = probC.setIntParameter(it->first.c_str(), value);
-          // TODO(Greg): set this back to Error == 0
-          casadi_assert_message(Error == Error, "snopt error setting option \"" + it->first + "\"");
+          casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
       }
     for (std::map<std::string, std::string>::const_iterator it = realOpts_.begin();
          it != realOpts_.end(); ++it)
@@ -472,8 +471,7 @@ namespace casadi {
           double value = getOption(it->first);
           casadi_assert(it->first.size() <= 55);
           int Error = probC.setRealParameter(it->first.c_str(), value);
-          // TODO(Greg): set this back to Error == 0
-          casadi_assert_message(Error == Error, "snopt error setting option \"" + it->first + "\"");
+          casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
       }
     for (std::map<std::string, std::pair<std::string, std::string> >::const_iterator
              it = strOpts_.begin(); it != strOpts_.end(); ++it)
@@ -484,8 +482,7 @@ namespace casadi {
           buffer.append(value);
           casadi_assert(buffer.size() <= 72);
           int Error = probC.setParameter(buffer.c_str());
-          // TODO(Greg): set this back to Error == 0
-          casadi_assert_message(Error == Error, "snopt error setting option \"" + it->first + "\"");
+          casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
       }
   } // passOptions()
 
@@ -657,6 +654,7 @@ namespace casadi {
     // Run SNOPT
     double time0 = clock();
     int info = snoptProbC.solve(getOptionEnumValue("start"));
+    casadi_assert_message(99 != info, "snopt problem set up improperly");
     t_mainloop_ = static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
 
     stats_["return_status"] = info;

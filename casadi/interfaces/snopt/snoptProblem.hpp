@@ -46,7 +46,7 @@ protected:
   isqLog  sqLog;
   isnSTOP snSTOP;
 
-  void errMsgExit      ( const char *var );
+  int  errMsgExit      ( const char *var );
   void allocI          ( int leniw );
   void allocR          ( int lenrw );
   void reallocI        ( int leniw );
@@ -102,7 +102,7 @@ protected:
 
   snFunA  usrfunA;
 
-  void userDataSet();
+  int     userDataSet();
 
 public:
   snoptProblemA();
@@ -110,7 +110,7 @@ public:
   snoptProblemA( const char *name, const char *prtfile );
   ~snoptProblemA();
 
-  void computeJac    ();
+  int  computeJac    ();
   int  solve         ( int starttype );
   void setWorkspace  ();
 
@@ -147,7 +147,7 @@ protected:
   int    *indJ, *locJ;
   double *Jval;
 
-  void userDataSet();
+  int     userDataSet();
 
 public:
   snoptProblemC();
@@ -173,7 +173,7 @@ public:
 class snoptProblemB : public snoptProblemC {
 private:
   void init2zero();
-  void userDataSet();
+  int  userDataSet();
 
 protected:
   snObjB  funobj;
