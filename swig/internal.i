@@ -4081,6 +4081,12 @@
 %exception  casadi::SubRef::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SundialsInterface::getBandwidth() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SundialsInterface::getBandwidthB() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SundialsInterface::getJac() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

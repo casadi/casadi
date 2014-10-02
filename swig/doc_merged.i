@@ -11637,12 +11637,10 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                 |                 |                 | r_options]      |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
-| ype             |                 |                 | ense|banded|ite |
-|                 |                 |                 | rative)         |
+| ype             |                 |                 | ense|iterative) |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
-| ypeB            |                 |                 | ense|banded|ite |
-|                 |                 |                 | rative)         |
+| ypeB            |                 |                 | ense|iterative) |
 +-----------------+-----------------+-----------------+-----------------+
 | lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
 |                 |                 |                 | width of banded |
@@ -12053,14 +12051,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 |              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | casadi::Sund |
-| r_type       |              |              | d|dense|band | ialsInterfac |
-|              |              |              | ed|iterative | e            |
-|              |              |              | )            |              |
+| r_type       |              |              | d|dense|iter | ialsInterfac |
+|              |              |              | ative)       | e            |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | GenericType( | (user_define | casadi::Sund |
-| r_typeB      |              | )            | d|dense|band | ialsInterfac |
-|              |              |              | ed|iterative | e            |
-|              |              |              | )            |              |
+| r_typeB      |              | )            | d|dense|iter | ialsInterfac |
+|              |              |              | ative)       | e            |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | casadi::Sund |
 | dth          |              | )            | width of     | ialsInterfac |
@@ -12528,6 +12524,8 @@ The function is not initialized
 
 ";
 
+%feature("docstring") casadi::CvodesInterface::getBandwidth "[INTERNAL] ";
+
 %feature("docstring") casadi::CvodesInterface::printPart "[INTERNAL]  The
 following functions are called internally from EvaluateMX. For
 documentation, see the MXNode class
@@ -12617,6 +12615,11 @@ Print options to a stream.
 
 ";
 
+%feature("docstring") casadi::CvodesInterface::symbolicInputSX "[INTERNAL]
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+";
+
 %feature("docstring") casadi::CvodesInterface::callSelf "[INTERNAL]  Create
 a call to this.
 
@@ -12632,10 +12635,7 @@ symbolically, MX type.
 
 ";
 
-%feature("docstring") casadi::CvodesInterface::symbolicInputSX "[INTERNAL]
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-";
+%feature("docstring") casadi::CvodesInterface::getBandwidthB "[INTERNAL] ";
 
 %feature("docstring") casadi::CvodesInterface::setInputScheme "[INTERNAL]
 Set input scheme.
@@ -22876,6 +22876,11 @@ diagonal?
 
 ";
 
+%feature("docstring") casadi::EmptySparsity::bandwidthL "[INTERNAL]  Lower
+half-bandwidth.
+
+";
+
 %feature("docstring") casadi::EmptySparsity::printCompact "[INTERNAL]
 Print a compact description of the sparsity pattern.
 
@@ -22883,7 +22888,8 @@ Print a compact description of the sparsity pattern.
 
 %feature("docstring") casadi::EmptySparsity::isEqual "[INTERNAL] ";
 
-%feature("docstring") casadi::EmptySparsity::clone "[INTERNAL]  Deep copy.
+%feature("docstring") casadi::EmptySparsity::bandwidthU "[INTERNAL]  Upper
+half-bandwidth.
 
 ";
 
@@ -23046,6 +23052,10 @@ nonzero entries of another sparsity pattern.
 >  void casadi::Sparsity::bor(DataType *data, const DataType *val_data, const Sparsity &val_sp) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
+";
+
+%feature("docstring") casadi::EmptySparsity::clone "[INTERNAL]  Deep copy.
+
 ";
 
 %feature("docstring") casadi::EmptySparsity::colind "
@@ -31620,12 +31630,10 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                 |                 |                 | r_options]      |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
-| ype             |                 |                 | ense|banded|ite |
-|                 |                 |                 | rative)         |
+| ype             |                 |                 | ense|iterative) |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
-| ypeB            |                 |                 | ense|banded|ite |
-|                 |                 |                 | rative)         |
+| ypeB            |                 |                 | ense|iterative) |
 +-----------------+-----------------+-----------------+-----------------+
 | lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
 |                 |                 |                 | width of banded |
@@ -32090,14 +32098,12 @@ Joel Andersson
 |              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | casadi::Sund |
-| r_type       |              |              | d|dense|band | ialsInterfac |
-|              |              |              | ed|iterative | e            |
-|              |              |              | )            |              |
+| r_type       |              |              | d|dense|iter | ialsInterfac |
+|              |              |              | ative)       | e            |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | GenericType( | (user_define | casadi::Sund |
-| r_typeB      |              | )            | d|dense|band | ialsInterfac |
-|              |              |              | ed|iterative | e            |
-|              |              |              | )            |              |
+| r_typeB      |              | )            | d|dense|iter | ialsInterfac |
+|              |              |              | ative)       | e            |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | casadi::Sund |
 | dth          |              | )            | width of     | ialsInterfac |
@@ -32363,6 +32369,8 @@ Return gradient function.
 function call node.
 
 ";
+
+%feature("docstring") casadi::IdasInterface::getBandwidth "[INTERNAL] ";
 
 %feature("docstring") casadi::IdasInterface::jacobian "[INTERNAL]  Return
 Jacobian function.
@@ -33218,6 +33226,8 @@ val:  can be double&, std::vector<double>&, Matrix<double>&, double *
 iname:  input name. Only allowed when an input scheme is set.
 
 ";
+
+%feature("docstring") casadi::IdasInterface::getBandwidthB "[INTERNAL] ";
 
 %feature("docstring") casadi::IdasInterface::input "[INTERNAL]  [UNSAFE]
 Obtain reference to inputs  getInput, setInput
@@ -37165,12 +37175,10 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                 |                 |                 | r_options]      |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
-| ype             |                 |                 | ense|banded|ite |
-|                 |                 |                 | rative)         |
+| ype             |                 |                 | ense|iterative) |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
-| ypeB            |                 |                 | ense|banded|ite |
-|                 |                 |                 | rative)         |
+| ypeB            |                 |                 | ense|iterative) |
 +-----------------+-----------------+-----------------+-----------------+
 | lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
 |                 |                 |                 | width of banded |
@@ -37486,12 +37494,10 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                 |                 |                 | r_options]      |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
-| ype             |                 |                 | ense|banded|ite |
-|                 |                 |                 | rative)         |
+| ype             |                 |                 | ense|iterative) |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
-| ypeB            |                 |                 | ense|banded|ite |
-|                 |                 |                 | rative)         |
+| ypeB            |                 |                 | ense|iterative) |
 +-----------------+-----------------+-----------------+-----------------+
 | lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
 |                 |                 |                 | width of banded |
@@ -61560,12 +61566,6 @@ SNOPT interface
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
-| _iprint         | OT_INTEGER      | 0               |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| _isumm          | OT_INTEGER      | 6               |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| _start          | OT_STRING       | \"Cold\"          | (Cold|Warm)     |
-+-----------------+-----------------+-----------------+-----------------+
 | detect_linear   | OT_BOOLEAN      | true            | Make an effort  |
 |                 |                 |                 | to treat linear |
 |                 |                 |                 | constraints and |
@@ -61573,10 +61573,19 @@ SNOPT interface
 |                 |                 |                 | variables       |
 |                 |                 |                 | specially.      |
 +-----------------+-----------------+-----------------+-----------------+
+| print file      | OT_STRING       |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
 | print_time      | OT_BOOLEAN      | true            | print           |
 |                 |                 |                 | information     |
 |                 |                 |                 | about execution |
 |                 |                 |                 | time            |
++-----------------+-----------------+-----------------+-----------------+
+| specs file      | OT_STRING       |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| start           | OT_STRING       | \"Cold\"          | (Cold|Basis|War |
+|                 |                 |                 | m)              |
++-----------------+-----------------+-----------------+-----------------+
+| summary         | OT_BOOLEAN      | true            |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
@@ -81927,7 +81936,10 @@ Is diagonal?
 
 ";
 
-%feature("docstring") casadi::ScalarSparseSparsity::hash "[INTERNAL] ";
+%feature("docstring") casadi::ScalarSparseSparsity::dimString "[INTERNAL]
+Get the dimension as a string.
+
+";
 
 %feature("docstring") casadi::ScalarSparseSparsity::assertInit "[INTERNAL]
 Assert that it is initialized
@@ -82257,18 +82269,7 @@ elements (i, j) with j>=i.
 
 ";
 
-%feature("docstring") casadi::ScalarSparseSparsity::add "
-
->  void casadi::Sparsity::add(T *data, const T *val_data, const Sparsity &val_sp) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Add the nonzero entries of one sparsity pattern to the nonzero entries
-of another sparsity pattern.
-
->  void casadi::Sparsity::add(DataType *data, const DataType *val_data, const Sparsity &val_sp) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-";
+%feature("docstring") casadi::ScalarSparseSparsity::hash "[INTERNAL] ";
 
 %feature("docstring") casadi::ScalarSparseSparsity::rowsSequential "[INTERNAL]  Do the rows appear sequentially on each column.
 
@@ -82403,11 +82404,6 @@ Get a pointer to the node.
 
 ";
 
-%feature("docstring") casadi::ScalarSparseSparsity::dimString "[INTERNAL]
-Get the dimension as a string.
-
-";
-
 %feature("docstring") casadi::ScalarSparseSparsity::depthFirstSearch "[INTERNAL]  Depth-first search on the adjacency graph of the sparsity See
 Direct Methods for Sparse Linear Systems by Davis (2006).
 
@@ -82415,6 +82411,11 @@ Direct Methods for Sparse Linear Systems by Davis (2006).
 
 %feature("docstring") casadi::ScalarSparseSparsity::isNull "[INTERNAL]  Is
 a null pointer?
+
+";
+
+%feature("docstring") casadi::ScalarSparseSparsity::bandwidthU "[INTERNAL]
+Upper half-bandwidth.
 
 ";
 
@@ -82470,6 +82471,11 @@ Create diagonal sparsity pattern.
 
 ";
 
+%feature("docstring") casadi::ScalarSparseSparsity::bandwidthL "[INTERNAL]
+Lower half-bandwidth.
+
+";
+
 %feature("docstring") casadi::ScalarSparseSparsity::getTriu "[INTERNAL]
 Get upper triangular part.
 
@@ -82483,6 +82489,19 @@ Get the sparsity in sparse triplet format.
 %feature("docstring") casadi::ScalarSparseSparsity::T "[INTERNAL]
 Transpose the matrix (shorthand)
 
+";
+
+%feature("docstring") casadi::ScalarSparseSparsity::add "
+
+>  void casadi::Sparsity::add(T *data, const T *val_data, const Sparsity &val_sp) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Add the nonzero entries of one sparsity pattern to the nonzero entries
+of another sparsity pattern.
+
+>  void casadi::Sparsity::add(DataType *data, const DataType *val_data, const Sparsity &val_sp) const 
+------------------------------------------------------------------------
+[INTERNAL] 
 ";
 
 %feature("docstring") casadi::ScalarSparseSparsity::compress "[INTERNAL]
@@ -82535,8 +82554,8 @@ matrix
 
 ";
 
-%feature("docstring") casadi::ScalarSparsity::isScalar "[INTERNAL]  Is
-scalar?
+%feature("docstring") casadi::ScalarSparsity::bandwidthU "[INTERNAL]  Upper
+half-bandwidth.
 
 ";
 
@@ -82733,6 +82752,11 @@ nonzeros in upper triangular part.
 
 ";
 
+%feature("docstring") casadi::ScalarSparsity::bandwidthL "[INTERNAL]  Lower
+half-bandwidth.
+
+";
+
 %feature("docstring") casadi::ScalarSparsity::init "[INTERNAL]  Initialize
 or re-initialize the object:
 
@@ -82851,7 +82875,10 @@ it.
 
 ";
 
-%feature("docstring") casadi::ScalarSparsity::hash "[INTERNAL] ";
+%feature("docstring") casadi::ScalarSparsity::isScalar "[INTERNAL]  Is
+scalar?
+
+";
 
 %feature("docstring") casadi::ScalarSparsity::bor "
 
@@ -83066,6 +83093,8 @@ the block boundaries to be found in r.
 Enlarge the matrix along the first dimension (i.e. insert rows)
 
 ";
+
+%feature("docstring") casadi::ScalarSparsity::hash "[INTERNAL] ";
 
 %feature("docstring") casadi::ScalarSparsity::isEmpty "[INTERNAL]  Check if
 the sparsity is empty.
@@ -94018,12 +94047,6 @@ SNOPT interface
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
-| _iprint         | OT_INTEGER      | 0               |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| _isumm          | OT_INTEGER      | 6               |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| _start          | OT_STRING       | \"Cold\"          | (Cold|Warm)     |
-+-----------------+-----------------+-----------------+-----------------+
 | detect_linear   | OT_BOOLEAN      | true            | Make an effort  |
 |                 |                 |                 | to treat linear |
 |                 |                 |                 | constraints and |
@@ -94031,10 +94054,19 @@ SNOPT interface
 |                 |                 |                 | variables       |
 |                 |                 |                 | specially.      |
 +-----------------+-----------------+-----------------+-----------------+
+| print file      | OT_STRING       |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
 | print_time      | OT_BOOLEAN      | true            | print           |
 |                 |                 |                 | information     |
 |                 |                 |                 | about execution |
 |                 |                 |                 | time            |
++-----------------+-----------------+-----------------+-----------------+
+| specs file      | OT_STRING       |                 |                 |
++-----------------+-----------------+-----------------+-----------------+
+| start           | OT_STRING       | \"Cold\"          | (Cold|Basis|War |
+|                 |                 |                 | m)              |
++-----------------+-----------------+-----------------+-----------------+
+| summary         | OT_BOOLEAN      | true            |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
 >List of available monitors
@@ -94147,15 +94179,6 @@ SNOPT interface
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| _iprint      | OT_INTEGER   | 0            |              | casadi::Snop |
-|              |              |              |              | tInterface   |
-+--------------+--------------+--------------+--------------+--------------+
-| _isumm       | OT_INTEGER   | 6            |              | casadi::Snop |
-|              |              |              |              | tInterface   |
-+--------------+--------------+--------------+--------------+--------------+
-| _start       | OT_STRING    | \"Cold\"       | (Cold|Warm)  | casadi::Snop |
-|              |              |              |              | tInterface   |
-+--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
 |              |              |              | calculate    | tionInternal |
 |              |              |              | the          |              |
@@ -94318,6 +94341,9 @@ SNOPT interface
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
+| print file   | OT_STRING    |              |              | casadi::Snop |
+|              |              |              |              | tInterface   |
++--------------+--------------+--------------+--------------+--------------+
 | print_time   | OT_BOOLEAN   | true         | print        | casadi::Snop |
 |              |              |              | information  | tInterface   |
 |              |              |              | about        |              |
@@ -94330,6 +94356,15 @@ SNOPT interface
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| specs file   | OT_STRING    |              |              | casadi::Snop |
+|              |              |              |              | tInterface   |
++--------------+--------------+--------------+--------------+--------------+
+| start        | OT_STRING    | \"Cold\"       | (Cold|Basis| | casadi::Snop |
+|              |              |              | Warm)        | tInterface   |
++--------------+--------------+--------------+--------------+--------------+
+| summary      | OT_BOOLEAN   | true         |              | casadi::Snop |
+|              |              |              |              | tInterface   |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -98135,6 +98170,12 @@ Return a string with a representation (for SWIG)
 
 ";
 
+%feature("docstring") casadi::Sparsity::bandwidthU "
+
+Upper half-bandwidth.
+
+";
+
 %feature("docstring") casadi::Sparsity::add "
 
 >  void casadi::Sparsity::add(T *data, const T *val_data, const Sparsity &val_sp) const 
@@ -98200,6 +98241,12 @@ SWIGINTERNAL
 Get the nonzero index for a set of elements The index vector is used both
 for input and outputs and must be sorted by increasing nonzero index, i.e.
 column-wise. Elements not found in the sparsity pattern are set to -1.
+
+";
+
+%feature("docstring") casadi::Sparsity::bandwidthL "
+
+Lower half-bandwidth.
 
 ";
 
@@ -107409,8 +107456,7 @@ documentation, see the MXNode class
 
 ";
 
-%feature("docstring") casadi::SundialsInterface::create "[INTERNAL]  Create
-a new integrator.
+%feature("docstring") casadi::SundialsInterface::generateDeclarations "[INTERNAL]  Generate code for the declarations of the C function.
 
 ";
 
@@ -107814,7 +107860,8 @@ For documentation, see the MXNode class
 
 %feature("docstring") casadi::SundialsInterface::qf "[INTERNAL] ";
 
-%feature("docstring") casadi::SundialsInterface::generateDeclarations "[INTERNAL]  Generate code for the declarations of the C function.
+%feature("docstring") casadi::SundialsInterface::create "[INTERNAL]  Create
+a new integrator.
 
 ";
 
@@ -108185,14 +108232,12 @@ Print all information there is to know about a certain option.
 |              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | casadi::Sund |
-| r_type       |              |              | d|dense|band | ialsInterfac |
-|              |              |              | ed|iterative | e            |
-|              |              |              | )            |              |
+| r_type       |              |              | d|dense|iter | ialsInterfac |
+|              |              |              | ative)       | e            |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | GenericType( | (user_define | casadi::Sund |
-| r_typeB      |              | )            | d|dense|band | ialsInterfac |
-|              |              |              | ed|iterative | e            |
-|              |              |              | )            |              |
+| r_typeB      |              | )            | d|dense|iter | ialsInterfac |
+|              |              |              | ative)       | e            |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | casadi::Sund |
 | dth          |              | )            | width of     | ialsInterfac |
@@ -108441,6 +108486,9 @@ sparsity pattern of the extended Jacobian (forward problem)
 
 ";
 
+%feature("docstring") casadi::SundialsInterface::getBandwidth "[INTERNAL]
+";
+
 %feature("docstring") casadi::SundialsInterface::setStopTime "[INTERNAL]
 Set stop time for the integration.
 
@@ -108536,6 +108584,9 @@ input/outputscheme ad_mode
 
 The function is not initialized
 
+";
+
+%feature("docstring") casadi::SundialsInterface::getBandwidthB "[INTERNAL]
 ";
 
 %feature("docstring") casadi::SundialsInterface::rxf "[INTERNAL] ";
