@@ -11637,10 +11637,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                 |                 |                 | r_options]      |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
-| ype             |                 |                 | ense|iterative) |
+| ype             |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
-| ypeB            |                 |                 | ense|iterative) |
+| ypeB            |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
 +-----------------+-----------------+-----------------+-----------------+
 | lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
 |                 |                 |                 | width of banded |
@@ -12051,12 +12053,14 @@ experience a dramatic speed-up by using a sparse linear solver:
 |              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | casadi::Sund |
-| r_type       |              |              | d|dense|iter | ialsInterfac |
-|              |              |              | ative)       | e            |
+| r_type       |              |              | d|dense|band | ialsInterfac |
+|              |              |              | ed|iterative | e            |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | GenericType( | (user_define | casadi::Sund |
-| r_typeB      |              | )            | d|dense|iter | ialsInterfac |
-|              |              |              | ative)       | e            |
+| r_typeB      |              | )            | d|dense|band | ialsInterfac |
+|              |              |              | ed|iterative | e            |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | casadi::Sund |
 | dth          |              | )            | width of     | ialsInterfac |
@@ -31630,10 +31634,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                 |                 |                 | r_options]      |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
-| ype             |                 |                 | ense|iterative) |
+| ype             |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
-| ypeB            |                 |                 | ense|iterative) |
+| ypeB            |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
 +-----------------+-----------------+-----------------+-----------------+
 | lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
 |                 |                 |                 | width of banded |
@@ -32098,12 +32104,14 @@ Joel Andersson
 |              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | casadi::Sund |
-| r_type       |              |              | d|dense|iter | ialsInterfac |
-|              |              |              | ative)       | e            |
+| r_type       |              |              | d|dense|band | ialsInterfac |
+|              |              |              | ed|iterative | e            |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | GenericType( | (user_define | casadi::Sund |
-| r_typeB      |              | )            | d|dense|iter | ialsInterfac |
-|              |              |              | ative)       | e            |
+| r_typeB      |              | )            | d|dense|band | ialsInterfac |
+|              |              |              | ed|iterative | e            |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | casadi::Sund |
 | dth          |              | )            | width of     | ialsInterfac |
@@ -37175,10 +37183,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                 |                 |                 | r_options]      |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
-| ype             |                 |                 | ense|iterative) |
+| ype             |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
-| ypeB            |                 |                 | ense|iterative) |
+| ypeB            |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
 +-----------------+-----------------+-----------------+-----------------+
 | lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
 |                 |                 |                 | width of banded |
@@ -37494,10 +37504,12 @@ experience a dramatic speed-up by using a sparse linear solver:
 |                 |                 |                 | r_options]      |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | \"dense\"         | (user_defined|d |
-| ype             |                 |                 | ense|iterative) |
+| ype             |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
 +-----------------+-----------------+-----------------+-----------------+
 | linear_solver_t | OT_STRING       | GenericType()   | (user_defined|d |
-| ypeB            |                 |                 | ense|iterative) |
+| ypeB            |                 |                 | ense|banded|ite |
+|                 |                 |                 | rative)         |
 +-----------------+-----------------+-----------------+-----------------+
 | lower_bandwidth | OT_INTEGER      | GenericType()   | Lower band-     |
 |                 |                 |                 | width of banded |
@@ -108232,12 +108244,14 @@ Print all information there is to know about a certain option.
 |              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | casadi::Sund |
-| r_type       |              |              | d|dense|iter | ialsInterfac |
-|              |              |              | ative)       | e            |
+| r_type       |              |              | d|dense|band | ialsInterfac |
+|              |              |              | ed|iterative | e            |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | GenericType( | (user_define | casadi::Sund |
-| r_typeB      |              | )            | d|dense|iter | ialsInterfac |
-|              |              |              | ative)       | e            |
+| r_typeB      |              | )            | d|dense|band | ialsInterfac |
+|              |              |              | ed|iterative | e            |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | casadi::Sund |
 | dth          |              | )            | width of     | ialsInterfac |
