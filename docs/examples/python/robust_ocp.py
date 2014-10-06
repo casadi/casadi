@@ -100,7 +100,7 @@ g = struct_MX([
   ])
  
 # Objective function
-F = V["T"] + 1e-2*norm_22(vertcat(V["U"]))/2/N
+F = V["T"] + 1e-2*sum_square(vertcat(V["U"]))/2/N
 
 nlp = MXFunction(nlpIn(x=V),nlpOut(f=F,g=g))
 
