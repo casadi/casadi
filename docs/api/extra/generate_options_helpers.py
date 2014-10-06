@@ -53,7 +53,7 @@ def addExtra(metadata):
   try:
     NlpSolver.loadPlugin("ipopt")
     i = NlpSolver("ipopt", f)
-    extra(metadata,i,"IpoptInternal")
+    extra(metadata,i,"IpoptInterface")
   except Exception as e:
     print e 
   
@@ -63,7 +63,7 @@ def addExtra(metadata):
   try:
     NlpSolver.loadPlugin("worhp")
     i = NlpSolver("worhp", f)
-    extra(metadata,i,"WorhpInternal")
+    extra(metadata,i,"WorhpInterface")
   except Exception as e:
     print e
     
@@ -73,13 +73,13 @@ def addExtra(metadata):
   try:
     NlpSolver.loadPlugin("snopt")
     i = NlpSolver("snopt", f)
-    extra(metadata,i,"SnoptInternal")
+    extra(metadata,i,"SnoptInterface")
   except Exception as e:
     print e
  
   try:
     i = QpSolver("qpoases", qpStruct(h=Sparsity.dense(3,3),a=Sparsity.dense(1,3)))
-    extra(metadata,i,"QPOasesInternal")
+    extra(metadata,i,"QpoasesInterface")
   except Exception as e:
     print e
     
