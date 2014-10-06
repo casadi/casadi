@@ -26,10 +26,58 @@
 #include "../core/function/lr_dle_internal.hpp"
 #include <casadi/solvers/casadi_lrdlesolver_smith_export.h>
 
+/** \defgroup LrDleSolversmith
+
+   For the low rank case, we have:
+   
+   \verbatim
+       P0 = CVC^T
+       P1 = ACVC^TA^T + CVC^T
+       P2 = AACVC^TAA^TAA^T + ACVC^TA^T + CVC^T
+       .....
+   \endverbatim
+
+
+   In other words, in each iteration, we perform a low-rank update
+   to the initial value of P.
+
+         P_k = P_{k-1} + D_k V D_k
+
+   with
+
+   D = [ C AC AAC AAAC ... ]
+   
+   Ther is no need to actually store D:
+   
+   \verbatim
+     C_0 = C
+     Y_0 = 0
+     k = 0
+     
+     while || C_k V C_k^T || < epsilon
+       Y_{k+1} = Y_k + H^T C_k V C_k^T H
+       C_{k+1} = A_k C_k
+       k += 1
+     end
+     
+     Y = Y_k
+   \endverbatim
+*/
+
 /** \defgroup plugin_LrDleSolver_smith
  Solving the Low-rank Discrete Lyapunov Equations with Smith iterations
 
    @copdyoc DleSolversmith
+   @copdyoc LrDleSolversmith
+
+
+   Implementation details:
+     - We avoid ever holding P in memory as it might be large
+       norm_inf_mul_tt was used to obtain a stopping criteria
+
+     - We avoid memory allocation in evaluate.
+       All sparsity pattern calculations have been done at init
+    
 */
 /** \pluginsection{LrDleSolver,smith} */
 

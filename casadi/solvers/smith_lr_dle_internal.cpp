@@ -209,42 +209,6 @@ namespace casadi {
 
   void SmithLrDleInternal::evaluate() {
 
-    /*
-
-       The basic Smith algorithm works by performing
-
-             P = A P A^T + V
-
-       iteratively. For low-rank input, we have instead
-
-             P = A P A^T + CVC^T
-
-       and hence
-
-             P0 = CVC^T
-             P1 = ACVAC^T + CVC^T
-             P2 = AACVAAC^T + ACVAC^T + CVC^T
-             ....
-
-       In other words, in each iteration, we perform a low-rank update
-       to the initial value of P.
-
-
-             P_k = P_k-1 + D_k V D_k
-
-       with
-
-       D = [ C AC AAC AAAC ... ]
-
-       Implementation details:
-         - We avoid ever holding P in memory as it might be large
-           norm_inf_mul_tt was used to obtain a stopping criteria
-
-         - We avoid memory allocation in evaluate.
-           All sparsity pattern calculations have been done at init
-
-    */
-
     // Set-up aliases for inputs
     DMatrix &A = input(LR_DLE_A);
     DMatrix &C = input(LR_DLE_C);

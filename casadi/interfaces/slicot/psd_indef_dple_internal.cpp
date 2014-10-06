@@ -323,6 +323,8 @@ namespace casadi {
         int n2 = partition_[l+1]-partition_[l];
         int np = n1*n2;
 
+        casadi_assert(n1-1+n2-1>=0);
+
         LinearSolver & solver = dpse_solvers_[n1-1+n2-1][((l+1)*l)/2+r];
 
         // ********** START ***************
