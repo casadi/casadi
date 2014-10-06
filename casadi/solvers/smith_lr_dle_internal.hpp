@@ -47,7 +47,7 @@
 
    D = [ C AC AAC AAAC ... ]
    
-   Ther is no need to actually store D:
+   There is no need to actually store D:
    
    \verbatim
      C_0 = C
