@@ -28,7 +28,7 @@
 #include "casadi/core/mx/mx_tools.hpp"
 
 #ifdef WITH_SYSTEM_SUNDIALS
-#include <idas/idas_spils_impl.h>
+#include <external_packages/sundials-2.5mod/idas/idas_spils_impl.h>
 #endif
 
 using namespace std;
