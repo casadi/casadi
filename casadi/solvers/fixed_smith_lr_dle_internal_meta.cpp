@@ -27,7 +27,7 @@
       const std::string casadi::FixedSmithLrDleInternal::meta_doc=
       "\n"
 "Solving the Discrete Lyapunov Equations with a regular LinearSolver\n"
-"DleSolversmith\n"
+"DleSolversmith  LrDleSolversmith\n"
 "\n"
 "\n"
 ">List of available options\n"

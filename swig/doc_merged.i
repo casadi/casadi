@@ -50482,7 +50482,7 @@ fixed_smith
 
 
 Solving the Discrete Lyapunov Equations with a regular LinearSolver
-DleSolversmith
+DleSolversmith  LrDleSolversmith
 
 >List of available options
 
@@ -50505,7 +50505,13 @@ smith
 
 Solving the Low-rank Discrete Lyapunov Equations with Smith iterations
 
-DleSolversmith
+DleSolversmith  LrDleSolversmith
+
+Implementation details: We avoid ever holding P in memory as it might be
+large norm_inf_mul_tt was used to obtain a stopping criteria
+
+We avoid memory allocation in evaluate. All sparsity pattern calculations
+have been done at init
 
 >List of available options
 
@@ -118056,28 +118062,6 @@ to be monotonously increasing
 
 ";
 
-%feature("docstring") casadi::unite "
-
-Unite two matrices no overlapping sparsity.
-
-";
-
-%feature("docstring") casadi::pw_lin "
-
-t a scalar variable (e.g. time)
-
-Create a piecewise linear function Create a piecewise linear function:
-
-Inputs: tval vector with the the discrete values of t (monotonically
-increasing) val vector with the corresponding function values (same length
-as tval)
-
-";
-
-%feature("docstring") casadi::all "";
-
-%feature("docstring") casadi::dense_mul_tn "[INTERNAL] ";
-
 %feature("docstring") casadi::vertsplit "
 
 >  std::vector< Matrix< DataType > > casadi::vertsplit(const Matrix< DataType > &v, const std::vector< int > &offset)
@@ -118113,6 +118097,28 @@ vertcat(vertsplit(x, ...)) = x
 ------------------------------------------------------------------------
 
 Split up a sparsity pattern vertically.
+
+";
+
+%feature("docstring") casadi::pw_lin "
+
+t a scalar variable (e.g. time)
+
+Create a piecewise linear function Create a piecewise linear function:
+
+Inputs: tval vector with the the discrete values of t (monotonically
+increasing) val vector with the corresponding function values (same length
+as tval)
+
+";
+
+%feature("docstring") casadi::all "";
+
+%feature("docstring") casadi::dense_mul_tn "[INTERNAL] ";
+
+%feature("docstring") casadi::unite "
+
+Unite two matrices no overlapping sparsity.
 
 ";
 
@@ -119357,7 +119363,15 @@ functions from the 'math.h' ('cmath') header.
 
 %feature("docstring") casadi::quad_form "
 
-Calculate quadratic form AXA^T.
+>  MatType casadi::quad_form(const GenericMatrix< MatType > &X, const GenericMatrix< MatType > &A)
+------------------------------------------------------------------------
+
+Calculate quadratic form X^T A X.
+
+>  MatType casadi::quad_form(const GenericMatrix< MatType > &X)
+------------------------------------------------------------------------
+
+Calculate quadratic form X^T X.
 
 ";
 
@@ -120232,6 +120246,12 @@ Output arguments of an NLP function
 ";
 
 %feature("docstring") casadi::casadi_load_lrdlesolver_smith "";
+
+%feature("docstring") casadi::sum_square "
+
+Calculate some of squares: sum_ij X_ij^2.
+
+";
 
 %feature("docstring") casadi::asinh "
 
@@ -123976,6 +123996,9 @@ This file does absolutely nothing but including all headers ";
 
 // File: group__plugin__DpleSolver__simple.xml
 
+
+
+// File: group__LrDleSolversmith.xml
 
 
 // File: group__plugin__LrDleSolver__smith.xml
