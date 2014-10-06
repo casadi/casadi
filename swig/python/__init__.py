@@ -285,8 +285,10 @@ for name,cl in inspect.getmembers(casadi, inspect.isclass):
 def internalAPI():
     backup = CasadiOptions.getAllowedInternalAPI()
     CasadiOptions.setAllowedInternalAPI(True)
-    yield
-    CasadiOptions.setAllowedInternalAPI(backup)
+    try:
+      yield
+    finally:
+      CasadiOptions.setAllowedInternalAPI(backup)
 
 __version__ = CasadiMeta.getVersion()
 if '+' in __version__ and CasadiMeta.getGitDescribe()!='':
