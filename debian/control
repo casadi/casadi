@@ -16,7 +16,8 @@ Build-Depends: debhelper (>= 9),
                swig2.0,
                dh-python,
                python-dev (>= 2.6.6),
-               python-numpy
+               python-numpy,
+               python-scipy
 Standards-Version: 3.9.5
 Section: libs
 Homepage: http://casadi.org

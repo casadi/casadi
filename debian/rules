@@ -12,11 +12,12 @@ export DH_VERBOSE=1
 CMAKE_FLAGS = \
 	-DWITH_EXAMPLES=OFF \
 	-DCMAKE_VERBOSE_MAKEFILE=ON \
-	-DCMAKE_BUILD_TYPE=Debug \
+	-DCMAKE_BUILD_TYPE=Release \
 	-DWITH_DEBIAN_BUILD=ON \
 	-DWITH_SLICOT=ON \
 	-DWITH_BUILD_SUNDIALS=OFF \
 	-DWITH_DSDP=OFF \
+	-DWITH_BUILD_DSDP=OFF \
 	-DWITH_BUILD_CSPARSE=OFF \
 	-DWITH_BUILD_TINYXML=OFF \
 	-DWITH_SNOPT_FORCE_DUMMY=ON \
@@ -33,6 +34,22 @@ CMAKE_FLAGS = \
 override_dh_auto_configure:
 	dh_auto_configure -- $(CMAKE_FLAGS)
 
+# unit tests are run post-install
 override_dh_install:
 	dh_install -O--buildsystem=cmake --list-missing
-	make test
+
+	LD_LIBRARY_PATH=\
+	$(CURDIR)/debian/libcasadi-core-dev/usr/lib:\
+	$(CURDIR)/debian/libcasadi-core2.0/usr/lib:\
+	$(CURDIR)/debian/libcasadi-dplesolver-slicot/usr/lib/casadi:\
+	$(CURDIR)/debian/libcasadi-linearsolver-csparse/usr/lib/casadi:\
+	$(CURDIR)/debian/libcasadi-linearsolver-lapack/usr/lib/casadi:\
+	$(CURDIR)/debian/libcasadi-nlpsolver-ipopt/usr/lib/casadi:\
+	$(CURDIR)/debian/libcasadi-nlpsolver-snopt/usr/lib/casadi:\
+	$(CURDIR)/debian/libcasadi-qpsolver-qpoases/usr/lib/casadi:\
+	$(CURDIR)/debian/libcasadi-solvers/usr/lib/casadi:\
+	$(CURDIR)/debian/libcasadi-sundials/usr/lib/casadi:\
+	$(CURDIR)/debian/libcasadi-sundials-common2.0/usr/lib:\
+	$(CURDIR)/debian/libcasadi-xmlfile-tinyxml/usr/lib/casadi \
+	PYTHONPATH=$(CURDIR)/debian/python-casadi/usr/lib/python2.7/dist-packages \
+	sh -c "cd test/python; python alltests.py --run_slow"
