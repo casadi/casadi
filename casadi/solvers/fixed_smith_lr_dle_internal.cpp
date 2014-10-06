@@ -93,8 +93,7 @@ namespace casadi {
     for (int i=0;i<iter_;++i) {
       if (with_H_) {
         for (int k=0;k<Hs.size();++k) {
-          MX temp = mul(Hs[k].T(), D);
-          HPH[k]+= mul(temp, mul(Vs, temp.T()));
+          HPH[k]+= quad_form(mul(D.T(), Hs[k]), Vs);
         }
       } else {
         out += mul(D, mul(Vs, D.T()));

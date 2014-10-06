@@ -204,7 +204,11 @@ namespace casadi {
   }
 
   MX norm_2(const MX &x) {
-    return x->getNorm2();
+    if (x.isVector()) {
+      return norm_F(x);
+    } else {
+      return x->getNorm2();
+    }
   }
 
   MX norm_F(const MX &x) {

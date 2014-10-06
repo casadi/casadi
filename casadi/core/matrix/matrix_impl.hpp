@@ -1761,7 +1761,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::quad_form(const Matrix<DataType>& A, const std::vector<DataType>& x) {
+  DataType Matrix<DataType>::quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A) {
     // Assert dimensions
     casadi_assert_message(x.size()==A.size2() && x.size()==A.size1(),
                           "Dimension mismatch. Got x=" << x.size() << " and A=" << A.dimString());

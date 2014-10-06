@@ -1129,7 +1129,7 @@ namespace casadi {
     // Make sure that we have a decent direction
     if (!gauss_newton_) {
       // Get the curvature in the step direction
-      double gain = DMatrix::quad_form(qpH_, x_step_);
+      double gain = DMatrix::quad_form(x_step_, qpH_);
       if (gain < 0) {
         iteration_note_ = "Hessian indefinite in the search direction";
       }

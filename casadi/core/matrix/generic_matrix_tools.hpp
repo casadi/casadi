@@ -37,9 +37,17 @@ namespace casadi {
 @{
 */
 
-  /** \brief Calculate quadratic form AXA^T*/
+  /** \brief Calculate quadratic form X^T A X*/
   template<typename MatType>
   MatType quad_form(const GenericMatrix<MatType> &X, const GenericMatrix<MatType> &A);
+
+  /** \brief Calculate quadratic form X^T X*/
+  template<typename MatType>
+  MatType quad_form(const GenericMatrix<MatType> &X);
+
+  /** \brief Calculate some of squares: sum_ij X_ij^2  */
+  template<typename MatType>
+  MatType sum_square(const GenericMatrix<MatType> &X);
 
   /** \brief Matlab's \c linspace command
    */
@@ -231,7 +239,19 @@ namespace casadi {
   MatType quad_form(const GenericMatrix<MatType> &X_, const GenericMatrix<MatType> &A_) {
     const MatType& X = static_cast<const MatType&>(X_);
     const MatType& A = static_cast<const MatType&>(A_);
-    return mul(A, mul(X, A.T()));
+    return mul(X.T(), mul(A, X));
+  }
+
+  template<typename MatType>
+  MatType quad_form(const GenericMatrix<MatType> &X_) {
+    const MatType& X = static_cast<const MatType&>(X_);
+    return mul(X.T(), X);
+  }
+
+  template<typename MatType>
+  MatType sum_square(const GenericMatrix<MatType> &X_) {
+    const MatType& X = static_cast<const MatType&>(X_);
+    return sumAll(X*X);
   }
 
 #endif // SWIG
@@ -252,6 +272,7 @@ namespace casadi {
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType) \
 GMTT_INST(MatType, cross) \
 GMTT_INST(MatType, quad_form) \
+GMTT_INST(MatType, sum_square) \
 GMTT_INST(MatType, tril2symm) \
 GMTT_INST(MatType, triu2symm) \
 GMTT_INST(MatType, triu) \

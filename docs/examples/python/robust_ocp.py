@@ -11,11 +11,9 @@ x  = struct_symSX([entry("p",struct=xy), entry("v",struct=xy)])
 u  = struct_symSX(xy)
 w  = struct_symSX(xy)
 
-k = 10; beta = 1; c= 1
-
 rhs = struct_SX(x)
 rhs["p"]  = x["v"]
-rhs["v"]  = -k*(x["p"]-u) - beta*x["v"]*sqrt(sumAll(x["v"]**2)+c**2) + w
+rhs["v"]  = -10*(x["p"]-u) - x["v"]*sqrt(sum_square(x["v"])+1) + w
 
 T = SX.sym("T") # Time-period
 
@@ -34,7 +32,7 @@ hyper = [ ( vertcat([1,1]),   vertcat([0,0  ]) , 4),
 P = SX.sym("P",4,4)
 
 h_nom    = [ sumAll(((x["p"]-p)/s)**n) - 1 for s,p,n in hyper ]
-h_margin = [ sqrt(quad_form(P,jacobian(i,x))) for i in h_nom ]
+h_margin = [ sqrt(quad_form(jacobian(i,x).T,P)) for i in h_nom ]
 
 h_robust = SXFunction([x,P],[ n - gamma*m for n,m in zip(h_nom, h_margin) ])
 h_robust.init()
@@ -87,30 +85,32 @@ for k in range(N):
   Qs.append(mul(C,C.T)*50)
  
 
+# DPLE solver
 dple = DpleSolver("slicot",[i.sparsity() for i in As],[i.sparsity() for i in Qs])
 dple.setOption("linear_solver","csparse")
 dple.init()
 
 Ps = horzsplit(dple(a=horzcat(As),v=horzcat(Qs))["p"],x.shape[0])
 
+# Constraints
 g = struct_MX([
-     entry("periodicity",expr=V["X",0]-V["X",-1]),
-     entry("coupling",expr=g_coupling),
-     entry("obstacles",expr=[ h_robust([V["X",k],Ps[k]]) for k in range(N) ]),
+     entry("periodic", expr=V["X",0]-V["X",-1]),
+     entry("coupling", expr=g_coupling),
+     entry("obstacle", expr=[ h_robust([V["X",k],Ps[k]]) for k in range(N) ]),
   ])
  
- 
-F = V["T"] + 1e-2*sumAll(vertcat(V["U"])**2)/2/N
+# Objective function
+F = V["T"] + 1e-2*norm_22(vertcat(V["U"]))/2/N
 
 nlp = MXFunction(nlpIn(x=V),nlpOut(f=F,g=g))
-
-solver = NlpSolver("ipopt",nlp)
-solver.setOption("hessian_approximation","limited-memory")
-solver.init()
 
 #  ==================================
 #   Set NLP initial guess and bounds
 #  ==================================
+
+solver = NlpSolver("ipopt",nlp)
+solver.setOption("hessian_approximation","limited-memory")
+solver.init()
 
 V0 = V(0.0)
 
@@ -122,10 +122,10 @@ for k in range(N+1):
 
 solver.setInput(V0,"x0")
 
-lbg = g(-inf); ubg = g(inf)
-lbg["coupling"]    = ubg["coupling"]    = 0
-lbg["periodicity"] = ubg["periodicity"] = 0
-lbg["obstacles"]   = 0
+lbg = g(-inf);    ubg = g(inf)
+lbg["coupling"] = ubg["coupling"] = 0
+lbg["periodic"] = ubg["periodic"] = 0
+lbg["obstacle"] = 0
 
 solver.setInput(lbg,"lbg")
 solver.setInput(ubg,"ubg")
