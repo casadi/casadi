@@ -25,15 +25,7 @@
 
 import warnings
 import os
-
-# workaround for issue #1012
-# Since ipopt uses "dlopen" internally, we have to make sure that all the
-# libraries we linked against are visible to the libraries dlopen loads.
-# Specifically, hsl.so needs blas and lapack.
-try:
-    import numpy as np
-except:
-    pass
+import numpy as np
 
 import ctypes
 
