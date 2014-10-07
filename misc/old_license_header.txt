@@ -1,9 +1,8 @@
 /*
  *    This file is part of CasADi.
  *
- *    CasADi -- A minimalistic computer algebra system with automatic differentiation 
- *    and framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl et al., K.U.Leuven. All rights reserved.
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,4 +19,3 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
