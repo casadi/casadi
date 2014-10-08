@@ -23,7 +23,6 @@
  */
 
 
-
       #include "simple_indef_dle_internal.hpp"
       #include <string>
 

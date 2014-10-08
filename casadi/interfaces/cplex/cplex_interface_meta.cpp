@@ -23,7 +23,6 @@
  */
 
 
-
       #include "cplex_interface.hpp"
       #include <string>
 

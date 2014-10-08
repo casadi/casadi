@@ -23,7 +23,6 @@
  */
 
 
-
       #include "qcqp_to_socp.hpp"
       #include <string>
 

@@ -23,7 +23,6 @@
  */
 
 
-
       #include "sqpmethod.hpp"
       #include <string>
 

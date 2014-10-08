@@ -23,7 +23,6 @@
  */
 
 
-
       #include "simple_indef_cle_internal.hpp"
       #include <string>
 

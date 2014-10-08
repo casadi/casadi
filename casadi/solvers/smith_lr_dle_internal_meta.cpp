@@ -23,7 +23,6 @@
  */
 
 
-
       #include "smith_lr_dle_internal.hpp"
       #include <string>
 

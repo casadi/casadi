@@ -23,7 +23,6 @@
  */
 
 
-
       #include "psd_indef_dple_internal.hpp"
       #include <string>
 

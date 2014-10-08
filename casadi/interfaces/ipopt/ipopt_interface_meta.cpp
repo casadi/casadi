@@ -23,7 +23,6 @@
  */
 
 
-
       #include "ipopt_interface.hpp"
       #include <string>
 

@@ -23,7 +23,6 @@
  */
 
 
-
       #include "knitro_interface.hpp"
       #include <string>
 

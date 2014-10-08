@@ -23,7 +23,6 @@
  */
 
 
-
       #include "sqic_interface.hpp"
       #include <string>
 

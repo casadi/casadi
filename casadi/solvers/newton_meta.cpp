@@ -23,7 +23,6 @@
  */
 
 
-
       #include "newton.hpp"
       #include <string>
 
