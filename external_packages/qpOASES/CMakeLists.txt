@@ -26,6 +26,6 @@ add_library(casadi_qpoases SHARED ${SRC} ${EXTRAS_SRC})
 endif()
 target_link_libraries(casadi_qpoases ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
 install(TARGETS casadi_qpoases
-  LIBRARY DESTINATION lib/casadi
-  ARCHIVE DESTINATION lib/casadi
+  LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH}
+  ARCHIVE DESTINATION ${PLUGIN_INSTALL_PATH}
 )

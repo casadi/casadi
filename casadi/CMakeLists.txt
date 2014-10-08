@@ -54,9 +54,9 @@ macro(casadi_library_or_plugin name is_plugin)
   # This seems to be standard practice. --Greg Horn
   if(${is_plugin})
     install(TARGETS ${name}
-      LIBRARY DESTINATION lib/casadi
-      ARCHIVE DESTINATION lib/casadi
-      RUNTIME DESTINATION lib/casadi
+      LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH}
+      ARCHIVE DESTINATION ${PLUGIN_INSTALL_PATH}
+      RUNTIME DESTINATION ${PLUGIN_INSTALL_PATH}
     )
   else()
     install(TARGETS ${name}
