@@ -23,7 +23,6 @@
  */
 
 
-
       #include "implicit_to_nlp.hpp"
       #include <string>
 

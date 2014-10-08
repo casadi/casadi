@@ -23,7 +23,6 @@
  */
 
 
-
       #include "old_collocation_integrator.hpp"
       #include <string>
 

@@ -23,7 +23,6 @@
  */
 
 
-
       #include "lifting_lr_dple_internal.hpp"
       #include <string>
 

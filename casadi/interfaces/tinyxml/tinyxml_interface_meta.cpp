@@ -23,7 +23,6 @@
  */
 
 
-
       #include "tinyxml_interface.hpp"
       #include <string>
 

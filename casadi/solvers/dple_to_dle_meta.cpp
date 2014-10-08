@@ -23,7 +23,6 @@
  */
 
 
-
       #include "dple_to_dle.hpp"
       #include <string>
 

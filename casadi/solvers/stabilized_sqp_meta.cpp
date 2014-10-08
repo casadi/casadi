@@ -23,7 +23,6 @@
  */
 
 
-
       #include "stabilized_sqp.hpp"
       #include <string>
 

@@ -23,7 +23,6 @@
  */
 
 
-
       #include "lapack_lu_dense.hpp"
       #include <string>
 

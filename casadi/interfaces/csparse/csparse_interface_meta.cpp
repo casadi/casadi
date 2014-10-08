@@ -23,7 +23,6 @@
  */
 
 
-
       #include "csparse_interface.hpp"
       #include <string>
 

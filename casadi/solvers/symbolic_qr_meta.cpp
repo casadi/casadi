@@ -23,7 +23,6 @@
  */
 
 
-
       #include "symbolic_qr.hpp"
       #include <string>
 

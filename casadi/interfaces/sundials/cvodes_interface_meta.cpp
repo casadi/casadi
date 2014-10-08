@@ -23,7 +23,6 @@
  */
 
 
-
       #include "cvodes_interface.hpp"
       #include <string>
 

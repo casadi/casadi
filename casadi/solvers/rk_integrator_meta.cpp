@@ -23,7 +23,6 @@
  */
 
 
-
       #include "rk_integrator.hpp"
       #include <string>
 

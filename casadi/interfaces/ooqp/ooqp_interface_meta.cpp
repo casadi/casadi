@@ -23,7 +23,6 @@
  */
 
 
-
       #include "ooqp_interface.hpp"
       #include <string>
 

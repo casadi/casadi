@@ -23,7 +23,6 @@
  */
 
 
-
       #include "snopt_interface.hpp"
       #include <string>
 

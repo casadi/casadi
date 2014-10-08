@@ -23,7 +23,6 @@
  */
 
 
-
       #include "stabilized_qp_to_qp.hpp"
       #include <string>
 
