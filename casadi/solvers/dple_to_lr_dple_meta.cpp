@@ -23,7 +23,6 @@
  */
 
 
-
       #include "dple_to_lr_dple.hpp"
       #include <string>
 

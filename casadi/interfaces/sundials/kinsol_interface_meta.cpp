@@ -23,7 +23,6 @@
  */
 
 
-
       #include "kinsol_interface.hpp"
       #include <string>
 

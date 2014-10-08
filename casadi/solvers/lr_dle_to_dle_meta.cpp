@@ -23,7 +23,6 @@
  */
 
 
-
       #include "lr_dle_to_dle.hpp"
       #include <string>
 

@@ -23,7 +23,6 @@
  */
 
 
-
       #include "socp_to_sdp.hpp"
       #include <string>
 

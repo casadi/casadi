@@ -23,7 +23,6 @@
  */
 
 
-
       #include "sdqp_to_sdp.hpp"
       #include <string>
 

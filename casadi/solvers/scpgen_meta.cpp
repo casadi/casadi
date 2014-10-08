@@ -23,7 +23,6 @@
  */
 
 
-
       #include "scpgen.hpp"
       #include <string>
 

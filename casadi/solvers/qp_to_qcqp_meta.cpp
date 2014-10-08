@@ -23,7 +23,6 @@
  */
 
 
-
       #include "qp_to_qcqp.hpp"
       #include <string>
 

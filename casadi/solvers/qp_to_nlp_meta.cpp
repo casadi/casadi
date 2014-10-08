@@ -23,7 +23,6 @@
  */
 
 
-
       #include "qp_to_nlp.hpp"
       #include <string>
 

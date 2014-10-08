@@ -23,7 +23,6 @@
  */
 
 
-
       #include "qpoases_interface.hpp"
       #include <string>
 

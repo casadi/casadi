@@ -23,7 +23,6 @@
  */
 
 
-
       #include "dsdp_interface.hpp"
       #include <string>
 

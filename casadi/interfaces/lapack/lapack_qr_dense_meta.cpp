@@ -23,7 +23,6 @@
  */
 
 
-
       #include "lapack_qr_dense.hpp"
       #include <string>
 

@@ -23,7 +23,6 @@
  */
 
 
-
       #include "lp_to_qp.hpp"
       #include <string>
 

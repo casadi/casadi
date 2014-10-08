@@ -23,7 +23,6 @@
  */
 
 
-
       #include "simple_homotopy_nlp.hpp"
       #include <string>
 

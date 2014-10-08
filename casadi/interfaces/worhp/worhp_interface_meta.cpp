@@ -23,7 +23,6 @@
  */
 
 
-
       #include "worhp_interface.hpp"
       #include <string>
 

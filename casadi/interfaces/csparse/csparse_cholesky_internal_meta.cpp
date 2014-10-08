@@ -23,7 +23,6 @@
  */
 
 
-
       #include "csparse_cholesky_internal.hpp"
       #include <string>
 

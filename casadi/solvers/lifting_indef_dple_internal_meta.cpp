@@ -23,7 +23,6 @@
  */
 
 
-
       #include "lifting_indef_dple_internal.hpp"
       #include <string>
 
