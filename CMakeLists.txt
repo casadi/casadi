@@ -88,6 +88,9 @@ else()
   option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
   option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 endif()
+# http://stackoverflow.com/questions/8709877/cmake-string-options
+# string-valued options with defaults don't work with option() so use this syntax:
+set(PLUGIN_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/lib/casadi" CACHE STRING "Where the plugins will be installed")
 
 
 
