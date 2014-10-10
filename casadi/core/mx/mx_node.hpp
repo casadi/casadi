@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_MX_NODE_HPP
 #define CASADI_MX_NODE_HPP
@@ -286,6 +289,13 @@ namespace casadi {
 
     /// Create a vertical split node (vectors only)
     virtual std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
+
+    /// Create a diagonal concatenation node
+    virtual MX getDiagcat(const std::vector<MX>& x) const;
+
+    /// Create a diagonal split node
+    virtual std::vector<MX> getDiagsplit(const std::vector<int>& offset1,
+                                         const std::vector<int>& offset2) const;
 
     /// Transpose
     virtual MX getTranspose() const;

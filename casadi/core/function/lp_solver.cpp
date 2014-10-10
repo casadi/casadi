@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #include "lp_internal.hpp"
 
 using namespace std;
@@ -36,12 +39,12 @@ namespace casadi {
     return static_cast<const LpSolverInternal*>(Function::operator->());
   }
 
-  bool LpSolver::checkNode() const {
-    return dynamic_cast<const LpSolverInternal*>(get())!=0;
+  bool LpSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const LpSolverInternal*>(ptr)!=0;
   }
 
   LpSolver::LpSolver(const std::string& name, const LPStructure& st) {
-    assignNode(LpSolverInternal::getPlugin(name).creator(st));
+    assignNode(LpSolverInternal::getPlugin(name).creator(st)->adaptor(name));
   }
 
   void LpSolver::loadPlugin(const std::string& name) {

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #include "nlp_solver.hpp"
 #include "nlp_solver_internal.hpp"
 #include "../sx/sx_tools.hpp"
@@ -34,7 +37,7 @@ namespace casadi {
   }
 
   NlpSolver::NlpSolver(const std::string& name, const Function& nlp) {
-    assignNode(NlpSolverInternal::getPlugin(name).creator(nlp));
+    assignNode(NlpSolverInternal::getPlugin(name).creator(nlp)->adaptor(name));
   }
 
   NlpSolverInternal* NlpSolver::operator->() {
@@ -45,8 +48,8 @@ namespace casadi {
     return static_cast<const NlpSolverInternal*>(Function::operator->());
   }
 
-  bool NlpSolver::checkNode() const {
-    return dynamic_cast<const NlpSolverInternal*>(get())!=0;
+  bool NlpSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const NlpSolverInternal*>(ptr)!=0;
   }
 
   void NlpSolver::reportConstraints(std::ostream &stream) {
@@ -205,6 +208,10 @@ namespace casadi {
 
   void NlpSolver::setOptionsFromFile(const std::string & file) {
     (*this)->setOptionsFromFile(file);
+  }
+
+  std::string NlpSolver::infix() {
+    return NlpSolverInternal::infix_;
   }
 
 } // namespace casadi

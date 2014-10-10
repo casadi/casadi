@@ -1,24 +1,26 @@
 #
 #     This file is part of CasADi.
-# 
+#
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-# 
+#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2011-2014 Greg Horn
+#
 #     CasADi is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU Lesser General Public
 #     License as published by the Free Software Foundation; either
 #     version 3 of the License, or (at your option) any later version.
-# 
+#
 #     CasADi is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #     Lesser General Public License for more details.
-# 
+#
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-# 
-# 
+#
+#
 from casadi import *
 import casadi as c
 from numpy import *
@@ -40,9 +42,21 @@ class typemaptests(casadiTestCase):
   def setUp(self):
     pass
 
+  def test_0a(self):
+    self.message("Typemap array -> IMatrix")
+    arrays = [array([[1,2,3],[4,5,6]],dtype=int32),array([[1,2,3],[4,5,6]]),array([[1,2,3],[4,5,6]],dtype=int)]
+    for i in range(len(arrays)):
+      m = arrays[i]
+      zt=c.transpose(c.transpose(m))
+      self.assertTrue(isinstance(zt,IMatrix),"IMatrix expected")
+      self.checkarray(m,zt,"IMatrix(numpy.ndarray)")
+      self.checkarray(m,zt.toArray(),"IMatrix(numpy.ndarray).toArray()")
+      #if scipy_available:
+      #  self.checkarray(m,zt.toCsc_matrix(),"IMatrix(numpy.ndarray).toCsc_matrix()")
+      
   def test_0(self):
     self.message("Typemap array -> DMatrix")
-    arrays = [array([[1,2,3],[4,5,6]]),array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
+    arrays = [array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))
@@ -897,6 +911,12 @@ class typemaptests(casadiTestCase):
       self.checkarray(val(SX(a)),DMatrix([[1,2],[3,4]]))
       self.checkarray(val(SX(a.T).T),DMatrix([[1,2],[3,4]]))
       
+  def test_issue1158(self):
+    A = numpy.zeros((0,2))
+    a = DMatrix(A)
+    self.assertEqual(a.shape[0],0)
+    self.assertEqual(a.shape[1],2)
+    
   def test_matrices(self):
 
     from scipy.sparse import csc_matrix

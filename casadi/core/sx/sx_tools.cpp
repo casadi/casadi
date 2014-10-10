@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "sx_tools.hpp"
 #include "../function/sx_function_internal.hpp"
@@ -848,33 +851,34 @@ namespace casadi {
     SXFunction f(arg, ex);
     f.init();
 
-    // Dimension of v
-    int v1 = v.size2(), v2 = v.size1();
+    // Split up v
+    vector<SX> vv = horzsplit(v);
 
     // Make sure well-posed
-    casadi_assert(v2 >= 1);
-    casadi_assert(ex.size1()==1);
-    casadi_assert(arg.size1()==1);
+    casadi_assert(vv.size() >= 1);
+    casadi_assert(ex.isVector());
+    casadi_assert(arg.isVector());
     if (transpose_jacobian) {
-      casadi_assert(v1==ex.size2());
+      casadi_assert(v.size1()==ex.size1());
     } else {
-      casadi_assert(v1==arg.size2());
+      casadi_assert(v.size1()==arg.size1());
     }
 
     // Number of sensitivities
-    int nfsens = transpose_jacobian ? 0 : v2;
-    int nasens = transpose_jacobian ? v2 : 0;
+    int nfsens = transpose_jacobian ? 0 : vv.size();
+    int nasens = transpose_jacobian ? vv.size() : 0;
 
     // Assemble arguments and directional derivatives
     vector<SX> argv = f.inputExpr();
     vector<SX> resv = f.outputExpr();
     vector<vector<SX> > fseed(nfsens, argv), fsens(nfsens, resv),
         aseed(nasens, resv), asens(nasens, argv);
-    for (int dir=0; dir<v2; ++dir) {
+
+    for (int dir=0; dir<vv.size(); ++dir) {
       if (transpose_jacobian) {
-        aseed[dir][0].set(v(dir, Slice(0, v1)));
+        aseed[dir][0].set(vv[dir]);
       } else {
-        fseed[dir][0].set(v(dir, Slice(0, v1)));
+        fseed[dir][0].set(vv[dir]);
       }
     }
 
@@ -882,15 +886,14 @@ namespace casadi {
     f.callDerivative(argv, resv, fseed, fsens, aseed, asens);
 
     // Get the results
-    vector<SX> dirder(v2);
-    for (int dir=0; dir<v2; ++dir) {
+    for (int dir=0; dir<vv.size(); ++dir) {
       if (transpose_jacobian) {
-        dirder[dir] = asens[dir][0];
+        vv[dir] = asens[dir][0];
       } else {
-        dirder[dir] = fsens[dir][0];
+        vv[dir] = fsens[dir][0];
       }
     }
-    return vertcat(dirder);
+    return horzcat(vv);
   }
 
   void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v,
@@ -1103,7 +1106,7 @@ namespace casadi {
       mult*=i+1;
     }
 
-    if (!success) casadi_error("poly: suplied expression does not appear to be polynomial.");
+    if (!success) casadi_error("poly: supplied expression does not appear to be polynomial.");
 
     std::reverse(ret.data().begin(), ret.data().end());
 
@@ -1114,7 +1117,7 @@ namespace casadi {
 
   SX poly_roots(const SX& p) {
     casadi_assert_message(p.size2()==1,
-                          "poly_root(): supplied paramter must be column vector but got "
+                          "poly_root(): supplied parameter must be column vector but got "
                           << p.dimString() << ".");
     casadi_assert(p.isDense());
     if (p.size1()==2) { // a*x + b
@@ -1208,7 +1211,7 @@ namespace casadi {
 
     SX ret;
 
-    /// Bring m in block diagonal form, calculating eigenvalues of each block seperately
+    /// Bring m in block diagonal form, calculating eigenvalues of each block separately
     std::vector<int> offset;
     std::vector<int> index;
     int nb = m.sparsity().stronglyConnectedComponents(offset, index);

@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 2.6)
 
 include_directories(include src/bounds src/lp src/sdp src/solver src/sys src/vecmat)
 
+# cmake_policy use MACOSX_RPATH=ON by default
+if(COMMAND cmake_policy)
+  if(CMAKE_MAJOR_VERSION GREATER 2)
+    cmake_policy(SET CMP0042 NEW)
+  endif()
+endif()
+
 file(GLOB DSDP_SRC "src/bounds/*.c"  "src/bounds/*.h" "src/lp/*.c" "src/lp/*.h" "src/sdp/*.c" "src/sdp/*.h" "src/solver/*.c" "src/solver/*.h" "src/sys/*.c" "src/sys/*.h" "src/vecmat/*.c" "src/vecmat/*.h")
 
 set(DSDP_LIBRARIES ${DSDP_LIBRARIES})
@@ -22,5 +29,9 @@ install(DIRECTORY include
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-set_target_properties(casadi_dsdp PROPERTIES COMPILE_FLAGS "-Wno-unused-value")
+set_target_properties(
+  casadi_dsdp
+PROPERTIES
+  SOVERSION ${PACKAGE_SO_VERSION}
+)
 endif()

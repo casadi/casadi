@@ -1,5 +1,5 @@
 # libraries
-set(SNOPT_LIBS_LIST snopt7)
+set(SNOPT_LIBS_LIST snopt7 snopt7_cpp)
 
 set(SNOPT_LIBRARIES)
 foreach(LIB ${SNOPT_LIBS_LIST})

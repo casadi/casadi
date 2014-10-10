@@ -1,24 +1,26 @@
 #
 #     This file is part of CasADi.
-# 
+#
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-# 
+#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2011-2014 Greg Horn
+#
 #     CasADi is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU Lesser General Public
 #     License as published by the Free Software Foundation; either
 #     version 3 of the License, or (at your option) any later version.
-# 
+#
 #     CasADi is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #     Lesser General Public License for more details.
-# 
+#
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-# 
-# 
+#
+#
 from casadi import *
 import casadi as c
 from numpy import *
@@ -29,7 +31,13 @@ from helpers import *
 socpsolvers = []
 try:
   SdpSolver.loadPlugin("dsdp")
-  socpsolvers.append((SDPSocpSolver,{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
+  socpsolvers.append(("sdp",{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
+except:
+  pass
+
+try:
+  SocpSolver.loadPlugin("sdp.dsdp")
+  socpsolvers.append(("sdp.dsdp",{ "target_options": {"verbose":True}},False))
 except:
   pass
   
@@ -58,7 +66,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -97,7 +105,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -137,7 +145,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -181,7 +189,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2,2])
       solver.init()
@@ -221,7 +229,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2,3])
       solver.init()

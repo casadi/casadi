@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "external_function_internal.hpp"
 #include "../std_vector_tools.hpp"
@@ -58,7 +61,10 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
 
   // Load symbols
   initPtr init = (initPtr)dlsym(handle_, "init");
-  if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
+  if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"init\" found. "
+                                       "Possible cause: If the function was generated from CasADi, "
+                                       "make sure that it was compiled with a C compiler. If the "
+                                       "function is C++, make sure to use extern \"C\" linkage.");
   getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "getSparsity");
   if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
   evaluate_ = (evaluatePtr) dlsym(handle_, "evaluateWrap");

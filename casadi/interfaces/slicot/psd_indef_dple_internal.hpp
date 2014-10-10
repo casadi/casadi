@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,16 +22,18 @@
  *
  */
 
+
 #ifndef CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
 #define CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
 
-#include "../../control/dple_internal.hpp"
+#include "../../core/function/dple_internal.hpp"
+#include "../../core/function/dense_io.hpp"
 #include <casadi/interfaces/slicot/casadi_dplesolver_slicot_export.h>
 
 /** \defgroup plugin_DpleSolver_slicot
  *
  * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
- 
+
  * Uses Periodic Schur Decomposition ('psd') and does not assume positive definiteness.
  * Based on Periodic Lyapunov equations: some applications and new algorithms.
  * Int. J. Control, vol. 67, pp. 69-87, 1997.
@@ -41,23 +45,23 @@
 namespace casadi {
 
   /** \brief \pluginbrief{DpleSolver,slicot}
-   * 
+   *
    * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
    *
    * @copydoc DPLE_doc
    * @copydoc plugin_DpleSolver_slicot
-   
+
        \author Joris Gillis
       \date 2014
 
   */
-  class CASADI_DPLESOLVER_SLICOT_EXPORT PsdIndefDpleInternal : public DpleInternal {
+  class CASADI_DPLESOLVER_SLICOT_EXPORT PsdIndefDpleInternal : public DpleInternal,
+    public DenseIO<PsdIndefDpleInternal> {
   public:
     /** \brief  Constructor
-     *  \param[in] A  List of sparsities of A_i
-     *  \param[in] V  List of sparsities of V_i
+     * \param st \structargument{Dple}
      */
-    PsdIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V,
+    PsdIndefDpleInternal(const DpleStructure & st,
                          int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
@@ -70,14 +74,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual PsdIndefDpleInternal* create(const std::vector< Sparsity >& A,
-                                         const std::vector< Sparsity >& V) const
-    { return new PsdIndefDpleInternal(A, V); }
+    virtual PsdIndefDpleInternal* create(const DpleStructure & st) const
+    { return new PsdIndefDpleInternal(st); }
 
     /** \brief  Create a new DPLE Solver */
-    static DpleInternal* creator(const std::vector< Sparsity >& A,
-                                 const std::vector< Sparsity >& V)
-    { return new PsdIndefDpleInternal(A, V);}
+    static DpleInternal* creator(const DpleStructure & st)
+    { return new PsdIndefDpleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "nullspace.hpp"
 #include "nullspace_internal.hpp"
@@ -37,8 +40,8 @@ namespace casadi {
     return static_cast<const NullspaceInternal*>(Function::operator->());
   }
 
-  bool Nullspace::checkNode() const {
-    return dynamic_cast<const NullspaceInternal*>(get())!=0;
+  bool Nullspace::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const NullspaceInternal*>(ptr)!=0;
   }
 
 } // namespace casadi

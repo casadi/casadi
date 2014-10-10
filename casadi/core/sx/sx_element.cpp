@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "sx_element.hpp"
 #include "../matrix/matrix.hpp"
@@ -126,9 +129,13 @@ namespace casadi {
     return *this = SXElement(scalar);
   }
 
-  std::ostream &operator<<(std::ostream &stream, const SXElement &scalar) {
-    scalar.node->print(stream);
-    return stream;
+  void SXElement::repr(std::ostream &stream, bool trailing_newline) const {
+    print(stream, trailing_newline);
+  }
+
+  void SXElement::print(std::ostream &stream, bool trailing_newline) const {
+    node->print(stream);
+    if (trailing_newline) stream << std::endl;
   }
 
   void SXElement::print(std::ostream &stream, long& remaining_calls) const {
@@ -401,18 +408,6 @@ namespace casadi {
 
   SXElement SXElement::unary(int op, const SXElement& x) {
     return UnarySX::create(Operation(op), x);
-  }
-
-  // SXElement::operator vector<SXElement>() const {
-  //   vector<SXElement> ret(1);
-  //   ret[0] = *this;
-  //   return ret;
-  // }
-
-  string SXElement::toString() const {
-    stringstream ss;
-    ss << *this;
-    return ss.str();
   }
 
   bool SXElement::isLeaf() const {

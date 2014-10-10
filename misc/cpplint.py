@@ -30,7 +30,7 @@
 
 
 # April 2014, Greg Horn:
-#   Edited the original file to supress "Done processing xxx"
+#   Edited the original file to suppress "Done processing xxx"
 
 """Does google-lint on c++ files.
 
@@ -4641,7 +4641,7 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
             'One or more unexpected \\r (^M) found;'
             'better to use only a \\n')
 
-  # supress printing
+  # suppress printing
   # sys.stderr.write('Done processing %s\n' % filename)
 
 
@@ -4739,6 +4739,11 @@ def ParseArguments(args):
 
 def main():
   filenames = ParseArguments(sys.argv[1:])
+  # Filter files we don't want to lint.
+  # This should really be done in cmake.
+  # -Greg
+  nolint = ['snopt.h', 'snoptProblem.hpp']
+  filenames = filter(lambda x: x not in nolint, filenames)
 
   # Change stderr to write with replacement characters so we don't die
   # if we try to print something containing non-ASCII characters.

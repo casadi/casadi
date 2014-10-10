@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #ifndef CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
 #define CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
 
@@ -30,16 +33,14 @@
 /** \pluginsection{LinearSolver,csparsecholesky} */
 
 /// \cond INTERNAL
-extern "C" {
-#include "external_packages/CSparse/Include/cs.h"
-}
+#include <cs.h>
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include <casadi/interfaces/csparse/casadi_linearsolver_csparsecholesky_export.h>
 
 namespace casadi {
 
   /** \brief \pluginbrief{LinearSolver,csparsecholesky}
-   * 
+   *
    *
    @copydoc LinearSolver_doc
    @copydoc plugin_LinearSolver_csparsecholesky

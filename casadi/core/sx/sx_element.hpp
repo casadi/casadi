@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,10 +22,12 @@
  *
  */
 
+
 #ifndef CASADI_SX_ELEMENT_HPP
 #define CASADI_SX_ELEMENT_HPP
 
 // exception class
+#include "../printable_object.hpp"
 #include "../casadi_exception.hpp"
 #include "../casadi_limits.hpp"
 #include "../matrix/matrix.hpp"
@@ -37,14 +41,10 @@
 #include <cmath>
 #include <vector>
 
-
-
 namespace casadi {
 
   /** \brief  forward declaration of Node and Matrix */
   class SXNode; // include will follow in the end
-
-
 
 #ifdef SWIG
 #ifdef WITH_IMPLICITCONV
@@ -54,9 +54,10 @@ namespace casadi {
 
   /** \brief The basic scalar symbolic class of CasADi
       \author Joel Andersson
-      \date 2010
+      \date 2010-2014
   */
-  class CASADI_CORE_EXPORT SXElement : public GenericExpression<SXElement>{
+  class CASADI_CORE_EXPORT SXElement : public GenericExpression<SXElement>,
+                                       public PrintableObject<SXElement> {
     friend class SXNode;
     friend class BinarySXNode;
     friend class Matrix<SXElement>;
@@ -109,15 +110,14 @@ namespace casadi {
     /// Convert to a 1-by-1 Matrix
     operator Matrix<SXElement>() const;
 
-    /** \brief  print to stream */
-    CASADI_CORE_EXPORT friend std::ostream& operator<<(std::ostream &stream,
-                                                           const SXElement &scalar);
+    /// Print a representation of the object
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print a description of the object
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /** \brief  print to stream, limited */
     void print(std::ostream &stream, long& remaining_calls) const;
-
-    /** \brief  string representation (SWIG workaround) */
-    std::string toString() const;
 
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */
@@ -274,7 +274,7 @@ namespace casadi {
     /// Mark by flipping the sign of the temporary and decreasing by one
     void mark();
 
-    /** \brief Assign to another expression, if a duplicate. 
+    /** \brief Assign to another expression, if a duplicate.
      * Check for equality up to a given depth */
     void assignIfDuplicate(const SXElement& scalar, int depth=1);
 
@@ -298,15 +298,6 @@ namespace casadi {
 #endif // SWIG
 
   };
-
-#ifdef SWIG
-  %extend SXElement {
-    std::string __str__()  { return $self->toString(); }
-    std::string __repr__() { return $self->toString(); }
-    double __float__() { return $self->getValue();}
-    int __int__() { return $self->getIntValue();}
-  }
-#endif // SWIG
 
 /// \cond INTERNAL
 #ifndef SWIG

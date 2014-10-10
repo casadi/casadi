@@ -1,8 +1,10 @@
 /*
- *    $self file is part of CasADi.
+ *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -35,7 +37,6 @@
 #include "casadi/core/function/qp_solver.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
 #include "casadi/core/function/lp_solver.hpp"
-#include "casadi/core/function/ocp_solver.hpp"
 #include "casadi/core/function/sdp_solver.hpp"
 #include "casadi/core/function/socp_solver.hpp"
 #include "casadi/core/function/qcqp_solver.hpp"
@@ -44,6 +45,11 @@
 #include "casadi/core/function/parallelizer.hpp"
 #include "casadi/core/function/custom_function.hpp"
 #include "casadi/core/function/nullspace.hpp"
+#include "casadi/core/function/dple_solver.hpp"
+#include "casadi/core/function/dle_solver.hpp"
+#include "casadi/core/function/lr_dple_solver.hpp"
+#include "casadi/core/function/lr_dle_solver.hpp"
+#include "casadi/core/function/cle_solver.hpp"
 %}
 
 #ifdef SWIGOCTAVE
@@ -149,6 +155,7 @@ def PyFunction(obj,inputs,outputs):
 %template(__call__original__) operator()< casadi::Sparsity >;
 %template(__call__original__) operator()< casadi::MX> ;
 %template(__call__original__) operator()< casadi::Matrix<casadi::SXElement> >;
+%template(__call__original__) operator()< casadi::Matrix<double> >;
 
 %pythoncode %{
   def __call__(self,*dummy,**kwargs):
@@ -161,10 +168,18 @@ def PyFunction(obj,inputs,outputs):
 }
 #endif
 
+%template(PrintIOSchemeVectorMX)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::MX> >;
+%template(PrintIOSchemeVectorSX)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> > >;
+%template(PrintIOSchemeVectorD)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<double> > >;
+%template(PrintIOSchemeVectorSparsity)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Sparsity> >;
+%template(PrintIOSchemeVectorSparsityVector)        casadi::PrintableObject<casadi::IOSchemeVector< std::vector< casadi::Sparsity> > >;
 %include "casadi/core/function/io_scheme_vector.hpp"
+
 %template(IOSchemeVectorMX) casadi::IOSchemeVector< casadi::MX >;
 %template(IOSchemeVectorSX) casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> >;
+%template(IOSchemeVectorD) casadi::IOSchemeVector< casadi::Matrix<double> >;
 %template(IOSchemeVectorSparsity) casadi::IOSchemeVector< casadi::Sparsity >;
+%template(IOSchemeVectorSparsityVector) casadi::IOSchemeVector< std::vector< casadi::Sparsity > >;
 #ifdef SWIGPYTHON
 %extend casadi::IOSchemeVector< casadi::MX > {
 %pythoncode %{
@@ -173,6 +188,12 @@ def PyFunction(obj,inputs,outputs):
 %}
 }
 %extend casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> > {
+%pythoncode %{
+  def __iter__(self):
+    return iter(self.data)
+%}
+}
+%extend casadi::IOSchemeVector< casadi::Matrix<double> > {
 %pythoncode %{
   def __iter__(self):
     return iter(self.data)
@@ -207,7 +228,6 @@ def PyFunction(obj,inputs,outputs):
 %include "casadi/core/function/qp_solver.hpp"
 %include "casadi/core/function/stabilized_qp_solver.hpp"
 %include "casadi/core/function/lp_solver.hpp"
-%include "casadi/core/function/ocp_solver.hpp"
 %include "casadi/core/function/sdp_solver.hpp"
 %include "casadi/core/function/socp_solver.hpp"
 %include "casadi/core/function/qcqp_solver.hpp"
@@ -217,6 +237,11 @@ def PyFunction(obj,inputs,outputs):
 %include "casadi/core/function/custom_function.hpp"
 %include "casadi/core/functor.hpp"
 %include "casadi/core/function/nullspace.hpp"
+%include "casadi/core/function/dple_solver.hpp"
+%include "casadi/core/function/dle_solver.hpp"
+%include "casadi/core/function/lr_dple_solver.hpp"
+%include "casadi/core/function/lr_dle_solver.hpp"
+%include "casadi/core/function/cle_solver.hpp"
 
 %template(IntegratorVector) std::vector<casadi::Integrator>;
 %template(Pair_Function_Function) std::pair<casadi::Function,casadi::Function>;

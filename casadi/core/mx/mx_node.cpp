@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,10 +22,10 @@
  *
  */
 
+
 #include "mx_node.hpp"
 #include "mx_tools.hpp"
 #include "../std_vector_tools.hpp"
-#include <cassert>
 #include <typeinfo>
 #include "../matrix/matrix_tools.hpp"
 #include "transpose.hpp"
@@ -345,7 +347,7 @@ namespace casadi {
     // Form result of the right sparsity
     MX z;
     if (sp_z.isNull()) {
-      Sparsity sp_z_ = y.sparsity().patternProduct(trans_x.sparsity());
+      Sparsity sp_z_ = sparsity().patternProductNew(y.sparsity());
       z = MX::zeros(sp_z_);
     } else {
       z = MX::zeros(sp_z);
@@ -708,6 +710,11 @@ namespace casadi {
     return MX::create(new Horzcat(x));
   }
 
+  MX MXNode::getDiagcat(const std::vector<MX>& x) const {
+    // Create a Horzcat node
+    return MX::create(new Diagcat(x));
+  }
+
   MX MXNode::getVertcat(const std::vector<MX>& x) const {
     // Check if there is any existing vertcat operation
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
@@ -757,6 +764,22 @@ namespace casadi {
         }
       }
     }
+    return ret;
+  }
+
+  std::vector<MX> MXNode::getDiagsplit(const std::vector<int>& offset1,
+                                       const std::vector<int>& offset2) const {
+    if (isZero()) {
+      std::vector<MX> ret =
+          MX::createMultipleOutput(new Diagsplit(shared_from_this<MX>(), offset1, offset2));
+      for (int i=0;i<ret.size();++i) {
+        ret[i]=MX::zeros(ret[i].sparsity());
+      }
+      return ret;
+    }
+    std::vector<MX> ret =
+        MX::createMultipleOutput(new Diagsplit(shared_from_this<MX>(), offset1, offset2));
+
     return ret;
   }
 

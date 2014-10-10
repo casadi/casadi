@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
@@ -56,6 +59,18 @@ namespace casadi {
       return horzcat(trim_empty(x));
     } else {
       return x.front()->getHorzcat(x);
+    }
+  }
+
+  MX diagcat(const vector<MX>& x) {
+    if (x.empty()) {
+      return MX();
+    } else if (x.size()==1) {
+      return x.front();
+    } else if (has_empty(x)) {
+      return diagcat(trim_empty(x));
+    } else {
+      return x.front()->getDiagcat(x);
     }
   }
 
@@ -98,6 +113,23 @@ namespace casadi {
     vector<int> offset2 = range(0, x.size2(), incr);
     offset2.push_back(x.size2());
     return horzsplit(x, offset2);
+  }
+
+  std::vector<MX> diagsplit(const MX& x,
+    const std::vector<int>& offset1, const std::vector<int>& offset2) {
+    // Consistency check
+    casadi_assert(offset1.size()>=1);
+    casadi_assert(offset1.front()==0);
+    casadi_assert(offset1.back()==x.size1());
+    casadi_assert(isMonotone(offset1));
+
+    // Consistency check
+    casadi_assert(offset2.size()>=1);
+    casadi_assert(offset2.front()==0);
+    casadi_assert(offset2.back()==x.size2());
+    casadi_assert(isMonotone(offset2));
+
+    return x->getDiagsplit(offset1, offset2);
   }
 
   std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset) {
@@ -175,7 +207,11 @@ namespace casadi {
   }
 
   MX norm_2(const MX &x) {
-    return x->getNorm2();
+    if (x.isVector()) {
+      return norm_F(x);
+    } else {
+      return x->getNorm2();
+    }
   }
 
   MX norm_F(const MX &x) {
@@ -414,24 +450,7 @@ namespace casadi {
   }
 
   MX blkdiag(const std::vector<MX> &A) {
-    // This implementation does not pretend to be efficient
-    int nrow=0, ncol=0;
-    for (int i=0;i<A.size();++i) {
-      nrow += A[i].size1();
-      ncol += A[i].size2();
-    }
-
-    MX ret = MX::sparse(nrow, ncol);
-    nrow = 0;
-    ncol = 0;
-
-    for (int i=0;i<A.size();++i) {
-      ret(range(nrow, nrow+A[i].size1()), range(ncol, ncol+A[i].size2())) = A[i];
-      nrow += A[i].size1();
-      ncol += A[i].size2();
-    }
-
-    return ret;
+    return diagcat(A);
   }
 
   MX blkdiag(const MX &A, const MX& B) {
@@ -951,7 +970,7 @@ namespace casadi {
     // Substitute symbols for boundary nodes
     std::vector<MX> ret = graph_substitute(e, boundary, syms);
 
-    // Obtain list of dependants
+    // Obtain list of dependents
     std::vector<MX> v = getSymbols(ret);
 
     // Construct an MXFunction with it

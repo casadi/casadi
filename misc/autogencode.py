@@ -1,3 +1,26 @@
+#
+#     This file is part of CasADi.
+#
+#     CasADi -- A symbolic framework for dynamic optimization.
+#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2011-2014 Greg Horn
+#
+#     CasADi is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU Lesser General Public
+#     License as published by the Free Software Foundation; either
+#     version 3 of the License, or (at your option) any later version.
+#
+#     CasADi is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     Lesser General Public License for more details.
+#
+#     You should have received a copy of the GNU Lesser General Public
+#     License along with CasADi; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+#
+#
 """
 
 This script generates parts of CasADi source code that are highly repetitive and easily automated
@@ -158,27 +181,34 @@ class CASADI_CORE_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
   def swigcode(self):
     s="namespace casadi {\n"
     #s+= "%warnfilter(302) " + self.name+ ";\n" -- does not seem to work
-    if self.enum.endswith('Struct'):
+    if self.enum.endswith('VecStruct'):
+      s+="%template(" + self.name + ") " + self.name + "< std::vector<casadi::Sparsity> >;\n"
+    elif self.enum.endswith('Struct'):
       s+="%template(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
     else:
       s+="%template(" + self.name + ") " + self.name + "<casadi::SX>;\n"
       s+="%template(" + self.name + ") " + self.name + "<casadi::MX>;\n"
+      s+="%template(" + self.name + ") " + self.name + "<casadi::Matrix<double> >;\n"
       s+="%template(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
       s+="%template(" +  "IOSchemeVector" + self.enum + "SX) " + self.enum + "IOSchemeVector<SX>;\n"
       s+="%template(" +  "IOSchemeVector" + self.enum + "MX) " + self.enum + "IOSchemeVector<MX>;\n"
+      s+="%template(" +  "IOSchemeVector" + self.enum + "D) " + self.enum + "IOSchemeVector< Matrix<double> >;\n"
       s+="%template(" +  "IOSchemeVector" + self.enum + "Sparsity) " + self.enum + "IOSchemeVector<Sparsity>;\n"
       #s+="%rename(" + self.name + ") " + self.name + "<casadi::SX>;\n"
       #s+="%rename(" + self.name + ") " + self.name + "<casadi::MX>;\n"
       #s+="%rename(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
       s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "SX;\n"
       s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "MX;\n"
+      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "D;\n"
       s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum+ "Sparsity;\n"
     s+="}\n"
     return s
 
   def pureswigcode(self):
     s="namespace casadi {\n"
-    if self.enum.endswith('Struct'):
+    if self.enum.endswith('VecStruct'):
+      s+="%template(" + self.enum + "ure) " + self.enum + "IOSchemeVector< std::vector<Sparsity> >;\n"
+    elif self.enum.endswith('Struct'):
       s+="%template(" + self.enum + "ure) " + self.enum + "IOSchemeVector<Sparsity>;\n"
     s+="}\n"
     return s
@@ -201,7 +231,7 @@ class CASADI_CORE_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     s+="""  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of %s. Either use keywords or non-keywords ")\n""" % self.name
     s+="""  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_%s,n)] for n in dummy[1:]]\n""" % self.enum
     for name, doc, enum in self.entries:
-      s+="  %s = []\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,name,name,name)
+      s+="  %s = %s\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,"Sparsity()" if self.enum.endswith("Struct") and not self.enum.endswith("VecStruct") else "[]",name,name,name)
     s+="""  for k in kwargs.keys():\n    if not(k in [%s]):\n      raise Exception("Keyword error in %s: '%%s' is not recognized. Available keywords are: %s" %% k )\n""" % (",".join(["'%s'" % name for name, doc, enum in self.entries]),self.name,", ".join([name for name, doc, enum in self.entries]))
 
     if (self.enum.endswith("Struct")):
@@ -293,7 +323,7 @@ autogenpy.write("""%include "casadi/core/function/schemes_metadata.hpp"\n%includ
 
 schemes = []
 
-for h in locate("*.hpp",os.path.join(os.curdir,"..")):
+for h in locate("*.hpp",os.path.join(os.curdir,"../casadi/core")):
   f =  file(h,'r')
   while 1:
     line = f.readline()
@@ -344,6 +374,10 @@ autogenpy.write("%pythoncode %{\n")
 autogenpy.write("""
 def IOSchemeVector(arg,io_scheme):
   try:
+    return IOSchemeVectorD(arg,io_scheme)
+  except:
+    pass
+  try:
     return IOSchemeVectorSX(arg,io_scheme)
   except:
     pass
@@ -356,7 +390,7 @@ def IOSchemeVector(arg,io_scheme):
     return IOSchemeVectorSparsity(arg,io_scheme)
   except:
     pass
-  raise Exception("IOSchemeVector called with faulty arguments. Individual values must be SX, MX or Sparsity.")
+  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX or Sparsity.")
 """)
 autogenpy.write("%}\n")
 autogenpy.write("#endif //SWIGPYTHON\n")

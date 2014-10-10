@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_QP_SOLVER_HPP
 #define CASADI_QP_SOLVER_HPP
@@ -110,7 +113,7 @@ namespace casadi {
 
       \generalsection{QpSolver}
       \pluginssection{QpSolver}
-      
+
       \author Joel Andersson
       \date 2010
   */
@@ -130,8 +133,8 @@ namespace casadi {
     QpSolverInternal* operator->();
     const QpSolverInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
@@ -143,10 +146,13 @@ namespace casadi {
     void setLPOptions();
 
     /** Generate native code in the interfaced language for debugging */
-    virtual void generateNativeCode(const std::string &filename) const;
+    void generateNativeCode(const std::string &filename) const;
 
     /** Generate native code in the interfaced language for debugging */
-    virtual void generateNativeCode(std::ostream &file) const;
+    void generateNativeCode(std::ostream &file) const;
+
+    /// Infix
+    static std::string infix();
   };
 
 } // namespace casadi

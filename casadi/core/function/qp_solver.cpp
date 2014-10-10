@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "qp_solver_internal.hpp"
 
@@ -37,8 +40,8 @@ namespace casadi {
     return static_cast<const QpSolverInternal*>(Function::operator->());
   }
 
-  bool QpSolver::checkNode() const {
-    return dynamic_cast<const QpSolverInternal*>(get())!=0;
+  bool QpSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const QpSolverInternal*>(ptr)!=0;
   }
 
   void QpSolver::setLPOptions() {
@@ -48,7 +51,6 @@ namespace casadi {
   void QpSolver::generateNativeCode(const std::string &filename) const {
     std::ofstream file;
     file.open(filename.c_str());
-
     (*this)->generateNativeCode(file);
   }
 
@@ -57,7 +59,7 @@ namespace casadi {
   }
 
   QpSolver::QpSolver(const std::string& name, const QPStructure& st) {
-    assignNode(QpSolverInternal::getPlugin(name).creator(st));
+    assignNode(QpSolverInternal::getPlugin(name).creator(st)->adaptor(name));
   }
 
   void QpSolver::loadPlugin(const std::string& name) {
@@ -66,6 +68,10 @@ namespace casadi {
 
   std::string QpSolver::doc(const std::string& name) {
     return QpSolverInternal::getPlugin(name).doc;
+  }
+
+  std::string QpSolver::infix() {
+    return QpSolverInternal::infix_;
   }
 
 } // namespace casadi

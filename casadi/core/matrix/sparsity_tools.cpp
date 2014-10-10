@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "sparsity_tools.hpp"
 #include "../casadi_exception.hpp"
@@ -39,7 +42,16 @@ namespace casadi {
   }
 
   Sparsity mul(const Sparsity& a, const Sparsity &b) {
-    return b.patternProduct(a.T());
+    return a.patternProductNew(b);
+  }
+
+  Sparsity mul(const std::vector<Sparsity>& s) {
+    if (s.size()==0) return Sparsity();
+    Sparsity ret = s[0];
+    for (int i=1;i<s.size();++i) {
+      ret = mul(ret, s[i]);
+    }
+    return ret;
   }
 
   int rank(const Sparsity& a) {
@@ -82,6 +94,13 @@ namespace casadi {
       }
       return ret.T();
     }
+  }
+
+  Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v) {
+    std::vector< Sparsity > ret;
+    for (int i=0; i<v.size(); ++i)
+      ret.push_back(horzcat(v[i]));
+    return vertcat(ret);
   }
 
   Sparsity vertcat(const Sparsity & a, const Sparsity & b) {
@@ -128,6 +147,42 @@ namespace casadi {
     v.push_back(b);
 
     return blkdiag(v);
+  }
+
+  std::vector<Sparsity> diagsplit(const Sparsity& sp,
+     const std::vector<int>& offset1,
+     const std::vector<int>& offset2) {
+    // Consistency check
+    casadi_assert(offset1.size()>=1);
+    casadi_assert(offset1.front()==0);
+    casadi_assert_message(offset1.back()==sp.size1(),
+                          "diagsplit(Sparsity, offset1, offset2): Last elements of offset1 "
+                          "(" << offset1.back() << ") must equal the number of rows "
+                          "(" << sp.size1() << ")");
+    casadi_assert_message(offset2.back()==sp.size2(),
+                          "diagsplit(Sparsity, offset1, offset2): Last elements of offset2 "
+                          "(" << offset2.back() << ") must equal the number of rows "
+                          "(" << sp.size2() << ")");
+    casadi_assert(isMonotone(offset1));
+    casadi_assert(isMonotone(offset2));
+    casadi_assert(offset1.size()==offset2.size());
+
+    // Number of outputs
+    int n = offset1.size()-1;
+
+    // Return value
+    std::vector<Sparsity> ret;
+
+    // Caveat: this is a very silly implementation
+    IMatrix x = IMatrix::zeros(sp);
+
+    for (int i=0;i<n;++i) {
+      ret.push_back(x(
+          Slice(offset1[i], offset1[i+1]),
+          Slice(offset2[i], offset2[i+1])).sparsity());
+    }
+
+    return ret;
   }
 
   std::vector<Sparsity> horzsplit(const Sparsity& sp, const std::vector<int>& offset) {
@@ -183,6 +238,31 @@ namespace casadi {
       *it = it->T();
     }
     return ret;
+  }
+
+  std::vector<Sparsity> diagsplit(const Sparsity& x, int incr) {
+    casadi_assert(incr>=1);
+    casadi_assert_message(x.isSquare(),
+      "diagsplit(x,incr)::input must be square but got " << x.dimString()  << ".");
+    vector<int> offset2 = range(0, x.size2(), incr);
+    offset2.push_back(x.size2());
+    return diagsplit(x, offset2);
+  }
+
+  std::vector<Sparsity> diagsplit(const Sparsity& x, int incr1, int incr2) {
+    casadi_assert(incr1>=1);
+    casadi_assert(incr2>=1);
+    vector<int> offset1 = range(0, x.size1(), incr1);
+    offset1.push_back(x.size1());
+    vector<int> offset2 = range(0, x.size2(), incr2);
+    offset2.push_back(x.size2());
+    return diagsplit(x, offset1, offset2);
+  }
+
+  std::vector<Sparsity> diagsplit(const Sparsity& x, const std::vector<int>& output_offset) {
+    casadi_assert_message(x.isSquare(),
+      "diagsplit(x,incr)::input must be square but got " << x.dimString()  << ".");
+    return diagsplit(x, output_offset, output_offset);
   }
 
 } // namespace casadi

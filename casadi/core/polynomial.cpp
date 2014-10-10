@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "polynomial.hpp"
 #include "std_vector_tools.hpp"
@@ -51,11 +54,12 @@ namespace casadi {
     p_[3] = p3;
   }
 
-  void Polynomial::repr(std::ostream &stream) const {
+  void Polynomial::repr(std::ostream &stream, bool trailing_newline) const {
     cout << "poly(" << p_ << ")" << endl;
+    if (trailing_newline) stream << std::endl;
   }
 
-  void Polynomial::print(std::ostream &stream) const {
+  void Polynomial::print(std::ostream &stream, bool trailing_newline) const {
     for (int d=0; d<p_.size(); ++d) {
       if (d==0) {
         stream << p_[d];
@@ -66,6 +70,7 @@ namespace casadi {
       }
     }
     stream << endl;
+    if (trailing_newline) stream << std::endl;
   }
 
   int Polynomial::degree() const {

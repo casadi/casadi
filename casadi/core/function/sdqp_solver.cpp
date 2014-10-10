@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #include "sdqp_solver_internal.hpp"
 
 using namespace std;
@@ -36,8 +39,8 @@ namespace casadi {
     return static_cast<const SdqpSolverInternal*>(Function::operator->());
   }
 
-  bool SdqpSolver::checkNode() const {
-    return dynamic_cast<const SdqpSolverInternal*>(get())!=0;
+  bool SdqpSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const SdqpSolverInternal*>(ptr)!=0;
   }
 
   void SdqpSolver::setSOCQPOptions() {
@@ -45,7 +48,7 @@ namespace casadi {
   }
 
   SdqpSolver::SdqpSolver(const std::string& name, const SDQPStructure& st) {
-    assignNode(SdqpSolverInternal::getPlugin(name).creator(st));
+    assignNode(SdqpSolverInternal::getPlugin(name).creator(st)->adaptor(name));
   }
 
   void SdqpSolver::loadPlugin(const std::string& name) {

@@ -2,10 +2,17 @@
 # Joel Andersson
 # K.U. Leuven 2012
 
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 
 project(sundials-2.5mod C)
 include_directories(.)
+
+# cmake_policy use MACOSX_RPATH=ON by default
+if(COMMAND cmake_policy)
+  if(CMAKE_MAJOR_VERSION GREATER 2)
+    cmake_policy(SET CMP0042 NEW)
+  endif()
+endif()
 
 set(SUNDIALS_INCLUDES
   nvector/nvector_serial.h
@@ -139,6 +146,4 @@ install(TARGETS casadi_sundials
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-set_target_properties(casadi_sundials PROPERTIES COMPILE_FLAGS "-Wno-format-security")
-endif()
+set_target_properties(casadi_sundials PROPERTIES SOVERSION ${PACKAGE_SO_VERSION})

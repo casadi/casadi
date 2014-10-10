@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,12 +22,13 @@
  *
  */
 
+
 #include "casadi_options.hpp"
 #include "casadi_exception.hpp"
 
 namespace casadi {
 
-  bool CasadiOptions::catch_errors_python = true;
+  bool CasadiOptions::catch_errors_swig = true;
   bool CasadiOptions::simplification_on_the_fly = true;
   bool CasadiOptions::profiling = false;
   std::ofstream CasadiOptions::profilingLog;

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_CASADI_EXCEPTION_HPP
 #define CASADI_CASADI_EXCEPTION_HPP
@@ -159,7 +162,8 @@ std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". 
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \
-  ((dynamic_cast<ostringstream &>(ostringstream() . seekp(0, ios_base::cur) << ITEMS)) . str())
+  ((dynamic_cast<std::ostringstream &>(std::ostringstream() \
+   . seekp(0, std::ios_base::cur) << ITEMS)) . str())
 
 #endif // CASADI_NDEBUG
 

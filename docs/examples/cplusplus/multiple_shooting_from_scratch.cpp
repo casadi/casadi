@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 /** \brief Writing a multiple shooting code from scratch 
 
@@ -40,10 +43,6 @@
 // CasADi core
 #include <casadi/casadi.hpp>
 
-// Declare solvers to be loaded manually
-extern "C" void casadi_load_integrator_cvodes();
-extern "C" void casadi_load_nlpsolver_ipopt();
-
 using namespace casadi;
 using namespace std;
 
@@ -51,9 +50,6 @@ using namespace std;
 double inf = numeric_limits<double>::infinity();
 
 int main(){
-  casadi_load_integrator_cvodes();
-  casadi_load_nlpsolver_ipopt();
-
   // Declare variables
   SX u = SX::sym("u"); // control
   SX r = SX::sym("r"), s = SX::sym("s"); // states

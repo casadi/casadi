@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #include "socp_solver_internal.hpp"
 
 using namespace std;
@@ -36,12 +39,12 @@ namespace casadi {
     return static_cast<const SocpSolverInternal*>(Function::operator->());
   }
 
-  bool SocpSolver::checkNode() const {
-    return dynamic_cast<const SocpSolverInternal*>(get())!=0;
+  bool SocpSolver::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const SocpSolverInternal*>(ptr)!=0;
   }
 
   SocpSolver::SocpSolver(const std::string& name, const SOCPStructure& st) {
-    assignNode(SocpSolverInternal::getPlugin(name).creator(st));
+    assignNode(SocpSolverInternal::getPlugin(name).creator(st)->adaptor(name));
   }
 
   void SocpSolver::loadPlugin(const std::string& name) {
@@ -50,6 +53,10 @@ namespace casadi {
 
   std::string SocpSolver::doc(const std::string& name) {
     return SocpSolverInternal::getPlugin(name).doc;
+  }
+
+  std::string SocpSolver::infix() {
+    return SocpSolverInternal::infix_;
   }
 
 } // namespace casadi

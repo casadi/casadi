@@ -4,29 +4,37 @@
 #  FULL_DOCS "add requires info for target"
 #)
 
-set(LINT_TARGETS)
-set(SPELL_TARGETS)
-
-macro(casadi_plugin Type name)
-  string(TOLOWER ${Type} type)
-  casadi_library(casadi_${type}_${name} ${ARGN})
-  set_property(GLOBAL APPEND PROPERTY CASADI_PLUGINS "${Type}::${name}")
-endmacro()
 
 macro(casadi_plugin_link_libraries Type name)
   string(TOLOWER ${Type} type)
   target_link_libraries(casadi_${type}_${name} ${ARGN})
 endmacro()
 
+macro(casadi_plugin Type name)
+  string(TOLOWER ${Type} type)
+  casadi_library_or_plugin(casadi_${type}_${name} TRUE ${ARGN})
+  set_property(GLOBAL APPEND PROPERTY CASADI_PLUGINS "${Type}::${name}")
+endmacro()
+
 macro(casadi_library name)
+  casadi_library_or_plugin(${name} FALSE ${ARGN})
+endmacro()
+
+if(ENABLE_SHARED)
+  if(NOT ENABLE_EXPORT_ALL)
+    add_compiler_export_flags()
+  endif()
+endif()
+
+# this function handles libraries and plugins
+# there is so much similarity in plugins/libraries, we just
+# use a flag and wrap this with casadi_plugin or casadi_library (above)
+macro(casadi_library_or_plugin name is_plugin)
   if(ENABLE_STATIC)
     add_library(${name} STATIC ${ARGN})
   endif()
   if(ENABLE_SHARED)
     add_definitions(-DSHARED_LIBRARY)
-    if(NOT ENABLE_EXPORT_ALL)
-      add_compiler_export_flags()
-    endif()
     add_library(${name} SHARED ${ARGN})
   endif()
   generate_export_header(${name})
@@ -40,20 +48,32 @@ macro(casadi_library name)
   if(NOT "${name}" STREQUAL "casadi_core")
     target_link_libraries(${name} casadi_core)
   endif()
- 
-  install(TARGETS ${name}
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION lib
-  )
-  SET_TARGET_PROPERTIES(
-    ${name}
-  PROPERTIES
-    SOVERSION ${PACKAGE_SO_VERSION}
-  )
+
+  # If it's a plugin, we install to lib/casadi and
+  # don't use a symlink to a versioned .so.
+  # This seems to be standard practice. --Greg Horn
+  if(${is_plugin})
+    install(TARGETS ${name}
+      LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH}
+      ARCHIVE DESTINATION ${PLUGIN_INSTALL_PATH}
+      RUNTIME DESTINATION ${PLUGIN_INSTALL_PATH}
+    )
+  else()
+    install(TARGETS ${name}
+      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION lib
+      RUNTIME DESTINATION lib
+    )
+    SET_TARGET_PROPERTIES(
+      ${name}
+    PROPERTIES
+      SOVERSION ${PACKAGE_SO_VERSION}
+    )
+  endif()
   add_style_check_target(${name} "${ARGN}")
-  set(LINT_TARGETS ${LINT_TARGETS} "lint_${name}" PARENT_SCOPE)
+  set_property(GLOBAL APPEND PROPERTY LINT_TARGETS  "lint_${name}")
   add_spell_check_target(${name} "${ARGN}")
+  set_property(GLOBAL APPEND PROPERTY SPELL_TARGETS  "spell_${name}")
   set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
 
   set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
@@ -62,8 +82,9 @@ endmacro()
 add_subdirectory(core)  # needed by all except external_packages
 add_subdirectory(interfaces)             # needs external_packages
 add_subdirectory(solvers)                # needs interfaces
-add_subdirectory(optimal_control)        # needs external_packages
-add_subdirectory(control)
+
+get_property(LINT_TARGETS GLOBAL PROPERTY LINT_TARGETS)
+get_property(SPELL_TARGETS GLOBAL PROPERTY SPELL_TARGETS)
 
 # add a dummy custom target which does nothing but
 # depend on the other lint targets
@@ -82,6 +103,8 @@ get_property(CASADI_PLUGINS GLOBAL PROPERTY CASADI_PLUGINS)
 set(CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)
 set(CASADI_PLUGINS ${CASADI_PLUGINS} PARENT_SCOPE)
 set(CASADI_SWIG_MODULES ${CASADI_SWIG_MODULES} PARENT_SCOPE)
+
+add_custom_target(libs ALL DEPENDS ${CASADI_MODULES})
 
 foreach(name ${CASADI_MODULES})
   set(PC_NAME "${name}")

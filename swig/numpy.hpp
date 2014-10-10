@@ -109,7 +109,7 @@ const char* pytype_string(PyObject* py_obj) {
   if (PyModule_Check(  py_obj)) return "module"      ;
   if (PyInstance_Check(py_obj)) return "instance"    ;
 
-  return "unkown type";
+  return "unknown type";
 }
 
 /* Given a NumPy typecode, return a string describing the type.

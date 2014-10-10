@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_MX_HPP
 #define CASADI_MX_HPP
@@ -52,8 +55,8 @@ namespace casadi {
       \date 2010-2011
   */
   class CASADI_CORE_EXPORT MX : public GenericExpression<MX>,
-                                    public GenericMatrix<MX>,
-                                    public SharedObject {
+                                public GenericMatrix<MX>,
+                                public SharedObject {
   public:
 
     /** \brief  Default constructor */
@@ -80,7 +83,7 @@ namespace casadi {
 
 /// \cond INTERNAL
     /** \brief  Destructor */
-    virtual ~MX();
+    ~MX();
 /// \endcond
 
 #ifndef SWIG
@@ -547,7 +550,7 @@ namespace casadi {
     /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;
 
-    /** \brief Set or reset the maximum number of calls to the 
+    /** \brief Set or reset the maximum number of calls to the
      * printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);
 
@@ -560,6 +563,9 @@ namespace casadi {
 
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int getEqualityCheckingDepth();
+
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
 #ifndef SWIG
   private:

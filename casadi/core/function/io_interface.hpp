@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #ifndef CASADI_IO_INTERFACE_HPP
 #define CASADI_IO_INTERFACE_HPP
 
@@ -28,6 +31,8 @@
 #include "../options_functionality.hpp"
 #include "../function/schemes_helpers.hpp"
 #include "../function/io_scheme.hpp"
+
+#include <exception>
 
 namespace casadi {
 
@@ -337,7 +342,12 @@ namespace casadi {
 
 #define SETTERS(T)                                                              \
     void setInput(T val, int iind=0)                                            \
-    { static_cast<const Derived*>(this)->assertInit(); input(iind).set(val);  } \
+    { static_cast<const Derived*>(this)->assertInit();                          \
+      try { input(iind).set(val); }                                             \
+      catch(std::exception& e) {                                                \
+        casadi_error(e.what() << "Occurred at iind = " << iind << ".");         \
+      }                                                                         \
+    }                                                                           \
     void setOutput(T val, int oind=0)                                           \
     { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
     void setInput(T val, const std::string &iname)                              \

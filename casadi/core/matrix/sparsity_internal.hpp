@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_SPARSITY_INTERNAL_HPP
 #define CASADI_SPARSITY_INTERNAL_HPP
@@ -117,7 +120,7 @@ namespace casadi {
     void augmentingPath(int k, std::vector<int>& jmatch,
                         int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const;
 
-    /** 
+    /**
      * return a random permutation vector, the identity perm, or p = n-1:-1:0.
      * seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.
      * otherwise p = random permutation. See cs_randperm in CSparse
@@ -201,6 +204,12 @@ namespace casadi {
     /// Number of non-zeros on the diagonal
     int sizeD() const;
 
+    /** \brief Upper half-bandwidth */
+    int bandwidthU() const;
+
+    /** \brief Lower half-bandwidth */
+    int bandwidthL() const;
+
     /// Shape
     std::pair<int, int> shape() const;
 
@@ -251,7 +260,9 @@ namespace casadi {
     /// Sparsity pattern for a matrix-matrix product (details in public class)
     Sparsity patternProduct(const Sparsity& x_trans,
                             std::vector< std::vector< std::pair<int, int> > >& mapping) const;
-    Sparsity patternProduct(const Sparsity& x_trans) const;
+
+    /// New implementation, multiplies with y from the right
+    Sparsity patternProductNew(const Sparsity& y) const;
     ///@}
 
     ///@{
@@ -367,7 +378,7 @@ namespace casadi {
     Sparsity starColoring(int ordering, int cutoff) const;
 
     /** \brief Perform a star coloring of a symmetric matrix
-     * 
+     *
      * An improved distance-2 coloring algorithm
      * (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
      */

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_OPTIONS_FUNCTIONALITY_HPP
 #define CASADI_OPTIONS_FUNCTIONALITY_HPP
@@ -101,12 +104,6 @@ class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
     const Dictionary& dictionary() const;
 
 /// @}
-
-    /// \cond INTERNAL
-    /// Assert that the node is pointing to the right type of object
-    virtual bool checkNode() const;
-    /// \endcond INTERNAL
-
     /** \brief Get a list of all option names */
     std::vector<std::string> getOptionNames() const;
 
@@ -139,6 +136,8 @@ class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
     /** \brief Get the default of a certain option */
     GenericType getOptionDefault(const std::string &str) const;
 
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 };
 
 /// \cond INTERNAL
@@ -251,8 +250,6 @@ virtual ~OptionsFunctionalityNode();
   /** \brief A distance metric between two words */
   static double wordDistance(const std::string &a, const std::string &b);
 
-protected:
-
 
   void addOption(
     const std::string &str, const opt_type& type,
@@ -271,6 +268,8 @@ protected:
   **/
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val,
                  const std::string& desc, const std::string &allowed_vals, bool inherit = false);
+
+protected:
 
 void assert_exists(const std::string &str) const;
 

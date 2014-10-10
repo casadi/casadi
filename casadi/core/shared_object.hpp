@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_SHARED_OBJECT_HPP
 #define CASADI_SHARED_OBJECT_HPP
@@ -75,7 +78,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT SharedObject : public PrintableObject {
+  class CASADI_CORE_EXPORT SharedObject : public PrintableObject<SharedObject> {
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
     template<class B> friend const B shared_cast(const SharedObject& A);
@@ -126,14 +129,13 @@ namespace casadi {
     /// Const access a member function or object
     const SharedObjectNode* operator->() const;
     /// \endcond
+#endif // SWIG
 
     /// Print a representation of the object
-    virtual void repr(std::ostream &stream) const;
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// Print a description of the object
-    virtual void print(std::ostream &stream=std::cout) const;
-
-#endif // SWIG
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class
@@ -156,12 +158,6 @@ namespace casadi {
 
     /// Is a null pointer?
     bool isNull() const;
-
-    /// \cond INTERNAL
-    /// Assert that the node is pointing to the right type of object
-    virtual bool checkNode() const;
-    /// \endcond
-
 
     ///@{
     /// \cond SWIGINTERNAL
@@ -285,13 +281,11 @@ namespace casadi {
     /// Create a return object
     B ret;
 
+    /// Quick return if not allowed
+    if (!B::testCast(ptr)) return ret;
+
     /// Assign node of B and return
     ret.assignNode(ptr);
-
-    /// Null pointer if not pointing towards the right type of object
-    if (ptr && !ret.checkNode())
-      ret.assignNode(0);
-
     return ret;
   }
 
@@ -358,23 +352,17 @@ namespace casadi {
   /// Template function implementations
   template<class B>
   B SharedObjectNode::shared_from_this() {
+    casadi_assert(B::testCast(this));
     B ret;
     ret.assignNode(this);
-
-    // Assert that the object is valid
-    casadi_assert(ret.checkNode());
-
     return ret;
   }
 
   template<class B>
   const B SharedObjectNode::shared_from_this() const {
+    casadi_assert(B::testCast(this));
     B ret;
     ret.assignNode(const_cast<SharedObjectNode*>(this));
-
-    // Assert that the object is valid
-    casadi_assert(ret.checkNode());
-
     return ret;
   }
   /// \endcond

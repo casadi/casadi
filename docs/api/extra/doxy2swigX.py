@@ -1,24 +1,26 @@
 #
 #     This file is part of CasADi.
-# 
+#
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-# 
+#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2011-2014 Greg Horn
+#
 #     CasADi is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU Lesser General Public
 #     License as published by the Free Software Foundation; either
 #     version 3 of the License, or (at your option) any later version.
-# 
+#
 #     CasADi is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #     Lesser General Public License for more details.
-# 
+#
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-# 
-# 
+#
+#
 from doxy2swig import *
 
 import sys
@@ -380,12 +382,12 @@ class Doxy2SWIG_X(Doxy2SWIG):
             # self.internal.add("%rename(\"_internal_%s\") " + swigname + ";")
             #  print swigname
               #self.internal.add("%pythonprepend " + swigname + " %{\n _mark_internal() \n%}")
-              self.internal[swigname] = "%exception " + swigname + " {\n  START INTERNAL_MSG() $action STOP { $action } \n}"
+              self.internal[swigname] = "%exception " + swigname + " {\n CATCH_OR_NOT(INTERNAL_MSG() $action) \n}"
           else:
             self.internal[swigname] = ""
             
           if deprecated is not None:
-            self.deprecated[swigname] = "%exception " + swigname + " {\n START DEPRECATED_MSG(\"%s\") $action STOP { $action } \n}" % deprecated
+            self.deprecated[swigname] = "%exception " + swigname + " {\n CATCH_OR_NOT(DEPRECATED_MSG(\"%s\")) \n}" % deprecated
           else:
             self.deprecated[swigname] = ""
               

@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 2.6)
 include_directories(${QPOASES_INCLUDE_DIR})
 
 casadi_plugin(QpSolver qpoases
-  qpoases_internal.hpp
-  qpoases_internal.cpp
-  qpoases_internal_meta.cpp)
+  qpoases_interface.hpp
+  qpoases_interface.cpp
+  qpoases_interface_meta.cpp)
 
 casadi_plugin_link_libraries(QpSolver qpoases ${QPOASES_LIBRARIES})
 

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #ifndef CASADI_LAPACK_QR_DENSE_HPP
 #define CASADI_LAPACK_QR_DENSE_HPP
 
@@ -30,7 +33,7 @@
 *
 * This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
 * <tt>A = Q.R</tt>, with Q orthogonal and R upper triangular
-*/ 
+*/
 
 /** \pluginsection{LinearSolver,lapackqr} */
 
@@ -56,20 +59,20 @@ namespace casadi {
    @copydoc plugin_LinearSolver_lapackqr
    *
    */
-  class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQRDenseInternal : public LinearSolverInternal {
+  class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQrDense : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQRDenseInternal(const Sparsity& sparsity, int nrhs);
+    LapackQrDense(const Sparsity& sparsity, int nrhs);
 
     // Clone
-    virtual LapackQRDenseInternal* clone() const;
+    virtual LapackQrDense* clone() const;
 
     /** \brief  Create a new LinearSolver */
     static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new LapackQRDenseInternal(sp, nrhs);}
+    { return new LapackQrDense(sp, nrhs);}
 
     // Destructor
-    virtual ~LapackQRDenseInternal();
+    virtual ~LapackQrDense();
 
     // Initialize the solver
     virtual void init();

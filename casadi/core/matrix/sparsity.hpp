@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_SPARSITY_HPP
 #define CASADI_SPARSITY_HPP
@@ -148,16 +151,16 @@ namespace casadi {
 
     /** \brief Create a single band in a square sparsity pattern
      *
-     * sp_band(n, 0) is equivalent to sp_diag(n) \n
-     * sp_band(n, -1) has a band below the diagonal \n
+     * band(n, 0) is equivalent to diag(n) \n
+     * band(n, -1) has a band below the diagonal \n
      * \param p indicate
      **/
     static Sparsity band(int n, int p);
 
     /** \brief Create banded square sparsity pattern
      *
-     * sp_band(n, 0) is equivalent to sp_diag(n) \n
-     * sp_band(n, 1) is tri-diagonal matrix \n
+     * band(n, 0) is equivalent to diag(n) \n
+     * band(n, 1) is tri-diagonal matrix \n
      **/
     static Sparsity banded(int n, int p);
 
@@ -218,6 +221,7 @@ namespace casadi {
     /// Compress a sparsity pattern
     std::vector<int> compress() const;
 
+#ifndef SWIG
     /// @{
     /// Access a member function or object
     SparsityInternal* operator->();
@@ -229,10 +233,7 @@ namespace casadi {
     SparsityInternal& operator*();
     const SparsityInternal& operator*() const;
     /// @}
-
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
-
+#endif // SWIG
     /// \name Check if two sparsity patterns are identical
     /// @{
     bool isEqual(const Sparsity& y) const;
@@ -278,6 +279,12 @@ namespace casadi {
 
     /** \brief Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i */
     int sizeD() const;
+
+    /** \brief Upper half-bandwidth */
+    int bandwidthU() const;
+
+    /** \brief Lower half-bandwidth */
+    int bandwidthL() const;
 
 #ifndef SWIG
     /** \brief  Get the shape */
@@ -371,7 +378,7 @@ namespace casadi {
 #endif
 
     /** \brief Transpose the matrix and get the reordering of the non-zero entries
-    * 
+    *
     *  \param[out] mapping the non-zeros of the original matrix
     *              for each non-zero of the new matrix
     */
@@ -417,7 +424,7 @@ namespace casadi {
     /// @}
 
     /// @{
-    /** \brief Sparsity pattern for a matrix-matrix product
+    /** \brief Sparsity pattern for a matrix-matrix product [deprecated]
         Returns the sparsity pattern resulting from pre-multiplying the pattern with the
         transpose of x.
         Returns the new sparsity pattern as well as a mapping with the same length as the number
@@ -428,7 +435,16 @@ namespace casadi {
       const Sparsity& x_trans,
       std::vector< std::vector< std::pair<int, int> > >& SWIG_OUTPUT(mapping)) const;
     Sparsity patternProduct(const Sparsity& x_trans) const;
+    /// @}
 
+    /// @{
+    /** \brief Sparsity pattern for a matrix-matrix product
+        Returns the sparsity pattern resulting from multiplying the pattern with
+        another pattern y from the right.
+
+        This will replace patternProduct after deprecation.
+    */
+    Sparsity patternProductNew(const Sparsity& y) const;
     /// @}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
@@ -650,6 +666,9 @@ namespace casadi {
     // Hash the sparsity pattern
     std::size_t hash() const;
 
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
+
 #ifndef SWIG
     /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero
      * entries of another sparsity pattern */
@@ -673,7 +692,6 @@ namespace casadi {
                       const std::vector<int>& row);
 
 #endif //SWIG
-
   };
 
   /// \cond INTERNAL
@@ -698,8 +716,8 @@ namespace casadi {
                                                    const std::vector<int>& row);
   /// \endcond
 
-  // Template instantiations
 #ifndef SWIG
+  // Template instantiations
   template<typename DataType>
   void Sparsity::set(DataType* data, const DataType* val_data, const Sparsity& val_sp) const {
     // Get dimensions of this

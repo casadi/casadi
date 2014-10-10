@@ -1876,7 +1876,7 @@ void KINProcessError(KINMem kin_mem,
 
 #ifndef NO_FPRINTF_OUTPUT
     fprintf(stderr, "\n[%s ERROR]  %s\n  ", module, fname);
-    fprintf(stderr, msgfmt);
+    fprintf(stderr, "%s", msgfmt);
     fprintf(stderr, "\n\n");
 #endif
 

@@ -572,3 +572,11 @@
    fun:PyRun_FileExFlags
    fun:PyRun_SimpleFileExFlags
 }
+
+{
+    matplotlib leak
+    Memcheck:Leak
+    match-leak-kinds: definite
+    fun:_Znwm
+    fun:_ZN2Py19ExtensionModuleBase10initializeEPKc
+}

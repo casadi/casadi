@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,9 +22,11 @@
  *
  */
 
+
 #include "qp_solver_internal.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
+#include <typeinfo>
 
 INPUTSCHEME(QpSolverInput)
 OUTPUTSCHEME(QpSolverOutput)
@@ -111,6 +115,11 @@ namespace casadi {
                             << ". Got LBA[i]=" << input(QP_SOLVER_LBA).at(i)
                             << " and UBA[i]=" << input(QP_SOLVER_UBA).at(i));
     }
+  }
+
+  void QpSolverInternal::generateNativeCode(std::ostream& file) const {
+    casadi_error("QpSolverInternal::generateNativeCode not defined for class "
+                 << typeid(*this).name());
   }
 
   std::map<std::string, QpSolverInternal::Plugin> QpSolverInternal::solvers_;

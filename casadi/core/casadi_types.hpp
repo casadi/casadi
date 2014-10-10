@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,11 +22,11 @@
  *
  */
 
+
 #ifndef CASADI_CASADI_TYPES_HPP
 #define CASADI_CASADI_TYPES_HPP
 
 #include <climits>
-#include <cassert>
 #include <vector>
 #include <utility>
 
@@ -45,6 +47,11 @@ namespace casadi {
   template<class T> class SDPStructIOSchemeVector;
   template<class T> class SOCPStructIOSchemeVector;
   template<class T> class SDQPStructIOSchemeVector;
+  template<class T> class DleStructIOSchemeVector;
+  template<class T> class DpleVecStructIOSchemeVector;
+  template<class T> class LrDleStructIOSchemeVector;
+  template<class T> class LrDpleVecStructIOSchemeVector;
+  template<class T> class CleStructIOSchemeVector;
   /// \endcond
   typedef LPStructIOSchemeVector<Sparsity> LPStructure;
   typedef QPStructIOSchemeVector<Sparsity> QPStructure;
@@ -52,6 +59,11 @@ namespace casadi {
   typedef SDPStructIOSchemeVector<Sparsity> SDPStructure;
   typedef SOCPStructIOSchemeVector<Sparsity> SOCPStructure;
   typedef SDQPStructIOSchemeVector<Sparsity> SDQPStructure;
+  typedef DleStructIOSchemeVector<Sparsity> DleStructure;
+  typedef LrDleStructIOSchemeVector<Sparsity> LrDleStructure;
+  typedef CleStructIOSchemeVector<Sparsity> CleStructure;
+  typedef DpleVecStructIOSchemeVector< std::vector<Sparsity> > DpleStructure;
+  typedef LrDpleVecStructIOSchemeVector< std::vector<Sparsity> > LrDpleStructure;
   class NlpSolver;
   class LinearSolver;
   class Integrator;
@@ -62,6 +74,8 @@ namespace casadi {
   class SdpSolver;
   class SocpSolver;
   class SdqpSolver;
+  class DleSolver;
+  class CleSolver;
   class ImplicitFunction;
 
   class DerivativeGenerator;
@@ -69,6 +83,9 @@ namespace casadi {
   class CustomEvaluate;
   class CustomFunction;
   class SymbolicNLP;
+  class Variable;
+  class SymbolicOCP;
+  class XmlFile;
 
 #ifndef SWIG
   // The number of derivative directions for which the tool has been optimized

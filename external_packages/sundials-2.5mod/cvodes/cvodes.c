@@ -8975,7 +8975,7 @@ void cvProcessError(CVodeMem cv_mem,
 
 #ifndef NO_FPRINTF_OUTPUT
     fprintf(stderr, "\n[%s ERROR]  %s\n  ", module, fname);
-    fprintf(stderr, msg);
+    fprintf(stderr, "%s", msg);
     fprintf(stderr, "\n\n");
 #endif
 

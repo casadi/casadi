@@ -15,11 +15,15 @@ cmake_policy(SET CMP0011 OLD)
 endif()
 endif()
 
-find_package(PythonLibs)
-find_package(NUMPY)
-
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
 
+# Find packages
+find_package(PythonLibs)
+find_package(PythonInterp)
+find_package(NUMPY)
+if(WITH_MATLAB)
+  find_package(MATLAB)
+endif()
 set(CASADI_SWIG_FLAGS "")
 
 # Include the use swig file
@@ -71,7 +75,7 @@ set(CASADI_SWIG_MAIN_MODULE casadi_core)
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
 
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=${CASADI_SWIG_MAIN_MODULE}")
+set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
 foreach(my_module ${CASADI_SWIG_MODULES})
 set_source_files_properties(${my_module}.i  PROPERTIES  CPLUSPLUS ON)
 endforeach()
@@ -79,15 +83,30 @@ set_source_files_properties(${CASADI_SWIG_MAIN_MODULE}.i  PROPERTIES SWIG_FLAGS 
 
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
+if(WITH_WERROR)
+  # This will make the swig command return an error so that "make" will fail,
+  # but swig will emit the output files anyways so subsequent calls to "make"
+  # will succeed. At least buildbot will report failures.
+  #
+  # I'm pretty sure this is also OK also in windows, see:
+  # http://www.swig.org/Doc3.0/Warnings.html#Warnings_nn7
+  set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-Werror")
+endif()
 
 # PYTHON interface
+if(WITH_WERROR)
+  set(MAYBE_WERROR "-Werror")
+else()
+  set(MAYBE_WERROR "")
+endif()
+
 foreach(my_module ${CASADI_SWIG_MODULES})
 swig_add_module(${my_module} python ${my_module}.i)
 swig_link_libraries(${my_module} ${PYTHON_LIBRARIES} ${my_module})
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign")
+  set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign -Wno-maybe-uninitialized")
+  set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
 endif()
 endforeach()
 
@@ -115,6 +134,17 @@ foreach(my_module ${CASADI_SWIG_MODULES})
   list(APPEND modules_python _${my_module})
 endforeach()
 add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
+
+if(WITH_MATLAB)
+  set(modules_matlab) 
+  include_directories(${MATLAB_INCLUDE_DIR})
+  add_definitions(${MATLAB_EXTRA_CXXFLAGS})
+  foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
+    list(APPEND modules_matlab ${my_module}_matlab)
+  endforeach()
+  add_custom_target(_matlab_modules DEPENDS ${modules_matlab}) # the matlab interface is created with the command "make matlab"
+endif()
+
 set(modules_json)
 foreach(my_module ${CASADI_SWIG_MODULES})
   list(APPEND modules_json ${my_module}_json)
@@ -146,8 +176,6 @@ add_custom_command(
   ARGS -E copy ${PYTHONLIBPATH_${my_module}} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_${my_module}}
 )
 endforeach()
-
-find_package(PythonInterp)
 
 if(NOT DEFINED PYTHON_PREFIX)
   if(PYTHONINTERP_FOUND)
@@ -182,9 +210,9 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
 endif()
 
 # Construct a dynamic loader for python
-file(WRITE "${PROJECT_BINARY_DIR}/python/casadi/casadi.py" "failed_modules={}\nloaded_modules=[]\n")
+file(WRITE "${PROJECT_BINARY_DIR}/python/casadi/casadi_loader.py" "failed_modules={}\nloaded_modules=[]\n")
 foreach(my_module ${CASADI_SWIG_MODULES})
-file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi.py"
+file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi_loader.py"
 "try:\n"
 "  from ${my_module} import *\n"
 "  loaded_modules.append('${my_module}')\n"
@@ -243,10 +271,27 @@ COMMAND ${CMAKE_COMMAND}
   -P cmake_install.cmake
 )
 foreach(my_module ${CASADI_SWIG_MODULES})
-add_dependencies(install_python DEPENDS _${my_module})
+add_dependencies(install_python _${my_module})
 endforeach()
 
+# MATLAB interface
+if(WITH_MATLAB)
+  foreach(my_module ${CASADI_SWIG_MAIN_MODULE})
+    swig_add_module(${my_module}_matlab matlab ${my_module}.i)
+  endforeach()
+endif()
+  
 # json interface
+
+# fooXML_wrap.xml are a big files which Joris wants to delete immedately after using.
+# These files are dependencies of json outputs, but they don't exist according to cmake.
+# So we silence these warnings. THIS IS A HACK AND WE NEED A BETTER SOLUTION
+if(COMMAND cmake_policy)
+  if(CMAKE_MAJOR_VERSION GREATER 2)
+    cmake_policy(SET CMP0046 OLD)
+  endif()
+endif()
+
 foreach(my_module ${CASADI_SWIG_MODULES})
   swig_add_module_xml(${my_module}_xml ${my_module}.i)
 endforeach()
@@ -256,7 +301,9 @@ add_custom_target(${my_module}_json
   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
   COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml
 )
-add_dependencies(${my_module}_json ${my_module}_xml DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml)
+add_dependencies(${my_module}_json ${my_module}_xml
+                 ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py
+                 ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml)
 endforeach()
 
 #foreach(my_module ${CASADI_SWIG_MODULES})
@@ -326,5 +373,3 @@ set(CPACK_PACKAGE_VERSION_PATCH "99")
 endif()
 
 include(CPack)
-
-

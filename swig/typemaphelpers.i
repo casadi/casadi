@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 %{
 #include "casadi/core/matrix/sparsity.hpp"
@@ -40,42 +43,50 @@
 /// Generic typemap structure
 %inline %{
 
+  /// Data structure in the target language holding data
 #ifdef SWIGPYTHON
-#define GUESTOBJECT PyObject * p
-#endif // SWIGPYTHON
+#define GUESTOBJECT PyObject
+#elif defined(SWIGMATLAB)
+#define GUESTOBJECT mxArray
+#else
+#define GUESTOBJECT void
+#endif
 
-#ifdef  SWIGPYTHON
+#ifndef SWIGXML
 /** Check if Guest object is of a particular SWIG type */
-bool istype(GUESTOBJECT, swig_type_info *type) {
+bool istype(GUESTOBJECT *p, swig_type_info *type) {
 	void *dummy = 0 ; 
   return SWIG_IsOK(SWIG_ConvertPtr(p, &dummy, type, 0)); 
 }
-#endif // SWIGPYTHON
+#endif
 
 template<class T>
 class meta {
   public:
     /// Check if Python object is of type T
-    static bool isa(GUESTOBJECT) {
+    static bool isa(GUESTOBJECT *p) {
       #ifdef SWIGPYTHON
       if (p == Py_None) return false;
-      #endif // SWIGPYTHON
+      #endif
+      #ifdef SWIGMATLAB
+      if (p == 0) return false;
+      #endif
       return istype(p,*meta<T>::name);
     };
     /// Convert Python object to pointer of type T
-    static bool get_ptr(GUESTOBJECT,T*& m) {
+    static T* get_ptr(GUESTOBJECT *p) {
       void *pd = 0 ;
-      int res = SWIG_ConvertPtr(p, &pd,*meta<T>::name, 0 );
+      int res = SWIG_ConvertPtr(p, &pd, *meta<T>::name, 0 );
       if (!SWIG_IsOK(res)) {
-        return false;
+        return 0;
+      } else {
+        return reinterpret_cast< T *>(pd);
       }
-      m = reinterpret_cast< T*  >(pd);
-      return true;
     };
     /// Convert Guest object to type T
-    /// This function must work when isa(GUESTOBJECT) too
-    static int as(GUESTOBJECT,T& m) {
-        T *t = (T *)(0);
+    /// This function must work when isa(GUESTOBJECT *p) too
+    static int as(GUESTOBJECT *p, T& m) {
+        T *t = 0;
         int res = swig::asptr(p, &t);
         bool succes = SWIG_CheckState(res) && t;
         if (succes) m=*t;
@@ -83,8 +94,8 @@ class meta {
         return succes;
     }
     /// Check if Guest object could ultimately be converted to type T
-    /// may return true when isa(GUESTOBJECT), but this is not required.
-    static bool couldbe(GUESTOBJECT) { 
+    /// may return true when isa(GUESTOBJECT *p), but this is not required.
+    static bool couldbe(GUESTOBJECT *p) {
         //int res = swig::asptr(p, (T**)(0));
         //if SWIG_CheckState(res) return true;
         T m;
@@ -97,7 +108,7 @@ class meta {
     
     #ifdef SWIGPYTHON
     static bool couldbe_sequence(PyObject * p) {
-      if(PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::Matrix<casadi::SXElement> >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
+      if(PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) return false;
         PyObject *pe;
@@ -117,9 +128,9 @@ class meta {
     #endif // SWIGPYTHON
     
     // Assumes that p is a PYTHON sequence
-    #ifdef SWIGPYTHON
-    static int as_vector(PyObject * p, std::vector<T> &m) {
-      if(PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::Matrix<casadi::SXElement> >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
+    static int as_vector(GUESTOBJECT * p, std::vector<T> &m) {
+#ifdef SWIGPYTHON
+      if (PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) { PyErr_Clear();  return false;}
         PyObject *pe;
@@ -138,11 +149,21 @@ class meta {
         Py_DECREF(it);
         return true;
       }
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
+        int sz = mxGetN(p);
+        m.resize(sz);
+        for (int i=0; i<sz; ++i) {
+          GUESTOBJECT *pi = mxGetCell(p,i);
+          if (pi==0 || !meta< T >::as(pi, m[i])) return false;
+        }
+        return true;
+      }
+#endif // SWIGMATLAB
       return false;
     }
-    #endif // SWIGPYTHON
-    
-    
+
     #ifdef SWIGPYTHON
     // Would love to make this const T&, but looks like not allowed
     static bool toPython(const T &, PyObject *&p);
@@ -152,13 +173,14 @@ class meta {
 %}
 
 %inline %{
-#define NATIVERETURN(Type, m) if (meta<Type>::isa(p)) { Type *mp; int result = meta<Type>::get_ptr(p,mp); if (!result) return false; m=*mp; return true;}
+#define NATIVERETURN(Type, m) if (meta<Type>::isa(p)) { Type *mp = meta< Type >::get_ptr(p); if (mp==0) return false; m=*mp; return true;}
 %}
 
 
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
-  if (!meta< Type >::get_ptr($input,$1)) {
+  $1 = meta< Type >::get_ptr($input);
+  if ($1 == 0) {
     if (!meta< Type >::as($input,m)) SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
     $1 = &m;
   }
@@ -291,7 +313,7 @@ void PyDECREFParent(PyObject* self) {
 template<> char meta< std::vector< Type > >::expected_message[] = "Expecting sequence(Type)"; \
  \
 template <> \
-int meta< std::vector< Type > >::as(GUESTOBJECT,std::vector< Type > &m) { \
+int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > &m) { \
   NATIVERETURN(std::vector< Type >,m) \
   return meta< Type >::as_vector(p,m); \
 } \
@@ -304,10 +326,9 @@ int meta< std::vector< Type > >::as(GUESTOBJECT,std::vector< Type > &m) { \
 %define %meta_pair(TypeA,TypeB) 
 %inline %{
 template <>
-int meta< std::pair< TypeA, TypeB > >::as(PyObject * p,std::pair< TypeA, TypeB > &m) {
-  std::pair< TypeA, TypeB > * tm;
-  int res1 = meta< std::pair< TypeA, TypeB > >::get_ptr(p,tm); 
-  if (res1) {
+int meta< std::pair<TypeA, TypeB> >::as(PyObject * p,std::pair< TypeA, TypeB > &m) {
+  std::pair< TypeA, TypeB > *tm = meta< std::pair< TypeA, TypeB > >::get_ptr(p);
+  if (tm!=0) {
     m = *tm;
     return true;
   }
@@ -353,7 +374,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 bool PyIsSequence(PyObject* p) {
-  return PySequence_Check(p) && !meta< casadi::Matrix<casadi::SXElement> >::isa(p) && !meta< casadi::MX >::isa(p);
+  return PySequence_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p);
 }
 
 %}

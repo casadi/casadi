@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "sparsity_internal.hpp"
 #include "sparsity_tools.hpp"
@@ -1922,100 +1925,62 @@ namespace casadi {
     return ss.str();
   }
 
-  Sparsity SparsityInternal::patternProduct(const Sparsity& x_trans) const {
-    // Dimensions
-    int x_nrow = x_trans.size2();
-    int y_ncol = ncol_;
+  Sparsity SparsityInternal::patternProductNew(const Sparsity& y) const {
+    // Dimensions of the result
+    int d1 = nrow_;
+    int d2 = y.size2();
 
     // Quick return if both are dense
-    if (isDense() && x_trans.isDense()) {
-      return !isEmpty() && !x_trans.isEmpty() ? Sparsity::dense(x_nrow, y_ncol) :
-          Sparsity::sparse(x_nrow, y_ncol);
+    if (isDense() && y.isDense()) {
+      return !isEmpty() && !y.isEmpty() ? Sparsity::dense(d1, d2) :
+        Sparsity::sparse(d1, d2);
     }
 
-    // return object
-    Sparsity ret = Sparsity::sparse(x_nrow, y_ncol);
+    // Quick return if first factor is diagonal
+    if (isDiagonal()) return y;
 
-    // Get the vectors for the return pattern
-    vector<int>& ret_row = ret.rowRef();
-    vector<int>& ret_colind = ret.colindRef();
+    // Quick return if second factor is diagonal
+    if (y.isDiagonal()) return shared_from_this<Sparsity>();
 
-    // Direct access to the arrays
-    const vector<int> &x_col = x_trans.row();
-    const vector<int> &x_rowind = x_trans.colind();
-    const vector<int> &y_row = row_;
-    const vector<int> &y_colind = colind_;
+    // Direct access to the vectors
+    const vector<int> &x_row = row_;
+    const vector<int> &x_colind = colind_;
+    const vector<int> &y_row = y.row();
+    const vector<int> &y_colind = y.colind();
 
-    // If the compiler supports C99, we shall use the long long datatype,
-    // which is 64 bit, otherwise long
-#if __STDC_VERSION__ >= 199901L
-    typedef unsigned long long int_t;
-#else
-    typedef unsigned long int_t;
-#endif
+    // Sparsity pattern of the result
+    vector<int> row, col;
 
-    // Number of directions we can deal with at a time
-    // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
-    int nr = CHAR_BIT*sizeof(int_t);
+    // Temporary vector for avoiding duplicate nonzeros
+    vector<int> tmp(d1, -1);
 
-    // Number of such groups needed
-    int ng = y_ncol/nr;
-    if (ng*nr != y_ncol) ng++;
+    // Loop over the nonzeros of y
+    for (int cc=0; cc<d2; ++cc) {
+      for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
+        int rr = y_row[kk];
 
-    // Which rows exist in a col of the first factor
-    vector<int_t> in_y_col(nrow_);
-    vector<int_t> in_res_row(x_nrow);
+        // Loop over corresponding columns of x
+        for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
+          int rr1 = x_row[kk1];
 
-    // Loop over the cols of the resulting matrix, nr cols at a time
-    for (int rr=0; rr<ng; ++rr) {
-
-      // Mark the elements in the x col
-      fill(in_y_col.begin(), in_y_col.end(), 0); // NOTE: expensive?
-      int_t b=1;
-      for (int i=rr*nr; i<rr*nr+nr && i<y_ncol; ++i) {
-        for (int el1=y_colind[i]; el1<y_colind[i+1]; ++el1) {
-          in_y_col[y_row[el1]] |= b;
-        }
-        b <<= 1;
-      }
-
-      // Get the sparsity pattern for the set of cols
-      fill(in_res_row.begin(), in_res_row.end(), 0); // NOTE: expensive?
-      for (int j=0; j<x_nrow; ++j) {
-
-        // Loop over the nonzeros of the row of the second factor
-        for (int el2=x_rowind[j]; el2<x_rowind[j+1]; ++el2) {
-
-          // Get the col
-          int i_y = x_col[el2];
-
-          // Add nonzero if the element matches an element in the x col
-          in_res_row[j] |= in_y_col[i_y];
-        }
-      }
-
-      b = 1;
-      for (int i=rr*nr; i<rr*nr+nr && i<y_ncol; ++i) {
-
-        // loop over the rows of the resulting matrix
-        for (int j=0; j<x_nrow; ++j) {
-
-          // Save nonzero, if any
-          if (in_res_row[j] & b) {
-            ret_row.push_back(j);
+          // Add to pattern if not already encountered
+          if (tmp[rr1]!=cc) {
+            tmp[rr1] = cc;
+            row.push_back(rr1);
+            col.push_back(cc);
           }
         }
-        ret_colind[i+1] = ret_row.size();
-        b <<=1;
       }
     }
-    return ret;
+
+    // Assemble sparsity pattern and return
+    return Sparsity::triplet(d1, d2, row, col);
   }
 
   Sparsity SparsityInternal::patternProduct(const Sparsity& x_trans,
                                             vector< vector< pair<int, int> > >& mapping) const {
     // return object
-    Sparsity ret = patternProduct(x_trans);
+    Sparsity ret = shared_from_this<Sparsity>().patternProduct(x_trans);
 
     // Get the vectors for the return pattern
     const vector<int>& ret_row = ret.row();
@@ -2605,6 +2570,10 @@ namespace casadi {
   void SparsityInternal::append(const SparsityInternal& sp) {
     // NOTE: Works also if this == &sp
 
+    casadi_assert_message(ncol_ == sp.ncol_,
+      "SparsityInternal::append(sp): column sizes must match but got " << ncol_ <<
+      " for lhs, and " << sp.ncol_ << " for rhs.");
+
     // Get current number of non-zeros
     int sz = row_.size();
 
@@ -2622,6 +2591,10 @@ namespace casadi {
 
   void SparsityInternal::appendColumns(const SparsityInternal& sp) {
     // NOTE: Works also if this == &sp
+
+    casadi_assert_message(nrow_== sp.nrow_,
+      "SparsityInternal::appendColumns(sp): row sizes must match but got " << nrow_ <<
+      " for lhs, and " << sp.nrow_ << " for rhs.");
 
     // Get current number of non-zeros
     int sz = row_.size();
@@ -3726,6 +3699,28 @@ namespace casadi {
       }
     }
     return ret;
+  }
+
+  int SparsityInternal::bandwidthU() const {
+    int bw = 0;
+    for (int cc=0; cc<ncol_; ++cc) {
+      if (colind_[cc] != colind_[cc+1]) { // if there are any elements of the column
+        int rr = row_[colind_[cc]];
+        bw = std::max(bw, cc-rr);
+      }
+    }
+    return bw;
+  }
+
+  int SparsityInternal::bandwidthL() const {
+    int bw = 0;
+    for (int cc=0; cc<ncol_; ++cc) {
+      if (colind_[cc] != colind_[cc+1]) { // if there are any elements of the column
+        int rr = row_[colind_[cc+1]-1];
+        bw = std::max(bw, rr-cc);
+      }
+    }
+    return bw;
   }
 
 } // namespace casadi

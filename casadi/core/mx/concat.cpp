@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "concat.hpp"
 #include "../std_vector_tools.hpp"
@@ -129,6 +132,68 @@ namespace casadi {
         if (*j>=0) *j -= begin;
       }
       return dep(i)->getGetNonzeros(sp, nz_new);
+    }
+  }
+
+
+  Diagcat::Diagcat(const std::vector<MX>& x) : Concat(x) {
+    // Construct the sparsity
+    casadi_assert(!x.empty());
+    std::vector<Sparsity> sp;
+    for (int i=0;i<x.size(); ++i) {
+      sp.push_back(x[i].sparsity());
+    }
+
+    setSparsity(blkdiag(sp));
+  }
+
+  void Diagcat::printPart(std::ostream &stream, int part) const {
+    if (part==0) {
+      stream << "diagcat(";
+    } else if (part==ndep()) {
+      stream << ")";
+    } else {
+      stream << ", ";
+    }
+  }
+
+  void Diagcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                           bool output_given) {
+    int nfwd = fwdSens.size();
+    int nadj = adjSeed.size();
+
+    // Non-differentiated output
+    if (!output_given) {
+      *output[0] = diagcat(getVector(input));
+    }
+
+    // Forward sensitivities
+    for (int d = 0; d<nfwd; ++d) {
+      *fwdSens[d][0] = diagcat(getVector(fwdSeed[d]));
+    }
+
+    // Quick return?
+    if (nadj==0) return;
+
+    // Get offsets for each row and column
+    vector<int> offset1(ndep()+1, 0);
+    vector<int> offset2(ndep()+1, 0);
+    for (int i=0; i<ndep(); ++i) {
+      int ncol = dep(i).sparsity().size2();
+      int nrow = dep(i).sparsity().size1();
+      offset2[i+1] = offset2[i] + ncol;
+      offset1[i+1] = offset1[i] + nrow;
+    }
+
+    // Adjoint sensitivities
+    for (int d=0; d<nadj; ++d) {
+      MX& aseed = *adjSeed[d][0];
+      vector<MX> s = diagsplit(aseed, offset1, offset2);
+      aseed = MX();
+      for (int i=0; i<ndep(); ++i) {
+        adjSens[d][i]->addToSum(s[i]);
+      }
     }
   }
 

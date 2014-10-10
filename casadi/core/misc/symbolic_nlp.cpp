@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "symbolic_nlp.hpp"
 #include "../core.hpp"
@@ -586,15 +589,17 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
   throw CasadiException("Error in SymbolicNLP::readExpressionNL: " + msg.str());
 }
 
-void SymbolicNLP::print(std::ostream &stream) const {
+void SymbolicNLP::print(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP:" << endl;
   stream << "x = " << x << endl;
   stream << "#f=" << f.size() << endl;
   stream << "#g=" << g.size() << endl;
+  if (trailing_newline) stream << endl;
 }
 
-void SymbolicNLP::repr(std::ostream &stream) const {
+void SymbolicNLP::repr(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP(#f=" << f.size() << ",#g="<< g.size() << ")";
+  if (trailing_newline) stream << endl;
 }
 
 } // namespace casadi

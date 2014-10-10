@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 // Lower value means wil be checked first
 #define PRECEDENCE_IVector 92
@@ -69,6 +72,8 @@
 
 //#ifdef SWIG_MAIN_MODULE
 %template(SXElementVector) std::vector< casadi::SXElement > ;
+%template(SparsityVector) std::vector< casadi::Sparsity > ;
+%template(SparsityVectorVector) std::vector< std::vector< casadi::Sparsity> > ;
 %template(SXVector) std::vector<casadi::Matrix<casadi::SXElement> > ;
 %template(SXVectorVector) std::vector< std::vector<casadi::Matrix<casadi::SXElement> > > ;
 %template(MXVector) std::vector<casadi::MX>;
@@ -92,6 +97,8 @@
 %template() std::vector< std::vector<casadi::Matrix<int> > > ;
 %template() std::vector<std::vector<casadi::SXElement> > ;
 %template() std::vector< std::vector<std::vector<casadi::SXElement> > > ;
+%template() std::vector< casadi::Sparsity > ;
+%template() std::vector< std::vector< casadi::Sparsity> > ;
 #endif //SWIG_MAIN_MODULE*/
 
 #ifdef CASADI_MODULE
@@ -129,6 +136,20 @@ if (!ret) {
 }
 }
 
+%typemap(out) std::vector< casadi::GenericType > {
+  PyObject* ret = PyList_New(0);
+  std::vector< casadi::GenericType > & in = $1;
+  for (int k=0 ; k < in.size(); ++k) {
+    PyObject* rete;
+    bool retv = meta< casadi::GenericType >::toPython(in[k],rete);
+    if (!retv) {
+      SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
+    }
+    PyList_Append(ret, rete);
+  }
+  $result = ret;
+}
+
 %typemap(out) const casadi::GenericType::Dictionary&  {
 bool ret=meta<  casadi::GenericType::Dictionary >::toPython(*$1,$result);
 if (!ret) {
@@ -138,6 +159,7 @@ if (!ret) {
 #endif // SWIGPYTHON
 
 %my_generic_const_typemap(PRECEDENCE_GENERICTYPE,casadi::GenericType)
+%my_generic_const_typemap(PRECEDENCE_GENERICTYPE,std::vector< casadi::GenericType >)
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(PRECEDENCE_DICTIONARY ,casadi::GenericType::Dictionary)
 #endif

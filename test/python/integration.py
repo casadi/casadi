@@ -1,24 +1,27 @@
 #
 #     This file is part of CasADi.
-# 
+#
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-# 
+#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2011-2014 Greg Horn
+#
 #     CasADi is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU Lesser General Public
 #     License as published by the Free Software Foundation; either
 #     version 3 of the License, or (at your option) any later version.
-# 
+#
 #     CasADi is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #     Lesser General Public License for more details.
-# 
+#
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-# 
 #
+#
+
 from casadi import *
 import casadi as c
 from numpy import *
@@ -51,8 +54,13 @@ except:
 
 integrators.append(("collocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18}))
 
-integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18,"startup_integrator":"cvodes"}))
-#integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": "csparse"}}))
+try:
+  Integrator.loadPlugin("oldcollocation")
+  integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18,"startup_integrator":"cvodes"}))
+  #integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": "csparse"}}))
+except:
+  pass
+
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000}))
 
 print "Will test these integrators:"
@@ -215,6 +223,7 @@ class Integrationtests(casadiTestCase):
       for p_features, din, dout, rdin, rdout,  solutionin, solution, point, (tstart_, tend_) in variations(*tt):
         for Integrator, features, options in integrators:
           self.message(Integrator)
+          dummyIntegrator = c.Integrator(Integrator,c.SXFunction())
           if p_features[0] in features:
             g = Function()
             if len(rdin)>1:
@@ -238,11 +247,15 @@ class Integrationtests(casadiTestCase):
              
             def solveroptions(post=""):
               yield {"linear_solver_type" +post: "dense" }
-              #for it in itoptions(post):
-              #  d = {"linear_solver_type" +post: "iterative" }
-              #  d.update(it)
-              #  yield d
-              #yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
+              allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
+              #allowedOpts.remove("iterative") # disabled, see #1231
+              if "iterative" in allowedOpts:
+                  for it in itoptions(post):
+                      d = {"linear_solver_type" +post: "iterative" }
+                      d.update(it)
+                      yield d
+              if "banded" in allowedOpts:
+                  yield {"linear_solver_type" +post: "banded" }
               yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
                 
             for a_options in solveroptions("B"):
@@ -326,6 +339,7 @@ class Integrationtests(casadiTestCase):
 
       for Integrator, features, options in integrators:
         self.message(Integrator)
+        dummyIntegrator = c.Integrator(Integrator,SXFunction())
         if p_features[0] in features:
           g = Function()
           if len(rdin)>1:
@@ -348,11 +362,15 @@ class Integrationtests(casadiTestCase):
            
           def solveroptions(post=""):
             yield {"linear_solver_type" +post: "dense" }
-            for it in itoptions(post):
-              d = {"linear_solver_type" +post: "iterative" }
-              d.update(it)
-              yield d
-            #yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
+            allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
+            #allowedOpts.remove("iterative")  # disabled, see #1231
+            if "iterative" in allowedOpts:
+                for it in itoptions(post):
+                    d = {"linear_solver_type" +post: "iterative" }
+                    d.update(it)
+                    yield d
+            if "banded" in allowedOpts:
+                yield {"linear_solver_type" +post: "banded" }
             yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
               
           for a_options in solveroptions("B"):

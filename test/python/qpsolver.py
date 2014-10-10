@@ -1,24 +1,26 @@
 #
 #     This file is part of CasADi.
-# 
+#
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-# 
+#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2011-2014 Greg Horn
+#
 #     CasADi is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU Lesser General Public
 #     License as published by the Free Software Foundation; either
 #     version 3 of the License, or (at your option) any later version.
-# 
+#
 #     CasADi is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #     Lesser General Public License for more details.
-# 
+#
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-# 
-# 
+#
+#
 from casadi import *
 import casadi as c
 from numpy import *
@@ -33,9 +35,19 @@ try:
 except:
   pass
 try:
+  QpSolver.loadPlugin("nlp.ipopt")
+  qpsolvers.append(("nlp.ipopt",{"target_options": {"tol": 1e-12}}))
+except:
+  pass
+try:
   NlpSolver.loadPlugin("worhp")
   qpsolvers.append(("nlp",{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}}))
   pass
+except:
+  pass
+try:
+  QpSolver.loadPlugin("nlp.worhp")
+  qpsolvers.append(("nlp.worhp",{"target_options": {"TolOpti": 1e-12}}))
 except:
   pass
 try:
@@ -67,6 +79,14 @@ try:
   qpsolvers.append(("qcqp",{"qcqp_solver":"socp","qcqp_solver_options": {"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp", "sdp_solver_options": {"gapTol":1e-10}} }}))
 except:
   pass
+
+try:
+  QpSolver.loadPlugin("qcqp.socp.sdp.dsdp")
+  qpsolvers.append(("qcqp.socp.sdp.dsdp",{"target_options": {"gapTol":1e-10}}))
+except:
+  pass
+
+print qpsolvers
 
 class QpSolverTests(casadiTestCase):
 

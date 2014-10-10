@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_NLP_SOLVER_HPP
 #define CASADI_NLP_SOLVER_HPP
@@ -185,7 +188,7 @@ namespace casadi {
   /** \brief NlpSolver
 
       @copydoc NlpSolver_doc
-      
+
       \generalsection{NlpSolver}
       \pluginssection{NlpSolver}
 
@@ -201,7 +204,7 @@ namespace casadi {
     /// NLP solver factory
     NlpSolver(
       const std::string& name,
-      /**< \pluginargument{NlpSolver} 
+      /**< \pluginargument{NlpSolver}
       */
       const Function& nlp
       /**< \parblock
@@ -218,8 +221,8 @@ namespace casadi {
     NlpSolverInternal* operator->();
     const NlpSolverInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
@@ -269,6 +272,9 @@ namespace casadi {
 
     /// Read options from parameter xml
     void setOptionsFromFile(const std::string & file);
+
+    /// Infix
+    static std::string infix();
   };
 
 } // namespace casadi

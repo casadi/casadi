@@ -4,6 +4,11 @@ cmake_minimum_required(VERSION 2.6)
 add_definitions(-DSHARED_LIBRARY_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 add_definitions(-DSHARED_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
+# Look for plugins in the installation directory
+file(TO_NATIVE_PATH ${PLUGIN_INSTALL_PATH} PLUGIN_EXTRA_SEARCH_PATH)
+string(REPLACE "\\" "\\\\" PLUGIN_EXTRA_SEARCH_PATH ${PLUGIN_EXTRA_SEARCH_PATH})
+add_definitions(-DPLUGIN_EXTRA_SEARCH_PATH="${PLUGIN_EXTRA_SEARCH_PATH}")
+
 add_subdirectory(runtime)
 
 set(CASADI_SRCS
@@ -21,7 +26,7 @@ set(CASADI_SRCS
   casadi_math.hpp
   casadi_options.hpp          casadi_options.cpp
   casadi_meta.hpp             ${PROJECT_BINARY_DIR}/casadi_meta.cpp
-  printable_object.hpp        printable_object.cpp      # Base class enabling printing a Python-style "description" as well as a shorter "representation" of a class
+  printable_object.hpp                                  # Interface class enabling printing a Python-style "description" as well as a shorter "representation" of a class
   shared_object.hpp           shared_object.cpp         # This base class implements the reference counting (garbage collection) framework used in CasADi
   weak_ref.hpp                weak_ref.cpp              # Provides weak reference functionality (non-owning smart pointers)
   generic_type.hpp            generic_type.cpp          # Generic type used for options and for compatibility with dynamically typed languages like Python
@@ -84,11 +89,11 @@ set(CASADI_SRCS
   mx/mx_tools.hpp            mx/mx_tools.cpp
 
   # A dynamically created function with AD capabilities
-  function/io_interface.hpp                                   # Input/output interface for Function and FunctionInternal
+  function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
   function/io_scheme.hpp           function/io_scheme.cpp           function/io_scheme_internal.hpp           function/io_scheme_internal.cpp
-  function/function.hpp                  function/function.cpp                  function/function_internal.hpp                  function/function_internal.cpp
-  function/plugin_interface.hpp                                   # Plugin interface for Function
-  function/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
+  function/function.hpp            function/function.cpp            function/function_internal.hpp            function/function_internal.cpp
+  function/plugin_interface.hpp                                     # Plugin interface for Function
+  function/x_function_internal.hpp                                  # Base class for SXFunction and MXFunction
   function/sx_function.hpp         function/sx_function.cpp         function/sx_function_internal.hpp         function/sx_function_internal.cpp
   function/mx_function.hpp         function/mx_function.cpp         function/mx_function_internal.hpp         function/mx_function_internal.cpp
   function/custom_function.hpp     function/custom_function.cpp     function/custom_function_internal.hpp     function/custom_function_internal.cpp
@@ -101,7 +106,6 @@ set(CASADI_SRCS
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
   function/control_simulator.hpp   function/control_simulator.cpp   function/control_simulator_internal.hpp   function/control_simulator_internal.cpp
   function/parallelizer.hpp        function/parallelizer.cpp        function/parallelizer_internal.hpp        function/parallelizer_internal.cpp
-  function/ocp_solver.hpp          function/ocp_solver.cpp          function/ocp_solver_internal.hpp          function/ocp_solver_internal.cpp
   function/qp_solver.hpp           function/qp_solver.cpp           function/qp_solver_internal.hpp           function/qp_solver_internal.cpp
   function/stabilized_qp_solver.hpp    function/stabilized_qp_solver.cpp    function/stabilized_qp_solver_internal.hpp function/stabilized_qp_solver_internal.cpp
   function/sdp_solver.hpp          function/sdp_solver.cpp          function/sdp_solver_internal.hpp          function/sdp_solver_internal.cpp
@@ -111,10 +115,20 @@ set(CASADI_SRCS
   function/lp_solver.hpp           function/lp_solver.cpp           function/lp_internal.hpp                  function/lp_internal.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/nullspace.hpp           function/nullspace.cpp           function/nullspace_internal.hpp           function/nullspace_internal.cpp
+  function/dple_solver.hpp         function/dple_solver.cpp         function/dple_internal.hpp     function/dple_internal.cpp
+  function/dle_solver.hpp          function/dle_solver.cpp          function/dle_internal.hpp      function/dle_internal.cpp
+  function/lr_dple_solver.hpp      function/lr_dple_solver.cpp      function/lr_dple_internal.hpp  function/lr_dple_internal.cpp
+  function/lr_dle_solver.hpp       function/lr_dle_solver.cpp       function/lr_dle_internal.hpp   function/lr_dle_internal.cpp
+  function/cle_solver.hpp          function/cle_solver.cpp          function/cle_internal.hpp      function/cle_internal.cpp
+  function/wrapper.hpp             function/adaptor.hpp             function/dense_io.hpp
 
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
   misc/symbolic_nlp.hpp            misc/symbolic_nlp.cpp
+  misc/xml_node.hpp                misc/xml_node.cpp
+  misc/xml_file.hpp                misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
+  misc/variable.hpp                misc/variable.cpp
+  misc/symbolic_ocp.hpp            misc/symbolic_ocp.cpp
 
   # User include class with the most essential includes
   core.hpp

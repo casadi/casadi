@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "slice.hpp"
 #include "matrix_tools.hpp"
@@ -79,7 +82,11 @@ namespace casadi {
     }
   }
 
-  void Slice::print(std::ostream& stream) const {
+  void Slice::repr(std::ostream& stream, bool trailing_newline) const {
+    print(stream, trailing_newline);
+  }
+
+  void Slice::print(std::ostream& stream, bool trailing_newline) const {
     bool from_beginning = start_ == 0;
     bool till_end = stop_ == std::numeric_limits<int>::max();
     bool skip_none = step_==1;
@@ -91,6 +98,7 @@ namespace casadi {
       if (!till_end) stream << stop_;
       if (!skip_none) stream << ":" << step_;
     }
+    if (trailing_newline) stream << std::endl;
   }
 
   Slice::Slice(const std::vector<int>& v) {

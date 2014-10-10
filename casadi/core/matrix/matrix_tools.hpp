@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #ifndef CASADI_MATRIX_TOOLS_HPP
 #define CASADI_MATRIX_TOOLS_HPP
 
@@ -32,6 +35,11 @@
 
 namespace casadi {
 
+/**
+\ingroup expression_tools
+@{
+*/
+
   /// Transpose of a matrix
   template<typename DataType>
   Matrix<DataType> transpose(const Matrix<DataType> &x);
@@ -40,7 +48,7 @@ namespace casadi {
    *
    * With optional sp_z you can specify the sparsity of the result
    * A typical use case might be where the product is only constructed to
-   * inspect the trace of it. sp_z diagonal will be more efficient 
+   * inspect the trace of it. sp_z diagonal will be more efficient
    * in that case.
    */
   template<typename DataType>
@@ -115,17 +123,17 @@ namespace casadi {
                             const Matrix<DataType> &C, const Matrix<DataType> &D);
 #endif // SWIG
 
-  /** \brief Concatenate a list of matrices vertically
-   * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
+  /** \brief Concatenate a list of matrices horizontally
+   * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
    *
    *   horzcat(horzsplit(x, ...)) = x
    */
   template<typename DataType>
   Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
 
-  /** \brief  split vertically, retaining groups of cols
-   * \param offset List of all start cols for each group
-   *      the last col group will run to the end.
+  /** \brief  split horizontally, retaining groups of columns
+   * \param offset List of all start columns for each group
+   *      the last column group will run to the end.
    *
    *   horzcat(horzsplit(x, ...)) = x
    */
@@ -133,23 +141,23 @@ namespace casadi {
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v,
                                            const std::vector<int>& offset);
 
-  /** \brief  split vertically, retaining fixed-sized groups of cols
-   * \param incr Size of each group of cols
+  /** \brief  split horizontally, retaining fixed-sized groups of columns
+   * \param incr Size of each group of columns
    *
    *   horzcat(horzsplit(x, ...)) = x
    */
   template<typename DataType>
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1);
 
-  /** \brief Concatenate a list of matrices horizontally
-   * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
+  /** \brief Concatenate a list of matrices vertically
+   * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
    *
    *   vertcat(vertsplit(x, ...)) = x
    */
   template<typename DataType>
   Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
 
-  /** \brief  split horizontally, retaining groups of rows
+  /** \brief  split vertically, retaining groups of rows
    * \param output_offset List of all start rows for each group
    *      the last row group will run to the end.
    *
@@ -159,7 +167,7 @@ namespace casadi {
   std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v,
                                            const std::vector<int>& offset);
 
-  /** \brief  split horizontally, retaining fixed-sized groups of rows
+  /** \brief  split vertically, retaining fixed-sized groups of rows
    * \param incr Size of each group of rows
    *
    *   vertcat(vertsplit(x, ...)) = x
@@ -169,8 +177,8 @@ namespace casadi {
 
 
   /** \brief  chop up into blocks
-   * \brief vert_offset Defines the boundaries of the block rows
-   * \brief horz_offset Defines the boundaries of the block columns
+   * \param vert_offset Defines the boundaries of the block rows
+   * \param horz_offset Defines the boundaries of the block columns
    *
    *   blockcat(blocksplit(x,..., ...)) = x
    */
@@ -180,8 +188,8 @@ namespace casadi {
                                                             const std::vector<int>& horz_offset);
 
   /** \brief  chop up into blocks
-   * \brief vert_incr Defines the increment for block boundaries in row dimension
-   * \brief horz_incr Defines the increment for block boundaries in column dimension
+   * \param vert_incr Defines the increment for block boundaries in row dimension
+   * \param horz_incr Defines the increment for block boundaries in column dimension
    *
    *   blockcat(blocksplit(x,..., ...)) = x
    */
@@ -189,6 +197,16 @@ namespace casadi {
   std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
                                                             int vert_incr = 1,
                                                             int horz_incr = 1);
+
+  /** \brief  split diagonally, retaining matrices
+  * \param output_offset1 List of all start locations (row) for each matrix
+  *      the last matrix will run to the end.
+  *   diagcat(diagsplit(x, ...)) = x
+  */
+  template<typename DataType>
+  std::vector< Matrix<DataType> > diagsplit(const Matrix<DataType>& x,
+                                                   const std::vector<int>& output_offset1,
+                                                   const std::vector<int>& output_offset2);
 
 #ifndef SWIG
   template<typename DataType>
@@ -296,6 +314,34 @@ namespace casadi {
   CASADI_CORE_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
                                              const Dictionary& dict = Dictionary());
 
+
+  /** Inf-norm of a Matrix-matrix product, no memory allocation
+  *   mul(x, y)
+  *
+  * \param Dwork  A double work vector that you must allocate
+  *               Minimum size: y.size1()
+  * \param Iwork  A integer work vector that you must allocate
+  *               Minimum size: y.size1()+x.size2()+1
+  */
+  CASADI_CORE_EXPORT double norm_inf_mul_nn(const Matrix<double> &x,
+                              const Matrix<double> &y,
+                              std::vector<double>& Dwork,
+                              std::vector<int>& Iwork);
+
+  /** 0-norm (nonzero count) of a Matrix-matrix product, no memory allocation
+  *   mul(x, y)
+  *
+  * \param Bwork  A boolean work vector that you must allocate
+  *               Minimum size: y.size1()
+  * \param Iwork  A integer work vector that you must allocate
+  *               Minimum size: y.size1()+x.size2()+1
+  */
+  template<typename DataType>
+  int norm_0_mul_nn(const Matrix<DataType> &x,
+                              const Matrix<DataType> &y,
+                              std::vector<bool>& Bwork,
+                              std::vector<int>& Iwork);
+
   /** \brief Kronecker tensor product
   *
   * Creates a block matrix in which each element (i, j) is a_ij*b
@@ -396,6 +442,10 @@ namespace casadi {
   /// Obtain the structural rank of a sparsity-pattern
   template<typename DataType>
   int sprank(const Matrix<DataType>& A);
+
+/*
+@}
+*/
 
 } // namespace casadi
 
@@ -711,6 +761,39 @@ namespace casadi {
     std::vector<int> offset2 = range(0, x.size2(), horz_incr);
     offset2.push_back(x.size2());
     return blocksplit(x, offset1, offset2);
+  }
+
+  template<typename DataType>
+  std::vector< Matrix<DataType> > diagsplit(const Matrix<DataType>& x,
+                                                   const std::vector<int>& offset1,
+                                                   const std::vector<int>& offset2) {
+    // Consistency check
+    casadi_assert(offset1.size()>=1);
+    casadi_assert(offset1.front()==0);
+    casadi_assert(offset1.back()==x.size1());
+    casadi_assert(isMonotone(offset1));
+
+    // Consistency check
+    casadi_assert(offset2.size()>=1);
+    casadi_assert(offset2.front()==0);
+    casadi_assert(offset2.back()==x.size2());
+    casadi_assert(isMonotone(offset2));
+
+    // Number of outputs
+    int n = offset1.size()-1;
+
+    // Return value
+    std::vector< Matrix<DataType> > ret;
+
+    // Caveat: this is a very silly implementation
+    for (int i=0;i<n;++i) {
+      ret.push_back(x(
+        Slice(offset1[i], offset1[i+1]),
+        Slice(offset2[i], offset2[i+1])));
+    }
+
+    return ret;
+
   }
 
   template<typename DataType>
@@ -1199,6 +1282,119 @@ namespace casadi {
     return rank(A.sparsity());
   }
 
+  template<typename DataType>
+  int norm_0_mul_nn(const Matrix<DataType> &B,
+                         const Matrix<DataType> &A,
+                         std::vector<bool>& Bwork,
+                         std::vector<int>& Iwork) {
+
+    // Note: because the algorithm works with compressed row storage,
+    // we have x=B and y=A
+
+    casadi_assert_message(A.size1()==B.size2(), "Dimension error. Got " << B.dimString()
+                          << " times " << A.dimString() << ".");
+
+
+    int n_row = A.size2();
+    int n_col = B.size1();
+
+    casadi_assert_message(Bwork.size()>=n_col,
+      "We need a bigger work vector (>=" << n_col << "), but got "<< Bwork.size() <<".");
+    casadi_assert_message(Iwork.size()>=n_row+1+n_col,
+      "We need a bigger work vector (>=" << n_row+1+n_col << "), but got "<< Iwork.size() <<".");
+
+    const std::vector<int> &Aj = A.row();
+    const std::vector<int> &Ap = A.colind();
+
+    const std::vector<int> &Bj = B.row();
+    const std::vector<int> &Bp = B.colind();
+
+    int *Cp = &Iwork[0];
+    int *mask = &Iwork[n_row+1];
+
+    // Implementation borrowed from Scipy's sparsetools/csr.h
+
+    // Pass 1
+
+    // method that uses O(n) temp storage
+    std::fill(mask, mask+n_col, -1);
+
+    Cp[0] = 0;
+    int nnz = 0;
+
+    for (int i = 0; i < n_row; i++) {
+      int row_nnz = 0;
+      for (int jj = Ap[i]; jj < Ap[i+1]; jj++) {
+        int j = Aj[jj];
+        for (int kk = Bp[j]; kk < Bp[j+1]; kk++) {
+          int k = Bj[kk];
+          if (mask[k] != i) {
+            mask[k] = i;
+            row_nnz++;
+          }
+        }
+      }
+      int next_nnz = nnz + row_nnz;
+
+      nnz = next_nnz;
+      Cp[i+1] = nnz;
+    }
+
+    // Pass 2
+    int *next = &Iwork[n_row+1];
+    std::fill(next, next+n_col, -1);
+
+    std::vector<bool> & sums = Bwork;
+    std::fill(sums.begin(), sums.end(), false);
+
+    nnz = 0;
+
+    Cp[0] = 0;
+
+    for (int i = 0; i < n_row; i++) {
+        int head   = -2;
+        int length =  0;
+
+        int jj_start = Ap[i];
+        int jj_end   = Ap[i+1];
+        for (int jj = jj_start; jj < jj_end; jj++) {
+            int j = Aj[jj];
+
+            int kk_start = Bp[j];
+            int kk_end   = Bp[j+1];
+            for (int kk = kk_start; kk < kk_end; kk++) {
+                int k = Bj[kk];
+
+                sums[k] = true;
+
+                if (next[k] == -1) {
+                    next[k] = head;
+                    head  = k;
+                    length++;
+                }
+            }
+        }
+
+        for (int jj = 0; jj < length; jj++) {
+
+            if (sums[head]) {
+                nnz++;
+            }
+
+            int temp = head;
+            head = next[head];
+
+            next[temp] = -1; //clear arrays
+            sums[temp] =  0;
+        }
+
+        Cp[i+1] = nnz;
+    }
+
+    return nnz;
+
+  }
+
 } // namespace casadi
 
 
@@ -1237,6 +1433,7 @@ namespace casadi {
   MTT_INST(DataType, norm_2)                            \
   MTT_INST(DataType, norm_inf)                          \
   MTT_INST(DataType, norm_F)                            \
+  MTT_INST(DataType, norm_0_mul_nn)                     \
   MTT_INST(DataType, qr)                                \
   MTT_INST(DataType, nullspace)                         \
   MTT_INST(DataType, solve)                             \

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "sparsity_internal.hpp"
 #include "sparsity_tools.hpp"
@@ -97,8 +100,8 @@ namespace casadi {
     return *static_cast<const SparsityInternal*>(get());
   }
 
-  bool Sparsity::checkNode() const {
-    return dynamic_cast<const SparsityInternal*>(get())!=0;
+  bool Sparsity::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const SparsityInternal*>(ptr)!=0;
   }
 
   int Sparsity::size1() const {
@@ -326,8 +329,12 @@ namespace casadi {
     return (*this)->patternCombine(y, true, true);
   }
 
+  Sparsity Sparsity::patternProductNew(const Sparsity& y) const {
+    return (*this)->patternProductNew(y);
+  }
+
   Sparsity Sparsity::patternProduct(const Sparsity& x_trans) const {
-    return (*this)->patternProduct(x_trans);
+    return x_trans.T().patternProductNew(*this);
   }
 
   Sparsity Sparsity::patternProduct(const Sparsity& x_trans,
@@ -1063,6 +1070,14 @@ namespace casadi {
 
   void Sparsity::printCompact(std::ostream &stream) const {
     (*this)->printCompact(stream);
+  }
+
+  int Sparsity::bandwidthU() const {
+    return (*this)->bandwidthU();
+  }
+
+  int Sparsity::bandwidthL() const {
+    return (*this)->bandwidthL();
   }
 
 } // namespace casadi

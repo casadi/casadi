@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,7 +22,8 @@
  *
  */
 
-%module casadi_core
+
+%module(package="casadi") casadi_core
 
 //  The things needed to make each casadi_*.i  compilable by itself: typemaps
 %include "common.i"
@@ -56,6 +59,19 @@
 %{
 #include "casadi/core/misc/integration_tools.hpp"
 #include "casadi/core/misc/symbolic_nlp.hpp"
+#include "casadi/core/misc/variable.hpp"
+#include "casadi/core/misc/symbolic_ocp.hpp"
+#include "casadi/core/misc/xml_file.hpp"
 %}
 %include "casadi/core/misc/integration_tools.hpp"
+
+%template(PrintSymbolicNLP)        casadi::PrintableObject<casadi::SymbolicNLP>;
 %include "casadi/core/misc/symbolic_nlp.hpp"
+
+%template(PrintVariable)        casadi::PrintableObject<casadi::Variable>;
+%include "casadi/core/misc/variable.hpp"
+
+%template(PrintSymbolicOCP)        casadi::PrintableObject<casadi::SymbolicOCP>;
+%include "casadi/core/misc/symbolic_ocp.hpp"
+
+%include "casadi/core/misc/xml_file.hpp"

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,10 +22,10 @@
  *
  */
 
+
 #include "sx_node.hpp"
 #include <limits>
 #include <typeinfo>
-#include <cassert>
 
 using namespace std;
 namespace casadi {
@@ -35,7 +37,9 @@ namespace casadi {
 
   SXNode::~SXNode() {
     // Make sure that this is there are no scalar expressions pointing to it when it is destroyed
-    assert(count==0);
+    casadi_assert_warning(count==0,
+                          "Reference counting failure. "
+                          "Possible cause: Circular dependency in user code.");
   }
 
   double SXNode::getValue() const {

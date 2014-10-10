@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,21 +22,17 @@
  *
  */
 
+
 #include <iostream>
 #include <fstream>
 #include <ctime>
 #include <casadi/casadi.hpp>
 
-// Load manually
-extern "C" void casadi_load_nlpsolver_ipopt();
-
 using namespace casadi;
 using namespace std;
 
 int main(){
-    
   cout << "program started" << endl;
-  casadi_load_nlpsolver_ipopt();
       
   // Dimensions
   int nu = 20;  // Number of control segments

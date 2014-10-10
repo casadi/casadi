@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,60 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
+
+
+#ifdef SWIGMATLAB
+%rename(plus) __add__;
+%rename(minus) __sub__;
+%rename(uminus) operator-;
+%rename(uplus) operator+;
+%rename(times) __mul__;
+%rename(mtimes) mul;
+%rename(rdivide) __div__;
+%rename(ldivide) __rdiv__;
+%rename(mrdivide) __mrdivide__;
+%rename(mldivide) __mldivide__;
+%rename(power) __pow__;
+%rename(mpower) __mpower__;
+%rename(lt) __lt__;
+%rename(gt) __gt__;
+%rename(le) __le__;
+%rename(ge) __ge__;
+%rename(ne) __ne__;
+%rename(eq) __eq__;
+//%rename(and) logic_and;
+//%rename(or) logic_or;
+//%rename(not) logic_not;
+%rename(trans) transpose;
+
+
+// Workarounds, pending proper fix
+%rename(truediv) __truediv__;
+%rename(nonzero) __nonzero__;
+%rename(constpow) __constpow__;
+%rename(copysign) __copysign__;
+%rename(rpow) __rpow__;
+%rename(radd) __radd__;
+%rename(rsub) __rsub__;
+%rename(rmul) __rmul__;
+%rename(rtruediv) __rtruediv__;
+%rename(rmldivide) __rmldivide__;
+%rename(rmrdivide) __rmrdivide__;
+%rename(rmpower) __rmpower__;
+%rename(rconstpow) __rconstpow__;
+%rename(rge) __rge__;
+%rename(rgt) __rgt__;
+%rename(rle) __rle__;
+%rename(rlt) __rlt__;
+%rename(req) __req__;
+%rename(rne) __rne__;
+%rename(rfmin) __rfmin__;
+%rename(rfmax) __rfmax__;
+%rename(rarctan2) __rarctan2__;
+%rename(rcopysign) __rcopysign__;
+%rename(hash) __hash__;
+#endif // SWIGMATLAB
 
 %{
 #include "casadi/core/matrix/sparsity.hpp"
@@ -156,6 +212,11 @@ class NZproxy:
 %enddef
 #endif
 
+#ifdef SWIGMATLAB
+%define %matrix_helpers(Type)
+%enddef
+#endif
+
 #ifndef SWIGPYTHON
 %define %matrix_convertors
 %enddef
@@ -286,7 +347,7 @@ PyObject* arrayView() {
 %}
 
 binopsrFull(casadi::Matrix<double>)
-binopsFull(const casadi::Matrix<casadi::SXElement> & b,,casadi::Matrix<casadi::SXElement>,casadi::Matrix<casadi::SXElement>)
+binopsFull(const casadi::SX & b,,casadi::SX,casadi::SX)
 binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 
 }; // extend Matrix<double>
@@ -324,7 +385,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
   %}
 
   binopsrFull(casadi::Matrix<int>)
-  binopsFull(const casadi::Matrix<casadi::SXElement> & b,,casadi::Matrix<casadi::SXElement>,casadi::Matrix<casadi::SXElement>)
+  binopsFull(const casadi::SX & b,,casadi::SX,casadi::SX)
   binopsFull(const casadi::Matrix<double> & b,,casadi::Matrix<double>,casadi::Matrix<double>)
   binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
   %pythoncode %{
@@ -389,13 +450,15 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 namespace casadi{
 
 %{
-#ifdef SWIGPYTHON
+
+#ifndef SWIGXML
+
 /// casadi::Slice
 template<> char meta< casadi::Slice >::expected_message[] = "Expecting Slice or number";
 template <>
-int meta< casadi::Slice >::as(PyObject * p,casadi::Slice &m) {
+int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice &m) {
   NATIVERETURN(casadi::Slice,m)
-
+#ifdef SWIGPYTHON
   if (PyInt_Check(p)) {
     m.start_ = PyInt_AsLong(p);
     m.stop_ = m.start_+1;
@@ -410,13 +473,15 @@ int meta< casadi::Slice >::as(PyObject * p,casadi::Slice &m) {
   } else {
     return false;
   }
-
+#else
+  return false;
+#endif
 }
 
 /// casadi::IndexList
 template<> char meta< casadi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 template <>
-int meta< casadi::IndexList >::as(PyObject * p,casadi::IndexList &m) {
+int meta< casadi::IndexList >::as(GUESTOBJECT *p, casadi::IndexList &m) {
   NATIVERETURN(casadi::IndexList,m)
   if (meta< int >::couldbe(p)) {
     m.type = casadi::IndexList::INT;
@@ -433,7 +498,9 @@ int meta< casadi::IndexList >::as(PyObject * p,casadi::IndexList &m) {
   return true;
 }
 
-#endif //SWIGPYTHON
+#endif // SWIGXML
+
+
 
 %}
 

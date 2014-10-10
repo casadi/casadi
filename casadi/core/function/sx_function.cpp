@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,8 +22,8 @@
  *
  */
 
+
 #include "sx_function_internal.hpp"
-#include <cassert>
 #include <limits>
 #include <stack>
 #include <deque>
@@ -101,8 +103,8 @@ SXFunctionInternal* SXFunction::operator->() {
   return static_cast<SXFunctionInternal*>(Function::operator->());
 }
 
-bool SXFunction::checkNode() const {
-  return dynamic_cast<const SXFunctionInternal*>(get())!=0;
+bool SXFunction::testCast(const SharedObjectNode* ptr) {
+  return dynamic_cast<const SXFunctionInternal*>(ptr)!=0;
 }
 
 SX SXFunction::jac(int iind, int oind, bool compact, bool symmetric) {

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_CONCAT_HPP
 #define CASADI_CONCAT_HPP
@@ -124,6 +127,34 @@ namespace casadi {
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_VERTCAT;}
+  };
+
+  /** \brief Diagonal concatenation of matrices
+      \author Joris Gillis
+      \date 2014
+  */
+  class CASADI_CORE_EXPORT Diagcat : public Concat {
+  public:
+
+    /// Constructor
+    Diagcat(const std::vector<MX>& x);
+
+    /// Clone function
+    virtual Diagcat* clone() const { return new Diagcat(*this);}
+
+    /// Destructor
+    virtual ~Diagcat() {}
+
+    /// Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
+
+    /// Evaluate the function symbolically (MX)
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                            bool output_given);
+
+    /** \brief Get the operation */
+    virtual int getOp() const { return OP_DIAGCAT;}
   };
 
 } // namespace casadi

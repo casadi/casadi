@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_STD_VECTOR_TOOLS_HPP
 #define CASADI_STD_VECTOR_TOOLS_HPP
@@ -63,7 +66,7 @@ namespace std {
 namespace casadi {
 
 #ifndef SWIG
-  /** Range function
+  /**  \brief Range function
   * \param start
   * \param stop
   * \param step
@@ -76,12 +79,24 @@ namespace casadi {
   CASADI_CORE_EXPORT std::vector<int> range(int start, int stop, int step=1,
                                                 int len=std::numeric_limits<int>::max());
 
-  /** Range function
+  /**  \brief Range function
   * \param stop
   *
   * \return list [0, 1, 2...stop-1]
   */
   CASADI_CORE_EXPORT std::vector<int> range(int stop);
+
+  /**  \brief Slicing vector
+  *  \param v Vector to slice
+  *  \param i List of indices
+  */
+  template<typename T>
+  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<int> &i);
+
+  /** \brief Reverse a list
+  */
+  template<typename T>
+  std::vector<T> reverse(const std::vector<T> &v);
 
   /// Print representation
   template<typename T>
@@ -225,6 +240,20 @@ namespace casadi {
   template<typename T>
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,
             bool invert_indices =false);
+
+
+  /** \brief cumulative sum
+  *
+  */
+  template<typename T>
+  std::vector<T> cumsum(const std::vector<T> &values);
+
+  /** \brief cumulative sum, starting with zero
+  *
+  */
+  template<typename T>
+  std::vector<T> cumsum0(const std::vector<T> &values);
+
 #endif //SWIG
 
   /** \brief Make a vector of a certain length with its entries specified
@@ -342,6 +371,30 @@ namespace std {
 } // namespace std
 
 namespace casadi {
+
+  template<typename T>
+  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<int> &i) {
+    std::vector<T> ret;
+    ret.reserve(i.size());
+    for (int k=0;k<i.size();++k) {
+       int j = i[k];
+       casadi_assert_message(j>=0,
+         "vector_slice: Indices should be larger than zero."
+         << "You have " << j << " at location " << k << ".");
+       casadi_assert_message(j<v.size(),
+         "vector_slice: Indices should be larger than zero."
+         << "You have " << j << " at location " << k << ".");
+       ret.push_back(v[j]);
+    }
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> reverse(const std::vector<T> &v) {
+    std::vector<T> ret(v.size());
+    std::reverse_copy(v.begin(), v.end(), ret.begin());
+    return ret;
+  }
 
   template<typename T>
   void repr(const std::vector<T> &v, std::ostream &stream) {
@@ -591,6 +644,28 @@ namespace casadi {
 
 
 
+  }
+
+  template<typename T>
+  std::vector<T> cumsum(const std::vector<T> &values) {
+    std::vector<T> ret(values.size());
+    T acc = 0;
+    for (int i=0;i<values.size();++i) {
+      acc+= values[i];
+      ret[i] = acc;
+    }
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> cumsum0(const std::vector<T> &values) {
+    std::vector<T> ret(values.size()+1, 0);
+    T acc = 0;
+    for (int i=0;i<values.size();++i) {
+      acc+= values[i];
+      ret[i+1] = acc;
+    }
+    return ret;
   }
 
   template<typename T>

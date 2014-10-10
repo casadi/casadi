@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,36 +22,35 @@
  *
  */
 
+
 #include "external_function_internal.hpp"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 //#include <dlfcn.h>
-#include <cassert>
 
 namespace casadi {
 
 using namespace std;
 
-ExternalFunction::ExternalFunction() {
-}
+  ExternalFunction::ExternalFunction() {
+  }
 
-ExternalFunction::ExternalFunction(const std::string& bin_name) {
-  assignNode(new ExternalFunctionInternal(bin_name));
-}
+  ExternalFunction::ExternalFunction(const std::string& bin_name) {
+    assignNode(new ExternalFunctionInternal(bin_name));
+  }
 
-ExternalFunctionInternal* ExternalFunction::operator->() {
-  return static_cast<ExternalFunctionInternal*>(Function::operator->());
-}
+  ExternalFunctionInternal* ExternalFunction::operator->() {
+    return static_cast<ExternalFunctionInternal*>(Function::operator->());
+  }
 
-const ExternalFunctionInternal* ExternalFunction::operator->() const {
-   return static_cast<const ExternalFunctionInternal*>(Function::operator->());
-}
+  const ExternalFunctionInternal* ExternalFunction::operator->() const {
+    return static_cast<const ExternalFunctionInternal*>(Function::operator->());
+  }
 
-bool ExternalFunction::checkNode() const {
-  return dynamic_cast<const ExternalFunctionInternal*>(get())!=0;
-}
-
+  bool ExternalFunction::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const ExternalFunctionInternal*>(ptr)!=0;
+  }
 
 } // namespace casadi

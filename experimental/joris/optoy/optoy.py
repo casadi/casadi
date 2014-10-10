@@ -1,10 +1,33 @@
+#
+#     This file is part of CasADi.
+#
+#     CasADi -- A symbolic framework for dynamic optimization.
+#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2011-2014 Greg Horn
+#
+#     CasADi is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU Lesser General Public
+#     License as published by the Free Software Foundation; either
+#     version 3 of the License, or (at your option) any later version.
+#
+#     CasADi is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     Lesser General Public License for more details.
+#
+#     You should have received a copy of the GNU Lesser General Public
+#     License along with CasADi; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+#
+#
 from casadi import *
 from casadi.tools import *
 
 class OptimizationObject(MX):
   def create(self,shape,name):
     if not isinstance(shape,tuple): shape = (shape,) 
-    MX.__init__(self,name,sp_dense(*shape))
+    MX.__init__(self,MX.sym(name,Sparsity.dense(*shape)))
     self.mapping[hash(self)] = self
     
   def __iter__(self):
@@ -159,11 +182,11 @@ def minimize(f,gl=[],verbose=False):
   original = MXFunction(x+p,nlpOut(f=f,g=G))
   original.init()
   
-  nlp = MXFunction(nlpIn(x=X,p=P),original.evalMX(X[...]+P[...]))
+  nlp = MXFunction(nlpIn(x=X,p=P),original(X[...]+P[...]))
   nlp.init()
   
   # Allocate an ipopt solver
-  solver = IpoptSolver(nlp)
+  solver = NlpSolver("ipopt",nlp)
   if not verbose:
     solver.setOption("print_time",False)
     solver.setOption("print_level",0)
@@ -201,7 +224,7 @@ def minimize(f,gl=[],verbose=False):
       ubg[str(i)] = 0
   
   # Solve the problem numerically
-  solver.solve()
+  solver.evaluate()
   
   # Raise an exception if not converged
   if solver.getStat('return_status')!="Solve_Succeeded":

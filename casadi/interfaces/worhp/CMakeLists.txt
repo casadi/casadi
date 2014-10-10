@@ -4,9 +4,9 @@ include_directories(../)
 include_directories(${WORHP_INCLUDE_DIR})
 
 casadi_plugin(NlpSolver worhp
-  worhp_internal.hpp
-  worhp_internal.cpp
-  worhp_internal_meta.cpp)
+  worhp_interface.hpp
+  worhp_interface.cpp
+  worhp_interface_meta.cpp)
 casadi_plugin_link_libraries(NlpSolver worhp ${WORHP_LIBRARIES})
 
 install(DIRECTORY ./

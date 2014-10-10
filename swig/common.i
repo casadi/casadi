@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
@@ -39,9 +42,34 @@
 
 %ignore *::operator->;
 
+#ifdef SWIGMATLAB
+%rename(disp) repr;
+#else
+%ignore print;
+%ignore repr;
+#endif
+
 %begin %{
 #define SWIG_PYTHON_OUTPUT_TUPLE
 %}
+
+// Print representation
+#ifdef SWIGMATLAB
+#define SWIG_REPR disp
+#else
+#define SWIG_REPR __repr__
+#endif
+
+// Print description
+#ifdef SWIGMATLAB
+#define SWIG_STR description
+#else
+#define SWIG_STR __str__
+#endif
+
+
+//#endif // SWIGPYTHON
+
 
 #ifdef SWIGPYTHON
 %pythoncode %{
@@ -329,11 +357,10 @@ namespace std {
 %template() std::vector< std::pair<int,int> >;*/
 //#endif //SWIG_MAIN_MODULE
 
-
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
 // nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code
 %extend std::vector<double>{  
-  std::string __repr__(){
+  std::string SWIG_REPR(){
     char buffer[32];
     std::string ret;
     ret += "[";
@@ -347,7 +374,7 @@ namespace std {
     ret += "]";
     return ret;
   }
-  std::string __str__(){
+  std::string SWIG_STR(){
     char buffer[32];
     std::string ret;
     
@@ -369,7 +396,7 @@ namespace std {
 
 // The same workaround for vector<double>
 %extend std::vector<int>{  
-  std::string __repr__(){
+  std::string SWIG_REPR(){
     char buffer[32];
     std::string ret;
     ret += "[";
@@ -383,7 +410,7 @@ namespace std {
     ret += "]";
     return ret;
   }
-  std::string __str__(){
+  std::string SWIG_STR(){
     char buffer[32];
     std::string ret;
     
@@ -413,36 +440,59 @@ if (deprecated("$decl",MSG)) SWIG_fail;
 if (internal("$decl")) SWIG_fail;
 %enddef
 
-#ifdef SWIGPYTHON
+#ifndef SWIGXML
 %wrapper %{
 int deprecated(const std::string & c,const std::string & a) {
-  return PyErr_WarnEx(PyExc_DeprecationWarning,("This CasADi function (" + c+") is deprecated. "  + a).c_str(),2);
+  std::string msg = "This CasADi function (" + c + ") is deprecated. " + a;
+#if defined(SWIGPYTHON)
+  return PyErr_WarnEx(PyExc_DeprecationWarning,msg.c_str(),2);
+#elif defined(SWIGMATLAB)
+  mexWarnMsgIdAndTxt("SWIG:DeprecationWarning",msg.c_str());
+  return 1;
+#endif
 }
 int internal(const std::string & c) {
   if (CasadiOptions::allowed_internal_api) return 0;
-  return PyErr_WarnEx(PyExc_SyntaxWarning,("This CasADi function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str(),2);
+  std::string msg = "This CasADi function (" + c + ") is not part of the public API. Use at your own risk.";
+#if defined(SWIGPYTHON)
+  return PyErr_WarnEx(PyExc_SyntaxWarning,msg.c_str(),2);
+#elif defined(SWIGMATLAB)
+  mexWarnMsgIdAndTxt("SWIG:SyntaxWarning",msg.c_str());
+  return 1;
+#endif
 }
 %}
 #endif
 
-#ifdef SWIGPYTHON
+#ifndef SWIGXML
 %{
-#define START \
-  if (casadi::CasadiOptions::catch_errors_python){ \
-  try {
-  
-#define STOP \
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_RuntimeError, e.what()); \
+// TODO(jgillis): remove after internal.i was updated
+#define CATCH_OR_RETHROW \
+  catch (const std::exception& e) { \
+    if (casadi::CasadiOptions::catch_errors_swig) { \
+      SWIG_exception(SWIG_RuntimeError, e.what()); \
+    } else { \
+      throw e; \
+    } \
+  }
+#define CATCH_OR_NOT(...) \
+if (casadi::CasadiOptions::catch_errors_swig) { \
+  try { \
+    __VA_ARGS__ \
+  } catch(const std::exception& e) { \
+    SWIG_exception(SWIG_RuntimeError, e.what()); \
   } \
-} else
+} else { \
+  __VA_ARGS__ \
+}
+
 %}
 #endif
 
 // Exceptions handling
 %include "exception.i"
 %exception {
-  START $action STOP { $action }
+  CATCH_OR_NOT($action)
 }
 
 // Python sometimes takes an approach to not check, but just try.
@@ -611,7 +661,6 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/function/custom_function.hpp"
-#include "casadi/core/function/ocp_solver.hpp"
 #include "casadi/core/function/simulator.hpp"
 #include "casadi/core/function/parallelizer.hpp"
 #include "casadi/core/function/external_function.hpp"
@@ -630,7 +679,6 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "casadi/core/function/qp_solver.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
 #include "casadi/core/function/lp_solver.hpp"
-#include "casadi/core/function/ocp_solver.hpp"
 #include "casadi/core/function/sdp_solver.hpp"
 #include "casadi/core/function/socp_solver.hpp"
 #include "casadi/core/function/qcqp_solver.hpp"
@@ -639,12 +687,15 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "casadi/core/function/parallelizer.hpp"
 #include "casadi/core/function/custom_function.hpp"
 #include "casadi/core/function/nullspace.hpp"
+#include "casadi/core/function/lr_dle_solver.hpp"
+#include "casadi/core/function/lr_dple_solver.hpp"
 #include "casadi/core/functor.hpp"
 
 using namespace casadi;
 
 %}
 
+#ifdef CASADI_MODULE
 #ifndef SWIGXML
 %traits_swigtype(casadi::DerivativeGenerator);
 %fragment(SWIG_Traits_frag(casadi::DerivativeGenerator));
@@ -660,6 +711,7 @@ using namespace casadi;
 %traits_swigtype(casadi::Function);
 %fragment(SWIG_Traits_frag(casadi::Function));
 
+#endif
 #endif
 
 

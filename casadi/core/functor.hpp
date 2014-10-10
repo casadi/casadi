@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_FUNCTOR_HPP
 #define CASADI_FUNCTOR_HPP
@@ -43,10 +46,7 @@ namespace casadi {
       \date 2013
   */
   class CASADI_CORE_EXPORT Functor : public SharedObject {
-    //Callback();
-
   };
-
 
   /** \brief Derivative Generator Functor
   *
@@ -66,11 +66,13 @@ namespace casadi {
   class CASADI_CORE_EXPORT DerivativeGenerator : public Functor {
     public:
       /// Default constructor
-      DerivativeGenerator() {}
+      DerivativeGenerator() { }
+
       /// Construct from C pointer
       DerivativeGenerator(DerivativeGeneratorCPtr ptr);
+
       /// Call
-      virtual Function operator() (Function& fcn, int nfwd, int nadj, void* user_data);
+      Function operator() (Function& fcn, int nfwd, int nadj, void* user_data);
   };
 
   /** \brief CustomEvaluate
@@ -92,10 +94,12 @@ namespace casadi {
     public:
       /// Default constructor
       CustomEvaluate() {}
+
       /// Construct from C pointer
       CustomEvaluate(CustomEvaluateCPtr ptr);
+
       /// Call
-      virtual void operator() (CustomFunction& fcn, void* user_data);
+      void operator() (CustomFunction& fcn, void* user_data);
   };
 
   /** \brief Callback
@@ -120,10 +124,12 @@ namespace casadi {
     public:
       /// Default constructor
       Callback() {}
+
       /// Construct from C pointer
       Callback(CallbackCPtr ptr);
+
       /// Call
-      virtual int operator() (Function& fcn, void* user_data);
+      int operator() (Function& fcn, void* user_data);
   };
 
 } // namespace casadi

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "options_functionality.hpp"
 
@@ -475,8 +478,8 @@ void OptionsFunctionality::printOptions(ostream &stream) const {
   (*this)->printOptions(stream);
 }
 
-bool OptionsFunctionality::checkNode() const {
-  return dynamic_cast<const OptionsFunctionalityNode*>(get())!=0;
+bool OptionsFunctionality::testCast(const SharedObjectNode* ptr) {
+  return dynamic_cast<const OptionsFunctionalityNode*>(ptr)!=0;
 }
 
 void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj, bool skipUnknown) {

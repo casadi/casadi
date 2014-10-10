@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #ifndef CASADI_SYMBOLIC_NLP_HPP
 #define CASADI_SYMBOLIC_NLP_HPP
 
@@ -34,7 +37,7 @@ class SymbolicNLPInternal;
   \date 2012
   \author Joel Andersson
 */
-class CASADI_CORE_EXPORT SymbolicNLP : public PrintableObject {
+class CASADI_CORE_EXPORT SymbolicNLP : public PrintableObject<SymbolicNLP> {
   public:
 
     /** @name Symbolic representation of the NLP
@@ -68,23 +71,19 @@ class CASADI_CORE_EXPORT SymbolicNLP : public PrintableObject {
     /// Parse an AMPL och PyOmo NL-file
     void parseNL(const std::string& filename, const Dictionary& options = Dictionary());
 
-#ifndef SWIG
     /// Print a description of the object
-    virtual void print(std::ostream &stream=std::cout) const;
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// Print a representation of the object
-    virtual void repr(std::ostream &stream=std::cout) const;
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
+#ifndef SWIG
   protected:
 
     /// Read an expression from an NL-file (Polish infix format)
     static SXElement readExpressionNL(std::istream &stream, const std::vector<SXElement>& v);
 
 #endif // SWIG
-
-
-
-
 };
 
 } // namespace casadi

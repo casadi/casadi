@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_MATRIX_HPP
 #define CASADI_MATRIX_HPP
@@ -103,7 +106,7 @@ namespace casadi {
   class CASADI_CORE_EXPORT Matrix :
         public GenericExpression<Matrix<DataType> >,
         public GenericMatrix<Matrix<DataType> >,
-        public PrintableObject {
+        public PrintableObject<Matrix<DataType> > {
   public:
 
     /** \brief  constructors */
@@ -585,6 +588,10 @@ namespace casadi {
     static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y,
                                 Matrix<DataType>& z);
 
+    /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
+    static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y,
+                                Matrix<DataType>& z, std::vector<DataType>& work);
+
     /// Matrix-matrix product, no memory allocation: z += mul(trans(x), y)
     static void mul_no_alloc_tn(const Matrix<DataType> &trans_x, const Matrix<DataType> &y,
                                 Matrix<DataType>& z);
@@ -608,7 +615,7 @@ namespace casadi {
     static void mul_sparsity(Matrix<DataType> &x_trans, Matrix<DataType> &y, Matrix<DataType>& z);
 
     /// Calculates inner_prod(x, mul(A, x)) without memory allocation
-    static DataType quad_form(const Matrix<DataType>& A, const std::vector<DataType>& x);
+    static DataType quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A);
     /// \endcond
 
     /// Transpose the matrix
@@ -671,18 +678,26 @@ namespace casadi {
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int getEqualityCheckingDepth();
 
-    ///@{
-    /// Printing
-#ifndef SWIG
-    virtual void print(std::ostream &stream=std::cout) const; // print print description
-    virtual void repr(std::ostream &stream=std::cout) const; // print representation
-#endif
-    static std::string className(); // name of the class
-    void printScalar(std::ostream &stream=std::cout) const; // print scalar
-    void printVector(std::ostream &stream=std::cout) const; // print vector-style
-    void printDense(std::ostream &stream=std::cout) const; // Print dense matrix-stype
-    void printSparse(std::ostream &stream=std::cout) const; // print sparse matrix style
-    ///@}
+    /// Get name of the class
+    static std::string className();
+
+    /// Print a description of the object
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print a representation of the object
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print scalar
+    void printScalar(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print vector-style
+    void printVector(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print dense matrix-stype
+    void printDense(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print sparse matrix style
+    void printSparse(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     // Get the sparsity pattern
     const std::vector<int>& row() const;

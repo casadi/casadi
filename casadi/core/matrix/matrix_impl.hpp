@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_MATRIX_IMPL_HPP
 #define CASADI_MATRIX_IMPL_HPP
@@ -548,7 +551,7 @@ namespace casadi {
   std::string Matrix<DataType>::className() { return matrixName<DataType>(); }
 
   template<typename DataType>
-  void Matrix<DataType>::printScalar(std::ostream &stream) const {
+  void Matrix<DataType>::printScalar(std::ostream &stream, bool trailing_newline) const {
     casadi_assert_message(numel()==1, "Not a scalar");
 
     std::streamsize precision = stream.precision();
@@ -569,6 +572,7 @@ namespace casadi {
       stream << toScalar();
     }
 
+    if (trailing_newline) stream << std::endl;
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
@@ -576,7 +580,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::printVector(std::ostream &stream) const {
+  void Matrix<DataType>::printVector(std::ostream &stream, bool trailing_newline) const {
     casadi_assert_message(isVector(), "Not a vector");
 
     std::streamsize precision = stream.precision();
@@ -612,6 +616,7 @@ namespace casadi {
     }
     stream << "]";
 
+    if (trailing_newline) stream << std::endl;
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
@@ -619,7 +624,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::printDense(std::ostream &stream) const {
+  void Matrix<DataType>::printDense(std::ostream &stream, bool trailing_newline) const {
     // Print as a single line
     bool oneliner=this->size1()<=1;
 
@@ -670,6 +675,7 @@ namespace casadi {
       }
     }
 
+    if (trailing_newline) stream << std::endl;
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
@@ -677,42 +683,46 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::printSparse(std::ostream &stream) const {
+  void Matrix<DataType>::printSparse(std::ostream &stream, bool trailing_newline) const {
     if (size()==0) {
       stream << "all zero sparse: " << size1() << "-by-" << size2();
     } else {
-      stream << "sparse: " << size1() << "-by-" << size2() << ", " << size() << " nnz" << std::endl;
+      stream << "sparse: " << size1() << "-by-" << size2() << ", " << size() << " nnz";
       for (int cc=0; cc<size2(); ++cc) {
         for (int el=colind(cc); el<colind(cc+1); ++el) {
           int rr=row(el);
-          stream << " (" << rr << ", " << cc << ") -> " << at(el) << std::endl;
+          stream << std::endl << " (" << rr << ", " << cc << ") -> " << at(el);
         }
       }
     }
+    if (trailing_newline) stream << std::endl;
     stream << std::flush;
   }
 
   template<typename DataType>
-  void Matrix<DataType>::print(std::ostream &stream) const {
+  void Matrix<DataType>::print(std::ostream &stream, bool trailing_newline) const {
     if (isEmpty()) {
       stream << "[]";
     } else if (numel()==1) {
-      printScalar(stream);
+      printScalar(stream, false);
     } else if (isVector()) {
-      printVector(stream);
+      printVector(stream, false);
     } else if (std::max(size1(), size2())<=10 || static_cast<double>(size())/numel()>=0.5) {
       // if "small" or "dense"
-      printDense(stream);
+      printDense(stream, false);
     } else {
-      printSparse(stream);
+      printSparse(stream, false);
     }
+    if (trailing_newline) stream << std::endl;
   }
 
   template<typename DataType>
-  void Matrix<DataType>::repr(std::ostream &stream) const {
+  void Matrix<DataType>::repr(std::ostream &stream, bool trailing_newline) const {
     stream << className() << "(";
-    print(stream);
-    stream << ")" << std::flush;
+    print(stream, false);
+    stream << ")";
+    if (trailing_newline) stream << std::endl;
+    stream << std::flush;
   }
 
   template<typename DataType>
@@ -1450,15 +1460,9 @@ namespace casadi {
 
     // Return object (assure RVO)
     Matrix<DataType> ret;
-
-    // Matrix multiplication
-
-    // Form the transpose of x
-    Matrix<DataType> x_trans = x.trans();
-
     if (sp_z.isNull()) {
       // Create the sparsity pattern for the matrix-matrix product
-      Sparsity spres = y.sparsity().patternProduct(x_trans.sparsity());
+      Sparsity spres = x.sparsity().patternProductNew(y.sparsity());
 
       // Create the return object
       ret = Matrix<DataType>::zeros(spres);
@@ -1467,9 +1471,64 @@ namespace casadi {
     }
 
     // Carry out the matrix product
-    mul_no_alloc_tn(x_trans, y, ret);
+    mul_no_alloc_nn(x, y, ret);
 
     return ret;
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType> &y,
+                                         Matrix<DataType>& z, std::vector<DataType>& work) {
+    // Dimensions of the result
+    int d1 = x.size1();
+    int d2 = y.size2();
+
+    // Assert dimensions
+    casadi_assert_message(d1==z.size1(), "Dimension error. Got x=" << x.dimString()
+                          << " and z=" << z.dimString() << ".");
+    casadi_assert_message(d2==z.size2(), "Dimension error. Got y=" << y.dimString()
+                          << " and z=" << z.dimString() << ".");
+    casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.dimString()
+                          << " and x=" << x.dimString() << ".");
+
+    // Assert work vector large enough
+    casadi_assert_message(work.size()>=d1, "Work vector too small. Got length "
+                          << work.size() << " < " << x.size1());
+
+    // Direct access to the arrays
+    const std::vector<int> &y_colind = y.colind();
+    const std::vector<int> &y_row = y.row();
+    const std::vector<DataType> &y_data = y.data();
+    const std::vector<int> &x_colind = x.colind();
+    const std::vector<int> &x_row = x.row();
+    const std::vector<DataType> &x_data = x.data();
+    const std::vector<int> &z_colind = z.colind();
+    const std::vector<int> &z_row = z.row();
+    std::vector<DataType> &z_data = z.data();
+
+    // Loop over the columns of y and z
+    for (int cc=0; cc<d2; ++cc) {
+      // Get the dense column of z
+      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+        work[z_row[kk]] = z_data[kk];
+      }
+
+      // Loop over the nonzeros of y
+      for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
+        int rr = y_row[kk];
+        DataType yy = y_data[kk];
+
+        // Loop over corresponding columns of x
+        for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
+          work[x_row[kk1]] += x_data[kk1]*yy;
+        }
+      }
+
+      // Get the sparse column of z
+      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+        z_data[kk] = work[z_row[kk]];
+      }
+    }
   }
 
   template<typename DataType>
@@ -1705,7 +1764,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::quad_form(const Matrix<DataType>& A, const std::vector<DataType>& x) {
+  DataType Matrix<DataType>::quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A) {
     // Assert dimensions
     casadi_assert_message(x.size()==A.size2() && x.size()==A.size1(),
                           "Dimension mismatch. Got x=" << x.size() << " and A=" << A.dimString());

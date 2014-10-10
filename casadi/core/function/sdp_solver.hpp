@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_SDP_SOLVER_HPP
 #define CASADI_SDP_SOLVER_HPP
@@ -168,7 +171,7 @@ namespace casadi {
 
       \generalsection{SdpSolver}
       \pluginssection{SdpSolver}
-      
+
       \author Joel Andersson
       \date 2010
   */
@@ -188,9 +191,6 @@ namespace casadi {
     SdpSolverInternal* operator->();
     const SdpSolverInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
-
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
@@ -199,6 +199,12 @@ namespace casadi {
 
     /// Set options that make the SDP solver more suitable for solving SOCPs
     void setSOCPOptions();
+
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
+
+    /// Infix
+    static std::string infix();
   };
 
 } // namespace casadi

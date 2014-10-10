@@ -1,3 +1,27 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
  /*
  *    This file is part of CasADi.
  *
@@ -271,6 +295,15 @@ namespace casadi {
     std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg) { return call(arg);}
     std::vector<SX> operator()(const std::vector<SX>& arg) { return call(arg);}
     std::vector<MX> operator()(const std::vector<MX>& arg) { return call(arg);}
+    IOSchemeVector<DMatrix> operator()(const IOSchemeVector<DMatrix>& arg) {
+      return outputScheme().fromVector(call(arg));
+    }
+    IOSchemeVector<SX> operator()(const IOSchemeVector<SX>& arg) {
+      return outputScheme().fromVector(call(arg));
+    }
+    IOSchemeVector<MX> operator()(const IOSchemeVector<MX>& arg) {
+      return outputScheme().fromVector(call(arg));
+    }
     ///@}
 
 #ifndef SWIG
@@ -345,7 +378,7 @@ namespace casadi {
 
     /** \brief Set a function that calculates \a nfwd forward derivatives
         and \a nadj adjoint derivatives
-        
+
 NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
     void setDerivative(const Function& fcn, int nfwd, int nadj);
 
@@ -376,13 +409,13 @@ NOTE: Does _not_ take ownership, only weak references to the derivatives are kep
     ///@}
 
     /** \brief Export / Generate C code for the function */
-    void generateCode(const std::string& filename);
+    void generateCode(const std::string& filename, bool generate_main=false);
 
     /** \brief Generate C code for the function */
     std::string generateCode();
 
     /** \brief Generate C code for the function */
-    void generateCode(std::ostream& filename);
+    void generateCode(std::ostream& filename, bool generate_main=false);
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
@@ -391,8 +424,8 @@ NOTE: Does _not_ take ownership, only weak references to the derivatives are kep
     /** \brief  Const access functions of the node */
     const FunctionInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
     /// \endcond
 
     /// Get all statistics obtained at the end of the last evaluate call

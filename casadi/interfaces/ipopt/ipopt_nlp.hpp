@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_IPOPT_NLP_HPP
 #define CASADI_IPOPT_NLP_HPP
@@ -46,7 +49,7 @@
 using namespace Ipopt;
 namespace casadi {
   // Forward declaration
-  class IpoptInternal;
+  class IpoptInterface;
 
   class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptUserClass : public TNLP {
 #ifdef WITH_IPOPT_CALLBACK
@@ -54,7 +57,7 @@ namespace casadi {
 #endif // WITH_IPOPT_CALLBACK
 
   public:
-    IpoptUserClass(IpoptInternal* ipoptInterface);
+    IpoptUserClass(IpoptInterface* ipoptInterface);
     virtual ~IpoptUserClass();
 
     /** Method to return some info about the nlp */
@@ -142,7 +145,7 @@ namespace casadi {
   private:
     IpoptUserClass(const IpoptUserClass&);
     IpoptUserClass& operator=(const IpoptUserClass&);
-    IpoptInternal* solver;
+    IpoptInterface* solver;
 
     double * x_;
     double * z_L_;

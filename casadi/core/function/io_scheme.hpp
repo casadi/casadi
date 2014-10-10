@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #ifndef CASADI_IO_SCHEME_HPP
 #define CASADI_IO_SCHEME_HPP
@@ -71,8 +74,8 @@ class CASADI_CORE_EXPORT IOScheme : public SharedObject {
     IOSchemeInternal* operator->();
     const IOSchemeInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
     /// Name of the scheme
     std::string name() const;
@@ -114,11 +117,10 @@ class CASADI_CORE_EXPORT IOScheme : public SharedObject {
 
     #ifndef SWIG
     /// Print a description of the object
-    virtual void print(std::ostream &stream=std::cout) const;
+    void print(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object
-    virtual void repr(std::ostream &stream=std::cout) const;
-
+    void repr(std::ostream &stream) const;
     #endif // SWIG
 
     #ifndef SWIGPYTHON
@@ -235,6 +237,11 @@ class CASADI_CORE_EXPORT IOScheme : public SharedObject {
     return IOSchemeVector<M>(v, *this);
   }
 
+  template<class M>
+    IOSchemeVector<M> fromVector(const std::vector<M> & arg_m) {
+    casadi_assert(size()==arg_m.size());
+    return IOSchemeVector<M>(arg_m, *this);
+  }
 };
 
 } // namespace casadi

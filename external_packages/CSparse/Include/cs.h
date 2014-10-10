@@ -28,6 +28,10 @@ typedef struct cs_sparse    /* matrix in compressed-column or triplet form */
     int nz ;        /* # of entries in triplet matrix, -1 for compressed-col */
 } cs ;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 CASADI_CSPARSE_EXPORT cs *cs_add (const cs *A, const cs *B, double alpha, double beta) ;
 CASADI_CSPARSE_EXPORT int cs_cholsol (int order, const cs *A, double *b) ;
 CASADI_CSPARSE_EXPORT cs *cs_compress (const cs *T) ;
@@ -134,6 +138,10 @@ CASADI_CSPARSE_EXPORT csd *cs_ddone (csd *D, cs *C, void *w, int ok) ;
 CASADI_CSPARSE_EXPORT cs *cs_done (cs *C, void *w, void *x, int ok) ;
 CASADI_CSPARSE_EXPORT int *cs_idone (int *p, cs *C, void *w, int ok) ;
 CASADI_CSPARSE_EXPORT csn *cs_ndone (csn *N, cs *C, void *w, void *x, int ok) ;
+
+#ifdef __cplusplus
+}
+#endif
 
 #define CS_MAX(a,b) (((a) > (b)) ? (a) : (b))
 #define CS_MIN(a,b) (((a) < (b)) ? (a) : (b))

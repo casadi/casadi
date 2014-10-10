@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #include "mx_function_internal.hpp"
 #include "../mx/mx_node.hpp"
 #include "../std_vector_tools.hpp"
@@ -27,14 +30,13 @@
 
 #include <stack>
 #include <typeinfo>
-#include <cassert>
 
 using namespace std;
 
 namespace casadi {
 
-bool MXFunction::checkNode() const {
-  return dynamic_cast<const MXFunctionInternal*>(get())!=0;
+bool MXFunction::testCast(const SharedObjectNode* ptr) {
+  return dynamic_cast<const MXFunctionInternal*>(ptr)!=0;
 }
 
 MXFunction::MXFunction() {

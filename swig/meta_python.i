@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 %{
 
@@ -228,8 +231,7 @@ int meta< int >::as(PyObject * p, int &m) {
     Py_DECREF(mm);
     return result;
   } else if (meta< casadi::Matrix<int> >::isa(p)) {
-    casadi::Matrix<int> *temp = 0;
-    meta< casadi::Matrix<int> >::get_ptr(p,temp);
+    casadi::Matrix<int> *temp = meta< casadi::Matrix<int> >::get_ptr(p);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
@@ -347,16 +349,14 @@ int meta< double >::as(PyObject * p, double &m) {
     Py_DECREF(mm);
     return result;
   } else if (meta< casadi::Matrix<double> >::isa(p)) {
-    casadi::Matrix<double> *temp = 0;
-    meta< casadi::Matrix<double> >::get_ptr(p,temp);
+    casadi::Matrix<double> *temp = meta< casadi::Matrix<double> >::get_ptr(p);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
     }
     return false;
   } else if (meta< casadi::Matrix<int> >::isa(p)) {
-    casadi::Matrix<int> *temp = 0;
-    meta< casadi::Matrix<int> >::get_ptr(p,temp);
+    casadi::Matrix<int> *temp = meta< casadi::Matrix<int> >::get_ptr(p);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
@@ -593,8 +593,8 @@ bool meta< casadi::GenericType::Dictionary >::toPython(const casadi::GenericType
 
 
 // Explicit intialization of these two member functions, so we can use them in meta< casadi::SXElement >
-template<> int meta< casadi::Matrix<casadi::SXElement> >::as(GUESTOBJECT,casadi::Matrix<casadi::SXElement> &);
-//template<> bool meta< casadi::Matrix<casadi::SXElement> >::couldbe(GUESTOBJECT);
+template<> int meta< casadi::SX >::as(GUESTOBJECT *p, casadi::SX &);
+//template<> bool meta< casadi::SX >::couldbe(GUESTOBJECT *p);
 
 /// casadi::SX
 template<> char meta< casadi::SXElement >::expected_message[] = "Expecting SXElement or number";
@@ -639,6 +639,54 @@ int meta< casadi::Matrix<int> >::as(PyObject * p,casadi::Matrix<int> &m) {
     int res = meta< int >::as(p,t);
     m = t;
     return res;
+  } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<int>
+    if (array_numdims(p)==0) {
+      int d;
+      int result = meta< int >::as(p,d);
+      if (!result) return result;
+      m = casadi::Matrix<int>(d);
+      return result;
+    }
+    if (array_numdims(p)>2 || array_numdims(p)<1) {
+      return false;
+    }
+    int nrows = array_size(p,0); // 1D array is cast into column vector
+    int ncols  = 1;
+    if (array_numdims(p)==2)
+      ncols=array_size(p,1); 
+    int size=nrows*ncols; // number of elements in the dense matrix
+    if (!array_is_native(p)) {
+      return false;
+    }
+    // Make sure we have a contigous array with int datatype
+    int array_is_new_object=0;
+    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
+    if (!array) { // Trying LONG
+      PyErr_Clear();
+      array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
+      if (!array) {
+        PyErr_Clear();
+        return false;
+      }
+      long* temp=(long*) array_data(array);
+      m = casadi::Matrix<int>::zeros(ncols,nrows);
+      for (int k=0;k<nrows*ncols;k++) m.data()[k]=temp[k];
+      m = m.trans();                  
+      // Free memory
+      if (array_is_new_object)
+        Py_DECREF(array);
+      return true;
+    }
+    
+    int* d=(int*) array_data(array);
+    std::vector<int> v(d,d+size);
+    
+    m = casadi::Matrix<int>::zeros(nrows,ncols);
+    m.set(d,casadi::DENSETRANS);
+                  
+    // Free memory
+    if (array_is_new_object)
+      Py_DECREF(array);
   } else if ( meta< int >::couldbe_sequence(p)) {
     std::vector <int> t;
     int res = meta< int >::as_vector(p,t);
@@ -828,12 +876,12 @@ int meta< casadi::Matrix<double> >::as(PyObject * p,casadi::Matrix<double> &m) {
 meta_vector(casadi::Matrix<double>)
 meta_vector(std::vector< casadi::Matrix<double> >)
 
-/// casadi::Matrix<casadi::SXElement>
-template<> char meta< casadi::Matrix<casadi::SXElement> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SX, SX, number, sequence(SX/number)";
+/// casadi::SX
+template<> char meta< casadi::SX >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SX, SX, number, sequence(SX/number)";
 
 template <>
-int meta< casadi::Matrix<casadi::SXElement> >::as(PyObject * p,casadi::Matrix<casadi::SXElement> &m) {
-  NATIVERETURN(casadi::Matrix<casadi::SXElement>, m)
+int meta< casadi::SX >::as(PyObject * p,casadi::SX &m) {
+  NATIVERETURN(casadi::SX, m)
   NATIVERETURN(casadi::SXElement, m)
   casadi::DMatrix mt;
   if(meta< casadi::Matrix<double> >::as(p,mt)) {
@@ -869,7 +917,7 @@ int meta< casadi::Matrix<casadi::SXElement> >::as(PyObject * p,casadi::Matrix<ca
     char name[] = "__SX__";
     PyObject *cr = PyObject_CallMethod(p, name,0);
     if (!cr) { return false; }
-    int result = meta< casadi::Matrix<casadi::SXElement> >::as(cr,m);
+    int result = meta< casadi::SX >::as(cr,m);
     Py_DECREF(cr);
     return result;
 	} else {

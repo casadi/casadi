@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +21,7 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+
 
 #include "function_internal.hpp"
 #include "../mx/call_function.hpp"
@@ -2086,7 +2089,7 @@ namespace casadi {
 
   }
 
-  void FunctionInternal::generateCode(std::ostream &cfile) {
+  void FunctionInternal::generateCode(std::ostream &cfile, bool generate_main) {
     assertInit();
 
     // set stream parameters
@@ -2137,7 +2140,7 @@ namespace casadi {
     cfile << "}" << std::endl << std::endl;
 
     // Create a main for debugging and profiling: TODO: Cleanup and expose to user, see #617
-    if (true) {
+    if (generate_main) {
       int n_in = getNumInputs();
       int n_out = getNumOutputs();
 

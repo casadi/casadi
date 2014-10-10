@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #ifndef CASADI_SLICE_HPP
 #define CASADI_SLICE_HPP
 
@@ -36,7 +39,7 @@ namespace casadi {
    * Note that Python or Octave do not need to use this class.
    * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
    */
-  class CASADI_CORE_EXPORT Slice : public PrintableObject {
+  class CASADI_CORE_EXPORT Slice : public PrintableObject<Slice> {
   public:
     /// Default constructor - all elements
     Slice();
@@ -72,10 +75,11 @@ namespace casadi {
     /// Check inequality
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
-#ifndef SWIG
-    /// Print a representation of the object to a stream
-    virtual void print(std::ostream& stream=std::cout) const;
-#endif // SWIG
+    /// Print a representation of the object
+    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+
+    /// Print a description of the object
+    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
 
     /// start value: negative values will get added to length
     int start_;

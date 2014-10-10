@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,7 @@
  *
  */
 
+
 #ifndef CASADI_MX_TOOLS_HPP
 #define CASADI_MX_TOOLS_HPP
 
@@ -36,13 +39,13 @@ namespace casadi {
 @{
 */
 
-  /** \brief  concatenate vertically
+  /** \brief  concatenate horizontally
   *
   *  horzcat(horzsplit(x, ...)) = x
   */
   CASADI_CORE_EXPORT MX horzcat(const std::vector<MX>& x);
 
-  /** \brief  split vertically, retaining groups of cols
+  /** \brief  split horizontally, retaining groups of cols
   * \param output_offset List of all start cols for each group
   *      the last col group will run to the end.
   *
@@ -51,20 +54,20 @@ namespace casadi {
   CASADI_CORE_EXPORT std::vector<MX> horzsplit(const MX& x,
                                                    const std::vector<int>& output_offset);
 
-  /** \brief  split vertically, retaining fixed-sized groups of cols
+  /** \brief  split horizontally, retaining fixed-sized groups of cols
   * \param incr Size of each group of cols
   *
   *  horzcat(horzsplit(x, ...)) = x
   */
   CASADI_CORE_EXPORT std::vector<MX> horzsplit(const MX& x, int incr=1);
 
-  /** \brief  concatenate horizontally
+  /** \brief  concatenate vertically
   *
   *   vertcat(vertsplit(x, ...)) = x
   */
   CASADI_CORE_EXPORT MX vertcat(const std::vector<MX>& comp);
 
-  /** \brief  split horizontally, retaining groups of rows
+  /** \brief  split vertically, retaining groups of rows
   * \param output_offset List of all start rows for each group
   *      the last row group will run to the end.
   *
@@ -73,7 +76,7 @@ namespace casadi {
   CASADI_CORE_EXPORT std::vector<MX> vertsplit(const MX& x,
                                                    const std::vector<int>& output_offset);
 
-  /** \brief  split horizontally, retaining fixed-sized groups of rows
+  /** \brief  split vertically, retaining fixed-sized groups of rows
   * \param incr Size of each group of rows
   *
   *   vertcat(vertsplit(x, ...)) = x
@@ -109,6 +112,22 @@ namespace casadi {
   /** \brief Construct a matrix from a list of list of blocks.*/
   CASADI_CORE_EXPORT MX blockcat(const MX &A, const MX &B, const MX &C, const MX &D);
 #endif // SWIG
+
+  /** \brief  concatenate diagonally
+  *
+  *  diagcat(diagsplit(x, ...)) = x
+  */
+  CASADI_CORE_EXPORT MX diagcat(const std::vector<MX>& x);
+
+  /** \brief  split diagonally, retaining matrices
+  * \param output_offset1 List of all start locations (row) for each matrix
+  * \param output_offset1 List of all start locations (column) for each matrix
+  *      the last matrix will run to the end.
+  *   diagcat(diagsplit(x, ...)) = x
+  */
+  CASADI_CORE_EXPORT std::vector<MX> diagsplit(const MX& x,
+                                                   const std::vector<int>& output_offset1,
+                                                   const std::vector<int>& output_offset2);
 
   /** \brief Concatenate vertically while vectorizing all arguments */
   CASADI_CORE_EXPORT MX veccat(const std::vector<MX>& comp);

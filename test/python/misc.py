@@ -1,24 +1,26 @@
 #
 #     This file is part of CasADi.
-# 
+#
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-# 
+#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2011-2014 Greg Horn
+#
 #     CasADi is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU Lesser General Public
 #     License as published by the Free Software Foundation; either
 #     version 3 of the License, or (at your option) any later version.
-# 
+#
 #     CasADi is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #     Lesser General Public License for more details.
-# 
+#
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-# 
-# 
+#
+#
 from casadi import *
 import casadi as c
 from numpy import *
@@ -355,7 +357,172 @@ class Misctests(casadiTestCase):
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
+    
+  def test_exceptions(self):
+    try:
+      NlpSolver(123)
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "NlpSolver(str,Function)" in e.message
+      assert "You have: NlpSolver(int)" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
 
+    try:
+      vertcat(123)
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "vertcat([SX]" in e.message
+      assert "vertcat([array(double)" in e.message
+      assert "You have: vertcat(int)" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
+      
+    try:
+      substitute(123)
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "substitute(SX,SX,SX)" in e.message
+      assert "substitute([SX] ,[SX] ,[SX] )" in e.message
+      assert "You have: substitute(int)" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
+      
+    try:
+      SXFunction(daeIn(x=SX.sym("x")))
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "SXFunction(scheme(SX),[SX] )" in e.message
+      assert "You have: SXFunction(scheme(SX))" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
+
+    try:
+      NlpSolver.loadPlugin(132)
+      self.assertTrue(False)
+    except TypeError as e:
+      print e.message
+      assert "type 'str' expected" in e.message
+      assert "NlpSolver.loadPlugin" in e.message
+      assert "You have: NlpSolver.loadPlugin(int)" in e.message
+      assert "::" not in e.message
+      assert "std" not in e.message
+
+    x=SX.sym("x")
+      
+    try:
+      [x]+ x
+      self.assertTrue(False)
+    except TypeError as e:
+      print e.message
+      assert "You try to do: [SX] + SX" in e.message
+
+    try:
+      x + [x]
+      self.assertTrue(False)
+    except TypeError as e:
+      print e.message
+      assert "You try to do: SX + [SX]" in e.message
+
+
+    try:
+      daeIn(x=x,p=[x])
+      self.assertTrue(False)
+    except TypeError as e:
+      print e.message
+      assert "You have: (x=SX, p=[SX])" in e.message
+
+    try:
+      QpSolver("qp",123)
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "QpSolver(str,QPStructure)" in e.message
+      
+    try:
+      SXFunction(qpStruct(a=12),[x])
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "QPStructure([Sparsity] )" in e.message
+      assert "You have: QPStructure([int,Sparsity])" in e.message
+      assert "QPStructure(a=int)" in e.message
+  
+    try:
+      x.reshape(2)
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "reshape(SX,(int,int) )" in e.message
+
+    try:
+      x.reshape(("a",2))
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "You have: reshape((str,int))" in e.message
+      
+    try:
+      diagsplit("s")
+      self.assertTrue(False)
+    except NotImplementedError as e:
+      print e.message
+      assert "diagsplit(SX ,int)" in e.message
+      assert "diagsplit(array(double) ,int)" in e.message
+      
+  def test_callkw(self):
+      x = SX.sym("x")
+
+      f = SXFunction(nlpIn(x=x),nlpOut(g=x**2))
+      f.init()
+
+      [f_,g_] = f(x=4)
+      self.checkarray(g_,DMatrix(16))
+
+      with self.assertRaises(RuntimeError):
+        [f_,g_] = f(m=4)
+      
+      try:
+        [f_,g_] = f(x=Sparsity.dense(2))
+        self.assertTrue(False)
+      except RuntimeError as e:
+        self.assertTrue("Function(scheme(SX))" in e.message)
+        self.assertTrue("Function([SX] )" in e.message)
+        self.assertTrue("You have: Function(scheme(Sparsity))" in e.message)
+
+      with self.assertRaises(RuntimeError):
+        [f_,g_] = f(x=[x])
+
+
+      f = SXFunction([x],nlpOut(g=x**2))
+      f.init()
+
+      with self.assertRaises(Exception):
+        [f_,g_] = f(x=4)
+        
+  def test_getscheme(self):
+    x = SX.sym("x")
+    p = SX.sym("p")
+
+    F = SXFunction(nlpIn(x=x,p=p),nlpOut(g=x**2,f=x+p))
+    F.init()
+    
+    fc = F(x=3,p=4)
+    [f] = fc.get.f
+    self.checkarray(f,DMatrix([7]))
+    [g] = fc.get.g
+    self.checkarray(g,DMatrix([9]))
+    [f,g] = fc.get.f.g
+    self.checkarray(f,DMatrix([7]))
+    self.checkarray(g,DMatrix([9]))
+    [g,f] = fc.get.g.f
+    self.checkarray(f,DMatrix([7]))
+    self.checkarray(g,DMatrix([9]))
+    
   def test_assertions(self):
     
     x = MX.sym("x") 

@@ -2,7 +2,9 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,10 +22,11 @@
  *
  */
 
+
 #ifndef CASADI_PSD_INDEF_DPLE_SOLVER_HPP
 #define CASADI_PSD_INDEF_DPLE_SOLVER_HPP
 
-#include "../../control/dple_solver.hpp"
+#include "../../core/function/dple_solver.hpp"
 #include <casadi/interfaces/slicot/casadi_dplesolver_slicot_export.h>
 
 namespace casadi {
@@ -34,7 +37,7 @@ namespace casadi {
   /** \brief An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
    *
    * @copydoc DPLE_doc
-   
+
        Uses Periodic Schur Decomposition ('psd') and does not assume positive definiteness.
        Based on Periodic Lyapunov equations: some applications and new algorithms.
        Int. J. Control, vol. 67, pp. 69-87, 1997.
@@ -61,8 +64,8 @@ namespace casadi {
     /// Access functions of the node
     const PsdIndefDpleInternal* operator->() const;
 
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
 
     /// Static creator function
     #ifdef SWIG

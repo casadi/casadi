@@ -1,24 +1,26 @@
 #
 #     This file is part of CasADi.
-# 
+#
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-# 
+#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2011-2014 Greg Horn
+#
 #     CasADi is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU Lesser General Public
 #     License as published by the Free Software Foundation; either
 #     version 3 of the License, or (at your option) any later version.
-# 
+#
 #     CasADi is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #     Lesser General Public License for more details.
-# 
+#
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-# 
-# 
+#
+#
 from casadi import *
 import casadi as c
 from numpy import *
@@ -47,13 +49,14 @@ except:
 
 try:
   NlpSolver.loadPlugin("snopt")
-  solvers.append(("snopt",{"_verify_level": 3,"detect_linear": True,"_optimality_tolerance":1e-12,"_feasibility_tolerance":1e-12}))
+  solvers.append(("snopt",{"Verify level": 3,"detect_linear": True,"Major optimality tolerance":1e-12,"Minor feasibility tolerance":1e-12,"Major feasibility tolerance":1e-12}))
   print "Will test snopt"
 except:
   pass
 
 try:
   NlpSolver.loadPlugin("ipopt")
+  NlpSolver.loadPlugin("sqpmethod")
   qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12} }
   solvers.append(("sqpmethod",{"qp_solver": "nlp","qp_solver_options": qp_solver_options}))
   print "Will test sqpmethod"
@@ -62,6 +65,7 @@ except:
   
 try:
   NlpSolver.loadPlugin("ipopt")
+  NlpSolver.loadPlugin("stabilizedsqp")
   qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12, "print_level": 0, "print_time": False} }
   solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": "qp", "stabilized_qp_solver_options": {"qp_solver": "nlp", "qp_solver_options": qp_solver_options}}))
   print "Will test stabilizedsqp"
@@ -71,17 +75,20 @@ except:
 try:
   qp_solver_options = {}
   QpSolver.loadPlugin("sqic")
+  NlpSolver.loadPlugin("stabilizedsqp")
   solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": "qp", "stabilized_qp_solver_options": {"qp_solver": "sqic"}}))
   print "Will test stabilizedsqp"
 except:
   pass
 
-#try:
-#NlpSolver.loadPlugin("knitro")
-#  solvers.append(("knitro",{}))
-#  print "Will test knitro"
-#except:
-#  pass
+"""
+try:
+  NlpSolver.loadPlugin("knitro")
+  solvers.append(("knitro",{}))
+  print "Will test knitro"
+except:
+  pass
+"""
 
 class NLPtests(casadiTestCase):
 
@@ -185,7 +192,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-Inf],"lbg")
       solver.setInput([Inf],"ubg")
 
-      if 'worhp' in str(Solver):
+      if Solver in ("worhp","knitro"):
         with self.assertRaises(Exception):
           solver.evaluate()
         return
@@ -927,7 +934,7 @@ class NLPtests(casadiTestCase):
       self.message(Solver)
       solver = NlpSolver(Solver, nlp)
       solver.setOption(solver_options)
-      for k,v in ({"tol":1e-8,"TolOpti":1e-20,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order", "hessian_approximation": "exact", "UserHM": True}).iteritems():
+      for k,v in ({"tol":1e-8,"TolOpti":1e-20,"max_iter":100, "MaxIter": 100, "MaxIt" : 100, "print_level":0,"derivative_test":"first-order", "hessian_approximation": "exact", "UserHM": True, "OptTolAbs":1e-10, "OptTol":1e-10}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.init()
@@ -937,12 +944,20 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
       solver.evaluate()
-      self.assertAlmostEqual(solver.getOutput("f")[0],9.0908263002590e-3,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[0],1.0952466252248,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[1],1.2,5,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],-8.6963632695079e-2,4,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
+      if float(solver.getOutput("x")[0])<0: # JOEL: There appears to be two local minima
+        self.assertAlmostEqual(solver.getOutput("f")[0],4.3817250416084308,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("x")[0],-1.0910624688699295,6,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("x")[1],1.2,5,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
+        self.assertAlmostEqual(solver.getOutput("lam_x")[1],-1.9165378046901287,4,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
+      else:
+        self.assertAlmostEqual(solver.getOutput("f")[0],9.0908263002590e-3,6,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("x")[0],1.0952466252248,6,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("x")[1],1.2,5,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5 if "stabilizedsqp"==Solver else 8,str(Solver)+str(solver_options))
+        self.assertAlmostEqual(solver.getOutput("lam_x")[1],-8.6963632695079e-2,4,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
 
   def testactiveLBG(self):
     self.message("active LBG")
@@ -1123,15 +1138,15 @@ class NLPtests(casadiTestCase):
       solver.setInput(UBA,"ubg")
       if 'sqic' in str(solver_options):
         continue
-      if 'worhp' in str(Solver):
+      if Solver=='worhp':
         with self.assertRaises(Exception):
           solver.evaluate()
         return
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],0.5,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1.25,6,str(Solver))
     
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
@@ -1194,8 +1209,8 @@ class NLPtests(casadiTestCase):
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(solver))
-      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],2.0/3,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],4.0/3,6,str(solver))
     
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(solver))
@@ -1387,9 +1402,7 @@ class NLPtests(casadiTestCase):
     #solver.setOption("detect_linear",False)
     solver.setOption("verbose",True)
     solver.setOption("monitor",["setup_nlp","eval_nlp"])
-    solver.setOption("_verify_level",3)
-    #solver.setOption("_optimality_tolerance",1e-8)
-    #solver.setOption("_feasibility_tolerance",1e-8)
+    solver.setOption("Verify level",3)
     #solver.setOption("_iteration_limit",1000)
 
     solver.init()
