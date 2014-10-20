@@ -32,14 +32,6 @@
 
 namespace casadi {
 
-  class AdaptorBase {
-    public:
-      virtual std::string prefix() = 0;
-
-      bool target_reached_;
-
-  };
-
   /** \brief A helper class for a Solver that delegates work to another solver
   *
   *
@@ -47,7 +39,7 @@ namespace casadi {
   *    \date 2014
   */
   template< class Derived, class Solver>
-  class Adaptor : public virtual AdaptorBase {
+  class Adaptor {
     public:
 
       /// Initialize
