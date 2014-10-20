@@ -1105,7 +1105,7 @@ class Matrixtests(casadiTestCase):
     B = numpy.random.random((2,8))
     
     dwork = DVector(range(10))
-    bwork = BVector([0]*10)
+    bwork = BVector([False]*10)
     iwork = IVector(range(10+1+8))
     
     self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
