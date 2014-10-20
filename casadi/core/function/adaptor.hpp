@@ -65,7 +65,6 @@ namespace casadi {
 
   };
 
-#ifndef SWIG
 template< class Derived, class Solver>
 void Adaptor<Derived, Solver>::adaptorLoader(const std::string& name) {
   Solver::loadPlugin(name);
@@ -126,7 +125,6 @@ template< class Derived, class Solver>
 std::string Adaptor<Derived, Solver>::targetName() {
   return static_cast<Derived*>(this)->getOption(prefix()+"_solver");
 }
-#endif
 
 } // namespace casadi
 
