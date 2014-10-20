@@ -85,9 +85,6 @@ namespace casadi {
     /** \brief Solve the SDQP */
     virtual void evaluate();
 
-    /// Underlying SDP solver
-    SdpSolver sdpsolver_;
-
     /// Cholesky Decomposition
     LinearSolver cholesky_;
 
