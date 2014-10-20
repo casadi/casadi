@@ -35,11 +35,11 @@ try:
 except:
   pass
 
-try:
-  SocpSolver.loadPlugin("sdp.dsdp")
-  socpsolvers.append(("sdp.dsdp",{ "target_options": {"verbose":True}},False))
-except:
-  pass
+# try:
+#   SocpSolver.loadPlugin("sdp.dsdp")
+#   socpsolvers.append(("sdp.dsdp",{ "target_options": {"verbose":True}},False))
+# except:
+#   pass
   
 print socpsolvers
   

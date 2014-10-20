@@ -34,22 +34,22 @@ try:
   qpsolvers.append(("nlp",{"nlp_solver":"ipopt", "nlp_solver_options": {"tol": 1e-12}}))
 except:
   pass
-try:
-  QpSolver.loadPlugin("nlp.ipopt")
-  qpsolvers.append(("nlp.ipopt",{"target_options": {"tol": 1e-12}}))
-except:
-  pass
+# try:
+#   QpSolver.loadPlugin("nlp.ipopt")
+#   qpsolvers.append(("nlp.ipopt",{"target_options": {"tol": 1e-12}}))
+# except:
+#   pass
 try:
   NlpSolver.loadPlugin("worhp")
   qpsolvers.append(("nlp",{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}}))
   pass
 except:
   pass
-try:
-  QpSolver.loadPlugin("nlp.worhp")
-  qpsolvers.append(("nlp.worhp",{"target_options": {"TolOpti": 1e-12}}))
-except:
-  pass
+# try:
+#   QpSolver.loadPlugin("nlp.worhp")
+#   qpsolvers.append(("nlp.worhp",{"target_options": {"TolOpti": 1e-12}}))
+# except:
+#   pass
 try:
   QpSolver.loadPlugin("ooqp")
   qpsolvers.append(("ooqp",{}))
@@ -80,11 +80,11 @@ try:
 except:
   pass
 
-try:
-  QpSolver.loadPlugin("qcqp.socp.sdp.dsdp")
-  qpsolvers.append(("qcqp.socp.sdp.dsdp",{"target_options": {"gapTol":1e-10}}))
-except:
-  pass
+# try:
+#   QpSolver.loadPlugin("qcqp.socp.sdp.dsdp")
+#   qpsolvers.append(("qcqp.socp.sdp.dsdp",{"target_options": {"gapTol":1e-10}}))
+# except:
+#   pass
 
 print qpsolvers
 

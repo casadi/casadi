@@ -35,11 +35,11 @@ try:
 except:
   pass
 
-try:
-  QcqpSolver.loadPlugin("socp.sdp.dsdp")
-  qcqpsolvers.append(("socp.sdp.dsdp",{},False))
-except:
-  pass
+# try:
+#   QcqpSolver.loadPlugin("socp.sdp.dsdp")
+#   qcqpsolvers.append(("socp.sdp.dsdp",{},False))
+# except:
+#   pass
 
 class QcqpSolverTests(casadiTestCase):
 
