@@ -52,7 +52,7 @@ namespace casadi {
       Solver solver_;
 
       /// Get the prefix of the target solver
-      virtual std::string prefix();
+      std::string prefix();
 
       /// \brief Get the name of the target solver
       std::string targetName();
