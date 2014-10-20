@@ -66,7 +66,7 @@ namespace casadi {
   LrDpleSolver::LrDpleSolver(const std::string& name,
                          const LrDpleStructure & st,
                          const std::vector< std::vector<int> > &Hs) {
-    assignNode(LrDpleInternal::getPlugin(name).creator(st, Hs)->adaptor(name));
+    assignNode(LrDpleInternal::getPlugin(name).creator(st, Hs));
   }
 
   std::string LrDpleSolver::infix() {

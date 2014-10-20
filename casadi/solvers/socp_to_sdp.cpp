@@ -40,7 +40,6 @@ namespace casadi {
     plugin->name = "sdp";
     plugin->doc = SocpToSdp::meta_doc.c_str();
     plugin->version = 20;
-    plugin->adaptorLoader = SocpToSdp::adaptorLoader;
     return 0;
   }
 

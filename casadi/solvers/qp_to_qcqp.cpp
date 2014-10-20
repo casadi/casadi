@@ -38,7 +38,6 @@ namespace casadi {
     plugin->name = "qcqp";
     plugin->doc = QpToQcqp::meta_doc.c_str();
     plugin->version = 20;
-    plugin->adaptorLoader = QpToQcqp::adaptorLoader;
     return 0;
   }
 

@@ -47,7 +47,6 @@ namespace casadi {
     plugin->name = "lifting";
     plugin->doc = LiftingIndefDpleInternal::meta_doc.c_str();
     plugin->version = 20;
-    plugin->adaptorLoader = LiftingIndefDpleInternal::adaptorLoader;
     return 0;
   }
 

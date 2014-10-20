@@ -44,7 +44,7 @@ namespace casadi {
   }
 
   SocpSolver::SocpSolver(const std::string& name, const SOCPStructure& st) {
-    assignNode(SocpSolverInternal::getPlugin(name).creator(st)->adaptor(name));
+    assignNode(SocpSolverInternal::getPlugin(name).creator(st));
   }
 
   void SocpSolver::loadPlugin(const std::string& name) {

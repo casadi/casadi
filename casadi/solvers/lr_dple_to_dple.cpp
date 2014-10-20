@@ -46,7 +46,6 @@ namespace casadi {
     plugin->name = "lrdple";
     plugin->doc = LrDpleToDple::meta_doc.c_str();
     plugin->version = 20;
-    plugin->adaptorLoader = LrDpleToDple::adaptorLoader;
     return 0;
   }
 

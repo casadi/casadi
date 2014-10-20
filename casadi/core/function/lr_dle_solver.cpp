@@ -65,7 +65,7 @@ namespace casadi {
 
   LrDleSolver::LrDleSolver(const std::string& name,
                          const LrDleStructure& st, const std::vector<int> &Hs) {
-    assignNode(LrDleInternal::getPlugin(name).creator(st, Hs)->adaptor(name));
+    assignNode(LrDleInternal::getPlugin(name).creator(st, Hs));
   }
 
   Sparsity LrDleSolver::getSparsity(const LrDleStructure& st, const std::vector<int> &Hs) {
