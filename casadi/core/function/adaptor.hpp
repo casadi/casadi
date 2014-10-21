@@ -65,7 +65,7 @@ namespace casadi {
     this_->addOption("target", OT_BOOLEAN, false, "Options to be passed to the DPLE solver.");
     this_->addOption("target_options",         OT_DICTIONARY,   GenericType(),
                      "Options to be passed to the DPLE solver.");
-    
+
     this_->addOption(prefix() + "_solver",            OT_STRING, GenericType(),
                      "User-defined DPLE solver class.");
     this_->addOption(prefix() + "_solver_options",    OT_DICTIONARY,   GenericType(),
@@ -75,7 +75,7 @@ namespace casadi {
   template< class Derived, class Solver>
   void Adaptor<Derived, Solver>::init() {
     Derived* this_ = static_cast<Derived*>(this);
-    
+
     if (this_->getOption("target")) {
       if (this_->hasSetOption("target_options")) {
         this_->setOption(this_->getOption("target_options"));
