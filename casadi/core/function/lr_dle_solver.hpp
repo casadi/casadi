@@ -135,10 +135,6 @@ namespace casadi {
     /// Get the resulting sparsity
     static Sparsity getSparsity(const LrDleStructure& st,
       const std::vector<int> &Hs=std::vector<int>());
-
-    /// Infix
-    static std::string infix();
-
   };
 
 } // namespace casadi

@@ -59,8 +59,4 @@ namespace casadi {
     return QcqpSolverInternal::getPlugin(name).doc;
   }
 
-  std::string QcqpSolver::infix() {
-    return QcqpSolverInternal::infix_;
-  }
-
 } // namespace casadi

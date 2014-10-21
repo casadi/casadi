@@ -72,9 +72,5 @@ namespace casadi {
     return DleInternal::getSparsity(st);
   }
 
-  std::string DleSolver::infix() {
-    return DleInternal::infix_;
-  }
-
 } // namespace casadi
 

@@ -154,9 +154,6 @@ namespace casadi {
 
     /// Set options that make the QP solver more suitable for solving LPs
     void setQPOptions();
-
-    /// Infix
-    static std::string infix();
   };
 
 } // namespace casadi

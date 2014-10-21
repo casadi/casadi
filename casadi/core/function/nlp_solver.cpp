@@ -210,8 +210,4 @@ namespace casadi {
     (*this)->setOptionsFromFile(file);
   }
 
-  std::string NlpSolver::infix() {
-    return NlpSolverInternal::infix_;
-  }
-
 } // namespace casadi

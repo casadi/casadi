@@ -202,9 +202,6 @@ namespace casadi {
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
-
-    /// Infix
-    static std::string infix();
   };
 
 } // namespace casadi

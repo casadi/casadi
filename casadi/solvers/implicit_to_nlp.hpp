@@ -27,7 +27,7 @@
 #define CASADI_IMPLICIT_TO_NLP_HPP
 
 #include "casadi/core/function/implicit_function_internal.hpp"
-#include "casadi/core/function/nlp_solver.hpp"
+#include "casadi/core/function/nlp_solver_internal.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
 #include <casadi/solvers/casadi_implicitfunction_nlp_export.h>
@@ -49,7 +49,7 @@ namespace casadi {
    \date 2012
   */
   class CASADI_IMPLICITFUNCTION_NLP_EXPORT QpToImplicit : public ImplicitFunctionInternal,
-    public Adaptor<QpToImplicit, NlpSolver> {
+    public Adaptor<QpToImplicit, NlpSolverInternal> {
   public:
     /** \brief  Constructor */
     explicit QpToImplicit(const Function& f, const Function& jac,

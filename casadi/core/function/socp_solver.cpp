@@ -55,8 +55,4 @@ namespace casadi {
     return SocpSolverInternal::getPlugin(name).doc;
   }
 
-  std::string SocpSolver::infix() {
-    return SocpSolverInternal::infix_;
-  }
-
 } // namespace casadi

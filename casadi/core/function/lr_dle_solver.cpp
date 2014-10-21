@@ -72,9 +72,5 @@ namespace casadi {
     return LrDleInternal::getSparsity(st, Hs);
   }
 
-  std::string LrDleSolver::infix() {
-    return LrDleInternal::infix_;
-  }
-
 } // namespace casadi
 

@@ -69,9 +69,5 @@ namespace casadi {
     assignNode(LrDpleInternal::getPlugin(name).creator(st, Hs));
   }
 
-  std::string LrDpleSolver::infix() {
-    return LrDpleInternal::infix_;
-  }
-
 } // namespace casadi
 

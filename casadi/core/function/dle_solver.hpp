@@ -120,10 +120,6 @@ namespace casadi {
 
     /// Get the resulting sparsity
     static Sparsity getSparsity(const DleStructure& st);
-
-    /// Infix
-    static std::string infix();
-
   };
 
 } // namespace casadi

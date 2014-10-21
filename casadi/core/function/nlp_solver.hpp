@@ -272,9 +272,6 @@ namespace casadi {
 
     /// Read options from parameter xml
     void setOptionsFromFile(const std::string & file);
-
-    /// Infix
-    static std::string infix();
   };
 
 } // namespace casadi

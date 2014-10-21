@@ -75,9 +75,5 @@ namespace casadi {
     assignNode(DpleInternal::getPlugin(name).creator(st));
   }
 
-  std::string DpleSolver::infix() {
-    return DpleInternal::infix_;
-  }
-
 } // namespace casadi
 

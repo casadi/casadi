@@ -126,10 +126,6 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-
-    /// Infix
-    static std::string infix();
-
   };
 
 } // namespace casadi

@@ -105,7 +105,7 @@ namespace casadi {
 
   template< class Derived, class Solver>
   std::string Adaptor<Derived, Solver>::prefix() {
-    std::string p = Solver::infix();
+    std::string p = Solver::infix_;
     // Without "solver"
     return p.substr(0, p.size()-6);
   }

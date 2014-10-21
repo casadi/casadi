@@ -27,7 +27,7 @@
 #define CASADI_QCQP_TO_SOCP_HPP
 
 #include "casadi/core/function/qcqp_solver_internal.hpp"
-#include "casadi/core/function/socp_solver.hpp"
+#include "casadi/core/function/socp_solver_internal.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 #include <casadi/solvers/casadi_qcqpsolver_socp_export.h>
 
@@ -79,7 +79,7 @@ namespace casadi {
    \date 2013
   */
   class CASADI_QCQPSOLVER_SOCP_EXPORT QcqpToSocp : public QcqpSolverInternal,
-    public Adaptor<QcqpToSocp, SocpSolver> {
+    public Adaptor<QcqpToSocp, SocpSolverInternal> {
   public:
 
     /** \brief  Create a new Solver */
