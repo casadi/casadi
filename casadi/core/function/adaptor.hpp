@@ -48,8 +48,11 @@ namespace casadi {
     /// Copy the necessary options to the target solver
     void setTargetOptions();
 
-    /// Get the prefix of the target solver
-    std::string prefix();
+    // Solver name of target solver
+    static std::string solvername() { return Solver::shortname() + "_solver"; }
+
+    // Options name of target solver
+    static std::string optionsname() { return solvername() + "_options"; }
 
     /// \brief Get the name of the target solver
     std::string targetName();
@@ -62,13 +65,14 @@ namespace casadi {
   void Adaptor<Derived, Solver>::addOptions() {
     Derived* this_ = static_cast<Derived*>(this);
 
-    this_->addOption("target", OT_BOOLEAN, false, "Options to be passed to the DPLE solver.");
-    this_->addOption("target_options",         OT_DICTIONARY,   GenericType(),
-                     "Options to be passed to the DPLE solver.");
-
-    this_->addOption(prefix() + "_solver",            OT_STRING, GenericType(),
+    // TODO(@jgillis): Fix option descriptions
+    this_->addOption("target",          OT_BOOLEAN,     false,
+                     "Options to be passed to the target solver.");
+    this_->addOption("target_options",  OT_DICTIONARY,  GenericType(),
+                     "Options to be passed to the target solver.");
+    this_->addOption(solvername(),      OT_STRING,      GenericType(),
                      "User-defined DPLE solver class.");
-    this_->addOption(prefix() + "_solver_options",    OT_DICTIONARY,   GenericType(),
+    this_->addOption(optionsname(),     OT_DICTIONARY,  GenericType(),
                      "Options to be passed to the DPLE solver.");
   }
 
@@ -87,8 +91,8 @@ namespace casadi {
   void Adaptor<Derived, Solver>::setTargetOptions() {
     Derived* this_ = static_cast<Derived*>(this);
 
-    if (this_->hasSetOption(prefix() + "_solver_options")) {
-      this_->solver_.setOption(this_->getOption(prefix() + "_solver_options"));
+    if (this_->hasSetOption(optionsname())) {
+      this_->solver_.setOption(this_->getOption(optionsname()));
     }
     if (!this_->getOption("target")) {
       if (this_->solver_.hasOption("target_options")) {
@@ -104,15 +108,8 @@ namespace casadi {
   }
 
   template< class Derived, class Solver>
-  std::string Adaptor<Derived, Solver>::prefix() {
-    std::string p = Solver::infix_;
-    // Without "solver"
-    return p.substr(0, p.size()-6);
-  }
-
-  template< class Derived, class Solver>
   std::string Adaptor<Derived, Solver>::targetName() {
-    return static_cast<Derived*>(this)->getOption(prefix()+"_solver");
+    return static_cast<Derived*>(this)->getOption(solvername());
   }
 
 } // namespace casadi
