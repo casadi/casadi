@@ -75,7 +75,7 @@ namespace casadi {
     static bool hasPlugin(const std::string& name);
 
     /// Load a plugin dynamically
-    static void loadPlugin(const std::string& name);
+    static void loadPlugin(const std::string& name, bool register_plugin=true);
 
     /// Register an integrator in the factory
     static void registerPlugin(RegFcn regfcn);
@@ -97,7 +97,7 @@ namespace casadi {
 
     // Try loading the plugin
     try {
-      loadPlugin(name);
+      loadPlugin(name, false);
       return true;
     } catch (CasadiException& ex) {
       return false;
@@ -105,7 +105,7 @@ namespace casadi {
   }
 
   template<class Derived>
-  void PluginInterface<Derived>::loadPlugin(const std::string& name) {
+  void PluginInterface<Derived>::loadPlugin(const std::string& name, bool register_plugin) {
     // Issue warning and quick return if already loaded
     if (Derived::solvers_.find(name) != Derived::solvers_.end()) {
       casadi_warning("PluginInterface: Solver " + name + " is already in use. Ignored.");
@@ -179,7 +179,9 @@ namespace casadi {
 #endif // _WIN32
 
     // Register the plugin
-    registerPlugin(reg);
+    if (register_plugin) {
+      registerPlugin(reg);
+    }
 #endif // WITH_DL
   }
 
