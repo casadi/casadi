@@ -82,7 +82,7 @@ namespace casadi {
 
     // Create solver instance
     template<class Problem>
-      static SharedObjectNode* instantiatePlugin(const std::string& name, Problem problem);
+      static Derived* instantiatePlugin(const std::string& name, Problem problem);
   };
 
   template<class Derived>
@@ -200,9 +200,25 @@ namespace casadi {
 
   template<class Derived>
   template<class Problem>
-  SharedObjectNode*
+  Derived*
   PluginInterface<Derived>::instantiatePlugin(const std::string& name, Problem problem) {
-    return getPlugin(name).creator(problem);
+    // Check if any dot in the name, i.e. a convertor
+    std::string::size_type dotpos = name.find(".");
+    if (dotpos == std::string::npos) {
+      // No dot, normal instantiation
+      return getPlugin(name).creator(problem);
+    } else {
+      // Dot present, separate convertor name from solver name
+      std::string convertor_name = name.substr(0, dotpos);
+      std::string solver_name = name.substr(dotpos+1);
+
+      // Load the convertor
+      Derived* convertor = getPlugin(convertor_name).creator(problem);
+
+      // Pass solver name to convertor
+      convertor->setOption(convertor_name + "_solver", solver_name);
+      return convertor;
+    }
   }
 
 
