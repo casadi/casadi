@@ -185,7 +185,7 @@ class NLPtests(casadiTestCase):
     f.init()
     solver=ImplicitFunction("kinsol",f)
     solver.setOption("constraints",[-1])
-    print solver.dictionary()
+    #print solver.dictionary()
     solver.init()
     solver.setInput(-6)
     solver.evaluate()
