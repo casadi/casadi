@@ -33,98 +33,99 @@
 namespace casadi {
 
   /** \brief A helper class for a Solver that delegates work to another solver
-  *
-  *
-  *    \author Joris Gillis
-  *    \date 2014
-  */
+   *
+   *
+   *    \author Joris Gillis
+   *    \date 2014
+   */
   template< class Derived, class Solver>
   class Adaptor {
-    public:
+  public:
 
-      /// Initialize
-      void init();
+    /// Initialize
+    void init();
 
-      /// Copy the necessary options to the target solver
-      void setTargetOptions();
+    /// Copy the necessary options to the target solver
+    void setTargetOptions();
 
-      /// Instance of the target solver
-      Solver solver_;
+    /// Instance of the target solver
+    Solver solver_;
 
-      /// Get the prefix of the target solver
-      std::string prefix();
+    /// Get the prefix of the target solver
+    std::string prefix();
 
-      /// \brief Get the name of the target solver
-      std::string targetName();
+    /// \brief Get the name of the target solver
+    std::string targetName();
 
-      /// Add options that are common to all Adaptor classes
-      void addOptions();
+    /// Add options that are common to all Adaptor classes
+    void addOptions();
 
-      /// Load the plugin needed by the target solver
-      static void adaptorLoader(const std::string& name);
+    /// Load the plugin needed by the target solver
+    static void adaptorLoader(const std::string& name);
 
   };
 
-template< class Derived, class Solver>
-void Adaptor<Derived, Solver>::adaptorLoader(const std::string& name) {
-  Solver::loadPlugin(name);
-}
-
-template< class Derived, class Solver>
-void Adaptor<Derived, Solver>::addOptions() {
-  Derived* d = static_cast<Derived*>(this);
-
-  d->addOption("target", OT_BOOLEAN, false, "Options to be passed to the DPLE solver.");
-  d->addOption("target_options",         OT_DICTIONARY,   GenericType(),
-              "Options to be passed to the DPLE solver.");
-
-  d->addOption(prefix() + "_solver",            OT_STRING, GenericType(),
-              "User-defined DPLE solver class.");
-  d->addOption(prefix() + "_solver_options",    OT_DICTIONARY,   GenericType(),
-              "Options to be passed to the DPLE solver.");
-}
-
-template< class Derived, class Solver>
-void Adaptor<Derived, Solver>::init() {
-  Derived* d = static_cast<Derived*>(this);
-
-  if (d->getOption("target")) {
-    if (d->hasSetOption("target_options")) {
-      d->setOption(d->getOption("target_options"));
-    }
+  template< class Derived, class Solver>
+  void Adaptor<Derived, Solver>::adaptorLoader(const std::string& name) {
+    Solver::loadPlugin(name);
   }
-}
 
-template< class Derived, class Solver>
-void Adaptor<Derived, Solver>::setTargetOptions() {
-  Derived* d = static_cast<Derived*>(this);
+  template< class Derived, class Solver>
+  void Adaptor<Derived, Solver>::addOptions() {
+    Derived* this_ = static_cast<Derived*>(this);
 
-  if (d->hasSetOption(prefix() + "_solver_options")) {
-    solver_.setOption(d->getOption(prefix() + "_solver_options"));
+    this_->addOption("target", OT_BOOLEAN, false, "Options to be passed to the DPLE solver.");
+    this_->addOption("target_options",         OT_DICTIONARY,   GenericType(),
+                     "Options to be passed to the DPLE solver.");
+    
+    this_->addOption(prefix() + "_solver",            OT_STRING, GenericType(),
+                     "User-defined DPLE solver class.");
+    this_->addOption(prefix() + "_solver_options",    OT_DICTIONARY,   GenericType(),
+                     "Options to be passed to the DPLE solver.");
   }
-  if (!d->getOption("target")) {
-    if (solver_.hasOption("target_options")) {
-      if (d->hasSetOption("target_options")) {
-        solver_.setOption("target_options", d->getOption("target_options"));
-      }
-    } else {
-      if (d->hasSetOption("target_options")) {
-        solver_.setOption(d->getOption("target_options"));
+
+  template< class Derived, class Solver>
+  void Adaptor<Derived, Solver>::init() {
+    Derived* this_ = static_cast<Derived*>(this);
+    
+    if (this_->getOption("target")) {
+      if (this_->hasSetOption("target_options")) {
+        this_->setOption(this_->getOption("target_options"));
       }
     }
   }
-}
 
-template< class Derived, class Solver>
-std::string Adaptor<Derived, Solver>::prefix() {
-  std::string p = Solver::infix();
-  return p.substr(0, p.size()-6); // solver
-}
+  template< class Derived, class Solver>
+  void Adaptor<Derived, Solver>::setTargetOptions() {
+    Derived* this_ = static_cast<Derived*>(this);
 
-template< class Derived, class Solver>
-std::string Adaptor<Derived, Solver>::targetName() {
-  return static_cast<Derived*>(this)->getOption(prefix()+"_solver");
-}
+    if (this_->hasSetOption(prefix() + "_solver_options")) {
+      solver_.setOption(this_->getOption(prefix() + "_solver_options"));
+    }
+    if (!this_->getOption("target")) {
+      if (solver_.hasOption("target_options")) {
+        if (this_->hasSetOption("target_options")) {
+          solver_.setOption("target_options", this_->getOption("target_options"));
+        }
+      } else {
+        if (this_->hasSetOption("target_options")) {
+          solver_.setOption(this_->getOption("target_options"));
+        }
+      }
+    }
+  }
+
+  template< class Derived, class Solver>
+  std::string Adaptor<Derived, Solver>::prefix() {
+    std::string p = Solver::infix();
+    // Without "solver"
+    return p.substr(0, p.size()-6);
+  }
+
+  template< class Derived, class Solver>
+  std::string Adaptor<Derived, Solver>::targetName() {
+    return static_cast<Derived*>(this)->getOption(prefix()+"_solver");
+  }
 
 } // namespace casadi
 
