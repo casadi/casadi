@@ -55,6 +55,10 @@ namespace casadi {
     return dynamic_cast<const DleInternal*>(ptr)!=0;
   }
 
+  bool DleSolver::hasPlugin(const std::string& name) {
+    return DleInternal::hasPlugin(name);
+  }
+
   void DleSolver::loadPlugin(const std::string& name) {
     DleInternal::loadPlugin(name);
   }

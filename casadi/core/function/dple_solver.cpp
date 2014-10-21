@@ -55,6 +55,10 @@ namespace casadi {
     return dynamic_cast<const DpleInternal*>(ptr)!=0;
   }
 
+  bool DpleSolver::hasPlugin(const std::string& name) {
+    return DpleInternal::hasPlugin(name);
+  }
+
   void DpleSolver::loadPlugin(const std::string& name) {
     DpleInternal::loadPlugin(name);
   }

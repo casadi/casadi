@@ -55,6 +55,10 @@ namespace casadi {
     return dynamic_cast<const CleInternal*>(ptr)!=0;
   }
 
+  bool CleSolver::hasPlugin(const std::string& name) {
+    return CleInternal::hasPlugin(name);
+  }
+
   void CleSolver::loadPlugin(const std::string& name) {
     CleInternal::loadPlugin(name);
   }

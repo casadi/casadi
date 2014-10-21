@@ -71,6 +71,9 @@ namespace casadi {
     // Plugin registration function
     typedef int (*RegFcn)(Plugin* plugin);
 
+    /// Check if a plugin is available or can be loaded
+    static bool hasPlugin(const std::string& name);
+
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
@@ -84,6 +87,22 @@ namespace casadi {
     template<class Problem>
       static Derived* instantiatePlugin(const std::string& name, Problem problem);
   };
+
+  template<class Derived>
+  bool PluginInterface<Derived>::hasPlugin(const std::string& name) {
+    // Quick return if available
+    if (Derived::solvers_.find(name) != Derived::solvers_.end()) {
+      return true;
+    }
+
+    // Try loading the plugin
+    try {
+      loadPlugin(name);
+      return true;
+    } catch (CasadiException& ex) {
+      return false;
+    }
+  }
 
   template<class Derived>
   void PluginInterface<Derived>::loadPlugin(const std::string& name) {

@@ -55,6 +55,10 @@ namespace casadi {
     return dynamic_cast<const LrDleInternal*>(ptr)!=0;
   }
 
+  bool LrDleSolver::hasPlugin(const std::string& name) {
+    return LrDleInternal::hasPlugin(name);
+  }
+
   void LrDleSolver::loadPlugin(const std::string& name) {
     LrDleInternal::loadPlugin(name);
   }

@@ -66,6 +66,10 @@ namespace casadi {
     return (*this)->linsol_;
   }
 
+  bool ImplicitFunction::hasPlugin(const std::string& name) {
+    return ImplicitFunctionInternal::hasPlugin(name);
+  }
+
   void ImplicitFunction::loadPlugin(const std::string& name) {
     ImplicitFunctionInternal::loadPlugin(name);
   }

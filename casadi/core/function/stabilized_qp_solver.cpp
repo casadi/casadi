@@ -57,6 +57,10 @@ namespace casadi {
     assignNode(StabilizedQpSolverInternal::instantiatePlugin(name, st));
   }
 
+  bool StabilizedQpSolver::hasPlugin(const std::string& name) {
+    return StabilizedQpSolverInternal::hasPlugin(name);
+  }
+
   void StabilizedQpSolver::loadPlugin(const std::string& name) {
     StabilizedQpSolverInternal::loadPlugin(name);
   }
