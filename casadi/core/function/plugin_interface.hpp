@@ -79,6 +79,10 @@ namespace casadi {
 
     /// Load and get the creator function
     static Plugin& getPlugin(const std::string& name);
+
+    // Create solver instance
+    template<class Problem>
+      static SharedObjectNode* instantiatePlugin(const std::string& name, Problem problem);
   };
 
   template<class Derived>
@@ -193,6 +197,14 @@ namespace casadi {
     casadi_assert(it!=Derived::solvers_.end());
     return it->second;
   }
+
+  template<class Derived>
+  template<class Problem>
+  SharedObjectNode*
+  PluginInterface<Derived>::instantiatePlugin(const std::string& name, Problem problem) {
+    return getPlugin(name).creator(problem);
+  }
+
 
 } // namespace casadi
 
