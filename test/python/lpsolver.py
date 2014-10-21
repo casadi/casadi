@@ -29,29 +29,17 @@ from types import *
 from helpers import *
 
 lpsolvers = []
-try:
-  QpSolver.loadPlugin("ooqp")
+if QpSolver.hasPlugin("ooqp"):
   lpsolvers.append(("qp",{"qp_solver": "ooqp" },False))
-except:
-  pass
 
-try:
-  NlpSolver.loadPlugin("ipopt")
+if NlpSolver.hasPlugin("ipopt"):
   lpsolvers.append(("qp",{"qp_solver": "nlp", "qp_solver_options":{"nlp_solver":"ipopt"}},False))
-except:
-  pass
 
-# try:
-#   LpSolver.loadPlugin("qp.nlp.ipopt")
-#   lpsolvers.append(("qp.nlp.ipopt",{},False))
-# except:
-#   pass
+if NlpSolver.hasPlugin("ipopt"):
+  lpsolvers.append(("qp.nlp.ipopt",{},False))
 
-# try:
-#   LpSolver.loadPlugin("qp.ooqp")
-#   lpsolvers.append(("qp.ooqp",{},False))
-# except:
-#   pass
+if QpSolver.hasPlugin("ooqp"):
+  lpsolvers.append(("qp.ooqp",{},False))
 
 # try:  
 #   QpSolver.loadPlugin("dsdp")

@@ -29,18 +29,12 @@ from types import *
 from helpers import *
 
 socpsolvers = []
-try:
-  SdpSolver.loadPlugin("dsdp")
+if SdpSolver.hasPlugin("dsdp"):
   socpsolvers.append(("sdp",{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
-except:
-  pass
 
-# try:
-#   SocpSolver.loadPlugin("sdp.dsdp")
-#   socpsolvers.append(("sdp.dsdp",{ "target_options": {"verbose":True}},False))
-# except:
-#   pass
-  
+if SdpSolver.hasPlugin("dsdp"):
+  socpsolvers.append(("sdp.dsdp",{ "sdp_solver_options": {"verbose":True}},False))
+
 print socpsolvers
   
 class SocpSolverTests(casadiTestCase):

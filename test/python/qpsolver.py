@@ -29,62 +29,35 @@ from types import *
 from helpers import *
 
 qpsolvers = []
-try:
-  NlpSolver.loadPlugin("ipopt")
+if NlpSolver.hasPlugin("ipopt"):
   qpsolvers.append(("nlp",{"nlp_solver":"ipopt", "nlp_solver_options": {"tol": 1e-12}}))
-except:
-  pass
-# try:
-#   QpSolver.loadPlugin("nlp.ipopt")
-#   qpsolvers.append(("nlp.ipopt",{"target_options": {"tol": 1e-12}}))
-# except:
-#   pass
-try:
-  NlpSolver.loadPlugin("worhp")
+
+if NlpSolver.hasPlugin("ipopt"):
+  qpsolvers.append(("nlp.ipopt",{"nlp_solver_options": {"tol": 1e-12}}))
+
+if NlpSolver.hasPlugin("worhp"):
   qpsolvers.append(("nlp",{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}}))
-  pass
-except:
-  pass
-# try:
-#   QpSolver.loadPlugin("nlp.worhp")
-#   qpsolvers.append(("nlp.worhp",{"target_options": {"TolOpti": 1e-12}}))
-# except:
-#   pass
-try:
-  QpSolver.loadPlugin("ooqp")
+
+if NlpSolver.hasPlugin("worhp"):
+  qpsolvers.append(("nlp.worhp",{"nlp_solver_options": {"TolOpti": 1e-12}}))
+
+if QpSolver.hasPlugin("ooqp"):
   qpsolvers.append(("ooqp",{}))
-except:
-  pass
 
-try:
-  QpSolver.loadPlugin("qpoases")
+if QpSolver.hasPlugin("qpoases"):
   qpsolvers.append(("qpoases",{}))
-except:
-  pass
 
-try:
-  QpSolver.loadPlugin("cplex")
+if QpSolver.hasPlugin("cplex"):
   qpsolvers.append(("cplex",{}))
-except:
-  pass
 
-try:
-  QpSolver.loadPlugin("sqic")
+if QpSolver.hasPlugin("sqic"):
   qpsolvers.append(("sqic",{}))
-except:
-  pass
 
-try:
-  SdpSolver.loadPlugin("dsdp")
+if SdpSolver.hasPlugin("dsdp"):
   qpsolvers.append(("qcqp",{"qcqp_solver":"socp","qcqp_solver_options": {"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp", "sdp_solver_options": {"gapTol":1e-10}} }}))
-except:
-  pass
 
-# try:
-#   QpSolver.loadPlugin("qcqp.socp.sdp.dsdp")
-#   qpsolvers.append(("qcqp.socp.sdp.dsdp",{"target_options": {"gapTol":1e-10}}))
-# except:
-#   pass
+if SdpSolver.hasPlugin("dsdp"):
+  qpsolvers.append(("qcqp.socp.sdp.dsdp",{"qcqp_solver_options": {"socp_solver_options": {"sdp_solver_options": {"gapTol":1e-10}} }}))
 
 print qpsolvers
 
