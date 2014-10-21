@@ -48,7 +48,7 @@ namespace casadi {
   }
 
   SdpSolver::SdpSolver(const std::string& name, const SDPStructure& st) {
-    assignNode(SdpSolverInternal::instantiatePlugin(name,st));
+    assignNode(SdpSolverInternal::instantiatePlugin(name, st));
   }
 
   void SdpSolver::loadPlugin(const std::string& name) {

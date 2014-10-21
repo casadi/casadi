@@ -65,7 +65,7 @@ namespace casadi {
 
   CleSolver::CleSolver(const std::string& name,
                          const CleStructure& st) {
-    assignNode(CleInternal::instantiatePlugin(name,st));
+    assignNode(CleInternal::instantiatePlugin(name, st));
   }
 
 } // namespace casadi

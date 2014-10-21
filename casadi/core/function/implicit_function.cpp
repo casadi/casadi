@@ -34,7 +34,7 @@ namespace casadi {
   ImplicitFunction::ImplicitFunction(const std::string& name, const Function& f,
                                      const Function& jac,
                                      const LinearSolver& linsol) {
-    assignNode(ImplicitFunctionInternal::instantiatePlugin(name,f));
+    assignNode(ImplicitFunctionInternal::instantiatePlugin(name, f));
     setOption("jacobian_function", jac);
     setOption("linear_solver_function", linsol);
   }

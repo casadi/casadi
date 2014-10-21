@@ -67,12 +67,12 @@ namespace casadi {
                const std::vector<Sparsity> & A,
                const std::vector<Sparsity> & V) {
     DpleStructure st = dpleStruct("a", A, "v", V);
-    assignNode(DpleInternal::instantiatePlugin(name,st));
+    assignNode(DpleInternal::instantiatePlugin(name, st));
   }
 
   DpleSolver::DpleSolver(const std::string& name,
                          const DpleStructure & st) {
-    assignNode(DpleInternal::instantiatePlugin(name,st));
+    assignNode(DpleInternal::instantiatePlugin(name, st));
   }
 
 } // namespace casadi
