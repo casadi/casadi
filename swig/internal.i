@@ -157,9 +157,6 @@
 %exception  casadi::Adaptor< SocpToSdp , SdpSolver  >::targetName() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::AdaptorBase::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Assertion::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3113,60 +3110,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OutputNode::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< Derived >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< DleInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< DpleInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< HomotopyNLPInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< ImplicitFunctionInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< IntegratorInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< LinearSolverInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< LpSolverInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< LrDleInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< LrDpleInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< NlpSolverInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< QcqpSolverInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< QpSolverInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< SdpSolverInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< SdqpSolverInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< SocpSolverInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< StabilizedQpSolverInternal  >::adaptor(const std::string &name_) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< XmlFileInternal  >::adaptor(const std::string &name_) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProfilingType() {
