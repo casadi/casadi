@@ -66,9 +66,7 @@ namespace casadi {
    * \see ImplicitFunction for more information
    *
    */
-  KinsolInterface::KinsolInterface(const Function& f, const Function& jac,
-                                 const LinearSolver& linsol)
-      : ImplicitFunctionInternal(f, jac, linsol) {
+  KinsolInterface::KinsolInterface(const Function& f) : ImplicitFunctionInternal(f) {
     addOption("max_iter",                 OT_INTEGER, 0,
               "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
     addOption("abstol",                   OT_REAL, 1e-6, "Stopping criterion tolerance");
@@ -97,7 +95,7 @@ namespace casadi {
   }
 
   KinsolInterface* KinsolInterface::clone() const {
-    KinsolInterface* node = new KinsolInterface(f_, jac_, linsol_);
+    KinsolInterface* node = new KinsolInterface(f_);
     node->setOption(dictionary());
     return node;
   }

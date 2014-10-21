@@ -52,8 +52,7 @@ namespace casadi {
     public Adaptor<QpToImplicit, NlpSolverInternal> {
   public:
     /** \brief  Constructor */
-    explicit QpToImplicit(const Function& f, const Function& jac,
-                                 const LinearSolver& linsol);
+    explicit QpToImplicit(const Function& f);
 
     /** \brief  Destructor */
     virtual ~QpToImplicit();
@@ -65,14 +64,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual QpToImplicit* create(const Function& f, const Function& jac,
-                                        const LinearSolver& linsol) const
-    { return new QpToImplicit(f, jac, linsol);}
+    virtual QpToImplicit* create(const Function& f) const
+    { return new QpToImplicit(f);}
 
     /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
-                                             const LinearSolver& linsol)
-    { return new QpToImplicit(f, jac, linsol);}
+    static ImplicitFunctionInternal* creator(const Function& f)
+    { return new QpToImplicit(f);}
 
     /** \brief  Initialize */
     virtual void init();

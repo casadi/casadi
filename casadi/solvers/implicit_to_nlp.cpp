@@ -46,12 +46,8 @@ namespace casadi {
     ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_nlp);
   }
 
-  QpToImplicit::QpToImplicit(const Function& f, const Function& jac,
-                                           const LinearSolver& linsol)
-      : ImplicitFunctionInternal(f, jac, linsol) {
-
+  QpToImplicit::QpToImplicit(const Function& f) : ImplicitFunctionInternal(f) {
     Adaptor::addOptions();
-
   }
 
   QpToImplicit::~QpToImplicit() {

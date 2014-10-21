@@ -52,9 +52,7 @@ namespace casadi {
     ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_newton);
   }
 
-  Newton::Newton(const Function& f, const Function& jac,
-                                                 const LinearSolver& linsol)
-      : ImplicitFunctionInternal(f, jac, linsol) {
+  Newton::Newton(const Function& f) : ImplicitFunctionInternal(f) {
     addOption("abstol",                      OT_REAL, 1e-12,
               "Stopping criterion tolerance on max(|F|)");
     addOption("abstolStep",                  OT_REAL, 1e-12,

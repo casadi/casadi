@@ -58,7 +58,7 @@ namespace casadi {
   class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolInterface : public ImplicitFunctionInternal {
   public:
     /** \brief  Constructor */
-    explicit KinsolInterface(const Function& f, const Function& jac, const LinearSolver& linsol);
+    explicit KinsolInterface(const Function& f);
 
     /** \brief  Destructor */
     virtual ~KinsolInterface();
@@ -67,14 +67,12 @@ namespace casadi {
     virtual KinsolInterface* clone() const;
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
-                                             const LinearSolver& linsol) const
-    { return new KinsolInterface(f, jac, linsol);}
+    virtual ImplicitFunctionInternal* create(const Function& f) const
+    { return new KinsolInterface(f);}
 
     /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
-                                             const LinearSolver& linsol)
-    { return new KinsolInterface(f, jac, linsol);}
+    static ImplicitFunctionInternal* creator(const Function& f)
+    { return new KinsolInterface(f);}
 
     /** \brief  Initialize stage */
     virtual void init();
