@@ -46,7 +46,7 @@ namespace casadi {
     plugin->creator = SmithLrDleInternal::creator;
     plugin->name = "smith";
     plugin->doc = SmithLrDleInternal::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

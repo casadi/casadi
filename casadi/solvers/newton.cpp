@@ -43,7 +43,7 @@ namespace casadi {
     plugin->creator = Newton::creator;
     plugin->name = "newton";
     plugin->doc = Newton::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

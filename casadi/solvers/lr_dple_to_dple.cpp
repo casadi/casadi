@@ -45,7 +45,7 @@ namespace casadi {
     plugin->creator = LrDpleToDple::creator;
     plugin->name = "lrdple";
     plugin->doc = LrDpleToDple::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

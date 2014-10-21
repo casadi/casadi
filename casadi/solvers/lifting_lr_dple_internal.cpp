@@ -46,7 +46,7 @@ namespace casadi {
     plugin->creator = LiftingLrDpleInternal::creator;
     plugin->name = "lifting";
     plugin->doc = LiftingLrDpleInternal::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

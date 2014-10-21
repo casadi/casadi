@@ -51,7 +51,7 @@ namespace casadi {
     plugin->creator = PsdIndefDpleInternal::creator;
     plugin->name = "slicot";
     plugin->doc = PsdIndefDpleInternal::meta_doc.c_str();;
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

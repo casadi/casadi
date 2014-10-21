@@ -45,7 +45,7 @@ namespace casadi {
     plugin->creator = LrDleToDle::creator;
     plugin->name = "lrdle";
     plugin->doc = LrDleToDle::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

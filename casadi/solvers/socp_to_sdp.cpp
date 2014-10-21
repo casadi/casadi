@@ -39,7 +39,7 @@ namespace casadi {
     plugin->creator = SocpToSdp::creator;
     plugin->name = "sdp";
     plugin->doc = SocpToSdp::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 
