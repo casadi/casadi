@@ -76,9 +76,8 @@ namespace casadi {
 
     form_ = getOptionEnumValue("form");
 
-
+    // Initialize the base classes
     DpleInternal::init();
-    Adaptor::init();
 
     casadi_assert_message(!pos_def_,
       "pos_def option set to True: Solver only handles the indefinite case.");
@@ -124,9 +123,9 @@ namespace casadi {
     }
 
     // Create an dlesolver instance
-    solver_ = DleSolver(Adaptor::targetName(), dleStruct("a", A.sparsity(), "v", V.sparsity()));
-
-    Adaptor::setTargetOptions();
+    solver_ = DleSolver(getOption(solvername()),
+                        dleStruct("a", A.sparsity(), "v", V.sparsity()));
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
 
     // Initialize the NLP solver
     solver_.init();

@@ -70,9 +70,8 @@ namespace casadi {
   }
 
   void LrDpleToDple::init() {
-
+    // Initialize the base classes
     DpleInternal::init();
-    Adaptor::init();
 
     MX A = MX::sym("A", input(DPLE_A).sparsity());
     MX V = MX::sym("V", input(DPLE_V).sparsity());
@@ -84,16 +83,14 @@ namespace casadi {
 
     int K = A_.size();
 
-    // Create an dplesolver instance
-    solver_ = LrDpleSolver(Adaptor::targetName(),
-        lrdpleStruct("a", st_[DPLE_A], "v", st_[DPLE_V],
-                     "c", std::vector<Sparsity>(K, C.sparsity()),
-                     "h", std::vector<Sparsity>(K, H.sparsity())),
-                std::vector< std::vector<int> >(K, std::vector<int>(1, n)));
-
-    Adaptor::setTargetOptions();
-
-    // Initialize the DLE solver
+    // Create an LrDpleSolver instance
+    solver_ = LrDpleSolver(getOption(solvername()),
+                           lrdpleStruct("a", st_[DPLE_A],
+                                        "v", st_[DPLE_V],
+                                        "c", std::vector<Sparsity>(K, C.sparsity()),
+                                        "h", std::vector<Sparsity>(K, H.sparsity())),
+                           std::vector< std::vector<int> >(K, std::vector<int>(1, n)));
+    solver_.setOption(getOption(optionsname()));
     solver_.init();
 
     std::vector<MX> Pr = solver_.call(

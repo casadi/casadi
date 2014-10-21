@@ -105,10 +105,8 @@ namespace casadi {
   }
 
   void QpToImplicit::init() {
-
     // Call the base class initializer
     ImplicitFunctionInternal::init();
-    Adaptor::init();
 
     // Free variable in the NLP
     MX u = MX::sym("u", input(iin_).sparsity());
@@ -135,13 +133,9 @@ namespace casadi {
     // We're going to use two-argument objective and constraints to allow the use of parameters
     MXFunction nlp(nlpIn("x", u, "p", p), nlpOut("f", nlp_f, "g", nlp_g));
 
-    // Create an nlpsolver instance
-
-    solver_ = NlpSolver(Adaptor::targetName(), nlp);
-
-    Adaptor::setTargetOptions();
-
-    // Initialize the NLP solver
+    // Create an NlpSolver instance
+    solver_ = NlpSolver(getOption(solvername()), nlp);
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
   }
 

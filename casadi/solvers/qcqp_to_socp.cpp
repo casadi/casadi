@@ -167,9 +167,8 @@ namespace casadi {
   }
 
   void QcqpToSocp::init() {
-
+    // Initialize the base classes
     QcqpSolverInternal::init();
-    Adaptor::init();
 
     // Collection of sparsities that will make up SOCP_SOLVER_G
     std::vector<Sparsity> socp_g;
@@ -192,14 +191,13 @@ namespace casadi {
         cholesky_[i].getFactorizationSparsity(false), Sparsity::dense(1, 1)));
     }
 
-    // Create an socpsolver instance
-    solver_ = SocpSolver(Adaptor::targetName(),
-                             socpStruct("g", horzcat(socp_g),
-                                        "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
-                                              Sparsity::sparse(nc_, 1))));
-
+    // Create an SocpSolver instance
+    solver_ = SocpSolver(getOption(solvername()),
+                         socpStruct("g", horzcat(socp_g),
+                                    "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
+                                                 Sparsity::sparse(nc_, 1))));
     //solver_.setQCQPOptions();
-    Adaptor::setTargetOptions();
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
 
     std::vector<int> ni(nq_+1);
     for (int i=0;i<nq_+1;++i) {
@@ -207,9 +205,8 @@ namespace casadi {
     }
     solver_.setOption("ni", ni);
 
-    // Initialize the SOCP solver
+    // Initialize the SocpSolver
     solver_.init();
-
   }
 
 } // namespace casadi

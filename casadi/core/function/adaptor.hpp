@@ -42,20 +42,11 @@ namespace casadi {
   class Adaptor {
   public:
 
-    /// Initialize
-    void init();
-
-    /// Copy the necessary options to the target solver
-    void setTargetOptions();
-
     // Solver name of target solver
     static std::string solvername() { return Solver::shortname() + "_solver"; }
 
     // Options name of target solver
     static std::string optionsname() { return solvername() + "_options"; }
-
-    /// \brief Get the name of the target solver
-    std::string targetName();
 
     /// Add options that are common to all Adaptor classes
     void addOptions();
@@ -64,52 +55,10 @@ namespace casadi {
   template< class Derived, class Solver>
   void Adaptor<Derived, Solver>::addOptions() {
     Derived* this_ = static_cast<Derived*>(this);
-
-    // TODO(@jgillis): Fix option descriptions
-    this_->addOption("target",          OT_BOOLEAN,     false,
-                     "Options to be passed to the target solver.");
-    this_->addOption("target_options",  OT_DICTIONARY,  GenericType(),
-                     "Options to be passed to the target solver.");
     this_->addOption(solvername(),      OT_STRING,      GenericType(),
-                     "User-defined DPLE solver class.");
+                     "Name of solver.");
     this_->addOption(optionsname(),     OT_DICTIONARY,  GenericType(),
-                     "Options to be passed to the DPLE solver.");
-  }
-
-  template< class Derived, class Solver>
-  void Adaptor<Derived, Solver>::init() {
-    Derived* this_ = static_cast<Derived*>(this);
-
-    if (this_->getOption("target")) {
-      if (this_->hasSetOption("target_options")) {
-        this_->setOption(this_->getOption("target_options"));
-      }
-    }
-  }
-
-  template< class Derived, class Solver>
-  void Adaptor<Derived, Solver>::setTargetOptions() {
-    Derived* this_ = static_cast<Derived*>(this);
-
-    if (this_->hasSetOption(optionsname())) {
-      this_->solver_.setOption(this_->getOption(optionsname()));
-    }
-    if (!this_->getOption("target")) {
-      if (this_->solver_.hasOption("target_options")) {
-        if (this_->hasSetOption("target_options")) {
-          this_->solver_.setOption("target_options", this_->getOption("target_options"));
-        }
-      } else {
-        if (this_->hasSetOption("target_options")) {
-          this_->solver_.setOption(this_->getOption("target_options"));
-        }
-      }
-    }
-  }
-
-  template< class Derived, class Solver>
-  std::string Adaptor<Derived, Solver>::targetName() {
-    return static_cast<Derived*>(this)->getOption(solvername());
+                     "Options to be passed to solver.");
   }
 
 } // namespace casadi

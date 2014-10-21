@@ -66,7 +66,6 @@ namespace casadi {
               "The form of the lifting", "A:0|B:1");
 
     Adaptor::addOptions();
-
   }
 
   LiftingLrDpleInternal::~LiftingLrDpleInternal() {
@@ -77,9 +76,8 @@ namespace casadi {
 
     form_ = getOptionEnumValue("form");
 
-
+    // Initialize the base classes
     LrDpleInternal::init();
-    Adaptor::init();
 
     casadi_assert_message(!pos_def_,
       "pos_def option set to True: Solver only handles the indefinite case.");
@@ -144,15 +142,14 @@ namespace casadi {
       H = blkdiag(form_==0? Hs_ : reverse(Hs_));
     }
 
-    // Create an dlesolver instance
-
-    solver_ = LrDleSolver(Adaptor::targetName(),
-      lrdleStruct("a", A.sparsity(), "v", V.sparsity(), "c", C.sparsity(), "h", H.sparsity()),
-      Hss_);
-
-    Adaptor::setTargetOptions();
-
-    // Initialize the LRDLE solver
+    // Create an LrDleSolver instance
+    solver_ = LrDleSolver(getOption(solvername()),
+                          lrdleStruct("a", A.sparsity(),
+                                      "v", V.sparsity(),
+                                      "c", C.sparsity(),
+                                      "h", H.sparsity()),
+                          Hss_);
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
     std::vector<MX> v_in(LR_DPLE_NUM_IN);

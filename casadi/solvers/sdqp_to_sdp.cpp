@@ -66,7 +66,6 @@ namespace casadi {
   void SdqpToSdp::init() {
     // Initialize the base classes
     SdqpSolverInternal::init();
-    Adaptor::init();
 
     cholesky_ = LinearSolver("csparsecholesky", st_[SDQP_STRUCT_H]);
     cholesky_.init();
@@ -107,17 +106,13 @@ namespace casadi {
                           mappingOut("f", horzcat(fi), "g", g));
     mapping_.init();
 
-    // Create an sdpsolver instance
-    std::string solver_name = getOption("sdp_solver");
-    solver_ = SdpSolver(Adaptor::targetName(),
+    // Create an SdpSolver instance
+    solver_ = SdpSolver(getOption(solvername()),
                         sdpStruct("g", mapping_.output("g").sparsity(),
                                   "f", mapping_.output("f").sparsity(),
                                   "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
                                                Sparsity::sparse(nc_, 1))));
-
-    Adaptor::setTargetOptions();
-
-    // Initialize the SDP solver
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
     solver_.input(SDP_SOLVER_C).at(n_)=1;

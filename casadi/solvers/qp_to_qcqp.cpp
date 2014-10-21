@@ -55,9 +55,7 @@ namespace casadi {
   }
 
   QpToQcqp::QpToQcqp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
-
     Adaptor::addOptions();
-
   }
 
   QpToQcqp::~QpToQcqp() {
@@ -90,21 +88,17 @@ namespace casadi {
   }
 
   void QpToQcqp::init() {
-
+    // Initialize the base classes
     QpSolverInternal::init();
-    Adaptor::init();
 
-    // Create an qcqpsolver instance
-    solver_ = QcqpSolver(Adaptor::targetName(),
-                             qcqpStruct("h", input(QP_SOLVER_H).sparsity(),
-                                        "p", Sparsity::sparse(n_, 0),
-                                        "a", input(QP_SOLVER_A).sparsity()));
+    // Create an QcqpSolver instance
+    solver_ = QcqpSolver(getOption(solvername()),
+                         qcqpStruct("h", input(QP_SOLVER_H).sparsity(),
+                                    "p", Sparsity::sparse(n_, 0),
+                                    "a", input(QP_SOLVER_A).sparsity()));
     solver_.setQPOptions();
-    Adaptor::setTargetOptions();
-
-    // Initialize the NLP solver
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
-
   }
 
 } // namespace casadi
