@@ -62,6 +62,8 @@ namespace casadi {
   class CASADI_SDQPSOLVER_SDP_EXPORT SdqpToSdp : public SdqpSolverInternal,
                                                  public Adaptor<SdqpToSdp, SdpSolver> {
   public:
+    /// Solve with
+    SdpSolver solver_;
 
     /** \brief Constructor */
     explicit SdqpToSdp(const std::vector<Sparsity> &st);

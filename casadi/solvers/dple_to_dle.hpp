@@ -91,6 +91,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Solve with
+    DpleSolver solver_;
   };
 
 } // namespace casadi

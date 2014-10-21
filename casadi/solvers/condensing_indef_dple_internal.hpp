@@ -126,6 +126,9 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Solve with
+    DleSolver solver_;
+
   private:
 
     /// State space dimension

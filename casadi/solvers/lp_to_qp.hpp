@@ -74,6 +74,8 @@ public:
   /// A documentation string
   static const std::string meta_doc;
 
+  /// Solve with
+  QpSolver solver_;
 };
 
 } // namespace casadi

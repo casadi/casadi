@@ -48,9 +48,6 @@ namespace casadi {
     /// Copy the necessary options to the target solver
     void setTargetOptions();
 
-    /// Instance of the target solver
-    Solver solver_;
-
     /// Get the prefix of the target solver
     std::string prefix();
 
@@ -59,16 +56,7 @@ namespace casadi {
 
     /// Add options that are common to all Adaptor classes
     void addOptions();
-
-    /// Load the plugin needed by the target solver
-    static void adaptorLoader(const std::string& name);
-
   };
-
-  template< class Derived, class Solver>
-  void Adaptor<Derived, Solver>::adaptorLoader(const std::string& name) {
-    Solver::loadPlugin(name);
-  }
 
   template< class Derived, class Solver>
   void Adaptor<Derived, Solver>::addOptions() {
@@ -100,16 +88,16 @@ namespace casadi {
     Derived* this_ = static_cast<Derived*>(this);
 
     if (this_->hasSetOption(prefix() + "_solver_options")) {
-      solver_.setOption(this_->getOption(prefix() + "_solver_options"));
+      this_->solver_.setOption(this_->getOption(prefix() + "_solver_options"));
     }
     if (!this_->getOption("target")) {
-      if (solver_.hasOption("target_options")) {
+      if (this_->solver_.hasOption("target_options")) {
         if (this_->hasSetOption("target_options")) {
-          solver_.setOption("target_options", this_->getOption("target_options"));
+          this_->solver_.setOption("target_options", this_->getOption("target_options"));
         }
       } else {
         if (this_->hasSetOption("target_options")) {
-          solver_.setOption(this_->getOption("target_options"));
+          this_->solver_.setOption(this_->getOption("target_options"));
         }
       }
     }

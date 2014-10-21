@@ -83,6 +83,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Solve with
+    NlpSolver solver_;
   };
 
 } // namespace casadi

@@ -74,6 +74,9 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Solve with
+    SdpSolver solver_;
+
   protected:
 
     /// Mapping from G, H, E, F to P, G
