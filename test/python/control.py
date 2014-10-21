@@ -52,7 +52,7 @@ except:
   pass
   
   
-try:
+"""try:
   LinearSolver.loadPlugin("csparse")
   DleSolver.loadPlugin("dple.slicot")
   dlesolvers.append(("dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
@@ -69,7 +69,7 @@ try:
   DleSolver.loadPlugin("lrdle.fixed_smith")
   dlesolvers.append(("lrdle.fixed_smith",{"target_options": {"iter":100}}))
 except:
-  pass
+  pass"""
   
 try:
   DleSolver.loadPlugin("fixed_smith")
@@ -97,7 +97,7 @@ try:
 except:
   pass
 
-try:
+"""try:
   LrDleSolver.loadPlugin("dle.simple")
   LinearSolver.loadPlugin("csparse")
   lrdlesolvers.append(("dle.simple",{"target_options": {"linear_solver": "csparse"}}))
@@ -108,7 +108,7 @@ try:
   LrDleSolver.loadPlugin("dle.lrdle.smith")
   lrdlesolvers.append(("dle.lrdle.smith",{"target_options": {"max_iter":100,"tol": 1e-13}}))
 except:
-  pass
+  pass"""
 
 lrdplesolvers = []
 
@@ -121,7 +121,7 @@ except Exception as e:
   pass
 
 
-try:
+"""try:
   LrDpleSolver.loadPlugin("lifting.smith")
   lrdplesolvers.append(("lifting.smith",{"target_options": {"max_iter":100,"tol": 1e-13}}))
 except Exception as e:
@@ -147,7 +147,7 @@ try:
   LrDpleSolver.loadPlugin("dple.lrdple.lifting.smith")
   lrdplesolvers.append(("dple.lrdple.lifting.smith",{ "target_options": {"max_iter":100,"tol": 1e-13}} ))
 except:
-  pass
+  pass"""
 
 dplesolvers = []
 
@@ -166,7 +166,7 @@ try:
 except:
   pass
 
-try:
+"""try:
   LinearSolver.loadPlugin("csparse")
   DpleSolver.loadPlugin("condensing.simple")
   dplesolvers.append(("condensing.simple",{"target_options": {"linear_solver": "csparse"}}))
@@ -204,7 +204,7 @@ try:
   dplesolvers.append(("lifting",{"form":"B","dle_solver": "dple.slicot","dle_solver_options": {"target_options": {"linear_solver": "csparse"}}}))
 except:
   pass
-
+"""
   
 print "DpleSolvers", len(dplesolvers), dplesolvers
 print "DleSolvers", len(dlesolvers), dlesolvers
