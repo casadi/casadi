@@ -1,160 +1,40 @@
 %exception  casadi::Adaptor< Derived, Solver >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< Derived, Solver >::init() {
+%exception  casadi::Adaptor< DleToLrDle , DleInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< Derived, Solver >::prefix() {
+%exception  casadi::Adaptor< DpleToDle , DpleInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< Derived, Solver >::setTargetOptions() {
+%exception  casadi::Adaptor< DpleToLrDple , DpleInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< Derived, Solver >::targetName() {
+%exception  casadi::Adaptor< LpToQp , QpSolverInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< DleToLrDle , DleSolver  >::addOptions() {
+%exception  casadi::Adaptor< LrDleToDle , LrDleInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< DleToLrDle , DleSolver  >::prefix() {
+%exception  casadi::Adaptor< LrDpleToDple , LrDpleInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< DleToLrDle , DleSolver  >::setTargetOptions() {
+%exception  casadi::Adaptor< QcqpToSocp , SocpSolverInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< DleToLrDle , DleSolver  >::targetName() {
+%exception  casadi::Adaptor< QpToImplicit , NlpSolverInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< DpleToDle , DpleSolver  >::addOptions() {
+%exception  casadi::Adaptor< QpToNlp , NlpSolverInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< DpleToDle , DpleSolver  >::prefix() {
+%exception  casadi::Adaptor< QpToQcqp , QcqpSolverInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< DpleToDle , DpleSolver  >::setTargetOptions() {
+%exception  casadi::Adaptor< SdqpToSdp , SdpSolverInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Adaptor< DpleToDle , DpleSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< DpleToLrDple , DpleSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< DpleToLrDple , DpleSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< DpleToLrDple , DpleSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< DpleToLrDple , DpleSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LpToQp , QpSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LpToQp , QpSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LpToQp , QpSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LpToQp , QpSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LrDleToDle , LrDleSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LrDleToDle , LrDleSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LrDleToDle , LrDleSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LrDleToDle , LrDleSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LrDpleToDple , LrDpleSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LrDpleToDple , LrDpleSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LrDpleToDple , LrDpleSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< LrDpleToDple , LrDpleSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QcqpToSocp , SocpSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QcqpToSocp , SocpSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QcqpToSocp , SocpSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QcqpToSocp , SocpSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToImplicit , NlpSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToImplicit , NlpSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToImplicit , NlpSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToImplicit , NlpSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToNlp , NlpSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToNlp , NlpSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToNlp , NlpSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToNlp , NlpSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToQcqp , QcqpSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToQcqp , QcqpSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToQcqp , QcqpSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< QpToQcqp , QcqpSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< SdqpToSdp , SdpSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< SdqpToSdp , SdpSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< SdqpToSdp , SdpSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< SdqpToSdp , SdpSolver  >::targetName() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< SocpToSdp , SdpSolver  >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< SocpToSdp , SdpSolver  >::prefix() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< SocpToSdp , SdpSolver  >::setTargetOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Adaptor< SocpToSdp , SdpSolver  >::targetName() {
+%exception  casadi::Adaptor< SocpToSdp , SdpSolverInternal  >::addOptions() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Assertion::clone() const  {
@@ -1621,7 +1501,7 @@
 %exception  casadi::KinsolInterface::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::KinsolInterface::create(const Function &f, const Function &jac, const LinearSolver &linsol) const  {
+%exception  casadi::KinsolInterface::create(const Function &f) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::KinsolInterface::djac(long N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2) {
@@ -2839,7 +2719,7 @@
 %exception  casadi::Newton::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Newton::create(const Function &f, const Function &jac, const LinearSolver &linsol) const  {
+%exception  casadi::Newton::create(const Function &f) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Newton::init() {
@@ -3166,7 +3046,7 @@
 %exception  casadi::QpToImplicit::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::QpToImplicit::create(const Function &f, const Function &jac, const LinearSolver &linsol) const  {
+%exception  casadi::QpToImplicit::create(const Function &f) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::QpToImplicit::init() {
@@ -4933,7 +4813,7 @@
 %exception casadi::JacGOutputIOSchemeVector< M >::JacGOutputIOSchemeVector(const std::vector< M > &t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::KinsolInterface::KinsolInterface(const Function &f, const Function &jac, const LinearSolver &linsol) {
+%exception casadi::KinsolInterface::KinsolInterface(const Function &f) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::KnitroInterface::KnitroInterface(const Function &nlp) {
@@ -5047,7 +4927,7 @@
 %exception casadi::NanSX::NanSX() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::Newton::Newton(const Function &f, const Function &jac, const LinearSolver &linsol) {
+%exception casadi::Newton::Newton(const Function &f) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::NlpSolverInputIOSchemeVector< M >::NlpSolverInputIOSchemeVector(const std::vector< M > &t) {
@@ -5113,7 +4993,7 @@
 %exception casadi::QpSolverOutputIOSchemeVector< M >::QpSolverOutputIOSchemeVector(const std::vector< M > &t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::QpToImplicit::QpToImplicit(const Function &f, const Function &jac, const LinearSolver &linsol) {
+%exception casadi::QpToImplicit::QpToImplicit(const Function &f) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::QpToNlp::QpToNlp() {
