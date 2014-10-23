@@ -27,7 +27,7 @@
 #define CASADI_DLE_TO_LR_DLE_HPP
 
 #include "../core/function/lr_dle_internal.hpp"
-#include "../core/function/dle_solver.hpp"
+#include "../core/function/dle_internal.hpp"
 #include <casadi/solvers/casadi_lrdlesolver_dle_export.h>
 
 /** \defgroup plugin_LrDleSolver_dle
@@ -50,7 +50,7 @@ namespace casadi {
 
   */
   class CASADI_LRDLESOLVER_DLE_EXPORT DleToLrDle : public LrDleInternal,
-    public Adaptor<DleToLrDle, DleSolver>,
+    public Adaptor<DleToLrDle, DleInternal>,
     public Wrapper<DleToLrDle> {
   public:
     /** \brief  Constructor
@@ -93,6 +93,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Solve with
+    DleSolver solver_;
   };
 
 } // namespace casadi

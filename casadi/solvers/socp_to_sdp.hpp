@@ -27,7 +27,7 @@
 #define CASADI_SOCP_TO_SDP_HPP
 
 #include "casadi/core/function/socp_solver_internal.hpp"
-#include "casadi/core/function/sdp_solver.hpp"
+#include "casadi/core/function/sdp_solver_internal.hpp"
 
 #include <casadi/solvers/casadi_socpsolver_sdp_export.h>
 
@@ -50,7 +50,7 @@ namespace casadi {
       \date 2013
   */
   class CASADI_SOCPSOLVER_SDP_EXPORT SocpToSdp : public SocpSolverInternal,
-    public Adaptor<SocpToSdp, SdpSolver> {
+    public Adaptor<SocpToSdp, SdpSolverInternal> {
   public:
 
     /** \brief  Create a new Solver */
@@ -73,6 +73,9 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// Solve with
+    SdpSolver solver_;
 
   protected:
 

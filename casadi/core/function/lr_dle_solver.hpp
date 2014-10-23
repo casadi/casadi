@@ -126,7 +126,10 @@ namespace casadi {
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
 
-    /// Load a plugin dynamically
+    /// Check if a plugin is available
+    static bool hasPlugin(const std::string& name);
+
+    /// Explicitly load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
     /// Get solver specific documentation
@@ -135,10 +138,6 @@ namespace casadi {
     /// Get the resulting sparsity
     static Sparsity getSparsity(const LrDleStructure& st,
       const std::vector<int> &Hs=std::vector<int>());
-
-    /// Infix
-    static std::string infix();
-
   };
 
 } // namespace casadi

@@ -27,7 +27,7 @@
 #define CASADI_LP_TO_QP_HPP
 
 #include "casadi/core/function/lp_internal.hpp"
-#include "casadi/core/function/qp_solver.hpp"
+#include "casadi/core/function/qp_solver_internal.hpp"
 
 #include <casadi/solvers/casadi_lpsolver_qp_export.h>
 
@@ -50,7 +50,7 @@ namespace casadi {
    \date 2013
   */
 class CASADI_LPSOLVER_QP_EXPORT LpToQp : public LpSolverInternal,
-  public Adaptor<LpToQp, QpSolver> {
+  public Adaptor<LpToQp, QpSolverInternal> {
 public:
 
   /** \brief  Create a new Solver */
@@ -74,6 +74,8 @@ public:
   /// A documentation string
   static const std::string meta_doc;
 
+  /// Solve with
+  QpSolver solver_;
 };
 
 } // namespace casadi

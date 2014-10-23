@@ -12,7 +12,7 @@ endif()
 
 find_path(WORHP_INCLUDE_DIR
 worhp.h
-HINTS $ENV{WORHP}/include/worhp/)
+HINTS $ENV{WORHP}/include/worhp/ $ENV{WORHP})
 
 if(WORHP_INCLUDE_DIR)
   message(STATUS "Worhp include dir detected: ${WORHP_INCLUDE_DIR}")
@@ -22,7 +22,7 @@ endif()
 
 find_library(WORHP_LIBRARY
   worhp
-  HINTS $ENV{WORHP}/lib/)
+  HINTS $ENV{WORHP}/lib/ $ENV{WORHP})
 
 
 if(WORHP_LIBRARY)

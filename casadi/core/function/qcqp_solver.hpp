@@ -146,7 +146,10 @@ namespace casadi {
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
 
-    /// Load a plugin dynamically
+    /// Check if a plugin is available
+    static bool hasPlugin(const std::string& name);
+
+    /// Explicitly load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
     /// Get solver specific documentation
@@ -154,9 +157,6 @@ namespace casadi {
 
     /// Set options that make the QP solver more suitable for solving LPs
     void setQPOptions();
-
-    /// Infix
-    static std::string infix();
   };
 
 } // namespace casadi

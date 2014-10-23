@@ -27,7 +27,7 @@
 #define CASADI_LIFTING_LR_DPLE_INTERNAL_HPP
 
 #include "../core/function/lr_dple_internal.hpp"
-#include "../core/function/lr_dle_solver.hpp"
+#include "../core/function/lr_dle_internal.hpp"
 #include <casadi/solvers/casadi_lrdplesolver_lifting_export.h>
 
 /** \defgroup plugin_LrDpleSolver_lifting
@@ -80,7 +80,7 @@ namespace casadi {
 
   */
   class CASADI_LRDPLESOLVER_LIFTING_EXPORT LiftingLrDpleInternal : public LrDpleInternal,
-    public Adaptor<LiftingLrDpleInternal, LrDleSolver>,
+    public Adaptor<LiftingLrDpleInternal, LrDleInternal>,
     public Wrapper<LiftingLrDpleInternal> {
   public:
     /** \brief  Constructor
@@ -124,6 +124,9 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// Solve with
+    LrDleSolver solver_;
 
   private:
 

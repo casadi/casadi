@@ -84,6 +84,10 @@ namespace casadi {
     assignNode(LinearSolverInternal::getPlugin(name).creator(sp, nrhs));
   }
 
+  bool LinearSolver::hasPlugin(const std::string& name) {
+    return LinearSolverInternal::hasPlugin(name);
+  }
+
   void LinearSolver::loadPlugin(const std::string& name) {
     LinearSolverInternal::loadPlugin(name);
   }

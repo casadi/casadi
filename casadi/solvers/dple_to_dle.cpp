@@ -45,8 +45,7 @@ namespace casadi {
     plugin->creator = DpleToDle::creator;
     plugin->name = "dple";
     plugin->doc = DpleToDle::meta_doc.c_str();
-    plugin->version = 20;
-    plugin->adaptorLoader = DpleToDle::adaptorLoader;
+    plugin->version = 21;
     return 0;
   }
 
@@ -62,7 +61,6 @@ namespace casadi {
     setOption("name", "unnamed_dple_to_dle"); // name of the function
 
     Adaptor::addOptions();
-
   }
 
   DpleToDle::~DpleToDle() {
@@ -70,23 +68,16 @@ namespace casadi {
   }
 
   void DpleToDle::init() {
-
+    // Initialize the base classes
     DleInternal::init();
-    Adaptor::init();
 
-    // Create an dplesolver instance
-    solver_ = DpleSolver(Adaptor::targetName(),
-      dpleStruct("a", std::vector<Sparsity>(1, A_),
-                 "v", std::vector<Sparsity>(1, V_)));
-
-    Adaptor::setTargetOptions();
-
-    // Initialize the NLP solver
+    // Create a DpleSolver instance
+    solver_ = DpleSolver(getOption(solvername()),
+                         dpleStruct("a", std::vector<Sparsity>(1, A_),
+                                    "v", std::vector<Sparsity>(1, V_)));
+    solver_.setOption(getOption(optionsname()));
     solver_.init();
-
   }
-
-
 
   void DpleToDle::evaluate() {
     for (int i=0;i<getNumInputs();++i) {

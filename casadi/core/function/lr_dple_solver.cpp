@@ -55,6 +55,10 @@ namespace casadi {
     return dynamic_cast<const LrDpleInternal*>(ptr)!=0;
   }
 
+  bool LrDpleSolver::hasPlugin(const std::string& name) {
+    return LrDpleInternal::hasPlugin(name);
+  }
+
   void LrDpleSolver::loadPlugin(const std::string& name) {
     LrDpleInternal::loadPlugin(name);
   }
@@ -66,11 +70,7 @@ namespace casadi {
   LrDpleSolver::LrDpleSolver(const std::string& name,
                          const LrDpleStructure & st,
                          const std::vector< std::vector<int> > &Hs) {
-    assignNode(LrDpleInternal::getPlugin(name).creator(st, Hs)->adaptor(name));
-  }
-
-  std::string LrDpleSolver::infix() {
-    return LrDpleInternal::infix_;
+    assignNode(LrDpleInternal::getPlugin(name).creator(st, Hs));
   }
 
 } // namespace casadi

@@ -44,7 +44,7 @@ namespace casadi {
     plugin->creator = StabilizedSqicInterface::creator;
     plugin->name = "sqic";
     plugin->doc = StabilizedSqicInterface::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

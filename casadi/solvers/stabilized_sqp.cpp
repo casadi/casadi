@@ -45,7 +45,7 @@ namespace casadi {
     plugin->creator = StabilizedSqp::creator;
     plugin->name = "stabilizedsqp";
     plugin->doc = StabilizedSqp::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

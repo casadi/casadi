@@ -27,7 +27,7 @@
 #define CASADI_DPLE_TO_LR_DPLE_HPP
 
 #include "../core/function/dple_internal.hpp"
-#include "../core/function/lr_dple_solver.hpp"
+#include "../core/function/lr_dple_internal.hpp"
 #include <casadi/solvers/casadi_dplesolver_lrdple_export.h>
 
 /** \defgroup plugin_DpleSolver_lrdple
@@ -50,7 +50,7 @@ namespace casadi {
 
   */
   class CASADI_DPLESOLVER_LRDPLE_EXPORT LrDpleToDple : public DpleInternal,
-    public Adaptor<LrDpleToDple, LrDpleSolver>,
+    public Adaptor<LrDpleToDple, LrDpleInternal>,
     public Wrapper<LrDpleToDple> {
   public:
     /** \brief  Constructor
@@ -92,6 +92,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Solve with
+    LrDpleSolver solver_;
   };
 
 } // namespace casadi

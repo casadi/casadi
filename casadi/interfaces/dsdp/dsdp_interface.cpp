@@ -43,7 +43,7 @@ namespace casadi {
     plugin->creator = DsdpInterface::creator;
     plugin->name = "dsdp";
     plugin->doc = DsdpInterface::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

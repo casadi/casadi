@@ -29,17 +29,11 @@ from types import *
 from helpers import *
 
 qcqpsolvers = []
-try:
-  SdpSolver.loadPlugin("dsdp")
+if SdpSolver.hasPlugin("dsdp"):
   qcqpsolvers.append(("socp",{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },False))
-except:
-  pass
 
-try:
-  QcqpSolver.loadPlugin("socp.sdp.dsdp")
+if SdpSolver.hasPlugin("dsdp"):
   qcqpsolvers.append(("socp.sdp.dsdp",{},False))
-except:
-  pass
 
 class QcqpSolverTests(casadiTestCase):
 

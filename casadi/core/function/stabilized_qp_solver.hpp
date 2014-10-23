@@ -116,7 +116,10 @@ namespace casadi {
     StabilizedQpSolverInternal* operator->();
     const StabilizedQpSolverInternal* operator->() const;
 
-    /// Load a plugin dynamically
+    /// Check if a plugin is available
+    static bool hasPlugin(const std::string& name);
+
+    /// Explicitly load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
     /// Get solver specific documentation

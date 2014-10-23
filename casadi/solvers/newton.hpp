@@ -53,8 +53,7 @@ namespace casadi {
       : public ImplicitFunctionInternal {
   public:
     /** \brief  Constructor */
-    explicit Newton(const Function& f, const Function& jac,
-                                    const LinearSolver& linsol);
+    explicit Newton(const Function& f);
 
     /** \brief  Destructor */
     virtual ~Newton();
@@ -63,14 +62,12 @@ namespace casadi {
     virtual Newton* clone() const { return new Newton(*this);}
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
-                                             const LinearSolver& linsol) const
-    { return new Newton(f, jac, linsol);}
+    virtual ImplicitFunctionInternal* create(const Function& f) const
+    { return new Newton(f);}
 
     /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
-                                             const LinearSolver& linsol)
-    { return new Newton(f, jac, linsol);}
+    static ImplicitFunctionInternal* creator(const Function& f)
+    { return new Newton(f);}
 
     /** \brief  Initialize */
     virtual void init();

@@ -27,7 +27,7 @@
 #define CASADI_SDQP_TO_SDP_HPP
 
 #include "casadi/core/function/sdqp_solver_internal.hpp"
-#include "casadi/core/function/sdp_solver.hpp"
+#include "casadi/core/function/sdp_solver_internal.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
 #include <casadi/solvers/casadi_sdqpsolver_sdp_export.h>
@@ -60,8 +60,10 @@ namespace casadi {
    \date 2013
   */
   class CASADI_SDQPSOLVER_SDP_EXPORT SdqpToSdp : public SdqpSolverInternal,
-    public Adaptor<SdqpToSdp, SdpSolver> {
+                                                 public Adaptor<SdqpToSdp, SdpSolverInternal> {
   public:
+    /// Solve with
+    SdpSolver solver_;
 
     /** \brief Constructor */
     explicit SdqpToSdp(const std::vector<Sparsity> &st);
@@ -84,9 +86,6 @@ namespace casadi {
 
     /** \brief Solve the SDQP */
     virtual void evaluate();
-
-    /// Underlying SDP solver
-    SdpSolver sdpsolver_;
 
     /// Cholesky Decomposition
     LinearSolver cholesky_;

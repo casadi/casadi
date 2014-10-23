@@ -45,8 +45,7 @@ namespace casadi {
     plugin->creator = LrDleToDle::creator;
     plugin->name = "lrdle";
     plugin->doc = LrDleToDle::meta_doc.c_str();
-    plugin->version = 20;
-    plugin->adaptorLoader = LrDleToDle::adaptorLoader;
+    plugin->version = 21;
     return 0;
   }
 
@@ -62,7 +61,6 @@ namespace casadi {
     setOption("name", "unnamed_lr_dle_to_dle"); // name of the function
 
     Adaptor::addOptions();
-
   }
 
   LrDleToDle::~LrDleToDle() {
@@ -70,20 +68,16 @@ namespace casadi {
   }
 
   void LrDleToDle::init() {
-
+    // Initialize the base classes
     DleInternal::init();
-    Adaptor::init();
 
     MX A = MX::sym("A", A_);
     MX V = MX::sym("V", V_);
 
-    // Create an dplesolver instance
-    solver_ = LrDleSolver(Adaptor::targetName(),
-        lrdleStruct("a", A_, "v", V_));
-
-    Adaptor::setTargetOptions();
-
-    // Initialize the DLE solver
+    // Create an LrDleSolver instance
+    solver_ = LrDleSolver(getOption(solvername()),
+                          lrdleStruct("a", A_, "v", V_));
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
     std::vector<MX> Pr = solver_.call(lrdleIn("a", A, "v", V));

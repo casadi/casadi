@@ -34,7 +34,7 @@ namespace casadi {
     plugin->creator = TinyXmlInterface::creator;
     plugin->name = "tinyxml";
     plugin->doc = TinyXmlInterface::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

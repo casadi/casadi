@@ -27,7 +27,7 @@
 #define CASADI_QP_TO_QCQP_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
-#include "casadi/core/function/qcqp_solver.hpp"
+#include "casadi/core/function/qcqp_solver_internal.hpp"
 #include <casadi/solvers/casadi_qpsolver_qcqp_export.h>
 
 /** \defgroup plugin_QpSolver_qcqp
@@ -48,7 +48,7 @@ namespace casadi {
       \date 2013
   */
   class CASADI_QPSOLVER_QCQP_EXPORT QpToQcqp : public QpSolverInternal,
-    public Adaptor<QpToQcqp, QcqpSolver> {
+    public Adaptor<QpToQcqp, QcqpSolverInternal> {
   public:
 
     /** \brief  Create a new Solver */
@@ -72,6 +72,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Solve with
+    QcqpSolver solver_;
   };
 
 } // namespace casadi

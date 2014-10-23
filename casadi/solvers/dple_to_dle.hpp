@@ -27,7 +27,7 @@
 #define CASADI_DPLE_TO_DLE_HPP
 
 #include "../core/function/dle_internal.hpp"
-#include "../core/function/dple_solver.hpp"
+#include "../core/function/dple_internal.hpp"
 #include <casadi/solvers/casadi_dlesolver_dple_export.h>
 
 /** \defgroup plugin_DleSolver_dple
@@ -49,7 +49,7 @@ namespace casadi {
 
   */
   class CASADI_DLESOLVER_DPLE_EXPORT DpleToDle : public DleInternal,
-    public Adaptor<DpleToDle, DpleSolver> {
+    public Adaptor<DpleToDle, DpleInternal> {
   public:
     /** \brief  Constructor
      *  \param[in] A  Sparsity of A
@@ -91,6 +91,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Solve with
+    DpleSolver solver_;
   };
 
 } // namespace casadi

@@ -46,6 +46,10 @@ namespace casadi {
     return dynamic_cast<const HomotopyNLPInternal*>(ptr)!=0;
   }
 
+  bool HomotopyNlpSolver::hasPlugin(const std::string& name) {
+    return HomotopyNLPInternal::hasPlugin(name);
+  }
+
   void HomotopyNlpSolver::loadPlugin(const std::string& name) {
     HomotopyNLPInternal::loadPlugin(name);
   }

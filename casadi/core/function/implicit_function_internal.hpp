@@ -44,7 +44,7 @@ namespace casadi {
      *
      * \param f   Function mapping from (n+1) inputs to 1 output.
      */
-    ImplicitFunctionInternal(const Function& f, const Function& J, const LinearSolver& linsol);
+    ImplicitFunctionInternal(const Function& f);
 
     /// Destructor
     virtual ~ImplicitFunctionInternal() = 0;
@@ -56,8 +56,7 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
-                                             const LinearSolver& linsol) const = 0;
+    virtual ImplicitFunctionInternal* create(const Function& f) const = 0;
 
     /// Initialize
     virtual void init();
@@ -105,12 +104,13 @@ namespace casadi {
     int iin_, iout_;
 
     // Creator function for internal class
-    typedef ImplicitFunctionInternal* (*Creator)(const Function& f,
-                                                 const Function& J,
-                                                 const LinearSolver& linsol);
+    typedef ImplicitFunctionInternal* (*Creator)(const Function& f);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
+
+    /// Short name
+    static std::string shortname() { return "nlsol";}
 
     /// Infix
     static const std::string infix_;

@@ -27,7 +27,7 @@
 #define CASADI_CONDENSING_INDEF_DPLE_INTERNAL_HPP
 
 #include "../core/function/dple_internal.hpp"
-#include "../core/function/dle_solver.hpp"
+#include "../core/function/dle_internal.hpp"
 #include <casadi/solvers/casadi_dplesolver_condensing_export.h>
 
 /** \defgroup plugin_DpleSolver_condensing
@@ -84,7 +84,7 @@ namespace casadi {
 
   */
   class CASADI_DPLESOLVER_CONDENSING_EXPORT CondensingIndefDpleInternal : public DpleInternal,
-    public Adaptor<CondensingIndefDpleInternal, DleSolver>,
+    public Adaptor<CondensingIndefDpleInternal, DleInternal>,
     public Wrapper<CondensingIndefDpleInternal> {
   public:
     /** \brief  Constructor
@@ -125,6 +125,9 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// Solve with
+    DleSolver solver_;
 
   private:
 

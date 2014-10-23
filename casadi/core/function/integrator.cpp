@@ -83,6 +83,10 @@ namespace casadi {
     return (*this)->getAugmented(nfwd, nadj, offset);
   }
 
+  bool Integrator::hasPlugin(const std::string& name) {
+    return IntegratorInternal::hasPlugin(name);
+  }
+
   void Integrator::loadPlugin(const std::string& name) {
     IntegratorInternal::loadPlugin(name);
   }

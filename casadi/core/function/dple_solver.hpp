@@ -121,15 +121,14 @@ namespace casadi {
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
 
+    /// Check if a plugin is available
+    static bool hasPlugin(const std::string& name);
+
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
-
-    /// Infix
-    static std::string infix();
-
   };
 
 } // namespace casadi

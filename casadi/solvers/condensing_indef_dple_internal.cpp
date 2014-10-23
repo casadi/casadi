@@ -46,8 +46,7 @@ namespace casadi {
     plugin->creator = CondensingIndefDpleInternal::creator;
     plugin->name = "condensing";
     plugin->doc = CondensingIndefDpleInternal::meta_doc.c_str();
-    plugin->version = 20;
-    plugin->adaptorLoader = CondensingIndefDpleInternal::adaptorLoader;
+    plugin->version = 21;
     return 0;
   }
 
@@ -71,9 +70,8 @@ namespace casadi {
   }
 
   void CondensingIndefDpleInternal::init() {
-
+    // Initialize the base classes
     DpleInternal::init();
-    Adaptor::init();
 
     casadi_assert_message(!pos_def_,
       "pos_def option set to True: Solver only handles the indefinite case.");
@@ -105,9 +103,8 @@ namespace casadi {
     MX Ap = mul(Assr);
 
     // Create an dlesolver instance
-    solver_ = DleSolver(Adaptor::targetName(), dleStruct("a", Ap.sparsity(), "v", R.sparsity()));
-
-    Adaptor::setTargetOptions();
+    solver_ = DleSolver(getOption(solvername()), dleStruct("a", Ap.sparsity(), "v", R.sparsity()));
+    solver_.setOption(getOption(optionsname()));
 
     // Initialize the NLP solver
     solver_.init();

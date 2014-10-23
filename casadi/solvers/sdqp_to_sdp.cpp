@@ -40,8 +40,7 @@ namespace casadi {
     plugin->creator = SdqpToSdp::creator;
     plugin->name = "sdp";
     plugin->doc = SdqpToSdp::meta_doc.c_str();
-    plugin->version = 20;
-    plugin->adaptorLoader = SdqpToSdp::adaptorLoader;
+    plugin->version = 21;
     return 0;
   }
 
@@ -59,7 +58,7 @@ namespace casadi {
 
   void SdqpToSdp::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     SdqpSolverInternal::deepCopyMembers(already_copied);
-    sdpsolver_ = deepcopy(sdpsolver_, already_copied);
+    solver_ = deepcopy(solver_, already_copied);
     cholesky_ = deepcopy(cholesky_, already_copied);
     mapping_ = deepcopy(mapping_, already_copied);
   }
@@ -67,7 +66,6 @@ namespace casadi {
   void SdqpToSdp::init() {
     // Initialize the base classes
     SdqpSolverInternal::init();
-    Adaptor::init();
 
     cholesky_ = LinearSolver("csparsecholesky", st_[SDQP_STRUCT_H]);
     cholesky_.init();
@@ -108,29 +106,26 @@ namespace casadi {
                           mappingOut("f", horzcat(fi), "g", g));
     mapping_.init();
 
-    // Create an sdpsolver instance
-    sdpsolver_ = SdpSolver(Adaptor::targetName(),
-                           sdpStruct("g", mapping_.output("g").sparsity(),
-                                     "f", mapping_.output("f").sparsity(),
-                                     "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
-                                                  Sparsity::sparse(nc_, 1))));
+    // Create an SdpSolver instance
+    solver_ = SdpSolver(getOption(solvername()),
+                        sdpStruct("g", mapping_.output("g").sparsity(),
+                                  "f", mapping_.output("f").sparsity(),
+                                  "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
+                                               Sparsity::sparse(nc_, 1))));
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
+    solver_.init();
 
-    Adaptor::setTargetOptions();
-
-    // Initialize the SDP solver
-    sdpsolver_.init();
-
-    sdpsolver_.input(SDP_SOLVER_C).at(n_)=1;
+    solver_.input(SDP_SOLVER_C).at(n_)=1;
 
     // Output arguments
     setNumOutputs(SDQP_SOLVER_NUM_OUT);
     output(SDQP_SOLVER_X) = DMatrix::zeros(n_, 1);
 
     std::vector<int> r = range(input(SDQP_SOLVER_G).size1());
-    output(SDQP_SOLVER_P) = sdpsolver_.output(SDP_SOLVER_P).isEmpty() ? DMatrix() :
-        sdpsolver_.output(SDP_SOLVER_P)(r, r);
-    output(SDQP_SOLVER_DUAL) = sdpsolver_.output(SDP_SOLVER_DUAL).isEmpty() ? DMatrix() :
-        sdpsolver_.output(SDP_SOLVER_DUAL)(r, r);
+    output(SDQP_SOLVER_P) = solver_.output(SDP_SOLVER_P).isEmpty() ? DMatrix() :
+        solver_.output(SDP_SOLVER_P)(r, r);
+    output(SDQP_SOLVER_DUAL) = solver_.output(SDP_SOLVER_DUAL).isEmpty() ? DMatrix() :
+        solver_.output(SDP_SOLVER_DUAL)(r, r);
     output(SDQP_SOLVER_COST) = 0.0;
     output(SDQP_SOLVER_DUAL_COST) = 0.0;
     output(SDQP_SOLVER_LAM_X) = DMatrix::zeros(n_, 1);
@@ -159,50 +154,50 @@ namespace casadi {
 
     std::copy(input(SDQP_SOLVER_A).begin(),
               input(SDQP_SOLVER_A).end(),
-              sdpsolver_.input(SDP_SOLVER_A).begin());
-    sdpsolver_.setInput(mapping_.output("f"), SDP_SOLVER_F);
-    sdpsolver_.setInput(mapping_.output("g"), SDP_SOLVER_G);
+              solver_.input(SDP_SOLVER_A).begin());
+    solver_.setInput(mapping_.output("f"), SDP_SOLVER_F);
+    solver_.setInput(mapping_.output("g"), SDP_SOLVER_G);
     std::copy(input(SDQP_SOLVER_LBA).begin(),
               input(SDQP_SOLVER_LBA).end(),
-              sdpsolver_.input(SDP_SOLVER_LBA).begin());
+              solver_.input(SDP_SOLVER_LBA).begin());
     std::copy(input(SDQP_SOLVER_UBA).begin(),
               input(SDQP_SOLVER_UBA).end(),
-              sdpsolver_.input(SDP_SOLVER_UBA).begin());
+              solver_.input(SDP_SOLVER_UBA).begin());
     std::copy(input(SDQP_SOLVER_LBX).begin(),
               input(SDQP_SOLVER_LBX).end(),
-              sdpsolver_.input(SDP_SOLVER_LBX).begin());
+              solver_.input(SDP_SOLVER_LBX).begin());
     std::copy(input(SDQP_SOLVER_UBX).begin(),
               input(SDQP_SOLVER_UBX).end(),
-              sdpsolver_.input(SDP_SOLVER_UBX).begin());
+              solver_.input(SDP_SOLVER_UBX).begin());
 
-    sdpsolver_.evaluate();
+    solver_.evaluate();
 
     // Pass the stats
-    stats_["sdp_solver_stats"] = sdpsolver_.getStats();
+    stats_["sdp_solver_stats"] = solver_.getStats();
 
-    std::copy(sdpsolver_.output(SDP_SOLVER_X).begin(),
-              sdpsolver_.output(SDP_SOLVER_X).begin()+n_,
+    std::copy(solver_.output(SDP_SOLVER_X).begin(),
+              solver_.output(SDP_SOLVER_X).begin()+n_,
               output(SDQP_SOLVER_X).begin());
-    setOutput(sdpsolver_.output(SDP_SOLVER_COST),
+    setOutput(solver_.output(SDP_SOLVER_COST),
               SDQP_SOLVER_COST);
-    setOutput(sdpsolver_.output(SDP_SOLVER_DUAL_COST),
+    setOutput(solver_.output(SDP_SOLVER_DUAL_COST),
               SDQP_SOLVER_DUAL_COST);
     if (!output(SDQP_SOLVER_DUAL).isEmpty())
-        std::copy(sdpsolver_.output(SDP_SOLVER_DUAL).begin(),
-                  sdpsolver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).size(),
+        std::copy(solver_.output(SDP_SOLVER_DUAL).begin(),
+                  solver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).size(),
                   output(SDQP_SOLVER_DUAL).begin());
     if (!output(SDQP_SOLVER_P).isEmpty())
-        std::copy(sdpsolver_.output(SDP_SOLVER_P).begin(),
-                  sdpsolver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).size(),
+        std::copy(solver_.output(SDP_SOLVER_P).begin(),
+                  solver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).size(),
                   output(SDQP_SOLVER_P).begin());
-    std::copy(sdpsolver_.output(SDP_SOLVER_X).begin(),
-              sdpsolver_.output(SDP_SOLVER_X).begin()+n_,
+    std::copy(solver_.output(SDP_SOLVER_X).begin(),
+              solver_.output(SDP_SOLVER_X).begin()+n_,
               output(SDQP_SOLVER_X).begin());
-    std::copy(sdpsolver_.output(SDP_SOLVER_LAM_A).begin(),
-              sdpsolver_.output(SDP_SOLVER_LAM_A).end(),
+    std::copy(solver_.output(SDP_SOLVER_LAM_A).begin(),
+              solver_.output(SDP_SOLVER_LAM_A).end(),
               output(SDQP_SOLVER_LAM_A).begin());
-    std::copy(sdpsolver_.output(SDP_SOLVER_LAM_X).begin(),
-              sdpsolver_.output(SDP_SOLVER_LAM_X).begin()+n_,
+    std::copy(solver_.output(SDP_SOLVER_LAM_X).begin(),
+              solver_.output(SDP_SOLVER_LAM_X).begin()+n_,
               output(SDQP_SOLVER_LAM_X).begin());
   }
 

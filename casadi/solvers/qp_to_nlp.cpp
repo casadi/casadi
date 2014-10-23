@@ -37,8 +37,7 @@ namespace casadi {
     plugin->creator = QpToNlp::creator;
     plugin->name = "nlp";
     plugin->doc = QpToNlp::meta_doc.c_str();
-    plugin->version = 20;
-    plugin->adaptorLoader = QpToNlp::adaptorLoader;
+    plugin->version = 21;
     return 0;
   }
 
@@ -56,9 +55,7 @@ namespace casadi {
   }
 
   QpToNlp::QpToNlp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
-
     Adaptor::addOptions();
-
   }
 
   QpToNlp::~QpToNlp() {
@@ -102,10 +99,8 @@ namespace casadi {
   }
 
   void QpToNlp::init() {
-
-
+    // Initialize the base classes
     QpSolverInternal::init();
-    Adaptor::init();
 
     // Create a symbolic matrix for the decision variables
     SX X = SX::sym("X", n_, 1);
@@ -126,15 +121,11 @@ namespace casadi {
                              nlpOut("f", mul(G.T(), X) + 0.5*mul(mul(X.T(), H), X),
                                     "g", mul(A, X)));
 
-    // Create an nlpsolver instance
-    solver_ = NlpSolver(Adaptor::targetName(), QP_SOLVER_nlp);
-
+    // Create an NlpSolver instance
+    solver_ = NlpSolver(getOption(solvername()), QP_SOLVER_nlp);
     solver_.setQPOptions();
-    Adaptor::setTargetOptions();
-
-    // Initialize the NLP solver
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
-
   }
 
 } // namespace casadi

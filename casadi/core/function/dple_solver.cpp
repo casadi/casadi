@@ -55,6 +55,10 @@ namespace casadi {
     return dynamic_cast<const DpleInternal*>(ptr)!=0;
   }
 
+  bool DpleSolver::hasPlugin(const std::string& name) {
+    return DpleInternal::hasPlugin(name);
+  }
+
   void DpleSolver::loadPlugin(const std::string& name) {
     DpleInternal::loadPlugin(name);
   }
@@ -67,16 +71,12 @@ namespace casadi {
                const std::vector<Sparsity> & A,
                const std::vector<Sparsity> & V) {
     DpleStructure st = dpleStruct("a", A, "v", V);
-    assignNode(DpleInternal::getPlugin(name).creator(st)->adaptor(name));
+    assignNode(DpleInternal::instantiatePlugin(name, st));
   }
 
   DpleSolver::DpleSolver(const std::string& name,
                          const DpleStructure & st) {
-    assignNode(DpleInternal::getPlugin(name).creator(st)->adaptor(name));
-  }
-
-  std::string DpleSolver::infix() {
-    return DpleInternal::infix_;
+    assignNode(DpleInternal::instantiatePlugin(name, st));
   }
 
 } // namespace casadi

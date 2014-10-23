@@ -55,6 +55,10 @@ namespace casadi {
     return dynamic_cast<const DleInternal*>(ptr)!=0;
   }
 
+  bool DleSolver::hasPlugin(const std::string& name) {
+    return DleInternal::hasPlugin(name);
+  }
+
   void DleSolver::loadPlugin(const std::string& name) {
     DleInternal::loadPlugin(name);
   }
@@ -65,15 +69,11 @@ namespace casadi {
 
   DleSolver::DleSolver(const std::string& name,
                          const DleStructure& st) {
-    assignNode(DleInternal::getPlugin(name).creator(st)->adaptor(name));
+    assignNode(DleInternal::instantiatePlugin(name, st));
   }
 
   Sparsity DleSolver::getSparsity(const DleStructure& st) {
     return DleInternal::getSparsity(st);
-  }
-
-  std::string DleSolver::infix() {
-    return DleInternal::infix_;
   }
 
 } // namespace casadi

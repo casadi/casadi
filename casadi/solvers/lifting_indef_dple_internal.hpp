@@ -27,7 +27,7 @@
 #define CASADI_LIFTING_INDEF_DPLE_INTERNAL_HPP
 
 #include "../core/function/dple_internal.hpp"
-#include "../core/function/dle_solver.hpp"
+#include "../core/function/dle_internal.hpp"
 #include <casadi/solvers/casadi_dplesolver_lifting_export.h>
 
 /** \defgroup plugin_DpleSolver_lifting
@@ -80,7 +80,7 @@ namespace casadi {
 
   */
   class CASADI_DPLESOLVER_LIFTING_EXPORT LiftingIndefDpleInternal : public DpleInternal,
-    public Adaptor<LiftingIndefDpleInternal, DleSolver>,
+    public Adaptor<LiftingIndefDpleInternal, DleInternal>,
     public Wrapper<LiftingIndefDpleInternal> {
   public:
     /** \brief  Constructor
@@ -121,6 +121,9 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// Solve with
+    DleSolver solver_;
 
   private:
 

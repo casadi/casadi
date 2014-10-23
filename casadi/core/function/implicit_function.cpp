@@ -34,7 +34,9 @@ namespace casadi {
   ImplicitFunction::ImplicitFunction(const std::string& name, const Function& f,
                                      const Function& jac,
                                      const LinearSolver& linsol) {
-    assignNode(ImplicitFunctionInternal::getPlugin(name).creator(f, jac, linsol));
+    assignNode(ImplicitFunctionInternal::instantiatePlugin(name, f));
+    setOption("jacobian_function", jac);
+    setOption("linear_solver_function", linsol);
   }
 
   ImplicitFunctionInternal* ImplicitFunction::operator->() {
@@ -62,6 +64,10 @@ namespace casadi {
   LinearSolver& ImplicitFunction::getLinsol() {
     casadi_assert(!isNull());
     return (*this)->linsol_;
+  }
+
+  bool ImplicitFunction::hasPlugin(const std::string& name) {
+    return ImplicitFunctionInternal::hasPlugin(name);
   }
 
   void ImplicitFunction::loadPlugin(const std::string& name) {

@@ -45,8 +45,7 @@ namespace casadi {
     plugin->creator = DpleToLrDple::creator;
     plugin->name = "dple";
     plugin->doc = DpleToLrDple::meta_doc.c_str();
-    plugin->version = 20;
-    plugin->adaptorLoader = DpleToLrDple::adaptorLoader;
+    plugin->version = 21;
     return 0;
   }
 
@@ -72,9 +71,8 @@ namespace casadi {
   }
 
   void DpleToLrDple::init() {
-
+    // Initialize the base classes
     LrDpleInternal::init();
-    Adaptor::init();
 
     MX As = MX::sym("As", input(LR_DPLE_A).sparsity());
     MX Vs = MX::sym("Vs", input(LR_DPLE_V).sparsity());
@@ -101,11 +99,9 @@ namespace casadi {
     }
 
     // Create an dplesolver instance
-    solver_ = DpleSolver(Adaptor::targetName(), dpleStruct("a",
-      A_, "v", Vsp));
-
-    Adaptor::setTargetOptions();
-
+    solver_ = DpleSolver(getOption(solvername()),
+                         dpleStruct("a", A_, "v", Vsp));
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
     std::vector<MX> Pr = solver_.call(dpleIn("a", horzcat(As_), "v", horzcat(V_)));

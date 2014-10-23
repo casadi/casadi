@@ -35,7 +35,7 @@ namespace casadi {
     plugin->creator = RkIntegrator::creator;
     plugin->name = "rk";
     plugin->doc = RkIntegrator::meta_doc.c_str();
-    plugin->version = 20;
+    plugin->version = 21;
     return 0;
   }
 

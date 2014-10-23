@@ -111,6 +111,9 @@ namespace casadi {
     /// Infix
     static const std::string infix_;
 
+    /// Short name
+    static std::string shortname() { return "dle";}
+
     /// Get the resulting sparsity
     static Sparsity getSparsity(const DleStructure& st);
 

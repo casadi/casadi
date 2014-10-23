@@ -39,8 +39,7 @@ namespace casadi {
     plugin->creator = SocpToSdp::creator;
     plugin->name = "sdp";
     plugin->doc = SocpToSdp::meta_doc.c_str();
-    plugin->version = 20;
-    plugin->adaptorLoader = SocpToSdp::adaptorLoader;
+    plugin->version = 21;
     return 0;
   }
 
@@ -58,9 +57,7 @@ namespace casadi {
   }
 
   SocpToSdp::SocpToSdp(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
-
     Adaptor::addOptions();
-
   }
 
   SocpToSdp::~SocpToSdp() {
@@ -97,9 +94,8 @@ namespace casadi {
   }
 
   void SocpToSdp::init() {
-
+    // Initialize the base classes
     SocpSolverInternal::init();
-
 
     /*
      *   || Gi' x + hi ||_2 <=  ei'x + fi
@@ -129,7 +125,6 @@ namespace casadi {
 
     // The blocks that will make up Fi of SDP
     std::vector<MX> Fi;
-
 
     for (int k=0;k<n_;++k) {
 
@@ -173,17 +168,13 @@ namespace casadi {
 
     log("SocpToSdp::init", "Created mapping function");
 
-    // Create an sdpsolver instance
-    solver_ = SdpSolver(Adaptor::targetName(),
-                           sdpStruct("a", input(SOCP_SOLVER_A).sparsity(),
-                                     "f", mapping_.output(0).sparsity(),
-                                     "g", mapping_.output(1).sparsity()));
-
+    // Create an SdpSolver instance
+    solver_ = SdpSolver(getOption(solvername()),
+                        sdpStruct("a", input(SOCP_SOLVER_A).sparsity(),
+                                  "f", mapping_.output(0).sparsity(),
+                                  "g", mapping_.output(1).sparsity()));
     solver_.setSOCPOptions();
-
-    Adaptor::setTargetOptions();
-
-    // Initialize the SDP solver
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
     log("SocpToSdp::init", "Initialized SDP solver");
