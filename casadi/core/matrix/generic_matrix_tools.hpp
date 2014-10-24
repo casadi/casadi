@@ -244,12 +244,12 @@ namespace casadi {
 
   template<typename MatType>
   std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_,
-     const std::vector<int>& output_offset1,
-     const std::vector<int>& output_offset2) {
+    const std::vector<int>& output_offset1,
+    const std::vector<int>& output_offset2) {
     const MatType& x = static_cast<const MatType&>(x_);
     return diagsplitNative(x, output_offset1, output_offset2);
   }
-  
+
   template<typename MatType>
   std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_,
       const std::vector<int>& output_offset) {
