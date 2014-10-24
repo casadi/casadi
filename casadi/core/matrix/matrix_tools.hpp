@@ -198,15 +198,19 @@ namespace casadi {
                                                             int vert_incr = 1,
                                                             int horz_incr = 1);
 
+/// \cond INTERNAL
+#ifndef SWIG
   /** \brief  split diagonally, retaining matrices
   * \param output_offset1 List of all start locations (row) for each matrix
   *      the last matrix will run to the end.
   *   diagcat(diagsplit(x, ...)) = x
   */
   template<typename DataType>
-  std::vector< Matrix<DataType> > diagsplit(const Matrix<DataType>& x,
-                                                   const std::vector<int>& output_offset1,
-                                                   const std::vector<int>& output_offset2);
+  std::vector< Matrix<DataType> > diagsplitNative(const Matrix<DataType>& x,
+                                                  const std::vector<int>& output_offset1,
+                                                  const std::vector<int>& output_offset2);
+#endif // SWIG
+/// \endcond
 
 #ifndef SWIG
   template<typename DataType>
@@ -764,7 +768,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  std::vector< Matrix<DataType> > diagsplit(const Matrix<DataType>& x,
+  std::vector< Matrix<DataType> > diagsplitNative(const Matrix<DataType>& x,
                                                    const std::vector<int>& offset1,
                                                    const std::vector<int>& offset2) {
     // Consistency check

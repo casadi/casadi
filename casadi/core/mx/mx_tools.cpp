@@ -115,7 +115,7 @@ namespace casadi {
     return horzsplit(x, offset2);
   }
 
-  std::vector<MX> diagsplit(const MX& x,
+  std::vector<MX> diagsplitNative(const MX& x,
     const std::vector<int>& offset1, const std::vector<int>& offset2) {
     // Consistency check
     casadi_assert(offset1.size()>=1);

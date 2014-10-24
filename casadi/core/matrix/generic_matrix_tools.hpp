@@ -113,7 +113,20 @@ namespace casadi {
   */
   template<typename MatType>
   std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x,
-                                                   const std::vector<int>& output_offset);
+                                   const std::vector<int>& output_offset);
+
+  /** \brief  split diagonally, retaining square matrices
+  * \param output_offset1 List of all start locations (row) for each group
+  *      the last matrix will run to the end.
+  * \param output_offset2 List of all start locations (row) for each group
+  *      the last matrix will run to the end.
+  *
+  *   diagcat(diagsplit(x, ...)) = x
+  */
+  template<typename MatType>
+  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x,
+                                   const std::vector<int>& output_offset1,
+                                   const std::vector<int>& output_offset2);
 
 #ifndef SWIG
   template<typename MatType>
@@ -229,6 +242,14 @@ namespace casadi {
     return diagsplit(x, offset1, offset2);
   }
 
+  template<typename MatType>
+  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_,
+     const std::vector<int>& output_offset1,
+     const std::vector<int>& output_offset2) {
+    const MatType& x = static_cast<const MatType&>(x_);
+    return diagsplitNative(x, output_offset1, output_offset2);
+  }
+  
   template<typename MatType>
   std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_,
       const std::vector<int>& output_offset) {
