@@ -1157,6 +1157,15 @@ class Functiontests(casadiTestCase):
     H.setInput([0.1])
     H.evaluate()
     
+  def test_simple_scheme_call(self):
+
+    x = SX.sym("x")
+
+    f = SXFunction(daeIn(x=x),[x**2])
+    f.init()
+
+    self.checkarray(f(x=0.3)[0],DMatrix(0.09))
+    
 if __name__ == '__main__':
     unittest.main()
 
