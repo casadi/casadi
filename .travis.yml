@@ -18,5 +18,5 @@ install:
   - sudo make install
 
 script:
-  - cd tests
+  - cd test
   - make unittests_py examples_code_py
