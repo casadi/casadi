@@ -4339,6 +4339,12 @@
 %exception  casadi::deepcopy(const A &a) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::diagsplitNative(const MX &x, const std::vector< int > &output_offset1, const std::vector< int > &output_offset2) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::diagsplitNative(const Matrix< DataType > &x, const std::vector< int > &output_offset1, const std::vector< int > &output_offset2) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::erf(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4607,6 +4613,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::twice(const T &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::veccat(const std::vector< MX > &comp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::vector_slice(const std::vector< T > &v, const std::vector< int > &i) {
