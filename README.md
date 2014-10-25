@@ -1,3 +1,5 @@
+Develop status: [![Build Status](https://travis-ci.org/casadi/casadi.png?branch=develop)](https://travis-ci.org/casadi/casadi) [![Build status](https://ci.appveyor.com/api/projects/status/ysa3763djq9yq0xa?svg=true)](https://ci.appveyor.com/project/jgillis/casadi)
+
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3048371fc8fb8a61361f4536456f535c "githalytics.com")](http://githalytics.com/casadi/casadi)
 <script type="text/javascript">
 
