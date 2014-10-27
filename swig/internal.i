@@ -4615,9 +4615,6 @@
 %exception  casadi::twice(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::veccat(const std::vector< MX > &comp) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::vector_slice(const std::vector< T > &v, const std::vector< int > &i) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
