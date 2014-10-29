@@ -131,7 +131,7 @@ namespace casadi {
                                                    const std::vector<int>& output_offset1,
                                                    const std::vector<int>& output_offset2);
 #endif // SWIG
-/// \endcond INTERNAL
+/// \endcond
 
   /** \brief Concatenate vertically while vectorizing all arguments */
   CASADI_CORE_EXPORT MX veccat(const std::vector<MX>& comp);

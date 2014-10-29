@@ -131,7 +131,7 @@ class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
 
     /** \brief Set a certain option by giving an enum value */
     void setOptionByEnumValue(const std::string &name, int v);
-    /// \endcond INTERNAL
+    /// \endcond
 
     /** \brief Get the default of a certain option */
     GenericType getOptionDefault(const std::string &str) const;

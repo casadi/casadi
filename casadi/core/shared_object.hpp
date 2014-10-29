@@ -167,7 +167,7 @@ namespace casadi {
      *  and point to this new object
      */
     void makeUnique(bool clone_members=true);
-    /// \endcond SWIGINTERNAL
+    /// \endcond
     /// \cond INTERNAL
 #ifndef SWIG
     void makeUnique(std::map<SharedObjectNode*, SharedObject>& already_copied,
