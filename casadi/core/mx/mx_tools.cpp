@@ -35,28 +35,50 @@ using namespace std;
 namespace casadi {
 
   // Helper function
-  bool has_empty(const vector<MX>& x) {
+  bool has_empty(const vector<MX>& x, bool both=false) {
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (i->isEmpty()) return true;
+      if (i->isEmpty(both)) return true;
     }
     return false;
   }
 
-  vector<MX> trim_empty(const vector<MX>& x) {
+  vector<MX> trim_empty(const vector<MX>& x, bool both=false) {
     vector<MX> ret;
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (!i->isEmpty()) ret.push_back(*i);
+      if (!i->isEmpty(both)) ret.push_back(*i);
     }
     return ret;
   }
 
   MX horzcat(const vector<MX>& x) {
+    // Check dimensions
+    if (x.size()>1) {
+      vector<MX> ne = trim_empty(x, true);
+      for (int i=0;i<ne.size();i++) {
+        casadi_assert_message(ne[i].size1()==ne[0].size1(),
+                      "horzcat dimension mismatch  " <<
+                      "x[" << i << "]:" << ne[i].dimString() <<
+                      " and x[0]: " << ne[0].dimString() << ".");
+      }
+    }
+
     if (x.empty()) {
       return MX();
     } else if (x.size()==1) {
       return x.front();
     } else if (has_empty(x)) {
-      return horzcat(trim_empty(x));
+      std::vector<MX> ret = trim_empty(x);
+      if (ret.empty()) {
+        // We still want horzcat(zeros(0,5),zeros(0,5)) -> zeros(0,10)
+        ret = trim_empty(x, true);
+        int s = 0;
+        for (int i=0;i<ret.size();++i) {
+          s+= ret[i].size2();
+        }
+        return MX::zeros(0, s);
+      } else {
+        return horzcat(ret);
+      }
     } else {
       return x.front()->getHorzcat(x);
     }
@@ -68,19 +90,54 @@ namespace casadi {
     } else if (x.size()==1) {
       return x.front();
     } else if (has_empty(x)) {
-      return diagcat(trim_empty(x));
+      std::vector<MX> ret = trim_empty(x);
+      if (ret.empty()) {
+        // We still want diagcat(zeros(5,0),zeros(5,0)) -> zeros(10,0)
+        ret = trim_empty(x, true);
+        int s1 = 0;
+        int s2 = 0;
+        for (int i=0;i<ret.size();++i) {
+          s1+= ret[i].size1();
+          s2+= ret[i].size2();
+        }
+        return MX::zeros(s1, s2);
+      } else {
+        return diagcat(ret);
+      }
     } else {
       return x.front()->getDiagcat(x);
     }
   }
 
   MX vertcat(const vector<MX>& x) {
+    // Check dimensions
+    if (x.size()>1) {
+      vector<MX> ne = trim_empty(x, true);
+      for (int i=0;i<ne.size();i++) {
+        casadi_assert_message(ne[i].size2()==ne[0].size2(),
+                      "vertcat dimension mismatch  " <<
+                      "x[" << i << "]:" << ne[i].dimString() <<
+                      " and x[0]: " << ne[0].dimString() << ".");
+      }
+    }
+
     if (x.empty()) {
       return MX();
     } else if (x.size()==1) {
       return x.front();
     } else if (has_empty(x)) {
-      return vertcat(trim_empty(x));
+      std::vector<MX> ret = trim_empty(x);
+      if (ret.empty()) {
+        // We still want vertcat(zeros(5,0),zeros(5,0)) -> zeros(10,0)
+        ret = trim_empty(x, true);
+        int s = 0;
+        for (int i=0;i<ret.size();++i) {
+          s+= ret[i].size1();
+        }
+        return MX::zeros(s, 0);
+      } else {
+        return vertcat(ret);
+      }
     } else if (!x.front().isVector()) {
       // Vertcat operation only supports vectors, rewrite using horzcat
       vector<MX> xT = x;

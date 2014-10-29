@@ -2731,6 +2731,63 @@ class MXtests(casadiTestCase):
     
     self.assertTrue(z.size()==0)
     
+  def test_singularcat(self):
+
+    for c in [MX,SX,DMatrix]:
+      x0 = c.zeros(10,0)
+      
+      x1s = vertsplit(x0, [0,5,10])
+      
+      for x in x1s:
+        self.checkarray(x.shape,(5,0))
+
+
+      x2 = vertcat(x1s)
+      self.checkarray(x2.shape,(10,0))
+      
+      x2 = vertcat([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
+      self.checkarray(x2.shape,(10,0))
+        
+    for c in [MX,SX,DMatrix]:
+      x0 = c.zeros(0,10)
+      
+      x1s = horzsplit(x0, [0,5,10])
+      
+      for x in x1s:
+        self.checkarray(x.shape,(0,5))
+
+      x2 = horzcat(x1s)
+      self.checkarray(x2.shape,(0,10))
+      
+      x2 = horzcat([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
+      self.checkarray(x2.shape,(0,10))
+ 
+    for c in [MX,SX,DMatrix]:
+      x0 = c.zeros(10,0)
+      
+      x1s = vertsplit(x0, [0,5,10])
+
+      x0 = c.zeros(0,10)      
+      x1st = horzsplit(x0, [0,5,10])
+      
+      x2 = blkdiag(x1s)
+      self.checkarray(x2.shape,(10,0))
+      
+      x2 = blkdiag([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
+      self.checkarray(x2.shape,(10,0))
+
+      x2 = blkdiag(x1st)
+      self.checkarray(x2.shape,(0,10))
+      
+      x2 = blkdiag([c.zeros(0,0)] + x1st + [c.zeros(0,0)])
+      self.checkarray(x2.shape,(0,10))
+      
+      x2 = blkdiag(x1s+x1st)
+      self.checkarray(x2.shape,(10,10))
+      
+      x2 = blkdiag([c.zeros(0,0)] + x1s+x1st + [c.zeros(0,0)])
+      self.checkarray(x2.shape,(10,10))
+      
       
 if __name__ == '__main__':
     unittest.main()
