@@ -370,6 +370,18 @@ P[:,"y","x"] = 3
 
 print P0
 
+#! Finally, we present the 'product' helper construct
+controls = struct(["u","v"])
+
+J0 = DMatrix.zeros(states.size,controls.size)
+
+J = states.product(controls,J0)
+
+J[:,"u"] = 3
+J[["x","z"],:] = 2
+
+print J()
+
 #! Saving and loading
 #! -------------------
 

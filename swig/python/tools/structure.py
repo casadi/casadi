@@ -437,10 +437,11 @@ class Dispatcher:
   def callableOuter(self,payload,canonicalIndex,extraIndex=None,entry=None,inner=None):
     return inner
     
+
 #Mixins
 class CasadiStructureDerivable:
-
-  def __call__(self,arg=0):
+  
+  def argtype(self,arg):
     mtype = None
     if isinstance(arg,DMatrix):
       a = arg
@@ -473,7 +474,12 @@ class CasadiStructureDerivable:
           mtype = SX
         except:
           raise Exception("Call to Structure has weird argument: expecting DMatrix-like or MX-like or SXMatrix-like")
-          
+    
+    return (a,mtype)
+
+  def __call__(self,arg=0):
+    (a,mtype) = self.argtype(arg)
+
     if isinstance(a,DMatrix):
       if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
         a = DMatrix.ones(self.size,1)*a
@@ -486,51 +492,61 @@ class CasadiStructureDerivable:
       return SXStruct(self,data=a)
     
   def repeated(self,arg=0):
-    if isinstance(arg,DMatrix):
-      a = arg
-    else:
-      try:
-        a = DMatrix(arg)
-      except:
-        raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
+    (a,mtype) = self.argtype(arg)
+
     if not(a.shape[0] == self.size):
        raise Exception("Expecting %d x n DMatrix. Got %s" % (self.size,a.dimString()))  
     s = struct([entry("t",struct=self,repeat=a.shape[1])])
-    numbers = DMatrixStruct(s,data=DataReferenceRepeated(a,a.shape[1]))
+
+    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+      if isinstance(a,t):
+        numbers = c(s,data=DataReferenceRepeated(a,a.shape[1]))
+   
     p = numbers.prefix["t"]
     p.castmaster = True
     return p  
     
   def squared(self,arg=0):
-    if isinstance(arg,DMatrix):
-      a = arg
-    else:
-      try:
-        a = DMatrix(arg)
-      except:
-        raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
+    (a,mtype) = self.argtype(arg)
+
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
        a = DMatrix.ones(self.size,self.size)*a
     if not(a.shape[1] == a.shape[0] and a.shape[0]==self.size):
        raise Exception("Expecting square DMatrix of size %s. Got %s" % (self.size,a.dimString()))
     s = struct([entry("t",shapestruct=(self,self))])
-    numbers = DMatrixStruct(s,data=DataReferenceSquared(a,a.shape[0]))
+    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+      if isinstance(a,t):
+        numbers = c(s,data=DataReferenceSquared(a,a.shape[0]))
+    p = numbers.prefix["t"]
+    p.castmaster = True
+    return p  
+    
+  def product(self,otherstruct,arg=0):
+    (a,mtype) = self.argtype(arg)
+
+    if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
+       a = DMatrix.ones(self.size,otherstruct.size)*a
+    if not(a.shape[1]==otherstruct.size and a.shape[0]==self.size):
+       raise Exception("Expecting DMatrix of shape (%s,%s). Got %s" % (self.size,otherstruct.size,a.dimString()))
+    s = struct([entry("t",shapestruct=(self,otherstruct))])
+    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+      if isinstance(a,t):
+        numbers = c(s,data=DataReferenceProduct(a,a.shape[0],a.shape[1]))
     p = numbers.prefix["t"]
     p.castmaster = True
     return p  
 
   def squared_repeated(self,arg=0):
-    if isinstance(arg,DMatrix):
-      a = arg
-    else:
-      try:
-        a = DMatrix(arg)
-      except:
-        raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
+    (a,mtype) = self.argtype(arg)
+
     if not(a.shape[0]==self.size and a.shape[1] % self.size == 0):
        raise Exception("Expecting square (%d) DMatrix by N. Got %s" % (self.size,a.dimString()))
     s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[1] / self.size)])
-    numbers = DMatrixStruct(s,data=DataReferenceSquaredRepeated(a,self.size,a.shape[1] / self.size))
+
+    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+      if isinstance(a,t):
+        numbers = c(s,data=DataReferenceSquaredRepeated(a,self.size,a.shape[1] / self.size))
+
     p = numbers.prefix["t"]
     p.castmaster = True
     return p  
@@ -924,6 +940,10 @@ class VertsplitStructure:
   def buildMap(self,struct=None,parentIndex = (),parent=None):
     if struct is None:  struct = self.struct
     if parent is None:  parent = self.master
+
+    if isinstance(parent,DataReference):
+      parent = parent.a
+
     ks  = []
     its = []
     sps = []
@@ -1335,6 +1355,7 @@ class DataReference:
     
   def dimString(self):
     return self.v.dimString()
+
   
 class DataReferenceRepeated(DataReference):
   def __init__(self,a,n):
@@ -1367,6 +1388,30 @@ class DataReferenceSquared(DataReference):
   def shape(self):
     return (self.n*self.n,1)
     
+class DataReferenceProduct(DataReference):
+  def __init__(self,a,n,m):
+    assert(a.isDense())
+    self.a = a
+    self.v = a
+    self.n = n
+    self.m = m
+    
+  def __setitem__(self,a,b):
+    self.a.__NZsetitem__(a,b)
+
+  def __getitem__(self,a):
+    return self.a.__NZgetitem__(a)
+
+  @property
+  def shape(self):
+    return (self.n*self.m,1)
+
+  def size1(self):
+    return self.n
+
+  def size2(self):
+    return self.m
+
 class DataReferenceSquaredRepeated(DataReference):
   def __init__(self,a,n,N):
     assert(a.isDense())

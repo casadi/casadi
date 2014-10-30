@@ -768,6 +768,33 @@ class Toolstests(casadiTestCase):
     b = DMatrix(v["A"])
     
     self.checkarray(a,b)
+
+  def test_jacobian(self):
+    states = struct_symSX(["x","y"])
+    controls = struct_symSX(["u","v","w"])
+
+    #   u v w
+    # x 1 3 5
+    # y 2 4 6
+
+    for t,F in [(SX,SXFunction), (MX,MXFunction)]:
+
+
+      J = t.sym("J",states.size,controls.size)
+
+      J = states.product(controls,J)
+
+      f = F([J],[J["x","v"], J["x",:] , J["y",["v","w"]],  J[:,"u"] ])
+      f.init()
+      f.setInput(range(1,7))
+
+      f.evaluate()
+
+      self.checkarray(f.output(0),DMatrix([3]))
+      self.checkarray(f.output(1),DMatrix([1,3,5]).T)
+      self.checkarray(f.output(2),DMatrix([4,6]).T)
+      self.checkarray(f.output(3),DMatrix([1,2]))
+
     
 if __name__ == '__main__':
     unittest.main()
