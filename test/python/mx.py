@@ -2787,7 +2787,21 @@ class MXtests(casadiTestCase):
       
       x2 = blkdiag([c.zeros(0,0)] + x1s+x1st + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,10))
+  def test_empty_symm_jac(self):
+
+    x = MX.sym("x",2)
+
+    g = MXFunction([x],[MX.sparse(1,1)])
+    g.init()
+
+    h = g.jacobian(0,0,False,True)
       
-      
+    x = MX.sym("x",2)
+
+    g = MXFunction([x],[MX.zeros(1,1)])
+    g.init()
+
+    h = g.jacobian(0,0,False,True)
+
 if __name__ == '__main__':
     unittest.main()
