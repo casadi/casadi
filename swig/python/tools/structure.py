@@ -1236,12 +1236,16 @@ class CasadiStructEntry(StructEntry):
           
       p,r = getPrimitive(self.expr)
       
-      self.repeat = r
-      
-      if hasattr(p,"sparsity"):
-        self.sparsity = p.sparsity()
+      if p is None:
+        self.repeat = [0]
+        self.sparsity = Sparsity.dense(0,0)
       else:
-        raise Exception("The 'expr' argument must be a matrix expression or nested list of matrix expressions. Got %s instead." % str(p))
+        self.repeat = r
+      
+        if hasattr(p,"sparsity"):
+          self.sparsity = p.sparsity()
+        else:
+          raise Exception("The 'expr' argument must be a matrix expression or nested list of matrix expressions. Got %s instead." % str(p))
         
     self.type = None
     #     class   argument
