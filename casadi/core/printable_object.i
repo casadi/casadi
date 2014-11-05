@@ -21,8 +21,12 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_PRINTABLE_OBJECT_I
+#define CASADI_PRINTABLE_OBJECT_I
 
-%include "casadi/core/std_vector_tools.i"
-%include "casadi/core/weak_ref.i"
-%include "casadi/core/options_functionality.i"
-%include "casadi/core/casadi_calculus.i"
+%{
+#include <casadi/core/printable_object.hpp>
+%}
+%include <casadi/core/printable_object.hpp>
+
+#endif // CASADI_PRINTABLE_OBJECT_I

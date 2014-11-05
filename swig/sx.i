@@ -24,7 +24,6 @@
 
 
 %{
-#include "casadi/core/matrix/sparsity.hpp"
 #include "casadi/core/matrix/slice.hpp"
 #include "casadi/core/matrix/generic_expression.hpp"
 #include "casadi/core/matrix/generic_matrix.hpp"
@@ -40,7 +39,7 @@
 %include "typemaps.i"
 #endif
 
-%include "casadi/core/matrix/sparsity.hpp"
+%include "casadi/core/matrix/sparsity.i"
 
 %template(PrintSlice)        casadi::PrintableObject<casadi::Slice>;
 %include "casadi/core/matrix/slice.hpp"

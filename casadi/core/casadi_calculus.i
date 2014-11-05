@@ -21,8 +21,12 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_CALCULUS_I
+#define CASADI_CALCULUS_I
 
-%include "casadi/core/std_vector_tools.i"
-%include "casadi/core/weak_ref.i"
-%include "casadi/core/options_functionality.i"
-%include "casadi/core/casadi_calculus.i"
+%{
+#include <casadi/core/casadi_calculus.hpp>
+%}
+%include <casadi/core/casadi_calculus.hpp>
+
+#endif // CASADI_CALCULUS_I

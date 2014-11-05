@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_CASADI_CALCULUS_HPP
-#define CASADI_CASADI_CALCULUS_HPP
+#ifndef CASADI_CALCULUS_HPP
+#define CASADI_CALCULUS_HPP
 
 #include <iostream>
 #include <string>
@@ -992,4 +992,4 @@ namespace casadi {
 
 /// \endcond
 
-#endif // CASADI_CASADI_CALCULUS_HPP
+#endif // CASADI_CALCULUS_HPP
