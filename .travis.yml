@@ -1,22 +1,28 @@
-language: cpp
-os:
-  - linux
-  - osx
-compiler:
-  - gcc
-  - clang
-python:
-  - "2.7_with_system_site_packages"
+env: 
+  global: 
+    secure: KvMG4VORV7Ja09shvmsMpiaRMoWqupR76dKxOd7W28I//F4YDIn5ZZefM4aoXsmRgs4G9YqloU8JjVpHutZARmKn2drUwHVMA+96iKb9eDODwZaKXgFYsrQIX5c/OgO8ZpsXynD2daqH3bMK8Mjz1+4fjbFToPFXHggxqQuHm1U=
+compiler: 
+- gcc
+- clang
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y gcc g++ gfortran git cmake liblapack-dev swig ipython python-dev python-numpy python-scipy python-matplotlib
-install:
-  - mkdir build
-  - cd build
-  - cmake ..
-  - make
-  - sudo make install
-
-script:
-  - cd ../test
-  - make unittests_py examples_code_py
+- git clone https://github.com/casadi/testbot.git
+- openssl aes-256-cbc -k "$keypass" -in testbot/id_rsa_travis.enc -out id_rsa_travis -d
+- ssh-add id_rsa_travis
+- git clone git@github.com:jgillis/restricted.git
+- sudo apt-get update -qq
+- sudo apt-get install -y gcc g++ gfortran git cmake liblapack-dev swig ipython python-dev python-numpy python-scipy python-matplotlib
+install: 
+- mkdir build
+- cd build
+- cmake ..
+- make
+- sudo make install
+python: 
+- 2.7_with_system_site_packages
+script: 
+- cd ../test
+- make unittests_py examples_code_py
+os: 
+- linux
+- osx
+language: cpp
