@@ -481,7 +481,7 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if isinstance(a,DMatrix):
-      if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
+      if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
         a = DMatrix.ones(self.size,1)*a
       return DMatrixStruct(self,data=a)
       
@@ -509,7 +509,7 @@ class CasadiStructureDerivable:
   def squared(self,arg=0):
     (a,mtype) = self.argtype(arg)
 
-    if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
+    if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
        a = DMatrix.ones(self.size,self.size)*a
     if not(a.shape[1] == a.shape[0] and a.shape[0]==self.size):
        raise Exception("Expecting square DMatrix of size %s. Got %s" % (self.size,a.dimString()))
@@ -524,7 +524,7 @@ class CasadiStructureDerivable:
   def product(self,otherstruct,arg=0):
     (a,mtype) = self.argtype(arg)
 
-    if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
+    if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
        a = DMatrix.ones(self.size,otherstruct.size)*a
     if not(a.shape[1]==otherstruct.size and a.shape[0]==self.size):
        raise Exception("Expecting DMatrix of shape (%s,%s). Got %s" % (self.size,otherstruct.size,a.dimString()))
