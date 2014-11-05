@@ -30,11 +30,28 @@
 
 %include "casadi/core/function/schemes_metadata.hpp"
 
-//  init hooks
-%include "casadi_runtime.i"
+// Init hooks
+#ifdef SWIGPYTHON
+#ifdef WITH_PYTHON_INTERRUPTS
+%{
+#include <pythonrun.h>
+void SigIntHandler(int) {
+  std::cerr << "Keyboard Interrupt" << std::endl;
+  signal(SIGINT, SIG_DFL);
+  kill(getpid(), SIGINT);
+}
+%}
 
-// Auxilliary casadi functions:  printing for std::vector, printable_object, shared_object, casadi_types, generic_type, options_functionality
-%include "casadi_aux.i"
+%init %{
+PyOS_setsig(SIGINT, SigIntHandler);
+%}
+#endif // WITH_PYTHON_INTERRUPTS
+#endif // SWIGPYTHON
+
+%include "casadi/core/std_vector_tools.i"
+%include "casadi/core/weak_ref.i"
+%include "casadi/core/options_functionality.i"
+%include "casadi/core/casadi_calculus.i"
 
 // SX, Matrix, MX
 %include "casadi_primitive.i"

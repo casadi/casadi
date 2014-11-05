@@ -644,55 +644,8 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 %include "commontypemaps.i"
 
 %{
-#include "casadi/core/matrix/matrix.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/matrix/sparsity_tools.hpp"
-	 
-// Scalar expressions 
-#include "casadi/core/sx/sx_element.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
-#include "casadi/core/function/sx_function.hpp"
-	 
-// Matrix expressions 
-#include "casadi/core/mx/mx.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
-
-#include "casadi/core/function/mx_function.hpp"
-
-#include "casadi/core/function/mx_function.hpp"
-#include "casadi/core/function/custom_function.hpp"
-#include "casadi/core/function/simulator.hpp"
-#include "casadi/core/function/parallelizer.hpp"
-#include "casadi/core/function/external_function.hpp"
-
-#include "casadi/core/function/io_interface.hpp"
-#include "casadi/core/function/function.hpp"
-#include "casadi/core/function/sx_function.hpp"
-#include "casadi/core/function/mx_function.hpp"
-#include "casadi/core/function/linear_solver.hpp"
-#include "casadi/core/function/implicit_function.hpp"
-#include "casadi/core/function/integrator.hpp"
-#include "casadi/core/function/simulator.hpp"
-#include "casadi/core/function/control_simulator.hpp"
-#include "casadi/core/function/nlp_solver.hpp"
-#include "casadi/core/function/homotopy_nlp_solver.hpp"
-#include "casadi/core/function/qp_solver.hpp"
-#include "casadi/core/function/stabilized_qp_solver.hpp"
-#include "casadi/core/function/lp_solver.hpp"
-#include "casadi/core/function/sdp_solver.hpp"
-#include "casadi/core/function/socp_solver.hpp"
-#include "casadi/core/function/qcqp_solver.hpp"
-#include "casadi/core/function/sdqp_solver.hpp"
-#include "casadi/core/function/external_function.hpp"
-#include "casadi/core/function/parallelizer.hpp"
-#include "casadi/core/function/custom_function.hpp"
-#include "casadi/core/function/nullspace.hpp"
-#include "casadi/core/function/lr_dle_solver.hpp"
-#include "casadi/core/function/lr_dple_solver.hpp"
-#include "casadi/core/functor.hpp"
-
+#include <casadi/casadi.hpp>
 using namespace casadi;
-
 %}
 
 #ifdef CASADI_MODULE
