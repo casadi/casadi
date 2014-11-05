@@ -53,8 +53,10 @@ PyOS_setsig(SIGINT, SigIntHandler);
 %include "casadi/core/options_functionality.i"
 %include "casadi/core/casadi_calculus.i"
 
-// SX, Matrix, MX
-%include "casadi_primitive.i"
+
+%include "matrix.i"
+%include "sx.i"
+%include "mx.i"
 
 // tools for SX, matrix, MX
 %include "casadi_primitive_tools.i"
