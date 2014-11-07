@@ -283,9 +283,6 @@ class NZproxy:
 %include <casadi/core/weak_ref.i>
 %include <casadi/core/options_functionality.i>
 %include <casadi/core/casadi_calculus.i>
-
-%include "matrix.i"
-
 %include <casadi/core/matrix/sparsity.i>
 %include <casadi/core/matrix/slice.i>
 %include <casadi/core/matrix/generic_expression.i>
