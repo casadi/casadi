@@ -23,234 +23,6 @@
  */
 
 
-
-#ifdef SWIGMATLAB
-%rename(plus) __add__;
-%rename(minus) __sub__;
-%rename(uminus) operator-;
-%rename(uplus) operator+;
-%rename(times) __mul__;
-%rename(mtimes) mul;
-%rename(rdivide) __div__;
-%rename(ldivide) __rdiv__;
-%rename(mrdivide) __mrdivide__;
-%rename(mldivide) __mldivide__;
-%rename(power) __pow__;
-%rename(mpower) __mpower__;
-%rename(lt) __lt__;
-%rename(gt) __gt__;
-%rename(le) __le__;
-%rename(ge) __ge__;
-%rename(ne) __ne__;
-%rename(eq) __eq__;
-//%rename(and) logic_and;
-//%rename(or) logic_or;
-//%rename(not) logic_not;
-%rename(trans) transpose;
-
-
-// Workarounds, pending proper fix
-%rename(truediv) __truediv__;
-%rename(nonzero) __nonzero__;
-%rename(constpow) __constpow__;
-%rename(copysign) __copysign__;
-%rename(rpow) __rpow__;
-%rename(radd) __radd__;
-%rename(rsub) __rsub__;
-%rename(rmul) __rmul__;
-%rename(rtruediv) __rtruediv__;
-%rename(rmldivide) __rmldivide__;
-%rename(rmrdivide) __rmrdivide__;
-%rename(rmpower) __rmpower__;
-%rename(rconstpow) __rconstpow__;
-%rename(rge) __rge__;
-%rename(rgt) __rgt__;
-%rename(rle) __rle__;
-%rename(rlt) __rlt__;
-%rename(req) __req__;
-%rename(rne) __rne__;
-%rename(rfmin) __rfmin__;
-%rename(rfmax) __rfmax__;
-%rename(rarctan2) __rarctan2__;
-%rename(rcopysign) __rcopysign__;
-%rename(hash) __hash__;
-#endif // SWIGMATLAB
-
-%{
-#include "casadi/core/matrix/sparsity.hpp"
-#include "casadi/core/matrix/matrix.hpp"
-#include <sstream>
-#include "casadi/core/casadi_exception.hpp"
-
-// to allow for typechecking
-#include "casadi/core/sx/sx_element.hpp"
-
-// to typecheck for MX
-#include "casadi/core/mx/mx.hpp"
-// to have prod available
-#include "casadi/core/mx/mx_tools.hpp"
-%}
-
-#ifdef SWIGPYTHON
-%pythoncode %{
-def prod(self,*args):
-    raise Exception("'prod' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
-def dot(self,*args):
-    raise Exception("'dot' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
-    
-class NZproxy:
-  def __init__(self,matrix):
-    self.matrix = matrix
-    
-  def __getitem__(self,s):
-    return self.matrix.__NZgetitem__(s)
-
-  def __setitem__(self,s,val):
-    return self.matrix.__NZsetitem__(s,val)
-
-  def __len__(self):
-    return self.matrix.size()
-    
-  def __iter__(self):
-    for k in range(len(self)):
-      yield self[k]
-%}
-
-%define %matrix_convertors
-%pythoncode %{
-        
-    def toMatrix(self):
-        import numpy as n
-        return n.matrix(self.toArray())
-
-    def __iter__(self):
-      for k in self.nz:
-        yield k
-        
-%}
-%enddef 
-%define %matrix_helpers(Type)
-%pythoncode %{
-    @property
-    def shape(self):
-        return (self.size1(),self.size2())
-        
-    def reshape(self,arg):
-        return _casadi_core.reshape(self,arg)
-        
-    @property
-    def T(self):
-        return _casadi_core.transpose(self)
-        
-    def __getitem__(self,s):
-        if isinstance(s,tuple) and len(s)==2:
-          return self.__Cgetitem__(s[0],s[1])  
-        return self.__Cgetitem__(s)
-
-    def __setitem__(self,s,val):
-        if isinstance(s,tuple) and len(s)==2:
-          return self.__Csetitem__(s[0],s[1],val)  
-        return self.__Csetitem__(s,val)
-        
-    @property
-    def nz(self):
-      return NZproxy(self)
-        
-    def prod(self,*args):
-        raise Exception("'prod' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
-     
-%}
-%enddef 
-    
-%define %python_array_wrappers(arraypriority)
-%pythoncode %{
-
-  __array_priority__ = arraypriority
-
-  def __array_wrap__(self,out_arr,context=None):
-    if context is None:
-      return out_arr
-    name = context[0].__name__
-    args = list(context[1])
-    
-    if len(context[1])==3:
-      raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b' where 'a' is a numpy type. This is not supported, and cannot be supported without changing numpy." % name)
-
-    if "vectorized" in name:
-        name = name[:-len(" (vectorized)")]
-    
-    conversion = {"multiply": "mul", "divide": "div", "true_divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt"}
-    if name in conversion:
-      name = conversion[name]
-    if len(context[1])==2 and context[1][1] is self and not(context[1][0] is self):
-      name = 'r' + name
-      args.reverse()
-    if not(hasattr(self,name)) or ('mul' in name):
-      name = '__' + name + '__'
-    fun=getattr(self, name)
-    return fun(*args[1:])
-     
-     
-  def __array__(self,*args,**kwargs):
-    import numpy as n
-    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc) and isinstance(args[1][0],n.ufunc) and len(args[1])>1 and args[1][0].nin==len(args[1][1]):
-      if len(args[1][1])==3:
-        raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b'. This is not supported when 'a' is a numpy type, and cannot be supported without changing numpy itself. Either upgrade a to a CasADi type first, or use 'a = a + b'. " % args[1][0].__name__)
-      return n.array([n.nan])
-    else:
-      if hasattr(self,'__array_custom__'):
-        return self.__array_custom__(*args,**kwargs)
-      else:
-        return self.toArray()
-      
-%}
-%enddef
-#endif // SWIGPYTHON
-
-#ifdef SWIGXML
-%define %matrix_helpers(Type)
-%enddef
-#endif
-
-#ifdef SWIGMATLAB
-%define %matrix_helpers(Type)
-%enddef
-#endif
-
-#ifndef SWIGPYTHON
-%define %matrix_convertors
-%enddef
-#endif
-
-#ifdef SWIGPYTHON
-%rename(__Cgetitem__) indexed_zero_based;
-%rename(__Cgetitem__) indexed;
-%rename(__Csetitem__) indexed_zero_based_assignment;
-%rename(__Csetitem__) indexed_assignment;
-%rename(__NZgetitem__) nz_indexed_zero_based;
-%rename(__NZgetitem__) nz_indexed;
-%rename(__NZsetitem__) nz_indexed_zero_based_assignment;
-%rename(__NZsetitem__) nz_indexed_assignment;
-#endif
-
-
-namespace casadi{
-  %extend Matrix<double> {
-
-    void assign(const casadi::Matrix<double>&rhs) { (*$self)=rhs; }
-    %matrix_convertors
-    %matrix_helpers(casadi::Matrix<double>)
-
-  }
-  %extend Matrix<int> {
-
-    void assign(const casadi::Matrix<int>&rhs) { (*$self)=rhs; }
-    %matrix_convertors
-    %matrix_helpers(casadi::Matrix<int>)
-
-  }
-}
-
 #ifdef SWIGPYTHON
 namespace casadi{
 %extend Matrix<double> {
@@ -396,21 +168,6 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 
 
 // Logic for pickling
-%extend Sparsity {
-
-  %pythoncode %{
-    def __setstate__(self, state):
-        if state:
-          self.__init__(state["nrow"],state["ncol"],state["colind"],state["row"])
-        else:
-          self.__init__()
-
-    def __getstate__(self):
-        if self.isNull(): return {}
-        return {"nrow": self.size1(), "ncol": self.size2(), "colind": numpy.array(self.colind(),dtype=int), "row": numpy.array(self.row(),dtype=int)}
-  %}
-  
-}
 
 %extend Matrix<int> {
 
@@ -422,8 +179,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 
     def __getstate__(self):
         return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data(),dtype=int)}
-  %}
-  
+  %} 
 }
 
 %extend Matrix<double> {
@@ -444,13 +200,9 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 } // namespace casadi
 #endif // SWIGPYTHON
 
-  
-
-
 namespace casadi{
 
 %{
-
 #ifndef SWIGXML
 
 /// casadi::Slice

@@ -26,9 +26,26 @@
 
 %include <casadi/core/shared_object.i>
 
-%{
-#include <casadi/core/matrix/sparsity.hpp>
-%}
 %include <casadi/core/matrix/sparsity.hpp>
+
+// Logic for pickling
+#ifdef SWIGPYTHON
+namespace casadi{
+%extend Sparsity {
+  %pythoncode %{
+    def __setstate__(self, state):
+        if state:
+          self.__init__(state["nrow"],state["ncol"],state["colind"],state["row"])
+        else:
+          self.__init__()
+
+    def __getstate__(self):
+        if self.isNull(): return {}
+        return {"nrow": self.size1(), "ncol": self.size2(), "colind": numpy.array(self.colind(),dtype=int), "row": numpy.array(self.row(),dtype=int)}
+  %}  
+}
+
+} // namespace casadi
+#endif // SWIGPYTHON
 
 #endif // CASADI_SPARSITY_I

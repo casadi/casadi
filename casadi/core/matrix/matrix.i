@@ -40,4 +40,21 @@
    %template(DMatrix) Matrix<int>;
 };
 
+namespace casadi{
+  %extend Matrix<double> {
+
+    void assign(const casadi::Matrix<double>&rhs) { (*$self)=rhs; }
+    %matrix_convertors
+    %matrix_helpers(casadi::Matrix<double>)
+
+  }
+  %extend Matrix<int> {
+
+    void assign(const casadi::Matrix<int>&rhs) { (*$self)=rhs; }
+    %matrix_convertors
+    %matrix_helpers(casadi::Matrix<int>)
+
+  }
+}
+
 #endif // CASADI_MATRIX_I
