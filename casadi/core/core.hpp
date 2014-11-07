@@ -34,6 +34,9 @@
 #include "matrix/generic_matrix_tools.hpp"
 #include "matrix/generic_expression_tools.hpp"
 #include "std_vector_tools.hpp"
+#include "functor.hpp"
+#include "casadi_options.hpp"
+#include "casadi_meta.hpp"
 
 // Matrices
 #include "matrix/matrix.hpp"
@@ -70,8 +73,15 @@
 #include "function/nullspace.hpp"
 #include "function/lr_dle_solver.hpp"
 #include "function/lr_dple_solver.hpp"
+#include "function/dple_solver.hpp"
+#include "function/cle_solver.hpp"
+#include "function/dle_solver.hpp"
 
 // Misc 
-#include "functor.hpp"
+#include "misc/integration_tools.hpp"
+#include "misc/symbolic_nlp.hpp"
+#include "misc/variable.hpp"
+#include "misc/symbolic_ocp.hpp"
+#include "misc/xml_file.hpp"
 
 #endif // CASADI_CORE_HPP
