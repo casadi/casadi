@@ -286,28 +286,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#ifdef SWIG
-
-// map the template name to the instantiated name
-#define GMTT_INST(MatType, function_name) \
-%template(function_name) casadi::function_name< MatType >;
-
-// Define template instantiations
-#define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType) \
-GMTT_INST(MatType, cross) \
-GMTT_INST(MatType, quad_form) \
-GMTT_INST(MatType, sum_square) \
-GMTT_INST(MatType, tril2symm) \
-GMTT_INST(MatType, triu2symm) \
-GMTT_INST(MatType, triu) \
-GMTT_INST(MatType, tril) \
-GMTT_INST(MatType, isEqual) \
-GMTT_INST(MatType, diagsplit)
-
-// Define template instantiations
-#define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(MatType) \
-GMTT_INST(MatType, linspace)
-
-#endif //SWIG
-
 #endif // CASADI_GENERIC_MATRIX_TOOLS_HPP

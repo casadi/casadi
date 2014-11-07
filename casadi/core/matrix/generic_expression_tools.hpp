@@ -47,18 +47,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#ifdef SWIG
-
-// map the template name to the instantiated name
-#define GET_INST(DataType, function_name) \
-%template(function_name) casadi::function_name< DataType >;
-
-// Define template instantiations
-#define GENERIC_EXPRESSION_TOOLS_TEMPLATES(DataType) \
-GET_INST(DataType, logic_and) \
-GET_INST(DataType, logic_or) \
-GET_INST(DataType, logic_not) \
-
-#endif //SWIG
-
 #endif // CASADI_GENERIC_EXPRESSION_TOOLS_HPP

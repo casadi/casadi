@@ -26,6 +26,16 @@
 
 %include <casadi/core/matrix/generic_expression_tools.hpp>
 
+// map the template name to the instantiated name
+#define GET_INST(DataType, function_name) \
+%template(function_name) casadi::function_name< DataType >;
+
+// Define template instantiations
+#define GENERIC_EXPRESSION_TOOLS_TEMPLATES(DataType) \
+GET_INST(DataType, logic_and) \
+GET_INST(DataType, logic_or) \
+GET_INST(DataType, logic_not) \
+
 GENERIC_EXPRESSION_TOOLS_TEMPLATES(int)
 GENERIC_EXPRESSION_TOOLS_TEMPLATES(double)
 GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::Matrix<int>)
