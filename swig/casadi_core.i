@@ -53,6 +53,41 @@ PyOS_setsig(SIGINT, SigIntHandler);
 %include "casadi/core/options_functionality.i"
 %include "casadi/core/casadi_calculus.i"
 
+#ifdef SWIGPYTHON
+%pythoncode%{
+try:
+  from numpy import pi, inf
+except:
+  pass
+
+try:
+  from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmod, fmin, fmax, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, fabs, sign, arctanh, arcsinh, arccosh, copysign
+except:
+  sin = lambda x: x.sin()
+  cos = lambda x: x.cos()
+  tan = lambda x: x.tan()
+  arcsin = lambda x: x.arcsin()
+  arccos = lambda x: x.arccos()
+  arctan = lambda x: x.arctan()
+  sqrt = lambda x: x.sqrt()
+  log = lambda x: x.log()
+  exp = lambda x: x.exp()
+  floor = lambda x: x.floor()
+  ceil = lambda x: x.ceil()
+  fmin = lambda x,y: x.fmin(y)
+  fmax = lambda x,y: x.fmax(y)
+  sinh = lambda x: x.sinh()
+  cosh = lambda x: x.cosh()
+  tanh = lambda x: x.tanh()
+  fabs = lambda x: x.fabs()
+  sign = lambda x: x.sign()
+  arctan2 = lambda x,y: x.arctan2(y)
+  arctanh = lambda x: x.arctanh()
+  arcsinh = lambda x: x.arcsinh()
+  arccosh = lambda x: x.arccosh()
+  copysign = lambda x,y: x.copysign(y)
+%}
+#endif // SWIGPYTHON
 
 %include "matrix.i"
 
@@ -69,8 +104,12 @@ PyOS_setsig(SIGINT, SigIntHandler);
 
 %include "mx.i"
 
-// tools for SX, matrix, MX
-%include "casadi_primitive_tools.i"
+%include <casadi/core/matrix/matrix_tools.i>
+%include <casadi/core/matrix/generic_matrix_tools.i>
+%include <casadi/core/matrix/generic_expression_tools.i>
+%include <casadi/core/matrix/sparsity_tools.i>
+%include <casadi/core/sx/sx_tools.i>
+%include <casadi/core/mx/mx_tools.i>
 
 // Function
 %include "casadi_function.i"
