@@ -21,30 +21,27 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_GENERIC_EXPRESSION_TOOLS_I
+#define CASADI_GENERIC_EXPRESSION_TOOLS_I
 
+%include <casadi/core/matrix/generic_expression_tools.hpp>
 
-#ifndef CASADI_GENERIC_EXPRESSION_TOOLS_HPP
-#define CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+// map the template name to the instantiated name
+#define GET_INST(DataType, function_name) \
+%template(function_name) casadi::function_name< DataType >;
 
-#include "../casadi_math.hpp"
+// Define template instantiations
+#define GENERIC_EXPRESSION_TOOLS_TEMPLATES(DataType) \
+GET_INST(DataType, logic_and) \
+GET_INST(DataType, logic_or) \
+GET_INST(DataType, logic_not) \
 
-namespace casadi {
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(int)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(double)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::Matrix<int>)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::Matrix<double>)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::Matrix<casadi::SXElement>)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::MX)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(casadi::SXElement)
 
-  /** \brief  Logical `and`, returns (an expression evaluating to) 1 if both
-   *          expressions are nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_and(const DataType& x, const DataType& y) { return x && y; }
-
-  /** \brief  Logical `or`, returns (an expression evaluating to) 1 if at
-   *          least one expression is nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_or(const DataType& x, const DataType& y) { return x || y; }
-
-  /** \brief  Logical `not`, returns (an expression evaluating to) 1 if
-   *          expression is zero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_not(const DataType &x) { return !x; }
-
-} // namespace casadi
-
-#endif // CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+#endif // CASADI_GENERIC_EXPRESSION_TOOLS_I

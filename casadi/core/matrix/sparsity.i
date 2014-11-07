@@ -21,30 +21,31 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_SPARSITY_I
+#define CASADI_SPARSITY_I
 
+%include <casadi/core/shared_object.i>
 
-#ifndef CASADI_GENERIC_EXPRESSION_TOOLS_HPP
-#define CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+%include <casadi/core/matrix/sparsity.hpp>
 
-#include "../casadi_math.hpp"
+// Logic for pickling
+#ifdef SWIGPYTHON
+namespace casadi{
+%extend Sparsity {
+  %pythoncode %{
+    def __setstate__(self, state):
+        if state:
+          self.__init__(state["nrow"],state["ncol"],state["colind"],state["row"])
+        else:
+          self.__init__()
 
-namespace casadi {
-
-  /** \brief  Logical `and`, returns (an expression evaluating to) 1 if both
-   *          expressions are nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_and(const DataType& x, const DataType& y) { return x && y; }
-
-  /** \brief  Logical `or`, returns (an expression evaluating to) 1 if at
-   *          least one expression is nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_or(const DataType& x, const DataType& y) { return x || y; }
-
-  /** \brief  Logical `not`, returns (an expression evaluating to) 1 if
-   *          expression is zero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_not(const DataType &x) { return !x; }
+    def __getstate__(self):
+        if self.isNull(): return {}
+        return {"nrow": self.size1(), "ncol": self.size2(), "colind": numpy.array(self.colind(),dtype=int), "row": numpy.array(self.row(),dtype=int)}
+  %}  
+}
 
 } // namespace casadi
+#endif // SWIGPYTHON
 
-#endif // CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+#endif // CASADI_SPARSITY_I

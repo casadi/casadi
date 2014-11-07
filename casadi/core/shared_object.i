@@ -21,30 +21,11 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_SHARED_OBJECT_I
+#define CASADI_SHARED_OBJECT_I
 
+%include <casadi/core/printable_object.i>
 
-#ifndef CASADI_GENERIC_EXPRESSION_TOOLS_HPP
-#define CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+%include <casadi/core/shared_object.hpp>
 
-#include "../casadi_math.hpp"
-
-namespace casadi {
-
-  /** \brief  Logical `and`, returns (an expression evaluating to) 1 if both
-   *          expressions are nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_and(const DataType& x, const DataType& y) { return x && y; }
-
-  /** \brief  Logical `or`, returns (an expression evaluating to) 1 if at
-   *          least one expression is nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_or(const DataType& x, const DataType& y) { return x || y; }
-
-  /** \brief  Logical `not`, returns (an expression evaluating to) 1 if
-   *          expression is zero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_not(const DataType &x) { return !x; }
-
-} // namespace casadi
-
-#endif // CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+#endif // CASADI_SHARED_OBJECT_I

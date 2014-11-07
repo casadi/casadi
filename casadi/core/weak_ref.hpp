@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_CASADI_WEAK_REF_HPP
-#define CASADI_CASADI_WEAK_REF_HPP
+#ifndef CASADI_WEAK_REF_HPP
+#define CASADI_WEAK_REF_HPP
 
 #include "shared_object.hpp"
 
@@ -94,4 +94,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // CASADI_CASADI_WEAK_REF_HPP
+#endif // CASADI_WEAK_REF_HPP

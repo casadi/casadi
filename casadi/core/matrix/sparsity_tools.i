@@ -21,13 +21,11 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_SPARSITY_TOOLS_I
+#define CASADI_SPARSITY_TOOLS_I
 
+%include <casadi/core/matrix/sparsity.i>
 
-// Matrix typemaps class
-%include "matrix.i"
+%include <casadi/core/matrix/sparsity_tools.hpp>
 
-// SXElement class
-%include "sx.i"
-
-// MX class
-%include "mx.i"
+#endif // CASADI_SPARSITY_TOOLS_I

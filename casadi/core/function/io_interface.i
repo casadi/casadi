@@ -21,30 +21,22 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_IO_INTERFACE_I
+#define CASADI_IO_INTERFACE_I
 
+%include <casadi/core/sx/sx_element.i>
+ //%include <casadi/core/mx/mx.i>
+%include <casadi/core/options_functionality.i>
+%include <casadi/core/function/io_scheme.i>
 
-#ifndef CASADI_GENERIC_EXPRESSION_TOOLS_HPP
-#define CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+%include <casadi/core/function/io_interface.hpp>
 
-#include "../casadi_math.hpp"
+%template(IOInterfaceFunction) casadi::IOInterface<casadi::Function>;
 
-namespace casadi {
+%extend casadi::IOInterface<casadi::Function> {
+  casadi::Matrix<double> getInput(int iind=0) const             { static_cast<const casadi::Function*>($self)->assertInit(); return $self->input(iind);}
+  casadi::Matrix<double> getInput(const std::string &iname) const             { return $self->input($self->inputSchemeEntry(iname)); }
+  casadi::Matrix<double> getOutput(int oind=0) const            { static_cast<const casadi::Function*>($self)->assertInit(); return $self->output(oind);}
+}
 
-  /** \brief  Logical `and`, returns (an expression evaluating to) 1 if both
-   *          expressions are nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_and(const DataType& x, const DataType& y) { return x && y; }
-
-  /** \brief  Logical `or`, returns (an expression evaluating to) 1 if at
-   *          least one expression is nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_or(const DataType& x, const DataType& y) { return x || y; }
-
-  /** \brief  Logical `not`, returns (an expression evaluating to) 1 if
-   *          expression is zero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_not(const DataType &x) { return !x; }
-
-} // namespace casadi
-
-#endif // CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+#endif // CASADI_IO_INTERFACE_I

@@ -34,6 +34,9 @@
 #include "matrix/generic_matrix_tools.hpp"
 #include "matrix/generic_expression_tools.hpp"
 #include "std_vector_tools.hpp"
+#include "functor.hpp"
+#include "casadi_options.hpp"
+#include "casadi_meta.hpp"
 
 // Matrices
 #include "matrix/matrix.hpp"
@@ -47,16 +50,38 @@
 #include "mx/mx.hpp"
 #include "mx/mx_tools.hpp"
 
-// Misc functions
+// Functions
 #include "function/sx_function.hpp"
 #include "function/mx_function.hpp"
 #include "function/external_function.hpp"
-
-// Misc solvers
 #include "function/linear_solver.hpp"
 #include "function/nlp_solver.hpp"
 #include "function/integrator.hpp"
 #include "function/implicit_function.hpp"
+#include "function/custom_function.hpp"
+#include "function/simulator.hpp"
+#include "function/parallelizer.hpp"
+#include "function/control_simulator.hpp"
+#include "function/qp_solver.hpp"
+#include "function/homotopy_nlp_solver.hpp"
+#include "function/stabilized_qp_solver.hpp"
+#include "function/lp_solver.hpp"
+#include "function/sdp_solver.hpp"
+#include "function/socp_solver.hpp"
+#include "function/qcqp_solver.hpp"
+#include "function/sdqp_solver.hpp"
+#include "function/nullspace.hpp"
+#include "function/lr_dle_solver.hpp"
+#include "function/lr_dple_solver.hpp"
+#include "function/dple_solver.hpp"
+#include "function/cle_solver.hpp"
+#include "function/dle_solver.hpp"
 
+// Misc
+#include "misc/integration_tools.hpp"
+#include "misc/symbolic_nlp.hpp"
+#include "misc/variable.hpp"
+#include "misc/symbolic_ocp.hpp"
+#include "misc/xml_file.hpp"
 
 #endif // CASADI_CORE_HPP

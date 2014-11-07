@@ -21,23 +21,18 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_STD_VECTOR_TOOLS_I
+#define CASADI_STD_VECTOR_TOOLS_I
 
+%include <casadi/core/shared_object.i>
 
 %{
-#include <sstream>
-#include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/printable_object.hpp"
-#include "casadi/core/shared_object.hpp"
-#include "casadi/core/weak_ref.hpp"
-#include "casadi/core/generic_type.hpp"
-#include "casadi/core/options_functionality.hpp"
-#include "casadi/core/casadi_calculus.hpp"
+#include <casadi/core/std_vector_tools.hpp>
 %}
+%include <casadi/core/std_vector_tools.hpp>
 
-%include "casadi/core/std_vector_tools.hpp"
 VECTOR_TOOLS_TEMPLATES(int)
 VECTOR_TOOLS_TEMPLATES(double)
-
 %define VECTOR_REPR(type)
 %extend std::vector< type >{
   std::string SWIG_REPR(){ return casadi::getRepresentation(*$self); }
@@ -48,24 +43,5 @@ VECTOR_TOOLS_TEMPLATES(double)
 #ifdef SWIGPYTHON
 %rename(SWIG_STR) getDescription;
 #endif // SWIGPYTHON
-%include "casadi/core/printable_object.hpp"
 
-%template(PrintSharedObject)           casadi::PrintableObject<casadi::SharedObject>;
-%include "casadi/core/shared_object.hpp"
-%include "casadi/core/weak_ref.hpp"
-%include "casadi/core/casadi_types.hpp"
-%include "casadi/core/generic_type.hpp"
-%include "casadi/core/options_functionality.hpp"
-%include "casadi/core/casadi_calculus.hpp"
-
-namespace casadi {
-  %extend OptionsFunctionality {
-    void setOption(const std::string &name, const std::string& val){$self->setOption(name,val);} 
-    void setOption(const std::string &name, const std::vector<int>& val){$self->setOption(name,val);} 
-    void setOption(const std::string &name, const std::vector<double>& val){$self->setOption(name,val);} 
-    void setOption(const std::string &name, double val){$self->setOption(name,val);}
-    void setOption(const std::string &name, int val){$self->setOption(name,val);} 
-    void setOption(const std::string &name, bool val){$self->setOption(name,val);}  
-  }
-} // namespace casadi
-
+#endif // CASADI_STD_VECTOR_TOOLS_I

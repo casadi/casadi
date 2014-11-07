@@ -21,30 +21,26 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_OPTIONS_FUNCTIONALITY_I
+#define CASADI_OPTIONS_FUNCTIONALITY_I
 
+%include <casadi/core/generic_type.i>
+%include <casadi/core/shared_object.i>
 
-#ifndef CASADI_GENERIC_EXPRESSION_TOOLS_HPP
-#define CASADI_GENERIC_EXPRESSION_TOOLS_HPP
-
-#include "../casadi_math.hpp"
+%{
+#include <casadi/core/options_functionality.hpp>
+%}
+%include <casadi/core/options_functionality.hpp>
 
 namespace casadi {
-
-  /** \brief  Logical `and`, returns (an expression evaluating to) 1 if both
-   *          expressions are nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_and(const DataType& x, const DataType& y) { return x && y; }
-
-  /** \brief  Logical `or`, returns (an expression evaluating to) 1 if at
-   *          least one expression is nonzero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_or(const DataType& x, const DataType& y) { return x || y; }
-
-  /** \brief  Logical `not`, returns (an expression evaluating to) 1 if
-   *          expression is zero and 0 otherwise */
-  template<typename DataType>
-  DataType logic_not(const DataType &x) { return !x; }
-
+  %extend OptionsFunctionality {
+    void setOption(const std::string &name, const std::string& val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, const std::vector<int>& val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, const std::vector<double>& val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, double val){$self->setOption(name,val);}
+    void setOption(const std::string &name, int val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, bool val){$self->setOption(name,val);}  
+  }
 } // namespace casadi
 
-#endif // CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+#endif // CASADI_OPTIONS_FUNCTIONALITY_I

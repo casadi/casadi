@@ -21,40 +21,13 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_SX_TOOLS_I
+#define CASADI_SX_TOOLS_I
 
+%include <casadi/core/sx/sx_element.i>
+%include <casadi/core/matrix/matrix_tools.i>
+%include <casadi/core/matrix/generic_matrix_tools.i>
 
-%{
-#include "casadi/core/mx/mx.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
-%}
+%include <casadi/core/sx/sx_tools.hpp>
 
-%include "casadi/core/mx/mx.hpp"
-
-%extend casadi::MX{
-  
-  %matrix_helpers(casadi::MX)
-  
-  #ifdef SWIGPYTHON
-  %python_array_wrappers(1002.0)
-  
-  %pythoncode %{
-  def __array_custom__(self,*args,**kwargs):
-    import numpy as np
-    if np.__version__=="1.8.1": #1083
-      return np.array(np.nan)
-    raise Exception("MX cannot be converted to an array. MX.__array__ purely exists to allow ufunc/numpy goodies")
-    
-  def __iter__(self):
-    return self.nz.__iter__()
-    
-  %}
-  #endif //SWIGPYTHON
-  
-  binopsrFull(casadi::MX)
-};
-
-
-
-VECTOR_REPR(casadi::MX)
-VECTOR_REPR(std::vector<casadi::MX>)
-
+#endif // CASADI_SX_TOOLS_I
