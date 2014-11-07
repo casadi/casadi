@@ -32,5 +32,10 @@
 %template(PrintDMatrix)      casadi::PrintableObject<casadi::Matrix<double> >;
 %template(PrintSXElement)    casadi::PrintableObject<casadi::SXElement>;
 //%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
+%template(PrintIOSchemeVectorMX)     casadi::PrintableObject<casadi::IOSchemeVector< casadi::MX> >;
+%template(PrintIOSchemeVectorSX)     casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> > >;
+%template(PrintIOSchemeVectorD)      casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<double> > >;
+%template(PrintIOSchemeVectorSparsity)        casadi::PrintableObject<casadi::IOSchemeVector< casadi::Sparsity> >;
+%template(PrintIOSchemeVectorSparsityVector)  casadi::PrintableObject<casadi::IOSchemeVector< std::vector< casadi::Sparsity> > >;
 
 #endif // CASADI_PRINTABLE_OBJECT_I
