@@ -32,6 +32,10 @@
 %template(PrintDMatrix)      casadi::PrintableObject<casadi::Matrix<double> >;
 %template(PrintSXElement)    casadi::PrintableObject<casadi::SXElement>;
 //%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
+%template(PrintSymbolicNLP)     casadi::PrintableObject<casadi::SymbolicNLP>;
+%template(PrintVariable)        casadi::PrintableObject<casadi::Variable>;
+%template(PrintSymbolicOCP)     casadi::PrintableObject<casadi::SymbolicOCP>;
+
 %template(PrintIOSchemeVectorMX)     casadi::PrintableObject<casadi::IOSchemeVector< casadi::MX> >;
 %template(PrintIOSchemeVectorSX)     casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> > >;
 %template(PrintIOSchemeVectorD)      casadi::PrintableObject<casadi::IOSchemeVector< casadi::Matrix<double> > >;
