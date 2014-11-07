@@ -63,10 +63,10 @@ PyOS_setsig(SIGINT, SigIntHandler);
 %include <casadi/core/matrix/sparsity.i>
 %include <casadi/core/matrix/slice.i>
 %include <casadi/core/matrix/generic_expression.i>
- //%include <casadi/core/matrix/generic_matrix.i>
- //%include <casadi/core/matrix/matrix.i>
+%include <casadi/core/matrix/generic_matrix.i>
+%include <casadi/core/matrix/matrix.i>
+%include <casadi/core/sx/sx_element.i>
 
-%include "sx.i"
 %include "mx.i"
 
 // tools for SX, matrix, MX

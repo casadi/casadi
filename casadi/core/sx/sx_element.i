@@ -21,37 +21,10 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_SX_ELEMENT_I
+#define CASADI_SX_ELEMENT_I
 
-%{
-#include "casadi/core/matrix/generic_expression.hpp"
-#include "casadi/core/matrix/generic_matrix.hpp"
-#include "casadi/core/matrix/matrix.hpp"
-#include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/sx/sx_element.hpp"
-#include "casadi/core/sx/sx_tools.hpp"
-#include "casadi/core/mx/mx.hpp"
-%}
-
-%include "casadi/core/matrix/generic_matrix.hpp"
-
-%template(GenIMatrix)        casadi::GenericMatrix<casadi::Matrix<int> >;
-%template(GenDMatrix)        casadi::GenericMatrix<casadi::Matrix<double> >;
-%template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElement> >;
-%template(GenMX)             casadi::GenericMatrix<casadi::MX>;
-%template(PrintIMatrix)      casadi::PrintableObject<casadi::Matrix<int> >;
-%template(PrintDMatrix)      casadi::PrintableObject<casadi::Matrix<double> >;
-%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
-%include "casadi/core/matrix/matrix.hpp"
-
-%template(IMatrix)           casadi::Matrix<int>;
-%template(DMatrix)           casadi::Matrix<double>;
-
-%extend casadi::Matrix<double> {
-   %template(DMatrix) Matrix<int>;
-};
-
-%template(PrintSXElement)    casadi::PrintableObject<casadi::SXElement>;
-%include "casadi/core/sx/sx_element.hpp"
+%include <casadi/core/sx/sx_element.hpp>
 
 #ifndef SWIGMATLAB
 %extend SXElement {
@@ -237,3 +210,4 @@ namespace casadi {
    %template(SX) Matrix<double>;
 };
 
+#endif // CASADI_SX_ELEMENT_I

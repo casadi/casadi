@@ -28,6 +28,9 @@
 %include <casadi/core/matrix/generic_matrix.i>
 %include <casadi/core/matrix/generic_expression.i>
 
+// FIXME: Placing in printable_object.i does not work
+%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
+
 %include <casadi/core/matrix/matrix.hpp>
 
 %template(IMatrix)           casadi::Matrix<int>;

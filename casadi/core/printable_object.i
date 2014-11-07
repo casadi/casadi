@@ -30,5 +30,7 @@
 %template(PrintSlice)        casadi::PrintableObject<casadi::Slice>;
 %template(PrintIMatrix)      casadi::PrintableObject<casadi::Matrix<int> >;
 %template(PrintDMatrix)      casadi::PrintableObject<casadi::Matrix<double> >;
+%template(PrintSXElement)    casadi::PrintableObject<casadi::SXElement>;
+//%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
 
 #endif // CASADI_PRINTABLE_OBJECT_I
