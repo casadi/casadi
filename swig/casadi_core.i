@@ -55,6 +55,17 @@ PyOS_setsig(SIGINT, SigIntHandler);
 
 
 %include "matrix.i"
+
+#ifndef SWIGXML
+%include "typemaps.i"
+#endif
+
+%include <casadi/core/matrix/sparsity.i>
+%include <casadi/core/matrix/slice.i>
+%include <casadi/core/matrix/generic_expression.i>
+ //%include <casadi/core/matrix/generic_matrix.i>
+ //%include <casadi/core/matrix/matrix.i>
+
 %include "sx.i"
 %include "mx.i"
 

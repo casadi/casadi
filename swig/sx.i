@@ -22,9 +22,7 @@
  *
  */
 
-
 %{
-#include "casadi/core/matrix/slice.hpp"
 #include "casadi/core/matrix/generic_expression.hpp"
 #include "casadi/core/matrix/generic_matrix.hpp"
 #include "casadi/core/matrix/matrix.hpp"
@@ -32,25 +30,8 @@
 #include "casadi/core/sx/sx_element.hpp"
 #include "casadi/core/sx/sx_tools.hpp"
 #include "casadi/core/mx/mx.hpp"
-
 %}
 
-#ifndef SWIGXML
-%include "typemaps.i"
-#endif
-
-%include "casadi/core/matrix/sparsity.i"
-
-%template(PrintSlice)        casadi::PrintableObject<casadi::Slice>;
-%include "casadi/core/matrix/slice.hpp"
-
-%include "casadi/core/matrix/generic_expression.hpp"
-
-%template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
-%template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
-%template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElement> >;
-%template(ExpMX)             casadi::GenericExpression<casadi::MX>;
-%template(ExpSXElement)      casadi::GenericExpression<casadi::SXElement>;
 %include "casadi/core/matrix/generic_matrix.hpp"
 
 %template(GenIMatrix)        casadi::GenericMatrix<casadi::Matrix<int> >;

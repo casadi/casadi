@@ -24,9 +24,11 @@
 #ifndef CASADI_PRINTABLE_OBJECT_I
 #define CASADI_PRINTABLE_OBJECT_I
 
-%{
-#include <casadi/core/printable_object.hpp>
-%}
 %include <casadi/core/printable_object.hpp>
+
+%template(PrintSharedObject) casadi::PrintableObject<casadi::SharedObject>;
+%template(PrintSlice)        casadi::PrintableObject<casadi::Slice>;
+%template(PrintIMatrix)      casadi::PrintableObject<casadi::Matrix<int> >;
+%template(PrintDMatrix)      casadi::PrintableObject<casadi::Matrix<double> >;
 
 #endif // CASADI_PRINTABLE_OBJECT_I

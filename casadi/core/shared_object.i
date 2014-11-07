@@ -26,10 +26,6 @@
 
 %include <casadi/core/printable_object.i>
 
-%{
-#include <casadi/core/shared_object.hpp>
-%}
-%template(PrintSharedObject) casadi::PrintableObject<casadi::SharedObject>;
 %include <casadi/core/shared_object.hpp>
 
 #endif // CASADI_SHARED_OBJECT_I
