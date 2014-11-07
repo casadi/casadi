@@ -77,7 +77,7 @@
 #include "function/cle_solver.hpp"
 #include "function/dle_solver.hpp"
 
-// Misc 
+// Misc
 #include "misc/integration_tools.hpp"
 #include "misc/symbolic_nlp.hpp"
 #include "misc/variable.hpp"
