@@ -289,9 +289,7 @@ class NZproxy:
 %include <casadi/core/matrix/generic_matrix.i>
 %include <casadi/core/matrix/matrix.i>
 %include <casadi/core/sx/sx_element.i>
-
-%include "mx.i"
-
+%include <casadi/core/mx/mx.i>
 %include <casadi/core/matrix/matrix_tools.i>
 %include <casadi/core/matrix/generic_matrix_tools.i>
 %include <casadi/core/matrix/generic_expression_tools.i>

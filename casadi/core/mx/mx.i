@@ -21,14 +21,14 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_MX_I
+#define CASADI_MX_I
 
+%include <casadi/core/shared_object.i>
+%include <casadi/core/matrix/matrix.i>
+%include <casadi/core/matrix/generic_expression.i>
 
-%{
-#include "casadi/core/mx/mx.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
-%}
-
-%include "casadi/core/mx/mx.hpp"
+%include <casadi/core/mx/mx.hpp>
 
 %extend casadi::MX{
   
@@ -53,8 +53,7 @@
   binopsrFull(casadi::MX)
 };
 
-
-
 VECTOR_REPR(casadi::MX)
 VECTOR_REPR(std::vector<casadi::MX>)
 
+#endif // CASADI_MX_I
