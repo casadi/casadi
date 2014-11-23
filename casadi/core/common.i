@@ -635,13 +635,13 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 //%fragment(SWIG_Traits_frag(casadi::Dictionary));
 
 // typemaphelpers
-%include "typemaphelpers.i"
+%include <casadi/core/typemaphelpers.i>
 
 // typemap meta implementations
 %include <casadi/core/meta.i>
 
 // common typemaps
-%include "commontypemaps.i"
+%include <casadi/core/commontypemaps.i>
 
 %{
 #include <casadi/casadi.hpp>

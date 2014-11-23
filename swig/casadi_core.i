@@ -25,9 +25,7 @@
 
 %module(package="casadi") casadi_core
 
-//  The things needed to make each casadi_*.i  compilable by itself: typemaps
-%include "common.i"
-
+%include <casadi/core/common.i>
 %include <casadi/core/function/schemes_metadata.hpp>
 
 // Init hooks

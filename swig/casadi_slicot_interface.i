@@ -25,15 +25,15 @@
 
 %module(package="casadi") casadi_slicot_interface
 
-%include "common.i"
+%include <casadi/core/common.i>
 
 %import "casadi_core.i"
 
 #define CASADI_SLICOT_INTERFACE_EXPORT
 
 %{
-#include "casadi/core/function/dple_solver.hpp"
-#include "casadi/interfaces/slicot/slicot_tools.hpp"
+#include <casadi/core/function/dple_solver.hpp>
+#include <casadi/interfaces/slicot/slicot_tools.hpp>
 %}
 
-%include "casadi/interfaces/slicot/slicot_tools.hpp"
+%include <casadi/interfaces/slicot/slicot_tools.hpp>
