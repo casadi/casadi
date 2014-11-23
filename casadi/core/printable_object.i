@@ -26,6 +26,10 @@
 
 %include <casadi/core/printable_object.hpp>
 
+#ifdef SWIGPYTHON
+%rename(SWIG_STR) getDescription;
+#endif // SWIGPYTHON
+
 %template(PrintSharedObject) casadi::PrintableObject<casadi::SharedObject>;
 %template(PrintSlice)        casadi::PrintableObject<casadi::Slice>;
 %template(PrintIMatrix)      casadi::PrintableObject<casadi::Matrix<int> >;

@@ -40,8 +40,4 @@ VECTOR_TOOLS_TEMPLATES(double)
 };
 %enddef
 
-#ifdef SWIGPYTHON
-%rename(SWIG_STR) getDescription;
-#endif // SWIGPYTHON
-
 #endif // CASADI_STD_VECTOR_TOOLS_I
