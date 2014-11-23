@@ -7,8 +7,3 @@ casadi_plugin(NlpSolver knitro
   knitro_interface_meta.cpp)
 
 casadi_plugin_link_libraries(NlpSolver knitro ${KNITRO_LIBRARIES})
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/knitro
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

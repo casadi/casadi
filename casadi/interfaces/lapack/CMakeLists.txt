@@ -15,8 +15,3 @@ casadi_plugin(LinearSolver lapackqr
   lapack_qr_dense_meta.cpp
   )
 casadi_plugin_link_libraries(LinearSolver lapackqr ${LAPACK_LIBRARIES})
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/lapack
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

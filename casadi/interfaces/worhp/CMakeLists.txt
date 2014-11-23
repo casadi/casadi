@@ -9,11 +9,6 @@ casadi_plugin(NlpSolver worhp
   worhp_interface_meta.cpp)
 casadi_plugin_link_libraries(NlpSolver worhp ${WORHP_LIBRARIES})
 
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/worhp
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)
-
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 set_target_properties(casadi_nlpsolver_worhp PROPERTIES COMPILE_FLAGS "-Wno-unused-function")
 endif()

@@ -137,8 +137,3 @@ if(WITH_CSPARSE)
   casadi_plugin(SdqpSolver sdp
     sdqp_to_sdp.cpp sdqp_to_sdp.hpp sdqp_to_sdp_meta.cpp)
 endif()
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/solvers
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

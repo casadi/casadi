@@ -8,11 +8,6 @@ casadi_plugin(QpSolver qpoases
 
 casadi_plugin_link_libraries(QpSolver qpoases ${QPOASES_LIBRARIES})
 
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/qpoases
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)
-
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 set_target_properties(casadi_qpsolver_qpoases PROPERTIES COMPILE_FLAGS "-Wno-overloaded-virtual")
 endif()

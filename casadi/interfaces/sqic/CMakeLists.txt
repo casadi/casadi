@@ -32,8 +32,3 @@ target_link_libraries(sqic_fortran_c_bridge ${SQIC_LIBRARIES})
 install(TARGETS sqic_fortran_c_bridge
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/sqic
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

@@ -13,8 +13,3 @@ casadi_plugin(LinearSolver csparsecholesky
   csparse_cholesky_internal_meta.cpp
   )
 casadi_plugin_link_libraries(LinearSolver csparsecholesky ${CSPARSE_LIBRARIES})
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/csparse
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

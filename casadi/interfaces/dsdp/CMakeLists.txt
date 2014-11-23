@@ -7,8 +7,3 @@ casadi_plugin(SdpSolver dsdp
   dsdp_interface_meta.cpp)
 
 casadi_plugin_link_libraries(SdpSolver dsdp ${DSDP_LIBRARIES})
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/dsdp
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

@@ -23,8 +23,3 @@ if(WITH_SNOPT_FORCE_DUMMY)
 else()
   casadi_plugin_link_libraries(NlpSolver snopt ${SNOPT_LIBRARIES})
 endif()
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/snopt
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

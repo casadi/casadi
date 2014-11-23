@@ -31,9 +31,3 @@ casadi_plugin(ImplicitFunction kinsol
    kinsol_interface_meta.cpp
    )
 casadi_plugin_link_libraries(ImplicitFunction kinsol  ${SUNDIALS_LIBRARIES})
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/sundials
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)
-

@@ -9,10 +9,3 @@ casadi_plugin(QpSolver ooqp
   ooqp_interface_meta.cpp)
 
 casadi_plugin_link_libraries(QpSolver ooqp ${OOQP_LIBRARIES})
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/ooqp
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)
-
-
