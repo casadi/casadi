@@ -117,11 +117,11 @@ namespace casadi {
     // Static functions exposed
     struct Exposed {
       void (*periodic_shur)(const std::vector< Matrix<double> > & A,
-			    std::vector< Matrix<double> > & T,
-			    std::vector< Matrix<double> > & Z,
-			    std::vector<double> &eig_real,
-			    std::vector<double> &eig_imag,
-			    double num_zero);
+                            std::vector< Matrix<double> > & T,
+                            std::vector< Matrix<double> > & Z,
+                            std::vector<double> &eig_real,
+                            std::vector<double> &eig_imag,
+                            double num_zero);
 
       // Constructor
       Exposed() { periodic_shur = 0; }

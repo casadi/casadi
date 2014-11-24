@@ -147,12 +147,12 @@ namespace casadi {
      *
      */
     static void periodic_schur(const std::string& name,
-			       const std::vector< Matrix<double> > & A,
-			       std::vector< Matrix<double> > & SWIG_OUTPUT(T),
-			       std::vector< Matrix<double> > & SWIG_OUTPUT(Z),
-			       std::vector<double> &SWIG_OUTPUT(eig_real),
-			       std::vector<double> &SWIG_OUTPUT(eig_imag),
-			       double num_zero=0);
+                               const std::vector< Matrix<double> > & A,
+                               std::vector< Matrix<double> > & SWIG_OUTPUT(T),
+                               std::vector< Matrix<double> > & SWIG_OUTPUT(Z),
+                               std::vector<double> &SWIG_OUTPUT(eig_real),
+                               std::vector<double> &SWIG_OUTPUT(eig_imag),
+                               double num_zero=0);
   };
 
 } // namespace casadi
