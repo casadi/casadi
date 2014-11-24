@@ -667,13 +667,13 @@ class ControlTests(casadiTestCase):
           for a,v,x,xp in zip(A_,V_,X,sigma(X)):
             self.checkarray(xp,mul([a,x,a.T])+v,digits=2 if "condensing" in str(Solver) else 7)
           
-  @requires("slicot_periodic_schur")
+  @requiresPlugin(DpleSolver,"slicot")
   def test_slicot_periodic_schur(self):
     for K in ([1,2,3,4,5] if args.run_slow and not args.ignore_memory_heavy else [1,2,3]):
       for n in ([2,3,4,8,16,32] if args.run_slow and not args.ignore_memory_heavy else [2,3,4]):
         numpy.random.seed(1)
         A = [DMatrix(numpy.random.random((n,n))) for i in range(K)]
-        T,Z,er,ec = slicot_periodic_schur(A)
+        T,Z,er,ec = DpleSolver.periodic_schur('slicot',A)
         def sigma(a):
           return a[1:] + [a[0]]
               

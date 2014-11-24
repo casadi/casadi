@@ -129,6 +129,30 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
+
+    /** \brief Obtain Periodic Schur Form of a set of matrices
+     *
+     *  Finds Z_i such that
+     \verbatim
+     Z_1' * A_1 * Z_2 = T_1,
+     Z_2' * A_2 * Z_3 = T_2,
+     ...
+     Z_K' * A_K * Z_1 = T_K,
+     \endverbatim
+     *
+     *  with T_1 in Hessenberg form (upper triangular + one band below 
+     *  the diagonal) and T_2..T_K  upper diagonal
+     *
+     *  with <tt>Z_k Z_k' = eye(n) = Z_k' Z_k</tt>
+     *
+     */
+    static void periodic_schur(const std::string& name,
+			       const std::vector< Matrix<double> > & A,
+			       std::vector< Matrix<double> > & SWIG_OUTPUT(T),
+			       std::vector< Matrix<double> > & SWIG_OUTPUT(Z),
+			       std::vector<double> &SWIG_OUTPUT(eig_real),
+			       std::vector<double> &SWIG_OUTPUT(eig_imag),
+			       double num_zero=0);
   };
 
 } // namespace casadi

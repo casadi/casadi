@@ -114,7 +114,7 @@ namespace casadi {
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
-    // No static functions exposed
+    // Static functions exposed
     struct Exposed {
       void (*periodic_shur)(const std::vector< Matrix<double> > & A,
 			    std::vector< Matrix<double> > & T,
