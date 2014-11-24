@@ -115,6 +115,9 @@ namespace casadi {
     // Creator function for internal class
     typedef LinearSolverInternal* (*Creator)(const Sparsity& sp, int nrhs);
 
+    // No static functions exposed
+    struct Exposed{ };
+
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 

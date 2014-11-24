@@ -51,6 +51,12 @@
 #endif // WITH_DL
 
 namespace casadi {
+  // Avoid segmentation faults when exposed function not implemented
+  template<typename T>
+  T check_exposed(T t) {
+    casadi_assert_message(t!=0, "Static function not implemented for plugin");
+    return t;
+  }
 
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
@@ -66,6 +72,7 @@ namespace casadi {
       const char* name;
       const char* doc;
       int version;
+      typename Derived::Exposed exposed;
     };
 
     // Plugin registration function

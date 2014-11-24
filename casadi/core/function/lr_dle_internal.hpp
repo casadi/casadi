@@ -117,6 +117,9 @@ namespace casadi {
     // Creator function for internal class
     typedef LrDleInternal* (*Creator)(const LrDleStructure& st, const std::vector<int> &Hs);
 
+    // No static functions exposed
+    struct Exposed{ };
+
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 

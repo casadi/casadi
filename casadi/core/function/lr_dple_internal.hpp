@@ -134,6 +134,9 @@ namespace casadi {
     typedef LrDpleInternal* (*Creator)(const LrDpleStructure & st,
       const std::vector< std::vector<int> >& Hs);
 
+    // No static functions exposed
+    struct Exposed{ };
+
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 

@@ -66,6 +66,9 @@ namespace casadi {
     // Creator function for internal class
     typedef StabilizedQpSolverInternal* (*Creator)(const QPStructure& st);
 
+    // No static functions exposed
+    struct Exposed{ };
+
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 

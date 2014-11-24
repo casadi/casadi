@@ -61,6 +61,9 @@ namespace casadi {
     // Creator function for internal class
     typedef LpSolverInternal* (*Creator)(const LPStructure& st);
 
+    // No static functions exposed
+    struct Exposed{ };
+
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
