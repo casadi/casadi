@@ -121,7 +121,10 @@ namespace casadi {
 			    std::vector< Matrix<double> > & Z,
 			    std::vector<double> &eig_real,
 			    std::vector<double> &eig_imag,
-			    double num_zero) = 0;
+			    double num_zero);
+
+      // Constructor
+      Exposed() { periodic_shur = 0; }
     };
 
     /// Infix
