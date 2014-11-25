@@ -1139,17 +1139,17 @@ if (dwork==0) {
   }
 
   void slicot_periodic_schur(int n, int K, const std::vector< double > & a,
-			     std::vector< double > & t,  std::vector< double > & z,
-			     std::vector<double> &eig_real, std::vector<double> &eig_imag,
-			     double num_zero) {
+                             std::vector< double > & t,  std::vector< double > & z,
+                             std::vector<double> &eig_real, std::vector<double> &eig_imag,
+                             double num_zero) {
     std::vector<double> dwork(std::max(n+K-2, 4*n)+(n-1)*K);
     slicot_periodic_schur(n, K, a, t, z, dwork, eig_real, eig_imag, num_zero);
   }
 
   void slicot_periodic_schur(int n, int K, const std::vector< double > & a,
-			     std::vector< double > & t,  std::vector< double > & z,
-			     std::vector<double> &dwork, std::vector<double> &eig_real,
-			     std::vector<double> &eig_imag, double num_zero) {
+                             std::vector< double > & t,  std::vector< double > & z,
+                             std::vector<double> &dwork, std::vector<double> &eig_real,
+                             std::vector<double> &eig_imag, double num_zero) {
     int mem_base = std::max(n+K-2, 4*n);
     int mem_needed = mem_base+(n-1)*K;
 
