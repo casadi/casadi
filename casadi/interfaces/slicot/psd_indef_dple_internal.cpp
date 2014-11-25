@@ -24,7 +24,6 @@
 
 
 #include "psd_indef_dple_internal.hpp"
-#include "slicot_tools.hpp"
 #include <cassert>
 #include "../../core/std_vector_tools.hpp"
 #include "../../core/matrix/matrix_tools.hpp"
