@@ -96,7 +96,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_CORE_EXPORT LrDpleSolver : public Function {
+  class CASADI_EXPORT LrDpleSolver : public Function {
   public:
     /// Default constructor
     LrDpleSolver();

@@ -84,7 +84,7 @@ namespace casadi {
       \date 2012
       \author Joel Andersson
   */
-  class CASADI_CORE_EXPORT SymbolicOCP : public PrintableObject<SymbolicOCP> {
+  class CASADI_EXPORT SymbolicOCP : public PrintableObject<SymbolicOCP> {
   public:
 
     /// Default constructor

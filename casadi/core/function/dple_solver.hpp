@@ -88,7 +88,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_CORE_EXPORT DpleSolver : public Function {
+  class CASADI_EXPORT DpleSolver : public Function {
   public:
     /// Default constructor
     DpleSolver();

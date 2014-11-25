@@ -37,7 +37,7 @@ class SymbolicNLPInternal;
   \date 2012
   \author Joel Andersson
 */
-class CASADI_CORE_EXPORT SymbolicNLP : public PrintableObject<SymbolicNLP> {
+class CASADI_EXPORT SymbolicNLP : public PrintableObject<SymbolicNLP> {
   public:
 
     /** @name Symbolic representation of the NLP

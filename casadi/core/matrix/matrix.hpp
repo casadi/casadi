@@ -48,7 +48,7 @@ namespace casadi {
 
 
   template<typename DataType>
-  class CASADI_CORE_EXPORT NonZeroIterator :
+  class CASADI_EXPORT NonZeroIterator :
         public std::iterator< std::forward_iterator_tag, NonZero<DataType> > {
   public:
     NonZeroIterator(const Matrix<DataType> & m);
@@ -103,7 +103,7 @@ namespace casadi {
       \date 2010-2014
   */
   template<typename DataType>
-  class CASADI_CORE_EXPORT Matrix :
+  class CASADI_EXPORT Matrix :
         public GenericExpression<Matrix<DataType> >,
         public GenericMatrix<Matrix<DataType> >,
         public PrintableObject<Matrix<DataType> > {
@@ -947,7 +947,7 @@ namespace casadi {
   /// \endcond
 } // namespace casadi
 
-#ifdef casadi_core_implementation
+#ifdef casadi_implementation
 #include "matrix_impl.hpp"
 #endif
 

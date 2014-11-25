@@ -34,7 +34,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2011-2013
   */
-  class CASADI_CORE_EXPORT SetSparse : public MXNode {
+  class CASADI_EXPORT SetSparse : public MXNode {
   public:
 
     /** \brief  Constructor */

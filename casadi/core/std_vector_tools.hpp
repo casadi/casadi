@@ -76,7 +76,7 @@ namespace casadi {
   * Elements larger than or equal to stop are chopped off.
   *
   */
-  CASADI_CORE_EXPORT std::vector<int> range(int start, int stop, int step=1,
+  CASADI_EXPORT std::vector<int> range(int start, int stop, int step=1,
                                                 int len=std::numeric_limits<int>::max());
 
   /**  \brief Range function
@@ -84,7 +84,7 @@ namespace casadi {
   *
   * \return list [0, 1, 2...stop-1]
   */
-  CASADI_CORE_EXPORT std::vector<int> range(int stop);
+  CASADI_EXPORT std::vector<int> range(int stop);
 
   /**  \brief Slicing vector
   *  \param v Vector to slice
@@ -121,7 +121,7 @@ namespace casadi {
   * The supplied vector will be checked for bounds
   * The result vector is guaranteed to be monotonously increasing
   */
-  CASADI_CORE_EXPORT std::vector<int> complement(const std::vector<int> &v, int size);
+  CASADI_EXPORT std::vector<int> complement(const std::vector<int> &v, int size);
 
   /** \brief Returns a vector for quickly looking up entries of supplied list
   *
@@ -130,7 +130,7 @@ namespace casadi {
   *
   *  Duplicates are treated by looking up last occurrence
   */
-  CASADI_CORE_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
+  CASADI_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
 
 
   /// \cond INTERNAL
@@ -207,10 +207,10 @@ namespace casadi {
 
   /// \cond INTERNAL
   /// Get an pointer of sets of booleans from a double vector
-  CASADI_CORE_EXPORT bvec_t* get_bvec_t(std::vector<double>& v);
+  CASADI_EXPORT bvec_t* get_bvec_t(std::vector<double>& v);
 
   /// Get an pointer of sets of booleans from a double vector
-  CASADI_CORE_EXPORT const bvec_t* get_bvec_t(const std::vector<double>& v);
+  CASADI_EXPORT const bvec_t* get_bvec_t(const std::vector<double>& v);
 
   /// Get an pointer of sets of booleans from a double vector
   template<typename T>
@@ -326,7 +326,7 @@ namespace casadi {
 
 // Implementations
 #ifndef SWIG
-//#ifdef casadi_core_EXPORTS
+//#ifdef casadi_EXPORTS
 namespace std {
 
   /// Enables flushing an std::vector to a stream (prints representation)

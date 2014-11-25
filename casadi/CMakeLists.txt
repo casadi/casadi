@@ -45,8 +45,8 @@ macro(casadi_library_or_plugin name is_plugin)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h
   DESTINATION include/${RELPATH})
   
-  if(NOT "${name}" STREQUAL "casadi_core")
-    target_link_libraries(${name} casadi_core)
+  if(NOT "${name}" STREQUAL "casadi")
+    target_link_libraries(${name} casadi)
   endif()
 
   # If it's a plugin, we install to lib/casadi and

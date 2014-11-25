@@ -37,57 +37,57 @@ namespace casadi {
 
   /** \brief Reshape the sparsity pattern keeping the relative location of the nonzeros
    */
-  CASADI_CORE_EXPORT Sparsity reshape(const Sparsity& a, int nrow, int ncol);
+  CASADI_EXPORT Sparsity reshape(const Sparsity& a, int nrow, int ncol);
 
   /** \brief Transpose the pattern */
   inline Sparsity transpose(const Sparsity& a) { return a.transpose();}
 
   /** \brief Vectorize the pattern */
-  CASADI_CORE_EXPORT Sparsity vec(const Sparsity& a);
+  CASADI_EXPORT Sparsity vec(const Sparsity& a);
 
   /** \brief Get the sparsity resulting from a matrix multiplication
    */
-  CASADI_CORE_EXPORT Sparsity mul(const Sparsity& a, const Sparsity &b);
+  CASADI_EXPORT Sparsity mul(const Sparsity& a, const Sparsity &b);
 
   /** \brief Get the sparsity resulting from a series of matrix multiplication
    */
-  CASADI_CORE_EXPORT Sparsity mul(const std::vector<Sparsity>& s);
+  CASADI_EXPORT Sparsity mul(const std::vector<Sparsity>& s);
 
   /** \brief Concatenate a list of sparsities vertically
   * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
   */
-  CASADI_CORE_EXPORT Sparsity vertcat(const std::vector<Sparsity > &v);
+  CASADI_EXPORT Sparsity vertcat(const std::vector<Sparsity > &v);
 
   /** \brief Concatenate a list of sparsities horizontally
   * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
   */
-  CASADI_CORE_EXPORT Sparsity horzcat(const std::vector<Sparsity > &v);
+  CASADI_EXPORT Sparsity horzcat(const std::vector<Sparsity > &v);
 
   /** \brief Construct a sparsity from a list of list of sparsities.
    */
-  CASADI_CORE_EXPORT Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
+  CASADI_EXPORT Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
 
   /** \brief   Construct a Sparsity with given blocks on the diagonal */
-  CASADI_CORE_EXPORT Sparsity blkdiag(const std::vector< Sparsity > &v);
+  CASADI_EXPORT Sparsity blkdiag(const std::vector< Sparsity > &v);
 
   #ifndef SWIG
-  CASADI_CORE_EXPORT Sparsity horzcat(const Sparsity &x, const Sparsity &y);
+  CASADI_EXPORT Sparsity horzcat(const Sparsity &x, const Sparsity &y);
 
-  CASADI_CORE_EXPORT Sparsity vertcat(const Sparsity &x, const Sparsity &y);
+  CASADI_EXPORT Sparsity vertcat(const Sparsity &x, const Sparsity &y);
 
-  CASADI_CORE_EXPORT Sparsity blkdiag(const Sparsity &x, const Sparsity &y);
+  CASADI_EXPORT Sparsity blkdiag(const Sparsity &x, const Sparsity &y);
   #endif // SWIG
 
   /** \brief Split up a sparsity pattern horizontally */
-  CASADI_CORE_EXPORT
+  CASADI_EXPORT
     std::vector<Sparsity> horzsplit(const Sparsity& sp, const std::vector<int>& output_offset);
 
   /** \brief Split up a sparsity pattern vertically */
-  CASADI_CORE_EXPORT
+  CASADI_EXPORT
     std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& output_offset);
 
   /** \brief Split up a sparsity pattern diagonally */
-  CASADI_CORE_EXPORT
+  CASADI_EXPORT
     std::vector<Sparsity> diagsplit(const Sparsity& sp,
       const std::vector<int>& output_offset1,
       const std::vector<int>& output_offset2);
@@ -97,7 +97,7 @@ namespace casadi {
   *
   *  diagsplit(diagsplit(x, ...)) = x
   */
-  CASADI_CORE_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x, int incr=1);
+  CASADI_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x, int incr=1);
 
   /** \brief  split diagonally, retaining fixed-sized matrices
   * \param incr1 Row dimension of each matrix
@@ -105,7 +105,7 @@ namespace casadi {
   *
   *  diagsplit(diagsplit(x, ...)) = x
   */
-  CASADI_CORE_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x, int incr1, int incr2);
+  CASADI_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x, int incr1, int incr2);
 
   /** \brief  split diagonally, retaining square matrices
   * \param output_offset List of all start locations for each group
@@ -113,11 +113,11 @@ namespace casadi {
   *
   *   diagcat(diagsplit(x, ...)) = x
   */
-  CASADI_CORE_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x,
+  CASADI_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x,
                                                    const std::vector<int>& output_offset);
 
   /// Obtain the structural rank of a sparsity-pattern
-  CASADI_CORE_EXPORT int rank(const Sparsity& a);
+  CASADI_EXPORT int rank(const Sparsity& a);
 
   /// Get upper triangular part
   inline Sparsity triu(const Sparsity& sp, bool includeDiagonal=true)

@@ -113,7 +113,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT Function : public OptionsFunctionality, public IOInterface<Function>{
+  class CASADI_EXPORT Function : public OptionsFunctionality, public IOInterface<Function>{
 
   public:
 

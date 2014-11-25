@@ -38,7 +38,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_CORE_EXPORT Split : public MultipleOutput {
+  class CASADI_EXPORT Split : public MultipleOutput {
   public:
     /// Constructor
     Split(const MX& x, const std::vector<int>& offset);
@@ -80,7 +80,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_CORE_EXPORT Horzsplit : public Split {
+  class CASADI_EXPORT Horzsplit : public Split {
   public:
 
     /// Constructor
@@ -111,7 +111,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2014
   */
-  class CASADI_CORE_EXPORT Diagsplit : public Split {
+  class CASADI_EXPORT Diagsplit : public Split {
   public:
 
     /// Constructor
@@ -142,7 +142,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_CORE_EXPORT Vertsplit : public Split {
+  class CASADI_EXPORT Vertsplit : public Split {
   public:
 
     /// Constructor

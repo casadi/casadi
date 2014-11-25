@@ -44,7 +44,7 @@ namespace casadi {
       \date 2013
   */
   template<bool Tr>
-  class CASADI_CORE_EXPORT Solve : public MXNode {
+  class CASADI_EXPORT Solve : public MXNode {
   public:
 
     /** \brief  Constructor */

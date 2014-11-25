@@ -78,7 +78,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT SharedObject : public PrintableObject<SharedObject> {
+  class CASADI_EXPORT SharedObject : public PrintableObject<SharedObject> {
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
     template<class B> friend const B shared_cast(const SharedObject& A);
@@ -193,7 +193,7 @@ namespace casadi {
 #ifndef SWIG
   /// \cond INTERNAL
   /// Internal class for the reference counting framework, see comments on the public class.
-  class CASADI_CORE_EXPORT SharedObjectNode {
+  class CASADI_EXPORT SharedObjectNode {
     friend class SharedObject;
   public:
 

@@ -40,7 +40,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   IntegratorInternal : public FunctionInternal,
                        public PluginInterface<IntegratorInternal> {
   public:

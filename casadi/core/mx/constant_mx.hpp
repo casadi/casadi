@@ -42,7 +42,7 @@ namespace casadi {
         This user can call MX(double) directly, or even rely on implicit typecasting.
         \sa zeros , ones
 */
-  class CASADI_CORE_EXPORT ConstantMX : public MXNode {
+  class CASADI_EXPORT ConstantMX : public MXNode {
   public:
     /// Destructor
     explicit ConstantMX(const Sparsity& sp);
@@ -98,7 +98,7 @@ namespace casadi {
   };
 
   /// A constant given as a DMatrix
-  class CASADI_CORE_EXPORT ConstantDMatrix : public ConstantMX {
+  class CASADI_EXPORT ConstantDMatrix : public ConstantMX {
   public:
 
     /** \brief  Constructor */
@@ -153,7 +153,7 @@ namespace casadi {
   };
 
   /// A zero-by-zero matrix
-  class CASADI_CORE_EXPORT ZeroByZero : public ConstantMX {
+  class CASADI_EXPORT ZeroByZero : public ConstantMX {
   private:
     /** \brief Private constructor (singleton design pattern) */
     explicit ZeroByZero() : ConstantMX(Sparsity::sparse(0, 0)) {
@@ -234,7 +234,7 @@ namespace casadi {
 
   /// A constant with all entries identical
   template<typename Value>
-  class CASADI_CORE_EXPORT Constant : public ConstantMX {
+  class CASADI_EXPORT Constant : public ConstantMX {
   public:
 
     /** \brief  Constructor */

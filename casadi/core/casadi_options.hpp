@@ -44,7 +44,7 @@ namespace casadi {
   *  \author Joris Gillis
   *  \date 2012
   */
-  class CASADI_CORE_EXPORT CasadiOptions {
+  class CASADI_EXPORT CasadiOptions {
     private:
       /// No instances are allowed
       CasadiOptions();

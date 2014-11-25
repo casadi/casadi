@@ -38,10 +38,10 @@ namespace casadi {
   /** \brief Obtain collocation points of specific order and scheme
   \param scheme  'radau' or 'legendre'
   **/
-  CASADI_CORE_EXPORT
+  CASADI_EXPORT
     std::vector<double> collocationPoints(int order, const std::string& scheme="radau");
 #ifndef SWIG
-  CASADI_CORE_EXPORT
+  CASADI_EXPORT
     std::vector<long double> collocationPointsL(int order, const std::string& scheme="radau");
 #endif // SWIG
   ///@}
@@ -57,12 +57,12 @@ namespace casadi {
       Length: order+1
   */
 #ifndef SWIG
-  CASADI_CORE_EXPORT
+  CASADI_EXPORT
     void collocationInterpolators(const std::vector<double> & tau_root,
                                   std::vector< std::vector<double> > &C,
                                   std::vector< double > &D);
 #else // SWIG
-  CASADI_CORE_EXPORT
+  CASADI_EXPORT
     void collocationInterpolators(const std::vector<double> & tau_root,
                                   std::vector< std::vector<double> > &OUTPUT,
                                   std::vector< double > &OUTPUT);
@@ -106,7 +106,7 @@ extern const long double** collocation_points[2];
   * \param order Order of integration
   * \param ne    Number of times the \e RK primitive is repeated over the integration interval
   */
-  CASADI_CORE_EXPORT Function explicitRK(Function& f, const MX &tf=1,
+  CASADI_EXPORT Function explicitRK(Function& f, const MX &tf=1,
                                                 int order=4, int ne = 1);
 
   /** \brief Construct an implicit Runge-Kutta integrator
@@ -118,7 +118,7 @@ extern const long double** collocation_points[2];
   * \param scheme Collocation scheme, as excepted by collocationPoints function.
   * \param ne    Number of times the \e RK primitive is repeated over the integration interval
   */
-  CASADI_CORE_EXPORT
+  CASADI_EXPORT
   Function implicitRK(Function& f, const std::string& impl,
                       const Dictionary& dict = Dictionary(), const MX &tf=1, int order=4,
                       const std::string& scheme="radau", int ne = 1);

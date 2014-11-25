@@ -37,7 +37,7 @@ namespace casadi {
 
   /// submatrix
   template<typename M, typename I, typename J>
-  class CASADI_CORE_EXPORT SubMatrix : public M {
+  class CASADI_EXPORT SubMatrix : public M {
   public:
     /// Constructor
     SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i, j)), mat_(mat), i_(i), j_(j) {}
@@ -61,7 +61,7 @@ namespace casadi {
     J j_;
   };
 
-#ifdef casadi_core_implementation
+#ifdef casadi_implementation
   // Implementation
   template<typename M, typename I, typename J>
   const M& SubMatrix<M, I, J>::operator=(const SubMatrix<M, I, J> &y) {

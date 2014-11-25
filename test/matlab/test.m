@@ -1,4 +1,4 @@
-import casadi_core.*
+import casadi.*
 
 x = SX.sym('x')
 

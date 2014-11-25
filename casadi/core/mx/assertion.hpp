@@ -36,7 +36,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_CORE_EXPORT Assertion : public MXNode {
+  class CASADI_EXPORT Assertion : public MXNode {
   public:
 
     /// Constructor

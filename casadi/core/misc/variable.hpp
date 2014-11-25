@@ -68,7 +68,7 @@ namespace casadi {
       \date 2012-2014
       \author Joel Andersson
    */
-  struct CASADI_CORE_EXPORT Variable : public PrintableObject<Variable> {
+  struct CASADI_EXPORT Variable : public PrintableObject<Variable> {
 
     /// Default constructor
     Variable();

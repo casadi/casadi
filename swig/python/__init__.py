@@ -43,8 +43,8 @@ else:
 from casadi_loader import *    # import everything
 import casadi_loader as casadi # import everything
   
-if 'casadi_core' in failed_modules:
-    raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_core"]))
+if 'casadi' in failed_modules:
+    raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi"]))
 
 import os
 import types

@@ -37,7 +37,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010-2013
   */
-  class CASADI_CORE_EXPORT CallFunction : public MultipleOutput {
+  class CASADI_EXPORT CallFunction : public MultipleOutput {
   public:
 
     /** \brief  Constructor */

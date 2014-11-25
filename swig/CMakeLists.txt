@@ -75,8 +75,8 @@ set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
 
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
 
-set_source_files_properties(casadi_core.i  PROPERTIES  CPLUSPLUS ON)
-set_source_files_properties(casadi_core.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
+set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
+set_source_files_properties(casadi.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
 
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
@@ -97,16 +97,16 @@ else()
   set(MAYBE_WERROR "")
 endif()
 
-swig_add_module(casadi_core python casadi_core.i)
-swig_link_libraries(casadi_core ${PYTHON_LIBRARIES} casadi_core)
+swig_add_module(casadi python casadi.i)
+swig_link_libraries(casadi ${PYTHON_LIBRARIES} casadi)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set_target_properties(_casadi_core PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
+  set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set_target_properties(_casadi_core PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
+  set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
 endif()
 
 # the name used for the shared module for the python interface is determined
-get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_core_REAL_NAME} SUFFIX)
+get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
 
 if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
   if( WIN32 )
@@ -116,22 +116,22 @@ if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
   endif()
 endif()
 
-set(CASADI_PYTHON_LIBRARY_casadi_core ${SWIG_MODULE_casadi_core_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
+set(CASADI_PYTHON_LIBRARY_casadi ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 
 # a python library is built in the build directory inside swig/python
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 # adding some extra commands to the target _casadi which is declared automatically when constructing a swig-python interface
 
-set(modules_python _casadi_core)
+set(modules_python _casadi)
 add_custom_target(_python_modules DEPENDS ${modules_python})
 
 if(WITH_MATLAB)
   include_directories(${MATLAB_INCLUDE_DIR})
   add_definitions(${MATLAB_EXTRA_CXXFLAGS})
-  add_custom_target(_matlab_modules DEPENDS casadi_core_matlab)
+  add_custom_target(_matlab_modules DEPENDS casadi_matlab)
 endif()
 
-add_custom_target(_json_modules DEPENDS casadi_core_json)
+add_custom_target(_json_modules DEPENDS casadi_json)
 
 # Workaround bug in cmake 2.8.3 and lower. See #704.
 add_custom_command(
@@ -142,15 +142,15 @@ add_custom_command(
 
 # workaround for Visual Studio! The default way is not general enough and should be changed!
 if(MSVC)
-  set(PYTHONLIBPATH_casadi_core ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_casadi_core})
+  set(PYTHONLIBPATH_casadi ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_casadi})
 else()
-  set(PYTHONLIBPATH_casadi_core ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_casadi_core})
+  set(PYTHONLIBPATH_casadi ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_casadi})
 endif()
 
 add_custom_command(
-  TARGET _casadi_core
+  TARGET _casadi
   COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PYTHONLIBPATH_casadi_core} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_casadi_core}
+  ARGS -E copy ${PYTHONLIBPATH_casadi} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_casadi}
 )
 
 if(NOT DEFINED PYTHON_PREFIX)
@@ -189,10 +189,10 @@ endif()
 file(WRITE "${PROJECT_BINARY_DIR}/python/casadi/casadi_loader.py" "failed_modules={}\nloaded_modules=[]\n")
 file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi_loader.py"
 "try:\n"
-"  from casadi_core import *\n"
-"  loaded_modules.append('casadi_core')\n"
+"  from casadi import *\n"
+"  loaded_modules.append('casadi')\n"
 "except Exception as e:\n"
-"  failed_modules['casadi_core'] = str(e)\n"
+"  failed_modules['casadi'] = str(e)\n"
 )
 
 install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
@@ -231,7 +231,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
   COMPONENT install_python
 )
 
-install(FILES ${PROJECT_BINARY_DIR}/swig/casadi_core.py
+install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
@@ -244,11 +244,11 @@ COMMAND ${CMAKE_COMMAND}
   -P cmake_install.cmake
 )
 
-add_dependencies(install_python _casadi_core)
+add_dependencies(install_python _casadi)
 
 # MATLAB interface
 if(WITH_MATLAB)
-  swig_add_module(casadi_core_matlab matlab casadi_core.i)
+  swig_add_module(casadi_matlab matlab casadi.i)
 endif()
   
 # json interface
@@ -262,16 +262,16 @@ if(COMMAND cmake_policy)
   endif()
 endif()
 
-swig_add_module_xml(casadi_core_xml casadi_core.i)
-add_custom_target(casadi_core_json
-  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/casadi_coreXML_wrap.xml casadi_core
-  COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/swig/casadi_coreXML_wrap.xml
+swig_add_module_xml(casadi_xml casadi.i)
+add_custom_target(casadi_json
+  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml casadi
+  COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml
 )
-add_dependencies(casadi_core_json casadi_core_xml
+add_dependencies(casadi_json casadi_xml
                  ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py
-                 ${PROJECT_BINARY_DIR}/swig/casadi_coreXML_wrap.xml)
+                 ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml)
 
-#install(FILES ${PROJECT_BINARY_DIR}/swig/casadi_core.json
+#install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.json
 #  DESTINATION share/casadi
 #  COMPONENT componentjson
 #)

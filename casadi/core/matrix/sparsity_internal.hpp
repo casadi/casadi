@@ -31,7 +31,7 @@
 
 namespace casadi {
 
-  class CASADI_CORE_EXPORT SparsityInternal : public SharedObjectNode {
+  class CASADI_EXPORT SparsityInternal : public SharedObjectNode {
   public:
     /// Construct a sparsity pattern from vectors
     SparsityInternal(int nrow, int ncol, const std::vector<int>& colind,

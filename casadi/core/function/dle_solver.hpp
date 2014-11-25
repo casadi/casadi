@@ -86,7 +86,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_CORE_EXPORT DleSolver : public Function {
+  class CASADI_EXPORT DleSolver : public Function {
   public:
     /// Default constructor
     DleSolver();

@@ -37,7 +37,7 @@ namespace casadi {
   /** Internal class
       @copydoc LinearSolver_doc
   */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   LinearSolverInternal : public FunctionInternal,
                          public PluginInterface<LinearSolverInternal> {
   public:

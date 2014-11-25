@@ -37,7 +37,7 @@ namespace casadi {
       A regular user is not supposed to work with this Node class.
       This user can call MX(name, n, m) directly.
   */
-  class CASADI_CORE_EXPORT SymbolicMX : public MXNode {
+  class CASADI_EXPORT SymbolicMX : public MXNode {
   public:
 
     /** \brief  Constructors */

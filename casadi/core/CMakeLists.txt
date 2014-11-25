@@ -139,23 +139,23 @@ set(CASADI_SRCS
 
 set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )
 
-casadi_library(casadi_core ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
+casadi_library(casadi ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
 
-add_dependencies(casadi_core casadi_runtime_embedded)
+add_dependencies(casadi casadi_runtime_embedded)
 
 if(WITH_DL)
   # Core needs support for dynamic linking
-  target_link_libraries(casadi_core ${CMAKE_DL_LIBS})
+  target_link_libraries(casadi ${CMAKE_DL_LIBS})
 endif()
 
 if(WITH_OPENCL)
   # Core depends on OpenCL for GPU calculations
-  target_link_libraries(casadi_core ${OPENCL_LIBRARIES})
+  target_link_libraries(casadi ${OPENCL_LIBRARIES})
 endif()
 
 if(RT)
   # Realtime library
-  target_link_libraries(casadi_core ${RT})
+  target_link_libraries(casadi ${RT})
 endif()
 
 install(DIRECTORY ./

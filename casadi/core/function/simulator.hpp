@@ -50,7 +50,7 @@ class SimulatorInternal;
   \date 2010
 */
 
-class CASADI_CORE_EXPORT Simulator : public Function {
+class CASADI_EXPORT Simulator : public Function {
 public:
 
   /// Default constructor

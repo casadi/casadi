@@ -34,7 +34,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_CORE_EXPORT Polynomial : public PrintableObject<Polynomial> {
+  class CASADI_EXPORT Polynomial : public PrintableObject<Polynomial> {
   public:
     /// Floating point type
     typedef long double real_t;

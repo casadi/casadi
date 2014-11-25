@@ -41,7 +41,7 @@ namespace casadi {
      \author Joris Gillis
       \date 2014
   */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   CleInternal : public FunctionInternal,
                  public PluginInterface<CleInternal> {
   public:

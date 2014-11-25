@@ -304,7 +304,7 @@ namespace casadi {
 
   /** \brief Solve a system of equations: A*x = b
   */
-  CASADI_CORE_EXPORT Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b,
+  CASADI_EXPORT Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b,
                                           const std::string& lsolver,
                                           const Dictionary& dict = Dictionary());
 
@@ -315,7 +315,7 @@ namespace casadi {
   * If the matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
   *
   */
-  CASADI_CORE_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
+  CASADI_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
                                              const Dictionary& dict = Dictionary());
 
 
@@ -327,7 +327,7 @@ namespace casadi {
   * \param Iwork  A integer work vector that you must allocate
   *               Minimum size: y.size1()+x.size2()+1
   */
-  CASADI_CORE_EXPORT double norm_inf_mul_nn(const Matrix<double> &x,
+  CASADI_EXPORT double norm_inf_mul_nn(const Matrix<double> &x,
                               const Matrix<double> &y,
                               std::vector<double>& Dwork,
                               std::vector<int>& Iwork);

@@ -34,7 +34,7 @@
 namespace casadi {
 
 /// Internal class
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   QcqpSolverInternal : public FunctionInternal,
                        public PluginInterface<QcqpSolverInternal> {
 

@@ -23,7 +23,7 @@
  */
 
 
-%module(package="casadi") casadi_core
+%module(package="casadi") casadi
 
 %include <casadi/core/common.i>
 %include <casadi/core/function/schemes_metadata.hpp>
@@ -176,11 +176,11 @@ class NZproxy:
         return (self.size1(),self.size2())
         
     def reshape(self,arg):
-        return _casadi_core.reshape(self,arg)
+        return _casadi.reshape(self,arg)
         
     @property
     def T(self):
-        return _casadi_core.transpose(self)
+        return _casadi.transpose(self)
         
     def __getitem__(self,s):
         if isinstance(s,tuple) and len(s)==2:

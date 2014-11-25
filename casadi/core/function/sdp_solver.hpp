@@ -175,7 +175,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT SdpSolver : public Function {
+  class CASADI_EXPORT SdpSolver : public Function {
   public:
 
     /// Default constructor

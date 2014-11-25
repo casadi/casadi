@@ -39,7 +39,7 @@ namespace casadi {
   \date 2012
 */
 template<typename ExType>
-class CASADI_CORE_EXPORT GenericExpression {
+class CASADI_EXPORT GenericExpression {
   public:
 
 #ifndef SWIG

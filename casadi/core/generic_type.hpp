@@ -54,7 +54,7 @@ namespace casadi {
   \author Joel Andersson
   \date 2010
   Return type when getting an option, can be converted into bool, int, string, vector, etc */
-  class CASADI_CORE_EXPORT GenericType : public SharedObject {
+  class CASADI_EXPORT GenericType : public SharedObject {
     public:
     GenericType();
     GenericType(bool b);
@@ -201,7 +201,7 @@ namespace casadi {
 
     #ifndef SWIG
     //! \brief Print
-    CASADI_CORE_EXPORT friend std::ostream& operator<<(std::ostream &stream,
+    CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
                                                            const GenericType& ref);
     #endif
 

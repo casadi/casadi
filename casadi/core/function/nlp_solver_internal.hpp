@@ -40,7 +40,7 @@ namespace casadi {
   \author Joel Andersson
   \date 2010-2013
 */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   NlpSolverInternal : public FunctionInternal,
                       public PluginInterface<NlpSolverInternal> {
 

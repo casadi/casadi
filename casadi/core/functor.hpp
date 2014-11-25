@@ -45,7 +45,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_CORE_EXPORT Functor : public SharedObject {
+  class CASADI_EXPORT Functor : public SharedObject {
   };
 
   /** \brief Derivative Generator Functor
@@ -63,7 +63,7 @@ namespace casadi {
   * \endcode
   *
   */
-  class CASADI_CORE_EXPORT DerivativeGenerator : public Functor {
+  class CASADI_EXPORT DerivativeGenerator : public Functor {
     public:
       /// Default constructor
       DerivativeGenerator() { }
@@ -90,7 +90,7 @@ namespace casadi {
   * \endcode
   *
   */
-  class CASADI_CORE_EXPORT CustomEvaluate : public Functor {
+  class CASADI_EXPORT CustomEvaluate : public Functor {
     public:
       /// Default constructor
       CustomEvaluate() {}
@@ -120,7 +120,7 @@ namespace casadi {
   * \endcode
   *
   */
-  class CASADI_CORE_EXPORT Callback : public Functor {
+  class CASADI_EXPORT Callback : public Functor {
     public:
       /// Default constructor
       Callback() {}

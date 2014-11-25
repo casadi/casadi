@@ -52,7 +52,7 @@ namespace casadi {
   Joel Andersson, K.U. Leuven 2010
   joel.andersson@esat.kuleuven.be
 */
-class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
+class CASADI_EXPORT OptionsFunctionality : public SharedObject {
   public:
     /// Default constructor
     OptionsFunctionality();
@@ -147,7 +147,7 @@ class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
   \author Joel Andersson
   \date 2010
 */
-class CASADI_CORE_EXPORT OptionsFunctionalityNode : public SharedObjectNode {
+class CASADI_EXPORT OptionsFunctionalityNode : public SharedObjectNode {
   friend class OptionsFunctionality;
   public:
 

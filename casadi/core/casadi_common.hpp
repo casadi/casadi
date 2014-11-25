@@ -26,14 +26,14 @@
 #ifndef CASADI_CASADI_COMMON_HPP
 #define CASADI_CASADI_COMMON_HPP
 
-#include <casadi/core/casadi_core_export.h>
+#include <casadi/core/casadi_export.h>
 
-#ifdef casadi_core_EXPORTS
-#define casadi_core_implementation
+#ifdef casadi_EXPORTS
+#define casadi_implementation
 #endif
 
 #ifndef SHARED_LIBRARY
-#define casadi_core_implementation
+#define casadi_implementation
 #endif
 
 #endif // CASADI_CASADI_COMMON_HPP

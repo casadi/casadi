@@ -5,7 +5,7 @@ LOG=$(CPP:.cc=.log)
 PDF=$(PY:.py=.pdf)
 BUILDDIR=../../../build
 
-CASADI_OBJECT=$(BUILDDIR)/python/casadi/_casadi_core.so
+CASADI_OBJECT=$(BUILDDIR)/python/casadi/_casadi.so
 OCTAVE_PATH=$(BUILDDIR)/lib
 all: python cpp cpprun
 

@@ -67,7 +67,7 @@ namespace casadi {
      \author Joel Andersson
      \date 2011
   */
-  class CASADI_CORE_EXPORT ImplicitFunction : public Function {
+  class CASADI_EXPORT ImplicitFunction : public Function {
   public:
 
     /** \brief  Default constructor */

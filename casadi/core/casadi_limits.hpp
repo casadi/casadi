@@ -43,7 +43,7 @@ e.g. symbolic scalars
 */
 
 template<class T>
-class CASADI_CORE_EXPORT casadi_limits {
+class CASADI_EXPORT casadi_limits {
   public:
     static bool isZero(const T& val) { return val==0; }
     static bool isAlmostZero(const T& val, double tol) { return val<=tol && val>=-tol; }

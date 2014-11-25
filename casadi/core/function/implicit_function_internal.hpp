@@ -36,7 +36,7 @@
 namespace casadi {
 
   /// Internal class
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   ImplicitFunctionInternal : public FunctionInternal,
                              public PluginInterface<ImplicitFunctionInternal> {
   public:

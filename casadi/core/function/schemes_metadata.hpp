@@ -90,13 +90,13 @@ enum InputOutputScheme {
   SCHEME_SOCPStruct,
   SCHEME_StabilizedQpSolverInput };
 
-CASADI_CORE_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);
-CASADI_CORE_EXPORT std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);
-CASADI_CORE_EXPORT std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);
-CASADI_CORE_EXPORT int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name);
-CASADI_CORE_EXPORT int getSchemeSize(InputOutputScheme scheme);
-CASADI_CORE_EXPORT std::string getSchemeName(InputOutputScheme scheme);
-CASADI_CORE_EXPORT std::string getSchemeEntryNames(InputOutputScheme scheme);
+CASADI_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);
+CASADI_EXPORT std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);
+CASADI_EXPORT std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);
+CASADI_EXPORT int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name);
+CASADI_EXPORT int getSchemeSize(InputOutputScheme scheme);
+CASADI_EXPORT std::string getSchemeName(InputOutputScheme scheme);
+CASADI_EXPORT std::string getSchemeEntryNames(InputOutputScheme scheme);
 } // namespace casadi
 #endif //SCHEMES_METADATA_HPP
 

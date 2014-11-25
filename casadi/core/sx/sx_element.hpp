@@ -56,7 +56,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010-2014
   */
-  class CASADI_CORE_EXPORT SXElement : public GenericExpression<SXElement>,
+  class CASADI_EXPORT SXElement : public GenericExpression<SXElement>,
                                        public PrintableObject<SXElement> {
     friend class SXNode;
     friend class BinarySXNode;
@@ -303,10 +303,10 @@ namespace casadi {
 #ifndef SWIG
   // Template specializations
   template<>
-  CASADI_CORE_EXPORT bool Matrix<SXElement>::__nonzero__() const;
+  CASADI_EXPORT bool Matrix<SXElement>::__nonzero__() const;
 
   template<>
-  class CASADI_CORE_EXPORT casadi_limits<SXElement>{
+  class CASADI_EXPORT casadi_limits<SXElement>{
   public:
     static bool isZero(const SXElement& val);
     static bool isAlmostZero(const SXElement& val, double tol);
@@ -371,7 +371,7 @@ namespace casadi {
 
 namespace std {
   template<>
-  class CASADI_CORE_EXPORT numeric_limits<casadi::SXElement>{
+  class CASADI_EXPORT numeric_limits<casadi::SXElement>{
   public:
     static const bool is_specialized = true;
     static casadi::SXElement min() throw();

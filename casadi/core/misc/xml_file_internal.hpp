@@ -31,7 +31,7 @@
 
 namespace casadi {
 
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   XmlFileInternal : public OptionsFunctionalityNode,
                     public PluginInterface<XmlFileInternal> {
   public:

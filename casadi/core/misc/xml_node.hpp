@@ -35,7 +35,7 @@
 
 namespace casadi {
 
-  class CASADI_CORE_EXPORT XmlNode {
+  class CASADI_EXPORT XmlNode {
   public:
     XmlNode();
     ~XmlNode();
@@ -115,7 +115,7 @@ namespace casadi {
     /** \brief  Read the double value of a string */
     static void readString(const std::string& str, double& val);
 
-    CASADI_CORE_EXPORT friend std::ostream& operator<<(std::ostream &stream,
+    CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
                                                        const XmlNode& node);
 
     void dump(std::ostream &stream, int indent=0) const;

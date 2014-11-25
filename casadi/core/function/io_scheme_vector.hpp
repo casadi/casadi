@@ -36,7 +36,7 @@ namespace casadi {
   A class
 */
   template<typename T>
-  class CASADI_CORE_EXPORT IOSchemeVector : public PrintableObject<IOSchemeVector<T> > {
+  class CASADI_EXPORT IOSchemeVector : public PrintableObject<IOSchemeVector<T> > {
     // Data members (all public)
   public:
     /// Vector of data

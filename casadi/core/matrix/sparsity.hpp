@@ -98,7 +98,7 @@ namespace casadi {
    * \author Joel Andersson
    * \date 2010
    */
-  class CASADI_CORE_EXPORT Sparsity : public SharedObject {
+  class CASADI_EXPORT Sparsity : public SharedObject {
   public:
 
     /// Default constructor
@@ -711,7 +711,7 @@ namespace casadi {
   }
 
   /** \brief Hash a sparsity pattern */
-  CASADI_CORE_EXPORT std::size_t hash_sparsity(int nrow, int ncol,
+  CASADI_EXPORT std::size_t hash_sparsity(int nrow, int ncol,
                                                    const std::vector<int>& colind,
                                                    const std::vector<int>& row);
   /// \endcond

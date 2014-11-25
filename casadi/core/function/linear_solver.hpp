@@ -78,7 +78,7 @@ namespace casadi {
    \author Joel Andersson
    \date 2010-2013
   */
-  class CASADI_CORE_EXPORT LinearSolver : public Function {
+  class CASADI_EXPORT LinearSolver : public Function {
   public:
 
     /// \cond INTERNAL

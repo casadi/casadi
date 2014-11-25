@@ -58,7 +58,7 @@ namespace casadi {
         \author Joel Andersson
         \date 2010-2013
   */
-  class CASADI_CORE_EXPORT SXFunction : public Function {
+  class CASADI_EXPORT SXFunction : public Function {
 
   public:
     /// Default constructor

@@ -67,7 +67,7 @@ namespace casadi {
       \date 2012
   */
   template<typename MatType>
-  class CASADI_CORE_EXPORT GenericMatrix {
+  class CASADI_EXPORT GenericMatrix {
   public:
 
     /** \brief Get the number of (structural) non-zero elements */
@@ -239,7 +239,7 @@ namespace casadi {
   };
 
 #ifndef SWIG
-#ifdef casadi_core_implementation
+#ifdef casadi_implementation
   // Implementations
 
   template<typename MatType>
@@ -355,7 +355,7 @@ namespace casadi {
 #endif
 #endif // SWIG
 
-#ifdef casadi_core_implementation
+#ifdef casadi_implementation
   template<typename MatType>
   std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name,
                                                    const Sparsity& sp, int p) {

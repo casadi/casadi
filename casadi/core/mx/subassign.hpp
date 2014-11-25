@@ -36,7 +36,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_CORE_EXPORT SubAssign : public MXNode {
+  class CASADI_EXPORT SubAssign : public MXNode {
   public:
 
     /// Constructor
