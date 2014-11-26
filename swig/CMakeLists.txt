@@ -17,51 +17,13 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
 
-# Find packages
-find_package(PythonLibs)
-find_package(PythonInterp)
-find_package(NUMPY)
-if(WITH_MATLAB)
-  find_package(MATLAB)
-endif()
 set(CASADI_SWIG_FLAGS "")
 
 # Include the use swig file
 include(${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
 
-if(IPOPT_FOUND)
-  link_directories(${IPOPT_LIBRARY_DIRS})
-  if(WITH_IPOPT_CALLBACK)
-    set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT_CALLBACK")
-  endif()
-endif()
-
-if(LAPACK_FOUND)
-  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_LAPACK")
-endif()
-
-# enabling openmp support if requesed
-if(OPENMP_FOUND)
-  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_OPENMP")
-endif()
-
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_DOXDOC")
-endif()
-
-# Find python library and add include path for python headers
-if(PYTHONLIBS_FOUND)
-  include_directories(${PYTHON_INCLUDE_PATH})
-endif()
-
-if(NUMPY_FOUND)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-  include_directories(${NUMPY_INCLUDED_DIRS})
-  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_NUMPY")
-endif()
-
-if(WITH_PYTHON_INTERRUPTS)
-  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_PYTHON_INTERRUPTS")
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
@@ -69,11 +31,9 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_lib")
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DCASADI_MODULE")
-
-set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
-set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
-
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
+
+
 
 set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
 set_source_files_properties(casadi.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
@@ -88,14 +48,44 @@ if(WITH_WERROR)
   # I'm pretty sure this is also OK also in windows, see:
   # http://www.swig.org/Doc3.0/Warnings.html#Warnings_nn7
   set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-Werror")
-endif()
-
-# PYTHON interface
-if(WITH_WERROR)
   set(MAYBE_WERROR "-Werror")
 else()
   set(MAYBE_WERROR "")
 endif()
+
+
+
+
+
+
+
+
+
+# Python front-end
+#add_subdirectory(python)
+
+# Find packages
+find_package(PythonLibs)
+find_package(PythonInterp)
+find_package(NUMPY)
+
+# Find python library and add include path for python headers
+if(PYTHONLIBS_FOUND)
+  include_directories(${PYTHON_INCLUDE_PATH})
+endif()
+
+if(NUMPY_FOUND)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+  include_directories(${NUMPY_INCLUDED_DIRS})
+  set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DWITH_NUMPY")
+endif()
+
+if(WITH_PYTHON_INTERRUPTS)
+  set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DWITH_PYTHON_INTERRUPTS")
+endif()
+
+set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
+set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
 
 swig_add_module(casadi python casadi.i)
 swig_link_libraries(casadi ${PYTHON_LIBRARIES} casadi)
@@ -124,14 +114,6 @@ make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 
 set(modules_python _casadi)
 add_custom_target(_python_modules DEPENDS ${modules_python})
-
-if(WITH_MATLAB)
-  include_directories(${MATLAB_INCLUDE_DIR})
-  add_definitions(${MATLAB_EXTRA_CXXFLAGS})
-  add_custom_target(_matlab_modules DEPENDS casadi_matlab)
-endif()
-
-add_custom_target(_json_modules DEPENDS casadi_json)
 
 # Workaround bug in cmake 2.8.3 and lower. See #704.
 add_custom_command(
@@ -246,12 +228,25 @@ COMMAND ${CMAKE_COMMAND}
 
 add_dependencies(install_python _casadi)
 
-# MATLAB interface
+
+# MATLAB front-end
 if(WITH_MATLAB)
+  #add_subdirectory(matlab)
+
+  find_package(MATLAB)
+
+  include_directories(${MATLAB_INCLUDE_DIR})
+  add_definitions(${MATLAB_EXTRA_CXXFLAGS})
+  add_custom_target(_matlab_modules DEPENDS casadi_matlab)
+
   swig_add_module(casadi_matlab matlab casadi.i)
+
 endif()
-  
-# json interface
+
+# JSON/Haskell front-end
+#add_subdirectory(json)
+
+add_custom_target(_json_modules DEPENDS casadi_json)
 
 # fooXML_wrap.xml are a big files which Joris wants to delete immedately after using.
 # These files are dependencies of json outputs, but they don't exist according to cmake.
@@ -276,7 +271,6 @@ add_dependencies(casadi_json casadi_xml
 #  COMPONENT componentjson
 #)
 
-
 #set(CPACK_MONOLITHIC_INSTALL FALSE)
 set(CPACK_TGZ_COMPONENT_INSTALL TRUE)
 
@@ -289,12 +283,16 @@ set(CPACK_COMPONENTS_ALL Unspecified componentjson)
 # This will not actually work since we are in a EXCLUDE_FROM_ALL
 # http://cmake.3232098.n2.nabble.com/Yet-another-install-vs-exclude-from-all-thread-td4967491.html
 
+
+
 # Pass meta information
 configure_file(
   ${CMAKE_SOURCE_DIR}/swig/linklist.txt.cmake
   ${PROJECT_BINARY_DIR}/swig/linklist.txt
   ESCAPE_QUOTES
 )
+
+
 
 include(InstallRequiredSystemLibraries)
 
@@ -321,8 +319,6 @@ macro(THREE_PART_VERSION_TO_VARS version major minor patch)
 endmacro()
 
 THREE_PART_VERSION_TO_VARS(${PACKAGE_VERSION} CPACK_PACKAGE_VERSION_MAJOR CPACK_PACKAGE_VERSION_MINOR CPACK_PACKAGE_VERSION_PATCH)
-
-
 
 if(ENABLE_STATIC)
   set(CPACK_PACKAGE_FILE_NAME "libcasadi-static-${PACKAGE_VERSION_FULL}-${CMAKE_SYSTEM_PROCESSOR}")
