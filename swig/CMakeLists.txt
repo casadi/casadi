@@ -30,10 +30,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_lib")
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DCASADI_MODULE")
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
-
-
 
 set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
 

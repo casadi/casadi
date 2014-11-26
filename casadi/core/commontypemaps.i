@@ -84,7 +84,6 @@
 %template(SXElementVectorVector)       std::vector<std::vector<casadi::SXElement> > ;
 %template(SXElementVectorVectorVector) std::vector< std::vector<std::vector<casadi::SXElement> > > ;
 
-#ifdef CASADI_MODULE
 #ifdef SWIGPYTHON
 %typemap(in) int (int m) {
   bool result=meta< int >::as($input,m);
@@ -216,5 +215,4 @@ if (!ret) {
 
 %outputRefOwn(casadi::Matrix< double >)
 %outputRefOwn(casadi::Matrix< casadi::SXElement >)
-#endif // CASADI_MODULE
 #endif // SWIGPYTHON

@@ -409,8 +409,6 @@ namespace std {
   }
 };
 
-#ifdef CASADI_MODULE
-
 %define DEPRECATED_MSG(MSG)
 if (deprecated("$decl",MSG)) SWIG_fail;
 %enddef
@@ -496,8 +494,6 @@ if (casadi::CasadiOptions::catch_errors_swig) { \
 }
 %include "internal.i"
 %include "deprecated.i"
-#endif // CASADI_MODULE
-
 
 #ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
@@ -627,7 +623,6 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 using namespace casadi;
 %}
 
-#ifdef CASADI_MODULE
 #ifndef SWIGXML
 %traits_swigtype(casadi::DerivativeGenerator);
 %fragment(SWIG_Traits_frag(casadi::DerivativeGenerator));
@@ -643,7 +638,6 @@ using namespace casadi;
 %traits_swigtype(casadi::Function);
 %fragment(SWIG_Traits_frag(casadi::Function));
 
-#endif
 #endif
 
 
