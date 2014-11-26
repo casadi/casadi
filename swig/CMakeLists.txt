@@ -29,13 +29,13 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_lib")
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
 
 set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
 
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
+
 if(WITH_WERROR)
   # This will make the swig command return an error so that "make" will fail,
   # but swig will emit the output files anyways so subsequent calls to "make"
@@ -52,24 +52,19 @@ endif()
 
 
 
-
-
-
-
-
 # Python front-end
 #add_subdirectory(python)
 
 # Find packages
 find_package(PythonLibs)
 find_package(PythonInterp)
-find_package(NUMPY)
 
 # Find python library and add include path for python headers
 if(PYTHONLIBS_FOUND)
   include_directories(${PYTHON_INCLUDE_PATH})
 endif()
 
+find_package(NUMPY)
 if(NUMPY_FOUND)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
   include_directories(${NUMPY_INCLUDED_DIRS})
@@ -108,8 +103,7 @@ set(CASADI_PYTHON_LIBRARY_casadi ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 # adding some extra commands to the target _casadi which is declared automatically when constructing a swig-python interface
 
-set(modules_python _casadi)
-add_custom_target(_python_modules DEPENDS ${modules_python})
+add_custom_target(_python_modules DEPENDS _casadi)
 
 # Workaround bug in cmake 2.8.3 and lower. See #704.
 add_custom_command(
@@ -190,12 +184,10 @@ install(FILES ${dlls}
   COMPONENT install_python
 )
 
-foreach(my_module ${modules_python})
-  install(TARGETS ${my_module}
-    DESTINATION "${PYTHON_PREFIX}/casadi"
-    COMPONENT install_python
-  )
-endforeach()
+install(TARGETS _casadi
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+)
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
   DESTINATION "${PYTHON_PREFIX}/casadi"
