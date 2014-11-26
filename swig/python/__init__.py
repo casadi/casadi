@@ -40,12 +40,9 @@ if "LD_LIBRARY_PATH" in os.environ:
 else:
   os.environ["LD_LIBRARY_PATH"] = os.path.dirname(__file__)
 
-from casadi_loader import *    # import everything
-import casadi_loader as casadi # import everything
+from casadi import *
+import casadi
   
-if 'casadi' in failed_modules:
-    raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi"]))
-
 import os
 import types
   
