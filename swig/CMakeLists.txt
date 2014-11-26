@@ -4,15 +4,11 @@ cmake_minimum_required(VERSION 2.6)
 # See https://github.com/casadi/casadi/issues/646
 
 # Enforce cmake2.4+ style behaviour for mixed filename/full path linker directives
-if(COMMAND cmake_policy)
 cmake_policy(SET CMP0003 NEW)
-endif()
 
 # cmake_policy propagation rules
-if(COMMAND cmake_policy)
 if(POLICY CMP0011)
 cmake_policy(SET CMP0011 OLD)
-endif()
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
@@ -239,10 +235,8 @@ add_custom_target(_json_modules DEPENDS casadi_json)
 # fooXML_wrap.xml are a big files which Joris wants to delete immedately after using.
 # These files are dependencies of json outputs, but they don't exist according to cmake.
 # So we silence these warnings. THIS IS A HACK AND WE NEED A BETTER SOLUTION
-if(COMMAND cmake_policy)
-  if(CMAKE_MAJOR_VERSION GREATER 2)
-    cmake_policy(SET CMP0046 OLD)
-  endif()
+if(CMAKE_MAJOR_VERSION GREATER 2)
+  cmake_policy(SET CMP0046 OLD)
 endif()
 
 swig_add_module_xml(casadi_xml casadi.i)

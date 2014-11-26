@@ -118,27 +118,19 @@ include(GenerateExportHeader)
 ############################################################
 # Enforce cmake2.4+ style behaviour for
 # mixed filename/full path linker directives
-if(COMMAND cmake_policy)
 cmake_policy(SET CMP0003 NEW)
-endif()
 
 # cmake_policy propagation rules
-if(COMMAND cmake_policy)
 if(POLICY CMP0011)
 cmake_policy(SET CMP0011 OLD)
 endif()
-endif()
 
 # cmake_policy avoid escaping in add_definitions
-if(COMMAND cmake_policy)
 cmake_policy(SET CMP0005 OLD)
-endif()
 
 # cmake_policy use MACOSX_RPATH=ON by default
-if(COMMAND cmake_policy)
-  if(CMAKE_MAJOR_VERSION GREATER 2)
-    cmake_policy(SET CMP0042 NEW)
-  endif()
+if(CMAKE_MAJOR_VERSION GREATER 2)
+  cmake_policy(SET CMP0042 NEW)
 endif()
 
 ############################################################
