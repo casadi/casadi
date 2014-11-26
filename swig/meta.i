@@ -98,9 +98,9 @@ template<> swig_type_info** meta< casadi::DerivativeGenerator >::name = & SWIGTY
 template<> swig_type_info** meta< casadi::CustomEvaluate >::name = & SWIGTYPE_p_casadi__CustomEvaluate;
 template<> swig_type_info** meta< casadi::Callback >::name = & SWIGTYPE_p_casadi__Callback;
 %}
-%include "meta_python.i"
+%include "python/meta_python.i"
 #endif
 
 #ifdef SWIGMATLAB
-%include "meta_matlab.i"
+%include "matlab/meta_matlab.i"
 #endif
