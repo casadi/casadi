@@ -70,7 +70,6 @@
 #define PRECEDENCE_GENERICTYPE 22
 #define PRECEDENCE_DICTIONARY 21
 
-//#ifdef SWIG_MAIN_MODULE
 %template(SXElementVector) std::vector< casadi::SXElement > ;
 %template(SparsityVector) std::vector< casadi::Sparsity > ;
 %template(SparsityVectorVector) std::vector< std::vector< casadi::Sparsity> > ;
@@ -84,22 +83,6 @@
 %template(IMatrixVectorVector) std::vector< std::vector<casadi::Matrix<int> > > ;
 %template(SXElementVectorVector)       std::vector<std::vector<casadi::SXElement> > ;
 %template(SXElementVectorVectorVector) std::vector< std::vector<std::vector<casadi::SXElement> > > ;
-//#endif //SWIG_MAIN_MODULE
-/**#ifndef SWIG_MAIN_MODULE
-%template() std::vector<casadi::Matrix<casadi::SXElement> > ;
-%template() std::vector< std::vector<casadi::Matrix<casadi::SXElement> > > ;
-%template() std::vector<casadi::MX>;
-%template() std::vector<casadi::SXElement>;
-%template() std::vector< std::vector<casadi::MX> >;
-%template() std::vector<casadi::Matrix<int> > ;
-%template() std::vector<casadi::Matrix<double> > ;
-%template() std::vector< std::vector<casadi::Matrix<double> > > ;
-%template() std::vector< std::vector<casadi::Matrix<int> > > ;
-%template() std::vector<std::vector<casadi::SXElement> > ;
-%template() std::vector< std::vector<std::vector<casadi::SXElement> > > ;
-%template() std::vector< casadi::Sparsity > ;
-%template() std::vector< std::vector< casadi::Sparsity> > ;
-#endif //SWIG_MAIN_MODULE*/
 
 #ifdef CASADI_MODULE
 #ifdef SWIGPYTHON

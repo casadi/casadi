@@ -317,7 +317,6 @@ namespace std {
 %include "std_map.i"
 #endif
 
-//#ifdef SWIG_MAIN_MODULE
 %template(StringVector) std::vector<std::string>;
 
 %template(BVector)             std::vector<bool> ;
@@ -336,26 +335,6 @@ namespace std {
 
 %template(Pair_Int_Int) std::pair<int,int>;
 %template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
-//#endif //SWIG_MAIN_MODULE
-//#ifndef SWIG_MAIN_MODULE
-/**%template() std::vector<std::string>;
-
-%template() std::vector<std::vector<bool> > ;
-%template() std::vector< std::vector<std::vector<bool> > > ;
-
-%template()  std::vector<unsigned char>;
-
-%template() std::vector<int>;
-%template() std::vector<std::vector<int> > ;
-%template() std::vector< std::vector<std::vector<int> > > ;
-
-%template() std::vector<double>;
-%template() std::vector<std::vector<double> > ;
-%template() std::vector< std::vector<std::vector<double> > > ;
-
-%template() std::pair<int,int>;
-%template() std::vector< std::pair<int,int> >;*/
-//#endif //SWIG_MAIN_MODULE
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
 // nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code

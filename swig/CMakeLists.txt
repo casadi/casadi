@@ -36,7 +36,6 @@ set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
 
 
 set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
-set_source_files_properties(casadi.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
 
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
