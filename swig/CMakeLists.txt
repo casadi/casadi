@@ -38,21 +38,9 @@ if(WITH_PYTHON)
    add_subdirectory(python)
 endif()
 
-# MATLAB front-end
 if(WITH_MATLAB)
-  #add_subdirectory(matlab)
-  add_custom_target(matlab DEPENDS casadi_matlab)
-
-  find_package(MATLAB REQUIRED)
-
-  include_directories(${MATLAB_INCLUDE_DIR})
-  add_definitions(${MATLAB_EXTRA_CXXFLAGS})
-
-  # Generate SWIG wrapper
-  set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
-  swig_add_module(casadi_matlab matlab casadi.i)
-
-endif(WITH_MATLAB)
+  add_subdirectory(matlab)
+endif()
 
 # JSON/Haskell front-end
 if(WITH_JSON)
