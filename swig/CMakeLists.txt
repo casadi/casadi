@@ -5,42 +5,30 @@ find_package(SWIG REQUIRED)
 # NOTE: you are not allowd to generate header files with configure_file in this module.
 # See https://github.com/casadi/casadi/issues/646
 
-# Enforce cmake2.4+ style behaviour for mixed filename/full path linker directives
-cmake_policy(SET CMP0003 NEW)
-
 # cmake_policy propagation rules
 if(POLICY CMP0011)
 cmake_policy(SET CMP0011 OLD)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
-
-set(CASADI_SWIG_FLAGS "")
-
-# Include the use swig file
-include(${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
-
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
-  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_DOXDOC")
-endif()
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
-
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
-
 set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
 
-set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
+# Include the use SWIG file
+include(${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
+
+# Set misc SWIG flags
+set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
+  set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-DWITH_DOXDOC")
+endif()
 
 if(WITH_WERROR)
   # This will make the swig command return an error so that "make" will fail,
   # but swig will emit the output files anyways so subsequent calls to "make"
   # will succeed. At least buildbot will report failures.
-  #
-  # I'm pretty sure this is also OK also in windows, see:
-  # http://www.swig.org/Doc3.0/Warnings.html#Warnings_nn7
   set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-Werror")
   set(MAYBE_WERROR "-Werror")
 else()
@@ -50,7 +38,6 @@ endif()
 if(WITH_PYTHON)
   add_custom_target(python DEPENDS _casadi)
 
-
 # Python front-end
 #add_subdirectory(python)
 
@@ -59,6 +46,9 @@ find_package(PythonLibs REQUIRED)
 find_package(PythonInterp REQUIRED)
 
 include_directories(${PYTHON_INCLUDE_PATH})
+
+# a python library is built in the build directory inside swig/python
+make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 
 find_package(NUMPY)
 if(NUMPY_FOUND)
@@ -74,6 +64,7 @@ endif()
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
 
+# Generate SWIG wrapper
 swig_add_module(casadi python casadi.i)
 swig_link_libraries(casadi ${PYTHON_LIBRARIES} casadi)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -84,7 +75,6 @@ endif()
 
 # the name used for the shared module for the python interface is determined
 get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
-
 if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
   if( WIN32 )
     set(CASADI_PYTHON_LIBRARY_SUFFIX ".pyd")
@@ -92,31 +82,14 @@ if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
     set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
   endif()
 endif()
-
-set(CASADI_PYTHON_LIBRARY_casadi ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
-
-# a python library is built in the build directory inside swig/python
-make_directory(${PROJECT_BINARY_DIR}/python/casadi)
+set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 
 # Workaround bug in cmake 2.8.3 and lower. See #704.
 add_custom_command(
   TARGET python
   COMMAND ${CMAKE_COMMAND}
-  ARGS -E touch ${PROJECT_BINARY_DIR}/_python_modules
+  ARGS -E touch ${PROJECT_BINARY_DIR}/_casadi_python_dummy_target
 )
-
-# workaround for Visual Studio! The default way is not general enough and should be changed!
-if(MSVC)
-  set(PYTHONLIBPATH_casadi ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_casadi})
-else()
-  set(PYTHONLIBPATH_casadi ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_casadi})
-endif()
-
-# add_custom_command(
-#   TARGET _casadi
-#   COMMAND ${CMAKE_COMMAND}
-#   ARGS -E copy ${PYTHONLIBPATH_casadi} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_casadi}
-# )
 
 if(NOT DEFINED PYTHON_PREFIX)
   if(PYTHONINTERP_FOUND)
@@ -150,7 +123,8 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
   endif()
 endif()
 
-# Construct a dynamic loader for python
+# Construct a dynamic loader for python 
+# NOTE(@jaeandersson): Needed?
 file(WRITE "${PROJECT_BINARY_DIR}/python/casadi/casadi_loader.py" "failed_modules={}\nloaded_modules=[]\n")
 file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi_loader.py"
 "try:\n"
@@ -160,6 +134,7 @@ file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi_loader.py"
 "  failed_modules['casadi'] = str(e)\n"
 )
 
+# NOTE(@jaeandersson): What is this?
 install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
   DESTINATION "${PYTHON_PREFIX}"
   COMPONENT install_python
@@ -169,19 +144,28 @@ install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
   PATTERN .py EXCLUDE
 )
 
-#  For DLL-based systems, rpath is not available,
-# so copy the dlls to the same directory as the .pyd files
-file(GLOB dlls "${PROJECT_BINARY_DIR}/lib/*.dll")
-install(FILES ${dlls}
-  DESTINATION "${PYTHON_PREFIX}/casadi"
-  COMPONENT install_python
+# Custom installation command for Python
+add_custom_target(install_python
+COMMAND ${CMAKE_COMMAND}
+  -D COMPONENT=install_python
+  -D CMAKE_INSTALL_PREFIX="${PYTHON_PREFIX}"
+  -P cmake_install.cmake
 )
+add_dependencies(install_python _casadi)
 
+# Install C++ wrapper
 install(TARGETS _casadi
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
 
+# Install Python proxy file
+install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+)
+
+# Install Python tools
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
@@ -189,25 +173,20 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
   PATTERN .pyc EXCLUDE
   PATTERN .svn EXCLUDE
 )
+
+# Install Python package initialization
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
 
-install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py
+# For DLL-based systems, rpath is not available,
+# so copy the dlls to the same directory as the .pyd files
+file(GLOB dlls "${PROJECT_BINARY_DIR}/lib/*.dll")
+install(FILES ${dlls}
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
-
-#creation of a custom installation command
-add_custom_target(install_python
-COMMAND ${CMAKE_COMMAND}
-  -D COMPONENT=install_python
-  -D CMAKE_INSTALL_PREFIX="${PYTHON_PREFIX}"
-  -P cmake_install.cmake
-)
-
-add_dependencies(install_python _casadi)
 
 endif(WITH_PYTHON)
 
@@ -221,6 +200,7 @@ if(WITH_MATLAB)
   include_directories(${MATLAB_INCLUDE_DIR})
   add_definitions(${MATLAB_EXTRA_CXXFLAGS})
 
+  # Generate SWIG wrapper
   swig_add_module(casadi_matlab matlab casadi.i)
 
 endif(WITH_MATLAB)
@@ -238,6 +218,7 @@ if(POLICY CMP0046)
   cmake_policy(SET CMP0046 OLD)
 endif()
 
+# Generate SWIG wrapper
 swig_add_module_xml(casadi_xml casadi.i)
 add_custom_target(casadi_json
   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml casadi
