@@ -192,9 +192,7 @@ namespace casadi {
 } // namespace casadi
 
 #ifdef SWIGPYTHON
-#ifdef WITH_NUMPY
 #include <arrayobject.h>
-#endif // WITH_NUMPY
 
 // Template instantiations
 %template()    std::vector<PyObject*>;

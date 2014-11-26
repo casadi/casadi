@@ -496,12 +496,7 @@ if (casadi::CasadiOptions::catch_errors_swig) { \
 %include "deprecated.i"
 
 #ifdef SWIGPYTHON
-#ifndef WITH_NUMPY
-//#warning "Not using numpy. option(WITH_NUMPY = OFF)"
-#endif
 
-#ifdef WITH_NUMPY
-//#warning "Using numpy. option(WITH_NUMPY = ON)"
 %{
 #define SWIG_FILE_WITH_INIT
 %}
@@ -517,7 +512,6 @@ if (casadi::CasadiOptions::catch_errors_swig) { \
 %init %{
 import_array();
 %}
-#endif // WITH_NUMPY
 #endif // SWIGPYTHON
 
 

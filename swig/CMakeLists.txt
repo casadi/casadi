@@ -44,18 +44,14 @@ if(WITH_PYTHON)
 # Find packages
 find_package(PythonLibs REQUIRED)
 find_package(PythonInterp REQUIRED)
+find_package(NUMPY REQUIRED)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PYTHON_INCLUDE_PATH})
+include_directories(${NUMPY_INCLUDED_DIRS})
 
 # a python library is built in the build directory inside swig/python
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
-
-find_package(NUMPY)
-if(NUMPY_FOUND)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-  include_directories(${NUMPY_INCLUDED_DIRS})
-  set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DWITH_NUMPY")
-endif()
 
 if(WITH_PYTHON_INTERRUPTS)
   set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DWITH_PYTHON_INTERRUPTS")

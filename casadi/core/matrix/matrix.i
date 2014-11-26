@@ -29,7 +29,6 @@ namespace casadi{
 
 #ifdef SWIGPYTHON
 
-#ifdef WITH_NUMPY
 /**
 
 Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype double)   - DENSE
@@ -190,7 +189,6 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
     $1=0;
   }
 }
-#endif // WITH_NUMPY
 #endif // SWIGPYTHON
 
 } // namespace casadi
@@ -234,7 +232,6 @@ namespace casadi{
 %extend Matrix<double> {
 /// Create a 2D contiguous NP_DOUBLE numpy.ndarray
 
-#ifdef WITH_NUMPY
 PyObject* arrayView() {
   if ($self->size()!=$self->numel()) 
     throw  casadi::CasadiException("Matrix<double>::arrayview() can only construct arrayviews for dense DMatrices.");
@@ -247,7 +244,6 @@ PyObject* arrayView() {
   Py_DECREF(temp); 
   return ret;
 }
-#endif // WITH_NUMPY
     
 %pythoncode %{
   def toArray(self,shared=False):
