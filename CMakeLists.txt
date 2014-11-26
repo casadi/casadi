@@ -129,7 +129,7 @@ endif()
 cmake_policy(SET CMP0005 OLD)
 
 # cmake_policy use MACOSX_RPATH=ON by default
-if(CMAKE_MAJOR_VERSION GREATER 2)
+if(POLICY CMP0042)
   cmake_policy(SET CMP0042 NEW)
 endif()
 
