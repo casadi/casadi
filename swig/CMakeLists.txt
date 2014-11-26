@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
+find_package(SWIG REQUIRED)
+
 # NOTE: you are not allowd to generate header files with configure_file in this module.
 # See https://github.com/casadi/casadi/issues/646
 
@@ -45,20 +47,16 @@ else()
   set(MAYBE_WERROR "")
 endif()
 
-
-
+if(WITH_PYTHON)
 
 # Python front-end
 #add_subdirectory(python)
 
 # Find packages
-find_package(PythonLibs)
-find_package(PythonInterp)
+find_package(PythonLibs REQUIRED)
+find_package(PythonInterp REQUIRED)
 
-# Find python library and add include path for python headers
-if(PYTHONLIBS_FOUND)
-  include_directories(${PYTHON_INCLUDE_PATH})
-endif()
+include_directories(${PYTHON_INCLUDE_PATH})
 
 find_package(NUMPY)
 if(NUMPY_FOUND)
@@ -115,11 +113,11 @@ else()
   set(PYTHONLIBPATH_casadi ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_casadi})
 endif()
 
-add_custom_command(
-  TARGET _casadi
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PYTHONLIBPATH_casadi} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_casadi}
-)
+# add_custom_command(
+#   TARGET _casadi
+#   COMMAND ${CMAKE_COMMAND}
+#   ARGS -E copy ${PYTHONLIBPATH_casadi} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_casadi}
+# )
 
 if(NOT DEFINED PYTHON_PREFIX)
   if(PYTHONINTERP_FOUND)
@@ -212,12 +210,13 @@ COMMAND ${CMAKE_COMMAND}
 
 add_dependencies(install_python _casadi)
 
+endif(WITH_PYTHON)
 
 # MATLAB front-end
 if(WITH_MATLAB)
   #add_subdirectory(matlab)
 
-  find_package(MATLAB)
+  find_package(MATLAB REQUIRED)
 
   include_directories(${MATLAB_INCLUDE_DIR})
   add_definitions(${MATLAB_EXTRA_CXXFLAGS})
@@ -225,9 +224,10 @@ if(WITH_MATLAB)
 
   swig_add_module(casadi_matlab matlab casadi.i)
 
-endif()
+endif(WITH_MATLAB)
 
 # JSON/Haskell front-end
+if(WITH_JSON)
 #add_subdirectory(json)
 
 add_custom_target(_json_modules DEPENDS casadi_json)
@@ -265,16 +265,12 @@ set(CPACK_COMPONENTS_ALL Unspecified componentjson)
 # This will not actually work since we are in a EXCLUDE_FROM_ALL
 # http://cmake.3232098.n2.nabble.com/Yet-another-install-vs-exclude-from-all-thread-td4967491.html
 
-
-
 # Pass meta information
 configure_file(
   ${CMAKE_SOURCE_DIR}/swig/linklist.txt.cmake
   ${PROJECT_BINARY_DIR}/swig/linklist.txt
   ESCAPE_QUOTES
 )
-
-
 
 include(InstallRequiredSystemLibraries)
 
@@ -314,3 +310,5 @@ set(CPACK_PACKAGE_VERSION_PATCH "99")
 endif()
 
 include(CPack)
+
+endif(WITH_JSON)
