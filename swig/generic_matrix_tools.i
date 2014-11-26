@@ -24,8 +24,8 @@
 #ifndef CASADI_GENERIC_MATRIX_TOOLS_I
 #define CASADI_GENERIC_MATRIX_TOOLS_I
 
-%include <casadi/core/matrix/slice.i>
-%include <casadi/core/matrix/sparsity.i>
+%include "slice.i"
+%include "sparsity.i"
 
 %include <casadi/core/matrix/generic_matrix_tools.hpp>
 

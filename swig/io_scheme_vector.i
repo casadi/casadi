@@ -24,7 +24,7 @@
 #ifndef CASADI_IO_SCHEME_VECTOR_I
 #define CASADI_IO_SCHEME_VECTOR_I
 
-%include <casadi/core/function/io_scheme.i>
+%include "io_scheme.i"
 
 %include <casadi/core/function/io_scheme_vector.hpp>
 

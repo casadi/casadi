@@ -21,28 +21,22 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CASADI_IO_SCHEME_I
-#define CASADI_IO_SCHEME_I
+#ifndef CASADI_IO_INTERFACE_I
+#define CASADI_IO_INTERFACE_I
 
-%include <casadi/core/shared_object.i>
+%include "sx_element.i"
+ //%include "mx.i"
+%include "options_functionality.i"
+%include "io_scheme.i"
 
-%rename(__call__original__) casadi::IOScheme::operator();
+%include <casadi/core/function/io_interface.hpp>
 
-%include <casadi/core/function/io_scheme.hpp>
+%template(IOInterfaceFunction) casadi::IOInterface<casadi::Function>;
 
-#ifdef SWIGPYTHON
-%extend casadi::IOScheme {
-%template(__call__original__) operator()< casadi::Sparsity >;
-%template(__call__original__) operator()< casadi::MX> ;
-%template(__call__original__) operator()< casadi::Matrix<casadi::SXElement> >;
-%template(__call__original__) operator()< casadi::Matrix<double> >;
-
-%pythoncode %{
-  def __call__(self,*dummy,**kwargs):
-    if len(dummy)>1: return self.__call__original__(dummy[0],dummy[1:])
-    return self.__call__original__(kwargs.keys(),kwargs.values())
-%}
+%extend casadi::IOInterface<casadi::Function> {
+  casadi::Matrix<double> getInput(int iind=0) const             { static_cast<const casadi::Function*>($self)->assertInit(); return $self->input(iind);}
+  casadi::Matrix<double> getInput(const std::string &iname) const             { return $self->input($self->inputSchemeEntry(iname)); }
+  casadi::Matrix<double> getOutput(int oind=0) const            { static_cast<const casadi::Function*>($self)->assertInit(); return $self->output(oind);}
 }
-#endif
 
-#endif // CASADI_IO_SCHEME_I
+#endif // CASADI_IO_INTERFACE_I

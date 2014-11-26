@@ -21,18 +21,39 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CASADI_GENERIC_EXPRESSION_I
-#define CASADI_GENERIC_EXPRESSION_I
+#ifndef CASADI_MX_I
+#define CASADI_MX_I
 
-%include <casadi/core/printable_object.i>
+%include "shared_object.i"
+%include "matrix.i"
+%include "generic_expression.i"
 
-%include <casadi/core/matrix/generic_expression.hpp>
+%include <casadi/core/mx/mx.hpp>
 
-%template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
-%template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
-%template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElement> >;
-%template(ExpMX)             casadi::GenericExpression<casadi::MX>;
-%template(ExpSXElement)      casadi::GenericExpression<casadi::SXElement>;
+%extend casadi::MX{
+  
+  %matrix_helpers(casadi::MX)
+  
+  #ifdef SWIGPYTHON
+  %python_array_wrappers(1002.0)
+  
+  %pythoncode %{
+  def __array_custom__(self,*args,**kwargs):
+    import numpy as np
+    if np.__version__=="1.8.1": #1083
+      return np.array(np.nan)
+    raise Exception("MX cannot be converted to an array. MX.__array__ purely exists to allow ufunc/numpy goodies")
+    
+  def __iter__(self):
+    return self.nz.__iter__()
+    
+  %}
+  #endif //SWIGPYTHON
+  
+  binopsrFull(casadi::MX)
+};
 
-#endif // CASADI_GENERIC_EXPRESSION_I
+VECTOR_REPR(casadi::MX)
+VECTOR_REPR(std::vector<casadi::MX>)
 
+#endif // CASADI_MX_I

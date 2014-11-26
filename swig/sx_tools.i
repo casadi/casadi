@@ -21,22 +21,13 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CASADI_IO_INTERFACE_I
-#define CASADI_IO_INTERFACE_I
+#ifndef CASADI_SX_TOOLS_I
+#define CASADI_SX_TOOLS_I
 
-%include <casadi/core/sx/sx_element.i>
- //%include <casadi/core/mx/mx.i>
-%include <casadi/core/options_functionality.i>
-%include <casadi/core/function/io_scheme.i>
+%include "sx_element.i"
+%include "matrix_tools.i"
+%include "generic_matrix_tools.i"
 
-%include <casadi/core/function/io_interface.hpp>
+%include <casadi/core/sx/sx_tools.hpp>
 
-%template(IOInterfaceFunction) casadi::IOInterface<casadi::Function>;
-
-%extend casadi::IOInterface<casadi::Function> {
-  casadi::Matrix<double> getInput(int iind=0) const             { static_cast<const casadi::Function*>($self)->assertInit(); return $self->input(iind);}
-  casadi::Matrix<double> getInput(const std::string &iname) const             { return $self->input($self->inputSchemeEntry(iname)); }
-  casadi::Matrix<double> getOutput(int oind=0) const            { static_cast<const casadi::Function*>($self)->assertInit(); return $self->output(oind);}
-}
-
-#endif // CASADI_IO_INTERFACE_I
+#endif // CASADI_SX_TOOLS_I

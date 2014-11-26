@@ -21,14 +21,26 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CASADI_WEAK_REF_I
-#define CASADI_WEAK_REF_I
+#ifndef CASADI_OPTIONS_FUNCTIONALITY_I
+#define CASADI_OPTIONS_FUNCTIONALITY_I
 
-%include <casadi/core/shared_object.i>
+%include "generic_type.i"
+%include "shared_object.i"
 
 %{
-#include <casadi/core/weak_ref.hpp>
+#include <casadi/core/options_functionality.hpp>
 %}
-%include <casadi/core/weak_ref.hpp>
+%include <casadi/core/options_functionality.hpp>
 
-#endif // CASADI_WEAK_REF_I
+namespace casadi {
+  %extend OptionsFunctionality {
+    void setOption(const std::string &name, const std::string& val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, const std::vector<int>& val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, const std::vector<double>& val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, double val){$self->setOption(name,val);}
+    void setOption(const std::string &name, int val){$self->setOption(name,val);} 
+    void setOption(const std::string &name, bool val){$self->setOption(name,val);}  
+  }
+} // namespace casadi
+
+#endif // CASADI_OPTIONS_FUNCTIONALITY_I

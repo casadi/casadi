@@ -24,9 +24,9 @@
 #ifndef CASADI_MATRIX_TOOLS_I
 #define CASADI_MATRIX_TOOLS_I
 
-%include <casadi/core/matrix/matrix.i>
-%include <casadi/core/options_functionality.i>
-%include <casadi/core/matrix/sparsity_tools.i>
+%include "matrix.i"
+%include "options_functionality.i"
+%include "sparsity_tools.i"
 
 %include <casadi/core/matrix/matrix_tools.hpp>
 

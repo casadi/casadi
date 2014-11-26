@@ -21,11 +21,31 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CASADI_SPARSITY_TOOLS_I
-#define CASADI_SPARSITY_TOOLS_I
+#ifndef CASADI_SPARSITY_I
+#define CASADI_SPARSITY_I
 
-%include <casadi/core/matrix/sparsity.i>
+%include "shared_object.i"
 
-%include <casadi/core/matrix/sparsity_tools.hpp>
+%include <casadi/core/matrix/sparsity.hpp>
 
-#endif // CASADI_SPARSITY_TOOLS_I
+// Logic for pickling
+#ifdef SWIGPYTHON
+namespace casadi{
+%extend Sparsity {
+  %pythoncode %{
+    def __setstate__(self, state):
+        if state:
+          self.__init__(state["nrow"],state["ncol"],state["colind"],state["row"])
+        else:
+          self.__init__()
+
+    def __getstate__(self):
+        if self.isNull(): return {}
+        return {"nrow": self.size1(), "ncol": self.size2(), "colind": numpy.array(self.colind(),dtype=int), "row": numpy.array(self.row(),dtype=int)}
+  %}  
+}
+
+} // namespace casadi
+#endif // SWIGPYTHON
+
+#endif // CASADI_SPARSITY_I

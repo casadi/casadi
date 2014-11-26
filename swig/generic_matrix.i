@@ -21,13 +21,17 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CASADI_MX_TOOLS_I
-#define CASADI_MX_TOOLS_I
+#ifndef CASADI_GENERIC_MATRIX_I
+#define CASADI_GENERIC_MATRIX_I
 
-%include <casadi/core/mx/mx.i>
-%include <casadi/core/matrix/generic_matrix_tools.i>
-%include <casadi/core/matrix/generic_expression_tools.i>
+%include "slice.i"
+%include "sparsity.i"
 
-%include <casadi/core/mx/mx_tools.hpp>
+%include <casadi/core/matrix/generic_matrix.hpp>
 
-#endif // CASADI_MX_TOOLS_I
+%template(GenIMatrix)        casadi::GenericMatrix<casadi::Matrix<int> >;
+%template(GenDMatrix)        casadi::GenericMatrix<casadi::Matrix<double> >;
+%template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElement> >;
+%template(GenMX)             casadi::GenericMatrix<casadi::MX>;
+
+#endif // CASADI_GENERIC_MATRIX_I

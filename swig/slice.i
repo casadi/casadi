@@ -24,7 +24,7 @@
 #ifndef CASADI_SLICE_I
 #define CASADI_SLICE_I
 
-%include <casadi/core/printable_object.i>
+%include "printable_object.i"
 
 %include <casadi/core/matrix/slice.hpp>
 

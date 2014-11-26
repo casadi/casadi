@@ -25,7 +25,7 @@
 
 %module(package="casadi") casadi
 
-%include <casadi/core/common.i>
+%include "common.i"
 %include <casadi/core/function/schemes_metadata.hpp>
 
 // Init hooks
@@ -277,23 +277,23 @@ class NZproxy:
 %include "typemaps.i"
 #endif
 
-%include <casadi/core/std_vector_tools.i>
-%include <casadi/core/weak_ref.i>
-%include <casadi/core/options_functionality.i>
-%include <casadi/core/casadi_calculus.i>
-%include <casadi/core/matrix/sparsity.i>
-%include <casadi/core/matrix/slice.i>
-%include <casadi/core/matrix/generic_expression.i>
-%include <casadi/core/matrix/generic_matrix.i>
-%include <casadi/core/matrix/matrix.i>
-%include <casadi/core/sx/sx_element.i>
-%include <casadi/core/mx/mx.i>
-%include <casadi/core/matrix/matrix_tools.i>
-%include <casadi/core/matrix/generic_matrix_tools.i>
-%include <casadi/core/matrix/generic_expression_tools.i>
-%include <casadi/core/matrix/sparsity_tools.i>
-%include <casadi/core/sx/sx_tools.i>
-%include <casadi/core/mx/mx_tools.i>
+%include "std_vector_tools.i"
+%include "weak_ref.i"
+%include "options_functionality.i"
+%include "casadi_calculus.i"
+%include "sparsity.i"
+%include "slice.i"
+%include "generic_expression.i"
+%include "generic_matrix.i"
+%include "matrix.i"
+%include "sx_element.i"
+%include "mx.i"
+%include "matrix_tools.i"
+%include "generic_matrix_tools.i"
+%include "generic_expression_tools.i"
+%include "sparsity_tools.i"
+%include "sx_tools.i"
+%include "mx_tools.i"
 
 
 #ifdef SWIGOCTAVE
@@ -389,9 +389,9 @@ def PyFunction(obj,inputs,outputs):
 %}
 #endif
 
-%include <casadi/core/function/io_interface.i>
-%include <casadi/core/function/io_scheme.i>
-%include <casadi/core/function/io_scheme_vector.i>
+%include "io_interface.i"
+%include "io_scheme.i"
+%include "io_scheme_vector.i"
 
 %include <casadi/core/function/function.hpp>
 %template(Pair_Function_Function) std::pair<casadi::Function,casadi::Function>;

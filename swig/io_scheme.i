@@ -21,31 +21,28 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CASADI_SPARSITY_I
-#define CASADI_SPARSITY_I
+#ifndef CASADI_IO_SCHEME_I
+#define CASADI_IO_SCHEME_I
 
-%include <casadi/core/shared_object.i>
+%include "shared_object.i"
 
-%include <casadi/core/matrix/sparsity.hpp>
+%rename(__call__original__) casadi::IOScheme::operator();
 
-// Logic for pickling
+%include <casadi/core/function/io_scheme.hpp>
+
 #ifdef SWIGPYTHON
-namespace casadi{
-%extend Sparsity {
-  %pythoncode %{
-    def __setstate__(self, state):
-        if state:
-          self.__init__(state["nrow"],state["ncol"],state["colind"],state["row"])
-        else:
-          self.__init__()
+%extend casadi::IOScheme {
+%template(__call__original__) operator()< casadi::Sparsity >;
+%template(__call__original__) operator()< casadi::MX> ;
+%template(__call__original__) operator()< casadi::Matrix<casadi::SXElement> >;
+%template(__call__original__) operator()< casadi::Matrix<double> >;
 
-    def __getstate__(self):
-        if self.isNull(): return {}
-        return {"nrow": self.size1(), "ncol": self.size2(), "colind": numpy.array(self.colind(),dtype=int), "row": numpy.array(self.row(),dtype=int)}
-  %}  
+%pythoncode %{
+  def __call__(self,*dummy,**kwargs):
+    if len(dummy)>1: return self.__call__original__(dummy[0],dummy[1:])
+    return self.__call__original__(kwargs.keys(),kwargs.values())
+%}
 }
+#endif
 
-} // namespace casadi
-#endif // SWIGPYTHON
-
-#endif // CASADI_SPARSITY_I
+#endif // CASADI_IO_SCHEME_I

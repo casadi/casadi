@@ -21,11 +21,15 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CASADI_SHARED_OBJECT_I
-#define CASADI_SHARED_OBJECT_I
+#ifndef CASADI_GENERIC_TYPE_I
+#define CASADI_GENERIC_TYPE_I
 
-%include <casadi/core/printable_object.i>
+%include "shared_object.i"
+%include <casadi/core/casadi_types.hpp>
 
-%include <casadi/core/shared_object.hpp>
+%{
+#include <casadi/core/generic_type.hpp>
+%}
+%include <casadi/core/generic_type.hpp>
 
-#endif // CASADI_SHARED_OBJECT_I
+#endif // CASADI_GENERIC_TYPE_I

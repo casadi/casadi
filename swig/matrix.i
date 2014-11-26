@@ -193,9 +193,9 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 
 } // namespace casadi
 
-%include <casadi/core/printable_object.i>
-%include <casadi/core/matrix/generic_matrix.i>
-%include <casadi/core/matrix/generic_expression.i>
+%include "printable_object.i"
+%include "generic_matrix.i"
+%include "generic_expression.i"
 
 // FIXME: Placing in printable_object.i does not work
 %template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;

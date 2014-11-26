@@ -160,5 +160,5 @@ endif()
 
 install(DIRECTORY ./
   DESTINATION include/casadi/core
-  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.i"
+  FILES_MATCHING PATTERN "*.hpp"
   PATTERN ".svn" EXCLUDE)

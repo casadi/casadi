@@ -21,23 +21,14 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CASADI_STD_VECTOR_TOOLS_I
-#define CASADI_STD_VECTOR_TOOLS_I
+#ifndef CASADI_WEAK_REF_I
+#define CASADI_WEAK_REF_I
 
-%include <casadi/core/shared_object.i>
+%include "shared_object.i"
 
 %{
-#include <casadi/core/std_vector_tools.hpp>
+#include <casadi/core/weak_ref.hpp>
 %}
-%include <casadi/core/std_vector_tools.hpp>
+%include <casadi/core/weak_ref.hpp>
 
-VECTOR_TOOLS_TEMPLATES(int)
-VECTOR_TOOLS_TEMPLATES(double)
-%define VECTOR_REPR(type)
-%extend std::vector< type >{
-  std::string SWIG_REPR(){ return casadi::getRepresentation(*$self); }
-  std::string SWIG_STR(){ return casadi::getDescription(*$self); }
-};
-%enddef
-
-#endif // CASADI_STD_VECTOR_TOOLS_I
+#endif // CASADI_WEAK_REF_I
