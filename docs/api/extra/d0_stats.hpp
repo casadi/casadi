@@ -254,17 +254,6 @@
 <tr><td>t_total</td></tr>
 </table>
 */
-/** \class casadi::PsdIndefDpleSolver
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>t_linear_solve</td><td>casadi::PsdIndefDpleInternal</td></tr>
-<tr><td>t_psd</td><td>casadi::PsdIndefDpleInternal</td></tr>
-<tr><td>t_total</td><td>casadi::PsdIndefDpleInternal</td></tr>
-</table>
-*/
 /// \cond INTERNAL
 /** \class casadi::QcqpToSocp
 \n

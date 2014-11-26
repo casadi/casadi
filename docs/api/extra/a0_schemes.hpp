@@ -984,13 +984,6 @@
 @copydoc scheme_DPLEOutput
 */
 /// \endcond
-/** \class casadi::PsdIndefDpleSolver
-\n
-\par
-@copydoc scheme_DPLEInput
-<br/>
-@copydoc scheme_DPLEOutput
-*/
 /// \cond INTERNAL
 /** \class casadi::QcqpSolverInternal
 \n
