@@ -48,6 +48,8 @@ else()
 endif()
 
 if(WITH_PYTHON)
+  add_custom_target(python DEPENDS _casadi)
+
 
 # Python front-end
 #add_subdirectory(python)
@@ -95,13 +97,10 @@ set(CASADI_PYTHON_LIBRARY_casadi ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_
 
 # a python library is built in the build directory inside swig/python
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
-# adding some extra commands to the target _casadi which is declared automatically when constructing a swig-python interface
-
-add_custom_target(_python_modules DEPENDS _casadi)
 
 # Workaround bug in cmake 2.8.3 and lower. See #704.
 add_custom_command(
-  TARGET _python_modules
+  TARGET python
   COMMAND ${CMAKE_COMMAND}
   ARGS -E touch ${PROJECT_BINARY_DIR}/_python_modules
 )
@@ -215,12 +214,12 @@ endif(WITH_PYTHON)
 # MATLAB front-end
 if(WITH_MATLAB)
   #add_subdirectory(matlab)
+  add_custom_target(matlab DEPENDS casadi_matlab)
 
   find_package(MATLAB REQUIRED)
 
   include_directories(${MATLAB_INCLUDE_DIR})
   add_definitions(${MATLAB_EXTRA_CXXFLAGS})
-  add_custom_target(_matlab_modules DEPENDS casadi_matlab)
 
   swig_add_module(casadi_matlab matlab casadi.i)
 
@@ -230,7 +229,7 @@ endif(WITH_MATLAB)
 if(WITH_JSON)
 #add_subdirectory(json)
 
-add_custom_target(_json_modules DEPENDS casadi_json)
+add_custom_target(json DEPENDS casadi_json)
 
 # fooXML_wrap.xml are a big files which Joris wants to delete immedately after using.
 # These files are dependencies of json outputs, but they don't exist according to cmake.

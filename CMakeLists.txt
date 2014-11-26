@@ -516,18 +516,6 @@ endif()
 #####################################################
 if(WITH_PYTHON OR WITH_MATLAB OR WITH_JSON)
   add_subdirectory(swig)
-
-  if(WITH_PYTHON)
-    add_custom_target(python DEPENDS _python_modules)
-  endif()
-
-  if(WITH_MATLAB)
-      add_custom_target(matlab DEPENDS _matlab_modules)
-  endif()
-
-  if(WITH_JSON)
-    add_custom_target(json DEPENDS _json_modules)
-  endif()
 endif()
 
 #####################################################
