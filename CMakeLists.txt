@@ -517,7 +517,7 @@ endif()
 if(WITH_PYTHON OR WITH_MATLAB OR WITH_JSON)
   add_subdirectory(swig)
 
-  if(WITH_MATLAB)
+  if(WITH_PYTHON)
     add_custom_target(python DEPENDS _python_modules)
   endif()
 
