@@ -13,7 +13,6 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
-set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
 
 # Include the use SWIG file
 include(${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
@@ -36,144 +35,8 @@ else()
 endif()
 
 if(WITH_PYTHON)
-  add_custom_target(python DEPENDS _casadi)
-
-# Python front-end
-#add_subdirectory(python)
-
-# Find packages
-find_package(PythonLibs REQUIRED)
-find_package(PythonInterp REQUIRED)
-find_package(NUMPY REQUIRED)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${PYTHON_INCLUDE_PATH})
-include_directories(${NUMPY_INCLUDED_DIRS})
-
-# a python library is built in the build directory inside swig/python
-make_directory(${PROJECT_BINARY_DIR}/python/casadi)
-
-if(WITH_PYTHON_INTERRUPTS)
-  set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DWITH_PYTHON_INTERRUPTS")
+   add_subdirectory(python)
 endif()
-
-set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
-set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
-
-# Generate SWIG wrapper
-swig_add_module(casadi python casadi.i)
-swig_link_libraries(casadi ${PYTHON_LIBRARIES} casadi)
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign -Wno-maybe-uninitialized ${MAYBE_WERROR}")
-endif()
-
-# the name used for the shared module for the python interface is determined
-get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
-if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
-  if( WIN32 )
-    set(CASADI_PYTHON_LIBRARY_SUFFIX ".pyd")
-  else()
-    set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
-  endif()
-endif()
-set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
-
-# Workaround bug in cmake 2.8.3 and lower. See #704.
-add_custom_command(
-  TARGET python
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E touch ${PROJECT_BINARY_DIR}/_casadi_python_dummy_target
-)
-
-if(NOT DEFINED PYTHON_PREFIX)
-  if(PYTHONINTERP_FOUND)
-    #determining the installation path for python libraries
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}"
-      "${CMAKE_CURRENT_SOURCE_DIR}/python/find_installation_path.py"
-      OUTPUT_VARIABLE PYTHON_INSTALLATION_PATH
-      RESULT_VARIABLE PYTHON_INSTALLATION_PATH_RESULT
-      ERROR_VARIABLE PYTHON_INSTALLATION_PATH_ERROR)
-  endif()
-  if(NOT "${PYTHON_INSTALLATION_PATH_RESULT}" STREQUAL "0")
-message(FATAL_ERROR "Something went wrong detecting your python setup...
-${PROJECT_BINARY_DIR} \$ ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/python/find_installation_path.py
-Returned the following error messages:
-${PYTHON_INSTALLATION_PATH_ERROR}
-You may try to fix this problem, or supply PYTHON_PREFIX manually.
-
-e.g.
-\$ cmake -DPYTHON_PREFIX=\"/usr/lib/python2.7/dist-packages\" ..
-
-The idea is to supply a directory that python knows about (included in PYTHONPATH).
-
-")
-  else()
-    # Replace backslashes with normal slashes
-    if(MSYS)
-      string(REGEX REPLACE "\\\\" "/" PYTHON_INSTALLATION_PATH ${PYTHON_INSTALLATION_PATH})
-    endif()
-
-    set(PYTHON_PREFIX  ${PYTHON_INSTALLATION_PATH} CACHE PATH "Python installation prefix")
-  endif()
-endif()
-
-# NOTE(@jaeandersson): What is this?
-install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
-  DESTINATION "${PYTHON_PREFIX}"
-  COMPONENT install_python
-  USE_SOURCE_PERMISSIONS
-  PATTERN .pyc EXCLUDE
-  PATTERN .svn EXCLUDE
-  PATTERN .py EXCLUDE
-)
-
-# Custom installation command for Python
-add_custom_target(install_python
-COMMAND ${CMAKE_COMMAND}
-  -D COMPONENT=install_python
-  -D CMAKE_INSTALL_PREFIX="${PYTHON_PREFIX}"
-  -P cmake_install.cmake
-)
-add_dependencies(install_python _casadi)
-
-# Install C++ wrapper
-install(TARGETS _casadi
-  DESTINATION "${PYTHON_PREFIX}/casadi"
-  COMPONENT install_python
-)
-
-# Install Python proxy file
-install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py
-  DESTINATION "${PYTHON_PREFIX}/casadi"
-  COMPONENT install_python
-)
-
-# Install Python tools
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
-  DESTINATION "${PYTHON_PREFIX}/casadi"
-  COMPONENT install_python
-  USE_SOURCE_PERMISSIONS
-  PATTERN .pyc EXCLUDE
-  PATTERN .svn EXCLUDE
-)
-
-# Install Python package initialization
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
-  DESTINATION "${PYTHON_PREFIX}/casadi"
-  COMPONENT install_python
-)
-
-# For DLL-based systems, rpath is not available,
-# so copy the dlls to the same directory as the .pyd files
-file(GLOB dlls "${PROJECT_BINARY_DIR}/lib/*.dll")
-install(FILES ${dlls}
-  DESTINATION "${PYTHON_PREFIX}/casadi"
-  COMPONENT install_python
-)
-
-endif(WITH_PYTHON)
 
 # MATLAB front-end
 if(WITH_MATLAB)
@@ -186,6 +49,7 @@ if(WITH_MATLAB)
   add_definitions(${MATLAB_EXTRA_CXXFLAGS})
 
   # Generate SWIG wrapper
+  set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
   swig_add_module(casadi_matlab matlab casadi.i)
 
 endif(WITH_MATLAB)
@@ -204,6 +68,7 @@ if(POLICY CMP0046)
 endif()
 
 # Generate SWIG wrapper
+set_source_files_properties(casadi.i  PROPERTIES  CPLUSPLUS ON)
 swig_add_module_xml(casadi_xml casadi.i)
 add_custom_target(casadi_json
   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml casadi
