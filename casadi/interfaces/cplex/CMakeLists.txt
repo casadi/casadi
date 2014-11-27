@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.8.6)
 include_directories(${CPLEX_INCLUDE_DIR})
 
 casadi_plugin(QpSolver cplex
