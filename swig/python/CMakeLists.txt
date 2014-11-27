@@ -3,6 +3,26 @@ cmake_minimum_required(VERSION 2.8.6)
 # Python front-end
 add_custom_target(python DEPENDS _casadi)
 
+# Workaround for OS X
+if(APPLE)
+  find_program(PYTHON_CONFIG_EXECUTABLE
+               NAMES python-config DOC "python-config executable")
+  if(PYTHON_CONFIG_EXECUTABLE)
+    execute_process(COMMAND ${PYTHON_CONFIG_EXECUTABLE} --prefix
+                    OUTPUT_VARIABLE PYTHON_PREFIX_STRING
+                    RESULT_VARIABLE PYTHON_PREFIX_FAILED
+                    ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(NOT PYTHON_PREFIX_FAILED)
+      find_library(PYTHON_LIBRARY NAMES python2.7
+        PATHS ${PYTHON_PREFIX_STRING}/lib NO_DEFAULT_PATH)
+      find_path(PYTHON_INCLUDE_DIR
+        NAMES Python.h
+        PATHS ${PYTHON_PREFIX_STRING}/include/python2.7 NO_DEFAULT_PATH)
+    endif()
+    message(STATUS ${PYTHON_INCLUDE_DIR})
+  endif()
+endif()
+
 # Find packages
 find_package(PythonLibs REQUIRED)
 find_package(PythonInterp REQUIRED)
