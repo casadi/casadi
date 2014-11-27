@@ -1977,53 +1977,6 @@ namespace casadi {
     return Sparsity::triplet(d1, d2, row, col);
   }
 
-  Sparsity SparsityInternal::patternProduct(const Sparsity& x_trans,
-                                            vector< vector< pair<int, int> > >& mapping) const {
-    // return object
-    Sparsity ret = shared_from_this<Sparsity>().patternProduct(x_trans);
-
-    // Get the vectors for the return pattern
-    const vector<int>& ret_row = ret.row();
-    const vector<int>& ret_colind = ret.colind();
-
-    // Direct access to the arrays
-    const vector<int> &x_col = x_trans.row();
-    const vector<int> &y_colind = colind_;
-    const vector<int> &y_row = row_;
-    const vector<int> &x_rowind = x_trans.colind();
-
-    // Clear the mapping
-    mapping.resize(ret.size());
-
-    // the entry of the matrix to be calculated
-    vector< pair<int, int> > d;
-
-    // loop over the col of the resulting matrix)
-    for (int i=0; i<ncol_; ++i) {
-      // Loop over nonzeros
-      for (int el=ret_colind[i]; el<ret_colind[i+1]; ++el) {
-        int j = ret_row[el];
-        int el1 = y_colind[i];
-        int el2 = x_rowind[j];
-        d.clear();
-        while (el1 < y_colind[i+1] && el2 < x_rowind[j+1]) { // loop over non-zero elements
-          int j1 = y_row[el1];
-          int i2 = x_col[el2];
-          if (j1==i2) {
-            d.push_back(pair<int, int>(el1++, el2++));
-          } else if (j1<i2) {
-            el1++;
-          } else {
-            el2++;
-          }
-        }
-        mapping[el] = d;
-      }
-    }
-
-    return ret;
-  }
-
   bool SparsityInternal::isScalar(bool scalar_and_dense) const {
     return ncol_==1 && nrow_==1 && (!scalar_and_dense || size()==1);
   }

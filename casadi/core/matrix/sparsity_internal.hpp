@@ -256,14 +256,8 @@ namespace casadi {
     /// Get the dimension as a string
     std::string dimString() const;
 
-    ///@{
     /// Sparsity pattern for a matrix-matrix product (details in public class)
-    Sparsity patternProduct(const Sparsity& x_trans,
-                            std::vector< std::vector< std::pair<int, int> > >& mapping) const;
-
-    /// New implementation, multiplies with y from the right
     Sparsity patternProductNew(const Sparsity& y) const;
-    ///@}
 
     ///@{
     /// Union of two sparsity patterns

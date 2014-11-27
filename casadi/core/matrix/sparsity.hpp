@@ -424,20 +424,6 @@ namespace casadi {
     /// @}
 
     /// @{
-    /** \brief Sparsity pattern for a matrix-matrix product [deprecated]
-        Returns the sparsity pattern resulting from pre-multiplying the pattern with the
-        transpose of x.
-        Returns the new sparsity pattern as well as a mapping with the same length as the number
-        of non-zero elements
-        The mapping contains a vector of the index pairs that makes up the scalar products
-        for each non-zero */
-    Sparsity patternProduct(
-      const Sparsity& x_trans,
-      std::vector< std::vector< std::pair<int, int> > >& SWIG_OUTPUT(mapping)) const;
-    Sparsity patternProduct(const Sparsity& x_trans) const;
-    /// @}
-
-    /// @{
     /** \brief Sparsity pattern for a matrix-matrix product
         Returns the sparsity pattern resulting from multiplying the pattern with
         another pattern y from the right.
