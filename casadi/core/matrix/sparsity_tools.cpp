@@ -42,7 +42,7 @@ namespace casadi {
   }
 
   Sparsity mul(const Sparsity& a, const Sparsity &b) {
-    return a.patternProductNew(b);
+    return a.patternProduct(b);
   }
 
   Sparsity mul(const std::vector<Sparsity>& s) {

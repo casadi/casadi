@@ -257,7 +257,7 @@ namespace casadi {
     std::string dimString() const;
 
     /// Sparsity pattern for a matrix-matrix product (details in public class)
-    Sparsity patternProductNew(const Sparsity& y) const;
+    Sparsity patternProduct(const Sparsity& y) const;
 
     ///@{
     /// Union of two sparsity patterns

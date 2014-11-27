@@ -575,7 +575,7 @@ namespace casadi {
 
     // Allocate QP data
     Sparsity sp_B_obj = mat_fcn_.output(mat_hes_).sparsity();
-    qpH_ = DMatrix(sp_B_obj.T().patternProductNew(sp_B_obj));
+    qpH_ = DMatrix(sp_B_obj.T().patternProduct(sp_B_obj));
     qpA_ = mat_fcn_.output(mat_jac_);
     qpB_.resize(ng_);
 

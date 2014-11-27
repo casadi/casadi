@@ -427,10 +427,8 @@ namespace casadi {
     /** \brief Sparsity pattern for a matrix-matrix product
         Returns the sparsity pattern resulting from multiplying the pattern with
         another pattern y from the right.
-
-        This will replace patternProduct after deprecation.
     */
-    Sparsity patternProductNew(const Sparsity& y) const;
+    Sparsity patternProduct(const Sparsity& y) const;
     /// @}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros

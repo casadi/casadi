@@ -1462,7 +1462,7 @@ namespace casadi {
     Matrix<DataType> ret;
     if (sp_z.isNull()) {
       // Create the sparsity pattern for the matrix-matrix product
-      Sparsity spres = x.sparsity().patternProductNew(y.sparsity());
+      Sparsity spres = x.sparsity().patternProduct(y.sparsity());
 
       // Create the return object
       ret = Matrix<DataType>::zeros(spres);

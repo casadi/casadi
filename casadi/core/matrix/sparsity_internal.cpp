@@ -1925,7 +1925,7 @@ namespace casadi {
     return ss.str();
   }
 
-  Sparsity SparsityInternal::patternProductNew(const Sparsity& y) const {
+  Sparsity SparsityInternal::patternProduct(const Sparsity& y) const {
     // Dimensions of the result
     int d1 = nrow_;
     int d2 = y.size2();
