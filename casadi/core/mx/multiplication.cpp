@@ -88,7 +88,7 @@ namespace casadi {
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for (int d=0; d<nfwd; ++d) {
-      *fwdSens[d][0] = *fwdSeed[d][0] + mul(*input[1], *fwdSeed[d][2], input[0]->sparsity()) 
+      *fwdSens[d][0] = *fwdSeed[d][0] + mul(*input[1], *fwdSeed[d][2], input[0]->sparsity())
         + mul(*fwdSeed[d][1], *input[2], input[0]->sparsity());
     }
 
