@@ -96,7 +96,7 @@ int main(){
   // Generate Makefile
   ofstream makefile;
   makefile.open("./CMakeLists.txt");
-  makefile << "cmake_minimum_required(VERSION 2.6)" << endl;
+  makefile << "cmake_minimum_required(VERSION 2.8.6)" << endl;
   makefile << "project(nlp-codegen-autogen C)" << endl;
 
   // Codegen and compile

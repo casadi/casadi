@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 2.6)
-
 # Python front-end
 add_custom_target(python DEPENDS _casadi)
 

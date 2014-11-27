@@ -2,7 +2,7 @@
 # Joel Andersson
 # K.U. Leuven 2012
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.6)
 
 project(sundials-2.5mod C)
 include_directories(.)

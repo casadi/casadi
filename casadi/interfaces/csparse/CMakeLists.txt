@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 2.6)
 include_directories(${CSPARSE_INCLUDE_DIR})
 
 casadi_plugin(LinearSolver csparse

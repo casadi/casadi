@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 2.6)
-
 # JSON/Haskell front-end
 add_custom_target(json DEPENDS casadi_json)
 

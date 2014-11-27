@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 2.6)
-
 # Make the shared library prefix and suffix available in C++
 add_definitions(-DSHARED_LIBRARY_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
 add_definitions(-DSHARED_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
