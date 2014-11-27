@@ -227,6 +227,43 @@ namespace casadi {
   }
 
   template<typename real_t>
+  void casadi_mm_sparse(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+    /*int nrow_x = sp_x[0];*/
+    int ncol_x = sp_x[1];
+    const int* colind_x = sp_x+2;
+    const int* row_x = sp_x + 2 + ncol_x+1;
+    /*int nnz_x = colind_x[ncol_x];*/
+
+    /*int nrow_y = sp_y[0];*/
+    int ncol_y = sp_y[1];
+    const int* colind_y = sp_y+2;
+    const int* row_y = sp_y + 2 + ncol_y+1;
+    /*int nnz_y = colind_y[ncol_y];*/
+
+    /*int nrow_z = sp_z[0];*/
+    int ncol_z = sp_z[1];
+    const int* colind_z = sp_z+2;
+    const int* row_z = sp_z + 2 + ncol_z+1;
+    /*int nnz_z = colind_z[ncol_z];*/
+
+    for (int cc=0; cc<ncol_y; ++cc) {
+      for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        w[row_z[kk]] = z[kk];
+      }
+      for (int kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+        int rr = row_y[kk];
+        real_t yy = y[kk];
+        for (int kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+          w[row_x[kk1]] += x[kk1]*yy;
+        }
+      }
+      for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        z[kk] = w[row_z[kk]];
+      }
+    }
+  }
+
+  template<typename real_t>
   void casadi_mm_tn_sparse(const real_t* trans_x, const int* sp_trans_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z) {
 
     /*int nrow_y = sp_y[0];*/

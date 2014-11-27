@@ -82,6 +82,7 @@ namespace casadi {
       AUX_SQ,
       AUX_SIGN,
       AUX_MM_TN_SPARSE,
+      AUX_MM_SPARSE,
       AUX_COPY_SPARSE,
       AUX_TRANS
     };

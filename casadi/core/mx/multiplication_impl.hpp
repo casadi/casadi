@@ -162,7 +162,6 @@ namespace casadi {
                                                   const std::vector<std::string>& arg,
                                                   const std::vector<std::string>& res,
                                                   CodeGenerator& gen) const {
-    casadi_assert_message(TrX, "Not implemented");
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
@@ -173,11 +172,19 @@ namespace casadi {
     }
 
     // Perform sparse matrix multiplication
-    gen.addAuxiliary(CodeGenerator::AUX_MM_TN_SPARSE);
-    stream << "  casadi_mm_tn_sparse(";
-    stream << arg.at(1) << ", s" << gen.getSparsity(dep(1).sparsity()) << ", ";
-    stream << arg.at(2) << ", s" << gen.getSparsity(dep(2).sparsity()) << ", ";
-    stream << res.front() << ", s" << gen.getSparsity(sparsity()) << ");" << endl;
+    if (TrX) {
+      gen.addAuxiliary(CodeGenerator::AUX_MM_TN_SPARSE);
+      stream << "  casadi_mm_tn_sparse(";
+      stream << arg.at(1) << ", s" << gen.getSparsity(dep(1).sparsity()) << ", ";
+      stream << arg.at(2) << ", s" << gen.getSparsity(dep(2).sparsity()) << ", ";
+      stream << res.front() << ", s" << gen.getSparsity(sparsity()) << ");" << endl;
+    } else {
+      gen.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
+      stream << "  casadi_mm_sparse(";
+      stream << arg.at(1) << ", s" << gen.getSparsity(dep(1).sparsity()) << ", ";
+      stream << arg.at(2) << ", s" << gen.getSparsity(dep(2).sparsity()) << ", ";
+      stream << res.front() << ", s" << gen.getSparsity(sparsity()) << ");" << endl;
+    }
   }
 
   template<bool TrX>
@@ -185,7 +192,6 @@ namespace casadi {
                                                        const std::vector<std::string>& arg,
                                                        const std::vector<std::string>& res,
                                                        CodeGenerator& gen) const {
-    casadi_assert_message(TrX, "Not implemented");
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
@@ -195,14 +201,25 @@ namespace casadi {
              << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
-    int ncol_y = this->dep(2).size2();
-    int nrow_y = this->dep(2).size1();
-    int ncol_x = this->dep(1).size2();
-    stream << "  for (i=0, rr=" << res.front() <<"; i<" << ncol_y << "; ++i)";
-    stream << " for (j=0; j<" << ncol_x << "; ++j, ++rr)";
-    stream << " for (k=0, ss=" << arg.at(2) << "+i*" << nrow_y << ", tt="
-           << arg.at(1) << "+j*" << nrow_y << "; k<" << nrow_y << "; ++k)";
-    stream << " *rr += *ss++**tt++;" << endl;
+    if (TrX) {
+      int ncol_y = this->dep(2).size2();
+      int nrow_y = this->dep(2).size1();
+      int ncol_x = this->dep(1).size2();
+      stream << "  for (i=0, rr=" << res.front() <<"; i<" << ncol_y << "; ++i)";
+      stream << " for (j=0; j<" << ncol_x << "; ++j, ++rr)";
+      stream << " for (k=0, ss=" << arg.at(2) << "+i*" << nrow_y << ", tt="
+             << arg.at(1) << "+j*" << nrow_y << "; k<" << nrow_y << "; ++k)";
+      stream << " *rr += *ss++**tt++;" << endl;
+    } else {
+      int nrow_x = this->dep(1).size1();
+      int nrow_y = this->dep(2).size1();
+      int ncol_y = this->dep(2).size2();
+      stream << "  for (i=0, rr=" << res.front() <<"; i<" << ncol_y << "; ++i)";
+      stream << " for (j=0; j<" << nrow_x << "; ++j, ++rr)";
+      stream << " for (k=0, ss=" << arg.at(1) << "+j, tt="
+             << arg.at(2) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)";
+      stream << " *rr += ss[k*" << nrow_x << "]**tt++;" << endl;
+    }
   }
 
 } // namespace casadi
