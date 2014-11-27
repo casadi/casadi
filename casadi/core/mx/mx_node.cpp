@@ -49,7 +49,6 @@
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
-#include "multiplication_impl.hpp"
 #include "solve_impl.hpp"
 #include "binary_mx_impl.hpp"
 
@@ -359,9 +358,9 @@ namespace casadi {
     casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.size1()
                           << " and x" << x.dimString() << ".");
     if (x.isDense() && y.isDense()) {
-      return MX::create(new DenseMultiplication<false>(z, x, y));
+      return MX::create(new DenseMultiplication(z, x, y));
     } else {
-      return MX::create(new Multiplication<false>(z, x, y));
+      return MX::create(new Multiplication(z, x, y));
     }
   }
 
