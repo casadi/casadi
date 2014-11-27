@@ -88,10 +88,10 @@ namespace casadi {
     if (input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
-    if(TrX) {
+    if (TrX) {
       Matrix<T>::mul_no_alloc_tn(*input[1], *input[2], *output[0]);
     } else {
-      Matrix<T>::mul_no_alloc_nn(*input[1], *input[2], *output[0], rtmp);
+      Matrix<T>::mul_no_alloc(*input[1], *input[2], *output[0], rtmp);
     }
   }
 
@@ -128,17 +128,26 @@ namespace casadi {
   }
 
   template<bool TrX>
-  void Multiplication<TrX>::propagateSparsity(DMatrixPtrV& input,
-                                                  DMatrixPtrV& output, bool fwd) {
-    casadi_assert_message(TrX, "Not implemented");
+  void Multiplication<TrX>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+                                              std::vector<int>& itmp, std::vector<double>& rtmp,
+                                              bool fwd) {
     bvec_t *zd = get_bvec_t(input[0]->data());
     bvec_t *rd = get_bvec_t(output[0]->data());
     const size_t n = this->size();
     if (fwd) {
       if (zd!=rd) copy(zd, zd+n, rd);
-      DMatrix::mul_sparsity<true>(*input[1], *input[2], *input[0]);
+      if (TrX) {
+        DMatrix::mul_sparsity<true>(*input[1], *input[2], *input[0]);
+      } else {
+        DMatrix::mul_sparsity<true>(*input[1], *input[2], *input[0], rtmp);
+      }
+
     } else {
-      DMatrix::mul_sparsity<false>(*input[1], *input[2], *output[0]);
+      if (TrX) {
+        DMatrix::mul_sparsity<false>(*input[1], *input[2], *output[0]);
+      } else {
+        DMatrix::mul_sparsity<false>(*input[1], *input[2], *output[0], rtmp);
+      }
       if (zd!=rd) {
         for (int i=0; i<n; ++i) {
           zd[i] |= rd[i];

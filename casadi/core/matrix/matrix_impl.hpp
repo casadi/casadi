@@ -1477,8 +1477,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType> &y,
-                                         Matrix<DataType>& z, std::vector<DataType>& work) {
+  void Matrix<DataType>::mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType> &y,
+                                      Matrix<DataType>& z, std::vector<DataType>& work) {
     // Dimensions of the result
     int d1 = x.size1();
     int d2 = y.size2();
@@ -1711,6 +1711,77 @@ namespace casadi {
             el2++;
           }
         }
+      }
+    }
+  }
+
+  template<typename DataType>
+  template<bool Fwd>
+  void Matrix<DataType>::mul_sparsity(Matrix<DataType> &x,
+                                      Matrix<DataType> &y,
+                                      Matrix<DataType>& z,
+                                      std::vector<DataType>& work) {
+
+    // Dimensions of the result
+    int d1 = x.size1();
+    int d2 = y.size2();
+
+    // Assert dimensions
+    casadi_assert_message(d1==z.size1(), "Dimension error. Got x=" << x.dimString()
+                          << " and z=" << z.dimString() << ".");
+    casadi_assert_message(d2==z.size2(), "Dimension error. Got y=" << y.dimString()
+                          << " and z=" << z.dimString() << ".");
+    casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.dimString()
+                          << " and x=" << x.dimString() << ".");
+
+    // Assert work vector large enough
+    casadi_assert_message(work.size()>=d1, "Work vector too small. Got length "
+                          << work.size() << " < " << x.size1());
+
+    // Direct access to the arrays
+    const std::vector<int> &y_colind = y.colind();
+    const std::vector<int> &y_row = y.row();
+    const std::vector<int> &x_colind = x.colind();
+    const std::vector<int> &x_row = x.row();
+    const std::vector<int> &z_colind = z.colind();
+    const std::vector<int> &z_row = z.row();
+
+    // Convert data array to arrays of integers
+    bvec_t *y_data = get_bvec_t(y.data());
+    bvec_t *x_data = get_bvec_t(x.data());
+    bvec_t *z_data = get_bvec_t(z.data());
+    bvec_t *w = get_bvec_t(work);
+
+    // Loop over the columns of y and z
+    for (int cc=0; cc<d2; ++cc) {
+      // Get the dense column of z
+      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+        w[z_row[kk]] = z_data[kk];
+      }
+
+      // Loop over the nonzeros of y
+      for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
+        int rr = y_row[kk];
+
+        // Loop over corresponding columns of x
+        if (Fwd) {
+          bvec_t yy = y_data[kk];
+          for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
+            w[x_row[kk1]] |= x_data[kk1] | yy;
+          }
+        } else {
+          bvec_t yy = 0;
+          for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
+            yy |= w[x_row[kk1]];
+            x_data[kk1] |= w[x_row[kk1]];
+          }
+          y_data[kk] |= yy;
+        }
+      }
+
+      // Get the sparse column of z
+      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+        z_data[kk] = w[z_row[kk]];
       }
     }
   }

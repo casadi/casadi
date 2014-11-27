@@ -589,8 +589,8 @@ namespace casadi {
                                 Matrix<DataType>& z);
 
     /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
-    static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y,
-                                Matrix<DataType>& z, std::vector<DataType>& work);
+    static void mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType>& y,
+                             Matrix<DataType>& z, std::vector<DataType>& work);
 
     /// Matrix-matrix product, no memory allocation: z += mul(trans(x), y)
     static void mul_no_alloc_tn(const Matrix<DataType> &trans_x, const Matrix<DataType> &y,
@@ -610,9 +610,17 @@ namespace casadi {
 
     /** \brief Propagate sparsity using 0-1 logic through a matrix product,
      * no memory allocation: <tt>z = mul(trans(x), y)</tt>
+     * DEPRECATED
      */
     template<bool Fwd>
     static void mul_sparsity(Matrix<DataType> &x_trans, Matrix<DataType> &y, Matrix<DataType>& z);
+
+    /** \brief Propagate sparsity using 0-1 logic through a matrix product,
+     * no memory allocation: <tt>z = mul(x, y)</tt> with work vector
+     */
+    template<bool Fwd>
+    static void mul_sparsity(Matrix<DataType> &x, Matrix<DataType> &y, Matrix<DataType>& z,
+                             std::vector<DataType>& work);
 
     /// Calculates inner_prod(x, mul(A, x)) without memory allocation
     static DataType quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A);
