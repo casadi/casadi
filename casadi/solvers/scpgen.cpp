@@ -937,14 +937,14 @@ namespace casadi {
     mat_fcn_.getOutput(qpA_, mat_jac_);
 
     if (gauss_newton_) {
-      // Gauss-Newton Hessian
+      // Gauss-Newton Hessian (use gf_ as work vector)
       const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
       fill(qpH_.begin(), qpH_.end(), 0);
-      DMatrix::mul_no_alloc_tn(B_obj, B_obj, qpH_);
+      DMatrix::mul_no_alloc(B_obj, B_obj, qpH_, gf_, true);
 
       // Gradient of the objective in Gauss-Newton
       fill(gf_.begin(), gf_.end(), 0);
-      DMatrix::mul_no_alloc_tn(B_obj, b_gn_, gf_);
+      DMatrix::mul_no_alloc(B_obj, b_gn_, gf_, true);
     } else {
       // Exact Hessian
       mat_fcn_.getOutput(qpH_, mat_hes_);

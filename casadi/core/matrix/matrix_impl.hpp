@@ -1521,7 +1521,7 @@ namespace casadi {
         // Loop over the nonzeros of z
         for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
           int rr = z_row[kk];
-        
+
           // Loop over corresponding columns of x
           for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
             z_data[kk] += x_data[kk1] * work[x_row[kk1]];
@@ -1598,53 +1598,48 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::mul_no_alloc_tn(const Matrix<DataType> &x_trans,
-                                         const std::vector<DataType> &y,
-                                         std::vector<DataType>& z) {
+  void Matrix<DataType>::mul_no_alloc(const Matrix<DataType> &x,
+                                      const std::vector<DataType> &y,
+                                      std::vector<DataType>& z, bool transpose_x) {
     // Assert dimensions
-    casadi_assert_message(x_trans.size2()==z.size(), "Dimension error. Got x_trans="
-                          << x_trans.dimString() << " and z=" << z.size() << ".");
-    casadi_assert_message(x_trans.size1()==y.size(), "Dimension error. Got x_trans="
-                          << x_trans.dimString() << " and y=" << y.size() << ".");
-
-    // Direct access to the arrays
-    const std::vector<int> &x_rowind = x_trans.colind();
-    const std::vector<int> &x_col = x_trans.row();
-    const std::vector<DataType> &x_trans_data = x_trans.data();
-
-    // loop over the columns of the matrix
-    for (int i=0; i<x_rowind.size()-1; ++i) {
-      for (int el=x_rowind[i]; el<x_rowind[i+1]; ++el) { // loop over the non-zeros of the matrix
-        int j = x_col[el];
-
-        // Perform operation
-        z[i] += x_trans_data[el] * y[j];
-      }
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::mul_no_alloc_nn(const Matrix<DataType>& x,
-                                         const std::vector<DataType> &y,
-                                         std::vector<DataType> &z) {
-    // Assert dimensions
-    casadi_assert_message(x.size1()==z.size(), "Dimension error. Got x=" << x.dimString()
-                          << " and z=" << z.size() << ".");
-    casadi_assert_message(x.size2()==y.size(), "Dimension error. Got x=" << x.dimString()
-                          << " and y=" << y.size() << ".");
+    casadi_assert_message(z.size()==transpose_x ? x.size2() : x.size1(),
+                          "Dimension error. Got transpose_x=" << transpose_x
+                          << ", x=" << x.dimString() << " and z=" << z.size() << ".");
+    casadi_assert_message(y.size()==transpose_x ? x.size1() : x.size2(),
+                          "Dimension error. Got transpose_x=" << transpose_x
+                          << ", x=" << x.dimString() << " and y=" << y.size() << ".");
 
     // Direct access to the arrays
     const std::vector<int> &x_colind = x.colind();
     const std::vector<int> &x_row = x.row();
     const std::vector<DataType> &x_data = x.data();
 
-    // loop over the rows of the matrix
+    // loop over the columns of the matrix
     for (int i=0; i<x_colind.size()-1; ++i) {
-      for (int el=x_colind[i]; el<x_colind[i+1]; ++el) { // loop over the non-zeros of the matrix
+      // loop over the non-zeros of the matrix
+      for (int el=x_colind[i]; el<x_colind[i+1]; ++el) {
         int j = x_row[el];
-        z[j] += x_data[el] * y[i];
+        if (transpose_x) {
+          z[i] += x_data[el] * y[j];
+        } else {
+          z[j] += x_data[el] * y[i];
+        }
       }
     }
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::mul_no_alloc_tn(const Matrix<DataType> &x_trans,
+                                         const std::vector<DataType> &y,
+                                         std::vector<DataType>& z) {
+    mul_no_alloc(x_trans, y, z, true);
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::mul_no_alloc_nn(const Matrix<DataType>& x,
+                                         const std::vector<DataType> &y,
+                                         std::vector<DataType> &z) {
+    mul_no_alloc(x, y, z);
   }
 
   template<typename DataType>

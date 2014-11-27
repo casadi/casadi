@@ -90,7 +90,7 @@ endif()
 
 if(WITH_QPOASES AND WITH_IPOPT)
   add_executable(shallow_water shallow_water.cpp)
-  target_link_libraries(shallow_water casadi_core)
+  target_link_libraries(shallow_water casadi)
 endif()
 
 if(WITH_QPOASES AND WITH_IPOPT)
