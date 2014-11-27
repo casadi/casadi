@@ -38,12 +38,19 @@ namespace casadi {
 
   template<bool TrX>
   Multiplication<TrX>::Multiplication(const MX& z, const MX& x, const MX& y) {
-    casadi_assert_message(TrX, "Not implemented");
+    if (TrX) {
     casadi_assert_message(
       x.size1() == y.size1() && x.size2() == z.size1() && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply trans("
       << x.dimString() << ") with " << y.dimString()
       << " and add the result to " << z.dimString());
+    } else {
+    casadi_assert_message(
+      x.size2() == y.size1() && x.size1() == z.size1() && y.size2() == z.size2(),
+      "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
+      << x.dimString() << " with " << y.dimString()
+      << " and add the result to " << z.dimString());
+    }
     setDependencies(z, x, y);
     setSparsity(z.sparsity());
   }
@@ -81,7 +88,11 @@ namespace casadi {
     if (input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
-    Matrix<T>::mul_no_alloc_tn(*input[1], *input[2], *output[0]);
+    if(TrX) {
+      Matrix<T>::mul_no_alloc_tn(*input[1], *input[2], *output[0]);
+    } else {
+      Matrix<T>::mul_no_alloc_nn(*input[1], *input[2], *output[0], rtmp);
+    }
   }
 
   template<bool TrX>
@@ -119,6 +130,7 @@ namespace casadi {
   template<bool TrX>
   void Multiplication<TrX>::propagateSparsity(DMatrixPtrV& input,
                                                   DMatrixPtrV& output, bool fwd) {
+    casadi_assert_message(TrX, "Not implemented");
     bvec_t *zd = get_bvec_t(input[0]->data());
     bvec_t *rd = get_bvec_t(output[0]->data());
     const size_t n = this->size();
@@ -141,6 +153,7 @@ namespace casadi {
                                                   const std::vector<std::string>& arg,
                                                   const std::vector<std::string>& res,
                                                   CodeGenerator& gen) const {
+    casadi_assert_message(TrX, "Not implemented");
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
@@ -163,6 +176,7 @@ namespace casadi {
                                                        const std::vector<std::string>& arg,
                                                        const std::vector<std::string>& res,
                                                        CodeGenerator& gen) const {
+    casadi_assert_message(TrX, "Not implemented");
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
