@@ -36,7 +36,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  template<bool TrX, bool TrY>
+  template<bool TrX>
   class CASADI_EXPORT Multiplication : public MXNode {
   public:
 
@@ -84,7 +84,7 @@ namespace casadi {
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const
-    { return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication<TrX, TrY>*>(node)!=0;}
+    { return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication<TrX>*>(node)!=0;}
 
     /// Helper class
     template<bool Tr>
@@ -97,13 +97,13 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  template<bool TrX, bool TrY>
-  class CASADI_EXPORT DenseMultiplication : public Multiplication<TrX, TrY>{
+  template<bool TrX>
+  class CASADI_EXPORT DenseMultiplication : public Multiplication<TrX>{
   public:
 
     /** \brief  Constructor */
     DenseMultiplication(const MX& z, const MX& x, const MX& y)
-        : Multiplication<TrX, TrY>(z, x, y) {}
+        : Multiplication<TrX>(z, x, y) {}
 
     /** \brief  Destructor */
     virtual ~DenseMultiplication() {}

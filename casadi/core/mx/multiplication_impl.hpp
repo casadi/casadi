@@ -36,11 +36,9 @@ using namespace std;
 
 namespace casadi {
 
-  template<bool TrX, bool TrY>
-  Multiplication<TrX, TrY>::Multiplication(const MX& z, const MX& x, const MX& y) {
-    casadi_assert_message(TrX || !TrY, "Illegal combination");
+  template<bool TrX>
+  Multiplication<TrX>::Multiplication(const MX& z, const MX& x, const MX& y) {
     casadi_assert_message(TrX, "Not implemented");
-    casadi_assert_message(!TrY, "Not implemented");
     casadi_assert_message(
       x.size1() == y.size1() && x.size2() == z.size1() && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply trans("
@@ -50,8 +48,8 @@ namespace casadi {
     setSparsity(z.sparsity());
   }
 
-  template<bool TrX, bool TrY>
-  void Multiplication<TrX, TrY>::printPart(std::ostream &stream, int part) const {
+  template<bool TrX>
+  void Multiplication<TrX>::printPart(std::ostream &stream, int part) const {
     if (part==0) {
       stream << "(";
     } else if (part==1) {
@@ -60,26 +58,25 @@ namespace casadi {
       if (TrX) stream << "'";
       stream << ", ";
     } else {
-      if (TrY) stream << "'";
       stream << "))";
     }
   }
 
-  template<bool TrX, bool TrY>
-  void Multiplication<TrX, TrY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+  template<bool TrX>
+  void Multiplication<TrX>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                                            std::vector<int>& itmp, std::vector<double>& rtmp) {
     evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
-  template<bool TrX, bool TrY>
-  void Multiplication<TrX, TrY>::evaluateSX(const SXPtrV& input, SXPtrV& output,
+  template<bool TrX>
+  void Multiplication<TrX>::evaluateSX(const SXPtrV& input, SXPtrV& output,
                                             std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
     evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
-  template<bool TrX, bool TrY>
+  template<bool TrX>
   template<typename T, typename MatV, typename MatVV>
-  void Multiplication<TrX, TrY>::evaluateGen(const MatV& input, MatV& output,
+  void Multiplication<TrX>::evaluateGen(const MatV& input, MatV& output,
                                              std::vector<int>& itmp, std::vector<T>& rtmp) {
     if (input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
@@ -87,33 +84,31 @@ namespace casadi {
     Matrix<T>::mul_no_alloc_tn(*input[1], *input[2], *output[0]);
   }
 
-  template<bool TrX, bool TrY>
-  void Multiplication<TrX, TrY>::evaluateMX(const MXPtrV& input, MXPtrV& output,
+  template<bool TrX>
+  void Multiplication<TrX>::evaluateMX(const MXPtrV& input, MXPtrV& output,
                                             const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
                                             const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                                             bool output_given) {
     if (!output_given)
-      *output[0] = *input[0] + mul(tr<TrX>(*input[1]), tr<TrY>(*input[2]), (*input[0]).sparsity());
+      *output[0] = *input[0] + mul(tr<TrX>(*input[1]), *input[2], (*input[0]).sparsity());
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = *fwdSeed[d][0] + mul(tr<TrX>(*input[1]),
-                                            tr<TrY>(*fwdSeed[d][2]),
+                                            *fwdSeed[d][2],
                                             (*input[0]).sparsity()) + mul(tr<TrX>(*fwdSeed[d][1]),
-                                                                          tr<TrY>(*input[2]),
+                                                                          *input[2],
                                                                           (*input[0]).sparsity());
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for (int d=0; d<nadj; ++d) {
-      adjSens[d][1]->addToSum(tr<TrX>(mul(*adjSeed[d][0],
-                                          tr<!TrY>(*input[2]),
+      adjSens[d][1]->addToSum(tr<TrX>(mul(*adjSeed[d][0], input[2]->T(),
                                           tr<TrX>(*input[1]).sparsity())));
-      adjSens[d][2]->addToSum(tr<TrY>(mul(tr<!TrX>(*input[1]),
-                                          *adjSeed[d][0],
-                                          tr<TrY>(*input[2]).sparsity())));
+      adjSens[d][2]->addToSum(mul(tr<!TrX>(*input[1]),
+                                  *adjSeed[d][0], input[2]->sparsity()));
       if (adjSeed[d][0]!=adjSens[d][0]) {
         adjSens[d][0]->addToSum(*adjSeed[d][0]);
         *adjSeed[d][0] = MX();
@@ -121,8 +116,8 @@ namespace casadi {
     }
   }
 
-  template<bool TrX, bool TrY>
-  void Multiplication<TrX, TrY>::propagateSparsity(DMatrixPtrV& input,
+  template<bool TrX>
+  void Multiplication<TrX>::propagateSparsity(DMatrixPtrV& input,
                                                   DMatrixPtrV& output, bool fwd) {
     bvec_t *zd = get_bvec_t(input[0]->data());
     bvec_t *rd = get_bvec_t(output[0]->data());
@@ -141,8 +136,8 @@ namespace casadi {
     }
   }
 
-  template<bool TrX, bool TrY>
-  void Multiplication<TrX, TrY>::generateOperation(std::ostream &stream,
+  template<bool TrX>
+  void Multiplication<TrX>::generateOperation(std::ostream &stream,
                                                   const std::vector<std::string>& arg,
                                                   const std::vector<std::string>& res,
                                                   CodeGenerator& gen) const {
@@ -163,8 +158,8 @@ namespace casadi {
     stream << res.front() << ", s" << gen.getSparsity(sparsity()) << ");" << endl;
   }
 
-  template<bool TrX, bool TrY>
-  void DenseMultiplication<TrX, TrY>::generateOperation(std::ostream &stream,
+  template<bool TrX>
+  void DenseMultiplication<TrX>::generateOperation(std::ostream &stream,
                                                        const std::vector<std::string>& arg,
                                                        const std::vector<std::string>& res,
                                                        CodeGenerator& gen) const {

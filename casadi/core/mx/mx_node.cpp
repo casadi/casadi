@@ -359,9 +359,9 @@ namespace casadi {
     casadi_assert_message(y.size1()==trans_x.size1(), "Dimension error. Got y=" << y.size1()
                           << " and trans_x" << trans_x.dimString() << ".");
     if (trans_x.isDense() && y.isDense()) {
-      return MX::create(new DenseMultiplication<true, false>(z, trans_x, y));
+      return MX::create(new DenseMultiplication<true>(z, trans_x, y));
     } else {
-      return MX::create(new Multiplication<true, false>(z, trans_x, y));
+      return MX::create(new Multiplication<true>(z, trans_x, y));
     }
   }
 
