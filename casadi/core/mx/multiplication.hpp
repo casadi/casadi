@@ -114,6 +114,9 @@ namespace casadi {
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
+
+    /// Get number of temporary variables needed
+    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=this->sparsity().size1();}
   };
 
 
