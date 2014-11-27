@@ -241,7 +241,7 @@ namespace casadi {
       f = inner_prod(vdef_out[0], vdef_out[0])/2;
       gL_defL = vdef_out[0];
       b_gn_.resize(gL_defL.size(), numeric_limits<double>::quiet_NaN());
-
+      work_.resize(gL_defL.size());
     } else {
       // Scalar objective function
       f = vdef_out[0];
@@ -937,10 +937,10 @@ namespace casadi {
     mat_fcn_.getOutput(qpA_, mat_jac_);
 
     if (gauss_newton_) {
-      // Gauss-Newton Hessian (use gf_ as work vector)
+      // Gauss-Newton Hessian
       const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
       fill(qpH_.begin(), qpH_.end(), 0);
-      DMatrix::mul_no_alloc(B_obj, B_obj, qpH_, gf_, true);
+      DMatrix::mul_no_alloc(B_obj, B_obj, qpH_, work_, true);
 
       // Gradient of the objective in Gauss-Newton
       fill(gf_.begin(), gf_.end(), 0);

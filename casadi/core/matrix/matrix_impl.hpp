@@ -1481,22 +1481,21 @@ namespace casadi {
   void Matrix<DataType>::mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType> &y,
                                       Matrix<DataType>& z, std::vector<DataType>& work,
                                       bool transpose_x) {
-    // Dimensions of the result
-    int d1 = z.size1();
-    int d2 = y.size2();
 
     // Assert dimensions
-    casadi_assert_message(d1 == transpose_x ? x.size2() : x.size1(),
-                          "Dimension error. Got transpose_x=" << transpose_x
-                          << ", x=" << x.dimString() << " and z=" << z.dimString() << ".");
-    casadi_assert_message(d2==z.size2(), "Dimension error. Got y=" << y.dimString()
-                          << " and z=" << z.dimString() << ".");
-    casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.dimString()
-                          << " and x=" << x.dimString() << ".");
-
-    // Assert work vector large enough
-    casadi_assert_message(work.size()>=d1, "Work vector too small. Got length "
-                          << work.size() << " < " << d1);
+    if (transpose_x) {
+      casadi_assert_message(z.size1()==x.size2() && x.size1()==y.size1() && y.size2()==z.size2(),
+                            "Dimension error. Got x=" << x.dimString() << ", y=" << y.dimString()
+                            << " and z=" << z.dimString() << ".");
+      casadi_assert_message(work.size()>=y.size1(),
+                            "Work vector too small: " << work.size() << " < " << y.size1());
+    } else {
+      casadi_assert_message(z.size1()==x.size1() && x.size2()==y.size1() && y.size2()==z.size2(),
+                            "Dimension error. Got x=" << x.dimString() << ", y=" << y.dimString()
+                            << " and z=" << z.dimString() << ".");
+      casadi_assert_message(work.size()>=z.size1(),
+                            "Work vector too small: " << work.size() << " < " << z.size1());
+    }
 
     // Direct access to the arrays
     const std::vector<int> &y_colind = y.colind();
@@ -1510,7 +1509,8 @@ namespace casadi {
     std::vector<DataType> &z_data = z.data();
 
     // Loop over the columns of y and z
-    for (int cc=0; cc<d2; ++cc) {
+    int ncol = z.size2();
+    for (int cc=0; cc<ncol; ++cc) {
       if (transpose_x) { // Transposed variant, loop over z
 
         // Get the dense column of y
@@ -1739,21 +1739,14 @@ namespace casadi {
                                       Matrix<DataType>& z,
                                       std::vector<DataType>& work) {
 
-    // Dimensions of the result
-    int d1 = x.size1();
-    int d2 = y.size2();
-
     // Assert dimensions
-    casadi_assert_message(d1==z.size1(), "Dimension error. Got x=" << x.dimString()
+    casadi_assert_message(z.size1()==x.size1() && x.size2()==y.size1() && y.size2()==z.size2(),
+                          "Dimension error. Got x=" << x.dimString() << ", y=" << y.dimString()
                           << " and z=" << z.dimString() << ".");
-    casadi_assert_message(d2==z.size2(), "Dimension error. Got y=" << y.dimString()
-                          << " and z=" << z.dimString() << ".");
-    casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.dimString()
-                          << " and x=" << x.dimString() << ".");
 
-    // Assert work vector large enough
-    casadi_assert_message(work.size()>=d1, "Work vector too small. Got length "
-                          << work.size() << " < " << x.size1());
+    // Make sure work vector large enough
+    casadi_assert_message(work.size()>=z.size1(),
+                          "Work vector too small: " << work.size() << " < " << z.size1());
 
     // Direct access to the arrays
     const std::vector<int> &y_colind = y.colind();
@@ -1770,7 +1763,8 @@ namespace casadi {
     bvec_t *w = get_bvec_t(work);
 
     // Loop over the columns of y and z
-    for (int cc=0; cc<d2; ++cc) {
+    int ncol = z.size2();
+    for (int cc=0; cc<ncol; ++cc) {
       // Get the dense column of z
       for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
         w[z_row[kk]] = z_data[kk];

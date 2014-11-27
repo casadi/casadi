@@ -243,6 +243,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Work vector
+    std::vector<double> work_;
   };
 
 } // namespace casadi
