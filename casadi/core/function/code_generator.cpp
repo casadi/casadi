@@ -263,9 +263,6 @@ namespace casadi {
     case AUX_FILL:
       auxiliaries_ << codegen_str_fill << endl;
       break;
-    case AUX_MM_TN_SPARSE:
-      auxiliaries_ << codegen_str_mm_tn_sparse << endl;
-      break;
     case AUX_MM_SPARSE:
       auxiliaries_ << codegen_str_mm_sparse << endl;
       break;

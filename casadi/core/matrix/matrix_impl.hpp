@@ -1471,7 +1471,8 @@ namespace casadi {
     }
 
     // Carry out the matrix product
-    mul_no_alloc_nn(x, y, ret);
+    std::vector<DataType> work(x.size1());
+    mul_no_alloc(x, y, ret, work);
 
     return ret;
   }
@@ -1782,54 +1783,6 @@ namespace casadi {
       // Get the sparse column of z
       for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
         z_data[kk] = w[z_row[kk]];
-      }
-    }
-  }
-
-  template<typename DataType>
-  template<bool Fwd>
-  void Matrix<DataType>::mul_sparsity(Matrix<DataType> &x_trans,
-                                      Matrix<DataType> &y,
-                                      Matrix<DataType>& z) {
-    // Direct access to the arrays
-    const std::vector<int> &z_row = z.row();
-    const std::vector<int> &z_colind = z.colind();
-    const std::vector<int> &y_row = y.row();
-    const std::vector<int> &x_col = x_trans.row();
-    const std::vector<int> &y_colind = y.colind();
-    const std::vector<int> &x_rowind = x_trans.colind();
-
-    // Convert data array to arrays of integers
-    bvec_t *y_data = get_bvec_t(y.data());
-    bvec_t *x_trans_data = get_bvec_t(x_trans.data());
-    bvec_t *z_data = get_bvec_t(z.data());
-
-    // loop over the cols of the resulting matrix)
-    for (int i=0; i<z_colind.size()-1; ++i) {
-      // loop over the non-zeros of the resulting matrix
-      for (int el=z_colind[i]; el<z_colind[i+1]; ++el) {
-        int j = z_row[el];
-        int el1 = y_colind[i];
-        int el2 = x_rowind[j];
-        while (el1 < y_colind[i+1] && el2 < x_rowind[j+1]) { // loop over non-zero elements
-          int j1 = y_row[el1];
-          int i2 = x_col[el2];
-          if (j1==i2) {
-            // | and not & since we are propagating dependencies
-            if (Fwd) {
-              z_data[el] |= y_data[el1] | x_trans_data[el2];
-            } else {
-              y_data[el1] |= z_data[el];
-              x_trans_data[el2] |= z_data[el];
-            }
-            el1++;
-            el2++;
-          } else if (j1<i2) {
-            el1++;
-          } else {
-            el2++;
-          }
-        }
       }
     }
   }

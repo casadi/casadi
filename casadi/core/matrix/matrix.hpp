@@ -609,13 +609,6 @@ namespace casadi {
                                 std::vector<DataType>& z);
 
     /** \brief Propagate sparsity using 0-1 logic through a matrix product,
-     * no memory allocation: <tt>z = mul(trans(x), y)</tt>
-     * DEPRECATED
-     */
-    template<bool Fwd>
-    static void mul_sparsity(Matrix<DataType> &x_trans, Matrix<DataType> &y, Matrix<DataType>& z);
-
-    /** \brief Propagate sparsity using 0-1 logic through a matrix product,
      * no memory allocation: <tt>z = mul(x, y)</tt> with work vector
      */
     template<bool Fwd>
