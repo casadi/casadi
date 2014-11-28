@@ -142,7 +142,7 @@ namespace casadi {
     stream << "  casadi_mm_sparse(";
     stream << arg.at(1) << ", s" << gen.getSparsity(dep(1).sparsity()) << ", ";
     stream << arg.at(2) << ", s" << gen.getSparsity(dep(2).sparsity()) << ", ";
-    stream << res.front() << ", s" << gen.getSparsity(sparsity()) << ");" << endl;
+    stream << res.front() << ", s" << gen.getSparsity(sparsity()) << ", rrr);" << endl;
   }
 
   void DenseMultiplication::generateOperation(std::ostream &stream,
