@@ -36,14 +36,15 @@ include_directories(${NUMPY_INCLUDED_DIRS})
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 
 if(WITH_PYTHON_INTERRUPTS)
-  set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DWITH_PYTHON_INTERRUPTS")
+  set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON_INTERRUPTS")
 endif()
 
-set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
-set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
+set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DPy_USING_UNICODE")
+set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-noproxydel")
 
 # Generate SWIG wrapper
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
+
 swig_add_module(casadi python ../casadi.i)
 swig_link_libraries(casadi ${PYTHON_LIBRARIES} casadi)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

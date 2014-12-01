@@ -12,3 +12,4 @@ add_definitions(${MATLAB_EXTRA_CXXFLAGS})
 # Generate SWIG wrapper
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
 swig_add_module(casadi_matlab matlab ../casadi.i)
+swig_link_libraries(casadi_matlab ${MATLAB_LIBRARIES} casadi)

@@ -14,16 +14,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 
-# Include the use SWIG file
-include(${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
-
-# Set misc SWIG flags
-set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
-set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
-  set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-DWITH_DOXDOC")
-endif()
-
 if(WITH_WERROR)
   # This will make the swig command return an error so that "make" will fail,
   # but swig will emit the output files anyways so subsequent calls to "make"
@@ -32,6 +22,18 @@ if(WITH_WERROR)
   set(MAYBE_WERROR "-Werror")
 else()
   set(MAYBE_WERROR "")
+endif()
+
+# Include the use SWIG file
+#include(UseSWIG)
+include(${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
+
+# Set SWIG flags
+set(CMAKE_SWIG_FLAGS)
+set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=casadi")
+set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-fvirtual")
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
+  set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_DOXDOC")
 endif()
 
 if(WITH_PYTHON)
