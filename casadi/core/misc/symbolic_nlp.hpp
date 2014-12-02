@@ -72,10 +72,10 @@ class CASADI_EXPORT SymbolicNLP : public PrintableObject<SymbolicNLP> {
     void parseNL(const std::string& filename, const Dictionary& options = Dictionary());
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
 #ifndef SWIG
   protected:

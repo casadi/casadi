@@ -106,7 +106,7 @@ namespace casadi {
                const CleStructure& st);
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=std::cout) const;
+    void printStats(std::ostream &stream=CASADI_COUT) const;
 
     /// Access functions of the node
     CleInternal* operator->();

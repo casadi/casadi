@@ -95,7 +95,7 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     bool hasSetOption(const std::string &str) const;
 
     /** \brief  Print options to a stream */
-    void printOptions(std::ostream &stream=std::cout) const;
+    void printOptions(std::ostream &stream=CASADI_COUT) const;
 
     /** \brief  Copy all options from another object*/
     void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);
@@ -208,10 +208,10 @@ virtual ~OptionsFunctionalityNode();
   bool hasSetOption(const std::string &str) const;
 
   /** \brief  Print options to a stream */
-  void printOptions(std::ostream &stream=std::cout) const;
+  void printOptions(std::ostream &stream=CASADI_COUT) const;
 
   /** \brief  Print all information there is to know about a certain option */
-  void printOption(const std::string &name, std::ostream &stream = std::cout) const;
+  void printOption(const std::string &name, std::ostream &stream = CASADI_COUT) const;
 
   /** \brief  get an option value */
   GenericType getOption(const std::string &str) const;

@@ -108,6 +108,16 @@ namespace casadi {
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
 #endif // SWIG
 
+  /* Standard stream used for printing
+     Allows MATLAB front-end to direct printing calls through mexPrintf
+   */
+#if defined(SWIG) && defined(SWIGMATLAB)
+#define CASADI_COUT casadi::mexout
+#else
+#define CASADI_COUT std::cout
+#endif
+
+
 } // namespace casadi
 
 #endif // CASADI_CASADI_TYPES_HPP

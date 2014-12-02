@@ -22,6 +22,45 @@
  *
  */
 
+%{
+#include <streambuf>
+#include <ostream>
+  namespace casadi {
+    /** Stream buffer to allow printing to mex conveniently
+        Adapted from answer to stackoverflow question 243696.
+    */
+    class mex_buf : public std::streambuf {
+    public:
+      mex_buf() {}
+    protected:
+      virtual int_type overflow(int_type ch) {
+        if(ch != traits_type::eof()) {
+          mexPrintf("%c", static_cast<char>(ch));
+        }
+        return ch;
+      }
+      /* virtual int sync() { // needed?
+         mexEvalString("drawnow;");
+         return 0;
+      } */
+      virtual std::streamsize xsputn(const char* s, std::streamsize num) {
+        mexPrintf("%.*s", static_cast<int>(num), s);
+        return num;
+      }
+    };
+
+    // Corresponding output stream
+    class mexostream : public std::ostream {
+    protected:
+      mex_buf buf;
+    public:
+      mexostream() : std::ostream(&buf) {}
+    };
+
+    // Instantiation (cf. cout)
+    static mexostream mexout;
+  } // namespace casadi
+%}
 
 %{
 

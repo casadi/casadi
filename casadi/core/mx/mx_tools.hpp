@@ -350,7 +350,7 @@ namespace casadi {
                      const std::string& v_prefix="v_", const std::string& v_suffix="");
 
   /** \brief Print compact, introducing new variables for shared subexpressions */
-  CASADI_EXPORT void printCompact(const MX& ex, std::ostream &stream=std::cout);
+  CASADI_EXPORT void printCompact(const MX& ex, std::ostream &stream=CASADI_COUT);
 
   ///@{
   /** \brief Calculate jacobian via source code transformation

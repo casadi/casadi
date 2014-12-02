@@ -420,10 +420,10 @@ namespace casadi {
     SX atTime(const std::string& name, double t, bool allocate=false);
 
     ///  Print representation
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print description
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
 #ifndef SWIG
     // Internal methods

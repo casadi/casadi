@@ -101,7 +101,7 @@ namespace casadi {
     DleSolver(const std::string& name, const DleStructure& st);
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=std::cout) const;
+    void printStats(std::ostream &stream=CASADI_COUT) const;
 
     /// Access functions of the node
     DleInternal* operator->();

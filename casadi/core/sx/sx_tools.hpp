@@ -344,7 +344,7 @@ namespace casadi {
                      const std::string& v_prefix="v_", const std::string& v_suffix="");
 
   /** \brief Print compact, introducing new variables for shared subexpressions */
-  CASADI_EXPORT void printCompact(const SX& ex, std::ostream &stream=std::cout);
+  CASADI_EXPORT void printCompact(const SX& ex, std::ostream &stream=CASADI_COUT);
 
   /** \brief extracts polynomial coefficients from an expression
    *

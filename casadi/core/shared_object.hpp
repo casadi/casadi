@@ -132,14 +132,14 @@ namespace casadi {
 #endif // SWIG
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class
-    void printPtr(std::ostream &stream=std::cout) const;
+    void printPtr(std::ostream &stream=CASADI_COUT) const;
     /// \endcond
 
     /** \brief Initialize or re-initialize the object:

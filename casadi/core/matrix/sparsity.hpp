@@ -638,14 +638,14 @@ namespace casadi {
 
     /** \brief Print a textual representation of sparsity
      */
-    void spy(std::ostream &stream=std::cout) const;
+    void spy(std::ostream &stream=CASADI_COUT) const;
 
     /** \brief Generate a script for Matlab or Octave which visualizes
      * the sparsity using the spy command  */
     void spyMatlab(const std::string& mfile) const;
 
     /** \brief Print a compact description of the sparsity pattern */
-    void printCompact(std::ostream &stream=std::cout) const;
+    void printCompact(std::ostream &stream=CASADI_COUT) const;
 
     // Hash the sparsity pattern
     std::size_t hash() const;

@@ -33,6 +33,7 @@
 #include <vector>
 
 #include "casadi_common.hpp"
+#include "casadi_types.hpp"
 
 namespace casadi {
 
@@ -77,7 +78,6 @@ namespace casadi {
     }
 #endif // SWIG
   };
-
 } // namespace casadi
 
 

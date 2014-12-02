@@ -76,10 +76,10 @@ namespace casadi {
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// start value: negative values will get added to length
     int start_;

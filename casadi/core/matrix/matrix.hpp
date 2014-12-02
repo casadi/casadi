@@ -688,22 +688,22 @@ namespace casadi {
     static std::string className();
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print scalar
-    void printScalar(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void printScalar(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print vector-style
-    void printVector(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void printVector(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print dense matrix-stype
-    void printDense(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void printDense(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print sparse matrix style
-    void printSparse(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void printSparse(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     // Get the sparsity pattern
     const std::vector<int>& row() const;

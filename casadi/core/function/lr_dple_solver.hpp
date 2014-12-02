@@ -113,7 +113,7 @@ namespace casadi {
                const std::vector< std::vector<int> > &Hs=std::vector< std::vector<int> >());
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=std::cout) const;
+    void printStats(std::ostream &stream=CASADI_COUT) const;
 
     /// Access functions of the node
     LrDpleInternal* operator->();
