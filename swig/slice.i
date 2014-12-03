@@ -40,7 +40,7 @@ template<> swig_type_info** meta< casadi::IndexList >::name = &SWIGTYPE_p_casadi
 template<> char meta< casadi::Slice >::expected_message[] = "Expecting Slice or number";
 template <>
 int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice &m) {
-  if (meta< casadi::Slice >::isa(p)) {
+  if (is_a(p, *meta< casadi::Slice >::name)) {
     casadi::Slice *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Slice >::name, 0) == -1)
       return false;
@@ -71,7 +71,7 @@ int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice &m) {
 template<> char meta< casadi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 template <>
 int meta< casadi::IndexList >::as(GUESTOBJECT *p, casadi::IndexList &m) {
-  if (meta< casadi::IndexList >::isa(p)) {
+  if (is_a(p, *meta< casadi::IndexList >::name)) {
     casadi::IndexList *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::IndexList >::name, 0) == -1)
       return false;

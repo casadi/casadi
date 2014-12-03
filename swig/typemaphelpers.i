@@ -52,22 +52,23 @@
 #define GUESTOBJECT void
 #endif
 
+  /// Check if Python object is of type T
+  bool is_a(GUESTOBJECT *p, swig_type_info *type) {
+#ifdef SWIGPYTHON
+    if (p == Py_None) return false;
+#endif
+#ifdef SWIGMATLAB
+    if (p == 0) return false;
+#endif
+    void *dummy = 0;
+    return SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
+  }
+
 template<class T>
 class meta {
   public:
-    /// Check if Python object is of type T
-    static bool isa(GUESTOBJECT *p) {
-      #ifdef SWIGPYTHON
-      if (p == Py_None) return false;
-      #endif
-      #ifdef SWIGMATLAB
-      if (p == 0) return false;
-      #endif
-      void *dummy = 0;
-      return SWIG_ConvertPtr(p, &dummy, *meta<T>::name, 0) >= 0;
-    }
     /// Convert Guest object to type T
-    /// This function must work when isa(GUESTOBJECT *p) too
+    /// This function must work when is_a(GUESTOBJECT *p) too
     static int as(GUESTOBJECT *p, T& m) {
         T *t = 0;
         int res = swig::asptr(p, &t);
@@ -77,7 +78,7 @@ class meta {
         return succes;
     }
     /// Check if Guest object could ultimately be converted to type T
-    /// may return true when isa(GUESTOBJECT *p), but this is not required.
+    /// may return true when is_a(GUESTOBJECT *p), but this is not required.
     static bool couldbe(GUESTOBJECT *p) {
         //int res = swig::asptr(p, (T**)(0));
         //if SWIG_CheckState(res) return true;
@@ -91,7 +92,15 @@ class meta {
     
     #ifdef SWIGPYTHON
     static bool couldbe_sequence(PyObject * p) {
-      if(PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
+      if(PySequence_Check(p)
+         && !PyString_Check(p)
+         && !is_a(p, *meta< casadi::SX >::name)
+         && !is_a(p, *meta< casadi::MX >::name)
+         && !is_a(p, *meta< casadi::Matrix<int> >::name)
+         && !is_a(p, *meta< casadi::Matrix<double> >::name)
+         && !PyObject_HasAttrString(p,"__DMatrix__")
+         && !PyObject_HasAttrString(p,"__SX__")
+         && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) return false;
         PyObject *pe;
@@ -113,7 +122,15 @@ class meta {
     // Assumes that p is a PYTHON sequence
     static int as_vector(GUESTOBJECT * p, std::vector<T> &m) {
 #ifdef SWIGPYTHON
-      if (PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
+      if (PySequence_Check(p)
+          && !PyString_Check(p)
+          && !is_a(p, *meta< casadi::SX >::name)
+          && !is_a(p, *meta< casadi::MX >::name)
+          && !is_a(p, *meta< casadi::Matrix<int> >::name)
+          && !is_a(p, *meta< casadi::Matrix<double> >::name)
+          && !PyObject_HasAttrString(p,"__DMatrix__")
+          && !PyObject_HasAttrString(p,"__SX__")
+          && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) { PyErr_Clear();  return false;}
         PyObject *pe;
@@ -163,7 +180,7 @@ class meta {
   }
 }
 
-%typemap(typecheck,precedence=Precedence) const Type & { $1 = meta< Type >::isa($input) || meta< Type >::couldbe($input); }
+%typemap(typecheck,precedence=Precedence) const Type & { $1 = is_a($input, $descriptor(Type *)) || meta< Type >::couldbe($input); }
 %typemap(freearg) const Type  & {}
 
 %enddef
@@ -291,7 +308,7 @@ template<> char meta< std::vector< Type > >::expected_message[] = "Expecting seq
  \
 template <> \
 int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > &m) { \
-  if (meta< std::vector< Type > >::isa(p)) { \
+  if (is_a(p, *meta< std::vector< Type > >::name)) {                                                       \
     std::vector< Type > *mp; \
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< std::vector< Type > >::name, 0) == -1) \
       return false; \
@@ -354,10 +371,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   bool ret = strcmp(PyString_AsString(classname),name)==0;
   Py_DECREF(classo);Py_DECREF(classname);
 	return ret;
-}
-
-bool PyIsSequence(PyObject* p) {
-  return PySequence_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p);
 }
 
 %}

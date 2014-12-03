@@ -207,7 +207,7 @@ template<> char meta< int >::expected_message[] = "Expecting integer";
 
 template <>
 int meta< int >::as(PyObject * p, int &m) {
-  if (meta< int >::isa(p)) {
+  if (is_a(p, *meta< int >::name)) {
     int *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< int >::name, 0) == -1)
       return false;
@@ -236,7 +236,7 @@ int meta< int >::as(PyObject * p, int &m) {
     }
     Py_DECREF(mm);
     return result;
-  } else if (meta< casadi::Matrix<int> >::isa(p)) {
+  } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
@@ -253,7 +253,7 @@ int meta< int >::as(PyObject * p, int &m) {
 template<> char meta< std::vector< double > >::expected_message[] = "Expecting sequence(double)"; 
 template <>
 int meta< std::vector< double > >::as(PyObject * p,std::vector<double > &m) {
-  if (meta< std::vector< double > >::isa(p)) {
+  if (is_a(p, *meta< std::vector< double > >::name)) {
     std::vector< double > *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< std::vector< double > >::name, 0) == -1)
       return false;
@@ -294,7 +294,7 @@ int meta< std::vector< double > >::as(PyObject * p,std::vector<double > &m) {
 template<> char meta< std::vector< int > >::expected_message[] = "Expecting sequence(integer) or 1D numpy.array of ints"; 
 template <>
 int meta< std::vector< int > >::as(PyObject * p,std::vector< int > &m) {
-  if (meta< std::vector< int > >::isa(p)) {
+  if (is_a(p, *meta< std::vector< int > >::name)) {
     std::vector< int > *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< std::vector< int > >::name, 0) == -1)
       return false;
@@ -344,7 +344,7 @@ template<> char meta< double >::expected_message[] = "Expecting double";
 
 template <>
 int meta< double >::as(PyObject * p, double &m) {
-  if (meta< double >::isa(p)) {
+  if (is_a(p, *meta< double >::name)) {
     double *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< double >::name, 0) == -1)
       return false;
@@ -373,7 +373,7 @@ int meta< double >::as(PyObject * p, double &m) {
     }
     Py_DECREF(mm);
     return result;
-  } else if (meta< casadi::Matrix<double> >::isa(p)) {
+  } else if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
     casadi::Matrix<double> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<double> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
@@ -381,7 +381,7 @@ int meta< double >::as(PyObject * p, double &m) {
       return true;
     }
     return false;
-  } else if (meta< casadi::Matrix<int> >::isa(p)) {
+  } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
@@ -399,7 +399,7 @@ template<> char meta< std::string >::expected_message[] = "Expecting string";
 
 template <>
 int meta< std::string >::as(PyObject * p, std::string &m) {
-  if (meta< std::string >::isa(p)) {
+  if (is_a(p, *meta< std::string >::name)) {
     std::string *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< std::string >::name, 0) == -1)
       return false;
@@ -423,7 +423,7 @@ template<> bool meta< casadi::GenericType::Dictionary >::toPython(const casadi::
 
  template <>
  int meta< casadi::DerivativeGenerator >::as(PyObject * p, casadi::DerivativeGenerator &s) {
-   if (meta< casadi::DerivativeGenerator >::isa(p)) {
+   if (is_a(p, *meta< casadi::DerivativeGenerator >::name)) {
      casadi::DerivativeGenerator *mp;
      if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::DerivativeGenerator >::name, 0) == -1)
        return false;
@@ -448,7 +448,7 @@ template<> char meta< casadi::CustomEvaluate >::expected_message[] = "Expecting 
 
 template <>
 int meta< casadi::CustomEvaluate >::as(PyObject * p, casadi::CustomEvaluate &s) {
-  if (meta< casadi::CustomEvaluate >::isa(p)) {
+  if (is_a(p, *meta< casadi::CustomEvaluate >::name)) {
     casadi::CustomEvaluate *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::CustomEvaluate >::name, 0) == -1)
       return false;
@@ -469,7 +469,7 @@ template<> char meta< casadi::Callback >::expected_message[] = "Expecting Callba
 
 template <>
 int meta< casadi::Callback >::as(PyObject * p, casadi::Callback &s) {
-  if (meta< casadi::Callback >::isa(p)) {
+  if (is_a(p, *meta< casadi::Callback >::name)) {
     casadi::Callback *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Callback >::name, 0) == -1)
       return false;
@@ -492,7 +492,7 @@ template<> char meta< casadi::GenericType >::expected_message[] = "Expecting any
 
 template <>
 int meta< casadi::GenericType >::as(PyObject * p,casadi::GenericType &s) {
-  if (meta< casadi::GenericType >::isa(p)) {
+  if (is_a(p, *meta< casadi::GenericType >::name)) {
     casadi::GenericType *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::GenericType >::name, 0) == -1)
       return false;
@@ -611,7 +611,7 @@ template<> char meta< casadi::GenericType::Dictionary >::expected_message[] = "E
 
 template <>
 int meta< casadi::GenericType::Dictionary >::as(PyObject * p,casadi::GenericType::Dictionary &s) {
-  if (meta< casadi::GenericType::Dictionary >::isa(p)) {
+  if (is_a(p, *meta< casadi::GenericType::Dictionary >::name)) {
     casadi::GenericType::Dictionary *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::GenericType::Dictionary >::name, 0) == -1)
       return false;
@@ -664,14 +664,14 @@ template<> char meta< casadi::SXElement >::expected_message[] = "Expecting SXEle
 
 template <>
 int meta< casadi::SXElement >::as(PyObject * p,casadi::SXElement &s) {
-  if (meta< casadi::SXElement >::isa(p)) {
+  if (is_a(p, *meta< casadi::SXElement >::name)) {
     casadi::SXElement *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SXElement >::name, 0) == -1)
       return false;
     s=*mp;
     return true;
   }
-  if (meta< casadi::SX >::isa(p)) {
+  if (is_a(p, *meta< casadi::SX >::name)) {
     casadi::SX res;
     int result = meta< casadi::SX >::as(p,res);
     if (!result) return false;
@@ -702,7 +702,7 @@ template<> char meta< casadi::Matrix<int> >::expected_message[] = "Expecting num
 
 template <>
 int meta< casadi::Matrix<int> >::as(PyObject * p,casadi::Matrix<int> &m) {
-  if (meta< casadi::Matrix<int> >::isa(p)) {
+  if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
       return false;
@@ -789,14 +789,14 @@ template<> char meta< casadi::Matrix<double> >::expected_message[] = "Expecting 
 
 template <>
 int meta< casadi::Matrix<double> >::as(PyObject * p,casadi::Matrix<double> &m) {
-  if (meta< casadi::Matrix<double> >::isa(p)) {
+  if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
     casadi::Matrix<double> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<double> >::name, 0) == -1)
       return false;
     m=*mp;
     return true;
   }
-  if (meta< casadi::Matrix<int> >::isa(p)) {
+  if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
       return false;
@@ -968,14 +968,14 @@ template<> char meta< casadi::SX >::expected_message[] = "Expecting one of: nump
 
 template <>
 int meta< casadi::SX >::as(PyObject * p,casadi::SX &m) {
-  if (meta< casadi::SX >::isa(p)) {
+  if (is_a(p, *meta< casadi::SX >::name)) {
     casadi::SX *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SX >::name, 0) == -1)
       return false;
     m=*mp;
     return true;
   }
-  if (meta< casadi::SXElement >::isa(p)) {
+  if (is_a(p, *meta< casadi::SXElement >::name)) {
     casadi::SXElement *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SXElement >::name, 0) == -1)
       return false;
@@ -1037,7 +1037,7 @@ template<> char meta< casadi::MX >::expected_message[] = "Expecting (MX, numbera
 
 template <>
 int meta< casadi::MX >::as(PyObject * p,casadi::MX &m) {
-  if (meta< casadi::MX >::isa(p)) {
+  if (is_a(p, *meta< casadi::MX >::name)) {
     casadi::MX *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::MX >::name, 0) == -1)
       return false;

@@ -68,14 +68,14 @@ template<> char meta< int >::expected_message[] = "Expecting integer";
 
 template <>
 int meta< int >::as(GUESTOBJECT * p, int &m) {
-  if (meta< int >::isa(p)) {
+  if (is_a(p, *meta< int >::name)) {
     int *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< int >::name, 0) == -1)
       return false;
     m=*mp;
     return true;
   }
-  if (meta< casadi::Matrix<int> >::isa(p)) {
+  if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
@@ -99,14 +99,14 @@ template<> char meta< double >::expected_message[] = "Expecting double";
 
 template <>
 int meta< double >::as(GUESTOBJECT * p, double &m) {
-  if (meta< double >::isa(p)) {
+  if (is_a(p, *meta< double >::name)) {
     double *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< double >::name, 0) == -1)
       return false;
     m=*mp;
     return true;
   }
-  if (meta< casadi::Matrix<double> >::isa(p)) {
+  if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
     casadi::Matrix<double> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<double> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
@@ -114,7 +114,7 @@ int meta< double >::as(GUESTOBJECT * p, double &m) {
       return true;
     }
     return false;
-  } else if (meta< casadi::Matrix<int> >::isa(p)) {
+  } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
@@ -153,7 +153,7 @@ template<> char meta< casadi::SXElement >::expected_message[] = "Expecting SXEle
 
 template <>
 int meta< casadi::SXElement >::as(GUESTOBJECT *p, casadi::SXElement &s) {
-  if (meta< casadi::SXElement >::isa(p)) {
+  if (is_a(p, *meta< casadi::SXElement >::name)) {
     casadi::SXElement *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SXElement >::name, 0) == -1)
       return false;
@@ -177,7 +177,7 @@ template<> char meta< casadi::Matrix<int> >::expected_message[] = "Expecting IMa
 
 template <>
 int meta< casadi::Matrix<int> >::as(GUESTOBJECT * p,casadi::Matrix<int> &m) {
-  if (meta< casadi::Matrix<int> >::isa(p)) {
+  if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
       return false;
@@ -201,14 +201,14 @@ template<> char meta< casadi::Matrix<double> >::expected_message[] = "Expecting 
 
 template <>
 int meta< casadi::Matrix<double> >::as(GUESTOBJECT * p,casadi::Matrix<double> &m) {
-  if (meta< casadi::Matrix<double> >::isa(p)) {
+  if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
     casadi::Matrix<double> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<double> >::name, 0) == -1)
       return false;
     m=*mp;
     return true;
   }
-  if (meta< casadi::Matrix<int> >::isa(p)) {
+  if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
       return false;
@@ -232,14 +232,14 @@ template<> char meta< casadi::SX >::expected_message[] = "Expecting one of: SX, 
 
 template <>
 int meta< casadi::SX >::as(GUESTOBJECT * p,casadi::SX &m) {
-  if (meta< casadi::SX >::isa(p)) {
+  if (is_a(p, *meta< casadi::SX >::name)) {
     casadi::SX *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SX >::name, 0) == -1)
       return false;
     m=*mp;
     return true;
   }
-  if (meta< casadi::SXElement >::isa(p)) {
+  if (is_a(p, *meta< casadi::SXElement >::name)) {
     casadi::SXElement *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SXElement >::name, 0) == -1)
       return false;
@@ -266,7 +266,7 @@ template<> char meta< casadi::MX >::expected_message[] = "Expecting (MX, numbera
 
 template <>
 int meta< casadi::MX >::as(GUESTOBJECT * p,casadi::MX &m) {
-  if (meta< casadi::MX >::isa(p)) {
+  if (is_a(p, *meta< casadi::MX >::name)) {
     casadi::MX *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::MX >::name, 0) == -1)
       return false;
