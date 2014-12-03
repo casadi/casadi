@@ -68,7 +68,13 @@ template<> char meta< int >::expected_message[] = "Expecting integer";
 
 template <>
 int meta< int >::as(GUESTOBJECT * p, int &m) {
-  NATIVERETURN(int,m)
+  if (meta< int >::isa(p)) {
+    int *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< int >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
   if (meta< casadi::Matrix<int> >::isa(p)) {
     casadi::Matrix<int> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
@@ -93,7 +99,13 @@ template<> char meta< double >::expected_message[] = "Expecting double";
 
 template <>
 int meta< double >::as(GUESTOBJECT * p, double &m) {
-  NATIVERETURN(double,m)
+  if (meta< double >::isa(p)) {
+    double *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< double >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
   if (meta< casadi::Matrix<double> >::isa(p)) {
     casadi::Matrix<double> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<double> >::name, 0 );
@@ -141,7 +153,13 @@ template<> char meta< casadi::SXElement >::expected_message[] = "Expecting SXEle
 
 template <>
 int meta< casadi::SXElement >::as(GUESTOBJECT *p, casadi::SXElement &s) {
-  NATIVERETURN(casadi::SXElement, s)
+  if (meta< casadi::SXElement >::isa(p)) {
+    casadi::SXElement *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SXElement >::name, 0) == -1)
+      return false;
+    s=*mp;
+    return true;
+  }
   if (meta< double >::couldbe(p)) {
     double res;
     int result = meta< double >::as(p,res);
@@ -159,7 +177,13 @@ template<> char meta< casadi::Matrix<int> >::expected_message[] = "Expecting IMa
 
 template <>
 int meta< casadi::Matrix<int> >::as(GUESTOBJECT * p,casadi::Matrix<int> &m) {
-  NATIVERETURN(casadi::Matrix<int>,m)
+  if (meta< casadi::Matrix<int> >::isa(p)) {
+    casadi::Matrix<int> *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
   if (meta< int >::couldbe(p)) {
     int t;
     int res = meta< int >::as(p,t);
@@ -177,8 +201,20 @@ template<> char meta< casadi::Matrix<double> >::expected_message[] = "Expecting 
 
 template <>
 int meta< casadi::Matrix<double> >::as(GUESTOBJECT * p,casadi::Matrix<double> &m) {
-  NATIVERETURN(casadi::Matrix<double>,m)
-  NATIVERETURN(casadi::Matrix<int>,m)
+  if (meta< casadi::Matrix<double> >::isa(p)) {
+    casadi::Matrix<double> *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<double> >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
+  if (meta< casadi::Matrix<int> >::isa(p)) {
+    casadi::Matrix<int> *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
   if (meta< double >::couldbe(p)) {
     double t;
     int res = meta< double >::as(p,t);
@@ -196,8 +232,20 @@ template<> char meta< casadi::SX >::expected_message[] = "Expecting one of: SX, 
 
 template <>
 int meta< casadi::SX >::as(GUESTOBJECT * p,casadi::SX &m) {
-  NATIVERETURN(casadi::SX, m)
-  NATIVERETURN(casadi::SXElement, m)
+  if (meta< casadi::SX >::isa(p)) {
+    casadi::SX *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SX >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
+  if (meta< casadi::SXElement >::isa(p)) {
+    casadi::SXElement *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SXElement >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
   casadi::DMatrix mt;
   if(meta< casadi::Matrix<double> >::as(p,mt)) {
     m = casadi::SX(mt);
@@ -218,7 +266,13 @@ template<> char meta< casadi::MX >::expected_message[] = "Expecting (MX, numbera
 
 template <>
 int meta< casadi::MX >::as(GUESTOBJECT * p,casadi::MX &m) {
-  NATIVERETURN(casadi::MX,m)
+  if (meta< casadi::MX >::isa(p)) {
+    casadi::MX *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::MX >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
   casadi::DMatrix mt;
   if(meta< casadi::Matrix<double> >::as(p,mt)) {
     m = casadi::MX(mt);

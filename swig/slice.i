@@ -40,7 +40,13 @@ template<> swig_type_info** meta< casadi::IndexList >::name = &SWIGTYPE_p_casadi
 template<> char meta< casadi::Slice >::expected_message[] = "Expecting Slice or number";
 template <>
 int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice &m) {
-  NATIVERETURN(casadi::Slice,m)
+  if (meta< casadi::Slice >::isa(p)) {
+    casadi::Slice *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Slice >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
 #ifdef SWIGPYTHON
   if (PyInt_Check(p)) {
     m.start_ = PyInt_AsLong(p);
@@ -65,7 +71,13 @@ int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice &m) {
 template<> char meta< casadi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 template <>
 int meta< casadi::IndexList >::as(GUESTOBJECT *p, casadi::IndexList &m) {
-  NATIVERETURN(casadi::IndexList,m)
+  if (meta< casadi::IndexList >::isa(p)) {
+    casadi::IndexList *mp;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::IndexList >::name, 0) == -1)
+      return false;
+    m=*mp;
+    return true;
+  }
   if (meta< int >::couldbe(p)) {
     m.type = casadi::IndexList::INT;
     meta< int >::as(p,m.i);

@@ -155,12 +155,6 @@ class meta {
 
 %}
 
-
-%inline %{
-#define NATIVERETURN(Type, m) if (meta< Type >::isa(p)) { Type *mp; if (SWIG_ConvertPtr(p, (void **) &mp, *meta< Type >::name, 0) == -1) return false; m=*mp; return true; }
-%}
-
-
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(Type*), 0) == -1) {
@@ -297,7 +291,13 @@ template<> char meta< std::vector< Type > >::expected_message[] = "Expecting seq
  \
 template <> \
 int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > &m) { \
-  NATIVERETURN(std::vector< Type >,m) \
+  if (meta< std::vector< Type > >::isa(p)) { \
+    std::vector< Type > *mp; \
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< std::vector< Type > >::name, 0) == -1) \
+      return false; \
+    m=*mp; \
+    return true; \
+  } \
   return meta< Type >::as_vector(p,m); \
 } \
 
