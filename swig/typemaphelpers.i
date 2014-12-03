@@ -52,14 +52,6 @@
 #define GUESTOBJECT void
 #endif
 
-#ifndef SWIGXML
-/** Check if Guest object is of a particular SWIG type */
-bool istype(GUESTOBJECT *p, swig_type_info *type) {
-	void *dummy = 0 ; 
-  return SWIG_IsOK(SWIG_ConvertPtr(p, &dummy, type, 0)); 
-}
-#endif
-
 template<class T>
 class meta {
   public:
@@ -71,7 +63,8 @@ class meta {
       #ifdef SWIGMATLAB
       if (p == 0) return false;
       #endif
-      return istype(p,*meta<T>::name);
+      void *dummy = 0;
+      return SWIG_ConvertPtr(p, &dummy, *meta<T>::name, 0) >= 0;
     }
     /// Convert Python object to pointer of type T
     static T* get_ptr(GUESTOBJECT *p) {
