@@ -24,9 +24,8 @@
 
 %define %my_genericmatrix_const_typemap(Precedence,Type...) 
 %typemap(in) const casadi::GenericMatrix< Type > & (Type m) {
-  if (meta< Type >::isa($input)) { // Type object get passed on as-is, and fast.
-    $1 = meta< Type >::get_ptr($input);
-    if ($1==0) {
+  if (meta< Type >::isa($input)) {
+    if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(Type*), 0) == -1) {
       SWIG_exception_fail(SWIG_TypeError,"Type cast failed");
     }
   } else {

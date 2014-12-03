@@ -72,7 +72,7 @@ class meta {
       if (p == 0) return false;
       #endif
       return istype(p,*meta<T>::name);
-    };
+    }
     /// Convert Python object to pointer of type T
     static T* get_ptr(GUESTOBJECT *p) {
       void *pd = 0 ;
@@ -82,7 +82,7 @@ class meta {
       } else {
         return reinterpret_cast< T *>(pd);
       }
-    };
+    }
     /// Convert Guest object to type T
     /// This function must work when isa(GUESTOBJECT *p) too
     static int as(GUESTOBJECT *p, T& m) {
@@ -170,6 +170,12 @@ class meta {
     #endif //SWIGPYTHON
 };
 
+
+ /// Convert guest object to pointer of type T
+ void guest_cast(GUESTOBJECT *p, void** pt, swig_type_info* name) {
+   if (!SWIG_IsOK(SWIG_ConvertPtr(p, (void **)pt, name, 0))) pt = 0;
+ }
+
 %}
 
 %inline %{
@@ -179,8 +185,7 @@ class meta {
 
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
-  $1 = meta< Type >::get_ptr($input);
-  if ($1 == 0) {
+  if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(Type*), 0) == -1) {
     if (!meta< Type >::as($input,m)) SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
     $1 = &m;
   }
