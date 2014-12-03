@@ -62,7 +62,7 @@
 
 // Print description
 #ifdef SWIGMATLAB
-#define SWIG_STR description
+#define SWIG_STR print
 #else
 #define SWIG_STR __str__
 #endif
