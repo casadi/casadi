@@ -72,10 +72,13 @@ class meta {
     static int as(GUESTOBJECT *p, T *m) {
         T *t = 0;
         int res = swig::asptr(p, &t);
-        bool succes = SWIG_CheckState(res) && t;
-        if (succes) *m=*t;
-        if (succes && SWIG_IsNewObj(res)) delete t;
-        return succes;
+        if(SWIG_CheckState(res) && t) {
+          if(m) *m=*t;
+          if (SWIG_IsNewObj(res)) delete t;
+          return true;
+        } else {
+          return false;
+        }
     }
     /// Check if Guest object could ultimately be converted to type T
     /// may return true when is_a(GUESTOBJECT *p), but this is not required.
@@ -312,7 +315,7 @@ int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > *m) { \
     std::vector< Type > *mp; \
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< std::vector< Type > >::name, 0) == -1) \
       return false; \
-    *m=*mp; \
+    if(m) *m=*mp;    \
     return true; \
   } \
   return meta< Type >::as_vector(p, m); \
@@ -326,21 +329,26 @@ int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > *m) { \
 %define %meta_pair(TypeA,TypeB) 
 %inline %{
 template <>
-int meta< std::pair<TypeA, TypeB> >::as(PyObject * p,std::pair< TypeA, TypeB > *m) {
+int meta< std::pair<TypeA, TypeB> >::as(PyObject * p, std::pair< TypeA, TypeB > *m) {
   std::pair< TypeA, TypeB > *tm;
   if (SWIG_ConvertPtr(p, (void **)&tm, *meta< std::pair< TypeA, TypeB > >::name, 0 )>=0) {
-    *m = *tm;
+    if(m) *m = *tm;
     return true;
   }
   if(!PySequence_Check(p)) return false;
   if(PySequence_Size(p)!=2) return false;
   PyObject * first =  PySequence_GetItem(p,0);
   PyObject * second = PySequence_GetItem(p,1);
-  bool result = meta< TypeA  >::as(p,&m->first) && meta< TypeB  >::as(p,&m->second);
-  
-  Py_DECREF(first);Py_DECREF(second);
+  bool result;
+  if (m) {
+    result = meta< TypeA  >::as(first, &m->first) && meta< TypeB  >::as(second, &m->second);
+  } else {
+    result = meta< TypeA  >::as(first, 0) && meta< TypeB  >::as(second, 0);
+  }
+  Py_DECREF(first);
+  Py_DECREF(second);
   return result;   
-}
+ }
 
 template <>
 bool meta < std::pair< TypeA, TypeB > >::toPython(const std::pair< TypeA, TypeB > &m, PyObject *&p) {
