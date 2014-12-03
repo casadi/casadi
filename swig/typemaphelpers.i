@@ -120,7 +120,7 @@ class meta {
     #endif // SWIGPYTHON
     
     // Assumes that p is a PYTHON sequence
-    static int as_vector(GUESTOBJECT * p, std::vector<T> &m) {
+    static int as_vector(GUESTOBJECT * p, std::vector<T> *m) {
 #ifdef SWIGPYTHON
       if (PySequence_Check(p)
           && !PyString_Check(p)
@@ -136,10 +136,10 @@ class meta {
         PyObject *pe;
         int size = PySequence_Size(p);
         if (size==-1) { PyErr_Clear();  return false;}
-        m.resize(size);
+        m->resize(size);
         int i=0;
         while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-          bool result=meta< T >::as(pe,&m[i++]);
+          bool result=meta< T >::as(pe, &(*m)[i++]);
           if (!result) {
             Py_DECREF(pe);Py_DECREF(it);
             return false;
@@ -153,10 +153,10 @@ class meta {
 #ifdef SWIGMATLAB
       if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
         int sz = mxGetN(p);
-        m.resize(sz);
+        m->resize(sz);
         for (int i=0; i<sz; ++i) {
-          GUESTOBJECT *pi = mxGetCell(p,i);
-          if (pi==0 || !meta< T >::as(pi, &m[i])) return false;
+          GUESTOBJECT *pi = mxGetCell(p, i);
+          if (pi==0 || !meta< T >::as(pi, &(*m)[i])) return false;
         }
         return true;
       }
@@ -315,7 +315,7 @@ int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > *m) { \
     *m=*mp; \
     return true; \
   } \
-  return meta< Type >::as_vector(p,*m); \
+  return meta< Type >::as_vector(p, m); \
 } \
 
 %}

@@ -287,7 +287,7 @@ int meta< std::vector< double > >::as(PyObject * p, std::vector<double > *m) {
       Py_DECREF(array); 
     return true;
   }
-  return meta< double >::as_vector(p,*m);
+  return meta< double >::as_vector(p, m);
 }
 
 /// std::vector<int>
@@ -336,7 +336,7 @@ int meta< std::vector< int > >::as(PyObject * p,std::vector< int > *m) {
       Py_DECREF(array); 
     return true;
   }
-  return meta< int >::as_vector(p, *m);
+  return meta< int >::as_vector(p, m);
 }
 
 /// double
@@ -764,7 +764,7 @@ int meta< casadi::Matrix<int> >::as(PyObject * p,casadi::Matrix<int> *m) {
       Py_DECREF(array);
   } else if ( meta< int >::couldbe_sequence(p)) {
     std::vector <int> t;
-    int res = meta< int >::as_vector(p,t);
+    int res = meta< int >::as_vector(p, &t);
     *m = casadi::Matrix<int>(t,t.size(),1);
     return res;
   } else if (PyObject_HasAttrString(p,"__IMatrix__")) {
@@ -946,7 +946,7 @@ int meta< casadi::Matrix<double> >::as(PyObject * p,casadi::Matrix<double> *m) {
     return res;
   } else if ( meta< double >::couldbe_sequence(p)) {
     std::vector <double> t;
-    int res = meta< double >::as_vector(p,t);
+    int res = meta< double >::as_vector(p, &t);
     if (t.size()>0) {
       *m = casadi::Matrix<double>(t,t.size(),1);
     } else {
