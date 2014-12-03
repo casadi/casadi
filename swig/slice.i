@@ -39,25 +39,25 @@ template<> swig_type_info** meta< casadi::IndexList >::name = &SWIGTYPE_p_casadi
 /// casadi::Slice
 template<> char meta< casadi::Slice >::expected_message[] = "Expecting Slice or number";
 template <>
-int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice &m) {
+int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice *m) {
   if (is_a(p, *meta< casadi::Slice >::name)) {
     casadi::Slice *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Slice >::name, 0) == -1)
       return false;
-    m=*mp;
+    *m = *mp;
     return true;
   }
 #ifdef SWIGPYTHON
   if (PyInt_Check(p)) {
-    m.start_ = PyInt_AsLong(p);
-    m.stop_ = m.start_+1;
-    if (m.stop_==0) m.stop_ = std::numeric_limits<int>::max();
+    m->start_ = PyInt_AsLong(p);
+    m->stop_ = m->start_+1;
+    if (m->stop_==0) m->stop_ = std::numeric_limits<int>::max();
     return true;
   } else if (PySlice_Check(p)) {
     PySliceObject *r = (PySliceObject*)(p);
-    m.start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
-    m.stop_  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max()) ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop) ;
-    if(r->step !=Py_None) m.step_  = PyInt_AsLong(r->step);
+    m->start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
+    m->stop_  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max()) ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop) ;
+    if(r->step !=Py_None) m->step_  = PyInt_AsLong(r->step);
     return true;
   } else {
     return false;
@@ -70,23 +70,23 @@ int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice &m) {
 /// casadi::IndexList
 template<> char meta< casadi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 template <>
-int meta< casadi::IndexList >::as(GUESTOBJECT *p, casadi::IndexList &m) {
+int meta< casadi::IndexList >::as(GUESTOBJECT *p, casadi::IndexList *m) {
   if (is_a(p, *meta< casadi::IndexList >::name)) {
     casadi::IndexList *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::IndexList >::name, 0) == -1)
       return false;
-    m=*mp;
+    *m = *mp;
     return true;
   }
   if (meta< int >::couldbe(p)) {
-    m.type = casadi::IndexList::INT;
-    meta< int >::as(p,m.i);
+    m->type = casadi::IndexList::INT;
+    meta< int >::as(p, &m->i);
   } else if (meta< std::vector<int> >::couldbe(p)) {
-    m.type = casadi::IndexList::IVECTOR;
-    return meta< std::vector<int> >::as(p,m.iv);
+    m->type = casadi::IndexList::IVECTOR;
+    return meta< std::vector<int> >::as(p, &m->iv);
   } else if (meta< casadi::Slice>::couldbe(p)) {
-    m.type = casadi::IndexList::SLICE;
-    return meta< casadi::Slice >::as(p,m.slice);
+    m->type = casadi::IndexList::SLICE;
+    return meta< casadi::Slice >::as(p, &m->slice);
   } else {
     return false;
   }

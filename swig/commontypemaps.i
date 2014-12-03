@@ -86,7 +86,7 @@
 
 #ifdef SWIGPYTHON
 %typemap(in) int (int m) {
-  bool result=meta< int >::as($input,m);
+  bool result=meta< int >::as($input,&m);
   if (!result)
     SWIG_exception_fail(SWIG_TypeError,meta< int >::expected_message);
   $1 = m;
@@ -99,7 +99,7 @@
 
 #ifdef SWIGPYTHON
 %typemap(in) double (double m) {
-  bool result=meta< double >::as($input,m);
+  bool result=meta< double >::as($input,&m);
   if (!result)
     SWIG_exception_fail(SWIG_TypeError,meta< double >::expected_message);
   $1 = m;

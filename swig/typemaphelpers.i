@@ -69,11 +69,11 @@ class meta {
   public:
     /// Convert Guest object to type T
     /// This function must work when is_a(GUESTOBJECT *p) too
-    static int as(GUESTOBJECT *p, T& m) {
+    static int as(GUESTOBJECT *p, T *m) {
         T *t = 0;
         int res = swig::asptr(p, &t);
         bool succes = SWIG_CheckState(res) && t;
-        if (succes) m=*t;
+        if (succes) *m=*t;
         if (succes && SWIG_IsNewObj(res)) delete t;
         return succes;
     }
@@ -83,7 +83,7 @@ class meta {
         //int res = swig::asptr(p, (T**)(0));
         //if SWIG_CheckState(res) return true;
         T m;
-        return as(p,m);
+        return as(p, &m);
     }
     static swig_type_info** name;
     static char expected_message[];
@@ -139,7 +139,7 @@ class meta {
         m.resize(size);
         int i=0;
         while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-          bool result=meta< T >::as(pe,m[i++]);
+          bool result=meta< T >::as(pe,&m[i++]);
           if (!result) {
             Py_DECREF(pe);Py_DECREF(it);
             return false;
@@ -156,7 +156,7 @@ class meta {
         m.resize(sz);
         for (int i=0; i<sz; ++i) {
           GUESTOBJECT *pi = mxGetCell(p,i);
-          if (pi==0 || !meta< T >::as(pi, m[i])) return false;
+          if (pi==0 || !meta< T >::as(pi, &m[i])) return false;
         }
         return true;
       }
@@ -175,7 +175,7 @@ class meta {
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(Type*), 0) == -1) {
-    if (!meta< Type >::as($input,m)) SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
+    if (!meta< Type >::as($input,&m)) SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
     $1 = &m;
   }
 }
@@ -307,15 +307,15 @@ void PyDECREFParent(PyObject* self) {
 template<> char meta< std::vector< Type > >::expected_message[] = "Expecting sequence(Type)"; \
  \
 template <> \
-int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > &m) { \
+int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > *m) { \
   if (is_a(p, *meta< std::vector< Type > >::name)) {                                                       \
     std::vector< Type > *mp; \
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< std::vector< Type > >::name, 0) == -1) \
       return false; \
-    m=*mp; \
+    *m=*mp; \
     return true; \
   } \
-  return meta< Type >::as_vector(p,m); \
+  return meta< Type >::as_vector(p,*m); \
 } \
 
 %}
@@ -326,17 +326,17 @@ int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > &m) { \
 %define %meta_pair(TypeA,TypeB) 
 %inline %{
 template <>
-int meta< std::pair<TypeA, TypeB> >::as(PyObject * p,std::pair< TypeA, TypeB > &m) {
+int meta< std::pair<TypeA, TypeB> >::as(PyObject * p,std::pair< TypeA, TypeB > *m) {
   std::pair< TypeA, TypeB > *tm;
   if (SWIG_ConvertPtr(p, (void **)&tm, *meta< std::pair< TypeA, TypeB > >::name, 0 )>=0) {
-    m = *tm;
+    *m = *tm;
     return true;
   }
   if(!PySequence_Check(p)) return false;
   if(PySequence_Size(p)!=2) return false;
   PyObject * first =  PySequence_GetItem(p,0);
   PyObject * second = PySequence_GetItem(p,1);
-  bool result = meta< TypeA  >::as(p,m.first) && meta< TypeB  >::as(p,m.second);
+  bool result = meta< TypeA  >::as(p,&m->first) && meta< TypeB  >::as(p,&m->second);
   
   Py_DECREF(first);Py_DECREF(second);
   return result;   

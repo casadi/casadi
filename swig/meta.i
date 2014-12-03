@@ -29,14 +29,16 @@
       SWIG_exception_fail(SWIG_TypeError,"Type cast failed");
     }
   } else {
-    bool result=meta< Type >::as($input,m);
+    bool result=meta< Type >::as($input,&m);
     if (!result)
       SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
     $1 = &m;
   }
 }
 
-%typemap(typecheck,precedence=Precedence) const casadi::GenericMatrix< Type > & { $1 = is_a($input, $descriptor(Type *)) || meta< Type >::couldbe($input); }
+%typemap(typecheck,precedence=Precedence) const casadi::GenericMatrix< Type > & {
+  $1 = is_a($input, $descriptor(Type *)) || meta< Type >::couldbe($input);
+ }
 %typemap(freearg) const casadi::GenericMatrix< Type >  & {}
 
 %enddef
