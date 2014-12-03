@@ -1201,10 +1201,10 @@
 %exception  casadi::IOScheme::repr(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::IOSchemeVector< M  >::print(std::ostream &stream=std::cout, bool trailing_newline=true) const {
+%exception  casadi::IOSchemeVector< M  >::print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::IOSchemeVector< M  >::repr(std::ostream &stream=std::cout, bool trailing_newline=true) const {
+%exception  casadi::IOSchemeVector< M  >::repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::IOSchemeVector< M  >::vector() const {
@@ -2224,19 +2224,19 @@
 %exception  casadi::Matrix< DataType >::nan(int nrow=1, int ncol=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::print(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
+%exception  casadi::Matrix< DataType >::print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::printDense(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
+%exception  casadi::Matrix< DataType >::printDense(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::printScalar(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
+%exception  casadi::Matrix< DataType >::printScalar(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::printSparse(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
+%exception  casadi::Matrix< DataType >::printSparse(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::printVector(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
+%exception  casadi::Matrix< DataType >::printVector(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::printme(const Matrix< DataType > &y) const  {
@@ -2257,7 +2257,7 @@
 %exception  casadi::Matrix< DataType >::repmat(const Matrix< DataType > &x, int nrow, int ncol=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::repr(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
+%exception  casadi::Matrix< DataType >::repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::reserve(int nnz) {
@@ -2947,10 +2947,10 @@
 %exception  casadi::OptionsFunctionalityNode::print(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptionsFunctionalityNode::printOption(const std::string &name, std::ostream &stream=std::cout) const  {
+%exception  casadi::OptionsFunctionalityNode::printOption(const std::string &name, std::ostream &stream=CASADI_COUT) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptionsFunctionalityNode::printOptions(std::ostream &stream=std::cout) const  {
+%exception  casadi::OptionsFunctionalityNode::printOptions(std::ostream &stream=CASADI_COUT) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OptionsFunctionalityNode::repr(std::ostream &stream) const  {
@@ -3160,10 +3160,10 @@
 %exception  casadi::SXElement::print(std::ostream &stream, long &remaining_calls) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SXElement::print(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
+%exception  casadi::SXElement::print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SXElement::repr(std::ostream &stream=std::cout, bool trailing_newline=true) const  {
+%exception  casadi::SXElement::repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElement::setTemp(int t) {
@@ -3457,7 +3457,7 @@
 %exception  casadi::SharedObject::getCount() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SharedObject::printPtr(std::ostream &stream=std::cout) const  {
+%exception  casadi::SharedObject::printPtr(std::ostream &stream=CASADI_COUT) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObject::swap(SharedObject &other) {
@@ -4516,7 +4516,7 @@
 %exception  casadi::pow(double x, const T &n) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::print(const std::vector< T > &v, std::ostream &stream=std::cout) {
+%exception  casadi::print(const std::vector< T > &v, std::ostream &stream=CASADI_COUT) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::printme(const T &x, const T &y) {
@@ -4552,7 +4552,7 @@
 %exception  casadi::range(int stop) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::repr(const std::vector< T > &v, std::ostream &stream=std::cout) {
+%exception  casadi::repr(const std::vector< T > &v, std::ostream &stream=CASADI_COUT) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::reshape(const MX &x, int nrow, int ncol) {
