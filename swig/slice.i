@@ -31,6 +31,9 @@
 namespace casadi{
 
 %{
+template<> swig_type_info** meta< casadi::Slice >::name = &SWIGTYPE_p_casadi__Slice;
+template<> swig_type_info** meta< casadi::IndexList >::name = &SWIGTYPE_p_casadi__IndexList;
+
 #ifndef SWIGXML
 
 /// casadi::Slice
@@ -80,11 +83,6 @@ int meta< casadi::IndexList >::as(GUESTOBJECT *p, casadi::IndexList &m) {
 
 #endif // SWIGXML
 
-%}
-
-%{
-template<> swig_type_info** meta< casadi::Slice >::name = &SWIGTYPE_p_casadi__Slice;
-template<> swig_type_info** meta< casadi::IndexList >::name = &SWIGTYPE_p_casadi__IndexList;
 %}
 
 %my_generic_const_typemap(PRECEDENCE_SLICE,casadi::Slice);

@@ -66,16 +66,6 @@ class meta {
       void *dummy = 0;
       return SWIG_ConvertPtr(p, &dummy, *meta<T>::name, 0) >= 0;
     }
-    /// Convert Python object to pointer of type T
-    static T* get_ptr(GUESTOBJECT *p) {
-      void *pd = 0 ;
-      int res = SWIG_ConvertPtr(p, &pd, *meta<T>::name, 0 );
-      if (!SWIG_IsOK(res)) {
-        return 0;
-      } else {
-        return reinterpret_cast< T *>(pd);
-      }
-    }
     /// Convert Guest object to type T
     /// This function must work when isa(GUESTOBJECT *p) too
     static int as(GUESTOBJECT *p, T& m) {
@@ -163,16 +153,11 @@ class meta {
     #endif //SWIGPYTHON
 };
 
-
- /// Convert guest object to pointer of type T
- void guest_cast(GUESTOBJECT *p, void** pt, swig_type_info* name) {
-   if (!SWIG_IsOK(SWIG_ConvertPtr(p, (void **)pt, name, 0))) pt = 0;
- }
-
 %}
 
+
 %inline %{
-#define NATIVERETURN(Type, m) if (meta<Type>::isa(p)) { Type *mp = meta< Type >::get_ptr(p); if (mp==0) return false; m=*mp; return true;}
+#define NATIVERETURN(Type, m) if (meta< Type >::isa(p)) { Type *mp; if (SWIG_ConvertPtr(p, (void **) &mp, *meta< Type >::name, 0) == -1) return false; m=*mp; return true; }
 %}
 
 
@@ -325,8 +310,8 @@ int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > &m) { \
 %inline %{
 template <>
 int meta< std::pair<TypeA, TypeB> >::as(PyObject * p,std::pair< TypeA, TypeB > &m) {
-  std::pair< TypeA, TypeB > *tm = meta< std::pair< TypeA, TypeB > >::get_ptr(p);
-  if (tm!=0) {
+  std::pair< TypeA, TypeB > *tm;
+  if (SWIG_ConvertPtr(p, (void **)&tm, *meta< std::pair< TypeA, TypeB > >::name, 0 )>=0) {
     m = *tm;
     return true;
   }

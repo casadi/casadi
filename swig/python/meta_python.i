@@ -231,7 +231,8 @@ int meta< int >::as(PyObject * p, int &m) {
     Py_DECREF(mm);
     return result;
   } else if (meta< casadi::Matrix<int> >::isa(p)) {
-    casadi::Matrix<int> *temp = meta< casadi::Matrix<int> >::get_ptr(p);
+    casadi::Matrix<int> *temp;
+    SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
@@ -349,14 +350,16 @@ int meta< double >::as(PyObject * p, double &m) {
     Py_DECREF(mm);
     return result;
   } else if (meta< casadi::Matrix<double> >::isa(p)) {
-    casadi::Matrix<double> *temp = meta< casadi::Matrix<double> >::get_ptr(p);
+    casadi::Matrix<double> *temp;
+    SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<double> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
     }
     return false;
   } else if (meta< casadi::Matrix<int> >::isa(p)) {
-    casadi::Matrix<int> *temp = meta< casadi::Matrix<int> >::get_ptr(p);
+    casadi::Matrix<int> *temp;
+    SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
       return true;
