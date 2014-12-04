@@ -25,8 +25,8 @@ from casadi import *
 from casadi.tools import *
 
 #! An SX graph
-a = SXElement.sym("a")
-b = SXElement.sym("b")
+a = SX.sym("a")
+b = SX.sym("b")
 
 c = sin(a**5 + b)
 

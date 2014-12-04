@@ -47,7 +47,7 @@ print type(q), q
 q = substitute(z,x,w)
 print type(q), q
 
-#! Note that substitution of non-symbolic SXElement nodes is not permitted:
+#! Note that substitution of non-symbolic SX nodes is not permitted:
 #  substitute([z],[z_],[w])  This would throw an error
   
 #! This is actually a restriction of SXFunction:
