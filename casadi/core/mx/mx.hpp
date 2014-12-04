@@ -260,10 +260,15 @@ namespace casadi {
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
     void enlarge(int nrow, int ncol, const std::vector<int>& rr, const std::vector<int>& cc);
 
+
     MX operator-() const;
 
+#ifndef SWIG
     /// \cond INTERNAL
     ///@{
+    /// Const access the non-zero elements (dummy implementation)
+    const MX& data() const{ return *this; }
+
     /** \brief  Access a member of the node */
     MXNode* operator->();
 
@@ -271,6 +276,7 @@ namespace casadi {
     const MXNode* operator->() const;
     ///@}
     /// \endcond
+#endif // SWIG
 
     /** \brief Get the nth dependency as MX */
     MX getDep(int ch=0) const;

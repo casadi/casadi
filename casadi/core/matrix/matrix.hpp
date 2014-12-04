@@ -144,7 +144,7 @@ namespace casadi {
     /// Construct from a vector
     /**
      * Thanks to implicit conversion, you can pretend that Matrix(const SXElement& x); exists.
-     * Note: above remark applies only to C++, not python or octave interfaces
+     * Note: above remark applies only to C++, not Python or MATLAB interfaces
      */
     Matrix(const std::vector<DataType>& x);
 
