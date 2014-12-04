@@ -40,7 +40,7 @@ class Misctests(casadiTestCase):
     
   def test_issue179A(self):
     self.message('Regression test #179 (A)')
-    x = SXElement.sym("x")
+    x = SX.sym("x")
     f = SXFunction([x], [2 * x])
     f.init()
     y = f.call([x])[0].data()
@@ -49,7 +49,7 @@ class Misctests(casadiTestCase):
   def test_issue179B(self):
     self.message('Regression test #179 (B)')
     def calc_sparsity():
-      x = casadi.SXElement.sym("x")
+      x = casadi.SX.sym("x")
       f = casadi.SXFunction([x], [x ** 2])
       f.init()
       return f.jacSparsity()
@@ -72,7 +72,7 @@ class Misctests(casadiTestCase):
   
   def test_setoptionerrors(self):
     self.message("option errors")
-    x = SXElement.sym("x")
+    x = SX.sym("x")
     f = SXFunction([x],[x])
     
     f.setOption("name","foobar")
@@ -123,7 +123,7 @@ class Misctests(casadiTestCase):
 
   def test_copyconstr_refcount_lazy(self):
     self.message("Copy constructor for refcounted classes - lazy")
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[2*x])
     f.init()
@@ -167,7 +167,7 @@ class Misctests(casadiTestCase):
   def test_copy_refcount_lazy(self):
     self.message("Shallow copy for refcounted classes - lazy")
     import copy
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[2*x])
     f.init()
@@ -210,7 +210,7 @@ class Misctests(casadiTestCase):
   def test_deepcopy_refcount_lazy(self):
     self.message("Deep copy for refcounted classes - lazy")
     import copy
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[2*x])
     f.init()

@@ -229,7 +229,7 @@ class casadiTestCase(unittest.TestCase):
       sample = x
       
 
-    if isinstance(sample,SXElement) or isinstance(sample,SX):
+    if isinstance(sample,SX):
       f = SXFunction(x,yt)
     else:
       f = MXFunction(x,yt)

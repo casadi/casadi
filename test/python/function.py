@@ -189,7 +189,7 @@ class Functiontests(casadiTestCase):
 
   def test_set_wrong(self):
     self.message("setter, wrong sparsity")
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[x])
     f.init()
@@ -200,7 +200,7 @@ class Functiontests(casadiTestCase):
     
   def test_issue304(self):
     self.message("regression test for #304") # this code used to segfault
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[x**2,x**3])
     f.init()

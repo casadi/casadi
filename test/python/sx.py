@@ -82,7 +82,7 @@ class SXtests(casadiTestCase):
 
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
     
-  def test_scalarSXElement(self):
+  def test_scalarSX(self):
       x=SX.sym("x")
       x0=0.738
       
@@ -364,13 +364,13 @@ class SXtests(casadiTestCase):
     
   def test_SXFunctionc(self):
     self.message("SXFunction constructors")
-    x0=SXElement.sym("x")
-    x1=SXElement.sym("x")
-    x2=SXElement.sym("x")
-    x3=SXElement.sym("x")
-    x4=SXElement.sym("x")
-    x5=SXElement.sym("x")
-    x6=SXElement.sym("x")
+    x0=SX.sym("x")
+    x1=SX.sym("x")
+    x2=SX.sym("x")
+    x3=SX.sym("x")
+    x4=SX.sym("x")
+    x5=SX.sym("x")
+    x6=SX.sym("x")
     y=SX.sym("y",2,3)
     
     f=SXFunction([y],[y])
@@ -389,7 +389,7 @@ class SXtests(casadiTestCase):
 
   def test_SXconversion(self):
     self.message("Conversions from and to SX")
-    y=SXElement.sym("y")
+    y=SX.sym("y")
     x=SX.sym("x",3,3)
     SX(y)
     SX(x)
@@ -400,8 +400,8 @@ class SXtests(casadiTestCase):
   def test_SXbool(self):
     self.message("bool")
     
-    x = SXElement.sym("x")
-    y = SXElement.sym("y")
+    x = SX.sym("x")
+    y = SX.sym("y")
     
     f = SXFunction([vertcat([x,y])],[vertcat([logic_and(x,y),logic_or(x,y),logic_not(x)])])
     f.init()
@@ -418,8 +418,8 @@ class SXtests(casadiTestCase):
   def test_SXineq(self):
     self.message("SX ineq")
     
-    x = SXElement.sym("x")
-    y = SXElement.sym("y")
+    x = SX.sym("x")
+    y = SX.sym("y")
     
     f = SXFunction([vertcat([x,y])],[vertcat([x<y,x<=y,x>=y,x==y,x!=y])])
     f.init()
@@ -438,14 +438,10 @@ class SXtests(casadiTestCase):
   def test_SXFunctionc2(self):
     self.message("SXmatrix typemaps constructors")
     with internalAPI():
-      simplify(SXElement.sym("x"))                 
-    SX(array([[SXElement.sym("x")]])).isEmpty()
-    list = [ ("SXElement" ,SXElement.sym("x"),(1,1)),
-                ("number",2.3, (1,1)),
-                ("SX", SX.sym("x"), (1,1)),
-                ("numpy.ndarray1D(SXElement)", array([SXElement.sym("x"),SXElement.sym("y")]), (2,1)),
-                ("numpy.ndarray(SXElement)", array([[SXElement.sym("x"),SXElement.sym("y")],[SXElement.sym("w"),SXElement.sym("z")]]), (2,2)),
-                ("numpy.ndarray(SX,number)", array([[SXElement.sym("x"),2.3]]), (1,2))
+      simplify(SX.sym("x"))
+    SX(array([[SX.sym("x")]])).isEmpty()
+    list = [    ("number",2.3, (1,1)),
+                ("SX", SX.sym("x"), (1,1))
     ];
     for name, arg,shape in list:
       self.message(":" + name)
@@ -456,9 +452,7 @@ class SXtests(casadiTestCase):
       
   def test_SXconstr(self):
     self.message("SXmatrix constructors")
-    list = [ ("SXElement" ,SXElement.sym("x"),(1,1)),
-                ("number",2.3, (1,1)),
-                ("list(SXElement)", [SXElement.sym("x"),SXElement.sym("y")], (2,1)),
+    list = [    ("number",2.3, (1,1)),
                 ("list(SX,number)", [SXElement.sym("x"),2.3], (2,1) ),
                 ("list(list(SX,number))", [[SXElement.sym("x"),2.3],[1,SXElement.sym("y")]], (2,2) ),
                 ("tuple(SXElement)", (SXElement.sym("x"),SXElement.sym("y")), (2,1)),

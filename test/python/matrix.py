@@ -72,20 +72,7 @@ class Matrixtests(casadiTestCase):
     b = a.T
     self.assertEquals(b.size1(),1)
     self.assertEquals(b.size2(),0)
-    
-  def test_numpy(self):
-    self.message("numpy check")
-    # This is an example that failed on a windows machine
-    import numpy as NP
-    A = NP.zeros((3,4),dtype=SXElement)
-    
-    x = SX.sym("x")
-    A[:,1] = x
-    A[1,:] = 5
-    #print A  -  printing does not seem to work for numpy 1.8.0dev
-
-    NP.dot(A.T,A)
-    
+        
   def test_vertcat(self):
     self.message("vertcat")
     A = DMatrix.ones(2,3)
