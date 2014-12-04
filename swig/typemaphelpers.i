@@ -311,49 +311,6 @@ int meta< std::vector< Type > >::toCpp(GUESTOBJECT *p, std::vector< Type > *m, s
 %}
 
 
-/// std::pair< TypeA, TypeB >
-#ifdef SWIGPYTHON
-%define %meta_pair(TypeA,TypeB) 
-%inline %{
-template <>
-int meta< std::pair<TypeA, TypeB> >::toCpp(PyObject * p, std::pair< TypeA, TypeB > *m, swig_type_info *type) {
-  std::pair< TypeA, TypeB > *tm;
-  if (SWIG_ConvertPtr(p, (void **)&tm, type, 0 )>=0) {
-    if(m) *m = *tm;
-    return true;
-  }
-  if(!PySequence_Check(p)) return false;
-  if(PySequence_Size(p)!=2) return false;
-  PyObject * first =  PySequence_GetItem(p,0);
-  PyObject * second = PySequence_GetItem(p,1);
-  TypeA* m_first = m ? &m->first : 0;
-  TypeB* m_second = m ? &m->second : 0;
-  bool result = meta< TypeA  >::toCpp(first, m_first, *meta< TypeA >::name)
-    && meta< TypeB  >::toCpp(second, m_second, *meta< TypeB  >::name);
-  Py_DECREF(first);
-  Py_DECREF(second);
-  return result;   
- }
-
-template <>
-bool meta < std::pair< TypeA, TypeB > >::toPython(const std::pair< TypeA, TypeB > &m, PyObject *&p) {
-  p = PyTuple_New(2);
-  PyObject *first = 0;
-  first  = SWIG_NewPointerObj((new TypeA(static_cast< const TypeA& >(m.first ))), *meta< TypeA >::name , SWIG_POINTER_OWN |  0 );
-  PyObject *second = 0;
-  second = SWIG_NewPointerObj((new TypeB(static_cast< const TypeB& >(m.second))), *meta< TypeB >::name , SWIG_POINTER_OWN |  0 );
-  
-  if (first==0 || second==0) return false;
-  
-  PyTuple_SetItem(p, 0, first);
-  PyTuple_SetItem(p, 1, second);
-  
-  return true;
-}
-%}
-%enddef
-#endif //SWIGPYTHON
-
 #ifdef SWIGPYTHON
 %inline%{
 /** Check PyObjects by class name */
