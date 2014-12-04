@@ -24,9 +24,6 @@
 #ifndef CASADI_CALCULUS_I
 #define CASADI_CALCULUS_I
 
-%{
-#include <casadi/core/casadi_calculus.hpp>
-%}
 %include <casadi/core/casadi_calculus.hpp>
 
 #endif // CASADI_CALCULUS_I

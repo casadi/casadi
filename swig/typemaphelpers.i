@@ -23,19 +23,6 @@
  */
 
 
-%{
-#include "casadi/core/matrix/sparsity.hpp"
-#include "casadi/core/matrix/matrix.hpp"
-#include <sstream>
-#include "casadi/core/casadi_exception.hpp"
-
-// to allow for typechecking
-#include "casadi/core/sx/sx_element.hpp"
-
-// to typecheck for MX
-#include "casadi/core/mx/mx.hpp"
-%}
-
 #ifndef SWIGXML
 %include "typemaps.i"
 #endif

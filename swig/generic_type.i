@@ -26,10 +26,6 @@
 
 %include "shared_object.i"
 %include <casadi/core/casadi_types.hpp>
-
-%{
-#include <casadi/core/generic_type.hpp>
-%}
 %include <casadi/core/generic_type.hpp>
 
 #endif // CASADI_GENERIC_TYPE_I

@@ -27,9 +27,6 @@
 %include "generic_type.i"
 %include "shared_object.i"
 
-%{
-#include <casadi/core/options_functionality.hpp>
-%}
 %include <casadi/core/options_functionality.hpp>
 
 namespace casadi {

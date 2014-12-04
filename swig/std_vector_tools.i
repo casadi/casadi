@@ -25,10 +25,6 @@
 #define CASADI_STD_VECTOR_TOOLS_I
 
 %include "shared_object.i"
-
-%{
-#include <casadi/core/std_vector_tools.hpp>
-%}
 %include <casadi/core/std_vector_tools.hpp>
 
 VECTOR_TOOLS_TEMPLATES(int)

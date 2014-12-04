@@ -25,10 +25,6 @@
 #define CASADI_WEAK_REF_I
 
 %include "shared_object.i"
-
-%{
-#include <casadi/core/weak_ref.hpp>
-%}
 %include <casadi/core/weak_ref.hpp>
 
 #endif // CASADI_WEAK_REF_I
