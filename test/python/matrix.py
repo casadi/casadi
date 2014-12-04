@@ -524,7 +524,7 @@ class Matrixtests(casadiTestCase):
 
     sp = Sparsity.tril(n)
 
-    x  = SX(sp,[SXElement.sym("a%d" % i) for i in range(sp.size())])
+    x  = SX.sparse(sp,vertcat([SX.sym("a%d" % i) for i in range(sp.size())]))
 
     
     x_ = DMatrix(x.sparsity(),1)
@@ -536,7 +536,7 @@ class Matrixtests(casadiTestCase):
     
     sp = Sparsity.tril(n)
 
-    x  = SX(sp,[SXElement.sym("a%d" % i) for i in range(sp.size())])
+    x = SX.sym("a", sp)
     x[0,n-1] = 1 
     
     
@@ -545,7 +545,7 @@ class Matrixtests(casadiTestCase):
     # An irreducible matrix has a dense inverse in general
     self.checkarray(DMatrix.ones(n,n),I_,"inv")
 
-    x  = SX(sp,[SXElement.sym("a%d" % i) for i in range(sp.size())])
+    x = SX.sym("a", sp)
     x[0,n/2] = 1 
     
     s_ = DMatrix(sp,1)

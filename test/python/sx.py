@@ -207,10 +207,10 @@ class SXtests(casadiTestCase):
         
   def test_SXSparse(self):
       self.message("SX unary operations, sparse")
-      x=SXElement.sym("x")
-      y=SXElement.sym("y")
-      z=SXElement.sym("z")
-      x=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),[x,y,z])
+      x=SX.sym("x")
+      y=SX.sym("y")
+      z=SX.sym("z")
+      x=SX.sparse(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([x,y,z]))
       if scipy_available:
         x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
       
@@ -231,14 +231,14 @@ class SXtests(casadiTestCase):
 
   def test_SXbinarySparse(self):
       self.message("SX binary operations")
-      x=SXElement.sym("x")
-      y=SXElement.sym("y")
-      z=SXElement.sym("z")
-      x2=SXElement.sym("x2")
-      y2=SXElement.sym("y2")
-      z2=SXElement.sym("z2")
-      xx=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),[x,y,z])
-      yy=SX(Sparsity(4,3,[0,2,2,3],[0,2,3]),[x2,z2,y2])
+      x=SX.sym("x")
+      y=SX.sym("y")
+      z=SX.sym("z")
+      x2=SX.sym("x2")
+      y2=SX.sym("y2")
+      z2=SX.sym("z2")
+      xx=SX.sparse(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([x,y,z]))
+      yy=SX.sparse(Sparsity(4,3,[0,2,2,3],[0,2,3]),vertcat([x2,z2,y2]))
       
       if scipy_available:
         x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
@@ -283,7 +283,7 @@ class SXtests(casadiTestCase):
 
       self.message(":sparse")
       
-      x=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),[SXElement.sym("x"),SXElement.sym("y"),SXElement.sym("z")])
+      x=SX.sparse(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([SX.sym("x"),SX.sym("y"),SX.sym("z")]))
       sx0=[0.738,0.39,0.99]
       x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]).toArray()
       self.numpyEvaluationCheck(lambda x: SX(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
@@ -309,8 +309,8 @@ class SXtests(casadiTestCase):
   def test_SX1(self):
     self.message("SXFunction evaluation")
     fun=lambda x,y: [x+y,x*y,x**2+y**3]
-    x=SXElement.sym("x")
-    y=SXElement.sym("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     f=SXFunction([vertcat([x,y])],[vertcat(fun(x,y))])
     f.init()
     L=[2,3]
@@ -332,15 +332,15 @@ class SXtests(casadiTestCase):
     self.message("SXFunction evalution 2")
     fun = lambda x,y: [3-sin(x*x)-y, sqrt(y)*x]
     # variables
-    x = SXElement.sym("x")
-    y = SXElement.sym("y")
+    x = SX.sym("x")
+    y = SX.sym("y")
 
     # Create function
     f = fun(x,y)
     if CasadiOptions.getSimplificationOnTheFly():
-      self.assertEqual(str(f),'[((3-sin(sq(x)))-y), (sqrt(y)*x)]','SX representation is wrong')
+      self.assertEqual(str(f),'[SX(((3-sin(sq(x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong')
     else:
-      self.assertEqual(str(f),'[((3-sin((x*x)))-y), (sqrt(y)*x)]','SX representation is wrong'+str(f))
+      self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong'+str(f))
     fcn = SXFunction([vertcat([x,y])],[vertcat(f)])
 
     # Set some options
@@ -453,14 +453,14 @@ class SXtests(casadiTestCase):
   def test_SXconstr(self):
     self.message("SXmatrix constructors")
     list = [    ("number",2.3, (1,1)),
-                ("list(SX,number)", [SXElement.sym("x"),2.3], (2,1) ),
-                ("list(list(SX,number))", [[SXElement.sym("x"),2.3],[1,SXElement.sym("y")]], (2,2) ),
-                ("tuple(SXElement)", (SXElement.sym("x"),SXElement.sym("y")), (2,1)),
-                ("tuple(SX,number)", (SXElement.sym("x"),2.3), (2,1)),
+                ("list(SX,number)", [SX.sym("x"),2.3], (2,1) ),
+                ("list(list(SX,number))", [[SX.sym("x"),2.3],[1,SX.sym("y")]], (2,2) ),
+                ("tuple(SX)", (SX.sym("x"),SX.sym("y")), (2,1)),
+                ("tuple(SX,number)", (SX.sym("x"),2.3), (2,1)),
                 ("SX", SX.sym("x"), (1,1)),
-                ("numpy.ndarray1D(SXElement)", array([SXElement.sym("x"),SXElement.sym("y")]), (2,1)),
-                ("numpy.ndarray(SXElement)", array([[SXElement.sym("x"),SXElement.sym("y")],[SXElement.sym("w"),SXElement.sym("z")]]), (2,2)),
-                ("numpy.ndarray(SX,number)", array([[SXElement.sym("x"),2.3]]), (1,2))
+                ("numpy.ndarray1D(SX)", array([SX.sym("x"),SX.sym("y")]), (2,1)),
+                ("numpy.ndarray(SX)", array([[SX.sym("x"),SX.sym("y")],[SX.sym("w"),SX.sym("z")]]), (2,2)),
+                ("numpy.ndarray(SX,number)", array([[SX.sym("x"),2.3]]), (1,2))
     ];
     for name, arg,shape in list:
       self.message(":" + name)
@@ -471,7 +471,7 @@ class SXtests(casadiTestCase):
     
   def test_SXFunctionc3(self):
     self.message("vector(SXmatrix) typemaps constructors")
-    y=SXElement.sym("y")
+    y=SX.sym("y")
     x=SX.sym("x",3,1)
     vertcat([x,x])
     vertcat([y,y])
@@ -487,7 +487,7 @@ class SXtests(casadiTestCase):
     
   def test_symbolcheck(self):
     self.message("Check if non-symbolic inputs are caught")
-    self.assertRaises(RuntimeError, lambda : SXFunction([SXElement(0)],[SXElement.sym("x")]))
+    self.assertRaises(RuntimeError, lambda : SXFunction([SX(0)],[SX.sym("x")]))
       
   def test_sparseconstr(self):
     self.message("Check sparsity constructors")
@@ -528,8 +528,8 @@ class SXtests(casadiTestCase):
   @skip(not CasadiOptions.getSimplificationOnTheFly())
   def test_substitute(self):
     self.message("Basic symbolic algebra: substitute")
-    x=SXElement.sym("x")
-    y=SXElement.sym("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     z = cos(x)*y
     self.assertTrue(dependsOn(z,y))
     self.assertTrue(dependsOn(z,x))
@@ -550,7 +550,7 @@ class SXtests(casadiTestCase):
    
   def test_primitivefunctions(self):
     self.message("Primitive functions")
-    x=SXElement.sym("x")
+    x=SX.sym("x")
     
     nums = [-2,-1.5,-1,-0.5,-0.25,0,0.25,0.5,1,1.5,2]
     
@@ -572,7 +572,7 @@ class SXtests(casadiTestCase):
     
   def test_taylor(self):
     self.message("univariate taylor expansion")
-    x=SXElement.sym("x")
+    x=SX.sym("x")
     
     if CasadiOptions.getSimplificationOnTheFly():
       self.assertTrue(isEqual(taylor(sin(x),x),x))
@@ -580,7 +580,7 @@ class SXtests(casadiTestCase):
     a_=0.13
     x_=0.15
 
-    a = SXElement.sym("a") 
+    a = SX.sym("a") 
     
     def test(e,r):
       f = SXFunction([x,a],[e])
@@ -636,10 +636,10 @@ class SXtests(casadiTestCase):
     
   def test_mtaylor(self):
     self.message("multivariate taylor expansions")
-    x=SXElement.sym("x")
-    y=SXElement.sym("y")
-    a=SXElement.sym("a")
-    b=SXElement.sym("b")
+    x=SX.sym("x")
+    y=SX.sym("y")
+    a=SX.sym("a")
+    b=SX.sym("b")
 
     a_=0.13
     x_=0.15
@@ -677,8 +677,8 @@ class SXtests(casadiTestCase):
     
   def test_issue107(self):
     self.message("Regression test for issue 107: +=")
-    x=SXElement.sym("x")
-    y=SXElement.sym("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
 
     z=x
     z+=y
@@ -714,23 +714,23 @@ class SXtests(casadiTestCase):
     y = casadi.SX.sym("y", 3) 
     self.assertRaises(RuntimeError,lambda : y[[0, 5]] )
     try:
-      y[[0, 5]] = SXElement.sym("a")
+      y[[0, 5]] = SX.sym("a")
       self.assertTrue(False)
     except RuntimeError:
       pass
     y[[0, 2]]
-    y[[0, 2]] = SXElement.sym("a")
+    y[[0, 2]] = SX.sym("a")
     
   def test_issue181(self):
     self.message("Regression test #181")
-    x = SXElement.sym("x")
+    x = SX.sym("x")
     #self.assertRaises(TypeError,lambda : SX([x,None]))  # FIXME: this is leaking memory
     self.assertRaises(NotImplementedError,lambda: SXFunction([[x], [None]], [[2 * x]]))
     
   def test_printLimiting(self):
     self.message("printLimiting")
 
-    x = SXElement.sym("x")
+    x = SX.sym("x")
     for i in range(100):
       x = sin(x)*x
       
@@ -742,9 +742,10 @@ class SXtests(casadiTestCase):
     
     SX.getMaxNumCallsInPrint()
     
+  @known_bug()  # Not implemented
   def test_isEqual(self):
     self.message("equivalent")
-    x = SXElement.sym("x")
+    x = SX.sym("x")
     a = x*x
     b = x*x
     self.assertTrue(a.isEqual(b,1))
@@ -752,7 +753,7 @@ class SXtests(casadiTestCase):
   @skip(not CasadiOptions.getSimplificationOnTheFly())
   def test_SXsimplifications(self):
     self.message("simplifications")
-    x = SXElement.sym("x")
+    x = SX.sym("x")
     
     ops = []
     def temp(x):
@@ -821,10 +822,10 @@ class SXtests(casadiTestCase):
     ops.append(lambda x: (0.5*x)+(0.5*x))
     ops.append(lambda x: (x/2)+(x/2))
     ops.append(lambda x: (x*0.5)+(0.5*x))
-    ops.append(lambda x: (SXElement(4)-SXElement(4))+x)
+    ops.append(lambda x: (SX(4)-SX(4))+x)
     
     
-    y = SXElement.sym("x")
+    y = SX.sym("x")
     
     ops.append(lambda x: ((x+y)-(y+x))+x)
     ops.append(lambda x: ((x*y)-(y*x))+x)
@@ -848,37 +849,37 @@ class SXtests(casadiTestCase):
       self.assertEqual(str(y),"(-x)")
 
   def test_evalf(self):
-    x = SXElement(3)
-    y = SXElement(5)
+    x = SX(3)
+    y = SX(5)
     z = evalf(x+y)
     self.assertEqual(type(z),DMatrix)
     self.assertEqual(z,8)
 
   def test_evalfs(self):
-    x = SXElement.sym("x")
-    y = SXElement(5)
+    x = SX.sym("x")
+    y = SX(5)
     z = evalf(x+y,x,3)
     self.assertEqual(type(z),DMatrix)
     self.assertEqual(z,8)
   
   def test_truth(self):
     self.message("Truth values")
-    self.assertRaises(Exception, lambda : bool(SXElement.sym("x")))
-    self.assertRaises(Exception, lambda : bool(SXElement.sym("x")>0))
-    self.assertTrue(bool(SXElement(1)))
-    self.assertFalse(bool(SXElement(0)))
-    self.assertTrue(bool(SXElement(0.2)))
-    self.assertTrue(bool(SXElement(-0.2)))
     self.assertRaises(Exception, lambda : bool(SX.sym("x")))
     self.assertRaises(Exception, lambda : bool(SX.sym("x")>0))
-    self.assertTrue(bool(SX(SXElement(1))))
-    self.assertFalse(bool(SX(SXElement(0))))
-    self.assertTrue(bool(SX(SXElement(0.2))))
-    self.assertTrue(bool(SX(SXElement(-0.2))))
+    self.assertTrue(bool(SX(1)))
+    self.assertFalse(bool(SX(0)))
+    self.assertTrue(bool(SX(0.2)))
+    self.assertTrue(bool(SX(-0.2)))
+    self.assertRaises(Exception, lambda : bool(SX.sym("x")))
+    self.assertRaises(Exception, lambda : bool(SX.sym("x")>0))
+    self.assertTrue(bool(SX(SX(1))))
+    self.assertFalse(bool(SX(SX(0))))
+    self.assertTrue(bool(SX(SX(0.2))))
+    self.assertTrue(bool(SX(SX(-0.2))))
     self.assertRaises(Exception, lambda : bool(SX([2.0,3])))
     
   def test_if_else(self):
-    x = SXElement.sym("x")
+    x = SX.sym("x")
     y = if_else(x,1,2)
     f = SXFunction([x],[y])
     f.init()
@@ -913,8 +914,8 @@ class SXtests(casadiTestCase):
   def test_isRegular(self):
     x = SX.sym("x")
     
-    self.assertTrue(SXElement(0).isRegular())
-    self.assertFalse(SXElement(Inf).isRegular())
+    self.assertTrue(SX(0).isRegular())
+    self.assertFalse(SX(Inf).isRegular())
     with self.assertRaises(Exception):
       self.assertTrue(x.at(0))
       
