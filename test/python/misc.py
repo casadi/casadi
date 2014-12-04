@@ -419,14 +419,12 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except TypeError as e:
       print e.message
-      assert "You try to do: [SX] + SX" in e.message
 
     try:
       x + [x]
       self.assertTrue(False)
     except TypeError as e:
       print e.message
-      assert "You try to do: SX + [SX]" in e.message
 
 
     try:

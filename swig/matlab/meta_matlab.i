@@ -64,8 +64,6 @@
 
 %inline %{
 /// int
-template<> char meta< int >::expected_message[] = "Expecting integer";
-
 template <>
 int meta< int >::as(GUESTOBJECT * p, int *m) {
   if (is_a(p, *meta< int >::name)) {
@@ -88,15 +86,7 @@ int meta< int >::as(GUESTOBJECT * p, int *m) {
   }
 }
 
-/// std::vector<double>
-template <> char meta< std::vector< double > >::expected_message[] = "Expecting sequence(double)";
-
-/// std::vector<int>
-template <> char meta< std::vector< int > >::expected_message[] = "Expecting sequence(integer) or 1D numpy.array of ints"; 
-
 /// double
-template<> char meta< double >::expected_message[] = "Expecting double";
-
 template <>
 int meta< double >::as(GUESTOBJECT * p, double *m) {
   if (is_a(p, *meta< double >::name)) {
@@ -127,30 +117,10 @@ int meta< double >::as(GUESTOBJECT * p, double *m) {
   }
 }
 
-/// std::string
-template<> char meta< std::string >::expected_message[] = "Expecting string";
-
-/// casadi::DerivativeGenerator
- template<> char meta< casadi::DerivativeGenerator >::expected_message[] = "Expecting sparsity generator";
-
-/// casadi::CustomEvaluate
-template<> char meta< casadi::CustomEvaluate >::expected_message[] = "Expecting CustomFunction wrapper generator";
-
-/// casadi::Callback
-template<> char meta< casadi::Callback >::expected_message[] = "Expecting Callback";
-
-/// casadi::GenericType
-template<> char meta< casadi::GenericType >::expected_message[] = "Expecting any type (None might be an exception)";
-
-/// casadi::GenericType::Dictionary
-template<> char meta< casadi::GenericType::Dictionary >::expected_message[] = "Expecting dictionary of GenericTypes";
-
 // Explicit intialization of these two member functions, so we can use them in meta< casadi::SXElement >
 template<> int meta< casadi::SX >::as(GUESTOBJECT *p, casadi::SX *);
 
 /// casadi::SX
-template<> char meta< casadi::SXElement >::expected_message[] = "Expecting SXElement or number";
-
 template <>
 int meta< casadi::SXElement >::as(GUESTOBJECT *p, casadi::SXElement *s) {
   if (is_a(p, *meta< casadi::SXElement >::name)) {
@@ -173,8 +143,6 @@ int meta< casadi::SXElement >::as(GUESTOBJECT *p, casadi::SXElement *s) {
 }
 
 /// casadi::Matrix<int>
-template<> char meta< casadi::Matrix<int> >::expected_message[] = "Expecting IMatrix";
-
 template <>
 int meta< casadi::Matrix<int> >::as(GUESTOBJECT * p,casadi::Matrix<int> *m) {
   if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
@@ -197,8 +165,6 @@ int meta< casadi::Matrix<int> >::as(GUESTOBJECT * p,casadi::Matrix<int> *m) {
 }
 
 /// casadi::Matrix<double>
-template<> char meta< casadi::Matrix<double> >::expected_message[] = "Expecting DMatrix";
-
 template <>
 int meta< casadi::Matrix<double> >::as(GUESTOBJECT * p,casadi::Matrix<double> *m) {
   if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
@@ -228,8 +194,6 @@ int meta< casadi::Matrix<double> >::as(GUESTOBJECT * p,casadi::Matrix<double> *m
 }
 
 /// casadi::SX
-template<> char meta< casadi::SX >::expected_message[] = "Expecting one of: SX, SXElement, number";
-
 template <>
 int meta< casadi::SX >::as(GUESTOBJECT * p,casadi::SX *m) {
   if (is_a(p, *meta< casadi::SX >::name)) {
@@ -262,8 +226,6 @@ meta_vector(casadi::Matrix< casadi::SXElement >);
 meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
 
 /// casadi::MX
-template<> char meta< casadi::MX >::expected_message[] = "Expecting (MX, numberarray)";
-
 template <>
 int meta< casadi::MX >::as(GUESTOBJECT * p,casadi::MX *m) {
   if (is_a(p, *meta< casadi::MX >::name)) {

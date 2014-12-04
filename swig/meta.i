@@ -26,12 +26,11 @@
 %typemap(in) const casadi::GenericMatrix< Type > & (Type m) {
   if (is_a($input, $descriptor(Type *))) {
     if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(Type *), 0) == -1) {
-      SWIG_exception_fail(SWIG_TypeError,"Type cast failed");
+      SWIG_exception_fail(SWIG_TypeError,"Type cast failed ($1_type)");
     }
   } else {
-    bool result=meta< Type >::as($input,&m);
-    if (!result)
-      SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
+    if (!meta< Type >::as($input,&m))
+      SWIG_exception_fail(SWIG_TypeError, "Input type conversion failure ($1_type)");
     $1 = &m;
   }
 }

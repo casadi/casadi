@@ -86,22 +86,17 @@
 
 #ifdef SWIGPYTHON
 %typemap(in) int (int m) {
-  bool result=meta< int >::as($input,&m);
-  if (!result)
-    SWIG_exception_fail(SWIG_TypeError,meta< int >::expected_message);
+  if (!meta< int >::as($input,&m))
+    SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure (int)");
   $1 = m;
 }
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) int { $1 = is_a($input, $descriptor(int *)) || meta< int >::couldbe($input); }
 %typemap(freearg) int {}
 
-#endif //SWIGPYTHON
-
-#ifdef SWIGPYTHON
 %typemap(in) double (double m) {
-  bool result=meta< double >::as($input,&m);
-  if (!result)
-    SWIG_exception_fail(SWIG_TypeError,meta< double >::expected_message);
+  if (!meta< double >::as($input,&m))
+    SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure (double)");
   $1 = m;
 }
 
@@ -112,10 +107,9 @@
 
 #ifdef SWIGPYTHON
 %typemap(out) casadi::GenericType {
-bool ret=meta<  casadi::GenericType >::toPython($1,$result);
-if (!ret) {
-  SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-}
+  if(!meta<  casadi::GenericType >::toPython($1,$result)) {
+    SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
+  }
 }
 
 %typemap(out) std::vector< casadi::GenericType > {
@@ -123,20 +117,17 @@ if (!ret) {
   std::vector< casadi::GenericType > & in = $1;
   for (int k=0 ; k < in.size(); ++k) {
     PyObject* rete;
-    bool retv = meta< casadi::GenericType >::toPython(in[k],rete);
-    if (!retv) {
+    if (!meta< casadi::GenericType >::toPython(in[k],rete))
       SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-    }
     PyList_Append(ret, rete);
   }
   $result = ret;
 }
 
 %typemap(out) const casadi::GenericType::Dictionary&  {
-bool ret=meta<  casadi::GenericType::Dictionary >::toPython(*$1,$result);
-if (!ret) {
-  SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
-}
+  if(!meta<  casadi::GenericType::Dictionary >::toPython(*$1,$result)) {
+    SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
+  }
 }
 #endif // SWIGPYTHON
 

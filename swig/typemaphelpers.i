@@ -89,7 +89,6 @@ class meta {
         return as(p, &m);
     }
     static swig_type_info** name;
-    static char expected_message[];
     
     // Vector specific stuff
     
@@ -178,10 +177,11 @@ class meta {
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(Type*), 0) == -1) {
-    if (!meta< Type >::as($input,&m)) SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
+    if (!meta< Type >::as($input,&m))
+      SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure ($1_type)");
     $1 = &m;
   }
-}
+ }
 
 %typemap(typecheck,precedence=Precedence) const Type & { $1 = is_a($input, $descriptor(Type *)) || meta< Type >::couldbe($input); }
 %typemap(freearg) const Type  & {}
@@ -307,8 +307,6 @@ void PyDECREFParent(PyObject* self) {
 %inline %{
 /// std::vector< Type >
 #define meta_vector(Type) \
-template<> char meta< std::vector< Type > >::expected_message[] = "Expecting sequence(Type)"; \
- \
 template <> \
 int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > *m) { \
   if (is_a(p, *meta< std::vector< Type > >::name)) {                                                       \

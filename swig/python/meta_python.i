@@ -203,8 +203,6 @@ namespace casadi {
 
 %inline %{
 /// int
-template<> char meta< int >::expected_message[] = "Expecting integer";
-
 template <>
   int meta< int >::as(PyObject * p, int *m) {
   if (is_a(p, *meta< int >::name)) {
@@ -250,7 +248,6 @@ template <>
 }
 
 /// std::vector<double>
-template<> char meta< std::vector< double > >::expected_message[] = "Expecting sequence(double)"; 
 template <>
 int meta< std::vector< double > >::as(PyObject * p, std::vector<double > *m) {
   if (is_a(p, *meta< std::vector< double > >::name)) {
@@ -291,7 +288,6 @@ int meta< std::vector< double > >::as(PyObject * p, std::vector<double > *m) {
 }
 
 /// std::vector<int>
-template<> char meta< std::vector< int > >::expected_message[] = "Expecting sequence(integer) or 1D numpy.array of ints"; 
 template <>
 int meta< std::vector< int > >::as(PyObject * p,std::vector< int > *m) {
   if (is_a(p, *meta< std::vector< int > >::name)) {
@@ -340,8 +336,6 @@ int meta< std::vector< int > >::as(PyObject * p,std::vector< int > *m) {
 }
 
 /// double
-template<> char meta< double >::expected_message[] = "Expecting double";
-
 template <>
 int meta< double >::as(PyObject * p, double *m) {
   if (is_a(p, *meta< double >::name)) {
@@ -395,8 +389,6 @@ int meta< double >::as(PyObject * p, double *m) {
 }
 
 /// std::string
-template<> char meta< std::string >::expected_message[] = "Expecting string";
-
 template <>
 int meta< std::string >::as(PyObject * p, std::string *m) {
   if (is_a(p, *meta< std::string >::name)) {
@@ -419,8 +411,6 @@ template<> int meta< casadi::GenericType::Dictionary >::as(PyObject * p,casadi::
 template<> bool meta< casadi::GenericType::Dictionary >::toPython(const casadi::GenericType::Dictionary &a, PyObject *&p);
 
 /// casadi::DerivativeGenerator
- template<> char meta< casadi::DerivativeGenerator >::expected_message[] = "Expecting sparsity generator";
-
  template <>
  int meta< casadi::DerivativeGenerator >::as(PyObject * p, casadi::DerivativeGenerator *s) {
    if (is_a(p, *meta< casadi::DerivativeGenerator >::name)) {
@@ -444,8 +434,6 @@ template<> bool meta< casadi::GenericType::Dictionary >::toPython(const casadi::
  }
 
 /// casadi::CustomEvaluate
-template<> char meta< casadi::CustomEvaluate >::expected_message[] = "Expecting CustomFunction wrapper generator";
-
 template <>
 int meta< casadi::CustomEvaluate >::as(PyObject * p, casadi::CustomEvaluate *s) {
   if (is_a(p, *meta< casadi::CustomEvaluate >::name)) {
@@ -465,8 +453,6 @@ int meta< casadi::CustomEvaluate >::as(PyObject * p, casadi::CustomEvaluate *s) 
 }
 
 /// casadi::Callback
-template<> char meta< casadi::Callback >::expected_message[] = "Expecting Callback";
-
 template <>
 int meta< casadi::Callback >::as(PyObject * p, casadi::Callback *s) {
   if (is_a(p, *meta< casadi::Callback >::name)) {
@@ -488,8 +474,6 @@ int meta< casadi::Callback >::as(PyObject * p, casadi::Callback *s) {
 }
 
 /// casadi::GenericType
-template<> char meta< casadi::GenericType >::expected_message[] = "Expecting any type (None might be an exception)";
-
 template <>
 int meta< casadi::GenericType >::as(PyObject * p,casadi::GenericType *s) {
   if (is_a(p, *meta< casadi::GenericType >::name)) {
@@ -607,8 +591,6 @@ bool meta< casadi::GenericType >::toPython(const casadi::GenericType &a, PyObjec
 }
 
 /// casadi::GenericType::Dictionary
-template<> char meta< casadi::GenericType::Dictionary >::expected_message[] = "Expecting dictionary of GenericTypes";
-
 template <>
 int meta< casadi::GenericType::Dictionary >::as(PyObject * p,casadi::GenericType::Dictionary *s) {
   if (is_a(p, *meta< casadi::GenericType::Dictionary >::name)) {
@@ -660,8 +642,6 @@ template<> int meta< casadi::SX >::as(GUESTOBJECT *p, casadi::SX *);
 //template<> bool meta< casadi::SX >::couldbe(GUESTOBJECT *p);
 
 /// casadi::SX
-template<> char meta< casadi::SXElement >::expected_message[] = "Expecting SXElement or number";
-
 template <>
 int meta< casadi::SXElement >::as(PyObject * p,casadi::SXElement *s) {
   if (is_a(p, *meta< casadi::SXElement >::name)) {
@@ -698,8 +678,6 @@ int meta< casadi::SXElement >::as(PyObject * p,casadi::SXElement *s) {
 }
 
 /// casadi::Matrix<int>
-template<> char meta< casadi::Matrix<int> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csc_matrix, IMatrix";
-
 template <>
 int meta< casadi::Matrix<int> >::as(PyObject * p,casadi::Matrix<int> *m) {
   if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
@@ -785,8 +763,6 @@ meta_vector(casadi::Matrix<int>)
 meta_vector(std::vector< casadi::Matrix<int> >)
 
 /// casadi::Matrix<double>
-template<> char meta< casadi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csc_matrix, DMatrix";
-
 template <>
 int meta< casadi::Matrix<double> >::as(PyObject * p,casadi::Matrix<double> *m) {
   if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
@@ -964,8 +940,6 @@ meta_vector(casadi::Matrix<double>)
 meta_vector(std::vector< casadi::Matrix<double> >)
 
 /// casadi::SX
-template<> char meta< casadi::SX >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SX, SX, number, sequence(SX/number)";
-
 template <>
 int meta< casadi::SX >::as(PyObject * p,casadi::SX *m) {
   if (is_a(p, *meta< casadi::SX >::name)) {
@@ -1033,8 +1007,6 @@ meta_vector(casadi::Matrix< casadi::SXElement >);
 meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
 
 /// casadi::MX
-template<> char meta< casadi::MX >::expected_message[] = "Expecting (MX, numberarray)";
-
 template <>
 int meta< casadi::MX >::as(PyObject * p,casadi::MX *m) {
   if (is_a(p, *meta< casadi::MX >::name)) {
