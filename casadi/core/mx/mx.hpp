@@ -267,7 +267,7 @@ namespace casadi {
     /// \cond INTERNAL
     ///@{
     /// Const access the non-zero elements (dummy implementation)
-    const MX& data() const{ return *this; }
+    const MX& data() const { return *this; }
 
     /** \brief  Access a member of the node */
     MXNode* operator->();
