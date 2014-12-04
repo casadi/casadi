@@ -29,7 +29,7 @@
       SWIG_exception_fail(SWIG_TypeError,"Type cast failed ($1_type)");
     }
   } else {
-    if (!meta< Type >::as($input,&m))
+    if (!meta< Type >::toCpp($input, &m, $descriptor(Type*)))
       SWIG_exception_fail(SWIG_TypeError, "Input type conversion failure ($1_type)");
     $1 = &m;
   }
@@ -54,6 +54,7 @@ template<> swig_type_info** meta< casadi::GenericType::Dictionary >::name = &SWI
 template<> swig_type_info** meta< casadi::SXElement >::name = &SWIGTYPE_p_casadi__SXElement;
 template<> swig_type_info** meta< casadi::SX >::name = &SWIGTYPE_p_casadi__MatrixT_casadi__SXElement_t;
 template<> swig_type_info** meta< std::vector< casadi::SX > >::name = &SWIGTYPE_p_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t;
+template<> swig_type_info** meta< casadi::Function >::name = &SWIGTYPE_p_casadi__Function;
 
 template<> swig_type_info** meta< std::vector< std::vector< casadi::SX > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_std__allocatorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_t_t;
 template<> swig_type_info** meta< std::vector< casadi::SXElement > >::name = &SWIGTYPE_p_std__vectorT_casadi__SXElement_std__allocatorT_casadi__SXElement_t_t;

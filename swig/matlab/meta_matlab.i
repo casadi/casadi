@@ -65,11 +65,10 @@
 %inline %{
 /// int
 template <>
-int meta< int >::as(GUESTOBJECT * p, int *m) {
-  if (is_a(p, *meta< int >::name)) {
+int meta< int >::toCpp(GUESTOBJECT * p, int *m, swig_type_info *type) {
+  if (is_a(p, type)) {
     int *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< int >::name, 0) == -1)
-      return false;
+    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
     *m=*mp;
     return true;
   }
@@ -88,7 +87,7 @@ int meta< int >::as(GUESTOBJECT * p, int *m) {
 
 /// double
 template <>
-int meta< double >::as(GUESTOBJECT * p, double *m) {
+int meta< double >::toCpp(GUESTOBJECT * p, double *m, swig_type_info *type) {
   if (is_a(p, *meta< double >::name)) {
     double *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< double >::name, 0) == -1)
@@ -118,11 +117,11 @@ int meta< double >::as(GUESTOBJECT * p, double *m) {
 }
 
 // Explicit intialization of these two member functions, so we can use them in meta< casadi::SXElement >
-template<> int meta< casadi::SX >::as(GUESTOBJECT *p, casadi::SX *);
+template<> int meta< casadi::SX >::toCpp(GUESTOBJECT *p, casadi::SX *, swig_type_info *type);
 
 /// casadi::SX
 template <>
-int meta< casadi::SXElement >::as(GUESTOBJECT *p, casadi::SXElement *s) {
+int meta< casadi::SXElement >::toCpp(GUESTOBJECT *p, casadi::SXElement *s, swig_type_info *type) {
   if (is_a(p, *meta< casadi::SXElement >::name)) {
     casadi::SXElement *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SXElement >::name, 0) == -1)
@@ -132,9 +131,7 @@ int meta< casadi::SXElement >::as(GUESTOBJECT *p, casadi::SXElement *s) {
   }
   if (meta< double >::couldbe(p)) {
     double res;
-    int result = meta< double >::as(p, &res);
-    if (!result)
-      return false;
+    if (!meta< double >::toCpp(p, &res, *meta< double >::name)) return false;
     *s=casadi::SXElement(res);
   } else {
     return false;
@@ -144,7 +141,7 @@ int meta< casadi::SXElement >::as(GUESTOBJECT *p, casadi::SXElement *s) {
 
 /// casadi::Matrix<int>
 template <>
-int meta< casadi::Matrix<int> >::as(GUESTOBJECT * p,casadi::Matrix<int> *m) {
+int meta< casadi::Matrix<int> >::toCpp(GUESTOBJECT * p,casadi::Matrix<int> *m, swig_type_info *type) {
   if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
@@ -154,7 +151,7 @@ int meta< casadi::Matrix<int> >::as(GUESTOBJECT * p,casadi::Matrix<int> *m) {
   }
   if (meta< int >::couldbe(p)) {
     int t;
-    int res = meta< int >::as(p, &t);
+    int res = meta< int >::toCpp(p, &t, *meta< int >::name);
     *m = t;
     return res;
   } else {
@@ -166,7 +163,7 @@ int meta< casadi::Matrix<int> >::as(GUESTOBJECT * p,casadi::Matrix<int> *m) {
 
 /// casadi::Matrix<double>
 template <>
-int meta< casadi::Matrix<double> >::as(GUESTOBJECT * p,casadi::Matrix<double> *m) {
+int meta< casadi::Matrix<double> >::toCpp(GUESTOBJECT * p, casadi::Matrix<double> *m, swig_type_info *type) {
   if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
     casadi::Matrix<double> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<double> >::name, 0) == -1)
@@ -183,7 +180,7 @@ int meta< casadi::Matrix<double> >::as(GUESTOBJECT * p,casadi::Matrix<double> *m
   }
   if (meta< double >::couldbe(p)) {
     double t;
-    int res = meta< double >::as(p, &t);
+    int res = meta< double >::toCpp(p, &t, *meta< double >::name);
     *m = t;
     return res;
   } else {
@@ -195,7 +192,7 @@ int meta< casadi::Matrix<double> >::as(GUESTOBJECT * p,casadi::Matrix<double> *m
 
 /// casadi::SX
 template <>
-int meta< casadi::SX >::as(GUESTOBJECT * p,casadi::SX *m) {
+int meta< casadi::SX >::toCpp(GUESTOBJECT * p,casadi::SX *m, swig_type_info *type) {
   if (is_a(p, *meta< casadi::SX >::name)) {
     casadi::SX *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SX >::name, 0) == -1)
@@ -211,7 +208,7 @@ int meta< casadi::SX >::as(GUESTOBJECT * p,casadi::SX *m) {
     return true;
   }
   casadi::DMatrix mt;
-  if(meta< casadi::Matrix<double> >::as(p, &mt)) {
+  if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
     *m = casadi::SX(mt);
   } else {
     //SWIG_Error(SWIG_TypeError, "asSX: unrecognised type. Should have been caught by typemap(typecheck)");
@@ -227,7 +224,7 @@ meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
 
 /// casadi::MX
 template <>
-int meta< casadi::MX >::as(GUESTOBJECT * p,casadi::MX *m) {
+int meta< casadi::MX >::toCpp(GUESTOBJECT * p,casadi::MX *m, swig_type_info *type) {
   if (is_a(p, *meta< casadi::MX >::name)) {
     casadi::MX *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::MX >::name, 0) == -1)
@@ -236,7 +233,7 @@ int meta< casadi::MX >::as(GUESTOBJECT * p,casadi::MX *m) {
     return true;
   }
   casadi::DMatrix mt;
-  if(meta< casadi::Matrix<double> >::as(p, &mt)) {
+  if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
     *m = casadi::MX(mt);
     return true;
   }

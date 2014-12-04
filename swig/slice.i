@@ -38,10 +38,10 @@ template<> swig_type_info** meta< casadi::IndexList >::name = &SWIGTYPE_p_casadi
 
 /// casadi::Slice
 template <>
-int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice *m) {
-  if (is_a(p, *meta< casadi::Slice >::name)) {
+int meta< casadi::Slice >::toCpp(GUESTOBJECT *p, casadi::Slice *m, swig_type_info *type) {
+  if (is_a(p, type)) {
     casadi::Slice *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Slice >::name, 0) == -1)
+    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1)
       return false;
     *m = *mp;
     return true;
@@ -68,23 +68,22 @@ int meta< casadi::Slice >::as(GUESTOBJECT *p, casadi::Slice *m) {
 
 /// casadi::IndexList
 template <>
-int meta< casadi::IndexList >::as(GUESTOBJECT *p, casadi::IndexList *m) {
-  if (is_a(p, *meta< casadi::IndexList >::name)) {
+int meta< casadi::IndexList >::toCpp(GUESTOBJECT *p, casadi::IndexList *m, swig_type_info *type) {
+  if (is_a(p, type)) {
     casadi::IndexList *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::IndexList >::name, 0) == -1)
-      return false;
+    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
     *m = *mp;
     return true;
   }
   if (meta< int >::couldbe(p)) {
     m->type = casadi::IndexList::INT;
-    meta< int >::as(p, &m->i);
+    meta< int >::toCpp(p, &m->i, *meta< int >::name);
   } else if (meta< std::vector<int> >::couldbe(p)) {
     m->type = casadi::IndexList::IVECTOR;
-    return meta< std::vector<int> >::as(p, &m->iv);
+    return meta< std::vector<int> >::toCpp(p, &m->iv, *meta< std::vector<int> >::name);
   } else if (meta< casadi::Slice>::couldbe(p)) {
     m->type = casadi::IndexList::SLICE;
-    return meta< casadi::Slice >::as(p, &m->slice);
+    return meta< casadi::Slice >::toCpp(p, &m->slice, *meta< casadi::Slice >::name);
   } else {
     return false;
   }

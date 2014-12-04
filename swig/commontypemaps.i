@@ -86,7 +86,7 @@
 
 #ifdef SWIGPYTHON
 %typemap(in) int (int m) {
-  if (!meta< int >::as($input,&m))
+  if (!meta< int >::toCpp($input, &m, $descriptor(int *)))
     SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure (int)");
   $1 = m;
 }
@@ -95,7 +95,7 @@
 %typemap(freearg) int {}
 
 %typemap(in) double (double m) {
-  if (!meta< double >::as($input,&m))
+  if (!meta< double >::toCpp($input, &m, $descriptor(double *)))
     SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure (double)");
   $1 = m;
 }
