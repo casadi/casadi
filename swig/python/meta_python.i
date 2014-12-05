@@ -208,13 +208,13 @@ template <>
     int *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1)
       return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p)) {
     PyObject *r = PyNumber_Long(p);
     if (!r) return false;
-    *m = PyLong_AsLong(r);
+    if (m) *m = PyLong_AsLong(r);
     Py_DECREF(r);
     return true;
   } else if (PyObject_HasAttrString(p,"dtype")) {
@@ -227,9 +227,10 @@ template <>
     if (!mm) { PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
     char *kk = PyString_AsString(k);
     bool result =  kk[0]=='i';
-    Py_DECREF(k); Py_DECREF(r);
+    Py_DECREF(k);
+    Py_DECREF(r);
     if (result) {
-      *m = PyLong_AsLong(mm);
+      if (m) *m = PyLong_AsLong(mm);
     }
     Py_DECREF(mm);
     return result;
@@ -237,7 +238,7 @@ template <>
     casadi::Matrix<int> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
-      *m = temp->data()[0];
+      if (m) *m = temp->data()[0];
       return true;
     }
     return false;
@@ -252,7 +253,7 @@ int meta< std::vector< double > >::toCpp(PyObject * p, std::vector<double > *m, 
   if (is_a(p, type)) {
     std::vector< double > *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (is_array(p)) {
@@ -274,7 +275,7 @@ int meta< std::vector< double > >::toCpp(PyObject * p, std::vector<double > *m, 
     }
     double* d=(double*) array_data(array);
     
-    m->assign( d, d+size );
+    if (m) m->assign( d, d+size );
     
                   
     // Free memory
@@ -291,7 +292,7 @@ int meta< std::vector< int > >::toCpp(PyObject * p,std::vector< int > *m, swig_t
   if (is_a(p, type)) {
     std::vector< int > *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (is_array(p)) {
@@ -315,13 +316,15 @@ int meta< std::vector< int > >::toCpp(PyObject * p,std::vector< int > *m, swig_t
         return false;
       }
       long* temp=(long*) array_data(array);
-      m->resize(size);
-      for (int k=0;k<size;k++) (*m)[k]=temp[k];
+      if (m) {
+        m->resize(size);
+        for (int k=0; k<size; k++) (*m)[k]=temp[k];
+      }
       return true;
     }
     int *d=(int*) array_data(array);
 
-    m->assign( d, d+size );
+    if (m) m->assign( d, d+size );
 
                   
     // Free memory
@@ -338,13 +341,13 @@ int meta< double >::toCpp(PyObject * p, double *m, swig_type_info *type) {
   if (is_a(p, type)) {
     double *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) {
     PyObject *r = PyNumber_Float(p);
     if (!r) return false;
-    *m = PyFloat_AsDouble(r);
+    if (m) *m = PyFloat_AsDouble(r);
     Py_DECREF(r);
     return true;
   } else if (PyObject_HasAttrString(p,"dtype")) {
@@ -357,9 +360,10 @@ int meta< double >::toCpp(PyObject * p, double *m, swig_type_info *type) {
     if (!mm) {   PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
     char *kk = PyString_AsString(k);
     bool result = kk[0]=='f' || kk[0]=='i';
-    Py_DECREF(k); Py_DECREF(r); 
+    Py_DECREF(k);
+    Py_DECREF(r); 
     if (result) {
-      *m = PyFloat_AsDouble(mm);
+      if (m) *m = PyFloat_AsDouble(mm);
     }
     Py_DECREF(mm);
     return result;
@@ -367,7 +371,7 @@ int meta< double >::toCpp(PyObject * p, double *m, swig_type_info *type) {
     casadi::Matrix<double> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<double> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
-      *m = temp->data()[0];
+      if (m) *m = temp->data()[0];
       return true;
     }
     return false;
@@ -375,7 +379,7 @@ int meta< double >::toCpp(PyObject * p, double *m, swig_type_info *type) {
     casadi::Matrix<int> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
-      *m = temp->data()[0];
+      if (m) *m = temp->data()[0];
       return true;
     }
     return false;
@@ -390,12 +394,12 @@ int meta< std::string >::toCpp(PyObject * p, std::string *m, swig_type_info *typ
   if (is_a(p, type)) {
     std::string *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (!PyString_Check(p)) return false;
-  m->clear();
-  m->append(PyString_AsString(p));
+  if (m) m->clear();
+  if (m) m->append(PyString_AsString(p));
   return true;
 }
 
@@ -407,11 +411,11 @@ GUESTOBJECT * fromCpp(const casadi::GenericType::Dictionary &a);
 
 /// casadi::DerivativeGenerator
 template <>
-int meta< casadi::DerivativeGenerator >::toCpp(PyObject * p, casadi::DerivativeGenerator *s, swig_type_info *type) {
+int meta< casadi::DerivativeGenerator >::toCpp(PyObject * p, casadi::DerivativeGenerator *m, swig_type_info *type) {
    if (is_a(p, type)) {
      casadi::DerivativeGenerator *mp;
      if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-     *s=*mp;
+     if (m) *m=*mp;
      return true;
    }
    PyObject* return_type = getReturnType(p);
@@ -419,9 +423,10 @@ int meta< casadi::DerivativeGenerator >::toCpp(PyObject * p, casadi::DerivativeG
    PyObject* function = getCasadiObject("Function");
    if (!function) { Py_DECREF(return_type); return false; }
    bool res = PyClass_IsSubclass(return_type,function);
-   Py_DECREF(return_type);Py_DECREF(function);
+   Py_DECREF(return_type);
+   Py_DECREF(function);
    if (res) {
-     *s = casadi::DerivativeGeneratorPython(p);
+     if (m) *m = casadi::DerivativeGeneratorPython(p);
      return true;
    }
    return false;
@@ -429,29 +434,29 @@ int meta< casadi::DerivativeGenerator >::toCpp(PyObject * p, casadi::DerivativeG
 
 /// casadi::CustomEvaluate
 template <>
-int meta< casadi::CustomEvaluate >::toCpp(PyObject * p, casadi::CustomEvaluate *s, swig_type_info *type) {
+int meta< casadi::CustomEvaluate >::toCpp(PyObject * p, casadi::CustomEvaluate *m, swig_type_info *type) {
   if (is_a(p, type)) {
     casadi::CustomEvaluate *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *s=*mp;
+    if (m) *m=*mp;
     return true;
   }
   PyObject* return_type = getReturnType(p);
   bool res = (return_type==Py_None) || !return_type;
   if (return_type) Py_DECREF(return_type);
   if (res) {
-    *s = casadi::CustomEvaluatePython(p);
+    if (m) *m = casadi::CustomEvaluatePython(p);
   }
   return res;
 }
 
 /// casadi::Callback
 template <>
-int meta< casadi::Callback >::toCpp(PyObject * p, casadi::Callback *s, swig_type_info *type) {
+int meta< casadi::Callback >::toCpp(PyObject * p, casadi::Callback *m, swig_type_info *type) {
   if (is_a(p, type)) {
     casadi::Callback *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *s=*mp;
+    if (m) *m=*mp;
     return true;
   }
   PyObject* return_type = getReturnType(p);
@@ -459,7 +464,7 @@ int meta< casadi::Callback >::toCpp(PyObject * p, casadi::Callback *s, swig_type
   bool res = PyType_IsSubtype((PyTypeObject *)return_type,&PyInt_Type) || PyType_IsSubtype((PyTypeObject *)return_type,&PyLong_Type);
   Py_DECREF(return_type);
   if (res) {
-    *s = casadi::CallbackPython(p);
+    if (m) *m = casadi::CallbackPython(p);
     return true;
   }
   return false;
@@ -467,37 +472,37 @@ int meta< casadi::Callback >::toCpp(PyObject * p, casadi::Callback *s, swig_type
 
 /// casadi::GenericType
 template <>
-int meta< casadi::GenericType >::toCpp(PyObject * p,casadi::GenericType *s, swig_type_info *type) {
+int meta< casadi::GenericType >::toCpp(PyObject * p, casadi::GenericType *m, swig_type_info *type) {
   if (is_a(p, type)) {
     casadi::GenericType *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *s=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (p==Py_None) {
-    *s=casadi::GenericType();
+    if (m) *m=casadi::GenericType();
   } else if (PyBool_Check(p)) {
-    *s=casadi::GenericType((bool) PyInt_AsLong(p));
+    if (m) *m=casadi::GenericType((bool) PyInt_AsLong(p));
   } else if (PyInt_Check(p)) {
-    *s=casadi::GenericType((int) PyInt_AsLong(p));
+    if (m) *m=casadi::GenericType((int) PyInt_AsLong(p));
   } else if (PyFloat_Check(p)) {
-    *s=casadi::GenericType(PyFloat_AsDouble(p));
+    if (m) *m=casadi::GenericType(PyFloat_AsDouble(p));
   } else if (meta< std::string >::couldbe(p)) {
     std::string temp;
     if (!meta< std::string >::toCpp(p, &temp, *meta< std::string >::name)) return false;
-    *s = casadi::GenericType(temp);
+    if (m) *m = casadi::GenericType(temp);
   } else if (meta< std::vector<int> >::couldbe(p)) {
     std::vector<int> temp;
     if (!meta< std::vector<int> >::toCpp(p, &temp, *meta< std::vector<int> >::name)) return false;
-    *s = casadi::GenericType(temp);
+    if (m) *m = casadi::GenericType(temp);
   } else if (meta< std::vector<double> >::couldbe(p)) {
     std::vector<double> temp;
     if (!meta< std::vector<double> >::toCpp(p, &temp, *meta< std::vector<double> >::name)) return false;
-    *s = casadi::GenericType(temp);
+    if (m) *m = casadi::GenericType(temp);
   } else if (meta< std::vector<std::string> >::couldbe(p)) {
     std::vector<std::string> temp;
     if (!meta< std::vector<std::string> >::toCpp(p, &temp, *meta< std::vector<std::string> >::name)) return false;
-    *s = casadi::GenericType(temp);
+    if (m) *m = casadi::GenericType(temp);
   } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
     PyObject *c = PyObject_GetAttrString(p,"creator");
     if (!c) return false;
@@ -513,7 +518,7 @@ int meta< casadi::GenericType >::toCpp(PyObject * p,casadi::GenericType *s, swig
     Py_DECREF(gt);
     
     if (g) {
-      int result = meta< casadi::GenericType >::toCpp(g, s, type);
+      int result = meta< casadi::GenericType >::toCpp(g, m, type);
       Py_DECREF(g);
       return result;
     }
@@ -523,7 +528,7 @@ int meta< casadi::GenericType >::toCpp(PyObject * p,casadi::GenericType *s, swig
     casadi::Function temp;
     int ret = meta< casadi::Function >::toCpp(p, &temp, *meta< casadi::Function >::name); 
     if (!ret) return false;
-    *s = casadi::GenericType(temp);
+    if (m) *m = casadi::GenericType(temp);
   } else if (meta< casadi::GenericType::Dictionary >::couldbe(p) || meta< casadi::DerivativeGenerator >::couldbe(p) || meta< casadi::Callback >::couldbe(p)) {
     PyObject* gt = getCasadiObject("GenericType");
     if (!gt) return false;
@@ -538,7 +543,7 @@ int meta< casadi::GenericType >::toCpp(PyObject * p,casadi::GenericType *s, swig
     Py_DECREF(gt);
     
     if (g) {
-      int result = meta< casadi::GenericType >::toCpp(g, s, type);
+      int result = meta< casadi::GenericType >::toCpp(g, m, type);
       Py_DECREF(g);
       return result;
     }
@@ -578,11 +583,11 @@ GUESTOBJECT * fromCpp(const casadi::GenericType &a) {
 
 /// casadi::GenericType::Dictionary
 template <>
-int meta< casadi::GenericType::Dictionary >::toCpp(PyObject * p,casadi::GenericType::Dictionary *s, swig_type_info *type) {
+int meta< casadi::GenericType::Dictionary >::toCpp(PyObject * p,casadi::GenericType::Dictionary *m, swig_type_info *type) {
   if (is_a(p, type)) {
     casadi::GenericType::Dictionary *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *s=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (!PyDict_Check(p)) return false;
@@ -592,7 +597,7 @@ int meta< casadi::GenericType::Dictionary >::toCpp(PyObject * p,casadi::GenericT
   while (PyDict_Next(p, &pos, &key, &value)) {
     if (!PyString_Check(key)) return false;
     if (!meta< casadi::GenericType >::toCpp(value, &gt, *meta< casadi::GenericType >::name)) return false;
-    (*s)[std::string(PyString_AsString(key))] = gt;
+    if (m) (*m)[std::string(PyString_AsString(key))] = gt;
   }
 
   return true;
@@ -619,20 +624,20 @@ int meta< casadi::Matrix<int> >::toCpp(PyObject * p,casadi::Matrix<int> *m, swig
   if (is_a(p, type)) {
     casadi::Matrix<int> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (meta< int >::couldbe(p)) {
     int t;
     int res = meta< int >::toCpp(p, &t, *meta< int >::name);
-    *m = t;
+    if (m) *m = t;
     return res;
   } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<int>
     if (array_numdims(p)==0) {
       int d;
       int result = meta< int >::toCpp(p, &d, *meta< int >::name);
       if (!result) return result;
-      *m = casadi::Matrix<int>(d);
+      if (m) *m = casadi::Matrix<int>(d);
       return result;
     }
     if (array_numdims(p)>2 || array_numdims(p)<1) return false;
@@ -652,9 +657,11 @@ int meta< casadi::Matrix<int> >::toCpp(PyObject * p,casadi::Matrix<int> *m, swig
         return false;
       }
       long* temp=(long*) array_data(array);
-      *m = casadi::Matrix<int>::zeros(ncols,nrows);
-      for (int k=0;k<nrows*ncols;k++) m->data()[k]=temp[k];
-      *m = m->trans();                  
+      if (m) {
+        *m = casadi::Matrix<int>::zeros(ncols,nrows);
+        for (int k=0;k<nrows*ncols;k++) m->data()[k]=temp[k];
+        *m = m->trans();                  
+      }
       // Free memory
       if (array_is_new_object) Py_DECREF(array);
       return true;
@@ -663,15 +670,17 @@ int meta< casadi::Matrix<int> >::toCpp(PyObject * p,casadi::Matrix<int> *m, swig
     int* d=(int*) array_data(array);
     std::vector<int> v(d,d+size);
     
-    *m = casadi::Matrix<int>::zeros(nrows,ncols);
-    m->set(d,casadi::DENSETRANS);
-                  
+    if (m) {
+      *m = casadi::Matrix<int>::zeros(nrows,ncols);
+      m->set(d,casadi::DENSETRANS);
+    }
+           
     // Free memory
     if (array_is_new_object) Py_DECREF(array);
   } else if ( meta< int >::couldbe_sequence(p)) {
     std::vector <int> t;
     int res = meta< int >::as_vector(p, &t);
-    *m = casadi::Matrix<int>(t,t.size(),1);
+    if (m) *m = casadi::Matrix<int>(t,t.size(),1);
     return res;
   } else if (PyObject_HasAttrString(p,"__IMatrix__")) {
     char name[] = "__IMatrix__";
@@ -696,14 +705,14 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
   if (is_a(p, type)) {
     casadi::Matrix<double> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
       return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   if (PyObject_HasAttrString(p,"__DMatrix__")) {
@@ -718,7 +727,7 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
       double d;
       int result = meta< double >::toCpp(p, &d, *meta< double >::name);
       if (!result) return result;
-      *m = casadi::Matrix<double>(d);
+      if (m) *m = casadi::Matrix<double>(d);
       return result;
     }
     if (array_numdims(p)>2 || array_numdims(p)<1) {
@@ -751,9 +760,11 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
     double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
     
-    *m = casadi::Matrix<double>::zeros(nrows,ncols);
-    m->set(d, casadi::DENSETRANS);
-                  
+    if (m) {
+      *m = casadi::Matrix<double>::zeros(nrows,ncols);
+      m->set(d, casadi::DENSETRANS);
+    }
+           
     // Free memory
     if (array_is_new_object)
       Py_DECREF(array); 
@@ -818,7 +829,7 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
       int* colindd=(int*) array_data(array_colind);
       std::vector<int> colindv(colindd,colindd+(ncols+1));
       
-      *m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v);
+      if (m) *m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v);
       
       ret = true;
     }
@@ -845,15 +856,15 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
   } else if (meta< double >::couldbe(p)) {
     double t;
     int res = meta< double >::toCpp(p, &t, *meta< double >::name);
-    *m = t;
+    if (m) *m = t;
     return res;
   } else if ( meta< double >::couldbe_sequence(p)) {
     std::vector <double> t;
     int res = meta< double >::as_vector(p, &t);
     if (t.size()>0) {
-      *m = casadi::Matrix<double>(t,t.size(),1);
+      if (m) *m = casadi::Matrix<double>(t,t.size(),1);
     } else {
-      *m = casadi::Matrix<double>(t,t.size(),0);
+      if (m) *m = casadi::Matrix<double>(t,t.size(),0);
     }
     return res;
   } else {
@@ -871,14 +882,14 @@ template <>
 int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) {
   if (is_a(p, type)) {
     casadi::SX *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SX >::name, 0) == -1)
+    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1)
       return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   casadi::DMatrix mt;
   if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
-    *m = casadi::SX(mt);
+    if (m) *m = casadi::SX(mt);
   } else if (is_array(p)) { // Numpy arrays will be cast to dense SX
     if (array_type(p)!=NPY_OBJECT) {
       //SWIG_Error(SWIG_TypeError, "asSX: numpy.ndarray must be of dtype object");
@@ -902,11 +913,13 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
     Py_DECREF(it);
     int nrows = array_size(p,0); // 1D array is cast into column vector
     int ncols  = array_numdims(p)==2 ? array_size(p,1) : 1;
-    *m = casadi::SX::zeros(nrows, ncols);
-    m->set(v, casadi::DENSETRANS);
+    if (m) {
+      *m = casadi::SX::zeros(nrows, ncols);
+      m->set(v, casadi::DENSETRANS);
+    }
   } else if (PyObject_HasAttrString(p,"__SX__")) {
     char name[] = "__SX__";
-    PyObject *cr = PyObject_CallMethod(p, name,0);
+    PyObject *cr = PyObject_CallMethod(p, name, 0);
     if (!cr) { return false; }
     int result = meta< casadi::SX >::toCpp(cr, m, type);
     Py_DECREF(cr);
@@ -929,12 +942,12 @@ int meta< casadi::MX >::toCpp(PyObject * p,casadi::MX *m, swig_type_info *type) 
     casadi::MX *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1)
       return false;
-    *m=*mp;
+    if (m) *m=*mp;
     return true;
   }
   casadi::DMatrix mt;
   if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
-    *m = casadi::MX(mt);
+    if (m) *m = casadi::MX(mt);
     return true;
   } else if (PyObject_HasAttrString(p,"__MX__")) {
     char name[] = "__MX__";

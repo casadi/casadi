@@ -126,11 +126,11 @@ class meta {
         PyObject *pe;
         int size = PySequence_Size(p);
         if (size==-1) { PyErr_Clear();  return false;}
-        m->resize(size);
+        if (m) m->resize(size);
         int i=0;
         while ((pe = PyIter_Next(it))) {
           // Iterate over the sequence inside the sequence
-          if (!meta< T >::toCpp(pe, &(*m)[i++], *meta< T >::name)) {
+          if (!meta< T >::toCpp(pe, m ? &(*m)[i++] : 0, *meta< T >::name)) {
             Py_DECREF(pe);
             Py_DECREF(it);
             return false;
