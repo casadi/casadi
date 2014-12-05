@@ -46,12 +46,6 @@ namespace casadi {
   /** \brief  forward declaration of Node and Matrix */
   class SXNode; // include will follow in the end
 
-#ifdef SWIG
-#ifdef WITH_IMPLICITCONV
-  %implicitconv SXElement;
-#endif // WITH_IMPLICITCONV
-#endif // SWIG
-
   /** \brief The basic scalar symbolic class of CasADi
       \author Joel Andersson
       \date 2010-2014
@@ -62,6 +56,7 @@ namespace casadi {
     friend class BinarySXNode;
     friend class Matrix<SXElement>;
   public:
+#ifndef SWIG
 
     /// \cond CLUTTER
     /** \brief Default constructor (not-a-number)
@@ -83,8 +78,6 @@ namespace casadi {
         SXElement objects with non-unique names.
     */
     static SXElement sym(const std::string& name);
-
-#ifndef SWIG
 
     /// \cond INTERNAL
     /// Create an expression from a node: extra dummy argument to avoid ambiguity for 0/NULL
@@ -128,8 +121,6 @@ namespace casadi {
     const SXNode* operator->() const;
     SXNode* operator->();
     /// \endcond
-
-#endif // SWIG
 
     /** \brief  Perform operations by ID */
     static SXElement binary(int op, const SXElement& x, const SXElement& y);
@@ -286,7 +277,6 @@ namespace casadi {
     /** \brief SXElement nodes are not allowed to be null */
     inline bool isNull() {return false;}
 
-#ifndef SWIG
   private:
     /// Pointer to node (SXElement is only a reference class)
     SXNode* node;

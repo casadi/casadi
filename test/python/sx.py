@@ -896,7 +896,7 @@ class SXtests(casadiTestCase):
     self.assertTrue(SX(0).isRegular())
     self.assertFalse(SX(Inf).isRegular())
     with self.assertRaises(Exception):
-      self.assertTrue(x.at(0))
+      self.assertTrue(x.nz[0])
       
     self.assertTrue(SX(DMatrix([0,1])).isRegular())
     self.assertFalse(SX(DMatrix([0,Inf])).isRegular())

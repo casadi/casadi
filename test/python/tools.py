@@ -93,7 +93,7 @@ class Toolstests(casadiTestCase):
     self.assertEqual(s.size,12)
     self.assertEqual(len(s["x"]),5)
     self.assertEqual(len(s["y"]),6)
-    self.assertTrue(s.cat.at(1).getName().startswith("x"))
+    self.assertTrue(s.cat.nz[1].getName().startswith("x"))
     s = struct_symSX([(entry('x',repeat=5),entry('y',repeat=[6,5])),entry('z')])
     
         
@@ -104,7 +104,7 @@ class Toolstests(casadiTestCase):
     self.assertEqual(s.size,36)
     self.assertEqual(len(s["x"]),5)
     self.assertEqual(len(s["y"]),6)
-    self.assertTrue(s.cat.at(1).getName().startswith("y"))
+    self.assertTrue(s.cat.nz[1].getName().startswith("y"))
     s = struct_symSX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=Sparsity.triu(5))])
     self.assertEqual(s.size,6+2+3+15)
     self.assertTrue(s["x"].sparsity()==Sparsity.dense(3,2))
@@ -115,7 +115,7 @@ class Toolstests(casadiTestCase):
     x  = SX.sym("x",2)
     x2 = SX.sym("x2",2)
     s = struct_symSX([entry('a',sym=x),'y','z'])
-    self.assertTrue(s.cat.at(0).getName().startswith("x"))
+    self.assertTrue(s.cat.nz[0].getName().startswith("x"))
     self.assertEqual(s.size,4)
     with self.assertRaises(Exception):
       struct_symSX([entry('a',sym=x+x),'y','z'])
@@ -129,9 +129,9 @@ class Toolstests(casadiTestCase):
     s = struct_symSX(['x','y','z'])
  
     S = struct_symSX([entry("X",sym=s)])
-    self.assertTrue(S.cat.at(0).getName()=="x")
+    self.assertTrue(S.cat.nz[0].getName()=="x")
     S = struct_symSX([entry("X",struct=s)])
-    self.assertTrue(S.cat.at(0).getName()=="X_x")
+    self.assertTrue(S.cat.nz[0].getName()=="X_x")
     S = struct_symSX([entry("X",repeat=[5],struct=s)])
     self.assertEqual(S.size,15)
     
@@ -435,7 +435,7 @@ class Toolstests(casadiTestCase):
     for i in range(shooting.size):
       ci = shooting.getCanonicalIndex(i)
       self.assertEqual(i, init.__getitem__(ci))
-      self.assertTrue("_".join(map(str,ci)).startswith(shooting.cat.at(i).getName()))
+      self.assertTrue("_".join(map(str,ci)).startswith(shooting.cat.nz[i].getName()))
       
   def test_structure_prefix(self):
     self.message("structure prefix")
