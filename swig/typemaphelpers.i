@@ -69,8 +69,10 @@ class meta {
           return false;
         }
     }
-    
-    static int as_vector(GUESTOBJECT * p, std::vector<T> *m) {
+};
+
+template<class T>
+  int as_vector(GUESTOBJECT * p, std::vector<T> *m) {
 #ifdef SWIGPYTHON
       if (PySequence_Check(p)
           && !PyString_Check(p)
@@ -114,7 +116,6 @@ class meta {
 #endif // SWIGMATLAB
       return false;
     }
-};
 %}
 
 %define %my_generic_const_typemap(Precedence,Type...) 
@@ -261,7 +262,7 @@ int meta< std::vector< Type > >::toCpp(GUESTOBJECT *p, std::vector< Type > *m, s
     if(m) *m=*mp;    \
     return true; \
   } \
-  return meta< Type >::as_vector(p, m); \
+  return as_vector(p, m); \
 } \
 
 %}

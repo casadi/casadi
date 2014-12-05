@@ -283,7 +283,7 @@ int meta< std::vector< double > >::toCpp(PyObject * p, std::vector<double > *m, 
       Py_DECREF(array); 
     return true;
   }
-  return meta< double >::as_vector(p, m);
+  return as_vector(p, m);
 }
 
 /// std::vector<int>
@@ -332,7 +332,7 @@ int meta< std::vector< int > >::toCpp(PyObject * p,std::vector< int > *m, swig_t
       Py_DECREF(array); 
     return true;
   }
-  return meta< int >::as_vector(p, m);
+  return as_vector(p, m);
 }
 
 /// double
@@ -688,7 +688,7 @@ int meta< casadi::Matrix<int> >::toCpp(PyObject * p,casadi::Matrix<int> *m, swig
     return result;
   } else {
     std::vector <int> t;
-    int res = meta< int >::as_vector(p, &t);
+    int res = as_vector(p, &t);
     if (m) *m = casadi::Matrix<int>(t,t.size(),1);
     return res;
   }
@@ -859,7 +859,7 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
     return res;
   } else {
     std::vector <double> t;
-    int res = meta< double >::as_vector(p, &t);
+    int res = as_vector(p, &t);
     if (t.size()>0) {
       if (m) *m = casadi::Matrix<double>(t,t.size(),1);
     } else {
