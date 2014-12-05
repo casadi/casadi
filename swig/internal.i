@@ -1663,6 +1663,9 @@
 %exception  casadi::MX::at(int k) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::data() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::getNZ(const Matrix< int > &k) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
