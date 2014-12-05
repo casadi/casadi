@@ -70,43 +70,6 @@ class meta {
         }
     }
     
-    // Vector specific stuff
-    
-    #ifdef SWIGPYTHON
-    static bool couldbe_sequence(PyObject * p) {
-      if(PySequence_Check(p)
-         && !PyString_Check(p)
-         && !is_a(p, *meta< casadi::SX >::name)
-         && !is_a(p, *meta< casadi::MX >::name)
-         && !is_a(p, *meta< casadi::Matrix<int> >::name)
-         && !is_a(p, *meta< casadi::Matrix<double> >::name)
-         && !PyObject_HasAttrString(p,"__DMatrix__")
-         && !PyObject_HasAttrString(p,"__SX__")
-         && !PyObject_HasAttrString(p,"__MX__")) {
-        PyObject *it = PyObject_GetIter(p);
-        if (!it) return false;
-        PyObject *pe;
-        while ((pe = PyIter_Next(it))) {
-          if (!meta< T >::toCpp(pe, 0, *meta< T >::name)) {
-            Py_DECREF(pe);
-            Py_DECREF(it);
-            return false;
-          }
-          Py_DECREF(pe);
-        }
-        Py_DECREF(it);
-        if (PyErr_Occurred()) {
-          PyErr_Clear();
-          return false;
-        }
-        return true;
-      } else {
-        return false;
-      }
-    }
-    #endif // SWIGPYTHON
-    
-    // Assumes that p is a PYTHON sequence
     static int as_vector(GUESTOBJECT * p, std::vector<T> *m) {
 #ifdef SWIGPYTHON
       if (PySequence_Check(p)

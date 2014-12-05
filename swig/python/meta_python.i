@@ -679,11 +679,6 @@ int meta< casadi::Matrix<int> >::toCpp(PyObject * p,casadi::Matrix<int> *m, swig
            
     // Free memory
     if (array_is_new_object) Py_DECREF(array);
-  } else if ( meta< int >::couldbe_sequence(p)) {
-    std::vector <int> t;
-    int res = meta< int >::as_vector(p, &t);
-    if (m) *m = casadi::Matrix<int>(t,t.size(),1);
-    return res;
   } else if (PyObject_HasAttrString(p,"__IMatrix__")) {
     char name[] = "__IMatrix__";
     PyObject *cr = PyObject_CallMethod(p, name,0);
@@ -692,8 +687,10 @@ int meta< casadi::Matrix<int> >::toCpp(PyObject * p,casadi::Matrix<int> *m, swig
     Py_DECREF(cr);
     return result;
   } else {
-    //SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
-    return false;
+    std::vector <int> t;
+    int res = meta< int >::as_vector(p, &t);
+    if (m) *m = casadi::Matrix<int>(t,t.size(),1);
+    return res;
   }
   return true;
 }
@@ -860,7 +857,7 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
     int res = meta< double >::toCpp(p, &t, *meta< double >::name);
     if (m) *m = t;
     return res;
-  } else if ( meta< double >::couldbe_sequence(p)) {
+  } else {
     std::vector <double> t;
     int res = meta< double >::as_vector(p, &t);
     if (t.size()>0) {
@@ -869,9 +866,6 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
       if (m) *m = casadi::Matrix<double>(t,t.size(),0);
     }
     return res;
-  } else {
-    //SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
-    return false;
   }
   return true;
 }
