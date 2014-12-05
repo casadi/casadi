@@ -66,13 +66,11 @@
 /// int
 template <>
 int meta< int >::toCpp(GUESTOBJECT * p, int *m, swig_type_info *type) {
-  if (is_a(p, type)) {
-    int *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
+  int *mp = 0;
+  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
     if (m) *m=*mp;
     return true;
-  }
-  if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
+  } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
@@ -88,14 +86,11 @@ int meta< int >::toCpp(GUESTOBJECT * p, int *m, swig_type_info *type) {
 /// double
 template <>
 int meta< double >::toCpp(GUESTOBJECT * p, double *m, swig_type_info *type) {
-  if (is_a(p, type)) {
-    double *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1)
-      return false;
+  double *mp = 0;
+  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
     if (m) *m=*mp;
     return true;
-  }
-  if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
+  } else if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
     casadi::Matrix<double> *temp;
     SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<double> >::name, 0 );
     if (temp->numel()==1 && temp->size()==1) {
@@ -122,60 +117,47 @@ template<> int meta< casadi::SX >::toCpp(GUESTOBJECT *p, casadi::SX *, swig_type
 /// casadi::Matrix<int>
 template <>
 int meta< casadi::Matrix<int> >::toCpp(GUESTOBJECT * p,casadi::Matrix<int> *m, swig_type_info *type) {
-  if (is_a(p, type)) {
-    casadi::Matrix<int> *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1)
-      return false;
+  casadi::Matrix<int> *mp = 0;
+  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
     if (m) *m=*mp;
     return true;
-  }
-  if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
+  } else if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
     int t;
     int res = meta< int >::toCpp(p, &t, *meta< int >::name);
     if (m) *m = t;
     return res;
   } else {
-    //SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
   }
-  return true;
 }
 
 template <>
 int meta< casadi::Matrix<double> >::toCpp(GUESTOBJECT * p, casadi::Matrix<double> *m, swig_type_info *type) {
-  if (is_a(p, type)) {
-    casadi::Matrix<double> *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1)
-      return false;
+  casadi::Matrix<double> *mp = 0;
+  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
     if (m) *m=*mp;
     return true;
-  }
-  if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
+  } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *mp;
     if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
       return false;
     if (m) *m=*mp;
     return true;
-  }
-  if (meta< double >::toCpp(p, 0, *meta< double >::name)) {
+  } else if (meta< double >::toCpp(p, 0, *meta< double >::name)) {
     double t;
     int res = meta< double >::toCpp(p, &t, *meta< double >::name);
     if (m) *m = t;
     return res;
   } else {
-    //SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
   }
-  return true;
 }
 
 /// casadi::SX
 template <>
 int meta< casadi::SX >::toCpp(GUESTOBJECT * p,casadi::SX *m, swig_type_info *type) {
-  if (is_a(p, type)) {
-    casadi::SX *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1)
-      return false;
+  casadi::SX *mp = 0;
+  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
     if (m) *m=*mp;
     return true;
   }
@@ -197,9 +179,8 @@ meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
 /// casadi::MX
 template <>
 int meta< casadi::MX >::toCpp(GUESTOBJECT * p,casadi::MX *m, swig_type_info *type) {
-  if (is_a(p, type)) {
-    casadi::MX *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
+  casadi::MX *mp = 0;
+  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
     if (m) *m=*mp;
     return true;
   }

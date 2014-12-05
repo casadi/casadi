@@ -89,7 +89,7 @@
 }
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) int {
-  $1 = is_a($input, $descriptor(int *)) || meta< int >::toCpp($input, 0, $descriptor(int *));
+  $1 = meta< int >::toCpp($input, 0, $descriptor(int *));
  }
 %typemap(freearg) int {}
 
@@ -100,7 +100,7 @@
 }
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_DOUBLE) double {
-  $1 = is_a($input, $descriptor(double *)) || meta< double >::toCpp($input, 0, $descriptor(double *));
+  $1 = meta< double >::toCpp($input, 0, $descriptor(double *));
  }
 %typemap(freearg) double {}
 
