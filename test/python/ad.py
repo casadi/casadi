@@ -119,10 +119,10 @@ class ADtests(casadiTestCase):
         "dense": [vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w])],
         "sparse": [out]
         }, "row": {
-          "dense":  [SX([x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
+          "dense":  [vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
           "sparse": [out.T]
       }, "matrix" : {
-          "dense":  [c.reshape(SX([x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
+          "dense":  [c.reshape(vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
           "sparse": [c.reshape(out,3,2)]
       }
     }

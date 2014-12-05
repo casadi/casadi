@@ -439,7 +439,6 @@ class SXtests(casadiTestCase):
     self.message("SXmatrix typemaps constructors")
     with internalAPI():
       simplify(SX.sym("x"))
-    SX(array([[SX.sym("x")]])).isEmpty()
     list = [    ("number",2.3, (1,1)),
                 ("SX", SX.sym("x"), (1,1))
     ];
@@ -449,26 +448,7 @@ class SXtests(casadiTestCase):
       self.assertEqual(i.shape[0],shape[0],"shape mismatch")
       self.assertEqual(i.shape[1],shape[1],"shape mismatch")
       SX(arg).isEmpty()
-      
-  def test_SXconstr(self):
-    self.message("SXmatrix constructors")
-    list = [    ("number",2.3, (1,1)),
-                ("list(SX,number)", [SX.sym("x"),2.3], (2,1) ),
-                ("list(list(SX,number))", [[SX.sym("x"),2.3],[1,SX.sym("y")]], (2,2) ),
-                ("tuple(SX)", (SX.sym("x"),SX.sym("y")), (2,1)),
-                ("tuple(SX,number)", (SX.sym("x"),2.3), (2,1)),
-                ("SX", SX.sym("x"), (1,1)),
-                ("numpy.ndarray1D(SX)", array([SX.sym("x"),SX.sym("y")]), (2,1)),
-                ("numpy.ndarray(SX)", array([[SX.sym("x"),SX.sym("y")],[SX.sym("w"),SX.sym("z")]]), (2,2)),
-                ("numpy.ndarray(SX,number)", array([[SX.sym("x"),2.3]]), (1,2))
-    ];
-    for name, arg,shape in list:
-      self.message(":" + name)
-      i=SX(arg)
-      self.assertEqual(i.shape[0],shape[0],"shape mismatch")
-      self.assertEqual(i.shape[1],shape[1],"shape mismatch")
-      i.isEmpty()
-    
+          
   def test_SXFunctionc3(self):
     self.message("vector(SXmatrix) typemaps constructors")
     y=SX.sym("y")
@@ -595,8 +575,7 @@ class SXtests(casadiTestCase):
     test(taylor(sin(x),x,a,2),sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0)
     test(taylor(sin(x),x,a,3),sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0-(cos(a_)*(x_-a_)**3)/6.0)
     
-    M=SX(matrix([[a*sin(x),a*cos(x)],[exp(a*x),a*x**2],[cos(x),0]]))
-    
+    M=blockcat([[a*sin(x),a*cos(x)],[exp(a*x),a*x**2],[cos(x),0]])    
     f = SXFunction([x,a],[taylor(M,x)])
     f.init()
     f.setInput(x_,0)

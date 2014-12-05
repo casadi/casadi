@@ -542,56 +542,6 @@ class typemaptests(casadiTestCase):
     
     self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SX.sym("x")))
     nlp_solver.setOption('acceptable_tol',DMatrix(1))
-	    
-  def test_operators(self):
-    self.message("Test operators on mixed numpy.array/Matrix")
-    self.message(":SX")
-    x=SX.sym("x")
-    y=SX.sym("y")
-
-    C=SX([x,y])
-    N=matrix([x,y]).T
-    
-    self.assertTrue(isinstance(N+C,SX))
-    self.assertTrue(isinstance(C+N,SX))
-    
-    f=SXFunction([vertcat([x,y])],[C+N])
-    f.init()
-    f.setInput([7,13])
-    f.evaluate()
-    self.checkarray(f.getOutput(),matrix([14,26]).T,"addition")
-    
-    f=SXFunction([vertcat([x,y])],[N+C])
-    f.init()
-    f.setInput([7,13])
-    f.evaluate()
-    self.checkarray(f.getOutput(),matrix([14,26]).T,"addition")
-    
-    self.message(":DMatrix")
-    D=DMatrix([7,13])
-    N=matrix([7,13]).T
-    
-    self.assertTrue(isinstance(N+D,DMatrix))
-    self.assertTrue(isinstance(D+N,DMatrix))
-    
-    self.checkarray(N+D,matrix([14,26]).T,"addition")
-    self.checkarray(D+N,matrix([14,26]).T,"addition")
-    
-    self.assertTrue(isinstance(C+D,SX))
-    self.assertTrue(isinstance(D+C,SX))
-  
-      
-    f=SXFunction([vertcat([x,y])],[C+D])
-    f.init()
-    f.setInput([1,4])
-    f.evaluate()
-    self.checkarray(f.getOutput(),matrix([8,17]).T,"addition")
-    
-    f=SXFunction([vertcat([x,y])],[D+C])
-    f.init()
-    f.setInput([1,4])
-    f.evaluate()
-    self.checkarray(f.getOutput(),matrix([8,17]).T,"addition")
 
   def test_DMatrixSXcast(self):
     self.message("Casting DMatrix to SX")
@@ -888,7 +838,7 @@ class typemaptests(casadiTestCase):
       return f.output()
       
     for i in [SX(1),1,1.0]:
-      a = numpy.array([[SX(1),2],[3,4]])
+      a = numpy.array([[1,2],[3,4]])
       print val(SX(a))
       print val(SX(a.T))
 
@@ -896,7 +846,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(val(SX(a.T).T),DMatrix([[1,2],[3,4]]))
 
 
-      a = numpy.matrix([[SX(1),2],[3,4]])
+      a = numpy.matrix([[1,2],[3,4]])
       
       print val(SX(a))
       print DMatrix([[1,2],[3,4]])
@@ -935,11 +885,6 @@ class typemaptests(casadiTestCase):
       self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))
       d.set(D)
       self.checkarray(d,DMatrix([[1,2],[3,4]]))
-
-  def test_issue1217(self):
-    a = numpy.matrix([0,SX.sym("x")])
-
-    print if_else(0,a,a)
 
   def test_vector_generic_return(self):
 

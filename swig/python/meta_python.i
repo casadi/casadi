@@ -626,21 +626,7 @@ int meta< casadi::SXElement >::toCpp(PyObject * p,casadi::SXElement *s, swig_typ
     *s=*mp;
     return true;
   }
-  if (is_a(p, *meta< casadi::SX >::name)) {
-    casadi::SX res;
-    int result = meta< casadi::SX >::toCpp(p, &res, *meta< casadi::SX >::name);
-    if (!result) return false;
-    if (res.size1()==1 && res.size2()==1) {
-      if (res.size()==0) {
-        *s = 0;
-      } else {
-        *s = res.at(0);
-      }
-      return true;
-    } else {
-      return false;
-    }
-  } else if (meta< double >::couldbe(p)) {
+  if (meta< double >::couldbe(p)) {
     double res;
     if (!meta< double >::toCpp(p, &res, *meta< double >::name)) return false;
     *s=casadi::SXElement(res);
