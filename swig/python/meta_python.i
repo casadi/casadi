@@ -949,7 +949,6 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
 }
 
 
-meta_vector(std::vector<casadi::SXElement>);
 meta_vector(casadi::SXElement);
 meta_vector(casadi::Matrix< casadi::SXElement >);
 meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
