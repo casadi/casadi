@@ -154,12 +154,7 @@ class meta {
 #endif // SWIGMATLAB
       return false;
     }
-
-    #ifdef SWIGPYTHON
-    static GUESTOBJECT * fromCpp(const T*);
-    #endif //SWIGPYTHON
 };
-
 %}
 
 %define %my_generic_const_typemap(Precedence,Type...) 

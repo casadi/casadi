@@ -107,7 +107,7 @@
 
 #ifdef SWIGPYTHON
 %typemap(out) casadi::GenericType {
-  if(!($result = meta<  casadi::GenericType >::fromCpp(&$1)))
+  if(!($result = fromCpp($1)))
     SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 
@@ -116,7 +116,7 @@
   std::vector< casadi::GenericType > & in = $1;
   for (int k=0 ; k < in.size(); ++k) {
     PyObject* rete;
-    if (!(rete = meta< casadi::GenericType >::fromCpp(&in[k])))
+    if (!(rete = fromCpp(in[k])))
       SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
     PyList_Append(ret, rete);
   }
@@ -124,7 +124,7 @@
 }
 
 %typemap(out) const casadi::GenericType::Dictionary&  {
-  if(!($result = meta<  casadi::GenericType::Dictionary >::fromCpp($1))) {
+  if(!($result = fromCpp(*$1))) {
     SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
   }
 }
