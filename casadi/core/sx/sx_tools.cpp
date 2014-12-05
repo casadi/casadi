@@ -1077,7 +1077,7 @@ namespace casadi {
     }
   }
 
-  std::vector<SXElement> getSymbols(const SX& e) {
+  SX getSymbols(const SX& e) {
     SXFunction f(std::vector<SX>(), e);
     f.init();
     return f.getFree();

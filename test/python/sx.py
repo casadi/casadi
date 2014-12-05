@@ -932,7 +932,7 @@ class SXtests(casadiTestCase):
     c = SX.sym("c")
     e = cos(a*b) + c
     w = getSymbols(e)
-    self.assertEqual(len(w),3)
+    self.assertEqual(w.size(),3)
     if CasadiOptions.getSimplificationOnTheFly():
       self.assertTrue(isEqual(w[0],a))
       self.assertTrue(isEqual(w[1],b))

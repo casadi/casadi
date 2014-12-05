@@ -205,7 +205,7 @@ namespace casadi {
     void clearSymbolic();
 
     /** \brief Get all the free variables of the function */
-    std::vector<SXElement> getFree() const;
+    SX getFree() const;
 
     /** \brief Get the corresponding matrix type */
     typedef SX MatType;

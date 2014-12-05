@@ -248,7 +248,7 @@ namespace casadi {
    * Get all symbols on which the supplied expression depends
    * \see SXFunction::getFree()
    */
-  CASADI_EXPORT std::vector<SXElement> getSymbols(const SX& e);
+  CASADI_EXPORT SX getSymbols(const SX& e);
 
   ///@{
   /** \brief Calculate jacobian via source code transformation
