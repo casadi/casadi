@@ -613,29 +613,6 @@ PyObject * fromCpp(const casadi::GenericType::Dictionary &a) {
   return p;
 }
 
-
-// Explicit intialization of these two member functions, so we can use them in meta< casadi::SXElement >
-template<> int meta< casadi::SX >::toCpp(GUESTOBJECT *p, casadi::SX *, swig_type_info *type);
-
-/// casadi::SX
-template <>
-int meta< casadi::SXElement >::toCpp(PyObject * p,casadi::SXElement *s, swig_type_info *type) {
-  if (is_a(p, type)) {
-    casadi::SXElement *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) return false;
-    *s=*mp;
-    return true;
-  }
-  if (meta< double >::couldbe(p)) {
-    double res;
-    if (!meta< double >::toCpp(p, &res, *meta< double >::name)) return false;
-    *s=casadi::SXElement(res);
-  } else {
-    return false;
-  }
-  return true;
-}
-
 /// casadi::Matrix<int>
 template <>
 int meta< casadi::Matrix<int> >::toCpp(PyObject * p,casadi::Matrix<int> *m, swig_type_info *type) {
