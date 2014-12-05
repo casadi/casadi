@@ -899,13 +899,6 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
     *m=*mp;
     return true;
   }
-  if (is_a(p, *meta< casadi::SXElement >::name)) {
-    casadi::SXElement *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::SXElement >::name, 0) == -1)
-      return false;
-    *m=*mp;
-    return true;
-  }
   casadi::DMatrix mt;
   if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
     *m = casadi::SX(mt);
