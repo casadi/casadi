@@ -254,10 +254,7 @@ PyObject* arrayView() {
       return self.arrayView()
     else:
       r = n.zeros((self.size1(),self.size2()))
-      for j in range(self.size2()):
-        for k in range(self.colind(j),self.colind(j+1)):
-          i = self.row(k)
-          r[i,j] = self.nz[k]
+      self.get(r)
       return r
 %}
 
@@ -337,9 +334,10 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
     def toArray(self):
       import numpy as n
       r = n.zeros((self.size1(),self.size2()))
-      for i in range(r.shape[0]):
-        for j in range(r.shape[1]):
-          r[i,j] = self.elem(i,j)
+      for j in range(self.size2()):
+        for k in range(self.colind(j),self.colind(j+1)):
+          i = self.row(k)
+          r[i,j] = self.at(k)
       return r
   %}
   

@@ -173,11 +173,10 @@ namespace casadi {
       import numpy as n
       r = n.array((),dtype=object)
       r.resize(self.size1(),self.size2())
-      for j in range(self.size2()):  # loop over columns
-        for el in range(self.colind(j),self.colind(j+1)): # loop over the non-zero elements
-          i=self.row(el)  # column
-          r[i,j] = self.at(el) # add the non-zero element
-
+      for j in range(self.size2()):
+        for el in range(self.colind(j),self.colind(j+1)):
+          i=self.row(el)
+          r[i,j] = self.nz[el]
       return r
     %}
     
