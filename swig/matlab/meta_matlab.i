@@ -129,7 +129,7 @@ int meta< casadi::Matrix<int> >::toCpp(GUESTOBJECT * p,casadi::Matrix<int> *m, s
     if (m) *m=*mp;
     return true;
   }
-  if (meta< int >::couldbe(p)) {
+  if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
     int t;
     int res = meta< int >::toCpp(p, &t, *meta< int >::name);
     if (m) *m = t;
@@ -157,7 +157,7 @@ int meta< casadi::Matrix<double> >::toCpp(GUESTOBJECT * p, casadi::Matrix<double
     if (m) *m=*mp;
     return true;
   }
-  if (meta< double >::couldbe(p)) {
+  if (meta< double >::toCpp(p, 0, *meta< double >::name)) {
     double t;
     int res = meta< double >::toCpp(p, &t, *meta< double >::name);
     if (m) *m = t;

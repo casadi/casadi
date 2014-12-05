@@ -81,13 +81,13 @@ int meta< casadi::IndexList >::toCpp(GUESTOBJECT *p, casadi::IndexList *m, swig_
     if (m) *m = *mp;
     return true;
   }
-  if (meta< int >::couldbe(p)) {
+  if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
     if (m) m->type = casadi::IndexList::INT;
     meta< int >::toCpp(p, m ? &m->i : 0, *meta< int >::name);
-  } else if (meta< std::vector<int> >::couldbe(p)) {
+  } else if (meta< std::vector<int> >::toCpp(p, 0, *meta< std::vector<int> >::name)) {
     if (m) m->type = casadi::IndexList::IVECTOR;
     return meta< std::vector<int> >::toCpp(p, m ? &m->iv : 0, *meta< std::vector<int> >::name);
-  } else if (meta< casadi::Slice>::couldbe(p)) {
+  } else if (meta< casadi::Slice>::toCpp(p, 0, *meta< casadi::Slice>::name)) {
     if (m) m->type = casadi::IndexList::SLICE;
     return meta< casadi::Slice >::toCpp(p, m ? &m->slice : 0, *meta< casadi::Slice >::name);
   } else {

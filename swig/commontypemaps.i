@@ -88,7 +88,9 @@
   $1 = m;
 }
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) int { $1 = is_a($input, $descriptor(int *)) || meta< int >::couldbe($input); }
+%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) int {
+  $1 = is_a($input, $descriptor(int *)) || meta< int >::toCpp($input, 0, $descriptor(int *));
+ }
 %typemap(freearg) int {}
 
 %typemap(in) double (double m) {
@@ -97,7 +99,9 @@
   $1 = m;
 }
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_DOUBLE) double { $1 = is_a($input, $descriptor(double *)) || meta< double >::couldbe($input); }
+%typemap(typecheck,precedence=SWIG_TYPECHECK_DOUBLE) double {
+  $1 = is_a($input, $descriptor(double *)) || meta< double >::toCpp($input, 0, $descriptor(double *));
+ }
 %typemap(freearg) double {}
 
 #endif //SWIGPYTHON

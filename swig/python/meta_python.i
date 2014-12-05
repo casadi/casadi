@@ -187,7 +187,7 @@ namespace casadi {
      throw CasadiException("CallbackPythonInternal: python method execution raised an Error.");
     }
     int ret = 0;
-    if ( meta< int >::couldbe(r)) {
+    if ( meta< int >::toCpp(r, 0, *meta< int >::name)) {
       /*int res = */ meta< int >::toCpp(r, &ret, *meta< int >::name);    
     }
     
@@ -487,19 +487,19 @@ int meta< casadi::GenericType >::toCpp(PyObject * p, casadi::GenericType *m, swi
     if (m) *m=casadi::GenericType((int) PyInt_AsLong(p));
   } else if (PyFloat_Check(p)) {
     if (m) *m=casadi::GenericType(PyFloat_AsDouble(p));
-  } else if (meta< std::string >::couldbe(p)) {
+  } else if (meta< std::string >::toCpp(p, 0, *meta< std::string >::name)) {
     std::string temp;
     if (!meta< std::string >::toCpp(p, &temp, *meta< std::string >::name)) return false;
     if (m) *m = casadi::GenericType(temp);
-  } else if (meta< std::vector<int> >::couldbe(p)) {
+  } else if (meta< std::vector<int> >::toCpp(p, 0, *meta< std::vector<int> >::name)) {
     std::vector<int> temp;
     if (!meta< std::vector<int> >::toCpp(p, &temp, *meta< std::vector<int> >::name)) return false;
     if (m) *m = casadi::GenericType(temp);
-  } else if (meta< std::vector<double> >::couldbe(p)) {
+  } else if (meta< std::vector<double> >::toCpp(p, 0, *meta< std::vector<double> >::name)) {
     std::vector<double> temp;
     if (!meta< std::vector<double> >::toCpp(p, &temp, *meta< std::vector<double> >::name)) return false;
     if (m) *m = casadi::GenericType(temp);
-  } else if (meta< std::vector<std::string> >::couldbe(p)) {
+  } else if (meta< std::vector<std::string> >::toCpp(p, 0, *meta< std::vector<std::string> >::name)) {
     std::vector<std::string> temp;
     if (!meta< std::vector<std::string> >::toCpp(p, &temp, *meta< std::vector<std::string> >::name)) return false;
     if (m) *m = casadi::GenericType(temp);
@@ -524,12 +524,14 @@ int meta< casadi::GenericType >::toCpp(PyObject * p, casadi::GenericType *m, swi
     }
     if (!g) { PyErr_Clear();  return false;}
     
-  } else if (meta< casadi::Function >::couldbe(p)) {
+  } else if (meta< casadi::Function >::toCpp(p, 0, *meta< casadi::Function >::name)) {
     casadi::Function temp;
     int ret = meta< casadi::Function >::toCpp(p, &temp, *meta< casadi::Function >::name); 
     if (!ret) return false;
     if (m) *m = casadi::GenericType(temp);
-  } else if (meta< casadi::GenericType::Dictionary >::couldbe(p) || meta< casadi::DerivativeGenerator >::couldbe(p) || meta< casadi::Callback >::couldbe(p)) {
+  } else if (meta< casadi::GenericType::Dictionary >::toCpp(p, 0, *meta< casadi::GenericType::Dictionary >::name) 
+             || meta< casadi::DerivativeGenerator >::toCpp(p, 0, *meta< casadi::DerivativeGenerator >::name)
+             || meta< casadi::Callback >::toCpp(p, 0, *meta< casadi::Callback >::name)) {
     PyObject* gt = getCasadiObject("GenericType");
     if (!gt) return false;
 
@@ -627,7 +629,7 @@ int meta< casadi::Matrix<int> >::toCpp(PyObject * p,casadi::Matrix<int> *m, swig
     if (m) *m=*mp;
     return true;
   }
-  if (meta< int >::couldbe(p)) {
+  if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
     int t;
     int res = meta< int >::toCpp(p, &t, *meta< int >::name);
     if (m) *m = t;
@@ -853,7 +855,7 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
     int result = meta< casadi::Matrix<double> >::toCpp(cr, m, *meta< casadi::Matrix<double> >::name);
     Py_DECREF(cr);
     return result;
-  } else if (meta< double >::couldbe(p)) {
+  } else if (meta< double >::toCpp(p, 0, *meta< double >::name)) {
     double t;
     int res = meta< double >::toCpp(p, &t, *meta< double >::name);
     if (m) *m = t;

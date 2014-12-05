@@ -69,14 +69,6 @@ class meta {
           return false;
         }
     }
-    /// Check if Guest object could ultimately be converted to type T
-    /// may return true when is_a(GUESTOBJECT *p), but this is not required.
-    static bool couldbe(GUESTOBJECT *p) {
-        //int res = swig::asptr(p, (T**)(0));
-        //if SWIG_CheckState(res) return true;
-        T m;
-        return toCpp(p, &m, *meta<T>::name);
-    }
     
     // Vector specific stuff
     
@@ -94,14 +86,19 @@ class meta {
         PyObject *it = PyObject_GetIter(p);
         if (!it) return false;
         PyObject *pe;
-        while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-          if (!meta< T >::couldbe(pe)) {
-            Py_DECREF(pe);Py_DECREF(it);return false;
+        while ((pe = PyIter_Next(it))) {
+          if (!meta< T >::toCpp(pe, 0, *meta< T >::name)) {
+            Py_DECREF(pe);
+            Py_DECREF(it);
+            return false;
           }
           Py_DECREF(pe);
         }
         Py_DECREF(it);
-        if (PyErr_Occurred()) { PyErr_Clear(); return false; }
+        if (PyErr_Occurred()) {
+          PyErr_Clear();
+          return false;
+        }
         return true;
       } else {
         return false;
@@ -144,10 +141,10 @@ class meta {
 #ifdef SWIGMATLAB
       if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
         int sz = mxGetN(p);
-        m->resize(sz);
+        if (m) m->resize(sz);
         for (int i=0; i<sz; ++i) {
           GUESTOBJECT *pi = mxGetCell(p, i);
-          if (pi==0 || !meta< T >::toCpp(pi, &(*m)[i], *meta< T >::name)) return false;
+          if (pi==0 || !meta< T >::toCpp(pi, m ? &(*m)[i] : 0, *meta< T >::name)) return false;
         }
         return true;
       }
@@ -166,7 +163,9 @@ class meta {
   }
  }
 
-%typemap(typecheck,precedence=Precedence) const Type & { $1 = is_a($input, $descriptor(Type *)) || meta< Type >::couldbe($input); }
+%typemap(typecheck,precedence=Precedence) const Type & {
+  $1 = is_a($input, $descriptor(Type *)) || meta< Type >::toCpp($input, 0, $descriptor(Type *));
+ }
 %typemap(freearg) const Type  & {}
 
 %enddef

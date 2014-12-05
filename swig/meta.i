@@ -36,7 +36,7 @@
 }
 
 %typemap(typecheck,precedence=Precedence) const casadi::GenericMatrix< Type > & {
-  $1 = is_a($input, $descriptor(Type *)) || meta< Type >::couldbe($input);
+  $1 = is_a($input, $descriptor(Type *)) || meta< Type >::toCpp($input, 0, $descriptor(Type *));
  }
 %typemap(freearg) const casadi::GenericMatrix< Type >  & {}
 
