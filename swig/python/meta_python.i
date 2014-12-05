@@ -923,7 +923,6 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
     std::vector<casadi::SXElement>::iterator v_it = v.begin();
     casadi::SX tmp;
     PyObject *pe;
-    int i=0;
     while (it->index < it->size) { 
       pe = *((PyObject**) PyArray_ITER_DATA(it));
       if (!meta< casadi::SX >::toCpp(pe, &tmp, type)) return false;
