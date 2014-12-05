@@ -726,26 +726,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const std::vector<int>& Matrix<DataType>::row() const {
-    return sparsity().row();
-  }
-
-  template<typename DataType>
-  const std::vector<int>& Matrix<DataType>::colind() const {
-    return sparsity_.colind();
-  }
-
-  template<typename DataType>
-  int Matrix<DataType>::row(int el) const {
-    return sparsity_.row(el);
-  }
-
-  template<typename DataType>
-  int Matrix<DataType>::colind(int col) const {
-    return sparsity_.colind(col);
-  }
-
-  template<typename DataType>
   void Matrix<DataType>::reserve(int nnz) {
     reserve(nnz, size2());
   }

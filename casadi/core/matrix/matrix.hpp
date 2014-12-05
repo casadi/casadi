@@ -175,6 +175,8 @@ namespace casadi {
     using B::isVector;
     using B::isTril;
     using B::isTriu;
+    using B::colind;
+    using B::row;
     using B::dimString;
     using B::sym;
     using B::sparse;
@@ -705,11 +707,6 @@ namespace casadi {
     /// Print sparse matrix style
     void printSparse(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
-    // Get the sparsity pattern
-    const std::vector<int>& row() const;
-    const std::vector<int>& colind() const;
-    int row(int el) const;
-    int colind(int col) const;
     void clear();
     void resize(int nrow, int ncol);
     void reserve(int nnz);

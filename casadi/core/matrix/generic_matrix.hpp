@@ -126,6 +126,14 @@ namespace casadi {
     /** \brief Check if the matrix is lower triangular */
     bool isTril() const { return sparsity().isTril();}
 
+    ///@{
+    /** \brief Get the sparsity pattern. See the Sparsity class for details. */
+    const std::vector<int>& row() const { return sparsity().row(); }
+    const std::vector<int>& colind() const { return sparsity().colind(); }
+    int row(int el) const { return sparsity().row(el); }
+    int colind(int col) const { return sparsity().colind(col); }
+    ///@}
+
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
 
