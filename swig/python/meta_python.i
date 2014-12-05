@@ -402,8 +402,8 @@ int meta< std::string >::toCpp(PyObject * p, std::string *m, swig_type_info *typ
 meta_vector(std::string);
 
 // Forward declarations
-template<> int meta< casadi::GenericType::Dictionary >::toCpp(PyObject * p,casadi::GenericType::Dictionary *s, swig_type_info *type);
-template<> bool meta< casadi::GenericType::Dictionary >::toPython(const casadi::GenericType::Dictionary &a, PyObject *&p);
+template<> int meta< casadi::GenericType::Dictionary >::toCpp(GUESTOBJECT * p, casadi::GenericType::Dictionary *s, swig_type_info *type);
+template<> GUESTOBJECT * meta< casadi::GenericType::Dictionary >::fromCpp(const casadi::GenericType::Dictionary *a);
 
 /// casadi::DerivativeGenerator
 template <>
@@ -553,29 +553,28 @@ int meta< casadi::GenericType >::toCpp(PyObject * p,casadi::GenericType *s, swig
 }
 
 template <>
-bool meta< casadi::GenericType >::toPython(const casadi::GenericType &a, PyObject *&p) {
-  if (a.isBool()) {
-    p=PyBool_FromLong(a.toBool());
-  } else if (a.isInt()) {
-    p=PyInt_FromLong(a.toInt());
-  } else if (a.isDouble()) {
-    p=PyFloat_FromDouble(a.toDouble());
-  } else if (a.isString()) {
-    p=PyString_FromString(a.toString().c_str());
-  } else if (a.isIntVector()) {
-    p = swig::from(a.toIntVector());
-  } else if (a.isDoubleVector()) {
-    p = swig::from( a.toDoubleVector());
-  }  else if (a.isStringVector()) {
-    p = swig::from(a.toStringVector());
-  } else if (a.isDictionary()) {
-    meta< casadi::GenericType::Dictionary >::toPython(a.toDictionary(),p);
-  } else if (a.isNull()) {
+GUESTOBJECT * meta< casadi::GenericType >::fromCpp(const casadi::GenericType *a) {
+  GUESTOBJECT *p = 0;
+  if (a->isBool()) {
+    p=PyBool_FromLong(a->toBool());
+  } else if (a->isInt()) {
+    p=PyInt_FromLong(a->toInt());
+  } else if (a->isDouble()) {
+    p=PyFloat_FromDouble(a->toDouble());
+  } else if (a->isString()) {
+    p=PyString_FromString(a->toString().c_str());
+  } else if (a->isIntVector()) {
+    p = swig::from(a->toIntVector());
+  } else if (a->isDoubleVector()) {
+    p = swig::from( a->toDoubleVector());
+  }  else if (a->isStringVector()) {
+    p = swig::from(a->toStringVector());
+  } else if (a->isDictionary()) {
+    p = meta< casadi::GenericType::Dictionary >::fromCpp(&a->toDictionary());
+  } else if (a->isNull()) {
     p = Py_None;
-  } else {
-    return false;
   }
-  return true;
+  return p;
 }
 
 /// casadi::GenericType::Dictionary
@@ -601,22 +600,19 @@ int meta< casadi::GenericType::Dictionary >::toCpp(PyObject * p,casadi::GenericT
 }
 
 template <>
-bool meta< casadi::GenericType::Dictionary >::toPython(const casadi::GenericType::Dictionary &a, PyObject *&p) {
-  p = PyDict_New();
-  //casadi::Dictionary::const_iterator end = a.end(); 
-  casadi::GenericType::Dictionary::const_iterator end = a.end();
-  for (casadi::GenericType::Dictionary::const_iterator it = a.begin(); it != end; ++it)
-  {
-    PyObject * e;
-    bool ret=meta< casadi::GenericType >::toPython(it->second,e);
-    if (!ret) {
+PyObject * meta< casadi::GenericType::Dictionary >::fromCpp(const casadi::GenericType::Dictionary *a) {
+  PyObject *p = PyDict_New();
+  casadi::GenericType::Dictionary::const_iterator end = a->end();
+  for (casadi::GenericType::Dictionary::const_iterator it = a->begin(); it != end; ++it) {
+    PyObject * e = meta< casadi::GenericType >::fromCpp(&it->second);
+    if (!e) {
       Py_DECREF(p);
-      return false;
+      return 0;
     }
     PyDict_SetItemString(p,(it->first).c_str(),e);
     Py_DECREF(e);
   }
-  return true;
+  return p;
 }
 
 

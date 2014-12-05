@@ -156,8 +156,7 @@ class meta {
     }
 
     #ifdef SWIGPYTHON
-    // Would love to make this const T&, but looks like not allowed
-    static bool toPython(const T &, PyObject *&p);
+    static GUESTOBJECT * fromCpp(const T*);
     #endif //SWIGPYTHON
 };
 
