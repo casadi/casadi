@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import SXElement, SX, MX, getOperatorRepresentation
+from casadi import SX, MX, getOperatorRepresentation
 import casadi as C
 
 try:
@@ -68,9 +68,6 @@ def addDependencies(master,slaves,dep={},invdep={}):
 def dependencyGraph(s,dep = {},invdep = {}):
   if isinstance(s,SX):
     addDependencies(s,list(s.data()),dep = dep,invdep = invdep)
-  elif isinstance(s,SXElement):
-    if not(s.isLeaf()):
-      addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
   elif isinstance(s,MX):
     addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
   return (dep,invdep)
@@ -583,11 +580,6 @@ class SXNonLeafArtist(DotArtist):
 def createArtist(node,dep={},invdep={},graph=None,artists={}):
   if isinstance(node,SX):
     return SXArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
-  elif isinstance(node,SXElement):
-    if node.isLeaf():
-      return SXLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
-    else:
-      return SXNonLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
   elif isinstance(node,MX):
     if node.isSymbolic():
       return MXSymbolicArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
@@ -614,7 +606,7 @@ def createArtist(node,dep={},invdep={},graph=None,artists={}):
         
 def dotgraph(s,direction="BT"):
   """
-  Creates and returns a pydot graph structure that represents an SXElement or SX.
+  Creates and returns a pydot graph structure that represents an SX.
   
   direction   one of "BT", "LR", "TB", "RL"
   """
@@ -647,7 +639,7 @@ def dotgraph(s,direction="BT"):
 
 def dotsave(s,format='ps',filename="temp",direction="RL"):
   """
-  Make a drawing of an SXElement or SX and save it.
+  Make a drawing of an SX and save it.
   
   format can be one of:
     dot canon cmap cmapx cmapx_np dia dot fig gd gd2 gif hpgl imap imap_np
@@ -671,7 +663,7 @@ def dotsave(s,format='ps',filename="temp",direction="RL"):
   
 def dotdraw(s,direction="RL"):
   """
-  Make a drawing of an SXElement or SX and display it.
+  Make a drawing of an SX and display it.
   
   direction   one of "BT", "LR", "TB", "RL"
   """
