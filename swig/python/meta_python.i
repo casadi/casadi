@@ -909,7 +909,7 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
   casadi::DMatrix mt;
   if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
     *m = casadi::SX(mt);
-  } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SXElement>
+  } else if (is_array(p)) { // Numpy arrays will be cast to dense SX
     if (array_type(p)!=NPY_OBJECT) {
       //SWIG_Error(SWIG_TypeError, "asSX: numpy.ndarray must be of dtype object");
       return false;
@@ -950,8 +950,8 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
 
 
 meta_vector(casadi::SXElement);
-meta_vector(casadi::Matrix< casadi::SXElement >);
-meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
+meta_vector(casadi::SX);
+meta_vector(std::vector<casadi::SX>);
 
 /// casadi::MX
 template <>

@@ -33,8 +33,8 @@
 #ifdef SWIGPYTHON
 %extend casadi::IOScheme {
 %template(__call__original__) operator()< casadi::Sparsity >;
-%template(__call__original__) operator()< casadi::MX> ;
-%template(__call__original__) operator()< casadi::Matrix<casadi::SXElement> >;
+%template(__call__original__) operator()< casadi::MX>;
+%template(__call__original__) operator()< casadi::SX>;
 %template(__call__original__) operator()< casadi::Matrix<double> >;
 
 %pythoncode %{
