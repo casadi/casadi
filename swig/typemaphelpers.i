@@ -118,6 +118,33 @@ template<class T>
     }
 %}
 
+%define %casadi_in_typemap(xName, xType...)
+%typemap(in, fragment="to"{xName}) xType (xType m) {
+  if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+  $1 = m;
+}
+%enddef
+
+%define %casadi_in_constref_typemap(xName, xType...)
+%typemap(in, fragment="to"{xName}) const xType & (xType m) {
+  if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(xType*), 0) == -1) {
+    if (!to_##xName($input, &m))
+      SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure (xName)");
+    $1 = &m;
+  }
+ }
+%enddef
+
+%define %casadi_typecheck_typemap(xName, xPrec, xType...)
+%typemap(typecheck, fragment="to"{xName}, precedence=xPrec) xType {
+  $1 = to_##xName($input, 0);
+ }
+%enddef
+
+%define %casadi_freearg_typemap(xType...)
+%typemap(freearg) xType {}
+%enddef
+
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(Type*), 0) == -1) {

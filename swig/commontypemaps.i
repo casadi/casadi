@@ -79,27 +79,26 @@
 %template(IMatrixVectorVector) std::vector< std::vector<casadi::Matrix<int> > > ;
 
 #ifdef SWIGPYTHON
-%typemap(in) int (int m) {
-  if (!meta< int >::toCpp($input, &m, $descriptor(int *)))
-    SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure (int)");
-  $1 = m;
-}
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) int {
-  $1 = meta< int >::toCpp($input, 0, $descriptor(int *));
+%fragment("to"{int}, "header") {
+  int to_int(GUESTOBJECT *p, int *m) {
+    return meta< int >::toCpp(p, m, $descriptor(int *));
+  }
  }
-%typemap(freearg) int {}
 
-%typemap(in) double (double m) {
-  if (!meta< double >::toCpp($input, &m, $descriptor(double *)))
-    SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure (double)");
-  $1 = m;
-}
+%casadi_in_typemap(int,int)
+%casadi_typecheck_typemap(int,SWIG_TYPECHECK_INTEGER,int)
+%casadi_freearg_typemap(int)
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_DOUBLE) double {
-  $1 = meta< double >::toCpp($input, 0, $descriptor(double *));
+%fragment("to"{double}, "header") {
+  int to_double(GUESTOBJECT *p, double *m) {
+    return meta< double >::toCpp(p, m, $descriptor(double *));
+  }
  }
-%typemap(freearg) double {}
+
+%casadi_in_typemap(double,double)
+%casadi_typecheck_typemap(double,SWIG_TYPECHECK_DOUBLE,double)
+%casadi_freearg_typemap(double)
 
 #endif //SWIGPYTHON
 
