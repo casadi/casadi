@@ -60,13 +60,13 @@ namespace casadi {
   Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args);
 
   template<typename DataType>
-  DataType det(const Matrix<DataType>& a);
+  Matrix<DataType> det(const Matrix<DataType>& a);
 
   template<typename DataType>
-  DataType getMinor(const Matrix<DataType> &x, int i, int j);
+  Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j);
 
   template<typename DataType>
-  DataType cofactor(const Matrix<DataType> &x, int i, int j);
+  Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j);
 
   template<typename DataType>
   Matrix<DataType> adj(const Matrix<DataType>& a);
@@ -485,7 +485,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType det(const Matrix<DataType>& a) {
+  Matrix<DataType> det(const Matrix<DataType>& a) {
     int n = a.size2();
     casadi_assert_message(n == a.size1(), "matrix must be square");
 
@@ -534,7 +534,7 @@ namespace casadi {
         // Sum up the cofactors
         ret += row.at(k)*cofactor(a, col_i.at(k), j);
       }
-      return ret.toScalar();
+      return ret;
     } else {
       // Expand along col i
       int i = col_count.sparsity().row(min_col);
@@ -547,13 +547,13 @@ namespace casadi {
         // Sum up the cofactors
         ret += col.at(k)*cofactor(a, i, row_i.at(k));
       }
-      return ret.toScalar();
+      return ret;
     }
 
   }
 
   template<typename DataType>
-  DataType getMinor(const Matrix<DataType> &x, int i, int j) {
+  Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) {
     int n = x.size2();
     casadi_assert_message(n == x.size1(), "getMinor: matrix must be square");
 
@@ -582,10 +582,10 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType cofactor(const Matrix<DataType> &x, int i, int j) {
+  Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) {
 
     // Calculate the i, j minor
-    DataType minor_ij = getMinor(x, i, j);
+    Matrix<DataType> minor_ij = getMinor(x, i, j);
     // Calculate the cofactor
     int sign_i = 1-2*((i+j) % 2);
 
@@ -598,15 +598,14 @@ namespace casadi {
     casadi_assert_message(n == a.size1(), "adj: matrix must be square");
 
     // Temporary placeholder
-    DataType temp;
+    Matrix<DataType> temp;
 
     // Cofactor matrix
     Matrix<DataType> C = Matrix<DataType>::sparse(n, n);
     for (int i=0; i<n; ++i)
       for (int j=0; j<n; ++j) {
         temp = cofactor(a, i, j);
-        if (!casadi_limits<DataType>::isZero(temp))
-          C(j, i) = temp;
+        if (!temp.isZero()) C(j, i) = temp;
       }
 
     return C.T();

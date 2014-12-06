@@ -202,7 +202,7 @@ class SXtests(casadiTestCase):
       x=SX.sym("x",3,3)
       x0=array([[0.738,0.2,0.3],[ 0.1,0.39,-6 ],[0.99,0.999999,-12]])
       #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SX)")
-      self.numpyEvaluationCheck(lambda x: SX([c.det(x[0])]), lambda   x: linalg.det(x),[x],x0,name="det(SX)")
+      self.numpyEvaluationCheck(lambda x: SX(c.det(x[0])), lambda   x: linalg.det(x),[x],x0,name="det(SX)")
       self.numpyEvaluationCheck(lambda x: c.inv(x[0]), lambda   x: linalg.inv(x),[x],x0,name="inv(SX)")
         
   def test_SXSparse(self):
