@@ -30,8 +30,7 @@
 PyObject * getReturnType(PyObject* p) {
   if (!p) return 0;
   if (!PyCallable_Check(p)) return 0;
-  int ret = PyObject_HasAttrString( p, "func_annotations");
-  if (!ret) return 0;
+  if (!PyObject_HasAttrString( p, "func_annotations")) return 0;
   PyObject * func_annotations = PyObject_GetAttrString(p,"func_annotations");
   if (!PyDict_Check(func_annotations)) {
     Py_DECREF(func_annotations);
@@ -53,17 +52,26 @@ PyObject * getReturnType(PyObject* p) {
 // Returns a new reference
 PyObject * getCasadiObject(const std::string &s) {
   PyObject* pPyObjectModuleName = PyString_FromString("casadi");
-  if (!pPyObjectModuleName) { PyErr_Clear(); return 0; }
-  PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
-  Py_DECREF(pPyObjectModuleName);
-  if (!pObjectModule) { PyErr_Clear(); return 0; }
-  PyObject* pObjectDict = PyModule_GetDict(pObjectModule); // Borrowed
-  Py_DECREF(pObjectModule);
-  if (!pObjectDict) { PyErr_Clear(); return 0; }
-  PyObject* ret = PyDict_GetItemString(pObjectDict,  s.c_str()); // Borrowed
-  if (!ret) { PyErr_Clear(); return 0; }
-  Py_INCREF(ret); // New reference
-  return ret;
+  if (pPyObjectModuleName) {
+    PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
+    Py_DECREF(pPyObjectModuleName);
+    if (pObjectModule) {
+      PyObject* pObjectDict = PyModule_GetDict(pObjectModule); // Borrowed
+      Py_DECREF(pObjectModule);
+      if (pObjectDict) {
+        PyObject* ret = PyDict_GetItemString(pObjectDict,  s.c_str()); // Borrowed
+        if (ret) {
+          // New reference
+          Py_INCREF(ret);
+          return ret;
+        }
+      }
+    }
+  }
+
+  // Unsuccessful
+  PyErr_Clear();
+  return 0;
 }
 
 #include <casadi/core/functor_internal.hpp>
@@ -143,8 +151,10 @@ namespace casadi {
     
     if (r) {
       Function ret;  
-      int result = meta< Function >::toCpp(r, &ret, *meta< Function >::name);
-      if(!result) { Py_DECREF(r); throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function."); }
+      if(!meta< Function >::toCpp(r, &ret, *meta< Function >::name)) {
+        Py_DECREF(r);
+        throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function.");
+      }
       Py_DECREF(r);
       return ret;
     } else {
@@ -512,8 +522,7 @@ int meta< casadi::GenericType >::toCpp(PyObject * p, casadi::GenericType *m, swi
     
   } else if (meta< casadi::Function >::toCpp(p, 0, *meta< casadi::Function >::name)) {
     casadi::Function temp;
-    int ret = meta< casadi::Function >::toCpp(p, &temp, *meta< casadi::Function >::name); 
-    if (!ret) return false;
+    if (!meta< casadi::Function >::toCpp(p, &temp, *meta< casadi::Function >::name)) return false;
     if (m) *m = casadi::GenericType(temp);
   } else if (meta< casadi::GenericType::Dictionary >::toCpp(p, 0, *meta< casadi::GenericType::Dictionary >::name) 
              || meta< casadi::DerivativeGenerator >::toCpp(p, 0, *meta< casadi::DerivativeGenerator >::name)
@@ -691,8 +700,7 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
     return true;
   } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
     casadi::Matrix<int> *mp;
-    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
-      return false;
+    if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1) return false;
     if (m) *m=*mp;
     return true;
   } else if (PyObject_HasAttrString(p,"__DMatrix__")) {
@@ -715,20 +723,13 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
     }
     int nrows = array_size(p,0); // 1D array is cast into column vector
     int ncols  = 1;
-    if (array_numdims(p)==2)
-      ncols=array_size(p,1); 
+    if (array_numdims(p)==2) ncols=array_size(p,1); 
     int size=nrows*ncols; // number of elements in the dense matrix
-    if (!array_is_native(p)) {
-      return false;
-      //SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: array byte order should be native.");
-    }
+    if (!array_is_native(p)) return false;
     // Make sure we have a contigous array with double datatype
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-    if (!array) { 
-      return false;
-      //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
-    }
+    if (!array) return false;
     
     double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
@@ -739,34 +740,28 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
     }
            
     // Free memory
-    if (array_is_new_object)
-      Py_DECREF(array); 
+    if (array_is_new_object) Py_DECREF(array); 
   } else if(PyObjectHasClassName(p, "csc_matrix")) { // scipy's csc_matrix will be cast to sparse Matrix<double>
     
     // Get the dimensions of the csc_matrix
     PyObject * shape = PyObject_GetAttrString( p, "shape"); // need's to be decref'ed
-    if (!shape) {
-     return false;
-    }
+    if (!shape) return false;
     if(!PyTuple_Check(shape) || PyTuple_Size(shape)!=2) {
       Py_DECREF(shape);
       return false;
     }
     int nrows=PyInt_AsLong(PyTuple_GetItem(shape,0));
     int ncols=PyInt_AsLong(PyTuple_GetItem(shape,1));
-		Py_DECREF(shape);
+    Py_DECREF(shape);
   
-
-    
-    
     bool ret= false;
     
-    PyObject * narray=NULL;
-    PyObject * row=NULL;
-    PyObject * colind=NULL;
-    PyArrayObject* array=NULL;
-    PyArrayObject* array_row=NULL;
-    PyArrayObject* array_colind=NULL;
+    PyObject * narray=0;
+    PyObject * row=0;
+    PyObject * colind=0;
+    PyArrayObject* array=0;
+    PyArrayObject* array_row=0;
+    PyArrayObject* array_colind=0;
     
     int array_is_new_object=0;
     int row_is_new_object=0;
@@ -790,7 +785,6 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
     array_colind = obj_to_array_contiguous_allow_conversion(colind,NPY_INT,&colind_is_new_object);
     if (!array_colind) goto cleanup;
     
-
     {
       int size=array_size(array,0); // number on non-zeros
       double* d=(double*) array_data(array);
@@ -807,16 +801,15 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
       ret = true;
     }
     
-    
-    cleanup: // yes that's right; goto.
-      // Rather that than a pyramid of conditional memory-deallocation 
-      if (array_is_new_object && array) Py_DECREF(array);
-      if (narray) Py_DECREF(narray);
-      if (row_is_new_object && array_row) Py_DECREF(array_row);
-      if (row) Py_DECREF(row);
-      if (colind_is_new_object && array_colind) Py_DECREF(array_colind);
-      if (colind) Py_DECREF(colind);
-      
+  cleanup: // yes that's right; goto.
+    // Rather that than a pyramid of conditional memory-deallocation 
+    if (array_is_new_object && array) Py_DECREF(array);
+    if (narray) Py_DECREF(narray);
+    if (row_is_new_object && array_row) Py_DECREF(array_row);
+    if (row) Py_DECREF(row);
+    if (colind_is_new_object && array_colind) Py_DECREF(array_colind);
+    if (colind) Py_DECREF(colind);
+
     return ret;
 
   } else if(PyObject_HasAttrString(p,"tocsc")) {
@@ -859,14 +852,8 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
   if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
     if (m) *m = casadi::SX(mt);
   } else if (is_array(p)) { // Numpy arrays will be cast to dense SX
-    if (array_type(p)!=NPY_OBJECT) {
-      //SWIG_Error(SWIG_TypeError, "asSX: numpy.ndarray must be of dtype object");
-      return false;
-    }
-    if (array_numdims(p)>2 || array_numdims(p)<1) {
-      //SWIG_Error(SWIG_TypeError, "asSX: Number of dimensions must be 1 or 2.");
-      return false;
-    }
+    if (array_type(p) != NPY_OBJECT) return false;
+    if (array_numdims(p)>2 || array_numdims(p)<1) return false;
     PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
     std::vector<casadi::SXElement> v(it->size);
     std::vector<casadi::SXElement>::iterator v_it = v.begin();
@@ -888,12 +875,11 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
   } else if (PyObject_HasAttrString(p,"__SX__")) {
     char name[] = "__SX__";
     PyObject *cr = PyObject_CallMethod(p, name, 0);
-    if (!cr) { return false; }
+    if (!cr) return false;
     int result = meta< casadi::SX >::toCpp(cr, m, type);
     Py_DECREF(cr);
     return result;
   } else {
-    //SWIG_Error(SWIG_TypeError, "asSX: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
   }
   return true;
@@ -928,5 +914,3 @@ int meta< casadi::MX >::toCpp(PyObject * p,casadi::MX *m, swig_type_info *type) 
 meta_vector(casadi::MX);
 meta_vector(std::vector< casadi::MX >);
 %}
-
-
