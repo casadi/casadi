@@ -56,7 +56,6 @@
 #define PRECEDENCE_SXElement 102
 #define PRECEDENCE_SXVector 103
 #define PRECEDENCE_SXVectorVector 103
-#define PRECEDENCE_SXElementVector 102
 #define PRECEDENCE_MX 104
 #define PRECEDENCE_MXVector 105
 #define PRECEDENCE_MXVectorVector 106
@@ -69,7 +68,6 @@
 #define PRECEDENCE_GENERICTYPE 22
 #define PRECEDENCE_DICTIONARY 21
 
-%template(SXElementVector) std::vector< casadi::SXElement > ;
 %template(SparsityVector) std::vector< casadi::Sparsity > ;
 %template(SparsityVectorVector) std::vector< std::vector< casadi::Sparsity> > ;
 %template(SXVector) std::vector<casadi::Matrix<casadi::SXElement> > ;
@@ -105,6 +103,7 @@
 %typemap(freearg) double {}
 
 #endif //SWIGPYTHON
+
 
 #ifdef SWIGPYTHON
 %typemap(out) casadi::GenericType {
@@ -154,7 +153,6 @@
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
 
 %my_generic_const_typemap(PRECEDENCE_SXElement,casadi::SXElement);
-%my_generic_const_typemap(PRECEDENCE_SXElementVector,std::vector< casadi::SXElement >);
 
 %my_generic_const_typemap(PRECEDENCE_SX,casadi::Matrix<casadi::SXElement>);
 %my_genericmatrix_const_typemap(PRECEDENCE_SX,casadi::Matrix<casadi::SXElement>);
@@ -199,7 +197,6 @@
 #ifdef SWIGPYTHON
 %outputRefOwn(casadi::Sparsity)
 
-%outputRefNew(std::vector< casadi::SXElement >)
 %outputRefNew(std::vector< int >)
 %outputRefNew(std::vector< double >)
 

@@ -171,8 +171,17 @@ int meta< casadi::SX >::toCpp(GUESTOBJECT * p,casadi::SX *m, swig_type_info *typ
   return true;
  }
 
-meta_vector(std::vector<casadi::SXElement>);
-meta_vector(casadi::SXElement);
+template <>
+int meta< casadi::SXElement >::toCpp(GUESTOBJECT * p, casadi::SXElement *m, swig_type_info *type) {
+  casadi::SX res;  
+  if (meta< casadi::SX >::toCpp(p, &res, *meta< casadi::SX >::name) && res.isScalar()) {
+    if (m) *m = res.toScalar();
+    return true;
+  } else {
+    return false;
+  }
+}
+
 meta_vector(casadi::Matrix< casadi::SXElement >);
 meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
 
