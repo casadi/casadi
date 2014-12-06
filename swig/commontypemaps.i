@@ -53,7 +53,6 @@
 #define PRECEDENCE_DMatrixVectorVector 101
 
 #define PRECEDENCE_SX 103
-#define PRECEDENCE_SXElement 102
 #define PRECEDENCE_SXVector 103
 #define PRECEDENCE_SXVectorVector 103
 #define PRECEDENCE_MX 104
@@ -152,8 +151,6 @@
 %my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
 
-%my_generic_const_typemap(PRECEDENCE_SXElement,casadi::SXElement);
-
 %my_generic_const_typemap(PRECEDENCE_SX,casadi::Matrix<casadi::SXElement>);
 %my_genericmatrix_const_typemap(PRECEDENCE_SX,casadi::Matrix<casadi::SXElement>);
 
@@ -192,7 +189,6 @@
 %my_value_output_typemaps(casadi::Matrix< int >);
 %my_value_output_typemaps(casadi::MX);
 %my_value_output_typemaps(casadi::Sparsity);
-//%my_value_output_typemaps(casadi::MXFunction);
 
 #ifdef SWIGPYTHON
 %outputRefOwn(casadi::Sparsity)
