@@ -128,7 +128,7 @@ template<class T>
  }
 
 %typemap(typecheck,precedence=Precedence) const Type & {
-  $1 = is_a($input, $descriptor(Type *)) || meta< Type >::toCpp($input, 0, $descriptor(Type *));
+  $1 = meta< Type >::toCpp($input, 0, $descriptor(Type *));
  }
 %typemap(freearg) const Type  & {}
 
@@ -255,14 +255,13 @@ void PyDECREFParent(PyObject* self) {
 #define meta_vector(Type) \
 template <> \
 int meta< std::vector< Type > >::toCpp(GUESTOBJECT *p, std::vector< Type > *m, swig_type_info *type) { \
-  if (is_a(p, type)) {\
-    std::vector< Type > *mp; \
-    if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) == -1) \
-      return false; \
-    if(m) *m=*mp;    \
+  std::vector< Type > *mp = 0; \
+  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) { \
+    if(m) *m=*mp; \
     return true; \
+  } else { \
+    return as_vector(p, m); \
   } \
-  return as_vector(p, m); \
 } \
 
 %}
