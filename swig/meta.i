@@ -57,8 +57,6 @@ template<> swig_type_info** meta< std::vector< casadi::SX > >::name = &SWIGTYPE_
 template<> swig_type_info** meta< casadi::Function >::name = &SWIGTYPE_p_casadi__Function;
 
 template<> swig_type_info** meta< std::vector< std::vector< casadi::SX > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_std__allocatorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_t_t;
-template<> swig_type_info** meta< std::vector< casadi::SXElement > >::name = &SWIGTYPE_p_std__vectorT_casadi__SXElement_std__allocatorT_casadi__SXElement_t_t;
-template<> swig_type_info** meta< std::vector< std::vector< casadi::SXElement > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__SXElement_std__allocatorT_casadi__SXElement_t_t_std__allocatorT_std__vectorT_casadi__SXElement_std__allocatorT_casadi__SXElement_t_t_t_t;
 
 template<> swig_type_info** meta< std::vector< casadi::Matrix<double> > >::name = &SWIGTYPE_p_std__vectorT_casadi__MatrixT_double_t_std__allocatorT_casadi__MatrixT_double_t_t_t;
 template<> swig_type_info** meta< std::vector< std::vector< casadi::Matrix<double> > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__MatrixT_double_t_std__allocatorT_casadi__MatrixT_double_t_t_t_std__allocatorT_std__vectorT_casadi__MatrixT_double_t_std__allocatorT_casadi__MatrixT_double_t_t_t_t_t;
