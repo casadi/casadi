@@ -120,7 +120,12 @@
 #endif // SWIGPYTHON
 
 #ifdef SWIGPYTHON
-%my_generic_const_typemap(PRECEDENCE_DICTIONARY ,casadi::GenericType::Dictionary)
+%fragment("to"{Dictionary}, "header") {
+  int to_Dictionary(GUESTOBJECT *p, casadi::GenericType::Dictionary *m) {
+    return meta< casadi::GenericType::Dictionary >::toCpp(p, m, $descriptor(casadi::GenericType::Dictionary *));
+  }
+ }
+%casadi_typemaps_constref(Dictionary, PRECEDENCE_DICTIONARY, casadi::GenericType::Dictionary)
 #endif
 
 %my_creator_typemap(PRECEDENCE_CREATOR, casadi::implicitFunctionCreator);
