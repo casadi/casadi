@@ -119,8 +119,6 @@
 }
 #endif // SWIGPYTHON
 
-%my_generic_const_typemap(PRECEDENCE_GENERICTYPE,casadi::GenericType)
-%my_generic_const_typemap(PRECEDENCE_GENERICTYPE,std::vector< casadi::GenericType >)
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(PRECEDENCE_DICTIONARY ,casadi::GenericType::Dictionary)
 #endif
