@@ -189,5 +189,17 @@ int meta< casadi::MX >::toCpp(GUESTOBJECT * p,casadi::MX *m, swig_type_info *typ
   return false;
 }
 
-meta_vector(casadi::MX);
+meta_vector(casadi::MX)
+
+
+template <>
+int meta< std::vector< double > >::toCpp(GUESTOBJECT * p, std::vector<double > *m, swig_type_info *type) {
+  return false;
+ }
+
+template <>
+int meta< std::vector< int > >::toCpp(GUESTOBJECT * p, std::vector<int > *m, swig_type_info *type) {
+  return false;
+ }
+
 %}

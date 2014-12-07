@@ -724,6 +724,10 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
   return true;
 }
 
+
+
+
+
 /// casadi::SX
 template <>
 int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) {
