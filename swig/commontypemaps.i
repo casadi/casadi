@@ -165,8 +165,8 @@
  }
 %casadi_typemaps_constref(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 %my_genericmatrix_const_typemap(PRECEDENCE_SX,casadi::Matrix<casadi::SXElement>)
+%casadi_typemaps_vector(SXVector, PRECEDENCE_SXVector, casadi::Matrix<casadi::SXElement>)
 
-%my_generic_const_typemap(PRECEDENCE_SXVector,std::vector< casadi::Matrix<casadi::SXElement> >);
 %my_generic_const_typemap(PRECEDENCE_SXVectorVector,std::vector< std::vector< casadi::Matrix<casadi::SXElement> > >);
 
 %fragment("to"{MX}, "header") {

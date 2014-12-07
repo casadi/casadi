@@ -135,6 +135,16 @@ template<class T>
  }
 %enddef
 
+%define %casadi_in_typemap_vector(xName,xType...)
+%typemap(in) const std::vector< xType > & (std::vector< xType > m) {
+  if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(std::vector< xType >*), 0) == -1) {
+    if (!meta< std::vector< xType > >::toCpp($input, &m, $descriptor(std::vector< xType >*)))
+      SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+    $1 = &m;
+  }
+ }
+%enddef
+
 %define %casadi_freearg_typemap(xType...)
 %typemap(freearg) xType {}
 %enddef
@@ -151,6 +161,12 @@ template<class T>
  }
 %enddef
 
+%define %casadi_typecheck_typemap_vector(xName, xPrec, xType...)
+%typemap(typecheck,precedence=xPrec) const std::vector< xType > & {
+  $1 = meta< std::vector< xType > >::toCpp($input, 0, $descriptor(std::vector< xType > *));
+ }
+%enddef
+
 %define %casadi_typemaps(xName, xPrec, xType...)
 %casadi_in_typemap(xName, xType)
 %casadi_freearg_typemap(xType)
@@ -161,6 +177,12 @@ template<class T>
 %casadi_in_typemap_constref(xName, xType)
 %casadi_freearg_typemap(const xType&)
 %casadi_typecheck_typemap_constref(xName, xPrec, xType)
+%enddef
+
+%define %casadi_typemaps_vector(xName, xPrec, xType...)
+%casadi_in_typemap_vector(xName, xType)
+%casadi_freearg_typemap(const std::vector< xType >&)
+%casadi_typecheck_typemap_vector(xName, xPrec, xType)
 %enddef
 
 
