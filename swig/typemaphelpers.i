@@ -162,7 +162,8 @@ template<class T>
 
 %define %casadi_typecheck_typemap_vector(xName, xPrec, xType...)
 %typemap(typecheck,precedence=xPrec) const std::vector< xType > & {
-  $1 = meta< std::vector< xType > >::toCpp($input, 0, $descriptor(std::vector< xType > *));
+  std::vector< xType > *mp = 0;
+  $1 = SWIG_ConvertPtr($input, (void **) &mp, $descriptor(std::vector< xType > *), 0) != -1 || as_vector< xType >($input, 0);
  }
 %enddef
 
