@@ -125,14 +125,18 @@ template<class T>
 }
 %enddef
 
-%define %casadi_in_constref_typemap(xName, xType...)
+%define %casadi_in_typemap_constref(xName, xType...)
 %typemap(in, fragment="to"{xName}) const xType & (xType m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(xType*), 0) == -1) {
     if (!to_##xName($input, &m))
-      SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure (xName)");
+      SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
     $1 = &m;
   }
  }
+%enddef
+
+%define %casadi_freearg_typemap(xType...)
+%typemap(freearg) xType {}
 %enddef
 
 %define %casadi_typecheck_typemap(xName, xPrec, xType...)
@@ -141,9 +145,24 @@ template<class T>
  }
 %enddef
 
-%define %casadi_freearg_typemap(xType...)
-%typemap(freearg) xType {}
+%define %casadi_typecheck_typemap_constref(xName, xPrec, xType...)
+%typemap(typecheck, fragment="to"{xName}, precedence=xPrec) const xType& {
+  $1 = to_##xName($input, 0);
+ }
 %enddef
+
+%define %casadi_typemaps(xName, xPrec, xType...)
+%casadi_in_typemap(xName, xType)
+%casadi_freearg_typemap(xType)
+%casadi_typecheck_typemap(xName, xPrec, xType)
+%enddef
+
+%define %casadi_typemaps_constref(xName, xPrec, xType...)
+%casadi_in_typemap_constref(xName, xType)
+%casadi_freearg_typemap(const xType&)
+%casadi_typecheck_typemap_constref(xName, xPrec, xType)
+%enddef
+
 
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
@@ -153,15 +172,11 @@ template<class T>
     $1 = &m;
   }
  }
-
 %typemap(typecheck,precedence=Precedence) const Type & {
   $1 = meta< Type >::toCpp($input, 0, $descriptor(Type *));
  }
 %typemap(freearg) const Type  & {}
-
 %enddef
-
-
 
 #ifdef SWIGPYTHON
 
