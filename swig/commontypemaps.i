@@ -92,6 +92,7 @@
   }
  }
 %casadi_typemaps(double, SWIG_TYPECHECK_DOUBLE, double)
+%casadi_typemaps_constref(double, SWIG_TYPECHECK_DOUBLE, double)
 #endif //SWIGPYTHON
 
 #ifdef SWIGPYTHON
@@ -132,14 +133,27 @@
 %my_creator_typemap(PRECEDENCE_CREATOR, casadi::linearSolverCreator);
 
 #ifdef SWIGPYTHON
-%my_generic_const_typemap(PRECEDENCE_DERIVATIVEGENERATOR,casadi::DerivativeGenerator);
-%my_generic_const_typemap(PRECEDENCE_CUSTOMEVALUATE,casadi::CustomEvaluate);
-%my_generic_const_typemap(PRECEDENCE_CALLBACK,casadi::Callback);
-#endif
+%fragment("to"{DerivativeGenerator}, "header") {
+  int to_DerivativeGenerator(GUESTOBJECT *p, casadi::DerivativeGenerator *m) {
+    return meta< casadi::DerivativeGenerator >::toCpp(p, m, $descriptor(casadi::DerivativeGenerator *));
+  }
+ }
+%casadi_typemaps_constref(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
 
-#ifdef SWIGPYTHON
-%my_generic_const_typemap(SWIG_TYPECHECK_DOUBLE,double);
-#endif // SWIGPYTHON
+%fragment("to"{CustomEvaluate}, "header") {
+  int to_CustomEvaluate(GUESTOBJECT *p, casadi::CustomEvaluate *m) {
+    return meta< casadi::CustomEvaluate >::toCpp(p, m, $descriptor(casadi::CustomEvaluate *));
+  }
+ }
+%casadi_typemaps_constref(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
+
+%fragment("to"{Callback}, "header") {
+  int to_Callback(GUESTOBJECT *p, casadi::Callback *m) {
+    return meta< casadi::Callback >::toCpp(p, m, $descriptor(casadi::Callback *));
+  }
+ }
+%casadi_typemaps_constref(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
+#endif
 
 %my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
@@ -174,8 +188,14 @@
 %my_generic_const_typemap(PRECEDENCE_MXVector,std::vector< casadi::MX >)
 
 #ifdef SWIGPYTHON
-%my_generic_const_typemap(PRECEDENCE_IMatrix,casadi::Matrix<int>);
-%my_genericmatrix_const_typemap(PRECEDENCE_IMatrix,casadi::Matrix<int>);
+%fragment("to"{IMatrix}, "header") {
+  int to_IMatrix(GUESTOBJECT *p, casadi::Matrix<int> *m) {
+    return meta< casadi::IMatrix >::toCpp(p, m, $descriptor(casadi::Matrix<int> *));
+  }
+ }
+%casadi_typemaps_constref(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
+%my_genericmatrix_const_typemap(PRECEDENCE_IMatrix,casadi::Matrix<int>)
+
 %my_generic_const_typemap(PRECEDENCE_MXVectorVector,std::vector< std::vector< casadi::MX > >);
 %my_generic_const_typemap(PRECEDENCE_DMatrixVector,std::vector< casadi::Matrix<double> >);
 %my_generic_const_typemap(PRECEDENCE_IMatrixVector,std::vector< casadi::Matrix<int> >);
