@@ -147,11 +147,13 @@
 %my_generic_const_typemap(PRECEDENCE_SXVector,std::vector< casadi::Matrix<casadi::SXElement> >);
 %my_generic_const_typemap(PRECEDENCE_SXVectorVector,std::vector< std::vector< casadi::Matrix<casadi::SXElement> > >);
 
-
-%my_generic_const_typemap(PRECEDENCE_MX,casadi::MX);
+%fragment("to"{MX}, "header") {
+  int to_MX(GUESTOBJECT *p, casadi::MX *m) {
+    return meta< casadi::MX >::toCpp(p, m, $descriptor(casadi::MX *));
+  }
+ }
+%casadi_typemaps_constref(MX, PRECEDENCE_MX, casadi::MX)
 %my_genericmatrix_const_typemap(PRECEDENCE_MX,casadi::MX);
-
-%my_generic_const_typemap(PRECEDENCE_MXVector,std::vector< casadi::MX >);
 
 %fragment("to"{DMatrix}, "header") {
   int to_DMatrix(GUESTOBJECT *p, casadi::Matrix<double> *m) {
@@ -159,9 +161,9 @@
   }
  }
 %casadi_typemaps_constref(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
-
 %my_genericmatrix_const_typemap(PRECEDENCE_DMatrix,casadi::Matrix<double>);
 
+%my_generic_const_typemap(PRECEDENCE_MXVector,std::vector< casadi::MX >);
 
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(PRECEDENCE_IMatrix,casadi::Matrix<int>);
