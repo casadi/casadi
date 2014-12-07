@@ -185,21 +185,6 @@ template<class T>
 %casadi_typecheck_typemap_vector(xName, xPrec, xType)
 %enddef
 
-
-%define %my_generic_const_typemap(Precedence,Type...) 
-%typemap(in) const Type & (Type m) {
-  if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(Type*), 0) == -1) {
-    if (!meta< Type >::toCpp($input, &m, $descriptor(Type*)))
-      SWIG_exception_fail(SWIG_TypeError,"Input type conversion failure ($1_type)");
-    $1 = &m;
-  }
- }
-%typemap(typecheck,precedence=Precedence) const Type & {
-  $1 = meta< Type >::toCpp($input, 0, $descriptor(Type *));
- }
-%typemap(freearg) const Type  & {}
-%enddef
-
 #ifdef SWIGPYTHON
 
 %define %my_creator_typemap(Precedence,Type...)

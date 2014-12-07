@@ -34,6 +34,6 @@
   }
  }
 %casadi_typemaps_constref(GenericType, PRECEDENCE_GENERICTYPE, casadi::GenericType)
-%my_generic_const_typemap(PRECEDENCE_GENERICTYPE,std::vector< casadi::GenericType >)
+%casadi_typemaps_vector(GenericTypeVector, PRECEDENCE_GENERICTYPE, casadi::GenericType)
 
 #endif // CASADI_GENERIC_TYPE_I
