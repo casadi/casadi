@@ -80,14 +80,18 @@
 
 #ifdef SWIGPYTHON
 %fragment("to"{int}, "header") {
-  int to_int(GUESTOBJECT *p, void *mv) {
+  int to_int(GUESTOBJECT *p, void *mv, int offs=0) {
+    int *m = static_cast<int*>(mv);
+    if (m) m += offs;
     return meta< int >::toCpp(p, static_cast<int *>(mv), $descriptor(int *));
   }
  }
 %casadi_typemaps(int, SWIG_TYPECHECK_INTEGER, int)
 
 %fragment("to"{double}, "header") {
-  int to_double(GUESTOBJECT *p, void *mv) {
+  int to_double(GUESTOBJECT *p, void *mv, int offs=0) {
+    double *m = static_cast<double*>(mv);
+    if (m) m += offs;
     return meta< double >::toCpp(p, static_cast<double *>(mv), $descriptor(double *));
   }
  }
@@ -122,10 +126,11 @@
 
 %fragment("to"{GenericType}, "header") {
   // Forward declaration
-  int to_Dictionary(GUESTOBJECT *p, void *mv);
+  int to_Dictionary(GUESTOBJECT *p, void *mv, int offs=0);
 
-  int to_GenericType(GUESTOBJECT *p, void *mv) {
+  int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0) {
     casadi::GenericType *m = static_cast<casadi::GenericType*>(mv);
+    if (m) m += offs;
 #ifndef SWIGPYTHON
     return false;
 #else // SWIGPYTHON
@@ -217,8 +222,9 @@
 
 #ifdef SWIGPYTHON
 %fragment("to"{Dictionary}, "header", fragment="to"{GenericType}) {
-  int to_Dictionary(GUESTOBJECT *p, void *mv) {
+  int to_Dictionary(GUESTOBJECT *p, void *mv, int offs) {
     casadi::GenericType::Dictionary *m = static_cast<casadi::GenericType::Dictionary*>(mv);
+    if (m) m += offs;
 #ifndef SWIGPYTHON
     return false;
 #else // SWIGPYTHON
@@ -248,24 +254,27 @@
 
 #ifdef SWIGPYTHON
 %fragment("to"{DerivativeGenerator}, "header") {
-  int to_DerivativeGenerator(GUESTOBJECT *p, void *mv) {
+  int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs=0) {
     casadi::DerivativeGenerator *m = static_cast<casadi::DerivativeGenerator*>(mv);
+    if (m) m += offs;
     return meta< casadi::DerivativeGenerator >::toCpp(p, m, $descriptor(casadi::DerivativeGenerator *));
   }
  }
 %casadi_typemaps_constref(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
 
 %fragment("to"{CustomEvaluate}, "header") {
-  int to_CustomEvaluate(GUESTOBJECT *p, void *mv) {
+  int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs=0) {
     casadi::CustomEvaluate *m = static_cast<casadi::CustomEvaluate*>(mv);
+    if (m) m += offs;
     return meta< casadi::CustomEvaluate >::toCpp(p, m, $descriptor(casadi::CustomEvaluate *));
   }
  }
 %casadi_typemaps_constref(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 
 %fragment("to"{Callback}, "header") {
-  int to_Callback(GUESTOBJECT *p, void *mv) {
+  int to_Callback(GUESTOBJECT *p, void *mv, int offs=0) {
     casadi::Callback *m = static_cast<casadi::Callback*>(mv);
+    if (m) m += offs;
     return meta< casadi::Callback >::toCpp(p, m, $descriptor(casadi::Callback *));
   }
  }
@@ -273,24 +282,27 @@
 #endif
 
 %fragment("to"{DVector}, "header") {
-  int to_DVector(GUESTOBJECT *p, void *mv) {
+  int to_DVector(GUESTOBJECT *p, void *mv, int offs=0) {
     std::vector<double> *m = static_cast<std::vector<double> *>(mv);
+    if (m) m += offs;
     return meta< std::vector<double> >::toCpp(p, m, $descriptor(std::vector<double> *));
   }
  }
 %casadi_typemaps_constref(DVector, PRECEDENCE_DVector, std::vector<double>)
 
 %fragment("to"{IVector}, "header") {
-  int to_IVector(GUESTOBJECT *p, void *mv) {
+  int to_IVector(GUESTOBJECT *p, void *mv, int offs=0) {
     std::vector<int> *m = static_cast<std::vector<int> *>(mv);
+    if (m) m += offs;
     return meta< std::vector<int> >::toCpp(p, m, $descriptor(std::vector<int> *));
   }
  }
 %casadi_typemaps_constref(IVector, PRECEDENCE_IVector, std::vector<int>)
 
 %fragment("to"{SX}, "header") {
-  int to_SX(GUESTOBJECT *p, casadi::Matrix<casadi::SXElement> *mv) {
+  int to_SX(GUESTOBJECT *p, void *mv, int offs=0) {
     casadi::SX *m = static_cast<casadi::SX*>(mv);
+    if (m) m += offs;
     return meta< casadi::SX >::toCpp(p, m, $descriptor(casadi::Matrix<casadi::SXElement> *));
   }
  }
@@ -300,8 +312,9 @@
 %casadi_typemaps_vector(SXVectorVector, PRECEDENCE_SXVectorVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 
 %fragment("to"{MX}, "header") {
-  int to_MX(GUESTOBJECT *p, void *mv) {
+  int to_MX(GUESTOBJECT *p, void *mv, int offs=0) {
     MX *m = static_cast<MX*>(mv);
+    if (m) m += offs;
     return meta< casadi::MX >::toCpp(p, m, $descriptor(casadi::MX *));
   }
  }
@@ -309,8 +322,9 @@
 %my_genericmatrix_const_typemap(PRECEDENCE_MX,casadi::MX)
 
 %fragment("to"{DMatrix}, "header") {
-  int to_DMatrix(GUESTOBJECT *p, void *mv) {
+  int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0) {
     casadi::DMatrix *m = static_cast<casadi::DMatrix*>(mv);
+    if (m) m += offs;
     return meta< casadi::DMatrix >::toCpp(p, m, $descriptor(casadi::Matrix<double> *));
   }
  }
@@ -320,8 +334,9 @@
 
 #ifdef SWIGPYTHON
 %fragment("to"{IMatrix}, "header") {
-  int to_IMatrix(GUESTOBJECT *p, void *mv) {
+  int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0) {
     casadi::IMatrix *m = static_cast<casadi::IMatrix*>(mv);
+    if (m) m += offs;
     return meta< casadi::IMatrix >::toCpp(p, m, $descriptor(casadi::Matrix<int> *));
   }
  }
