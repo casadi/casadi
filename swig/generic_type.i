@@ -28,11 +28,6 @@
 %include <casadi/core/casadi_types.hpp>
 %include <casadi/core/generic_type.hpp>
 
-%fragment("to"{GenericType}, "header") {
-  int to_GenericType(GUESTOBJECT *p, casadi::GenericType *m) {
-    return meta< casadi::GenericType >::toCpp(p, m, $descriptor(casadi::GenericType *));
-  }
- }
 %casadi_typemaps_constref(GenericType, PRECEDENCE_GENERICTYPE, casadi::GenericType)
 %casadi_typemaps_vector(GenericTypeVector, PRECEDENCE_GENERICTYPE, casadi::GenericType)
 

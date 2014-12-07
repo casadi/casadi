@@ -120,10 +120,122 @@
 }
 #endif // SWIGPYTHON
 
+%fragment("to"{GenericType}, "header") {
+  // Forward declaration
+  int to_Dictionary(GUESTOBJECT *p, casadi::GenericType::Dictionary *m);
+
+  int to_GenericType(GUESTOBJECT *p, casadi::GenericType *m) {
+#ifndef SWIGPYTHON
+    return false;
+#else // SWIGPYTHON
+    casadi::GenericType *mp = 0;
+    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::GenericType *), 0) != -1) {
+      if (m) *m=*mp;
+      return true;
+    }
+    if (p==Py_None) {
+      if (m) *m=casadi::GenericType();
+    } else if (PyBool_Check(p)) {
+      if (m) *m=casadi::GenericType((bool) PyInt_AsLong(p));
+    } else if (PyInt_Check(p)) {
+      if (m) *m=casadi::GenericType((int) PyInt_AsLong(p));
+    } else if (PyFloat_Check(p)) {
+      if (m) *m=casadi::GenericType(PyFloat_AsDouble(p));
+    } else if (meta< std::string >::toCpp(p, 0, *meta< std::string >::name)) {
+      std::string temp;
+      if (!meta< std::string >::toCpp(p, &temp, *meta< std::string >::name)) return false;
+      if (m) *m = casadi::GenericType(temp);
+    } else if (meta< std::vector<int> >::toCpp(p, 0, *meta< std::vector<int> >::name)) {
+      std::vector<int> temp;
+      if (!meta< std::vector<int> >::toCpp(p, &temp, *meta< std::vector<int> >::name)) return false;
+      if (m) *m = casadi::GenericType(temp);
+    } else if (meta< std::vector<double> >::toCpp(p, 0, *meta< std::vector<double> >::name)) {
+      std::vector<double> temp;
+      if (!meta< std::vector<double> >::toCpp(p, &temp, *meta< std::vector<double> >::name)) return false;
+      if (m) *m = casadi::GenericType(temp);
+    } else if (meta< std::vector<std::string> >::toCpp(p, 0, *meta< std::vector<std::string> >::name)) {
+      std::vector<std::string> temp;
+      if (!meta< std::vector<std::string> >::toCpp(p, &temp, *meta< std::vector<std::string> >::name)) return false;
+      if (m) *m = casadi::GenericType(temp);
+    } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
+      PyObject *c = PyObject_GetAttrString(p,"creator");
+      if (!c) return false;
+      PyObject* gt = getCasadiObject("GenericType");
+      if (!gt) return false;
+
+      PyObject* args = PyTuple_New(1);
+      PyTuple_SetItem(args,0,c);
+    
+      PyObject* g = PyObject_CallObject(gt,args);
+    
+      Py_DECREF(args);
+      Py_DECREF(gt);
+    
+      if (g) {
+        int result = to_GenericType(g, m);
+        Py_DECREF(g);
+        return result;
+      }
+      if (!g) { PyErr_Clear();  return false;}
+    
+    } else if (meta< casadi::Function >::toCpp(p, 0, *meta< casadi::Function >::name)) {
+      casadi::Function temp;
+      if (!meta< casadi::Function >::toCpp(p, &temp, *meta< casadi::Function >::name)) return false;
+      if (m) *m = casadi::GenericType(temp);
+    } else if (to_Dictionary(p, 0)
+               || meta< casadi::DerivativeGenerator >::toCpp(p, 0, *meta< casadi::DerivativeGenerator >::name)
+               || meta< casadi::Callback >::toCpp(p, 0, *meta< casadi::Callback >::name)) {
+      PyObject* gt = getCasadiObject("GenericType");
+      if (!gt) return false;
+
+      PyObject* args = PyTuple_New(1);
+      Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
+      PyTuple_SetItem(args,0,p);
+    
+      PyObject* g = PyObject_CallObject(gt,args);
+    
+      Py_DECREF(args);
+      Py_DECREF(gt);
+    
+      if (g) {
+        int result = to_GenericType(g, m);
+        Py_DECREF(g);
+        return result;
+      }
+      if (!g) {
+        PyErr_Clear();
+        return false;
+      }
+    } else {
+      return false;
+    }
+    return true;
+#endif // SWIGPYTHON
+  }
+ }
+
 #ifdef SWIGPYTHON
-%fragment("to"{Dictionary}, "header") {
+%fragment("to"{Dictionary}, "header", fragment="to"{GenericType}) {
   int to_Dictionary(GUESTOBJECT *p, casadi::GenericType::Dictionary *m) {
-    return meta< casadi::GenericType::Dictionary >::toCpp(p, m, $descriptor(casadi::GenericType::Dictionary *));
+#ifndef SWIGPYTHON
+    return false;
+#else // SWIGPYTHON
+    casadi::GenericType::Dictionary *mp = 0;
+    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::GenericType::Dictionary *), 0) != -1) {
+      if (m) *m=*mp;
+      return true;
+    }
+    if (!PyDict_Check(p)) return false;
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+    casadi::GenericType gt;
+    while (PyDict_Next(p, &pos, &key, &value)) {
+      if (!PyString_Check(key)) return false;
+      if (!to_GenericType(value, &gt)) return false;
+      if (m) (*m)[std::string(PyString_AsString(key))] = gt;
+    }
+    return true;
+#endif // SWIGPYTHON
   }
  }
 %casadi_typemaps_constref(Dictionary, PRECEDENCE_DICTIONARY, casadi::GenericType::Dictionary)
