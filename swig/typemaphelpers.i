@@ -162,6 +162,7 @@ template<class T>
     }
 %}
 
+
 %fragment("to_vector", "header") {
   template<class T>
   int to_vector(GUESTOBJECT * p, std::vector<T> *m) {

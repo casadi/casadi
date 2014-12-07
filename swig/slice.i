@@ -32,8 +32,8 @@ namespace casadi{
 
 #ifndef SWIGXML
 
-%fragment("to"{Slice}, "header") {
-   int to_Slice(GUESTOBJECT *p, void *mv, int offs=0) {
+%fragment("to"{Slice}, "header", fragment="fwd") {
+   int to_Slice(GUESTOBJECT *p, void *mv, int offs) {
     casadi::Slice *m = static_cast<casadi::Slice*>(mv);
     if (m) m += offs;
     if (is_a(p, $descriptor(casadi::Slice *))) {
@@ -71,8 +71,8 @@ namespace casadi{
 }
 %casadi_typemaps_constref(Slice, PRECEDENCE_SLICE, casadi::Slice)
 
-%fragment("to"{IndexList}, "header", fragment="to"{Slice}) {
-  int to_IndexList(GUESTOBJECT *p, void *mv, int offs=0) {
+%fragment("to"{IndexList}, "header", fragment="fwd") {
+int to_IndexList(GUESTOBJECT *p, void *mv, int offs) {
     casadi::IndexList *m = static_cast<casadi::IndexList*>(mv);
     if (m) m += offs;
     if (is_a(p, $descriptor(casadi::IndexList *))) {
