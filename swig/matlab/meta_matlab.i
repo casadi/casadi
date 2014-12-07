@@ -172,7 +172,6 @@ int meta< casadi::SX >::toCpp(GUESTOBJECT * p,casadi::SX *m, swig_type_info *typ
  }
 
 meta_vector(casadi::Matrix< casadi::SXElement >);
-meta_vector(std::vector< casadi::Matrix< casadi::SXElement > >);
 
 /// casadi::MX
 template <>
@@ -191,5 +190,4 @@ int meta< casadi::MX >::toCpp(GUESTOBJECT * p,casadi::MX *m, swig_type_info *typ
 }
 
 meta_vector(casadi::MX);
-meta_vector(std::vector< casadi::MX >);
 %}

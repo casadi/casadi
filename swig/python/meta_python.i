@@ -403,8 +403,6 @@ int meta< std::string >::toCpp(PyObject * p, std::string *m, swig_type_info *typ
   return true;
 }
 
-meta_vector(std::string);
-
 // Forward declarations
 GUESTOBJECT * fromCpp(const casadi::GenericType::Dictionary &a);
 
@@ -580,9 +578,6 @@ int meta< casadi::Matrix<int> >::toCpp(PyObject * p, casadi::Matrix<int> *m, swi
   return true;
 }
 
-meta_vector(casadi::Matrix<int>)
-meta_vector(std::vector< casadi::Matrix<int> >)
-
 /// casadi::Matrix<double>
 template <>
 int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m, swig_type_info *type) {
@@ -729,9 +724,6 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
   return true;
 }
 
-meta_vector(casadi::Matrix<double>)
-meta_vector(std::vector< casadi::Matrix<double> >)
-
 /// casadi::SX
 template <>
 int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) {
@@ -778,7 +770,6 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
 }
 
 meta_vector(casadi::SX);
-meta_vector(std::vector<casadi::SX>);
 
 /// casadi::MX
 template <>
@@ -804,5 +795,4 @@ int meta< casadi::MX >::toCpp(PyObject * p,casadi::MX *m, swig_type_info *type) 
 }
 
 meta_vector(casadi::MX);
-meta_vector(std::vector< casadi::MX >);
 %}
