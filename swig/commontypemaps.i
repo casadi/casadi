@@ -454,7 +454,92 @@
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs) {
     casadi::IMatrix *m = static_cast<casadi::IMatrix*>(mv);
     if (m) m += offs;
-    return meta< casadi::IMatrix >::toCpp(p, m, $descriptor(casadi::Matrix<int> *));
+#ifdef SWIGPYTHON
+    casadi::Matrix<int> *mp = 0;
+    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Matrix<int> *), 0) != -1) {
+      if (m) *m=*mp;
+      return true;
+    }
+    if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
+      int t;
+      int res = meta< int >::toCpp(p, &t, *meta< int >::name);
+      if (m) *m = t;
+      return res;
+    } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<int>
+      if (array_numdims(p)==0) {
+        int d;
+        int result = meta< int >::toCpp(p, &d, *meta< int >::name);
+        if (!result) return result;
+        if (m) *m = casadi::Matrix<int>(d);
+        return result;
+      }
+      if (array_numdims(p)>2 || array_numdims(p)<1) return false;
+      int nrows = array_size(p,0); // 1D array is cast into column vector
+      int ncols  = 1;
+      if (array_numdims(p)==2) ncols=array_size(p,1); 
+      int size=nrows*ncols; // number of elements in the dense matrix
+      if (!array_is_native(p)) return false;
+      // Make sure we have a contigous array with int datatype
+      int array_is_new_object=0;
+      PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
+      if (!array) { // Trying LONG
+        PyErr_Clear();
+        array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
+        if (!array) {
+          PyErr_Clear();
+          return false;
+        }
+        long* temp=(long*) array_data(array);
+        if (m) {
+          *m = casadi::Matrix<int>::zeros(ncols,nrows);
+          for (int k=0;k<nrows*ncols;k++) m->data()[k]=temp[k];
+          *m = m->trans();                  
+        }
+        // Free memory
+        if (array_is_new_object) Py_DECREF(array);
+        return true;
+      }
+    
+      int* d=(int*) array_data(array);
+      std::vector<int> v(d,d+size);
+    
+      if (m) {
+        *m = casadi::Matrix<int>::zeros(nrows,ncols);
+        m->set(d,casadi::DENSETRANS);
+      }
+           
+      // Free memory
+      if (array_is_new_object) Py_DECREF(array);
+    } else if (PyObject_HasAttrString(p,"__IMatrix__")) {
+      char name[] = "__IMatrix__";
+      PyObject *cr = PyObject_CallMethod(p, name,0);
+      if (!cr) { return false; }
+      int result = to_IMatrix(cr, m);
+      Py_DECREF(cr);
+      return result;
+    } else {
+      std::vector <int> t;
+      int res = as_vector(p, &t);
+      if (m) *m = casadi::Matrix<int>(t,t.size(),1);
+      return res;
+    }
+    return true;
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+    casadi::Matrix<int> *mp = 0;
+    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Matrix<int> *),, 0) != -1) {
+      if (m) *m=*mp;
+      return true;
+    } else if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
+      int t;
+      int res = meta< int >::toCpp(p, &t, *meta< int >::name);
+      if (m) *m = t;
+      return res;
+    } else {
+      return false;
+    }
+#endif // SWIGMATLAB
+    return false;
   }
  }
 %casadi_typemaps_constref(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
