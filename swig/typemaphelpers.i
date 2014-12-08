@@ -114,6 +114,55 @@ template <>
     return false;
   }
  }
+
+template<class T>
+  int as_vector(GUESTOBJECT * p, std::vector<T> *m) {
+#ifdef SWIGPYTHON
+      if (PySequence_Check(p)
+          && !PyString_Check(p)
+          && !is_a(p, *meta< casadi::SX >::name)
+          && !is_a(p, *meta< casadi::MX >::name)
+          && !is_a(p, *meta< casadi::Matrix<int> >::name)
+          && !is_a(p, *meta< casadi::Matrix<double> >::name)
+          && !PyObject_HasAttrString(p,"__DMatrix__")
+          && !PyObject_HasAttrString(p,"__SX__")
+          && !PyObject_HasAttrString(p,"__MX__")) {
+        PyObject *it = PyObject_GetIter(p);
+        if (!it) { PyErr_Clear();  return false;}
+        PyObject *pe;
+        int size = PySequence_Size(p);
+        if (size==-1) {
+          PyErr_Clear(); 
+          return false;
+        }
+        if (m) m->resize(size);
+        int i=0;
+        while ((pe = PyIter_Next(it))) {
+          // Iterate over the sequence inside the sequence
+          if (!meta< T >::toCpp(pe, m ? &(*m)[i++] : 0, *meta< T >::name)) {
+            Py_DECREF(pe);
+            Py_DECREF(it);
+            return false;
+          }
+          Py_DECREF(pe);
+        }
+        Py_DECREF(it);
+        return true;
+      }
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
+        int sz = mxGetN(p);
+        if (m) m->resize(sz);
+        for (int i=0; i<sz; ++i) {
+          GUESTOBJECT *pi = mxGetCell(p, i);
+          if (pi==0 || !meta< T >::toCpp(pi, m ? &(*m)[i] : 0, *meta< T >::name)) return false;
+        }
+        return true;
+      }
+#endif // SWIGMATLAB
+      return false;
+    }
 %}
 
 
@@ -209,7 +258,7 @@ template <>
   }
  }
 
-%fragment("make_vector", "header", fragment="fwd,vector_size,to_vector") {
+%fragment("make_vector", "header", fragment="vector_size,to_vector") {
   template<typename T>
   bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
     int sz = vector_size(p);
