@@ -254,42 +254,6 @@ template <>
   }
 }
 
-/// std::vector<double>
-template <>
-int meta< std::vector< double > >::toCpp(PyObject * p, std::vector<double > *m, swig_type_info *type) {
-  std::vector< double > *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  } else if (is_array(p)) {
-    if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT)) {
-      return false;
-      //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
-    }
-    int size = array_size(p,0);
-    if (!array_is_native(p)) {
-      return false;
-      //SWIG_Error_return(SWIG_TypeError, "std::vector<double>: array byte order should be native.");
-    }
-    // Make sure we have a contigous array with double datatype
-    int array_is_new_object;
-    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-    if (!array) { 
-      //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
-      return false;
-    }
-    double* d=(double*) array_data(array);
-    
-    if (m) m->assign( d, d+size );
-    
-                  
-    // Free memory
-    if (array_is_new_object)
-      Py_DECREF(array); 
-    return true;
-  }
-  return as_vector(p, m);
-}
 
 /// std::vector<int>
 template <>
@@ -387,21 +351,6 @@ int meta< double >::toCpp(PyObject * p, double *m, swig_type_info *type) {
   } else {
     return false;
   }
-}
-
-
-/// std::string
-template <>
-int meta< std::string >::toCpp(PyObject * p, std::string *m, swig_type_info *type) {
-  std::string *mp = 0;
-  if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  }
-  if (!PyString_Check(p)) return false;
-  if (m) m->clear();
-  if (m) m->append(PyString_AsString(p));
-  return true;
 }
 
 // Forward declarations
