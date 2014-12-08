@@ -345,6 +345,22 @@
 %casadi_typemaps_constref(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
 
 %fragment("to"{CustomEvaluate}, "header", fragment="fwd") {
+  namespace casadi {
+    void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
+      casadi_assert(p_!=0);
+      PyObject * fcn_py = SWIG_NewPointerObj((new CustomFunction(static_cast< const CustomFunction& >(fcn))),
+                                             $descriptor(casadi::CustomFunction *), SWIG_POINTER_OWN |  0 );
+      if(!fcn_py) throw CasadiException("CustomEvaluatePythonInternal: failed to convert CustomFunction to python");
+      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
+      Py_DECREF(fcn_py);
+      if (!r) {
+        PyErr_Print();
+        throw CasadiException("CustomEvaluatePythonInternal: Python method execution raised an Error.");
+      }
+      Py_DECREF(r);
+    }
+  }
+
   int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs) {
     casadi::CustomEvaluate *m = static_cast<casadi::CustomEvaluate*>(mv);
     if (m) m += offs;
