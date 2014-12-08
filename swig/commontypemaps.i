@@ -148,7 +148,7 @@
   }
 }
 
-%fragment("to"{IVector}, "header", fragment="fwd") {
+%fragment("to"{IVector}, "header", fragment="fwd,make_vector") {
   int to_IVector(GUESTOBJECT *p, void *mv, int offs) {
     std::vector<int> *m = static_cast<std::vector<int>*>(mv);
     if (m) m += offs;
@@ -194,14 +194,14 @@
         Py_DECREF(array); 
       return true;
     }
-    return as_vector(p, m);
+    return make_vector(p, m, to_IVector);
 #endif // SWIGPYTHON
     return false;
   }
 }
 %casadi_typemaps_constref(IVector, PRECEDENCE_IVector, std::vector<int>)
 
-%fragment("to"{DVector}, "header", fragment="fwd") {
+%fragment("to"{DVector}, "header", fragment="fwd,make_vector") {
   int to_DVector(GUESTOBJECT *p, void *mv, int offs) {
     std::vector<double> *m = static_cast<std::vector<double>*>(mv);
     if (m) m += offs;
@@ -237,14 +237,14 @@
         Py_DECREF(array); 
       return true;
     }
-    return as_vector(p, m);
+    return make_vector(p, m, to_DVector);
 #endif // SWIGPYTHON
     return false;
   }
  }
 %casadi_typemaps_constref(DVector, PRECEDENCE_DVector, std::vector<double>)
 
-%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}, fragment="to"{IVector}, fragment="to"{DVector}) {
+%fragment("to"{GenericType}, "header", fragment="fwd,make_vector", fragment="to"{string}, fragment="to"{IVector}, fragment="to"{DVector}) {
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
     casadi::GenericType *m = static_cast<casadi::GenericType*>(mv);
     if (m) m += offs;
@@ -506,7 +506,7 @@
 %casadi_typemaps_constref(MX, PRECEDENCE_MX, casadi::MX)
 %casadi_typemaps_genericmatrix(MX, PRECEDENCE_MX, casadi::MX)
 
-%fragment("to"{DMatrix}, "header", fragment="fwd") {
+%fragment("to"{DMatrix}, "header", fragment="fwd,make_vector") {
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs) {
     casadi::DMatrix *m = static_cast<casadi::DMatrix*>(mv);
     if (m) m += offs;
@@ -643,7 +643,7 @@
       return res;
     } else {
       std::vector <double> t;
-      int res = as_vector(p, &t);
+      int res = make_vector(p, &t, to_DMatrix);
       if (t.size()>0) {
         if (m) *m = casadi::Matrix<double>(t,t.size(),1);
       } else {
@@ -681,7 +681,7 @@
 %casadi_typemaps_vector(MX, PRECEDENCE_MXVector, casadi::MX)
 
 #ifdef SWIGPYTHON
-%fragment("to"{IMatrix}, "header", fragment="fwd") {
+%fragment("to"{IMatrix}, "header", fragment="fwd,make_vector") {
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs) {
     casadi::IMatrix *m = static_cast<casadi::IMatrix*>(mv);
     if (m) m += offs;
@@ -750,7 +750,7 @@
       return result;
     } else {
       std::vector <int> t;
-      int res = as_vector(p, &t);
+      int res = make_vector(p, &t, to_IMatrix);
       if (m) *m = casadi::Matrix<int>(t,t.size(),1);
       return res;
     }
