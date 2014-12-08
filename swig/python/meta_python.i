@@ -254,54 +254,6 @@ template <>
   }
 }
 
-
-/// std::vector<int>
-template <>
-int meta< std::vector< int > >::toCpp(PyObject * p,std::vector< int > *m, swig_type_info *type) {
-  std::vector< int > *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  } else if (is_array(p)) {
-    if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT)) {
-      //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
-      return false;
-    }
-    int size = array_size(p,0);
-    if (!array_is_native(p)) {
-      //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array byte order should be native.");
-      return false;
-    }
-      
-    // Make sure we have a contigous array with int datatype
-    int array_is_new_object;
-    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
-    if (!array) { // Trying LONG
-      array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
-      if (!array) { 
-        //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "std::vector<int>: no luck converting numpy array to int. Better don't use unsigned datatypes.");
-        return false;
-      }
-      long* temp=(long*) array_data(array);
-      if (m) {
-        m->resize(size);
-        for (int k=0; k<size; k++) (*m)[k]=temp[k];
-      }
-      return true;
-    }
-    int *d=(int*) array_data(array);
-
-    if (m) m->assign( d, d+size );
-
-                  
-    // Free memory
-    if (array_is_new_object)
-      Py_DECREF(array); 
-    return true;
-  }
-  return as_vector(p, m);
-}
-
 /// double
 template <>
 int meta< double >::toCpp(PyObject * p, double *m, swig_type_info *type) {

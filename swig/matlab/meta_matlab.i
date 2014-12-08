@@ -111,9 +111,4 @@ int meta< double >::toCpp(GUESTOBJECT * p, double *m, swig_type_info *type) {
   }
 }
 
-template <>
-int meta< std::vector< int > >::toCpp(GUESTOBJECT * p, std::vector<int > *m, swig_type_info *type) {
-  return false;
- }
-
 %}
