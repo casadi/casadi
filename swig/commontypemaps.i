@@ -78,25 +78,6 @@
 %template(DMatrixVectorVector) std::vector< std::vector<casadi::Matrix<double> > > ;
 %template(IMatrixVectorVector) std::vector< std::vector<casadi::Matrix<int> > > ;
 
-// Forward declarations
-%fragment("fwd", "header") {
-  int to_int(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_double(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_Dictionary(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_Callback(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_DVector(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_IVector(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_SX(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_MX(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_IndexList(GUESTOBJECT *p, void *mv, int offs=0);
-}
-
 #ifdef SWIGPYTHON
 %fragment("to"{int}, "header", fragment="fwd") {
   int to_int(GUESTOBJECT *p, void *mv, int offs) {
@@ -141,9 +122,21 @@
     SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
   }
 }
+
 #endif // SWIGPYTHON
 
-%fragment("to"{GenericType}, "header", fragment="fwd") {
+%fragment("to"{string}, "header", fragment="fwd") {
+  int to_string(GUESTOBJECT *p, void *mv, int offs) {
+#ifdef SWIGPYTHON
+    std::string *m = static_cast<std::string*>(mv);
+    if (m) m += offs;
+    return meta< std::string >::toCpp(p, static_cast<std::string *>(mv), $descriptor(std::string *));
+#endif // SWIGPYTHON
+    return false;
+  }
+}
+
+%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}) {
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
     casadi::GenericType *m = static_cast<casadi::GenericType*>(mv);
     if (m) m += offs;
@@ -163,9 +156,9 @@
       if (m) *m=casadi::GenericType((int) PyInt_AsLong(p));
     } else if (PyFloat_Check(p)) {
       if (m) *m=casadi::GenericType(PyFloat_AsDouble(p));
-    } else if (meta< std::string >::toCpp(p, 0, *meta< std::string >::name)) {
+    } else if (to_string(p, 0)) {
       std::string temp;
-      if (!meta< std::string >::toCpp(p, &temp, *meta< std::string >::name)) return false;
+      if (!to_string(p, &temp)) return false;
       if (m) *m = casadi::GenericType(temp);
     } else if (meta< std::vector<int> >::toCpp(p, 0, *meta< std::vector<int> >::name)) {
       std::vector<int> temp;
@@ -175,9 +168,9 @@
       std::vector<double> temp;
       if (!meta< std::vector<double> >::toCpp(p, &temp, *meta< std::vector<double> >::name)) return false;
       if (m) *m = casadi::GenericType(temp);
-    } else if (meta< std::vector<std::string> >::toCpp(p, 0, *meta< std::vector<std::string> >::name)) {
+    } else if (make_vector(p, static_cast<std::vector<std::string>*>(0), to_string)) {
       std::vector<std::string> temp;
-      if (!meta< std::vector<std::string> >::toCpp(p, &temp, *meta< std::vector<std::string> >::name)) return false;
+      if (!make_vector(p, &temp, to_string)) return false;
       if (m) *m = casadi::GenericType(temp);
     } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
       PyObject *c = PyObject_GetAttrString(p,"creator");

@@ -389,6 +389,7 @@ int meta< double >::toCpp(PyObject * p, double *m, swig_type_info *type) {
   }
 }
 
+
 /// std::string
 template <>
 int meta< std::string >::toCpp(PyObject * p, std::string *m, swig_type_info *type) {

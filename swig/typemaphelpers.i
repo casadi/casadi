@@ -165,6 +165,30 @@ template<class T>
     }
 %}
 
+
+// Forward declarations
+%fragment("fwd", "header") {
+  template<typename T> bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs));
+  template<typename T> bool make_vector2(GUESTOBJECT * p, std::vector<std::vector<T> >* m, int (*f)(GUESTOBJECT *p, void *mv, int offs));
+
+  int to_int(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_double(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_Dictionary(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_Callback(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_DVector(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_IVector(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_SX(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_MX(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_IndexList(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_string(GUESTOBJECT *p, void *mv, int offs=0);
+}
+
 %fragment("vector_size", "header") {
   int vector_size(GUESTOBJECT * p) {
 #ifdef SWIGPYTHON
