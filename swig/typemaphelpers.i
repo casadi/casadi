@@ -131,7 +131,10 @@ template<class T>
         if (!it) { PyErr_Clear();  return false;}
         PyObject *pe;
         int size = PySequence_Size(p);
-        if (size==-1) { PyErr_Clear();  return false;}
+        if (size==-1) {
+          PyErr_Clear(); 
+          return false;
+        }
         if (m) m->resize(size);
         int i=0;
         while ((pe = PyIter_Next(it))) {
@@ -231,6 +234,34 @@ template<class T>
   }
  }
 
+%fragment("make_vector", "header", fragment="vector_size,to_vector") {
+  template<typename T>
+  bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+    int sz = vector_size(p);
+    if (sz<0) return false;
+    if (m) m->resize(sz);
+    if (sz>0 && !to_vector(p, m ? &m->front() : 0, f)) return false;
+    return true;
+  }
+ }
+
+// %fragment("make_vector2", "header", fragment="make_vector") {
+//   template<typename T>
+//     bool make_vector2(GUESTOBJECT * p, swig_type_info *type, swig_type_info *dtype, std::vector<std::vector<T> >& m, void** mp, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+//     if (SWIG_ConvertPtr(p, (void **) mp, type, 0) != -1) return true;
+//     int sz = vector_size(p);
+//     if (sz<0) return false;
+//     m.resize(sz);
+//     for (int i=0; i<nz; ++i) {
+//       if (sz>0 && !make_vector(p, dtype, m[i], 0
+//                                }
+
+// p, &m.front(), f)) return false;
+//     *mp = &m;
+//     return true;
+//   }
+//  }
+
 %define %casadi_in_typemap(xName, xType...)
 %typemap(in, fragment="to"{xName}) xType (xType m) {
   if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
@@ -241,33 +272,26 @@ template<class T>
 %define %casadi_in_typemap_constref(xName, xType...)
 %typemap(in, fragment="to"{xName}) const xType & (xType m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(xType*), 0) == -1) {
-    if (!to_##xName($input, &m))
-      SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+    if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
     $1 = &m;
   }
  }
 %enddef
 
 %define %casadi_in_typemap_vector(xName,xType...)
-%typemap(in, fragment="to_vector") const std::vector< xType > & (std::vector< xType > m) {
+%typemap(in, fragment="make_vector,fwd") const std::vector< xType > & (std::vector< xType > m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(std::vector< xType >*), 0) == -1) {
-    if (!as_vector($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to vector<xName>.");
+    if (!make_vector($input, &m, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to std::vector<xName>.");
     $1 = &m;
   }
  }
 %enddef
 
-%define %casadi_in_typemap_vector_new(xName,xType...)
-%typemap(in, fragment="vector_size,to_vector,fwd") const std::vector< xType > & (std::vector< xType > m) {
+%define %casadi_in_typemap_vector2(xName,xType...)
+%typemap(in, fragment="to_vector") const std::vector< xType > & (std::vector< xType > m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(std::vector< xType >*), 0) == -1) {
-    int sz = vector_size($input);
-    if (sz<0) SWIG_exception_fail(SWIG_TypeError,"Input not a sequence..");
-    m.resize(sz);
-    if (sz==0 || to_vector($input, &m.front(), to_##xName)) {
-      $1 = &m;
-    } else {
-      SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to vector<xName>.");
-    }
+    if (!as_vector($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to vector<xName>.");
+    $1 = &m;
   }
  }
 %enddef
@@ -314,7 +338,7 @@ template<class T>
 %enddef
 
 %define %casadi_typemaps_vector2(xName, xPrec, xType...)
-%casadi_in_typemap_vector(xName, std::vector< xType >)
+%casadi_in_typemap_vector2(xName, std::vector< xType >)
 %casadi_freearg_typemap(const std::vector< std::vector< xType > >&)
 %casadi_typecheck_typemap_vector(xName, xPrec, std::vector< xType >)
 %enddef
