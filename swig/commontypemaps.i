@@ -78,12 +78,14 @@
 %template(DMatrixVectorVector) std::vector< std::vector<casadi::Matrix<double> > > ;
 %template(IMatrixVectorVector) std::vector< std::vector<casadi::Matrix<int> > > ;
 
-#ifdef SWIGPYTHON
 %fragment("to"{int}, "header", fragment="fwd") {
   int to_int(GUESTOBJECT *p, void *mv, int offs) {
     int *m = static_cast<int*>(mv);
     if (m) m += offs;
+#ifdef SWIGPYTHON
     return meta< int >::toCpp(p, static_cast<int *>(mv), $descriptor(int *));
+#endif //SWIGPYTHON
+    return false;
   }
  }
 %casadi_typemaps(int, SWIG_TYPECHECK_INTEGER, int)
@@ -92,12 +94,14 @@
   int to_double(GUESTOBJECT *p, void *mv, int offs) {
     double *m = static_cast<double*>(mv);
     if (m) m += offs;
+#ifdef SWIGPYTHON
     return meta< double >::toCpp(p, static_cast<double *>(mv), $descriptor(double *));
+#endif //SWIGPYTHON
+    return false;
   }
  }
 %casadi_typemaps(double, SWIG_TYPECHECK_DOUBLE, double)
 %casadi_typemaps_constref(double, SWIG_TYPECHECK_DOUBLE, double)
-#endif //SWIGPYTHON
 
 #ifdef SWIGPYTHON
 %typemap(out) casadi::GenericType {
@@ -127,9 +131,9 @@
 
 %fragment("to"{string}, "header", fragment="fwd") {
   int to_string(GUESTOBJECT *p, void *mv, int offs) {
-#ifdef SWIGPYTHON
     std::string *m = static_cast<std::string*>(mv);
     if (m) m += offs;
+#ifdef SWIGPYTHON
     return meta< std::string >::toCpp(p, static_cast<std::string *>(mv), $descriptor(std::string *));
 #endif // SWIGPYTHON
     return false;
@@ -138,25 +142,27 @@
 
 %fragment("to"{IVector}, "header", fragment="fwd") {
   int to_IVector(GUESTOBJECT *p, void *mv, int offs) {
-#ifdef SWIGPYTHON
     std::vector<int> *m = static_cast<std::vector<int>*>(mv);
     if (m) m += offs;
-    return meta< std::vector<int> >::toCpp(p, static_cast<std::vector<int> *>(mv), $descriptor(std::vector<int> *));
+#ifdef SWIGPYTHON
+    return meta< std::vector<int> >::toCpp(p, m, $descriptor(std::vector<int> *));
 #endif // SWIGPYTHON
     return false;
   }
 }
+%casadi_typemaps_constref(IVector, PRECEDENCE_IVector, std::vector<int>)
 
 %fragment("to"{DVector}, "header", fragment="fwd") {
   int to_DVector(GUESTOBJECT *p, void *mv, int offs) {
 #ifdef SWIGPYTHON
     std::vector<double> *m = static_cast<std::vector<double>*>(mv);
     if (m) m += offs;
-    return meta< std::vector<double> >::toCpp(p, static_cast<std::vector<double> *>(mv), $descriptor(std::vector<double> *));
+    return meta< std::vector<double> >::toCpp(p, m, $descriptor(std::vector<double> *));
 #endif // SWIGPYTHON
     return false;
   }
-}
+ }
+%casadi_typemaps_constref(DVector, PRECEDENCE_DVector, std::vector<double>)
 
 %fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}, fragment="to"{IVector}, fragment="to"{DVector}) {
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
@@ -312,24 +318,6 @@
 %casadi_typemaps_constref(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
 #endif
 
-%fragment("to"{DVector}, "header", fragment="fwd") {
-  int to_DVector(GUESTOBJECT *p, void *mv, int offs) {
-    std::vector<double> *m = static_cast<std::vector<double> *>(mv);
-    if (m) m += offs;
-    return meta< std::vector<double> >::toCpp(p, m, $descriptor(std::vector<double> *));
-  }
- }
-%casadi_typemaps_constref(DVector, PRECEDENCE_DVector, std::vector<double>)
-
-%fragment("to"{IVector}, "header", fragment="fwd") {
-  int to_IVector(GUESTOBJECT *p, void *mv, int offs) {
-    std::vector<int> *m = static_cast<std::vector<int> *>(mv);
-    if (m) m += offs;
-    return meta< std::vector<int> >::toCpp(p, m, $descriptor(std::vector<int> *));
-  }
- }
-%casadi_typemaps_constref(IVector, PRECEDENCE_IVector, std::vector<int>)
-
 %fragment("to"{SX}, "header", fragment="fwd") {
   int to_SX(GUESTOBJECT *p, void *mv, int offs) {
     casadi::SX *m = static_cast<casadi::SX*>(mv);
@@ -462,7 +450,7 @@
     } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
       if (array_numdims(p)==0) {
         double d;
-        int result = meta< double >::toCpp(p, &d, *meta< double >::name);
+        int result = to_double(p, &d);
         if (!result) return result;
         if (m) *m = casadi::Matrix<double>(d);
         return result;
@@ -568,9 +556,9 @@
       int result = to_DMatrix(cr, m);
       Py_DECREF(cr);
       return result;
-    } else if (meta< double >::toCpp(p, 0, *meta< double >::name)) {
+    } else if (to_double(p, 0)) {
       double t;
-      int res = meta< double >::toCpp(p, &t, *meta< double >::name);
+      int res = to_double(p, &t);
       if (m) *m = t;
       return res;
     } else {
@@ -596,9 +584,9 @@
         return false;
       if (m) *m=*mp;
       return true;
-    } else if (meta< double >::toCpp(p, 0, *meta< double >::name)) {
+    } else if (to_double(p, 0)) {
       double t;
-      int res = meta< double >::toCpp(p, &t, *meta< double >::name);
+      int res = to_double(p, &t);
       if (m) *m = t;
       return res;
     } else {
@@ -623,15 +611,15 @@
       if (m) *m=*mp;
       return true;
     }
-    if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
+    if (to_int(p, 0)) {
       int t;
-      int res = meta< int >::toCpp(p, &t, *meta< int >::name);
+      int res = to_int(p, &t);
       if (m) *m = t;
       return res;
     } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<int>
       if (array_numdims(p)==0) {
         int d;
-        int result = meta< int >::toCpp(p, &d, *meta< int >::name);
+        int result = to_int(p, &d);
         if (!result) return result;
         if (m) *m = casadi::Matrix<int>(d);
         return result;
@@ -693,9 +681,9 @@
     if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Matrix<int> *),, 0) != -1) {
       if (m) *m=*mp;
       return true;
-    } else if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
+    } else if (to_int(p, 0)) {
       int t;
-      int res = meta< int >::toCpp(p, &t, *meta< int >::name);
+      int res = to_int(p, &t);
       if (m) *m = t;
       return res;
     } else {

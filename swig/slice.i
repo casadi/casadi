@@ -81,12 +81,12 @@ int to_IndexList(GUESTOBJECT *p, void *mv, int offs) {
       if (m) *m = *mp;
       return true;
     }
-    if (meta< int >::toCpp(p, 0, *meta< int >::name)) {
+    if (to_int(p, 0)) {
       if (m) m->type = casadi::IndexList::INT;
-      meta< int >::toCpp(p, m ? &m->i : 0, *meta< int >::name);
-    } else if (meta< std::vector<int> >::toCpp(p, 0, *meta< std::vector<int> >::name)) {
+      to_int(p, m ? &m->i : 0);
+    } else if (to_IVector(p, 0)) {
       if (m) m->type = casadi::IndexList::IVECTOR;
-      return meta< std::vector<int> >::toCpp(p, m ? &m->iv : 0, *meta< std::vector<int> >::name);
+      return to_IVector(p, m ? &m->iv : 0);
     } else if (to_Slice(p, 0)) {
       if (m) m->type = casadi::IndexList::SLICE;
       return to_Slice(p, m ? &m->slice : 0);
