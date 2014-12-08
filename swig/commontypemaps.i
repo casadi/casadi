@@ -136,7 +136,18 @@
   }
 }
 
-%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}) {
+%fragment("to"{IVector}, "header", fragment="fwd") {
+  int to_IVector(GUESTOBJECT *p, void *mv, int offs) {
+#ifdef SWIGPYTHON
+    std::vector<int> *m = static_cast<std::vector<int>*>(mv);
+    if (m) m += offs;
+    return meta< std::vector<int> >::toCpp(p, static_cast<std::vector<int> *>(mv), $descriptor(std::vector<int> *));
+#endif // SWIGPYTHON
+    return false;
+  }
+}
+
+%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}, fragment="to"{IVector}) {
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
     casadi::GenericType *m = static_cast<casadi::GenericType*>(mv);
     if (m) m += offs;
@@ -160,9 +171,9 @@
       std::string temp;
       if (!to_string(p, &temp)) return false;
       if (m) *m = casadi::GenericType(temp);
-    } else if (meta< std::vector<int> >::toCpp(p, 0, *meta< std::vector<int> >::name)) {
+    } else if (to_IVector(p, 0)) {
       std::vector<int> temp;
-      if (!meta< std::vector<int> >::toCpp(p, &temp, *meta< std::vector<int> >::name)) return false;
+      if (!to_IVector(p, &temp)) return false;
       if (m) *m = casadi::GenericType(temp);
     } else if (meta< std::vector<double> >::toCpp(p, 0, *meta< std::vector<double> >::name)) {
       std::vector<double> temp;
