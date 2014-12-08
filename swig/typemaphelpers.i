@@ -61,50 +61,9 @@ class meta {
     static int toCpp(GUESTOBJECT *p, T *m, swig_type_info *type);
 };
 
-
 template <> 
 int meta< casadi::Function>::toCpp(GUESTOBJECT *p, casadi::Function *m, swig_type_info *type) {
   casadi::Function *t = 0;
-  int res = swig::asptr(p, &t);
-  if(SWIG_CheckState(res) && t) {
-    if(m) *m=*t;
-    if (SWIG_IsNewObj(res)) delete t;
-    return true;
-  } else {
-    return false;
-  }
- }
-
-template <> 
-int meta< casadi::DMatrixVector>::toCpp(GUESTOBJECT *p, casadi::DMatrixVector *m, swig_type_info *type) {
-  casadi::DMatrixVector *t = 0;
-  int res = swig::asptr(p, &t);
-  if(SWIG_CheckState(res) && t) {
-    if(m) *m=*t;
-    if (SWIG_IsNewObj(res)) delete t;
-    return true;
-  } else {
-    return false;
-  }
- }
-
-
-template <> 
-  int meta< std::vector<casadi::IMatrix> >::toCpp(GUESTOBJECT *p, std::vector<casadi::IMatrix> *m, swig_type_info *type) {
-  std::vector<casadi::IMatrix> *t = 0;
-  int res = swig::asptr(p, &t);
-  if(SWIG_CheckState(res) && t) {
-    if(m) *m=*t;
-    if (SWIG_IsNewObj(res)) delete t;
-    return true;
-  } else {
-    return false;
-  }
- }
-
-template <> 
-  int meta< std::vector<std::string> >::toCpp(GUESTOBJECT *p, std::vector<std::string> *m, swig_type_info *type) {
-  std::vector<std::string> *t = 0;
   int res = swig::asptr(p, &t);
   if(SWIG_CheckState(res) && t) {
     if(m) *m=*t;
