@@ -245,22 +245,38 @@ template<class T>
   }
  }
 
-// %fragment("make_vector2", "header", fragment="make_vector") {
-//   template<typename T>
-//     bool make_vector2(GUESTOBJECT * p, swig_type_info *type, swig_type_info *dtype, std::vector<std::vector<T> >& m, void** mp, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
-//     if (SWIG_ConvertPtr(p, (void **) mp, type, 0) != -1) return true;
-//     int sz = vector_size(p);
-//     if (sz<0) return false;
-//     m.resize(sz);
-//     for (int i=0; i<nz; ++i) {
-//       if (sz>0 && !make_vector(p, dtype, m[i], 0
-//                                }
-
-// p, &m.front(), f)) return false;
-//     *mp = &m;
-//     return true;
-//   }
-//  }
+%fragment("make_vector2", "header", fragment="make_vector") {
+  template<typename T>
+    bool make_vector2(GUESTOBJECT * p, std::vector<std::vector<T> >* m, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+    int sz = vector_size(p);
+    if (sz<0) return false;
+    if (m) m->resize(sz);
+#ifdef SWIGPYTHON
+    PyObject *it = PyObject_GetIter(p);
+    if (!it) { PyErr_Clear();  return false;}
+    PyObject *pe;
+    int i=0;
+    while ((pe = PyIter_Next(it))) {
+      if (!make_vector(pe, m ? &m->at(i++) : 0, f)) {
+        Py_DECREF(pe);
+        Py_DECREF(it);
+        return false;
+      }
+      Py_DECREF(pe);
+    }
+    Py_DECREF(it);
+    return true;
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+    for (int i=0; i<sz; ++i) {
+      GUESTOBJECT *pi = mxGetCell(p, i);
+      if (pi==0 || !make_vector(pi, m ? &m->at(i) : 0, f)) return false;
+    }
+    return true;
+#endif // SWIGMATLAB
+    return false;
+  }
+ }
 
 %define %casadi_in_typemap(xName, xType...)
 %typemap(in, fragment="to"{xName}) xType (xType m) {
@@ -280,17 +296,17 @@ template<class T>
 
 %define %casadi_in_typemap_vector(xName,xType...)
 %typemap(in, fragment="make_vector,fwd") const std::vector< xType > & (std::vector< xType > m) {
-  if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(std::vector< xType >*), 0) == -1) {
-    if (!make_vector($input, &m, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to std::vector<xName>.");
+  if (SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor, 0) == -1) {
+    if (!make_vector($input, &m, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector<xName>.");
     $1 = &m;
   }
  }
 %enddef
 
 %define %casadi_in_typemap_vector2(xName,xType...)
-%typemap(in, fragment="to_vector") const std::vector< xType > & (std::vector< xType > m) {
-  if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(std::vector< xType >*), 0) == -1) {
-    if (!as_vector($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to vector<xName>.");
+%typemap(in, fragment="make_vector2,fwd") const std::vector< xType > & (std::vector< xType > m) {
+  if (SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor, 0) == -1) {
+    if (!make_vector2($input, &m, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector< std::vector<xName> >.");
     $1 = &m;
   }
  }
