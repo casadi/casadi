@@ -359,7 +359,7 @@
       }
       Py_DECREF(r);
     }
-  }
+  } // namespace casadi
 
   int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs) {
     casadi::CustomEvaluate *m = static_cast<casadi::CustomEvaluate*>(mv);
@@ -381,6 +381,25 @@
 %casadi_typemaps_constref(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
 
 %fragment("to"{Callback}, "header", fragment="fwd") {
+  namespace casadi {
+    int CallbackPythonInternal::call(Function& fcn, void* user_data) {
+      casadi_assert(p_!=0);
+      PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))),
+                                             $descriptor(casadi::CustomFunction *), SWIG_POINTER_OWN |  0 );
+      if(!fcn_py) throw CasadiException("CallbackPythonInternal: failed to convert CustomFunction to python");
+      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
+      Py_DECREF(fcn_py);
+      if (!r) {
+        PyErr_Print();
+        throw CasadiException("CallbackPythonInternal: python method execution raised an Error.");
+      }
+      int ret = 0;
+      if ( to_int(r, 0)) to_int(r, &ret);
+      Py_DECREF(r);
+      return ret;
+    }  
+  } // namespace casadi
+
   int to_Callback(GUESTOBJECT *p, void *mv, int offs) {
     casadi::Callback *m = static_cast<casadi::Callback*>(mv);
     if (m) m += offs;

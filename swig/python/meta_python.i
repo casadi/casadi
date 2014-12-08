@@ -162,34 +162,6 @@ namespace casadi {
 }
 %}
 
-%wrapper %{  
-namespace casadi {
-  int CallbackPythonInternal::call(Function& fcn, void* user_data) {
-    casadi_assert(p_!=0);
-
-    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_casadi__CustomFunction, SWIG_POINTER_OWN |  0 );
-    if(!fcn_py) {
-      throw CasadiException("CallbackPythonInternal: failed to convert CustomFunction to python");
-    }
-    
-    PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
-
-    Py_DECREF(fcn_py);
-    if (!r) {
-     PyErr_Print();
-     throw CasadiException("CallbackPythonInternal: python method execution raised an Error.");
-    }
-    int ret = 0;
-    if ( meta< int >::toCpp(r, 0, *meta< int >::name)) {
-      /*int res = */ meta< int >::toCpp(r, &ret, *meta< int >::name);    
-    }
-    
-    Py_DECREF(r);
-    return ret;
-  }  
-}
-%}
-
 %inline %{
 /// int
 template <>
