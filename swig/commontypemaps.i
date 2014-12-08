@@ -78,6 +78,7 @@
 %template(DMatrixVectorVector) std::vector< std::vector<casadi::Matrix<double> > > ;
 %template(IMatrixVectorVector) std::vector< std::vector<casadi::Matrix<int> > > ;
 
+
 %fragment("to"{int}, "header", fragment="fwd") {
   int to_int(GUESTOBJECT *p, void *mv, int offs) {
     int *m = static_cast<int*>(mv);
@@ -322,7 +323,23 @@
   int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
     casadi::DerivativeGenerator *m = static_cast<casadi::DerivativeGenerator*>(mv);
     if (m) m += offs;
-    return meta< casadi::DerivativeGenerator >::toCpp(p, m, $descriptor(casadi::DerivativeGenerator *));
+    casadi::DerivativeGenerator *mp = 0;
+    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::DerivativeGenerator *), 0) != -1) {
+      if (m) *m=*mp;
+      return true;
+    }
+    PyObject* return_type = getReturnType(p);
+    if (!return_type) return false;
+    PyObject* function = getCasadiObject("Function");
+    if (!function) { Py_DECREF(return_type); return false; }
+    bool res = PyClass_IsSubclass(return_type,function);
+    Py_DECREF(return_type);
+    Py_DECREF(function);
+    if (res) {
+      if (m) *m = casadi::DerivativeGeneratorPython(p);
+      return true;
+    }
+    return false;
   }
  }
 %casadi_typemaps_constref(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
@@ -431,9 +448,7 @@
       casadi::Function temp;
       if (!meta< casadi::Function >::toCpp(p, &temp, *meta< casadi::Function >::name)) return false;
       if (m) *m = casadi::GenericType(temp);
-    } else if (to_Dictionary(p, 0)
-               || meta< casadi::DerivativeGenerator >::toCpp(p, 0, *meta< casadi::DerivativeGenerator >::name)
-               || to_Callback(p, 0)) {
+    } else if (to_Dictionary(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
       PyObject* gt = getCasadiObject("GenericType");
       if (!gt) return false;
 

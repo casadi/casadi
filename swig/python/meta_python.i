@@ -77,8 +77,6 @@ PyObject * getCasadiObject(const std::string &s) {
 #include <casadi/core/functor_internal.hpp>
 
 namespace casadi {
-  //using namespace casadi;
-
   class FunctorPythonInternal {
     public:
       FunctorPythonInternal(PyObject *p) : p_(p) { Py_INCREF(p_); }
@@ -129,10 +127,9 @@ namespace casadi {
 }
 %}
 
+
 %wrapper %{  
-
 namespace casadi {
-
   Function DerivativeGeneratorPythonInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
     casadi_assert(p_!=0);
     PyObject * nfwd_py = PyInt_FromLong(nfwd);
@@ -162,7 +159,11 @@ namespace casadi {
       throw CasadiException("DerivativeGeneratorPythonInternal: python method execution raised an Error.");
     }
   }
+}
+%}
 
+%wrapper %{
+namespace casadi {
   void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
     casadi_assert(p_!=0);
     PyObject * fcn_py = SWIG_NewPointerObj((new CustomFunction(static_cast< const CustomFunction& >(fcn))), SWIGTYPE_p_casadi__CustomFunction, SWIG_POINTER_OWN |  0 );
@@ -178,9 +179,12 @@ namespace casadi {
     }
     
     Py_DECREF(r);
-
   }
-  
+}
+%}
+
+%wrapper %{  
+namespace casadi {
   int CallbackPythonInternal::call(Function& fcn, void* user_data) {
     casadi_assert(p_!=0);
 
@@ -203,11 +207,8 @@ namespace casadi {
     
     Py_DECREF(r);
     return ret;
-
-  }
-  
+  }  
 }
-
 %}
 
 %inline %{
@@ -256,28 +257,6 @@ template <>
 
 // Forward declarations
 GUESTOBJECT * fromCpp(const casadi::GenericType::Dictionary &a);
-
-/// casadi::DerivativeGenerator
-template <>
-int meta< casadi::DerivativeGenerator >::toCpp(PyObject * p, casadi::DerivativeGenerator *m, swig_type_info *type) {
-  casadi::DerivativeGenerator *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-   }
-   PyObject* return_type = getReturnType(p);
-   if (!return_type) return false;
-   PyObject* function = getCasadiObject("Function");
-   if (!function) { Py_DECREF(return_type); return false; }
-   bool res = PyClass_IsSubclass(return_type,function);
-   Py_DECREF(return_type);
-   Py_DECREF(function);
-   if (res) {
-     if (m) *m = casadi::DerivativeGeneratorPython(p);
-     return true;
-   }
-   return false;
- }
 
 GUESTOBJECT * fromCpp(const casadi::GenericType &a) {
   GUESTOBJECT *p = 0;
