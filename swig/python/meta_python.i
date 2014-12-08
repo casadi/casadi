@@ -775,29 +775,4 @@ int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) 
 }
 
 meta_vector(casadi::SX);
-
-/// casadi::MX
-template <>
-int meta< casadi::MX >::toCpp(PyObject * p,casadi::MX *m, swig_type_info *type) {
-  casadi::MX *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  }
-  casadi::DMatrix mt;
-  if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
-    if (m) *m = casadi::MX(mt);
-    return true;
-  } else if (PyObject_HasAttrString(p,"__MX__")) {
-    char name[] = "__MX__";
-    PyObject *cr = PyObject_CallMethod(p, name,0);
-    if (!cr) { return false; }
-    int result = meta< casadi::MX >::toCpp(cr, m, type);
-    Py_DECREF(cr);
-    return result;
-  }
-  return false;
-}
-
-meta_vector(casadi::MX);
 %}

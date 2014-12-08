@@ -147,7 +147,18 @@
   }
 }
 
-%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}, fragment="to"{IVector}) {
+%fragment("to"{DVector}, "header", fragment="fwd") {
+  int to_DVector(GUESTOBJECT *p, void *mv, int offs) {
+#ifdef SWIGPYTHON
+    std::vector<double> *m = static_cast<std::vector<double>*>(mv);
+    if (m) m += offs;
+    return meta< std::vector<double> >::toCpp(p, static_cast<std::vector<double> *>(mv), $descriptor(std::vector<double> *));
+#endif // SWIGPYTHON
+    return false;
+  }
+}
+
+%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}, fragment="to"{IVector}, fragment="to"{DVector}) {
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
     casadi::GenericType *m = static_cast<casadi::GenericType*>(mv);
     if (m) m += offs;
@@ -175,9 +186,9 @@
       std::vector<int> temp;
       if (!to_IVector(p, &temp)) return false;
       if (m) *m = casadi::GenericType(temp);
-    } else if (meta< std::vector<double> >::toCpp(p, 0, *meta< std::vector<double> >::name)) {
+    } else if (to_DVector(p, 0)) {
       std::vector<double> temp;
-      if (!meta< std::vector<double> >::toCpp(p, &temp, *meta< std::vector<double> >::name)) return false;
+      if (!to_DVector(p, &temp)) return false;
       if (m) *m = casadi::GenericType(temp);
     } else if (make_vector(p, static_cast<std::vector<std::string>*>(0), to_string)) {
       std::vector<std::string> temp;
@@ -335,7 +346,38 @@
   int to_MX(GUESTOBJECT *p, void *mv, int offs) {
     MX *m = static_cast<MX*>(mv);
     if (m) m += offs;
-    return meta< casadi::MX >::toCpp(p, m, $descriptor(casadi::MX *));
+#ifdef SWIGPYTHON
+    casadi::MX *mp = 0;
+    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::MX *), 0) != -1) {
+      if (m) *m=*mp;
+      return true;
+    }
+    casadi::DMatrix mt;
+    if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
+      if (m) *m = casadi::MX(mt);
+      return true;
+    } else if (PyObject_HasAttrString(p,"__MX__")) {
+      char name[] = "__MX__";
+      PyObject *cr = PyObject_CallMethod(p, name,0);
+      if (!cr) { return false; }
+      int result = to_MX(cr, m);
+      Py_DECREF(cr);
+      return result;
+    }
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+    casadi::MX *mp = 0;
+    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::MX *), 0) != -1) {
+      if (m) *m=*mp;
+      return true;
+    }
+    casadi::DMatrix mt;
+    if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
+      if (m) *m = casadi::MX(mt);
+      return true;
+    }
+#endif // SWIGMATLAB
+    return false;
   }
  }
 %casadi_typemaps_constref(MX, PRECEDENCE_MX, casadi::MX)
