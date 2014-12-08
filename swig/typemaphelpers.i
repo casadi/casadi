@@ -354,8 +354,15 @@ template<class T>
 
 %define %casadi_typecheck_typemap_vector(xName, xPrec, xType...)
 %typemap(typecheck, precedence=xPrec, fragment="to_vector") const std::vector< xType > & {
-  std::vector< xType > *mp = 0;
-  $1 = SWIG_ConvertPtr($input, (void **) &mp, $descriptor(std::vector< xType > *), 0) != -1 || as_vector< xType >($input, 0);
+  void *mp = 0;
+  $1 = SWIG_ConvertPtr($input, &mp, $1_descriptor, 0) != -1 || make_vector< xType >($input, 0, to_##xName);
+ }
+%enddef
+
+%define %casadi_typecheck_typemap_vector2(xName, xPrec, xType...)
+%typemap(typecheck, precedence=xPrec, fragment="make_vector2") const std::vector< std::vector< xType > > & {
+  void *mp = 0;
+  $1 = SWIG_ConvertPtr($input, &mp, $1_descriptor, 0) != -1 || make_vector2< xType >($input, 0, to_##xName);
  }
 %enddef
 
@@ -380,7 +387,7 @@ template<class T>
 %define %casadi_typemaps_vector2(xName, xPrec, xType...)
 %casadi_in_typemap_vector2(xName, std::vector< xType >)
 %casadi_freearg_typemap(const std::vector< std::vector< xType > >&)
-%casadi_typecheck_typemap_vector(xName, xPrec, std::vector< xType >)
+%casadi_typecheck_typemap_vector2(xName, xPrec, xType)
 %enddef
 
 #ifdef SWIGPYTHON
