@@ -111,9 +111,6 @@ int meta< double >::toCpp(GUESTOBJECT * p, double *m, swig_type_info *type) {
   }
 }
 
-// Explicit intialization of these two member functions, so we can use them in meta< casadi::SXElement >
-template<> int meta< casadi::SX >::toCpp(GUESTOBJECT *p, casadi::SX *, swig_type_info *type);
-
 /// casadi::Matrix<int>
 template <>
 int meta< casadi::Matrix<int> >::toCpp(GUESTOBJECT * p,casadi::Matrix<int> *m, swig_type_info *type) {
@@ -153,25 +150,6 @@ int meta< casadi::Matrix<double> >::toCpp(GUESTOBJECT * p, casadi::Matrix<double
   }
 }
 
-/// casadi::SX
-template <>
-int meta< casadi::SX >::toCpp(GUESTOBJECT * p,casadi::SX *m, swig_type_info *type) {
-  casadi::SX *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  }
-  casadi::DMatrix mt;
-  if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
-    if (m) *m = casadi::SX(mt);
-  } else {
-    //SWIG_Error(SWIG_TypeError, "asSX: unrecognised type. Should have been caught by typemap(typecheck)");
-    return false;
-  }
-  return true;
- }
-
-meta_vector(casadi::Matrix< casadi::SXElement >);
 
 template <>
 int meta< std::vector< double > >::toCpp(GUESTOBJECT * p, std::vector<double > *m, swig_type_info *type) {

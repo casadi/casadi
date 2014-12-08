@@ -723,56 +723,5 @@ int meta< casadi::Matrix<double> >::toCpp(PyObject * p,casadi::Matrix<double> *m
     return res;
   }
   return true;
-}
-
-
-
-
-
-/// casadi::SX
-template <>
-int meta< casadi::SX >::toCpp(PyObject * p,casadi::SX *m, swig_type_info *type) {
-  casadi::SX *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  }
-  casadi::DMatrix mt;
-  if(meta< casadi::Matrix<double> >::toCpp(p, &mt, *meta< casadi::Matrix<double> >::name)) {
-    if (m) *m = casadi::SX(mt);
-  } else if (is_array(p)) { // Numpy arrays will be cast to dense SX
-    if (array_type(p) != NPY_OBJECT) return false;
-    if (array_numdims(p)>2 || array_numdims(p)<1) return false;
-    PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
-    std::vector<casadi::SXElement> v(it->size);
-    std::vector<casadi::SXElement>::iterator v_it = v.begin();
-    casadi::SX tmp;
-    PyObject *pe;
-    while (it->index < it->size) { 
-      pe = *((PyObject**) PyArray_ITER_DATA(it));
-      if (!meta< casadi::SX >::toCpp(pe, &tmp, type)) return false;
-      *v_it++ = tmp.toScalar();
-      PyArray_ITER_NEXT(it);
-    }
-    Py_DECREF(it);
-    int nrows = array_size(p,0); // 1D array is cast into column vector
-    int ncols  = array_numdims(p)==2 ? array_size(p,1) : 1;
-    if (m) {
-      *m = casadi::SX::zeros(nrows, ncols);
-      m->set(v, casadi::DENSETRANS);
-    }
-  } else if (PyObject_HasAttrString(p,"__SX__")) {
-    char name[] = "__SX__";
-    PyObject *cr = PyObject_CallMethod(p, name, 0);
-    if (!cr) return false;
-    int result = meta< casadi::SX >::toCpp(cr, m, type);
-    Py_DECREF(cr);
-    return result;
-  } else {
-    return false;
-  }
-  return true;
-}
-
-meta_vector(casadi::SX);
+ }
 %}

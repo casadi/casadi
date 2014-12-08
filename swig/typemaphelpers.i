@@ -504,23 +504,6 @@ void PyDECREFParent(PyObject* self) {
 }
 %enddef
 
-%inline %{
-/// std::vector< Type >
-#define meta_vector(Type) \
-template <> \
-int meta< std::vector< Type > >::toCpp(GUESTOBJECT *p, std::vector< Type > *m, swig_type_info *type) { \
-  std::vector< Type > *mp = 0; \
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) { \
-    if(m) *m=*mp; \
-    return true; \
-  } else { \
-    return as_vector(p, m); \
-  } \
-} \
-
-%}
-
-
 #ifdef SWIGPYTHON
 %inline%{
 /** Check PyObjects by class name */
