@@ -314,6 +314,62 @@
  }
 %casadi_typemaps_constref(DVector, PRECEDENCE_DVector, std::vector<double>)
 
+%my_creator_typemap(PRECEDENCE_CREATOR, casadi::implicitFunctionCreator);
+%my_creator_typemap(PRECEDENCE_CREATOR, casadi::linearSolverCreator);
+
+#ifdef SWIGPYTHON
+%fragment("to"{DerivativeGenerator}, "header", fragment="fwd") {
+  int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
+    casadi::DerivativeGenerator *m = static_cast<casadi::DerivativeGenerator*>(mv);
+    if (m) m += offs;
+    return meta< casadi::DerivativeGenerator >::toCpp(p, m, $descriptor(casadi::DerivativeGenerator *));
+  }
+ }
+%casadi_typemaps_constref(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
+
+%fragment("to"{CustomEvaluate}, "header", fragment="fwd") {
+  int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs) {
+    casadi::CustomEvaluate *m = static_cast<casadi::CustomEvaluate*>(mv);
+    if (m) m += offs;
+    casadi::CustomEvaluate *mp = 0;
+    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::CustomEvaluate *), 0) != -1) {
+      if (m) *m=*mp;
+      return true;
+    }
+    PyObject* return_type = getReturnType(p);
+    bool res = (return_type==Py_None) || !return_type;
+    if (return_type) Py_DECREF(return_type);
+    if (res) {
+      if (m) *m = casadi::CustomEvaluatePython(p);
+    }
+    return res;
+  }
+ }
+%casadi_typemaps_constref(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
+
+%fragment("to"{Callback}, "header", fragment="fwd") {
+  int to_Callback(GUESTOBJECT *p, void *mv, int offs) {
+    casadi::Callback *m = static_cast<casadi::Callback*>(mv);
+    if (m) m += offs;
+    casadi::Callback *mp = 0;
+    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Callback *), 0) != -1) {
+      if (m) *m=*mp;
+      return true;
+    }
+    PyObject* return_type = getReturnType(p);
+    if (!return_type) return false;
+    bool res = PyType_IsSubtype((PyTypeObject *)return_type,&PyInt_Type) || PyType_IsSubtype((PyTypeObject *)return_type,&PyLong_Type);
+    Py_DECREF(return_type);
+    if (res) {
+      if (m) *m = casadi::CallbackPython(p);
+      return true;
+    }
+    return false;
+  }
+ }
+%casadi_typemaps_constref(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
+#endif
+
 %fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}, fragment="to"{IVector}, fragment="to"{DVector}) {
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
     casadi::GenericType *m = static_cast<casadi::GenericType*>(mv);
@@ -377,7 +433,7 @@
       if (m) *m = casadi::GenericType(temp);
     } else if (to_Dictionary(p, 0)
                || meta< casadi::DerivativeGenerator >::toCpp(p, 0, *meta< casadi::DerivativeGenerator >::name)
-               || meta< casadi::Callback >::toCpp(p, 0, *meta< casadi::Callback >::name)) {
+               || to_Callback(p, 0)) {
       PyObject* gt = getCasadiObject("GenericType");
       if (!gt) return false;
 
@@ -434,38 +490,6 @@
   }
  }
 %casadi_typemaps_constref(Dictionary, PRECEDENCE_DICTIONARY, casadi::GenericType::Dictionary)
-#endif
-
-%my_creator_typemap(PRECEDENCE_CREATOR, casadi::implicitFunctionCreator);
-%my_creator_typemap(PRECEDENCE_CREATOR, casadi::linearSolverCreator);
-
-#ifdef SWIGPYTHON
-%fragment("to"{DerivativeGenerator}, "header", fragment="fwd") {
-  int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::DerivativeGenerator *m = static_cast<casadi::DerivativeGenerator*>(mv);
-    if (m) m += offs;
-    return meta< casadi::DerivativeGenerator >::toCpp(p, m, $descriptor(casadi::DerivativeGenerator *));
-  }
- }
-%casadi_typemaps_constref(DerivativeGenerator, PRECEDENCE_DERIVATIVEGENERATOR, casadi::DerivativeGenerator)
-
-%fragment("to"{CustomEvaluate}, "header", fragment="fwd") {
-  int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::CustomEvaluate *m = static_cast<casadi::CustomEvaluate*>(mv);
-    if (m) m += offs;
-    return meta< casadi::CustomEvaluate >::toCpp(p, m, $descriptor(casadi::CustomEvaluate *));
-  }
- }
-%casadi_typemaps_constref(CustomEvaluate, PRECEDENCE_CUSTOMEVALUATE, casadi::CustomEvaluate)
-
-%fragment("to"{Callback}, "header", fragment="fwd") {
-  int to_Callback(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::Callback *m = static_cast<casadi::Callback*>(mv);
-    if (m) m += offs;
-    return meta< casadi::Callback >::toCpp(p, m, $descriptor(casadi::Callback *));
-  }
- }
-%casadi_typemaps_constref(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
 #endif
 
 %fragment("to"{SX}, "header", fragment="fwd") {
@@ -585,9 +609,9 @@
     if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Matrix<double> *), 0) != -1) {
       if (m) *m=*mp;
       return true;
-    } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
+    } else if (is_a(p, $descriptor(casadi::Matrix<int> *))) {
       casadi::Matrix<int> *mp;
-      if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1) return false;
+      if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Matrix<int> *), 0) == -1) return false;
       if (m) *m=*mp;
       return true;
     } else if (PyObject_HasAttrString(p,"__DMatrix__")) {
@@ -728,9 +752,9 @@
     if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Matrix<double> *), 0) != -1) {
       if (m) *m=*mp;
       return true;
-    } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
+    } else if (is_a(p, $descriptor(casadi::Matrix<int> *))) {
       casadi::Matrix<int> *mp;
-      if (SWIG_ConvertPtr(p, (void **) &mp, *meta< casadi::Matrix<int> >::name, 0) == -1)
+      if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Matrix<int> *), 0) == -1)
         return false;
       if (m) *m=*mp;
       return true;

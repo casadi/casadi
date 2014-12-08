@@ -279,43 +279,6 @@ int meta< casadi::DerivativeGenerator >::toCpp(PyObject * p, casadi::DerivativeG
    return false;
  }
 
-/// casadi::CustomEvaluate
-template <>
-int meta< casadi::CustomEvaluate >::toCpp(PyObject * p, casadi::CustomEvaluate *m, swig_type_info *type) {
-  casadi::CustomEvaluate *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  }
-  PyObject* return_type = getReturnType(p);
-  bool res = (return_type==Py_None) || !return_type;
-  if (return_type) Py_DECREF(return_type);
-  if (res) {
-    if (m) *m = casadi::CustomEvaluatePython(p);
-  }
-  return res;
-}
-
-/// casadi::Callback
-template <>
-int meta< casadi::Callback >::toCpp(PyObject * p, casadi::Callback *m, swig_type_info *type) {
-  casadi::Callback *mp = 0;
-  if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  }
-  PyObject* return_type = getReturnType(p);
-  if (!return_type) return false;
-  bool res = PyType_IsSubtype((PyTypeObject *)return_type,&PyInt_Type) || PyType_IsSubtype((PyTypeObject *)return_type,&PyLong_Type);
-  Py_DECREF(return_type);
-  if (res) {
-    if (m) *m = casadi::CallbackPython(p);
-    return true;
-  }
-  return false;
-}
-
-
 GUESTOBJECT * fromCpp(const casadi::GenericType &a) {
   GUESTOBJECT *p = 0;
   if (a.isBool()) {
