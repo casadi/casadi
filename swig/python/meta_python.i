@@ -254,57 +254,6 @@ template <>
   }
 }
 
-/// double
-template <>
-int meta< double >::toCpp(PyObject * p, double *m, swig_type_info *type) {
-  double *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  } else if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) {
-    PyObject *r = PyNumber_Float(p);
-    if (!r) return false;
-    if (m) *m = PyFloat_AsDouble(r);
-    Py_DECREF(r);
-    return true;
-  } else if (PyObject_HasAttrString(p,"dtype")) {
-    PyObject *r = PyObject_GetAttrString(p,"dtype");
-    if (!PyObject_HasAttrString(r,"kind")) { Py_DECREF(r); return false;}
-    PyObject *k = PyObject_GetAttrString(r,"kind");
-    if (!PyObject_HasAttrString(p,"__float__")) { Py_DECREF(k);Py_DECREF(r); return false;}
-    char name[] = "__float__";
-    PyObject *mm = PyObject_CallMethod(p, name,NULL);
-    if (!mm) {   PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
-    char *kk = PyString_AsString(k);
-    bool result = kk[0]=='f' || kk[0]=='i';
-    Py_DECREF(k);
-    Py_DECREF(r); 
-    if (result) {
-      if (m) *m = PyFloat_AsDouble(mm);
-    }
-    Py_DECREF(mm);
-    return result;
-  } else if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
-    casadi::Matrix<double> *temp;
-    SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<double> >::name, 0 );
-    if (temp->numel()==1 && temp->size()==1) {
-      if (m) *m = temp->data()[0];
-      return true;
-    }
-    return false;
-  } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
-    casadi::Matrix<int> *temp;
-    SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
-    if (temp->numel()==1 && temp->size()==1) {
-      if (m) *m = temp->data()[0];
-      return true;
-    }
-    return false;
-  } else {
-    return false;
-  }
-}
-
 // Forward declarations
 GUESTOBJECT * fromCpp(const casadi::GenericType::Dictionary &a);
 

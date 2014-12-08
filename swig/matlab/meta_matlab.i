@@ -83,32 +83,4 @@ int meta< int >::toCpp(GUESTOBJECT * p, int *m, swig_type_info *type) {
   }
 }
 
-/// double
-template <>
-int meta< double >::toCpp(GUESTOBJECT * p, double *m, swig_type_info *type) {
-  double *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  } else if (is_a(p, *meta< casadi::Matrix<double> >::name)) {
-    casadi::Matrix<double> *temp;
-    SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<double> >::name, 0 );
-    if (temp->numel()==1 && temp->size()==1) {
-      if (m) *m = temp->data()[0];
-      return true;
-    }
-    return false;
-  } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
-    casadi::Matrix<int> *temp;
-    SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
-    if (temp->numel()==1 && temp->size()==1) {
-      if (m) *m = temp->data()[0];
-      return true;
-    }
-    return false;
-  } else {
-    return false;
-  }
-}
-
 %}
