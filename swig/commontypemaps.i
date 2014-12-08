@@ -327,7 +327,7 @@
   }
  }
 %casadi_typemaps_constref(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
-%my_genericmatrix_const_typemap(PRECEDENCE_SX,casadi::Matrix<casadi::SXElement>)
+%casadi_typemaps_genericmatrix(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 %casadi_typemaps_vector(SX, PRECEDENCE_SXVector, casadi::Matrix<casadi::SXElement>)
 %casadi_typemaps_vector2(SX, PRECEDENCE_SXVectorVector, casadi::Matrix<casadi::SXElement>)
 
@@ -339,7 +339,7 @@
   }
  }
 %casadi_typemaps_constref(MX, PRECEDENCE_MX, casadi::MX)
-%my_genericmatrix_const_typemap(PRECEDENCE_MX,casadi::MX)
+%casadi_typemaps_genericmatrix(MX, PRECEDENCE_MX, casadi::MX)
 
 %fragment("to"{DMatrix}, "header", fragment="fwd") {
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs) {
@@ -349,7 +349,7 @@
   }
  }
 %casadi_typemaps_constref(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
-%my_genericmatrix_const_typemap(PRECEDENCE_DMatrix,casadi::Matrix<double>)
+%casadi_typemaps_genericmatrix(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
 %casadi_typemaps_vector(MX, PRECEDENCE_MXVector, casadi::MX)
 
 #ifdef SWIGPYTHON
@@ -361,8 +361,7 @@
   }
  }
 %casadi_typemaps_constref(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
-%my_genericmatrix_const_typemap(PRECEDENCE_IMatrix,casadi::Matrix<int>)
-
+%casadi_typemaps_genericmatrix(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
 %casadi_typemaps_vector2(MX, PRECEDENCE_MXVectorVector, casadi::MX)
 %casadi_typemaps_vector(DMatrix, PRECEDENCE_DMatrixVector, casadi::Matrix<double>)
 %casadi_typemaps_vector(IMatrix, PRECEDENCE_IMatrixVector, casadi::Matrix<int>)

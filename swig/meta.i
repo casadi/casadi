@@ -22,26 +22,32 @@
  *
  */
 
-%define %my_genericmatrix_const_typemap(Precedence,Type...) 
-%typemap(in) const casadi::GenericMatrix< Type > & (Type m) {
-  if (is_a($input, $descriptor(Type *))) {
-    if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(Type *), 0) == -1) {
-      SWIG_exception_fail(SWIG_TypeError,"Type cast failed ($1_type)");
+
+%define %casadi_in_typemap_genericmatrix(xName, xType...) 
+%typemap(in) const casadi::GenericMatrix< xType > & (xType m) {
+  if (is_a($input, $descriptor(xType *))) {
+    if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(xType *), 0) == -1) {
+      SWIG_exception_fail(SWIG_TypeError,"xType cast failed ($1_type)");
     }
   } else {
-    if (!meta< Type >::toCpp($input, &m, $descriptor(Type*)))
+    if (!to_##xName($input, &m))
       SWIG_exception_fail(SWIG_TypeError, "Input type conversion failure ($1_type)");
     $1 = &m;
   }
-}
-
-%typemap(typecheck,precedence=Precedence) const casadi::GenericMatrix< Type > & {
-  $1 = is_a($input, $descriptor(Type *)) || meta< Type >::toCpp($input, 0, $descriptor(Type *));
  }
-%typemap(freearg) const casadi::GenericMatrix< Type >  & {}
-
 %enddef
 
+%define %casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType...)
+%typemap(typecheck,precedence=xPrec) const casadi::GenericMatrix< xType > & {
+  $1 = is_a($input, $descriptor(xType *)) || to_##xName($input, 0);
+ }
+%enddef
+
+%define %casadi_typemaps_genericmatrix(xName, xPrec, xType...)
+%casadi_in_typemap_genericmatrix(xName, xType)
+%casadi_freearg_typemap(const casadi::GenericMatrix< xType >  &)
+%casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType)
+%enddef
 
 %inline %{
 template<> swig_type_info** meta< double >::name = &SWIGTYPE_p_double;
