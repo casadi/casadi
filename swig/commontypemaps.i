@@ -324,8 +324,8 @@
  }
 %casadi_typemaps_constref(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 %my_genericmatrix_const_typemap(PRECEDENCE_SX,casadi::Matrix<casadi::SXElement>)
-%casadi_typemaps_vector(SXVector, PRECEDENCE_SXVector, casadi::Matrix<casadi::SXElement>)
-%casadi_typemaps_vector(SXVectorVector, PRECEDENCE_SXVectorVector, std::vector< casadi::Matrix<casadi::SXElement> >)
+%casadi_typemaps_vector(SX, PRECEDENCE_SXVector, casadi::Matrix<casadi::SXElement>)
+%casadi_typemaps_vector(SXVector, PRECEDENCE_SXVectorVector, std::vector< casadi::Matrix<casadi::SXElement> >)
 
 %fragment("to"{MX}, "header", fragment="fwd") {
   int to_MX(GUESTOBJECT *p, void *mv, int offs) {
@@ -346,7 +346,7 @@
  }
 %casadi_typemaps_constref(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
 %my_genericmatrix_const_typemap(PRECEDENCE_DMatrix,casadi::Matrix<double>)
-%casadi_typemaps_vector(MXVector, PRECEDENCE_MXVector, casadi::MX)
+%casadi_typemaps_vector(MX, PRECEDENCE_MXVector, casadi::MX)
 
 #ifdef SWIGPYTHON
 %fragment("to"{IMatrix}, "header", fragment="fwd") {
@@ -359,11 +359,11 @@
 %casadi_typemaps_constref(IMatrix, PRECEDENCE_IMatrix, casadi::Matrix<int>)
 %my_genericmatrix_const_typemap(PRECEDENCE_IMatrix,casadi::Matrix<int>)
 
-%casadi_typemaps_vector(MXVectorVector, PRECEDENCE_MXVectorVector, std::vector<casadi::MX>)
-%casadi_typemaps_vector(DMatrixVector, PRECEDENCE_DMatrixVector, casadi::Matrix<double>)
-%casadi_typemaps_vector(IMatrixVector, PRECEDENCE_IMatrixVector, casadi::Matrix<int>)
-%casadi_typemaps_vector(DMatrixVectorVector, PRECEDENCE_DMatrixVectorVector, std::vector< casadi::Matrix<double> >)
-%casadi_typemaps_vector(IMatrixVectorVector, PRECEDENCE_IMatrixVectorVector, std::vector< casadi::Matrix<int> >)
+%casadi_typemaps_vector(MXVector, PRECEDENCE_MXVectorVector, std::vector<casadi::MX>)
+%casadi_typemaps_vector(DMatrix, PRECEDENCE_DMatrixVector, casadi::Matrix<double>)
+%casadi_typemaps_vector(IMatrix, PRECEDENCE_IMatrixVector, casadi::Matrix<int>)
+%casadi_typemaps_vector(DMatrixVector, PRECEDENCE_DMatrixVectorVector, std::vector< casadi::Matrix<double> >)
+%casadi_typemaps_vector(IMatrixVector, PRECEDENCE_IMatrixVectorVector, std::vector< casadi::Matrix<int> >)
 #endif // SWIGPYTHON
 
 %define %my_value_output_typemaps(Type,...)

@@ -231,7 +231,7 @@ template<class T>
 %define %casadi_in_typemap_vector(xName,xType...)
 %typemap(in, fragment="to_vector") const std::vector< xType > & (std::vector< xType > m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(std::vector< xType >*), 0) == -1) {
-    if (!to_vector($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+    if (!to_vector($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to vector<xName>.");
     $1 = &m;
   }
  }
