@@ -233,11 +233,11 @@
 %enddef
 
 %define %casadi_freearg_typemap(xType...)
-%typemap(freearg) xType {}
+%typemap(freearg, noblock=1) xType {}
 %enddef
 
 %define %casadi_typecheck_typemap(xName, xPrec, xType...)
-%typemap(typecheck, fragment="to"{xName}, precedence=xPrec) xType {
+%typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) xType {
   $1 = to_##xName($input, 0);
  }
 %enddef
@@ -261,21 +261,16 @@
 %enddef
 
 %define %casadi_in_typemap_genericmatrix(xName, xType...) 
-%typemap(in, fragment="is_a") const casadi::GenericMatrix< xType > & (xType m) {
-  if (is_a($input, $descriptor(xType *))) {
-    if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(xType *), 0) == -1) {
-      SWIG_exception_fail(SWIG_TypeError,"xType cast failed ($1_type)");
-    }
-  } else {
-    if (!to_##xName($input, &m))
-      SWIG_exception_fail(SWIG_TypeError, "Input type conversion failure ($1_type)");
+%typemap(in, noblock=1, fragment="is_a") const casadi::GenericMatrix< xType > & (xType m) {
+  if (is_null($input) || SWIG_ConvertPtr($input, (void **) &$1, $descriptor(xType *), 0) == -1) {
+    if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError, "Input type conversion failure ($1_type)");
     $1 = &m;
   }
  }
 %enddef
 
 %define %casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType...)
-   %typemap(typecheck,precedence=xPrec, fragment="is_a") const casadi::GenericMatrix< xType > & {
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="is_a") const casadi::GenericMatrix< xType > & {
   $1 = is_a($input, $descriptor(xType *)) || to_##xName($input, 0);
  }
 %enddef
@@ -350,7 +345,7 @@
 
 // Create an output typemap for a const ref such that a copy is made
 %define %outputConstRefCopy(Type)
-%typemap(out) const Type & {
+%typemap(out, noblock=1) const Type & {
   $result = SWIG_NewPointerObj((new Type(*$1)), $descriptor(Type*), SWIG_POINTER_OWN |  0 );
 }
 %enddef
@@ -386,11 +381,11 @@ void PyDECREFParent(PyObject* self) {
 // We do not really imply that this SWIG objects owns the pointer
 // We are actually abusing the term SWIG_POINTER_OWN: a non-const ref is usually created with SWIG_NewPointerObj(..., 0 |  0 )
 %define %outputRefOwn(Type)
-%typemap(out) Type & {
+%typemap(out, noblock=1) Type & {
   $result = SWIG_NewPointerObj($1, $descriptor(Type*), 0 |  0 );
   PySetParent($result, obj0);
 }
-%typemap(out) const Type & {
+%typemap(out, noblock=1) const Type & {
    $result = swig::from(static_cast< Type * >($1));
    PySetParent($result, obj0);
 }
