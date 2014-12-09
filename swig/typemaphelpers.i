@@ -38,24 +38,13 @@
 #else
 #define GUESTOBJECT void
 #endif
-
-  /// Check if Python object is of type T
-  bool is_a(GUESTOBJECT *p, swig_type_info *type) {
-#ifdef SWIGPYTHON
-    if (p == Py_None) return false;
-#endif
-#ifdef SWIGMATLAB
-    if (p == 0) return false;
-#endif
-    void *dummy = 0;
-    return SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
-  }
 %}
 
 // Forward declarations
 %fragment("fwd", "header") {
   template<typename T> bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs));
   template<typename T> bool make_vector2(GUESTOBJECT * p, std::vector<std::vector<T> >* m, int (*f)(GUESTOBJECT *p, void *mv, int offs));
+  bool is_a(GUESTOBJECT *p, swig_type_info *type);
 
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
   int to_double(GUESTOBJECT *p, void *mv, int offs=0);
@@ -76,7 +65,21 @@
   int to_Function(GUESTOBJECT *p, void *mv, int offs=0);
 }
 
-%fragment("vector_size", "header") {
+/// Check if Python object is of type T
+%fragment("is_a", "header", fragment="fwd") {
+  bool is_a(GUESTOBJECT *p, swig_type_info *type) {
+#ifdef SWIGPYTHON
+    if (p == Py_None) return false;
+#endif
+#ifdef SWIGMATLAB
+    if (p == 0) return false;
+#endif
+    void *dummy = 0;
+    return SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
+  }
+}
+
+%fragment("vector_size", "header", fragment="is_a") {
   int vector_size(GUESTOBJECT * p) {
 #ifdef SWIGPYTHON
     if (PySequence_Check(p)
@@ -254,7 +257,7 @@
 %enddef
 
 %define %casadi_in_typemap_genericmatrix(xName, xType...) 
-%typemap(in) const casadi::GenericMatrix< xType > & (xType m) {
+%typemap(in, fragment="is_a") const casadi::GenericMatrix< xType > & (xType m) {
   if (is_a($input, $descriptor(xType *))) {
     if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(xType *), 0) == -1) {
       SWIG_exception_fail(SWIG_TypeError,"xType cast failed ($1_type)");
@@ -268,7 +271,7 @@
 %enddef
 
 %define %casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType...)
-%typemap(typecheck,precedence=xPrec) const casadi::GenericMatrix< xType > & {
+   %typemap(typecheck,precedence=xPrec, fragment="is_a") const casadi::GenericMatrix< xType > & {
   $1 = is_a($input, $descriptor(xType *)) || to_##xName($input, 0);
  }
 %enddef
