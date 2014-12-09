@@ -338,6 +338,8 @@ namespace casadi {
   template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
   template<> bool SX::isRegular() const;
   template<> bool SX::isSmooth() const;
+  template<> bool SX::isLeaf() const;
+  template<> bool SX::isCommutative() const;
   template<> bool SX::isSymbolic() const;
   template<> bool SX::isSymbolicSparse() const;
   template<> double SX::getValue() const;
@@ -348,6 +350,8 @@ namespace casadi {
   template<> long SX::getMaxNumCallsInPrint();
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
+  template<> long SX::getElementHash() const;
+
 
 } // namespace casadi
 

@@ -2170,6 +2170,21 @@ namespace casadi {
   }
 
   template<typename DataType>
+  long Matrix<DataType>::getElementHash() const {
+    throw CasadiException("\"getElementHash\" not defined for instantiation");
+  }
+
+  template<typename DataType>
+  bool Matrix<DataType>::isLeaf() const {
+    throw CasadiException("\"isLeaf\" not defined for instantiation");
+  }
+
+  template<typename DataType>
+  bool Matrix<DataType>::isCommutative() const {
+    throw CasadiException("\"isCommutative\" not defined for instantiation");
+  }
+
+  template<typename DataType>
   bool Matrix<DataType>::isSymbolic() const {
     return false;
   }
