@@ -273,6 +273,22 @@
   }
 }
 
+%fragment("to"{Function}, "header", fragment="fwd") {
+  int to_Function(GUESTOBJECT *p, void *mv, int offs) {
+    casadi::Function *m = static_cast<casadi::Function*>(mv);
+    if (m) m += offs;
+    casadi::Function *t = 0;
+    int res = swig::asptr(p, &t);
+    if(SWIG_CheckState(res) && t) {
+      if(m) *m=*t;
+      if (SWIG_IsNewObj(res)) delete t;
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
 %fragment("to"{IVector}, "header", fragment="fwd,make_vector") {
   int to_IVector(GUESTOBJECT *p, void *mv, int offs) {
     std::vector<int> *m = static_cast<std::vector<int>*>(mv);
@@ -373,7 +389,7 @@
 %my_creator_typemap(PRECEDENCE_CREATOR, casadi::linearSolverCreator);
 
 #ifdef SWIGPYTHON
-%fragment("to"{DerivativeGenerator}, "header", fragment="fwd") {
+%fragment("to"{DerivativeGenerator}, "header", fragment="fwd", fragment="to"{Function}) {
   namespace casadi {
     Function DerivativeGeneratorPythonInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
       casadi_assert(p_!=0);
@@ -392,7 +408,7 @@
       Py_DECREF(fcn_py);
       if (r) {
         Function ret;  
-        if(!meta< Function >::toCpp(r, &ret, $descriptor(casadi::Function *))) {
+        if(!to_Function(r, &ret)) {
           Py_DECREF(r);
           throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function.");
         }
@@ -507,7 +523,8 @@
 %casadi_typemaps_constref(Callback, PRECEDENCE_CALLBACK, casadi::Callback)
 #endif
 
-%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string}, fragment="to"{IVector}, fragment="to"{DVector}) {
+%fragment("to"{GenericType}, "header", fragment="fwd", fragment="to"{string},
+          fragment="to"{IVector}, fragment="to"{DVector}, fragment="to"{Function}) {
   int to_GenericType(GUESTOBJECT *p, void *mv, int offs) {
     casadi::GenericType *m = static_cast<casadi::GenericType*>(mv);
     if (m) m += offs;
@@ -564,9 +581,9 @@
       }
       if (!g) { PyErr_Clear();  return false;}
     
-    } else if (meta< casadi::Function >::toCpp(p, 0, *meta< casadi::Function >::name)) {
+    } else if (to_Function(p, 0)) {
       casadi::Function temp;
-      if (!meta< casadi::Function >::toCpp(p, &temp, *meta< casadi::Function >::name)) return false;
+      if (!to_Function(p, &temp)) return false;
       if (m) *m = casadi::GenericType(temp);
     } else if (to_Dictionary(p, 0) || to_DerivativeGenerator(p, 0) || to_Callback(p, 0)) {
       PyObject* gt = getCasadiObject("GenericType");

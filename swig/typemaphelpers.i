@@ -51,28 +51,12 @@
     return SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
   }
 
-template<class T>
-class meta {
+  template<class T>
+    class meta {
   public:
     static swig_type_info** name;
-
-    /// Convert Guest object to type T
-    /// This function must work when is_a(GUESTOBJECT *p) too
     static int toCpp(GUESTOBJECT *p, T *m, swig_type_info *type);
-};
-
-template <> 
-int meta< casadi::Function>::toCpp(GUESTOBJECT *p, casadi::Function *m, swig_type_info *type) {
-  casadi::Function *t = 0;
-  int res = swig::asptr(p, &t);
-  if(SWIG_CheckState(res) && t) {
-    if(m) *m=*t;
-    if (SWIG_IsNewObj(res)) delete t;
-    return true;
-  } else {
-    return false;
-  }
- }
+ };
 %}
 
 
@@ -97,6 +81,7 @@ int meta< casadi::Function>::toCpp(GUESTOBJECT *p, casadi::Function *m, swig_typ
   int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
   int to_IndexList(GUESTOBJECT *p, void *mv, int offs=0);
   int to_string(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_Function(GUESTOBJECT *p, void *mv, int offs=0);
 }
 
 %fragment("vector_size", "header") {
