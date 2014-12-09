@@ -7,24 +7,23 @@ f = cos(x*y)
 y = SX.ones(3,2)
 f = cos(x*y)
 
-%X = 
 
-%y = SX.sym('y',2,1);
-%z = MX.sym('z',3);
-
+y = SX.sym('y',2,1);
+z = MX.sym('z',3);
 
 
 
-%f = SXFunction({x},{cos(x)})
-%f.init()
 
-%f.setInput(3,0)
+f = SXFunction({x},{cos(x)})
+f.init()
 
-%f.evaluate()
+f.setInput(3,0)
+
+f.evaluate()
 
 
-%f.getOutput()
+disp(f.getOutput())
 
-%res = f.getOutput()-DMatrix(cos(3))
-%assert(res.isZero())
+res = f.getOutput()-DMatrix(cos(3))
+assert(res.isZero())
 clear
