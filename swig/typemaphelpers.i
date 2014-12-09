@@ -63,6 +63,9 @@
   int to_IndexList(GUESTOBJECT *p, void *mv, int offs=0);
   int to_string(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Function(GUESTOBJECT *p, void *mv, int offs=0);
+
+  GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
+  GUESTOBJECT * from_Dictionary(const casadi::GenericType::Dictionary &a);
 }
 
 /// Check if Python object is of type T
