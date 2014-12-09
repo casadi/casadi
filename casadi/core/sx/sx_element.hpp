@@ -340,6 +340,8 @@ namespace casadi {
   template<> bool SX::isSymbolic() const;
   template<> bool SX::isSymbolicSparse() const;
   template<> double SX::getValue() const;
+  template<> SX SX::getDep(int ch) const;
+  template<> int SX::getNdeps() const;
   template<> std::string SX::getName() const;
   template<> void SX::setMaxNumCallsInPrint(long num);
   template<> long SX::getMaxNumCallsInPrint();

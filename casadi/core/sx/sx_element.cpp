@@ -907,6 +907,16 @@ namespace casadi {
     return toScalar().getName();
   }
 
+  template<>
+  SX SX::getDep(int ch) const {
+    return toScalar().getDep(ch);
+  }
+
+  template<>
+  int SX::getNdeps() const {
+    return toScalar().getNdeps();
+  }
+
 } // namespace casadi
 
 using namespace casadi;

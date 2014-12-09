@@ -67,7 +67,7 @@ def addDependencies(master,slaves,dep={},invdep={}):
 
 def dependencyGraph(s,dep = {},invdep = {}):
   if isinstance(s,SX):
-    addDependencies(s,list(s.data()),dep = dep,invdep = invdep)
+    addDependencies(s,list(s),dep = dep,invdep = invdep)
   elif isinstance(s,MX):
     addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
   return (dep,invdep)

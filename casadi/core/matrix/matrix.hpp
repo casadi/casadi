@@ -912,6 +912,17 @@ namespace casadi {
     /** \brief Get name (only if symbolic scalar) */
     std::string getName() const;
 
+    /** \brief Get expressions of the children of the expression 
+        Only defined if symbolic scalar. 
+        Wraps SXElement SXElement::getDep(int ch=0) const.
+     */
+    Matrix<DataType> getDep(int ch=0) const;
+
+    /** \brief Get the number of dependencies of a binary SXElement
+        Only defined if symbolic scalar. 
+    */
+    int getNdeps() const;
+
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
     static void setPrecision(int precision) { stream_precision_ = precision; }
