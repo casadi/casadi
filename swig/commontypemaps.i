@@ -85,7 +85,7 @@
     if (m) m += offs;
 #ifdef SWIGPYTHON
     int *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(int *), 0) != -1) {
+    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(int *), 0) != -1) {
       if (m) *m=*mp;
       return true;
     } else if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p)) {
