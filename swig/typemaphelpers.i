@@ -42,6 +42,7 @@
 %fragment("fwd", "header") {
   template<typename T> bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs));
   template<typename T> bool make_vector2(GUESTOBJECT * p, std::vector<std::vector<T> >* m, int (*f)(GUESTOBJECT *p, void *mv, int offs));
+  bool is_null(GUESTOBJECT *p);
   bool is_a(GUESTOBJECT *p, swig_type_info *type);
 
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
@@ -68,15 +69,19 @@
 
 /// Check if Python object is of type T
 %fragment("is_a", "header", fragment="fwd") {
-  bool is_a(GUESTOBJECT *p, swig_type_info *type) {
+  bool is_null(GUESTOBJECT *p) {
 #ifdef SWIGPYTHON
-    if (p == Py_None) return false;
+    if (p == Py_None) return true;
 #endif
 #ifdef SWIGMATLAB
-    if (p == 0) return false;
+    if (p == 0) return true;
 #endif
+    return false;
+  }
+
+  bool is_a(GUESTOBJECT *p, swig_type_info *type) {
     void *dummy = 0;
-    return SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
+    return !is_null(p) && SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
   }
 }
 

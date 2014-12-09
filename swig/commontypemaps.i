@@ -85,7 +85,7 @@
     if (m) m += offs;
 #ifdef SWIGPYTHON
     int *mp = 0;
-    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(int *), 0) != -1) {
+    if (!is_null(p) && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(int *), 0) != -1) {
       if (m) *m=*mp;
       return true;
     } else if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p)) {
@@ -151,7 +151,7 @@
     if (m) m += offs;
 #ifdef SWIGPYTHON
     double *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(double *), 0) != -1) {
+    if (!is_null(p) && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(double *), 0) != -1) {
       if (m) *m=*mp;
       return true;
     } else if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) {
@@ -297,7 +297,7 @@
     if (m) m += offs;
 #ifdef SWIGPYTHON
     std::string *mp = 0;
-    if (p != Py_None && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(std::string *), 0) != -1) {
+    if (!is_null(p) && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(std::string *), 0) != -1) {
       if (m) *m=*mp;
       return true;
     }
