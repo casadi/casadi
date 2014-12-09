@@ -32,7 +32,6 @@
 %template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
 %template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElement> >;
 %template(ExpMX)             casadi::GenericExpression<casadi::MX>;
-%template(ExpSXElement)      casadi::GenericExpression<casadi::SXElement>;
 
 #endif // CASADI_GENERIC_EXPRESSION_I
 

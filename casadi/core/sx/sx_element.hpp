@@ -46,6 +46,11 @@ namespace casadi {
   /** \brief  forward declaration of Node and Matrix */
   class SXNode; // include will follow in the end
 
+  /** SXElement is exposed only as an empty struct to SWIG */
+#ifdef SWIG
+  struct SXElement {};
+#else // SWIG
+
   /** \brief The basic scalar symbolic class of CasADi
       \author Joel Andersson
       \date 2010-2014
@@ -56,7 +61,6 @@ namespace casadi {
     friend class BinarySXNode;
     friend class Matrix<SXElement>;
   public:
-#ifndef SWIG
 
     /// \cond CLUTTER
     /** \brief Default constructor (not-a-number)
@@ -285,12 +289,9 @@ namespace casadi {
     /// replaces the ternary conditional operator "?:", which cannot be overloaded
     friend SXElement if_else(const SXElement& cond, const SXElement& if_true,
                              const SXElement& if_false);
-#endif // SWIG
-
   };
 
-/// \cond INTERNAL
-#ifndef SWIG
+  /// \cond INTERNAL
   // Template specializations
   template<>
   CASADI_EXPORT bool Matrix<SXElement>::__nonzero__() const;
@@ -349,8 +350,6 @@ namespace casadi {
   template<> int SX::getEqualityCheckingDepth();
 
 } // namespace casadi
-
-
 
 #ifndef SWIG
 
