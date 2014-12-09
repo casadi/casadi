@@ -28,7 +28,6 @@
 #endif
 
 /// Generic typemap structure
-%inline %{
 
   /// Data structure in the target language holding data
 #ifdef SWIGPYTHON
@@ -38,7 +37,6 @@
 #else
 #define GUESTOBJECT void
 #endif
-%}
 
 // Forward declarations
 %fragment("fwd", "header") {
