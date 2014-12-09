@@ -199,14 +199,14 @@
  }
 
 %define %casadi_in_typemap(xName, xType...)
-%typemap(in, fragment="to"{xName}) xType (xType m) {
+%typemap(in, noblock=1, fragment="to"{xName}) xType (xType m) {
   if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
   $1 = m;
 }
 %enddef
 
 %define %casadi_in_typemap_constref(xName, xType...)
-%typemap(in, fragment="to"{xName}) const xType & (xType m) {
+%typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(xType*), 0) == -1) {
     if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
     $1 = &m;
@@ -215,7 +215,7 @@
 %enddef
 
 %define %casadi_in_typemap_vector(xName,xType...)
-%typemap(in, fragment="make_vector,fwd") const std::vector< xType > & (std::vector< xType > m) {
+%typemap(in, noblock=1, fragment="make_vector,fwd") const std::vector< xType > & (std::vector< xType > m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor, 0) == -1) {
     if (!make_vector($input, &m, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector<xName>.");
     $1 = &m;
@@ -224,7 +224,7 @@
 %enddef
 
 %define %casadi_in_typemap_vector2(xName,xType...)
-%typemap(in, fragment="make_vector2,fwd") const std::vector< xType > & (std::vector< xType > m) {
+%typemap(in, noblock=1, fragment="make_vector2,fwd") const std::vector< xType > & (std::vector< xType > m) {
   if (SWIG_ConvertPtr($input, (void **) &$1, $1_descriptor, 0) == -1) {
     if (!make_vector2($input, &m, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector< std::vector<xName> >.");
     $1 = &m;
@@ -243,22 +243,20 @@
 %enddef
 
 %define %casadi_typecheck_typemap_constref(xName, xPrec, xType...)
-%typemap(typecheck, fragment="to"{xName}, precedence=xPrec) const xType& {
+%typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) const xType& {
   $1 = to_##xName($input, 0);
  }
 %enddef
 
 %define %casadi_typecheck_typemap_vector(xName, xPrec, xType...)
-%typemap(typecheck, precedence=xPrec, fragment="to_vector") const std::vector< xType > & {
-  void *mp = 0;
-  $1 = SWIG_ConvertPtr($input, &mp, $1_descriptor, 0) != -1 || make_vector< xType >($input, 0, to_##xName);
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="is_a,to_vector") const std::vector< xType > & {
+  $1 = is_a($input,$1_descriptor) || make_vector< xType >($input, 0, to_##xName);
  }
 %enddef
 
 %define %casadi_typecheck_typemap_vector2(xName, xPrec, xType...)
-%typemap(typecheck, precedence=xPrec, fragment="make_vector2") const std::vector< std::vector< xType > > & {
-  void *mp = 0;
-  $1 = SWIG_ConvertPtr($input, &mp, $1_descriptor, 0) != -1 || make_vector2< xType >($input, 0, to_##xName);
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="is_a,make_vector2") const std::vector< std::vector< xType > > & {
+  $1 = is_a($input, $1_descriptor) || make_vector2< xType >($input, 0, to_##xName);
  }
 %enddef
 

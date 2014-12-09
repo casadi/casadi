@@ -125,14 +125,14 @@
 #endif //SWIGPYTHON
 #ifdef SWIGMATLAB
     int *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(int *), 0) != -1) {
+    if (!is_null(p) && SWIG_ConvertPtr(p, (void **) &mp, $descriptor(int *), 0) != -1) {
       if (m) *m=*mp;
       return true;
     } else if (is_a(p, $descriptor(casadi::Matrix<int> *))) {
       casadi::Matrix<int> *temp;
       SWIG_ConvertPtr(p, (void **) &temp, $descriptor(casadi::Matrix<int> *), 0 );
-      if (temp->numel()==1 && temp->size()==1) {
-        if (m) *m = temp->data()[0];
+      if (temp->isScalar()) {
+        if (m) *m = temp->toScalar();
         return true;
       }
       return false;
