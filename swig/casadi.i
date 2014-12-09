@@ -603,18 +603,17 @@ memberbinops(mpower,argtype,argCast,selfCast,returntype)
 #define binopsNoPriority(argtype,argCast,selfCast,returntype) \
 memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
-//%traits_swigtype(casadi::GenericType);
-//%traits_swigtype(std::mapcasadi::Dictionary);
-
-//%fragment(SWIG_Traits_frag(std::map< std::string, casadi::GenericType, std::less<std::string > , allocator<std::pair<const std::string, casadi::GenericType > > >));
-
-//%fragment(SWIG_Traits_frag(casadi::Dictionary));
-
 // typemaphelpers
 %include "typemaphelpers.i"
 
-// typemap meta implementations
-%include "meta.i"
+
+#ifdef SWIGPYTHON
+%include "python/meta_python.i"
+#endif
+
+#ifdef SWIGMATLAB
+%include "matlab/meta_matlab.i"
+#endif
 
 // common typemaps
 %include "commontypemaps.i"

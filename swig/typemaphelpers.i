@@ -253,6 +253,26 @@
  }
 %enddef
 
+%define %casadi_in_typemap_genericmatrix(xName, xType...) 
+%typemap(in) const casadi::GenericMatrix< xType > & (xType m) {
+  if (is_a($input, $descriptor(xType *))) {
+    if (SWIG_ConvertPtr($input, (void **) &$1, $descriptor(xType *), 0) == -1) {
+      SWIG_exception_fail(SWIG_TypeError,"xType cast failed ($1_type)");
+    }
+  } else {
+    if (!to_##xName($input, &m))
+      SWIG_exception_fail(SWIG_TypeError, "Input type conversion failure ($1_type)");
+    $1 = &m;
+  }
+ }
+%enddef
+
+%define %casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType...)
+%typemap(typecheck,precedence=xPrec) const casadi::GenericMatrix< xType > & {
+  $1 = is_a($input, $descriptor(xType *)) || to_##xName($input, 0);
+ }
+%enddef
+
 %define %casadi_typemaps(xName, xPrec, xType...)
 %casadi_in_typemap(xName, xType)
 %casadi_freearg_typemap(xType)
@@ -275,6 +295,12 @@
 %casadi_in_typemap_vector2(xName, std::vector< xType >)
 %casadi_freearg_typemap(const std::vector< std::vector< xType > >&)
 %casadi_typecheck_typemap_vector2(xName, xPrec, xType)
+%enddef
+
+%define %casadi_typemaps_genericmatrix(xName, xPrec, xType...)
+%casadi_in_typemap_genericmatrix(xName, xType)
+%casadi_freearg_typemap(const casadi::GenericMatrix< xType >  &)
+%casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType)
 %enddef
 
 #ifdef SWIGPYTHON
