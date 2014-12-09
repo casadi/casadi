@@ -125,48 +125,6 @@
   %}
 
 %inline %{
-/// int
-template <>
-  int meta< int >::toCpp(PyObject * p, int *m, swig_type_info *type) {
-  int *mp = 0;
-  if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
-    if (m) *m=*mp;
-    return true;
-  } else if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p)) {
-    PyObject *r = PyNumber_Long(p);
-    if (!r) return false;
-    if (m) *m = PyLong_AsLong(r);
-    Py_DECREF(r);
-    return true;
-  } else if (PyObject_HasAttrString(p,"dtype")) {
-    PyObject *r = PyObject_GetAttrString(p,"dtype");
-    if (!PyObject_HasAttrString(r,"kind")) { Py_DECREF(r); return false;}
-    PyObject *k = PyObject_GetAttrString(r,"kind");
-    if (!PyObject_HasAttrString(p,"__int__")) { Py_DECREF(k);Py_DECREF(r); return false;}
-    char name[] = "__int__";
-    PyObject *mm = PyObject_CallMethod(p, name,0);
-    if (!mm) { PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
-    char *kk = PyString_AsString(k);
-    bool result =  kk[0]=='i';
-    Py_DECREF(k);
-    Py_DECREF(r);
-    if (result) {
-      if (m) *m = PyLong_AsLong(mm);
-    }
-    Py_DECREF(mm);
-    return result;
-  } else if (is_a(p, *meta< casadi::Matrix<int> >::name)) {
-    casadi::Matrix<int> *temp;
-    SWIG_ConvertPtr(p, (void **) &temp, *meta< casadi::Matrix<int> >::name, 0 );
-    if (temp->numel()==1 && temp->size()==1) {
-      if (m) *m = temp->data()[0];
-      return true;
-    }
-    return false;
-  } else {
-    return false;
-  }
-}
 
 // Forward declarations
 GUESTOBJECT * fromCpp(const casadi::GenericType::Dictionary &a);
