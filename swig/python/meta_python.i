@@ -24,143 +24,105 @@
 
 
 %{
-
-
-// Returns a new reference
-PyObject * getReturnType(PyObject* p) {
-  if (!p) return 0;
-  if (!PyCallable_Check(p)) return 0;
-  if (!PyObject_HasAttrString( p, "func_annotations")) return 0;
-  PyObject * func_annotations = PyObject_GetAttrString(p,"func_annotations");
-  if (!PyDict_Check(func_annotations)) {
+  // Returns a new reference
+  PyObject * getReturnType(PyObject* p) {
+    if (!p) return 0;
+    if (!PyCallable_Check(p)) return 0;
+    if (!PyObject_HasAttrString( p, "func_annotations")) return 0;
+    PyObject * func_annotations = PyObject_GetAttrString(p,"func_annotations");
+    if (!PyDict_Check(func_annotations)) {
+      Py_DECREF(func_annotations);
+      return 0;
+    }
+    PyObject * return_type = PyDict_GetItemString(func_annotations, "return"); // Borrowed
+    Py_INCREF(return_type); // Make a new reference
     Py_DECREF(func_annotations);
-    return 0;
+    if (return_type==0) {
+      return 0;
+    }
+    if (!PyType_Check(return_type) && return_type!=Py_None) {
+      Py_DECREF(return_type);
+      return 0;
+    }
+    return return_type;
   }
-  PyObject * return_type = PyDict_GetItemString(func_annotations, "return"); // Borrowed
-  Py_INCREF(return_type); // Make a new reference
-  Py_DECREF(func_annotations);
-  if (return_type==0) {
-    return 0;
-  }
-  if (!PyType_Check(return_type) && return_type!=Py_None) {
-    Py_DECREF(return_type);
-    return 0;
-  }
-  return return_type;
-}
 
-// Returns a new reference
-PyObject * getCasadiObject(const std::string &s) {
-  PyObject* pPyObjectModuleName = PyString_FromString("casadi");
-  if (pPyObjectModuleName) {
-    PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
-    Py_DECREF(pPyObjectModuleName);
-    if (pObjectModule) {
-      PyObject* pObjectDict = PyModule_GetDict(pObjectModule); // Borrowed
-      Py_DECREF(pObjectModule);
-      if (pObjectDict) {
-        PyObject* ret = PyDict_GetItemString(pObjectDict,  s.c_str()); // Borrowed
-        if (ret) {
-          // New reference
-          Py_INCREF(ret);
-          return ret;
+  // Returns a new reference
+  PyObject * getCasadiObject(const std::string &s) {
+    PyObject* pPyObjectModuleName = PyString_FromString("casadi");
+    if (pPyObjectModuleName) {
+      PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
+      Py_DECREF(pPyObjectModuleName);
+      if (pObjectModule) {
+        PyObject* pObjectDict = PyModule_GetDict(pObjectModule); // Borrowed
+        Py_DECREF(pObjectModule);
+        if (pObjectDict) {
+          PyObject* ret = PyDict_GetItemString(pObjectDict,  s.c_str()); // Borrowed
+          if (ret) {
+            // New reference
+            Py_INCREF(ret);
+            return ret;
+          }
         }
       }
     }
-  }
 
-  // Unsuccessful
-  PyErr_Clear();
-  return 0;
-}
+    // Unsuccessful
+    PyErr_Clear();
+    return 0;
+  }
 
 #include <casadi/core/functor_internal.hpp>
 
-namespace casadi {
-  class FunctorPythonInternal {
+  namespace casadi {
+    class FunctorPythonInternal {
     public:
-      FunctorPythonInternal(PyObject *p) : p_(p) { Py_INCREF(p_); }
+    FunctorPythonInternal(PyObject *p) : p_(p) { Py_INCREF(p_); }
       ~FunctorPythonInternal() { Py_DECREF(p_); }
     protected:
       PyObject *p_;
-  };
+    };
   
-  class DerivativeGeneratorPythonInternal : public DerivativeGeneratorInternal, FunctorPythonInternal {
-    friend class DerivativeGeneratorPython;
+    class DerivativeGeneratorPythonInternal : public DerivativeGeneratorInternal, FunctorPythonInternal {
+      friend class DerivativeGeneratorPython;
     
-  DerivativeGeneratorPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-    virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data);
-    virtual DerivativeGeneratorPythonInternal* clone() const { return new DerivativeGeneratorPythonInternal(p_); }
-  };
+    DerivativeGeneratorPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
+      virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data);
+      virtual DerivativeGeneratorPythonInternal* clone() const { return new DerivativeGeneratorPythonInternal(p_); }
+    };
    
-  class CustomEvaluatePythonInternal : public CustomEvaluateInternal, FunctorPythonInternal {
-    friend class CustomEvaluatePython;
+    class CustomEvaluatePythonInternal : public CustomEvaluateInternal, FunctorPythonInternal {
+      friend class CustomEvaluatePython;
     
     CustomEvaluatePythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-    virtual void call(CustomFunction& fcn, void* user_data);
-    virtual CustomEvaluatePythonInternal* clone() const { return new CustomEvaluatePythonInternal(p_); }
-  };
+      virtual void call(CustomFunction& fcn, void* user_data);
+      virtual CustomEvaluatePythonInternal* clone() const { return new CustomEvaluatePythonInternal(p_); }
+    };
   
-  class DerivativeGeneratorPython : public DerivativeGenerator {
-  public:
-    DerivativeGeneratorPython(PyObject *p) { assignNode(new DerivativeGeneratorPythonInternal(p)); }
-  };
+    class DerivativeGeneratorPython : public DerivativeGenerator {
+    public:
+      DerivativeGeneratorPython(PyObject *p) { assignNode(new DerivativeGeneratorPythonInternal(p)); }
+    };
   
-  class CallbackPythonInternal : public CallbackInternal, FunctorPythonInternal {
-    friend class CallbackPython;
+    class CallbackPythonInternal : public CallbackInternal, FunctorPythonInternal {
+      friend class CallbackPython;
     
     CallbackPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-    virtual int call(Function& fcn, void* user_data);
-    virtual CallbackPythonInternal* clone() const { return new CallbackPythonInternal(p_); }
-  };
+      virtual int call(Function& fcn, void* user_data);
+      virtual CallbackPythonInternal* clone() const { return new CallbackPythonInternal(p_); }
+    };
   
-  class CustomEvaluatePython : public CustomEvaluate {
+    class CustomEvaluatePython : public CustomEvaluate {
     public:
       CustomEvaluatePython(PyObject *p) { assignNode(new CustomEvaluatePythonInternal(p)); }
-  };
+    };
 
-  class CallbackPython : public Callback {
+    class CallbackPython : public Callback {
     public:
       CallbackPython(PyObject *p) { assignNode(new CallbackPythonInternal(p)); }
-  };
-  
-}
-%}
-
-
-%wrapper %{  
-namespace casadi {
-  Function DerivativeGeneratorPythonInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
-    casadi_assert(p_!=0);
-    PyObject * nfwd_py = PyInt_FromLong(nfwd);
-    PyObject * nadj_py = PyInt_FromLong(nadj);
-    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_casadi__Function, SWIG_POINTER_OWN |  0 );
-    if(!fcn_py) {
-      Py_DECREF(nfwd_py);
-      Py_DECREF(nadj_py);
-      throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert Function to python");
-    }
-    
-    PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, nfwd_py, nadj_py, NULL);
-    Py_DECREF(nfwd_py);
-    Py_DECREF(nadj_py);
-    Py_DECREF(fcn_py);
-    
-    if (r) {
-      Function ret;  
-      if(!meta< Function >::toCpp(r, &ret, *meta< Function >::name)) {
-        Py_DECREF(r);
-        throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function.");
-      }
-      Py_DECREF(r);
-      return ret;
-    } else {
-      PyErr_Print();
-      throw CasadiException("DerivativeGeneratorPythonInternal: python method execution raised an Error.");
-    }
+    };
   }
-}
-%}
+  %}
 
 %inline %{
 /// int

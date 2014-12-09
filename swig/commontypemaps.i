@@ -320,6 +320,37 @@
 
 #ifdef SWIGPYTHON
 %fragment("to"{DerivativeGenerator}, "header", fragment="fwd") {
+  namespace casadi {
+    Function DerivativeGeneratorPythonInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
+      casadi_assert(p_!=0);
+      PyObject * nfwd_py = PyInt_FromLong(nfwd);
+      PyObject * nadj_py = PyInt_FromLong(nadj);
+      PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))),
+                                             $descriptor(casadi::Function *), SWIG_POINTER_OWN |  0 );
+      if(!fcn_py) {
+        Py_DECREF(nfwd_py);
+        Py_DECREF(nadj_py);
+        throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert Function to python");
+      }
+      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, nfwd_py, nadj_py, NULL);
+      Py_DECREF(nfwd_py);
+      Py_DECREF(nadj_py);
+      Py_DECREF(fcn_py);
+      if (r) {
+        Function ret;  
+        if(!meta< Function >::toCpp(r, &ret, $descriptor(casadi::Function *))) {
+          Py_DECREF(r);
+          throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function.");
+        }
+        Py_DECREF(r);
+        return ret;
+      } else {
+        PyErr_Print();
+        throw CasadiException("DerivativeGeneratorPythonInternal: python method execution raised an Error.");
+      }
+    }
+  } // namespace casadi
+
   int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs) {
     casadi::DerivativeGenerator *m = static_cast<casadi::DerivativeGenerator*>(mv);
     if (m) m += offs;
