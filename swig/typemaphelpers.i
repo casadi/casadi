@@ -50,15 +50,7 @@
     void *dummy = 0;
     return SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
   }
-
-  template<class T>
-    class meta {
-  public:
-    static swig_type_info** name;
-    static int toCpp(GUESTOBJECT *p, T *m, swig_type_info *type);
- };
 %}
-
 
 // Forward declarations
 %fragment("fwd", "header") {

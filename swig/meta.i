@@ -49,38 +49,7 @@
 %casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType)
 %enddef
 
-%inline %{
-template<> swig_type_info** meta< double >::name = &SWIGTYPE_p_double;
-template<> swig_type_info** meta< int >::name = &SWIGTYPE_p_int;
-template<> swig_type_info** meta< std::string >::name = &SWIGTYPE_p_std__string;
-template<> swig_type_info** meta< std::vector<double> >::name = &SWIGTYPE_p_std__vectorT_double_std__allocatorT_double_t_t;
-template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t;
-template<> swig_type_info** meta< casadi::SXElement >::name = &SWIGTYPE_p_casadi__SXElement;
-template<> swig_type_info** meta< casadi::SX >::name = &SWIGTYPE_p_casadi__MatrixT_casadi__SXElement_t;
-template<> swig_type_info** meta< std::vector< casadi::SX > >::name = &SWIGTYPE_p_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t;
-template<> swig_type_info** meta< casadi::Function >::name = &SWIGTYPE_p_casadi__Function;
-
-template<> swig_type_info** meta< std::vector< std::vector< casadi::SX > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_std__allocatorT_std__vectorT_casadi__MatrixT_casadi__SXElement_t_std__allocatorT_casadi__MatrixT_casadi__SXElement_t_t_t_t_t;
-
-template<> swig_type_info** meta< std::vector< casadi::Matrix<double> > >::name = &SWIGTYPE_p_std__vectorT_casadi__MatrixT_double_t_std__allocatorT_casadi__MatrixT_double_t_t_t;
-template<> swig_type_info** meta< std::vector< std::vector< casadi::Matrix<double> > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__MatrixT_double_t_std__allocatorT_casadi__MatrixT_double_t_t_t_std__allocatorT_std__vectorT_casadi__MatrixT_double_t_std__allocatorT_casadi__MatrixT_double_t_t_t_t_t;
-template<> swig_type_info** meta< std::vector< casadi::Matrix<int> > >::name = &SWIGTYPE_p_std__vectorT_casadi__MatrixT_int_t_std__allocatorT_casadi__MatrixT_int_t_t_t;
-template<> swig_type_info** meta< std::vector< std::vector< casadi::Matrix<int> > >  >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__MatrixT_int_t_std__allocatorT_casadi__MatrixT_int_t_t_t_std__allocatorT_std__vectorT_casadi__MatrixT_int_t_std__allocatorT_casadi__MatrixT_int_t_t_t_t_t;
-template<> swig_type_info** meta< casadi::Sparsity >::name = &SWIGTYPE_p_casadi__Sparsity;
-template<> swig_type_info** meta< casadi::Matrix<double> >::name = &SWIGTYPE_p_casadi__MatrixT_double_t;
-template<> swig_type_info** meta< casadi::Matrix<int> >::name = &SWIGTYPE_p_casadi__MatrixT_int_t;
-template<> swig_type_info** meta< casadi::MX >::name = &SWIGTYPE_p_casadi__MX;
-template<> swig_type_info** meta< std::vector< casadi::MX> >::name = &SWIGTYPE_p_std__vectorT_casadi__MX_std__allocatorT_casadi__MX_t_t;
-	template<> swig_type_info** meta< std::vector< std::vector< casadi::MX> > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_casadi__MX_p_std__allocatorT_casadi__MX_p_t_t_std__allocatorT_std__vectorT_casadi__MX_p_std__allocatorT_casadi__MX_p_t_t_t_t;
-template<> swig_type_info** meta< std::vector<std::string> >::name = &SWIGTYPE_p_std__vectorT_std__string_std__allocatorT_std__string_t_t;
-%}
-
 #ifdef SWIGPYTHON
-%inline %{
-template<> swig_type_info** meta< casadi::DerivativeGenerator >::name = & SWIGTYPE_p_casadi__DerivativeGenerator;
-template<> swig_type_info** meta< casadi::CustomEvaluate >::name = & SWIGTYPE_p_casadi__CustomEvaluate;
-template<> swig_type_info** meta< casadi::Callback >::name = & SWIGTYPE_p_casadi__Callback;
-%}
 %include "python/meta_python.i"
 #endif
 
