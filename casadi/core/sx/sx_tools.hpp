@@ -335,6 +335,11 @@ namespace casadi {
                                        const SXElement& x,
                                        const std::vector<std::string>& args);
 
+  /** \brief Get a string representation for a binary SX, using custom arguments */
+  CASADI_EXPORT std::string getOperatorRepresentation(
+                                       const SX& x,
+                                       const std::vector<std::string>& args);
+
   /** \brief Get all the free variables in an expression */
   CASADI_EXPORT SX getFree(const SX& ex);
 

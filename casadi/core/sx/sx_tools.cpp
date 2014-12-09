@@ -645,6 +645,9 @@ namespace casadi {
     return f.countNodes();
   }
 
+  std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args) {
+    return getOperatorRepresentation(x.toScalar(), args);
+  }
 
   std::string getOperatorRepresentation(const SXElement& x, const std::vector<std::string>& args) {
     if (!x.hasDep())
