@@ -700,12 +700,10 @@
   int to_SX(GUESTOBJECT *p, void *mv, int offs) {
     casadi::SX *m = static_cast<casadi::SX*>(mv);
     if (m) m += offs;
+    // Use operator=
+    if (TRY_COPY(p, casadi::SX, type_SX(), m)) return true;
+    if (TRY_COPY(p, casadi::DMatrix, type_DMatrix(), m)) return true;
 #ifdef SWIGPYTHON
-    casadi::SX *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Matrix<casadi::SXElement> *), 0) != -1) {
-      if (m) *m=*mp;
-      return true;
-    }
     casadi::DMatrix mt;
     if(to_DMatrix(p, &mt)) {
       if (m) *m = casadi::SX(mt);
@@ -743,19 +741,8 @@
     return true;
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
-    casadi::SX *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Matrix<casadi::SXElement> *), 0) != -1) {
-      if (m) *m=*mp;
-      return true;
-    }
-    casadi::DMatrix mt;
-    if(to_DMatrix(p, &mt)) {
-      if (m) *m = casadi::SX(mt);
-    } else {
-      return false;
-    }
-    return true;
 #endif // SWIGMATLAB
+    return false;
   }
  }
 %casadi_typemaps_constref(SX, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)

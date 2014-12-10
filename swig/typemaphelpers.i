@@ -439,12 +439,28 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %}
 #endif // SWIGPYTHON
 
+%fragment("try_copy", "header") {
+  template<typename FromType>
+  struct CopyTraits {
+    template<typename ToType>
+    static bool try_copy(GUESTOBJECT *p, swig_type_info *type, ToType* m) {
+      FromType *mp = 0;
+      if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
+        if (m) *m=*mp;
+        return true;
+      }
+      return false;
+    }
+  };
+}
+#define TRY_COPY(fromPtr, fromClass, fromType, toPtr) CopyTraits<fromClass>::try_copy(fromPtr, fromType, toPtr)
+
 %{
 #define SWIG_Error_return(code, msg)  { std::cerr << "Error occured in CasADi SWIG interface code:" << std::endl << "  "<< msg << std::endl;SWIG_Error(code, msg); return 0; }
 %}
 
 // Forward declarations
-%fragment("fwd", "header", fragment="vector_size,to_vector,make_vector,make_vector2,conv_constref,conv_vector,conv_vector2,conv_genericmatrix") {
+%fragment("fwd", "header", fragment="vector_size,to_vector,make_vector,make_vector2,conv_constref,conv_vector,conv_vector2,conv_genericmatrix,try_copy") {
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
   int to_double(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Dictionary(GUESTOBJECT *p, void *mv, int offs=0);
@@ -465,6 +481,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
   GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
   GUESTOBJECT * from_Dictionary(const casadi::GenericType::Dictionary &a);
+
+  swig_type_info * type_SX() { return $descriptor(casadi::Matrix<casadi::SXElement> *); }
+  swig_type_info * type_DMatrix() { return $descriptor(casadi::Matrix<double> *); }
 }
-
-
