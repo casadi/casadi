@@ -907,12 +907,17 @@
     }
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
-    {
-      double t;
-      if (to_double(p, &t)) {
-        if (m) *m = t;
-        return true;
+    // MATLAB dense matrix
+    if (mxIsDouble(p)) {
+      if (m) {
+        // Get dimensions
+        size_t nrow = mxGetM(p);
+        size_t ncol = mxGetN(p);
+        double* data = static_cast<double*>(mxGetData(p));
+        *m = casadi::DMatrix::zeros(nrow,ncol);
+        m->set(data);
       }
+      return true;
     }
 #endif // SWIGMATLAB
     return false;
