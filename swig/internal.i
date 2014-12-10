@@ -2125,6 +2125,12 @@
 %exception  casadi::Matrix< DataType >::get(std::vector< DataType > &val, SparsityType sp=SPARSE) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< DataType >::getDep(int ch=0) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::getElementHash() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< DataType >::getNZ(const Matrix< int > &k) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2132,6 +2138,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::getName() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::getNdeps() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::getValue() const  {
@@ -2152,6 +2161,9 @@
 %exception  casadi::Matrix< DataType >::inf(int nrow=1, int ncol=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< DataType >::isCommutative() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< DataType >::isConstant() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2162,6 +2174,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::isInteger() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::isLeaf() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::isMinusOne() const  {
