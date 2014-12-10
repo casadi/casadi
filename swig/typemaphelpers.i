@@ -485,4 +485,5 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   swig_type_info * type_SX() { return $descriptor(casadi::Matrix<casadi::SXElement> *); }
   swig_type_info * type_DMatrix() { return $descriptor(casadi::Matrix<double> *); }
   swig_type_info * type_IMatrix() { return $descriptor(casadi::Matrix<int> *); }
+  swig_type_info * type_MX() { return $descriptor(casadi::MX *); }
 }

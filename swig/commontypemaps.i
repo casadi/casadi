@@ -736,37 +736,28 @@
   int to_MX(GUESTOBJECT *p, void *mv, int offs) {
     MX *m = static_cast<MX*>(mv);
     if (m) m += offs;
-#ifdef SWIGPYTHON
-    casadi::MX *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::MX *), 0) != -1) {
-      if (m) *m=*mp;
-      return true;
+    // Use operator=
+    if (TRY_COPY(p, casadi::MX, type_MX(), m)) return true;
+    if (TRY_COPY(p, casadi::DMatrix, type_DMatrix(), m)) return true;
+    // Try first converting to a temporary DMatrix
+    {
+      casadi::DMatrix mt;
+      if(to_DMatrix(p, m ? &mt : 0)) {
+        if (m) *m = mt;
+        return true;
+      }
     }
-    casadi::DMatrix mt;
-    if(to_DMatrix(p, &mt)) {
-      if (m) *m = casadi::MX(mt);
-      return true;
-    } else if (PyObject_HasAttrString(p,"__MX__")) {
+#ifdef SWIGPYTHON
+    if (PyObject_HasAttrString(p,"__MX__")) {
       char name[] = "__MX__";
       PyObject *cr = PyObject_CallMethod(p, name,0);
-      if (!cr) { return false; }
+      if (!cr) return false;
       int result = to_MX(cr, m);
       Py_DECREF(cr);
       return result;
     }
 #endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-    casadi::MX *mp = 0;
-    if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::MX *), 0) != -1) {
-      if (m) *m=*mp;
-      return true;
-    }
-    casadi::DMatrix mt;
-    if(to_DMatrix(p, &mt)) {
-      if (m) *m = casadi::MX(mt);
-      return true;
-    }
-#endif // SWIGMATLAB
+    // Failure if reached this point
     return false;
   }
  }
