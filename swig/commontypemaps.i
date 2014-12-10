@@ -703,22 +703,30 @@
     // Use operator=
     if (TRY_COPY(p, casadi::SX, type_SX(), m)) return true;
     if (TRY_COPY(p, casadi::DMatrix, type_DMatrix(), m)) return true;
+    // Try first converting to a temporary DMatrix
+    {
+      casadi::DMatrix mt;
+      if(to_DMatrix(p, m ? &mt : 0)) {
+        if (m) *m = mt;
+        return true;
+      }
+    }
 #ifdef SWIGPYTHON
-    casadi::DMatrix mt;
-    if(to_DMatrix(p, &mt)) {
-      if (m) *m = casadi::SX(mt);
-    } else if (is_array(p)) { // Numpy arrays will be cast to dense SX
+    // Numpy arrays will be cast to dense SX
+    if (is_array(p)) {
       if (array_type(p) != NPY_OBJECT) return false;
       if (array_numdims(p)>2 || array_numdims(p)<1) return false;
       PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
-      std::vector<casadi::SXElement> v(it->size);
+      std::vector<casadi::SXElement> v;
+      if (m) v.resize(it->size);
       std::vector<casadi::SXElement>::iterator v_it = v.begin();
       casadi::SX tmp;
       PyObject *pe;
       while (it->index < it->size) { 
         pe = *((PyObject**) PyArray_ITER_DATA(it));
         if (!to_SX(pe, &tmp)) return false;
-        *v_it++ = tmp.toScalar();
+        if (!tmp.isScalar()) return false;
+        if (m) *v_it++ = tmp.toScalar();
         PyArray_ITER_NEXT(it);
       }
       Py_DECREF(it);
@@ -728,20 +736,18 @@
         *m = casadi::SX::zeros(nrows, ncols);
         m->set(v, casadi::DENSETRANS);
       }
-    } else if (PyObject_HasAttrString(p,"__SX__")) {
+      return true;
+    }
+    // Object has __SX__ method
+    if (PyObject_HasAttrString(p,"__SX__")) {
       char name[] = "__SX__";
       PyObject *cr = PyObject_CallMethod(p, name, 0);
       if (!cr) return false;
       int result = to_SX(cr, m);
       Py_DECREF(cr);
       return result;
-    } else {
-      return false;
     }
-    return true;
 #endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-#endif // SWIGMATLAB
     return false;
   }
  }
