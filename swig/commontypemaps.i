@@ -135,10 +135,7 @@
   }
  }
 
-// TODO: Remove completely?
-#ifdef SWIGPYTHON
 %casadi_typemaps(int, SWIG_TYPECHECK_INTEGER, int)
-#endif
 
 %fragment("to"{double}, "header", fragment="fwd") {
   int to_double(GUESTOBJECT *p, void *mv, int offs) {
@@ -205,11 +202,8 @@
   }
  }
 
-// TODO: Remove completely?
-#ifdef SWIGPYTHON
 %casadi_typemaps(double, SWIG_TYPECHECK_DOUBLE, double)
 %casadi_typemaps_constref(double, SWIG_TYPECHECK_DOUBLE, double)
-#endif
 
 #ifdef SWIGPYTHON
 %fragment("from"{GenericType}, "header", fragment="fwd") {
