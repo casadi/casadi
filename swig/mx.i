@@ -50,7 +50,9 @@
   %}
   #endif //SWIGPYTHON
   
+#ifdef SWIGPYTHON
   binopsrFull(casadi::MX)
+#endif // SWIGPYTHON
 };
 
 VECTOR_REPR(casadi::MX)

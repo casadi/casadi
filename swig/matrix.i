@@ -320,9 +320,11 @@ PyObject* arrayView() {
     return abs(self.__float__())
 %}
 
+#ifdef SWIGPYTHON
 binopsrFull(casadi::Matrix<double>)
 binopsFull(const casadi::SX & b,,casadi::SX,casadi::SX)
 binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
+#endif // SWIGPYTHON
 
 }; // extend Matrix<double>
 
@@ -359,10 +361,12 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
       return self.toScalar()
   %}
 
+#ifdef SWIGPYTHON
   binopsrFull(casadi::Matrix<int>)
   binopsFull(const casadi::SX & b,,casadi::SX,casadi::SX)
   binopsFull(const casadi::Matrix<double> & b,,casadi::Matrix<double>,casadi::Matrix<double>)
   binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
+#endif // SWIGPYTHON
   %pythoncode %{
     def __abs__(self):
       return int(self.__int__())
