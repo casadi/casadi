@@ -563,7 +563,7 @@ namespace casadi {
     /// \cond INTERNAL
     ///@{
     /// Elementwise operations -- Octave/Python naming
-    Matrix<DataType> __add__(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_plus(const Matrix<DataType> &y) const;
     Matrix<DataType> __sub__(const Matrix<DataType> &y) const;
     Matrix<DataType> __mul__(const Matrix<DataType> &y) const;
     Matrix<DataType> __div__(const Matrix<DataType> &y) const;

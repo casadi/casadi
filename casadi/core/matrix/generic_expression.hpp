@@ -44,7 +44,7 @@ class CASADI_EXPORT GenericExpression {
 
 #ifndef SWIG
     /// Addition
-    inline friend ExType operator+(const ExType &x, const ExType &y) { return x.__add__(y); }
+    inline friend ExType operator+(const ExType &x, const ExType &y) { return x.zz_plus(y); }
 
     /// Subtraction
     inline friend ExType operator-(const ExType &x, const ExType &y) { return x.__sub__(y); }
@@ -57,7 +57,7 @@ class CASADI_EXPORT GenericExpression {
 
     /// In-place addition
     inline ExType& operator+=(const ExType &y) {
-      return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__add__(y);
+      return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->zz_plus(y);
     }
 
     /// In-place subtraction
@@ -124,7 +124,7 @@ class CASADI_EXPORT GenericExpression {
      */
     ///@{
     inline ExType __radd__(const ExType& y) const
-    { return y.__add__(static_cast<const ExType&>(*this));}
+    { return y.zz_plus(static_cast<const ExType&>(*this));}
     inline ExType __rsub__(const ExType& y) const
     { return y.__sub__(static_cast<const ExType&>(*this));}
     inline ExType __rmul__(const ExType& y) const

@@ -184,7 +184,7 @@ namespace casadi {
     return at(0).__nonzero__();
   }
 
-  SXElement SXElement::__add__(const SXElement& y) const {
+  SXElement SXElement::zz_plus(const SXElement& y) const {
     // NOTE: Only simplifications that do not result in extra nodes area allowed
 
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_ADD, *this, y);
@@ -229,7 +229,7 @@ namespace casadi {
     if (isEqual(y, SXNode::eq_depth_)) // the terms are equal
       return 0;
     else if (y.hasDep() && y.getOp()==OP_NEG) // x - (-y) -> x + y
-      return __add__(-y);
+      return zz_plus(-y);
     else if (hasDep() && getOp()==OP_ADD && getDep(1).isEqual(y, SXNode::eq_depth_))
       return getDep(0);
     else if (hasDep() && getOp()==OP_ADD && getDep(0).isEqual(y, SXNode::eq_depth_))

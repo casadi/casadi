@@ -841,7 +841,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__add__(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_plus(const Matrix<DataType> &y) const {
     return binary(OP_ADD, *this, y);
   }
 

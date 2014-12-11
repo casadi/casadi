@@ -472,7 +472,7 @@ namespace casadi {
 
     /// \cond SWIGINTERNAL
     /// all binary operations
-    MX __add__(const MX& y) const;
+    MX zz_plus(const MX& y) const;
     MX __sub__(const MX& y) const;
     MX __mul__(const MX& y) const;
     MX __div__(const MX& y) const;

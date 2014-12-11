@@ -774,7 +774,7 @@ namespace casadi {
     *this = (*this)->getBinary(OP_LIFT, x_guess, false, false);
   }
 
-  MX MX::__add__(const MX& y) const {
+  MX MX::zz_plus(const MX& y) const {
     return MX::binary(OP_ADD, *this, y);
   }
 

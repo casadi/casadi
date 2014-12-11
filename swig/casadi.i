@@ -543,7 +543,7 @@ Type r##uname##(const Type& b) const{ return b.##uname##(*$self);}
 
 #define binopsrFull(Type) \
 memberbinopsr(Type,pow) \
-memberbinopsr(Type,add) \
+Type __radd__(const Type& b) const{ return b.zz_plus(*$self);} \
 memberbinopsr(Type,sub) \
 memberbinopsr(Type,mul) \
 memberbinopsr(Type,div) \
@@ -588,7 +588,8 @@ memberbinops(constpow,argtype,argCast,selfCast,returntype) \
 memberbinops_un(arctan2,argtype,argCast,selfCast,returntype) \
 memberbinops(copysign,argtype,argCast,selfCast,returntype) \
 memberbinops(pow,argtype,argCast,selfCast,returntype) \
-memberbinops(add,argtype,argCast,selfCast,returntype) \
+returntype __add__ (argtype) const{ return selfCast(*$self).zz_plus(argCast(b));} \
+returntype __radd__(argtype) const{ return argCast(b).zz_plus(selfCast(*$self));} \
 memberbinops(sub,argtype,argCast,selfCast,returntype) \
 memberbinops(mul,argtype,argCast,selfCast,returntype) \
 memberbinops_custom(ge,>=,argtype,argCast,selfCast,returntype) \
@@ -788,9 +789,12 @@ except:
 %}
 #endif // SWIGPYTHON
 
-#ifdef SWIGMATLAB
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
-%rename(plus) __add__;
+#ifdef SWIGPYTHON
+%rename(__add__) zz_plus;
+#endif // SWIGPYTHON
+
+#ifdef SWIGMATLAB
 %rename(minus) __sub__;
 %rename(uminus) operator-;
 %rename(uplus) operator+;
