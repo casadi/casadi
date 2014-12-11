@@ -2509,6 +2509,49 @@ namespace casadi {
     return adj()/det();
   }
 
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::reshape(int nrow, int ncol) const {
+    Sparsity sp = sparsity().reshape(nrow, ncol);
+    return Matrix<DataType>(sp, data());
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::reshape(std::pair<int, int> rc) const {
+    return reshape(rc.first, rc.second);
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::reshape(const Sparsity& sp) const {
+    // quick return if already the right shape
+    if (sp==sparsity()) return *this;
+
+    // make sure that the patterns match
+    casadi_assert(sp.isReshape(sparsity()));
+
+    return Matrix<DataType>(sp, data());
+  }
+
+  template<typename DataType>
+  DataType Matrix<DataType>::trace() const {
+    casadi_assert_message(size2() == size1(), "trace: must be square");
+    DataType res=0;
+    for (int i=0; i< size2(); i ++) {
+      res += elem(i, i);
+    }
+    return res;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::vec() const {
+    Matrix<DataType> ret = reshape(numel(), 1);
+    return ret;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::vecNZ() const {
+    return Matrix<DataType>(data());
+  }
+
 } // namespace casadi
 
 /// \endcond

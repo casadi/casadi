@@ -681,6 +681,12 @@ namespace casadi {
     Matrix<DataType> inv() const;
     Matrix<DataType> cofactor(int i, int j) const;
     Matrix<DataType> getMinor(int i, int j) const;
+    Matrix<DataType> reshape(int nrow, int ncol) const;
+    Matrix<DataType> reshape(std::pair<int, int> rc) const;
+    Matrix<DataType> reshape(const Sparsity& sp) const;
+    DataType trace() const;
+    Matrix<DataType> vec() const;
+    Matrix<DataType> vecNZ() const;
     ///@}
 
     /** \brief Set or reset the maximum number of calls to the

@@ -76,16 +76,20 @@ namespace casadi {
   Matrix<DataType> inv(const Matrix<DataType>& a) { return a.inv();}
 
   template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol);
+  Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol) {
+    return a.reshape(nrow, ncol);
+  }
 
   template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, std::pair<int, int> rc);
+  Matrix<DataType> reshape(const Matrix<DataType>& a, std::pair<int, int> rc) {
+    return a.reshape(rc);
+  }
 
   template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, const Sparsity& sp);
+  Matrix<DataType> reshape(const Matrix<DataType>& a, const Sparsity& sp) { return a.reshape(sp);}
 
   template<typename DataType>
-  DataType trace(const Matrix<DataType>& a);
+  DataType trace(const Matrix<DataType>& a) { return a.trace();}
 
   /** \brief  make a vector
       Reshapes/vectorizes the Matrix<DataType> such that the shape becomes (expr.numel(), 1).
@@ -104,12 +108,12 @@ namespace casadi {
 
   */
   template<typename DataType>
-  Matrix<DataType> vec(const Matrix<DataType>& a);
+  Matrix<DataType> vec(const Matrix<DataType>& a) { return a.vec();}
 
   /** \brief Returns a flattened version of the Matrix, preserving only nonzeros
    */
   template<typename DataType>
-  Matrix<DataType> vecNZ(const Matrix<DataType>& a);
+  Matrix<DataType> vecNZ(const Matrix<DataType>& a) { return a.vecNZ();}
 
   /** \brief Construct a matrix from a list of list of blocks.
    */
@@ -461,50 +465,6 @@ namespace casadi {
 
 namespace casadi {
   // Implementations
-  template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol) {
-    Sparsity sp = a.sparsity().reshape(nrow, ncol);
-    return Matrix<DataType>(sp, a.data());
-  }
-
-  template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, std::pair<int, int> rc) {
-    return reshape(a, rc.first, rc.second);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& x, const Sparsity& sp) {
-    // quick return if already the right shape
-    if (sp==x.sparsity())
-      return x;
-
-    // make sure that the patterns match
-    casadi_assert(sp.isReshape(x.sparsity()));
-
-    return Matrix<DataType>(sp, x.data());
-  }
-
-  template<typename DataType>
-  DataType trace(const Matrix<DataType>& a) {
-    casadi_assert_message(a.size2() == a.size1(), "trace: must be square");
-    DataType res=0;
-    for (int i=0; i< a.size2(); i ++) {
-      res+=a.elem(i, i);
-    }
-    return res;
-  }
-
-  template<typename DataType>
-  Matrix<DataType> vec(const Matrix<DataType>& a) {
-    Matrix<DataType> ret = reshape(a, a.numel(), 1);
-    return ret;
-  }
-
-  template<typename DataType>
-  Matrix<DataType> vecNZ(const Matrix<DataType>& a) {
-    return Matrix<DataType>(a.data());
-  }
-
   template<typename DataType>
   Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
     std::vector< Matrix<DataType> > ret;
