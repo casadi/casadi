@@ -789,6 +789,8 @@ except:
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
+// Strip leading underscore
+%rename("%(strip:[_])s") "";
 %rename(plus) __add__;
 %rename(minus) __sub__;
 %rename(uminus) operator-;

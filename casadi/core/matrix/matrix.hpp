@@ -587,7 +587,7 @@ namespace casadi {
     Matrix<DataType> mul(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
 
     /// Matrix product of n matrices
-    static Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args);
+    static Matrix<DataType> _mul(const std::vector< Matrix<DataType> > &args);
 
     /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
     static void mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType>& y,
@@ -673,48 +673,48 @@ namespace casadi {
     Matrix<DataType> logic_and(const Matrix<DataType>& y) const;
     Matrix<DataType> logic_or(const Matrix<DataType>& y) const;
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
-    Matrix<DataType> det() const;
-    Matrix<DataType> sumAll() const;
-    Matrix<DataType> sumCols() const;
-    Matrix<DataType> sumRows() const;
-    Matrix<DataType> adj() const;
-    Matrix<DataType> inv() const;
-    Matrix<DataType> cofactor(int i, int j) const;
-    Matrix<DataType> getMinor(int i, int j) const;
-    Matrix<DataType> reshape(int nrow, int ncol) const;
-    Matrix<DataType> reshape(std::pair<int, int> rc) const;
-    Matrix<DataType> reshape(const Sparsity& sp) const;
-    DataType trace() const;
-    Matrix<DataType> vec() const;
-    Matrix<DataType> vecNZ() const;
-    static Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
-    static Matrix<DataType> blockcat(const Matrix<DataType> &A,
+    Matrix<DataType> _det() const;
+    Matrix<DataType> _sumAll() const;
+    Matrix<DataType> _sumCols() const;
+    Matrix<DataType> _sumRows() const;
+    Matrix<DataType> _adj() const;
+    Matrix<DataType> _inv() const;
+    Matrix<DataType> _cofactor(int i, int j) const;
+    Matrix<DataType> _getMinor(int i, int j) const;
+    Matrix<DataType> _reshape(int nrow, int ncol) const;
+    Matrix<DataType> _reshape(std::pair<int, int> rc) const;
+    Matrix<DataType> _reshape(const Sparsity& sp) const;
+    DataType _trace() const;
+    Matrix<DataType> _vec() const;
+    Matrix<DataType> _vecNZ() const;
+    static Matrix<DataType> _blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
+    static Matrix<DataType> _blockcat(const Matrix<DataType> &A,
                                      const Matrix<DataType> &B,
                                      const Matrix<DataType> &C,
                                      const Matrix<DataType> &D);
-    static Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
-    std::vector<Matrix<DataType> > horzsplit(const std::vector<int>& offset) const;
-    std::vector<Matrix<DataType> > horzsplit(int incr) const;
-    static Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
-    std::vector< Matrix<DataType> > vertsplit(const std::vector<int>& offset) const;
-    std::vector< Matrix<DataType> > vertsplit(int incr) const;
+    static Matrix<DataType> _horzcat(const std::vector<Matrix<DataType> > &v);
+    std::vector<Matrix<DataType> > _horzsplit(const std::vector<int>& offset) const;
+    std::vector<Matrix<DataType> > _horzsplit(int incr) const;
+    static Matrix<DataType> _vertcat(const std::vector<Matrix<DataType> > &v);
+    std::vector< Matrix<DataType> > _vertsplit(const std::vector<int>& offset) const;
+    std::vector< Matrix<DataType> > _vertsplit(int incr) const;
     std::vector< std::vector< Matrix<DataType> > >
-      blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const;
-    std::vector< std::vector< Matrix<DataType> > > blocksplit(int vert_incr, int horz_incr) const;
-    std::vector< Matrix<DataType> > diagsplitNative(const std::vector<int>& offset1,
-                                                    const std::vector<int>& offset2) const;
-    static Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
-    static Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
-    static Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp);
-    static Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp);
-    Matrix<DataType> inner_prod(const Matrix<DataType> &y) const;
-    Matrix<DataType> outer_prod(const Matrix<DataType> &y) const;
-    DataType all() const;
-    DataType any() const;
-    Matrix<DataType> norm_1() const;
-    Matrix<DataType> norm_2() const;
-    Matrix<DataType> norm_F() const;
-    Matrix<DataType> norm_inf() const;
+      _blocksplit(const std::vector<int>& _vert_offset, const std::vector<int>& horz_offset) const;
+    std::vector< std::vector< Matrix<DataType> > > _blocksplit(int vert_incr, int horz_incr) const;
+    std::vector< Matrix<DataType> > _diagsplitNative(const std::vector<int>& offset1,
+                                                     const std::vector<int>& offset2) const;
+    static Matrix<DataType> _horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> _vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> _veccat(const std::vector< Matrix<DataType> >& comp);
+    static Matrix<DataType> _vecNZcat(const std::vector< Matrix<DataType> >& comp);
+    Matrix<DataType> _inner_prod(const Matrix<DataType> &y) const;
+    Matrix<DataType> _outer_prod(const Matrix<DataType> &y) const;
+    DataType _all() const;
+    DataType _any() const;
+    Matrix<DataType> _norm_1() const;
+    Matrix<DataType> _norm_2() const;
+    Matrix<DataType> _norm_F() const;
+    Matrix<DataType> _norm_inf() const;
     ///@}
 
     /** \brief Set or reset the maximum number of calls to the
