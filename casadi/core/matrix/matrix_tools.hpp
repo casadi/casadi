@@ -39,10 +39,9 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-
   /// Transpose of a matrix
   template<typename DataType>
-  Matrix<DataType> transpose(const Matrix<DataType> &x);
+  Matrix<DataType> transpose(const Matrix<DataType> &x) { return x.T();}
 
   /** \brief  Matrix product of two matrices
    *
@@ -53,14 +52,16 @@ namespace casadi {
    */
   template<typename DataType>
   Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y,
-                       const Sparsity& sp_z=Sparsity());
+                       const Sparsity& sp_z=Sparsity()) { return x.mul(y, sp_z);}
 
   /// Matrix product of n matrices
   template<typename DataType>
-  Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args);
+  Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args) {
+    return Matrix<DataType>::mul(args);
+  }
 
   template<typename DataType>
-  Matrix<DataType> det(const Matrix<DataType>& a);
+  Matrix<DataType> det(const Matrix<DataType>& A) { return A.det();}
 
   template<typename DataType>
   Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j);
@@ -371,15 +372,15 @@ namespace casadi {
 
   /// Return summation of all elements
   template<typename DataType>
-  Matrix<DataType> sumAll(const Matrix<DataType> &x);
+  Matrix<DataType> sumAll(const Matrix<DataType> &x) { return x.sumAll();}
 
   /** \brief Return a col-wise summation of elements */
   template<typename DataType>
-  Matrix<DataType> sumCols(const Matrix<DataType> &x);
+  Matrix<DataType> sumCols(const Matrix<DataType> &x) { return x.sumCols();}
 
   /** \brief Return a row-wise summation of elements */
   template<typename DataType>
-  Matrix<DataType> sumRows(const Matrix<DataType> &x);
+  Matrix<DataType> sumRows(const Matrix<DataType> &x) { return x.sumRows();}
 
 #ifdef SWIG
   /// Returns true only if every element in the matrix is true
@@ -460,98 +461,6 @@ namespace casadi {
 
 namespace casadi {
   // Implementations
-
-  template<typename DataType>
-  Matrix<DataType> transpose(const Matrix<DataType> &x) {
-    return x.T();
-  }
-
-  template<typename DataType>
-  Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y, const Sparsity &sp_z) {
-    return x.mul(y, sp_z);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args) {
-    casadi_assert_message(args.size()>=1,
-                          "mul(std::vector< Matrix<DataType> > &args): "
-                          "supplied list must not be empty.");
-    if (args.size()==1) return args[0];
-    Matrix<DataType> ret = args[0].mul(args[1]);
-    for (int i=2;i<args.size();++i) {
-      ret = ret.mul(args[i]);
-    }
-    return ret;
-  }
-
-  template<typename DataType>
-  Matrix<DataType> det(const Matrix<DataType>& a) {
-    int n = a.size2();
-    casadi_assert_message(n == a.size1(), "matrix must be square");
-
-    // Trivial return if scalar
-    if (a.isScalar()) return a.toScalar();
-
-    // Trivial case 2 x 2
-    if (n==2) return a.elem(0, 0) * a.elem(1, 1) - a.elem(0, 1) * a.elem(1, 0);
-
-    // Return expression
-    Matrix<DataType> ret = 0;
-
-    // Find out which is the best direction to expand along
-
-    // Build up an IMatrix with ones on the non-zeros
-    Matrix<int> sp = IMatrix(a.sparsity(), 1);
-
-    // Have a count of the nonzeros for each row
-    Matrix<int> row_count = sumCols(sp);
-
-    // A blank row? determinant is structurally zero
-    if (!row_count.isDense()) return 0;
-
-    // Have a count of the nonzeros for each col
-    Matrix<int> col_count = sumRows(sp).T();
-
-    // A blank col? determinant is structurally zero
-    if (!row_count.isDense()) return 0;
-
-    int min_row = std::distance(row_count.data().begin(),
-                                std::min_element(row_count.data().begin(),
-                                                 row_count.data().end()));
-    int min_col = std::distance(col_count.data().begin(),
-                                std::min_element(col_count.data().begin(),
-                                                 col_count.data().end()));
-
-    if (min_row <= min_col) {
-      // Expand along row j
-      int j = row_count.sparsity().row(min_row);
-
-      Matrix<DataType> row = a(j, range(n));
-
-      std::vector< int > col_i = row.sparsity().getCol();
-
-      for (int k=0; k<row.size(); ++k) {
-        // Sum up the cofactors
-        ret += row.at(k)*cofactor(a, col_i.at(k), j);
-      }
-      return ret;
-    } else {
-      // Expand along col i
-      int i = col_count.sparsity().row(min_col);
-
-      Matrix<DataType> col = a(range(n), i);
-
-      const std::vector< int > &row_i = col.sparsity().row();
-
-      for (int k=0; k<col.size(); ++k) {
-        // Sum up the cofactors
-        ret += col.at(k)*cofactor(a, i, row_i.at(k));
-      }
-      return ret;
-    }
-
-  }
-
   template<typename DataType>
   Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) {
     int n = x.size2();
@@ -832,28 +741,6 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
     return mul(x, y.T());
-  }
-
-  template<typename DataType>
-  Matrix<DataType> sumAll(const Matrix<DataType> &x) {
-    // Quick return if empty
-    if (x.isEmpty()) return Matrix<DataType>::sparse(1, 1);
-    // Sum non-zero elements
-    DataType res=0;
-    for (int k=0; k<x.size(); k++) {
-      res += x.data()[k];
-    }
-    return res;
-  }
-
-  template<typename DataType>
-  Matrix<DataType> sumCols(const Matrix<DataType> &x) {
-    return mul(x, Matrix<DataType>::ones(x.size2(), 1));
-  }
-
-  template<typename DataType>
-  Matrix<DataType> sumRows(const Matrix<DataType> &x) {
-    return mul(Matrix<DataType>::ones(1, x.size1()), x);
   }
 
   template<typename DataType>

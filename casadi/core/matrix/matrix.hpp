@@ -586,6 +586,9 @@ namespace casadi {
     /// Matrix-matrix product
     Matrix<DataType> mul(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
 
+    /// Matrix product of n matrices
+    static Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args);
+
     /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
     static void mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType>& y,
                              Matrix<DataType>& z, std::vector<DataType>& work,
@@ -670,6 +673,10 @@ namespace casadi {
     Matrix<DataType> logic_and(const Matrix<DataType>& y) const;
     Matrix<DataType> logic_or(const Matrix<DataType>& y) const;
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
+    Matrix<DataType> det() const;
+    Matrix<DataType> sumAll() const;
+    Matrix<DataType> sumCols() const;
+    Matrix<DataType> sumRows() const;
     ///@}
 
     /** \brief Set or reset the maximum number of calls to the

@@ -2342,6 +2342,110 @@ namespace casadi {
     throw CasadiException("\"getEqualityCheckingDepth\" not defined for instantiation");
   }
 
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::det() const {
+    int n = size2();
+    casadi_assert_message(n == size1(), "matrix must be square");
+
+    // Trivial return if scalar
+    if (isScalar()) return toScalar();
+
+    // Trivial case 2 x 2
+    if (n==2) return elem(0, 0) * elem(1, 1) - elem(0, 1) * elem(1, 0);
+
+    // Return expression
+    Matrix<DataType> ret = 0;
+
+    // Find out which is the best direction to expand along
+
+    // Build up an IMatrix with ones on the non-zeros
+    Matrix<int> sp = IMatrix(sparsity(), 1);
+
+    // Have a count of the nonzeros for each row
+    Matrix<int> row_count = sp.sumCols();
+
+    // A blank row? determinant is structurally zero
+    if (!row_count.isDense()) return 0;
+
+    // Have a count of the nonzeros for each col
+    Matrix<int> col_count = sp.sumRows().T();
+
+    // A blank col? determinant is structurally zero
+    if (!row_count.isDense()) return 0;
+
+    int min_row = std::distance(row_count.data().begin(),
+                                std::min_element(row_count.data().begin(),
+                                                 row_count.data().end()));
+    int min_col = std::distance(col_count.data().begin(),
+                                std::min_element(col_count.data().begin(),
+                                                 col_count.data().end()));
+
+    if (min_row <= min_col) {
+      // Expand along row j
+      int j = row_count.sparsity().row(min_row);
+
+      Matrix<DataType> row = (*this)(j, Slice(0, n));
+
+      std::vector< int > col_i = row.sparsity().getCol();
+
+      for (int k=0; k<row.size(); ++k) {
+        // Sum up the cofactors
+        ret += row.at(k)*cofactor(*this, col_i.at(k), j);
+      }
+      return ret;
+    } else {
+      // Expand along col i
+      int i = col_count.sparsity().row(min_col);
+
+      Matrix<DataType> col = (*this)(Slice(0, n), i);
+
+      const std::vector< int > &row_i = col.sparsity().row();
+
+      for (int k=0; k<col.size(); ++k) {
+        // Sum up the cofactors
+        ret += col.at(k)*cofactor(*this, i, row_i.at(k));
+      }
+      return ret;
+    }
+
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::sumAll() const {
+    // Quick return if empty
+    if (isEmpty()) return Matrix<DataType>::sparse(1, 1);
+    // Sum non-zero elements
+    DataType res=0;
+    for (int k=0; k<size(); k++) {
+      res += data()[k];
+    }
+    return res;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::sumCols() const {
+    return mul(Matrix<DataType>::ones(size2(), 1));
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::sumRows() const {
+    return Matrix<DataType>::ones(1, size1()).mul(*this);
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::mul(const std::vector< Matrix<DataType> > &args) {
+    casadi_assert_message(args.size()>=1,
+                          "mul(std::vector< Matrix<DataType> > &args): "
+                          "supplied list must not be empty.");
+    if (args.size()==1) return args[0];
+    Matrix<DataType> ret = args[0].mul(args[1]);
+    for (int i=2;i<args.size();++i) {
+      ret = ret.mul(args[i]);
+    }
+    return ret;
+  }
+
+
 } // namespace casadi
 
 /// \endcond
