@@ -2390,7 +2390,7 @@ namespace casadi {
 
       for (int k=0; k<row.size(); ++k) {
         // Sum up the cofactors
-        ret += row.at(k)*cofactor(*this, col_i.at(k), j);
+        ret += row.at(k)*cofactor(col_i.at(k), j);
       }
       return ret;
     } else {
@@ -2403,7 +2403,7 @@ namespace casadi {
 
       for (int k=0; k<col.size(); ++k) {
         // Sum up the cofactors
-        ret += col.at(k)*cofactor(*this, i, row_i.at(k));
+        ret += col.at(k)*cofactor(i, row_i.at(k));
       }
       return ret;
     }
@@ -2445,6 +2445,69 @@ namespace casadi {
     return ret;
   }
 
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::getMinor(int i, int j) const {
+    int n = size2();
+    casadi_assert_message(n == size1(), "getMinor: matrix must be square");
+
+    // Trivial return if scalar
+    if (n==1) return 1;
+
+    // Remove col i and row j
+    Matrix<DataType> M = Matrix<DataType>::sparse(n-1, n-1);
+
+    std::vector<int> col = sparsity().getCol();
+    const std::vector<int> &row = sparsity().row();
+
+    for (int k=0;k<size();++k) {
+      int i1 = col[k];
+      int j1 = row[k];
+
+      if (i1 == i || j1 == j) continue;
+
+      int i2 = (i1<i)?i1:i1-1;
+      int j2 = (j1<j)?j1:j1-1;
+
+      M(j2, i2) = (*this)(j1, i1);
+    }
+    return M.det();
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::cofactor(int i, int j) const {
+
+    // Calculate the i, j minor
+    Matrix<DataType> minor_ij = getMinor(i, j);
+    // Calculate the cofactor
+    int sign_i = 1-2*((i+j) % 2);
+
+    return sign_i * minor_ij;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::adj() const {
+    int n = size2();
+    casadi_assert_message(n == size1(), "adj: matrix must be square");
+
+    // Temporary placeholder
+    Matrix<DataType> temp;
+
+    // Cofactor matrix
+    Matrix<DataType> C = Matrix<DataType>::sparse(n, n);
+    for (int i=0; i<n; ++i)
+      for (int j=0; j<n; ++j) {
+        temp = cofactor(i, j);
+        if (!temp.isZero()) C(j, i) = temp;
+      }
+
+    return C.T();
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::inv() const {
+    // laplace formula
+    return adj()/det();
+  }
 
 } // namespace casadi
 

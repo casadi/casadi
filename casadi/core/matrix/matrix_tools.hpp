@@ -64,16 +64,16 @@ namespace casadi {
   Matrix<DataType> det(const Matrix<DataType>& A) { return A.det();}
 
   template<typename DataType>
-  Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j);
+  Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) { return x.getMinor(i, j);}
 
   template<typename DataType>
-  Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j);
+  Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) { return x.cofactor(i, j);}
 
   template<typename DataType>
-  Matrix<DataType> adj(const Matrix<DataType>& a);
+  Matrix<DataType> adj(const Matrix<DataType>& a) { return a.adj();}
 
   template<typename DataType>
-  Matrix<DataType> inv(const Matrix<DataType>& a);
+  Matrix<DataType> inv(const Matrix<DataType>& a) { return a.inv();}
 
   template<typename DataType>
   Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol);
@@ -461,71 +461,6 @@ namespace casadi {
 
 namespace casadi {
   // Implementations
-  template<typename DataType>
-  Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) {
-    int n = x.size2();
-    casadi_assert_message(n == x.size1(), "getMinor: matrix must be square");
-
-    // Trivial return if scalar
-    if (n==1) return 1;
-
-    // Remove col i and row j
-    Matrix<DataType> M = Matrix<DataType>::sparse(n-1, n-1);
-
-    std::vector<int> col = x.sparsity().getCol();
-    const std::vector<int> &row = x.sparsity().row();
-
-    for (int k=0;k<x.size();++k) {
-      int i1 = col[k];
-      int j1 = row[k];
-
-      if (i1 == i || j1 == j)
-        continue;
-
-      int i2 = (i1<i)?i1:i1-1;
-      int j2 = (j1<j)?j1:j1-1;
-
-      M(j2, i2) = x(j1, i1);
-    }
-    return det(M);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) {
-
-    // Calculate the i, j minor
-    Matrix<DataType> minor_ij = getMinor(x, i, j);
-    // Calculate the cofactor
-    int sign_i = 1-2*((i+j) % 2);
-
-    return sign_i * minor_ij;
-  }
-
-  template<typename DataType>
-  Matrix<DataType> adj(const Matrix<DataType>& a) {
-    int n = a.size2();
-    casadi_assert_message(n == a.size1(), "adj: matrix must be square");
-
-    // Temporary placeholder
-    Matrix<DataType> temp;
-
-    // Cofactor matrix
-    Matrix<DataType> C = Matrix<DataType>::sparse(n, n);
-    for (int i=0; i<n; ++i)
-      for (int j=0; j<n; ++j) {
-        temp = cofactor(a, i, j);
-        if (!temp.isZero()) C(j, i) = temp;
-      }
-
-    return C.T();
-  }
-
-  template<typename DataType>
-  Matrix<DataType> inv(const Matrix<DataType>& a) {
-    // laplace formula
-    return adj(a)/det(a);
-  }
-
   template<typename DataType>
   Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol) {
     Sparsity sp = a.sparsity().reshape(nrow, ncol);

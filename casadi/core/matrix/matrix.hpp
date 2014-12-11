@@ -677,6 +677,10 @@ namespace casadi {
     Matrix<DataType> sumAll() const;
     Matrix<DataType> sumCols() const;
     Matrix<DataType> sumRows() const;
+    Matrix<DataType> adj() const;
+    Matrix<DataType> inv() const;
+    Matrix<DataType> cofactor(int i, int j) const;
+    Matrix<DataType> getMinor(int i, int j) const;
     ///@}
 
     /** \brief Set or reset the maximum number of calls to the
