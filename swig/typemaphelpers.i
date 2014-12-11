@@ -455,12 +455,45 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 #define TRY_COPY(fromPtr, fromClass, fromType, toPtr) CopyTraits<fromClass>::try_copy(fromPtr, fromType, toPtr)
 
+#ifdef SWIGMATLAB
+// Get sparsity pattern
+%fragment("get_sparsity", "header") {
+  Sparsity getSparsity(const mxArray* p) {
+    // Get sparsity pattern
+    size_t nrow = mxGetM(p);
+    size_t ncol = mxGetN(p);
+
+    if (mxIsSparse(p)) {
+      // Sparse storage in MATLAB
+      mwIndex *Jc = mxGetJc(p);
+      mwIndex *Ir = mxGetIr(p);
+
+      // Store in vectors
+      std::vector<int> colind(ncol+1);
+      std::copy(Jc, Jc+ncol+1, colind.begin());
+      std::vector<int> row(colind.back());
+      std::copy(Ir, Ir+ncol+1, row.begin());
+
+      // Create pattern and return
+      return casadi::Sparsity(nrow, ncol, colind, row);
+    } else {
+      return casadi::Sparsity::dense(nrow, ncol);
+    }
+  }
+ }
+#endif // SWIGMATLAB
+
 %{
 #define SWIG_Error_return(code, msg)  { std::cerr << "Error occured in CasADi SWIG interface code:" << std::endl << "  "<< msg << std::endl;SWIG_Error(code, msg); return 0; }
 %}
 
 // Forward declarations
-%fragment("fwd", "header", fragment="vector_size,to_vector,make_vector,make_vector2,conv_constref,conv_vector,conv_vector2,conv_genericmatrix,try_copy") {
+%fragment("fwd", "header",
+          fragment="vector_size,to_vector,make_vector,make_vector2,conv_constref,conv_vector,conv_vector2,conv_genericmatrix,try_copy"
+#ifdef SWIGMATLAB
+          ,fragment="get_sparsity"
+#endif // SWIGMATLAB
+          ) {
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
   int to_double(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Dictionary(GUESTOBJECT *p, void *mv, int offs=0);
