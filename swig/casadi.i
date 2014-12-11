@@ -541,39 +541,43 @@ Type __r##uname##__(const Type& b) const{ return b.##uname##(*$self);}
 #define memberbinopsr_nn(Type,uname) \
 Type r##uname##(const Type& b) const{ return b.##uname##(*$self);}
 
-#define binopsrFull(Type) \
-memberbinopsr(Type,pow) \
-Type __radd__(const Type& b) const{ return b.zz_plus(*$self);} \
-memberbinopsr(Type,sub) \
-memberbinopsr(Type,mul) \
-memberbinopsr(Type,div) \
-memberbinopsr(Type,truediv) \
-memberbinopsr(Type,mldivide) \
-memberbinopsr(Type,mrdivide) \
-memberbinopsr(Type,mpower) \
-memberbinopsr(Type,constpow) \
-memberbinopsr_custom(Type,ge,>=) \
-memberbinopsr_custom(Type,gt,>) \
-memberbinopsr_custom(Type,le,<=) \
-memberbinopsr_custom(Type,lt,<) \
-memberbinopsr_custom(Type,eq,==) \
-memberbinopsr_custom(Type,ne,!=) \
-memberbinopsr_un(Type,fmin) \
-memberbinopsr_un(Type,fmax) \
-memberbinopsr_nn(Type,mul) \
-memberbinopsr_un(Type,arctan2) \
+%define binopsrFull(Type)
+memberbinopsr(Type,pow)
+Type __radd__(const Type& b) const{ return b.zz_plus(*$self);}
+Type __rsub__(const Type& b) const{ return b.zz_minus(*$self);}
+memberbinopsr(Type,mul)
+memberbinopsr(Type,div)
+memberbinopsr(Type,truediv)
+memberbinopsr(Type,mldivide)
+memberbinopsr(Type,mrdivide)
+memberbinopsr(Type,mpower)
+memberbinopsr(Type,constpow)
+memberbinopsr_custom(Type,ge,>=)
+memberbinopsr_custom(Type,gt,>)
+memberbinopsr_custom(Type,le,<=)
+memberbinopsr_custom(Type,lt,<)
+memberbinopsr_custom(Type,eq,==)
+memberbinopsr_custom(Type,ne,!=)
+memberbinopsr_un(Type,fmin)
+memberbinopsr_un(Type,fmax)
+memberbinopsr_nn(Type,mul)
+memberbinopsr_un(Type,arctan2)
 memberbinopsr(Type,copysign)
+%enddef
 
-#define memberbinops(uname,argtype,argCast,selfCast,returntype) \
-returntype __##uname##__ (argtype) const{ return selfCast(*$self).__##uname##__(argCast(b));} \
-returntype __r##uname##__(argtype) const{ return argCast(b).__##uname##__(selfCast(*$self));} \
+%define memberbinops(uname,argtype,argCast,selfCast,returntype)
+returntype __##uname##__ (argtype) const{ return selfCast(*$self).__##uname##__(argCast(b));}
+returntype __r##uname##__(argtype) const{ return argCast(b).__##uname##__(selfCast(*$self));}
+%enddef
 
-#define memberbinops_custom(uname,custom,argtype,argCast,selfCast,returntype) \
-returntype __##uname##__ (argtype) const{ return selfCast(*$self) ##custom## argCast(b);} \
-returntype __r##uname##__(argtype) const{ return argCast(b) ##custom## selfCast(*$self);} \
+%define memberbinops_custom(uname,custom,argtype,argCast,selfCast,returntype)
+returntype __##uname##__ (argtype) const{ return selfCast(*$self) ##custom## argCast(b);}
+returntype __r##uname##__(argtype) const{ return argCast(b) ##custom## selfCast(*$self);}
+%enddef
 
-#define memberbinops_un(uname,argtype,argCast,selfCast,returntype) \
+%define memberbinops_un(uname,argtype,argCast,selfCast,returntype)
 returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*$self));}
+%enddef
 
 // These methods must be added since the implicit type cast does not work.
 // Consider a+b  with a DMatrix and b SX
@@ -581,30 +585,32 @@ returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*
 // In python, __array_priority__ will be checked and b.__radd__(a) will be called (effectively implicit casting)
 
 // This is a list of all operators:
-#define binopsFull(argtype,argCast,selfCast,returntype) \
-memberbinops_un(fmin,argtype,argCast,selfCast,returntype) \
-memberbinops_un(fmax,argtype,argCast,selfCast,returntype) \
-memberbinops(constpow,argtype,argCast,selfCast,returntype) \
-memberbinops_un(arctan2,argtype,argCast,selfCast,returntype) \
-memberbinops(copysign,argtype,argCast,selfCast,returntype) \
-memberbinops(pow,argtype,argCast,selfCast,returntype) \
-returntype __add__ (argtype) const{ return selfCast(*$self).zz_plus(argCast(b));} \
-returntype __radd__(argtype) const{ return argCast(b).zz_plus(selfCast(*$self));} \
-memberbinops(sub,argtype,argCast,selfCast,returntype) \
-memberbinops(mul,argtype,argCast,selfCast,returntype) \
-memberbinops_custom(ge,>=,argtype,argCast,selfCast,returntype) \
-memberbinops_custom(le,<=,argtype,argCast,selfCast,returntype) \
-memberbinops_custom(gt,>,argtype,argCast,selfCast,returntype) \
-memberbinops_custom(lt,<,argtype,argCast,selfCast,returntype) \
-memberbinops_custom(eq,==,argtype,argCast,selfCast,returntype) \
-memberbinops_custom(ne,!=,argtype,argCast,selfCast,returntype) \
-returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));} \
-returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));} \
-memberbinops(div,argtype,argCast,selfCast,returntype) \
-memberbinops(truediv,argtype,argCast,selfCast,returntype) \
-memberbinops(mldivide,argtype,argCast,selfCast,returntype) \
-memberbinops(mrdivide,argtype,argCast,selfCast,returntype) \
-memberbinops(mpower,argtype,argCast,selfCast,returntype) 
+%define binopsFull(argtype,argCast,selfCast,returntype)
+memberbinops_un(fmin,argtype,argCast,selfCast,returntype)
+memberbinops_un(fmax,argtype,argCast,selfCast,returntype)
+memberbinops(constpow,argtype,argCast,selfCast,returntype)
+memberbinops_un(arctan2,argtype,argCast,selfCast,returntype)
+memberbinops(copysign,argtype,argCast,selfCast,returntype)
+memberbinops(pow,argtype,argCast,selfCast,returntype)
+returntype __add__ (argtype) const{ return selfCast(*$self).zz_plus(argCast(b));}
+returntype __radd__(argtype) const{ return argCast(b).zz_plus(selfCast(*$self));}
+returntype __sub__ (argtype) const{ return selfCast(*$self).zz_minus(argCast(b));}
+returntype __rsub__(argtype) const{ return argCast(b).zz_minus(selfCast(*$self));}
+memberbinops(mul,argtype,argCast,selfCast,returntype)
+memberbinops_custom(ge,>=,argtype,argCast,selfCast,returntype)
+memberbinops_custom(le,<=,argtype,argCast,selfCast,returntype)
+memberbinops_custom(gt,>,argtype,argCast,selfCast,returntype)
+memberbinops_custom(lt,<,argtype,argCast,selfCast,returntype)
+memberbinops_custom(eq,==,argtype,argCast,selfCast,returntype)
+memberbinops_custom(ne,!=,argtype,argCast,selfCast,returntype)
+returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));}
+returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));}
+memberbinops(div,argtype,argCast,selfCast,returntype)
+memberbinops(truediv,argtype,argCast,selfCast,returntype)
+memberbinops(mldivide,argtype,argCast,selfCast,returntype)
+memberbinops(mrdivide,argtype,argCast,selfCast,returntype)
+memberbinops(mpower,argtype,argCast,selfCast,returntype)
+%enddef
 
 // This is a list of operators that do not check __array_priority__ in python
 #define binopsNoPriority(argtype,argCast,selfCast,returntype) \
@@ -792,10 +798,10 @@ except:
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
 #ifdef SWIGPYTHON
 %rename(__add__) zz_plus;
+%rename(__sub__) zz_minus;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
-%rename(minus) __sub__;
 %rename(uminus) operator-;
 %rename(uplus) operator+;
 %rename(times) __mul__;

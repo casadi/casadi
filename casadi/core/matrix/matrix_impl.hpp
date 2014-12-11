@@ -846,7 +846,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__sub__(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_minus(const Matrix<DataType> &y) const {
     return binary(OP_SUB, *this, y);
   }
 

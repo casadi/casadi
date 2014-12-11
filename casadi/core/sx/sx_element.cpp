@@ -194,9 +194,9 @@ namespace casadi {
     else if (y->isZero()) // term2 is zero
       return *this;
     else if (y.hasDep() && y.getOp()==OP_NEG) // x + (-y) -> x - y
-      return __sub__(-y);
+      return zz_minus(-y);
     else if (hasDep() && getOp()==OP_NEG) // (-x) + y -> y - x
-      return y.__sub__(getDep());
+      return y.zz_minus(getDep());
     else if (hasDep() && getOp()==OP_MUL &&
             y.hasDep() && y.getOp()==OP_MUL &&
             getDep(0).isConstant() && getDep(0).getValue()==0.5 &&
@@ -217,7 +217,7 @@ namespace casadi {
       return BinarySX::create(OP_ADD, *this, y);
   }
 
-  SXElement SXElement::__sub__(const SXElement& y) const {
+  SXElement SXElement::zz_minus(const SXElement& y) const {
     // Only simplifications that do not result in extra nodes area allowed
 
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_SUB, *this, y);

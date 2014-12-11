@@ -778,7 +778,7 @@ namespace casadi {
     return MX::binary(OP_ADD, *this, y);
   }
 
-  MX MX::__sub__(const MX& y) const {
+  MX MX::zz_minus(const MX& y) const {
     return MX::binary(OP_SUB, *this, y);
   }
 

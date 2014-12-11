@@ -193,7 +193,7 @@ namespace casadi {
 
     //  all binary operations
     SXElement zz_plus(const SXElement& y) const;
-    SXElement __sub__(const SXElement& y) const;
+    SXElement zz_minus(const SXElement& y) const;
     SXElement __mul__(const SXElement& y) const;
     SXElement __div__(const SXElement& y) const;
     SXElement __lt__(const SXElement& y) const;
