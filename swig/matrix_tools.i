@@ -31,62 +31,59 @@
 %include <casadi/core/matrix/matrix_tools.hpp>
 
 // map the template name to the instantiated name
-#define MTT_INST(DataType, function_name)                       \
-  %template(function_name) casadi::function_name <DataType >;
+%define MTT_INST(DataType, function_name)
+%template(function_name) casadi::function_name <DataType >;
+%enddef
 
 // Define template instantiations
-#define MATRIX_TOOLS_TEMPLATES_COMMON(DataType)        \
-  MTT_INST(DataType, transpose)                         \
-  MTT_INST(DataType, mul)                               \
-  MTT_INST(DataType, det)                               \
-  MTT_INST(DataType, getMinor)                          \
-  MTT_INST(DataType, cofactor)                          \
-  MTT_INST(DataType, adj)                               \
-  MTT_INST(DataType, inv)                               \
-  MTT_INST(DataType, reshape)                           \
-  MTT_INST(DataType, vec)                               \
-  MTT_INST(DataType, vecNZ)                             \
-  MTT_INST(DataType, blockcat)                          \
-  MTT_INST(DataType, blocksplit)                        \
-  MTT_INST(DataType, vertcat)                           \
-  MTT_INST(DataType, vertsplit)                         \
-  MTT_INST(DataType, horzcat)                           \
-  MTT_INST(DataType, horzsplit)                         \
-  MTT_INST(DataType, inner_prod)                        \
-  MTT_INST(DataType, outer_prod)                        \
-  MTT_INST(DataType, norm_1)                            \
-  MTT_INST(DataType, norm_2)                            \
-  MTT_INST(DataType, norm_inf)                          \
-  MTT_INST(DataType, norm_F)                            \
-  MTT_INST(DataType, norm_0_mul_nn)                     \
-  MTT_INST(DataType, qr)                                \
-  MTT_INST(DataType, nullspace)                         \
-  MTT_INST(DataType, solve)                             \
-  MTT_INST(DataType, pinv)                              \
-  MTT_INST(DataType, repmat)                            \
-  MTT_INST(DataType, unite)                             \
-  MTT_INST(DataType, sumRows)                           \
-  MTT_INST(DataType, sumCols)                           \
-  MTT_INST(DataType, sumAll)                            \
-  MTT_INST(DataType, trace)                             \
-  MTT_INST(DataType, diag)                              \
-  MTT_INST(DataType, blkdiag)                           \
-  MTT_INST(DataType, polyval)                           \
-  MTT_INST(DataType, addMultiple)                       \
-  MTT_INST(DataType, veccat)                            \
-  MTT_INST(DataType, vecNZcat)                          \
-  MTT_INST(DataType, project)                           \
-  MTT_INST(DataType, sprank)                            \
+%define MATRIX_TOOLS_TEMPLATES(DataType)
+  MTT_INST(DataType, transpose)
+  MTT_INST(DataType, mul)
+  MTT_INST(DataType, det)
+  MTT_INST(DataType, getMinor)
+  MTT_INST(DataType, cofactor)
+  MTT_INST(DataType, adj)
+  MTT_INST(DataType, inv)
+  MTT_INST(DataType, reshape)
+  MTT_INST(DataType, vec)
+  MTT_INST(DataType, vecNZ)
+  MTT_INST(DataType, blockcat)
+  MTT_INST(DataType, blocksplit)
+  MTT_INST(DataType, vertcat)
+  MTT_INST(DataType, vertsplit)
+  MTT_INST(DataType, horzcat)
+  MTT_INST(DataType, horzsplit)
+  MTT_INST(DataType, inner_prod)
+  MTT_INST(DataType, outer_prod)
+  MTT_INST(DataType, norm_1)
+  MTT_INST(DataType, norm_2)
+  MTT_INST(DataType, norm_inf)
+  MTT_INST(DataType, norm_F)
+  MTT_INST(DataType, norm_0_mul_nn)
+  MTT_INST(DataType, qr)
+  MTT_INST(DataType, nullspace)
+  MTT_INST(DataType, solve)
+  MTT_INST(DataType, pinv)
+  MTT_INST(DataType, repmat)
+  MTT_INST(DataType, unite)
+  MTT_INST(DataType, sumRows)
+  MTT_INST(DataType, sumCols)
+  MTT_INST(DataType, sumAll)
+  MTT_INST(DataType, trace)
+  MTT_INST(DataType, diag)
+  MTT_INST(DataType, blkdiag)
+  MTT_INST(DataType, polyval)
+  MTT_INST(DataType, addMultiple)
+  MTT_INST(DataType, veccat)
+  MTT_INST(DataType, vecNZcat)
+  MTT_INST(DataType, project)
+  MTT_INST(DataType, sprank)
   MTT_INST(DataType, kron)
-
-#ifdef SWIGOCTAVE
-#define MATRIX_TOOLS_TEMPLATES(DataType) MATRIX_TOOLS_TEMPLATES_COMMON(DataType)
-#else
-#define MATRIX_TOOLS_TEMPLATES(DataType)               \
-  MATRIX_TOOLS_TEMPLATES_COMMON(DataType)              \
-  MTT_INST(DataType, sparse)                            \
+#ifndef SWIGOCTAVE
+  MTT_INST(DataType, sparse)
   MTT_INST(DataType, dense)
 #endif //SWIGOCTAVE
+%enddef
 
 MATRIX_TOOLS_TEMPLATES(int)
 MATRIX_TOOLS_TEMPLATES(double)
