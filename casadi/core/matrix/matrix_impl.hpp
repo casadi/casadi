@@ -2718,9 +2718,69 @@ namespace casadi {
     return vertcat(x_vec);
   }
 
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::inner_prod(const Matrix<DataType> &y) const {
+    casadi_assert_message(shape()==y.shape(), "inner_prod: Dimension mismatch");
+    return (*this*y).sumAll();
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::outer_prod(const Matrix<DataType> &y) const {
+    return mul(y.T());
+  }
+
+  template<typename DataType>
+  DataType Matrix<DataType>::all() const {
+    if (!isDense()) return false;
+    DataType ret=1;
+    for (int i=0;i<size();++i) {
+      ret = ret && at(i)==1;
+    }
+    return ret;
+  }
+
+  template<typename DataType>
+  DataType Matrix<DataType>::any() const {
+    if (!isDense()) return false;
+    DataType ret=0;
+    for (int i=0;i<size();++i) {
+      ret = ret || at(i)==1;
+    }
+    return ret;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::norm_1() const {
+    return fabs().sumAll();
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::norm_2() const {
+    if (isVector()) {
+      return norm_F();
+    } else {
+      casadi_error("2-norms currently only supported for vectors. "
+                   "Did you intend to calculate a Frobenius norms (norm_F)?");
+    }
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::norm_F() const {
+    return (*this**this).sumAll().sqrt();
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::norm_inf() const {
+    // Get largest element by absolute value
+    Matrix<DataType> s = 0;
+    for (typename std::vector<DataType>::const_iterator i=begin(); i!=end(); ++i) {
+      s = s.fmax(Matrix<DataType>(*i).fabs());
+    }
+    return s;
+  }
+
 } // namespace casadi
 
 /// \endcond
 
 #endif // CASADI_MATRIX_IMPL_HPP
-

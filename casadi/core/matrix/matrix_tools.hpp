@@ -271,7 +271,9 @@ namespace casadi {
   */
   // inner product
   template<typename DataType>
-  Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y);
+  Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+    return x.inner_prod(y);
+  }
 
   /** \brief Outer product of two vectors
       Equals
@@ -281,7 +283,9 @@ namespace casadi {
       with x and y vectors
   */
   template<typename DataType>
-  Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y);
+  Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+    return x.outer_prod(y);
+  }
 
   /** \brief  QR factorization using the modified Gram-Schmidt algorithm
    * More stable than the classical Gram-Schmidt, but may break down if the rows of A
@@ -389,19 +393,19 @@ namespace casadi {
 
   /** \brief  Frobenius norm  */
   template<typename DataType>
-  Matrix<DataType> norm_F(const Matrix<DataType> &x);
+  Matrix<DataType> norm_F(const Matrix<DataType> &x) { return x.norm_F();}
 
   /** \brief  2-norm  */
   template<typename DataType>
-  Matrix<DataType> norm_2(const Matrix<DataType> &x);
+  Matrix<DataType> norm_2(const Matrix<DataType> &x) { return x.norm_2();}
 
   /** \brief 1-norm  */
   template<typename DataType>
-  Matrix<DataType> norm_1(const Matrix<DataType> &x);
+  Matrix<DataType> norm_1(const Matrix<DataType> &x) { return x.norm_1();}
 
   /** \brief Infinity-norm */
   template<typename DataType>
-  Matrix<DataType> norm_inf(const Matrix<DataType> &x);
+  Matrix<DataType> norm_inf(const Matrix<DataType> &x) { return x.norm_inf();}
 
   /// Return summation of all elements
   template<typename DataType>
@@ -415,15 +419,13 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> sumRows(const Matrix<DataType> &x) { return x.sumRows();}
 
-#ifdef SWIG
   /// Returns true only if every element in the matrix is true
   template<typename DataType>
-  DataType all(const Matrix<DataType> &x);
+  DataType all(const Matrix<DataType> &x) { return x.all();}
 
   /// Returns true if any element in the matrix is true
   template<typename DataType>
-  DataType any(const Matrix<DataType> &x);
-#endif //SWIG
+  DataType any(const Matrix<DataType> &x) { return x.any();}
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
   template<typename DataType>
@@ -494,69 +496,6 @@ namespace casadi {
 
 namespace casadi {
   // Implementations
-  template<typename DataType>
-  Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    casadi_assert_message(x.shape()==y.shape(), "inner_prod: Dimension mismatch");
-    return sumAll(x*y);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return mul(x, y.T());
-  }
-
-  template<typename DataType>
-  DataType all(const Matrix<DataType> &x) {
-    if (!x.isDense()) return false;
-    DataType ret=1;
-    for (int i=0;i<x.size();++i) {
-      ret = ret && x.at(i)==1;
-    }
-    return ret;
-  }
-
-  template<typename DataType>
-  DataType any(const Matrix<DataType> &x) {
-    if (!x.isDense()) return false;
-    DataType ret=0;
-    for (int i=0;i<x.size();++i) {
-      ret = ret || x.at(i)==1;
-    }
-    return ret;
-  }
-
-
-  template<typename DataType>
-  Matrix<DataType> norm_1(const Matrix<DataType>& x) {
-    return sumAll(fabs(x));
-  }
-
-  template<typename DataType>
-  Matrix<DataType> norm_2(const Matrix<DataType>& x) {
-    if (x.isVector()) {
-      return norm_F(x);
-    } else {
-      casadi_error("2-norms currently only supported for vectors. "
-                   "Did you intend to calculate a Frobenius norms (norm_F)?");
-    }
-  }
-
-  template<typename DataType>
-  Matrix<DataType> norm_F(const Matrix<DataType>& x) {
-    return sqrt(1.0*sumAll(x*x));
-  }
-
-  template<typename DataType>
-  Matrix<DataType> norm_inf(const Matrix<DataType>& x) {
-    // Get largest element by absolute value
-    DataType s = 0;
-    for (typename std::vector<DataType>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      s = fmax(s, DataType(abs(*i)));
-    }
-
-    return s;
-  }
-
   template<typename DataType>
   void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType> &R) {
     // The following algorithm is taken from J. Demmel:

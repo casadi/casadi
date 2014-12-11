@@ -707,6 +707,14 @@ namespace casadi {
     static Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
     static Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp);
     static Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp);
+    Matrix<DataType> inner_prod(const Matrix<DataType> &y) const;
+    Matrix<DataType> outer_prod(const Matrix<DataType> &y) const;
+    DataType all() const;
+    DataType any() const;
+    Matrix<DataType> norm_1() const;
+    Matrix<DataType> norm_2() const;
+    Matrix<DataType> norm_F() const;
+    Matrix<DataType> norm_inf() const;
     ///@}
 
     /** \brief Set or reset the maximum number of calls to the
