@@ -789,8 +789,7 @@ except:
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
-// Strip leading underscore
-%rename("%(strip:[_])s") "";
+%rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
 %rename(plus) __add__;
 %rename(minus) __sub__;
 %rename(uminus) operator-;

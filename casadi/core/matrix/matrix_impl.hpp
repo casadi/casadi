@@ -2343,7 +2343,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_det() const {
+  Matrix<DataType> Matrix<DataType>::zz_det() const {
     int n = size2();
     casadi_assert_message(n == size1(), "matrix must be square");
 
@@ -2362,13 +2362,13 @@ namespace casadi {
     Matrix<int> sp = IMatrix(sparsity(), 1);
 
     // Have a count of the nonzeros for each row
-    Matrix<int> row_count = sp._sumCols();
+    Matrix<int> row_count = sp.zz_sumCols();
 
     // A blank row? determinant is structurally zero
     if (!row_count.isDense()) return 0;
 
     // Have a count of the nonzeros for each col
-    Matrix<int> col_count = sp._sumRows().T();
+    Matrix<int> col_count = sp.zz_sumRows().T();
 
     // A blank col? determinant is structurally zero
     if (!row_count.isDense()) return 0;
@@ -2411,7 +2411,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_sumAll() const {
+  Matrix<DataType> Matrix<DataType>::zz_sumAll() const {
     // Quick return if empty
     if (isEmpty()) return Matrix<DataType>::sparse(1, 1);
     // Sum non-zero elements
@@ -2423,17 +2423,17 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_sumCols() const {
+  Matrix<DataType> Matrix<DataType>::zz_sumCols() const {
     return mul(Matrix<DataType>::ones(size2(), 1));
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_sumRows() const {
+  Matrix<DataType> Matrix<DataType>::zz_sumRows() const {
     return Matrix<DataType>::ones(1, size1()).mul(*this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_mul(const std::vector< Matrix<DataType> > &args) {
+  Matrix<DataType> Matrix<DataType>::zz_mul(const std::vector< Matrix<DataType> > &args) {
     casadi_assert_message(args.size()>=1,
                           "mul(std::vector< Matrix<DataType> > &args): "
                           "supplied list must not be empty.");
@@ -2446,7 +2446,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_getMinor(int i, int j) const {
+  Matrix<DataType> Matrix<DataType>::zz_getMinor(int i, int j) const {
     int n = size2();
     casadi_assert_message(n == size1(), "getMinor: matrix must be square");
 
@@ -2474,7 +2474,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_cofactor(int i, int j) const {
+  Matrix<DataType> Matrix<DataType>::zz_cofactor(int i, int j) const {
 
     // Calculate the i, j minor
     Matrix<DataType> minor_ij = getMinor(*this, i, j);
@@ -2485,7 +2485,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_adj() const {
+  Matrix<DataType> Matrix<DataType>::zz_adj() const {
     int n = size2();
     casadi_assert_message(n == size1(), "adj: matrix must be square");
 
@@ -2504,24 +2504,24 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_inv() const {
+  Matrix<DataType> Matrix<DataType>::zz_inv() const {
     // laplace formula
     return adj(*this)/det(*this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_reshape(int nrow, int ncol) const {
+  Matrix<DataType> Matrix<DataType>::zz_reshape(int nrow, int ncol) const {
     Sparsity sp = reshape(sparsity(), nrow, ncol);
     return Matrix<DataType>(sp, data());
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_reshape(std::pair<int, int> rc) const {
+  Matrix<DataType> Matrix<DataType>::zz_reshape(std::pair<int, int> rc) const {
     return reshape(*this, rc.first, rc.second);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_reshape(const Sparsity& sp) const {
+  Matrix<DataType> Matrix<DataType>::zz_reshape(const Sparsity& sp) const {
     // quick return if already the right shape
     if (sp==sparsity()) return *this;
 
@@ -2532,7 +2532,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::_trace() const {
+  DataType Matrix<DataType>::zz_trace() const {
     casadi_assert_message(size2() == size1(), "trace: must be square");
     DataType res=0;
     for (int i=0; i< size2(); i ++) {
@@ -2542,19 +2542,19 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_vec() const {
+  Matrix<DataType> Matrix<DataType>::zz_vec() const {
     Matrix<DataType> ret = reshape(*this, numel(), 1);
     return ret;
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_vecNZ() const {
+  Matrix<DataType> Matrix<DataType>::zz_vecNZ() const {
     return Matrix<DataType>(data());
   }
 
   template<typename DataType>
   Matrix<DataType>
-  Matrix<DataType>::_blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
+  Matrix<DataType>::zz_blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
     std::vector< Matrix<DataType> > ret;
     for (int i=0; i<v.size(); ++i)
       ret.push_back(horzcat(v[i]));
@@ -2562,7 +2562,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_blockcat(const Matrix<DataType> &A,
+  Matrix<DataType> Matrix<DataType>::zz_blockcat(const Matrix<DataType> &A,
                                               const Matrix<DataType> &B,
                                               const Matrix<DataType> &C,
                                               const Matrix<DataType> &D) {
@@ -2570,7 +2570,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_horzcat(const std::vector<Matrix<DataType> > &v) {
+  Matrix<DataType> Matrix<DataType>::zz_horzcat(const std::vector<Matrix<DataType> > &v) {
     Matrix<DataType> ret;
     for (int i=0; i<v.size(); ++i)
       ret.appendColumns(v[i]);
@@ -2578,7 +2578,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  std::vector<Matrix<DataType> > Matrix<DataType>::_horzsplit(const std::vector<int>& offset) const {
+  std::vector<Matrix<DataType> > Matrix<DataType>::zz_horzsplit(const std::vector<int>& offset) const {
     // Split up the sparsity pattern
     std::vector<Sparsity> sp = horzsplit(sparsity(), offset);
 
@@ -2600,7 +2600,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  std::vector<Matrix<DataType> > Matrix<DataType>::_horzsplit(int incr) const {
+  std::vector<Matrix<DataType> > Matrix<DataType>::zz_horzsplit(int incr) const {
     casadi_assert(incr>=1);
     std::vector<int> offset2 = range(0, size2(), incr);
     offset2.push_back(size2());
@@ -2608,7 +2608,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_vertcat(const std::vector<Matrix<DataType> > &v) {
+  Matrix<DataType> Matrix<DataType>::zz_vertcat(const std::vector<Matrix<DataType> > &v) {
     Matrix<DataType> ret;
     for (int i=0; i<v.size(); ++i)
       ret.appendColumns(v[i].T());
@@ -2617,7 +2617,7 @@ namespace casadi {
 
   template<typename DataType>
   std::vector< Matrix<DataType> >
-  Matrix<DataType>::_vertsplit(const std::vector<int>& offset) const {
+  Matrix<DataType>::zz_vertsplit(const std::vector<int>& offset) const {
     std::vector< Matrix<DataType> > ret = horzsplit(this->T(), offset);
     Matrix<DataType> (*transposeT)(const Matrix<DataType>& x) = transpose;
     std::transform(ret.begin(), ret.end(), ret.begin(), transposeT);
@@ -2625,7 +2625,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  std::vector< Matrix<DataType> > Matrix<DataType>::_vertsplit(int incr) const {
+  std::vector< Matrix<DataType> > Matrix<DataType>::zz_vertsplit(int incr) const {
     casadi_assert(incr>=1);
     std::vector<int> offset1 = range(0, size1(), incr);
     offset1.push_back(size1());
@@ -2634,7 +2634,7 @@ namespace casadi {
 
   template<typename DataType>
   std::vector< std::vector< Matrix<DataType> > >
-  Matrix<DataType>::_blocksplit(const std::vector<int>& vert_offset,
+  Matrix<DataType>::zz_blocksplit(const std::vector<int>& vert_offset,
                                const std::vector<int>& horz_offset) const {
     std::vector< Matrix<DataType> > rows = vertsplit(*this, vert_offset);
     std::vector< std::vector< Matrix<DataType> > > ret;
@@ -2646,7 +2646,7 @@ namespace casadi {
 
   template<typename DataType>
   std::vector< std::vector< Matrix<DataType> > >
-  Matrix<DataType>::_blocksplit(int vert_incr, int horz_incr) const {
+  Matrix<DataType>::zz_blocksplit(int vert_incr, int horz_incr) const {
     casadi_assert(horz_incr>=1);
     casadi_assert(vert_incr>=1);
     std::vector<int> offset1 = range(0, size1(), vert_incr);
@@ -2658,7 +2658,7 @@ namespace casadi {
 
   template<typename DataType>
   std::vector< Matrix<DataType> >
-  Matrix<DataType>::_diagsplitNative(const std::vector<int>& offset1,
+  Matrix<DataType>::zz_diagsplitNative(const std::vector<int>& offset1,
                                     const std::vector<int>& offset2) const {
     // Consistency check
     casadi_assert(offset1.size()>=1);
@@ -2687,19 +2687,19 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+  Matrix<DataType> Matrix<DataType>::zz_horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
     Matrix<DataType> xy = x;
     xy.appendColumns(y);
     return xy;
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+  Matrix<DataType> Matrix<DataType>::zz_vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
     return horzcat(x.T(), y.T()).T();
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_veccat(const std::vector< Matrix<DataType> >& x) {
+  Matrix<DataType> Matrix<DataType>::zz_veccat(const std::vector< Matrix<DataType> >& x) {
     std::vector< Matrix<DataType> > x_vec = x;
     for (typename std::vector< Matrix<DataType> >::iterator it=x_vec.begin();
          it!=x_vec.end(); ++it) {
@@ -2709,7 +2709,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_vecNZcat(const std::vector< Matrix<DataType> >& x) {
+  Matrix<DataType> Matrix<DataType>::zz_vecNZcat(const std::vector< Matrix<DataType> >& x) {
     std::vector< Matrix<DataType> > x_vec = x;
     for (typename std::vector< Matrix<DataType> >::iterator it=x_vec.begin();
          it!=x_vec.end(); ++it) {
@@ -2719,18 +2719,18 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_inner_prod(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_inner_prod(const Matrix<DataType> &y) const {
     casadi_assert_message(shape()==y.shape(), "inner_prod: Dimension mismatch");
     return sumAll(*this*y);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_outer_prod(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_outer_prod(const Matrix<DataType> &y) const {
     return mul(y.T());
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::_all() const {
+  DataType Matrix<DataType>::zz_all() const {
     if (!isDense()) return false;
     DataType ret=1;
     for (int i=0;i<size();++i) {
@@ -2740,7 +2740,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::_any() const {
+  DataType Matrix<DataType>::zz_any() const {
     if (!isDense()) return false;
     DataType ret=0;
     for (int i=0;i<size();++i) {
@@ -2750,12 +2750,12 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_norm_1() const {
+  Matrix<DataType> Matrix<DataType>::zz_norm_1() const {
     return sumAll(fabs());
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_norm_2() const {
+  Matrix<DataType> Matrix<DataType>::zz_norm_2() const {
     if (isVector()) {
       return norm_F(*this);
     } else {
@@ -2765,12 +2765,12 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_norm_F() const {
+  Matrix<DataType> Matrix<DataType>::zz_norm_F() const {
     return sumAll((*this**this)).sqrt();
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::_norm_inf() const {
+  Matrix<DataType> Matrix<DataType>::zz_norm_inf() const {
     // Get largest element by absolute value
     Matrix<DataType> s = 0;
     for (typename std::vector<DataType>::const_iterator i=begin(); i!=end(); ++i) {

@@ -57,39 +57,39 @@ namespace casadi {
   /// Matrix product of n matrices
   template<typename DataType>
   Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args) {
-    return Matrix<DataType>::_mul(args);
+    return Matrix<DataType>::zz_mul(args);
   }
 
   template<typename DataType>
-  Matrix<DataType> det(const Matrix<DataType>& A) { return A._det();}
+  Matrix<DataType> det(const Matrix<DataType>& A) { return A.zz_det();}
 
   template<typename DataType>
-  Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) { return x._getMinor(i, j);}
+  Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) { return x.zz_getMinor(i, j);}
 
   template<typename DataType>
-  Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) { return x._cofactor(i, j);}
+  Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) { return x.zz_cofactor(i, j);}
 
   template<typename DataType>
-  Matrix<DataType> adj(const Matrix<DataType>& a) { return a._adj();}
+  Matrix<DataType> adj(const Matrix<DataType>& a) { return a.zz_adj();}
 
   template<typename DataType>
-  Matrix<DataType> inv(const Matrix<DataType>& a) { return a._inv();}
+  Matrix<DataType> inv(const Matrix<DataType>& a) { return a.zz_inv();}
 
   template<typename DataType>
   Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol) {
-    return a._reshape(nrow, ncol);
+    return a.zz_reshape(nrow, ncol);
   }
 
   template<typename DataType>
   Matrix<DataType> reshape(const Matrix<DataType>& a, std::pair<int, int> rc) {
-    return a._reshape(rc);
+    return a.zz_reshape(rc);
   }
 
   template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, const Sparsity& sp) { return a._reshape(sp);}
+  Matrix<DataType> reshape(const Matrix<DataType>& a, const Sparsity& sp) { return a.zz_reshape(sp);}
 
   template<typename DataType>
-  DataType trace(const Matrix<DataType>& a) { return a._trace();}
+  DataType trace(const Matrix<DataType>& a) { return a.zz_trace();}
 
   /** \brief  make a vector
       Reshapes/vectorizes the Matrix<DataType> such that the shape becomes (expr.numel(), 1).
@@ -108,18 +108,18 @@ namespace casadi {
 
   */
   template<typename DataType>
-  Matrix<DataType> vec(const Matrix<DataType>& a) { return a._vec();}
+  Matrix<DataType> vec(const Matrix<DataType>& a) { return a.zz_vec();}
 
   /** \brief Returns a flattened version of the Matrix, preserving only nonzeros
    */
   template<typename DataType>
-  Matrix<DataType> vecNZ(const Matrix<DataType>& a) { return a._vecNZ();}
+  Matrix<DataType> vecNZ(const Matrix<DataType>& a) { return a.zz_vecNZ();}
 
   /** \brief Construct a matrix from a list of list of blocks.
    */
   template<typename DataType>
   Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
-    return Matrix<DataType>::_blockcat(v);
+    return Matrix<DataType>::zz_blockcat(v);
   }
 
 #ifndef SWIG
@@ -128,7 +128,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> blockcat(const Matrix<DataType> &A, const Matrix<DataType> &B,
                             const Matrix<DataType> &C, const Matrix<DataType> &D) {
-    return Matrix<DataType>::_blockcat(A, B, C, D);
+    return Matrix<DataType>::zz_blockcat(A, B, C, D);
   }
 #endif // SWIG
 
@@ -139,7 +139,7 @@ namespace casadi {
    */
   template<typename DataType>
   Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v) {
-    return Matrix<DataType>::_horzcat(v);
+    return Matrix<DataType>::zz_horzcat(v);
   }
 
   /** \brief  split horizontally, retaining groups of columns
@@ -151,7 +151,7 @@ namespace casadi {
   template<typename DataType>
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v,
                                            const std::vector<int>& offset) {
-    return v._horzsplit(offset);
+    return v.zz_horzsplit(offset);
   }
 
   /** \brief  split horizontally, retaining fixed-sized groups of columns
@@ -161,7 +161,7 @@ namespace casadi {
    */
   template<typename DataType>
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1) {
-    return v._horzsplit(incr);
+    return v.zz_horzsplit(incr);
   }
 
   /** \brief Concatenate a list of matrices vertically
@@ -171,7 +171,7 @@ namespace casadi {
    */
   template<typename DataType>
   Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v) {
-    return Matrix<DataType>::_vertcat(v);
+    return Matrix<DataType>::zz_vertcat(v);
   }
 
   /** \brief  split vertically, retaining groups of rows
@@ -183,7 +183,7 @@ namespace casadi {
   template<typename DataType>
   std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v,
                                            const std::vector<int>& offset) {
-    return v._vertsplit(offset);
+    return v.zz_vertsplit(offset);
   }
 
   /** \brief  split vertically, retaining fixed-sized groups of rows
@@ -193,7 +193,7 @@ namespace casadi {
    */
   template<typename DataType>
   std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, int incr=1) {
-    return v._vertsplit(incr);
+    return v.zz_vertsplit(incr);
   }
 
   /** \brief  chop up into blocks
@@ -206,7 +206,7 @@ namespace casadi {
   std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
                                                             const std::vector<int>& vert_offset,
                                                             const std::vector<int>& horz_offset) {
-    return x._blocksplit(vert_offset, horz_offset);
+    return x.zz_blocksplit(vert_offset, horz_offset);
   }
 
   /** \brief  chop up into blocks
@@ -219,7 +219,7 @@ namespace casadi {
   std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
                                                             int vert_incr = 1,
                                                             int horz_incr = 1) {
-    return x._blocksplit(vert_incr, horz_incr);
+    return x.zz_blocksplit(vert_incr, horz_incr);
   }
 
 /// \cond INTERNAL
@@ -233,7 +233,7 @@ namespace casadi {
   std::vector< Matrix<DataType> > diagsplitNative(const Matrix<DataType>& x,
                                                   const std::vector<int>& output_offset1,
                                                   const std::vector<int>& output_offset2) {
-    return x._diagsplitNative(output_offset1, output_offset2);
+    return x.zz_diagsplitNative(output_offset1, output_offset2);
   }
 #endif // SWIG
 /// \endcond
@@ -241,25 +241,25 @@ namespace casadi {
 #ifndef SWIG
   template<typename DataType>
   Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return Matrix<DataType>::_vertcat(x, y);
+    return Matrix<DataType>::zz_vertcat(x, y);
   }
 
   template<typename DataType>
   Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return Matrix<DataType>::_horzcat(x, y);
+    return Matrix<DataType>::zz_horzcat(x, y);
   }
 #endif // SWIG
 
   template<typename DataType>
   /** \brief  concatenate vertically while vectorizing all arguments with vec */
   Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& x) {
-    return Matrix<DataType>::_veccat(x);
+    return Matrix<DataType>::zz_veccat(x);
   }
 
   template<typename DataType>
   /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
   Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& x) {
-    return Matrix<DataType>::_vecNZcat(x);
+    return Matrix<DataType>::zz_vecNZcat(x);
   }
 
   /** \brief Inner product of two matrices
@@ -272,7 +272,7 @@ namespace casadi {
   // inner product
   template<typename DataType>
   Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return x._inner_prod(y);
+    return x.zz_inner_prod(y);
   }
 
   /** \brief Outer product of two vectors
@@ -284,7 +284,7 @@ namespace casadi {
   */
   template<typename DataType>
   Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return x._outer_prod(y);
+    return x.zz_outer_prod(y);
   }
 
   /** \brief  QR factorization using the modified Gram-Schmidt algorithm
@@ -393,39 +393,39 @@ namespace casadi {
 
   /** \brief  Frobenius norm  */
   template<typename DataType>
-  Matrix<DataType> norm_F(const Matrix<DataType> &x) { return x._norm_F();}
+  Matrix<DataType> norm_F(const Matrix<DataType> &x) { return x.zz_norm_F();}
 
   /** \brief  2-norm  */
   template<typename DataType>
-  Matrix<DataType> norm_2(const Matrix<DataType> &x) { return x._norm_2();}
+  Matrix<DataType> norm_2(const Matrix<DataType> &x) { return x.zz_norm_2();}
 
   /** \brief 1-norm  */
   template<typename DataType>
-  Matrix<DataType> norm_1(const Matrix<DataType> &x) { return x._norm_1();}
+  Matrix<DataType> norm_1(const Matrix<DataType> &x) { return x.zz_norm_1();}
 
   /** \brief Infinity-norm */
   template<typename DataType>
-  Matrix<DataType> norm_inf(const Matrix<DataType> &x) { return x._norm_inf();}
+  Matrix<DataType> norm_inf(const Matrix<DataType> &x) { return x.zz_norm_inf();}
 
   /// Return summation of all elements
   template<typename DataType>
-  Matrix<DataType> sumAll(const Matrix<DataType> &x) { return x._sumAll();}
+  Matrix<DataType> sumAll(const Matrix<DataType> &x) { return x.zz_sumAll();}
 
   /** \brief Return a col-wise summation of elements */
   template<typename DataType>
-  Matrix<DataType> sumCols(const Matrix<DataType> &x) { return x._sumCols();}
+  Matrix<DataType> sumCols(const Matrix<DataType> &x) { return x.zz_sumCols();}
 
   /** \brief Return a row-wise summation of elements */
   template<typename DataType>
-  Matrix<DataType> sumRows(const Matrix<DataType> &x) { return x._sumRows();}
+  Matrix<DataType> sumRows(const Matrix<DataType> &x) { return x.zz_sumRows();}
 
   /// Returns true only if every element in the matrix is true
   template<typename DataType>
-  DataType all(const Matrix<DataType> &x) { return x._all();}
+  DataType all(const Matrix<DataType> &x) { return x.zz_all();}
 
   /// Returns true if any element in the matrix is true
   template<typename DataType>
-  DataType any(const Matrix<DataType> &x) { return x._any();}
+  DataType any(const Matrix<DataType> &x) { return x.zz_any();}
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
   template<typename DataType>
