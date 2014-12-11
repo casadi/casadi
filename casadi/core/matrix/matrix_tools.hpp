@@ -118,14 +118,18 @@ namespace casadi {
   /** \brief Construct a matrix from a list of list of blocks.
    */
   template<typename DataType>
-  Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
+  Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
+    return Matrix<DataType>::blockcat(v);
+  }
 
 #ifndef SWIG
   /** \brief Construct a matrix from 4 blocks
    */
   template<typename DataType>
   Matrix<DataType> blockcat(const Matrix<DataType> &A, const Matrix<DataType> &B,
-                            const Matrix<DataType> &C, const Matrix<DataType> &D);
+                            const Matrix<DataType> &C, const Matrix<DataType> &D) {
+    return Matrix<DataType>::blockcat(A, B, C, D);
+  }
 #endif // SWIG
 
   /** \brief Concatenate a list of matrices horizontally
@@ -134,7 +138,9 @@ namespace casadi {
    *   horzcat(horzsplit(x, ...)) = x
    */
   template<typename DataType>
-  Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
+  Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v) {
+    return Matrix<DataType>::horzcat(v);
+  }
 
   /** \brief  split horizontally, retaining groups of columns
    * \param offset List of all start columns for each group
@@ -144,7 +150,9 @@ namespace casadi {
    */
   template<typename DataType>
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v,
-                                           const std::vector<int>& offset);
+                                           const std::vector<int>& offset) {
+    return v.horzsplit(offset);
+  }
 
   /** \brief  split horizontally, retaining fixed-sized groups of columns
    * \param incr Size of each group of columns
@@ -152,7 +160,9 @@ namespace casadi {
    *   horzcat(horzsplit(x, ...)) = x
    */
   template<typename DataType>
-  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1);
+  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1) {
+    return v.horzsplit(incr);
+  }
 
   /** \brief Concatenate a list of matrices vertically
    * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
@@ -160,7 +170,9 @@ namespace casadi {
    *   vertcat(vertsplit(x, ...)) = x
    */
   template<typename DataType>
-  Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
+  Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v) {
+    return Matrix<DataType>::vertcat(v);
+  }
 
   /** \brief  split vertically, retaining groups of rows
    * \param output_offset List of all start rows for each group
@@ -170,7 +182,9 @@ namespace casadi {
    */
   template<typename DataType>
   std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v,
-                                           const std::vector<int>& offset);
+                                           const std::vector<int>& offset) {
+    return v.vertsplit(offset);
+  }
 
   /** \brief  split vertically, retaining fixed-sized groups of rows
    * \param incr Size of each group of rows
@@ -178,8 +192,9 @@ namespace casadi {
    *   vertcat(vertsplit(x, ...)) = x
    */
   template<typename DataType>
-  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, int incr=1);
-
+  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, int incr=1) {
+    return v.vertsplit(incr);
+  }
 
   /** \brief  chop up into blocks
    * \param vert_offset Defines the boundaries of the block rows
@@ -190,7 +205,9 @@ namespace casadi {
   template<typename DataType>
   std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
                                                             const std::vector<int>& vert_offset,
-                                                            const std::vector<int>& horz_offset);
+                                                            const std::vector<int>& horz_offset) {
+    return x.blocksplit(vert_offset, horz_offset);
+  }
 
   /** \brief  chop up into blocks
    * \param vert_incr Defines the increment for block boundaries in row dimension
@@ -201,7 +218,9 @@ namespace casadi {
   template<typename DataType>
   std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
                                                             int vert_incr = 1,
-                                                            int horz_incr = 1);
+                                                            int horz_incr = 1) {
+    return x.blocksplit(vert_incr, horz_incr);
+  }
 
 /// \cond INTERNAL
 #ifndef SWIG
@@ -213,25 +232,35 @@ namespace casadi {
   template<typename DataType>
   std::vector< Matrix<DataType> > diagsplitNative(const Matrix<DataType>& x,
                                                   const std::vector<int>& output_offset1,
-                                                  const std::vector<int>& output_offset2);
+                                                  const std::vector<int>& output_offset2) {
+    return x.diagsplitNative(output_offset1, output_offset2);
+  }
 #endif // SWIG
 /// \endcond
 
 #ifndef SWIG
   template<typename DataType>
-  Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
+  Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+    return Matrix<DataType>::vertcat(x, y);
+  }
 
   template<typename DataType>
-  Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
+  Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+    return Matrix<DataType>::horzcat(x, y);
+  }
 #endif // SWIG
 
   template<typename DataType>
   /** \brief  concatenate vertically while vectorizing all arguments with vec */
-  Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp);
+  Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& x) {
+    return Matrix<DataType>::veccat(x);
+  }
 
   template<typename DataType>
   /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
-  Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp);
+  Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& x) {
+    return Matrix<DataType>::vecNZcat(x);
+  }
 
   /** \brief Inner product of two matrices
       Equals
@@ -465,168 +494,6 @@ namespace casadi {
 
 namespace casadi {
   // Implementations
-  template<typename DataType>
-  Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
-    std::vector< Matrix<DataType> > ret;
-    for (int i=0; i<v.size(); ++i)
-      ret.push_back(horzcat(v[i]));
-    return vertcat(ret);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> blockcat(const Matrix<DataType> &A,
-                            const Matrix<DataType> &B,
-                            const Matrix<DataType> &C,
-                            const Matrix<DataType> &D) {
-    return vertcat(horzcat(A, B), horzcat(C, D));
-  }
-
-  template<typename DataType>
-  Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v) {
-    Matrix<DataType> ret;
-    for (int i=0; i<v.size(); ++i)
-      ret.appendColumns(v[i]);
-    return ret;
-  }
-
-  template<typename DataType>
-  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v,
-                                           const std::vector<int>& offset) {
-    // Split up the sparsity pattern
-    std::vector<Sparsity> sp = horzsplit(v.sparsity(), offset);
-
-    // Return object
-    std::vector<Matrix<DataType> > ret;
-    ret.reserve(sp.size());
-
-    // Copy data
-    typename std::vector<DataType>::const_iterator data_start=v.begin(), data_stop;
-    for (std::vector<Sparsity>::const_iterator j=sp.begin(); j!=sp.end(); ++j) {
-      data_stop = data_start + j->size();
-      ret.push_back(Matrix<DataType>(*j, std::vector<DataType>(data_start, data_stop)));
-      data_start = data_stop;
-    }
-
-    // Return the assembled matrix
-    casadi_assert(data_stop==v.end());
-    return ret;
-  }
-
-  template<typename DataType>
-  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr) {
-    casadi_assert(incr>=1);
-    std::vector<int> offset2 = range(0, v.size2(), incr);
-    offset2.push_back(v.size2());
-    return horzsplit(v, offset2);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v) {
-    Matrix<DataType> ret;
-    for (int i=0; i<v.size(); ++i)
-      ret.appendColumns(v[i].T());
-    return ret.T();
-  }
-
-  template<typename DataType>
-  std::vector< Matrix<DataType> > vertsplit(const Matrix<DataType>& x,
-                                            const std::vector<int>& offset) {
-    std::vector< Matrix<DataType> > ret = horzsplit(x.T(), offset);
-    Matrix<DataType> (*transposeT)(const Matrix<DataType>& x) = transpose;
-    std::transform(ret.begin(), ret.end(), ret.begin(), transposeT);
-    return ret;
-  }
-
-  template<typename DataType>
-  std::vector< Matrix<DataType> > vertsplit(const Matrix<DataType>& x, int incr) {
-    casadi_assert(incr>=1);
-    std::vector<int> offset1 = range(0, x.size1(), incr);
-    offset1.push_back(x.size1());
-    return vertsplit(x, offset1);
-  }
-
-  template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
-                                                            const std::vector<int>& vert_offset,
-                                                            const std::vector<int>& horz_offset) {
-    std::vector< Matrix<DataType> > rows = vertsplit(x, vert_offset);
-    std::vector< std::vector< Matrix<DataType> > > ret;
-    for (int i=0;i<rows.size();++i) {
-      ret.push_back(horzsplit(rows[i], horz_offset));
-    }
-    return ret;
-  }
-
-  template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
-                                                            int vert_incr,
-                                                            int horz_incr) {
-    casadi_assert(horz_incr>=1);
-    casadi_assert(vert_incr>=1);
-    std::vector<int> offset1 = range(0, x.size1(), vert_incr);
-    offset1.push_back(x.size1());
-    std::vector<int> offset2 = range(0, x.size2(), horz_incr);
-    offset2.push_back(x.size2());
-    return blocksplit(x, offset1, offset2);
-  }
-
-  template<typename DataType>
-  std::vector< Matrix<DataType> > diagsplitNative(const Matrix<DataType>& x,
-                                                   const std::vector<int>& offset1,
-                                                   const std::vector<int>& offset2) {
-    // Consistency check
-    casadi_assert(offset1.size()>=1);
-    casadi_assert(offset1.front()==0);
-    casadi_assert(offset1.back()==x.size1());
-    casadi_assert(isMonotone(offset1));
-
-    // Consistency check
-    casadi_assert(offset2.size()>=1);
-    casadi_assert(offset2.front()==0);
-    casadi_assert(offset2.back()==x.size2());
-    casadi_assert(isMonotone(offset2));
-
-    // Number of outputs
-    int n = offset1.size()-1;
-
-    // Return value
-    std::vector< Matrix<DataType> > ret;
-
-    // Caveat: this is a very silly implementation
-    for (int i=0;i<n;++i) {
-      ret.push_back(x(
-        Slice(offset1[i], offset1[i+1]),
-        Slice(offset2[i], offset2[i+1])));
-    }
-
-    return ret;
-
-  }
-
-  template<typename DataType>
-  Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    Matrix<DataType> xy = x;
-    xy.appendColumns(y);
-    return xy;
-  }
-
-  template<typename DataType>
-  Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return horzcat(x.T(), y.T()).T();
-  }
-
-  template<typename DataType>
-  Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp) {
-    Matrix<DataType> (&f)(const Matrix<DataType>&) = vec;
-    return vertcat(applymap(f, comp));
-  }
-
-  template<typename DataType>
-  Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp) {
-    Matrix<DataType> (&f)(const Matrix<DataType>&) = vecNZ;
-    return vertcat(applymap(f, comp));
-  }
-
   template<typename DataType>
   Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
     casadi_assert_message(x.shape()==y.shape(), "inner_prod: Dimension mismatch");

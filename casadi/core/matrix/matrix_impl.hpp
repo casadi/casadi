@@ -2552,6 +2552,172 @@ namespace casadi {
     return Matrix<DataType>(data());
   }
 
+  template<typename DataType>
+  Matrix<DataType>
+  Matrix<DataType>::blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
+    std::vector< Matrix<DataType> > ret;
+    for (int i=0; i<v.size(); ++i)
+      ret.push_back(horzcat(v[i]));
+    return vertcat(ret);
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::blockcat(const Matrix<DataType> &A,
+                                              const Matrix<DataType> &B,
+                                              const Matrix<DataType> &C,
+                                              const Matrix<DataType> &D) {
+    return vertcat(horzcat(A, B), horzcat(C, D));
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::horzcat(const std::vector<Matrix<DataType> > &v) {
+    Matrix<DataType> ret;
+    for (int i=0; i<v.size(); ++i)
+      ret.appendColumns(v[i]);
+    return ret;
+  }
+
+  template<typename DataType>
+  std::vector<Matrix<DataType> > Matrix<DataType>::horzsplit(const std::vector<int>& offset) const {
+    // Split up the sparsity pattern
+    std::vector<Sparsity> sp = casadi::horzsplit(sparsity(), offset);
+
+    // Return object
+    std::vector<Matrix<DataType> > ret;
+    ret.reserve(sp.size());
+
+    // Copy data
+    typename std::vector<DataType>::const_iterator data_start=begin(), data_stop;
+    for (std::vector<Sparsity>::const_iterator j=sp.begin(); j!=sp.end(); ++j) {
+      data_stop = data_start + j->size();
+      ret.push_back(Matrix<DataType>(*j, std::vector<DataType>(data_start, data_stop)));
+      data_start = data_stop;
+    }
+
+    // Return the assembled matrix
+    casadi_assert(data_stop==end());
+    return ret;
+  }
+
+  template<typename DataType>
+  std::vector<Matrix<DataType> > Matrix<DataType>::horzsplit(int incr) const {
+    casadi_assert(incr>=1);
+    std::vector<int> offset2 = range(0, size2(), incr);
+    offset2.push_back(size2());
+    return horzsplit(offset2);
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::vertcat(const std::vector<Matrix<DataType> > &v) {
+    Matrix<DataType> ret;
+    for (int i=0; i<v.size(); ++i)
+      ret.appendColumns(v[i].T());
+    return ret.T();
+  }
+
+  template<typename DataType>
+  std::vector< Matrix<DataType> >
+  Matrix<DataType>::vertsplit(const std::vector<int>& offset) const {
+    std::vector< Matrix<DataType> > ret = T().horzsplit(offset);
+    Matrix<DataType> (*transposeT)(const Matrix<DataType>& x) = transpose;
+    std::transform(ret.begin(), ret.end(), ret.begin(), transposeT);
+    return ret;
+  }
+
+  template<typename DataType>
+  std::vector< Matrix<DataType> > Matrix<DataType>::vertsplit(int incr) const {
+    casadi_assert(incr>=1);
+    std::vector<int> offset1 = range(0, size1(), incr);
+    offset1.push_back(size1());
+    return vertsplit(offset1);
+  }
+
+  template<typename DataType>
+  std::vector< std::vector< Matrix<DataType> > >
+  Matrix<DataType>::blocksplit(const std::vector<int>& vert_offset,
+                               const std::vector<int>& horz_offset) const {
+    std::vector< Matrix<DataType> > rows = vertsplit(vert_offset);
+    std::vector< std::vector< Matrix<DataType> > > ret;
+    for (int i=0;i<rows.size();++i) {
+      ret.push_back(rows[i].horzsplit(horz_offset));
+    }
+    return ret;
+  }
+
+  template<typename DataType>
+  std::vector< std::vector< Matrix<DataType> > >
+  Matrix<DataType>::blocksplit(int vert_incr, int horz_incr) const {
+    casadi_assert(horz_incr>=1);
+    casadi_assert(vert_incr>=1);
+    std::vector<int> offset1 = range(0, size1(), vert_incr);
+    offset1.push_back(size1());
+    std::vector<int> offset2 = range(0, size2(), horz_incr);
+    offset2.push_back(size2());
+    return blocksplit(offset1, offset2);
+  }
+
+  template<typename DataType>
+  std::vector< Matrix<DataType> >
+  Matrix<DataType>::diagsplitNative(const std::vector<int>& offset1,
+                                    const std::vector<int>& offset2) const {
+    // Consistency check
+    casadi_assert(offset1.size()>=1);
+    casadi_assert(offset1.front()==0);
+    casadi_assert(offset1.back()==size1());
+    casadi_assert(isMonotone(offset1));
+
+    // Consistency check
+    casadi_assert(offset2.size()>=1);
+    casadi_assert(offset2.front()==0);
+    casadi_assert(offset2.back()==size2());
+    casadi_assert(isMonotone(offset2));
+
+    // Number of outputs
+    int n = offset1.size()-1;
+
+    // Return value
+    std::vector< Matrix<DataType> > ret;
+
+    // Caveat: this is a very silly implementation
+    for (int i=0; i<n; ++i) {
+      ret.push_back((*this)(Slice(offset1[i], offset1[i+1]), Slice(offset2[i], offset2[i+1])));
+    }
+
+    return ret;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+    Matrix<DataType> xy = x;
+    xy.appendColumns(y);
+    return xy;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+    return horzcat(x.T(), y.T()).T();
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::veccat(const std::vector< Matrix<DataType> >& x) {
+    std::vector< Matrix<DataType> > x_vec = x;
+    for (typename std::vector< Matrix<DataType> >::iterator it=x_vec.begin();
+         it!=x_vec.end(); ++it) {
+      *it = it->vec();
+    }
+    return vertcat(x_vec);
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::vecNZcat(const std::vector< Matrix<DataType> >& x) {
+    std::vector< Matrix<DataType> > x_vec = x;
+    for (typename std::vector< Matrix<DataType> >::iterator it=x_vec.begin();
+         it!=x_vec.end(); ++it) {
+      *it = it->vecNZ();
+    }
+    return vertcat(x_vec);
+  }
+
 } // namespace casadi
 
 /// \endcond

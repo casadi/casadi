@@ -687,6 +687,26 @@ namespace casadi {
     DataType trace() const;
     Matrix<DataType> vec() const;
     Matrix<DataType> vecNZ() const;
+    static Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
+    static Matrix<DataType> blockcat(const Matrix<DataType> &A,
+                                     const Matrix<DataType> &B,
+                                     const Matrix<DataType> &C,
+                                     const Matrix<DataType> &D);
+    static Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
+    std::vector<Matrix<DataType> > horzsplit(const std::vector<int>& offset) const;
+    std::vector<Matrix<DataType> > horzsplit(int incr) const;
+    static Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
+    std::vector< Matrix<DataType> > vertsplit(const std::vector<int>& offset) const;
+    std::vector< Matrix<DataType> > vertsplit(int incr) const;
+    std::vector< std::vector< Matrix<DataType> > >
+      blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const;
+    std::vector< std::vector< Matrix<DataType> > > blocksplit(int vert_incr, int horz_incr) const;
+    std::vector< Matrix<DataType> > diagsplitNative(const std::vector<int>& offset1,
+                                                    const std::vector<int>& offset2) const;
+    static Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp);
+    static Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp);
     ///@}
 
     /** \brief Set or reset the maximum number of calls to the
