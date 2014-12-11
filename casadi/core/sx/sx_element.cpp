@@ -242,7 +242,7 @@ namespace casadi {
       return BinarySX::create(OP_SUB, *this, y);
   }
 
-  SXElement SXElement::__mul__(const SXElement& y) const {
+  SXElement SXElement::zz_times(const SXElement& y) const {
 
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_MUL, *this, y);
 
@@ -250,7 +250,7 @@ namespace casadi {
     if (y.isEqual(*this, SXNode::eq_depth_))
       return sq();
     else if (!isConstant() && y.isConstant())
-      return y.__mul__(*this);
+      return y.zz_times(*this);
     else if (node->isZero() || y->isZero()) // one of the terms is zero
       return 0;
     else if (node->isOne()) // term1 is one
@@ -285,7 +285,7 @@ namespace casadi {
     return isOp(OP_ADD) && node->dep(0).isEqual(node->dep(1), SXNode::eq_depth_);
   }
 
-  SXElement SXElement::__div__(const SXElement& y) const {
+  SXElement SXElement::zz_rdivide(const SXElement& y) const {
     // Only simplifications that do not result in extra nodes area allowed
 
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_DIV, *this, y);

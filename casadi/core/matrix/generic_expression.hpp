@@ -50,10 +50,10 @@ class CASADI_EXPORT GenericExpression {
     inline friend ExType operator-(const ExType &x, const ExType &y) { return x.zz_minus(y); }
 
     /// Elementwise multiplication
-    inline friend ExType operator*(const ExType &x, const ExType &y) { return x.__mul__(y); }
+    inline friend ExType operator*(const ExType &x, const ExType &y) { return x.zz_times(y); }
 
     /// Elementwise division
-    inline friend ExType operator/(const ExType &x, const ExType &y) { return x.__div__(y); }
+    inline friend ExType operator/(const ExType &x, const ExType &y) { return x.zz_rdivide(y); }
 
     /// In-place addition
     inline ExType& operator+=(const ExType &y) {
@@ -67,11 +67,11 @@ class CASADI_EXPORT GenericExpression {
 
     /// In-place elementwise multiplication
     inline ExType& operator*=(const ExType &y) {return static_cast<ExType&>(*this) =
-            static_cast<ExType*>(this)->__mul__(y);}
+            static_cast<ExType*>(this)->zz_times(y);}
 
     /// In-place elementwise division
     inline ExType& operator/=(const ExType &y) {return static_cast<ExType&>(*this) =
-            static_cast<ExType*>(this)->__div__(y);}
+            static_cast<ExType*>(this)->zz_rdivide(y);}
 
     /// Logic less than
     inline friend ExType operator<(const ExType &x, const ExType &y) { return x.__lt__(y); }

@@ -782,11 +782,11 @@ namespace casadi {
     return MX::binary(OP_SUB, *this, y);
   }
 
-  MX MX::__mul__(const MX& y) const {
+  MX MX::zz_times(const MX& y) const {
     return MX::binary(OP_MUL, *this, y);
   }
 
-  MX MX::__div__(const MX& y) const {
+  MX MX::zz_rdivide(const MX& y) const {
     return MX::binary(OP_DIV, *this, y);
   }
 

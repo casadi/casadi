@@ -851,12 +851,12 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__mul__(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_times(const Matrix<DataType> &y) const {
     return binary(OP_MUL, *this, y);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__div__(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_rdivide(const Matrix<DataType> &y) const {
     return binary(OP_DIV, *this, y);
   }
 

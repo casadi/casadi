@@ -545,8 +545,8 @@ Type r##uname##(const Type& b) const{ return b.##uname##(*$self);}
 memberbinopsr(Type,pow)
 Type __radd__(const Type& b) const{ return b.zz_plus(*$self);}
 Type __rsub__(const Type& b) const{ return b.zz_minus(*$self);}
-memberbinopsr(Type,mul)
-memberbinopsr(Type,div)
+Type __rmul__(const Type& b) const{ return b.zz_times(*$self);}
+Type __rdiv__(const Type& b) const{ return b.zz_rdivide(*$self);}
 memberbinopsr(Type,truediv)
 memberbinopsr(Type,mldivide)
 memberbinopsr(Type,mrdivide)
@@ -596,7 +596,10 @@ returntype __add__ (argtype) const{ return selfCast(*$self).zz_plus(argCast(b));
 returntype __radd__(argtype) const{ return argCast(b).zz_plus(selfCast(*$self));}
 returntype __sub__ (argtype) const{ return selfCast(*$self).zz_minus(argCast(b));}
 returntype __rsub__(argtype) const{ return argCast(b).zz_minus(selfCast(*$self));}
-memberbinops(mul,argtype,argCast,selfCast,returntype)
+returntype __mul__ (argtype) const{ return selfCast(*$self).zz_times(argCast(b));}
+returntype __rmul__(argtype) const{ return argCast(b).zz_times(selfCast(*$self));}
+returntype __div__ (argtype) const{ return selfCast(*$self).zz_rdivide(argCast(b));}
+returntype __rdiv__(argtype) const{ return argCast(b).zz_rdivide(selfCast(*$self));}
 memberbinops_custom(ge,>=,argtype,argCast,selfCast,returntype)
 memberbinops_custom(le,<=,argtype,argCast,selfCast,returntype)
 memberbinops_custom(gt,>,argtype,argCast,selfCast,returntype)
@@ -605,7 +608,6 @@ memberbinops_custom(eq,==,argtype,argCast,selfCast,returntype)
 memberbinops_custom(ne,!=,argtype,argCast,selfCast,returntype)
 returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));}
 returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));}
-memberbinops(div,argtype,argCast,selfCast,returntype)
 memberbinops(truediv,argtype,argCast,selfCast,returntype)
 memberbinops(mldivide,argtype,argCast,selfCast,returntype)
 memberbinops(mrdivide,argtype,argCast,selfCast,returntype)
@@ -799,14 +801,14 @@ except:
 #ifdef SWIGPYTHON
 %rename(__add__) zz_plus;
 %rename(__sub__) zz_minus;
+%rename(__mul__) zz_times;
+%rename(__div__) zz_rdivide;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
 %rename(uplus) operator+;
-%rename(times) __mul__;
 %rename(mtimes) mul;
-%rename(rdivide) __div__;
 %rename(ldivide) __rdiv__;
 %rename(mrdivide) __mrdivide__;
 %rename(mldivide) __mldivide__;

@@ -194,8 +194,8 @@ namespace casadi {
     //  all binary operations
     SXElement zz_plus(const SXElement& y) const;
     SXElement zz_minus(const SXElement& y) const;
-    SXElement __mul__(const SXElement& y) const;
-    SXElement __div__(const SXElement& y) const;
+    SXElement zz_times(const SXElement& y) const;
+    SXElement zz_rdivide(const SXElement& y) const;
     SXElement __lt__(const SXElement& y) const;
     SXElement __le__(const SXElement& y) const;
     SXElement __eq__(const SXElement& y) const;
@@ -203,7 +203,7 @@ namespace casadi {
     using GenericExpression<SXElement>::__gt__;
     using GenericExpression<SXElement>::__ge__;
     using GenericExpression<SXElement>::__mldivide__;
-    SXElement __truediv__(const SXElement &y) const {return __div__(y);}
+    SXElement __truediv__(const SXElement &y) const {return zz_rdivide(y);}
     SXElement __pow__(const SXElement& b) const;
     SXElement __constpow__(const SXElement& b) const;
 
@@ -213,7 +213,7 @@ namespace casadi {
 
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
-    SXElement mul(const SXElement& y) const { return __mul__(y);}
+    SXElement mul(const SXElement& y) const { return zz_times(y);}
     SXElement exp() const;
     SXElement log() const;
     SXElement sqrt() const;
