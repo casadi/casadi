@@ -543,10 +543,10 @@ Type r##uname##(const Type& b) const{ return b.##uname##(*$self);}
 
 %define binopsrFull(Type)
 memberbinopsr(Type,pow)
-Type __radd__(const Type& b) const{ return b.zz_plus(*$self);}
-Type __rsub__(const Type& b) const{ return b.zz_minus(*$self);}
-Type __rmul__(const Type& b) const{ return b.zz_times(*$self);}
-Type __rdiv__(const Type& b) const{ return b.zz_rdivide(*$self);}
+Type __radd__(const Type& b) const{ return b + *$self;}
+Type __rsub__(const Type& b) const{ return b - *$self;}
+Type __rmul__(const Type& b) const{ return b * *$self;}
+Type __rdiv__(const Type& b) const{ return b / *$self;}
 memberbinopsr(Type,truediv)
 memberbinopsr(Type,mldivide)
 memberbinopsr(Type,mrdivide)
@@ -560,7 +560,7 @@ memberbinopsr_custom(Type,eq,==)
 memberbinopsr_custom(Type,ne,!=)
 memberbinopsr_un(Type,fmin)
 memberbinopsr_un(Type,fmax)
-Type rmul(const Type& b) const{ return b.zz_mtimes(*$self);}
+Type rmul(const Type& b) const{ return casadi::mul(b, *$self);}
 memberbinopsr_un(Type,arctan2)
 memberbinopsr(Type,copysign)
 %enddef

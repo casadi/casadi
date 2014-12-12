@@ -47,17 +47,25 @@ GMTT_INST(MatType, isEqual)
 GMTT_INST(MatType, diagsplit)
 GMTT_INST(MatType, transpose)
 GMTT_INST(MatType, mul)
+GMTT_INST(MatType, det)
+GMTT_INST(MatType, inv)
 %enddef
 
-// Define template instantiations
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(MatType...)
 GMTT_INST(MatType, linspace)
 %enddef
 
+%define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
+GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<DataType>)
+GMTT_INST(casadi::Matrix<DataType>, adj)
+GMTT_INST(casadi::Matrix<DataType>, getMinor)
+GMTT_INST(casadi::Matrix<DataType>, cofactor)
+%enddef
+
 #ifndef SWIGMATLAB
-GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<int>)
-GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<double>)
-GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<casadi::SXElement>)
+GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(int)
+GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(double)
+GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 
 GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(casadi::Matrix<double>)

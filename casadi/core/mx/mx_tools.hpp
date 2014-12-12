@@ -376,12 +376,6 @@ namespace casadi {
   */
   inline MX nullspace(const MX& A) { return A.zz_nullspace();}
 
-  /** \brief Matrix determinant (experimental) */
-  inline MX det(const MX& A) { return A.zz_det();}
-
-  /** \brief Matrix inverse (experimental) */
-  inline MX inv(const MX& A) { return A.zz_inv();}
-
   /** \brief Get all symbols contained in the supplied expression
   * Get all symbols on which the supplied expression depends
   * \see MXFunction::getFree()

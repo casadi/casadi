@@ -143,11 +143,35 @@ namespace casadi {
    */
   template<typename MatType>
   MatType mul(const GenericMatrix<MatType> &x, const GenericMatrix<MatType> &y,
-              const Sparsity& sp_z=Sparsity());
+              const Sparsity& sp_z=Sparsity()) { return Mat(x).zz_mtimes(Mat(y), sp_z); }
 
   /** \brief  Take the matrix product of n MX objects */
   template<typename MatType>
   MatType mul(const std::vector<MatType> &args);
+
+  /** \brief Matrix determinant (experimental) */
+  template<typename MatType>
+  MatType det(const GenericMatrix<MatType>& A) { return Mat(A).zz_det();}
+
+  /** \brief Matrix inverse (experimental) */
+  template<typename MatType>
+  MatType inv(const GenericMatrix<MatType>& A) { return Mat(A).zz_inv();}
+
+  /** \brief Matrix adjoint */
+  template<typename MatType>
+  MatType adj(const GenericMatrix<MatType>& A) { return Mat(A).zz_adj();}
+
+  /** \brief Get the (i,j) minor matrix */
+  template<typename MatType>
+  MatType getMinor(const GenericMatrix<MatType> &x, int i, int j) {
+    return Mat(x).zz_getMinor(i, j);
+  }
+
+  /** \brief Get the (i,j) cofactor matrix */
+  template<typename MatType>
+  MatType cofactor(const GenericMatrix<MatType> &x, int i, int j) {
+    return Mat(x).zz_cofactor(i, j);
+  }
 
 #ifndef SWIG
   template<typename MatType>
@@ -167,6 +191,8 @@ namespace casadi {
 #endif // SWIG
 
 #ifndef SWIG
+  // Implementations
+
   template<typename MatType>
   MatType cross(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int dim) {
     casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),
@@ -302,12 +328,6 @@ namespace casadi {
   template<typename MatType>
   MatType transpose(const GenericMatrix<MatType> &X) {
     return static_cast<const MatType&>(X).T();
-  }
-
-  template<typename MatType>
-  MatType mul(const GenericMatrix<MatType> &x, const GenericMatrix<MatType> &y,
-              const Sparsity& sp_z) {
-    return Mat(x).zz_mtimes(Mat(y), sp_z);
   }
 
   template<typename MatType>

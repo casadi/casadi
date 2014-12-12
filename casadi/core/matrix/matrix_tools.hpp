@@ -41,21 +41,6 @@ namespace casadi {
 @{
 */
   template<typename DataType>
-  Matrix<DataType> det(const Matrix<DataType>& A) { return A.zz_det();}
-
-  template<typename DataType>
-  Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) { return x.zz_getMinor(i, j);}
-
-  template<typename DataType>
-  Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) { return x.zz_cofactor(i, j);}
-
-  template<typename DataType>
-  Matrix<DataType> adj(const Matrix<DataType>& a) { return a.zz_adj();}
-
-  template<typename DataType>
-  Matrix<DataType> inv(const Matrix<DataType>& a) { return a.zz_inv();}
-
-  template<typename DataType>
   Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol) {
     return a.zz_reshape(nrow, ncol);
   }
