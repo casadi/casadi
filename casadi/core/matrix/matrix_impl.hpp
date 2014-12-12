@@ -1415,7 +1415,6 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::sanityCheck(bool complete) const {
     sparsity_.sanityCheck(complete);
-
     if (data_.size()!=sparsity_.row().size()) {
       std::stringstream s;
       s << "Matrix:Compressed Col Storage is not sane. The following must hold:" << std::endl;
@@ -1428,7 +1427,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::mul(const Matrix<DataType> &y, const Sparsity& sp_z) const {
+  Matrix<DataType> Matrix<DataType>::zz_mtimes(const Matrix<DataType> &y,
+                                               const Sparsity& sp_z) const {
     return this->mul_smart(y, sp_z);
   }
 
@@ -2424,25 +2424,12 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_sumCols() const {
-    return mul(Matrix<DataType>::ones(size2(), 1));
+    return mul(*this, Matrix<DataType>::ones(size2(), 1));
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_sumRows() const {
-    return Matrix<DataType>::ones(1, size1()).mul(*this);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_mul(const std::vector< Matrix<DataType> > &args) {
-    casadi_assert_message(args.size()>=1,
-                          "mul(std::vector< Matrix<DataType> > &args): "
-                          "supplied list must not be empty.");
-    if (args.size()==1) return args[0];
-    Matrix<DataType> ret = args[0].mul(args[1]);
-    for (int i=2;i<args.size();++i) {
-      ret = ret.mul(args[i]);
-    }
-    return ret;
+    return mul(Matrix<DataType>::ones(1, size1()), *this);
   }
 
   template<typename DataType>
@@ -2731,7 +2718,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_outer_prod(const Matrix<DataType> &y) const {
-    return mul(y.T());
+    return mul(*this, y.T());
   }
 
   template<typename DataType>
@@ -2805,7 +2792,7 @@ namespace casadi {
         // Get the j-th column of Q
         Matrix<DataType> qj = Q(ALL, j);
 
-        ri(j, 0) = casadi::mul(qi.T(), qj); // Modified Gram-Schmidt
+        ri(j, 0) = mul(qi.T(), qj); // Modified Gram-Schmidt
         // ri[j] = inner_prod(qj, ai); // Classical Gram-Schmidt
 
         // Remove projection in direction j
@@ -2853,14 +2840,14 @@ namespace casadi {
       beta = 1-x0/b;
 
       X(Slice(i, n), Slice(i, m)) -=
-        beta*casadi::mul(casadi::mul(X(Slice(i, n), Slice(i, m)), u.T()), u);
+        beta*mul(mul(X(Slice(i, n), Slice(i, m)), u.T()), u);
       us.push_back(u);
       betas.push_back(beta);
     }
 
     for (int i=n-1;i>=0;--i) {
       seed(Slice(i, m), Slice(0, m-n)) -=
-        betas[i]*casadi::mul(us[i].T(), casadi::mul(us[i], seed(Slice(i, m), Slice(0, m-n))));
+        betas[i]*mul(us[i].T(), mul(us[i], seed(Slice(i, m), Slice(0, m-n))));
     }
 
     return seed;
@@ -2941,7 +2928,7 @@ namespace casadi {
       } else if (size2()<=3) {
 
         // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
-        xperm = casadi::mul(inv(Aperm), bperm);
+        xperm = mul(inv(Aperm), bperm);
 
       } else {
 
@@ -2950,7 +2937,7 @@ namespace casadi {
         qr(Aperm, Q, R);
 
         // Solve the factorized system (note that solve will now be fast since it is triangular)
-        xperm = solve(R, casadi::mul(Q.T(), bperm));
+        xperm = solve(R, mul(Q.T(), bperm));
       }
 
       // get the inverted column permutation
@@ -2967,9 +2954,9 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_pinv() const {
     if (size2()>=size1()) {
-      return solve(casadi::mul(*this, T()), *this).T();
+      return solve(mul(*this, T()), *this).T();
     } else {
-      return solve(casadi::mul(this->T(), *this), this->T());
+      return solve(mul(this->T(), *this), this->T());
     }
   }
 

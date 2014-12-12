@@ -32,6 +32,7 @@
 #include "../options_functionality.hpp"
 
 #include "sparsity_tools.hpp"
+#include "generic_matrix_tools.hpp"
 
 namespace casadi {
 
@@ -39,23 +40,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief  Matrix product of two matrices
-   *
-   * With optional sp_z you can specify the sparsity of the result
-   * A typical use case might be where the product is only constructed to
-   * inspect the trace of it. sp_z diagonal will be more efficient
-   * in that case.
-   */
-  template<typename DataType>
-  Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y,
-                       const Sparsity& sp_z=Sparsity()) { return x.mul(y, sp_z);}
-
-  /// Matrix product of n matrices
-  template<typename DataType>
-  Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args) {
-    return Matrix<DataType>::zz_mul(args);
-  }
-
   template<typename DataType>
   Matrix<DataType> det(const Matrix<DataType>& A) { return A.zz_det();}
 

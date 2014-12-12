@@ -583,12 +583,6 @@ namespace casadi {
     /// Matrix-matrix product
     Matrix<DataType> mul_full(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
 
-    /// Matrix-matrix product
-    Matrix<DataType> mul(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
-
-    /// Matrix product of n matrices
-    static Matrix<DataType> zz_mul(const std::vector< Matrix<DataType> > &args);
-
     /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
     static void mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType>& y,
                              Matrix<DataType>& z, std::vector<DataType>& work,
@@ -673,6 +667,7 @@ namespace casadi {
     Matrix<DataType> logic_and(const Matrix<DataType>& y) const;
     Matrix<DataType> logic_or(const Matrix<DataType>& y) const;
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_mtimes(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
     Matrix<DataType> zz_det() const;
     Matrix<DataType> zz_sumAll() const;
     Matrix<DataType> zz_sumCols() const;

@@ -488,7 +488,6 @@ namespace casadi {
     MX __mpower__(const MX& b) const;
     /// \endcond
 
-    MX mul(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     MX mul_full(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     MX inner_prod(const MX& y) const;
     MX outer_prod(const MX& y) const;
@@ -549,8 +548,7 @@ namespace casadi {
     MX zz_norm_F() const;
     MX zz_norm_1() const;
     MX zz_norm_inf() const;
-    MX zz_mul(const MX &y, const Sparsity& sp_z=Sparsity()) const;
-    static MX zz_mul(const std::vector< MX > &args);
+    MX zz_mtimes(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     void zz_simplify();
     MX zz_reshape(std::pair<int, int> rc) const;
     MX zz_reshape(int nrow, int ncol) const;

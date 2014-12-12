@@ -169,20 +169,6 @@ namespace casadi {
   /** \brief Infinity-norm */
   inline MX norm_inf(const MX &x) { return x.zz_norm_inf();}
 
-  /** \brief  Take the matrix product of 2 MX objects
-  *
-  * With optional sp_z you can specify the sparsity of the result
-  * A typical use case might be where the product is only constructed to
-  * inspect the trace of it. sp_z diagonal will be more efficient then.
-  *
-  */
-  inline MX mul(const MX &x, const MX &y, const Sparsity& sp_z=Sparsity()) {
-    return x.zz_mul(y, sp_z);
-  }
-
-  /** \brief  Take the matrix product of n MX objects */
-  inline MX mul(const std::vector< MX > &x) { return MX::zz_mul(x);}
-
   /** \brief  Take the inner product of two vectors
       Equals
       \code

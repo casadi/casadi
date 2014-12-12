@@ -33,6 +33,9 @@
 #include "../casadi_math.hpp"
 #include "../casadi_exception.hpp"
 
+// Cast to interfaced class
+#define Mat(x) static_cast<const MatType&>(x)
+
 namespace casadi {
 
 /**
@@ -130,6 +133,21 @@ namespace casadi {
   /** \brief Transpose an expression */
   template<typename MatType>
   MatType transpose(const GenericMatrix<MatType> &X);
+
+  /** \brief  Matrix product of two matrices
+   *
+   * With optional sp_z you can specify the sparsity of the result
+   * A typical use case might be where the product is only constructed to
+   * inspect the trace of it. sp_z diagonal will be more efficient
+   * in that case.
+   */
+  template<typename MatType>
+  MatType mul(const GenericMatrix<MatType> &x, const GenericMatrix<MatType> &y,
+              const Sparsity& sp_z=Sparsity());
+
+  /** \brief  Take the matrix product of n MX objects */
+  template<typename MatType>
+  MatType mul(const std::vector<MatType> &args);
 
 #ifndef SWIG
   template<typename MatType>
@@ -284,6 +302,25 @@ namespace casadi {
   template<typename MatType>
   MatType transpose(const GenericMatrix<MatType> &X) {
     return static_cast<const MatType&>(X).T();
+  }
+
+  template<typename MatType>
+  MatType mul(const GenericMatrix<MatType> &x, const GenericMatrix<MatType> &y,
+              const Sparsity& sp_z) {
+    return Mat(x).zz_mtimes(Mat(y), sp_z);
+  }
+
+  template<typename MatType>
+  MatType mul(const std::vector<MatType> &args) {
+    casadi_assert_message(args.size()>=1,
+                          "mul(std::vector<MatType> &args): "
+                          "supplied list must not be empty.");
+    if (args.size()==1) return args[0];
+    MatType ret = mul(args[0], args[1]);
+    for (int i=2; i<args.size(); ++i) {
+      ret = mul(ret, args[i]);
+    }
+    return ret;
   }
 
 #endif // SWIG

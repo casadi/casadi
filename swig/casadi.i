@@ -560,7 +560,7 @@ memberbinopsr_custom(Type,eq,==)
 memberbinopsr_custom(Type,ne,!=)
 memberbinopsr_un(Type,fmin)
 memberbinopsr_un(Type,fmax)
-memberbinopsr_nn(Type,mul)
+Type rmul(const Type& b) const{ return b.zz_mtimes(*$self);}
 memberbinopsr_un(Type,arctan2)
 memberbinopsr(Type,copysign)
 %enddef
@@ -803,6 +803,7 @@ except:
 %rename(__sub__) zz_minus;
 %rename(__mul__) zz_times;
 %rename(__div__) zz_rdivide;
+%rename(mul) zz_mtimes;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB

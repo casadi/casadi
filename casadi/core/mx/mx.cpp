@@ -623,7 +623,7 @@ namespace casadi {
     return x->getMultiplication(y, z);
   }
 
-  MX MX::mul(const MX& y, const Sparsity &z) const {
+  MX MX::zz_mtimes(const MX& y, const Sparsity &z) const {
     return mul_smart(y, z);
   }
 
@@ -632,7 +632,7 @@ namespace casadi {
   }
 
   MX MX::outer_prod(const MX& y) const {
-    return mul(y.T());
+    return mul(*this, y.T());
   }
 
   MX MX::__pow__(const MX& n) const {
@@ -1310,21 +1310,6 @@ namespace casadi {
     return (*this)->getNormInf();
   }
 
-  MX MX::zz_mul(const MX &y, const Sparsity& sp_z) const {
-    return this->mul(y, sp_z);
-  }
-
-  MX MX::zz_mul(const std::vector< MX > &args) {
-    casadi_assert_message(args.size()>=1,
-                          "mul(std::vector< MX > &args): supplied list must not be empty.");
-    if (args.size()==1) return args[0];
-    MX ret = args[0].mul(args[1]);
-    for (int i=2;i<args.size();++i) {
-      ret = ret.mul(args[i]);
-    }
-    return ret;
-  }
-
   void MX::zz_simplify() {
     if (!isEmpty(true)) {
       (*this)->simplifyMe(*this);
@@ -1508,11 +1493,11 @@ namespace casadi {
   }
 
   MX MX::zz_sumCols() const {
-    return casadi::mul(*this, MX::ones(size2(), 1));
+    return mul(*this, MX::ones(size2(), 1));
   }
 
   MX MX::zz_sumRows() const {
-    return casadi::mul(MX::ones(1, size1()), *this);
+    return mul(MX::ones(1, size1()), *this);
   }
 
   MX MX::zz_sumAll() const {
@@ -2025,9 +2010,9 @@ namespace casadi {
 
   MX MX::zz_pinv(const std::string& lsolver, const Dictionary& dict) const {
     if (size1()>=size2()) {
-      return solve(casadi::mul(T(), *this), T(), lsolver, dict);
+      return solve(mul(T(), *this), T(), lsolver, dict);
     } else {
-      return solve(casadi::mul(*this, T()), *this, lsolver, dict).T();
+      return solve(mul(*this, T()), *this, lsolver, dict).T();
     }
   }
 

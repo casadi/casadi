@@ -37,7 +37,6 @@
 
 // Define template instantiations
 %define MATRIX_TOOLS_TEMPLATES(DataType)
-  MTT_INST(DataType, mul)
   MTT_INST(DataType, det)
   MTT_INST(DataType, getMinor)
   MTT_INST(DataType, cofactor)

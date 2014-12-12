@@ -46,6 +46,7 @@ GMTT_INST(MatType, tril)
 GMTT_INST(MatType, isEqual)
 GMTT_INST(MatType, diagsplit)
 GMTT_INST(MatType, transpose)
+GMTT_INST(MatType, mul)
 %enddef
 
 // Define template instantiations
