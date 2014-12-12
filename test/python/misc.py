@@ -455,7 +455,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "reshape(SX,(int,int) )" in e.message
+      assert "reshape(SX ,(int,int) )" in e.message
 
     try:
       x.reshape(("a",2))

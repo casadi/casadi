@@ -173,6 +173,47 @@ namespace casadi {
     return Mat(x).zz_cofactor(i, j);
   }
 
+  //! \brief Returns a reshaped version of the matrix
+  template<typename MatType>
+  MatType reshape(const GenericMatrix<MatType>& a, int nrow, int ncol) {
+    return Mat(a).zz_reshape(nrow, ncol);
+  }
+
+  //! \brief Returns a reshaped version of the matrix, dimensions as a vector
+  template<typename MatType>
+  MatType reshape(const GenericMatrix<MatType>& a, std::pair<int, int> rc) {
+    return Mat(a).zz_reshape(rc);
+  }
+
+  //! \brief Reshape the matrix
+  template<typename MatType>
+  MatType reshape(const GenericMatrix<MatType>& a,
+                  const Sparsity& sp) { return Mat(a).zz_reshape(sp);}
+
+  /** \brief  make a vector
+      Reshapes/vectorizes the matrix such that the shape becomes (expr.numel(), 1).
+      Columns are stacked on top of each other.
+      Same as reshape(expr, expr.numel(), 1)
+
+      a c \n
+      b d \n
+
+      turns into
+
+      a \n
+      b \n
+      c \n
+      d \n
+
+  */
+  template<typename MatType>
+  MatType vec(const GenericMatrix<MatType>& a) { return Mat(a).zz_vec();}
+
+  /** \brief Returns a flattened version of the matrix, preserving only nonzeros
+   */
+  template<typename MatType>
+  MatType vecNZ(const GenericMatrix<MatType>& a) { return Mat(a).zz_vecNZ();}
+
 #ifndef SWIG
   template<typename MatType>
   MatType linspace(const GenericMatrix<MatType> &a_, const GenericMatrix<MatType> &b_, int nsteps) {

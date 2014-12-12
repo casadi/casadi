@@ -37,9 +37,6 @@
 
 // Define template instantiations
 %define MATRIX_TOOLS_TEMPLATES(DataType)
-  MTT_INST(DataType, reshape)
-  MTT_INST(DataType, vec)
-  MTT_INST(DataType, vecNZ)
   MTT_INST(DataType, blockcat)
   MTT_INST(DataType, blocksplit)
   MTT_INST(DataType, vertcat)

@@ -49,6 +49,9 @@ GMTT_INST(MatType, transpose)
 GMTT_INST(MatType, mul)
 GMTT_INST(MatType, det)
 GMTT_INST(MatType, inv)
+GMTT_INST(MatType, reshape)
+GMTT_INST(MatType, vec)
+GMTT_INST(MatType, vecNZ)
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(MatType...)

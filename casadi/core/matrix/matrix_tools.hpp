@@ -41,45 +41,7 @@ namespace casadi {
 @{
 */
   template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol) {
-    return a.zz_reshape(nrow, ncol);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, std::pair<int, int> rc) {
-    return a.zz_reshape(rc);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a,
-                           const Sparsity& sp) { return a.zz_reshape(sp);}
-
-  template<typename DataType>
   DataType trace(const Matrix<DataType>& a) { return a.zz_trace();}
-
-  /** \brief  make a vector
-      Reshapes/vectorizes the Matrix<DataType> such that the shape becomes (expr.numel(), 1).
-      Columns are stacked on top of each other.
-      Same as reshape(expr, expr.numel(), 1)
-
-      a c \n
-      b d \n
-
-      turns into
-
-      a \n
-      b \n
-      c \n
-      d \n
-
-  */
-  template<typename DataType>
-  Matrix<DataType> vec(const Matrix<DataType>& a) { return a.zz_vec();}
-
-  /** \brief Returns a flattened version of the Matrix, preserving only nonzeros
-   */
-  template<typename DataType>
-  Matrix<DataType> vecNZ(const Matrix<DataType>& a) { return a.zz_vecNZ();}
 
   /** \brief Construct a matrix from a list of list of blocks.
    */

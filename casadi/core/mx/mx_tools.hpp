@@ -194,37 +194,6 @@ namespace casadi {
     return cond.zz_if_else(if_true, if_false);
   }
 
-#ifndef SWIG
-  //! \brief Returns a reshaped version of the MX
-  inline MX reshape(const MX &x, int nrow, int ncol) { return x.zz_reshape(nrow, ncol);}
-#endif // SWIG
-
-  //! \brief Returns a reshaped version of the MX, dimensions as a vector
-  inline MX reshape(const MX &x, std::pair<int, int> rc) { return x.zz_reshape(rc);}
-
-  //! \brief Reshape the MX
-  inline MX reshape(const MX &x, const Sparsity& sp) { return x.zz_reshape(sp);}
-
-  /** \brief Returns a vectorized version of the MX
-      Same as reshape(x, x.numel(), 1)
-
-      a c
-      b d
-
-      turns into
-
-      a
-      b
-      c
-      d
-
-  */
-  inline MX vec(const MX &x) { return x.zz_vec();}
-
-  /** \brief Returns a vectorized version of the MX, preserving only nonzeros
-  */
-  inline MX vecNZ(const MX &x) { return x.zz_vecNZ();}
-
   /** \brief  Unite two matrices no overlapping sparsity */
   inline MX unite(const MX& A, const MX& B) { return A.zz_unite(B);}
 

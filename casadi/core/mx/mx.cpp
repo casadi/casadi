@@ -1257,12 +1257,19 @@ namespace casadi {
   }
 
   MX MX::zz_veccat(const vector<MX>& comp) {
-    MX (&f)(const MX&) = vec;
-    return vertcat(applymap(f, comp));
+    vector<MX> ret = comp;
+    for (vector<MX>::iterator i=ret.begin(); i!=ret.end(); ++i) {
+      *i = vec(*i);
+    }
+    return vertcat(ret);
   }
 
   MX MX::zz_vecNZcat(const vector<MX>& comp) {
-    return vertcat(applymap(vecNZ, comp));
+    vector<MX> ret = comp;
+    for (vector<MX>::iterator i=ret.begin(); i!=ret.end(); ++i) {
+      *i = vecNZ(*i);
+    }
+    return vertcat(ret);
   }
 
   MX MX::zz_blockcat(const std::vector< std::vector<MX > > &v) {
