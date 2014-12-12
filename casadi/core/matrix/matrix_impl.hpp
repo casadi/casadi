@@ -2578,7 +2578,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  std::vector<Matrix<DataType> > Matrix<DataType>::zz_horzsplit(const std::vector<int>& offset) const {
+  std::vector<Matrix<DataType> >
+  Matrix<DataType>::zz_horzsplit(const std::vector<int>& offset) const {
     // Split up the sparsity pattern
     std::vector<Sparsity> sp = horzsplit(sparsity(), offset);
 
@@ -2687,14 +2688,16 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+  Matrix<DataType>
+  Matrix<DataType>::zz_horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
     Matrix<DataType> xy = x;
     xy.appendColumns(y);
     return xy;
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+  Matrix<DataType>
+  Matrix<DataType>::zz_vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
     return horzcat(x.T(), y.T()).T();
   }
 
@@ -2777,6 +2780,462 @@ namespace casadi {
       s = s.fmax(Matrix<DataType>(*i).fabs());
     }
     return s;
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::zz_qr(Matrix<DataType>& Q, Matrix<DataType> &R) const {
+    // The following algorithm is taken from J. Demmel:
+    // Applied Numerical Linear Algebra (algorithm 3.1.)
+    casadi_assert_message(size1()>=size2(), "qr: fewer rows than columns");
+
+    // compute Q and R column by column
+    Q = R = Matrix<DataType>();
+    for (int i=0; i<size2(); ++i) {
+      // Initialize qi to be the i-th column of *this
+      Matrix<DataType> ai = (*this)(ALL, i);
+      Matrix<DataType> qi = ai;
+      // The i-th column of R
+      Matrix<DataType> ri = Matrix<DataType>::sparse(size2(), 1);
+
+      // subtract the projection of qi in the previous directions from ai
+      for (int j=0; j<i; ++j) {
+
+        // Get the j-th column of Q
+        Matrix<DataType> qj = Q(ALL, j);
+
+        ri(j, 0) = casadi::mul(qi.T(), qj); // Modified Gram-Schmidt
+        // ri[j] = inner_prod(qj, ai); // Classical Gram-Schmidt
+
+        // Remove projection in direction j
+        if (ri.hasNZ(j, 0))
+          qi -= ri(j, 0) * qj;
+      }
+
+      // Normalize qi
+      ri(i, 0) = norm_2(qi);
+      qi /= ri(i, 0);
+
+      // Update R and Q
+      Q.appendColumns(qi);
+      R.appendColumns(ri);
+    }
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_nullspace() const {
+    int n = size1();
+    int m = size2();
+
+    Matrix<DataType> X = *this;
+
+    casadi_assert_message(m>=n, "nullspace(): expecting a flat matrix (more columns than rows), "
+                          "but got " << dimString() << ".");
+
+    Matrix<DataType> seed = DMatrix::eye(m)(Slice(0, m), Slice(n, m));
+
+    std::vector< Matrix<DataType> > us;
+    std::vector< Matrix<DataType> > betas;
+
+    Matrix<DataType> beta;
+
+    for (int i=0;i<n;++i) {
+      Matrix<DataType> x = X(i, Slice(i, m));
+      Matrix<DataType> u = Matrix<DataType>(x);
+      Matrix<DataType> sigma = sumCols(x*x).sqrt();
+      const Matrix<DataType>& x0 = x(0, 0);
+      u(0, 0) = 1;
+
+      Matrix<DataType> b = -copysign(sigma, x0);
+
+      u(Slice(0), Slice(1, m-i))*= 1/(x0-b);
+      beta = 1-x0/b;
+
+      X(Slice(i, n), Slice(i, m))-= beta*casadi::mul(casadi::mul(X(Slice(i, n), Slice(i, m)), u.T()), u);
+      us.push_back(u);
+      betas.push_back(beta);
+    }
+
+    for (int i=n-1;i>=0;--i) {
+      seed(Slice(i, m), Slice(0, m-n)) -=
+        betas[i]*casadi::mul(us[i].T(), casadi::mul(us[i], seed(Slice(i, m), Slice(0, m-n))));
+    }
+
+    return seed;
+
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_solve(const Matrix<DataType>& b) const {
+    // check dimensions
+    casadi_assert_message(size1() == b.size1(), "solve Ax=b: dimension mismatch: b has "
+                          << b.size1() << " rows while A has " << size1() << ".");
+    casadi_assert_message(size1() == size2(), "solve: A not square but " << dimString());
+
+    if (isTril()) {
+      // forward substitution if lower triangular
+      Matrix<DataType> x = b;
+      const std::vector<int> & Arow = row();
+      const std::vector<int> & Acolind = colind();
+      const std::vector<DataType> & Adata = data();
+      for (int i=0; i<size2(); ++i) { // loop over columns forwards
+        for (int k=0; k<b.size2(); ++k) { // for every right hand side
+          if (!x.hasNZ(i, k)) continue;
+          x(i, k) /= (*this)(i, i);
+          for (int kk=Acolind[i+1]-1; kk>=Acolind[i] && Arow[kk]>i; --kk) {
+            int j = Arow[kk];
+            x(j, k) -= Adata[kk]*x(i, k);
+          }
+        }
+      }
+      return x;
+    } else if (isTriu()) {
+      // backward substitution if upper triangular
+      Matrix<DataType> x = b;
+      const std::vector<int> & Arow = row();
+      const std::vector<int> & Acolind = colind();
+      const std::vector<DataType> & Adata = data();
+      for (int i=size2()-1; i>=0; --i) { // loop over columns backwards
+        for (int k=0; k<b.size2(); ++k) { // for every right hand side
+          if (!x.hasNZ(i, k)) continue;
+          x(i, k) /= (*this)(i, i);
+          for (int kk=Acolind[i]; kk<Acolind[i+1] && Arow[kk]<i; ++kk) {
+            int j = Arow[kk];
+            x(j, k) -= Adata[kk]*x(i, k);
+          }
+        }
+      }
+      return x;
+    } else if (hasNonStructuralZeros()) {
+
+      // If there are structurally nonzero entries that are known to be zero,
+      // remove these and rerun the algorithm
+      Matrix<DataType> A_sparse = *this;
+      A_sparse.sparsify();
+      return solve(A_sparse, b);
+
+    } else {
+
+      // Make a BLT transformation of A
+      std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+      sparsity().dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+                                     coarse_rowblock, coarse_colblock);
+
+      // Permute the right hand side
+      Matrix<DataType> bperm = b(rowperm, ALL);
+
+      // Permute the linear system
+      Matrix<DataType> Aperm = (*this)(rowperm, colperm);
+
+      // Solution
+      Matrix<DataType> xperm;
+
+      // Solve permuted system
+      if (Aperm.isTril()) {
+
+        // Forward substitution if lower triangular
+        xperm = solve(Aperm, bperm);
+
+      } else if (size2()<=3) {
+
+        // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
+        xperm = casadi::mul(inv(Aperm), bperm);
+
+      } else {
+
+        // Make a QR factorization
+        Matrix<DataType> Q, R;
+        qr(Aperm, Q, R);
+
+        // Solve the factorized system (note that solve will now be fast since it is triangular)
+        xperm = solve(R, casadi::mul(Q.T(), bperm));
+      }
+
+      // get the inverted column permutation
+      std::vector<int> inv_colperm(colperm.size());
+      for (int k=0; k<colperm.size(); ++k)
+        inv_colperm[colperm[k]] = k;
+
+      // Permute back the solution and return
+      Matrix<DataType> x = xperm(inv_colperm, ALL);
+      return x;
+    }
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_pinv() const {
+    if (size2()>=size1()) {
+      return solve(casadi::mul(*this, T()), *this).T();
+    } else {
+      return solve(casadi::mul(this->T(), *this), this->T());
+    }
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_kron(const Matrix<DataType>& b) const {
+    const Sparsity &a_sp = sparsity();
+    Matrix<DataType> filler = Matrix<DataType>::sparse(b.shape());
+    std::vector< std::vector< Matrix<DataType> > >
+      blocks(size1(), std::vector< Matrix<DataType> >(size2(), filler));
+    for (int i=0;i<size1();++i) {
+      for (int j=0;j<size2();++j) {
+        int k = a_sp.getNZ(i, j);
+        if (k!=-1) {
+          blocks[i][j] = (*this)[k]*b;
+        }
+      }
+    }
+    return blockcat(blocks);
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_repmat(int n, int m) const {
+    // First concatenate horizontally
+    Matrix<DataType> col = horzcat(std::vector<Matrix<DataType> >(m, *this));
+
+    // Then vertically
+    return vertcat(std::vector<Matrix<DataType> >(n, col));
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_diag() const {
+    // Nonzero mapping
+    std::vector<int> mapping;
+    // Get the sparsity
+    Sparsity sp = sparsity().getDiag(mapping);
+
+    Matrix<DataType> ret = Matrix<DataType>(sp);
+
+    for (int k=0;k<mapping.size();k++) ret[k] = (*this)[mapping[k]];
+    return ret;
+  }
+
+  /** \brief   Construct a matrix with given block on the diagonal */
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_blkdiag(const std::vector< Matrix<DataType> > &A) {
+    std::vector<DataType> data;
+
+    std::vector<Sparsity> sp;
+    for (int i=0;i<A.size();++i) {
+      data.insert(data.end(), A[i].data().begin(), A[i].data().end());
+      sp.push_back(A[i].sparsity());
+    }
+
+    return Matrix<DataType>(blkdiag(sp), data);
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_unite(const Matrix<DataType>& B) const {
+    // Join the sparsity patterns
+    std::vector<unsigned char> mapping;
+    Sparsity sp = sparsity().patternUnion(B.sparsity(), mapping);
+
+    // Create return matrix
+    Matrix<DataType> ret(sp);
+
+    // Copy sparsity
+    int elA=0, elB=0;
+    for (int k=0; k<mapping.size(); ++k) {
+      if (mapping[k]==1) {
+        ret.data()[k] = data()[elA++];
+      } else if (mapping[k]==2) {
+        ret.data()[k] = B.data()[elB++];
+      } else {
+        throw CasadiException("Pattern intersection not empty");
+      }
+    }
+
+    casadi_assert(size()==elA);
+    casadi_assert(B.size()==elB);
+
+    return ret;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_polyval(const Matrix<DataType>& x) const {
+    casadi_assert_message(isDense(), "polynomial coefficients vector must be dense");
+    casadi_assert_message(isVector() && size()>0, "polynomial coefficients must be a vector");
+    Matrix<DataType> ret = (*this)[0];
+    for (int i=1; i<size(); ++i) {
+      ret = ret*x + (*this)[i];
+    }
+    return ret;
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::zz_addMultiple(const std::vector<DataType>& v,
+                                     std::vector<DataType>& res, bool trans_A) const {
+    // Get dimension and sparsity
+    int d1=size2(), d2=size1();
+    const std::vector<int> &colind=this->colind();
+    const std::vector<int> &row=this->row();
+    const std::vector<DataType>& data = this->data();
+
+    // Assert consistent dimensions
+    if (trans_A) {
+      casadi_assert(v.size()==d1);
+      casadi_assert(res.size()==d2);
+    } else {
+      casadi_assert(v.size()==d2);
+      casadi_assert(res.size()==d1);
+    }
+
+    // Carry out multiplication
+    for (int i=0; i<d1; ++i) { // loop over cols
+      for (int el=colind[i]; el<colind[i+1]; ++el) { // loop over the non-zero elements
+        int j=row[el];  // row
+        // Add scalar product
+        if (trans_A) {
+          res[j] += v[i]*data[el];
+        } else {
+          res[i] += v[j]*data[el];
+        }
+      }
+    }
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_project(const Sparsity& sp) const {
+    // Check dimensions
+    if (!(isEmpty() && sp.numel()==0)) {
+      casadi_assert_message(size2()==sp.size2() && size1()==sp.size1(),
+                            "Shape mismatch. Expecting " << dimString() << ", but got " <<
+                            sp.dimString() << " instead.");
+    }
+
+    // Return value
+    Matrix<DataType> ret(sp, 0);
+
+    // Get the elements of the known matrix
+    std::vector<int> known_ind = sparsity().getElements(false);
+
+    // Find the corresponding nonzeros in the return matrix
+    sp.getNZInplace(known_ind);
+
+    // Set the element values
+    const std::vector<DataType>& A_data = data();
+    std::vector<DataType>& ret_data = ret.data();
+    for (int k=0; k<known_ind.size(); ++k) {
+      if (known_ind[k]!=-1) {
+        ret_data[known_ind[k]] = A_data[k];
+      }
+    }
+    return ret;
+  }
+
+  template<typename DataType>
+  int Matrix<DataType>::zz_sprank() const {
+    return rank(sparsity());
+  }
+
+  template<typename DataType>
+  int Matrix<DataType>::zz_norm_0_mul_nn(const Matrix<DataType> &A,
+                                         std::vector<bool>& Bwork,
+                                         std::vector<int>& Iwork) const {
+
+    // Note: because the algorithm works with compressed row storage,
+    // we have x=B and y=A
+
+    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dimString()
+                          << " times " << A.dimString() << ".");
+
+    int n_row = A.size2();
+    int n_col = size1();
+
+    casadi_assert_message(Bwork.size()>=n_col,
+      "We need a bigger work vector (>=" << n_col << "), but got "<< Bwork.size() <<".");
+    casadi_assert_message(Iwork.size()>=n_row+1+n_col,
+      "We need a bigger work vector (>=" << n_row+1+n_col << "), but got "<< Iwork.size() <<".");
+
+    const std::vector<int> &Aj = A.row();
+    const std::vector<int> &Ap = A.colind();
+
+    const std::vector<int> &Bj = row();
+    const std::vector<int> &Bp = colind();
+
+    int *Cp = &Iwork[0];
+    int *mask = &Iwork[n_row+1];
+
+    // Implementation borrowed from Scipy's sparsetools/csr.h
+
+    // Pass 1
+
+    // method that uses O(n) temp storage
+    std::fill(mask, mask+n_col, -1);
+
+    Cp[0] = 0;
+    int nnz = 0;
+
+    for (int i = 0; i < n_row; i++) {
+      int row_nnz = 0;
+      for (int jj = Ap[i]; jj < Ap[i+1]; jj++) {
+        int j = Aj[jj];
+        for (int kk = Bp[j]; kk < Bp[j+1]; kk++) {
+          int k = Bj[kk];
+          if (mask[k] != i) {
+            mask[k] = i;
+            row_nnz++;
+          }
+        }
+      }
+      int next_nnz = nnz + row_nnz;
+
+      nnz = next_nnz;
+      Cp[i+1] = nnz;
+    }
+
+    // Pass 2
+    int *next = &Iwork[n_row+1];
+    std::fill(next, next+n_col, -1);
+
+    std::vector<bool> & sums = Bwork;
+    std::fill(sums.begin(), sums.end(), false);
+
+    nnz = 0;
+
+    Cp[0] = 0;
+
+    for (int i = 0; i < n_row; i++) {
+        int head   = -2;
+        int length =  0;
+
+        int jj_start = Ap[i];
+        int jj_end   = Ap[i+1];
+        for (int jj = jj_start; jj < jj_end; jj++) {
+            int j = Aj[jj];
+
+            int kk_start = Bp[j];
+            int kk_end   = Bp[j+1];
+            for (int kk = kk_start; kk < kk_end; kk++) {
+                int k = Bj[kk];
+
+                sums[k] = true;
+
+                if (next[k] == -1) {
+                    next[k] = head;
+                    head  = k;
+                    length++;
+                }
+            }
+        }
+
+        for (int jj = 0; jj < length; jj++) {
+
+            if (sums[head]) {
+                nnz++;
+            }
+
+            int temp = head;
+            head = next[head];
+
+            next[temp] = -1; //clear arrays
+            sums[temp] =  0;
+        }
+
+        Cp[i+1] = nnz;
+    }
+
+    return nnz;
+
   }
 
 } // namespace casadi

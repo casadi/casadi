@@ -697,12 +697,14 @@ namespace casadi {
     std::vector<Matrix<DataType> > zz_horzsplit(int incr) const;
     static Matrix<DataType> zz_vertcat(const std::vector<Matrix<DataType> > &v);
     std::vector< Matrix<DataType> > zz_vertsplit(const std::vector<int>& offset) const;
-    std::vector< Matrix<DataType> > zz_vertsplit(int incr) const;
+    std::vector< Matrix<DataType> > zz_vertsplit(int incr=1) const;
     std::vector< std::vector< Matrix<DataType> > >
-      zz_blocksplit(const std::vector<int>& zz_vert_offset, const std::vector<int>& horz_offset) const;
-    std::vector< std::vector< Matrix<DataType> > > zz_blocksplit(int vert_incr, int horz_incr) const;
+      zz_blocksplit(const std::vector<int>& vert_offset,
+                    const std::vector<int>& horz_offset) const;
+    std::vector< std::vector< Matrix<DataType> > >
+      zz_blocksplit(int vert_incr=1, int horz_incr=1) const;
     std::vector< Matrix<DataType> > zz_diagsplitNative(const std::vector<int>& offset1,
-                                                     const std::vector<int>& offset2) const;
+                                                       const std::vector<int>& offset2) const;
     static Matrix<DataType> zz_horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
     static Matrix<DataType> zz_vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
     static Matrix<DataType> zz_veccat(const std::vector< Matrix<DataType> >& comp);
@@ -715,6 +717,23 @@ namespace casadi {
     Matrix<DataType> zz_norm_2() const;
     Matrix<DataType> zz_norm_F() const;
     Matrix<DataType> zz_norm_inf() const;
+    void zz_qr(Matrix<DataType>& Q, Matrix<DataType> &R) const;
+    Matrix<DataType> zz_nullspace() const;
+    Matrix<DataType> zz_solve(const Matrix<DataType>& b) const;
+    Matrix<DataType> zz_pinv() const;
+    Matrix<DataType> zz_kron(const Matrix<DataType>& b) const;
+    Matrix<DataType> zz_repmat(int n, int m) const;
+    Matrix<DataType> zz_diag() const;
+    static Matrix<DataType> zz_blkdiag(const std::vector< Matrix<DataType> > &A);
+    Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;
+    Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
+    void zz_addMultiple(const std::vector<DataType>& v,
+                        std::vector<DataType>& res, bool trans_A=false) const;
+    Matrix<DataType> zz_project(const Sparsity& sparsity) const;
+    int zz_sprank() const;
+    int zz_norm_0_mul_nn(const Matrix<DataType>& B,
+                         std::vector<bool>& Bwork,
+                         std::vector<int>& Iwork) const;
     ///@}
 
     /** \brief Set or reset the maximum number of calls to the
