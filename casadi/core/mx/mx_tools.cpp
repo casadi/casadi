@@ -33,59 +33,6 @@
 using namespace std;
 
 namespace casadi {
-  MX norm_2(const MX &x) {
-    if (x.isVector()) {
-      return norm_F(x);
-    } else {
-      return x->getNorm2();
-    }
-  }
-
-  MX norm_F(const MX &x) {
-    return x->getNormF();
-  }
-
-  MX norm_1(const MX &x) {
-    return x->getNorm1();
-  }
-
-  MX norm_inf(const MX &x) {
-    return x->getNormInf();
-  }
-
-  MX mul(const MX &x, const MX &y, const Sparsity& sp_z) {
-    return x.mul(y, sp_z);
-  }
-
-  MX mul(const std::vector< MX > &args) {
-    casadi_assert_message(args.size()>=1,
-                          "mul(std::vector< MX > &args): supplied list must not be empty.");
-    if (args.size()==1) return args[0];
-    MX ret = args[0].mul(args[1]);
-    for (int i=2;i<args.size();++i) {
-      ret = ret.mul(args[i]);
-    }
-    return ret;
-  }
-
-  MX inner_prod(const MX &x, const MX &y) {
-    return x.inner_prod(y);
-  }
-
-  MX outer_prod(const MX &x, const MX &y) {
-    return x.outer_prod(y);
-  }
-
-  void simplify(MX& ex) {
-    if (!ex.isEmpty(true)) {
-      ex->simplifyMe(ex);
-    }
-  }
-
-  MX transpose(const MX &x) {
-    return x.T();
-  }
-
   MX reshape(const MX &x, std::pair<int, int> rc) {
     return reshape(x, rc.first, rc.second);
   }

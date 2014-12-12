@@ -158,19 +158,19 @@ namespace casadi {
 #endif // SWIG
 
   /** \brief  Frobenius norm  */
-  CASADI_EXPORT MX norm_F(const MX &x);
+  inline MX norm_F(const MX &x) { return x.zz_norm_F();}
 
   /** \brief  2-norm  */
-  CASADI_EXPORT MX norm_2(const MX &x);
+  inline MX norm_2(const MX &x) { return x.zz_norm_2();}
 
   /** \brief 1-norm  */
-  CASADI_EXPORT MX norm_1(const MX &x);
+  inline MX norm_1(const MX &x) { return x.zz_norm_1();}
 
   /** \brief Infinity-norm */
-  CASADI_EXPORT MX norm_inf(const MX &x);
+  inline MX norm_inf(const MX &x) { return x.zz_norm_inf();}
 
   /** \brief Transpose an expression */
-  CASADI_EXPORT MX transpose(const MX &x);
+  inline MX transpose(const MX &x) { return x.T();}
 
   /** \brief  Take the matrix product of 2 MX objects
   *
@@ -179,10 +179,12 @@ namespace casadi {
   * inspect the trace of it. sp_z diagonal will be more efficient then.
   *
   */
-  CASADI_EXPORT MX mul(const MX &x, const MX &y, const Sparsity& sp_z=Sparsity());
+  inline MX mul(const MX &x, const MX &y, const Sparsity& sp_z=Sparsity()) {
+    return x.zz_mul(y, sp_z);
+  }
 
   /** \brief  Take the matrix product of n MX objects */
-  CASADI_EXPORT MX mul(const std::vector< MX > &x);
+  inline MX mul(const std::vector< MX > &x) { return MX::zz_mul(x);}
 
   /** \brief  Take the inner product of two vectors
       Equals
@@ -191,7 +193,7 @@ namespace casadi {
       \endcode
       with x and y vectors
   */
-  CASADI_EXPORT MX inner_prod(const MX &x, const MX &y);
+  inline MX inner_prod(const MX &x, const MX &y) { return x.inner_prod(y);}
 
   /** \brief  Take the outer product of two vectors
       Equals
@@ -200,7 +202,7 @@ namespace casadi {
       \endcode
       with x and y vectors
   */
-  CASADI_EXPORT MX outer_prod(const MX &x, const MX &y);
+  inline MX outer_prod(const MX &x, const MX &y) { return x.outer_prod(y);}
 
   /** \brief Branching on MX nodes
       Ternary operator, "cond ? if_true : if_false"
@@ -242,7 +244,7 @@ namespace casadi {
   CASADI_EXPORT MX unite(const MX& A, const MX& B);
 
   /** \brief  Simplify an expression */
-  CASADI_EXPORT void simplify(MX& ex);
+  inline void simplify(MX& ex) { ex.zz_simplify();}
 
   /** \brief Matrix trace */
   CASADI_EXPORT MX trace(const MX& A);

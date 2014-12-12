@@ -544,6 +544,13 @@ namespace casadi {
     static MX zz_vecNZcat(const std::vector<MX>& comp);
     static MX zz_blockcat(const MX &A, const MX &B, const MX &C, const MX &D);
     static MX zz_blockcat(const std::vector< std::vector<MX > > &v);
+    MX zz_norm_2() const;
+    MX zz_norm_F() const;
+    MX zz_norm_1() const;
+    MX zz_norm_inf() const;
+    MX zz_mul(const MX &y, const Sparsity& sp_z=Sparsity()) const;
+    static MX zz_mul(const std::vector< MX > &args);
+    void zz_simplify();
 
     /** \brief returns itself, but with an assertion attached
     *

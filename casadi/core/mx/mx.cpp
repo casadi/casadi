@@ -1289,4 +1289,45 @@ namespace casadi {
     return vertcat(horzcat(A, B), horzcat(C, D));
   }
 
+  MX MX::zz_norm_2() const {
+    if (isVector()) {
+      return norm_F(*this);
+    } else {
+      return (*this)->getNorm2();
+    }
+  }
+
+  MX MX::zz_norm_F() const {
+    return (*this)->getNormF();
+  }
+
+  MX MX::zz_norm_1() const {
+    return (*this)->getNorm1();
+  }
+
+  MX MX::zz_norm_inf() const {
+    return (*this)->getNormInf();
+  }
+
+  MX MX::zz_mul(const MX &y, const Sparsity& sp_z) const {
+    return this->mul(y, sp_z);
+  }
+
+  MX MX::zz_mul(const std::vector< MX > &args) {
+    casadi_assert_message(args.size()>=1,
+                          "mul(std::vector< MX > &args): supplied list must not be empty.");
+    if (args.size()==1) return args[0];
+    MX ret = args[0].mul(args[1]);
+    for (int i=2;i<args.size();++i) {
+      ret = ret.mul(args[i]);
+    }
+    return ret;
+  }
+
+  void MX::zz_simplify() {
+    if (!isEmpty(true)) {
+      (*this)->simplifyMe(*this);
+    }
+  }
+
 } // namespace casadi
