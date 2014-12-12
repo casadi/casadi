@@ -33,10 +33,12 @@
 #include "../casadi_math.hpp"
 #include "../casadi_exception.hpp"
 
-// Cast to interfaced class
-#define Mat(x) static_cast<const MatType&>(x)
-
 namespace casadi {
+  // Helper function
+  template<typename MatType>
+  const MatType& mat(const GenericMatrix<MatType>& x) {
+    return static_cast<const MatType&>(x);
+  }
 
 /**
 \ingroup expression_tools
@@ -87,7 +89,7 @@ namespace casadi {
   /** \brief Check if two expressions are equal, assuming that they are comparable */
   template<typename MatType>
   bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y) {
-    return static_cast<const MatType&>(x).isEqual(static_cast<const MatType&>(y));
+    return mat(x).isEqual(mat(y));
   }
 
   /** \brief  split diagonally, retaining groups of square matrices
@@ -143,7 +145,7 @@ namespace casadi {
    */
   template<typename MatType>
   MatType mul(const GenericMatrix<MatType> &x, const GenericMatrix<MatType> &y,
-              const Sparsity& sp_z=Sparsity()) { return Mat(x).zz_mtimes(Mat(y), sp_z); }
+              const Sparsity& sp_z=Sparsity()) { return mat(x).zz_mtimes(mat(y), sp_z); }
 
   /** \brief  Take the matrix product of n MX objects */
   template<typename MatType>
@@ -151,44 +153,44 @@ namespace casadi {
 
   /** \brief Matrix determinant (experimental) */
   template<typename MatType>
-  MatType det(const GenericMatrix<MatType>& A) { return Mat(A).zz_det();}
+  MatType det(const GenericMatrix<MatType>& A) { return mat(A).zz_det();}
 
   /** \brief Matrix inverse (experimental) */
   template<typename MatType>
-  MatType inv(const GenericMatrix<MatType>& A) { return Mat(A).zz_inv();}
+  MatType inv(const GenericMatrix<MatType>& A) { return mat(A).zz_inv();}
 
   /** \brief Matrix adjoint */
   template<typename MatType>
-  MatType adj(const GenericMatrix<MatType>& A) { return Mat(A).zz_adj();}
+  MatType adj(const GenericMatrix<MatType>& A) { return mat(A).zz_adj();}
 
   /** \brief Get the (i,j) minor matrix */
   template<typename MatType>
   MatType getMinor(const GenericMatrix<MatType> &x, int i, int j) {
-    return Mat(x).zz_getMinor(i, j);
+    return mat(x).zz_getMinor(i, j);
   }
 
   /** \brief Get the (i,j) cofactor matrix */
   template<typename MatType>
   MatType cofactor(const GenericMatrix<MatType> &x, int i, int j) {
-    return Mat(x).zz_cofactor(i, j);
+    return mat(x).zz_cofactor(i, j);
   }
 
   //! \brief Returns a reshaped version of the matrix
   template<typename MatType>
   MatType reshape(const GenericMatrix<MatType>& a, int nrow, int ncol) {
-    return Mat(a).zz_reshape(nrow, ncol);
+    return mat(a).zz_reshape(nrow, ncol);
   }
 
   //! \brief Returns a reshaped version of the matrix, dimensions as a vector
   template<typename MatType>
   MatType reshape(const GenericMatrix<MatType>& a, std::pair<int, int> rc) {
-    return Mat(a).zz_reshape(rc);
+    return mat(a).zz_reshape(rc);
   }
 
   //! \brief Reshape the matrix
   template<typename MatType>
   MatType reshape(const GenericMatrix<MatType>& a,
-                  const Sparsity& sp) { return Mat(a).zz_reshape(sp);}
+                  const Sparsity& sp) { return mat(a).zz_reshape(sp);}
 
   /** \brief  make a vector
       Reshapes/vectorizes the matrix such that the shape becomes (expr.numel(), 1).
@@ -207,18 +209,18 @@ namespace casadi {
 
   */
   template<typename MatType>
-  MatType vec(const GenericMatrix<MatType>& a) { return Mat(a).zz_vec();}
+  MatType vec(const GenericMatrix<MatType>& a) { return mat(a).zz_vec();}
 
   /** \brief Returns a flattened version of the matrix, preserving only nonzeros
    */
   template<typename MatType>
-  MatType vecNZ(const GenericMatrix<MatType>& a) { return Mat(a).zz_vecNZ();}
+  MatType vecNZ(const GenericMatrix<MatType>& a) { return mat(a).zz_vecNZ();}
 
 #ifndef SWIG
   template<typename MatType>
   MatType linspace(const GenericMatrix<MatType> &a_, const GenericMatrix<MatType> &b_, int nsteps) {
-    const MatType& a = static_cast<const MatType&>(a_);
-    const MatType& b = static_cast<const MatType&>(b_);
+    const MatType& a = mat(a_);
+    const MatType& b = mat(b_);
     std::vector<MatType> ret(nsteps);
     ret[0] = a;
     MatType step = (b-a)/(nsteps-1);
@@ -272,7 +274,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType tril2symm(const GenericMatrix<MatType> &a_) {
-    const MatType& a = static_cast<const MatType&>(a_);
+    const MatType& a = mat(a_);
     casadi_assert_message(a.isSquare(),
                           "Shape error in tril2symm. Expecting square shape but got "
                           << a.dimString());
@@ -285,7 +287,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType triu2symm(const GenericMatrix<MatType> &a_) {
-    const MatType& a = static_cast<const MatType&>(a_);
+    const MatType& a = mat(a_);
     casadi_assert_message(a.isSquare(),
                           "Shape error in triu2symm. Expecting square shape but got "
                           << a.dimString());
@@ -297,19 +299,19 @@ namespace casadi {
 
   template<typename MatType>
   MatType triu(const GenericMatrix<MatType> &a_) {
-    const MatType& a = static_cast<const MatType&>(a_);
+    const MatType& a = mat(a_);
     return a.setSparse(a.sparsity().getTriu());
   }
 
   template<typename MatType>
   MatType tril(const GenericMatrix<MatType> &a_) {
-    const MatType& a = static_cast<const MatType&>(a_);
+    const MatType& a = mat(a_);
     return a.setSparse(a.sparsity().getTril());
   }
 
   template<typename MatType>
   std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_, int incr) {
-    const MatType& x = static_cast<const MatType&>(x_);
+    const MatType& x = mat(x_);
     casadi_assert(incr>=1);
     casadi_assert_message(x.isSquare(),
       "diagsplit(x,incr)::input must be square but got " << x.dimString()  << ".");
@@ -320,7 +322,7 @@ namespace casadi {
 
   template<typename MatType>
   std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_, int incr1, int incr2) {
-    const MatType& x = static_cast<const MatType&>(x_);
+    const MatType& x = mat(x_);
     casadi_assert(incr1>=1);
     casadi_assert(incr2>=1);
     std::vector<int> offset1 = range(0, x.size1(), incr1);
@@ -334,14 +336,14 @@ namespace casadi {
   std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_,
     const std::vector<int>& output_offset1,
     const std::vector<int>& output_offset2) {
-    const MatType& x = static_cast<const MatType&>(x_);
+    const MatType& x = mat(x_);
     return diagsplitNative(x, output_offset1, output_offset2);
   }
 
   template<typename MatType>
   std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_,
       const std::vector<int>& output_offset) {
-    const MatType& x = static_cast<const MatType&>(x_);
+    const MatType& x = mat(x_);
     casadi_assert_message(x.isSquare(),
       "diagsplit(x,incr)::input must be square but got " << x.dimString()  << ".");
     return diagsplit(x, output_offset, output_offset);
@@ -349,26 +351,26 @@ namespace casadi {
 
   template<typename MatType>
   MatType quad_form(const GenericMatrix<MatType> &X_, const GenericMatrix<MatType> &A_) {
-    const MatType& X = static_cast<const MatType&>(X_);
-    const MatType& A = static_cast<const MatType&>(A_);
+    const MatType& X = mat(X_);
+    const MatType& A = mat(A_);
     return mul(X.T(), mul(A, X));
   }
 
   template<typename MatType>
   MatType quad_form(const GenericMatrix<MatType> &X_) {
-    const MatType& X = static_cast<const MatType&>(X_);
+    const MatType& X = mat(X_);
     return mul(X.T(), X);
   }
 
   template<typename MatType>
   MatType sum_square(const GenericMatrix<MatType> &X_) {
-    const MatType& X = static_cast<const MatType&>(X_);
+    const MatType& X = mat(X_);
     return sumAll(X*X);
   }
 
   template<typename MatType>
   MatType transpose(const GenericMatrix<MatType> &X) {
-    return static_cast<const MatType&>(X).T();
+    return mat(X).T();
   }
 
   template<typename MatType>
