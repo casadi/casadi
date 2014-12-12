@@ -2620,8 +2620,10 @@ namespace casadi {
   std::vector< Matrix<DataType> >
   Matrix<DataType>::zz_vertsplit(const std::vector<int>& offset) const {
     std::vector< Matrix<DataType> > ret = horzsplit(this->T(), offset);
-    Matrix<DataType> (*transposeT)(const Matrix<DataType>& x) = transpose;
-    std::transform(ret.begin(), ret.end(), ret.begin(), transposeT);
+    for (typename std::vector< Matrix<DataType> >::iterator it=ret.begin();
+         it!=ret.end(); ++it) {
+      *it = it->T();
+    }
     return ret;
   }
 

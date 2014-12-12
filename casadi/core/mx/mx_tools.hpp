@@ -169,9 +169,6 @@ namespace casadi {
   /** \brief Infinity-norm */
   inline MX norm_inf(const MX &x) { return x.zz_norm_inf();}
 
-  /** \brief Transpose an expression */
-  inline MX transpose(const MX &x) { return x.T();}
-
   /** \brief  Take the matrix product of 2 MX objects
   *
   * With optional sp_z you can specify the sparsity of the result

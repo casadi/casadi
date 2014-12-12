@@ -1209,7 +1209,7 @@ namespace casadi {
       }
     } else {
       std::vector<MX> ret = horzsplit(T(), offset);
-      MX (*transposeMX)(const MX& x) = transpose;
+      MX (*transposeMX)(const GenericMatrix<MX>& x) = transpose;
       std::transform(ret.begin(), ret.end(), ret.begin(), transposeMX);
       return ret;
     }

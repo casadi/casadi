@@ -39,7 +39,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-
   /** \brief Calculate quadratic form X^T A X*/
   template<typename MatType>
   MatType quad_form(const GenericMatrix<MatType> &X, const GenericMatrix<MatType> &A);
@@ -127,6 +126,10 @@ namespace casadi {
   std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x,
                                    const std::vector<int>& output_offset1,
                                    const std::vector<int>& output_offset2);
+
+  /** \brief Transpose an expression */
+  template<typename MatType>
+  MatType transpose(const GenericMatrix<MatType> &X);
 
 #ifndef SWIG
   template<typename MatType>
@@ -276,6 +279,11 @@ namespace casadi {
   MatType sum_square(const GenericMatrix<MatType> &X_) {
     const MatType& X = static_cast<const MatType&>(X_);
     return sumAll(X*X);
+  }
+
+  template<typename MatType>
+  MatType transpose(const GenericMatrix<MatType> &X) {
+    return static_cast<const MatType&>(X).T();
   }
 
 #endif // SWIG

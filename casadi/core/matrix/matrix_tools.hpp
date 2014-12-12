@@ -39,10 +39,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /// Transpose of a matrix
-  template<typename DataType>
-  Matrix<DataType> transpose(const Matrix<DataType> &x) { return x.T();}
-
   /** \brief  Matrix product of two matrices
    *
    * With optional sp_z you can specify the sparsity of the result

@@ -37,7 +37,6 @@
 
 // Define template instantiations
 %define MATRIX_TOOLS_TEMPLATES(DataType)
-  MTT_INST(DataType, transpose)
   MTT_INST(DataType, mul)
   MTT_INST(DataType, det)
   MTT_INST(DataType, getMinor)
@@ -79,14 +78,14 @@
   MTT_INST(DataType, project)
   MTT_INST(DataType, sprank)
   MTT_INST(DataType, kron)
-#ifndef SWIGOCTAVE
   MTT_INST(DataType, sparse)
   MTT_INST(DataType, dense)
-#endif //SWIGOCTAVE
 %enddef
 
+#ifndef SWIGMATLAB
 MATRIX_TOOLS_TEMPLATES(int)
 MATRIX_TOOLS_TEMPLATES(double)
 MATRIX_TOOLS_TEMPLATES(casadi::SXElement)
+#endif // SWIGMATLAB
 
 #endif // CASADI_MATRIX_TOOLS_I
