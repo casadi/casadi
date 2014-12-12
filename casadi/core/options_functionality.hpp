@@ -32,9 +32,6 @@
 
 namespace casadi {
 
-  /// C++ version of Python's dictionary
-  typedef GenericType::Dictionary Dictionary;
-
   // Forward declaration
   class OptionsFunctionalityNode;
 

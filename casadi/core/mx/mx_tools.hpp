@@ -207,18 +207,20 @@ namespace casadi {
   /** \brief Branching on MX nodes
       Ternary operator, "cond ? if_true : if_false"
   */
-  CASADI_EXPORT MX if_else(const MX &cond, const MX &if_true, const MX &if_false);
+  inline MX if_else(const MX &cond, const MX &if_true, const MX &if_false) {
+    return cond.zz_if_else(if_true, if_false);
+  }
 
 #ifndef SWIG
   //! \brief Returns a reshaped version of the MX
-  CASADI_EXPORT MX reshape(const MX &x, int nrow, int ncol);
+  inline MX reshape(const MX &x, int nrow, int ncol) { return x.zz_reshape(nrow, ncol);}
 #endif // SWIG
 
   //! \brief Returns a reshaped version of the MX, dimensions as a vector
-  CASADI_EXPORT MX reshape(const MX &x, std::pair<int, int> rc);
+  inline MX reshape(const MX &x, std::pair<int, int> rc) { return x.zz_reshape(rc);}
 
   //! \brief Reshape the MX
-  CASADI_EXPORT MX reshape(const MX &x, const Sparsity& sp);
+  inline MX reshape(const MX &x, const Sparsity& sp) { return x.zz_reshape(sp);}
 
   /** \brief Returns a vectorized version of the MX
       Same as reshape(x, x.numel(), 1)
@@ -234,33 +236,26 @@ namespace casadi {
       d
 
   */
-  CASADI_EXPORT MX vec(const MX &x);
+  inline MX vec(const MX &x) { return x.zz_vec();}
 
   /** \brief Returns a vectorized version of the MX, preserving only nonzeros
   */
-  CASADI_EXPORT MX vecNZ(const MX &x);
+  inline MX vecNZ(const MX &x) { return x.zz_vecNZ();}
 
   /** \brief  Unite two matrices no overlapping sparsity */
-  CASADI_EXPORT MX unite(const MX& A, const MX& B);
+  inline MX unite(const MX& A, const MX& B) { return A.zz_unite(B);}
 
   /** \brief  Simplify an expression */
   inline void simplify(MX& ex) { ex.zz_simplify();}
 
   /** \brief Matrix trace */
-  CASADI_EXPORT MX trace(const MX& A);
+  inline MX trace(const MX& A) { return A.zz_trace();}
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
-  CASADI_EXPORT MX repmat(const MX &A, int n, int m);
+  inline MX repmat(const MX &A, int n, int m) { return A.zz_repmat(n, m);}
 
-  /** \brief create a clipped view into a matrix
-      Create a sparse matrix from a dense matrix A, with sparsity pattern sp
-  **/
-  //MX clip(const MX& A, const Sparsity& sp);
-
-#ifndef SWIGOCTAVE
   /** \brief  Make the matrix dense if not already */
-  CASADI_EXPORT MX dense(const MX& x);
-#endif // SWIGOCTAVE
+  inline MX dense(const MX& x) { return x.zz_dense();}
 
   /** \brief  Create a parent MX on which all given MX's will depend.
 
@@ -268,109 +263,123 @@ namespace casadi {
 
       \param deps  Must all be symbolic matrices.
   */
-  CASADI_EXPORT MX createParent(std::vector<MX> &deps);
+  inline MX createParent(std::vector<MX> &deps) { return MX::zz_createParent(deps);}
 
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
-  CASADI_EXPORT MX createParent(const std::vector<MX> &deps,
-                                std::vector<MX>& SWIG_OUTPUT(children));
+  inline MX createParent(const std::vector<MX> &deps,
+                         std::vector<MX>& SWIG_OUTPUT(children)) {
+    return MX::zz_createParent(deps, children);
+  }
 
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
-  CASADI_EXPORT MX createParent(const std::vector<Sparsity> &deps,
-                                std::vector<MX>& SWIG_OUTPUT(children));
+  inline MX createParent(const std::vector<Sparsity> &deps,
+                         std::vector<MX>& SWIG_OUTPUT(children)) {
+    return MX::zz_createParent(deps, children);
+  }
 
   /** Count number of nodes */
-  CASADI_EXPORT int countNodes(const MX& A);
+  inline int countNodes(const MX& A) { return A.zz_countNodes();}
 
   /** \brief  Get the diagonal of a matrix or construct a diagonal
 
       When the input is square, the diagonal elements are returned.
       If the input is vector-like, a diagonal matrix is constructed with it.
   */
-  CASADI_EXPORT MX diag(const MX& x);
+  inline MX diag(const MX& x) { return x.zz_diag();}
 
   /** \brief   Construct a matrix with given blocks on the diagonal */
-  CASADI_EXPORT MX blkdiag(const std::vector<MX> &A);
+  inline MX blkdiag(const std::vector<MX> &A) { return MX::zz_blkdiag(A);}
 
 #ifndef SWIG
   /** \brief   Construct a matrix with given blocks on the diagonal */
-  CASADI_EXPORT MX blkdiag(const MX &A, const MX& B);
+  inline MX blkdiag(const MX &A, const MX& B) { return A.zz_blkdiag(B);}
 #endif // SWIG
 
   /** \brief Return a col-wise summation of elements */
-  CASADI_EXPORT MX sumCols(const MX &x);
+  inline MX sumCols(const MX &x) { return x.zz_sumCols();}
 
   /** \brief Return a row-wise summation of elements */
-  CASADI_EXPORT MX sumRows(const MX &x);
+  inline MX sumRows(const MX &x) { return x.zz_sumRows();}
 
   /// Return summation of all elements
-  CASADI_EXPORT MX sumAll(const MX &x);
+  inline MX sumAll(const MX &x) { return x.zz_sumAll();}
 
   /** \brief  Evaluate a polynomial with coefficients p in x */
-  CASADI_EXPORT MX polyval(const MX& p, const MX& x);
+  inline MX polyval(const MX& p, const MX& x) { return p.zz_polyval(x);}
 
   /** \brief Get a string representation for a binary MX, using custom arguments */
-  CASADI_EXPORT std::string
-    getOperatorRepresentation(const MX& xb, const std::vector<std::string>& args);
+  inline std::string
+  getOperatorRepresentation(const MX& xb, const std::vector<std::string>& args) {
+    return xb.zz_getOperatorRepresentation(args);
+  }
 
   /** \brief  Substitute variable v with expression vdef in an expression ex */
-  CASADI_EXPORT MX substitute(const MX &ex, const MX& v, const MX& vdef);
+  inline MX substitute(const MX &ex, const MX& v, const MX& vdef) {
+    return ex.zz_substitute(v, vdef);
+  }
 
   /** \brief  Substitute variable var with expression expr in multiple expressions */
-  CASADI_EXPORT std::vector<MX>
-    substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
+  inline std::vector<MX>
+  substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef) {
+    return MX::zz_substitute(ex, v, vdef);
+  }
 
   /** \brief  Substitute variable v with expression vdef in an expression ex, preserving nodes */
-  CASADI_EXPORT MX
-     graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
+  inline MX
+  graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef) {
+    return ex.zz_graph_substitute(v, vdef);
+  }
 
   /** \brief  Substitute variable var with expression expr in
    * multiple expressions, preserving nodes  */
-  CASADI_EXPORT std::vector<MX>
-    graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
-                     const std::vector<MX> &vdef);
+  inline std::vector<MX>
+  graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
+                   const std::vector<MX> &vdef) {
+    return MX::zz_graph_substitute(ex, v, vdef);
+  }
 
   /** \brief Inplace substitution
    * Substitute variables v out of the expressions vdef sequentially
    */
-#ifndef SWIG
-  CASADI_EXPORT void
-    substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse=false);
-#else // SWIG
-  CASADI_EXPORT void
-    substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, bool reverse=false);
-#endif // SWIG
+  inline void
+  substituteInPlace(const std::vector<MX>& v,
+                    std::vector<MX>& SWIG_INOUT(vdef), bool reverse=false) {
+    return MX::zz_substituteInPlace(v, vdef, reverse);
+  }
 
   /** \brief Inplace substitution with piggyback expressions
    * Substitute variables v out of the expressions vdef sequentially,
    * as well as out of a number of other expressions piggyback */
-#ifndef SWIG
-  CASADI_EXPORT void
-    substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
-                      std::vector<MX>& ex, bool reverse=false);
-#else // SWIG
-  CASADI_EXPORT void
-    substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT,
-                      std::vector<MX>& INOUT, bool reverse=false);
-#endif // SWIG
+  inline void
+  substituteInPlace(const std::vector<MX>& v,
+                    std::vector<MX>& SWIG_INOUT(vdef),
+                    std::vector<MX>& SWIG_INOUT(ex), bool reverse=false) {
+    return MX::zz_substituteInPlace(v, vdef, ex, reverse);
+  }
 
   /** \brief Extract shared subexpressions from an set of expressions */
-  CASADI_EXPORT void extractShared(std::vector<MX>& ex,
-                     std::vector<MX>& v, std::vector<MX>& vdef,
-                     const std::string& v_prefix="v_", const std::string& v_suffix="");
+  inline void extractShared(std::vector<MX>& ex,
+                            std::vector<MX>& v, std::vector<MX>& vdef,
+                            const std::string& v_prefix="v_",
+                            const std::string& v_suffix="") {
+    return MX::zz_extractShared(ex, v, vdef, v_prefix, v_suffix);
+  }
 
   /** \brief Print compact, introducing new variables for shared subexpressions */
-  CASADI_EXPORT void printCompact(const MX& ex, std::ostream &stream=CASADI_COUT);
+  inline void printCompact(const MX& ex, std::ostream &stream=CASADI_COUT) {
+    return ex.zz_printCompact(stream);
+  }
 
   ///@{
   /** \brief Calculate jacobian via source code transformation
 
       Uses casadi::MXFunction::jac
   */
-  CASADI_EXPORT MX jacobian(const MX &ex, const MX &arg);
-  CASADI_EXPORT MX gradient(const MX &ex, const MX &arg);
-  CASADI_EXPORT MX tangent(const MX &ex, const MX &arg);
+  inline MX jacobian(const MX &ex, const MX &arg) { return ex.zz_jacobian(arg);}
+  inline MX gradient(const MX &ex, const MX &arg) { return ex.zz_gradient(arg);}
+  inline MX tangent(const MX &ex, const MX &arg) { return ex.zz_tangent(arg);}
   ///@}
 
   /** \brief Computes the nullspace of a matrix A
@@ -382,30 +391,32 @@ namespace casadi {
   *
   * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
   */
-  CASADI_EXPORT MX nullspace(const MX& A);
+  inline MX nullspace(const MX& A) { return A.zz_nullspace();}
 
   /** \brief Matrix determinant (experimental) */
-  CASADI_EXPORT MX det(const MX& A);
+  inline MX det(const MX& A) { return A.zz_det();}
 
   /** \brief Matrix inverse (experimental) */
-  CASADI_EXPORT MX inv(const MX& A);
+  inline MX inv(const MX& A) { return A.zz_inv();}
 
   /** \brief Get all symbols contained in the supplied expression
   * Get all symbols on which the supplied expression depends
   * \see MXFunction::getFree()
   */
-  CASADI_EXPORT std::vector<MX> getSymbols(const MX& e);
+  inline std::vector<MX> getSymbols(const MX& e) { return e.zz_getSymbols();}
 
   /** \brief Get all symbols contained in the supplied expression
   * Get all symbols on which the supplied expression depends
   * \see MXFunction::getFree()
   */
-  CASADI_EXPORT std::vector<MX> getSymbols(const std::vector<MX>& e);
+  inline std::vector<MX> getSymbols(const std::vector<MX>& e) {
+    return MX::zz_getSymbols(e);
+  }
 
   /** \brief Check if expression depends on any of the arguments
     The arguments must be symbolic
   */
-  CASADI_EXPORT bool dependsOn(const MX& ex, const std::vector<MX> &arg);
+  inline bool dependsOn(const MX& ex, const std::vector<MX> &arg) { return ex.zz_dependsOn(arg);}
 
   /** \brief Expand MX graph to SXFunction call
   *
@@ -413,8 +424,10 @@ namespace casadi {
   *  supplying expressions contained in it at which expansion should stop.
   *
   */
-  CASADI_EXPORT MX
-    matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>());
+  inline MX
+  matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>()) {
+    return MX::zz_matrix_expand(e, boundary);
+  }
 
   /** \brief Expand MX graph to SXFunction call
   *
@@ -422,20 +435,22 @@ namespace casadi {
   *  supplying expressions contained in it at which expansion should stop.
   *
   */
-  CASADI_EXPORT std::vector<MX>
-    matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary = std::vector<MX>());
+  inline std::vector<MX>
+  matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary = std::vector<MX>()) {
+    return MX::zz_matrix_expand(e, boundary);
+  }
 
   /** \brief Kronecker tensor product
   *
   * Creates a block matrix in which each element (i, j) is a_ij*b
   */
-  CASADI_EXPORT MX kron(const MX& a, const MX& b);
+  inline MX kron(const MX& a, const MX& b) { return a.zz_kron(b);}
 
   /** \brief Solve a system of equations: A*x = b
   */
-  CASADI_EXPORT MX
+  inline MX
   solve(const MX& A, const MX& b, const std::string& lsolver = "symbolicqr",
-        const Dictionary& dict = Dictionary());
+        const Dictionary& dict = Dictionary()) { return A.zz_solve(b, lsolver, dict);}
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
   *
@@ -443,19 +458,11 @@ namespace casadi {
   * If the matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
   *
   */
-  CASADI_EXPORT MX pinv(const MX& A, const std::string& lsolver,
-                                 const Dictionary& dict = Dictionary());
-
+  inline MX pinv(const MX& A, const std::string& lsolver,
+                 const Dictionary& dict = Dictionary()) { return A.zz_pinv(lsolver, dict);}
 /** @}
 */
 
 } // namespace casadi
-
-#ifdef SWIG
-// Template instantiations
-%template(Pair_MX_MXVector) std::pair<casadi::MX, std::vector<casadi::MX> >;
-#endif // SWIG
-
-
 
 #endif // CASADI_MX_TOOLS_HPP

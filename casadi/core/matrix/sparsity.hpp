@@ -34,8 +34,10 @@
 
 #ifdef SWIG
 #define SWIG_OUTPUT(arg) OUTPUT
+#define SWIG_INOUT(arg) INOUT
 #else
 #define SWIG_OUTPUT(arg) arg
+#define SWIG_INOUT(arg) arg
 #endif
 
 // Cashing requires a multimap (preferably a hash map)

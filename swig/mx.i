@@ -30,6 +30,9 @@
 
 %include <casadi/core/mx/mx.hpp>
 
+// Template instantiations
+%template(Pair_MX_MXVector) std::pair<casadi::MX, std::vector<casadi::MX> >;
+
 %extend casadi::MX{
   
   %matrix_helpers(casadi::MX)

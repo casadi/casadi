@@ -213,10 +213,10 @@ namespace casadi {
 
    private:
     opt_type type_;
-
-
   };
 
+  /// C++ version of Python's dictionary
+  typedef GenericType::Dictionary Dictionary;
 
 } // namespace casadi
 

@@ -28,6 +28,7 @@
 #include "../shared_object.hpp"
 #include "../matrix/matrix.hpp"
 #include "../matrix/generic_expression.hpp"
+#include "../generic_type.hpp"
 #include <vector>
 namespace casadi {
 
@@ -551,6 +552,60 @@ namespace casadi {
     MX zz_mul(const MX &y, const Sparsity& sp_z=Sparsity()) const;
     static MX zz_mul(const std::vector< MX > &args);
     void zz_simplify();
+    MX zz_reshape(std::pair<int, int> rc) const;
+    MX zz_reshape(int nrow, int ncol) const;
+    MX zz_reshape(const Sparsity& sp) const;
+    MX zz_vec() const;
+    MX zz_vecNZ() const;
+    MX zz_if_else(const MX &if_true, const MX &if_false) const;
+    MX zz_unite(const MX& B) const;
+    MX zz_trace() const;
+    MX zz_repmat(int n, int m) const;
+    MX zz_dense() const;
+    static MX zz_createParent(std::vector<MX> &deps);
+    static MX zz_createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children);
+    static MX zz_createParent(const std::vector<MX> &deps, std::vector<MX>& children);
+    MX zz_diag() const;
+    static MX zz_blkdiag(const std::vector<MX> &A);
+    MX zz_blkdiag(const MX& B) const;
+    int zz_countNodes() const;
+    MX zz_sumCols() const;
+    MX zz_sumRows() const;
+    MX zz_sumAll() const;
+    MX zz_polyval(const MX& x) const;
+    std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+    static void zz_substituteInPlace(const std::vector<MX>& v,
+                                     std::vector<MX>& vdef, bool reverse=false);
+    static void zz_substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
+                              std::vector<MX>& ex, bool reverse=false);
+    MX zz_substitute(const MX& v, const MX& vdef) const;
+    static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
+                                         const std::vector<MX> &v,
+                                         const std::vector<MX> &vdef);
+    MX zz_graph_substitute(const std::vector<MX> &v, const std::vector<MX> &vdef) const;
+    static std::vector<MX> zz_graph_substitute(const std::vector<MX> &ex,
+                                               const std::vector<MX> &expr,
+                                               const std::vector<MX> &exprs);
+    static void zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
+                                 const std::string& v_prefix="v_", const std::string& v_suffix="");
+    void zz_printCompact(std::ostream &stream=CASADI_COUT) const;
+    MX zz_jacobian(const MX &arg) const;
+    MX zz_gradient(const MX &arg) const;
+    MX zz_tangent(const MX &arg) const;
+    MX zz_det() const;
+    MX zz_inv() const;
+    std::vector<MX> zz_getSymbols() const;
+    static std::vector<MX> zz_getSymbols(const std::vector<MX>& e);
+    bool zz_dependsOn(const std::vector<MX> &arg) const;
+    static MX zz_matrix_expand(const MX& e,
+                               const std::vector<MX> &boundary = std::vector<MX>());
+    static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,
+                                            const std::vector<MX>& boundary = std::vector<MX>());
+    MX zz_kron(const MX& b) const;
+    MX zz_solve(const MX& b, const std::string& lsolver,
+                const Dictionary& dict = Dictionary()) const;
+    MX zz_pinv(const std::string& lsolver, const Dictionary& dict = Dictionary()) const;
+    MX zz_nullspace() const;
 
     /** \brief returns itself, but with an assertion attached
     *
