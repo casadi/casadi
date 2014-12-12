@@ -1035,4 +1035,258 @@ namespace casadi {
     return dynamic_cast<const MXNode*>(ptr)!=0;
   }
 
+  // Helper function
+  bool has_empty(const vector<MX>& x, bool both=false) {
+    for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
+      if (i->isEmpty(both)) return true;
+    }
+    return false;
+  }
+
+  vector<MX> trim_empty(const vector<MX>& x, bool both=false) {
+    vector<MX> ret;
+    for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
+      if (!i->isEmpty(both)) ret.push_back(*i);
+    }
+    return ret;
+  }
+
+  MX MX::zz_horzcat(const vector<MX>& x) {
+    // Check dimensions
+    if (x.size()>1) {
+      vector<MX> ne = trim_empty(x, true);
+      for (int i=0;i<ne.size();i++) {
+        casadi_assert_message(ne[i].size1()==ne[0].size1(),
+                      "horzcat dimension mismatch  " <<
+                      "x[" << i << "]:" << ne[i].dimString() <<
+                      " and x[0]: " << ne[0].dimString() << ".");
+      }
+    }
+
+    if (x.empty()) {
+      return MX();
+    } else if (x.size()==1) {
+      return x.front();
+    } else if (has_empty(x)) {
+      std::vector<MX> ret = trim_empty(x);
+      if (ret.empty()) {
+        // We still want horzcat(zeros(0,5),zeros(0,5)) -> zeros(0,10)
+        ret = trim_empty(x, true);
+        int s = 0;
+        for (int i=0;i<ret.size();++i) {
+          s+= ret[i].size2();
+        }
+        return MX::zeros(0, s);
+      } else {
+        return horzcat(ret);
+      }
+    } else {
+      return x.front()->getHorzcat(x);
+    }
+  }
+
+  MX MX::zz_diagcat(const vector<MX>& x) {
+    if (x.empty()) {
+      return MX();
+    } else if (x.size()==1) {
+      return x.front();
+    } else if (has_empty(x)) {
+      std::vector<MX> ret = trim_empty(x);
+      if (ret.empty()) {
+        // We still want diagcat(zeros(5,0),zeros(5,0)) -> zeros(10,0)
+        ret = trim_empty(x, true);
+        int s1 = 0;
+        int s2 = 0;
+        for (int i=0;i<ret.size();++i) {
+          s1+= ret[i].size1();
+          s2+= ret[i].size2();
+        }
+        return MX::zeros(s1, s2);
+      } else {
+        return diagcat(ret);
+      }
+    } else {
+      return x.front()->getDiagcat(x);
+    }
+  }
+
+  MX MX::zz_vertcat(const vector<MX>& x) {
+    // Check dimensions
+    if (x.size()>1) {
+      vector<MX> ne = trim_empty(x, true);
+      for (int i=0;i<ne.size();i++) {
+        casadi_assert_message(ne[i].size2()==ne[0].size2(),
+                      "vertcat dimension mismatch  " <<
+                      "x[" << i << "]:" << ne[i].dimString() <<
+                      " and x[0]: " << ne[0].dimString() << ".");
+      }
+    }
+
+    if (x.empty()) {
+      return MX();
+    } else if (x.size()==1) {
+      return x.front();
+    } else if (has_empty(x)) {
+      std::vector<MX> ret = trim_empty(x);
+      if (ret.empty()) {
+        // We still want vertcat(zeros(5,0),zeros(5,0)) -> zeros(10,0)
+        ret = trim_empty(x, true);
+        int s = 0;
+        for (int i=0;i<ret.size();++i) {
+          s+= ret[i].size1();
+        }
+        return MX::zeros(s, 0);
+      } else {
+        return vertcat(ret);
+      }
+    } else if (!x.front().isVector()) {
+      // Vertcat operation only supports vectors, rewrite using horzcat
+      vector<MX> xT = x;
+      for (vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
+      return horzcat(xT).T();
+    } else {
+      return x.front()->getVertcat(x);
+    }
+  }
+
+  std::vector<MX> MX::zz_horzsplit(const std::vector<int>& offset) const {
+    // Consistency check
+    casadi_assert(offset.size()>=1);
+    casadi_assert(offset.front()==0);
+    casadi_assert(offset.back()==size2());
+    casadi_assert(isMonotone(offset));
+
+    // Trivial return if possible
+    if (offset.size()==1) {
+      return vector<MX>(0);
+    } else if (offset.size()==2) {
+      return vector<MX>(1, *this);
+    } else {
+      return (*this)->getHorzsplit(offset);
+    }
+  }
+
+  std::vector<MX> MX::zz_horzsplit(int incr) const {
+    casadi_assert(incr>=1);
+    vector<int> offset2 = range(0, size2(), incr);
+    offset2.push_back(size2());
+    return horzsplit(*this, offset2);
+  }
+
+  std::vector<MX> MX::zz_diagsplitNative(const std::vector<int>& offset1,
+                                         const std::vector<int>& offset2) const {
+    // Consistency check
+    casadi_assert(offset1.size()>=1);
+    casadi_assert(offset1.front()==0);
+    casadi_assert(offset1.back()==size1());
+    casadi_assert(isMonotone(offset1));
+
+    // Consistency check
+    casadi_assert(offset2.size()>=1);
+    casadi_assert(offset2.front()==0);
+    casadi_assert(offset2.back()==size2());
+    casadi_assert(isMonotone(offset2));
+
+    return (*this)->getDiagsplit(offset1, offset2);
+  }
+
+  std::vector<MX> MX::zz_vertsplit(const std::vector<int>& offset) const {
+    if (isVector()) {
+      // Consistency check
+      casadi_assert(offset.size()>=1);
+      casadi_assert(offset.front()==0);
+      casadi_assert(offset.back()==size1());
+      casadi_assert(isMonotone(offset));
+
+      // Trivial return if possible
+      if (offset.size()==1) {
+        return vector<MX>();
+      } else if (offset.size()==2) {
+        return vector<MX>(1, *this);
+      } else {
+        return (*this)->getVertsplit(offset);
+      }
+    } else {
+      std::vector<MX> ret = horzsplit(T(), offset);
+      MX (*transposeMX)(const MX& x) = transpose;
+      std::transform(ret.begin(), ret.end(), ret.begin(), transposeMX);
+      return ret;
+    }
+  }
+
+  std::vector<MX> MX::zz_vertsplit(int incr) const {
+    casadi_assert(incr>=1);
+    vector<int> offset1 = range(0, size1(), incr);
+    offset1.push_back(size1());
+    return vertsplit(*this, offset1);
+  }
+
+  std::vector< std::vector<MX> > MX::zz_blocksplit(const std::vector<int>& vert_offset,
+                                                   const std::vector<int>& horz_offset) const {
+    std::vector<MX> rows = vertsplit(*this, vert_offset);
+    std::vector< std::vector<MX> > ret;
+    for (int i=0; i<rows.size(); ++i) {
+      ret.push_back(horzsplit(rows[i], horz_offset));
+    }
+    return ret;
+  }
+
+  std::vector< std::vector<MX > > MX::zz_blocksplit(int vert_incr, int horz_incr) const {
+    casadi_assert(horz_incr>=1);
+    casadi_assert(vert_incr>=1);
+    vector<int> offset1 = range(0, size1(), vert_incr);
+    offset1.push_back(size1());
+    vector<int> offset2 = range(0, size2(), horz_incr);
+    offset2.push_back(size2());
+    return blocksplit(*this, offset1, offset2);
+  }
+
+  MX MX::zz_horzcat(const MX& b) const {
+    vector<MX> ab;
+    ab.push_back(*this);
+    ab.push_back(b);
+    return horzcat(ab);
+  }
+
+  MX MX::zz_vertcat(const MX& b) const {
+    vector<MX> ab;
+    ab.push_back(*this);
+    ab.push_back(b);
+    return vertcat(ab);
+  }
+
+  MX MX::zz_veccat(const vector<MX>& comp) {
+    MX (&f)(const MX&) = vec;
+    return vertcat(applymap(f, comp));
+  }
+
+  MX MX::zz_vecNZcat(const vector<MX>& comp) {
+    return vertcat(applymap(vecNZ, comp));
+  }
+
+  MX MX::zz_blockcat(const std::vector< std::vector<MX > > &v) {
+    // Quick return if no block rows
+    if (v.empty()) return MX::sparse(0, 0);
+
+    // Make sure same number of block columns
+    int ncols = v.front().size();
+    for (vector<vector<MX> >::const_iterator it=v.begin(); it!=v.end(); ++it) {
+      casadi_assert_message(it->size()==ncols, "blockcat: Inconsistent number of blocl columns");
+    }
+
+    // Quick return if no block columns
+    if (v.front().empty()) return MX::sparse(0, 0);
+
+    // Horizontally concatenate all columns for each row, then vertically concatenate rows
+    std::vector<MX> rows;
+    for (vector<vector<MX> >::const_iterator it=v.begin(); it!=v.end(); ++it) {
+      rows.push_back(horzcat(*it));
+    }
+    return vertcat(rows);
+  }
+
+  MX MX::zz_blockcat(const MX &A, const MX &B, const MX &C, const MX &D) {
+    return vertcat(horzcat(A, B), horzcat(C, D));
+  }
+
 } // namespace casadi

@@ -526,6 +526,24 @@ namespace casadi {
     MX arccosh() const;
     MX arctanh() const;
     MX logic_not() const;
+    static MX zz_horzcat(const std::vector<MX>& x);
+    static MX zz_diagcat(const std::vector<MX>& x);
+    static MX zz_vertcat(const std::vector<MX>& x);
+    std::vector<MX> zz_horzsplit(const std::vector<int>& offset) const;
+    std::vector<MX> zz_horzsplit(int incr=1) const;
+    std::vector<MX> zz_diagsplitNative(const std::vector<int>& offset1,
+                                       const std::vector<int>& offset2) const;
+    std::vector<MX> zz_vertsplit(const std::vector<int>& offset) const;
+    std::vector<MX> zz_vertsplit(int incr=1) const;
+    std::vector< std::vector<MX> > zz_blocksplit(const std::vector<int>& vert_offset,
+                                                 const std::vector<int>& horz_offset) const;
+    std::vector< std::vector<MX > > zz_blocksplit(int vert_incr=1, int horz_incr=1) const;
+    MX zz_horzcat(const MX& b) const;
+    MX zz_vertcat(const MX& b) const;
+    static MX zz_veccat(const std::vector<MX>& comp);
+    static MX zz_vecNZcat(const std::vector<MX>& comp);
+    static MX zz_blockcat(const MX &A, const MX &B, const MX &C, const MX &D);
+    static MX zz_blockcat(const std::vector< std::vector<MX > > &v);
 
     /** \brief returns itself, but with an assertion attached
     *

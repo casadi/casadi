@@ -2850,7 +2850,8 @@ namespace casadi {
       u(Slice(0), Slice(1, m-i))*= 1/(x0-b);
       beta = 1-x0/b;
 
-      X(Slice(i, n), Slice(i, m))-= beta*casadi::mul(casadi::mul(X(Slice(i, n), Slice(i, m)), u.T()), u);
+      X(Slice(i, n), Slice(i, m)) -=
+        beta*casadi::mul(casadi::mul(X(Slice(i, n), Slice(i, m)), u.T()), u);
       us.push_back(u);
       betas.push_back(beta);
     }

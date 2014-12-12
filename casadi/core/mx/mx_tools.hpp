@@ -43,7 +43,7 @@ namespace casadi {
   *
   *  horzcat(horzsplit(x, ...)) = x
   */
-  CASADI_EXPORT MX horzcat(const std::vector<MX>& x);
+  inline MX horzcat(const std::vector<MX>& x) { return MX::zz_horzcat(x);}
 
   /** \brief  split horizontally, retaining groups of cols
   * \param output_offset List of all start cols for each group
@@ -51,21 +51,22 @@ namespace casadi {
   *
   *   horzcat(horzsplit(x, ...)) = x
   */
-  CASADI_EXPORT std::vector<MX> horzsplit(const MX& x,
-                                                   const std::vector<int>& output_offset);
+  inline std::vector<MX> horzsplit(const MX& x, const std::vector<int>& output_offset) {
+    return x.zz_horzsplit(output_offset);
+  }
 
   /** \brief  split horizontally, retaining fixed-sized groups of cols
   * \param incr Size of each group of cols
   *
   *  horzcat(horzsplit(x, ...)) = x
   */
-  CASADI_EXPORT std::vector<MX> horzsplit(const MX& x, int incr=1);
+  inline std::vector<MX> horzsplit(const MX& x, int incr=1) { return x.zz_horzsplit(incr);}
 
   /** \brief  concatenate vertically
   *
   *   vertcat(vertsplit(x, ...)) = x
   */
-  CASADI_EXPORT MX vertcat(const std::vector<MX>& comp);
+  inline MX vertcat(const std::vector<MX>& comp) { return MX::zz_vertcat(comp);}
 
   /** \brief  split vertically, retaining groups of rows
   * \param output_offset List of all start rows for each group
@@ -73,21 +74,22 @@ namespace casadi {
   *
   *   vertcat(vertsplit(x, ...)) = x
   */
-  CASADI_EXPORT std::vector<MX> vertsplit(const MX& x,
-                                                   const std::vector<int>& output_offset);
+  inline std::vector<MX> vertsplit(const MX& x, const std::vector<int>& output_offset) {
+    return x.zz_vertsplit(output_offset);
+  }
 
   /** \brief  split vertically, retaining fixed-sized groups of rows
   * \param incr Size of each group of rows
   *
   *   vertcat(vertsplit(x, ...)) = x
   */
-  CASADI_EXPORT std::vector<MX> vertsplit(const MX& x, int incr=1);
+  inline std::vector<MX> vertsplit(const MX& x, int incr=1) { return x.zz_vertsplit(incr);}
 
   /** \brief Construct a matrix from a list of list of blocks.
   *
   *   blockcat(blocksplit(x,..., ...)) = x
   */
-  CASADI_EXPORT MX blockcat(const std::vector< std::vector<MX > > &v);
+  inline MX blockcat(const std::vector< std::vector<MX > > &v) { return MX::zz_blockcat(v);}
 
   /** \brief  chop up into blocks
   * \brief vert_offset Defines the boundaries of the block cols
@@ -95,9 +97,11 @@ namespace casadi {
   *
   *   blockcat(blocksplit(x,..., ...)) = x
   */
-  CASADI_EXPORT std::vector< std::vector<MX > >
-    blocksplit(const MX& x, const std::vector<int>& vert_offset,
-               const std::vector<int>& horz_offset);
+  inline std::vector< std::vector<MX > >
+  blocksplit(const MX& x, const std::vector<int>& vert_offset,
+             const std::vector<int>& horz_offset) {
+    return x.zz_blocksplit(vert_offset, horz_offset);
+  }
 
   /** \brief  chop up into blocks
   * \brief vert_incr Defines the increment for block boundaries in col dimension
@@ -105,19 +109,23 @@ namespace casadi {
   *
   *   blockcat(blocksplit(x,..., ...)) = x
   */
-  CASADI_EXPORT std::vector< std::vector<MX > >
-    blocksplit(const MX& x, int vert_incr = 1, int horz_incr = 1);
+  inline std::vector< std::vector<MX > >
+  blocksplit(const MX& x, int vert_incr = 1, int horz_incr = 1) {
+    return x.zz_blocksplit(vert_incr, horz_incr);
+  }
 
 #ifndef SWIG
   /** \brief Construct a matrix from a list of list of blocks.*/
-  CASADI_EXPORT MX blockcat(const MX &A, const MX &B, const MX &C, const MX &D);
+  inline MX blockcat(const MX &A, const MX &B, const MX &C, const MX &D) {
+    return MX::zz_blockcat(A, B, C, D);
+  }
 #endif // SWIG
 
   /** \brief  concatenate diagonally
   *
   *  diagcat(diagsplit(x, ...)) = x
   */
-  CASADI_EXPORT MX diagcat(const std::vector<MX>& x);
+  inline MX diagcat(const std::vector<MX>& x) { return MX::zz_diagcat(x);}
 
 /// \cond INTERNAL
 #ifndef SWIG
@@ -127,24 +135,26 @@ namespace casadi {
   *      the last matrix will run to the end.
   *   diagcat(diagsplit(x, ...)) = x
   */
-  CASADI_EXPORT std::vector<MX> diagsplitNative(const MX& x,
-                                                   const std::vector<int>& output_offset1,
-                                                   const std::vector<int>& output_offset2);
+  inline std::vector<MX> diagsplitNative(const MX& x,
+                                         const std::vector<int>& output_offset1,
+                                         const std::vector<int>& output_offset2) {
+    return x.zz_diagsplitNative(output_offset1, output_offset2);
+  }
 #endif // SWIG
 /// \endcond
 
   /** \brief Concatenate vertically while vectorizing all arguments */
-  CASADI_EXPORT MX veccat(const std::vector<MX>& comp);
+  inline MX veccat(const std::vector<MX>& comp) { return MX::zz_veccat(comp);}
 
   /** \brief  concatenate vertically while vecing all arguments with vecNZ */
-  CASADI_EXPORT MX vecNZcat(const std::vector<MX>& comp);
+  inline MX vecNZcat(const std::vector<MX>& comp) { return MX::zz_vecNZcat(comp);}
 
 #ifndef SWIG
   /** \brief  concatenate vertically, two matrices */
-  CASADI_EXPORT MX horzcat(const MX& a, const MX& b);
+  inline MX horzcat(const MX& a, const MX& b) { return a.zz_horzcat(b);}
 
   /** \brief  concatenate horizontally, two matrices */
-  CASADI_EXPORT MX vertcat(const MX& a, const MX& b);
+  inline MX vertcat(const MX& a, const MX& b) { return a.zz_vertcat(b);}
 #endif // SWIG
 
   /** \brief  Frobenius norm  */
@@ -261,13 +271,12 @@ namespace casadi {
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
   CASADI_EXPORT MX createParent(const std::vector<MX> &deps,
-                                         std::vector<MX>& SWIG_OUTPUT(children));
-
+                                std::vector<MX>& SWIG_OUTPUT(children));
 
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
   CASADI_EXPORT MX createParent(const std::vector<Sparsity> &deps,
-                                         std::vector<MX>& SWIG_OUTPUT(children));
+                                std::vector<MX>& SWIG_OUTPUT(children));
 
   /** Count number of nodes */
   CASADI_EXPORT int countNodes(const MX& A);
