@@ -86,7 +86,7 @@ set(CASADI_SRCS
   mx/inner_prod.hpp          mx/inner_prod.cpp          # Inner product
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/assertion.hpp           mx/assertion.cpp           # Assertion
-  mx/mx_tools.hpp            mx/mx_tools.cpp
+  mx/mx_tools.hpp
 
   # A dynamically created function with AD capabilities
   function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
