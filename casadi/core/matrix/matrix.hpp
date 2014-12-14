@@ -679,7 +679,7 @@ namespace casadi {
     Matrix<DataType> zz_reshape(int nrow, int ncol) const;
     Matrix<DataType> zz_reshape(std::pair<int, int> rc) const;
     Matrix<DataType> zz_reshape(const Sparsity& sp) const;
-    DataType zz_trace() const;
+    Matrix<DataType> zz_trace() const;
     Matrix<DataType> zz_vec() const;
     Matrix<DataType> zz_vecNZ() const;
     static Matrix<DataType> zz_blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);

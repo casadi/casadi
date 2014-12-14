@@ -40,9 +40,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  template<typename DataType>
-  DataType trace(const Matrix<DataType>& a) { return a.zz_trace();}
-
   /** \brief Construct a matrix from a list of list of blocks.
    */
   template<typename DataType>

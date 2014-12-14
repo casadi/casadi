@@ -59,7 +59,6 @@
   MTT_INST(DataType, sumRows)
   MTT_INST(DataType, sumCols)
   MTT_INST(DataType, sumAll)
-  MTT_INST(DataType, trace)
   MTT_INST(DataType, diag)
   MTT_INST(DataType, blkdiag)
   MTT_INST(DataType, polyval)

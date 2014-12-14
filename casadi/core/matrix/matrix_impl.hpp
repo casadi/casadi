@@ -2519,7 +2519,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::zz_trace() const {
+  Matrix<DataType> Matrix<DataType>::zz_trace() const {
     casadi_assert_message(size2() == size1(), "trace: must be square");
     DataType res=0;
     for (int i=0; i< size2(); i ++) {

@@ -216,6 +216,10 @@ namespace casadi {
   template<typename MatType>
   MatType vecNZ(const GenericMatrix<MatType>& a) { return mat(a).zz_vecNZ();}
 
+  /** \brief Matrix trace */
+  template<typename MatType>
+  MatType trace(const GenericMatrix<MatType>& a) { return mat(a).zz_trace();}
+
 #ifndef SWIG
   template<typename MatType>
   MatType linspace(const GenericMatrix<MatType> &a_, const GenericMatrix<MatType> &b_, int nsteps) {

@@ -200,9 +200,6 @@ namespace casadi {
   /** \brief  Simplify an expression */
   inline void simplify(MX& ex) { ex.zz_simplify();}
 
-  /** \brief Matrix trace */
-  inline MX trace(const MX& A) { return A.zz_trace();}
-
   /** \brief Repeat matrix A n times vertically and m times horizontally */
   inline MX repmat(const MX &A, int n, int m) { return A.zz_repmat(n, m);}
 
