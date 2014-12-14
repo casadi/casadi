@@ -57,16 +57,6 @@ namespace casadi {
   }
 #endif // SWIG
 
-  /** \brief Concatenate a list of matrices horizontally
-   * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
-   *
-   *   horzcat(horzsplit(x, ...)) = x
-   */
-  template<typename DataType>
-  Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v) {
-    return Matrix<DataType>::zz_horzcat(v);
-  }
-
   /** \brief  split horizontally, retaining groups of columns
    * \param offset List of all start columns for each group
    *      the last column group will run to the end.
@@ -87,16 +77,6 @@ namespace casadi {
   template<typename DataType>
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1) {
     return v.zz_horzsplit(incr);
-  }
-
-  /** \brief Concatenate a list of matrices vertically
-   * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
-   *
-   *   vertcat(vertsplit(x, ...)) = x
-   */
-  template<typename DataType>
-  Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v) {
-    return Matrix<DataType>::zz_vertcat(v);
   }
 
   /** \brief  split vertically, retaining groups of rows
@@ -162,18 +142,6 @@ namespace casadi {
   }
 #endif // SWIG
 /// \endcond
-
-#ifndef SWIG
-  template<typename DataType>
-  Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return Matrix<DataType>::zz_vertcat(x, y);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return Matrix<DataType>::zz_horzcat(x, y);
-  }
-#endif // SWIG
 
   template<typename DataType>
   /** \brief  concatenate vertically while vectorizing all arguments with vec */

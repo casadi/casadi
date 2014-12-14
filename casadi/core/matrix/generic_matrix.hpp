@@ -250,7 +250,6 @@ namespace casadi {
      * delegates to MatType::mul_full if no such quick returns are found.
      */
     MatType mul_smart(const MatType& y, const Sparsity& sp_z) const;
-
   };
 
 #ifndef SWIG

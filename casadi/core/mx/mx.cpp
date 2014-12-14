@@ -1242,20 +1242,6 @@ namespace casadi {
     return blocksplit(*this, offset1, offset2);
   }
 
-  MX MX::zz_horzcat(const MX& b) const {
-    vector<MX> ab;
-    ab.push_back(*this);
-    ab.push_back(b);
-    return horzcat(ab);
-  }
-
-  MX MX::zz_vertcat(const MX& b) const {
-    vector<MX> ab;
-    ab.push_back(*this);
-    ab.push_back(b);
-    return vertcat(ab);
-  }
-
   MX MX::zz_veccat(const vector<MX>& comp) {
     vector<MX> ret = comp;
     for (vector<MX>::iterator i=ret.begin(); i!=ret.end(); ++i) {

@@ -60,59 +60,11 @@ namespace casadi {
     return coarse_colblock.at(3);
   }
 
-  Sparsity horzcat(const std::vector<Sparsity> & sp) {
-    if (sp.empty()) {
-      return Sparsity();
-    } else {
-      Sparsity ret = sp[0];
-      for (int i=1; i<sp.size(); ++i) {
-        ret.appendColumns(sp[i]);
-      }
-      return ret;
-    }
-  }
-
-  Sparsity horzcat(const Sparsity & a, const Sparsity & b) {
-    Sparsity ret = a;
-    ret.appendColumns(b);
-    return ret;
-  }
-
-  Sparsity vertcat(const std::vector<Sparsity> & sp) {
-    if (sp.empty()) {
-      return Sparsity();
-    } else if (sp[0].isVector()) {
-      Sparsity ret = sp[0];
-      for (int i=1; i<sp.size(); ++i) {
-        ret.append(sp[i]);
-      }
-      return ret;
-    } else {
-      Sparsity ret = sp[0].T();
-      for (int i=1; i<sp.size(); ++i) {
-        ret.appendColumns(sp[i].T());
-      }
-      return ret.T();
-    }
-  }
-
   Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v) {
     std::vector< Sparsity > ret;
     for (int i=0; i<v.size(); ++i)
       ret.push_back(horzcat(v[i]));
     return vertcat(ret);
-  }
-
-  Sparsity vertcat(const Sparsity & a, const Sparsity & b) {
-    if (a.isVector()) {
-      Sparsity ret = a;
-      ret.append(b);
-      return ret;
-    } else {
-      Sparsity ret = a.T();
-      ret.appendColumns(b.T());
-      return ret.T();
-    }
   }
 
   Sparsity blkdiag(const std::vector< Sparsity > &v) {

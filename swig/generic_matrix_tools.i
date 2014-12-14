@@ -29,6 +29,15 @@
 
 %include <casadi/core/matrix/generic_matrix_tools.hpp>
 
+%define SPARSITY_INTERFACE_DECL(MatType...)
+MatType horzcat(const std::vector< MatType > &v);
+MatType vertcat(const std::vector< MatType > &v);
+%enddef
+
+#ifndef SWIGMATLAB
+SPARSITY_INTERFACE_DECL(casadi::Sparsity)
+#endif // SWIGMATLAB
+
 // map the template name to the instantiated name
 %define GMTT_INST(MatType, function_name...)
 %template(function_name) casadi::function_name< MatType >;
@@ -36,6 +45,7 @@
 
 // Define template instantiations
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
+SPARSITY_INTERFACE_DECL(MatType)
 GMTT_INST(MatType, cross)
 GMTT_INST(MatType, quad_form)
 GMTT_INST(MatType, sum_square)
@@ -75,6 +85,7 @@ GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
 GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(casadi::Matrix<double>)
 GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(casadi::Matrix<casadi::SXElement>)
 GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(casadi::MX)
+
 #endif // SWIGMATLAB
 
 #endif // CASADI_GENERIC_MATRIX_TOOLS_I

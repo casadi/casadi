@@ -39,12 +39,6 @@ namespace casadi {
 @{
 */
 
-  /** \brief  concatenate horizontally
-  *
-  *  horzcat(horzsplit(x, ...)) = x
-  */
-  inline MX horzcat(const std::vector<MX>& x) { return MX::zz_horzcat(x);}
-
   /** \brief  split horizontally, retaining groups of cols
   * \param output_offset List of all start cols for each group
   *      the last col group will run to the end.
@@ -61,12 +55,6 @@ namespace casadi {
   *  horzcat(horzsplit(x, ...)) = x
   */
   inline std::vector<MX> horzsplit(const MX& x, int incr=1) { return x.zz_horzsplit(incr);}
-
-  /** \brief  concatenate vertically
-  *
-  *   vertcat(vertsplit(x, ...)) = x
-  */
-  inline MX vertcat(const std::vector<MX>& comp) { return MX::zz_vertcat(comp);}
 
   /** \brief  split vertically, retaining groups of rows
   * \param output_offset List of all start rows for each group
@@ -148,14 +136,6 @@ namespace casadi {
 
   /** \brief  concatenate vertically while vecing all arguments with vecNZ */
   inline MX vecNZcat(const std::vector<MX>& comp) { return MX::zz_vecNZcat(comp);}
-
-#ifndef SWIG
-  /** \brief  concatenate vertically, two matrices */
-  inline MX horzcat(const MX& a, const MX& b) { return a.zz_horzcat(b);}
-
-  /** \brief  concatenate horizontally, two matrices */
-  inline MX vertcat(const MX& a, const MX& b) { return a.zz_vertcat(b);}
-#endif // SWIG
 
   /** \brief  Frobenius norm  */
   inline MX norm_F(const MX &x) { return x.zz_norm_F();}

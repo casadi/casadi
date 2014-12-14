@@ -700,8 +700,6 @@ namespace casadi {
       zz_blocksplit(int vert_incr=1, int horz_incr=1) const;
     std::vector< Matrix<DataType> > zz_diagsplitNative(const std::vector<int>& offset1,
                                                        const std::vector<int>& offset2) const;
-    static Matrix<DataType> zz_horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
-    static Matrix<DataType> zz_vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
     static Matrix<DataType> zz_veccat(const std::vector< Matrix<DataType> >& comp);
     static Matrix<DataType> zz_vecNZcat(const std::vector< Matrix<DataType> >& comp);
     Matrix<DataType> zz_inner_prod(const Matrix<DataType> &y) const;

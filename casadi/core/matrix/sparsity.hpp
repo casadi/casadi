@@ -438,6 +438,12 @@ namespace casadi {
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity patternInverse() const;
 
+    /// @{
+    /** \brief Accessed by SparsityInterface */
+    static Sparsity zz_horzcat(const std::vector<Sparsity> & sp);
+    static Sparsity zz_vertcat(const std::vector<Sparsity> & sp);
+    /// @}
+
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros
 

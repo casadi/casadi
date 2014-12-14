@@ -1071,4 +1071,34 @@ namespace casadi {
     return (*this)->bandwidthL();
   }
 
+  Sparsity Sparsity::zz_horzcat(const std::vector<Sparsity> & sp) {
+    if (sp.empty()) {
+      return Sparsity();
+    } else {
+      Sparsity ret = sp[0];
+      for (int i=1; i<sp.size(); ++i) {
+        ret.appendColumns(sp[i]);
+      }
+      return ret;
+    }
+  }
+
+  Sparsity Sparsity::zz_vertcat(const std::vector<Sparsity> & sp) {
+    if (sp.empty()) {
+      return Sparsity();
+    } else if (sp[0].isVector()) {
+      Sparsity ret = sp[0];
+      for (int i=1; i<sp.size(); ++i) {
+        ret.append(sp[i]);
+      }
+      return ret;
+    } else {
+      Sparsity ret = sp[0].T();
+      for (int i=1; i<sp.size(); ++i) {
+        ret.appendColumns(sp[i].T());
+      }
+      return ret.T();
+    }
+  }
+
 } // namespace casadi

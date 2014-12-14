@@ -82,8 +82,8 @@ namespace casadi {
     std::vector<MX> fi(n_+1);
     MX znp = MX::sparse(n_+1, n_+1);
     for (int k=0;k<n_;++k) {
-      MX gk = vertcat(g_socp(ALL, k), DMatrix::sparse(1, 1));
-      MX fk = -blockcat(znp, gk, gk.T(), DMatrix::sparse(1, 1));
+      MX gk = vertcat(g_socp(ALL, k), MX::sparse(1, 1));
+      MX fk = -blockcat(znp, gk, gk.T(), MX::sparse(1, 1));
       // TODO(Joel): replace with ALL
       fi.push_back(blkdiag(f_sdqp(ALL, Slice(f_sdqp.size1()*k, f_sdqp.size1()*(k+1))), fk));
     }
