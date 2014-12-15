@@ -26,6 +26,9 @@
 
 %include "shared_object.i"
 
+%include <casadi/core/matrix/sparsity_interface.hpp>
+
+%template(SpSparsity) casadi::SparsityInterface<casadi::Sparsity>;
 %include <casadi/core/matrix/sparsity.hpp>
 
 // Logic for pickling

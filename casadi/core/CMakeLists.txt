@@ -45,6 +45,7 @@ set(CASADI_SRCS
   matrix/generic_matrix_tools.hpp                       # Tools for both Matrix<> and MX
   matrix/matrix.hpp           matrix/matrix_impl.hpp    # The Matrix template class
   matrix/sparse_storage.hpp   matrix/sparse_storage_impl.hpp
+  matrix/sparsity_interface.hpp
   matrix/sparsity.hpp         matrix/sparsity.cpp  matrix/sparsity_internal.hpp   matrix/sparsity_internal.cpp    # reference counted sparsity pattern
   matrix/slice.hpp            matrix/slice.cpp          # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
   matrix/submatrix.hpp                                  # A reference to a block of the matrix to allow operations such as A(:,3) = ...

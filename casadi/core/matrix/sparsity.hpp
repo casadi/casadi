@@ -28,6 +28,7 @@
 
 #include "../shared_object.hpp"
 #include "../casadi_types.hpp"
+#include "sparsity_interface.hpp"
 #include <vector>
 #include <list>
 #include <limits>
@@ -100,7 +101,8 @@ namespace casadi {
    * \author Joel Andersson
    * \date 2010
    */
-  class CASADI_EXPORT Sparsity : public SharedObject {
+  class CASADI_EXPORT Sparsity : public SharedObject,
+                                 public SparsityInterface<Sparsity> {
   public:
 
     /// Default constructor

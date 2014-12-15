@@ -32,6 +32,7 @@
 #include "sparsity.hpp"
 #include "sparsity_tools.hpp"
 #include "../casadi_math.hpp"
+#include "sparsity_interface.hpp"
 
 namespace casadi {
 
@@ -67,7 +68,7 @@ namespace casadi {
       \date 2012
   */
   template<typename MatType>
-  class CASADI_EXPORT GenericMatrix {
+  class CASADI_EXPORT GenericMatrix : public SparsityInterface<MatType> {
   public:
 
     /** \brief Get the number of (structural) non-zero elements */

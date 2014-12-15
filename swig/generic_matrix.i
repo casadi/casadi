@@ -27,6 +27,12 @@
 %include "slice.i"
 %include "sparsity.i"
 
+%template(SpIMatrix)        casadi::SparsityInterface<casadi::Matrix<int> >;
+%template(SpDMatrix)        casadi::SparsityInterface<casadi::Matrix<double> >;
+%template(SpSX)             casadi::SparsityInterface<casadi::Matrix<casadi::SXElement> >;
+%template(SpMX)             casadi::SparsityInterface<casadi::MX>;
+
+
 %include <casadi/core/matrix/generic_matrix.hpp>
 
 %template(GenIMatrix)        casadi::GenericMatrix<casadi::Matrix<int> >;
