@@ -100,10 +100,8 @@ namespace casadi {
     */
     std::string dimString() const;
 
-#ifndef SWIG
     /** \brief  Get the shape */
     std::pair<int, int> shape() const;
-#endif
 
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */

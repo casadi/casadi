@@ -810,6 +810,7 @@ except:
 %rename(__div__) zz_rdivide;
 %rename(mul) zz_mtimes;
 %ignore T;
+%ignore shape;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB

@@ -290,10 +290,8 @@ namespace casadi {
     /** \brief Lower half-bandwidth */
     int bandwidthL() const;
 
-#ifndef SWIG
     /** \brief  Get the shape */
     std::pair<int, int> shape() const;
-#endif
     /// @}
 
     /** \brief Get a reference to row-vector,
