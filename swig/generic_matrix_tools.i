@@ -35,7 +35,7 @@ MatType vertcat(const std::vector< MatType > &v);
 MatType blkdiag(const std::vector< MatType > &v);
 MatType mul(const MatType &x, const MatType &y);
 MatType mul(const MatType &x, const MatType &y, const MatType &z);
-MatType mul(const std::vector<MatType> &args);
+MatType mul(const std::vector< MatType > &args);
 %enddef
 
 #ifndef SWIGMATLAB
