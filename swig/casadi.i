@@ -797,6 +797,11 @@ except:
 %}
 #endif // SWIGPYTHON
 
+#ifdef SWIGMATLAB
+%rename(casadi_vertcat) zz_vertcat;
+%rename(casadi_horzcat) zz_horzcat;
+#endif // SWIGMATLAB
+
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
 #ifdef SWIGPYTHON
 %rename(__add__) zz_plus;
