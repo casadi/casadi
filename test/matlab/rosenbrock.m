@@ -40,10 +40,7 @@ solver = NlpSolver('ipopt', nlp);
 solver.init();
  
 % Solution guess [2.5,3.0,0.75]
-x0 = DMatrix.zeros(0,1);
-x0.append(2.5);
-x0.append(3.0);
-x0.append(0.75);
+x0 = DMatrix([2.5,3.0,0.75]);
 solver.setInput(x0,'x0');
  
 % Set variable bounds
