@@ -443,7 +443,19 @@ namespace casadi {
     static Sparsity zz_horzcat(const std::vector<Sparsity> & sp);
     static Sparsity zz_vertcat(const std::vector<Sparsity> & sp);
     static Sparsity zz_blkdiag(const std::vector< Sparsity > &v);
-    Sparsity zz_mtimes(const Sparsity& Y) const { return patternProduct(Y);}
+    Sparsity zz_mtimes(const Sparsity& y) const {
+      if (isScalar()) {
+        return isDense() ? y : Sparsity::sparse(y.shape());
+      } else if (y.isScalar()) {
+        return y.isDense() ? *this : Sparsity::sparse(shape());
+      } else {
+        // Check dimensions
+        casadi_assert_message(size2()==y.size1(),
+                              "Matrix product with incompatible dimensions. Lhs is "
+                              << dimString() << " and rhs is " << y.dimString() << ".");
+        return patternProduct(y);
+      }
+    }
     Sparsity zz_mtimes(const Sparsity& Y, const Sparsity& Z) const { return Z;}
     /// @}
 
