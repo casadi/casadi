@@ -31,8 +31,8 @@ x = SX.sym('x');
 y = SX.sym('y');
 z = SX.sym('z');
 v = SX.casadi_vertcat({x,y,z}); % workaround!
-f = x*x + SX(100)*z*z;
-g = z + (SX(1)-x)*(SX(1)-x) - y;
+f = x^2 + SX(100)*z^2;
+g = z + (SX(1)-x)^2 - y;
 nlp = SXFunction(nlpIn('x',v),nlpOut('f',f','g',g));
  
 % Create IPOPT solver object
@@ -40,7 +40,7 @@ solver = NlpSolver('ipopt', nlp);
 solver.init();
  
 % Solution guess [2.5,3.0,0.75]
-x0 = DMatrix([2.5,3.0,0.75]);
+x0 = DMatrix([2.5;3.0;0.75]);
 solver.setInput(x0,'x0');
  
 % Set variable bounds
