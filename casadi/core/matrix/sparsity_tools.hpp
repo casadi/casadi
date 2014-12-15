@@ -39,9 +39,6 @@ namespace casadi {
    */
   CASADI_EXPORT Sparsity reshape(const Sparsity& a, int nrow, int ncol);
 
-  /** \brief Transpose the pattern */
-  inline Sparsity transpose(const Sparsity& a) { return a.transpose();}
-
   /** \brief Vectorize the pattern */
   CASADI_EXPORT Sparsity vec(const Sparsity& a);
 

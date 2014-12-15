@@ -132,10 +132,6 @@ namespace casadi {
                                    const std::vector<int>& output_offset1,
                                    const std::vector<int>& output_offset2);
 
-  /** \brief Transpose an expression */
-  template<typename MatType>
-  MatType transpose(const GenericMatrix<MatType> &X);
-
   /** \brief Matrix determinant (experimental) */
   template<typename MatType>
   MatType det(const GenericMatrix<MatType>& A) { return mat(A).zz_det();}
@@ -355,11 +351,6 @@ namespace casadi {
   MatType sum_square(const GenericMatrix<MatType> &X_) {
     const MatType& X = mat(X_);
     return sumAll(X*X);
-  }
-
-  template<typename MatType>
-  MatType transpose(const GenericMatrix<MatType> &X) {
-    return mat(X).T();
   }
 #endif // SWIG
 

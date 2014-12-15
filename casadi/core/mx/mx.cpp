@@ -1228,8 +1228,7 @@ namespace casadi {
       }
     } else {
       std::vector<MX> ret = horzsplit(T(), offset);
-      MX (*transposeMX)(const GenericMatrix<MX>& x) = transpose;
-      std::transform(ret.begin(), ret.end(), ret.begin(), transposeMX);
+      for (std::vector<MX>::iterator it=ret.begin(); it!=ret.end(); ++it) *it = it->T();
       return ret;
     }
   }

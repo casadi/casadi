@@ -112,6 +112,10 @@ namespace casadi {
       return ret;
     }
 
+    /** \brief Transpose */
+    inline friend MatType transpose(const MatType &X) {
+      return X.T();
+    }
 #endif // SWIG
   };
 
