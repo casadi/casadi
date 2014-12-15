@@ -971,7 +971,7 @@
         if (m) {
           *m = casadi::Matrix<int>::zeros(ncols,nrows);
           for (int k=0;k<nrows*ncols;k++) m->data()[k]=temp[k];
-          *m = m->trans();                  
+          *m = m->T();                  
         }
         // Free memory
         if (array_is_new_object) Py_DECREF(array);

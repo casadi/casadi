@@ -284,7 +284,7 @@ namespace casadi {
   }
 
   void Sparsity::getCRS(std::vector<int>& rowind, std::vector<int>& col) const {
-    transpose().getCCS(rowind, col);
+    T().getCCS(rowind, col);
   }
 
 
@@ -297,8 +297,8 @@ namespace casadi {
     return (*this)->transpose(mapping, invert_mapping);
   }
 
-  Sparsity Sparsity::transpose() const {
-    return (*this)->transpose();
+  Sparsity Sparsity::T() const {
+    return (*this)->T();
   }
 
   Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero,
@@ -526,7 +526,7 @@ namespace casadi {
 
   Sparsity Sparsity::unidirectionalColoring(const Sparsity& AT, int cutoff) const {
     if (AT.isNull()) {
-      return (*this)->unidirectionalColoring(transpose(), cutoff);
+      return (*this)->unidirectionalColoring(T(), cutoff);
     } else {
       return (*this)->unidirectionalColoring(AT, cutoff);
     }

@@ -34,7 +34,7 @@ namespace casadi {
 
   Transpose::Transpose(const MX& x) {
     setDependencies(x);
-    setSparsity(x.sparsity().transpose());
+    setSparsity(x.sparsity().T());
   }
 
   void Transpose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,

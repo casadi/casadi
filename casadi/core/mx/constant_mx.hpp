@@ -351,7 +351,7 @@ namespace casadi {
 
   template<typename Value>
   MX Constant<Value>::getTranspose() const {
-    return MX::create(new Constant<Value>(sparsity().transpose(), v_));
+    return MX::create(new Constant<Value>(sparsity().T(), v_));
   }
 
   template<typename Value>

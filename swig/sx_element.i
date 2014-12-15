@@ -35,7 +35,7 @@
             
         @property
         def T(self):
-            return self.transpose()
+            return _casadi.transpose(self)
             
         def __array__(self,*args,**kwargs):
             return DMatrix(self,1).toArray()

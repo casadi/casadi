@@ -611,7 +611,7 @@ namespace casadi {
     }
 
     // Create return object
-    MatType ret = MatType(jacSparsity(iind, oind, compact, symmetric).transpose());
+    MatType ret = MatType(jacSparsity(iind, oind, compact, symmetric).T());
     if (verbose()) std::cout << "XFunctionInternal::jac allocated return value" << std::endl;
 
     // Quick return if empty
@@ -642,7 +642,7 @@ namespace casadi {
     std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
 
     // Get the sparsity of the Jacobian block
-    Sparsity jsp = jacSparsity(iind, oind, true, symmetric).transpose();
+    Sparsity jsp = jacSparsity(iind, oind, true, symmetric).T();
     const std::vector<int>& jsp_colind = jsp.colind();
     const std::vector<int>& jsp_row = jsp.row();
 

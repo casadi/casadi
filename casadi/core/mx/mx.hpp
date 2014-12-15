@@ -622,12 +622,7 @@ namespace casadi {
     void addToSum(const MX& x);
 
     /// Transpose the matrix
-    MX trans() const;
-
-#ifndef SWIG
-    /// Transpose the matrix (shorthand)
-    MX T() const { return trans();}
-#endif
+    MX T() const;
 
     /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;

@@ -746,7 +746,7 @@ namespace casadi {
       // find out which variables enter nonlinearily
       SXFunction fcnb_nonlin(xb, inner_prod(fcnb_dep, SX::sym("dum2", fcnb_dep.size())));
       fcnb_nonlin.init();
-      Sparsity sp_nonlin = fcnb_nonlin.jacSparsity().transpose();
+      Sparsity sp_nonlin = fcnb_nonlin.jacSparsity().T();
 
       // Get the subsets of variables that appear nonlinearily
       vector<bool> nonlin(sp_nonlin.size1(), false);

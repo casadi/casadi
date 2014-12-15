@@ -348,7 +348,7 @@ class Functiontests(casadiTestCase):
   def test_hessians(self):
     def test(sp):
       x = SX.sym("x",sp.size2())
-      self.assertTrue(sp==sp.transpose())
+      self.assertTrue(sp==sp.T)
       f = SXFunction([x],[mul([x.T,DMatrix(sp,1),x])])
       f.init()
       J = f.hessian()

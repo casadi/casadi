@@ -1034,7 +1034,7 @@ namespace casadi {
     }
   }
 
-  MX MX::trans() const {
+  MX MX::T() const {
     // Quick return if scalar
     if (isScalar()) {
       return *this;

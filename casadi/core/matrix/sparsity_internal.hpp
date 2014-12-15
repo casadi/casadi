@@ -58,7 +58,7 @@ namespace casadi {
     int stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const;
 
     /// Transpose the matrix
-    Sparsity transpose() const;
+    Sparsity T() const;
 
     /** \brief Transpose the matrix and get the reordering of the non-zero entries,
      *
@@ -99,7 +99,7 @@ namespace casadi {
                           std::vector<int>& rowblock, std::vector<int>& colblock,
                           std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock,
                           int seed) const {
-      return transpose()->dulmageMendelsohnUpper(colperm, rowperm, colblock, rowblock,
+      return T()->dulmageMendelsohnUpper(colperm, rowperm, colblock, rowblock,
                                                  coarse_colblock, coarse_rowblock, seed);
     }
 

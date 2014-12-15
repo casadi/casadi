@@ -374,12 +374,7 @@ namespace casadi {
                  std::vector<int>& SWIG_OUTPUT(mapping)) const;
 
     /// Transpose the matrix
-    Sparsity transpose() const;
-
-#ifndef SWIG
-    /// Transpose the matrix (shorthand)
-    Sparsity T() const { return transpose();}
-#endif
+    Sparsity T() const;
 
     /** \brief Transpose the matrix and get the reordering of the non-zero entries
     *

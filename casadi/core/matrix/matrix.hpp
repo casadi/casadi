@@ -621,13 +621,7 @@ namespace casadi {
     /// \endcond
 
     /// Transpose the matrix
-    Matrix<DataType> trans() const;
-
-#ifndef SWIG
-    /// Transpose the matrix (shorthand)
-    Matrix<DataType> T() const { return trans();}
-#endif
-
+    Matrix<DataType> T() const;
     ///@{
 
     ///@{

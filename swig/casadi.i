@@ -809,6 +809,7 @@ except:
 %rename(__mul__) zz_times;
 %rename(__div__) zz_rdivide;
 %rename(mul) zz_mtimes;
+%ignore T;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
@@ -828,7 +829,7 @@ except:
 //%rename(and) logic_and;
 //%rename(or) logic_or;
 //%rename(not) logic_not;
-%rename(trans) transpose;
+%rename(transpose) T;
 
 // Workarounds, pending proper fix
 %rename(truediv) __truediv__;

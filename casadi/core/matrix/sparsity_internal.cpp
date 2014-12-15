@@ -150,7 +150,7 @@ namespace casadi {
     return col;
   }
 
-  Sparsity SparsityInternal::transpose() const {
+  Sparsity SparsityInternal::T() const {
     // Dummy mapping
     vector<int> mapping;
 
@@ -277,7 +277,7 @@ namespace casadi {
     // it needs cleaning up to be proper C++
     vector<int> tmp;
 
-    Sparsity AT = transpose();
+    Sparsity AT = T();
 
     vector<int> xi(2*ncol_+1);
     vector<int>& Blk = xi;
@@ -373,7 +373,7 @@ namespace casadi {
     if (mark == 1) {
       C = this;
     } else {
-      trans = transpose();
+      trans = T();
       C = static_cast<const SparsityInternal *>(trans.get());
     }
 
@@ -553,7 +553,7 @@ namespace casadi {
 
     // transpose if needed
     if (m2 < n2 && trans.isNull())
-      trans = transpose();
+      trans = T();
 
     // Get pointer to sparsity
     const SparsityInternal* C = m2 < n2 ? static_cast<const SparsityInternal*>(trans.get()) : this;
@@ -1089,7 +1089,7 @@ namespace casadi {
     vector<int> w(s);
 
     // AT = A'
-    Sparsity AT = transpose();
+    Sparsity AT = T();
 
     ancestor = &w.front();
     maxfirst = &w.front()+n;
@@ -1183,7 +1183,7 @@ namespace casadi {
     unsigned int h;
 
     //-- Construct matrix C -----------------------------------------------
-    Sparsity AT = transpose() ;              // compute A'
+    Sparsity AT = T() ;              // compute A'
 
     int m = nrow_;
     int n = ncol_;
@@ -1222,7 +1222,7 @@ namespace casadi {
       AT_row.resize(p2);
 
       // A2 = AT'
-      Sparsity A2 = AT->transpose();
+      Sparsity A2 = AT->T();
 
       // C=A'*A with no dense cols
       C = AT->multiply(A2);
@@ -1884,7 +1884,7 @@ namespace casadi {
       if (ncol_ == 1) {
         sp = this;
       } else {
-        trans = transpose();
+        trans = T();
         sp = static_cast<const SparsityInternal *>(trans.get());
       }
 

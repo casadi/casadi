@@ -1811,7 +1811,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::trans() const {
+  Matrix<DataType> Matrix<DataType>::T() const {
     // quick return if empty or scalar
     if ((size1()==0 && size2()==0) || isScalar()) return *this;
 

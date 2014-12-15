@@ -52,7 +52,7 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
   const Sparsity& G = st_[SDP_STRUCT_G];
   const Sparsity& F = st_[SDP_STRUCT_F];
 
-  casadi_assert_message(G==G.transpose(), "SdpSolverInternal: Supplied G sparsity must "
+  casadi_assert_message(G==G.T(), "SdpSolverInternal: Supplied G sparsity must "
                         "symmetric but got " << G.dimString());
 
   m_ = G.size1();
@@ -81,7 +81,7 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
 
   for (int i=0;i<n_;i++) {
     Sparsity s = input(SDP_SOLVER_F)(ALL, Slice(i*m_, (i+1)*m_)).sparsity();
-    casadi_assert_message(s==s.transpose(),
+    casadi_assert_message(s==s.T(),
                           "SdpSolverInternal: Each supplied Fi must be symmetric. "
                           "But got " << s.dimString() <<  " for i = " << i << ".");
   }
