@@ -83,20 +83,20 @@ namespace casadi {
                                   const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                                   bool output_given) {
     if (!output_given)
-      *output[0] = *input[0] + mulold(*input[1], *input[2], input[0]->sparsity());
+      *output[0] = mul(*input[1], *input[2], *input[0]);
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for (int d=0; d<nfwd; ++d) {
-      *fwdSens[d][0] = *fwdSeed[d][0] + mulold(*input[1], *fwdSeed[d][2], input[0]->sparsity())
-        + mulold(*fwdSeed[d][1], *input[2], input[0]->sparsity());
+      *fwdSens[d][0] = *fwdSeed[d][0] + mul(*input[1], *fwdSeed[d][2], MX::zeros(input[0]->sparsity()))
+        + mul(*fwdSeed[d][1], *input[2], MX::zeros(input[0]->sparsity()));
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for (int d=0; d<nadj; ++d) {
-      adjSens[d][1]->addToSum(mulold(*adjSeed[d][0], input[2]->T(), input[1]->sparsity()));
-      adjSens[d][2]->addToSum(mulold(input[1]->T(), *adjSeed[d][0], input[2]->sparsity()));
+      adjSens[d][1]->addToSum(mul(*adjSeed[d][0], input[2]->T(), MX::zeros(input[1]->sparsity())));
+      adjSens[d][2]->addToSum(mul(input[1]->T(), *adjSeed[d][0], MX::zeros(input[2]->sparsity())));
       if (adjSeed[d][0]!=adjSens[d][0]) {
         adjSens[d][0]->addToSum(*adjSeed[d][0]);
         *adjSeed[d][0] = MX();

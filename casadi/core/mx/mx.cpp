@@ -623,8 +623,8 @@ namespace casadi {
     return x->getMultiplication(y, z);
   }
 
-  MX MX::zz_mtimes(const MX& y, const Sparsity& z) const {
-    return mul_smart(y, z);
+  MX MX::zz_mtimes(const MX& y) const {
+    return mul_smart(y);
   }
 
   MX MX::zz_mtimes(const MX& y, const MX& z) const {

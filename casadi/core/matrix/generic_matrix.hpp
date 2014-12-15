@@ -249,7 +249,7 @@ namespace casadi {
      * Attempts to identify quick returns on matrix-level and
      * delegates to MatType::mul_full if no such quick returns are found.
      */
-    MatType mul_smart(const MatType& y, const Sparsity& sp_z) const;
+    MatType mul_smart(const MatType& y) const;
   };
 
 #ifndef SWIG
@@ -317,7 +317,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::mul_smart(const MatType& y, const Sparsity &sp_z) const {
+  MatType GenericMatrix<MatType>::mul_smart(const MatType& y) const {
     const MatType& x = *static_cast<const MatType*>(this);
 
     if (!(x.isScalar() || y.isScalar())) {
@@ -347,7 +347,7 @@ namespace casadi {
     } else if (x.isScalar() || y.isScalar()) {
       return x*y;
     } else {
-      return x.mul_full(y, sp_z);
+      return x.mul_full(y);
     }
   }
 

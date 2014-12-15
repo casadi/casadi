@@ -34,6 +34,7 @@ MatType horzcat(const std::vector< MatType > &v);
 MatType vertcat(const std::vector< MatType > &v);
 MatType blkdiag(const std::vector< MatType > &v);
 MatType mul(const MatType &x, const MatType &y);
+MatType mul(const MatType &x, const MatType &y, const MatType &z);
 MatType mul(const std::vector<MatType> &args);
 %enddef
 
@@ -59,7 +60,6 @@ GMTT_INST(MatType, tril)
 GMTT_INST(MatType, isEqual)
 GMTT_INST(MatType, diagsplit)
 GMTT_INST(MatType, transpose)
-GMTT_INST(MatType, mulold)
 GMTT_INST(MatType, det)
 GMTT_INST(MatType, inv)
 GMTT_INST(MatType, reshape)

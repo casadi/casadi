@@ -136,17 +136,6 @@ namespace casadi {
   template<typename MatType>
   MatType transpose(const GenericMatrix<MatType> &X);
 
-  /** \brief  Matrix product of two matrices
-   *
-   * With optional sp_z you can specify the sparsity of the result
-   * A typical use case might be where the product is only constructed to
-   * inspect the trace of it. sp_z diagonal will be more efficient
-   * in that case.
-   */
-  template<typename MatType>
-  MatType mulold(const GenericMatrix<MatType> &x, const GenericMatrix<MatType> &y,
-                 const Sparsity& sp_z) { return mat(x).zz_mtimes(mat(y), sp_z); }
-
   /** \brief Matrix determinant (experimental) */
   template<typename MatType>
   MatType det(const GenericMatrix<MatType>& A) { return mat(A).zz_det();}

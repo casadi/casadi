@@ -1427,9 +1427,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_mtimes(const Matrix<DataType> &y,
-                                               const Sparsity& sp_z) const {
-    return this->mul_smart(y, sp_z);
+  Matrix<DataType> Matrix<DataType>::zz_mtimes(const Matrix<DataType> &y) const {
+    return this->mul_smart(y);
   }
 
   template<typename DataType>
