@@ -668,6 +668,7 @@ namespace casadi {
     Matrix<DataType> logic_or(const Matrix<DataType>& y) const;
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_mtimes(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
+    Matrix<DataType> zz_mtimes(const Matrix<DataType> &y, const Matrix<DataType> &z) const;
     Matrix<DataType> zz_det() const;
     Matrix<DataType> zz_sumAll() const;
     Matrix<DataType> zz_sumCols() const;

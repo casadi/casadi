@@ -87,9 +87,19 @@ namespace casadi {
       return blkdiag(v);
     }
 
-    /** \brief Matrix product of two matrices */
-    inline friend MatType mul(const MatType &x, const MatType &y) {
-      return x.zz_mtimes(y);
+    /** \brief Matrix product of two matrices:  */
+    inline friend MatType mul(const MatType &X, const MatType &Y) {
+      return X.zz_mtimes(Y);
+    }
+
+    /** \brief Matrix product and addition
+        Matrix product of two matrices (X and Y), adding the result to
+        a third matrix Z. The result has the same sparsity pattern as
+        C meaning that other entries of (X*Y) are ignored.
+        The operation is equivalent to: Z+mul(X,Y).setSparse(Z.sparsity()).
+    */
+    inline friend MatType mul(const MatType &X, const MatType &Y, const MatType &Z) {
+      return X.zz_mtimes(Y, Z);
     }
 
     /** \brief Matrix product of n matrices */

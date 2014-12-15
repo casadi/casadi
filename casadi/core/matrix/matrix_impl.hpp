@@ -1433,6 +1433,15 @@ namespace casadi {
   }
 
   template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_mtimes(const Matrix<DataType> &y,
+                                               const Matrix<DataType> &z) const {
+    Matrix<DataType> ret = z;
+    std::vector<DataType> work(size1());
+    mul_no_alloc(*this, y, ret, work);
+    return ret;
+  }
+
+  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::mul_full(const Matrix<DataType> &y,
                                               const Sparsity& sp_z) const {
     // First factor

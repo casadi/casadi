@@ -546,7 +546,8 @@ namespace casadi {
     MX zz_norm_F() const;
     MX zz_norm_1() const;
     MX zz_norm_inf() const;
-    MX zz_mtimes(const MX& y, const Sparsity &sp_z=Sparsity()) const;
+    MX zz_mtimes(const MX& Y, const Sparsity &sp_z=Sparsity()) const;
+    MX zz_mtimes(const MX& Y, const MX& Z) const;
     void zz_simplify();
     MX zz_reshape(std::pair<int, int> rc) const;
     MX zz_reshape(int nrow, int ncol) const;
