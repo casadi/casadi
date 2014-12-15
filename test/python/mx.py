@@ -1796,7 +1796,7 @@ class MXtests(casadiTestCase):
     f.init()
     f.setInput(x_,0)
     f.setInput(y_,1)
-    g = MXFunction([x,y],[mul(x,y,filt)])
+    g = MXFunction([x,y],[mulold(x,y,filt)])
     g.init()
     g.setInput(x_,0)
     g.setInput(y_,1)

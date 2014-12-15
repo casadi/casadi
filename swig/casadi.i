@@ -560,7 +560,7 @@ memberbinopsr_custom(Type,eq,==)
 memberbinopsr_custom(Type,ne,!=)
 memberbinopsr_un(Type,fmin)
 memberbinopsr_un(Type,fmax)
-Type rmul(const Type& b) const{ return casadi::mul(b, *$self);}
+Type rmul(const Type& b) const{ return b.zz_mtimes(*$self);}
 memberbinopsr_un(Type,arctan2)
 memberbinopsr(Type,copysign)
 %enddef
@@ -814,7 +814,6 @@ except:
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
 %rename(uplus) operator+;
-%rename(mtimes) mul;
 %rename(ldivide) __rdiv__;
 %rename(mrdivide) __mrdivide__;
 %rename(mldivide) __mldivide__;

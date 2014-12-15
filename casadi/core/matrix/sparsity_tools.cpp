@@ -41,19 +41,6 @@ namespace casadi {
     return reshape(a, a.numel(), 1);
   }
 
-  Sparsity mul(const Sparsity& a, const Sparsity &b) {
-    return a.patternProduct(b);
-  }
-
-  Sparsity mul(const std::vector<Sparsity>& s) {
-    if (s.size()==0) return Sparsity();
-    Sparsity ret = s[0];
-    for (int i=1;i<s.size();++i) {
-      ret = mul(ret, s[i]);
-    }
-    return ret;
-  }
-
   int rank(const Sparsity& a) {
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
     a.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);

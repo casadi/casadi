@@ -45,14 +45,6 @@ namespace casadi {
   /** \brief Vectorize the pattern */
   CASADI_EXPORT Sparsity vec(const Sparsity& a);
 
-  /** \brief Get the sparsity resulting from a matrix multiplication
-   */
-  CASADI_EXPORT Sparsity mul(const Sparsity& a, const Sparsity &b);
-
-  /** \brief Get the sparsity resulting from a series of matrix multiplication
-   */
-  CASADI_EXPORT Sparsity mul(const std::vector<Sparsity>& s);
-
   /** \brief Construct a sparsity from a list of list of sparsities.
    */
   CASADI_EXPORT Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);

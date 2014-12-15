@@ -86,6 +86,22 @@ namespace casadi {
       v[1] = y;
       return blkdiag(v);
     }
+
+    /** \brief Matrix product of two matrices */
+    inline friend MatType mul(const MatType &x, const MatType &y) {
+      return x.zz_mtimes(y);
+    }
+
+    /** \brief Matrix product of n matrices */
+    inline friend MatType mul(const std::vector<MatType> &args) {
+      casadi_assert_message(args.size()>=1,
+                            "mul(std::vector<MatType> &args): "
+                            "supplied list must not be empty.");
+      MatType ret = args[0];
+      for (int i=1; i<args.size(); ++i) ret = mul(ret, args[i]);
+      return ret;
+    }
+
 #endif // SWIG
   };
 

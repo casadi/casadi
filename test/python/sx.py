@@ -1097,7 +1097,7 @@ class SXtests(casadiTestCase):
     f.init()
     f.setInput(x_,0)
     f.setInput(y_,1)
-    g = SXFunction([x,y],[mul(x,y,filt)])
+    g = SXFunction([x,y],[mulold(x,y,filt)])
     g.init()
     g.setInput(x_,0)
     g.setInput(y_,1)

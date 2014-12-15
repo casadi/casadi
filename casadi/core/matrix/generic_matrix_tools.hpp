@@ -144,12 +144,8 @@ namespace casadi {
    * in that case.
    */
   template<typename MatType>
-  MatType mul(const GenericMatrix<MatType> &x, const GenericMatrix<MatType> &y,
-              const Sparsity& sp_z=Sparsity()) { return mat(x).zz_mtimes(mat(y), sp_z); }
-
-  /** \brief  Take the matrix product of n MX objects */
-  template<typename MatType>
-  MatType mul(const std::vector<MatType> &args);
+  MatType mulold(const GenericMatrix<MatType> &x, const GenericMatrix<MatType> &y,
+                 const Sparsity& sp_z) { return mat(x).zz_mtimes(mat(y), sp_z); }
 
   /** \brief Matrix determinant (experimental) */
   template<typename MatType>
@@ -376,20 +372,6 @@ namespace casadi {
   MatType transpose(const GenericMatrix<MatType> &X) {
     return mat(X).T();
   }
-
-  template<typename MatType>
-  MatType mul(const std::vector<MatType> &args) {
-    casadi_assert_message(args.size()>=1,
-                          "mul(std::vector<MatType> &args): "
-                          "supplied list must not be empty.");
-    if (args.size()==1) return args[0];
-    MatType ret = mul(args[0], args[1]);
-    for (int i=2; i<args.size(); ++i) {
-      ret = mul(ret, args[i]);
-    }
-    return ret;
-  }
-
 #endif // SWIG
 
 /**

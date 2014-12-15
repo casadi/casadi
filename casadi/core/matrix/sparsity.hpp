@@ -443,6 +443,7 @@ namespace casadi {
     static Sparsity zz_horzcat(const std::vector<Sparsity> & sp);
     static Sparsity zz_vertcat(const std::vector<Sparsity> & sp);
     static Sparsity zz_blkdiag(const std::vector< Sparsity > &v);
+    Sparsity zz_mtimes(const Sparsity& b) const { return patternProduct(b);}
     /// @}
 
     /** \brief Enlarge matrix
