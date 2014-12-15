@@ -99,7 +99,7 @@ namespace casadi {
     x_index_.resize(n_);
     c_index_.resize(nc_);
     p_.resize(n_);
-    AT_ = DMatrix::zeros(input(QP_SOLVER_A).sparsity().transpose());
+    AT_ = DMatrix::zeros(input(QP_SOLVER_A).sparsity().T());
     AT_tmp_.resize(nc_);
 
     // Solution
