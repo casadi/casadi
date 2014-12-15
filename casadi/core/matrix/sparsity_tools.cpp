@@ -67,40 +67,6 @@ namespace casadi {
     return vertcat(ret);
   }
 
-  Sparsity blkdiag(const std::vector< Sparsity > &v) {
-    int n = 0;
-    int m = 0;
-
-    std::vector<int> colind(1, 0);
-    std::vector<int> row;
-
-    int nz = 0;
-    for (int i=0;i<v.size();++i) {
-      const std::vector<int> &colind_ = v[i].colind();
-      const std::vector<int> &row_ = v[i].row();
-      for (int k=1;k<colind_.size();++k) {
-        colind.push_back(colind_[k]+nz);
-      }
-      for (int k=0;k<row_.size();++k) {
-        row.push_back(row_[k]+m);
-      }
-      n+= v[i].size2();
-      m+= v[i].size1();
-      nz+= v[i].size();
-    }
-
-    return Sparsity(m, n, colind, row);
-  }
-
-  Sparsity blkdiag(const Sparsity &a, const Sparsity &b) {
-
-    std::vector<Sparsity> v;
-    v.push_back(a);
-    v.push_back(b);
-
-    return blkdiag(v);
-  }
-
   std::vector<Sparsity> diagsplit(const Sparsity& sp,
      const std::vector<int>& offset1,
      const std::vector<int>& offset2) {

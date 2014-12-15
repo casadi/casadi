@@ -1101,4 +1101,29 @@ namespace casadi {
     }
   }
 
+  Sparsity Sparsity::zz_blkdiag(const std::vector< Sparsity > &v) {
+    int n = 0;
+    int m = 0;
+
+    std::vector<int> colind(1, 0);
+    std::vector<int> row;
+
+    int nz = 0;
+    for (int i=0;i<v.size();++i) {
+      const std::vector<int> &colind_ = v[i].colind();
+      const std::vector<int> &row_ = v[i].row();
+      for (int k=1;k<colind_.size();++k) {
+        colind.push_back(colind_[k]+nz);
+      }
+      for (int k=0;k<row_.size();++k) {
+        row.push_back(row_[k]+m);
+      }
+      n+= v[i].size2();
+      m+= v[i].size1();
+      nz+= v[i].size();
+    }
+
+    return Sparsity(m, n, colind, row);
+  }
+
 } // namespace casadi

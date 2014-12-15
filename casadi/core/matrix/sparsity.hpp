@@ -442,6 +442,7 @@ namespace casadi {
     /** \brief Accessed by SparsityInterface */
     static Sparsity zz_horzcat(const std::vector<Sparsity> & sp);
     static Sparsity zz_vertcat(const std::vector<Sparsity> & sp);
+    static Sparsity zz_blkdiag(const std::vector< Sparsity > &v);
     /// @}
 
     /** \brief Enlarge matrix

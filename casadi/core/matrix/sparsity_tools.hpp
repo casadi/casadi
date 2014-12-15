@@ -57,13 +57,6 @@ namespace casadi {
    */
   CASADI_EXPORT Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
 
-  /** \brief   Construct a Sparsity with given blocks on the diagonal */
-  CASADI_EXPORT Sparsity blkdiag(const std::vector< Sparsity > &v);
-
-  #ifndef SWIG
-  CASADI_EXPORT Sparsity blkdiag(const Sparsity &x, const Sparsity &y);
-  #endif // SWIG
-
   /** \brief Split up a sparsity pattern horizontally */
   CASADI_EXPORT
     std::vector<Sparsity> horzsplit(const Sparsity& sp, const std::vector<int>& output_offset);

@@ -218,14 +218,6 @@ namespace casadi {
   */
   inline MX diag(const MX& x) { return x.zz_diag();}
 
-  /** \brief   Construct a matrix with given blocks on the diagonal */
-  inline MX blkdiag(const std::vector<MX> &A) { return MX::zz_blkdiag(A);}
-
-#ifndef SWIG
-  /** \brief   Construct a matrix with given blocks on the diagonal */
-  inline MX blkdiag(const MX &A, const MX& B) { return A.zz_blkdiag(B);}
-#endif // SWIG
-
   /** \brief Return a col-wise summation of elements */
   inline MX sumCols(const MX &x) { return x.zz_sumCols();}
 

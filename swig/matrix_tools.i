@@ -58,7 +58,6 @@
   MTT_INST(DataType, sumCols)
   MTT_INST(DataType, sumAll)
   MTT_INST(DataType, diag)
-  MTT_INST(DataType, blkdiag)
   MTT_INST(DataType, polyval)
   MTT_INST(DataType, addMultiple)
   MTT_INST(DataType, veccat)

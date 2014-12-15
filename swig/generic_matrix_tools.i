@@ -32,6 +32,7 @@
 %define SPARSITY_INTERFACE_DECL(MatType...)
 MatType horzcat(const std::vector< MatType > &v);
 MatType vertcat(const std::vector< MatType > &v);
+MatType blkdiag(const std::vector< MatType > &v);
 %enddef
 
 #ifndef SWIGMATLAB

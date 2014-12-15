@@ -342,12 +342,6 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> diag(const Matrix<DataType> &A) { return A.zz_diag();}
 
-  /** \brief   Construct a matrix with given block on the diagonal */
-  template<typename DataType>
-  Matrix<DataType> blkdiag(const std::vector< Matrix<DataType> > &A) {
-    return Matrix<DataType>::zz_blkdiag(A);
-  }
-
   /** \brief  Unite two matrices no overlapping sparsity */
   template<typename DataType>
   Matrix<DataType> unite(const Matrix<DataType>& A, const Matrix<DataType>& B) {
