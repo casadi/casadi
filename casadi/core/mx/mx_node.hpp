@@ -303,11 +303,8 @@ namespace casadi {
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;
 
-    /** \brief Matrix multiplication
-    *
-    *  The optimal argument sp_z will be used as the sparsity pattern of the result
-    */
-    virtual MX getMultiplication(const MX& y, const Sparsity& sp_z=Sparsity()) const;
+    /** \brief Matrix multiplication and addition */
+    virtual MX getMultiplication(const MX& y, const MX& z) const;
 
     /** \brief Solve a system of linear equations
     *

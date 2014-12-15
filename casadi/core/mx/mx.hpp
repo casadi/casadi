@@ -488,7 +488,7 @@ namespace casadi {
     MX __mpower__(const MX& b) const;
     /// \endcond
 
-    MX mul_full(const MX& y, const Sparsity &sp_z=Sparsity()) const;
+    MX mul_full(const MX& y) const { return zz_mtimes(y); }
     MX inner_prod(const MX& y) const;
     MX outer_prod(const MX& y) const;
     MX constpow(const MX& y) const;

@@ -339,18 +339,10 @@ namespace casadi {
   }
 
 
-  MX MXNode::getMultiplication(const MX& y, const Sparsity& sp_z) const {
+  MX MXNode::getMultiplication(const MX& y, const MX& z) const {
     // Get reference to transposed first argument
     MX x = shared_from_this<MX>();
 
-    // Form result of the right sparsity
-    MX z;
-    if (sp_z.isNull()) {
-      Sparsity sp_z_ = sparsity().patternProduct(y.sparsity());
-      z = MX::zeros(sp_z_);
-    } else {
-      z = MX::zeros(sp_z);
-    }
     casadi_assert_message(y.size2()==z.size2(), "Dimension error. Got y=" << y.size2()
                           << " and z=" << z.dimString() << ".");
     casadi_assert_message(x.size1()==z.size1(), "Dimension error. Got x="

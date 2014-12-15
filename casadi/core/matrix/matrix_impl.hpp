@@ -1441,22 +1441,15 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::mul_full(const Matrix<DataType> &y,
-                                              const Sparsity& sp_z) const {
+  Matrix<DataType> Matrix<DataType>::mul_full(const Matrix<DataType> &y) const {
     // First factor
     const Matrix<DataType>& x = *this;
 
-    // Return object (assure RVO)
-    Matrix<DataType> ret;
-    if (sp_z.isNull()) {
-      // Create the sparsity pattern for the matrix-matrix product
-      Sparsity spres = x.sparsity().patternProduct(y.sparsity());
+    // Create the sparsity pattern for the matrix-matrix product
+    Sparsity spres = x.sparsity().patternProduct(y.sparsity());
 
-      // Create the return object
-      ret = Matrix<DataType>::zeros(spres);
-    } else {
-      ret = Matrix<DataType>::zeros(sp_z);
-    }
+    // Return object (assure RVO)
+    Matrix<DataType> ret = Matrix<DataType>::zeros(spres);
 
     // Carry out the matrix product
     std::vector<DataType> work(x.size1());

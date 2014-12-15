@@ -581,7 +581,7 @@ namespace casadi {
     ///@}
 
     /// Matrix-matrix product
-    Matrix<DataType> mul_full(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
+    Matrix<DataType> mul_full(const Matrix<DataType> &y) const;
 
     /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
     static void mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType>& y,

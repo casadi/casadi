@@ -618,17 +618,32 @@ namespace casadi {
     *this = ret;
   }
 
-  MX MX::mul_full(const MX& y, const Sparsity &z) const {
-    const MX& x = *this;
-    return x->getMultiplication(y, z);
-  }
-
   MX MX::zz_mtimes(const MX& y) const {
-    return mul_smart(y);
+    MX z = MX::zeros(sparsity().patternProduct(y.sparsity()));
+    return zz_mtimes(y, z);
   }
 
   MX MX::zz_mtimes(const MX& y, const MX& z) const {
-    return z + (*this)->getMultiplication(y, z.sparsity());
+    if (isScalar() || y.isScalar()) {
+      // Use element-wise multiplication if at least one factor scalar
+      return z + *this*y;
+    }
+
+    // Check matching dimensions
+    casadi_assert_message(size2()==y.size1(),
+                          "Matrix product with incompatible dimensions. Lhs is "
+                          << dimString() << " and rhs is " << y.dimString() << ".");
+
+    // Check if we can simplify the product
+    if (isIdentity()) {
+      return y + z;
+    } else if (y.isIdentity()) {
+      return *this + z;
+    } else if (isZero() || y.isZero()) {
+      return z;
+    } else {
+      return (*this)->getMultiplication(y, z);
+    }
   }
 
   MX MX::inner_prod(const MX& y) const {
