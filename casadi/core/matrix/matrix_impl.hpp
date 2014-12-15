@@ -1428,34 +1428,37 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_mtimes(const Matrix<DataType> &y) const {
-    return this->mul_smart(y);
+    Matrix<DataType> z = Matrix<DataType>::zeros(mul(sparsity(), y.sparsity()));
+    return zz_mtimes(y, z);
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_mtimes(const Matrix<DataType> &y,
                                                const Matrix<DataType> &z) const {
-    Matrix<DataType> ret = z;
-    std::vector<DataType> work(size1());
-    mul_no_alloc(*this, y, ret, work);
-    return ret;
-  }
+    if (isScalar() || y.isScalar()) {
+      // Use element-wise multiplication if at least one factor scalar
+      return z + *this*y;
+    }
 
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::mul_full(const Matrix<DataType> &y) const {
-    // First factor
-    const Matrix<DataType>& x = *this;
+    // Check matching dimensions
+    casadi_assert_message(size2()==y.size1(),
+                          "Matrix product with incompatible dimensions. Lhs is "
+                          << dimString() << " and rhs is " << y.dimString() << ".");
 
-    // Create the sparsity pattern for the matrix-matrix product
-    Sparsity spres = x.sparsity().patternProduct(y.sparsity());
-
-    // Return object (assure RVO)
-    Matrix<DataType> ret = Matrix<DataType>::zeros(spres);
-
-    // Carry out the matrix product
-    std::vector<DataType> work(x.size1());
-    mul_no_alloc(x, y, ret, work);
-
-    return ret;
+    // Check if we can simplify the product
+    if (isIdentity()) {
+      return y + z;
+    } else if (y.isIdentity()) {
+      return *this + z;
+    } else if (isZero() || y.isZero()) {
+      return z;
+    } else {
+      // Carry out the matrix product
+      Matrix<DataType> ret = z;
+      std::vector<DataType> work(size1());
+      mul_no_alloc(*this, y, ret, work);
+      return ret;
+    }
   }
 
   template<typename DataType>

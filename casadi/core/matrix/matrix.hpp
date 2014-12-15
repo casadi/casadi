@@ -580,9 +580,6 @@ namespace casadi {
     Matrix<DataType> __mrdivide__(const Matrix<DataType> &y) const;
     ///@}
 
-    /// Matrix-matrix product
-    Matrix<DataType> mul_full(const Matrix<DataType> &y) const;
-
     /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
     static void mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType>& y,
                              Matrix<DataType>& z, std::vector<DataType>& work,
