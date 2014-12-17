@@ -1338,17 +1338,17 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::logic_not() const {
+  Matrix<DataType> Matrix<DataType>::zz_not() const {
     return unary(OP_NOT, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::logic_and(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_and(const Matrix<DataType>& y) const {
     return binary(OP_AND, *this, y);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::logic_or(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_or(const Matrix<DataType>& y) const {
     return binary(OP_OR, *this, y);
   }
 

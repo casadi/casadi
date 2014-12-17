@@ -734,7 +734,7 @@ namespace casadi {
     return BinarySX::create(OP_CONSTPOW, *this, n);
   }
 
-  SXElement SXElement::logic_not() const {
+  SXElement SXElement::zz_not() const {
     if (hasDep() && getOp() == OP_NOT) {
       return getDep();
     } else {
@@ -742,11 +742,11 @@ namespace casadi {
     }
   }
 
-  SXElement SXElement::logic_and(const SXElement& y) const {
+  SXElement SXElement::zz_and(const SXElement& y) const {
     return BinarySX::create(OP_AND, *this, y);
   }
 
-  SXElement SXElement::logic_or(const SXElement& y) const {
+  SXElement SXElement::zz_or(const SXElement& y) const {
     return BinarySX::create(OP_OR, *this, y);
   }
 

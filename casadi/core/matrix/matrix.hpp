@@ -652,9 +652,9 @@ namespace casadi {
     Matrix<DataType> zz_atan2(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_log10() const;
     Matrix<DataType> printme(const Matrix<DataType>& y) const;
-    Matrix<DataType> logic_not() const;
-    Matrix<DataType> logic_and(const Matrix<DataType>& y) const;
-    Matrix<DataType> logic_or(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_not() const;
+    Matrix<DataType> zz_and(const Matrix<DataType>& y) const;
+    Matrix<DataType> zz_or(const Matrix<DataType>& y) const;
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_mtimes(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mtimes(const Matrix<DataType> &y, const Matrix<DataType> &z) const;

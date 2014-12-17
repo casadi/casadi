@@ -785,7 +785,7 @@ namespace casadi {
     return (*this)->getUnary(OP_ERF);
   }
 
-  MX MX::logic_not() const {
+  MX MX::zz_not() const {
     return (*this)->getUnary(OP_NOT);
   }
 
@@ -826,11 +826,11 @@ namespace casadi {
     return MX::binary(OP_NE, *this, y);
   }
 
-  MX MX::logic_and(const MX& y) const {
+  MX MX::zz_and(const MX& y) const {
     return MX::binary(OP_AND, *this, y);
   }
 
-  MX MX::logic_or(const MX& y) const {
+  MX MX::zz_or(const MX& y) const {
     return MX::binary(OP_OR, *this, y);
   }
 

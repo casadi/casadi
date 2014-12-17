@@ -92,13 +92,13 @@ class CASADI_EXPORT GenericExpression {
     inline friend ExType operator!=(const ExType &x, const ExType &y) { return x.zz_ne(y); }
 
     /// Logic not
-    inline ExType operator!() const { return static_cast<const ExType &>(*this).logic_not(); }
+    inline ExType operator!() const { return static_cast<const ExType &>(*this).zz_not(); }
 
     /// Logic and
-    inline friend ExType operator&&(const ExType &x, const ExType &y) { return x.logic_and(y); }
+    inline friend ExType operator&&(const ExType &x, const ExType &y) { return x.zz_and(y); }
 
     /// Logic or
-    inline friend ExType operator||(const ExType &x, const ExType &y) { return x.logic_or(y); }
+    inline friend ExType operator||(const ExType &x, const ExType &y) { return x.zz_or(y); }
 
     #endif // SWIG
 

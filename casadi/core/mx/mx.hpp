@@ -496,8 +496,8 @@ namespace casadi {
     MX zz_mod(const MX& y) const;
     MX printme(const MX& y) const;
     MX zz_atan2(const MX& y) const;
-    MX logic_and(const MX& y) const;
-    MX logic_or(const MX& y) const;
+    MX zz_and(const MX& y) const;
+    MX zz_or(const MX& y) const;
     MX if_else_zero(const MX& y) const;
     MX __copysign__(const MX& y) const;
 
@@ -524,7 +524,7 @@ namespace casadi {
     MX zz_asinh() const;
     MX zz_acosh() const;
     MX zz_atanh() const;
-    MX logic_not() const;
+    MX zz_not() const;
     static MX zz_horzcat(const std::vector<MX>& x);
     static MX zz_diagcat(const std::vector<MX>& x);
     static MX zz_vertcat(const std::vector<MX>& x);

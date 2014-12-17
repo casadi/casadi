@@ -828,6 +828,9 @@ except:
 %rename(__ge__) zz_ge;
 %rename(__ne__) zz_ne;
 %rename(__eq__) zz_eq;
+%rename(logic_and) zz_and;
+%rename(logic_or) zz_or;
+%rename(logic_not) zz_not;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
@@ -838,9 +841,6 @@ except:
 %rename(mldivide) __mldivide__;
 %rename(power) __pow__;
 %rename(mpower) __mpower__;
-//%rename(and) logic_and;
-//%rename(or) logic_or;
-//%rename(not) logic_not;
 %rename(transpose) T;
 
 // Workarounds, pending proper fix
