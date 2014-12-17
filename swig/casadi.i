@@ -801,11 +801,6 @@ except:
 %}
 #endif // SWIGPYTHON
 
-#ifdef SWIGMATLAB
-%rename(casadi_vertcat) zz_vertcat;
-%rename(casadi_horzcat) zz_horzcat;
-#endif // SWIGMATLAB
-
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
 #ifdef SWIGPYTHON
 %rename(__add__) zz_plus;
@@ -847,28 +842,12 @@ except:
 %rename(transpose) T;
 
 // Workarounds, pending proper fix
+%rename(casadi_vertcat) zz_vertcat;
+%rename(casadi_horzcat) zz_horzcat;
 %rename(truediv) __truediv__;
 %rename(nonzero) __nonzero__;
 %rename(constpow) __constpow__;
 %rename(copysign) __copysign__;
-%rename(rpow) __rpow__;
-%rename(radd) __radd__;
-%rename(rsub) __rsub__;
-%rename(rmul) __rmul__;
-%rename(rtruediv) __rtruediv__;
-%rename(rmldivide) __rmldivide__;
-%rename(rmrdivide) __rmrdivide__;
-%rename(rmpower) __rmpower__;
-%rename(rconstpow) __rconstpow__;
-%rename(rge) __rge__;
-%rename(rgt) __rgt__;
-%rename(rle) __rle__;
-%rename(rlt) __rlt__;
-%rename(req) __req__;
-%rename(rne) __rne__;
-%rename(rfmin) __rfmin__;
-%rename(rfmax) __rfmax__;
-%rename(rarctan2) __rarctan2__;
 %rename(rcopysign) __rcopysign__;
 %rename(hash) __hash__;
 #endif // SWIGMATLAB
