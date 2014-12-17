@@ -355,7 +355,7 @@ namespace casadi {
   }
 
   SX SXElement::zz_atan2(const SX& b) const {
-    return atan2(SX(*this),b);
+    return atan2(SX(*this), b);
   }
 
   SXElement SXElement::zz_le(const SXElement& y) const {
