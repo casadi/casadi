@@ -46,6 +46,7 @@ namespace casadi {
     plugin->name = "dple";
     plugin->doc = DpleToLrDple::meta_doc.c_str();
     plugin->version = 21;
+    plugin->adaptorHasPlugin = DpleSolver::hasPlugin;
     return 0;
   }
 
@@ -55,9 +56,8 @@ namespace casadi {
   }
 
   DpleToLrDple::DpleToLrDple(
-         const LrDpleStructure& st,
-         const std::vector< std::vector<int> > &Hs) :
-          LrDpleInternal(st, Hs) {
+         const LrDpleStructure& st) :
+          LrDpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_dple_to_lr_dple"); // name of the function
@@ -144,7 +144,7 @@ namespace casadi {
 
   DpleToLrDple* DpleToLrDple::clone() const {
     // Return a deep copy
-    DpleToLrDple* node = new DpleToLrDple(st_, Hs_);
+    DpleToLrDple* node = new DpleToLrDple(st_);
     node->setOption(dictionary());
     return node;
   }

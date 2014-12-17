@@ -46,6 +46,7 @@ namespace casadi {
     plugin->name = "lrdle";
     plugin->doc = LrDleToDle::meta_doc.c_str();
     plugin->version = 21;
+    plugin->adaptorHasPlugin = LrDleSolver::hasPlugin;
     return 0;
   }
 

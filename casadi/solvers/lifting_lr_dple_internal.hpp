@@ -86,8 +86,7 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{LrDple}
      */
-    LiftingLrDpleInternal(const LrDpleStructure & st,
-                             const std::vector< std::vector<int> > &Hs);
+    LiftingLrDpleInternal(const LrDpleStructure & st);
 
     /** \brief  Destructor */
     virtual ~LiftingLrDpleInternal();
@@ -99,14 +98,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual LiftingLrDpleInternal* create(const LrDpleStructure & st,
-      const std::vector< std::vector<int> > &Hs) const {
-        return new LiftingLrDpleInternal(st, Hs);}
+    virtual LiftingLrDpleInternal* create(const LrDpleStructure & st) const {
+        return new LiftingLrDpleInternal(st);}
 
     /** \brief  Create a new DPLE Solver */
-    static LrDpleInternal* creator(const LrDpleStructure & st,
-      const std::vector< std::vector<int> > &Hs) {
-        return new LiftingLrDpleInternal(st, Hs);}
+    static LrDpleInternal* creator(const LrDpleStructure & st) {
+        return new LiftingLrDpleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -116,6 +113,9 @@ namespace casadi {
 
     /** \brief  Initialize */
     virtual void init();
+
+    /** \brief  Obtain solver name from Adaptor */
+    virtual std::string getAdaptorSolverName() const { return solvername(); }
 
     /** \brief Generate a function that calculates \a nfwd forward derivatives
      and \a nadj adjoint derivatives

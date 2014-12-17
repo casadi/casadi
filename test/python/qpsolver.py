@@ -53,11 +53,8 @@ if QpSolver.hasPlugin("cplex"):
 if QpSolver.hasPlugin("sqic"):
   qpsolvers.append(("sqic",{}))
 
-if SdpSolver.hasPlugin("dsdp"):
-  qpsolvers.append(("qcqp",{"qcqp_solver":"socp","qcqp_solver_options": {"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp", "sdp_solver_options": {"gapTol":1e-10}} }}))
-
-if SdpSolver.hasPlugin("dsdp"):
-  qpsolvers.append(("qcqp.socp.sdp.dsdp",{"qcqp_solver_options": {"socp_solver_options": {"sdp_solver_options": {"gapTol":1e-10}} }}))
+if QpSolver.hasPlugin("qcqp.socp.sdp.dsdp"):
+  qpsolvers.append(("qcqp.socp.sdp.dsdp",{"qcqp_solver_options.socp_solver_options.sdp_solver_options": {"gapTol":1e-10}}))
 
 print qpsolvers
 

@@ -57,7 +57,7 @@ namespace casadi {
     Derived* this_ = static_cast<Derived*>(this);
     this_->addOption(solvername(),      OT_STRING,      GenericType(),
                      "Name of solver.");
-    this_->addOption(optionsname(),     OT_DICTIONARY,  GenericType(),
+    this_->addOption(optionsname(),     OT_DICTIONARY,  Dictionary(),
                      "Options to be passed to solver.");
   }
 

@@ -47,6 +47,7 @@ namespace casadi {
     plugin->name = "lifting";
     plugin->doc = LiftingLrDpleInternal::meta_doc.c_str();
     plugin->version = 21;
+    plugin->adaptorHasPlugin = LrDleSolver::hasPlugin;
     return 0;
   }
 
@@ -56,8 +57,7 @@ namespace casadi {
   }
 
   LiftingLrDpleInternal::LiftingLrDpleInternal(
-      const LrDpleStructure & st,
-      const std::vector< std::vector<int> > &Hs) : LrDpleInternal(st, Hs) {
+      const LrDpleStructure & st) : LrDpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lifting_lr_dple_solver"); // name of the function
@@ -147,8 +147,8 @@ namespace casadi {
                           lrdleStruct("a", A.sparsity(),
                                       "v", V.sparsity(),
                                       "c", C.sparsity(),
-                                      "h", H.sparsity()),
-                          Hss_);
+                                      "h", H.sparsity()));
+    solver_.setOption("Hs", Hss_);
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
@@ -199,7 +199,7 @@ namespace casadi {
 
   LiftingLrDpleInternal* LiftingLrDpleInternal::clone() const {
     // Return a deep copy
-    LiftingLrDpleInternal* node = new LiftingLrDpleInternal(st_, Hs_);
+    LiftingLrDpleInternal* node = new LiftingLrDpleInternal(st_);
     node->setOption(dictionary());
     return node;
   }

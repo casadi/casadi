@@ -47,6 +47,7 @@ namespace casadi {
     plugin->name = "condensing";
     plugin->doc = CondensingIndefDpleInternal::meta_doc.c_str();
     plugin->version = 21;
+    plugin->adaptorHasPlugin = DleSolver::hasPlugin;
     return 0;
   }
 

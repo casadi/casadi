@@ -39,16 +39,17 @@ using namespace std;
 namespace casadi {
 
   LrDpleInternal::LrDpleInternal(const LrDpleStructure & st,
-                             const std::vector< std::vector<int> > &Hs,
                              int nrhs,
                              bool transp) :
-      st_(st), Hs_(Hs), nrhs_(nrhs), transp_(transp) {
+      st_(st), nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
 
     addOption("const_dim", OT_BOOLEAN, true, "Assume constant dimension of P");
     addOption("pos_def", OT_BOOLEAN, false, "Assume P positive definite");
+    addOption("Hs",      OT_INTEGERVECTORVECTOR, std::vector<std::vector<int> >(),
+              "Column-sizes of H_i");
 
     addOption("error_unstable", OT_BOOLEAN, false,
               "Throw an exception when it is detected that Product(A_i, i=N..1) "
@@ -72,6 +73,7 @@ namespace casadi {
     pos_def_ = getOption("pos_def");
     error_unstable_ = getOption("error_unstable");
     eps_unstable_ = getOption("eps_unstable");
+    Hs_ = getOption("Hs");
 
     casadi_assert(const_dim_);
 

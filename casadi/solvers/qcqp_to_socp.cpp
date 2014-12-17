@@ -38,6 +38,7 @@ namespace casadi {
     plugin->name = "socp";
     plugin->doc = QcqpToSocp::meta_doc.c_str();;
     plugin->version = 21;
+    plugin->adaptorHasPlugin = SocpSolver::hasPlugin;
     return 0;
   }
 

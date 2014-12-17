@@ -56,8 +56,8 @@ namespace casadi {
   }
 
   SmithLrDleInternal::SmithLrDleInternal(
-      const LrDleStructure& st, const std::vector<int> &Hs, int nfwd, int nadj) :
-      LrDleInternal(st, Hs), nfwd_(nfwd), nadj_(nadj) {
+      const LrDleStructure& st, int nfwd, int nadj) :
+      LrDleInternal(st), nfwd_(nfwd), nadj_(nadj) {
 
     // set default options
     setOption("name", "unnamed_smith_lr_dle_solver"); // name of the function
@@ -509,7 +509,7 @@ namespace casadi {
     casadi_assert_message((nfwd_==0 && nadj_==0) || (nfwd==0 && nadj==0),
       "SmithLrDleInternal::second order derivatives are not supported");
     // Return a deep copy
-    SmithLrDleInternal* node = new SmithLrDleInternal(st_, Hs_, nfwd, nadj);
+    SmithLrDleInternal* node = new SmithLrDleInternal(st_, nfwd, nadj);
     node->setOption(dictionary());
     node->init();
     return node->shared_from_this<Function>();
@@ -522,7 +522,7 @@ namespace casadi {
 
   SmithLrDleInternal* SmithLrDleInternal::clone() const {
     // Return a deep copy
-    SmithLrDleInternal* node = new SmithLrDleInternal(st_, Hs_);
+    SmithLrDleInternal* node = new SmithLrDleInternal(st_);
     node->setOption(dictionary());
     return node;
   }

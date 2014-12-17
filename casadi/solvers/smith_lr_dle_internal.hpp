@@ -100,9 +100,8 @@ namespace casadi {
   public:
     /** \brief  Constructor
      * \param st \structargument{LrDle}
-     * \param Hs Column-sizes of H_i
      */
-    SmithLrDleInternal(const LrDleStructure& st, const std::vector<int> &Hs,
+    SmithLrDleInternal(const LrDleStructure& st,
       int nfwd=0, int nadj=0);
 
     /** \brief  Destructor */
@@ -115,12 +114,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual SmithLrDleInternal* create(const LrDleStructure& st, const std::vector<int> &Hs) const {
-        return new SmithLrDleInternal(st, Hs);}
+    virtual SmithLrDleInternal* create(const LrDleStructure& st) const {
+        return new SmithLrDleInternal(st);}
 
     /** \brief  Create a new DLE Solver */
-    static LrDleInternal* creator(const LrDleStructure& st, const std::vector<int> &Hs)
-    { return new SmithLrDleInternal(st, Hs);}
+    static LrDleInternal* creator(const LrDleStructure& st)
+    { return new SmithLrDleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

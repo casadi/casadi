@@ -34,180 +34,85 @@ import __builtin__
 import scipy.linalg
 
 clesolvers = []
-try:
-  LinearSolver.loadPlugin("csparse")
-  CleSolver.loadPlugin("simple")
+if LinearSolver.hasPlugin("csparse") and CleSolver.hasPlugin("simple"):
   clesolvers.append(("simple",{"linear_solver": "csparse"}))
-except:
-  pass
-
 
 dlesolvers = []
 
-try:
-  LinearSolver.loadPlugin("csparse")
-  DleSolver.loadPlugin("simple")
+if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("simple"):
   dlesolvers.append(("simple",{"linear_solver": "csparse"}))
-except:
-  pass
   
   
-"""try:
-  LinearSolver.loadPlugin("csparse")
-  DleSolver.loadPlugin("dple.slicot")
-  dlesolvers.append(("dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
-except:
-  pass
-  
-try:
-  DleSolver.loadPlugin("lrdle.smith")
-  dlesolvers.append(("lrdle.smith",{"target_options": {"max_iter":100,"tol": 1e-13}}))
-except:
-  pass
+if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("dple.slicot"):
+  dlesolvers.append(("dple.slicot",{"dple_solver_options": {"linear_solver": "csparse"}}))
 
-try:
-  DleSolver.loadPlugin("lrdle.fixed_smith")
-  dlesolvers.append(("lrdle.fixed_smith",{"target_options": {"iter":100}}))
-except:
-  pass"""
+if DleSolver.hasPlugin("lrdle.smith"):
+  dlesolvers.append(("lrdle.smith",{"lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
+
+if DleSolver.hasPlugin("lrdle.fixed_smith"):
+  dlesolvers.append(("lrdle.fixed_smith",{"lrdle_solver_options": {"iter":100}}))
+
   
-try:
-  DleSolver.loadPlugin("fixed_smith")
+if DleSolver.hasPlugin("fixed_smith"):
   dlesolvers.append(("fixed_smith",{"iter":100, "freq_doubling": False}))
-except:
-  pass
-  
-try:
-  DleSolver.loadPlugin("fixed_smith")
   dlesolvers.append(("fixed_smith",{"iter":100, "freq_doubling": True}))
-except:
-  pass
-  
+
 lrdlesolvers = []
 
-try:
-  LrDleSolver.loadPlugin("smith")
+if LrDleSolver.hasPlugin("smith"):
   lrdlesolvers.append(("smith",{"max_iter":100,"tol": 1e-13}))
-except:
-  pass
 
-try:
-  LrDleSolver.loadPlugin("fixed_smith")
+if LrDleSolver.hasPlugin("fixed_smith"):
   lrdlesolvers.append(("fixed_smith",{"iter":100}))
-except:
-  pass
 
-"""try:
-  LrDleSolver.loadPlugin("dle.simple")
-  LinearSolver.loadPlugin("csparse")
-  lrdlesolvers.append(("dle.simple",{"target_options": {"linear_solver": "csparse"}}))
-except:
-  pass
 
-try:
-  LrDleSolver.loadPlugin("dle.lrdle.smith")
-  lrdlesolvers.append(("dle.lrdle.smith",{"target_options": {"max_iter":100,"tol": 1e-13}}))
-except:
-  pass"""
+if LrDleSolver.hasPlugin("dle.simple") and LinearSolver.hasPlugin("csparse"):
+  lrdlesolvers.append(("dle.simple",{"dle_solver_options": {"linear_solver": "csparse"}}))
+
+if LrDleSolver.hasPlugin("dle.lrdle.smith"):
+  lrdlesolvers.append(("dle.lrdle.smith",{"dle_solver_options.lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
 
 lrdplesolvers = []
 
 """ lrsmith has a problem #1294
-try:
-  LrDpleSolver.loadPlugin("lifting")
-  LrDleSolver.loadPlugin("smith")
-  lrdplesolvers.append(("lifting",{"lrdle_solver": "smith", "form": "B", "lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
-except Exception as e:
-  print e
-  pass
+if LrDpleSolver.hasPlugin("lifting.smith"):
+  lrdplesolvers.append(("lifting.smith",{"lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
+  lrdplesolvers.append(("lifting.smith",{"form": "B", "lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
 """
 
+if LrDpleSolver.hasPlugin("dple.slicot") and LinearSolver.hasPlugin("csparse"):
+  lrdplesolvers.append(("dple.slicot",{"dple_solver_options": {"linear_solver": "csparse"}}))
 
-"""try:
-  LrDpleSolver.loadPlugin("lifting.smith")
-  lrdplesolvers.append(("lifting.smith",{"target_options": {"max_iter":100,"tol": 1e-13}}))
-except Exception as e:
-  print e
-  pass
-
-
-try:
-  LrDpleSolver.loadPlugin("dple.slicot")
-  LinearSolver.loadPlugin("csparse")
-  lrdplesolvers.append(("dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
-except:
-  pass
-
-try:
-  LrDpleSolver.loadPlugin("dple.lrdple.lifting")
-  LrDleSolver.loadPlugin("smith")
-  lrdplesolvers.append(("dple.lrdple.lifting",{ "target_options": {"lrdle_solver":"smith","lrdle_solver_options": {"max_iter":100,"tol": 1e-13}} }))
-except:
-  pass
-
-try:
-  LrDpleSolver.loadPlugin("dple.lrdple.lifting.smith")
-  lrdplesolvers.append(("dple.lrdple.lifting.smith",{ "target_options": {"max_iter":100,"tol": 1e-13}} ))
-except:
-  pass"""
+""" lrsmith has a problem #1294
+if LrDpleSolver.hasPlugin("dple.lrdple.lifting.smith"):
+  lrdplesolvers.append(("dple.lrdple.lifting.smith",{ "dple_solver_options.lrdple_solver_options.lrdle_solver_options": {"max_iter":100,"tol": 1e-13}} ))
+"""
 
 dplesolvers = []
 
-try:
-  LinearSolver.loadPlugin("csparse")
-  DpleSolver.loadPlugin("slicot")
+if LinearSolver.hasPlugin("csparse") and DpleSolver.hasPlugin("slicot"):
   dplesolvers.append(("slicot",{"linear_solver": "csparse"}))
-except:
-  pass
   
-  
-try:
-  LinearSolver.loadPlugin("csparse")
-  DpleSolver.loadPlugin("simple")
+if LinearSolver.hasPlugin("csparse") and DpleSolver.hasPlugin("simple"):
   dplesolvers.append(("simple",{"linear_solver": "csparse"}))
-except:
-  pass
 
-"""try:
-  LinearSolver.loadPlugin("csparse")
-  DpleSolver.loadPlugin("condensing.simple")
-  dplesolvers.append(("condensing.simple",{"target_options": {"linear_solver": "csparse"}}))
-except:
-  pass
+if LinearSolver.hasPlugin("csparse") and DpleSolver.hasPlugin("condensing.simple"):
+  dplesolvers.append(("condensing.simple",{"dle_solver_options": {"linear_solver": "csparse"}}))
 
-try:
-  LinearSolver.loadPlugin("csparse")
-  DpleSolver.loadPlugin("condensing.dple.slicot")
-  dplesolvers.append(("condensing.dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
-except:
-  pass
+if DpleSolver.hasPlugin("condensing.dple.slicot") and LinearSolver.hasPlugin("csparse"):
+  dplesolvers.append(("condensing.dple.slicot",{"dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
 
-try:
-  DpleSolver.loadPlugin("lrdple.lifting.dle.dple.slicot")
-  dplesolvers.append(("lrdple.lifting.dle.dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
-except:
-  pass
+if DpleSolver.hasPlugin("lrdple.lifting.dle.dple.slicot") and LinearSolver.hasPlugin("csparse"):
+  dplesolvers.append(("lrdple.lifting.dle.dple.slicot",{"lrdple_solver_options.lrdle_solver_options.dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
 
-try:
-  DpleSolver.loadPlugin("lifting.dple.simple")
-  dplesolvers.append(("lifting.dple.simple",{"target_options": {"linear_solver": "csparse"}}))
-except:
-  pass
+if DpleSolver.hasPlugin("lifting.dple.simple") and LinearSolver.hasPlugin("csparse"):
+  dplesolvers.append(("lifting.dple.simple",{"dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
 
-try:
-  DpleSolver.loadPlugin("lifting.dple.slicot")
-  dplesolvers.append(("lifting.dple.slicot",{"target_options": {"linear_solver": "csparse"}}))
-except:
-  pass
-  
-try:
-  LinearSolver.loadPlugin("csparse")
-  DpleSolver.loadPlugin("lifting")
-  dplesolvers.append(("lifting",{"form":"B","dle_solver": "dple.slicot","dle_solver_options": {"target_options": {"linear_solver": "csparse"}}}))
-except:
-  pass
-"""
-  
+
+if DpleSolver.hasPlugin("lifting.dple.slicot") and LinearSolver.hasPlugin("csparse"):
+  dplesolvers.append(("lifting.dple.slicot",{"dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("lifting.dple.slicot",{"form": "B", "dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
+
 print "DpleSolvers", len(dplesolvers), dplesolvers
 print "DleSolvers", len(dlesolvers), dlesolvers
 print "CleSolvers", len(clesolvers), clesolvers
@@ -343,9 +248,11 @@ class ControlTests(casadiTestCase):
         for Solver, options in lrdplesolvers:
           print Solver, options
           print "c", [i.sparsity() for i in Cs_]
-          g = LrDpleSolver(Solver,lrdpleStruct(a=[i.sparsity() for i in As_],c=[i.sparsity() for i in Cs_],v=[ i.sparsity() for i in Vs_],h=[i.sparsity() for i in Hs_]if with_H else [])  ,[h]*K)
+          g = LrDpleSolver(Solver,lrdpleStruct(a=[i.sparsity() for i in As_],c=[i.sparsity() for i in Cs_],v=[ i.sparsity() for i in Vs_],h=[i.sparsity() for i in Hs_]if with_H else [])  )
           
           print g.dictionary()
+          g.setOption("Hs",[h]*K)
+          print options
           g.setOption(options)
           g.init()
           
@@ -430,7 +337,8 @@ class ControlTests(casadiTestCase):
         
         for Solver, options in lrdlesolvers:
           print Solver
-          g = LrDleSolver(Solver,lrdleStruct(a=A.sparsity(),c=C.sparsity(),v=Vs.sparsity(),h=H.sparsity()),h  if with_H else [])
+          g = LrDleSolver(Solver,lrdleStruct(a=A.sparsity(),c=C.sparsity(),v=Vs.sparsity(),h=H.sparsity()))
+          g.setOption("Hs",h  if with_H else [])
           g.setOption(options)
           g.init()
           

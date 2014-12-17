@@ -114,6 +114,9 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
+    /** \brief  Obtain solver name from Adaptor */
+    virtual std::string getAdaptorSolverName() const { return solvername(); }
+
     /** \brief Generate a function that calculates \a nfwd forward derivatives
      and \a nadj adjoint derivatives
     */

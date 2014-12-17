@@ -23,55 +23,59 @@
  */
 
 
-#ifndef CASADI_DPLE_TO_DLE_HPP
-#define CASADI_DPLE_TO_DLE_HPP
+#ifndef CASADI_LR_DPLE_TO_LR_DLE_HPP
+#define CASADI_LR_DPLE_TO_LR_DLE_HPP
 
-#include "../core/function/dle_internal.hpp"
-#include "../core/function/dple_solver.hpp"
-#include <casadi/solvers/casadi_dlesolver_dple_export.h>
+#include "../core/function/lr_dle_internal.hpp"
+#include "../core/function/lr_dple_solver.hpp"
+#include "../core/function/adaptor.hpp"
+#include <casadi/solvers/casadi_lrdlesolver_lrdple_export.h>
 
-/** \defgroup plugin_DleSolver_dple
- Solving the Discrete Lyapunov Equations with Periodic Solver
+/** \defgroup plugin_LrDleSolver_lrdple
+
+ Solving the low-rank  Periodic Discrete Lyapunov Equations
+ with a low-rank discrete Lyapunov solver
 
 */
-/** \pluginsection{DleSolver,dple} */
+/** \pluginsection{LrDleSolver,lrdple} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{DleSolver,dple}
+  /** \brief \pluginbrief{LrDleSolver,lrdple}
 
    @copydoc DLE_doc
-   @copydoc plugin_DleSolver_dple
+   @copydoc plugin_LrDleSolver_lrdple
 
        \author Joris Gillis
       \date 2014
 
   */
-  class CASADI_DLESOLVER_DPLE_EXPORT DpleToDle : public DleInternal {
+  class CASADI_DLESOLVER_DPLE_EXPORT LrDpleToLrDle : public LrDleInternal,
+    public Adaptor<LrDpleToLrDle, LrDleInternal> {
   public:
     /** \brief  Constructor
      *  \param[in] A  Sparsity of A
      *  \param[in] V  Sparsity of V
      */
-    DpleToDle(const DleStructure& st, const std::vector<int> &Hs);
+    LrDpleToLrDle(const LrDleStructure& st, const std::vector<int> &Hs);
 
     /** \brief  Destructor */
-    virtual ~DpleToDle();
+    virtual ~LrDpleToLrDle();
 
     /** \brief  Clone */
-    virtual DpleToDle* clone() const;
+    virtual LrDpleToLrDle* clone() const;
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual DpleToDle* create(const DleStructure& st, const std::vector<int> &Hs) const {
-        return new DpleToDle(st, Hs);}
+    virtual LrDpleToLrDle* create(const LrDleStructure& st, const std::vector<int> &Hs) const {
+        return new LrDpleToLrDle(st, Hs);}
 
     /** \brief  Create a new DLE Solver */
-    static DleInternal* creator(const DleStructure& st, const std::vector<int> &Hs)
-    { return new DpleToDle(st, Hs);}
+    static DleInternal* creator(const LrDleStructure& st, const std::vector<int> &Hs)
+    { return new LrDpleToLrDle(st, Hs);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -90,13 +94,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
-  private:
-
-    /// The solver used internally
-    DpleSolver dplesolver_;
-
   };
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_DPLE_TO_DLE_HPP
+#endif // CASADI_LR_DPLE_TO_LR_DLE_HPP
