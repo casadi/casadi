@@ -700,7 +700,7 @@ namespace casadi {
     return BinarySX::create(OP_PRINTME, *this, b);
   }
 
-  SXElement SXElement::__pow__(const SXElement& n) const {
+  SXElement SXElement::zz_power(const SXElement& n) const {
     if (n->isConstant()) {
       if (n->isInteger()) {
         int nn = n->getIntValue();

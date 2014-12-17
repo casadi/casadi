@@ -654,7 +654,7 @@ namespace casadi {
     return mul(*this, y.T());
   }
 
-  MX MX::__pow__(const MX& n) const {
+  MX MX::zz_power(const MX& n) const {
     if (n->getOp()==OP_CONST) {
       return MX::binary(OP_CONSTPOW, *this, n);
     } else {
@@ -841,8 +841,9 @@ namespace casadi {
   MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
   MX MX::__mrdivide__(const MX& b) const
   { if (b.isScalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
-  MX MX::__mpower__(const MX& b) const
-  { return pow(*this, b); throw CasadiException("mpower: Not implemented");}
+  MX MX::zz_mpower(const MX& b) const {
+    return pow(*this, b); throw CasadiException("mpower: Not implemented");
+  }
 
   void MX::append(const MX& y) {
     *this = vertcat(*this, y);

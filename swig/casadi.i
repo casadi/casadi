@@ -542,7 +542,7 @@ Type __r##uname##__(const Type& b) const{ return b.##uname##(*$self);}
 Type r##uname##(const Type& b) const{ return b.##uname##(*$self);}
 
 %define binopsrFull(Type)
-memberbinopsr(Type,pow)
+Type __rpow__(const Type& b) const{ return pow(b, *$self);}
 Type __radd__(const Type& b) const{ return b + *$self;}
 Type __rsub__(const Type& b) const{ return b - *$self;}
 Type __rmul__(const Type& b) const{ return b * *$self;}
@@ -550,7 +550,7 @@ Type __rdiv__(const Type& b) const{ return b / *$self;}
 memberbinopsr(Type,truediv)
 memberbinopsr(Type,mldivide)
 memberbinopsr(Type,mrdivide)
-memberbinopsr(Type,mpower)
+Type __rmpower__(const Type& b) const{ return b.zz_mpower(*$self);}
 memberbinopsr(Type,constpow)
 Type __rge__(const Type& b) const{ return b >= (*$self);}
 Type __rgt__(const Type& b) const{ return b > (*$self);}
@@ -591,15 +591,16 @@ returntype __rfmax__(argtype) const { return fmax(argCast(b), selfCast(*$self));
 memberbinops(constpow,argtype,argCast,selfCast,returntype)
 returntype __rarctan2__(argtype) const{ return argCast(b).zz_atan2(selfCast(*$self));}
 memberbinops(copysign,argtype,argCast,selfCast,returntype)
-memberbinops(pow,argtype,argCast,selfCast,returntype)
-returntype __add__ (argtype) const{ return selfCast(*$self).zz_plus(argCast(b));}
-returntype __radd__(argtype) const{ return argCast(b).zz_plus(selfCast(*$self));}
-returntype __sub__ (argtype) const{ return selfCast(*$self).zz_minus(argCast(b));}
-returntype __rsub__(argtype) const{ return argCast(b).zz_minus(selfCast(*$self));}
-returntype __mul__ (argtype) const{ return selfCast(*$self).zz_times(argCast(b));}
-returntype __rmul__(argtype) const{ return argCast(b).zz_times(selfCast(*$self));}
-returntype __div__ (argtype) const{ return selfCast(*$self).zz_rdivide(argCast(b));}
-returntype __rdiv__(argtype) const{ return argCast(b).zz_rdivide(selfCast(*$self));}
+returntype __pow__ (argtype) const { return selfCast(*$self).zz_power(argCast(b));}
+returntype __rpow__(argtype) const { return argCast(b).zz_power(selfCast(*$self));}
+returntype __add__ (argtype) const { return selfCast(*$self).zz_plus(argCast(b));}
+returntype __radd__(argtype) const { return argCast(b).zz_plus(selfCast(*$self));}
+returntype __sub__ (argtype) const { return selfCast(*$self).zz_minus(argCast(b));}
+returntype __rsub__(argtype) const { return argCast(b).zz_minus(selfCast(*$self));}
+returntype __mul__ (argtype) const { return selfCast(*$self).zz_times(argCast(b));}
+returntype __rmul__(argtype) const { return argCast(b).zz_times(selfCast(*$self));}
+returntype __div__ (argtype) const { return selfCast(*$self).zz_rdivide(argCast(b));}
+returntype __rdiv__(argtype) const { return argCast(b).zz_rdivide(selfCast(*$self));}
 memberbinops_custom(ge,>=,argtype,argCast,selfCast,returntype)
 memberbinops_custom(le,<=,argtype,argCast,selfCast,returntype)
 memberbinops_custom(gt,>,argtype,argCast,selfCast,returntype)
@@ -611,12 +612,15 @@ returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));}
 memberbinops(truediv,argtype,argCast,selfCast,returntype)
 memberbinops(mldivide,argtype,argCast,selfCast,returntype)
 memberbinops(mrdivide,argtype,argCast,selfCast,returntype)
-memberbinops(mpower,argtype,argCast,selfCast,returntype)
+returntype __mpower__ (argtype) const{ return selfCast(*$self).zz_mpower(argCast(b));}
+returntype __rmpower__(argtype) const{ return argCast(b).zz_mpower(selfCast(*$self));}
 %enddef
 
 // This is a list of operators that do not check __array_priority__ in python
-#define binopsNoPriority(argtype,argCast,selfCast,returntype) \
-memberbinops(pow,argtype,argCast,selfCast,returntype) \
+%define binopsNoPriority(argtype,argCast,selfCast,returntype)
+returntype __pow__ (argtype) const { return pow(selfCast(*$self), argCast(b));}
+returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
+%enddef
 
 // typemaphelpers
 %include "typemaphelpers.i"
@@ -831,6 +835,7 @@ except:
 %rename(logic_and) zz_and;
 %rename(logic_or) zz_or;
 %rename(logic_not) zz_not;
+%rename(__pow__) zz_power;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
@@ -839,8 +844,6 @@ except:
 %rename(ldivide) __rdiv__;
 %rename(mrdivide) __mrdivide__;
 %rename(mldivide) __mldivide__;
-%rename(power) __pow__;
-%rename(mpower) __mpower__;
 %rename(transpose) T;
 
 // Workarounds, pending proper fix

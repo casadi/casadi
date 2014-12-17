@@ -572,9 +572,9 @@ namespace casadi {
     Matrix<DataType> zz_eq(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_ne(const Matrix<DataType> &y) const;
     Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return zz_rdivide(y);}
-    Matrix<DataType> __pow__(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_power(const Matrix<DataType> &y) const;
     Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
-    Matrix<DataType> __mpower__(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_mpower(const Matrix<DataType> &y) const;
     Matrix<DataType> __mrdivide__(const Matrix<DataType> &y) const;
     ///@}
 

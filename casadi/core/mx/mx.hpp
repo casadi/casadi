@@ -482,10 +482,10 @@ namespace casadi {
     MX zz_eq(const MX& y) const;
     MX zz_ne(const MX& y) const;
     MX __truediv__(const MX& y) const { return zz_rdivide(y);}
-    MX __pow__(const MX& b) const;
+    MX zz_power(const MX& b) const;
     MX __constpow__(const MX& b) const;
     MX __mrdivide__(const MX& b) const;
-    MX __mpower__(const MX& b) const;
+    MX zz_mpower(const MX& b) const;
     /// \endcond
 
     MX inner_prod(const MX& y) const;

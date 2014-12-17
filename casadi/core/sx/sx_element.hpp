@@ -200,14 +200,12 @@ namespace casadi {
     SXElement zz_le(const SXElement& y) const;
     SXElement zz_eq(const SXElement& y) const;
     SXElement zz_ne(const SXElement& y) const;
-    using GenericExpression<SXElement>::__mldivide__;
     SXElement __truediv__(const SXElement &y) const {return zz_rdivide(y);}
-    SXElement __pow__(const SXElement& b) const;
+    SXElement zz_power(const SXElement& b) const;
     SXElement __constpow__(const SXElement& b) const;
 
     SXElement __mrdivide__(const SXElement& b) const {  return *this / b;}
-    SXElement __mpower__(const SXElement& b) const {return (*this).__pow__(b);}
-    SXElement trans() const { return *this;}
+    SXElement zz_mpower(const SXElement& b) const {return pow(*this, b);}
 
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access

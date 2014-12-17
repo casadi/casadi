@@ -225,9 +225,9 @@ namespace casadi {
     return log(x + sqrt(1+x)*sqrt(x-1));
   }
 
-  template<class T> T pow(const T &x, const T &n) { return x.__pow__(n);}
-  template<class T> T pow(const T &x,   double n) { return x.__pow__(n);}
-  template<class T> T pow(double   x, const T &n) { return T(x).__pow__(n);}
+  template<class T> T pow(const T &x, const T &n) { return x.zz_power(n);}
+  template<class T> T pow(const T &x,   double n) { return x.zz_power(n);}
+  template<class T> T pow(double   x, const T &n) { return T(x).zz_power(n);}
   using std::pow;
 
   template<class T> T abs(const T &x) {return x.zz_abs();}

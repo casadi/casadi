@@ -887,8 +887,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__mpower__(const Matrix<DataType>& b) const {
-    if (b.numel()==1) return (*this).__pow__(b);
+  Matrix<DataType> Matrix<DataType>::zz_mpower(const Matrix<DataType>& b) const {
+    if (b.numel()==1) return pow(*this, b);
     throw CasadiException("mpower: Not implemented");
   }
 
@@ -1188,7 +1188,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__pow__(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_power(const Matrix<DataType>& y) const {
     return binary(OP_POW, *this, y);
   }
 
