@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_DPLE_TO_DLE_HPP
-#define CASADI_DPLE_TO_DLE_HPP
+#ifndef CASADI_DLE_TO_DPLE_HPP
+#define CASADI_DLE_TO_DPLE_HPP
 
 #include "../core/function/dle_internal.hpp"
 #include "../core/function/dple_internal.hpp"
@@ -48,31 +48,31 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DLESOLVER_DPLE_EXPORT DpleToDle : public DleInternal,
-    public Adaptor<DpleToDle, DpleInternal> {
+  class CASADI_DLESOLVER_DPLE_EXPORT DleToDple : public DleInternal,
+    public Adaptor<DleToDple, DpleInternal> {
   public:
     /** \brief  Constructor
      *  \param[in] A  Sparsity of A
      *  \param[in] V  Sparsity of V
      */
-    DpleToDle(const DleStructure& st);
+    DleToDple(const DleStructure& st);
 
     /** \brief  Destructor */
-    virtual ~DpleToDle();
+    virtual ~DleToDple();
 
     /** \brief  Clone */
-    virtual DpleToDle* clone() const;
+    virtual DleToDple* clone() const;
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual DpleToDle* create(const DleStructure& st) const {
-        return new DpleToDle(st);}
+    virtual DleToDple* create(const DleStructure& st) const {
+        return new DleToDple(st);}
 
     /** \brief  Create a new DLE Solver */
     static DleInternal* creator(const DleStructure& st)
-    { return new DpleToDle(st);}
+    { return new DleToDple(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -97,4 +97,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_DPLE_TO_DLE_HPP
+#endif // CASADI_DLE_TO_DPLE_HPP

@@ -34,29 +34,29 @@
 
 #include <numeric>
 
-INPUTSCHEME(DLEInput)
+INPUTSCHEME(LR_DLEInput)
 
 using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DLESOLVER_LRDLE_EXPORT
-  casadi_register_dlesolver_lrdle(DleInternal::Plugin* plugin) {
+  int CASADI_LRDLESOLVER_DLE_EXPORT
+  casadi_register_lrdlesolver_dle(LrDleInternal::Plugin* plugin) {
     plugin->creator = LrDleToDle::creator;
-    plugin->name = "lrdle";
+    plugin->name = "dle";
     plugin->doc = LrDleToDle::meta_doc.c_str();
     plugin->version = 21;
-    plugin->adaptorHasPlugin = LrDleSolver::hasPlugin;
+    plugin->adaptorHasPlugin = DleSolver::hasPlugin;
     return 0;
   }
 
   extern "C"
-  void CASADI_DLESOLVER_LRDLE_EXPORT casadi_load_dlesolver_lrdle() {
-    DleInternal::registerPlugin(casadi_register_dlesolver_lrdle);
+  void CASADI_LRDLESOLVER_DLE_EXPORT casadi_load_lrdlesolver_dle() {
+    LrDleInternal::registerPlugin(casadi_register_lrdlesolver_dle);
   }
 
   LrDleToDle::LrDleToDle(
-         const DleStructure& st) : DleInternal(st) {
+         const LrDleStructure& st) : LrDleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lr_dle_to_dle"); // name of the function
@@ -70,21 +70,36 @@ namespace casadi {
 
   void LrDleToDle::init() {
     // Initialize the base classes
-    DleInternal::init();
+    LrDleInternal::init();
 
+    MX H = MX::sym("H", H_);
     MX A = MX::sym("A", A_);
+    MX C = MX::sym("C", C_);
     MX V = MX::sym("V", V_);
 
-    // Create an LrDleSolver instance
-    solver_ = LrDleSolver(getOption(solvername()),
-                          lrdleStruct("a", A_, "v", V_));
+    MX Vs = (V+V.T())/2;
+
+    MX CVC = mul(C, mul(V, C.T()));
+
+    // Create an DleSolver instance
+    solver_ = DleSolver(getOption(solvername()),
+                        dleStruct("a", A_, "v", CVC.sparsity()));
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    std::vector<MX> Pr = solver_.call(lrdleIn("a", A, "v", V));
+    std::vector<MX> Pr = solver_.call(dleIn("a", A, "v", CVC));
+    MX P = Pr[DLE_P];
 
-    f_ = MXFunction(dleIn("a", A, "v", V),
-                    dleOut("p", Pr[DLE_P]));
+    std::vector<MX> HPH(Hs_.size(), 0);
+    std::vector<MX> Hs = horzsplit(H, Hi_);
+    MX out = 0;
+
+    for (int k=0;k<Hs.size();++k) {
+      HPH[k] = mul(Hs[k].T(), mul(P, Hs[k]));
+    }
+
+    f_ = MXFunction(lrdpleIn("a", A, "v", V, "c", C, "h", H),
+                    lrdleOut("y", blkdiag(HPH)));
     f_.init();
 
     Wrapper::checkDimensions();
@@ -97,13 +112,12 @@ namespace casadi {
 
   Function LrDleToDle::getDerivative(int nfwd, int nadj) {
     return f_.derivative(nfwd, nadj);
-
   }
 
 
   void LrDleToDle::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    DleInternal::deepCopyMembers(already_copied);
+    LrDleInternal::deepCopyMembers(already_copied);
   }
 
   LrDleToDle* LrDleToDle::clone() const {

@@ -23,13 +23,11 @@
  */
 
 
-      #include "dple_to_dle.hpp"
+      #include "lr_dle_to_dle.hpp"
       #include <string>
 
-      const std::string casadi::DpleToDle::meta_doc=
+      const std::string casadi::DleToLrDle::meta_doc=
       "\n"
-"Solving the Discrete Lyapunov Equations with Periodic Solver\n"
-"\n"
 "\n"
 ">List of available options\n"
 "\n"

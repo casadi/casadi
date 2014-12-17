@@ -101,9 +101,14 @@ casadi_plugin(DleSolver lrdle
   lr_dle_to_dle_meta.cpp)
   
 casadi_plugin(DleSolver dple
-  dple_to_dle.hpp
-  dple_to_dle.cpp
-  dple_to_dle_meta.cpp)
+  dle_to_dple.hpp
+  dle_to_dple.cpp
+  dle_to_dple_meta.cpp)
+  
+#casadi_plugin(LrDleSolver lrdple
+#  lr_dple_to_lr_dle.hpp
+#  lr_dple_to_lr_dle.cpp
+#  lr_dple_to_lr_dle_meta.cpp)
 
 casadi_plugin(DpleSolver lrdple
   lr_dple_to_dple.hpp

@@ -40,23 +40,24 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DPLESOLVER_LRDPLE_EXPORT
-      casadi_register_dplesolver_lrdple(DpleInternal::Plugin* plugin) {
+  int CASADI_LRDPLESOLVER_DPLE_EXPORT
+  casadi_register_lrdplesolver_dple(LrDpleInternal::Plugin* plugin) {
     plugin->creator = LrDpleToDple::creator;
-    plugin->name = "lrdple";
+    plugin->name = "dple";
     plugin->doc = LrDpleToDple::meta_doc.c_str();
     plugin->version = 21;
+    plugin->adaptorHasPlugin = DpleSolver::hasPlugin;
     return 0;
   }
 
   extern "C"
-  void CASADI_DPLESOLVER_LRDPLE_EXPORT casadi_load_dplesolver_lrdple() {
-    DpleInternal::registerPlugin(casadi_register_dplesolver_lrdple);
+  void CASADI_LRDPLESOLVER_DPLE_EXPORT casadi_load_lrdplesolver_dple() {
+    LrDpleInternal::registerPlugin(casadi_register_lrdplesolver_dple);
   }
 
   LrDpleToDple::LrDpleToDple(
-         const DpleStructure& st) :
-          DpleInternal(st) {
+         const LrDpleStructure& st) :
+          LrDpleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_lr_dple_to_dple"); // name of the function
@@ -71,33 +72,55 @@ namespace casadi {
 
   void LrDpleToDple::init() {
     // Initialize the base classes
-    DpleInternal::init();
+    LrDpleInternal::init();
 
-    MX A = MX::sym("A", input(DPLE_A).sparsity());
-    MX V = MX::sym("V", input(DPLE_V).sparsity());
+    MX As = MX::sym("As", input(LR_DPLE_A).sparsity());
+    MX Vs = MX::sym("Vs", input(LR_DPLE_V).sparsity());
+    MX Cs = MX::sym("Cs", input(LR_DPLE_C).sparsity());
+    MX Hs = MX::sym("Hs", input(LR_DPLE_H).sparsity());
 
-    int n = A.size1();
+    int n_ = A_[0].size1();
 
-    DMatrix C = DMatrix::eye(n);
-    DMatrix H = DMatrix::eye(n);
+    // Chop-up the arguments
+    std::vector<MX> As_ = horzsplit(As, n_);
+    std::vector<MX> Vs_ = horzsplit(Vs, V_[0].size2());
+    std::vector<MX> Cs_ = horzsplit(Cs, V_[0].size2());
+    std::vector<MX> Hss_ = horzsplit(Hs, Hsi_);
 
-    int K = A_.size();
+    std::vector<MX> V_(Vs_.size());
 
-    // Create an LrDpleSolver instance
-    solver_ = LrDpleSolver(getOption(solvername()),
-                           lrdpleStruct("a", st_[DPLE_A],
-                                        "v", st_[DPLE_V],
-                                        "c", std::vector<Sparsity>(K, C.sparsity()),
-                                        "h", std::vector<Sparsity>(K, H.sparsity())));
-    solver_.setOption("Hs", std::vector< std::vector<int> >(K, std::vector<int>(1, n)));
-    solver_.setOption(getOption(optionsname()));
+    for (int k=0;k<V_.size();++k) {
+      V_[k] = mul(Cs_[k], mul(Vs_[k], Cs_[k].T()));
+    }
+
+    std::vector<Sparsity> Vsp(Vs_.size());
+    for (int k=0;k<V_.size();++k) {
+      Vsp[k] = V_[k].sparsity();
+    }
+
+    // Create an dplesolver instance
+    solver_ = DpleSolver(getOption(solvername()),
+                         dpleStruct("a", A_, "v", Vsp));
+    if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    std::vector<MX> Pr = solver_.call(
-      lrdpleIn("a", A, "v", V, "c", MX(repmat(C, 1, K)), "h", MX(repmat(H, 1, K))));
+    std::vector<MX> Pr = solver_.call(dpleIn("a", horzcat(As_), "v", horzcat(V_)));
+    std::vector<MX> Ps_ = horzsplit(Pr[DPLE_P], n_);
 
-    f_ = MXFunction(dpleIn("a", A, "v", V),
-                    dpleOut("p", Pr[DPLE_P]));
+    std::vector<MX> HPH(K_);
+
+    for (int k=0;k<K_;++k) {
+      std::vector<MX> hph = horzsplit(Hss_[k], cumsum0(Hs_[k]));
+
+      for (int kk=0;kk<hph.size();++kk) {
+        hph[kk] = mul(hph[kk].T(), mul(Ps_[k], hph[kk]));
+      }
+      HPH[k] = blkdiag(hph);
+    }
+
+
+    f_ = MXFunction(lrdpleIn("a", As, "v", Vs, "c", Cs, "h", Hs),
+                    lrdpleOut("y", horzcat(HPH)));
     f_.init();
 
     Wrapper::checkDimensions();
@@ -116,7 +139,7 @@ namespace casadi {
 
   void LrDpleToDple::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    DpleInternal::deepCopyMembers(already_copied);
+    LrDpleInternal::deepCopyMembers(already_copied);
   }
 
   LrDpleToDple* LrDpleToDple::clone() const {
@@ -125,7 +148,6 @@ namespace casadi {
     node->setOption(dictionary());
     return node;
   }
-
 
 } // namespace casadi
 

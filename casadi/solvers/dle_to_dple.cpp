@@ -23,7 +23,7 @@
  */
 
 
-#include "dple_to_dle.hpp"
+#include "dle_to_dple.hpp"
 #include <cassert>
 #include "../core/std_vector_tools.hpp"
 #include "../core/matrix/matrix_tools.hpp"
@@ -42,9 +42,9 @@ namespace casadi {
   extern "C"
   int CASADI_DLESOLVER_DPLE_EXPORT
   casadi_register_dlesolver_dple(DleInternal::Plugin* plugin) {
-    plugin->creator = DpleToDle::creator;
+    plugin->creator = DleToDple::creator;
     plugin->name = "dple";
-    plugin->doc = DpleToDle::meta_doc.c_str();
+    plugin->doc = DleToDple::meta_doc.c_str();
     plugin->version = 21;
     return 0;
   }
@@ -54,20 +54,20 @@ namespace casadi {
     DleInternal::registerPlugin(casadi_register_dlesolver_dple);
   }
 
-  DpleToDle::DpleToDle(
+  DleToDple::DleToDple(
          const DleStructure& st) : DleInternal(st) {
 
     // set default options
-    setOption("name", "unnamed_dple_to_dle"); // name of the function
+    setOption("name", "unnamed_dle_to_dple"); // name of the function
 
     Adaptor::addOptions();
   }
 
-  DpleToDle::~DpleToDle() {
+  DleToDple::~DleToDple() {
 
   }
 
-  void DpleToDle::init() {
+  void DleToDple::init() {
     // Initialize the base classes
     DleInternal::init();
 
@@ -79,7 +79,7 @@ namespace casadi {
     solver_.init();
   }
 
-  void DpleToDle::evaluate() {
+  void DleToDple::evaluate() {
     for (int i=0;i<getNumInputs();++i) {
       std::copy(input(i).begin(), input(i).end(), solver_.input(i).begin());
     }
@@ -89,19 +89,19 @@ namespace casadi {
     }
   }
 
-  Function DpleToDle::getDerivative(int nfwd, int nadj) {
+  Function DleToDple::getDerivative(int nfwd, int nadj) {
     return solver_.derivative(nfwd, nadj);
   }
 
 
-  void DpleToDle::deepCopyMembers(
+  void DleToDple::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     DleInternal::deepCopyMembers(already_copied);
   }
 
-  DpleToDle* DpleToDle::clone() const {
+  DleToDple* DleToDple::clone() const {
     // Return a deep copy
-    DpleToDle* node = new DpleToDle(st_);
+    DleToDple* node = new DleToDple(st_);
     node->setOption(dictionary());
     return node;
   }

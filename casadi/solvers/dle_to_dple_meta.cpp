@@ -23,16 +23,12 @@
  */
 
 
-      #include "lr_dle_to_dle.hpp"
+      #include "dle_to_dple.hpp"
       #include <string>
 
-      const std::string casadi::LrDleToDle::meta_doc=
+      const std::string casadi::DleToDple::meta_doc=
       "\n"
-"Solving the Low-Rank Discrete Lyapunov Equations with a regular\n"
-"Discrete Lyapunov Equations solver\n"
-"\n"
-"Solving the Discrete Lyapunov Equations with a Low-rank Discrete\n"
-"Lyapunov Equations solver\n"
+"Solving the Discrete Lyapunov Equations with Periodic Solver\n"
 "\n"
 "\n"
 ">List of available options\n"
