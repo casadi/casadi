@@ -196,12 +196,10 @@ namespace casadi {
     SXElement zz_minus(const SXElement& y) const;
     SXElement zz_times(const SXElement& y) const;
     SXElement zz_rdivide(const SXElement& y) const;
-    SXElement __lt__(const SXElement& y) const;
-    SXElement __le__(const SXElement& y) const;
-    SXElement __eq__(const SXElement& y) const;
-    SXElement __ne__(const SXElement& y) const;
-    using GenericExpression<SXElement>::__gt__;
-    using GenericExpression<SXElement>::__ge__;
+    SXElement zz_lt(const SXElement& y) const;
+    SXElement zz_le(const SXElement& y) const;
+    SXElement zz_eq(const SXElement& y) const;
+    SXElement zz_ne(const SXElement& y) const;
     using GenericExpression<SXElement>::__mldivide__;
     SXElement __truediv__(const SXElement &y) const {return zz_rdivide(y);}
     SXElement __pow__(const SXElement& b) const;

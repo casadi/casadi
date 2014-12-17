@@ -552,12 +552,12 @@ memberbinopsr(Type,mldivide)
 memberbinopsr(Type,mrdivide)
 memberbinopsr(Type,mpower)
 memberbinopsr(Type,constpow)
-memberbinopsr_custom(Type,ge,>=)
-memberbinopsr_custom(Type,gt,>)
-memberbinopsr_custom(Type,le,<=)
-memberbinopsr_custom(Type,lt,<)
-memberbinopsr_custom(Type,eq,==)
-memberbinopsr_custom(Type,ne,!=)
+Type __rge__(const Type& b) const{ return b >= (*$self);}
+Type __rgt__(const Type& b) const{ return b > (*$self);}
+Type __rle__(const Type& b) const{ return b <= (*$self);}
+Type __rlt__(const Type& b) const{ return b < (*$self);}
+Type __req__(const Type& b) const{ return b == (*$self);}
+Type __rne__(const Type& b) const{ return b != (*$self);}
 Type __rfmin__(const Type& b) const { return fmin(b, *$self);}
 Type __rfmax__(const Type& b) const { return fmax(b, *$self);}
 Type rmul(const Type& b) const{ return b.zz_mtimes(*$self);}
@@ -822,6 +822,12 @@ except:
 %rename(mul) zz_mtimes;
 %ignore T;
 %ignore shape;
+%rename(__lt__) zz_lt;
+%rename(__gt__) zz_gt;
+%rename(__le__) zz_le;
+%rename(__ge__) zz_ge;
+%rename(__ne__) zz_ne;
+%rename(__eq__) zz_eq;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
@@ -832,12 +838,6 @@ except:
 %rename(mldivide) __mldivide__;
 %rename(power) __pow__;
 %rename(mpower) __mpower__;
-%rename(lt) __lt__;
-%rename(gt) __gt__;
-%rename(le) __le__;
-%rename(ge) __ge__;
-%rename(ne) __ne__;
-%rename(eq) __eq__;
 //%rename(and) logic_and;
 //%rename(or) logic_or;
 //%rename(not) logic_not;

@@ -477,10 +477,10 @@ namespace casadi {
     MX zz_minus(const MX& y) const;
     MX zz_times(const MX& y) const;
     MX zz_rdivide(const MX& y) const;
-    MX __lt__(const MX& y) const;
-    MX __le__(const MX& y) const;
-    MX __eq__(const MX& y) const;
-    MX __ne__(const MX& y) const;
+    MX zz_lt(const MX& y) const;
+    MX zz_le(const MX& y) const;
+    MX zz_eq(const MX& y) const;
+    MX zz_ne(const MX& y) const;
     MX __truediv__(const MX& y) const { return zz_rdivide(y);}
     MX __pow__(const MX& b) const;
     MX __constpow__(const MX& b) const;

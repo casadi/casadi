@@ -562,17 +562,15 @@ namespace casadi {
 
     /// \cond INTERNAL
     ///@{
-    /// Elementwise operations -- Octave/Python naming
+    /// Functions called by the corresponding friend functions -- MATLAB naming
     Matrix<DataType> zz_plus(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_minus(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_times(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_rdivide(const Matrix<DataType> &y) const;
-    Matrix<DataType> __lt__(const Matrix<DataType> &y) const;
-    Matrix<DataType> __le__(const Matrix<DataType> &y) const;
-    Matrix<DataType> __gt__(const Matrix<DataType> &y) const { return y.__lt__(*this);}
-    Matrix<DataType> __ge__(const Matrix<DataType> &y) const { return y.__le__(*this);}
-    Matrix<DataType> __eq__(const Matrix<DataType> &y) const;
-    Matrix<DataType> __ne__(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_lt(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_le(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_eq(const Matrix<DataType> &y) const;
+    Matrix<DataType> zz_ne(const Matrix<DataType> &y) const;
     Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return zz_rdivide(y);}
     Matrix<DataType> __pow__(const Matrix<DataType> &y) const;
     Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;

@@ -358,28 +358,28 @@ namespace casadi {
     return atan2(SX(*this),b);
   }
 
-  SXElement SXElement::__le__(const SXElement& y) const {
+  SXElement SXElement::zz_le(const SXElement& y) const {
     if ((y-(*this)).isNonNegative())
       return 1;
     else
       return BinarySX::create(OP_LE, *this, y);
   }
 
-  SXElement SXElement::__lt__(const SXElement& y) const {
+  SXElement SXElement::zz_lt(const SXElement& y) const {
     if (((*this)-y).isNonNegative())
       return 0;
     else
       return BinarySX::create(OP_LT, *this, y);
   }
 
-  SXElement SXElement::__eq__(const SXElement& y) const {
+  SXElement SXElement::zz_eq(const SXElement& y) const {
     if (isEqual(y))
       return 1;
     else
       return BinarySX::create(OP_EQ, *this, y);
   }
 
-  SXElement SXElement::__ne__(const SXElement& y) const {
+  SXElement SXElement::zz_ne(const SXElement& y) const {
     if (isEqual(y))
       return 0;
     else

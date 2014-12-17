@@ -810,19 +810,19 @@ namespace casadi {
     return MX::binary(OP_DIV, *this, y);
   }
 
-  MX MX::__lt__(const MX& y) const {
+  MX MX::zz_lt(const MX& y) const {
     return MX::binary(OP_LT, *this, y);
   }
 
-  MX MX::__le__(const MX& y) const {
+  MX MX::zz_le(const MX& y) const {
     return MX::binary(OP_LE, *this, y);
   }
 
-  MX MX::__eq__(const MX& y) const {
+  MX MX::zz_eq(const MX& y) const {
     return MX::binary(OP_EQ, *this, y);
   }
 
-  MX MX::__ne__(const MX& y) const {
+  MX MX::zz_ne(const MX& y) const {
     return MX::binary(OP_NE, *this, y);
   }
 

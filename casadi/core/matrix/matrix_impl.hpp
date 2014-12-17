@@ -861,22 +861,22 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__lt__(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_lt(const Matrix<DataType> &y) const {
     return binary(OP_LT, *this, y);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__le__(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_le(const Matrix<DataType> &y) const {
     return binary(OP_LE, *this, y);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__eq__(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_eq(const Matrix<DataType> &y) const {
     return binary(OP_EQ, *this, y);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::__ne__(const Matrix<DataType> &y) const {
+  Matrix<DataType> Matrix<DataType>::zz_ne(const Matrix<DataType> &y) const {
     return binary(OP_NE, *this, y);
   }
 
