@@ -51,7 +51,7 @@
       you may experience a dramatic speed-up by using a sparse linear solver:
 
       \verbatim
-       intg.setOption("linear_solver","csparse")
+       intg.setOption("linsol","csparse")
        intg.setOption("linear_solver_type","user_defined")
       \endverbatim
 */

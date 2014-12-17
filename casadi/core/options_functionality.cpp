@@ -131,7 +131,7 @@ void setAdaptorOptions(Dictionary& dict, const string &name, const Dictionary &o
 
   // Get the adaptor name (before '.', or the entire name if '.' not found)
   std::string adaptor_name = name.substr(0, dotpos);
-  
+
   if (dotpos!=std::string::npos) {
     adaptor_name = adaptor_name + "_options";
   }
@@ -163,7 +163,25 @@ void setAdaptorOptions(Dictionary& dict, const string &name, const Dictionary &o
 
 
 void OptionsFunctionalityNode::setOption(const string &name, const GenericType &op) {
-
+  if (name=="linear_solver" && !hasOption("linear_solver")) {
+     casadi_deprecated("'linear_solver' option will be discarded in favour of 'linsol'");
+     setOption("linsol", op);
+     return;
+  } else if (name=="linear_solverB") {
+     casadi_deprecated("'linear_solver' option will be discarded in favour of 'linsolB'");
+     setOption("linsolB", op);
+     return;
+  } else if (name=="linear_solver_options") {
+     casadi_deprecated("'linear_solver_options' option"
+                       "will be discarded in favour of 'linsol_options'");
+     setOption("linsol_options", op);
+     return;
+  } else if (name=="linear_solver_optionsB") {
+     casadi_deprecated("'linear_solver_optionsB' option"
+                       "will be discarded in favour of 'linsol_optionsB'");
+     setOption("linsol_optionsB", op);
+     return;
+  }
   // Check for adaptor-style options
   std::string::size_type dotpos = name.find(".");
   if (dotpos != std::string::npos && op.isDictionary()) {

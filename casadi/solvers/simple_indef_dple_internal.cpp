@@ -61,9 +61,9 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_simple_indef_dple_solver"); // name of the function
 
-    addOption("linear_solver",            OT_STRING, GenericType(),
+    addOption("linsol",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linsol_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }
@@ -109,7 +109,7 @@ namespace casadi {
     Vss_shift.push_back(Vss.back());
     Vss_shift.insert(Vss_shift.end(), Vss.begin(), Vss.begin()+K_-1);
 
-    MX Pf = solve(A_total, vec(horzcat(Vss_shift)), getOption("linear_solver"));
+    MX Pf = solve(A_total, vec(horzcat(Vss_shift)), getOption("linsol"));
     MX P = reshape(Pf, n_, K_*n_);
 
     P = P(output(DPLE_P).sparsity());

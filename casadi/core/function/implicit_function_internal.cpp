@@ -36,9 +36,9 @@ using namespace std;
 namespace casadi {
 
   ImplicitFunctionInternal::ImplicitFunctionInternal(const Function& f) : f_(f) {
-    addOption("linear_solver",            OT_STRING, GenericType(),
+    addOption("linsol",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linsol_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
     addOption("constraints",              OT_INTEGERVECTOR, GenericType(),
               "Constrain the unknowns. 0 (default): no constraint on ui, "
@@ -131,15 +131,15 @@ namespace casadi {
 
     // Get the linear solver creator function
     if (linsol_.isNull()) {
-      if (hasSetOption("linear_solver")) {
-        std::string linear_solver_name = getOption("linear_solver");
+      if (hasSetOption("linsol")) {
+        std::string linear_solver_name = getOption("linsol");
 
         // Allocate an NLP solver
         linsol_ = LinearSolver(linear_solver_name, jac_.output().sparsity(), 1);
 
         // Pass options
-        if (hasSetOption("linear_solver_options")) {
-          const Dictionary& linear_solver_options = getOption("linear_solver_options");
+        if (hasSetOption("linsol_options")) {
+          const Dictionary& linear_solver_options = getOption("linsol_options");
           linsol_.setOption(linear_solver_options);
         }
 

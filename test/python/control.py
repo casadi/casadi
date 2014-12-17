@@ -35,16 +35,16 @@ import scipy.linalg
 
 clesolvers = []
 if LinearSolver.hasPlugin("csparse") and CleSolver.hasPlugin("simple"):
-  clesolvers.append(("simple",{"linear_solver": "csparse"}))
+  clesolvers.append(("simple",{"linsol": "csparse"}))
 
 dlesolvers = []
 
 if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("simple"):
-  dlesolvers.append(("simple",{"linear_solver": "csparse"}))
+  dlesolvers.append(("simple",{"linsol": "csparse"}))
   
   
 if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("dple.slicot"):
-  dlesolvers.append(("dple.slicot",{"dple_options": {"linear_solver": "csparse"}}))
+  dlesolvers.append(("dple.slicot",{"dple_options": {"linsol": "csparse"}}))
 
 if DleSolver.hasPlugin("lrdle.smith"):
   dlesolvers.append(("lrdle.smith",{"lrdle_options": {"max_iter":100,"tol": 1e-13}}))
@@ -67,7 +67,7 @@ if LrDleSolver.hasPlugin("fixed_smith"):
 
 
 if LrDleSolver.hasPlugin("dle.simple") and LinearSolver.hasPlugin("csparse"):
-  lrdlesolvers.append(("dle.simple",{"dle_options": {"linear_solver": "csparse"}}))
+  lrdlesolvers.append(("dle.simple",{"dle_options": {"linsol": "csparse"}}))
 
 if LrDleSolver.hasPlugin("dle.lrdle.smith"):
   lrdlesolvers.append(("dle.lrdle.smith",{"dle.lrdle_options": {"max_iter":100,"tol": 1e-13}}))
@@ -81,7 +81,7 @@ if LrDpleSolver.hasPlugin("lifting.smith"):
 """
 
 if LrDpleSolver.hasPlugin("dple.slicot") and LinearSolver.hasPlugin("csparse"):
-  lrdplesolvers.append(("dple.slicot",{"dple_options": {"linear_solver": "csparse"}}))
+  lrdplesolvers.append(("dple.slicot",{"dple_options": {"linsol": "csparse"}}))
 
 """ lrsmith has a problem #1294
 if LrDpleSolver.hasPlugin("dple.lrdple.lifting.smith"):
@@ -91,27 +91,27 @@ if LrDpleSolver.hasPlugin("dple.lrdple.lifting.smith"):
 dplesolvers = []
 
 if LinearSolver.hasPlugin("csparse") and DpleSolver.hasPlugin("slicot"):
-  dplesolvers.append(("slicot",{"linear_solver": "csparse"}))
+  dplesolvers.append(("slicot",{"linsol": "csparse"}))
   
 if LinearSolver.hasPlugin("csparse") and DpleSolver.hasPlugin("simple"):
-  dplesolvers.append(("simple",{"linear_solver": "csparse"}))
+  dplesolvers.append(("simple",{"linsol": "csparse"}))
 
 if LinearSolver.hasPlugin("csparse") and DpleSolver.hasPlugin("condensing.simple"):
-  dplesolvers.append(("condensing.simple",{"dle_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("condensing.simple",{"dle_options": {"linsol": "csparse"}}))
 
 if DpleSolver.hasPlugin("condensing.dple.slicot") and LinearSolver.hasPlugin("csparse"):
-  dplesolvers.append(("condensing.dple.slicot",{"dle.dple_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("condensing.dple.slicot",{"dle.dple_options": {"linsol": "csparse"}}))
 
 if DpleSolver.hasPlugin("lrdple.lifting.dle.dple.slicot") and LinearSolver.hasPlugin("csparse"):
-  dplesolvers.append(("lrdple.lifting.dle.dple.slicot",{"lrdple.lrdle.dle.dple_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("lrdple.lifting.dle.dple.slicot",{"lrdple.lrdle.dle.dple_options": {"linsol": "csparse"}}))
 
 if DpleSolver.hasPlugin("lifting.dple.simple") and LinearSolver.hasPlugin("csparse"):
-  dplesolvers.append(("lifting.dple.simple",{"dle.dple_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("lifting.dple.simple",{"dle.dple_options": {"linsol": "csparse"}}))
 
 
 if DpleSolver.hasPlugin("lifting.dple.slicot") and LinearSolver.hasPlugin("csparse"):
-  dplesolvers.append(("lifting.dple.slicot",{"dle.dple_options": {"linear_solver": "csparse"}}))
-  dplesolvers.append(("lifting.dple.slicot",{"form": "B", "dle.dple_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("lifting.dple.slicot",{"dle.dple_options": {"linsol": "csparse"}}))
+  dplesolvers.append(("lifting.dple.slicot",{"form": "B", "dle.dple_options": {"linsol": "csparse"}}))
 
 print "DpleSolvers", len(dplesolvers), dplesolvers
 print "DleSolvers", len(dlesolvers), dlesolvers

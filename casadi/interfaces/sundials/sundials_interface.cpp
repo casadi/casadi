@@ -115,11 +115,11 @@ SundialsInterface::SundialsInterface(const Function& f, const Function& g)
             "Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]");
   addOption("abstolB",                     OT_REAL,             GenericType(),
             "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]");
-  addOption("linear_solver",               OT_STRING,     GenericType(),
+  addOption("linsol",               OT_STRING,     GenericType(),
             "A custom linear solver creator function");
-  addOption("linear_solver_options",       OT_DICTIONARY,       GenericType(),
+  addOption("linsol_options",       OT_DICTIONARY,       GenericType(),
             "Options to be passed to the linear solver");
-  addOption("linear_solverB",              OT_STRING,     GenericType(),
+  addOption("linsolB",              OT_STRING,     GenericType(),
             "A custom linear solver creator function for backwards integration "
             "[default: equal to linear_solver]");
   addOption("linear_solver_optionsB",      OT_DICTIONARY,       GenericType(),
@@ -268,27 +268,27 @@ void SundialsInterface::init() {
       << jacB_.output().size2() << ")");
   }
 
-  if (hasSetOption("linear_solver") && !jac_.isNull()) {
+  if (hasSetOption("linsol") && !jac_.isNull()) {
     // Create a linear solver
-    std::string linear_solver_name = getOption("linear_solver");
+    std::string linear_solver_name = getOption("linsol");
     linsol_ = LinearSolver(linear_solver_name, jac_.output().sparsity(), 1);
     // Pass options
-    if (hasSetOption("linear_solver_options")) {
-      linsol_.setOption(getOption("linear_solver_options"));
+    if (hasSetOption("linsol_options")) {
+      linsol_.setOption(getOption("linsol_options"));
     }
     linsol_.init();
   }
 
-  if ((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()) {
+  if ((hasSetOption("linsolB") || hasSetOption("linsol")) && !jacB_.isNull()) {
     // Create a linear solver
     std::string linear_solver_name =
-        hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
+        hasSetOption("linsolB") ? getOption("linsolB") : getOption("linsol");
     linsolB_ = LinearSolver(linear_solver_name, jacB_.output().sparsity(), 1);
     // Pass options
     if (hasSetOption("linear_solver_optionsB")) {
       linsolB_.setOption(getOption("linear_solver_optionsB"));
-    } else if (hasSetOption("linear_solver_options")) {
-      linsolB_.setOption(getOption("linear_solver_options"));
+    } else if (hasSetOption("linsol_options")) {
+      linsolB_.setOption(getOption("linsol_options"));
     }
     linsolB_.init();
   }

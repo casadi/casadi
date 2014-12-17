@@ -117,7 +117,7 @@ for k in range(N):
 
 # DPLE solver
 dple = DpleSolver("slicot",[i.sparsity() for i in As],[i.sparsity() for i in Qs])
-dple.setOption("linear_solver","csparse")
+dple.setOption("linsol","csparse")
 dple.init()
 
 Ps = horzsplit(dple(a=horzcat(As),v=horzcat(Qs))["p"],x.shape[0])

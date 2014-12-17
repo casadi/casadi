@@ -32,18 +32,18 @@ solvers= []
 try:
   LinearSolver.loadPlugin("csparse")
   ImplicitFunction.loadPlugin("kinsol")
-  solvers.append(("kinsol",{"linear_solver": "csparse","abstol":1e-10}))
+  solvers.append(("kinsol",{"linsol": "csparse","abstol":1e-10}))
 except:
   pass
 try:
   LinearSolver.loadPlugin("csparse")
   NlpSolver.loadPlugin("ipopt")
-  solvers.append(("nlp",{"linear_solver": "csparse", "nlp": "ipopt"}))
+  solvers.append(("nlp",{"linsol": "csparse", "nlp": "ipopt"}))
 except:
   pass
 try:
   LinearSolver.loadPlugin("csparse")
-  solvers.append(("newton",{"linear_solver": "csparse"}))
+  solvers.append(("newton",{"linsol": "csparse"}))
 except:
   pass
 
@@ -236,7 +236,7 @@ class NLPtests(casadiTestCase):
 
     # Create a implicit function instance to solve the system of equations
     ifcn = ImplicitFunction("newton",vfcn_sx)
-    ifcn.setOption("linear_solver","csparse")
+    ifcn.setOption("linsol","csparse")
     ifcn.init()
 
     #ifcn = MXFunction([X0],[vertcat([X0])])

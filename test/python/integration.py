@@ -115,7 +115,7 @@ class Integrationtests(casadiTestCase):
     
     for integrator in [
          explicitRK(f,tf,4,10),
-         implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",10)
+         implicitRK(f,"newton",{"linsol": "csparse"},tf,4,"radau",10)
        ]:
       integrator.init()
       
@@ -146,7 +146,7 @@ class Integrationtests(casadiTestCase):
     tf = 1
     for integrator in [
          explicitRK(f,tf,4,500),
-         implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",50)
+         implicitRK(f,"newton",{"linsol": "csparse"},tf,4,"radau",50)
        ]:
       integrator.init()
       
@@ -243,7 +243,7 @@ class Integrationtests(casadiTestCase):
             def itoptions(post=""):
               yield {"iterative_solver"+post: "gmres"}
               yield {"iterative_solver"+post: "bcgstab"}
-              yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
+              yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linsolB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
              
             def solveroptions(post=""):
               yield {"linear_solver_type" +post: "dense" }
@@ -256,7 +256,7 @@ class Integrationtests(casadiTestCase):
                       yield d
               if "banded" in allowedOpts:
                   yield {"linear_solver_type" +post: "banded" }
-              yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
+              yield {"linear_solver_type" +post: "user_defined", "linsol"+post: "csparse" }
                 
             for a_options in solveroptions("B"):
               for f_options in solveroptions():
@@ -358,7 +358,7 @@ class Integrationtests(casadiTestCase):
           def itoptions(post=""):
             yield {"iterative_solver"+post: "gmres"}
             yield {"iterative_solver"+post: "bcgstab"}
-            yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
+            yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linsolB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
            
           def solveroptions(post=""):
             yield {"linear_solver_type" +post: "dense" }
@@ -371,7 +371,7 @@ class Integrationtests(casadiTestCase):
                     yield d
             if "banded" in allowedOpts:
                 yield {"linear_solver_type" +post: "banded" }
-            yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
+            yield {"linear_solver_type" +post: "user_defined", "linsol"+post: "csparse" }
               
           for a_options in solveroptions("B"):
             for f_options in solveroptions():

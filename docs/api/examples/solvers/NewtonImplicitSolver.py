@@ -63,7 +63,7 @@ params_ = [0.1,0.1,alpha_,k_,sigma_]
 f=SXFunction([vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
 s=ImplicitFunction("newton", f)
 s.setOption("abstol",1e-14)
-s.setOption("linear_solver","csparse")
+s.setOption("linsol","csparse")
 s.init()
 s.setInput(params_,1)
 

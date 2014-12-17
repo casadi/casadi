@@ -61,9 +61,9 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_simple_indef_cle_solver"); // name of the function
 
-    addOption("linear_solver",            OT_STRING, GenericType(),
+    addOption("linsol",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linsol_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }
@@ -89,7 +89,7 @@ namespace casadi {
     DMatrix e = DMatrix::eye(n_);
 
     MX A_total = -kron(As, e)-kron(e, As);
-    MX Pf = solve(A_total, vec(Vss), getOption("linear_solver"));
+    MX Pf = solve(A_total, vec(Vss), getOption("linsol"));
 
     std::vector<MX> v_in;
     v_in.push_back(As);
