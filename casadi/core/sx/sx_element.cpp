@@ -565,19 +565,19 @@ namespace casadi {
     return val.isNan();
   }
 
-  SXElement SXElement::exp() const {
+  SXElement SXElement::zz_exp() const {
     return UnarySX::create(OP_EXP, *this);
   }
 
-  SXElement SXElement::log() const {
+  SXElement SXElement::zz_log() const {
     return UnarySX::create(OP_LOG, *this);
   }
 
   SXElement SXElement::log10() const {
-    return log()*(1/std::log(10.));
+    return log(*this)*(1/std::log(10.));
   }
 
-  SXElement SXElement::sqrt() const {
+  SXElement SXElement::zz_sqrt() const {
     if (isOp(OP_SQ))
       return node->dep(0).fabs();
     else
@@ -591,27 +591,27 @@ namespace casadi {
       return UnarySX::create(OP_SQ, *this);
   }
 
-  SXElement SXElement::sin() const {
+  SXElement SXElement::zz_sin() const {
     return UnarySX::create(OP_SIN, *this);
   }
 
-  SXElement SXElement::cos() const {
+  SXElement SXElement::zz_cos() const {
     return UnarySX::create(OP_COS, *this);
   }
 
-  SXElement SXElement::tan() const {
+  SXElement SXElement::zz_tan() const {
     return UnarySX::create(OP_TAN, *this);
   }
 
-  SXElement SXElement::arcsin() const {
+  SXElement SXElement::zz_asin() const {
     return UnarySX::create(OP_ASIN, *this);
   }
 
-  SXElement SXElement::arccos() const {
+  SXElement SXElement::zz_acos() const {
     return UnarySX::create(OP_ACOS, *this);
   }
 
-  SXElement SXElement::arctan() const {
+  SXElement SXElement::zz_atan() const {
     return UnarySX::create(OP_ATAN, *this);
   }
 
@@ -717,7 +717,7 @@ namespace casadi {
           return rt*rt;
         }
       } else if (n->getValue()==0.5) {
-        return sqrt();
+        return sqrt(*this);
       } else {
         return BinarySX::create(OP_CONSTPOW, *this, n);
       }

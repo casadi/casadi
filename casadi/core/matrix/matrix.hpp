@@ -625,16 +625,16 @@ namespace casadi {
     ///@{
 
     ///@{
-    /// Operations defined in the standard namespace for unambiguous access and Numpy compatibility
-    Matrix<DataType> sin() const;
-    Matrix<DataType> cos() const;
-    Matrix<DataType> tan() const;
-    Matrix<DataType> arcsin() const;
-    Matrix<DataType> arccos() const;
-    Matrix<DataType> arctan() const;
-    Matrix<DataType> exp() const;
-    Matrix<DataType> log() const;
-    Matrix<DataType> sqrt() const;
+    /// Operations called by the corresponding friend functions, MATLAB naming convention
+    Matrix<DataType> zz_sin() const;
+    Matrix<DataType> zz_cos() const;
+    Matrix<DataType> zz_tan() const;
+    Matrix<DataType> zz_asin() const;
+    Matrix<DataType> zz_acos() const;
+    Matrix<DataType> zz_atan() const;
+    Matrix<DataType> zz_exp() const;
+    Matrix<DataType> zz_log() const;
+    Matrix<DataType> zz_sqrt() const;
     Matrix<DataType> floor() const;
     Matrix<DataType> ceil() const;
     Matrix<DataType> fmod(const Matrix<DataType>& y) const;

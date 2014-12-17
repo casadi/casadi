@@ -502,16 +502,16 @@ namespace casadi {
     MX __copysign__(const MX& y) const;
 
     // all unary operations
-    MX exp() const;
-    MX log() const;
+    MX zz_exp() const;
+    MX zz_log() const;
     MX log10() const;
-    MX sqrt() const;
-    MX sin() const;
-    MX cos() const;
-    MX tan() const;
-    MX arcsin() const;
-    MX arccos() const;
-    MX arctan() const;
+    MX zz_sqrt() const;
+    MX zz_sin() const;
+    MX zz_cos() const;
+    MX zz_tan() const;
+    MX zz_asin() const;
+    MX zz_acos() const;
+    MX zz_atan() const;
     MX floor() const;
     MX ceil() const;
     MX fabs() const;

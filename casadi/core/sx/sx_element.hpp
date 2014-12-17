@@ -214,16 +214,16 @@ namespace casadi {
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
     SXElement mul(const SXElement& y) const { return zz_times(y);}
-    SXElement exp() const;
-    SXElement log() const;
-    SXElement sqrt() const;
+    SXElement zz_exp() const;
+    SXElement zz_log() const;
+    SXElement zz_sqrt() const;
     SXElement sq() const;
-    SXElement sin() const;
-    SXElement cos() const;
-    SXElement tan() const;
-    SXElement arcsin() const;
-    SXElement arccos() const;
-    SXElement arctan() const;
+    SXElement zz_sin() const;
+    SXElement zz_cos() const;
+    SXElement zz_tan() const;
+    SXElement zz_asin() const;
+    SXElement zz_acos() const;
+    SXElement zz_atan() const;
     SXElement floor() const;
     SXElement ceil() const;
     SXElement fmod(const SXElement &y) const;

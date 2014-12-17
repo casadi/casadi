@@ -693,43 +693,43 @@ namespace casadi {
     return(*this)->getAssertion(y, fail_message);
   }
 
-  MX MX::exp() const {
+  MX MX::zz_exp() const {
     return (*this)->getUnary(OP_EXP);
   }
 
-  MX MX::log() const {
+  MX MX::zz_log() const {
     return (*this)->getUnary(OP_LOG);
   }
 
   MX MX::log10() const {
-    return log()*(1/std::log(10.));
+    return log(*this)*(1/std::log(10.));
   }
 
-  MX MX::sqrt() const {
+  MX MX::zz_sqrt() const {
     return (*this)->getUnary(OP_SQRT);
   }
 
-  MX MX::sin() const {
+  MX MX::zz_sin() const {
     return (*this)->getUnary(OP_SIN);
   }
 
-  MX MX::cos() const {
+  MX MX::zz_cos() const {
     return (*this)->getUnary(OP_COS);
   }
 
-  MX MX::tan() const {
+  MX MX::zz_tan() const {
     return (*this)->getUnary(OP_TAN);
   }
 
-  MX MX::arcsin() const {
+  MX MX::zz_asin() const {
     return (*this)->getUnary(OP_ASIN);
   }
 
-  MX MX::arccos() const {
+  MX MX::zz_acos() const {
     return (*this)->getUnary(OP_ACOS);
   }
 
-  MX MX::arctan() const {
+  MX MX::zz_atan() const {
     return (*this)->getUnary(OP_ATAN);
   }
 

@@ -808,6 +808,9 @@ except:
 %rename(__sub__) zz_minus;
 %rename(__mul__) zz_times;
 %rename(__div__) zz_rdivide;
+%rename(arcsin) zz_asin;
+%rename(arccos) zz_acos;
+%rename(arctan) zz_atan;
 %rename(mul) zz_mtimes;
 %ignore T;
 %ignore shape;

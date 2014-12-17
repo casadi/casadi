@@ -168,25 +168,25 @@ namespace casadi {
 
   ///@{
   /** \brief  Pre-C99 elementary functions from the 'math.h' ('cmath') header */
-  template<class T> T sqrt(const T &x) {return x.sqrt();}
+  template<class T> T sqrt(const T &x) {return x.zz_sqrt();}
   using std::sqrt;
 
-  template<class T> T sin(const T &x) {return x.sin();}
+  template<class T> T sin(const T &x) {return x.zz_sin();}
   using std::sin;
 
-  template<class T> T cos(const T &x) {return x.cos();}
+  template<class T> T cos(const T &x) {return x.zz_cos();}
   using std::cos;
 
-  template<class T> T tan(const T &x) {return x.tan();}
+  template<class T> T tan(const T &x) {return x.zz_tan();}
   using std::tan;
 
-  template<class T> T atan(const T &x) {return x.arctan();}
+  template<class T> T atan(const T &x) {return x.zz_atan();}
   using std::atan;
 
-  template<class T> T asin(const T &x) {return x.arcsin();}
+  template<class T> T asin(const T &x) {return x.zz_asin();}
   using std::asin;
 
-  template<class T> T acos(const T &x) {return x.arccos();}
+  template<class T> T acos(const T &x) {return x.zz_acos();}
   using std::acos;
 
   template<class T> T sinh(const T &x) {return x.sinh();}
@@ -202,10 +202,10 @@ namespace casadi {
   template<class T> T acosh(const T &x) {return x.arccosh();}
   template<class T> T atanh(const T &x) {return x.arctanh();}
 
-  template<class T> T exp(const T &x) {return x.exp();}
+  template<class T> T exp(const T &x) {return x.zz_exp();}
   using std::exp;
 
-  template<class T> T log(const T &x) {return x.log();}
+  template<class T> T log(const T &x) {return x.zz_log();}
   using std::log;
 
   template<class T> T log10(const T &x) {return x.log10();}

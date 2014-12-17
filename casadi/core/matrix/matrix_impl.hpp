@@ -1198,17 +1198,17 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::sin() const {
+  Matrix<DataType> Matrix<DataType>::zz_sin() const {
     return unary(OP_SIN, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::cos() const {
+  Matrix<DataType> Matrix<DataType>::zz_cos() const {
     return unary(OP_COS, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::tan() const {
+  Matrix<DataType> Matrix<DataType>::zz_tan() const {
     return unary(OP_TAN, *this);
   }
 
@@ -1218,17 +1218,17 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::arcsin() const {
+  Matrix<DataType> Matrix<DataType>::zz_asin() const {
     return unary(OP_ASIN, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::arccos() const {
+  Matrix<DataType> Matrix<DataType>::zz_acos() const {
     return unary(OP_ACOS, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::arctan() const {
+  Matrix<DataType> Matrix<DataType>::zz_atan() const {
     return unary(OP_ATAN, *this);
   }
 
@@ -1263,22 +1263,22 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::exp() const {
+  Matrix<DataType> Matrix<DataType>::zz_exp() const {
     return unary(OP_EXP, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::log() const {
+  Matrix<DataType> Matrix<DataType>::zz_log() const {
     return unary(OP_LOG, *this);
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::log10() const {
-    return log()*(1/std::log(10.));
+    return log(*this)*(1/std::log(10.));
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::sqrt() const {
+  Matrix<DataType> Matrix<DataType>::zz_sqrt() const {
     return unary(OP_SQRT, *this);
   }
 
@@ -2748,7 +2748,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_norm_F() const {
-    return sumAll((*this**this)).sqrt();
+    return sqrt(sumAll((*this**this)));
   }
 
   template<typename DataType>
@@ -2820,7 +2820,7 @@ namespace casadi {
     for (int i=0;i<n;++i) {
       Matrix<DataType> x = X(i, Slice(i, m));
       Matrix<DataType> u = Matrix<DataType>(x);
-      Matrix<DataType> sigma = sumCols(x*x).sqrt();
+      Matrix<DataType> sigma = sqrt(sumCols(x*x));
       const Matrix<DataType>& x0 = x(0, 0);
       u(0, 0) = 1;
 
