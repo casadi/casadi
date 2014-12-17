@@ -100,7 +100,6 @@ namespace casadi {
   public:
     /** \brief  Constructor
      * \param st \structargument{Dle}
-     * \param Hs Column-sizes of H_i
      */
     FixedSmithDleInternal(const DleStructure& st);
 

@@ -38,6 +38,7 @@ namespace casadi {
     plugin->name = "nlp";
     plugin->doc = QpToImplicit::meta_doc.c_str();
     plugin->version = 21;
+    plugin->adaptorHasPlugin = NlpSolver::hasPlugin;
     return 0;
   }
 

@@ -46,6 +46,7 @@ namespace casadi {
     plugin->name = "dle";
     plugin->doc = DleToLrDle::meta_doc.c_str();
     plugin->version = 21;
+    plugin->adaptorHasPlugin = DleSolver::hasPlugin;
     return 0;
   }
 
@@ -55,8 +56,7 @@ namespace casadi {
   }
 
   DleToLrDle::DleToLrDle(
-         const LrDleStructure& st,
-         const std::vector<int> &Hs) : LrDleInternal(st, Hs) {
+         const LrDleStructure& st) : LrDleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_dle_to_lr_dle"); // name of the function
@@ -122,7 +122,7 @@ namespace casadi {
 
   DleToLrDle* DleToLrDle::clone() const {
     // Return a deep copy
-    DleToLrDle* node = new DleToLrDle(st_, Hs_);
+    DleToLrDle* node = new DleToLrDle(st_);
     node->setOption(dictionary());
     return node;
   }

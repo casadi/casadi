@@ -49,7 +49,6 @@ namespace casadi {
      *  \param st \structargument{Dle}
      */
     LrDleInternal(const LrDleStructure& st,
-                 const std::vector<int> &Hs,
                  int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
@@ -62,7 +61,7 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual LrDleInternal* create(const LrDleStructure& st, const std::vector<int> &Hs) const = 0;
+    virtual LrDleInternal* create(const LrDleStructure& st) const = 0;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -115,7 +114,7 @@ namespace casadi {
     bool transp_;
 
     // Creator function for internal class
-    typedef LrDleInternal* (*Creator)(const LrDleStructure& st, const std::vector<int> &Hs);
+    typedef LrDleInternal* (*Creator)(const LrDleStructure& st);
 
     // No static functions exposed
     struct Exposed{ };

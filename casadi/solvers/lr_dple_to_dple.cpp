@@ -88,8 +88,8 @@ namespace casadi {
                            lrdpleStruct("a", st_[DPLE_A],
                                         "v", st_[DPLE_V],
                                         "c", std::vector<Sparsity>(K, C.sparsity()),
-                                        "h", std::vector<Sparsity>(K, H.sparsity())),
-                           std::vector< std::vector<int> >(K, std::vector<int>(1, n)));
+                                        "h", std::vector<Sparsity>(K, H.sparsity())));
+    solver_.setOption("Hs", std::vector< std::vector<int> >(K, std::vector<int>(1, n)));
     solver_.setOption(getOption(optionsname()));
     solver_.init();
 

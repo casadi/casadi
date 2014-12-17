@@ -56,8 +56,8 @@ namespace casadi {
   }
 
   FixedSmithLrDleInternal::FixedSmithLrDleInternal(
-      const LrDleStructure& st, const std::vector<int> &Hs) :
-      LrDleInternal(st, Hs) {
+      const LrDleStructure& st) :
+      LrDleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_fixed_smith_indef_dle_solver"); // name of the function
@@ -132,7 +132,7 @@ namespace casadi {
 
   FixedSmithLrDleInternal* FixedSmithLrDleInternal::clone() const {
     // Return a deep copy
-    FixedSmithLrDleInternal* node = new FixedSmithLrDleInternal(st_, Hs_);
+    FixedSmithLrDleInternal* node = new FixedSmithLrDleInternal(st_);
     node->setOption(dictionary());
     return node;
   }

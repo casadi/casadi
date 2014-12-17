@@ -68,6 +68,9 @@ namespace casadi {
     /** \brief  Evaluate */
     virtual void evaluate() = 0;
 
+    /** \brief  Obtain solver name from Adaptor */
+    virtual std::string getAdaptorSolverName() const { return ""; }
+
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation.
         This method is typically called after setting options but before evaluating.

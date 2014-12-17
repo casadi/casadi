@@ -42,6 +42,7 @@ namespace casadi {
   typedef GenericTypeInternal<bool> BoolType;
   typedef GenericTypeInternal<std::vector<double> > DoubleVectorType;
   typedef GenericTypeInternal<std::vector<int> > IntVectorType;
+  typedef GenericTypeInternal<std::vector< std::vector<int> > > IntVectorVectorType;
   typedef GenericTypeInternal<std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<SharedObject> SharedObjectType;
   typedef GenericTypeInternal<Function> FunctionType;
@@ -71,6 +72,8 @@ GenericType GenericType::from_type(opt_type type) {
   switch (type) {
       case OT_INTEGERVECTOR:
               return std::vector<int>();
+      case OT_INTEGERVECTORVECTOR:
+              return std::vector< std::vector<int> >();
       case OT_BOOLVECTOR:
               return std::vector<bool>();
       case OT_REALVECTOR:
@@ -94,6 +97,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_STRING";
       case OT_INTEGERVECTOR:
               return "OT_INTEGERVECTOR";
+      case OT_INTEGERVECTORVECTOR:
+              return "OT_INTEGERVECTORVECTOR";
       case OT_BOOLVECTOR:
               return "OT_BOOLVECTOR";
       case OT_REALVECTOR:
@@ -135,12 +140,17 @@ bool GenericType::isString() const {
 
 bool GenericType::isEmptyVector() const {
   return (isIntVector() && toIntVector().size()==0) ||
+      (isIntVectorVector() && toIntVectorVector().size()==0) ||
       (isDoubleVector() && toDoubleVector().size()==0) ||
       (isStringVector() && toStringVector().size()==0);
 }
 
 bool GenericType::isIntVector() const {
   return is_a<vector<int> >();
+}
+
+bool GenericType::isIntVectorVector() const {
+  return is_a<vector<vector<int> > >();
 }
 
 bool GenericType::isDoubleVector() const {
@@ -191,6 +201,10 @@ GenericType::GenericType(double d) : type_(OT_REAL) {
 
 GenericType::GenericType(const vector<int>& iv) : type_(OT_INTEGERVECTOR) {
   assignNode(new IntVectorType(iv));
+}
+
+GenericType::GenericType(const vector<vector<int> >& ivv) : type_(OT_INTEGERVECTORVECTOR) {
+  assignNode(new IntVectorVectorType(ivv));
 }
 
 GenericType::GenericType(const vector<bool>& b_vec) : type_(OT_BOOLVECTOR) {
@@ -279,6 +293,11 @@ const vector<int>& GenericType::toIntVector() const {
   return static_cast<const IntVectorType*>(get())->d_;
 }
 
+const vector<vector<int> >& GenericType::toIntVectorVector() const {
+  casadi_assert_message(isIntVectorVector(), "type mismatch");
+  return static_cast<const IntVectorVectorType*>(get())->d_;
+}
+
 const vector<double>& GenericType::toDoubleVector() const {
   casadi_assert_message(isDoubleVector(), "type mismatch");
   return static_cast<const DoubleVectorType*>(get())->d_;
@@ -287,6 +306,11 @@ const vector<double>& GenericType::toDoubleVector() const {
 vector<int>& GenericType::toIntVector() {
   casadi_assert_message(isIntVector(), "type mismatch");
   return static_cast<IntVectorType*>(get())->d_;
+}
+
+vector<vector<int> >& GenericType::toIntVectorVector() {
+  casadi_assert_message(isIntVectorVector(), "type mismatch");
+  return static_cast<IntVectorVectorType*>(get())->d_;
 }
 
 vector<double>& GenericType::toDoubleVector() {
@@ -351,6 +375,19 @@ bool GenericType::operator!=(const GenericType& op2) const {
     if (v1.size() != v2.size()) return true;
     for (int i=0; i<v1.size(); ++i)
       if (v1[i] != v2[i]) return true;
+    return false;
+  }
+
+  if (isIntVectorVector() && op2.isIntVectorVector()) {
+    const vector< vector<int> > &v1 = toIntVectorVector();
+    const vector< vector<int> > &v2 = op2.toIntVectorVector();
+    if (v1.size() != v2.size()) return true;
+    for (int i=0; i<v1.size(); ++i) {
+        if (v1[i].size() != v2[i].size()) return true;
+        for (int j=0; j<v1[i].size(); ++j) {
+          if (v1[i][j] != v2[i][j]) return true;
+        }
+      }
     return false;
   }
 

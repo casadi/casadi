@@ -25,6 +25,7 @@
 
 // Lower value means wil be checked first
 #define PRECEDENCE_IVector 92
+#define PRECEDENCE_IVectorVector 92
 #define PRECEDENCE_PAIR_SLICE_SLICE 93
 #define PRECEDENCE_SLICE 94
 #define PRECEDENCE_PAIR_IVector_IVector 96
@@ -206,6 +207,8 @@
       p=PyString_FromString(a.toString().c_str());
     } else if (a.isIntVector()) {
       p = swig::from(a.toIntVector());
+    } else if (a.isIntVectorVector()) {
+      p = swig::from(a.toIntVectorVector());
     } else if (a.isDoubleVector()) {
       p = swig::from( a.toDoubleVector());
     }  else if (a.isStringVector()) {
@@ -1029,6 +1032,7 @@
 %casadi_typemaps_vector(IMatrix, PRECEDENCE_IMatrixVector, casadi::Matrix<int>)
 %casadi_typemaps_vector2(DMatrix, PRECEDENCE_DMatrixVectorVector, casadi::Matrix<double>)
 %casadi_typemaps_vector2(IMatrix, PRECEDENCE_IMatrixVectorVector, casadi::Matrix<int>)
+%casadi_typemaps_vector(IVector, PRECEDENCE_IVectorVector, std::vector<int>)
 
 %define %my_value_output_typemaps(Type,...)
 %value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));

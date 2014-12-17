@@ -109,10 +109,8 @@ namespace casadi {
     /** \brief LrDleSolver solver factory
     * \param name \pluginargument{LrDleSolver}
     * \param st \structargument{LrDle}
-    * \param Hs Column-sizes of H_i
     */
-    LrDleSolver(const std::string& name, const LrDleStructure& st,
-      const std::vector<int> &Hs=std::vector<int>());
+    LrDleSolver(const std::string& name, const LrDleStructure& st);
 
     /// Print solver statistics
     void printStats(std::ostream &stream=CASADI_COUT) const;
