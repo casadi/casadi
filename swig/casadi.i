@@ -655,6 +655,11 @@ using namespace casadi;
   data[0] = $1.first;
   data[1] = $1.second;
 }
+
+// The natural way to represent an integer in MATLAB is as a double
+%typemap(out) int {
+  $result = mxCreateDoubleScalar($1);
+}
 #endif // SWIGMATLAB
 
 #ifndef SWIGXML

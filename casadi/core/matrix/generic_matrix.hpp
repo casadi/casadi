@@ -86,6 +86,9 @@ namespace casadi {
     /** \brief Get the number of elements */
     int numel() const;
 
+    /** \brief Get the number of elements in slice (cf. MATLAB) */
+    int numel(int i) const { return 1;}
+
     /** \brief Get the first dimension (i.e. number of rows) */
     int size1() const;
 
