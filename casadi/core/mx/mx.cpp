@@ -666,15 +666,15 @@ namespace casadi {
     return binary(OP_CONSTPOW, *this, b);
   }
 
-  MX MX::fmin(const MX& b) const {
+  MX MX::zz_min(const MX& b) const {
     return binary(OP_FMIN, *this, b);
   }
 
-  MX MX::fmax(const MX& b) const {
+  MX MX::zz_max(const MX& b) const {
     return binary(OP_FMAX, *this, b);
   }
 
-  MX MX::fmod(const MX& b) const {
+  MX MX::zz_mod(const MX& b) const {
     return binary(OP_FMOD, *this, b);
   }
 
@@ -701,7 +701,7 @@ namespace casadi {
     return (*this)->getUnary(OP_LOG);
   }
 
-  MX MX::log10() const {
+  MX MX::zz_log10() const {
     return log(*this)*(1/std::log(10.));
   }
 
@@ -757,19 +757,19 @@ namespace casadi {
     return (*this)->getUnary(OP_ATANH);
   }
 
-  MX MX::floor() const {
+  MX MX::zz_floor() const {
     return (*this)->getUnary(OP_FLOOR);
   }
 
-  MX MX::ceil() const {
+  MX MX::zz_ceil() const {
     return (*this)->getUnary(OP_CEIL);
   }
 
-  MX MX::fabs() const {
+  MX MX::zz_abs() const {
     return (*this)->getUnary(OP_FABS);
   }
 
-  MX MX::sign() const {
+  MX MX::zz_sign() const {
     return (*this)->getUnary(OP_SIGN);
   }
 

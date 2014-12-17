@@ -491,9 +491,9 @@ namespace casadi {
     MX inner_prod(const MX& y) const;
     MX outer_prod(const MX& y) const;
     MX constpow(const MX& y) const;
-    MX fmin(const MX& y) const;
-    MX fmax(const MX& y) const;
-    MX fmod(const MX& y) const;
+    MX zz_min(const MX& y) const;
+    MX zz_max(const MX& y) const;
+    MX zz_mod(const MX& y) const;
     MX printme(const MX& y) const;
     MX zz_atan2(const MX& y) const;
     MX logic_and(const MX& y) const;
@@ -504,7 +504,7 @@ namespace casadi {
     // all unary operations
     MX zz_exp() const;
     MX zz_log() const;
-    MX log10() const;
+    MX zz_log10() const;
     MX zz_sqrt() const;
     MX zz_sin() const;
     MX zz_cos() const;
@@ -512,10 +512,10 @@ namespace casadi {
     MX zz_asin() const;
     MX zz_acos() const;
     MX zz_atan() const;
-    MX floor() const;
-    MX ceil() const;
-    MX fabs() const;
-    MX sign() const;
+    MX zz_floor() const;
+    MX zz_ceil() const;
+    MX zz_abs() const;
+    MX zz_sign() const;
     MX zz_erfinv() const;
     MX zz_erf() const;
     MX zz_sinh() const;

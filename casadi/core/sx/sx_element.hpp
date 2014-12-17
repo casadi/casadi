@@ -224,14 +224,14 @@ namespace casadi {
     SXElement zz_asin() const;
     SXElement zz_acos() const;
     SXElement zz_atan() const;
-    SXElement floor() const;
-    SXElement ceil() const;
-    SXElement fmod(const SXElement &y) const;
+    SXElement zz_floor() const;
+    SXElement zz_ceil() const;
+    SXElement zz_mod(const SXElement &y) const;
     SXElement zz_erf() const;
     SXElement zz_erfinv() const;
-    SXElement fabs() const;
-    SXElement fmin(const SXElement &y) const;
-    SXElement fmax(const SXElement &y) const;
+    SXElement zz_abs() const;
+    SXElement zz_min(const SXElement &y) const;
+    SXElement zz_max(const SXElement &y) const;
     SXElement inv() const;
     SXElement zz_sinh() const;
     SXElement zz_cosh() const;
@@ -240,9 +240,9 @@ namespace casadi {
     SXElement zz_acosh() const;
     SXElement zz_atanh() const;
     SXElement zz_atan2(const SXElement &y) const;
-    SXElement log10() const;
+    SXElement zz_log10() const;
     SXElement printme(const SXElement &y) const;
-    SXElement sign() const;
+    SXElement zz_sign() const;
     SXElement __copysign__(const SXElement &y) const;
     SXElement constpow(const SXElement& y) const;
     SXElement logic_not() const;
@@ -250,8 +250,8 @@ namespace casadi {
     SXElement logic_or(const SXElement& y) const;
     SXElement if_else_zero(const SXElement& y) const;
 
-    Matrix<SXElement> fmin(const Matrix<SXElement>& b) const;
-    Matrix<SXElement> fmax(const Matrix<SXElement>& b) const;
+    Matrix<SXElement> zz_min(const Matrix<SXElement>& b) const;
+    Matrix<SXElement> zz_max(const Matrix<SXElement>& b) const;
     Matrix<SXElement> constpow(const Matrix<SXElement>& n) const;
     Matrix<SXElement> __copysign__(const Matrix<SXElement>& n) const;
     Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;

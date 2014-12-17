@@ -558,8 +558,8 @@ memberbinopsr_custom(Type,le,<=)
 memberbinopsr_custom(Type,lt,<)
 memberbinopsr_custom(Type,eq,==)
 memberbinopsr_custom(Type,ne,!=)
-memberbinopsr_un(Type,fmin)
-memberbinopsr_un(Type,fmax)
+Type __rfmin__(const Type& b) const { return fmin(b, *$self);}
+Type __rfmax__(const Type& b) const { return fmax(b, *$self);}
 Type rmul(const Type& b) const{ return b.zz_mtimes(*$self);}
 Type __rarctan2__(const Type& b) const{ return b.zz_atan2(*$self);}
 memberbinopsr(Type,copysign)
@@ -586,8 +586,8 @@ returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*
 
 // This is a list of all operators:
 %define binopsFull(argtype,argCast,selfCast,returntype)
-memberbinops_un(fmin,argtype,argCast,selfCast,returntype)
-memberbinops_un(fmax,argtype,argCast,selfCast,returntype)
+returntype __rfmin__(argtype) const { return fmin(argCast(b), selfCast(*$self));}
+returntype __rfmax__(argtype) const { return fmax(argCast(b), selfCast(*$self));}
 memberbinops(constpow,argtype,argCast,selfCast,returntype)
 returntype __rarctan2__(argtype) const{ return argCast(b).zz_atan2(selfCast(*$self));}
 memberbinops(copysign,argtype,argCast,selfCast,returntype)
@@ -815,6 +815,10 @@ except:
 %rename(arcsinh) zz_asinh;
 %rename(arccosh) zz_acosh;
 %rename(arctanh) zz_atanh;
+%rename(fabs) zz_abs;
+%rename(fmod) zz_mod;
+%rename(fmin) zz_min;
+%rename(fmax) zz_max;
 %rename(mul) zz_mtimes;
 %ignore T;
 %ignore shape;

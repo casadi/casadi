@@ -1273,7 +1273,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::log10() const {
+  Matrix<DataType> Matrix<DataType>::zz_log10() const {
     return log(*this)*(1/std::log(10.));
   }
 
@@ -1283,27 +1283,27 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::floor() const {
+  Matrix<DataType> Matrix<DataType>::zz_floor() const {
     return unary(OP_FLOOR, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::ceil() const {
+  Matrix<DataType> Matrix<DataType>::zz_ceil() const {
     return unary(OP_CEIL, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::fmod(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_mod(const Matrix<DataType>& y) const {
     return binary(OP_FMOD, *this, y);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::fabs() const {
+  Matrix<DataType> Matrix<DataType>::zz_abs() const {
     return unary(OP_FABS, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::sign() const {
+  Matrix<DataType> Matrix<DataType>::zz_sign() const {
     return unary(OP_SIGN, *this);
   }
 
@@ -1318,7 +1318,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::fmin(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_min(const Matrix<DataType>& y) const {
     return binary(OP_FMIN, *this, y);
   }
 
@@ -1328,7 +1328,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::fmax(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_max(const Matrix<DataType>& y) const {
     return binary(OP_FMAX, *this, y);
   }
 
@@ -2733,7 +2733,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_norm_1() const {
-    return sumAll(fabs());
+    return sumAll(fabs(*this));
   }
 
   template<typename DataType>
@@ -2756,7 +2756,7 @@ namespace casadi {
     // Get largest element by absolute value
     Matrix<DataType> s = 0;
     for (typename std::vector<DataType>::const_iterator i=begin(); i!=end(); ++i) {
-      s = s.fmax(Matrix<DataType>(*i).fabs());
+      s = fmax(s, fabs(Matrix<DataType>(*i)));
     }
     return s;
   }

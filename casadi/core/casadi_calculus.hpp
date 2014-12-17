@@ -208,7 +208,7 @@ namespace casadi {
   template<class T> T log(const T &x) {return x.zz_log();}
   using std::log;
 
-  template<class T> T log10(const T &x) {return x.log10();}
+  template<class T> T log10(const T &x) {return x.zz_log10();}
   using std::log10;
 
   inline double atanh(double x) throw() {
@@ -230,19 +230,19 @@ namespace casadi {
   template<class T> T pow(double   x, const T &n) { return T(x).__pow__(n);}
   using std::pow;
 
-  template<class T> T abs(const T &x) {return x.fabs();}
+  template<class T> T abs(const T &x) {return x.zz_abs();}
   using std::abs;
 
-  template<class T> T fabs(const T &x) {return x.fabs();}
+  template<class T> T fabs(const T &x) {return x.zz_abs();}
   using std::fabs;
 
-  template<class T> T floor(const T &x) {return x.floor();}
+  template<class T> T floor(const T &x) {return x.zz_floor();}
   using std::floor;
 
-  template<class T> T ceil(const T &x) {return x.ceil();}
+  template<class T> T ceil(const T &x) {return x.zz_ceil();}
   using std::ceil;
 
-  template<class T> T fmod(const T &x, const T &y) {return x.fmod(y);}
+  template<class T> T fmod(const T &x, const T &y) {return x.zz_mod(y);}
   using std::fmod;
 
   template<class T> T atan2(const T &x, const T &n) { return x.zz_atan2(n);}
@@ -270,15 +270,15 @@ namespace casadi {
   }
 #endif // HAS ERF
 
-  template<class T> T fmin(const T &x, const T &n) { return x.fmin(n);}
-  template<class T> T fmin(const T &x,   double n) { return x.fmin(n);}
-  template<class T> T fmin(double   x, const T &n) { return T(x).fmin(n);}
+  template<class T> T fmin(const T &x, const T &n) { return x.zz_min(n);}
+  template<class T> T fmin(const T &x,   double n) { return x.zz_min(n);}
+  template<class T> T fmin(double   x, const T &n) { return T(x).zz_min(n);}
   inline double fmin(double x, double y) throw() { return std::min(x, y);}
   inline int fmin(int x, int y) throw() { return std::min(x, y);}
 
-  template<class T> T fmax(const T &x, const T &n) { return x.fmax(n);}
-  template<class T> T fmax(const T &x,   double n) { return x.fmax(n);}
-  template<class T> T fmax(double   x, const T &n) { return T(x).fmax(n);}
+  template<class T> T fmax(const T &x, const T &n) { return x.zz_max(n);}
+  template<class T> T fmax(const T &x,   double n) { return x.zz_max(n);}
+  template<class T> T fmax(double   x, const T &n) { return T(x).zz_max(n);}
   inline double fmax(double x, double y) throw() { return std::max(x, y);}
   inline int fmax(int x, int y) throw() { return std::max(x, y);}
 
@@ -296,7 +296,7 @@ namespace casadi {
   }
 
   /// Sign function, note that sign(nan) == nan
-  template<class T> T sign(const T &x) {return x.sign();}
+  template<class T> T sign(const T &x) {return x.zz_sign();}
 
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}

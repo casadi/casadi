@@ -160,7 +160,7 @@ namespace casadi {
       return UnarySX::create(OP_NEG, *this);
   }
 
-  SXElement SXElement::sign() const {
+  SXElement SXElement::zz_sign() const {
     return UnarySX::create(OP_SIGN, *this);
   }
 
@@ -341,11 +341,11 @@ namespace casadi {
     }
   }
 
-  SX SXElement::fmin(const SX& b) const {
-    return SX(*this).fmin(b);
+  SX SXElement::zz_min(const SX& b) const {
+    return fmin(SX(*this), b);
   }
-  SX SXElement::fmax(const SX& b) const {
-    return SX(*this).fmax(b);
+  SX SXElement::zz_max(const SX& b) const {
+    return fmax(SX(*this), b);
   }
   SX SXElement::constpow(const SX& n) const {
     return SX(*this).__constpow__(n);
@@ -573,13 +573,13 @@ namespace casadi {
     return UnarySX::create(OP_LOG, *this);
   }
 
-  SXElement SXElement::log10() const {
+  SXElement SXElement::zz_log10() const {
     return log(*this)*(1/std::log(10.));
   }
 
   SXElement SXElement::zz_sqrt() const {
     if (isOp(OP_SQ))
-      return node->dep(0).fabs();
+      return fabs(node->dep(0));
     else
       return UnarySX::create(OP_SQRT, *this);
   }
@@ -657,15 +657,15 @@ namespace casadi {
       return UnarySX::create(OP_ASINH, *this);
   }
 
-  SXElement SXElement::floor() const {
+  SXElement SXElement::zz_floor() const {
     return UnarySX::create(OP_FLOOR, *this);
   }
 
-  SXElement SXElement::ceil() const {
+  SXElement SXElement::zz_ceil() const {
     return UnarySX::create(OP_CEIL, *this);
   }
 
-  SXElement SXElement::fmod(const SXElement &b) const {
+  SXElement SXElement::zz_mod(const SXElement &b) const {
     return BinarySX::create(OP_FMOD, *this, b);
   }
 
@@ -673,7 +673,7 @@ namespace casadi {
     return UnarySX::create(OP_ERF, *this);
   }
 
-  SXElement SXElement::fabs() const {
+  SXElement SXElement::zz_abs() const {
     if (isOp(OP_FABS) || isOp(OP_SQ))
       return *this;
     else
@@ -684,11 +684,11 @@ namespace casadi {
     return SX(Sparsity::scalar(), *this);
   }
 
-  SXElement SXElement::fmin(const SXElement &b) const {
+  SXElement SXElement::zz_min(const SXElement &b) const {
     return BinarySX::create(OP_FMIN, *this, b);
   }
 
-  SXElement SXElement::fmax(const SXElement &b) const {
+  SXElement SXElement::zz_max(const SXElement &b) const {
     return BinarySX::create(OP_FMAX, *this, b);
   }
 
