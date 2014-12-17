@@ -66,9 +66,9 @@ if(WITH_SUNDIALS AND IPOPT_FOUND)
   target_link_libraries(rocket_single_shooting
     casadi_integrator_cvodes
     casadi_integrator_idas
-    casadi_nlpsolver_ipopt
+    casadi_nlp_ipopt
     casadi_integrator_rk
-    casadi_nlpsolver_scpgen)
+    casadi_nlp_scpgen)
 endif()
 
 # Writing a multiple shooting code from scratch

@@ -62,9 +62,9 @@ namespace casadi {
               "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",
               "Collocation scheme", "radau|legendre");
-    addOption("implicit_solver",               OT_STRING,  GenericType(),
+    addOption("nlsol",                         OT_STRING,  GenericType(),
               "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
+    addOption("nlsol_options",                 OT_DICTIONARY, GenericType(),
               "Options to be passed to the implicit solver");
     addOption("expand_f",                      OT_BOOLEAN,  false,
               "Expand the ODE/DAE residual function in an SX graph");
@@ -375,7 +375,7 @@ namespace casadi {
     }
 
     // Get the root-finding solver creator function
-    std::string implicit_function_name = getOption("implicit_solver");
+    std::string implicit_function_name = getOption("nlsol");
 
     // Allocate a root-finding solver
     implicit_solver_ = ImplicitFunction(implicit_function_name,
@@ -385,8 +385,8 @@ namespace casadi {
     implicit_solver_.setOption("name", ss_implicit_solver.str());
 
     // Pass options
-    if (hasSetOption("implicit_solver_options")) {
-      const Dictionary& implicit_solver_options = getOption("implicit_solver_options");
+    if (hasSetOption("nlsol_options")) {
+      const Dictionary& implicit_solver_options = getOption("nlsol_options");
       implicit_solver_.setOption(implicit_solver_options);
     }
 

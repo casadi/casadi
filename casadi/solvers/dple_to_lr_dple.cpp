@@ -40,8 +40,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DPLESOLVER_LRDPLE_EXPORT
-      casadi_register_dplesolver_lrdple(DpleInternal::Plugin* plugin) {
+  int CASADI_DPLE_LRDPLE_EXPORT
+      casadi_register_dple_lrdple(DpleInternal::Plugin* plugin) {
     plugin->creator = DpleToLrDple::creator;
     plugin->name = "lrdple";
     plugin->doc = DpleToLrDple::meta_doc.c_str();
@@ -50,8 +50,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DPLESOLVER_LRDPLE_EXPORT casadi_load_dplesolver_lrdple() {
-    DpleInternal::registerPlugin(casadi_register_dplesolver_lrdple);
+  void CASADI_DPLE_LRDPLE_EXPORT casadi_load_dple_lrdple() {
+    DpleInternal::registerPlugin(casadi_register_dple_lrdple);
   }
 
   DpleToLrDple::DpleToLrDple(

@@ -52,12 +52,12 @@ try:
 except:
   pass
 
-integrators.append(("collocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18}))
+integrators.append(("collocation",["dae","ode"],{"nlsol":"kinsol","number_of_finite_elements": 18}))
 
 try:
   Integrator.loadPlugin("oldcollocation")
-  integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18,"startup_integrator":"cvodes"}))
-  #integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp": "ipopt","linear_solver_creator": "csparse"}}))
+  integrators.append(("oldcollocation",["dae","ode"],{"nlsol":"kinsol","number_of_finite_elements": 18,"startup_integrator":"cvodes"}))
+  #integrators.append(("oldcollocation",["dae","ode"],{"nlsol":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","nlsol_options": {"nlp": "ipopt","linear_solver_creator": "csparse"}}))
 except:
   pass
 

@@ -161,10 +161,10 @@ namespace casadi {
 
     // Get the name of the shared library
     std::string lib = SHARED_LIBRARY_PREFIX "casadi_"
-      + Derived::infix_ + "_" + name + SHARED_LIBRARY_SUFFIX;
+      + Derived::shortname() + "_" + name + SHARED_LIBRARY_SUFFIX;
 
     // Load the dll
-    std::string regName = "casadi_register_" + Derived::infix_ + "_" + name;
+    std::string regName = "casadi_register_" + Derived::shortname() + "_" + name;
 
     // Error string
     std::string errors = "PluginInterface::loadPlugin: Cannot load shared library:";
@@ -277,7 +277,8 @@ namespace casadi {
 
     // Assert the plugin exists (needed for adaptors)
     if (!hasPlugin(name)) {
-      casadi_error("Plugin '" << name << "' is not found.");
+      casadi_error("Plugin '" << name << "' is not found for '" <<
+        Derived::shortname() <<"'.");
     }
 
     // Check if any dot in the name, i.e. an adaptor

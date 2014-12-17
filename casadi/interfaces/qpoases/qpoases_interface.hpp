@@ -27,7 +27,7 @@
 #define CASADI_QPOASES_INTERFACE_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
-#include <casadi/interfaces/qpoases/casadi_qpsolver_qpoases_export.h>
+#include <casadi/interfaces/qpoases/casadi_qp_qpoases_export.h>
 #include <qpOASES.hpp>
 
 /** \defgroup plugin_QpSolver_qpoases
@@ -49,7 +49,7 @@ namespace casadi {
    * \date 2011
    *
    * */
-class CASADI_QPSOLVER_QPOASES_EXPORT QpoasesInterface : public QpSolverInternal {
+class CASADI_QP_QPOASES_EXPORT QpoasesInterface : public QpSolverInternal {
 public:
   /** \brief  Constructor */
   explicit QpoasesInterface();

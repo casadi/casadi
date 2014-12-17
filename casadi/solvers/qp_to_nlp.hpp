@@ -29,7 +29,7 @@
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include "casadi/core/function/nlp_solver_internal.hpp"
 
-#include <casadi/solvers/casadi_qpsolver_nlp_export.h>
+#include <casadi/solvers/casadi_qp_nlp_export.h>
 
 
 /** \defgroup plugin_QpSolver_nlp
@@ -49,7 +49,7 @@ namespace casadi {
    \author Joris Gillis
    \date 2011
   */
-class CASADI_QPSOLVER_NLP_EXPORT QpToNlp : public QpSolverInternal,
+class CASADI_QP_NLP_EXPORT QpToNlp : public QpSolverInternal,
   public Adaptor<QpToNlp, NlpSolverInternal> {
 public:
   /** \brief  Constructor */

@@ -27,7 +27,7 @@
 #define CASADI_SMITH_INDEF_DLE_INTERNAL_HPP
 
 #include "../core/function/lr_dle_internal.hpp"
-#include <casadi/solvers/casadi_lrdlesolver_smith_export.h>
+#include <casadi/solvers/casadi_lrdle_smith_export.h>
 
 /** \defgroup LrDleSolversmith
 
@@ -96,7 +96,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_LRDLESOLVER_SMITH_EXPORT SmithLrDleInternal : public LrDleInternal {
+  class CASADI_LRDLE_SMITH_EXPORT SmithLrDleInternal : public LrDleInternal {
   public:
     /** \brief  Constructor
      * \param st \structargument{LrDle}

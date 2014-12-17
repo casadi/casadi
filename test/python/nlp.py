@@ -67,7 +67,7 @@ try:
   NlpSolver.loadPlugin("ipopt")
   NlpSolver.loadPlugin("stabilizedsqp")
   qp_options = {"nlp": "ipopt", "nlp_options": {"tol": 1e-12, "print_level": 0, "print_time": False} }
-  solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilizedqp": "qp", "stabilizedqp_options": {"qp": "nlp", "qp_options": qp_options}}))
+  solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabqp": "qp", "stabqp_options": {"qp": "nlp", "qp_options": qp_options}}))
   print "Will test stabilizedsqp"
 except:
   pass
@@ -76,7 +76,7 @@ try:
   qp_options = {}
   QpSolver.loadPlugin("sqic")
   NlpSolver.loadPlugin("stabilizedsqp")
-  solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilizedqp": "qp", "stabilizedqp_options": {"qp": "sqic"}}))
+  solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabqp": "qp", "stabqp_options": {"qp": "sqic"}}))
   print "Will test stabilizedsqp"
 except:
   pass

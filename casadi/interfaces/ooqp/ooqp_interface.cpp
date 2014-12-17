@@ -43,8 +43,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOLVER_OOQP_EXPORT
-  casadi_register_qpsolver_ooqp(QpSolverInternal::Plugin* plugin) {
+  int CASADI_QP_OOQP_EXPORT
+  casadi_register_qp_ooqp(QpSolverInternal::Plugin* plugin) {
     plugin->creator = OoqpInterface::creator;
     plugin->name = "ooqp";
     plugin->doc = OoqpInterface::meta_doc.c_str();
@@ -53,8 +53,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_OOQP_EXPORT casadi_load_qpsolver_ooqp() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_ooqp);
+  void CASADI_QP_OOQP_EXPORT casadi_load_qp_ooqp() {
+    QpSolverInternal::registerPlugin(casadi_register_qp_ooqp);
   }
 
   OoqpInterface::OoqpInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {

@@ -41,8 +41,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_CLESOLVER_SIMPLE_EXPORT
-  casadi_register_clesolver_simple(CleInternal::Plugin* plugin) {
+  int CASADI_CLE_SIMPLE_EXPORT
+  casadi_register_cle_simple(CleInternal::Plugin* plugin) {
     plugin->creator = SimpleIndefCleInternal::creator;
     plugin->name = "simple";
     plugin->doc = SimpleIndefCleInternal::meta_doc.c_str();
@@ -51,8 +51,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_CLESOLVER_SIMPLE_EXPORT casadi_load_clesolver_simple() {
-    CleInternal::registerPlugin(casadi_register_clesolver_simple);
+  void CASADI_CLE_SIMPLE_EXPORT casadi_load_cle_simple() {
+    CleInternal::registerPlugin(casadi_register_cle_simple);
   }
 
   SimpleIndefCleInternal::SimpleIndefCleInternal(

@@ -181,7 +181,16 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
                        "will be discarded in favour of 'linsol_optionsB'");
      setOption("linsol_optionsB", op);
      return;
-  }
+  } else if (name=="implicit_solver") {
+     casadi_deprecated("'implicit_solver' option will be discarded in favour of 'nlsol'");
+     setOption("nlsol", op);
+     return;
+  } else if (name=="implicit_solver_options") {
+     casadi_deprecated("'implicit_solver_options' option"
+                       "will be discarded in favour of 'nlsol_options'");
+     setOption("nlsol_options", op);
+     return;
+   }
   // Check for adaptor-style options
   std::string::size_type dotpos = name.find(".");
   if (dotpos != std::string::npos && op.isDictionary()) {

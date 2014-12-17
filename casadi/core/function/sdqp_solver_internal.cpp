@@ -134,7 +134,7 @@ namespace casadi {
 
   std::map<std::string, SdqpSolverInternal::Plugin> SdqpSolverInternal::solvers_;
 
-  const std::string SdqpSolverInternal::infix_ = "sdqpsolver";
+
 
 
 } // namespace casadi

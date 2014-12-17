@@ -40,8 +40,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOLVER_SQIC_EXPORT
-  casadi_register_qpsolver_sqic(QpSolverInternal::Plugin* plugin) {
+  int CASADI_QP_SQIC_EXPORT
+  casadi_register_qp_sqic(QpSolverInternal::Plugin* plugin) {
     plugin->creator = SqicInterface::creator;
     plugin->name = "sqic";
     plugin->doc = SqicInterface::meta_doc.c_str();
@@ -50,8 +50,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_SQIC_EXPORT casadi_load_qpsolver_sqic() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_sqic);
+  void CASADI_QP_SQIC_EXPORT casadi_load_qp_sqic() {
+    QpSolverInternal::registerPlugin(casadi_register_qp_sqic);
   }
 
   SqicInterface* SqicInterface::clone() const {

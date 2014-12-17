@@ -245,7 +245,7 @@ namespace casadi {
 
   std::map<std::string, LrDleInternal::Plugin> LrDleInternal::solvers_;
 
-  const std::string LrDleInternal::infix_ = "lrdlesolver";
+
 
 } // namespace casadi
 

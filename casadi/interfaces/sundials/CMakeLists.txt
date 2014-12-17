@@ -12,22 +12,22 @@ casadi_library(casadi_sundials_common sundials_interface.hpp sundials_interface.
 target_link_libraries(casadi_sundials_common ${SUNDIALS_LIBRARIES})
 
 # CVODES
-casadi_plugin(Integrator cvodes
+casadi_plugin(Integrator integrator cvodes
   cvodes_interface.hpp    cvodes_interface.cpp
   cvodes_interface_meta.cpp
   )
-casadi_plugin_link_libraries(Integrator cvodes casadi_sundials_common)
+casadi_plugin_link_libraries(integrator cvodes casadi_sundials_common)
 
 # IDAS
-casadi_plugin(Integrator idas
+casadi_plugin(Integrator integrator idas
   idas_interface.hpp      idas_interface.cpp
   idas_interface_meta.cpp
   )
-casadi_plugin_link_libraries(Integrator idas casadi_sundials_common)
+casadi_plugin_link_libraries(integrator idas casadi_sundials_common)
 
 # KINSOL
-casadi_plugin(ImplicitFunction kinsol 
+casadi_plugin(ImplicitFunction nlsol kinsol 
    kinsol_interface.hpp    kinsol_interface.cpp
    kinsol_interface_meta.cpp
    )
-casadi_plugin_link_libraries(ImplicitFunction kinsol  ${SUNDIALS_LIBRARIES})
+casadi_plugin_link_libraries(nlsol kinsol  ${SUNDIALS_LIBRARIES})

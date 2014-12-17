@@ -389,7 +389,7 @@ namespace casadi {
 
   std::map<std::string, LinearSolverInternal::Plugin> LinearSolverInternal::solvers_;
 
-  const std::string LinearSolverInternal::infix_ = "linearsolver";
+
 
   void LinearSolverInternal::solveL(double* x, int nrhs, bool transpose) {
     casadi_error("LinearSolverInternal::solveL not defined for class "

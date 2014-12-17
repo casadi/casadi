@@ -40,8 +40,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DLESOLVER_LRDLE_EXPORT
-  casadi_register_dlesolver_lrdle(DleInternal::Plugin* plugin) {
+  int CASADI_DLE_LRDLE_EXPORT
+  casadi_register_dle_lrdle(DleInternal::Plugin* plugin) {
     plugin->creator = DleToLrDle::creator;
     plugin->name = "lrdle";
     plugin->doc = DleToLrDle::meta_doc.c_str();
@@ -51,8 +51,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DLESOLVER_LRDLE_EXPORT casadi_load_dlesolver_lrdle() {
-    DleInternal::registerPlugin(casadi_register_dlesolver_lrdle);
+  void CASADI_DLE_LRDLE_EXPORT casadi_load_dle_lrdle() {
+    DleInternal::registerPlugin(casadi_register_dle_lrdle);
   }
 
   DleToLrDle::DleToLrDle(

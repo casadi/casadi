@@ -27,7 +27,7 @@
 #define CASADI_LAPACK_LU_DENSE_HPP
 
 #include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/lapack/casadi_linearsolver_lapacklu_export.h>
+#include <casadi/interfaces/lapack/casadi_linsol_lapacklu_export.h>
 
 namespace casadi {
 
@@ -63,7 +63,7 @@ namespace casadi {
    * @copydoc plugin_LinearSolver_lapacklu
    *
    */
-  class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLuDense : public LinearSolverInternal {
+  class CASADI_LINSOL_LAPACKLU_EXPORT LapackLuDense : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackLuDense(const Sparsity& sparsity, int nrhs);

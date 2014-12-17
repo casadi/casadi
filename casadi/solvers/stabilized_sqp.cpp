@@ -40,8 +40,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT
-  casadi_register_nlpsolver_stabilizedsqp(NlpSolverInternal::Plugin* plugin) {
+  int CASADI_NLP_STABILIZEDSQP_EXPORT
+  casadi_register_nlp_stabilizedsqp(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = StabilizedSqp::creator;
     plugin->name = "stabilizedsqp";
     plugin->doc = StabilizedSqp::meta_doc.c_str();
@@ -50,15 +50,15 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT casadi_load_nlpsolver_stabilizedsqp() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_stabilizedsqp);
+  void CASADI_NLP_STABILIZEDSQP_EXPORT casadi_load_nlp_stabilizedsqp() {
+    NlpSolverInternal::registerPlugin(casadi_register_nlp_stabilizedsqp);
   }
 
   StabilizedSqp::StabilizedSqp(const Function& nlp) : NlpSolverInternal(nlp) {
     casadi_warning("The SQP method is under development");
-    addOption("stabilizedqp",         OT_STRING,   GenericType(),
+    addOption("stabqp",         OT_STRING,   GenericType(),
               "The Stabilized QP solver to be used by the SQP method");
-    addOption("stabilizedqp_options", OT_DICTIONARY, GenericType(),
+    addOption("stabqp_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the Stabilized QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "limited-memory|exact");
@@ -175,13 +175,13 @@ namespace casadi {
     Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_)
         : jacG().output().sparsity();
 
-    std::string stabilizedqp_solver_name = getOption("stabilizedqp");
+    std::string stabilizedqp_solver_name = getOption("stabqp");
     stabilizedqp_solver_ = StabilizedQpSolver(stabilizedqp_solver_name,
                                                qpStruct("h", H_sparsity, "a", A_sparsity));
 
     // Set options if provided
-    if (hasSetOption("stabilizedqp_options")) {
-      Dictionary stabilizedqp_solver_options = getOption("stabilizedqp_options");
+    if (hasSetOption("stabqp_options")) {
+      Dictionary stabilizedqp_solver_options = getOption("stabqp_options");
       stabilizedqp_solver_.setOption(stabilizedqp_solver_options);
     }
     stabilizedqp_solver_.init();

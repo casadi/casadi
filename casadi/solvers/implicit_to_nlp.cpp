@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IMPLICITFUNCTION_NLP_EXPORT
-  casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin* plugin) {
+  int CASADI_NLSOL_NLP_EXPORT
+  casadi_register_nlsol_nlp(ImplicitFunctionInternal::Plugin* plugin) {
     plugin->creator = QpToImplicit::creator;
     plugin->name = "nlp";
     plugin->doc = QpToImplicit::meta_doc.c_str();
@@ -43,8 +43,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_IMPLICITFUNCTION_NLP_EXPORT casadi_load_implicitfunction_nlp() {
-    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_nlp);
+  void CASADI_NLSOL_NLP_EXPORT casadi_load_nlsol_nlp() {
+    ImplicitFunctionInternal::registerPlugin(casadi_register_nlsol_nlp);
   }
 
   QpToImplicit::QpToImplicit(const Function& f) : ImplicitFunctionInternal(f) {

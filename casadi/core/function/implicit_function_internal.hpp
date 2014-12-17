@@ -116,7 +116,7 @@ namespace casadi {
     static std::string shortname() { return "nlsol";}
 
     /// Infix
-    static const std::string infix_;
+
   };
 
 

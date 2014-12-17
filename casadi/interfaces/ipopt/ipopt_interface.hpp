@@ -26,7 +26,7 @@
 #ifndef CASADI_IPOPT_INTERFACE_HPP
 #define CASADI_IPOPT_INTERFACE_HPP
 
-#include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
+#include <casadi/interfaces/ipopt/casadi_nlp_ipopt_export.h>
 #include "casadi/core/function/nlp_solver_internal.hpp"
 
 /** \defgroup plugin_NlpSolver_ipopt
@@ -63,7 +63,7 @@ namespace casadi {
 @copydoc NlpSolver_doc
 @copydoc plugin_NlpSolver_ipopt
 */
-class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInterface : public NlpSolverInternal {
+class CASADI_NLP_IPOPT_EXPORT IpoptInterface : public NlpSolverInternal {
 friend class IpoptUserClass;
 
 public:

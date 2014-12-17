@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.6)
 include_directories(../)
 include_directories(${SNOPT_INCLUDE_DIR})
 
-casadi_plugin(NlpSolver snopt
+casadi_plugin(NlpSolver nlp snopt
   snopt_interface.hpp
   snopt_interface.cpp
   snopt.h
@@ -19,7 +19,7 @@ if(WITH_SNOPT_FORCE_DUMMY)
   add_library(snopt7 SHARED empty_lib.cpp)
   add_library(snopt7_cpp SHARED empty_lib.cpp)
   endif()
-  casadi_plugin_link_libraries(NlpSolver snopt snopt7 snopt7_cpp)
+  casadi_plugin_link_libraries(nlp snopt snopt7 snopt7_cpp)
 else()
-  casadi_plugin_link_libraries(NlpSolver snopt ${SNOPT_LIBRARIES})
+  casadi_plugin_link_libraries(nlp snopt ${SNOPT_LIBRARIES})
 endif()

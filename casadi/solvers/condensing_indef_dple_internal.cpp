@@ -41,8 +41,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DPLESOLVER_CONDENSING_EXPORT
-  casadi_register_dplesolver_condensing(DpleInternal::Plugin* plugin) {
+  int CASADI_DPLE_CONDENSING_EXPORT
+  casadi_register_dple_condensing(DpleInternal::Plugin* plugin) {
     plugin->creator = CondensingIndefDpleInternal::creator;
     plugin->name = "condensing";
     plugin->doc = CondensingIndefDpleInternal::meta_doc.c_str();
@@ -52,8 +52,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DPLESOLVER_CONDENSING_EXPORT casadi_load_dplesolver_condensing() {
-    DpleInternal::registerPlugin(casadi_register_dplesolver_condensing);
+  void CASADI_DPLE_CONDENSING_EXPORT casadi_load_dple_condensing() {
+    DpleInternal::registerPlugin(casadi_register_dple_condensing);
   }
 
   CondensingIndefDpleInternal::CondensingIndefDpleInternal(

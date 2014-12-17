@@ -41,8 +41,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DPLESOLVER_SIMPLE_EXPORT
-  casadi_register_dplesolver_simple(DpleInternal::Plugin* plugin) {
+  int CASADI_DPLE_SIMPLE_EXPORT
+  casadi_register_dple_simple(DpleInternal::Plugin* plugin) {
     plugin->creator = SimpleIndefDpleInternal::creator;
     plugin->name = "simple";
     plugin->doc = SimpleIndefDpleInternal::meta_doc.c_str();
@@ -51,8 +51,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DPLESOLVER_SIMPLE_EXPORT casadi_load_dplesolver_simple() {
-    DpleInternal::registerPlugin(casadi_register_dplesolver_simple);
+  void CASADI_DPLE_SIMPLE_EXPORT casadi_load_dple_simple() {
+    DpleInternal::registerPlugin(casadi_register_dple_simple);
   }
 
   SimpleIndefDpleInternal::SimpleIndefDpleInternal(

@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LPSOLVER_QP_EXPORT
-  casadi_register_lpsolver_qp(LpSolverInternal::Plugin* plugin) {
+  int CASADI_LP_QP_EXPORT
+  casadi_register_lp_qp(LpSolverInternal::Plugin* plugin) {
     plugin->creator = LpToQp::creator;
     plugin->name = "qp";
     plugin->doc = LpToQp::meta_doc.c_str();;
@@ -43,8 +43,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LPSOLVER_QP_EXPORT casadi_load_lpsolver_qp() {
-    LpSolverInternal::registerPlugin(casadi_register_lpsolver_qp);
+  void CASADI_LP_QP_EXPORT casadi_load_lp_qp() {
+    LpSolverInternal::registerPlugin(casadi_register_lp_qp);
   }
 
   LpToQp* LpToQp::clone() const {

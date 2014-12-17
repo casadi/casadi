@@ -365,7 +365,7 @@ namespace casadi {
 
   std::map<std::string, NlpSolverInternal::Plugin> NlpSolverInternal::solvers_;
 
-  const std::string NlpSolverInternal::infix_ = "nlpsolver";
+
 
   DMatrix NlpSolverInternal::getReducedHessian() {
     casadi_error("NlpSolverInternal::getReducedHessian not defined for class "

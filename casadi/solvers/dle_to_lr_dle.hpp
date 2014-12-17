@@ -29,7 +29,7 @@
 #include "../core/function/dle_internal.hpp"
 #include "../core/function/lr_dle_internal.hpp"
 #include "../core/function/adaptor.hpp"
-#include <casadi/solvers/casadi_dlesolver_lrdle_export.h>
+#include <casadi/solvers/casadi_dle_lrdle_export.h>
 
 /** \defgroup plugin_LrDleSolver_dle
  Solving the Discrete Lyapunov Equations with a
@@ -50,7 +50,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DLESOLVER_LRDLE_EXPORT DleToLrDle : public DleInternal,
+  class CASADI_DLE_LRDLE_EXPORT DleToLrDle : public DleInternal,
     public Adaptor<DleToLrDle, LrDleInternal>,
     public Wrapper<DleToLrDle>   {
   public:

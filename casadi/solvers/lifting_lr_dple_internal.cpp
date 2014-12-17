@@ -41,8 +41,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LRDPLESOLVER_LIFTING_EXPORT
-  casadi_register_lrdplesolver_lifting(LrDpleInternal::Plugin* plugin) {
+  int CASADI_LRDPLE_LIFTING_EXPORT
+  casadi_register_lrdple_lifting(LrDpleInternal::Plugin* plugin) {
     plugin->creator = LiftingLrDpleInternal::creator;
     plugin->name = "lifting";
     plugin->doc = LiftingLrDpleInternal::meta_doc.c_str();
@@ -52,8 +52,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LRDPLESOLVER_LIFTING_EXPORT casadi_load_lrdplesolver_lifting() {
-    LrDpleInternal::registerPlugin(casadi_register_lrdplesolver_lifting);
+  void CASADI_LRDPLE_LIFTING_EXPORT casadi_load_lrdple_lifting() {
+    LrDpleInternal::registerPlugin(casadi_register_lrdple_lifting);
   }
 
   LiftingLrDpleInternal::LiftingLrDpleInternal(

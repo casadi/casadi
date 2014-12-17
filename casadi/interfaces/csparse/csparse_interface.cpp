@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_CSPARSE_EXPORT
-  casadi_register_linearsolver_csparse(LinearSolverInternal::Plugin* plugin) {
+  int CASADI_LINSOL_CSPARSE_EXPORT
+  casadi_register_linsol_csparse(LinearSolverInternal::Plugin* plugin) {
     plugin->creator = CsparseInterface::creator;
     plugin->name = "csparse";
     plugin->doc = CsparseInterface::meta_doc.c_str();
@@ -42,8 +42,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_CSPARSE_EXPORT casadi_load_linearsolver_csparse() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_csparse);
+  void CASADI_LINSOL_CSPARSE_EXPORT casadi_load_linsol_csparse() {
+    LinearSolverInternal::registerPlugin(casadi_register_linsol_csparse);
   }
 
   CsparseInterface::CsparseInterface(const Sparsity& sparsity, int nrhs)

@@ -35,7 +35,7 @@
 /// \cond INTERNAL
 #include <cs.h>
 #include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/csparse/casadi_linearsolver_csparsecholesky_export.h>
+#include <casadi/interfaces/csparse/casadi_linsol_csparsecholesky_export.h>
 
 namespace casadi {
 
@@ -46,7 +46,7 @@ namespace casadi {
    @copydoc plugin_LinearSolver_csparsecholesky
    *
    */
-  class CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT
+  class CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
   CSparseCholeskyInternal : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides

@@ -33,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IMPLICITFUNCTION_KINSOL_EXPORT
-  casadi_register_implicitfunction_kinsol(ImplicitFunctionInternal::Plugin* plugin) {
+  int CASADI_NLSOL_KINSOL_EXPORT
+  casadi_register_nlsol_kinsol(ImplicitFunctionInternal::Plugin* plugin) {
     plugin->creator = KinsolInterface::creator;
     plugin->name = "kinsol";
     plugin->doc = KinsolInterface::meta_doc.c_str();
@@ -43,8 +43,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_IMPLICITFUNCTION_KINSOL_EXPORT casadi_load_implicitfunction_kinsol() {
-    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_kinsol);
+  void CASADI_NLSOL_KINSOL_EXPORT casadi_load_nlsol_kinsol() {
+    ImplicitFunctionInternal::registerPlugin(casadi_register_nlsol_kinsol);
   }
 
   /** \brief Kinsol solver class

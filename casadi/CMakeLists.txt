@@ -5,13 +5,11 @@
 #)
 
 
-macro(casadi_plugin_link_libraries Type name)
-  string(TOLOWER ${Type} type)
+macro(casadi_plugin_link_libraries type name)
   target_link_libraries(casadi_${type}_${name} ${ARGN})
 endmacro()
 
-macro(casadi_plugin Type name)
-  string(TOLOWER ${Type} type)
+macro(casadi_plugin Type type name)
   casadi_library_or_plugin(casadi_${type}_${name} TRUE ${ARGN})
   set_property(GLOBAL APPEND PROPERTY CASADI_PLUGINS "${Type}::${name}")
 endmacro()

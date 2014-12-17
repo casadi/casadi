@@ -35,8 +35,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT
-  casadi_register_linearsolver_symbolicqr(LinearSolverInternal::Plugin* plugin) {
+  int CASADI_LINSOL_SYMBOLICQR_EXPORT
+  casadi_register_linsol_symbolicqr(LinearSolverInternal::Plugin* plugin) {
     plugin->creator = SymbolicQr::creator;
     plugin->name = "symbolicqr";
     plugin->doc = SymbolicQr::meta_doc.c_str();
@@ -45,8 +45,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT casadi_load_linearsolver_symbolicqr() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_symbolicqr);
+  void CASADI_LINSOL_SYMBOLICQR_EXPORT casadi_load_linsol_symbolicqr() {
+    LinearSolverInternal::registerPlugin(casadi_register_linsol_symbolicqr);
   }
 
   SymbolicQr::SymbolicQr(const Sparsity& sparsity, int nrhs) :

@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_STABILIZEDQPSOLVER_QP_EXPORT
-  casadi_register_stabilizedqpsolver_qp(StabilizedQpSolverInternal::Plugin* plugin) {
+  int CASADI_STABQP_QP_EXPORT
+  casadi_register_stabqp_qp(StabilizedQpSolverInternal::Plugin* plugin) {
     plugin->creator = StabilizedQpToQp::creator;
     plugin->name = "qp";
     plugin->doc = StabilizedQpToQp::meta_doc.c_str();
@@ -42,8 +42,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_STABILIZEDQPSOLVER_QP_EXPORT casadi_load_stabilizedqpsolver_qp() {
-    StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_qp);
+  void CASADI_STABQP_QP_EXPORT casadi_load_stabqp_qp() {
+    StabilizedQpSolverInternal::registerPlugin(casadi_register_stabqp_qp);
   }
 
   StabilizedQpToQp::StabilizedQpToQp(const std::vector<Sparsity> &st)

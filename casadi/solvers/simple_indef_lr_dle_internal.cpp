@@ -40,8 +40,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DLESOLVER_SIMPLE_EXPORT
-  casadi_register_dlesolver_simple(DleInternal::Plugin* plugin) {
+  int CASADI_DLE_SIMPLE_EXPORT
+  casadi_register_dle_simple(DleInternal::Plugin* plugin) {
     plugin->creator = SimpleIndefDleInternal::creator;
     plugin->name = "simple";
     plugin->doc = SimpleIndefDleInternal::meta_doc.c_str();
@@ -50,8 +50,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DLESOLVER_SIMPLE_EXPORT casadi_load_dlesolver_simple() {
-    DleInternal::registerPlugin(casadi_register_dlesolver_simple);
+  void CASADI_DLE_SIMPLE_EXPORT casadi_load_dle_simple() {
+    DleInternal::registerPlugin(casadi_register_dle_simple);
   }
 
   SimpleIndefDleInternal::SimpleIndefDleInternal(

@@ -26,7 +26,7 @@
 #ifndef CASADI_KINSOL_INTERFACE_HPP
 #define CASADI_KINSOL_INTERFACE_HPP
 
-#include <casadi/interfaces/sundials/casadi_implicitfunction_kinsol_export.h>
+#include <casadi/interfaces/sundials/casadi_nlsol_kinsol_export.h>
 #include "casadi/core/function/implicit_function_internal.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
@@ -55,7 +55,7 @@ namespace casadi {
   * @copydoc ImplicitFunction_doc
   * @copydoc plugin_ImplicitFunction_kinsol
   */
-  class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolInterface : public ImplicitFunctionInternal {
+  class CASADI_NLSOL_KINSOL_EXPORT KinsolInterface : public ImplicitFunctionInternal {
   public:
     /** \brief  Constructor */
     explicit KinsolInterface(const Function& f);

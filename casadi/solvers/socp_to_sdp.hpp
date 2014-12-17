@@ -29,7 +29,7 @@
 #include "casadi/core/function/socp_solver_internal.hpp"
 #include "casadi/core/function/sdp_solver_internal.hpp"
 
-#include <casadi/solvers/casadi_socpsolver_sdp_export.h>
+#include <casadi/solvers/casadi_socp_sdp_export.h>
 
 /** \defgroup plugin_SocpSolver_sdp
    Solve SOCPs using an SdpSolver
@@ -49,7 +49,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_SOCPSOLVER_SDP_EXPORT SocpToSdp : public SocpSolverInternal,
+  class CASADI_SOCP_SDP_EXPORT SocpToSdp : public SocpSolverInternal,
     public Adaptor<SocpToSdp, SdpSolverInternal> {
   public:
 

@@ -26,7 +26,7 @@
 #ifndef CASADI_KNITRO_INTERFACE_HPP
 #define CASADI_KNITRO_INTERFACE_HPP
 
-#include <casadi/interfaces/knitro/casadi_nlpsolver_knitro_export.h>
+#include <casadi/interfaces/knitro/casadi_nlp_knitro_export.h>
 #include <knitro.h>
 #include "casadi/core/function/nlp_solver_internal.hpp"
 
@@ -43,7 +43,7 @@ namespace casadi {
      @copydoc NlpSolver_doc
      @copydoc plugin_NlpSolver_knitro
   */
-  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInterface : public NlpSolverInternal {
+  class CASADI_NLP_KNITRO_EXPORT KnitroInterface : public NlpSolverInternal {
 
   public:
     explicit KnitroInterface(const Function& nlp);

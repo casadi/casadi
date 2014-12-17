@@ -27,7 +27,7 @@
 #define CASADI_OOQP_INTERFACE_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
-#include <casadi/interfaces/ooqp/casadi_qpsolver_ooqp_export.h>
+#include <casadi/interfaces/ooqp/casadi_qp_ooqp_export.h>
 
 /** \defgroup plugin_QpSolver_ooqp
  Interface to the OOQP Solver for quadratic programming
@@ -47,7 +47,7 @@ namespace casadi {
       @copydoc plugin_QpSolver_ooqp
 
   */
-  class CASADI_QPSOLVER_OOQP_EXPORT OoqpInterface : public QpSolverInternal {
+  class CASADI_QP_OOQP_EXPORT OoqpInterface : public QpSolverInternal {
   public:
 
     /** \brief  Constructor */

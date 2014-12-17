@@ -27,7 +27,7 @@
 #define CASADI_SYMBOLIC_QR_HPP
 
 #include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/solvers/casadi_linearsolver_symbolicqr_export.h>
+#include <casadi/solvers/casadi_linsol_symbolicqr_export.h>
 
 /** \defgroup plugin_LinearSolver_symbolicqr
 
@@ -48,7 +48,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQr
+  class CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQr
     : public LinearSolverInternal {
   public:
     // Constructor

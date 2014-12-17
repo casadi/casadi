@@ -29,7 +29,7 @@
 #include "../core/function/lr_dle_internal.hpp"
 #include "../core/function/lr_dple_solver.hpp"
 #include "../core/function/adaptor.hpp"
-#include <casadi/solvers/casadi_lrdlesolver_lrdple_export.h>
+#include <casadi/solvers/casadi_lrdle_lrdple_export.h>
 
 /** \defgroup plugin_LrDleSolver_lrdple
 
@@ -51,7 +51,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DLESOLVER_DPLE_EXPORT LrDpleToLrDle : public LrDleInternal,
+  class CASADI_DLE_DPLE_EXPORT LrDpleToLrDle : public LrDleInternal,
     public Adaptor<LrDpleToLrDle, LrDleInternal> {
   public:
     /** \brief  Constructor

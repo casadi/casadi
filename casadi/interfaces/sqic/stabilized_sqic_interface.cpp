@@ -39,8 +39,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT
-  casadi_register_stabilizedqpsolver_sqic(StabilizedQpSolverInternal::Plugin* plugin) {
+  int CASADI_STABILIZEDQP_SQIC_EXPORT
+  casadi_register_stabilizedqp_sqic(StabilizedQpSolverInternal::Plugin* plugin) {
     plugin->creator = StabilizedSqicInterface::creator;
     plugin->name = "sqic";
     plugin->doc = StabilizedSqicInterface::meta_doc.c_str();
@@ -49,8 +49,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT casadi_load_stabilizedqpsolver_sqic() {
-    StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_sqic);
+  void CASADI_STABILIZEDQP_SQIC_EXPORT casadi_load_stabilizedqp_sqic() {
+    StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqp_sqic);
   }
 
   StabilizedSqicInterface* StabilizedSqicInterface::clone() const {

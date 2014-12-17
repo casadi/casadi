@@ -33,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_LAPACKLU_EXPORT
-  casadi_register_linearsolver_lapacklu(LinearSolverInternal::Plugin* plugin) {
+  int CASADI_LINSOL_LAPACKLU_EXPORT
+  casadi_register_linsol_lapacklu(LinearSolverInternal::Plugin* plugin) {
     plugin->creator = LapackLuDense::creator;
     plugin->name = "lapacklu";
     plugin->doc = LapackLuDense::meta_doc.c_str();
@@ -43,8 +43,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_LAPACKLU_EXPORT casadi_load_linearsolver_lapacklu() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapacklu);
+  void CASADI_LINSOL_LAPACKLU_EXPORT casadi_load_linsol_lapacklu() {
+    LinearSolverInternal::registerPlugin(casadi_register_linsol_lapacklu);
   }
 
   LapackLuDense::LapackLuDense(const Sparsity& sparsity, int nrhs)

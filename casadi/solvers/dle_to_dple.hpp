@@ -28,7 +28,7 @@
 
 #include "../core/function/dle_internal.hpp"
 #include "../core/function/dple_internal.hpp"
-#include <casadi/solvers/casadi_dlesolver_dple_export.h>
+#include <casadi/solvers/casadi_dle_dple_export.h>
 
 /** \defgroup plugin_DleSolver_dple
  Solving the Discrete Lyapunov Equations with Periodic Solver
@@ -48,7 +48,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DLESOLVER_DPLE_EXPORT DleToDple : public DleInternal,
+  class CASADI_DLE_DPLE_EXPORT DleToDple : public DleInternal,
     public Adaptor<DleToDple, DpleInternal> {
   public:
     /** \brief  Constructor

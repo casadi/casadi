@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOLVER_NLP_EXPORT
-  casadi_register_qpsolver_nlp(QpSolverInternal::Plugin* plugin) {
+  int CASADI_QP_NLP_EXPORT
+  casadi_register_qp_nlp(QpSolverInternal::Plugin* plugin) {
     plugin->creator = QpToNlp::creator;
     plugin->name = "nlp";
     plugin->doc = QpToNlp::meta_doc.c_str();
@@ -43,8 +43,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_NLP_EXPORT casadi_load_qpsolver_nlp() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_nlp);
+  void CASADI_QP_NLP_EXPORT casadi_load_qp_nlp() {
+    QpSolverInternal::registerPlugin(casadi_register_qp_nlp);
   }
 
   QpToNlp* QpToNlp::clone() const {

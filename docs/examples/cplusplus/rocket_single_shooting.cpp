@@ -33,8 +33,8 @@ using namespace std;
 extern "C" void casadi_load_integrator_cvodes();
 extern "C" void casadi_load_integrator_idas();
 extern "C" void casadi_load_integrator_rk();
-extern "C" void casadi_load_nlpsolver_ipopt();
-extern "C" void casadi_load_nlpsolver_scpgen();
+extern "C" void casadi_load_nlp_ipopt();
+extern "C" void casadi_load_nlp_scpgen();
 
 bool sundials_integrator = true;
 bool explicit_integrator = false;
@@ -45,8 +45,8 @@ int main(){
   casadi_load_integrator_cvodes();
   casadi_load_integrator_idas();
   casadi_load_integrator_rk();
-  casadi_load_nlpsolver_ipopt();
-  casadi_load_nlpsolver_scpgen();
+  casadi_load_nlp_ipopt();
+  casadi_load_nlp_scpgen();
   
   // Time length
   double T = 10.0;

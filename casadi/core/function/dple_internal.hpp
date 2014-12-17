@@ -128,7 +128,7 @@ namespace casadi {
     };
 
     /// Infix
-    static const std::string infix_;
+
 
     /// Short name
     static std::string shortname() { return "dple";}

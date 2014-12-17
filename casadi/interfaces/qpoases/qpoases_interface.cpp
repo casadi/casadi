@@ -35,8 +35,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOLVER_QPOASES_EXPORT
-  casadi_register_qpsolver_qpoases(QpSolverInternal::Plugin* plugin) {
+  int CASADI_QP_QPOASES_EXPORT
+  casadi_register_qp_qpoases(QpSolverInternal::Plugin* plugin) {
     plugin->creator = QpoasesInterface::creator;
     plugin->name = "qpoases";
     plugin->doc = QpoasesInterface::meta_doc.c_str();
@@ -45,8 +45,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_QPOASES_EXPORT casadi_load_qpsolver_qpoases() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_qpoases);
+  void CASADI_QP_QPOASES_EXPORT casadi_load_qp_qpoases() {
+    QpSolverInternal::registerPlugin(casadi_register_qp_qpoases);
   }
 
   QpoasesInterface* QpoasesInterface::clone() const {

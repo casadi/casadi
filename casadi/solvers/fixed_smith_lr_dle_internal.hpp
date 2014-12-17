@@ -27,7 +27,7 @@
 #define CASADI_FIXED_SMITH_LR_DLE_INTERNAL_HPP
 
 #include "../core/function/lr_dle_internal.hpp"
-#include <casadi/solvers/casadi_lrdlesolver_fixed_smith_export.h>
+#include <casadi/solvers/casadi_lrdle_fixed_smith_export.h>
 
 /** \defgroup plugin_LrDleSolver_fixed_smith
  Solving the Discrete Lyapunov Equations with a regular LinearSolver
@@ -49,7 +49,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_LRDLESOLVER_FIXED_SMITH_EXPORT FixedSmithLrDleInternal : public LrDleInternal,
+  class CASADI_LRDLE_FIXED_SMITH_EXPORT FixedSmithLrDleInternal : public LrDleInternal,
     public Wrapper<FixedSmithLrDleInternal> {
   public:
     /** \brief  Constructor

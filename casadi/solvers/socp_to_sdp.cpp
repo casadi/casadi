@@ -34,8 +34,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_SOCPSOLVER_SDP_EXPORT
-  casadi_register_socpsolver_sdp(SocpSolverInternal::Plugin* plugin) {
+  int CASADI_SOCP_SDP_EXPORT
+  casadi_register_socp_sdp(SocpSolverInternal::Plugin* plugin) {
     plugin->creator = SocpToSdp::creator;
     plugin->name = "sdp";
     plugin->doc = SocpToSdp::meta_doc.c_str();
@@ -45,8 +45,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_SOCPSOLVER_SDP_EXPORT casadi_load_socpsolver_sdp() {
-    SocpSolverInternal::registerPlugin(casadi_register_socpsolver_sdp);
+  void CASADI_SOCP_SDP_EXPORT casadi_load_socp_sdp() {
+    SocpSolverInternal::registerPlugin(casadi_register_socp_sdp);
   }
 
   SocpToSdp* SocpToSdp::clone() const {

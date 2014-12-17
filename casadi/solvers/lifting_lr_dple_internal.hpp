@@ -28,7 +28,7 @@
 
 #include "../core/function/lr_dple_internal.hpp"
 #include "../core/function/lr_dle_internal.hpp"
-#include <casadi/solvers/casadi_lrdplesolver_lifting_export.h>
+#include <casadi/solvers/casadi_lrdple_lifting_export.h>
 
 /** \defgroup plugin_LrDpleSolver_lifting
  Solving the Discrete Periodic Lyapunov Equations by
@@ -79,7 +79,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_LRDPLESOLVER_LIFTING_EXPORT LiftingLrDpleInternal : public LrDpleInternal,
+  class CASADI_LRDPLE_LIFTING_EXPORT LiftingLrDpleInternal : public LrDpleInternal,
     public Adaptor<LiftingLrDpleInternal, LrDleInternal>,
     public Wrapper<LiftingLrDpleInternal> {
   public:

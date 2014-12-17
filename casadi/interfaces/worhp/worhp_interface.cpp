@@ -36,8 +36,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_WORHP_EXPORT
-  casadi_register_nlpsolver_worhp(NlpSolverInternal::Plugin* plugin) {
+  int CASADI_NLP_WORHP_EXPORT
+  casadi_register_nlp_worhp(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = WorhpInterface::creator;
     plugin->name = "worhp";
     plugin->doc = WorhpInterface::meta_doc.c_str();
@@ -46,8 +46,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_WORHP_EXPORT casadi_load_nlpsolver_worhp() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_worhp);
+  void CASADI_NLP_WORHP_EXPORT casadi_load_nlp_worhp() {
+    NlpSolverInternal::registerPlugin(casadi_register_nlp_worhp);
   }
 
   WorhpInterface::WorhpInterface(const Function& nlp) : NlpSolverInternal(nlp) {

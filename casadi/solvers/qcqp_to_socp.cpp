@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QCQPSOLVER_SOCP_EXPORT
-  casadi_register_qcqpsolver_socp(QcqpSolverInternal::Plugin* plugin) {
+  int CASADI_QCQP_SOCP_EXPORT
+  casadi_register_qcqp_socp(QcqpSolverInternal::Plugin* plugin) {
     plugin->creator = QcqpToSocp::creator;
     plugin->name = "socp";
     plugin->doc = QcqpToSocp::meta_doc.c_str();;
@@ -43,8 +43,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QCQPSOLVER_SOCP_EXPORT casadi_load_qcqpsolver_socp() {
-    QcqpSolverInternal::registerPlugin(casadi_register_qcqpsolver_socp);
+  void CASADI_QCQP_SOCP_EXPORT casadi_load_qcqp_socp() {
+    QcqpSolverInternal::registerPlugin(casadi_register_qcqp_socp);
   }
 
   QcqpToSocp* QcqpToSocp::clone() const {

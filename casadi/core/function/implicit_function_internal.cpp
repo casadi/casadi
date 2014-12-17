@@ -364,6 +364,6 @@ namespace casadi {
 
   std::map<std::string, ImplicitFunctionInternal::Plugin> ImplicitFunctionInternal::solvers_;
 
-  const std::string ImplicitFunctionInternal::infix_ = "implicitfunction";
+
 
 } // namespace casadi

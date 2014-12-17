@@ -43,7 +43,7 @@
 
 #include <iostream>
 
-#include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
+#include <casadi/interfaces/ipopt/casadi_nlp_ipopt_export.h>
 
 /// \cond INTERNAL
 using namespace Ipopt;
@@ -51,7 +51,7 @@ namespace casadi {
   // Forward declaration
   class IpoptInterface;
 
-  class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptUserClass : public TNLP {
+  class CASADI_NLP_IPOPT_EXPORT IpoptUserClass : public TNLP {
 #ifdef WITH_IPOPT_CALLBACK
     friend class TNLPAdapter;
 #endif // WITH_IPOPT_CALLBACK

@@ -220,7 +220,7 @@ namespace casadi {
 
   std::map<std::string, LrDpleInternal::Plugin> LrDpleInternal::solvers_;
 
-  const std::string LrDpleInternal::infix_ = "lrdplesolver";
+
 
 
   std::vector<Sparsity> LrDpleInternal::getSparsity(

@@ -46,8 +46,10 @@ if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("simple"):
 if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("dple.slicot"):
   dlesolvers.append(("dple.slicot",{"dple_options": {"linsol": "csparse"}}))
 
+""" lrsmith has a problem #1294
 if DleSolver.hasPlugin("lrdle.smith"):
   dlesolvers.append(("lrdle.smith",{"lrdle_options": {"max_iter":100,"tol": 1e-13}}))
+"""
 
 if DleSolver.hasPlugin("lrdle.fixed_smith"):
   dlesolvers.append(("lrdle.fixed_smith",{"lrdle_options": {"iter":100}}))
@@ -59,8 +61,10 @@ if DleSolver.hasPlugin("fixed_smith"):
 
 lrdlesolvers = []
 
+""" lrsmith has a problem #1294
 if LrDleSolver.hasPlugin("smith"):
   lrdlesolvers.append(("smith",{"max_iter":100,"tol": 1e-13}))
+"""
 
 if LrDleSolver.hasPlugin("fixed_smith"):
   lrdlesolvers.append(("fixed_smith",{"iter":100}))
@@ -69,8 +73,10 @@ if LrDleSolver.hasPlugin("fixed_smith"):
 if LrDleSolver.hasPlugin("dle.simple") and LinearSolver.hasPlugin("csparse"):
   lrdlesolvers.append(("dle.simple",{"dle_options": {"linsol": "csparse"}}))
 
+""" lrsmith has a problem #1294
 if LrDleSolver.hasPlugin("dle.lrdle.smith"):
   lrdlesolvers.append(("dle.lrdle.smith",{"dle.lrdle_options": {"max_iter":100,"tol": 1e-13}}))
+"""
 
 lrdplesolvers = []
 

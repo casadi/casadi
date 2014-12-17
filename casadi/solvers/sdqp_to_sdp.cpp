@@ -35,8 +35,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_SDQPSOLVER_SDP_EXPORT
-  casadi_register_sdqpsolver_sdp(SdqpSolverInternal::Plugin* plugin) {
+  int CASADI_SDQP_SDP_EXPORT
+  casadi_register_sdqp_sdp(SdqpSolverInternal::Plugin* plugin) {
     plugin->creator = SdqpToSdp::creator;
     plugin->name = "sdp";
     plugin->doc = SdqpToSdp::meta_doc.c_str();
@@ -46,8 +46,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_SDQPSOLVER_SDP_EXPORT casadi_load_sdqpsolver_sdp() {
-    SdqpSolverInternal::registerPlugin(casadi_register_sdqpsolver_sdp);
+  void CASADI_SDQP_SDP_EXPORT casadi_load_sdqp_sdp() {
+    SdqpSolverInternal::registerPlugin(casadi_register_sdqp_sdp);
   }
 
   SdqpToSdp::SdqpToSdp(const std::vector<Sparsity> &st) : SdqpSolverInternal(st) {

@@ -28,7 +28,7 @@
 
 #include "../core/function/lr_dple_internal.hpp"
 #include "../core/function/dple_internal.hpp"
-#include <casadi/solvers/casadi_lrdplesolver_dple_export.h>
+#include <casadi/solvers/casadi_lrdple_dple_export.h>
 
 /** \defgroup plugin_LrDpleSolver_dple
  Solving the Low-Rank Discrete Lyapunov Equations with
@@ -49,7 +49,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_LRDPLESOLVER_DPLE_EXPORT LrDpleToDple :
+  class CASADI_LRDPLE_DPLE_EXPORT LrDpleToDple :
     public LrDpleInternal,
     public Adaptor<LrDpleToDple, DpleInternal>,
     public Wrapper<LrDpleToDple> {

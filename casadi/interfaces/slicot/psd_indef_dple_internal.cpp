@@ -57,8 +57,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DPLESOLVER_SLICOT_EXPORT
-  casadi_register_dplesolver_slicot(DpleInternal::Plugin* plugin) {
+  int CASADI_DPLE_SLICOT_EXPORT
+  casadi_register_dple_slicot(DpleInternal::Plugin* plugin) {
     plugin->creator = PsdIndefDpleInternal::creator;
     plugin->name = "slicot";
     plugin->doc = PsdIndefDpleInternal::meta_doc.c_str();
@@ -68,8 +68,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DPLESOLVER_SLICOT_EXPORT casadi_load_dplesolver_slicot() {
-    DpleInternal::registerPlugin(casadi_register_dplesolver_slicot);
+  void CASADI_DPLE_SLICOT_EXPORT casadi_load_dple_slicot() {
+    DpleInternal::registerPlugin(casadi_register_dple_slicot);
   }
 
   PsdIndefDpleInternal::PsdIndefDpleInternal(const DpleStructure & st,

@@ -111,7 +111,7 @@ namespace casadi {
     static std::map<std::string, Plugin> solvers_;
 
     /// Infix
-    static const std::string infix_;
+
 
     /// Short name
     static std::string shortname() { return "cle";}

@@ -34,8 +34,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_KNITRO_EXPORT
-  casadi_register_nlpsolver_knitro(NlpSolverInternal::Plugin* plugin) {
+  int CASADI_NLP_KNITRO_EXPORT
+  casadi_register_nlp_knitro(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = KnitroInterface::creator;
     plugin->name = "knitro";
     plugin->doc = KnitroInterface::meta_doc.c_str();
@@ -44,8 +44,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_KNITRO_EXPORT casadi_load_nlpsolver_knitro() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_knitro);
+  void CASADI_NLP_KNITRO_EXPORT casadi_load_nlp_knitro() {
+    NlpSolverInternal::registerPlugin(casadi_register_nlp_knitro);
   }
 
   KnitroInterface::KnitroInterface(const Function& nlp) : NlpSolverInternal(nlp) {

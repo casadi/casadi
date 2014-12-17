@@ -27,7 +27,7 @@
 #define CASADI_LAPACK_QR_DENSE_HPP
 
 #include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/lapack/casadi_linearsolver_lapackqr_export.h>
+#include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
 
 /** \defgroup plugin_LinearSolver_lapackqr
 *
@@ -59,7 +59,7 @@ namespace casadi {
    @copydoc plugin_LinearSolver_lapackqr
    *
    */
-  class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQrDense : public LinearSolverInternal {
+  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQrDense : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackQrDense(const Sparsity& sparsity, int nrhs);
