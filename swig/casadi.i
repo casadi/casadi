@@ -340,8 +340,11 @@ namespace std {
 %template(DVectorVector)       std::vector<std::vector<double> > ;
 %template(DVectorVectorVector) std::vector< std::vector<std::vector<double> > > ;
 
+#ifndef SWIGMATLAB
 %template(Pair_Int_Int) std::pair<int,int>;
 %template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
+#endif // SWIGMATLAB
+
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
 // nor the std::stringstream class, since these are included _after_ std::vector in the C++ generated wrapper code
@@ -625,6 +628,10 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 // typemaphelpers
 %include "typemaphelpers.i"
 
+#ifndef SWIGMATLAB
+%template(Pair_Int_Int) std::pair<int,int>;
+%template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
+#endif // SWIGMATLAB
 
 #ifdef SWIGPYTHON
 %include "python/meta_python.i"
@@ -640,6 +647,15 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 %{
 using namespace casadi;
 %}
+
+#ifdef SWIGMATLAB
+%typemap(out) std::pair<int, int> {
+  $result = mxCreateDoubleMatrix(1, 2, mxREAL);
+  double* data = static_cast<double*>(mxGetData($result));
+  data[0] = $1.first;
+  data[1] = $1.second;
+}
+#endif // SWIGMATLAB
 
 #ifndef SWIGXML
 %traits_swigtype(casadi::DerivativeGenerator);
@@ -840,6 +856,12 @@ except:
 %rename(mrdivide) __mrdivide__;
 %rename(mldivide) __mldivide__;
 %rename(transpose) T;
+
+// Nonzeros are accessed with the syntax A{i} 0-based
+%rename(getitemcurl) getNZ;
+%rename(setitemcurl) setNZ;
+%rename(size) shape;
+%rename(nnz) size;
 
 // Workarounds, pending proper fix
 %rename(casadi_vertcat) zz_vertcat;
