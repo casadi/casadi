@@ -23,40 +23,41 @@
  */
 
 
-#ifndef CASADI_DPLE_TO_LR_DPLE_HPP
-#define CASADI_DPLE_TO_LR_DPLE_HPP
+#ifndef CASADI_LR_DPLE_TO_DPLE_HPP
+#define CASADI_LR_DPLE_TO_DPLE_HPP
 
-#include "../core/function/dple_internal.hpp"
 #include "../core/function/lr_dple_internal.hpp"
-#include <casadi/solvers/casadi_dplesolver_lrdple_export.h>
+#include "../core/function/dple_internal.hpp"
+#include <casadi/solvers/casadi_lrdplesolver_dple_export.h>
 
-/** \defgroup plugin_DpleSolver_lrdple
+/** \defgroup plugin_LrDpleSolver_dple
  Solving the Low-Rank Discrete Lyapunov Equations with
  a Low-Rank Discrete Lyapunov Equations Solver
 
 */
-/** \pluginsection{DpleSolver,lrdple} */
+/** \pluginsection{LrDpleSolver,dple} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{DpleSolver,lrdple}
+  /** \brief \pluginbrief{LrDpleSolver,dple}
 
-   @copydoc DPLE_doc
-   @copydoc plugin_DpleSolver_lrdple
+   @copydoc LR_DLE_doc
+   @copydoc plugin_LrDpleSolver_dple
 
        \author Joris Gillis
       \date 2014
 
   */
-  class CASADI_DPLESOLVER_LRDPLE_EXPORT LrDpleToDple : public DpleInternal,
-    public Adaptor<LrDpleToDple, LrDpleInternal>,
+  class CASADI_LRDPLESOLVER_DPLE_EXPORT LrDpleToDple :
+    public LrDpleInternal,
+    public Adaptor<LrDpleToDple, DpleInternal>,
     public Wrapper<LrDpleToDple> {
   public:
     /** \brief  Constructor
      * \param st \structargument{LrDple}
      */
-    LrDpleToDple(const DpleStructure & st);
+    LrDpleToDple(const LrDpleStructure & st);
 
     /** \brief  Destructor */
     virtual ~LrDpleToDple();
@@ -68,11 +69,11 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual LrDpleToDple* create(const DpleStructure& st) const {
+    virtual LrDpleToDple* create(const LrDpleStructure& st) const {
         return new LrDpleToDple(st);}
 
     /** \brief  Create a new DLE Solver */
-    static DpleInternal* creator(const DpleStructure& st)
+    static LrDpleInternal* creator(const LrDpleStructure& st)
     { return new LrDpleToDple(st);}
 
     /** \brief  Print solver statistics */
@@ -93,9 +94,9 @@ namespace casadi {
     static const std::string meta_doc;
 
     /// Solve with
-    LrDpleSolver solver_;
+    DpleSolver solver_;
   };
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_DPLE_TO_LR_DPLE_HPP
+#endif // CASADI_LR_DPLE_TO_DPLE_HPP
