@@ -561,7 +561,7 @@ memberbinopsr_custom(Type,ne,!=)
 memberbinopsr_un(Type,fmin)
 memberbinopsr_un(Type,fmax)
 Type rmul(const Type& b) const{ return b.zz_mtimes(*$self);}
-memberbinopsr_un(Type,arctan2)
+Type __rarctan2__(const Type& b) const{ return b.zz_atan2(*$self);}
 memberbinopsr(Type,copysign)
 %enddef
 
@@ -589,7 +589,7 @@ returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*
 memberbinops_un(fmin,argtype,argCast,selfCast,returntype)
 memberbinops_un(fmax,argtype,argCast,selfCast,returntype)
 memberbinops(constpow,argtype,argCast,selfCast,returntype)
-memberbinops_un(arctan2,argtype,argCast,selfCast,returntype)
+returntype __rarctan2__(argtype) const{ return argCast(b).zz_atan2(selfCast(*$self));}
 memberbinops(copysign,argtype,argCast,selfCast,returntype)
 memberbinops(pow,argtype,argCast,selfCast,returntype)
 returntype __add__ (argtype) const{ return selfCast(*$self).zz_plus(argCast(b));}
@@ -811,6 +811,10 @@ except:
 %rename(arcsin) zz_asin;
 %rename(arccos) zz_acos;
 %rename(arctan) zz_atan;
+%rename(arctan2) zz_atan2;
+%rename(arcsinh) zz_asinh;
+%rename(arccosh) zz_acosh;
+%rename(arctanh) zz_atanh;
 %rename(mul) zz_mtimes;
 %ignore T;
 %ignore shape;

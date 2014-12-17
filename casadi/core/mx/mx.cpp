@@ -678,7 +678,7 @@ namespace casadi {
     return binary(OP_FMOD, *this, b);
   }
 
-  MX MX::arctan2(const MX& b) const {
+  MX MX::zz_atan2(const MX& b) const {
     return binary(OP_ATAN2, *this, b);
   }
 
@@ -733,27 +733,27 @@ namespace casadi {
     return (*this)->getUnary(OP_ATAN);
   }
 
-  MX MX::sinh() const {
+  MX MX::zz_sinh() const {
     return (*this)->getUnary(OP_SINH);
   }
 
-  MX MX::cosh() const {
+  MX MX::zz_cosh() const {
     return (*this)->getUnary(OP_COSH);
   }
 
-  MX MX::tanh() const {
+  MX MX::zz_tanh() const {
     return (*this)->getUnary(OP_TANH);
   }
 
-  MX MX::arcsinh() const {
+  MX MX::zz_asinh() const {
     return (*this)->getUnary(OP_ASINH);
   }
 
-  MX MX::arccosh() const {
+  MX MX::zz_acosh() const {
     return (*this)->getUnary(OP_ACOSH);
   }
 
-  MX MX::arctanh() const {
+  MX MX::zz_atanh() const {
     return (*this)->getUnary(OP_ATANH);
   }
 
@@ -777,11 +777,11 @@ namespace casadi {
     return MX::binary(OP_COPYSIGN, *this, y);
   }
 
-  MX MX::erfinv() const {
+  MX MX::zz_erfinv() const {
     return (*this)->getUnary(OP_ERFINV);
   }
 
-  MX MX::erf() const {
+  MX MX::zz_erf() const {
     return (*this)->getUnary(OP_ERF);
   }
 

@@ -227,19 +227,19 @@ namespace casadi {
     SXElement floor() const;
     SXElement ceil() const;
     SXElement fmod(const SXElement &y) const;
-    SXElement erf() const;
-    SXElement erfinv() const;
+    SXElement zz_erf() const;
+    SXElement zz_erfinv() const;
     SXElement fabs() const;
     SXElement fmin(const SXElement &y) const;
     SXElement fmax(const SXElement &y) const;
     SXElement inv() const;
-    SXElement sinh() const;
-    SXElement cosh() const;
-    SXElement tanh() const;
-    SXElement arcsinh() const;
-    SXElement arccosh() const;
-    SXElement arctanh() const;
-    SXElement arctan2(const SXElement &y) const;
+    SXElement zz_sinh() const;
+    SXElement zz_cosh() const;
+    SXElement zz_tanh() const;
+    SXElement zz_asinh() const;
+    SXElement zz_acosh() const;
+    SXElement zz_atanh() const;
+    SXElement zz_atan2(const SXElement &y) const;
     SXElement log10() const;
     SXElement printme(const SXElement &y) const;
     SXElement sign() const;
@@ -254,7 +254,7 @@ namespace casadi {
     Matrix<SXElement> fmax(const Matrix<SXElement>& b) const;
     Matrix<SXElement> constpow(const Matrix<SXElement>& n) const;
     Matrix<SXElement> __copysign__(const Matrix<SXElement>& n) const;
-    Matrix<SXElement> arctan2(const Matrix<SXElement>& b) const;
+    Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;
 
     /// \cond INTERNAL
     /// Get the temporary variable

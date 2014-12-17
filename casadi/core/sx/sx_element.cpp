@@ -168,7 +168,7 @@ namespace casadi {
     return BinarySX::create(OP_COPYSIGN, *this, y);
   }
 
-  SXElement SXElement::erfinv() const {
+  SXElement SXElement::zz_erfinv() const {
     return UnarySX::create(OP_ERFINV, *this);
   }
 
@@ -354,8 +354,8 @@ namespace casadi {
     return SX(*this).__copysign__(n);
   }
 
-  SX SXElement::arctan2(const SX& b) const {
-    return SX(*this).arctan2(b);
+  SX SXElement::zz_atan2(const SX& b) const {
+    return atan2(SX(*this),b);
   }
 
   SXElement SXElement::__le__(const SXElement& y) const {
@@ -615,42 +615,42 @@ namespace casadi {
     return UnarySX::create(OP_ATAN, *this);
   }
 
-  SXElement SXElement::sinh() const {
+  SXElement SXElement::zz_sinh() const {
     if (node->isZero())
       return 0;
     else
       return UnarySX::create(OP_SINH, *this);
   }
 
-  SXElement SXElement::cosh() const {
+  SXElement SXElement::zz_cosh() const {
     if (node->isZero())
       return 1;
     else
       return UnarySX::create(OP_COSH, *this);
   }
 
-  SXElement SXElement::tanh() const {
+  SXElement SXElement::zz_tanh() const {
     if (node->isZero())
       return 0;
     else
       return UnarySX::create(OP_TANH, *this);
   }
 
-  SXElement SXElement::arctanh() const {
+  SXElement SXElement::zz_atanh() const {
     if (node->isZero())
       return 0;
     else
       return UnarySX::create(OP_ATANH, *this);
   }
 
-  SXElement SXElement::arccosh() const {
+  SXElement SXElement::zz_acosh() const {
     if (node->isOne())
       return 0;
     else
       return UnarySX::create(OP_ACOSH, *this);
   }
 
-  SXElement SXElement::arcsinh() const {
+  SXElement SXElement::zz_asinh() const {
     if (node->isZero())
       return 0;
     else
@@ -669,7 +669,7 @@ namespace casadi {
     return BinarySX::create(OP_FMOD, *this, b);
   }
 
-  SXElement SXElement::erf() const {
+  SXElement SXElement::zz_erf() const {
     return UnarySX::create(OP_ERF, *this);
   }
 
@@ -692,7 +692,7 @@ namespace casadi {
     return BinarySX::create(OP_FMAX, *this, b);
   }
 
-  SXElement SXElement::arctan2(const SXElement &b) const {
+  SXElement SXElement::zz_atan2(const SXElement &b) const {
     return BinarySX::create(OP_ATAN2, *this, b);
   }
 

@@ -189,18 +189,18 @@ namespace casadi {
   template<class T> T acos(const T &x) {return x.zz_acos();}
   using std::acos;
 
-  template<class T> T sinh(const T &x) {return x.sinh();}
+  template<class T> T sinh(const T &x) {return x.zz_sinh();}
   using std::sinh;
 
-  template<class T> T cosh(const T &x) {return x.cosh();}
+  template<class T> T cosh(const T &x) {return x.zz_cosh();}
   using std::cosh;
 
-  template<class T> T tanh(const T &x) {return x.tanh();}
+  template<class T> T tanh(const T &x) {return x.zz_tanh();}
   using std::tanh;
 
-  template<class T> T asinh(const T &x) {return x.arcsinh();}
-  template<class T> T acosh(const T &x) {return x.arccosh();}
-  template<class T> T atanh(const T &x) {return x.arctanh();}
+  template<class T> T asinh(const T &x) {return x.zz_asinh();}
+  template<class T> T acosh(const T &x) {return x.zz_acosh();}
+  template<class T> T atanh(const T &x) {return x.zz_atanh();}
 
   template<class T> T exp(const T &x) {return x.zz_exp();}
   using std::exp;
@@ -245,16 +245,16 @@ namespace casadi {
   template<class T> T fmod(const T &x, const T &y) {return x.fmod(y);}
   using std::fmod;
 
-  template<class T> T atan2(const T &x, const T &n) { return x.arctan2(n);}
-  template<class T> T atan2(const T &x,   double n) { return x.arctan2(n);}
-  template<class T> T atan2(double   x, const T &n) { return T(x).arctan2(n);}
+  template<class T> T atan2(const T &x, const T &n) { return x.zz_atan2(n);}
+  template<class T> T atan2(const T &x,   double n) { return x.zz_atan2(n);}
+  template<class T> T atan2(double   x, const T &n) { return T(x).zz_atan2(n);}
   using std::atan2;
 
   ///@}
 
   ///@{
   /** \brief  C99 elementary functions from the 'math.h' header */
-  template<class T> T erf(const T &x) {return x.erf();}
+  template<class T> T erf(const T &x) {return x.zz_erf();}
 #ifdef HAS_ERF
   using ::erf;
 #else // HAS ERF
@@ -318,7 +318,7 @@ namespace casadi {
   inline double if_else_zero(double x, double y) { return x ? y : 0;}
 
   /// Inverse of the error function
-  template<class T> T erfinv(const T &x) {return x.erfinv();}
+  template<class T> T erfinv(const T &x) {return x.zz_erfinv();}
 #ifdef HAS_ERFINV
   using ::erfinv;
 #else // HAS ERFINV

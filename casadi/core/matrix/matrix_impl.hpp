@@ -1213,7 +1213,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::erf() const {
+  Matrix<DataType> Matrix<DataType>::zz_erf() const {
     return unary(OP_ERF, *this);
   }
 
@@ -1233,32 +1233,32 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::sinh() const {
+  Matrix<DataType> Matrix<DataType>::zz_sinh() const {
     return unary(OP_SINH, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::cosh() const {
+  Matrix<DataType> Matrix<DataType>::zz_cosh() const {
     return unary(OP_COSH, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::tanh() const {
+  Matrix<DataType> Matrix<DataType>::zz_tanh() const {
     return unary(OP_TANH, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::arcsinh() const {
+  Matrix<DataType> Matrix<DataType>::zz_asinh() const {
     return unary(OP_ASINH, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::arccosh() const {
+  Matrix<DataType> Matrix<DataType>::zz_acosh() const {
     return unary(OP_ACOSH, *this);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::arctanh() const {
+  Matrix<DataType> Matrix<DataType>::zz_atanh() const {
     return unary(OP_ATANH, *this);
   }
 
@@ -1313,7 +1313,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::erfinv() const {
+  Matrix<DataType> Matrix<DataType>::zz_erfinv() const {
     return unary(OP_ERFINV, *this);
   }
 
@@ -1323,7 +1323,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::arctan2(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_atan2(const Matrix<DataType>& y) const {
     return binary(OP_ATAN2, *this, y);
   }
 
