@@ -66,8 +66,8 @@ G = MXFunction([U],[X[:2]]) # first two components of X
 
 # Allocate an NLP solver
 solver = SCPgen(F,G)
-solver.setOption("qp_solver",QPOasesSolver)
-solver.setOption("qp_solver_options",\
+solver.setOption("qp",QPOasesSolver)
+solver.setOption("qp_options",\
                     {"printLevel":"none"})
 solver.init()
 

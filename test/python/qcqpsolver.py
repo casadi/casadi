@@ -30,7 +30,7 @@ from helpers import *
 
 qcqpsolvers = []
 if SdpSolver.hasPlugin("dsdp"):
-  qcqpsolvers.append(("socp",{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },False))
+  qcqpsolvers.append(("socp",{"socp": "sdp", "socp_options": {"sdp": "dsdp"} },False))
 
 if SdpSolver.hasPlugin("dsdp"):
   qcqpsolvers.append(("socp.sdp.dsdp",{},False))

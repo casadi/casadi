@@ -30,10 +30,10 @@ from helpers import *
 
 socpsolvers = []
 if SdpSolver.hasPlugin("dsdp"):
-  socpsolvers.append(("sdp",{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
+  socpsolvers.append(("sdp",{"sdp": "dsdp" ,"verbose": True, "sdp_options": {"verbose":True}},False))
 
 if SdpSolver.hasPlugin("dsdp"):
-  socpsolvers.append(("sdp.dsdp",{ "sdp_solver_options": {"verbose":True}},False))
+  socpsolvers.append(("sdp.dsdp",{ "sdp_options": {"verbose":True}},False))
 
 print socpsolvers
   

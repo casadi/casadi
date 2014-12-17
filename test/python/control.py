@@ -44,13 +44,13 @@ if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("simple"):
   
   
 if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("dple.slicot"):
-  dlesolvers.append(("dple.slicot",{"dple_solver_options": {"linear_solver": "csparse"}}))
+  dlesolvers.append(("dple.slicot",{"dple_options": {"linear_solver": "csparse"}}))
 
 if DleSolver.hasPlugin("lrdle.smith"):
-  dlesolvers.append(("lrdle.smith",{"lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
+  dlesolvers.append(("lrdle.smith",{"lrdle_options": {"max_iter":100,"tol": 1e-13}}))
 
 if DleSolver.hasPlugin("lrdle.fixed_smith"):
-  dlesolvers.append(("lrdle.fixed_smith",{"lrdle_solver_options": {"iter":100}}))
+  dlesolvers.append(("lrdle.fixed_smith",{"lrdle_options": {"iter":100}}))
 
   
 if DleSolver.hasPlugin("fixed_smith"):
@@ -67,25 +67,25 @@ if LrDleSolver.hasPlugin("fixed_smith"):
 
 
 if LrDleSolver.hasPlugin("dle.simple") and LinearSolver.hasPlugin("csparse"):
-  lrdlesolvers.append(("dle.simple",{"dle_solver_options": {"linear_solver": "csparse"}}))
+  lrdlesolvers.append(("dle.simple",{"dle_options": {"linear_solver": "csparse"}}))
 
 if LrDleSolver.hasPlugin("dle.lrdle.smith"):
-  lrdlesolvers.append(("dle.lrdle.smith",{"dle_solver_options.lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
+  lrdlesolvers.append(("dle.lrdle.smith",{"dle.lrdle_options": {"max_iter":100,"tol": 1e-13}}))
 
 lrdplesolvers = []
 
 """ lrsmith has a problem #1294
 if LrDpleSolver.hasPlugin("lifting.smith"):
-  lrdplesolvers.append(("lifting.smith",{"lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
-  lrdplesolvers.append(("lifting.smith",{"form": "B", "lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
+  lrdplesolvers.append(("lifting.smith",{"lrdle_options": {"max_iter":100,"tol": 1e-13}}))
+  lrdplesolvers.append(("lifting.smith",{"form": "B", "lrdle_options": {"max_iter":100,"tol": 1e-13}}))
 """
 
 if LrDpleSolver.hasPlugin("dple.slicot") and LinearSolver.hasPlugin("csparse"):
-  lrdplesolvers.append(("dple.slicot",{"dple_solver_options": {"linear_solver": "csparse"}}))
+  lrdplesolvers.append(("dple.slicot",{"dple_options": {"linear_solver": "csparse"}}))
 
 """ lrsmith has a problem #1294
 if LrDpleSolver.hasPlugin("dple.lrdple.lifting.smith"):
-  lrdplesolvers.append(("dple.lrdple.lifting.smith",{ "dple_solver_options.lrdple_solver_options.lrdle_solver_options": {"max_iter":100,"tol": 1e-13}} ))
+  lrdplesolvers.append(("dple.lrdple.lifting.smith",{ "dple.lrdple.lrdle_options": {"max_iter":100,"tol": 1e-13}} ))
 """
 
 dplesolvers = []
@@ -97,21 +97,21 @@ if LinearSolver.hasPlugin("csparse") and DpleSolver.hasPlugin("simple"):
   dplesolvers.append(("simple",{"linear_solver": "csparse"}))
 
 if LinearSolver.hasPlugin("csparse") and DpleSolver.hasPlugin("condensing.simple"):
-  dplesolvers.append(("condensing.simple",{"dle_solver_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("condensing.simple",{"dle_options": {"linear_solver": "csparse"}}))
 
 if DpleSolver.hasPlugin("condensing.dple.slicot") and LinearSolver.hasPlugin("csparse"):
-  dplesolvers.append(("condensing.dple.slicot",{"dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("condensing.dple.slicot",{"dle.dple_options": {"linear_solver": "csparse"}}))
 
 if DpleSolver.hasPlugin("lrdple.lifting.dle.dple.slicot") and LinearSolver.hasPlugin("csparse"):
-  dplesolvers.append(("lrdple.lifting.dle.dple.slicot",{"lrdple_solver_options.lrdle_solver_options.dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("lrdple.lifting.dle.dple.slicot",{"lrdple.lrdle.dle.dple_options": {"linear_solver": "csparse"}}))
 
 if DpleSolver.hasPlugin("lifting.dple.simple") and LinearSolver.hasPlugin("csparse"):
-  dplesolvers.append(("lifting.dple.simple",{"dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("lifting.dple.simple",{"dle.dple_options": {"linear_solver": "csparse"}}))
 
 
 if DpleSolver.hasPlugin("lifting.dple.slicot") and LinearSolver.hasPlugin("csparse"):
-  dplesolvers.append(("lifting.dple.slicot",{"dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
-  dplesolvers.append(("lifting.dple.slicot",{"form": "B", "dle_solver_options.dple_solver_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("lifting.dple.slicot",{"dle.dple_options": {"linear_solver": "csparse"}}))
+  dplesolvers.append(("lifting.dple.slicot",{"form": "B", "dle.dple_options": {"linear_solver": "csparse"}}))
 
 print "DpleSolvers", len(dplesolvers), dplesolvers
 print "DleSolvers", len(dlesolvers), dlesolvers

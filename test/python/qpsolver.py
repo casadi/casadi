@@ -30,16 +30,16 @@ from helpers import *
 
 qpsolvers = []
 if NlpSolver.hasPlugin("ipopt"):
-  qpsolvers.append(("nlp",{"nlp_solver":"ipopt", "nlp_solver_options": {"tol": 1e-12}}))
+  qpsolvers.append(("nlp",{"nlp":"ipopt", "nlp_options": {"tol": 1e-12}}))
 
 if NlpSolver.hasPlugin("ipopt"):
-  qpsolvers.append(("nlp.ipopt",{"nlp_solver_options": {"tol": 1e-12}}))
+  qpsolvers.append(("nlp.ipopt",{"nlp_options": {"tol": 1e-12}}))
 
 if NlpSolver.hasPlugin("worhp"):
-  qpsolvers.append(("nlp",{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}}))
+  qpsolvers.append(("nlp",{"nlp": "worhp", "nlp_options": {"TolOpti": 1e-12}}))
 
 if NlpSolver.hasPlugin("worhp"):
-  qpsolvers.append(("nlp.worhp",{"nlp_solver_options": {"TolOpti": 1e-12}}))
+  qpsolvers.append(("nlp.worhp",{"nlp_options": {"TolOpti": 1e-12}}))
 
 if QpSolver.hasPlugin("ooqp"):
   qpsolvers.append(("ooqp",{}))
@@ -54,7 +54,7 @@ if QpSolver.hasPlugin("sqic"):
   qpsolvers.append(("sqic",{}))
 
 if QpSolver.hasPlugin("qcqp.socp.sdp.dsdp"):
-  qpsolvers.append(("qcqp.socp.sdp.dsdp",{"qcqp_solver_options.socp_solver_options.sdp_solver_options": {"gapTol":1e-10}}))
+  qpsolvers.append(("qcqp.socp.sdp.dsdp",{"qcqp.socp.sdp_options": {"gapTol":1e-10}}))
 
 print qpsolvers
 

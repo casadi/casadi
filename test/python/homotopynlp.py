@@ -34,7 +34,7 @@ import itertools
 solvers= []
  
 try:
-  solvers.append((SimpleHomotopyNlpSolver,{"nlp_solver":"ipopt","nlp_solver_options": {"tol": 1e-12} }))
+  solvers.append((SimpleHomotopyNlpSolver,{"nlp":"ipopt","nlp_options": {"tol": 1e-12} }))
   print "Will test SimpleHomotopyNlpSolver"
 except:
   pass

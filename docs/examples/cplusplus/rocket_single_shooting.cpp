@@ -169,15 +169,15 @@ int main(){
     solver.setOption("max_iter",100);
     
     // Use IPOPT as QP solver
-    solver.setOption("qp_solver","nlp");
+    solver.setOption("qp","nlp");
     Dictionary qp_solver_options;
-    qp_solver_options["nlp_solver"] = "ipopt";
+    qp_solver_options["nlp"] = "ipopt";
     Dictionary ipopt_options;
     ipopt_options["tol"] = 1e-12;
     ipopt_options["print_level"] = 0;
     ipopt_options["print_time"] = false;
-    qp_solver_options["nlp_solver_options"] = ipopt_options;
-    solver.setOption("qp_solver_options",qp_solver_options);
+    qp_solver_options["nlp_options"] = ipopt_options;
+    solver.setOption("qp_options",qp_solver_options);
   } else {
     solver = NlpSolver("ipopt", nlp);
     

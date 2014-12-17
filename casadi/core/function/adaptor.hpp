@@ -43,7 +43,7 @@ namespace casadi {
   public:
 
     // Solver name of target solver
-    static std::string solvername() { return Solver::shortname() + "_solver"; }
+    static std::string solvername() { return Solver::shortname(); }
 
     // Options name of target solver
     static std::string optionsname() { return solvername() + "_options"; }

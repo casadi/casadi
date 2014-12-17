@@ -295,7 +295,7 @@ namespace casadi {
 
       // Pass solver name to adaptor
       if (adaptor->getAdaptorSolverName().size()==0) {
-        adaptor->setOption(adaptor_name + "_solver", solver_name);
+        adaptor->setOption(adaptor_name, solver_name);
       } else {
         adaptor->setOption(adaptor->getAdaptorSolverName(), solver_name);
       }

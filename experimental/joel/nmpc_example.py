@@ -40,8 +40,8 @@ for k in range(N):
 # Allocate NLP solver
 h = MXFunction(nlpIn(x=u,p=p),nlpOut(f=f,g=g));
 S = SCPgen(h)
-S.setOption("qp_solver",QPOasesSolver)
-S.setOption("qp_solver_options",{"printLevel":"none"}) # Should be automatic
+S.setOption("qp",QPOasesSolver)
+S.setOption("qp_options",{"printLevel":"none"}) # Should be automatic
 S.init()
 
 # Pass bounds and solve

@@ -57,7 +57,7 @@ integrators.append(("collocation",["dae","ode"],{"implicit_solver":"kinsol","num
 try:
   Integrator.loadPlugin("oldcollocation")
   integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18,"startup_integrator":"cvodes"}))
-  #integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": "csparse"}}))
+  #integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp": "ipopt","linear_solver_creator": "csparse"}}))
 except:
   pass
 

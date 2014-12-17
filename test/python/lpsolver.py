@@ -30,10 +30,10 @@ from helpers import *
 
 lpsolvers = []
 if QpSolver.hasPlugin("ooqp"):
-  lpsolvers.append(("qp",{"qp_solver": "ooqp" },False))
+  lpsolvers.append(("qp",{"qp": "ooqp" },False))
 
 if NlpSolver.hasPlugin("ipopt"):
-  lpsolvers.append(("qp",{"qp_solver": "nlp", "qp_solver_options":{"nlp_solver":"ipopt"}},False))
+  lpsolvers.append(("qp",{"qp": "nlp", "qp_options":{"nlp":"ipopt"}},False))
 
 if NlpSolver.hasPlugin("ipopt"):
   lpsolvers.append(("qp.nlp.ipopt",{},False))

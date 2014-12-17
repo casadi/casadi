@@ -38,8 +38,8 @@ namespace casadi{
 
 LiftedSQPInternal::LiftedSQPInternal(const Function& F, const Function& G) : NlpSolverInternal(Function(),F,G){
   casadi_warning("casadi::LiftedSQP has been replaced by casadi::SCPgen. This class will be deleted.");
-  addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
-  addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
+  addOption("qp",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
+  addOption("qp_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
   addOption("max_iter",           OT_INTEGER,    100,           "Maximum number of SQP iterations");
   addOption("max_iter_ls",        OT_INTEGER,    100,           "Maximum number of linesearch iterations");
   addOption("toldx",             OT_REAL   ,    1e-12,         "Stopping criterion for the stepsize");
@@ -340,12 +340,12 @@ void LiftedSQPInternal::init(){
   DMatrix &lam_g_k = output(NLP_SOLVER_LAM_G);
 
   // Allocate a QP solver
-  QpSolverCreator qp_solver_creator = getOption("qp_solver");
+  QpSolverCreator qp_solver_creator = getOption("qp");
   qp_solver_ = qp_solver_creator(B1.sparsity(),B2.sparsity());
   
   // Set options if provided
-  if(hasSetOption("qp_solver_options")){
-    Dictionary qp_solver_options = getOption("qp_solver_options");
+  if(hasSetOption("qp_options")){
+    Dictionary qp_solver_options = getOption("qp_options");
     qp_solver_.setOption(qp_solver_options);
   }
   

@@ -56,9 +56,9 @@ namespace casadi {
 
   StabilizedSqp::StabilizedSqp(const Function& nlp) : NlpSolverInternal(nlp) {
     casadi_warning("The SQP method is under development");
-    addOption("stabilized_qp_solver",         OT_STRING,   GenericType(),
+    addOption("stabilizedqp",         OT_STRING,   GenericType(),
               "The Stabilized QP solver to be used by the SQP method");
-    addOption("stabilized_qp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("stabilizedqp_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the Stabilized QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "limited-memory|exact");
@@ -175,16 +175,16 @@ namespace casadi {
     Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_)
         : jacG().output().sparsity();
 
-    std::string stabilized_qp_solver_name = getOption("stabilized_qp_solver");
-    stabilized_qp_solver_ = StabilizedQpSolver(stabilized_qp_solver_name,
+    std::string stabilizedqp_solver_name = getOption("stabilizedqp");
+    stabilizedqp_solver_ = StabilizedQpSolver(stabilizedqp_solver_name,
                                                qpStruct("h", H_sparsity, "a", A_sparsity));
 
     // Set options if provided
-    if (hasSetOption("stabilized_qp_solver_options")) {
-      Dictionary stabilized_qp_solver_options = getOption("stabilized_qp_solver_options");
-      stabilized_qp_solver_.setOption(stabilized_qp_solver_options);
+    if (hasSetOption("stabilizedqp_options")) {
+      Dictionary stabilizedqp_solver_options = getOption("stabilizedqp_options");
+      stabilizedqp_solver_.setOption(stabilizedqp_solver_options);
     }
-    stabilized_qp_solver_.init();
+    stabilizedqp_solver_.init();
 
     // Lagrange multipliers of the NLP
     mu_.resize(ng_);
@@ -1101,27 +1101,27 @@ namespace casadi {
                                        const std::vector<double> & muE) {
 
     // Pass data to QP solver
-    stabilized_qp_solver_.setInput(H, STABILIZED_QP_SOLVER_H);
-    stabilized_qp_solver_.setInput(g, STABILIZED_QP_SOLVER_G);
-    stabilized_qp_solver_.setInput(mu, STABILIZED_QP_SOLVER_MU);
-    stabilized_qp_solver_.setInput(muE, STABILIZED_QP_SOLVER_MUE);
-    stabilized_qp_solver_.setInput(muR, STABILIZED_QP_SOLVER_MUR);
+    stabilizedqp_solver_.setInput(H,   STABILIZED_QP_SOLVER_H);
+    stabilizedqp_solver_.setInput(g,   STABILIZED_QP_SOLVER_G);
+    stabilizedqp_solver_.setInput(mu,  STABILIZED_QP_SOLVER_MU);
+    stabilizedqp_solver_.setInput(muE, STABILIZED_QP_SOLVER_MUE);
+    stabilizedqp_solver_.setInput(muR, STABILIZED_QP_SOLVER_MUR);
 
     // Hot-starting if possible
-    stabilized_qp_solver_.setInput(x_opt, STABILIZED_QP_SOLVER_X0);
+    stabilizedqp_solver_.setInput(x_opt, STABILIZED_QP_SOLVER_X0);
 
     //TODO(Joel): Fix hot-starting of dual variables
     //qp_solver_.setInput(lambda_A_opt, QP_SOLVER_LAMBDA_INIT);
 
     // Pass simple bounds
-    stabilized_qp_solver_.setInput(lbx, STABILIZED_QP_SOLVER_LBX);
-    stabilized_qp_solver_.setInput(ubx, STABILIZED_QP_SOLVER_UBX);
+    stabilizedqp_solver_.setInput(lbx, STABILIZED_QP_SOLVER_LBX);
+    stabilizedqp_solver_.setInput(ubx, STABILIZED_QP_SOLVER_UBX);
 
     // Pass linear bounds
     if (ng_>0) {
-      stabilized_qp_solver_.setInput(A, STABILIZED_QP_SOLVER_A);
-      stabilized_qp_solver_.setInput(lbA, STABILIZED_QP_SOLVER_LBA);
-      stabilized_qp_solver_.setInput(ubA, STABILIZED_QP_SOLVER_UBA);
+      stabilizedqp_solver_.setInput(A, STABILIZED_QP_SOLVER_A);
+      stabilizedqp_solver_.setInput(lbA, STABILIZED_QP_SOLVER_LBA);
+      stabilizedqp_solver_.setInput(ubA, STABILIZED_QP_SOLVER_UBA);
     }
 
     if (monitored("qp")) {
@@ -1137,12 +1137,12 @@ namespace casadi {
     }
 
     // Solve the QP
-    stabilized_qp_solver_.evaluate();
+    stabilizedqp_solver_.evaluate();
 
     // Get the optimal solution
-    stabilized_qp_solver_.getOutput(x_opt, QP_SOLVER_X);
-    stabilized_qp_solver_.getOutput(lambda_x_opt, QP_SOLVER_LAM_X);
-    stabilized_qp_solver_.getOutput(lambda_A_opt, QP_SOLVER_LAM_A);
+    stabilizedqp_solver_.getOutput(x_opt, QP_SOLVER_X);
+    stabilizedqp_solver_.getOutput(lambda_x_opt, QP_SOLVER_LAM_X);
+    stabilizedqp_solver_.getOutput(lambda_A_opt, QP_SOLVER_LAM_A);
     if (monitored("dx")) {
       cout << "dx = " << x_opt << endl;
     }

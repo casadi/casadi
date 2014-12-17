@@ -275,7 +275,7 @@ class OCPtests(casadiTestCase):
   #   ms.setOption("integrator", "cvodes")
   #   ms.setOption("number_of_grid_points",ns)
   #   ms.setOption("final_time",tf)
-  #   ms.setOption("nlp_solver", "ipopt")
+  #   ms.setOption("nlp", "ipopt")
   #   ms.init()
     
   #   for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
@@ -313,7 +313,7 @@ class OCPtests(casadiTestCase):
   #   ms.setOption("number_of_grid_points",ns)
   #   ms.setOption("number_of_parameters",np)
   #   ms.setOption("final_time",tf)
-  #   ms.setOption("nlp_solver", "ipopt")
+  #   ms.setOption("nlp", "ipopt")
   #   ms.init()
     
   #   for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
@@ -370,14 +370,14 @@ class OCPtests(casadiTestCase):
   #   ms.setOption("integrator_options",integrator_options)
   #   ms.setOption("number_of_grid_points",N)
   #   ms.setOption("final_time",te)
-  #   ms.setOption("nlp_solver", "ipopt")
-  #   nlp_solver_options = {}
-  #   nlp_solver_options["tol"] = 1e-10
-  #   nlp_solver_options["hessian_approximation"] = "limited-memory"
-  #   nlp_solver_options["max_iter"] = 100
-  #   nlp_solver_options["linear_solver"] = "ma57"
-  #   nlp_solver_options["derivative_test"] = "first-order"
-  #   ms.setOption("nlp_solver_options",nlp_solver_options)
+  #   ms.setOption("nlp", "ipopt")
+  #   nlp_options = {}
+  #   nlp_options["tol"] = 1e-10
+  #   nlp_options["hessian_approximation"] = "limited-memory"
+  #   nlp_options["max_iter"] = 100
+  #   nlp_options["linear_solver"] = "ma57"
+  #   nlp_options["derivative_test"] = "first-order"
+  #   ms.setOption("nlp_options",nlp_options)
   #   ms.init()
     
   #   ms.setInput(-inf,"lbx")
@@ -446,14 +446,14 @@ class OCPtests(casadiTestCase):
   #   ms.setOption("number_of_parameters",1);
   #   ms.setOption("final_time",te);
 
-  #   ms.setOption("nlp_solver", "ipopt")
-  #   nlp_solver_options = {}
-  #   nlp_solver_options["tol"] = 1e-10
-  #   nlp_solver_options["hessian_approximation"] = "limited-memory"
-  #   nlp_solver_options["max_iter"] = 100
-  #   nlp_solver_options["linear_solver"] = "ma57"
-  #   nlp_solver_options["derivative_test"] = "first-order"
-  #   ms.setOption("nlp_solver_options",nlp_solver_options)
+  #   ms.setOption("nlp", "ipopt")
+  #   nlp_options = {}
+  #   nlp_options["tol"] = 1e-10
+  #   nlp_options["hessian_approximation"] = "limited-memory"
+  #   nlp_options["max_iter"] = 100
+  #   nlp_options["linear_solver"] = "ma57"
+  #   nlp_options["derivative_test"] = "first-order"
+  #   ms.setOption("nlp_options",nlp_options)
   #   ms.init()
     
   #   ms.setInput(-inf,"lbx")

@@ -143,8 +143,8 @@ int main(){
       case LIFTED_SQP:
 	cout << "Testing lifted SQP" << endl;
 	nlp_solver = LiftedSQP(ffcn,gfcn);
-	nlp_solver.setOption("qp_solver",QPOasesSolver::creator);
-	nlp_solver.setOption("qp_solver_options",qp_solver_options);
+	nlp_solver.setOption("qp",QPOasesSolver::creator);
+	nlp_solver.setOption("qp_options",qp_solver_options);
 	nlp_solver.setOption("num_lifted",v.size());
 	nlp_solver.setOption("toldx",1e-10);
 	nlp_solver.setOption("verbose",true);
@@ -152,8 +152,8 @@ int main(){
       case FULLSPACE_SQP:
 	cout << "Testing fullspace SQP" << endl;
 	nlp_solver = LiftedSQP(ffcn,gfcn);
-	nlp_solver.setOption("qp_solver",QPOasesSolver::creator);
-	nlp_solver.setOption("qp_solver_options",qp_solver_options);
+	nlp_solver.setOption("qp",QPOasesSolver::creator);
+	nlp_solver.setOption("qp_options",qp_solver_options);
 	nlp_solver.setOption("num_lifted",0);
 	nlp_solver.setOption("toldx",1e-10);
 	nlp_solver.setOption("verbose",true);
@@ -161,8 +161,8 @@ int main(){
       case OLD_SQP_METHOD:
 	cout << "Testing old SQP method" << endl;
 	nlp_solver = SQPMethod(ffcn,gfcn);
-	nlp_solver.setOption("qp_solver",QPOasesSolver::creator);
-	nlp_solver.setOption("qp_solver_options",qp_solver_options);
+	nlp_solver.setOption("qp",QPOasesSolver::creator);
+	nlp_solver.setOption("qp_options",qp_solver_options);
 	nlp_solver.setOption("generate_hessian",true);
     }
     

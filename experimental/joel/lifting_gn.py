@@ -37,10 +37,10 @@ gauss_newton = False
 # QP-solver
 if False:
   QpSolverClass = OOQpSolver
-  qp_solver_options = {}
+  qp_options = {}
 else:
   QpSolverClass = QPOasesSolver
-  qp_solver_options = {"printLevel" : "none"}
+  qp_options = {"printLevel" : "none"}
 
 # Initial condition
 x0_test = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.20, 0.30]
@@ -119,8 +119,8 @@ for (i,x0) in enumerate([0.08]):
 
   # Solve with ipopt
   #nlp_solver = SQPMethod(F1,F2)
-  #nlp_solver.setOption("qp_solver",QPOasesSolver)
-  #nlp_solver.setOption("qp_solver_options",{"printLevel":"none"})
+  #nlp_solver.setOption("qp",QPOasesSolver)
+  #nlp_solver.setOption("qp_options",{"printLevel":"none"})
   nlp_solver = IpoptSolver(F1,F2)
   nlp_solver.init()
   nlp_solver.setInput(u_guess,"x0")
@@ -297,7 +297,7 @@ for (i,x0) in enumerate([0.08]):
     if k==0:
       # Allocate a QP solver
       qp_solver = QpSolverClass(H.sparsity(),A.sparsity())
-      qp_solver.setOption(qp_solver_options)
+      qp_solver.setOption(qp_options)
       qp_solver.init()
 
     # Formulate the QP

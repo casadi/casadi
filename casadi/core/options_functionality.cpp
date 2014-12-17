@@ -131,6 +131,10 @@ void setAdaptorOptions(Dictionary& dict, const string &name, const Dictionary &o
 
   // Get the adaptor name (before '.', or the entire name if '.' not found)
   std::string adaptor_name = name.substr(0, dotpos);
+  
+  if (dotpos!=std::string::npos) {
+    adaptor_name = adaptor_name + "_options";
+  }
 
   // Check if adaptor name already occurs in the dictionary of options
   Dictionary::const_iterator it = dict.find(adaptor_name);

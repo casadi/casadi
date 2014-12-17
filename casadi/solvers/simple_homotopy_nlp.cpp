@@ -56,9 +56,9 @@ namespace casadi {
 
   SimpleHomotopyNlp::SimpleHomotopyNlp(const Function& nlp)
       : HomotopyNLPInternal(nlp) {
-    addOption("nlp_solver",         OT_STRING,   GenericType(),
+    addOption("nlp",         OT_STRING,   GenericType(),
               "The NLP solver to be used by the Homotopy solver");
-    addOption("nlp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("nlp_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the Homotopy solver");
 
     //addOption("max_step",            OT_REAL,      1.,
@@ -92,11 +92,11 @@ namespace casadi {
                    hnlp_.call(hnlpIn("x", x, "p", p_tau[0], "tau", p_tau[1])));
 
     // Create an nlpsolver instance
-    std::string nlpsolver_name = getOption("nlp_solver");
+    std::string nlpsolver_name = getOption("nlp");
     nlpsolver_ = NlpSolver(nlpsolver_name, nlp);
 
-    if (hasSetOption("nlp_solver_options")) {
-      nlpsolver_.setOption(getOption("nlp_solver_options"));
+    if (hasSetOption("nlp_options")) {
+      nlpsolver_.setOption(getOption("nlp_options"));
     }
 
     // Initialize the NLP solver

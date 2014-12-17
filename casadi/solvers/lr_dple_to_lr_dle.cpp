@@ -60,7 +60,7 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_dple_to_dle"); // name of the function
 
-    addOption("dple_solver",            OT_STRING, GenericType(),
+    addOption("dple",            OT_STRING, GenericType(),
               "User-defined DPLE solver class.");
     addOption("dple",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the DPLE solver.");
@@ -76,7 +76,7 @@ namespace casadi {
     DleInternal::init();
 
     // Create an dplesolver instance
-    std::string dplesolver_name = getOption("dple_solver");
+    std::string dplesolver_name = getOption("dple");
     dplesolver_ = DpleSolver(dplesolver_name, dpleStruct("a",
       std::vector<Sparsity>(1,A_), "v",std::vector<Sparsity>(1,V_),"c",std::vector<Sparsity>(1,C_),"h",std::vector<Sparsity>(1,H_))
     );

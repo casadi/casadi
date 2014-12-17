@@ -32,8 +32,8 @@ def sdqp_sol(h=None,c=None,a=None,uba=None,f=None,g=None):
   global solver
   if solver is None:
     solver = SDPSdqpSolver(sdqpStruct(h=h.sparsity(),f=f.sparsity(),g=g.sparsity(),a=a.sparsity()))
-    solver.setOption("sdp_solver",DSdpSolver)
-    solver.setOption("sdp_solver_options",{"_printlevel": 0})
+    solver.setOption("sdp",DSdpSolver)
+    solver.setOption("sdp_options",{"_printlevel": 0})
     solver.init()
     
   solver.setInput(h,"h")
