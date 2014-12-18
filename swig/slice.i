@@ -36,6 +36,7 @@ namespace casadi{
    int to_Slice(GUESTOBJECT *p, void *mv, int offs) {
     casadi::Slice *m = static_cast<casadi::Slice*>(mv);
     if (m) m += offs;
+    // CasADi-Slice already
     if (is_a(p, $descriptor(casadi::Slice *))) {
       casadi::Slice *mp;
       if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Slice *), 0) == -1)
@@ -44,6 +45,7 @@ namespace casadi{
       return true;
     }
 #ifdef SWIGPYTHON
+    // Python int
     if (PyInt_Check(p)) {
       if (m) {
         m->start_ = PyInt_AsLong(p);
@@ -51,7 +53,9 @@ namespace casadi{
         if (m->stop_==0) m->stop_ = std::numeric_limits<int>::max();
       }
       return true;
-    } else if (PySlice_Check(p)) {
+    }
+    // Python slice
+    if (PySlice_Check(p)) {
       PySliceObject *r = (PySliceObject*)(p);
       if (m) {
         m->start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) 
@@ -61,12 +65,10 @@ namespace casadi{
         if(r->step !=Py_None) m->step_  = PyInt_AsLong(r->step);
       }
       return true;
-    } else {
-      return false;
     }
-#else
+#endif // SWIGPYTHON
+    // Failure if reached this point
     return false;
-#endif
   }
 }
 %casadi_typemaps_constref(Slice, PRECEDENCE_SLICE, casadi::Slice)
