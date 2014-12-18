@@ -1369,7 +1369,7 @@ class DataReferenceRepeated(DataReference):
     self.v = a.reshape((n*a.size1(),1))
     
   def __setitem__(self,a,b):
-    self.v.__NZsetitem__(a,b)
+    self.v.setNZ(a,b)
     self.a.set(self.v.data(),DENSE)
 
   def __getitem__(self,a):
@@ -1383,7 +1383,7 @@ class DataReferenceSquared(DataReference):
     self.n = n
     
   def __setitem__(self,a,b):
-    self.a.__NZsetitem__(a,b)
+    self.a.setNZ(a,b)
 
   def __getitem__(self,a):
     return self.a.getNZ(a)
@@ -1401,7 +1401,7 @@ class DataReferenceProduct(DataReference):
     self.m = m
     
   def __setitem__(self,a,b):
-    self.a.__NZsetitem__(a,b)
+    self.a.setNZ(a,b)
 
   def __getitem__(self,a):
     return self.a.getNZ(a)
@@ -1425,7 +1425,7 @@ class DataReferenceSquaredRepeated(DataReference):
     self.v = a.reshape((n*n*N,1))
     
   def __setitem__(self,a,b):
-    self.v.__NZsetitem__(a,b)
+    self.v.setNZ(a,b)
     self.a.set(self.v.data(),DENSE)
 
   def __getitem__(self,a):

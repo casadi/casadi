@@ -445,20 +445,10 @@ namespace casadi {
     }
 
     /// set a non-zero
-    void nz_indexed_one_based_assignment(int k, const DataType & m) { at(k-1) = m;}
-    void nz_indexed_zero_based_assignment(int k, const DataType & m) { at(k) = m;}
-    void nz_indexed_assignment(const Slice &k, const Matrix<DataType>& m) { (*this)[k] = m;}
     void indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
     { (*this)[k-1] = m;}
     void indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
     { (*this)[k] = m;}
-    void nz_indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
-    { (*this)[k-1] = m;}
-    void nz_indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
-    { (*this)[k] = m;}
-    void nz_indexed_assignment(const IndexList &k, const Matrix<DataType>& m) {
-      (*this)[k.getAll(size())] = m;
-    }
 
     /// set a matrix element
     void indexed_one_based_assignment(int rr, int cc, const DataType & m) { elem(rr-1, cc-1) = m;}

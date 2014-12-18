@@ -890,7 +890,7 @@ class NZproxy:
     return self.matrix.getNZ(s)
 
   def __setitem__(self,s,val):
-    return self.matrix.__NZsetitem__(s,val)
+    return self.matrix.setNZ(s,val)
 
   def __len__(self):
     return self.matrix.size()
@@ -1011,8 +1011,6 @@ class NZproxy:
 %rename(__Cgetitem__) indexed;
 %rename(__Csetitem__) indexed_zero_based_assignment;
 %rename(__Csetitem__) indexed_assignment;
-%rename(__NZsetitem__) nz_indexed_zero_based_assignment;
-%rename(__NZsetitem__) nz_indexed_assignment;
 #endif
 
 #ifndef SWIGXML
