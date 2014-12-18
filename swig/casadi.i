@@ -933,8 +933,8 @@ class NZproxy:
 
     def __setitem__(self,s,val):
         if isinstance(s,tuple) and len(s)==2:
-          return self.__Csetitem__(s[0],s[1],val)  
-        return self.__Csetitem__(s,val)
+          return self.setSub(val, s[0], s[1])  
+        return self.setSub(val, s, 0)
         
     @property
     def nz(self):
@@ -1004,11 +1004,6 @@ class NZproxy:
 #ifndef SWIGPYTHON
 %define %matrix_convertors
 %enddef
-#endif
-
-#ifdef SWIGPYTHON
-%rename(__Csetitem__) indexed_zero_based_assignment;
-%rename(__Csetitem__) indexed_assignment;
 #endif
 
 #ifndef SWIGXML

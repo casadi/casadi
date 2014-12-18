@@ -389,68 +389,6 @@ namespace casadi {
     /// Append a matrix horizontally
     void appendColumns(const Matrix<DataType>& y);
 
-    /// \cond INTERNAL
-    ///@{
-    /// Indexing for interfaced languages
-
-    /// set a non-zero
-    void indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
-    { (*this)(k-1) = m;}
-    void indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
-    { (*this)(k) = m;}
-
-    /// set a matrix element
-    void indexed_one_based_assignment(int rr, int cc, const DataType & m) { elem(rr-1, cc-1) = m;}
-    void indexed_zero_based_assignment(int rr, int cc, const DataType & m) { elem(rr, cc) = m;}
-    void indexed_assignment(const Slice &rr, const Slice &cc, const Matrix<DataType>& m)
-    { (*this)(rr, cc) = m; }
-    void indexed_assignment(const IndexList &rr, const IndexList &cc, const Matrix<DataType>& m) {
-      (*this)(rr.getAll(size1()), cc.getAll(size2())) = m;
-    }
-    void indexed_assignment(const Slice &rr, const Matrix<int>& cc, const Matrix<DataType>& m) {
-      (*this)(rr, cc) = m;
-    }
-    void indexed_assignment(const Matrix<int>& rr, const Slice &cc, const Matrix<DataType>& m) {
-      (*this)(rr, cc) = m;
-    }
-    void indexed_assignment(const Matrix<int> &rr, const IndexList& cc, const Matrix<DataType>& m) {
-      (*this)(rr, cc.getAll(size2())) = m;
-    }
-    void indexed_assignment(const IndexList& rr, const Matrix<int> &cc, const Matrix<DataType>& m) {
-      (*this)(rr.getAll(size1()), cc) = m;
-    }
-    void indexed_assignment(const Matrix<int>& rr, const Matrix<int>& cc,
-                            const Matrix<DataType>& m) {
-      (*this)(rr, cc) = m;
-    }
-    void indexed_assignment(const Sparsity &sp, const Matrix<DataType>& m) {
-      // (*this)(sp) = m;   // VC2010 compiler errors
-          SubMatrix<Matrix<DataType>, Sparsity, int> temp(*this, sp, 0);
-          temp = m;
-    }
-    ///@}
-
-    /// set a vector element
-    void indexed_one_based_assignment(int rr, const DataType & m) {
-      casadi_assert_message(isDense() && isVector(),
-                            "Matrix must be a dense vector, but got " << dimString() << ".");
-      elem(rr-1) = m;
-    }
-    void indexed_zero_based_assignment(int rr, const DataType & m) {
-      casadi_assert_message(isDense() && isVector(),
-                            "Matrix must be a dense vector, but got " << dimString() << ".");
-      elem(rr) = m;
-    }
-    void indexed_assignment(const Slice &rr, const Matrix<DataType>& m) {
-      casadi_assert_message(isDense() && isVector(),
-                            "Matrix must be a dense vector, but got " << dimString() << ".");
-      (*this)(rr, Slice(0)) = m;
-    }
-    void indexed_assignment(const IndexList &rr, const Matrix<DataType>& m) {
-      (*this)(rr.getAll(size1()), 0) = m;
-    }
-    /// \endcond
-
     /// Set all elements to zero
     void setZero();
 
