@@ -121,6 +121,7 @@ def _swig_repr(self):
 %feature("compactdefaultargs","1");
 //%feature("compactdefaultargs","0") casadi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
 %feature("compactdefaultargs","0") casadi::solve; // buggy
+%feature("compactdefaultargs","0") casadi::Function::generateCode; // buggy
 #endif //SWIGXML
 
 // STL
