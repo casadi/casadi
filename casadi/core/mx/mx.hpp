@@ -172,7 +172,7 @@ namespace casadi {
     }
 
     void indexed_zero_based_assignment(const Matrix<int>& k, const MX &m) {
-      (*this)[k] = m;
+      (*this)(k) = m;
     }
     void indexed_assignment(const Sparsity& sp, const MX &m) {
       (*this)(sp) = m;
