@@ -112,6 +112,7 @@ except:
 
 lrdplesolvers = []
 
+""" lrsmith has a problem #1294
 try:
   LrDpleSolver.loadPlugin("lifting")
   LrDleSolver.loadPlugin("smith")
@@ -119,6 +120,7 @@ try:
 except Exception as e:
   print e
   pass
+"""
 
 
 """try:
