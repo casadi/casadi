@@ -266,7 +266,7 @@ class Matrixtests(casadiTestCase):
     
     B = DMatrix.sparse(5,1)
    
-    #self.assertRaises(Exception, lambda : B[A])
+    self.assertRaises(Exception, lambda : B.nz[A])
 
   def test_sparsity_indexing(self):
     self.message("sparsity")
