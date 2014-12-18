@@ -1373,7 +1373,7 @@ class DataReferenceRepeated(DataReference):
     self.a.set(self.v.data(),DENSE)
 
   def __getitem__(self,a):
-    return self.v.__NZgetitem__(a)
+    return self.v.getNZ(a)
 
 class DataReferenceSquared(DataReference):
   def __init__(self,a,n):
@@ -1386,7 +1386,7 @@ class DataReferenceSquared(DataReference):
     self.a.__NZsetitem__(a,b)
 
   def __getitem__(self,a):
-    return self.a.__NZgetitem__(a)
+    return self.a.getNZ(a)
 
   @property
   def shape(self):
@@ -1404,7 +1404,7 @@ class DataReferenceProduct(DataReference):
     self.a.__NZsetitem__(a,b)
 
   def __getitem__(self,a):
-    return self.a.__NZgetitem__(a)
+    return self.a.getNZ(a)
 
   @property
   def shape(self):
@@ -1429,7 +1429,7 @@ class DataReferenceSquaredRepeated(DataReference):
     self.a.set(self.v.data(),DENSE)
 
   def __getitem__(self,a):
-    return self.v.__NZgetitem__(a)
+    return self.v.getNZ(a)
     
 def struct_load(filename):
     import pickle

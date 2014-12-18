@@ -111,19 +111,6 @@ namespace casadi {
     ///@{
     /// Indexing for interfaced languages
 
-    /// get a non-zero
-    const MX nz_indexed_one_based(int k) const { return at(k-1);}
-    const MX nz_indexed_zero_based(int k) const { return at(k);}
-    const MX nz_indexed(const IndexList &k) const {
-      return (*this)[k.getAll(size())];
-    }
-    const MX nz_indexed(const Slice &k) const {
-      return (*this)[k.getAll(size())];
-    }
-    const MX nz_indexed(const Matrix<int> &k) const {
-      return (*this)[k];
-    }
-
     /// get a matrix element
     const MX indexed_one_based(int rr, int cc) const { return (*this)(rr-1, cc-1);}
     const MX indexed_zero_based(int rr, int cc) const { return (*this)(rr, cc);}

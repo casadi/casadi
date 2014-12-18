@@ -887,7 +887,7 @@ class NZproxy:
     self.matrix = matrix
     
   def __getitem__(self,s):
-    return self.matrix.__NZgetitem__(s)
+    return self.matrix.getNZ(s)
 
   def __setitem__(self,s,val):
     return self.matrix.__NZsetitem__(s,val)
@@ -1011,8 +1011,6 @@ class NZproxy:
 %rename(__Cgetitem__) indexed;
 %rename(__Csetitem__) indexed_zero_based_assignment;
 %rename(__Csetitem__) indexed_assignment;
-%rename(__NZgetitem__) nz_indexed_zero_based;
-%rename(__NZgetitem__) nz_indexed;
 %rename(__NZsetitem__) nz_indexed_zero_based_assignment;
 %rename(__NZsetitem__) nz_indexed_assignment;
 #endif

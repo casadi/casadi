@@ -393,21 +393,10 @@ namespace casadi {
     ///@{
     /// Indexing for interfaced languages
     /// get a non-zero
-    const Matrix<DataType> nz_indexed_one_based(int k) const { return this->operator[](k-1);}
-    const Matrix<DataType> nz_indexed_zero_based(int k) const { return this->operator[](k);}
-    const Matrix<DataType> nz_indexed_one_based(const Matrix<int>& k) const
-    { return this->operator[](k-1);}
-    const Matrix<DataType> nz_indexed_zero_based(const Matrix<int>& k) const
-    { return this->operator[](k);}
     const Matrix<DataType> indexed_one_based(const Matrix<int>& k) const
     { return this->operator[](k-1);}
     const Matrix<DataType> indexed_zero_based(const Matrix<int>& k) const
     { return this->operator[](k);}
-    const Matrix<DataType> nz_indexed(const Slice &k) const
-    { return this->operator[](k);}
-    const Matrix<DataType> nz_indexed(const IndexList &k) const {
-      return (*this)[k.getAll(size())];
-    }
 
     /// get a matrix element
     const Matrix<DataType> indexed_one_based(int rr, int cc) const { return (*this)(rr-1, cc-1);}
