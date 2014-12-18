@@ -394,9 +394,9 @@ namespace casadi {
     /// Indexing for interfaced languages
     /// get a non-zero
     const Matrix<DataType> indexed_one_based(const Matrix<int>& k) const
-    { return this->operator[](k-1);}
+    { return (*this)(k-1);}
     const Matrix<DataType> indexed_zero_based(const Matrix<int>& k) const
-    { return this->operator[](k);}
+    { return (*this)(k);}
 
     /// get a matrix element
     const Matrix<DataType> indexed_one_based(int rr, int cc) const { return (*this)(rr-1, cc-1);}
