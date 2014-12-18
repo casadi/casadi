@@ -629,11 +629,6 @@ returntype __rpow__(argtype) const { return pow(argCast(b), selfCast(*$self));}
 // typemaphelpers
 %include "typemaphelpers.i"
 
-#ifndef SWIGMATLAB
-%template(Pair_Int_Int) std::pair<int,int>;
-%template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
-#endif // SWIGMATLAB
-
 #ifdef SWIGPYTHON
 %include "python/meta_python.i"
 #endif
