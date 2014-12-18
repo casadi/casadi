@@ -446,9 +446,9 @@ namespace casadi {
 
     /// set a non-zero
     void indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
-    { (*this)[k-1] = m;}
+    { (*this)(k-1) = m;}
     void indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
-    { (*this)[k] = m;}
+    { (*this)(k) = m;}
 
     /// set a matrix element
     void indexed_one_based_assignment(int rr, int cc, const DataType & m) { elem(rr-1, cc-1) = m;}
