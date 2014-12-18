@@ -1869,7 +1869,7 @@ namespace casadi {
 
         // Add element if nonzero on diagonal
         if (row_[el]==i) {
-          ret.getNZ(i, 0);
+          ret.elem(i, 0);
           mapping.push_back(el);
         }
       }
@@ -2141,7 +2141,7 @@ namespace casadi {
     return mapping;
   }
 
-  vector<int> SparsityInternal::getNZ(const vector<int>& jj, const vector<int>& ii) const {
+  vector<int> SparsityInternal::elem(const vector<int>& jj, const vector<int>& ii) const {
     if (!inBounds(jj, nrow_)) {
       casadi_error("Slicing [jj, ii] out of bounds. Your jj contains "
                    << *std::min_element(jj.begin(), jj.end()) << " up to "
@@ -2624,7 +2624,7 @@ namespace casadi {
     return Sparsity::dense(nrow_, ncol_);
   }
 
-  int SparsityInternal::getNZ(int rr, int cc) const {
+  int SparsityInternal::elem(int rr, int cc) const {
     // If negative index, count from the back
     if (rr<0) rr += nrow_;
     if (cc<0) cc += ncol_;
@@ -2811,7 +2811,7 @@ namespace casadi {
     }
   }
 
-  void SparsityInternal::getNZInplace(std::vector<int>& indices) const {
+  void SparsityInternal::elem(std::vector<int>& indices) const {
     // Quick return if no elements
     if (indices.empty()) return;
 

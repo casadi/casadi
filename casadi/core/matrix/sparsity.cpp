@@ -163,7 +163,7 @@ namespace casadi {
     (*this)->resize(nrow, ncol);
   }
 
-  int Sparsity::getNZ(int rr, int cc) {
+  int Sparsity::elem(int rr, int cc) {
     // If negative index, count from the back
     if (rr<0) rr += size1();
     if (cc<0) cc += size2();
@@ -208,20 +208,20 @@ namespace casadi {
   }
 
   bool Sparsity::hasNZ(int rr, int cc) const {
-    return (*this)->getNZ(rr, cc)!=-1;
+    return (*this)->elem(rr, cc)!=-1;
   }
 
 
-  int Sparsity::getNZ(int rr, int cc) const {
-    return (*this)->getNZ(rr, cc);
+  int Sparsity::elem(int rr, int cc) const {
+    return (*this)->elem(rr, cc);
   }
 
   Sparsity Sparsity::reshape(int nrow, int ncol) const {
     return (*this)->reshape(nrow, ncol);
   }
 
-  std::vector<int> Sparsity::getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const {
-    return (*this)->getNZ(rr, cc);
+  std::vector<int> Sparsity::elem(const std::vector<int>& rr, const std::vector<int>& cc) const {
+    return (*this)->elem(rr, cc);
   }
 
   bool Sparsity::isScalar(bool scalar_and_dense) const {
@@ -520,8 +520,8 @@ namespace casadi {
     (*this)->getElements(loc, col_major);
   }
 
-  void Sparsity::getNZInplace(std::vector<int>& indices) const {
-    (*this)->getNZInplace(indices);
+  void Sparsity::elem(std::vector<int>& indices) const {
+    (*this)->elem(indices);
   }
 
   Sparsity Sparsity::unidirectionalColoring(const Sparsity& AT, int cutoff) const {
@@ -836,7 +836,7 @@ namespace casadi {
 
   Sparsity Sparsity::unit(int n, int el) {
     Sparsity ret = Sparsity::sparse(n);
-    ret.getNZ(el, 0);
+    ret.elem(el, 0);
     return ret;
   }
 

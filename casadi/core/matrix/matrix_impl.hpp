@@ -39,7 +39,7 @@ namespace casadi {
 
   template<typename DataType>
   const DataType& Matrix<DataType>::elem(int rr, int cc) const {
-    int ind = sparsity().getNZ(rr, cc);
+    int ind = sparsity().elem(rr, cc);
     if (ind==-1)
       return casadi_limits<DataType>::zero;
     else
@@ -56,7 +56,7 @@ namespace casadi {
   template<typename DataType>
   DataType& Matrix<DataType>::elem(int rr, int cc) {
     int oldsize = sparsity().size();
-    int ind = sparsityRef().getNZ(rr, cc);
+    int ind = sparsityRef().elem(rr, cc);
     if (oldsize != sparsity().size())
       data().insert(begin()+ind, DataType(0));
     return at(ind);
@@ -2958,7 +2958,7 @@ namespace casadi {
       blocks(size1(), std::vector< Matrix<DataType> >(size2(), filler));
     for (int i=0;i<size1();++i) {
       for (int j=0;j<size2();++j) {
-        int k = a_sp.getNZ(i, j);
+        int k = a_sp.elem(i, j);
         if (k!=-1) {
           blocks[i][j] = (*this)[k]*b;
         }
@@ -3089,7 +3089,7 @@ namespace casadi {
     std::vector<int> known_ind = sparsity().getElements(false);
 
     // Find the corresponding nonzeros in the return matrix
-    sp.getNZInplace(known_ind);
+    sp.elem(known_ind);
 
     // Set the element values
     const std::vector<DataType>& A_data = data();

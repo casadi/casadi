@@ -120,23 +120,23 @@ namespace casadi {
     return sub(j, std::vector<int>(1, i));
   }
 
-  const MX MX::sub(int j, const std::vector<int>& i) const {
-    return sub(std::vector<int>(1, j), i);
+  const MX MX::sub(int rr, const std::vector<int>& cc) const {
+    return sub(std::vector<int>(1, rr), cc);
   }
 
-  const MX MX::sub(const std::vector<int>& jj, const std::vector<int>& ii) const {
+  const MX MX::sub(const std::vector<int>& rr, const std::vector<int>& cc) const {
     // Nonzero mapping from submatrix to full
     std::vector<int> mapping;
 
     // Get the sparsity pattern
-    Sparsity sp = sparsity().sub(jj, ii, mapping);
+    Sparsity sp = sparsity().sub(rr, cc, mapping);
 
     // Create return MX
     return (*this)->getGetNonzeros(sp, mapping);
   }
 
-  const MX MX::sub(int j, int i) const {
-    int ind = sparsity().getNZ(j, i);
+  const MX MX::sub(int rr, int cc) const {
+    int ind = sparsity().elem(rr, cc);
     if (ind>=0) {
       return (*this)->getGetNonzeros(Sparsity::getScalar(), std::vector<int>(1, ind));
     } else {
@@ -2004,7 +2004,7 @@ namespace casadi {
     std::vector< std::vector< MX > > blocks(size1(), std::vector< MX >(size2(), filler));
     for (int i=0; i<size1(); ++i) {
       for (int j=0; j<size2(); ++j) {
-        int k = a_sp.getNZ(i, j);
+        int k = a_sp.elem(i, j);
         if (k!=-1) {
           blocks[i][j] = (*this)[k]*b;
         }

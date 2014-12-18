@@ -59,7 +59,7 @@
 #include "../weak_ref.hpp"
 
 #ifdef SWIG
-  %rename(getNZ_const) getNZ(int, int) const;
+  %rename(elem_const) elem(int, int) const;
 #endif
 
 namespace casadi {
@@ -328,25 +328,25 @@ namespace casadi {
 
     /** \brief Get the index of a non-zero element
         Add the element if it does not exist and copy object if it's not unique */
-    int getNZ(int rr, int cc);
+    int elem(int rr, int cc);
 
     /** \brief Get the index of an existing non-zero element
         return -1 if the element does not exist */
-    int getNZ(int rr, int cc) const;
+    int elem(int rr, int cc) const;
 
     /// Returns true if the pattern has a non-zero at location rr, cc
     bool hasNZ(int rr, int cc) const;
 
     /** \brief Get a set of non-zero element
         return -1 if the element does not exist */
-    std::vector<int> getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const;
+    std::vector<int> elem(const std::vector<int>& rr, const std::vector<int>& cc) const;
 
     /** \brief Get the nonzero index for a set of elements
         The index vector is used both for input and outputs and must be sorted by increasing
         nonzero index, i.e. column-wise.
         Elements not found in the sparsity pattern are set to -1.
     */
-    void getNZInplace(std::vector<int>& indices) const;
+    void elem(std::vector<int>& SWIG_INOUT(indices)) const;
 
     /// Get nonzeros in lower triangular part
     std::vector<int> getLowerNZ() const;

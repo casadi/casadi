@@ -43,11 +43,11 @@ class Sparsitytests(casadiTestCase):
     
     a = Sparsity.sparse(4,5)
     for i in nza:
-      a.getNZ(i[0],i[1])
+      a.elem(i[0],i[1])
       
     b = Sparsity.sparse(4,5)  
     for i in nzb:
-      b.getNZ(i[0],i[1])
+      b.elem(i[0],i[1])
       
     c,w =a.patternUnion(b)
     self.assertEquals(len(w),len(nza.union(nzb)))
@@ -80,11 +80,11 @@ class Sparsitytests(casadiTestCase):
     
     a = Sparsity.sparse(4,5)
     for i in nza:
-      a.getNZ(i[0],i[1])
+      a.elem(i[0],i[1])
       
     b = Sparsity.sparse(4,5)  
     for i in nzb:
-      b.getNZ(i[0],i[1])
+      b.elem(i[0],i[1])
     
     c,_=a.patternIntersection(b)
     for k in range(c.size()):
@@ -103,7 +103,7 @@ class Sparsitytests(casadiTestCase):
     
     a = Sparsity.sparse(4,5)
     for i in nza:
-      a.getNZ(i[0],i[1])
+      a.elem(i[0],i[1])
       
     A = DMatrix(a,1)
     Ad = DMatrix(array(A))
@@ -155,7 +155,7 @@ class Sparsitytests(casadiTestCase):
     
     a = Sparsity.sparse(4,5)
     for i in nza:
-      a.getNZ(i[0],i[1])
+      a.elem(i[0],i[1])
       
     b = Sparsity.triplet(4,5,[i[0] for i in nza],[i[1] for i in nza])
     self.checkarray(self.tomatrix(a),self.tomatrix(b),"rowcol")
@@ -168,7 +168,7 @@ class Sparsitytests(casadiTestCase):
     a = Sparsity.sparse(4,5)
     for i in r:
       for j in c:
-        a.getNZ(i,j)
+        a.elem(i,j)
       
     b = Sparsity.rowcol(r,c,4,5)
     self.checkarray(self.tomatrix(a),self.tomatrix(b),"rowcol")
@@ -184,7 +184,7 @@ class Sparsitytests(casadiTestCase):
     
     a = Sparsity.sparse(4,5)
     for i in nza:
-      a.getNZ(i[0],i[1])
+      a.elem(i[0],i[1])
       
     A=self.tomatrix(a).toArray()
     B=self.tomatrix(casadi.reshape(a,2,10)).toArray()
@@ -204,7 +204,7 @@ class Sparsitytests(casadiTestCase):
     
     a = Sparsity.sparse(4,5)
     for i in nza:
-      a.getNZ(i[0],i[1])
+      a.elem(i[0],i[1])
       
     A=self.tomatrix(a).toArray()
     B=self.tomatrix(vec(a)).toArray()
@@ -228,9 +228,9 @@ class Sparsitytests(casadiTestCase):
   def test_diag(self):
     self.message("diag")
     A = Sparsity.sparse(5,5)
-    A.getNZ(1,1)
-    A.getNZ(2,4)
-    A.getNZ(3,3)
+    A.elem(1,1)
+    A.elem(2,4)
+    A.elem(3,3)
     
     sp, mapping = A.getDiag()
     B = DMatrix(sp,1)
@@ -241,9 +241,9 @@ class Sparsitytests(casadiTestCase):
     #print B
     
     A = Sparsity.sparse(5,1)
-    A.getNZ(1,0)
-    A.getNZ(2,0)
-    A.getNZ(4,0)
+    A.elem(1,0)
+    A.elem(2,0)
+    A.elem(4,0)
     
     sp, mapping = A.getDiag()
     B = DMatrix(sp,1)
@@ -253,9 +253,9 @@ class Sparsitytests(casadiTestCase):
     self.checkarray(array([0,1,2]),array(list(mapping)),"getDiag(vector)")
     
     A = Sparsity.sparse(1,5)
-    A.getNZ(0,1)
-    A.getNZ(0,2)
-    A.getNZ(0,4)
+    A.elem(0,1)
+    A.elem(0,2)
+    A.elem(0,4)
     
     sp, mapping = A.getDiag()
     B = DMatrix(sp,1)
@@ -277,7 +277,7 @@ class Sparsitytests(casadiTestCase):
     
     a = Sparsity.sparse(5,5)
     for i in nza:
-      a.getNZ(i[0],i[1])
+      a.elem(i[0],i[1])
       
     b = SX.sym("b",a)
     
@@ -310,7 +310,7 @@ class Sparsitytests(casadiTestCase):
     
     a = Sparsity.sparse(5,5)
     for i in nza:
-      a.getNZ(i[0],i[1])
+      a.elem(i[0],i[1])
       
     b = MX.sym("b",a)
     
@@ -340,7 +340,7 @@ class Sparsitytests(casadiTestCase):
     
     a = Sparsity.sparse(4,5)
     for i in nza:
-      a.getNZ(i[0],i[1])
+      a.elem(i[0],i[1])
       
     A1, B1= a.getCCS()
     
