@@ -926,10 +926,10 @@ class NZproxy:
     def T(self):
         return _casadi.transpose(self)
         
-    def __getitem__(self,s):
-        if isinstance(s,tuple) and len(s)==2:
-          return self.__Cgetitem__(s[0],s[1])  
-        return self.__Cgetitem__(s)
+    def __getitem__(self, s):
+        if isinstance(s, tuple) and len(s)==2:
+          return self.sub(s[0], s[1])
+        return self.sub(s, 0)
 
     def __setitem__(self,s,val):
         if isinstance(s,tuple) and len(s)==2:
@@ -1007,8 +1007,6 @@ class NZproxy:
 #endif
 
 #ifdef SWIGPYTHON
-%rename(__Cgetitem__) indexed_zero_based;
-%rename(__Cgetitem__) indexed;
 %rename(__Csetitem__) indexed_zero_based_assignment;
 %rename(__Csetitem__) indexed_assignment;
 #endif
@@ -1034,15 +1032,6 @@ class NZproxy:
 %include "sparsity_tools.i"
 %include "sx_tools.i"
 %include "mx_tools.i"
-
-
-#ifdef SWIGOCTAVE
-%rename(__paren__) indexed_one_based;
-#endif
-
-#ifdef SWIGPYTHON
-%rename(__getitem__) indexed_zero_based;
-#endif
 
 #ifdef SWIGPYTHON
 %pythoncode %{
