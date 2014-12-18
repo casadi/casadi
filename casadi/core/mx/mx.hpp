@@ -417,8 +417,6 @@ namespace casadi {
     /** \brief  Identity matrix */
     static MX eye(int ncol);
 
-
-    /// \cond INTERNAL
     const MX sub(int rr, int cc) const;
     const MX sub(const std::vector<int>& rr, int cc) const;
     const MX sub(int rr, const std::vector<int>& cc) const;
@@ -462,7 +460,6 @@ namespace casadi {
     void setNZ(const std::vector<int>& k, const MX& el);
     void setNZ(const Slice& k, const MX& m) { setNZ(k.getAll(size()), m);}
     void setNZ(const Matrix<int>& k, const MX& m);
-    /// \endcond
 
 
     /** \brief Append a matrix vertically (NOTE: only efficient if vector) */
@@ -471,7 +468,6 @@ namespace casadi {
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
 
-    /// \cond SWIGINTERNAL
     /// all binary operations
     MX zz_plus(const MX& y) const;
     MX zz_minus(const MX& y) const;
@@ -486,8 +482,6 @@ namespace casadi {
     MX __constpow__(const MX& b) const;
     MX __mrdivide__(const MX& b) const;
     MX zz_mpower(const MX& b) const;
-    /// \endcond
-
     MX inner_prod(const MX& y) const;
     MX outer_prod(const MX& y) const;
     MX constpow(const MX& y) const;

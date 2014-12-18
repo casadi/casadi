@@ -290,7 +290,6 @@ namespace casadi {
     /// Returns the truth value of a Matrix
     bool __nonzero__() const;
 
-    /// \cond INTERNAL
     ///@{
     /// Get a submatrix
     const Matrix<DataType> sub(int rr, int cc) const;
@@ -367,7 +366,6 @@ namespace casadi {
     template<typename RR, typename CC>
     void getSub(Matrix<DataType>& m, RR rr, CC cc) { m = sub(rr, cc);}
     ///@}
-    /// \endcond
 
     ///@{
     /// Get a set of nonzeros
@@ -385,13 +383,11 @@ namespace casadi {
     void setNZ(const Matrix<int>& k, const Matrix<DataType>& m);
     ///@}
 
-    /// \cond INTERNAL
     /// Append a matrix vertically (NOTE: only efficient if vector)
     void append(const Matrix<DataType>& y);
 
     /// Append a matrix horizontally
     void appendColumns(const Matrix<DataType>& y);
-    /// \endcond
 
     /// \cond INTERNAL
     ///@{
