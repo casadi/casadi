@@ -92,31 +92,6 @@ namespace casadi {
   static Slice ALL;
 #endif // SWIG
 
-  /// \cond INTERNAL
-  /**  Class representing a non-regular (and thus non-slice) index list
-   */
-  class CASADI_EXPORT IndexList {
-  private:
-
-  public:
-    enum Type {NILL, INT, SLICE, IVECTOR};
-    /// Constructor
-    IndexList();
-    explicit IndexList(int i);
-    explicit IndexList(const std::vector<int> &i);
-    explicit IndexList(const Slice &i);
-
-    /// Get a vector of indices
-    std::vector<int> getAll(int len) const;
-
-    /// Data members (all public)
-    Slice slice;
-    int i;
-    std::vector<int> iv;
-    Type type;
-  };
-  /// \endcond
-
 } // namespace casadi
 
 

@@ -65,23 +65,6 @@ namespace casadi {
     return range(start, stop, step_, len);
   }
 
-  IndexList::IndexList() : type(NILL) {}
-  IndexList::IndexList(int i_) : i(i_), type(INT) {}
-  IndexList::IndexList(const std::vector<int> &i_) : iv(i_) , type(IVECTOR) {}
-  IndexList::IndexList(const Slice &s) : slice(s), type(SLICE) {}
-
-  std::vector<int> IndexList::getAll(int len) const {
-    if (type == INT)  {
-      if (i<0) return std::vector<int>(1, i+len);
-      return std::vector<int>(1, i);
-    } else if (type == IVECTOR) {
-      return iv;
-    } else {
-      casadi_assert(type == SLICE);
-      return slice.getAll(len);
-    }
-  }
-
   void Slice::repr(std::ostream& stream, bool trailing_newline) const {
     print(stream, trailing_newline);
   }

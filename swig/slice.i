@@ -71,33 +71,6 @@ namespace casadi{
 }
 %casadi_typemaps_constref(Slice, PRECEDENCE_SLICE, casadi::Slice)
 
-%fragment("to"{IndexList}, "header", fragment="fwd") {
-int to_IndexList(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::IndexList *m = static_cast<casadi::IndexList*>(mv);
-    if (m) m += offs;
-    if (is_a(p, $descriptor(casadi::IndexList *))) {
-      casadi::IndexList *mp;
-      if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::IndexList *), 0) == -1) return false;
-      if (m) *m = *mp;
-      return true;
-    }
-    if (to_int(p, 0)) {
-      if (m) m->type = casadi::IndexList::INT;
-      to_int(p, m ? &m->i : 0);
-    } else if (to_IVector(p, 0)) {
-      if (m) m->type = casadi::IndexList::IVECTOR;
-      return to_IVector(p, m ? &m->iv : 0);
-    } else if (to_Slice(p, 0)) {
-      if (m) m->type = casadi::IndexList::SLICE;
-      return to_Slice(p, m ? &m->slice : 0);
-    } else {
-      return false;
-    }
-    return true;
-  }
-}
-%casadi_typemaps_constref(IndexList, PRECEDENCE_IndexVector, casadi::IndexList)
-
 #endif // SWIGXML
 
 } // namespace casadi

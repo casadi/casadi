@@ -665,8 +665,6 @@ using namespace casadi;
 %fragment(SWIG_Traits_frag(casadi::Callback));
 %traits_swigtype(casadi::CustomEvaluate);
 %fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
-%traits_swigtype(casadi::IndexList);
-%fragment(SWIG_Traits_frag(casadi::IndexList));
 
 %template(Dictionary) std::map<std::string,casadi::GenericType>;
 

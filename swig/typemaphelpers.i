@@ -508,7 +508,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_IndexList(GUESTOBJECT *p, void *mv, int offs=0);
   int to_string(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Function(GUESTOBJECT *p, void *mv, int offs=0);
 
