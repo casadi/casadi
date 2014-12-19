@@ -290,6 +290,12 @@ namespace casadi {
     /// Returns the truth value of a Matrix
     bool __nonzero__() const;
 
+    /// Is the Matrix a Slice (only for IMatrix)
+    bool isSlice() const;
+
+    ///  Convert to Slice (only for IMatrix)
+    Slice toSlice() const;
+
     ///@{
     /// Get a submatrix
     const Matrix<DataType> sub(int rr, int cc) const;
@@ -876,11 +882,11 @@ namespace casadi {
 
   };
 
-} // namespace casadi
+  // Template specialization declarations
+  template<> bool Matrix<int>::isSlice() const;
+  template<> Slice Matrix<int>::toSlice() const;
 
-// Typedefs/template initializations
-namespace casadi {
-
+  // Typedefs initializations
   typedef Matrix<int> IMatrix;
   typedef Matrix<double> DMatrix;
   typedef std::vector<Matrix<double> > DMatrixVector;

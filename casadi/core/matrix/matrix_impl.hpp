@@ -70,6 +70,18 @@ namespace casadi {
   }
 
   template<typename DataType>
+  bool Matrix<DataType>::isSlice() const {
+    throw CasadiException("\"isSlice\" not defined for instantiation");
+    return false;
+  }
+
+  template<typename DataType>
+  Slice Matrix<DataType>::toSlice() const {
+    throw CasadiException("\"toSlice\" not defined for instantiation");
+    return toSlice();
+  }
+
+  template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::sub(int rr, int cc) const {
     return elem(rr, cc);
   }
