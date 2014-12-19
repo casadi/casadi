@@ -161,143 +161,89 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, int j, int i) {
-    if (m.isDense()) {
-      elem(j, i) = m.toScalar();
-    } else {
-      setSub(m, std::vector<int>(1, j), std::vector<int>(1, i));
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc) {
+    // Both are scalar
+    if (rr.isScalar() && cc.isScalar() && m.isDense()) {
+      elem(rr.toScalar(size1()), cc.toScalar(size2())) = m.toScalar();
+      return;
     }
+
+    // Fall back on (IMatrix, IMatrix)
+    setSub(m, rr.getAll(size1()), cc.getAll(size2()));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const std::vector<int>& rr,
-                                const std::vector<int>& cc) {
-    casadi_assert_message(m.numel()==1 || (cc.size() == m.size2() && rr.size() == m.size1()),
-                          "Dimension mismatch." << std::endl << "lhs is " << rr.size() << " x "
-                          << cc.size() << ", while rhs is " << m.dimString());
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc) {
+    // Fall back on (IMatrix, IMatrix)
+    setSub(m, rr.getAll(size1()), cc);
+  }
 
-    if (!inBounds(rr, size1())) {
-      casadi_error("setSub[., rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc) {
+    // Fall back on (IMatrix, IMatrix)
+    setSub(m, rr, cc.getAll(size2()));
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& rr,
+                                const Matrix<int>& cc) {
+    // Scalar
+    if (rr.isScalar() && cc.isScalar() && m.isDense()) {
+      setSub(m, rr.toSlice(), cc.toSlice());
+      return;
+    }
+
+    // Dimensions
+    int sz1 = size1(), sz2 = size2();
+
+    // Sought indices as vectors
+    std::vector<int> r = rr.data(), c = cc.data();
+    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
+    for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
+
+    casadi_assert_message(m.numel()==1 || (c.size() == m.size2() && r.size() == m.size1()),
+                          "Dimension mismatch." << std::endl << "lhs is " << r.size() << " x "
+                          << c.size() << ", while rhs is " << m.dimString());
+
+    if (!inBounds(r, size1())) {
+      casadi_error("setSub[., r, c] out of bounds. Your r contains "
+                   << *std::min_element(r.begin(), r.end()) << " up to "
+                   << *std::max_element(r.begin(), r.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
     }
-    if (!inBounds(cc, size2())) {
-      casadi_error("setSub [., rr, cc] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
+    if (!inBounds(c, size2())) {
+      casadi_error("setSub [., r, c] out of bounds. Your c contains "
+                   << *std::min_element(c.begin(), c.end()) << " up to "
+                   << *std::max_element(c.begin(), c.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
     }
 
     // If m is scalar
-    if (m.numel() != cc.size() * rr.size()) {
-      setSub(Matrix<DataType>::repmat(m.toScalar(), rr.size(), cc.size()), rr, cc);
+    if (m.numel() != c.size() * r.size()) {
+      setSub(Matrix<DataType>::repmat(m.toScalar(), r.size(), c.size()), r, c);
       return;
     }
 
     if (isDense() && m.isDense()) {
       // Dense mode
-      for (int i=0; i<cc.size(); ++i) {
-        for (int j=0; j<rr.size(); ++j) {
-          data()[cc[i]*size1() + rr[j]]=m.data()[i*m.size1()+j];
+      for (int i=0; i<c.size(); ++i) {
+        for (int j=0; j<r.size(); ++j) {
+          at(c[i]*size1() + r[j]) = m.at(i*m.size1()+j);
         }
       }
     } else {
       // Sparse mode
 
       // Remove submatrix to be replaced
-      erase(rr, cc);
+      erase(r, c);
 
       // Extend el to the same dimension as this
       Matrix<DataType> el_ext = m;
-      el_ext.enlarge(size1(), size2(), rr, cc);
+      el_ext.enlarge(size1(), size2(), r, c);
 
       // Unite the sparsity patterns
       *this = unite(*this, el_ext);
     }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const std::vector<int>& jj,
-                                const Matrix<int>& i) {
-    // If el is scalar
-    if (m.isScalar() && (jj.size() > 1 || i.size() > 1)) {
-      setSub(repmat(Matrix<DataType>(i.sparsity(), m.toScalar()), jj.size(), 1), jj, i);
-      return;
-    }
-
-    if (!inBounds(jj, size1())) {
-      casadi_error(
-        "setSub[., i, jj] out of bounds. Your jj contains "
-        << *std::min_element(jj.begin(), jj.end()) << " up to "
-        << *std::max_element(jj.begin(), jj.end())
-        << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-
-    Sparsity result_sparsity = repmat(i, jj.size(), 1).sparsity();
-
-    casadi_assert_message(
-      result_sparsity == m.sparsity(),
-      "setSub(Imatrix" << i.dimString() << ", Ivector(length=" << jj.size()
-      << "), Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(IMatrix, "
-      << jj.size() << ",1) = " << result_sparsity.dimString()
-      << " must match the sparsity of Matrix<DataType> = "  << m.dimString()
-      << ".");
-
-    std::vector<int> slice_i = range(i.size2());
-
-    for (int k=0; k<jj.size(); ++k) {
-      Matrix<DataType> el_k = m(range(k*i.size1(), (k+1)*i.size1()), slice_i);
-      for (int j=0;j<i.size();++j) {
-        elem(jj[k], i.at(j))=el_k.at(j);
-      }
-    }
-
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& j,
-                                const std::vector<int>& ii) {
-
-    // If el is scalar
-    if (m.isScalar() && (ii.size() > 1 || j.size() > 1)) {
-      setSub(repmat(Matrix<DataType>(j.sparsity(), m.toScalar()), 1, ii.size()), j, ii);
-      return;
-    }
-
-    if (!inBounds(ii, size2())) {
-      casadi_error("setSub[., ii, j] out of bounds. Your ii contains "
-                   << *std::min_element(ii.begin(), ii.end()) << " up to "
-                   << *std::max_element(ii.begin(), ii.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-
-    Sparsity result_sparsity = repmat(j, 1, ii.size()).sparsity();
-
-
-    casadi_assert_message(
-        result_sparsity == m.sparsity(),
-        "setSub(Ivector(length=" << ii.size() << "), Imatrix" << j.dimString()
-        << ", Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(Imatrix,1, "
-        << ii.size() << ") = " << result_sparsity.dimString()
-        << " must match the sparsity of Matrix<DataType> = " << m.dimString() << ".");
-
-    std::vector<int> slice_j = range(j.size1());
-
-    for (int k=0; k<ii.size(); ++k) {
-      Matrix<DataType> el_k = m(slice_j, range(k*j.size2(), (k+1)*j.size2()));
-      for (int i=0;i<j.size();++i) {
-        elem(j.at(i), ii[k])=el_k.at(i);
-      }
-    }
-
-  }
-
-
-  template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& rr,
-                                const Matrix<int>& cc) {
-    casadi_error("unknown overload of Matrix::setSub");
   }
 
   template<typename DataType>
