@@ -281,32 +281,18 @@ namespace casadi {
     /** \brief  Identity matrix */
     static MX eye(int ncol);
 
-    const MX sub(int rr, int cc) const;
-    const MX sub(int rr, const Slice& cc) const {return sub(Slice(rr), cc);}
-    const MX sub(int rr, const std::vector<int>& cc) const;
-    const MX sub(int rr, const Matrix<int>& cc) const { return sub(Slice(rr), cc);}
-
-    const MX sub(const Slice& rr, int cc) const {return sub(rr, Slice(cc));}
-    const MX sub(const Slice& rr, const Slice& cc) const
-    { return sub(rr.getAll(size1()), cc.getAll(size2())); }
-    const MX sub(const Slice& rr, std::vector<int>& cc) const
-    { return sub(rr.getAll(size1()), cc); }
-    const MX sub(const Slice& rr, const Matrix<int>& cc) const
-    { return sub(rr.getAll(size1()), cc); }
-
-    const MX sub(const std::vector<int>& rr, int cc) const;
-    const MX sub(std::vector<int>& rr, const Slice& cc) const
-    { return sub(rr, cc.getAll(size1())); }
-    const MX sub(const std::vector<int>& rr, const std::vector<int>& cc) const;
-    const MX sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
-
-    const MX sub(const Matrix<int>& rr, int cc) const { return sub(rr, Slice(cc));}
-    const MX sub(const Matrix<int>& rr, const Slice& cc) const
-    { return sub(rr, cc.getAll(size2())); }
-    const MX sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
+    ///@{
+    /// Get a submatrix
+    const MX sub(const Slice& rr, const Slice& cc) const;
+    const MX sub(const Slice& rr, const Matrix<int>& cc) const;
+    const MX sub(const Matrix<int>& rr, const Slice& cc) const;
     const MX sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
-
     const MX sub(const Sparsity& sp, int dummy=0) const;
+    ///@}
+
+    ///@{
+    /// Set a submatrix
+    ///@}
 
     void setSub(const MX& m, int rr, int cc);
     void setSub(const MX& m, int rr, const Slice& cc)

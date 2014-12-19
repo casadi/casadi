@@ -116,69 +116,53 @@ namespace casadi {
     return (*this)->__nonzero__();
   }
 
-  const MX MX::sub(const std::vector<int>& j, int i) const {
-    return sub(j, std::vector<int>(1, i));
+  const MX MX::sub(const Slice& rr, const Slice& cc) const {
+    // Both are scalar
+    if (rr.isScalar() && cc.isScalar()) {
+      int ind = sparsity().elem(rr.toScalar(size1()), cc.toScalar(size2()));
+      if (ind>=0) {
+        return (*this)->getGetNonzeros(Sparsity::getScalar(), std::vector<int>(1, ind));
+      } else {
+        return (*this)->getGetNonzeros(Sparsity::getScalarSparse(), std::vector<int>(0));
+      }
+    }
+
+    // Fall back on (IMatrix, IMatrix)
+    return sub(rr.getAll(size1()), cc.getAll(size2()));
   }
 
-  const MX MX::sub(int rr, const std::vector<int>& cc) const {
-    return sub(std::vector<int>(1, rr), cc);
+  const MX MX::sub(const Slice& rr, const Matrix<int>& cc) const {
+    // Fall back on (IMatrix, IMatrix)
+    return sub(rr.getAll(size1()), cc);
   }
 
-  const MX MX::sub(const std::vector<int>& rr, const std::vector<int>& cc) const {
+  const MX MX::sub(const Matrix<int>& rr, const Slice& cc) const {
+    // Fall back on (IMatrix, IMatrix)
+    return sub(rr, cc.getAll(size2()));
+  }
+
+  const MX MX::sub(const Matrix<int>& rr, const Matrix<int>& cc) const {
+    // Scalar
+    if (rr.isScalar() && cc.isScalar()) {
+      return sub(rr.toSlice(), cc.toSlice());
+    }
+
+    // Dimensions
+    int sz1 = size1(), sz2 = size2();
+
+    // Sought indices as vectors
+    std::vector<int> r = rr.data(), c = cc.data();
+    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
+    for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
+
     // Nonzero mapping from submatrix to full
     std::vector<int> mapping;
 
     // Get the sparsity pattern
-    Sparsity sp = sparsity().sub(rr, cc, mapping);
+    Sparsity sp = sparsity().sub(r, c, mapping);
 
     // Create return MX
     return (*this)->getGetNonzeros(sp, mapping);
-  }
-
-  const MX MX::sub(int rr, int cc) const {
-    int ind = sparsity().elem(rr, cc);
-    if (ind>=0) {
-      return (*this)->getGetNonzeros(Sparsity::getScalar(), std::vector<int>(1, ind));
-    } else {
-      return (*this)->getGetNonzeros(Sparsity::getScalarSparse(), std::vector<int>(0));
-    }
-  }
-
-  const MX MX::sub(const Matrix<int>& k, const std::vector<int>& ii) const {
-    std::vector< int > rows = range(size1());
-    std::vector< MX > temp;
-
-    for (int i=0;i<ii.size();++i) {
-      MX m(k.sparsity(), MX(0));
-      for (int j=0;j<m.size();++j) {
-        m[j] = sub(k.at(j), ii.at(i));
-      }
-      temp.push_back(m);
-    }
-    MX ret = horzcat(temp);
-    simplify(ret);
-    return ret;
-  }
-
-  const MX MX::sub(const std::vector<int>& jj, const Matrix<int>& k) const {
-    std::vector< int > cols = range(size2());
-    std::vector< MX > temp;
-
-    for (int j=0;j<jj.size();++j) {
-      MX m(k.sparsity(), MX(0));
-      for (int i=0;i<m.size();++i) {
-        m[i] = sub(jj.at(j), k.at(i));
-      }
-      temp.push_back(m);
-    }
-    MX ret = vertcat(temp);
-    simplify(ret);
-    return ret;
-  }
-
-  const MX MX::sub(const Matrix<int>& j, const Matrix<int>& i) const {
-    casadi_error("unknown overload of MX::sub");
-    return MX();
   }
 
   const MX MX::sub(const Sparsity& sp, int dummy) const {
