@@ -92,42 +92,42 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& rr,
-                                               const std::vector<int>& cc) const {
+  const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& jj,
+                                               const std::vector<int>& ii) const {
     // Nonzero mapping from submatrix to full
     std::vector<int> mapping;
 
     // Get the sparsity pattern - does bounds checking
-    Sparsity sp = sparsity().sub(rr, cc, mapping);
+    Sparsity sp = sparsity().sub(jj, ii, mapping);
 
     // Create return object
     Matrix<DataType> ret(sp);
 
     // Copy nonzeros
     for (int k=0; k<mapping.size(); ++k)
-      ret.at(k) = at(mapping[k]);
+      ret.data()[k] = data()[mapping[k]];
 
     // Return (RVO)
     return ret;
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& rr,
-                                               const std::vector<int>& cc) const {
+  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& k,
+                                               const std::vector<int>& ii) const {
     std::vector< int > rows = range(size1());
     std::vector< Matrix<DataType> > temp;
 
-    if (!inBounds(cc, size2())) {
-      casadi_error("Slicing [cc, rr] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
+    if (!inBounds(ii, size2())) {
+      casadi_error("Slicing [ii, k] out of bounds. Your ii contains "
+                   << *std::min_element(ii.begin(), ii.end()) << " up to "
+                   << *std::max_element(ii.begin(), ii.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
     }
 
-    for (int i=0;i<cc.size();++i) {
-      Matrix<DataType> m = rr;
-      for (int j=0; j<m.size(); ++j) {
-        m.at(j) = elem(rr.at(j), cc.at(i));
+    for (int i=0;i<ii.size();++i) {
+      Matrix<DataType> m = k;
+      for (int j=0;j<m.size();++j) {
+        m.data()[j] = elem(k.at(j), ii.at(i));
       }
       temp.push_back(m);
     }
@@ -136,25 +136,26 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& rr,
-                                               const Matrix<int>& cc) const {
+  const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& jj,
+                                               const Matrix<int>& k) const {
     std::vector< int > cols = range(size2());
     std::vector< Matrix<DataType> > temp;
 
-    if (!inBounds(rr, size1())) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
+    if (!inBounds(jj, size1())) {
+      casadi_error("Slicing [ii, k] out of bounds. Your jj contains "
+                   << *std::min_element(jj.begin(), jj.end()) << " up to "
+                   << *std::max_element(jj.begin(), jj.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
     }
 
-    for (int j=0; j<rr.size(); ++j) {
-      Matrix<DataType> m = cc;
-      for (int i=0; i<m.size(); ++i) {
-        m.at(i) = elem(rr.at(j), cc.at(i));
+    for (int j=0;j<jj.size();++j) {
+      Matrix<DataType> m = k;
+      for (int i=0;i<m.size();++i) {
+        m.data()[i] = elem(jj.at(j), k.at(i));
       }
       temp.push_back(m);
     }
+
     return vertcat(temp);
   }
 
@@ -171,19 +172,6 @@ namespace casadi {
     } else if (cc.isScalar()) {
       // cc scalar, rr not
       return sub(rr, cc.toSlice());
-    }
-
-    if (rr.isDense() && rr.isVector()) {
-      if (cc.isDense() && cc.isVector()) {
-        // Both are vectors
-        return sub(rr.data(), cc.data());
-      } else {
-        // rr vector, cc not
-        return sub(rr.data(), cc);
-      }
-    } else if (cc.isDense() && cc.isVector()) {
-      // cc vector, rr not
-      return sub(rr, cc.data());
     }
 
     casadi_assert_message(rr.sparsity()==cc.sparsity(),
