@@ -82,11 +82,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(int rr, int cc) const {
-    return elem(rr, cc);
-  }
-
-  template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::sub(const Slice& rr, const Slice& cc) const {
     // Quick return if scalar
     //    if (rr.isScalar() && cc.isScalar()) {
@@ -166,6 +161,19 @@ namespace casadi {
 
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& rr, const Matrix<int>& cc) const {
+    if (rr.isScalar()) {
+      if (cc.isScalar()) {
+        // Both are scalar
+        return elem(rr.toScalar(), cc.toScalar());
+      } else {
+        // rr scalar, cc not
+        return sub(rr.toSlice(), cc);
+      }
+    } else if (cc.isScalar()) {
+      // cc scalar, rr not
+      return sub(rr, cc.toSlice());
+    }
+
     casadi_assert_message(rr.sparsity()==cc.sparsity(),
                           "sub(Imatrix rr, Imatrix cc): sparsities must match. Got "
                           << rr.dimString() << " and " << cc.dimString() << ".");
