@@ -354,58 +354,6 @@ class Matrixtests(casadiTestCase):
 
     self.checkarray(B,DMatrix([[8,8,8,8],[8,8,8,8],[8,8,8,8],[0,0,0,0]]),"B[A,:] = ")
     
-    
-  def test_IMatrix_IMatrix_index(self):
-    self.message("IMatrix IMatrix index")
-
-    A = IMatrix.sparse(2,2)
-    A[0,0] = 0
-    A[1,1] = 1
-    A[0,1] = 2
-    
-    B = IMatrix.sparse(2,2)
-    B[0,0] = 2
-    B[1,1] = 1
-    B[0,1] = 0
-    
-    C = DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
-    F = DMatrix([[1,2],[4,5]])
-
-    self.checkarray(C[A,B],DMatrix([[3,7],[0,5]]),"C[A,B]")
-    self.assertRaises(Exception, lambda : F[A,B])
-    
-    C = DMatrix.sparse(3,4)
-    C_ = C[A,B]
-    self.assertEqual(C_.size(),3)
-    self.checkarray(C_,DMatrix([[0,0],[0,0]]),"C[A,B]")
-
-  def test_IMatrix_IMatrix_index_assignment(self):
-    self.message("IMatrix IMatrix index assignment")
-
-    A = IMatrix.sparse(2,2)
-    A[0,0] = 0
-    A[1,1] = 1
-    A[0,1] = 2
-    
-    B = IMatrix.sparse(2,2)
-    B[0,0] = 2
-    B[1,1] = 1
-    B[0,1] = 0
-    
-    C = DMatrix.zeros((3,4))
-    C_ = DMatrix.sparse(2,2)
-    C_[0,0] = 3
-    C_[0,1] = 7
-    C_[1,1] = 5;
-    
-    C[A,B] = C_
-
-    self.checkarray(C[A,B],DMatrix([[3,7],[0,5]]),"C[A,B]")
-    
-    C = DMatrix.sparse(3,4)
-    C[A,B] = C_
-    self.checkarray(C[A,B],DMatrix([[3,7],[0,5]]),"C[A,B]")
-
   def test_index_setting(self):
     self.message("index setting")
     B = DMatrix([1,2,3,4,5])

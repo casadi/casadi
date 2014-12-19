@@ -174,16 +174,8 @@ namespace casadi {
       return sub(rr, cc.toSlice());
     }
 
-    casadi_assert_message(rr.sparsity()==cc.sparsity(),
-                          "sub(Imatrix rr, Imatrix cc): sparsities must match. Got "
-                          << rr.dimString() << " and " << cc.dimString() << ".");
-
-    Matrix<DataType> ret(cc.sparsity());
-    for (int k=0; k<cc.size(); ++k) {
-      ret.at(k) = elem(rr.at(k), cc.at(k));
-    }
-
-    return ret;
+    casadi_error("unknown overload of Matrix::sub");
+    return Matrix<DataType>();
   }
 
   template<typename DataType>
@@ -348,26 +340,9 @@ namespace casadi {
 
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& j,
-                                const Matrix<int>& i) {
-    casadi_assert_message(i.sparsity()==j.sparsity(),
-                          "setSub(., Imatrix i, Imatrix j): sparsities must match. Got "
-                          << i.dimString() << " for i and " << j.dimString() << " for j.");
-
-    // If m is scalar
-    if (m.isScalar() && i.numel() > 1) {
-      setSub(Matrix<DataType>(i.sparsity(), m.toScalar()), j, i);
-      return;
-    }
-
-    casadi_assert_message(
-      m.sparsity()==i.sparsity(),
-      "setSub(Matrix m, Imatrix i, Imatrix j): sparsities must match. Got "
-      << m.dimString() << " for m and " << j.dimString() << " for i and j.");
-
-    for (int k=0; k<i.size(); ++k) {
-      elem(j.at(k), i.at(k)) = m.at(k);
-    }
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& rr,
+                                const Matrix<int>& cc) {
+    casadi_error("unknown overload of Matrix::setSub");
   }
 
   template<typename DataType>

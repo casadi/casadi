@@ -177,16 +177,8 @@ namespace casadi {
   }
 
   const MX MX::sub(const Matrix<int>& j, const Matrix<int>& i) const {
-    casadi_assert_message(i.sparsity()==j.sparsity(),
-                          "sub(Imatrix i, Imatrix j): sparsities must match. Got "
-                          << i.dimString() << " and " << j.dimString() << ".");
-
-    MX ret(i.sparsity(), MX(0));
-    for (int k=0;k<i.size();++k) {
-      ret[k] = sub(j.at(k), i.at(k));
-    }
-    simplify(ret);
-    return ret;
+    casadi_error("unknown overload of MX::sub");
+    return MX();
   }
 
   const MX MX::sub(const Sparsity& sp, int dummy) const {
@@ -354,25 +346,7 @@ namespace casadi {
 
 
   void MX::setSub(const MX& m, const Matrix<int>& j, const Matrix<int>& i) {
-    casadi_assert_message(
-      i.sparsity()==j.sparsity(),
-      "setSub(Imatrix m, Imatrix i, Imatrix j): sparsities must match. Got "
-      << i.dimString() << " for i and " << j.dimString() << " for j.");
-
-    // If m is scalar
-    if (m.isScalar() && i.numel() > 1) {
-      setSub(MX(i.sparsity(), m), j, i);
-      return;
-    }
-
-    casadi_assert_message(
-      m.sparsity()==i.sparsity(),
-      "setSub(MX m, Imatrix i, Imatrix j): sparsities must match. Got "
-      << m.dimString() << " for m and " << j.dimString() << " for i and j.");
-
-    for (int k=0; k<i.size(); ++k) {
-      (*this)(j.at(k), i.at(k)) = m[k];
-    }
+    casadi_error("unknown overload of MX::setSub");
   }
 
   void MX::setSub(const MX& m, const Sparsity& sp, int dummy) {

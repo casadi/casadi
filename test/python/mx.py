@@ -788,29 +788,6 @@ class MXtests(casadiTestCase):
 
     self.checkarray(f.getOutput(),DMatrix([[24,25,26],[4,5,6],[20,21,22],[10,11,12]]),"B[A,:] setter")
     
-  def test_IMatrix_IMatrix_index(self):
-    self.message("IMatrix IMatrix index")
-
-    A = IMatrix.sparse(2,2)
-    A[0,0] = 0
-    A[1,1] = 1
-    A[0,1] = 2
-    
-    B = IMatrix.sparse(2,2)
-    B[0,0] = 2
-    B[1,1] = 1
-    B[0,1] = 0
-    
-    C = MX(DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]]))
-    F = MX(DMatrix([[1,2],[4,5]]))
-
-    f = MXFunction([],[C[A,B]])
-    f.init()
-    f.evaluate()
-    
-    self.checkarray(f.getOutput(),DMatrix([[3,7],[0,5]]),"C[A,B]")
-    self.assertRaises(Exception, lambda : F[A,B])
-
   def test_subsass(self):
      self.message("Check subscripted assignment")
      
