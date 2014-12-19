@@ -847,6 +847,8 @@ except:
 %rename(logic_and) zz_and;
 %rename(logic_or) zz_or;
 %rename(logic_not) zz_not;
+%rename(logic_all) zz_all;
+%rename(logic_any) zz_any;
 %rename(__pow__) zz_power;
 #endif // SWIGPYTHON
 
