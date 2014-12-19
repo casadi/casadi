@@ -83,99 +83,54 @@ namespace casadi {
 
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::sub(const Slice& rr, const Slice& cc) const {
-    // Quick return if scalar
-    //    if (rr.isScalar() && cc.isScalar()) {
-    //   return elem(rr.toScalar(size1()), cc.toScalar(size2()));
-    // }
+    // Both are scalar
+    if (rr.isScalar() && cc.isScalar()) {
+      return elem(rr.toScalar(size1()), cc.toScalar(size2()));
+    }
 
+    // Fall back on IMatrix-IMatrix
     return sub(rr.getAll(size1()), cc.getAll(size2()));
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& jj,
-                                               const std::vector<int>& ii) const {
-    // Nonzero mapping from submatrix to full
-    std::vector<int> mapping;
-
-    // Get the sparsity pattern - does bounds checking
-    Sparsity sp = sparsity().sub(jj, ii, mapping);
-
-    // Create return object
-    Matrix<DataType> ret(sp);
-
-    // Copy nonzeros
-    for (int k=0; k<mapping.size(); ++k)
-      ret.data()[k] = data()[mapping[k]];
-
-    // Return (RVO)
-    return ret;
+  const Matrix<DataType> Matrix<DataType>::sub(const Slice& rr, const Matrix<int>& cc) const {
+    // Fall back on IMatrix-IMatrix
+    return sub(rr.getAll(size1()), cc);
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& k,
-                                               const std::vector<int>& ii) const {
-    std::vector< int > rows = range(size1());
-    std::vector< Matrix<DataType> > temp;
-
-    if (!inBounds(ii, size2())) {
-      casadi_error("Slicing [ii, k] out of bounds. Your ii contains "
-                   << *std::min_element(ii.begin(), ii.end()) << " up to "
-                   << *std::max_element(ii.begin(), ii.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-
-    for (int i=0;i<ii.size();++i) {
-      Matrix<DataType> m = k;
-      for (int j=0;j<m.size();++j) {
-        m.data()[j] = elem(k.at(j), ii.at(i));
-      }
-      temp.push_back(m);
-    }
-
-    return horzcat(temp);
-  }
-
-  template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& jj,
-                                               const Matrix<int>& k) const {
-    std::vector< int > cols = range(size2());
-    std::vector< Matrix<DataType> > temp;
-
-    if (!inBounds(jj, size1())) {
-      casadi_error("Slicing [ii, k] out of bounds. Your jj contains "
-                   << *std::min_element(jj.begin(), jj.end()) << " up to "
-                   << *std::max_element(jj.begin(), jj.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-
-    for (int j=0;j<jj.size();++j) {
-      Matrix<DataType> m = k;
-      for (int i=0;i<m.size();++i) {
-        m.data()[i] = elem(jj.at(j), k.at(i));
-      }
-      temp.push_back(m);
-    }
-
-    return vertcat(temp);
+  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& rr, const Slice& cc) const {
+    // Fall back on IMatrix-IMatrix
+    return sub(rr, cc.getAll(size2()));
   }
 
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& rr, const Matrix<int>& cc) const {
-    if (rr.isScalar()) {
-      if (cc.isScalar()) {
-        // Both are scalar
-        return elem(rr.toScalar(), cc.toScalar());
-      } else {
-        // rr scalar, cc not
-        return sub(rr.toSlice(), cc);
-      }
-    } else if (cc.isScalar()) {
-      // cc scalar, rr not
-      return sub(rr, cc.toSlice());
+    // Scalar
+    if (rr.isScalar() && cc.isScalar()) {
+      return sub(rr.toSlice(), cc.toSlice());
     }
 
-    casadi_error("unknown overload of Matrix::sub");
-    return Matrix<DataType>();
+    // Both are vectors
+    casadi_assert_message(rr.isDense() && rr.isVector() && cc.isDense() && cc.isVector(),
+                          "unknown overload of Matrix::sub");
+
+    // Dimensions
+    int sz1 = size1(), sz2 = size2();
+
+    // Nonzero mapping from submatrix to full
+    std::vector<int> mapping;
+
+    // Get the sparsity pattern - does bounds checking
+    std::vector<int> r = rr.data(), c = cc.data();
+    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
+    for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
+    Sparsity sp = sparsity().sub(r, c, mapping);
+
+    // Copy nonzeros and return
+    Matrix<DataType> ret(sp);
+    for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
+    return ret;
   }
 
   template<typename DataType>

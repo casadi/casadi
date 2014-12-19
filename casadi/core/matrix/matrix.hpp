@@ -298,31 +298,10 @@ namespace casadi {
 
     ///@{
     /// Get a submatrix
-    const Matrix<DataType> sub(int rr, const Slice& cc) const
-    { return sub(Slice(rr), cc);}
-    const Matrix<DataType> sub(int rr, const std::vector<int>& cc) const
-    { return sub(Slice(rr), cc);}
-
-    const Matrix<DataType> sub(const Slice& rr, int cc) const
-    { return sub(rr, Slice(cc));}
     const Matrix<DataType> sub(const Slice& rr, const Slice& cc) const;
-    const Matrix<DataType> sub(const Slice& rr, const std::vector<int>& cc) const
-    { return sub(rr.getAll(size1()), cc);}
-    const Matrix<DataType> sub(const Slice& rr, const Matrix<int>& cc) const
-    {return sub(rr.getAll(size1()), cc);}
-
-    const Matrix<DataType> sub(const std::vector<int>& rr, int cc) const
-    { return sub(rr, Slice(cc));}
-    const Matrix<DataType> sub(const std::vector<int>& rr, const Slice& cc) const
-    { return sub(rr, cc.getAll(size2()));}
-    const Matrix<DataType> sub(const std::vector<int>& rr, const std::vector<int>& cc) const;
-    const Matrix<DataType> sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
-
-    const Matrix<DataType> sub(const Matrix<int>& rr, const Slice& cc) const
-    {return sub(rr, cc.getAll(size2()));}
-    const Matrix<DataType> sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
+    const Matrix<DataType> sub(const Slice& rr, const Matrix<int>& cc) const;
+    const Matrix<DataType> sub(const Matrix<int>& rr, const Slice& cc) const;
     const Matrix<DataType> sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
-
     const Matrix<DataType> sub(const Sparsity& sp, int dummy = 0) const;
     ///@}
 
