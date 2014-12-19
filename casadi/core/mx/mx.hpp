@@ -282,11 +282,11 @@ namespace casadi {
     static MX eye(int ncol);
 
     const MX sub(int rr, int cc) const;
-    const MX sub(int rr, const Slice& cc) const {return sub(rr, cc.getAll(size2()));}
+    const MX sub(int rr, const Slice& cc) const {return sub(Slice(rr), cc);}
     const MX sub(int rr, const std::vector<int>& cc) const;
     const MX sub(int rr, const Matrix<int>& cc) const { return sub(Slice(rr), cc);}
 
-    const MX sub(const Slice& rr, int cc) const {return sub(rr.getAll(size1()), cc);}
+    const MX sub(const Slice& rr, int cc) const {return sub(rr, Slice(cc));}
     const MX sub(const Slice& rr, const Slice& cc) const
     { return sub(rr.getAll(size1()), cc.getAll(size2())); }
     const MX sub(const Slice& rr, std::vector<int>& cc) const
@@ -313,7 +313,7 @@ namespace casadi {
     { setSub(m, rr, cc.getAll(size2()));}
     void setSub(const MX& m, int rr, const std::vector<int>& cc);
     void setSub(const MX& m, int rr, const Matrix<int>& cc)
-    { setSub(m, std::vector<int>(1, rr), cc); }
+    { setSub(m, Slice(rr), cc); }
 
     void setSub(const MX& m, const Slice& rr, int cc)
     { setSub(m, rr.getAll(size2()), cc);}
@@ -330,7 +330,7 @@ namespace casadi {
     void setSub(const MX& m, const std::vector<int>& rr, const Matrix<int>& cc);
 
     void setSub(const MX& m, const Matrix<int>& rr, int cc)
-    { setSub(m, rr, std::vector<int>(1, cc)); }
+    { setSub(m, rr, Slice(cc)); }
     void setSub(const MX& m, const Matrix<int>& rr, const Slice& cc)
     { setSub(m, rr, cc.getAll(size2()));}
     void setSub(const MX& m, const Matrix<int>& rr, const std::vector<int>& cc);
