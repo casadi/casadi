@@ -33,6 +33,7 @@ namespace casadi {
   }
 
   Slice::Slice(int i) : start_(i), stop_(i+1), step_(1) {
+    if (i==-1) stop_ = std::numeric_limits<int>::max();
   }
 
   Slice::Slice(int start, int stop, int step) : start_(start), stop_(stop), step_(step) {
