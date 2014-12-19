@@ -68,6 +68,12 @@ namespace casadi {
     /// Get a vector of indices (nested slice)
     std::vector<int> getAll(const Slice& outer, int len) const;
 
+    /// Is the slice a scalar
+    bool isScalar() const;
+
+    /// Get scalar (if isScalar)
+    int toScalar(int len) const;
+
     /// Check equality
     bool operator==(const Slice& other) const
     { return start_==other.start_ && stop_==other.stop_ && step_==other.step_;}
