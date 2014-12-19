@@ -274,15 +274,6 @@ for name,cl in inspect.getmembers(casadi, inspect.isclass):
   if "IOSchemeVector" in name:
     setattr(cl,"get",property(extract))
     getattr(cl,"__swig_getmethods__")["get"] = extract
-    
-@contextlib.contextmanager
-def internalAPI():
-    backup = CasadiOptions.getAllowedInternalAPI()
-    CasadiOptions.setAllowedInternalAPI(True)
-    try:
-      yield
-    finally:
-      CasadiOptions.setAllowedInternalAPI(backup)
 
 __version__ = CasadiMeta.getVersion()
 if '+' in __version__ and CasadiMeta.getGitDescribe()!='':

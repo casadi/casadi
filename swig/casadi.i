@@ -81,6 +81,17 @@
 #ifdef SWIGPYTHON
 %pythoncode %{
 
+import contextlib
+
+@contextlib.contextmanager
+def internalAPI():
+    backup = CasadiOptions.getAllowedInternalAPI()
+    CasadiOptions.setAllowedInternalAPI(True)
+    try:
+      yield
+    finally:
+      CasadiOptions.setAllowedInternalAPI(backup)
+
 class _copyableObject(_object):
   def __copy__(self):
     return self.__class__(self)
@@ -925,14 +936,16 @@ class NZproxy:
         return _casadi.transpose(self)
         
     def __getitem__(self, s):
-        if isinstance(s, tuple) and len(s)==2:
-          return self.sub(s[0], s[1])
-        return self.sub(s, 0)
+        with internalAPI():
+          if isinstance(s, tuple) and len(s)==2:
+            return self.sub(s[0], s[1])
+          return self.sub(s, 0)
 
     def __setitem__(self,s,val):
-        if isinstance(s,tuple) and len(s)==2:
-          return self.setSub(val, s[0], s[1])  
-        return self.setSub(val, s, 0)
+        with internalAPI():
+          if isinstance(s,tuple) and len(s)==2:
+            return self.setSub(val, s[0], s[1])  
+          return self.setSub(val, s, 0)
         
     @property
     def nz(self):
