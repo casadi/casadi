@@ -87,6 +87,16 @@ namespace casadi {
   }
 
   template<typename DataType>
+  const Matrix<DataType> Matrix<DataType>::sub(const Slice& rr, const Slice& cc) const {
+    // Quick return if scalar
+    //    if (rr.isScalar() && cc.isScalar()) {
+    //   return elem(rr.toScalar(size1()), cc.toScalar(size2()));
+    // }
+
+    return sub(rr.getAll(size1()), cc.getAll(size2()));
+  }
+
+  template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& jj,
                                                const std::vector<int>& ii) const {
     // Nonzero mapping from submatrix to full
@@ -155,14 +165,14 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& j, const Matrix<int>& i) const {
-    casadi_assert_message(i.sparsity()==j.sparsity(),
-                          "sub(Imatrix i, Imatrix j): sparsities must match. Got "
-                          << i.dimString() << " and " << j.dimString() << ".");
+  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& rr, const Matrix<int>& cc) const {
+    casadi_assert_message(rr.sparsity()==cc.sparsity(),
+                          "sub(Imatrix rr, Imatrix cc): sparsities must match. Got "
+                          << rr.dimString() << " and " << cc.dimString() << ".");
 
-    Matrix<DataType> ret(i.sparsity());
-    for (int k=0;k<i.size();++k) {
-      ret.data()[k] = elem(j.at(k), i.at(k));
+    Matrix<DataType> ret(cc.sparsity());
+    for (int k=0; k<cc.size(); ++k) {
+      ret.at(k) = elem(rr.at(k), cc.at(k));
     }
 
     return ret;

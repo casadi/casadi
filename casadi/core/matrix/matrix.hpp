@@ -307,8 +307,7 @@ namespace casadi {
 
     const Matrix<DataType> sub(const Slice& rr, int cc) const
     { return sub(rr, Slice(cc));}
-    const Matrix<DataType> sub(const Slice& rr, const Slice& cc) const
-    { return sub(rr.getAll(size1()), cc.getAll(size2()));}
+    const Matrix<DataType> sub(const Slice& rr, const Slice& cc) const;
     const Matrix<DataType> sub(const Slice& rr, const std::vector<int>& cc) const
     { return sub(rr.getAll(size1()), cc);}
     const Matrix<DataType> sub(const Slice& rr, const Matrix<int>& cc) const
