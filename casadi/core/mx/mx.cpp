@@ -299,34 +299,19 @@ namespace casadi {
         k_sp++;
       }
     }
-
     *this =  mm->getSetNonzeros((*this), nz);
-
   }
 
-  MX MX::getNZ(int k) const {
-    if (k<0) k+=size();
-    casadi_assert_message(k<size(),
-                          "MX::getNZ: requested at(" <<  k << "), but that is out of bounds:  "
-                          << dimString() << ".");
-    return getNZ(std::vector<int>(1, k));
+  MX MX::getNZ(const Slice& kk) const {
+    // Fallback on IMatrix
+    return getNZ(kk.getAll(size()));
   }
 
-  MX MX::getNZ(const std::vector<int>& k) const {
-    Sparsity sp = Sparsity::dense(k.size());
-
-    for (int i=0;i<k.size();i++) {
-      casadi_assert_message(k[i] < size(), "Mapping::assign: index vector reaches " << k[i]
-                            << ", while dependent is only of size " << size());
-    }
-
-    MX ret = (*this)->getGetNonzeros(sp, k);
-    return ret;
-  }
-
-  MX MX::getNZ(const Matrix<int>& k) const {
-    MX ret = (*this)->getGetNonzeros(k.sparsity(), k.data());
-    return ret;
+  MX MX::getNZ(const Matrix<int>& kk) const {
+    std::vector<int> k = kk.data();
+    int sz = size();
+    for (std::vector<int>::iterator i=k.begin(); i!=k.end(); ++i) if (*i<0) *i += sz;
+    return (*this)->getGetNonzeros(kk.sparsity(), k);
   }
 
   void MX::setNZ(int k, const MX& el) {
