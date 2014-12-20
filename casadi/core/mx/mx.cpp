@@ -147,6 +147,10 @@ namespace casadi {
       return sub(rr.toSlice(), cc.toSlice());
     }
 
+    casadi_assert_message(rr.isDense() && cc.isDense(), "Matrix::sub: Index vectors must be dense");
+    casadi_assert_message(cc.isScalar() || (rr.isVector() && cc.isVector()),
+                          "Unknown overload of Matrix::sub");
+
     // Dimensions
     int sz1 = size1(), sz2 = size2();
 
@@ -162,7 +166,13 @@ namespace casadi {
     Sparsity sp = sparsity().sub(r, c, mapping);
 
     // Create return MX
-    return (*this)->getGetNonzeros(sp, mapping);
+    MX ret = (*this)->getGetNonzeros(sp, mapping);
+
+    // Reshape, if needed
+    if (!rr.isVector()) ret = reshape(ret, rr.shape());
+
+    // Return (RVO)
+    return ret;
   }
 
   const MX MX::sub(const Sparsity& sp, int dummy) const {
@@ -215,6 +225,20 @@ namespace casadi {
   }
 
   void MX::setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc) {
+    casadi_assert_message(rr.isDense() && cc.isDense(),
+                          "MX::setSub: Index vectors must be dense");
+    casadi_assert_message(/*cc.isScalar() || */ (rr.isVector() && cc.isVector()),
+                          "Unknown overload of MX::setSub");
+
+    // Call recursively if m scalar, and submatrix isn't
+    if (m.isScalar() && (rr.numel()>1 || cc.numel()>1)) {
+      if (cc.isScalar()) {
+        return setSub(repmat(m, rr.shape()), rr, cc);
+      } else {
+        return setSub(repmat(m, rr.size1(), cc.size1()), rr, cc);
+      }
+    }
+
     // Dimensions
     int sz1 = size1(), sz2 = size2();
 
@@ -222,13 +246,6 @@ namespace casadi {
     std::vector<int> r = rr.data(), c = cc.data();
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
     for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
-
-    // Allow m to be a 1x1
-    if (m.isDense() && m.isScalar()) {
-      if (r.size()>1 || c.size()>1) {
-        return setSub(repmat(m, r.size(), c.size()), r, c);
-      }
-    }
 
     casadi_assert_message(r.size()==m.size1(),
                           "Dimension mismatch." << "lhs is " << r.size() << " x " << c.size()
