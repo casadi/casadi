@@ -64,42 +64,42 @@ class CASADI_EXPORT NonZeros : public M {
 // Implementation
 template<typename M, typename K>
 const M& NonZeros<M, K>::operator=(const NonZeros<M, K> &y) {
-  mat_.setNZ2(y, k_);
+  mat_.setNZ(y, k_);
   return y;
 }
 
 // Implementation
 template<typename M, typename K>
 const M& NonZeros<M, K>::operator=(const M &y) {
-  mat_.setNZ2(y, k_);
+  mat_.setNZ(y, k_);
   return y;
 }
 
 template<typename M, typename K>
 M NonZeros<M, K>::operator+=(const M &y) {
   M s = *this+y;
-  mat_.setNZ2(s, k_);
+  mat_.setNZ(s, k_);
   return s;
 }
 
 template<typename M, typename K>
 M NonZeros<M, K>::operator-=(const M &y) {
   M s = *this-y;
-  mat_.setNZ2(s, k_);
+  mat_.setNZ(s, k_);
   return s;
 }
 
 template<typename M, typename K>
 M NonZeros<M, K>::operator*=(const M &y) {
    M s = *this*y;
-   mat_.setNZ2(s, k_);
+   mat_.setNZ(s, k_);
    return s;
 }
 
 template<typename M, typename K>
 M NonZeros<M, K>::operator/=(const M &y) {
   M s = *this/y;
-  mat_.setNZ2(s, k_);
+  mat_.setNZ(s, k_);
   return s;
 }
 #endif

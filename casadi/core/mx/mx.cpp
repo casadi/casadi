@@ -330,12 +330,12 @@ namespace casadi {
     return (*this)->getGetNonzeros(kk.sparsity(), k);
   }
 
-  void MX::setNZ2(const MX& m, const Slice& kk) {
+  void MX::setNZ(const MX& m, const Slice& kk) {
     // Fallback on IMatrix
-    setNZ2(m, kk.getAll(size()));
+    setNZ(m, kk.getAll(size()));
   }
 
-  void MX::setNZ2(const MX& m, const Matrix<int>& kk) {
+  void MX::setNZ(const MX& m, const Matrix<int>& kk) {
     casadi_assert_message(kk.size()==m.size() || m.size()==1,
                           "MX::setNZ: length of non-zero indices (" << kk.size() << ") " <<
                           "must match size of rhs (" << m.size() << ").");
@@ -343,7 +343,7 @@ namespace casadi {
     // Call recursively if points both objects point to the same node
     if (this==&m) {
       MX m_copy = m;
-      setNZ2(m_copy, kk);
+      setNZ(m_copy, kk);
       return;
     }
 
