@@ -360,7 +360,7 @@ namespace casadi {
       // Get nonzeros
       int sz = size();
       bool is_scalar = m.isScalar();
-      for (int el=0; el<sz; ++el) {
+      for (int el=0; el<k.size(); ++el) {
         int k_pos = k[el]>=0 ? k[el] : k[el]+sz;
         at(k_pos) = is_scalar ? m.toScalar() : m.at(el);
       }
