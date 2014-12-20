@@ -1482,7 +1482,7 @@ class MXtests(casadiTestCase):
     i.printDense()
     print vecNZ(i.T)
 
-    T = X[i]
+    T = X.nz[i]
 
     f = MXFunction([X],[vecNZ(T.T)**2])
     f.init()
@@ -2532,7 +2532,7 @@ class MXtests(casadiTestCase):
 
     sp = Sparsity.triplet(3,3,[0,1,2,2],[0,0,1,2])
 
-    f = MXFunction([x],[x[IMatrix(sp,range(sp.size()))]])
+    f = MXFunction([x],[x.nz[IMatrix(sp,range(sp.size()))]])
     f.init()
 
     g = MXFunction([x],[MX(sp,x)])
