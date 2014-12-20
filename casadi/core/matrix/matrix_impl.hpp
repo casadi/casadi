@@ -314,7 +314,7 @@ namespace casadi {
       // Get nonzeros
       int sz = size();
       Matrix<DataType> ret = zeros(kk.sparsity());
-      for (int el=0; el<sz; ++el) {
+      for (int el=0; el<k.size(); ++el) {
         ret.at(el) = at(k[el]>=0 ? k[el] : k[el]+sz); // Negative indices
       }
       return ret;
