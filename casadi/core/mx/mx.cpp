@@ -214,37 +214,36 @@ namespace casadi {
     setSub(m, rr, cc.getAll(size2()));
   }
 
-  void MX::setSub(const MX& m, const Matrix<int>& rr2, const Matrix<int>& cc2) {
+  void MX::setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc) {
     // Dimensions
     int sz1 = size1(), sz2 = size2();
 
     // Sought indices as vectors
-    std::vector<int> rr = rr2.data(), cc = cc2.data();
-    for (std::vector<int>::iterator i=rr.begin(); i!=rr.end(); ++i) if (*i<0) *i += sz1;
-    for (std::vector<int>::iterator i=cc.begin(); i!=cc.end(); ++i) if (*i<0) *i += sz2;
+    std::vector<int> r = rr.data(), c = cc.data();
+    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
+    for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
 
     // Allow m to be a 1x1
     if (m.isDense() && m.isScalar()) {
-      if (rr.size()>1 || cc.size()>1) {
-        setSub(repmat(m, rr.size(), cc.size()), rr, cc);
-        return;
+      if (r.size()>1 || c.size()>1) {
+        return setSub(repmat(m, r.size(), c.size()), r, c);
       }
     }
 
-    casadi_assert_message(rr.size()==m.size1(),
-                          "Dimension mismatch." << "lhs is " << rr.size() << " x " << cc.size()
+    casadi_assert_message(r.size()==m.size1(),
+                          "Dimension mismatch." << "lhs is " << r.size() << " x " << c.size()
                           << ", while rhs is " << m.dimString());
-    casadi_assert_message(cc.size()==m.size2(),
-                          "Dimension mismatch." << "lhs is " << rr.size() << " x " << cc.size()
+    casadi_assert_message(c.size()==m.size2(),
+                          "Dimension mismatch." << "lhs is " << r.size() << " x " << c.size()
                           << ", while rhs is " << m.dimString());
 
     if (isDense() && m.isDense()) {
       // Dense mode
       int ld = size1(), ld_el = m.size1(); // leading dimensions
       std::vector<int> kk1, kk2;
-      for (int i=0; i<cc.size(); ++i) {
-        for (int j=0; j<rr.size(); ++j) {
-          kk1.push_back(cc[i]*ld + rr[j]);
+      for (int i=0; i<c.size(); ++i) {
+        for (int j=0; j<r.size(); ++j) {
+          kk1.push_back(c[i]*ld + r[j]);
           kk2.push_back(i*ld_el+j);
         }
       }
@@ -253,11 +252,11 @@ namespace casadi {
       // Sparse mode
 
       // Remove submatrix to be replaced
-      erase(rr, cc);
+      erase(r, c);
 
       // Extend m to the same dimension as this
       MX el_ext = m;
-      el_ext.enlarge(size1(), size2(), rr, cc);
+      el_ext.enlarge(size1(), size2(), r, c);
 
       // Unite the sparsity patterns
       *this = unite(*this, el_ext);
