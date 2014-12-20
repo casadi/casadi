@@ -194,8 +194,21 @@ namespace casadi {
                                 const Matrix<int>& cc) {
     // Scalar
     if (rr.isScalar() && cc.isScalar() && m.isDense()) {
-      setSub(m, rr.toSlice(), cc.toSlice());
-      return;
+      return setSub(m, rr.toSlice(), cc.toSlice());
+    }
+
+    casadi_assert_message(rr.isDense() && cc.isDense(),
+                          "Matrix::setSub: Index vectors must be dense");
+    casadi_assert_message(cc.isScalar() || (rr.isVector() && cc.isVector()),
+                          "Unknown overload of Matrix::setSub");
+
+    // Call recursively if m scalar, and submatrix isn't
+    if (m.isScalar() && (rr.numel()>1 || cc.numel()>1)) {
+      if (cc.isScalar()) {
+        return setSub(repmat(m, rr.shape()), rr, cc);
+      } else {
+        return setSub(repmat(m, rr.size1(), cc.size1()), rr, cc);
+      }
     }
 
     // Dimensions
@@ -206,9 +219,15 @@ namespace casadi {
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
     for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
 
-    casadi_assert_message(m.numel()==1 || (c.size() == m.size2() && r.size() == m.size1()),
-                          "Dimension mismatch." << std::endl << "lhs is " << r.size() << " x "
-                          << c.size() << ", while rhs is " << m.dimString());
+    if (cc.isScalar()) {
+      casadi_assert_message(rr.shape()==m.shape(), "Dimension mismatch: "
+                            "Lhs has dimension " << rr.shape()
+                            << " while rhs has dimension " << m.shape());
+    } else {
+      casadi_assert_message(c.size() == m.size2() && r.size() == m.size1(),
+                            "Dimension mismatch." << "lhs is " << r.size() << "-by-"
+                            << c.size() << ", while rhs is " << m.shape());
+    }
 
     if (!inBounds(r, size1())) {
       casadi_error("setSub[., r, c] out of bounds. Your r contains "
@@ -223,17 +242,12 @@ namespace casadi {
                    << ", which is outside of the matrix shape " << dimString() << ".");
     }
 
-    // If m is scalar
-    if (m.numel() != c.size() * r.size()) {
-      setSub(Matrix<DataType>::repmat(m.toScalar(), r.size(), c.size()), r, c);
-      return;
-    }
-
     if (isDense() && m.isDense()) {
       // Dense mode
+      int el=0;
       for (int i=0; i<c.size(); ++i) {
         for (int j=0; j<r.size(); ++j) {
-          at(c[i]*size1() + r[j]) = m.at(i*m.size1()+j);
+          at(c[i]*size1() + r[j]) = m.at(el++);
         }
       }
     } else {
