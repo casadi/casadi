@@ -214,22 +214,22 @@ namespace casadi {
     return ret;
   }
 
-  void MX::setSub(const MX& m, const Slice& rr, const Slice& cc) {
+  void MX::setSub(const MX& m, const Slice& rr, const Slice& cc, bool ind1) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr.getAll(size1()), cc.getAll(size2()));
+    setSub(m, rr.getAll(size1()), cc.getAll(size2()), ind1);
   }
 
-  void MX::setSub(const MX& m, const Slice& rr, const Matrix<int>& cc) {
+  void MX::setSub(const MX& m, const Slice& rr, const Matrix<int>& cc, bool ind1) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr.getAll(size1()), cc);
+    setSub(m, rr.getAll(size1()), cc, ind1);
   }
 
-  void MX::setSub(const MX& m, const Matrix<int>& rr, const Slice& cc) {
+  void MX::setSub(const MX& m, const Matrix<int>& rr, const Slice& cc, bool ind1) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr, cc.getAll(size2()));
+    setSub(m, rr, cc.getAll(size2()), ind1);
   }
 
-  void MX::setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc) {
+  void MX::setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc, bool ind1) {
     casadi_assert_message(rr.isDense() && cc.isDense(),
                           "MX::setSub: Index vectors must be dense");
     casadi_assert_message(/*cc.isScalar() || */ (rr.isVector() && cc.isVector()),
@@ -238,9 +238,9 @@ namespace casadi {
     // Call recursively if m scalar, and submatrix isn't
     if (m.isScalar() && (rr.numel()>1 || cc.numel()>1)) {
       if (cc.isScalar()) {
-        return setSub(repmat(m, rr.shape()), rr, cc);
+        return setSub(repmat(m, rr.shape()), rr, cc, ind1);
       } else {
-        return setSub(repmat(m, rr.size1(), cc.size1()), rr, cc);
+        return setSub(repmat(m, rr.size1(), cc.size1()), rr, cc, ind1);
       }
     }
 
@@ -248,7 +248,12 @@ namespace casadi {
     int sz1 = size1(), sz2 = size2();
 
     // Sought indices as vectors
+    // TODO(@jaeandersson): refactor to make the following unnecessary
     std::vector<int> r = rr.data(), c = cc.data();
+    if (ind1) {
+      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) *i--;
+      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) *i--;
+    }
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
     for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
 
@@ -285,7 +290,7 @@ namespace casadi {
     }
   }
 
-  void MX::setSub(const MX& m, const Sparsity& sp, int dummy) {
+  void MX::setSub(const MX& m, const Sparsity& sp, int dummy, bool ind1) {
     casadi_assert_message(
       size2()==sp.size2() && size1()==sp.size1(),
       "setSub(., Sparsity sp): shape mismatch. This matrix has shape "
@@ -295,11 +300,11 @@ namespace casadi {
 
     // If m is scalar
     if (m.isScalar()) {
-      setSub(MX(sp, m), sp, dummy);
+      setSub(MX(sp, m), sp, dummy, ind1);
       return;
     }
 
-    MX mm = m.sub(sp, 0, false);
+    MX mm = m.sub(sp, 0, ind1);
 
     std::vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
 

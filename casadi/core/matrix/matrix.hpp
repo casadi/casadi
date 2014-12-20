@@ -307,23 +307,25 @@ namespace casadi {
 
     ///@{
     /// Set a submatrix
-    void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc);
-    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc);
-    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy);
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc, bool ind1);
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc, bool ind1);
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc, bool ind1);
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Matrix<int>& cc, bool ind1);
+    void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy, bool ind1);
     ///@}
 
     ///@{
     /// Add a submatrix to an existing matrix (TODO: remove memory allocation)
     template<typename RR, typename CC>
-    void addSub(const Matrix<DataType>& m, RR rr, CC cc) { setSub(m+sub(rr, cc, false), rr, cc);}
+    void addSub(const Matrix<DataType>& m, RR rr, CC cc, bool ind1) {
+      setSub(m+sub(rr, cc, ind1), rr, cc, ind1);
+    }
     ///@}
 
     ///@{
     /// Retrieve a submatrix (TODO: remove memory allocation)
     template<typename RR, typename CC>
-    void getSub(Matrix<DataType>& m, RR rr, CC cc) { m = sub(rr, cc, false);}
+    void getSub(Matrix<DataType>& m, RR rr, CC cc, bool ind1) { m = sub(rr, cc, ind1);}
     ///@}
 
     ///@{

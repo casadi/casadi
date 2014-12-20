@@ -292,11 +292,11 @@ namespace casadi {
 
     ///@{
     /// Set a submatrix
-    void setSub(const MX& m, const Slice& rr, const Slice& cc);
-    void setSub(const MX& m, const Slice& rr, const Matrix<int>& cc);
-    void setSub(const MX& m, const Matrix<int>& rr, const Slice& cc);
-    void setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc);
-    void setSub(const MX& m, const Sparsity& sp, int dummy);
+    void setSub(const MX& m, const Slice& rr, const Slice& cc, bool ind1);
+    void setSub(const MX& m, const Slice& rr, const Matrix<int>& cc, bool ind1);
+    void setSub(const MX& m, const Matrix<int>& rr, const Slice& cc, bool ind1);
+    void setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc, bool ind1);
+    void setSub(const MX& m, const Sparsity& sp, int dummy, bool ind1);
     ///@}
 
     ///@{

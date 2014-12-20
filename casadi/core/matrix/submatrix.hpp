@@ -65,42 +65,42 @@ namespace casadi {
   // Implementation
   template<typename M, typename I, typename J>
   const M& SubMatrix<M, I, J>::operator=(const SubMatrix<M, I, J> &y) {
-    mat_.setSub(y, i_, j_);
+    mat_.setSub(y, i_, j_, false);
     return y;
   }
 
   // Implementation
   template<typename M, typename I, typename J>
   const M& SubMatrix<M, I, J>::operator=(const M &y) {
-    mat_.setSub(y, i_, j_);
+    mat_.setSub(y, i_, j_, false);
     return y;
   }
 
   template<typename M, typename I, typename J>
   M SubMatrix<M, I, J>::operator+=(const M &y) {
     M s = *this+y;
-    mat_.setSub(s, i_, j_);
+    mat_.setSub(s, i_, j_, false);
     return s;
   }
 
   template<typename M, typename I, typename J>
   M SubMatrix<M, I, J>::operator-=(const M &y) {
     M s = *this-y;
-    mat_.setSub(s, i_, j_);
+    mat_.setSub(s, i_, j_, false);
     return s;
   }
 
   template<typename M, typename I, typename J>
   M SubMatrix<M, I, J>::operator*=(const M &y) {
     M s = *this*y;
-    mat_.setSub(s, i_, j_);
+    mat_.setSub(s, i_, j_, false);
     return s;
   }
 
   template<typename M, typename I, typename J>
   M SubMatrix<M, I, J>::operator/=(const M &y) {
     M s = *this/y;
-    mat_.setSub(s, i_, j_);
+    mat_.setSub(s, i_, j_, false);
     return s;
   }
 #endif

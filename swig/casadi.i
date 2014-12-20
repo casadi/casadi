@@ -947,8 +947,8 @@ class NZproxy:
     def __setitem__(self,s,val):
         with internalAPI():
           if isinstance(s,tuple) and len(s)==2:
-            return self.setSub(val, s[0], s[1])  
-          return self.setSub(val, s, 0)
+            return self.setSub(val, s[0], s[1], False)  
+          return self.setSub(val, s, 0, False)
         
     @property
     def nz(self):
