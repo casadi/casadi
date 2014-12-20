@@ -291,69 +291,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(B,DMatrix([[2,4,3,4,5],[6,7,16,9,10]]),"Imatrix indexing assignement")
     
     self.assertRaises(Exception, lambda : B[Sparsity.dense(4,4)])
-    
-  
-  
-  def test_IMatrix_index_slice(self):
-    self.message("IMatrix combined with slice")
-
-    A = IMatrix.sparse(2,2)
-    A[0,0] = 0
-    A[1,1] = 1
-    A[0,1] = 2
-    A[1,0] = 0
-    
-    
-    B = DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
-    F = DMatrix([[1,2],[4,5]])
-
-    self.checkarray(B[:,A],DMatrix([[1,3],[1,2],[4,6],[4,5],[7,9],[7,8],[10,12],[10,11]]),"B[:,A]")
-    self.checkarray(B[A,:],DMatrix([[1,7,2,8,3,9],[1,4,2,5,3,6]]),"B[A,:]")
-    
-    self.assertRaises(Exception, lambda : F[:,A])
-    
-    self.checkarray(B[A,1],DMatrix([[2,8],[2,5]]),"B[A,1]")
-    
-    self.checkarray(B[1,A],DMatrix([[4,6],[4,5]]),"B[1,A]")
-
-  def test_IMatrix_index_slice_assignment(self):
-    self.message("IMatrix combined with slice assignment")
-
-    A = IMatrix.sparse(2,2)
-    A[0,0] = 0
-    A[1,1] = 1
-    A[0,1] = 2
-    A[1,0] = 0
-    
-    
-    B = DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
-    B_ = DMatrix(B)
-    B[:,A] = DMatrix([[1,3],[1,2],[4,6],[4,5],[7,9],[7,8],[10,12],[10,11]])*2
-    
-    self.checkarray(B,2*B_,"B[:,A] = ")
-    
-    B[:,A] = 7
-    
-    self.checkarray(B,DMatrix([[7,7,7],[7,7,7],[7,7,7],[7,7,7]]),"B[:,A] = ")
-    
-    B[A,:] = DMatrix([[1,7,2,8,3,9],[1,4,2,5,3,6]])
-    
-    self.checkarray(B,DMatrix([[1,2,3],[4,5,6],[7,8,9],[7,7,7]]),"B[A,:] = ")
-
-    B[A,:] = 6
-    
-    self.checkarray(B,DMatrix([[6,6,6],[6,6,6],[6,6,6],[7,7,7]]),"B[A,:] = ")
-    
-    B=DMatrix.sparse(3,4)
-    B[:,A] = 7
-    
-    self.checkarray(B,DMatrix([[7,7,7,0],[7,7,7,0],[7,7,7,0]]),"B[:,A] = ")
-    
-    B=DMatrix.sparse(4,4)
-    B[A,:] = 8
-
-    self.checkarray(B,DMatrix([[8,8,8,8],[8,8,8,8],[8,8,8,8],[0,0,0,0]]),"B[A,:] = ")
-    
+        
   def test_index_setting(self):
     self.message("index setting")
     B = DMatrix([1,2,3,4,5])
