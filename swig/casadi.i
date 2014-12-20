@@ -869,7 +869,7 @@ except:
 
 // Nonzeros are accessed with the syntax A{i} 0-based
 %rename(getitemcurl) getNZ;
-%rename(setitemcurl) setNZ;
+%rename(setitemcurl) setNZ2;
 %rename(size) shape;
 %rename(nnz) size;
 
@@ -899,7 +899,7 @@ class NZproxy:
     return self.matrix.getNZ(s)
 
   def __setitem__(self,s,val):
-    return self.matrix.setNZ(s,val)
+    return self.matrix.setNZ2(val, s)
 
   def __len__(self):
     return self.matrix.size()

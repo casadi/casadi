@@ -327,7 +327,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setNZ(const Slice& kk, const Matrix<DataType>& m) {
+  void Matrix<DataType>::setNZ2(const Matrix<DataType>& m, const Slice& kk) {
     try {
       // Scalar
       if (kk.isScalar()) {
@@ -342,15 +342,14 @@ namespace casadi {
     }
 
     // Fallback on IMatrix
-    setNZ(kk.getAll(size()), m);
+    setNZ2(m, kk.getAll(size()));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setNZ(const Matrix<int>& kk, const Matrix<DataType>& m) {
+  void Matrix<DataType>::setNZ2(const Matrix<DataType>& m, const Matrix<int>& kk) {
     // Scalar
     if (kk.isScalar()) {
-      setNZ(kk.toSlice(), m);
-      return;
+      return setNZ2(m, kk.toSlice());
     }
 
     // Get nonzeros

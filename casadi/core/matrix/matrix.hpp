@@ -334,8 +334,8 @@ namespace casadi {
 
     ///@{
     /// Set a set of nonzeros
-    void setNZ(const Slice& k, const Matrix<DataType>& m);
-    void setNZ(const Matrix<int>& k, const Matrix<DataType>& m);
+    void setNZ2(const Matrix<DataType>& m, const Slice& k);
+    void setNZ2(const Matrix<DataType>& m, const Matrix<int>& k);
     ///@}
 
     /// Append a matrix vertically (NOTE: only efficient if vector)
