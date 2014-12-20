@@ -407,10 +407,10 @@ void PyDECREFParent(PyObject* self) {
 
 // Convert reference output to a new data structure
 %define %outputRefNew(Type)
-%typemap(out) Type & {
+%typemap(out, noblock=1) Type & {
    $result = swig::from(static_cast< Type >(*$1));
 }
-%typemap(out) const Type & {
+%typemap(out, noblock=1) const Type & {
    $result = swig::from(static_cast< Type >(*$1));
 }
 %extend Type {

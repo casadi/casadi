@@ -219,7 +219,7 @@
   }
 }
 
-%typemap(out, fragment="from"{GenericType}) casadi::GenericType {
+%typemap(out, noblock=1, fragment="from"{GenericType}) casadi::GenericType {
   if(!($result = from_GenericType($1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 
@@ -250,7 +250,7 @@
     return p;
   }
 }
-%typemap(out, fragment="from"{Dictionary}) const casadi::GenericType::Dictionary&  {
+%typemap(out, noblock=1, fragment="from"{Dictionary}) const casadi::GenericType::Dictionary&  {
   if(!($result = from_Dictionary(*$1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 #endif // SWIGPYTHON
