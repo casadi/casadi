@@ -2822,7 +2822,8 @@ namespace casadi {
         int el_col = *it % ncol_;
         int el_row = *it / ncol_;
         int el = nrow_*el_col + el_row;
-        casadi_assert_message(el>=last, "Elements must be sorted col-wise in non-decreasing order");
+        casadi_assert_message(el>=last,
+                              "Elements must be sorted columnwise in non-decreasing order");
         last = el;
       }
     }

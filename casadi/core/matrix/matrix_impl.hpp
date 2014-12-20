@@ -111,9 +111,9 @@ namespace casadi {
       return sub(rr.toSlice(), cc.toSlice());
     }
 
-    // Both are vectors
-    casadi_assert_message(rr.isDense() && rr.isVector() && cc.isDense() && cc.isVector(),
-                          "unknown overload of Matrix::sub");
+    casadi_assert_message(rr.isDense() && cc.isDense(), "Matrix::sub: Index vectors must be dense");
+    casadi_assert_message(cc.isScalar() || (rr.isVector() && cc.isVector()),
+                          "Unknown overload of Matrix::sub");
 
     // Dimensions
     int sz1 = size1(), sz2 = size2();
@@ -130,6 +130,11 @@ namespace casadi {
     // Copy nonzeros and return
     Matrix<DataType> ret(sp);
     for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
+
+    // Reshape, if needed
+    if (!rr.isVector()) ret = reshape(ret, rr.shape());
+
+    // Return (RVO)
     return ret;
   }
 
