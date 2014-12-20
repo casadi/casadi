@@ -870,6 +870,9 @@ except:
 // Nonzeros are accessed with the syntax A{i} 0-based
 %rename(getitemcurl) getNZ;
 %rename(setitemcurl) setNZ;
+// Elements are accessed with the syntax A(i) 0-based
+%rename(getitem) sub;
+%rename(setitem) setSub;
 %rename(size) shape;
 %rename(nnz) size;
 
