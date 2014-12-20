@@ -941,8 +941,8 @@ class NZproxy:
     def __getitem__(self, s):
         with internalAPI():
           if isinstance(s, tuple) and len(s)==2:
-            return self.sub(s[0], s[1])
-          return self.sub(s, 0)
+            return self.sub(s[0], s[1], False)
+          return self.sub(s, 0, False)
 
     def __setitem__(self,s,val):
         with internalAPI():

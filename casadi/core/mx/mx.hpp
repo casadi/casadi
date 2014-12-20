@@ -283,11 +283,11 @@ namespace casadi {
 
     ///@{
     /// Get a submatrix
-    const MX sub(const Slice& rr, const Slice& cc) const;
-    const MX sub(const Slice& rr, const Matrix<int>& cc) const;
-    const MX sub(const Matrix<int>& rr, const Slice& cc) const;
-    const MX sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
-    const MX sub(const Sparsity& sp, int dummy=0) const;
+    const MX sub(const Slice& rr, const Slice& cc, bool ind1) const;
+    const MX sub(const Slice& rr, const Matrix<int>& cc, bool ind1) const;
+    const MX sub(const Matrix<int>& rr, const Slice& cc, bool ind1) const;
+    const MX sub(const Matrix<int>& rr, const Matrix<int>& cc, bool ind1) const;
+    const MX sub(const Sparsity& sp, int dummy, bool ind1) const;
     ///@}
 
     ///@{

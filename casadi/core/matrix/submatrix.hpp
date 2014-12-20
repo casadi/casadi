@@ -40,7 +40,7 @@ namespace casadi {
   class CASADI_EXPORT SubMatrix : public M {
   public:
     /// Constructor
-    SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i, j)), mat_(mat), i_(i), j_(j) {}
+    SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i, j, false)), mat_(mat), i_(i), j_(j) {}
 
     ///@{
     /// Methods that modify a part of the parent object (A(i, j) = ?, A(i, j) += ?, etc.)

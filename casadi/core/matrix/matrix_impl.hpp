@@ -82,33 +82,36 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Slice& rr, const Slice& cc) const {
+  const Matrix<DataType> Matrix<DataType>::sub(const Slice& rr, const Slice& cc, bool ind1) const {
     // Both are scalar
     if (rr.isScalar() && cc.isScalar()) {
-      return elem(rr.toScalar(size1()), cc.toScalar(size2()));
+      return elem(rr.toScalar(size1()-ind1), cc.toScalar(size2())-ind1);
     }
 
     // Fall back on IMatrix-IMatrix
-    return sub(rr.getAll(size1()), cc.getAll(size2()));
+    return sub(rr.getAll(size1()), cc.getAll(size2()), ind1);
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Slice& rr, const Matrix<int>& cc) const {
+  const Matrix<DataType>
+  Matrix<DataType>::sub(const Slice& rr, const Matrix<int>& cc, bool ind1) const {
     // Fall back on IMatrix-IMatrix
-    return sub(rr.getAll(size1()), cc);
+    return sub(rr.getAll(size1()), cc, ind1);
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& rr, const Slice& cc) const {
+  const Matrix<DataType>
+  Matrix<DataType>::sub(const Matrix<int>& rr, const Slice& cc, bool ind1) const {
     // Fall back on IMatrix-IMatrix
-    return sub(rr, cc.getAll(size2()));
+    return sub(rr, cc.getAll(size2()), ind1);
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& rr, const Matrix<int>& cc) const {
+  const Matrix<DataType>
+  Matrix<DataType>::sub(const Matrix<int>& rr, const Matrix<int>& cc, bool ind1) const {
     // Scalar
     if (rr.isScalar() && cc.isScalar()) {
-      return sub(rr.toSlice(), cc.toSlice());
+      return sub(rr.toSlice(), cc.toSlice(), ind1);
     }
 
     casadi_assert_message(rr.isDense() && cc.isDense(), "Matrix::sub: Index vectors must be dense");
@@ -122,7 +125,12 @@ namespace casadi {
     std::vector<int> mapping;
 
     // Get the sparsity pattern - does bounds checking
+    // TODO(@jaeandersson): refactor Sparsity::sub to make the following unnecessary
     std::vector<int> r = rr.data(), c = cc.data();
+    if (ind1) {
+      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) *i--;
+      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) *i--;
+    }
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
     for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
     Sparsity sp = sparsity().sub(r, c, mapping);
@@ -139,7 +147,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Sparsity& sp, int dummy) const {
+  const Matrix<DataType> Matrix<DataType>::sub(const Sparsity& sp, int dummy, bool ind1) const {
     casadi_assert_message(
       size1()==sp.size1() && size2()==sp.size2(),
       "sub(Sparsity sp): shape mismatch. This matrix has shape "
@@ -273,12 +281,12 @@ namespace casadi {
       << size2() << " x " << size1()
       << ", but supplied sparsity index has shape "
       << sp.size2() << " x " << sp.size1() << ".");
-    // TODO(Joel): optimize this for speed
+    // TODO(@jaeandersson): optimize this for speed
     Matrix<DataType> elm;
     if (m.isScalar()) {
       elm = Matrix<DataType>(sp, m.at(0));
     } else {
-      elm = m.sub(sp);
+      elm = m.sub(sp, 0, false);
     }
 
     for (int i=0; i<sp.colind().size()-1; ++i) {
@@ -2200,7 +2208,7 @@ namespace casadi {
 
   template<typename DataType>
   bool Matrix<DataType>::isEqual(const Matrix<DataType> &ex2) const {
-    // TODO(Joel): Very inefficient, refactor
+    // TODO(@jaeandersson): Very inefficient, refactor
     if ((size()!=0 || ex2.size()!=0) && shape()!=ex2.shape()) return false;
     Matrix<DataType> difference = *this - ex2;
     return difference.isZero();
