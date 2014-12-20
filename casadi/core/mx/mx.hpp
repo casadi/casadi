@@ -301,19 +301,15 @@ namespace casadi {
 
     ///@{
     /// Get a set of nonzeros
-    MX getNZ(const Slice& k) const;
-    MX getNZ(const Matrix<int>& k) const;
+    MX getNZ(const Slice& kk) const;
+    MX getNZ(const Matrix<int>& kk) const;
     ///@}
 
     ///@{
     /// Set a set of nonzeros
-    void setNZ(const Slice& k, const MX& m) { setNZ(k.getAll(size()), m);}
-    void setNZ(const Matrix<int>& k, const MX& m);
+    void setNZ(const Slice& kk, const MX& m);
+    void setNZ(const Matrix<int>& kk, const MX& m);
     ///@}
-
-
-    void setNZ(int k, const MX& el);
-    void setNZ(const std::vector<int>& k, const MX& el);
 
     /** \brief Append a matrix vertically (NOTE: only efficient if vector) */
     void append(const MX& y);

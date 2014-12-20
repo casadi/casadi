@@ -314,25 +314,27 @@ namespace casadi {
     return (*this)->getGetNonzeros(kk.sparsity(), k);
   }
 
-  void MX::setNZ(int k, const MX& el) {
-    if (k<0) k+=size();
-    casadi_assert_message(k<size(),
-                          "MX::setNZ: requested at(" <<  k << "), but that is out of bounds:  "
-                          << dimString() << ".");
-    setNZ(std::vector<int>(1, k), el);
+  void MX::setNZ(const Slice& kk, const MX& m) {
+    // Fallback on IMatrix
+    setNZ(kk.getAll(size()), m);
   }
 
-  void MX::setNZ(const std::vector<int>& k, const MX& el) {
-    casadi_assert_message(k.size()==el.size() || el.size()==1,
-                          "MX::setNZ: length of non-zero indices (" << k.size() << ") " <<
-                          "must match size of rhs (" << el.size() << ").");
+  void MX::setNZ(const Matrix<int>& kk, const MX& m) {
+    casadi_assert_message(kk.size()==m.size() || m.size()==1,
+                          "MX::setNZ: length of non-zero indices (" << kk.size() << ") " <<
+                          "must match size of rhs (" << m.size() << ").");
 
     // Call recursively if points both objects point to the same node
-    if (this==&el) {
-      MX el2 = el;
-      setNZ(k, el2);
+    if (this==&m) {
+      MX m_copy = m;
+      setNZ(kk, m_copy);
       return;
     }
+
+    // Handle negative indices
+    std::vector<int> k = kk.data();
+    int sz = size();
+    for (std::vector<int>::iterator i=k.begin(); i!=k.end(); ++i) if (*i<0) *i += sz;
 
     // Assert correctness
     for (int i=0; i<k.size(); ++i) {
@@ -348,27 +350,15 @@ namespace casadi {
     MX x;
 
     // Project scalars
-    if (k.size()!=el.size() && el.isScalar() && el.isDense()) {
-      MX new_el = el->getGetNonzeros(Sparsity::dense(1, k.size()), std::vector<int>(k.size(), 0));
-      x = new_el->getSetNonzeros(*this, k);
+    if (k.size()!=m.size() && m.isScalar() && m.isDense()) {
+      MX new_m = m->getGetNonzeros(Sparsity::dense(1, k.size()), std::vector<int>(k.size(), 0));
+      x = new_m->getSetNonzeros(*this, k);
     } else {
       // Create a nonzero assignment node
-      x = el->getSetNonzeros(*this, k);
+      x = m->getSetNonzeros(*this, k);
     }
     *this = x;
     simplify(*this);
-  }
-
-  void MX::setNZ(const Matrix<int>& kk, const MX& m) {
-    if (m.size()==1 && m.numel()==1) {
-      setNZ(kk.data(), m);
-      return;
-    }
-    casadi_assert_message(kk.sparsity()==m.sparsity(),
-                          "Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString()
-                          << " " << std::endl << "must match sparsity of rhs " << m.dimString()
-                          << ".");
-    setNZ(kk.data(), m);
   }
 
   const MX MX::at(int k) const {
