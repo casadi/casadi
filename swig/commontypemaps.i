@@ -913,7 +913,6 @@
 %casadi_typemaps_genericmatrix(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
 %casadi_typemaps_vector(MX, PRECEDENCE_MXVector, casadi::MX)
 
-#ifdef SWIGPYTHON
 %fragment("to"{IMatrix}, "header", fragment="fwd,make_vector") {
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs) {
     casadi::IMatrix *m = static_cast<casadi::IMatrix*>(mv);
@@ -994,6 +993,15 @@
     return true;
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
+    // In MATLAB, it is common to use floating point values to represent integers
+    {
+      // Try converting to a temporary DMatrix
+      casadi::DMatrix mt;
+      if(to_DMatrix(p, m ? &mt : 0) && mt.isInteger()) {
+        if (m) *m = mt;
+        return true;
+      }
+    }
 #endif // SWIGMATLAB
     return false;
   }
@@ -1005,7 +1013,6 @@
 %casadi_typemaps_vector(IMatrix, PRECEDENCE_IMatrixVector, casadi::Matrix<int>)
 %casadi_typemaps_vector2(DMatrix, PRECEDENCE_DMatrixVectorVector, casadi::Matrix<double>)
 %casadi_typemaps_vector2(IMatrix, PRECEDENCE_IMatrixVectorVector, casadi::Matrix<int>)
-#endif // SWIGPYTHON
 
 %define %my_value_output_typemaps(Type,...)
 %value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));
