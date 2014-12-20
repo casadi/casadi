@@ -334,9 +334,7 @@ namespace casadi {
 
     ///@{
     /// Set a set of nonzeros
-    void setNZ(int k, const Matrix<DataType>& m);
-    void setNZ(const std::vector<int>& k, const Matrix<DataType>& m);
-    void setNZ(const Slice& k, const Matrix<DataType>& m) { setNZ(k.getAll(size()), m);}
+    void setNZ(const Slice& k, const Matrix<DataType>& m);
     void setNZ(const Matrix<int>& k, const Matrix<DataType>& m);
     ///@}
 

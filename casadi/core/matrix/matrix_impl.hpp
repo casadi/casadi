@@ -308,54 +308,48 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setNZ(int k, const Matrix<DataType>& m) {
-    if (k<0) k+=size();
-    at(k) = m.toScalar();
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setNZ(const std::vector<int>& kk, const Matrix<DataType>& m) {
-    if (m.isScalar()) {
-      // Assign all elements with the same scalar
-      for (int k=0; k<kk.size(); ++k) {
-        setNZ(kk[k], m);
+  void Matrix<DataType>::setNZ(const Slice& kk, const Matrix<DataType>& m) {
+    try {
+      // Scalar
+      if (kk.isScalar()) {
+         at(kk.toScalar(size())) = m.toScalar();
+         return;
       }
-    } else {
-      // Assignment elementwise
-      casadi_assert_message(kk.size()==m.size(),
-                            "Matrix<DataType>::setNZ: length of non-zero indices ("
-                            << kk.size() << ") " << std::endl << "must match size of rhs ("
-                            << m.size() << ").");
-      for (int k=0; k<kk.size(); ++k) {
-        setNZ(kk[k], m[k]);
-      }
+    } catch(std::out_of_range& ex) {
+      std::stringstream ss;
+      ss << "Out of range error in Matrix<>::setNZ: " << kk
+         << " not all in range [-" << size() << "," << size() << ")";
+      throw CasadiException(ss.str());
     }
+
+    // Fallback on IMatrix
+    setNZ(kk.getAll(size()), m);
   }
 
   template<typename DataType>
   void Matrix<DataType>::setNZ(const Matrix<int>& kk, const Matrix<DataType>& m) {
-    if (m.isScalar()) {
-      // Assign all elements with the same scalar
-      for (int k=0; k<kk.size(); ++k) {
-        setNZ(kk.at(k), m);
+    // Scalar
+    if (kk.isScalar()) {
+      setNZ(kk.toSlice(), m);
+      return;
+    }
+
+    // Get nonzeros
+    const std::vector<int>& k = kk.data();
+
+    try {
+      // Get nonzeros
+      int sz = size();
+      bool is_scalar = m.isScalar();
+      for (int el=0; el<sz; ++el) {
+        int k_pos = k[el]>=0 ? k[el] : k[el]+sz;
+        at(k_pos) = is_scalar ? m.toScalar() : m.at(el);
       }
-    } else if (kk.isDense() && !m.isDense() && kk.size2()==m.size2() && kk.size1()==m.size1()) {
-      const std::vector<int>& row = m.sparsity().row();
-      const std::vector<int>& colind = m.sparsity().colind();
-      for (int i=0; i<colind.size()-1; ++i) {
-        for (int k=colind[i]; k<colind[i+1]; ++k) {
-          int j=row[k];
-          setNZ(kk.elem(j, i), m[k]);
-        }
-      }
-    } else {
-      casadi_assert_message(kk.sparsity()==m.sparsity(),
-                            "Matrix<DataType>::setNZ: sparsity of IMatrix index "
-                            << kk.dimString() << " " << std::endl
-                            << "must match sparsity of rhs " << m.dimString() << ".");
-      for (int k=0; k<kk.size(); ++k) {
-        setNZ(kk.at(k), m[k]);
-      }
+    } catch(std::out_of_range& ex) {
+      std::stringstream ss;
+      ss << "Out of range error in Matrix<>::setNZ: " << k
+         << " not all in range [-" << size() << "," << size() << ")";
+      throw CasadiException(ss.str());
     }
   }
 
