@@ -199,23 +199,30 @@ namespace casadi {
     return ret;
   }
 
-  void MX::setSub(const MX& m, int j, int i) {
-    setSub(m, std::vector<int>(1, j), std::vector<int>(1, i));
+  void MX::setSub(const MX& m, const Slice& rr, const Slice& cc) {
+    // Fall back on (IMatrix, IMatrix)
+    setSub(m, rr.getAll(size1()), cc.getAll(size2()));
   }
 
-  void MX::setSub(const MX& m, const std::vector<int>& j, int i) {
-    setSub(m, j, std::vector<int>(1, i));
+  void MX::setSub(const MX& m, const Slice& rr, const Matrix<int>& cc) {
+    // Fall back on (IMatrix, IMatrix)
+    setSub(m, rr.getAll(size1()), cc);
   }
 
-  void MX::setSub(const MX& m, int j, const std::vector<int>& i) {
-    setSub(m, std::vector<int>(1, j), i);
+  void MX::setSub(const MX& m, const Matrix<int>& rr, const Slice& cc) {
+    // Fall back on (IMatrix, IMatrix)
+    setSub(m, rr, cc.getAll(size2()));
   }
 
-  void MX::setSub(const MX& m, const Slice& j, const Slice& i) {
-    setSub(m, j.getAll(size1()), i.getAll(size2()));
-  }
+  void MX::setSub(const MX& m, const Matrix<int>& rr2, const Matrix<int>& cc2) {
+    // Dimensions
+    int sz1 = size1(), sz2 = size2();
 
-  void MX::setSub(const MX& m, const std::vector<int>& rr, const std::vector<int>& cc) {
+    // Sought indices as vectors
+    std::vector<int> rr = rr2.data(), cc = cc2.data();
+    for (std::vector<int>::iterator i=rr.begin(); i!=rr.end(); ++i) if (*i<0) *i += sz1;
+    for (std::vector<int>::iterator i=cc.begin(); i!=cc.end(); ++i) if (*i<0) *i += sz2;
+
     // Allow m to be a 1x1
     if (m.isDense() && m.isScalar()) {
       if (rr.size()>1 || cc.size()>1) {
@@ -255,82 +262,6 @@ namespace casadi {
       // Unite the sparsity patterns
       *this = unite(*this, el_ext);
     }
-  }
-
-  void MX::setSub(const MX& m, const std::vector<int>& jj, const Matrix<int>& i) {
-    // If m is scalar
-    if (m.isScalar() && (jj.size() > 1 || i.size() > 1)) {
-      setSub(repmat(MX(i.sparsity(), m), 1, jj.size()), jj, i);
-      return;
-    }
-
-    if (!inBounds(jj, size1())) {
-      casadi_error(
-        "setSub[., i, jj] out of bounds. Your jj contains "
-        << *std::min_element(jj.begin(), jj.end()) << " up to "
-        << *std::max_element(jj.begin(), jj.end())
-        << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-
-    //Sparsity result_sparsity = repmat(i, 1, jj.size()).sparsity();
-    Sparsity result_sparsity = vertcat(std::vector< Matrix<int> >(jj.size(), i)).sparsity();
-
-    casadi_assert_message(
-      result_sparsity == m.sparsity(),
-      "setSub(., Imatrix" << i.dimString() << ", Ivector(length=" << jj.size()
-      << "), Matrix<T>)::Dimension mismatch. The sparsity of repmat(Imatrix,1, "
-      << jj.size() << ") = " << result_sparsity.dimString()
-      << " must match the sparsity of MX = "  << m.dimString() << ".");
-
-    std::vector<int> slice_i = range(i.size2());
-
-    for (int k=0; k<jj.size(); ++k) {
-      MX el_k = m(range(k*i.size1(), (k+1)*i.size1()), slice_i);
-      for (int j=0;j<i.size();++j) {
-        (*this)(jj[k], i.at(j))=el_k[j];
-      }
-    }
-
-  }
-
-  void MX::setSub(const MX& m, const Matrix<int>& j, const std::vector<int>& ii) {
-    // If m is scalar
-    if (m.isScalar() && (ii.size() > 1 || j.size() > 1)) {
-      setSub(repmat(MX(j.sparsity(), m), ii.size(), 1), j, ii);
-      return;
-    }
-
-    if (!inBounds(ii, size2())) {
-      casadi_error("setSub[., ii, j] out of bounds. Your ii contains "
-                   << *std::min_element(ii.begin(), ii.end()) << " up to "
-                   << *std::max_element(ii.begin(), ii.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-
-    //Sparsity result_sparsity = repmat(j, ii.size(), 1).sparsity();
-    Sparsity result_sparsity = horzcat(std::vector< Matrix<int> >(ii.size(), j)).sparsity();
-
-    casadi_assert_message(
-      result_sparsity == m.sparsity(),
-      "setSub(Ivector(length=" << ii.size() << "), Imatrix" << j.dimString()
-      << ", MX)::Dimension mismatch. The sparsity of repmat(Imatrix, "
-      << ii.size() << ",1) = " << result_sparsity.dimString()
-      << " must match the sparsity of Matrix<T> = " << m.dimString() << ".");
-
-    std::vector<int> slice_j = range(j.size1());
-
-    for (int k=0; k<ii.size(); ++k) {
-      MX el_k = m(slice_j, range(k*j.size2(), (k+1)*j.size2()));
-      for (int i=0;i<j.size();++i) {
-        (*this)(j.at(i), ii[k])=el_k[i];
-      }
-    }
-
-  }
-
-
-  void MX::setSub(const MX& m, const Matrix<int>& j, const Matrix<int>& i) {
-    casadi_error("unknown overload of MX::setSub");
   }
 
   void MX::setSub(const MX& m, const Sparsity& sp, int dummy) {
