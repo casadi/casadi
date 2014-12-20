@@ -328,9 +328,7 @@ namespace casadi {
 
     ///@{
     /// Get a set of nonzeros
-    const Matrix<DataType> getNZ(int k) const { return at(k);}
-    const Matrix<DataType> getNZ(const std::vector<int>& k) const;
-    const Matrix<DataType> getNZ(const Slice& k) const { return getNZ(k.getAll(size()));}
+    const Matrix<DataType> getNZ(const Slice& k) const;
     const Matrix<DataType> getNZ(const Matrix<int>& k) const;
     ///@}
 

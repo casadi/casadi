@@ -271,33 +271,38 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getNZ(const std::vector<int>& k) const {
-    try {
-      Matrix<DataType> ret = zeros(k.size());
-      for (int el=0; el<k.size(); ++el)
-        ret.data()[el] = data().at(k[el]);
-
-      return ret;
-    } catch(std::out_of_range& ex) {
-      std::stringstream ss;
-      ss << "Out of range error in Matrix<>::getNZ: " << k
-         << " not all in range [0, " << size() << ")";
-      throw CasadiException(ss.str());
+  const Matrix<DataType> Matrix<DataType>::getNZ(const Slice& k) const {
+    // Scalar
+    if (k.isScalar()) {
+      return at(k.toScalar(size()));
     }
+
+    // Fall back on IMatrix
+    return getNZ(k.getAll(size()));
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getNZ(const Matrix<int>& k) const {
-    try {
-      Matrix<DataType> ret = zeros(k.sparsity());
-      for (int el=0; el<k.size(); ++el)
-        ret.data()[el] = data().at(k.at(el));
+  const Matrix<DataType> Matrix<DataType>::getNZ(const Matrix<int>& kk) const {
+    // Scalar
+    if (kk.isScalar()) {
+      return getNZ(kk.toSlice());
+    }
 
+    // Get nonzeros
+    const std::vector<int>& k = kk.data();
+
+    try {
+      // Get nonzeros
+      int sz = size();
+      Matrix<DataType> ret = zeros(kk.sparsity());
+      for (int el=0; el<sz; ++el) {
+        ret.at(el) = at(k[el]>=0 ? k[el] : k[el]+sz); // Negative indices
+      }
       return ret;
     } catch(std::out_of_range& ex) {
       std::stringstream ss;
       ss << "Out of range error in Matrix<>::getNZ: " << k
-         << " not all in range [0, " << size() << ")";
+         << " not all in range [-" << size() << "," << size() << ")";
       throw CasadiException(ss.str());
     }
   }
