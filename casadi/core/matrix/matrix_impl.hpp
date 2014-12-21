@@ -115,7 +115,7 @@ namespace casadi {
       return getSub(ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
-    // Row vector rr (e.g. in MATLAB) is transposed to row vector
+    // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
       return getSub(ind1, rr.T(), cc);
     }
@@ -191,9 +191,9 @@ namespace casadi {
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += nel;
     Sparsity sp;
     if (rr.isVector()) {
-      sp = sparsity().sub(r, std::vector<int>(1,0), mapping);
+      sp = sparsity().sub(r, std::vector<int>(1, 0), mapping);
     } else {
-      sp = sparsity().sub(std::vector<int>(1,0), r, mapping);
+      sp = sparsity().sub(std::vector<int>(1, 0), r, mapping);
     }
 
     // Copy nonzeros and return
@@ -266,23 +266,22 @@ namespace casadi {
       return setSub(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
+    // Row vector rr (e.g. in MATLAB) is transposed to column vector
+    if (rr.size1()==1 && rr.size2()>1) {
+      return setSub(m, ind1, rr.T(), cc);
+    }
+
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
       return setSub(m, ind1, rr, cc.T());
     }
 
-    casadi_assert_message(rr.isDense() && cc.isDense(),
-                          "Matrix::setSub: Index vectors must be dense");
-    casadi_assert_message(cc.isScalar() || (rr.isVector() && cc.isVector()),
-                          "Unknown overload of Matrix::setSub");
+    casadi_assert_message(rr.isDense() && rr.isVector() && cc.isDense() && cc.isVector(),
+                          "Matrix::setSub: Index vectors must be dense vectors");
 
     // Call recursively if m scalar, and submatrix isn't
     if (m.isScalar() && (rr.numel()>1 || cc.numel()>1)) {
-      if (cc.isScalar()) {
-        return setSub(repmat(m, rr.shape()), ind1, rr, cc);
-      } else {
-        return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
-      }
+      return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
     }
 
     // Dimensions
@@ -298,15 +297,9 @@ namespace casadi {
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
     for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
 
-    if (cc.isScalar()) {
-      casadi_assert_message(rr.shape()==m.shape(), "Dimension mismatch: "
-                            "Lhs has dimension " << rr.shape()
-                            << " while rhs has dimension " << m.shape());
-    } else {
-      casadi_assert_message(c.size() == m.size2() && r.size() == m.size1(),
-                            "Dimension mismatch." << "lhs is " << r.size() << "-by-"
-                            << c.size() << ", while rhs is " << m.shape());
-    }
+    casadi_assert_message(c.size() == m.size2() && r.size() == m.size1(),
+                          "Dimension mismatch." << "lhs is " << r.size() << "-by-"
+                          << c.size() << ", while rhs is " << m.shape());
 
     if (!inBounds(r, size1())) {
       casadi_error("setSub[., r, c] out of bounds. Your r contains "
@@ -345,13 +338,63 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Slice& ii) {
-    setSub(m, ind1, ii, ind1);
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr) {
+    // Scalar
+    if (rr.isScalar() && m.isDense()) {
+      int r = rr.toScalar(numel());
+      elem(r % size1(), r / size1()) = m.toScalar();
+      return;
+    }
+
+    // Fall back on IMatrix
+    setSub(m, ind1, rr.getAll(numel(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& ii) {
-    setSub(m, ind1, ii, ind1);
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) {
+    // Scalar
+    if (rr.isScalar() && m.isDense()) {
+      return setSub(m, ind1, rr.toSlice(ind1));
+    }
+
+    casadi_assert_message(rr.isDense(), "Matrix::setSub: Index vectors must be dense");
+
+    // Call recursively if m scalar, and submatrix isn't
+    if (m.isScalar() && rr.numel()>1) {
+      return setSub(repmat(m, rr.shape()), ind1, rr);
+    }
+
+    // Dimension
+    int nel = numel();
+
+    // Sought indices as vectors
+    // TODO(@jaeandersson): refactor to make the following unnecessary
+    std::vector<int> r = rr.data();
+    if (ind1) {
+      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
+    }
+    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += nel;
+
+    casadi_assert_message(rr.shape()==m.shape(), "Dimension mismatch: "
+                          "Lhs has dimension " << rr.shape()
+                          << " while rhs has dimension " << m.shape());
+
+    if (!inBounds(r, nel)) {
+      casadi_error("setSub[., r] out of bounds. Your r contains "
+                   << *std::min_element(r.begin(), r.end()) << " up to "
+                   << *std::max_element(r.begin(), r.end())
+                   << ", which is outside of the matrix of length " << nel << ".");
+    }
+
+    if (isDense() && m.isDense()) {
+      // Dense mode
+      for (int j=0; j<r.size(); ++j) {
+        at(r[j]) = m.at(j);
+      }
+    } else {
+      // Sparse mode
+      casadi_error("Not implemented");
+    }
   }
 
   template<typename DataType>
