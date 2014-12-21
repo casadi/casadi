@@ -67,6 +67,16 @@ namespace casadi{
       return true;
     }
 #endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+    if (mxIsChar(p) && mxGetM(p)==1 && mxGetN(p)==1) {
+      char ch;
+      if(mxGetString(p, &ch,(mwSize)sizeof(&ch))) return SWIG_TypeError;
+      if (ch==':') {
+        if (m) *m = casadi::Slice();
+        return true;
+      }
+    }
+#endif // SWIGMATLAB
     // Failure if reached this point
     return false;
   }
