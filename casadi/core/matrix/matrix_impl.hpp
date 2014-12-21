@@ -164,7 +164,7 @@ namespace casadi {
     }
 
     // Fall back on IMatrix
-    return getSub(ind1, rr.getAll(numel(), ind1), ind1);
+    return getSub(ind1, rr.getAll(numel(), ind1));
   }
 
   template<typename DataType>
@@ -189,19 +189,30 @@ namespace casadi {
       for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
     }
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += nel;
-    Sparsity sp;
-    if (rr.isVector()) {
-      sp = sparsity().sub(r, std::vector<int>(1, 0), mapping);
+
+    if (isDense()) {
+      // Dense mode
+      Matrix<DataType> ret = Matrix<DataType>::zeros(rr.sparsity());
+      for (int i=0; i<r.size(); ++i) {
+        ret.at(i) = at(r[i]);
+      }
+      return ret;
     } else {
-      sp = sparsity().sub(std::vector<int>(1, 0), r, mapping);
+      // Sparse mode
+      Sparsity sp;
+      if (rr.isVector()) {
+        sp = sparsity().sub(r, std::vector<int>(1, 0), mapping);
+      } else {
+        sp = sparsity().sub(std::vector<int>(1, 0), r, mapping);
+      }
+
+      // Copy nonzeros and return
+      Matrix<DataType> ret(sp);
+      for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
+
+      // Return (RVO)
+      return ret;
     }
-
-    // Copy nonzeros and return
-    Matrix<DataType> ret(sp);
-    for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
-
-    // Return (RVO)
-    return ret;
   }
 
   template<typename DataType>
