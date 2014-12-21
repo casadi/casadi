@@ -82,42 +82,41 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Slice& rr, const Slice& cc, bool ind1) const {
+  const Matrix<DataType> Matrix<DataType>::getSub2(bool ind1, const Slice& rr, const Slice& cc) const {
     // Both are scalar
     if (rr.isScalar() && cc.isScalar()) {
       return elem(rr.toScalar(size1()), cc.toScalar(size2()));
     }
 
     // Fall back on IMatrix-IMatrix
-    return sub(rr.getAll(size1(), ind1), cc.getAll(size2(), ind1), ind1);
+    return getSub2(ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
   const Matrix<DataType>
-  Matrix<DataType>::sub(const Slice& rr, const Matrix<int>& cc, bool ind1) const {
+  Matrix<DataType>::getSub2(bool ind1, const Slice& rr, const Matrix<int>& cc) const {
     // Fall back on IMatrix-IMatrix
-    return sub(rr.getAll(size1(), ind1), cc, ind1);
+    return getSub2(ind1, rr.getAll(size1(), ind1), cc);
   }
 
   template<typename DataType>
   const Matrix<DataType>
-  Matrix<DataType>::sub(const Matrix<int>& rr, const Slice& cc, bool ind1) const {
+  Matrix<DataType>::getSub2(bool ind1, const Matrix<int>& rr, const Slice& cc) const {
     // Fall back on IMatrix-IMatrix
-    return sub(rr, cc.getAll(size2(), ind1), ind1);
+    return getSub2(ind1, rr, cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
   const Matrix<DataType>
-  Matrix<DataType>::sub(const Matrix<int>& rr, const Matrix<int>& cc, bool ind1) const {
+  Matrix<DataType>::getSub2(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Scalar
     if (rr.isScalar() && cc.isScalar()) {
-      return sub(rr.toSlice(ind1), cc.toSlice(ind1), ind1);
+      return getSub2(ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      std::cout << "transposing" << std::endl;
-      return sub(rr, cc.T(), ind1);
+      return getSub2(ind1, rr, cc.T());
     }
 
     casadi_assert_message(rr.isDense() && cc.isDense(), "Matrix::sub: Index vectors must be dense");
@@ -153,10 +152,10 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Sparsity& sp, int dummy, bool ind1) const {
+  const Matrix<DataType> Matrix<DataType>::getSub2(bool ind1, const Sparsity& sp, int dummy) const {
     casadi_assert_message(
       size1()==sp.size1() && size2()==sp.size2(),
-      "sub(Sparsity sp): shape mismatch. This matrix has shape "
+      "getSub2(Sparsity sp): shape mismatch. This matrix has shape "
       << size1() << " x " << size2()
       << ", but supplied sparsity index has shape "
       << sp.size1() << " x " << sp.size2() << ".");
@@ -180,8 +179,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m,
-                                const Slice& rr, const Slice& cc, bool ind1) {
+  void Matrix<DataType>::setSub2(const Matrix<DataType>& m, bool ind1,
+                                const Slice& rr, const Slice& cc) {
     // Both are scalar
     if (rr.isScalar() && cc.isScalar() && m.isDense()) {
       elem(rr.toScalar(size1()), cc.toScalar(size2())) = m.toScalar();
@@ -189,34 +188,34 @@ namespace casadi {
     }
 
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1), ind1);
+    setSub2(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m,
-                                const Slice& rr, const Matrix<int>& cc, bool ind1) {
+  void Matrix<DataType>::setSub2(const Matrix<DataType>& m, bool ind1,
+                                const Slice& rr, const Matrix<int>& cc) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr.getAll(size1(), ind1), cc, ind1);
+    setSub2(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m,
-                                const Matrix<int>& rr, const Slice& cc, bool ind1) {
+  void Matrix<DataType>::setSub2(const Matrix<DataType>& m, bool ind1,
+                                const Matrix<int>& rr, const Slice& cc) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr, cc.getAll(size2(), ind1), ind1);
+    setSub2(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& rr,
-                                const Matrix<int>& cc, bool ind1) {
+  void Matrix<DataType>::setSub2(const Matrix<DataType>& m, bool ind1,
+                                const Matrix<int>& rr, const Matrix<int>& cc) {
     // Scalar
     if (rr.isScalar() && cc.isScalar() && m.isDense()) {
-      return setSub(m, rr.toSlice(ind1), cc.toSlice(ind1), ind1);
+      return setSub2(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return setSub(m, rr, cc.T(), ind1);
+      return setSub2(m, ind1, rr, cc.T());
     }
 
     casadi_assert_message(rr.isDense() && cc.isDense(),
@@ -227,9 +226,9 @@ namespace casadi {
     // Call recursively if m scalar, and submatrix isn't
     if (m.isScalar() && (rr.numel()>1 || cc.numel()>1)) {
       if (cc.isScalar()) {
-        return setSub(repmat(m, rr.shape()), rr, cc, ind1);
+        return setSub2(repmat(m, rr.shape()), ind1, rr, cc);
       } else {
-        return setSub(repmat(m, rr.size1(), cc.size1()), rr, cc, ind1);
+        return setSub2(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
       }
     }
 
@@ -293,11 +292,11 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m,
-                                const Sparsity& sp, int dummy, bool ind1) {
+  void Matrix<DataType>::setSub2(const Matrix<DataType>& m, bool ind1,
+                                const Sparsity& sp, int dummy) {
     casadi_assert_message(
       size2()==sp.size2() && size1()==sp.size1(),
-      "sub(Sparsity sp): shape mismatch. This matrix has shape "
+      "setSub2(Sparsity sp): shape mismatch. This matrix has shape "
       << size2() << " x " << size1()
       << ", but supplied sparsity index has shape "
       << sp.size2() << " x " << sp.size1() << ".");
@@ -306,7 +305,7 @@ namespace casadi {
     if (m.isScalar()) {
       elm = Matrix<DataType>(sp, m.at(0));
     } else {
-      elm = m.sub(sp, 0, ind1);
+      elm = m.getSub2(ind1, sp, 0);
     }
 
     for (int i=0; i<sp.colind().size()-1; ++i) {

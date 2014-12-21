@@ -867,12 +867,8 @@ except:
 %rename(mldivide) __mldivide__;
 %rename(transpose) T;
 
-// Nonzeros are accessed with the syntax A{i} 0-based
 %rename(getitemcurl) getNZ;
 %rename(setitemcurl) setNZ;
-// Elements are accessed with the syntax A(i) 0-based
-//%rename(getitem) sub;
-//%rename(setitem) setSub;
 %rename(size) shape;
 %rename(nnz) size;
 
@@ -941,14 +937,14 @@ class NZproxy:
     def __getitem__(self, s):
         with internalAPI():
           if isinstance(s, tuple) and len(s)==2:
-            return self.sub(s[0], s[1], False)
-          return self.sub(s, 0, False)
+            return self.getSub2(False, s[0], s[1])
+          return self.getSub2(False, s, 0)
 
     def __setitem__(self,s,val):
         with internalAPI():
           if isinstance(s,tuple) and len(s)==2:
-            return self.setSub(val, s[0], s[1], False)  
-          return self.setSub(val, s, 0, False)
+            return self.setSub2(val, False, s[0], s[1])  
+          return self.setSub2(val, False, s, 0)
         
     @property
     def nz(self):
@@ -1013,22 +1009,22 @@ class NZproxy:
 #ifdef SWIGMATLAB
 %define %matrix_helpers(Type)
     // Get a submatrix (index-1 default arguments for MATLAB)
-    const Type getitem(const Slice& rr) const { return $self->sub(rr, 1, true);}
-    const Type getitem(const Matrix<int>& rr) const { return $self->sub(rr, 1, true);}
-    const Type getitem(const Slice& rr, const Slice& cc) const { return $self->sub(rr, cc, true);}
-    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { return $self->sub(rr, cc, true);}
-    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { return $self->sub(rr, cc, true);}
-    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { return $self->sub(rr, cc, true);}
-    const Type getitem(const Sparsity& sp, int dummy=0) const { return $self->sub(sp, dummy, true);}
+    const Type getitem(const Slice& rr) const { return $self->getSub2(true, rr, 1);}
+    const Type getitem(const Matrix<int>& rr) const { return $self->getSub2(true, rr, 1);}
+    const Type getitem(const Slice& rr, const Slice& cc) const { return $self->getSub2(true, rr, cc);}
+    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { return $self->getSub2(true, rr, cc);}
+    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { return $self->getSub2(true, rr, cc);}
+    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { return $self->getSub2(true, rr, cc);}
+    const Type getitem(const Sparsity& sp, int dummy=0) const { return $self->getSub2(true, sp, dummy);}
 
     // Set a submatrix (index-1 default arguments for MATLAB)
-    void setitem(const Type& m, const Slice& rr) { $self->setSub(m, rr, 1, true);}
-    void setitem(const Type& m, const Matrix<int>& rr) { $self->setSub(m, rr, 1, true);}
-    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->setSub(m, rr, cc, true);}
-    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub(m, rr, cc, true);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub(m, rr, cc, true);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, rr, cc, true);}
-    void setitem(const Type& m, const Sparsity& sp, int dummy=0) { $self->setSub(m, sp, dummy, true);}
+    void setitem(const Type& m, const Slice& rr) { $self->setSub2(m, true, rr, 1);}
+    void setitem(const Type& m, const Matrix<int>& rr) { $self->setSub2(m, true, rr, 1);}
+    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->setSub2(m, true, rr, cc);}
+    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub2(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub2(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub2(m, true, rr, cc);}
+    void setitem(const Type& m, const Sparsity& sp, int dummy=0) { $self->setSub2(m, true, sp, dummy);}
 %enddef
 #endif
 

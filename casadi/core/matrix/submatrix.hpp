@@ -40,7 +40,7 @@ namespace casadi {
   class CASADI_EXPORT SubMatrix : public M {
   public:
     /// Constructor
-    SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i, j, false)), mat_(mat), i_(i), j_(j) {}
+    SubMatrix(M& mat, const I& i, const J& j) : M(mat.getSub2(false, i, j)), mat_(mat), i_(i), j_(j) {}
 
     ///@{
     /// Methods that modify a part of the parent object (A(i, j) = ?, A(i, j) += ?, etc.)
@@ -65,42 +65,42 @@ namespace casadi {
   // Implementation
   template<typename M, typename I, typename J>
   const M& SubMatrix<M, I, J>::operator=(const SubMatrix<M, I, J> &y) {
-    mat_.setSub(y, i_, j_, false);
+    mat_.setSub2(y, false, i_, j_);
     return y;
   }
 
   // Implementation
   template<typename M, typename I, typename J>
   const M& SubMatrix<M, I, J>::operator=(const M &y) {
-    mat_.setSub(y, i_, j_, false);
+    mat_.setSub2(y, false, i_, j_);
     return y;
   }
 
   template<typename M, typename I, typename J>
   M SubMatrix<M, I, J>::operator+=(const M &y) {
     M s = *this+y;
-    mat_.setSub(s, i_, j_, false);
+    mat_.setSub2(s, false, i_, j_);
     return s;
   }
 
   template<typename M, typename I, typename J>
   M SubMatrix<M, I, J>::operator-=(const M &y) {
     M s = *this-y;
-    mat_.setSub(s, i_, j_, false);
+    mat_.setSub2(s, false, i_, j_);
     return s;
   }
 
   template<typename M, typename I, typename J>
   M SubMatrix<M, I, J>::operator*=(const M &y) {
     M s = *this*y;
-    mat_.setSub(s, i_, j_, false);
+    mat_.setSub2(s, false, i_, j_);
     return s;
   }
 
   template<typename M, typename I, typename J>
   M SubMatrix<M, I, J>::operator/=(const M &y) {
     M s = *this/y;
-    mat_.setSub(s, i_, j_, false);
+    mat_.setSub2(s, false, i_, j_);
     return s;
   }
 #endif

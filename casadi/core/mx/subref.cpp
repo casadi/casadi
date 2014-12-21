@@ -50,7 +50,7 @@ namespace casadi {
   template<typename T, typename MatV, typename MatVV>
   void SubRef::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
                            std::vector<T>& rtmp) {
-    *output[0] = input[0]->sub(i_, j_, false);
+    *output[0] = input[0]->getSub2(false, i_, j_);
   }
 
   void SubRef::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {

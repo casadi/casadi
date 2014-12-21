@@ -283,20 +283,20 @@ namespace casadi {
 
     ///@{
     /// Get a submatrix (index-1 default arguments for MATLAB)
-    const MX sub(const Slice& rr, const Slice& cc, bool ind1) const;
-    const MX sub(const Slice& rr, const Matrix<int>& cc, bool ind1) const;
-    const MX sub(const Matrix<int>& rr, const Slice& cc, bool ind1) const;
-    const MX sub(const Matrix<int>& rr, const Matrix<int>& cc, bool ind1) const;
-    const MX sub(const Sparsity& sp, int dummy, bool ind1) const;
+    const MX getSub2(bool ind1, const Slice& rr, const Slice& cc) const;
+    const MX getSub2(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
+    const MX getSub2(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
+    const MX getSub2(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
+    const MX getSub2(bool ind1, const Sparsity& sp, int dummy) const;
     ///@}
 
     ///@{
     /// Set a submatrix (index-1 default arguments for MATLAB)
-    void setSub(const MX& m, const Slice& rr, const Slice& cc, bool ind1);
-    void setSub(const MX& m, const Slice& rr, const Matrix<int>& cc, bool ind1);
-    void setSub(const MX& m, const Matrix<int>& rr, const Slice& cc, bool ind1);
-    void setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc, bool ind1);
-    void setSub(const MX& m, const Sparsity& sp, int dummy, bool ind1);
+    void setSub2(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
+    void setSub2(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
+    void setSub2(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
+    void setSub2(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
+    void setSub2(const MX& m, bool ind1, const Sparsity& sp, int dummy);
     ///@}
 
     ///@{

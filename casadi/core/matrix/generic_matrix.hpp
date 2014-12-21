@@ -156,16 +156,16 @@ namespace casadi {
     /** \brief  Get vector element or slice */
     template<typename RR>
     const MatType operator()(const RR& rr) const
-    { return static_cast<const MatType*>(this)->sub(rr, 0, false);}
+    { return static_cast<const MatType*>(this)->getSub2(false, rr, 0);}
 
     /** \brief  Get Sparsity slice */
     const MatType operator()(const Sparsity& sp) const
-    { return static_cast<const MatType*>(this)->sub(sp, 0, false); }
+    { return static_cast<const MatType*>(this)->getSub2(false, sp, 0); }
 
     /** \brief  Get Matrix element or slice */
     template<typename RR, typename CC>
     const MatType operator()(const RR& rr, const CC& cc) const
-    { return static_cast<const MatType*>(this)->sub(rr, cc, false); }
+    { return static_cast<const MatType*>(this)->getSub2(false, rr, cc); }
 
     /** \brief  Access vector element or slice */
     template<typename RR>
