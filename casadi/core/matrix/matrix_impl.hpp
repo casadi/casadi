@@ -153,7 +153,17 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Sparsity& sp, int dummy) const {
+  const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Slice& rr) const {
+    return getSub(ind1, rr, ind1);
+  }
+
+  template<typename DataType>
+  const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Matrix<int>& rr) const {
+    return getSub(ind1, rr, ind1);
+  }
+
+  template<typename DataType>
+  const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Sparsity& sp) const {
     casadi_assert_message(
       size1()==sp.size1() && size2()==sp.size2(),
       "getSub(Sparsity sp): shape mismatch. This matrix has shape "
@@ -293,8 +303,18 @@ namespace casadi {
   }
 
   template<typename DataType>
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr) {
+    setSub(m, ind1, rr, ind1);
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) {
+    setSub(m, ind1, rr, ind1);
+  }
+
+  template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
-                                const Sparsity& sp, int dummy) {
+                                const Sparsity& sp) {
     casadi_assert_message(
       size2()==sp.size2() && size1()==sp.size1(),
       "setSub(Sparsity sp): shape mismatch. This matrix has shape "
@@ -306,7 +326,7 @@ namespace casadi {
     if (m.isScalar()) {
       elm = Matrix<DataType>(sp, m.at(0));
     } else {
-      elm = m.getSub(ind1, sp, 0);
+      elm = m.getSub(ind1, sp);
     }
 
     for (int i=0; i<sp.colind().size()-1; ++i) {

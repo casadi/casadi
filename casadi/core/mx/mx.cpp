@@ -185,7 +185,15 @@ namespace casadi {
     return ret;
   }
 
-  const MX MX::getSub(bool ind1, const Sparsity& sp, int dummy) const {
+  const MX MX::getSub(bool ind1, const Slice& rr) const {
+    return getSub(ind1, rr, ind1);
+  }
+
+  const MX MX::getSub(bool ind1, const Matrix<int>& rr) const {
+    return getSub(ind1, rr, ind1);
+  }
+
+  const MX MX::getSub(bool ind1, const Sparsity& sp) const {
     casadi_assert_message(
       size2()==sp.size2() && size1()==sp.size1(),
       "getSub(Sparsity sp): shape mismatch. This matrix has shape "
@@ -300,7 +308,15 @@ namespace casadi {
     }
   }
 
-  void MX::setSub(const MX& m, bool ind1, const Sparsity& sp, int dummy) {
+  void MX::setSub(const MX& m, bool ind1, const Slice& rr) {
+    setSub(m, ind1, rr, ind1);
+  }
+
+  void MX::setSub(const MX& m, bool ind1, const Matrix<int>& rr) {
+    setSub(m, ind1, rr, ind1);
+  }
+
+  void MX::setSub(const MX& m, bool ind1, const Sparsity& sp) {
     casadi_assert_message(
       size2()==sp.size2() && size1()==sp.size1(),
       "setSub(., Sparsity sp): shape mismatch. This matrix has shape "
@@ -310,11 +326,11 @@ namespace casadi {
 
     // If m is scalar
     if (m.isScalar()) {
-      setSub(MX(sp, m), ind1, sp, dummy);
+      setSub(MX(sp, m), ind1, sp);
       return;
     }
 
-    MX mm = m.getSub(ind1, sp, 0);
+    MX mm = m.getSub(ind1, sp);
 
     std::vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
 

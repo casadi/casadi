@@ -297,21 +297,33 @@ namespace casadi {
     Slice toSlice(bool ind1=false) const;
 
     ///@{
-    /// Get a submatrix
+    /// Get a submatrix, single argument
+    const Matrix<DataType> getSub(bool ind1, const Slice& rr) const;
+    const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr) const;
+    const Matrix<DataType> getSub(bool ind1, const Sparsity& sp) const;
+    ///@}
+
+    /// Get a submatrix, two arguments
+    ///@{
     const Matrix<DataType> getSub(bool ind1, const Slice& rr, const Slice& cc) const;
     const Matrix<DataType> getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
     const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
     const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
-    const Matrix<DataType> getSub(bool ind1, const Sparsity& sp, int dummy) const;
     ///@}
 
     ///@{
-    /// Set a submatrix
+    /// Set a submatrix, single argument
+    void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr);
+    void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr);
+    void setSub(const Matrix<DataType>& m, bool ind1, const Sparsity& sp);
+    ///@}
+
+    ///@{
+    /// Set a submatrix, two arguments
     void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Slice& cc);
     void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
     void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
     void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Sparsity& sp, int dummy);
     ///@}
 
     ///@{
