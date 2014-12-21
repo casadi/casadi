@@ -115,14 +115,20 @@ namespace casadi {
       return getSub(ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
+    // Row vector rr (e.g. in MATLAB) is transposed to row vector
+    if (rr.size1()==1 && rr.size2()>1) {
+      return getSub(ind1, rr.T(), cc);
+    }
+
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
       return getSub(ind1, rr, cc.T());
     }
 
-    casadi_assert_message(rr.isDense() && cc.isDense(), "Matrix::sub: Index vectors must be dense");
-    casadi_assert_message(cc.isScalar() || (rr.isVector() && cc.isVector()),
-                          "Unknown overload of Matrix::sub");
+    casadi_assert_message(rr.isDense() && rr.isVector(),
+                          "Marix::getSub: First index must be a dense vector");
+    casadi_assert_message(cc.isDense() && cc.isVector(),
+                          "Marix::getSub: Second index must be a dense vector");
 
     // Dimensions
     int sz1 = size1(), sz2 = size2();
@@ -145,21 +151,57 @@ namespace casadi {
     Matrix<DataType> ret(sp);
     for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
 
-    // Reshape, if needed
-    if (!rr.isVector()) ret = reshape(ret, rr.shape());
-
     // Return (RVO)
     return ret;
   }
 
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Slice& rr) const {
-    return getSub(ind1, rr, ind1);
+    // Scalar
+    if (rr.isScalar()) {
+      int r = rr.toScalar(numel());
+      return elem(r % size1(), r / size1());
+    }
+
+    // Fall back on IMatrix
+    return getSub(ind1, rr.getAll(numel(), ind1), ind1);
   }
 
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Matrix<int>& rr) const {
-    return getSub(ind1, rr, ind1);
+    // Scalar
+    if (rr.isScalar()) {
+      return getSub(ind1, rr.toSlice(ind1));
+    }
+    casadi_assert_message(rr.isDense(), "Matrix::sub: Index vectors must be dense");
+    casadi_assert_message(rr.isVector() || rr.size1()==1, "Not implemented");
+
+    // Dimensions
+    int nel = numel();
+
+    // Nonzero mapping from submatrix to full
+    std::vector<int> mapping;
+
+    // Get the sparsity pattern - does bounds checking
+    // TODO(@jaeandersson): refactor Sparsity::sub to make the following unnecessary
+    std::vector<int> r = rr.data();
+    if (ind1) {
+      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
+    }
+    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += nel;
+    Sparsity sp;
+    if (rr.isVector()) {
+      sp = sparsity().sub(r, std::vector<int>(1,0), mapping);
+    } else {
+      sp = sparsity().sub(std::vector<int>(1,0), r, mapping);
+    }
+
+    // Copy nonzeros and return
+    Matrix<DataType> ret(sp);
+    for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
+
+    // Return (RVO)
+    return ret;
   }
 
   template<typename DataType>
@@ -303,13 +345,13 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr) {
-    setSub(m, ind1, rr, ind1);
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Slice& ii) {
+    setSub(m, ind1, ii, ind1);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) {
-    setSub(m, ind1, rr, ind1);
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& ii) {
+    setSub(m, ind1, ii, ind1);
   }
 
   template<typename DataType>
@@ -338,14 +380,14 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getNZ(const Slice& k) const {
+  const Matrix<DataType> Matrix<DataType>::getNZ(const Slice& kk) const {
     // Scalar
-    if (k.isScalar()) {
-      return at(k.toScalar(size()));
+    if (kk.isScalar()) {
+      return at(kk.toScalar(size()));
     }
 
     // Fall back on IMatrix
-    return getNZ(k.getAll(size()));
+    return getNZ(kk.getAll(size()));
   }
 
   template<typename DataType>
