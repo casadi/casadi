@@ -871,8 +871,8 @@ except:
 %rename(getitemcurl) getNZ;
 %rename(setitemcurl) setNZ;
 // Elements are accessed with the syntax A(i) 0-based
-%rename(getitem) sub;
-%rename(setitem) setSub;
+//%rename(getitem) sub;
+//%rename(setitem) setSub;
 %rename(size) shape;
 %rename(nnz) size;
 
@@ -1012,6 +1012,23 @@ class NZproxy:
 
 #ifdef SWIGMATLAB
 %define %matrix_helpers(Type)
+    // Get a submatrix (index-1 default arguments for MATLAB)
+    const Type getitem(const Slice& rr) const { return $self->sub(rr, 1, true);}
+    const Type getitem(const Matrix<int>& rr) const { return $self->sub(rr, 1, true);}
+    const Type getitem(const Slice& rr, const Slice& cc) const { return $self->sub(rr, cc, true);}
+    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { return $self->sub(rr, cc, true);}
+    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { return $self->sub(rr, cc, true);}
+    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { return $self->sub(rr, cc, true);}
+    const Type getitem(const Sparsity& sp, int dummy=0) const { return $self->sub(sp, dummy, true);}
+
+    // Set a submatrix (index-1 default arguments for MATLAB)
+    void setitem(const Type& m, const Slice& rr) { $self->setSub(m, rr, 1, true);}
+    void setitem(const Type& m, const Matrix<int>& rr) { $self->setSub(m, rr, 1, true);}
+    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->setSub(m, rr, cc, true);}
+    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub(m, rr, cc, true);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub(m, rr, cc, true);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, rr, cc, true);}
+    void setitem(const Type& m, const Sparsity& sp, int dummy=0) { $self->setSub(m, sp, dummy, true);}
 %enddef
 #endif
 
