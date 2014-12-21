@@ -114,6 +114,12 @@ namespace casadi {
       return sub(rr.toSlice(ind1), cc.toSlice(ind1), ind1);
     }
 
+    // Row vector cc (e.g. in MATLAB) is transposed to column vector
+    if (cc.size1()==1 && cc.size2()>1) {
+      std::cout << "transposing" << std::endl;
+      return sub(rr, cc.T(), ind1);
+    }
+
     casadi_assert_message(rr.isDense() && cc.isDense(), "Matrix::sub: Index vectors must be dense");
     casadi_assert_message(cc.isScalar() || (rr.isVector() && cc.isVector()),
                           "Unknown overload of Matrix::sub");
@@ -206,6 +212,11 @@ namespace casadi {
     // Scalar
     if (rr.isScalar() && cc.isScalar() && m.isDense()) {
       return setSub(m, rr.toSlice(ind1), cc.toSlice(ind1), ind1);
+    }
+
+    // Row vector cc (e.g. in MATLAB) is transposed to column vector
+    if (cc.size1()==1 && cc.size2()>1) {
+      return setSub(m, rr, cc.T(), ind1);
     }
 
     casadi_assert_message(rr.isDense() && cc.isDense(),
