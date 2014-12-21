@@ -323,12 +323,6 @@ namespace casadi {
     ///@}
 
     ///@{
-    /// Retrieve a submatrix (TODO: remove memory allocation)
-    template<typename RR, typename CC>
-    void getSub(Matrix<DataType>& m, RR rr, CC cc, bool ind1) { m = sub(rr, cc, ind1);}
-    ///@}
-
-    ///@{
     /// Get a set of nonzeros
     const Matrix<DataType> getNZ(const Slice& k) const;
     const Matrix<DataType> getNZ(const Matrix<int>& k) const;
