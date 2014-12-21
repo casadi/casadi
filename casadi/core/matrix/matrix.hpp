@@ -291,27 +291,27 @@ namespace casadi {
     bool __nonzero__() const;
 
     /// Is the Matrix a Slice (only for IMatrix)
-    bool isSlice() const;
+    bool isSlice(bool ind1=false) const;
 
     ///  Convert to Slice (only for IMatrix)
-    Slice toSlice() const;
+    Slice toSlice(bool ind1=false) const;
 
     ///@{
-    /// Get a submatrix
-    const Matrix<DataType> sub(const Slice& rr, const Slice& cc, bool ind1) const;
-    const Matrix<DataType> sub(const Slice& rr, const Matrix<int>& cc, bool ind1) const;
-    const Matrix<DataType> sub(const Matrix<int>& rr, const Slice& cc, bool ind1) const;
-    const Matrix<DataType> sub(const Matrix<int>& rr, const Matrix<int>& cc, bool ind1) const;
-    const Matrix<DataType> sub(const Sparsity& sp, int dummy, bool ind1) const;
+    /// Get a submatrix (index-1 default arguments for MATLAB)
+    const Matrix<DataType> sub(const Slice& rr, const Slice& cc, bool ind1=true) const;
+    const Matrix<DataType> sub(const Slice& rr, const Matrix<int>& cc=1, bool ind1=true) const;
+    const Matrix<DataType> sub(const Matrix<int>& rr, const Slice& cc, bool ind1=true) const;
+    const Matrix<DataType> sub(const Matrix<int>& rr, const Matrix<int>& cc=1, bool ind1=true) const;
+    const Matrix<DataType> sub(const Sparsity& sp, int dummy=0, bool ind1=true) const;
     ///@}
 
     ///@{
-    /// Set a submatrix
-    void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc, bool ind1);
-    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc, bool ind1);
-    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc, bool ind1);
-    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Matrix<int>& cc, bool ind1);
-    void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy, bool ind1);
+    /// Set a submatrix (index-1 default arguments for MATLAB)
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc, bool ind1=true);
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc=1, bool ind1=true);
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc, bool ind1=true);
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Matrix<int>& cc=1, bool ind1=true);
+    void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy=0, bool ind1=true);
     ///@}
 
     ///@{
@@ -829,8 +829,8 @@ namespace casadi {
   };
 
   // Template specialization declarations
-  template<> bool Matrix<int>::isSlice() const;
-  template<> Slice Matrix<int>::toSlice() const;
+  template<> bool Matrix<int>::isSlice(bool ind1) const;
+  template<> Slice Matrix<int>::toSlice(bool ind1) const;
 
   // Typedefs initializations
   typedef Matrix<int> IMatrix;

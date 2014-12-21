@@ -70,13 +70,13 @@ namespace casadi {
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isSlice() const {
+  bool Matrix<DataType>::isSlice(bool ind1) const {
     throw CasadiException("\"isSlice\" not defined for instantiation");
     return false;
   }
 
   template<typename DataType>
-  Slice Matrix<DataType>::toSlice() const {
+  Slice Matrix<DataType>::toSlice(bool ind1) const {
     throw CasadiException("\"toSlice\" not defined for instantiation");
     return toSlice();
   }
@@ -85,25 +85,25 @@ namespace casadi {
   const Matrix<DataType> Matrix<DataType>::sub(const Slice& rr, const Slice& cc, bool ind1) const {
     // Both are scalar
     if (rr.isScalar() && cc.isScalar()) {
-      return elem(rr.toScalar(size1()-ind1), cc.toScalar(size2())-ind1);
+      return elem(rr.toScalar(size1()), cc.toScalar(size2()));
     }
 
     // Fall back on IMatrix-IMatrix
-    return sub(rr.getAll(size1()), cc.getAll(size2()), ind1);
+    return sub(rr.getAll(size1(), ind1), cc.getAll(size2(), ind1), ind1);
   }
 
   template<typename DataType>
   const Matrix<DataType>
   Matrix<DataType>::sub(const Slice& rr, const Matrix<int>& cc, bool ind1) const {
     // Fall back on IMatrix-IMatrix
-    return sub(rr.getAll(size1()), cc, ind1);
+    return sub(rr.getAll(size1(), ind1), cc, ind1);
   }
 
   template<typename DataType>
   const Matrix<DataType>
   Matrix<DataType>::sub(const Matrix<int>& rr, const Slice& cc, bool ind1) const {
     // Fall back on IMatrix-IMatrix
-    return sub(rr, cc.getAll(size2()), ind1);
+    return sub(rr, cc.getAll(size2(), ind1), ind1);
   }
 
   template<typename DataType>
@@ -111,7 +111,7 @@ namespace casadi {
   Matrix<DataType>::sub(const Matrix<int>& rr, const Matrix<int>& cc, bool ind1) const {
     // Scalar
     if (rr.isScalar() && cc.isScalar()) {
-      return sub(rr.toSlice(), cc.toSlice(), ind1);
+      return sub(rr.toSlice(ind1), cc.toSlice(ind1), ind1);
     }
 
     casadi_assert_message(rr.isDense() && cc.isDense(), "Matrix::sub: Index vectors must be dense");
@@ -128,8 +128,8 @@ namespace casadi {
     // TODO(@jaeandersson): refactor Sparsity::sub to make the following unnecessary
     std::vector<int> r = rr.data(), c = cc.data();
     if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) *i--;
-      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) *i--;
+      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
+      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
     }
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
     for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
@@ -178,26 +178,26 @@ namespace casadi {
                                 const Slice& rr, const Slice& cc, bool ind1) {
     // Both are scalar
     if (rr.isScalar() && cc.isScalar() && m.isDense()) {
-      elem(rr.toScalar(size1())-ind1, cc.toScalar(size2())-ind1) = m.toScalar();
+      elem(rr.toScalar(size1()), cc.toScalar(size2())) = m.toScalar();
       return;
     }
 
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr.getAll(size1()), cc.getAll(size2()), ind1);
+    setSub(m, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1), ind1);
   }
 
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m,
                                 const Slice& rr, const Matrix<int>& cc, bool ind1) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr.getAll(size1()), cc, ind1);
+    setSub(m, rr.getAll(size1(), ind1), cc, ind1);
   }
 
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m,
                                 const Matrix<int>& rr, const Slice& cc, bool ind1) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr, cc.getAll(size2()), ind1);
+    setSub(m, rr, cc.getAll(size2(), ind1), ind1);
   }
 
   template<typename DataType>
@@ -205,7 +205,7 @@ namespace casadi {
                                 const Matrix<int>& cc, bool ind1) {
     // Scalar
     if (rr.isScalar() && cc.isScalar() && m.isDense()) {
-      return setSub(m, rr.toSlice(), cc.toSlice(), ind1);
+      return setSub(m, rr.toSlice(ind1), cc.toSlice(ind1), ind1);
     }
 
     casadi_assert_message(rr.isDense() && cc.isDense(),
@@ -229,8 +229,8 @@ namespace casadi {
     // TODO(@jaeandersson): refactor to make the following unnecessary
     std::vector<int> r = rr.data(), c = cc.data();
     if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) *i--;
-      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) *i--;
+      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
+      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
     }
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
     for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;

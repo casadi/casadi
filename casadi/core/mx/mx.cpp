@@ -119,7 +119,7 @@ namespace casadi {
   const MX MX::sub(const Slice& rr, const Slice& cc, bool ind1) const {
     // Both are scalar
     if (rr.isScalar() && cc.isScalar()) {
-      int ind = sparsity().elem(rr.toScalar(size1())-ind1, cc.toScalar(size2())-ind1);
+      int ind = sparsity().elem(rr.toScalar(size1()), cc.toScalar(size2()));
       if (ind>=0) {
         return (*this)->getGetNonzeros(Sparsity::getScalar(), std::vector<int>(1, ind));
       } else {
@@ -128,23 +128,23 @@ namespace casadi {
     }
 
     // Fall back on (IMatrix, IMatrix)
-    return sub(rr.getAll(size1()), cc.getAll(size2()), ind1);
+    return sub(rr.getAll(size1(), ind1), cc.getAll(size2(), ind1), ind1);
   }
 
   const MX MX::sub(const Slice& rr, const Matrix<int>& cc, bool ind1) const {
     // Fall back on (IMatrix, IMatrix)
-    return sub(rr.getAll(size1()), cc, ind1);
+    return sub(rr.getAll(size1(), ind1), cc, ind1);
   }
 
   const MX MX::sub(const Matrix<int>& rr, const Slice& cc, bool ind1) const {
     // Fall back on (IMatrix, IMatrix)
-    return sub(rr, cc.getAll(size2()), ind1);
+    return sub(rr, cc.getAll(size2(), ind1), ind1);
   }
 
   const MX MX::sub(const Matrix<int>& rr, const Matrix<int>& cc, bool ind1) const {
     // Scalar
     if (rr.isScalar() && cc.isScalar()) {
-      return sub(rr.toSlice(), cc.toSlice(), ind1);
+      return sub(rr.toSlice(ind1), cc.toSlice(ind1), ind1);
     }
 
     casadi_assert_message(rr.isDense() && cc.isDense(), "Matrix::sub: Index vectors must be dense");
@@ -158,8 +158,8 @@ namespace casadi {
     // TODO(@jaeandersson): refactor Sparsity::sub to make the following unnecessary
     std::vector<int> r = rr.data(), c = cc.data();
     if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) *i--;
-      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) *i--;
+      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
+      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
     }
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
     for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
@@ -216,17 +216,17 @@ namespace casadi {
 
   void MX::setSub(const MX& m, const Slice& rr, const Slice& cc, bool ind1) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr.getAll(size1()), cc.getAll(size2()), ind1);
+    setSub(m, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1), ind1);
   }
 
   void MX::setSub(const MX& m, const Slice& rr, const Matrix<int>& cc, bool ind1) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr.getAll(size1()), cc, ind1);
+    setSub(m, rr.getAll(size1(), ind1), cc, ind1);
   }
 
   void MX::setSub(const MX& m, const Matrix<int>& rr, const Slice& cc, bool ind1) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, rr, cc.getAll(size2()), ind1);
+    setSub(m, rr, cc.getAll(size2(), ind1), ind1);
   }
 
   void MX::setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc, bool ind1) {
@@ -251,8 +251,8 @@ namespace casadi {
     // TODO(@jaeandersson): refactor to make the following unnecessary
     std::vector<int> r = rr.data(), c = cc.data();
     if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) *i--;
-      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) *i--;
+      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
+      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
     }
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
     for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;

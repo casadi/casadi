@@ -29,13 +29,13 @@ using namespace std;
 namespace casadi {
 
   template<>
-  bool Matrix<int>::isSlice() const {
-    return isScalar() || (isVector() && isDense() && Slice::isSlice(data()));
+  bool Matrix<int>::isSlice(bool ind1) const {
+    return isScalar() || (isVector() && isDense() && Slice::isSlice(data(), ind1));
   }
 
   template<>
-  Slice Matrix<int>::toSlice() const {
-    return isScalar() ? Slice(toScalar()) : Slice(data());
+  Slice Matrix<int>::toSlice(bool ind1) const {
+    return isScalar() ? Slice(toScalar()-ind1) : Slice(data(), ind1);
   }
 
 } // namespace casadi

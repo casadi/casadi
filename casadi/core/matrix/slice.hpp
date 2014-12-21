@@ -51,19 +51,19 @@ namespace casadi {
     Slice(int start, int stop, int step=1);
 
     /// Construct from an index vector (requires isSlice(v) to be true)
-    explicit Slice(const std::vector<int>& v);
+    explicit Slice(const std::vector<int>& v, bool ind1=false);
 
     /// Construct nested slices from an index vector (requires isSlice2(v) to be true)
     explicit Slice(const std::vector<int>& v, Slice& outer);
 
     /// Check if an index vector can be represented more efficiently as a slice
-    static bool isSlice(const std::vector<int>& v);
+    static bool isSlice(const std::vector<int>& v, bool ind1=false);
 
     /// Check if an index vector can be represented more efficiently as two nested slices
     static bool isSlice2(const std::vector<int>& v);
 
     /// Get a vector of indices
-    std::vector<int> getAll(int len) const;
+    std::vector<int> getAll(int len, bool ind1=false) const;
 
     /// Get a vector of indices (nested slice)
     std::vector<int> getAll(const Slice& outer, int len) const;
