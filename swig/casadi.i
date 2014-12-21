@@ -937,14 +937,14 @@ class NZproxy:
     def __getitem__(self, s):
         with internalAPI():
           if isinstance(s, tuple) and len(s)==2:
-            return self.getSub2(False, s[0], s[1])
-          return self.getSub2(False, s, 0)
+            return self.getSub(False, s[0], s[1])
+          return self.getSub(False, s, 0)
 
     def __setitem__(self,s,val):
         with internalAPI():
           if isinstance(s,tuple) and len(s)==2:
-            return self.setSub2(val, False, s[0], s[1])  
-          return self.setSub2(val, False, s, 0)
+            return self.setSub(val, False, s[0], s[1])  
+          return self.setSub(val, False, s, 0)
         
     @property
     def nz(self):
@@ -1009,22 +1009,22 @@ class NZproxy:
 #ifdef SWIGMATLAB
 %define %matrix_helpers(Type)
     // Get a submatrix (index-1 default arguments for MATLAB)
-    const Type getitem(const Slice& rr) const { return $self->getSub2(true, rr, 1);}
-    const Type getitem(const Matrix<int>& rr) const { return $self->getSub2(true, rr, 1);}
-    const Type getitem(const Slice& rr, const Slice& cc) const { return $self->getSub2(true, rr, cc);}
-    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { return $self->getSub2(true, rr, cc);}
-    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { return $self->getSub2(true, rr, cc);}
-    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { return $self->getSub2(true, rr, cc);}
-    const Type getitem(const Sparsity& sp, int dummy=0) const { return $self->getSub2(true, sp, dummy);}
+    const Type getitem(const Slice& rr) const { return $self->getSub(true, rr, 1);}
+    const Type getitem(const Matrix<int>& rr) const { return $self->getSub(true, rr, 1);}
+    const Type getitem(const Slice& rr, const Slice& cc) const { return $self->getSub(true, rr, cc);}
+    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { return $self->getSub(true, rr, cc);}
+    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { return $self->getSub(true, rr, cc);}
+    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { return $self->getSub(true, rr, cc);}
+    const Type getitem(const Sparsity& sp, int dummy=0) const { return $self->getSub(true, sp, dummy);}
 
     // Set a submatrix (index-1 default arguments for MATLAB)
-    void setitem(const Type& m, const Slice& rr) { $self->setSub2(m, true, rr, 1);}
-    void setitem(const Type& m, const Matrix<int>& rr) { $self->setSub2(m, true, rr, 1);}
-    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->setSub2(m, true, rr, cc);}
-    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub2(m, true, rr, cc);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub2(m, true, rr, cc);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub2(m, true, rr, cc);}
-    void setitem(const Type& m, const Sparsity& sp, int dummy=0) { $self->setSub2(m, true, sp, dummy);}
+    void setitem(const Type& m, const Slice& rr) { $self->setSub(m, true, rr, 1);}
+    void setitem(const Type& m, const Matrix<int>& rr) { $self->setSub(m, true, rr, 1);}
+    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
+    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
+    void setitem(const Type& m, const Sparsity& sp, int dummy=0) { $self->setSub(m, true, sp, dummy);}
 %enddef
 #endif
 

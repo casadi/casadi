@@ -282,21 +282,21 @@ namespace casadi {
     static MX eye(int ncol);
 
     ///@{
-    /// Get a submatrix (index-1 default arguments for MATLAB)
-    const MX getSub2(bool ind1, const Slice& rr, const Slice& cc) const;
-    const MX getSub2(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
-    const MX getSub2(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
-    const MX getSub2(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
-    const MX getSub2(bool ind1, const Sparsity& sp, int dummy) const;
+    /// Get a submatrix
+    const MX getSub(bool ind1, const Slice& rr, const Slice& cc) const;
+    const MX getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
+    const MX getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
+    const MX getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
+    const MX getSub(bool ind1, const Sparsity& sp, int dummy) const;
     ///@}
 
     ///@{
-    /// Set a submatrix (index-1 default arguments for MATLAB)
-    void setSub2(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
-    void setSub2(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
-    void setSub2(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
-    void setSub2(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
-    void setSub2(const MX& m, bool ind1, const Sparsity& sp, int dummy);
+    /// Set a submatrix
+    void setSub(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
+    void setSub(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
+    void setSub(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
+    void setSub(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
+    void setSub(const MX& m, bool ind1, const Sparsity& sp, int dummy);
     ///@}
 
     ///@{

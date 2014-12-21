@@ -297,21 +297,21 @@ namespace casadi {
     Slice toSlice(bool ind1=false) const;
 
     ///@{
-    /// Get a submatrix (index-1 default arguments for MATLAB)
-    const Matrix<DataType> getSub2(bool ind1, const Slice& rr, const Slice& cc) const;
-    const Matrix<DataType> getSub2(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
-    const Matrix<DataType> getSub2(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
-    const Matrix<DataType> getSub2(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
-    const Matrix<DataType> getSub2(bool ind1, const Sparsity& sp, int dummy) const;
+    /// Get a submatrix
+    const Matrix<DataType> getSub(bool ind1, const Slice& rr, const Slice& cc) const;
+    const Matrix<DataType> getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
+    const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
+    const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
+    const Matrix<DataType> getSub(bool ind1, const Sparsity& sp, int dummy) const;
     ///@}
 
     ///@{
-    /// Set a submatrix (index-1 default arguments for MATLAB)
-    void setSub2(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Slice& cc);
-    void setSub2(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
-    void setSub2(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
-    void setSub2(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
-    void setSub2(const Matrix<DataType>& m, bool ind1, const Sparsity& sp, int dummy);
+    /// Set a submatrix
+    void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Slice& cc);
+    void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
+    void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
+    void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
+    void setSub(const Matrix<DataType>& m, bool ind1, const Sparsity& sp, int dummy);
     ///@}
 
     ///@{
