@@ -173,6 +173,18 @@ namespace casadi {
     if (rr.isScalar()) {
       return getSub(ind1, rr.toSlice(ind1));
     }
+
+    // If the indexed matrix is dense, use nonzero indexing
+    if (isDense()) {
+      if (ind1) {
+        IMatrix rr0 = rr;
+        for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) (*i)--;
+        return getNZ(rr0);
+      } else {
+        return getNZ(rr);
+      }
+    }
+
     casadi_assert_message(rr.isDense(), "Matrix::sub: Index vectors must be dense");
     casadi_assert_message(rr.isVector() || rr.size1()==1, "Not implemented");
 
@@ -190,29 +202,20 @@ namespace casadi {
     }
     for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += nel;
 
-    if (isDense()) {
-      // Dense mode
-      Matrix<DataType> ret = Matrix<DataType>::zeros(rr.sparsity());
-      for (int i=0; i<r.size(); ++i) {
-        ret.at(i) = at(r[i]);
-      }
-      return ret;
+    // Sparse mode
+    Sparsity sp;
+    if (rr.isVector()) {
+      sp = sparsity().sub(r, std::vector<int>(1, 0), mapping);
     } else {
-      // Sparse mode
-      Sparsity sp;
-      if (rr.isVector()) {
-        sp = sparsity().sub(r, std::vector<int>(1, 0), mapping);
-      } else {
-        sp = sparsity().sub(std::vector<int>(1, 0), r, mapping);
-      }
-
-      // Copy nonzeros and return
-      Matrix<DataType> ret(sp);
-      for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
-
-      // Return (RVO)
-      return ret;
+      sp = sparsity().sub(std::vector<int>(1, 0), r, mapping);
     }
+
+    // Copy nonzeros and return
+    Matrix<DataType> ret(sp);
+    for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
+
+    // Return (RVO)
+    return ret;
   }
 
   template<typename DataType>
@@ -368,6 +371,17 @@ namespace casadi {
       return setSub(m, ind1, rr.toSlice(ind1));
     }
 
+    // If the indexed matrix is dense, use nonzero indexing
+    if (isDense() && m.isDense()) {
+      if (ind1) {
+        IMatrix rr0 = rr;
+        for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) (*i)--;
+        return setNZ(m, rr0);
+      } else {
+        return setNZ(m, rr);
+      }
+    }
+
     casadi_assert_message(rr.isDense(), "Matrix::setSub: Index vectors must be dense");
 
     // Call recursively if m scalar, and submatrix isn't
@@ -397,15 +411,8 @@ namespace casadi {
                    << ", which is outside of the matrix of length " << nel << ".");
     }
 
-    if (isDense() && m.isDense()) {
-      // Dense mode
-      for (int j=0; j<r.size(); ++j) {
-        at(r[j]) = m.at(j);
-      }
-    } else {
-      // Sparse mode
-      casadi_error("Not implemented");
-    }
+    // Sparse mode
+    casadi_error("Not implemented");
   }
 
   template<typename DataType>
