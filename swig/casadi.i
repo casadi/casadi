@@ -1027,9 +1027,12 @@ class NZproxy:
     void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
 
     // 'end' function (needed for end syntax in MATLAB)
-    inline int end(int i, int n) {
+    inline int end(int i, int n) const {
       return n==1 ? $self->numel() : i==1 ? $self->size1() : $self->size2();
     }
+
+    // Transpose using the A' syntax in addition to A.'
+    Type ctranspose() const { return $self->T();}
 
 %enddef
 #endif
