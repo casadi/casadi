@@ -994,11 +994,27 @@
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
     // In MATLAB, it is common to use floating point values to represent integers
-    {
-      // Try converting to a temporary DMatrix
-      casadi::DMatrix mt;
-      if(to_DMatrix(p, m ? &mt : 0) && mt.isInteger()) {
-        if (m) *m = mt;
+    if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
+      double* data = static_cast<double*>(mxGetData(p));
+
+      // Check if all integers
+      bool all_integers=true;
+      size_t sz = getNNZ(p);
+      for (size_t i=0; i<sz; ++i) {
+        if (data[i] != int(data[i])) {
+          all_integers = false;
+          break;
+        }
+      }
+
+      // If successful
+      if (all_integers) {
+        if (m) {
+          *m = casadi::IMatrix(getSparsity(p));
+          for (size_t i=0; i<sz; ++i) {
+            m->at(i) = int(data[i]);
+          }
+        }
         return true;
       }
     }
