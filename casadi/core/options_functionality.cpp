@@ -124,8 +124,80 @@ double OptionsFunctionalityNode::getBestMatches(const std::string &name,
   return getBestMatches(name, dict, suggestions, amount);
 }
 
+void setAdaptorOptions(Dictionary& dict, const string &name, const Dictionary &op) {
+
+  // Find position of '.' separator
+  std::string::size_type dotpos = name.find(".");
+
+  // Get the adaptor name (before '.', or the entire name if '.' not found)
+  std::string adaptor_name = name.substr(0, dotpos);
+
+  if (dotpos!=std::string::npos) {
+    adaptor_name = adaptor_name + "_options";
+  }
+
+  // Check if adaptor name already occurs in the dictionary of options
+  Dictionary::const_iterator it = dict.find(adaptor_name);
+
+  if (it == dict.end()) {
+    // Create an empty dictionary if not
+    dict[adaptor_name] = Dictionary();
+  } else if (!dict[adaptor_name].isDictionary()) {
+    // If an entry is found, make sure it is a dictionary
+    casadi_error("setAdaptorOptions: Dictionary expected, but got " << dict[adaptor_name] << ".");
+  }
+
+  if (dotpos==std::string::npos) {
+    // We reached the end of the dotted adaptor string
+    Dictionary& target = dict[adaptor_name];
+    // Merge the contents of the supplied dictionary
+    for (Dictionary::const_iterator it=op.begin(); it!=op.end(); ++it) {
+      target[it->first] = it->second;
+    }
+  } else {
+    // Descend one level down
+    setAdaptorOptions(dict[adaptor_name], name.substr(dotpos+1), op);
+  }
+
+}
+
 
 void OptionsFunctionalityNode::setOption(const string &name, const GenericType &op) {
+  if (name=="linear_solver" && !hasOption("linear_solver")) {
+     casadi_deprecated("'linear_solver' option will be discarded in favour of 'linsol'");
+     setOption("linsol", op);
+     return;
+  } else if (name=="linear_solverB") {
+     casadi_deprecated("'linear_solver' option will be discarded in favour of 'linsolB'");
+     setOption("linsolB", op);
+     return;
+  } else if (name=="linear_solver_options") {
+     casadi_deprecated("'linear_solver_options' option"
+                       "will be discarded in favour of 'linsol_options'");
+     setOption("linsol_options", op);
+     return;
+  } else if (name=="linear_solver_optionsB") {
+     casadi_deprecated("'linear_solver_optionsB' option"
+                       "will be discarded in favour of 'linsol_optionsB'");
+     setOption("linsol_optionsB", op);
+     return;
+  } else if (name=="implicit_solver") {
+     casadi_deprecated("'implicit_solver' option will be discarded in favour of 'nlsol'");
+     setOption("nlsol", op);
+     return;
+  } else if (name=="implicit_solver_options") {
+     casadi_deprecated("'implicit_solver_options' option"
+                       "will be discarded in favour of 'nlsol_options'");
+     setOption("nlsol_options", op);
+     return;
+   }
+  // Check for adaptor-style options
+  std::string::size_type dotpos = name.find(".");
+  if (dotpos != std::string::npos && op.isDictionary()) {
+    setAdaptorOptions(dictionary_, name, op);
+    return;
+  }
+
   assert_exists(name);
 
   // If we have an empty vector, than we are not strict about the type

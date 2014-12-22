@@ -30,7 +30,7 @@
 #include "casadi/core/function/sdp_solver_internal.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
-#include <casadi/solvers/casadi_sdqpsolver_sdp_export.h>
+#include <casadi/solvers/casadi_sdqp_sdp_export.h>
 
 /** \defgroup plugin_SdqpSolver_sdp
 
@@ -59,7 +59,7 @@ namespace casadi {
    \author Joris Gillis
    \date 2013
   */
-  class CASADI_SDQPSOLVER_SDP_EXPORT SdqpToSdp : public SdqpSolverInternal,
+  class CASADI_SDQP_SDP_EXPORT SdqpToSdp : public SdqpSolverInternal,
                                                  public Adaptor<SdqpToSdp, SdpSolverInternal> {
   public:
     /// Solve with

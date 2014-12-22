@@ -160,6 +160,12 @@ if ((x)==false) { \
 #define casadi_warning(msg) \
 std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". " << std::endl;
 
+// This is for deprectations
+#define casadi_deprecated(msg) \
+std::cerr << "CasADi deprecation warning: \"" << msg \
+<< "\" issued " CASADI_ASSERT_WHERE ". " << std::endl;
+
+
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
 #define STRING(ITEMS) \
   ((dynamic_cast<std::ostringstream &>(std::ostringstream() \

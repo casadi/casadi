@@ -38,8 +38,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IMPLICITFUNCTION_NEWTON_EXPORT
-  casadi_register_implicitfunction_newton(ImplicitFunctionInternal::Plugin* plugin) {
+  int CASADI_NLSOL_NEWTON_EXPORT
+  casadi_register_nlsol_newton(ImplicitFunctionInternal::Plugin* plugin) {
     plugin->creator = Newton::creator;
     plugin->name = "newton";
     plugin->doc = Newton::meta_doc.c_str();
@@ -48,8 +48,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_IMPLICITFUNCTION_NEWTON_EXPORT casadi_load_implicitfunction_newton() {
-    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_newton);
+  void CASADI_NLSOL_NEWTON_EXPORT casadi_load_nlsol_newton() {
+    ImplicitFunctionInternal::registerPlugin(casadi_register_nlsol_newton);
   }
 
   Newton::Newton(const Function& f) : ImplicitFunctionInternal(f) {

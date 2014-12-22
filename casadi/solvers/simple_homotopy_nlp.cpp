@@ -40,8 +40,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT
-  casadi_register_homotopynlpsolver_simple(HomotopyNLPInternal::Plugin* plugin) {
+  int CASADI_HOMOTOPYNLP_SIMPLE_EXPORT
+  casadi_register_homotopynlp_simple(HomotopyNLPInternal::Plugin* plugin) {
     plugin->creator = SimpleHomotopyNlp::creator;
     plugin->name = "simple";
     plugin->doc = SimpleHomotopyNlp::meta_doc.c_str();
@@ -50,15 +50,15 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT casadi_load_homotopynlpsolver_simple() {
-    HomotopyNLPInternal::registerPlugin(casadi_register_homotopynlpsolver_simple);
+  void CASADI_HOMOTOPYNLP_SIMPLE_EXPORT casadi_load_homotopynlp_simple() {
+    HomotopyNLPInternal::registerPlugin(casadi_register_homotopynlp_simple);
   }
 
   SimpleHomotopyNlp::SimpleHomotopyNlp(const Function& nlp)
       : HomotopyNLPInternal(nlp) {
-    addOption("nlp_solver",         OT_STRING,   GenericType(),
+    addOption("nlp",         OT_STRING,   GenericType(),
               "The NLP solver to be used by the Homotopy solver");
-    addOption("nlp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("nlp_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the Homotopy solver");
 
     //addOption("max_step",            OT_REAL,      1.,
@@ -92,11 +92,11 @@ namespace casadi {
                    hnlp_.call(hnlpIn("x", x, "p", p_tau[0], "tau", p_tau[1])));
 
     // Create an nlpsolver instance
-    std::string nlpsolver_name = getOption("nlp_solver");
+    std::string nlpsolver_name = getOption("nlp");
     nlpsolver_ = NlpSolver(nlpsolver_name, nlp);
 
-    if (hasSetOption("nlp_solver_options")) {
-      nlpsolver_.setOption(getOption("nlp_solver_options"));
+    if (hasSetOption("nlp_options")) {
+      nlpsolver_.setOption(getOption("nlp_options"));
     }
 
     // Initialize the NLP solver

@@ -26,7 +26,7 @@ if(WITH_SIPOPT)
   add_definitions(-DWITH_SIPOPT)
 endif()
 
-casadi_plugin(NlpSolver ipopt ${NLPSOLVER_IPOPT_SRCS})
-casadi_plugin_link_libraries(NlpSolver ipopt ${IPOPT_LIBRARIES})
+casadi_plugin(NlpSolver nlp ipopt ${NLPSOLVER_IPOPT_SRCS})
+casadi_plugin_link_libraries(nlp ipopt ${IPOPT_LIBRARIES})
 
-set_property(TARGET casadi_nlpsolver_ipopt PROPERTY PKG_CONFIG_REQUIRES ipopt)
+set_property(TARGET casadi_nlp_ipopt PROPERTY PKG_CONFIG_REQUIRES ipopt)

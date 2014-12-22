@@ -59,14 +59,14 @@ int main(int argc, char **argv){
   // nlp_solver.setOption("derivative_test","second-order");
 
   // Specify QP solver
-  nlp_solver.setOption("qp_solver","nlp");
+  nlp_solver.setOption("qp","nlp");
   Dictionary qp_solver_options;
-  qp_solver_options["nlp_solver"] = "ipopt"; 
+  qp_solver_options["nlp"] = "ipopt"; 
   Dictionary nlp_solver_options;
   nlp_solver_options["print_level"] = 0;
   nlp_solver_options["print_time"] = 0;
-  qp_solver_options["nlp_solver_options"] = nlp_solver_options;
-  nlp_solver.setOption("qp_solver_options",qp_solver_options);
+  qp_solver_options["nlp_options"] = nlp_solver_options;
+  nlp_solver.setOption("qp_options",qp_solver_options);
  
   // Initialize NLP solver
   nlp_solver.init();

@@ -40,8 +40,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DLESOLVER_DPLE_EXPORT
-  casadi_register_dlesolver_dple(DleInternal::Plugin* plugin) {
+  int CASADI_DLE_DPLE_EXPORT
+  casadi_register_dle_dple(DleInternal::Plugin* plugin) {
     plugin->creator = DpleToDle::creator;
     plugin->name = "dple";
     plugin->doc = DpleToDle::meta_doc.c_str();
@@ -50,8 +50,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DLESOLVER_DPLE_EXPORT casadi_load_dlesolver_dple() {
-    DleInternal::registerPlugin(casadi_register_dlesolver_dple);
+  void CASADI_DLE_DPLE_EXPORT casadi_load_dle_dple() {
+    DleInternal::registerPlugin(casadi_register_dle_dple);
   }
 
   DpleToDle::DpleToDle(
@@ -60,9 +60,9 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_dple_to_dle"); // name of the function
 
-    addOption("dple_solver",            OT_STRING, GenericType(),
+    addOption("dple",            OT_STRING, GenericType(),
               "User-defined DPLE solver class.");
-    addOption("dple_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("dple",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the DPLE solver.");
 
   }
@@ -76,13 +76,13 @@ namespace casadi {
     DleInternal::init();
 
     // Create an dplesolver instance
-    std::string dplesolver_name = getOption("dple_solver");
+    std::string dplesolver_name = getOption("dple");
     dplesolver_ = DpleSolver(dplesolver_name, dpleStruct("a",
       std::vector<Sparsity>(1,A_), "v",std::vector<Sparsity>(1,V_),"c",std::vector<Sparsity>(1,C_),"h",std::vector<Sparsity>(1,H_))
     );
 
-    if (hasSetOption("dple_solver_options")) {
-      dplesolver_.setOption(getOption("dple_solver_options"));
+    if (hasSetOption("dple")) {
+      dplesolver_.setOption(getOption("dple"));
     }
 
     // Initialize the NLP solver

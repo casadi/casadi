@@ -37,6 +37,7 @@ namespace casadi {
     void setOption(const std::string &name, double val){$self->setOption(name,val);}
     void setOption(const std::string &name, int val){$self->setOption(name,val);} 
     void setOption(const std::string &name, bool val){$self->setOption(name,val);}  
+    void setOption(const std::string &name, const std::vector< std::vector<int> >& val){$self->setOption(name,val);}  
   }
 } // namespace casadi
 

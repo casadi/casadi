@@ -143,7 +143,7 @@ namespace casadi {
 
   std::map<std::string, SocpSolverInternal::Plugin> SocpSolverInternal::solvers_;
 
-  const std::string SocpSolverInternal::infix_ = "socpsolver";
+
 
 } // namespace casadi
 

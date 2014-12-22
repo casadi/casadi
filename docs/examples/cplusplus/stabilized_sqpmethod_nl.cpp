@@ -82,7 +82,7 @@ int main(int argc, char **argv){
   
   nlp_solver.setOption("stabilized_qp_solver","qp");
   Dictionary stabilized_qp_solver_options;
-  stabilized_qp_solver_options["qp_solver"] = "sqic";
+  stabilized_qp_solver_options["qp"] = "sqic";
   nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
   
   /// Stabilized SQIC Solver
@@ -95,9 +95,9 @@ int main(int argc, char **argv){
   /**
   nlp_solver.setOption("stabilized_qp_solver","qp");
   Dictionary stabilized_qp_solver_options;
-  stabilized_qp_solver_options["qp_solver"] = "nlp";
+  stabilized_qp_solver_options["qp"] = "nlp";
   Dictionary qp_solver_options;
-  qp_solver_options["nlp_solver"]= "ipopt";
+  qp_solver_options["nlp"]= "ipopt";
   Dictionary nlp_solver_options;
   nlp_solver_options["print_level"] = 0;
   nlp_solver_options["print_time"] = 0;
@@ -105,8 +105,8 @@ int main(int argc, char **argv){
   nlp_solver_options["constr_viol_tol"] = 1e-16;
   nlp_solver_options["dual_inf_tol"] = 1e-16;
   nlp_solver_options["compl_inf_tol"] = 1e-16;
-  qp_solver_options["nlp_solver_options"] = nlp_solver_options;
-  stabilized_qp_solver_options["qp_solver_options"] = qp_solver_options;
+  qp_solver_options["nlp_options"] = nlp_solver_options;
+  stabilized_qp_solver_options["qp_options"] = qp_solver_options;
   nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
   */
   

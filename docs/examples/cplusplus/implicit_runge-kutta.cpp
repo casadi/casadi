@@ -133,7 +133,7 @@ int main(){
 
   // Create a implicit function instance to solve the system of equations
   ImplicitFunction ifcn("newton", vfcn_sx);
-  ifcn.setOption("linear_solver", "csparse");
+  ifcn.setOption("linsol", "csparse");
   ifcn.init();
   vector<MX> ifcn_arg;
   ifcn_arg.push_back(MX());

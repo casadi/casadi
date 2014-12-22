@@ -43,7 +43,7 @@ namespace casadi {
   public:
 
     // Solver name of target solver
-    static std::string solvername() { return Solver::shortname() + "_solver"; }
+    static std::string solvername() { return Solver::shortname(); }
 
     // Options name of target solver
     static std::string optionsname() { return solvername() + "_options"; }
@@ -57,7 +57,7 @@ namespace casadi {
     Derived* this_ = static_cast<Derived*>(this);
     this_->addOption(solvername(),      OT_STRING,      GenericType(),
                      "Name of solver.");
-    this_->addOption(optionsname(),     OT_DICTIONARY,  GenericType(),
+    this_->addOption(optionsname(),     OT_DICTIONARY,  Dictionary(),
                      "Options to be passed to solver.");
   }
 

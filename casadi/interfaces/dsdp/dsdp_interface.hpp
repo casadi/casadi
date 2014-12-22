@@ -27,7 +27,7 @@
 #define CASADI_DSDP_INTERFACE_HPP
 
 #include "casadi/core/function/sdp_solver_internal.hpp"
-#include <casadi/interfaces/dsdp/casadi_sdpsolver_dsdp_export.h>
+#include <casadi/interfaces/dsdp/casadi_sdp_dsdp_export.h>
 #include <dsdp5.h>
 
 /** \defgroup plugin_SdpSolver_dsdp
@@ -52,7 +52,7 @@ namespace casadi {
    @copydoc SdpSolver_doc
    @copydoc plugin_SdpSolver_dsdp
    * */
-  class CASADI_SDPSOLVER_DSDP_EXPORT DsdpInterface : public SdpSolverInternal {
+  class CASADI_SDP_DSDP_EXPORT DsdpInterface : public SdpSolverInternal {
   public:
 
     /** \brief Constructor */

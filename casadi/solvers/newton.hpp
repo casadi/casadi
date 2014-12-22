@@ -30,7 +30,7 @@
 #include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
-#include <casadi/solvers/casadi_implicitfunction_newton_export.h>
+#include <casadi/solvers/casadi_nlsol_newton_export.h>
 
 /** \defgroup plugin_ImplicitFunction_newton
      Implements simple newton iterations to solve an implicit function.
@@ -49,7 +49,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT Newton
+  class CASADI_NLSOL_NEWTON_EXPORT Newton
       : public ImplicitFunctionInternal {
   public:
     /** \brief  Constructor */

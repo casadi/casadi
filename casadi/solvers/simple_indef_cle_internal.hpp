@@ -27,7 +27,7 @@
 #define CASADI_SIMPLE_INDEF_CLE_INTERNAL_HPP
 
 #include "../core/function/cle_internal.hpp"
-#include <casadi/solvers/casadi_clesolver_simple_export.h>
+#include <casadi/solvers/casadi_cle_simple_export.h>
 
 /** \defgroup plugin_CleSolver_simple
  Solving the Discrete Lyapunov Equations with a regular LinearSolver
@@ -47,7 +47,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_CLESOLVER_SIMPLE_EXPORT SimpleIndefCleInternal : public CleInternal {
+  class CASADI_CLE_SIMPLE_EXPORT SimpleIndefCleInternal : public CleInternal {
   public:
     /** \brief  Constructor
      * \param st \structargument{Cle}

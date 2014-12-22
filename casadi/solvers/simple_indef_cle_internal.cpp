@@ -41,8 +41,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_CLESOLVER_SIMPLE_EXPORT
-  casadi_register_clesolver_simple(CleInternal::Plugin* plugin) {
+  int CASADI_CLE_SIMPLE_EXPORT
+  casadi_register_cle_simple(CleInternal::Plugin* plugin) {
     plugin->creator = SimpleIndefCleInternal::creator;
     plugin->name = "simple";
     plugin->doc = SimpleIndefCleInternal::meta_doc.c_str();
@@ -51,8 +51,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_CLESOLVER_SIMPLE_EXPORT casadi_load_clesolver_simple() {
-    CleInternal::registerPlugin(casadi_register_clesolver_simple);
+  void CASADI_CLE_SIMPLE_EXPORT casadi_load_cle_simple() {
+    CleInternal::registerPlugin(casadi_register_cle_simple);
   }
 
   SimpleIndefCleInternal::SimpleIndefCleInternal(
@@ -61,9 +61,9 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_simple_indef_cle_solver"); // name of the function
 
-    addOption("linear_solver",            OT_STRING, GenericType(),
+    addOption("linsol",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linsol_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }
@@ -89,7 +89,7 @@ namespace casadi {
     DMatrix e = DMatrix::eye(n_);
 
     MX A_total = -kron(As, e)-kron(e, As);
-    MX Pf = solve(A_total, vec(Vss), getOption("linear_solver"));
+    MX Pf = solve(A_total, vec(Vss), getOption("linsol"));
 
     std::vector<MX> v_in;
     v_in.push_back(As);

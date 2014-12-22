@@ -29,7 +29,7 @@
 #include "casadi/core/function/homotopy_nlp_internal.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
 
-#include <casadi/solvers/casadi_homotopynlpsolver_simple_export.h>
+#include <casadi/solvers/casadi_homotopynlp_simple_export.h>
 
 /** \pluginsection{HomotopyNlpSolver,simple} */
 
@@ -44,7 +44,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2014
   */
-  class CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT
+  class CASADI_HOMOTOPYNLP_SIMPLE_EXPORT
   SimpleHomotopyNlp : public HomotopyNLPInternal {
 
   public:

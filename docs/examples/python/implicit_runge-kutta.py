@@ -125,7 +125,7 @@ vfcn_sx = SXFunction(vfcn)
 
 # Create a implicit function instance to solve the system of equations
 ifcn = ImplicitFunction("newton", vfcn_sx)
-ifcn.setOption("linear_solver","csparse")
+ifcn.setOption("linsol","csparse")
 ifcn.init()
 [V] = ifcn.call([MX(),X0,P])
 X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]

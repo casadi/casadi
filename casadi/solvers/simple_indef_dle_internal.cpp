@@ -41,8 +41,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DLESOLVER_SIMPLE_EXPORT
-  casadi_register_dlesolver_simple(DleInternal::Plugin* plugin) {
+  int CASADI_DLE_SIMPLE_EXPORT
+  casadi_register_dle_simple(DleInternal::Plugin* plugin) {
     plugin->creator = SimpleIndefDleInternal::creator;
     plugin->name = "simple";
     plugin->doc = SimpleIndefDleInternal::meta_doc.c_str();
@@ -51,8 +51,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DLESOLVER_SIMPLE_EXPORT casadi_load_dlesolver_simple() {
-    DleInternal::registerPlugin(casadi_register_dlesolver_simple);
+  void CASADI_DLE_SIMPLE_EXPORT casadi_load_dle_simple() {
+    DleInternal::registerPlugin(casadi_register_dle_simple);
   }
 
   SimpleIndefDleInternal::SimpleIndefDleInternal(
@@ -64,9 +64,9 @@ namespace casadi {
     addOption("compressed_solve",         OT_BOOLEAN, true,
               "When a system with sparse rhs arises, compress to"
               "a smaller system with dense rhs.");
-    addOption("linear_solver",            OT_STRING, GenericType(),
+    addOption("linsol",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linsol_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
 
   }
@@ -91,7 +91,7 @@ namespace casadi {
 
     MX A_total = DMatrix::eye(n_*n_) - kron(As, As);
 
-    MX Pf = solve(A_total, vec(Vss), getOption("linear_solver"));
+    MX Pf = solve(A_total, vec(Vss), getOption("linsol"));
 
     MX P = reshape(Pf, n_, n_);
 

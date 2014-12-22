@@ -43,8 +43,8 @@
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_SNOPT_EXPORT
-  casadi_register_nlpsolver_snopt(NlpSolverInternal::Plugin* plugin) {
+  int CASADI_NLP_SNOPT_EXPORT
+  casadi_register_nlp_snopt(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = SnoptInterface::creator;
     plugin->name = "snopt";
     plugin->doc = SnoptInterface::meta_doc.c_str();
@@ -53,8 +53,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_SNOPT_EXPORT casadi_load_nlpsolver_snopt() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_snopt);
+  void CASADI_NLP_SNOPT_EXPORT casadi_load_nlp_snopt() {
+    NlpSolverInternal::registerPlugin(casadi_register_nlp_snopt);
   }
 
   SnoptInterface::SnoptInterface(const Function& nlp) : NlpSolverInternal(nlp) {

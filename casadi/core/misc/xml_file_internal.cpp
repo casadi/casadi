@@ -37,7 +37,7 @@ namespace casadi {
 
   std::map<std::string, XmlFileInternal::Plugin> XmlFileInternal::solvers_;
 
-  const std::string XmlFileInternal::infix_ = "xmlfile";
+
 
   void XmlFileInternal::print(ostream &stream) const {
     stream << "XmlFile" << endl;

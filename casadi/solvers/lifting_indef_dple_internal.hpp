@@ -28,7 +28,7 @@
 
 #include "../core/function/dple_internal.hpp"
 #include "../core/function/dle_internal.hpp"
-#include <casadi/solvers/casadi_dplesolver_lifting_export.h>
+#include <casadi/solvers/casadi_dple_lifting_export.h>
 
 /** \defgroup plugin_DpleSolver_lifting
  Solving the Discrete Periodic Lyapunov Equations by
@@ -79,7 +79,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DPLESOLVER_LIFTING_EXPORT LiftingIndefDpleInternal : public DpleInternal,
+  class CASADI_DPLE_LIFTING_EXPORT LiftingIndefDpleInternal : public DpleInternal,
     public Adaptor<LiftingIndefDpleInternal, DleInternal>,
     public Wrapper<LiftingIndefDpleInternal> {
   public:
@@ -113,6 +113,9 @@ namespace casadi {
 
     /** \brief  Initialize */
     virtual void init();
+
+    /** \brief  Obtain solver name from Adaptor */
+    virtual std::string getAdaptorSolverName() const { return solvername(); }
 
     /** \brief Generate a function that calculates \a nfwd forward derivatives
      and \a nadj adjoint derivatives

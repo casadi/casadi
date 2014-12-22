@@ -41,8 +41,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LRDLESOLVER_FIXED_SMITH_EXPORT
-  casadi_register_lrdlesolver_fixed_smith(LrDleInternal::Plugin* plugin) {
+  int CASADI_LRDLE_FIXED_SMITH_EXPORT
+  casadi_register_lrdle_fixed_smith(LrDleInternal::Plugin* plugin) {
     plugin->creator = FixedSmithLrDleInternal::creator;
     plugin->name = "fixed_smith";
     plugin->doc = FixedSmithLrDleInternal::meta_doc.c_str();
@@ -51,13 +51,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LRDLESOLVER_FIXED_SMITH_EXPORT casadi_load_lrdlesolver_fixed_smith() {
-    LrDleInternal::registerPlugin(casadi_register_lrdlesolver_fixed_smith);
+  void CASADI_LRDLE_FIXED_SMITH_EXPORT casadi_load_lrdle_fixed_smith() {
+    LrDleInternal::registerPlugin(casadi_register_lrdle_fixed_smith);
   }
 
   FixedSmithLrDleInternal::FixedSmithLrDleInternal(
-      const LrDleStructure& st, const std::vector<int> &Hs) :
-      LrDleInternal(st, Hs) {
+      const LrDleStructure& st) :
+      LrDleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_fixed_smith_indef_dle_solver"); // name of the function
@@ -132,7 +132,7 @@ namespace casadi {
 
   FixedSmithLrDleInternal* FixedSmithLrDleInternal::clone() const {
     // Return a deep copy
-    FixedSmithLrDleInternal* node = new FixedSmithLrDleInternal(st_, Hs_);
+    FixedSmithLrDleInternal* node = new FixedSmithLrDleInternal(st_);
     node->setOption(dictionary());
     return node;
   }

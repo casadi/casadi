@@ -38,8 +38,8 @@ namespace casadi {
   using namespace std;
 
   extern "C"
-  int CASADI_QPSOLVER_CPLEX_EXPORT
-  casadi_register_qpsolver_cplex(QpSolverInternal::Plugin* plugin) {
+  int CASADI_QP_CPLEX_EXPORT
+  casadi_register_qp_cplex(QpSolverInternal::Plugin* plugin) {
     plugin->creator = CplexInterface::creator;
     plugin->name = "cplex";
     plugin->doc = CplexInterface::meta_doc.c_str();
@@ -48,8 +48,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_CPLEX_EXPORT casadi_load_qpsolver_cplex() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_cplex);
+  void CASADI_QP_CPLEX_EXPORT casadi_load_qp_cplex() {
+    QpSolverInternal::registerPlugin(casadi_register_qp_cplex);
   }
 
   CplexInterface::CplexInterface(const std::vector<Sparsity>& st) : QpSolverInternal(st) {

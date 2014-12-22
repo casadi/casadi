@@ -27,7 +27,7 @@
 #define CASADI_FIXED_SMITH_DLE_INTERNAL_HPP
 
 #include "../core/function/dle_internal.hpp"
-#include <casadi/solvers/casadi_dlesolver_fixed_smith_export.h>
+#include <casadi/solvers/casadi_dle_fixed_smith_export.h>
 
 /** \defgroup plugin_DleSolver_fixed_smith
  Solving the Discrete Lyapunov Equations
@@ -95,12 +95,11 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DLESOLVER_FIXED_SMITH_EXPORT FixedSmithDleInternal : public DleInternal,
+  class CASADI_DLE_FIXED_SMITH_EXPORT FixedSmithDleInternal : public DleInternal,
     public Wrapper<FixedSmithDleInternal> {
   public:
     /** \brief  Constructor
      * \param st \structargument{Dle}
-     * \param Hs Column-sizes of H_i
      */
     FixedSmithDleInternal(const DleStructure& st);
 

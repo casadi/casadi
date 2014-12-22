@@ -117,13 +117,13 @@ Solver = "nlp"
 # Allocate an implict solver
 solver = ImplicitFunction(Solver, rfp)
 if Solver=="nlp":
-    solver.setOption("nlp_solver", "ipopt")
-    solver.setOption("nlp_solver_options",{"hessian_approximation":"limited-memory"})
+    solver.setOption("nlp", "ipopt")
+    solver.setOption("nlp_options",{"hessian_approximation":"limited-memory"})
 elif Solver=="newton":
-    solver.setOption("linear_solver",CSparse)
+    solver.setOption("linsol",CSparse)
 elif Solver=="kinsol":
     solver.setOption("linear_solver_type","user_defined")
-    solver.setOption("linear_solver",CSparse)
+    solver.setOption("linsol",CSparse)
     solver.setOption("max_iter",1000)
 
 # Initialize the solver

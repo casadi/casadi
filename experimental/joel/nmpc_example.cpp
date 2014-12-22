@@ -123,19 +123,19 @@ int main(){
 
   Dictionary qp_solver_options;
   if(false){
-    solver.setOption("qp_solver",NLPQpSolver::creator);
-    qp_solver_options["nlp_solver"] = IpoptSolver::creator;
+    solver.setOption("qp",NLPQpSolver::creator);
+    qp_solver_options["nlp"] = IpoptSolver::creator;
     Dictionary nlp_solver_options;
     nlp_solver_options["tol"] = 1e-12;
     nlp_solver_options["print_level"] = 0;
     nlp_solver_options["print_time"] = false;
-    qp_solver_options["nlp_solver_options"] = nlp_solver_options;
+    qp_solver_options["nlp_options"] = nlp_solver_options;
       
   } else {
-    solver.setOption("qp_solver",QPOasesSolver::creator);
+    solver.setOption("qp",QPOasesSolver::creator);
     qp_solver_options["printLevel"] = "none";
   }
-  solver.setOption("qp_solver_options",qp_solver_options);
+  solver.setOption("qp_options",qp_solver_options);
 
   solver.init();
     

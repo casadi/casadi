@@ -57,8 +57,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DPLESOLVER_SLICOT_EXPORT
-  casadi_register_dplesolver_slicot(DpleInternal::Plugin* plugin) {
+  int CASADI_DPLE_SLICOT_EXPORT
+  casadi_register_dple_slicot(DpleInternal::Plugin* plugin) {
     plugin->creator = PsdIndefDpleInternal::creator;
     plugin->name = "slicot";
     plugin->doc = PsdIndefDpleInternal::meta_doc.c_str();
@@ -68,8 +68,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DPLESOLVER_SLICOT_EXPORT casadi_load_dplesolver_slicot() {
-    DpleInternal::registerPlugin(casadi_register_dplesolver_slicot);
+  void CASADI_DPLE_SLICOT_EXPORT casadi_load_dple_slicot() {
+    DpleInternal::registerPlugin(casadi_register_dple_slicot);
   }
 
   PsdIndefDpleInternal::PsdIndefDpleInternal(const DpleStructure & st,
@@ -83,9 +83,9 @@ namespace casadi {
     setOption("pos_def", false);
     setOption("const_dim", true);
 
-    addOption("linear_solver",            OT_STRING, GenericType(),
+    addOption("linsol",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("linsol_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
     addOption("psd_num_zero",             OT_REAL,         1e-12,
               "Numerical zero used in Periodic Schur decomposition with slicot."
@@ -139,8 +139,8 @@ namespace casadi {
     // There can be at most n partitions
     partition_.reserve(n_);
 
-    if (hasSetOption("linear_solver")) {
-      std::string linear_solver_name = getOption("linear_solver");
+    if (hasSetOption("linsol")) {
+      std::string linear_solver_name = getOption("linsol");
 
       // Construct linear solvers for low-order Discrete Periodic Sylvester Equations
       // I00X

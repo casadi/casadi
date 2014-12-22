@@ -39,8 +39,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_SCPGEN_EXPORT
-      casadi_register_nlpsolver_scpgen(NlpSolverInternal::Plugin* plugin) {
+  int CASADI_NLP_SCPGEN_EXPORT
+      casadi_register_nlp_scpgen(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = Scpgen::creator;
     plugin->name = "scpgen";
     plugin->doc = Scpgen::meta_doc.c_str();
@@ -49,15 +49,15 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_SCPGEN_EXPORT casadi_load_nlpsolver_scpgen() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_scpgen);
+  void CASADI_NLP_SCPGEN_EXPORT casadi_load_nlp_scpgen() {
+    NlpSolverInternal::registerPlugin(casadi_register_nlp_scpgen);
   }
 
   Scpgen::Scpgen(const Function& nlp) : NlpSolverInternal(nlp) {
     casadi_warning("SCPgen is under development");
-    addOption("qp_solver",         OT_STRING,   GenericType(),
+    addOption("qp",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
+    addOption("qp_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "gauss-newton|exact");
@@ -580,13 +580,13 @@ namespace casadi {
     qpB_.resize(ng_);
 
     // Allocate a QP solver
-    std::string qp_solver_name = getOption("qp_solver");
+    std::string qp_solver_name = getOption("qp");
     qp_solver_ = QpSolver(qp_solver_name,
                           qpStruct("h", qpH_.sparsity(), "a", qpA_.sparsity()));
 
     // Set options if provided
-    if (hasSetOption("qp_solver_options")) {
-      Dictionary qp_solver_options = getOption("qp_solver_options");
+    if (hasSetOption("qp_options")) {
+      Dictionary qp_solver_options = getOption("qp_options");
       qp_solver_.setOption(qp_solver_options);
     }
 

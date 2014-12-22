@@ -27,7 +27,7 @@
 #define CASADI_SIMPLE_INDEF_DPLE_INTERNAL_HPP
 
 #include "../core/function/dple_internal.hpp"
-#include <casadi/solvers/casadi_dplesolver_simple_export.h>
+#include <casadi/solvers/casadi_dple_simple_export.h>
 
 /** \defgroup plugin_DpleSolver_simple
  Solving the Discrete Periodic Lyapunov Equations with a regular LinearSolver
@@ -47,7 +47,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DPLESOLVER_SIMPLE_EXPORT SimpleIndefDpleInternal : public DpleInternal {
+  class CASADI_DPLE_SIMPLE_EXPORT SimpleIndefDpleInternal : public DpleInternal {
   public:
     /** \brief  Constructor
      * \param st \structargument{Dple}

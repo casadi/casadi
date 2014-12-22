@@ -359,19 +359,19 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
 
   Dictionary qp_solver_options;
   if(ipopt_as_qp_solver){
-    nlp_solver_.setOption("qp_solver","nlp");
-    qp_solver_options["nlp_solver"] = "ipopt";
+    nlp_solver_.setOption("qp","nlp");
+    qp_solver_options["nlp"] = "ipopt";
     Dictionary nlp_solver_options;
     nlp_solver_options["tol"] = 1e-12;
     nlp_solver_options["print_level"] = 0;
     nlp_solver_options["print_time"] = false;
-    qp_solver_options["nlp_solver_options"] = nlp_solver_options;
+    qp_solver_options["nlp_options"] = nlp_solver_options;
     
   } else {
-    nlp_solver_.setOption("qp_solver","qpoases");
+    nlp_solver_.setOption("qp","qpoases");
     qp_solver_options["printLevel"] = "none";
   }
-  nlp_solver_.setOption("qp_solver_options",qp_solver_options);
+  nlp_solver_.setOption("qp_options",qp_solver_options);
   nlp_solver_.init();
 
 }

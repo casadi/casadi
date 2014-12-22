@@ -41,8 +41,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_DLESOLVER_FIXED_SMITH_EXPORT
-  casadi_register_dlesolver_fixed_smith(DleInternal::Plugin* plugin) {
+  int CASADI_DLE_FIXED_SMITH_EXPORT
+  casadi_register_dle_fixed_smith(DleInternal::Plugin* plugin) {
     plugin->creator = FixedSmithDleInternal::creator;
     plugin->name = "fixed_smith";
     plugin->doc = FixedSmithDleInternal::meta_doc.c_str();
@@ -51,8 +51,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_DLESOLVER_FIXED_SMITH_EXPORT casadi_load_dlesolver_fixed_smith() {
-    DleInternal::registerPlugin(casadi_register_dlesolver_fixed_smith);
+  void CASADI_DLE_FIXED_SMITH_EXPORT casadi_load_dle_fixed_smith() {
+    DleInternal::registerPlugin(casadi_register_dle_fixed_smith);
   }
 
   FixedSmithDleInternal::FixedSmithDleInternal(

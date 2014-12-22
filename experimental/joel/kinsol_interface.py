@@ -35,7 +35,7 @@ impfun = SXFunction([[x,y],[p]],[[x*x - y,x + 2*y + p]])
 
 # Implicitly defined function
 fun = KinsolSolver(impfun) 
-fun.setOption("linear_solver",CSparse)
+fun.setOption("linsol",CSparse)
 fun.setOption("abstol",1e-10)
 fun.init() 
 

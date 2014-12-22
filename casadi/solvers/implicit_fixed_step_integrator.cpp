@@ -37,9 +37,9 @@ namespace casadi {
   ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(const Function& f,
                                                                            const Function& g)
       : FixedStepIntegrator(f, g) {
-    addOption("implicit_solver",               OT_STRING,  GenericType(),
+    addOption("nlsol",               OT_STRING,  GenericType(),
               "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
+    addOption("nlsol_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the NLP Solver");
   }
 
@@ -58,7 +58,7 @@ namespace casadi {
     FixedStepIntegrator::init();
 
     // Get the NLP creator function
-    std::string implicit_function_name = getOption("implicit_solver");
+    std::string implicit_function_name = getOption("nlsol");
 
     // Allocate an NLP solver
     implicit_solver_ = ImplicitFunction(implicit_function_name, F_, Function(), LinearSolver());
@@ -67,8 +67,8 @@ namespace casadi {
     implicit_solver_.setOption("implicit_output", DAE_ALG);
 
     // Pass options
-    if (hasSetOption("implicit_solver_options")) {
-      const Dictionary& implicit_solver_options = getOption("implicit_solver_options");
+    if (hasSetOption("nlsol_options")) {
+      const Dictionary& implicit_solver_options = getOption("nlsol_options");
       implicit_solver_.setOption(implicit_solver_options);
     }
 
@@ -79,7 +79,7 @@ namespace casadi {
     if (nRZ_>0) {
 
       // Get the NLP creator function
-      std::string backward_implicit_function_name = getOption("implicit_solver");
+      std::string backward_implicit_function_name = getOption("nlsol");
 
       // Allocate an NLP solver
       backward_implicit_solver_ = ImplicitFunction(backward_implicit_function_name,
@@ -90,8 +90,8 @@ namespace casadi {
       backward_implicit_solver_.setOption("implicit_output", RDAE_ALG);
 
       // Pass options
-      if (hasSetOption("implicit_solver_options")) {
-        const Dictionary& backward_implicit_solver_options = getOption("implicit_solver_options");
+      if (hasSetOption("nlsol_options")) {
+        const Dictionary& backward_implicit_solver_options = getOption("nlsol_options");
         backward_implicit_solver_.setOption(backward_implicit_solver_options);
       }
 

@@ -30,7 +30,7 @@
 #include "casadi/core/function/stabilized_qp_solver.hpp"
 #include <deque>
 
-#include <casadi/solvers/casadi_nlpsolver_stabilizedsqp_export.h>
+#include <casadi/solvers/casadi_nlp_stabilizedsqp_export.h>
 
 /** \defgroup plugin_NlpSolver_stabilizedsqp
       Stabilized Sequential Quadratic Programming method.
@@ -50,7 +50,7 @@ namespace casadi {
      \author Slava Kung
      \date 2013
   */
-  class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSqp : public NlpSolverInternal {
+  class CASADI_NLP_STABILIZEDSQP_EXPORT StabilizedSqp : public NlpSolverInternal {
   public:
     explicit StabilizedSqp(const Function& nlp);
     virtual ~StabilizedSqp();
@@ -64,7 +64,7 @@ namespace casadi {
     virtual void evaluate();
 
     /// Stabilized QP solver for the subproblems
-    StabilizedQpSolver stabilized_qp_solver_;
+    StabilizedQpSolver stabilizedqp_solver_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -119,7 +119,7 @@ namespace casadi {
     int TRsuccess_;
 
     /// Access StabilizedQpSolver
-    const StabilizedQpSolver getStabilizedQpSolver() const { return stabilized_qp_solver_;}
+    const StabilizedQpSolver getStabilizedQpSolver() const { return stabilizedqp_solver_;}
 
     /// Lagrange multipliers of the NLP
     std::vector<double> mu_, mu_x_, mu_e_, pi_, pi2_;

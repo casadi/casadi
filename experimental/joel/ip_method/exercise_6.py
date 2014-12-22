@@ -47,7 +47,7 @@ for solver in ['ipopt','ip_method']:
   elif solver =='ip_method':
     # Solve with IP-method
     nlp_solver = IPMethod(ffcn,gfcn)
-    nlp_solver.setOption("linear_solver",CSparse)
+    nlp_solver.setOption("linsol",CSparse)
     #nlp_solver.setOption("verbose",True)
   
   # Initialize the NLP solver

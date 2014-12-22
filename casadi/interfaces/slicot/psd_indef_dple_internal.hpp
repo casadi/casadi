@@ -28,7 +28,7 @@
 
 #include "../../core/function/dple_internal.hpp"
 #include "../../core/function/dense_io.hpp"
-#include <casadi/interfaces/slicot/casadi_dplesolver_slicot_export.h>
+#include <casadi/interfaces/slicot/casadi_dple_slicot_export.h>
 
 /** \defgroup plugin_DpleSolver_slicot
  *
@@ -55,7 +55,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DPLESOLVER_SLICOT_EXPORT PsdIndefDpleInternal : public DpleInternal,
+  class CASADI_DPLE_SLICOT_EXPORT PsdIndefDpleInternal : public DpleInternal,
     public DenseIO<PsdIndefDpleInternal> {
   public:
     /** \brief  Constructor

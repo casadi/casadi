@@ -30,7 +30,7 @@
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
-#include <casadi/solvers/casadi_implicitfunction_nlp_export.h>
+#include <casadi/solvers/casadi_nlsol_nlp_export.h>
 
 /** \defgroup plugin_ImplicitFunction_nlp
   Use an NlpSolver as ImplicitFunction solver
@@ -48,7 +48,7 @@ namespace casadi {
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NLP_EXPORT QpToImplicit : public ImplicitFunctionInternal,
+  class CASADI_NLSOL_NLP_EXPORT QpToImplicit : public ImplicitFunctionInternal,
     public Adaptor<QpToImplicit, NlpSolverInternal> {
   public:
     /** \brief  Constructor */

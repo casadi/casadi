@@ -40,13 +40,13 @@ nlp_solver = SCPgen
 
 # Choose a qp solver (for CasADi NLP methods)
 qp_solver = QPOasesSolver
-qp_solver_options = {"printLevel" : "none"}
+qp_options = {"printLevel" : "none"}
 
 #qp_solver = NLPQpSolver
-#qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
+#qp_options = {"nlp":IpoptSolver, "nlp_options": {"print_level" : 0}}
 
 #qp_solver = OOQpSolver
-#qp_solver_options = {}
+#qp_options = {}
 
 # Create solver
 solv = nlp_solver(nlp)
@@ -54,8 +54,8 @@ solv = nlp_solver(nlp)
 # NLP solver options
 solv.setOption("generate_hessian",True)
 if nlp_solver in (SQPMethod, LiftedSQP, SCPgen):
-  solv.setOption("qp_solver",qp_solver)
-  solv.setOption("qp_solver_options",qp_solver_options)
+  solv.setOption("qp",qp_solver)
+  solv.setOption("qp_options",qp_options)
   solv.setOption("max_iter",5)
 if nlp_solver == SQPMethod:
   #solv.setOption("monitor",['qp'])

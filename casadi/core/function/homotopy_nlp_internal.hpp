@@ -70,8 +70,11 @@ namespace casadi {
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
+    /// Short name
+    static std::string shortname() { return "homotopynlp";}
+
     /// Infix
-    static const std::string infix_;
+
 
   };
 

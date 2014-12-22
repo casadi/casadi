@@ -111,7 +111,7 @@ namespace casadi {
 
   std::map<std::string, CleInternal::Plugin> CleInternal::solvers_;
 
-  const std::string CleInternal::infix_ = "clesolver";
+
 
 
 } // namespace casadi

@@ -27,7 +27,7 @@
 #define CASADI_FIXED_SMITH_LR_DLE_INTERNAL_HPP
 
 #include "../core/function/lr_dle_internal.hpp"
-#include <casadi/solvers/casadi_lrdlesolver_fixed_smith_export.h>
+#include <casadi/solvers/casadi_lrdle_fixed_smith_export.h>
 
 /** \defgroup plugin_LrDleSolver_fixed_smith
  Solving the Discrete Lyapunov Equations with a regular LinearSolver
@@ -49,14 +49,13 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_LRDLESOLVER_FIXED_SMITH_EXPORT FixedSmithLrDleInternal : public LrDleInternal,
+  class CASADI_LRDLE_FIXED_SMITH_EXPORT FixedSmithLrDleInternal : public LrDleInternal,
     public Wrapper<FixedSmithLrDleInternal> {
   public:
     /** \brief  Constructor
      * \param st \structargument{Dle}
-     * \param Hs Column-sizes of H_i
      */
-    FixedSmithLrDleInternal(const LrDleStructure& st, const std::vector<int> &Hs);
+    FixedSmithLrDleInternal(const LrDleStructure& st);
 
     /** \brief  Destructor */
     virtual ~FixedSmithLrDleInternal();
@@ -68,13 +67,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual FixedSmithLrDleInternal* create(const LrDleStructure& st,
-      const std::vector<int> &Hs) const {
-        return new FixedSmithLrDleInternal(st, Hs);}
+    virtual FixedSmithLrDleInternal* create(const LrDleStructure& st) const {
+        return new FixedSmithLrDleInternal(st);}
 
     /** \brief  Create a new DLE Solver */
-    static LrDleInternal* creator(const LrDleStructure& st, const std::vector<int> &Hs)
-    { return new FixedSmithLrDleInternal(st, Hs);}
+    static LrDleInternal* creator(const LrDleStructure& st)
+    { return new FixedSmithLrDleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

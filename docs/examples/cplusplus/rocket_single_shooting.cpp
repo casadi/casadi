@@ -33,8 +33,8 @@ using namespace std;
 extern "C" void casadi_load_integrator_cvodes();
 extern "C" void casadi_load_integrator_idas();
 extern "C" void casadi_load_integrator_rk();
-extern "C" void casadi_load_nlpsolver_ipopt();
-extern "C" void casadi_load_nlpsolver_scpgen();
+extern "C" void casadi_load_nlp_ipopt();
+extern "C" void casadi_load_nlp_scpgen();
 
 bool sundials_integrator = true;
 bool explicit_integrator = false;
@@ -45,8 +45,8 @@ int main(){
   casadi_load_integrator_cvodes();
   casadi_load_integrator_idas();
   casadi_load_integrator_rk();
-  casadi_load_nlpsolver_ipopt();
-  casadi_load_nlpsolver_scpgen();
+  casadi_load_nlp_ipopt();
+  casadi_load_nlp_scpgen();
   
   // Time length
   double T = 10.0;
@@ -169,15 +169,15 @@ int main(){
     solver.setOption("max_iter",100);
     
     // Use IPOPT as QP solver
-    solver.setOption("qp_solver","nlp");
+    solver.setOption("qp","nlp");
     Dictionary qp_solver_options;
-    qp_solver_options["nlp_solver"] = "ipopt";
+    qp_solver_options["nlp"] = "ipopt";
     Dictionary ipopt_options;
     ipopt_options["tol"] = 1e-12;
     ipopt_options["print_level"] = 0;
     ipopt_options["print_time"] = false;
-    qp_solver_options["nlp_solver_options"] = ipopt_options;
-    solver.setOption("qp_solver_options",qp_solver_options);
+    qp_solver_options["nlp_options"] = ipopt_options;
+    solver.setOption("qp_options",qp_solver_options);
   } else {
     solver = NlpSolver("ipopt", nlp);
     

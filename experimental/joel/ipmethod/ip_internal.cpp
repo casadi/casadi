@@ -38,8 +38,8 @@ namespace casadi{
 
 IPInternal::IPInternal(const Function& F, const Function& G) : NlpSolverInternal(Function(),F,G){
   casadi_warning("The IP method is experimental and incomplete. Can be used as the basis of an IP solver in CasADi.");
-  addOption("linear_solver",         OT_LINEARSOLVER,   GenericType(), "The linear solver to be used by the IP method");
-  addOption("linear_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
+  addOption("linsol",         OT_LINEARSOLVER,   GenericType(), "The linear solver to be used by the IP method");
+  addOption("linsol_options", OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
 }
 
 IPInternal::~IPInternal(){
@@ -96,7 +96,7 @@ void IPInternal::init(){
   kfcn_.init();
   
   // Create a linear solver for the KKT system
-  linearSolverCreator linear_solver_creator = getOption("linear_solver");
+  linearSolverCreator linear_solver_creator = getOption("linsol");
   linear_solver_ = linear_solver_creator(K.sparsity());
   linear_solver_.init();  
 }

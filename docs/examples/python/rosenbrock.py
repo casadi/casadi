@@ -42,21 +42,21 @@ nlp_solver = "ipopt"
 
 # Choose a qp solver (for CasADi NLP methods)
 #qp_solver = "qpoases"
-#qp_solver_options = {"printLevel" : "none"}
+#qp_options = {"printLevel" : "none"}
 
 #qp_solver = "nlp"
-#qp_solver_options = {"nlp_solver":"ipopt", "nlp_solver_options": {"print_level" : 0}}
+#qp_options = {"nlp":"ipopt", "nlp_options": {"print_level" : 0}}
 
 #qp_solver = ooqp"
-#qp_solver_options = {}
+#qp_options = {}
 
 # Create solver
 solv = NlpSolver(nlp_solver, nlp)
 
 # NLP solver options
 if nlp_solver in ("sqpmethod", "scpgen"):
-  solv.setOption("qp_solver",qp_solver)
-  solv.setOption("qp_solver_options",qp_solver_options)
+  solv.setOption("qp",qp_solver)
+  solv.setOption("qp_options",qp_options)
   solv.setOption("max_iter",5)
   
 # Init solver  

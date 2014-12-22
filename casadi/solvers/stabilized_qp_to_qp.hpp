@@ -28,8 +28,9 @@
 
 #include "casadi/core/function/stabilized_qp_solver_internal.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
+#include "casadi/core/function/qp_solver_internal.hpp"
 
-#include <casadi/solvers/casadi_stabilizedqpsolver_qp_export.h>
+#include <casadi/solvers/casadi_stabqp_qp_export.h>
 
 /** \defgroup plugin_StabilizedQpSolver_qp
       Solved a stabilized QP using a standard QP solver
@@ -48,8 +49,9 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_STABILIZEDQPSOLVER_QP_EXPORT StabilizedQpToQp
-    : public StabilizedQpSolverInternal {
+  class CASADI_STABQP_QP_EXPORT StabilizedQpToQp
+    : public StabilizedQpSolverInternal,
+      public Adaptor<StabilizedQpToQp, QpSolverInternal> {
   public:
 
     /** \brief Constructor */

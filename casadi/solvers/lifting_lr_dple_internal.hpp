@@ -28,7 +28,7 @@
 
 #include "../core/function/lr_dple_internal.hpp"
 #include "../core/function/lr_dle_internal.hpp"
-#include <casadi/solvers/casadi_lrdplesolver_lifting_export.h>
+#include <casadi/solvers/casadi_lrdple_lifting_export.h>
 
 /** \defgroup plugin_LrDpleSolver_lifting
  Solving the Discrete Periodic Lyapunov Equations by
@@ -79,15 +79,14 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_LRDPLESOLVER_LIFTING_EXPORT LiftingLrDpleInternal : public LrDpleInternal,
+  class CASADI_LRDPLE_LIFTING_EXPORT LiftingLrDpleInternal : public LrDpleInternal,
     public Adaptor<LiftingLrDpleInternal, LrDleInternal>,
     public Wrapper<LiftingLrDpleInternal> {
   public:
     /** \brief  Constructor
      * \param st \structargument{LrDple}
      */
-    LiftingLrDpleInternal(const LrDpleStructure & st,
-                             const std::vector< std::vector<int> > &Hs);
+    LiftingLrDpleInternal(const LrDpleStructure & st);
 
     /** \brief  Destructor */
     virtual ~LiftingLrDpleInternal();
@@ -99,14 +98,12 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual LiftingLrDpleInternal* create(const LrDpleStructure & st,
-      const std::vector< std::vector<int> > &Hs) const {
-        return new LiftingLrDpleInternal(st, Hs);}
+    virtual LiftingLrDpleInternal* create(const LrDpleStructure & st) const {
+        return new LiftingLrDpleInternal(st);}
 
     /** \brief  Create a new DPLE Solver */
-    static LrDpleInternal* creator(const LrDpleStructure & st,
-      const std::vector< std::vector<int> > &Hs) {
-        return new LiftingLrDpleInternal(st, Hs);}
+    static LrDpleInternal* creator(const LrDpleStructure & st) {
+        return new LiftingLrDpleInternal(st);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
@@ -116,6 +113,9 @@ namespace casadi {
 
     /** \brief  Initialize */
     virtual void init();
+
+    /** \brief  Obtain solver name from Adaptor */
+    virtual std::string getAdaptorSolverName() const { return solvername(); }
 
     /** \brief Generate a function that calculates \a nfwd forward derivatives
      and \a nadj adjoint derivatives

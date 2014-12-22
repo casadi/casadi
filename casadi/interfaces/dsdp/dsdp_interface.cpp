@@ -38,8 +38,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_SDPSOLVER_DSDP_EXPORT
-  casadi_register_sdpsolver_dsdp(SdpSolverInternal::Plugin* plugin) {
+  int CASADI_SDP_DSDP_EXPORT
+  casadi_register_sdp_dsdp(SdpSolverInternal::Plugin* plugin) {
     plugin->creator = DsdpInterface::creator;
     plugin->name = "dsdp";
     plugin->doc = DsdpInterface::meta_doc.c_str();
@@ -48,8 +48,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_SDPSOLVER_DSDP_EXPORT casadi_load_sdpsolver_dsdp() {
-    SdpSolverInternal::registerPlugin(casadi_register_sdpsolver_dsdp);
+  void CASADI_SDP_DSDP_EXPORT casadi_load_sdp_dsdp() {
+    SdpSolverInternal::registerPlugin(casadi_register_sdp_dsdp);
   }
 
   DsdpInterface* DsdpInterface::clone() const {

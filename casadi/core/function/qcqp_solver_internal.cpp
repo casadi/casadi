@@ -138,6 +138,6 @@ namespace casadi {
 
   std::map<std::string, QcqpSolverInternal::Plugin> QcqpSolverInternal::solvers_;
 
-  const std::string QcqpSolverInternal::infix_ = "qcqpsolver";
+
 
 } // namespace casadi

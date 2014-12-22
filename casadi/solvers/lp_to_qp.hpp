@@ -29,7 +29,7 @@
 #include "casadi/core/function/lp_internal.hpp"
 #include "casadi/core/function/qp_solver_internal.hpp"
 
-#include <casadi/solvers/casadi_lpsolver_qp_export.h>
+#include <casadi/solvers/casadi_lp_qp_export.h>
 
 /** \defgroup plugin_LpSolver_qp
 
@@ -49,7 +49,7 @@ namespace casadi {
    \author Joris Gillis
    \date 2013
   */
-class CASADI_LPSOLVER_QP_EXPORT LpToQp : public LpSolverInternal,
+class CASADI_LP_QP_EXPORT LpToQp : public LpSolverInternal,
   public Adaptor<LpToQp, QpSolverInternal> {
 public:
 

@@ -26,7 +26,7 @@
 #define CASADI_CPLEX_INTERFACE_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
-#include <casadi/interfaces/cplex/casadi_qpsolver_cplex_export.h>
+#include <casadi/interfaces/cplex/casadi_qp_cplex_export.h>
 #include "ilcplex/cplex.h"
 
 #include <string>
@@ -50,7 +50,7 @@ namespace casadi {
       \author Attila Kozma, Joel Andersson
       \date 2012
   */
-  class CASADI_QPSOLVER_CPLEX_EXPORT CplexInterface : public QpSolverInternal {
+  class CASADI_QP_CPLEX_EXPORT CplexInterface : public QpSolverInternal {
   public:
     /** \brief Default constructor */
     explicit CplexInterface();

@@ -27,7 +27,7 @@
 #define CASADI_SIMPLE_INDEF_DLE_INTERNAL_HPP
 
 #include "../core/function/dle_internal.hpp"
-#include <casadi/solvers/casadi_dlesolver_simple_export.h>
+#include <casadi/solvers/casadi_dle_simple_export.h>
 
 /** \defgroup plugin_DleSolver_simple
  Solving the Discrete Lyapunov Equations with a regular LinearSolver
@@ -47,7 +47,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_DLESOLVER_SIMPLE_EXPORT SimpleIndefDleInternal : public DleInternal {
+  class CASADI_DLE_SIMPLE_EXPORT SimpleIndefDleInternal : public DleInternal {
   public:
     /** \brief  Constructor
       * \param st \structargument{Dle}

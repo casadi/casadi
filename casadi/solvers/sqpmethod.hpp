@@ -30,7 +30,7 @@
 #include "casadi/core/function/qp_solver.hpp"
 #include <deque>
 
-#include <casadi/solvers/casadi_nlpsolver_sqpmethod_export.h>
+#include <casadi/solvers/casadi_nlp_sqpmethod_export.h>
 
 /** \defgroup plugin_NlpSolver_sqpmethod
  A textbook SQPMethod
@@ -45,7 +45,7 @@ namespace casadi {
   *  @copydoc NLPSolver_doc
   *  @copydoc plugin_NlpSolver_sqpmethod
   */
-  class CASADI_NLPSOLVER_SQPMETHOD_EXPORT Sqpmethod : public NlpSolverInternal {
+  class CASADI_NLP_SQPMETHOD_EXPORT Sqpmethod : public NlpSolverInternal {
   public:
     explicit Sqpmethod(const Function& nlp);
     virtual ~Sqpmethod();

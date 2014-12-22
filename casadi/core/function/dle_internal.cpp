@@ -139,7 +139,7 @@ namespace casadi {
 
   std::map<std::string, DleInternal::Plugin> DleInternal::solvers_;
 
-  const std::string DleInternal::infix_ = "dlesolver";
+
 
 
 } // namespace casadi

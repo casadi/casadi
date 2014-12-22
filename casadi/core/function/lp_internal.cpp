@@ -96,7 +96,7 @@ namespace casadi {
 
   std::map<std::string, LpSolverInternal::Plugin> LpSolverInternal::solvers_;
 
-  const std::string LpSolverInternal::infix_ = "lpsolver";
+
 
 
 } // namespace casadi

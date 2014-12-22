@@ -199,8 +199,8 @@ int main(){
 	  nlp_solver = LiftedSQP(ffcn,gfcn);
 	  if(gauss_newton)
 	    nlp_solver.setOption("gauss_newton",true);
-	  nlp_solver.setOption("qp_solver",QPOasesSolver::creator);
-	  nlp_solver.setOption("qp_solver_options",qp_solver_options);
+	  nlp_solver.setOption("qp",QPOasesSolver::creator);
+	  nlp_solver.setOption("qp_options",qp_solver_options);
 	  nlp_solver.setOption("num_lifted",nv);
 	  nlp_solver.setOption("toldx",1e-9);
 // 	  nlp_solver.setOption("verbose",true);
@@ -210,8 +210,8 @@ int main(){
 	  nlp_solver = LiftedSQP(ffcn,gfcn);
 	  if(gauss_newton)
 	    nlp_solver.setOption("gauss_newton",true);
-	  nlp_solver.setOption("qp_solver",QPOasesSolver::creator);
-	  nlp_solver.setOption("qp_solver_options",qp_solver_options);
+	  nlp_solver.setOption("qp",QPOasesSolver::creator);
+	  nlp_solver.setOption("qp_options",qp_solver_options);
 	  nlp_solver.setOption("num_lifted",0);
 	  nlp_solver.setOption("toldx",1e-9);
 // 	  nlp_solver.setOption("verbose",true);
@@ -220,8 +220,8 @@ int main(){
 	  if(gauss_newton) continue; // not supported
 	  if(!lifting && x0>=0.07) continue;;
 	  nlp_solver = SQPMethod(ffcn,gfcn);
-	  nlp_solver.setOption("qp_solver",QPOasesSolver::creator);
-	  nlp_solver.setOption("qp_solver_options",qp_solver_options);
+	  nlp_solver.setOption("qp",QPOasesSolver::creator);
+	  nlp_solver.setOption("qp_options",qp_solver_options);
 	  if(gauss_newton){
 	    nlp_solver.setOption("gauss_newton",true);
 	  } else {

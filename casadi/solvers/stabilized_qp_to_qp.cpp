@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_STABILIZEDQPSOLVER_QP_EXPORT
-  casadi_register_stabilizedqpsolver_qp(StabilizedQpSolverInternal::Plugin* plugin) {
+  int CASADI_STABQP_QP_EXPORT
+  casadi_register_stabqp_qp(StabilizedQpSolverInternal::Plugin* plugin) {
     plugin->creator = StabilizedQpToQp::creator;
     plugin->name = "qp";
     plugin->doc = StabilizedQpToQp::meta_doc.c_str();
@@ -42,16 +42,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_STABILIZEDQPSOLVER_QP_EXPORT casadi_load_stabilizedqpsolver_qp() {
-    StabilizedQpSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_qp);
+  void CASADI_STABQP_QP_EXPORT casadi_load_stabqp_qp() {
+    StabilizedQpSolverInternal::registerPlugin(casadi_register_stabqp_qp);
   }
 
   StabilizedQpToQp::StabilizedQpToQp(const std::vector<Sparsity> &st)
       : StabilizedQpSolverInternal(st) {
-    addOption("qp_solver",         OT_STRING,   GenericType(),
-              "The QP solver used to solve the stabilized QPs.");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
-              "Options to be passed to the QP solver instance");
+    Adaptor::addOptions();
   }
 
   StabilizedQpToQp::~StabilizedQpToQp() {
@@ -70,13 +67,13 @@ namespace casadi {
     // Form augmented QP
     Sparsity H_sparsity_qp = blkdiag(st_[QP_STRUCT_H], Sparsity::diag(nc_));
     Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A], Sparsity::diag(nc_));
-    std::string qp_solver_name = getOption("qp_solver");
+    std::string qp_solver_name = getOption("qp");
     qp_solver_ = QpSolver(qp_solver_name,
                           qpStruct("h", H_sparsity_qp, "a", A_sparsity_qp));
 
     // Pass options if provided
-    if (hasSetOption("qp_solver_options")) {
-      Dictionary qp_solver_options = getOption("qp_solver_options");
+    if (hasSetOption("qp_options")) {
+      Dictionary qp_solver_options = getOption("qp_options");
       qp_solver_.setOption(qp_solver_options);
     }
 
