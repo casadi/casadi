@@ -308,8 +308,8 @@ namespace casadi {
     * Does bounds checking
     * ii and jj are not required to be monotonous
     */
-    Sparsity sub(const std::vector<int>& jj, const std::vector<int>& ii,
-                 std::vector<int>& mapping) const;
+    Sparsity sub(const std::vector<int>& rr, const std::vector<int>& cc,
+                 std::vector<int>& mapping, bool ind1) const;
 
     /// Get the index of an existing non-zero element
     int elem(int rr, int cc) const;
@@ -393,14 +393,6 @@ namespace casadi {
 
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spyMatlab(const std::string& mfile) const;
-
- private:
-    /// Time complexity: O(ii.size()*jj.size())
-    Sparsity sub1(const std::vector<int>& jj, const std::vector<int>& ii,
-                  std::vector<int>& mapping) const;
-    /// Time complexity: O(ii.size()*(nnz per column))
-    Sparsity sub2(const std::vector<int>& jj, const std::vector<int>& ii,
-                  std::vector<int>& mapping) const;
 };
 
 } // namespace casadi

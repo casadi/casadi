@@ -368,8 +368,9 @@ namespace casadi {
      * Returns the sparsity of the submatrix, with a mapping such that
      *   submatrix[k] = originalmatrix[mapping[k]]
      */
-    Sparsity sub(const std::vector<int>& jj, const std::vector<int>& ii,
-                 std::vector<int>& SWIG_OUTPUT(mapping)) const;
+    Sparsity sub(const std::vector<int>& rr,
+                 const std::vector<int>& cc,
+                 std::vector<int>& SWIG_OUTPUT(mapping), bool ind1=false) const;
 
     /// Transpose the matrix
     Sparsity T() const;

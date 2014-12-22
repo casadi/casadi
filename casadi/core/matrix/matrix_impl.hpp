@@ -133,19 +133,9 @@ namespace casadi {
     // Dimensions
     int sz1 = size1(), sz2 = size2();
 
-    // Nonzero mapping from submatrix to full
-    std::vector<int> mapping;
-
     // Get the sparsity pattern - does bounds checking
-    // TODO(@jaeandersson): refactor Sparsity::sub to make the following unnecessary
-    std::vector<int> r = rr.data(), c = cc.data();
-    if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
-      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
-    }
-    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
-    for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
-    Sparsity sp = sparsity().sub(r, c, mapping);
+    std::vector<int> mapping;
+    Sparsity sp = sparsity().sub(rr.data(), cc.data(), mapping, ind1);
 
     // Copy nonzeros and return
     Matrix<DataType> ret(sp);

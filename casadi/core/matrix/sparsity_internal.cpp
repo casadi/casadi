@@ -2183,83 +2183,125 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::sub(const vector<int>& rr, const vector<int>& cc,
-                                 vector<int>& mapping) const {
-    if (!inBounds(rr, nrow_)) {
+                                 vector<int>& mapping, bool ind1) const {
+    if (!inBounds(rr, -nrow_+ind1, nrow_+ind1)) {
       casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+                   << ", which is outside the range [" << -nrow_+ind1 << ","<< nrow_+ind1 <<  ").");
     }
-    if (!inBounds(cc, ncol_)) {
+    if (!inBounds(cc, -ncol_+ind1, ncol_+ind1)) {
       casadi_error("Slicing [rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+                   << ", which is outside the range [" << -ncol_+ind1 << ","<< ncol_+ind1 <<  ").");
     }
 
+    // Handle index-1, negative indices in rr
+    std::vector<int> tmp = rr;
+    for (vector<int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
+      if (ind1) (*i)--;
+      if (*i<0) *i += nrow_;
+    }
+    std::vector<int> rr_sorted, rr_sorted_index;
+    sort(tmp, rr_sorted, rr_sorted_index, false);
+
+    // Handle index-1, negative indices in cc
+    tmp = cc;
+    for (vector<int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
+      if (ind1) (*i)--;
+      if (*i<0) *i += ncol_;
+    }
+    std::vector<int> cc_sorted, cc_sorted_index;
+    sort(tmp, cc_sorted, cc_sorted_index, false);
+    vector<int> columns, rows;
+
     if (static_cast<double>(cc.size())*static_cast<double>(rr.size()) > size()) {
+      /// Time complexity: O(ii.size()*(nnz per column))
       // Typical use case:
       // a = SX::sym("a", sp_diag(50000))
       // a[:, :]
-      return sub2(rr, cc, mapping);
+      std::vector<int> rrlookup = lookupvector(rr_sorted, nrow_);
+
+      // count the number of non-zeros
+      int nnz = 0;
+
+      // loop over the columns of the slice
+      for (int i=0;i<cc.size();++i) {
+        int it = cc_sorted[i];
+        for (int el=colind_[it]; el<colind_[it+1]; ++el) { // loop over the non-zeros of the matrix
+          int j = row_[el];
+          int ji = rrlookup[j];
+          if (ji!=-1) {
+            int jv = rr_sorted[ji];
+            while (ji>=0 && jv == rr_sorted[ji--]) nnz++;
+          }
+        }
+      }
+
+      mapping.resize(nnz);
+      columns.resize(nnz);
+      rows.resize(nnz);
+
+      int k = 0;
+      // loop over the col of the slice
+      for (int i=0;i<cc.size();++i) {
+        int it = cc_sorted[i];
+        for (int el=colind_[it]; el<colind_[it+1]; ++el) { // loop over the non-zeros of the matrix
+          int jt = row_[el];
+          int ji = rrlookup[jt];
+          if (ji!=-1) {
+            int jv = rr_sorted[ji];
+            while (ji>=0 && jv == rr_sorted[ji]) {
+              rows[k] = rr_sorted_index[ji];
+              columns[k] = cc_sorted_index[i];
+              mapping[k] = el;
+              k++;
+              ji--;
+            }
+          }
+        }
+      }
     } else {
+      /// Time complexity: O(ii.size()*jj.size())
       // Typical use case:
       // a = DMatrix.ones(1000, 1000)
       // a[[0, 1],[0, 1]]
-      return sub1(rr, cc, mapping);
-    }
+      // count the number of non-zeros
+      int nnz = 0;
 
-  }
-
-  Sparsity SparsityInternal::sub2(const vector<int>& rr, const vector<int>& cc,
-                                  vector<int>& mapping) const {
-    std::vector<int> rr_sorted;
-    std::vector<int> rr_sorted_index;
-
-    std::vector<int> cc_sorted;
-    std::vector<int> cc_sorted_index;
-
-    sort(rr, rr_sorted, rr_sorted_index, false);
-    sort(cc, cc_sorted, cc_sorted_index, false);
-
-    std::vector<int> rrlookup = lookupvector(rr_sorted, nrow_);
-
-    // count the number of non-zeros
-    int nnz = 0;
-
-    // loop over the columns of the slice
-    for (int i=0;i<cc.size();++i) {
-      int it = cc_sorted[i];
-      for (int el=colind_[it]; el<colind_[it+1]; ++el) { // loop over the non-zeros of the matrix
-        int j = row_[el];
-        int ji = rrlookup[j];
-        if (ji!=-1) {
-          int jv = rr_sorted[ji];
-          while (ji>=0 && jv == rr_sorted[ji--]) nnz++;
+      for (int i=0; i<cc.size(); ++i) {
+        int it = cc_sorted[i];
+        int el=colind_[it];
+        for (int j=0;j<rr_sorted.size();++j) {
+          int jt=rr_sorted[j];
+          // Continue to the non-zero element
+          for (; el<colind_[it+1] && row_[el]<jt; ++el) {}
+          // Add the non-zero element, if there was an element in the location exists
+          if (el<colind_[it+1] && row_[el]== jt) {
+            nnz++;
+          }
         }
       }
-    }
 
-    mapping.resize(nnz);
+      mapping.resize(nnz);
+      columns.resize(nnz);
+      rows.resize(nnz);
 
-    vector<int> columns(nnz);
-    vector<int> rows(nnz);
-
-    int k = 0;
-    // loop over the col of the slice
-    for (int i=0;i<cc.size();++i) {
-      int it = cc_sorted[i];
-      for (int el=colind_[it]; el<colind_[it+1]; ++el) { // loop over the non-zeros of the matrix
-        int jt = row_[el];
-        int ji = rrlookup[jt];
-        if (ji!=-1) {
-          int jv = rr_sorted[ji];
-          while (ji>=0 && jv == rr_sorted[ji]) {
-            rows[k] = rr_sorted_index[ji];
+      int k=0;
+      for (int i=0; i<cc.size(); ++i) {
+        int it = cc_sorted[i];
+        int K = colind_[it];
+        for (int j=0;j<rr_sorted.size();++j) {
+          int jt=rr_sorted[j];
+          // Continue to the non-zero element
+          for (; K<colind_[it+1] && row_[K]<jt; ++K) {}
+          // Add the non-zero element, if there was an element in the location exists
+          if (K<colind_[it+1] && row_[K]== jt) {
+            rows[k] = rr_sorted_index[j];
             columns[k] = cc_sorted_index[i];
-            mapping[k] = el;
+            mapping[k] = K;
             k++;
-            ji--;
           }
         }
       }
@@ -2269,71 +2311,7 @@ namespace casadi {
     std::vector<int> mapping_ = mapping;
     Sparsity ret = Sparsity::triplet(rr.size(), cc.size(), rows, columns, sp_mapping);
 
-    for (int i=0;i<mapping.size();++i)
-      mapping[i] = mapping_[sp_mapping[i]];
-
-    // Create sparsity pattern
-    return ret;
-  }
-
-  Sparsity SparsityInternal::sub1(const vector<int>& rr, const vector<int>& cc,
-                                  vector<int>& mapping) const {
-
-    std::vector<int> rr_sorted;
-    std::vector<int> rr_sorted_index;
-
-    std::vector<int> cc_sorted;
-    std::vector<int> cc_sorted_index;
-
-    sort(rr, rr_sorted, rr_sorted_index, false);
-    sort(cc, cc_sorted, cc_sorted_index, false);
-
-    // count the number of non-zeros
-    int nnz = 0;
-
-    for (int i=0;i<cc.size();++i) {
-      int it = cc_sorted[i];
-      int el=colind_[it];
-      for (int j=0;j<rr_sorted.size();++j) {
-        int jt=rr_sorted[j];
-        // Continue to the non-zero element
-        for (; el<colind_[it+1] && row_[el]<jt; ++el) {}
-        // Add the non-zero element, if there was an element in the location exists
-        if (el<colind_[it+1] && row_[el]== jt) {
-          nnz++;
-        }
-      }
-    }
-
-    mapping.resize(nnz);
-
-    vector<int> columns(nnz);
-    vector<int> rows(nnz);
-
-
-    int k=0;
-    for (int i=0;i<cc.size();++i) {
-      int it = cc_sorted[i];
-      int K = colind_[it];
-      for (int j=0;j<rr_sorted.size();++j) {
-        int jt=rr_sorted[j];
-        // Continue to the non-zero element
-        for (; K<colind_[it+1] && row_[K]<jt; ++K) {}
-        // Add the non-zero element, if there was an element in the location exists
-        if (K<colind_[it+1] && row_[K]== jt) {
-          rows[k] = rr_sorted_index[j];
-          columns[k] = cc_sorted_index[i];
-          mapping[k] = K;
-          k++;
-        }
-      }
-    }
-
-    std::vector<int> sp_mapping;
-    std::vector<int> mapping_ = mapping;
-    Sparsity ret = Sparsity::triplet(rr.size(), cc.size(), rows, columns, sp_mapping);
-
-    for (int i=0;i<mapping.size();++i)
+    for (int i=0; i<mapping.size(); ++i)
       mapping[i] = mapping_[sp_mapping[i]];
 
     // Create sparsity pattern
