@@ -1025,6 +1025,12 @@ class NZproxy:
     void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
     void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
     void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
+
+    // 'end' function (needed for end syntax in MATLAB)
+    inline int end(int i, int n) {
+      return n==1 ? $self->numel() : i==1 ? $self->size1() : $self->size2();
+    }
+
 %enddef
 #endif
 
