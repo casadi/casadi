@@ -372,6 +372,14 @@ namespace casadi {
                  const std::vector<int>& cc,
                  std::vector<int>& SWIG_OUTPUT(mapping), bool ind1=false) const;
 
+    /** \brief Get a set of elements
+     *
+     * Returns the sparsity of the corresponding elements, with a mapping such that
+     *   submatrix[k] = originalmatrix[mapping[k]]
+     */
+    Sparsity sub(const std::vector<int>& rr, const Sparsity& sp,
+                 std::vector<int>& SWIG_OUTPUT(mapping), bool ind1=false) const;
+
     /// Transpose the matrix
     Sparsity T() const;
 

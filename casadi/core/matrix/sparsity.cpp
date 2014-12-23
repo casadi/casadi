@@ -252,6 +252,11 @@ namespace casadi {
     return (*this)->isTriu();
   }
 
+  Sparsity Sparsity::sub(const std::vector<int>& rr, const Sparsity& sp,
+                         std::vector<int>& mapping, bool ind1) const {
+    return (*this)->sub(rr, *sp, mapping, ind1);
+  }
+
   Sparsity Sparsity::sub(const std::vector<int>& rr, const std::vector<int>& cc,
                          std::vector<int>& mapping, bool ind1) const {
     return (*this)->sub(rr, cc, mapping, ind1);

@@ -2182,6 +2182,62 @@ namespace casadi {
     return ret;
   }
 
+  Sparsity SparsityInternal::sub(const vector<int>& rr, const SparsityInternal& sp,
+                                 vector<int>& mapping, bool ind1) const {
+    casadi_assert(rr.size()==sp.size());
+
+    // Check bounds
+    if (!inBounds(rr, -numel()+ind1, numel()+ind1)) {
+      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
+                   << *std::min_element(rr.begin(), rr.end()) << " up to "
+                   << *std::max_element(rr.begin(), rr.end())
+                   << ", which is outside the range [" << -numel()+ind1 << ","<< numel()+ind1 <<  ").");
+    }
+
+    // Handle index-1, negative indices
+    if (ind1 || *std::min_element(rr.begin(), rr.end())<0) {
+      std::vector<int> rr_mod = rr;
+      for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += numel();
+      }
+      return sub(rr_mod, sp, mapping, false); // Call recursively
+    }
+
+    // Find the nonzeros corresponding to rr
+    mapping.resize(rr.size());
+    std::copy(rr.begin(), rr.end(), mapping.begin());
+    elem(mapping);
+
+    // Construct new pattern of the corresponding elements
+    vector<int> ret_colind(sp.ncol_+1), ret_row;
+    ret_colind[0] = 0;
+    for (int c=0; c<sp.ncol_; ++c) {
+      for (int el=sp.colind_[c]; el<sp.colind_[c+1]; ++el) {
+        if (mapping[el]>=0) {
+          mapping[ret_row.size()] = mapping[el];
+          ret_row.push_back(sp.row_[el]);
+        }
+      }
+      ret_colind[c+1] = ret_row.size();
+    }
+    mapping.resize(ret_row.size());
+    return Sparsity(sp.nrow_, sp.ncol_, ret_colind, ret_row);
+
+#if 0
+    // Sort rr in nondecreasing order, if needed
+    if (!isNonDecreasing(rr)) {
+      std::vector<int> rr_sorted, rr_sorted_mapping;
+      sort(rr, rr_sorted, rr_sorted_index, false);
+      Sparsity ret = sub(rr_sorted, mapping, false); // Call recursively
+      for (vector<int>::iterator i=mapping.begin(); i!=mapping.end(); ++i) {
+        *i = rr_sorted_index[*i];
+      }
+      return ret;
+    }
+#endif
+  }
+
   Sparsity SparsityInternal::sub(const vector<int>& rr, const vector<int>& cc,
                                  vector<int>& mapping, bool ind1) const {
     if (!inBounds(rr, -nrow_+ind1, nrow_+ind1)) {

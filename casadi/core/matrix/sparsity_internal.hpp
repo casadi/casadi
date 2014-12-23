@@ -306,9 +306,16 @@ namespace casadi {
 
     /** \brief Get a submatrix
     * Does bounds checking
-    * ii and jj are not required to be monotonous
+    * rr and rr are not required to be monotonous
     */
     Sparsity sub(const std::vector<int>& rr, const std::vector<int>& cc,
+                 std::vector<int>& mapping, bool ind1) const;
+
+    /** \brief Get a set of elements
+    * Does bounds checking
+    * rr is not required to be monotonous
+    */
+    Sparsity sub(const std::vector<int>& rr, const SparsityInternal& sp,
                  std::vector<int>& mapping, bool ind1) const;
 
     /// Get the index of an existing non-zero element
