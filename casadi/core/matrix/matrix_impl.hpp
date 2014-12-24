@@ -175,30 +175,9 @@ namespace casadi {
       }
     }
 
-    casadi_assert_message(rr.isDense(), "Matrix::sub: Index vectors must be dense");
-    casadi_assert_message(rr.isVector() || rr.size1()==1, "Not implemented");
-
-    // Dimensions
-    int nel = numel();
-
-    // Nonzero mapping from submatrix to full
-    std::vector<int> mapping;
-
     // Get the sparsity pattern - does bounds checking
-    // TODO(@jaeandersson): refactor Sparsity::sub to make the following unnecessary
-    std::vector<int> r = rr.data();
-    if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
-    }
-    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += nel;
-
-    // Sparse mode
-    Sparsity sp;
-    if (rr.isVector()) {
-      sp = sparsity().sub(r, std::vector<int>(1, 0), mapping);
-    } else {
-      sp = sparsity().sub(std::vector<int>(1, 0), r, mapping);
-    }
+    std::vector<int> mapping;
+    Sparsity sp = sparsity().sub(rr.data(), rr.sparsity(), mapping, ind1);
 
     // Copy nonzeros and return
     Matrix<DataType> ret(sp);

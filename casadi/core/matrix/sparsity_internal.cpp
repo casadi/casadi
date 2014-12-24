@@ -2224,19 +2224,6 @@ namespace casadi {
     }
     mapping.resize(ret_row.size());
     return Sparsity(sp.nrow_, sp.ncol_, ret_colind, ret_row);
-
-#if 0
-    // Sort rr in nondecreasing order, if needed
-    if (!isNonDecreasing(rr)) {
-      std::vector<int> rr_sorted, rr_sorted_mapping;
-      sort(rr, rr_sorted, rr_sorted_index, false);
-      Sparsity ret = sub(rr_sorted, mapping, false); // Call recursively
-      for (vector<int>::iterator i=mapping.begin(); i!=mapping.end(); ++i) {
-        *i = rr_sorted_index[*i];
-      }
-      return ret;
-    }
-#endif
   }
 
   Sparsity SparsityInternal::sub(const vector<int>& rr, const vector<int>& cc,
@@ -2855,8 +2842,16 @@ namespace casadi {
     for (vector<int>::iterator it=indices.begin(); it!=indices.end(); ++it) {
       if (*it>=0) {
         int el = *it;
-        casadi_assert_message(el>=last,
-                              "Elements must be sorted columnwise in non-decreasing order");
+        if (el<last) {
+          // Sort rr in nondecreasing order, if needed
+          std::vector<int> indices_sorted, mapping;
+          sort(indices, indices_sorted, mapping, false);
+          elem(indices_sorted);
+          for (size_t i; i<indices.size(); ++i) {
+            indices[mapping[i]] = indices_sorted[i];
+          }
+          break;
+        }
         last = el;
       }
     }
