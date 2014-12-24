@@ -325,7 +325,7 @@ namespace casadi {
     std::vector<int> elem(const std::vector<int>& rr, const std::vector<int>& cc) const;
 
     /// Get the nonzero index for a set of elements (see description in public class)
-    void elem(std::vector<int>& indices, bool col_major) const;
+    void elem(std::vector<int>& indices) const;
 
     /// Does the rows appear sequentially on each col
     bool rowsSequential(bool strictly) const;

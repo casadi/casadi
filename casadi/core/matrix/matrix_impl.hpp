@@ -3150,10 +3150,10 @@ namespace casadi {
     Matrix<DataType> ret(sp, 0);
 
     // Get the elements of the known matrix
-    std::vector<int> known_ind = sparsity().getElements(false);
+    std::vector<int> known_ind = sparsity().getElements();
 
     // Find the corresponding nonzeros in the return matrix
-    sp.elem(known_ind, false);
+    sp.elem(known_ind);
 
     // Set the element values
     const std::vector<DataType>& A_data = data();

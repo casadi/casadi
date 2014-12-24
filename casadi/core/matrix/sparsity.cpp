@@ -525,8 +525,8 @@ namespace casadi {
     (*this)->getElements(loc, col_major);
   }
 
-  void Sparsity::elem(std::vector<int>& indices, bool col_major) const {
-    (*this)->elem(indices, col_major);
+  void Sparsity::elem(std::vector<int>& indices) const {
+    (*this)->elem(indices);
   }
 
   Sparsity Sparsity::unidirectionalColoring(const Sparsity& AT, int cutoff) const {

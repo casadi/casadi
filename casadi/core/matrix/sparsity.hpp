@@ -346,7 +346,7 @@ namespace casadi {
         nonzero index, i.e. column-wise.
         Elements not found in the sparsity pattern are set to -1.
     */
-    void elem(std::vector<int>& SWIG_INOUT(indices), bool col_major) const;
+    void elem(std::vector<int>& SWIG_INOUT(indices)) const;
 
     /// Get nonzeros in lower triangular part
     std::vector<int> getLowerNZ() const;
