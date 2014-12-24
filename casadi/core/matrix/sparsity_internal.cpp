@@ -2191,7 +2191,8 @@ namespace casadi {
       casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside the range [" << -numel()+ind1 << ","<< numel()+ind1 <<  ").");
+                   << ", which is outside the range [" << -numel()+ind1
+                   << ","<< numel()+ind1 <<  ").");
     }
 
     // Handle index-1, negative indices
@@ -2207,7 +2208,7 @@ namespace casadi {
     // Find the nonzeros corresponding to rr
     mapping.resize(rr.size());
     std::copy(rr.begin(), rr.end(), mapping.begin());
-    elem(mapping);
+    elem(mapping, false);
 
     // Construct new pattern of the corresponding elements
     vector<int> ret_colind(sp.ncol_+1), ret_row;
@@ -2845,7 +2846,7 @@ namespace casadi {
     }
   }
 
-  void SparsityInternal::elem(std::vector<int>& indices) const {
+  void SparsityInternal::elem(std::vector<int>& indices, bool col_major) const {
     // Quick return if no elements
     if (indices.empty()) return;
 
@@ -2853,9 +2854,14 @@ namespace casadi {
     int last=-1;
     for (vector<int>::iterator it=indices.begin(); it!=indices.end(); ++it) {
       if (*it>=0) {
-        int el_col = *it % ncol_;
-        int el_row = *it / ncol_;
-        int el = nrow_*el_col + el_row;
+        int el;
+        if (col_major) {
+          el = *it;
+        } else {
+          int el_col = *it % ncol_;
+          int el_row = *it / ncol_;
+          el = nrow_*el_col + el_row;
+        }
         casadi_assert_message(el>=last,
                               "Elements must be sorted columnwise in non-decreasing order");
         last = el;
@@ -2870,8 +2876,14 @@ namespace casadi {
     while (*it<0) it++; // first non-ignored
 
     // Current element sought
-    int el_col = *it % ncol_;
-    int el_row = *it / ncol_;
+    int el_col, el_row;
+    if (col_major) {
+      el_row = *it % nrow_;
+      el_col = *it / nrow_;
+    } else {
+      el_col = *it % ncol_;
+      el_row = *it / ncol_;
+    }
 
     // Loop over columns
     for (int i=0; i<ncol_; ++i) {
@@ -2891,8 +2903,13 @@ namespace casadi {
           if (++it==indices.end()) return;
 
           // Next element sought
-          el_col = *it % ncol_;
-          el_row = *it / ncol_;
+          if (col_major) {
+            el_row = *it % nrow_;
+            el_col = *it / nrow_;
+          } else {
+            el_col = *it % ncol_;
+            el_row = *it / ncol_;
+          }
         }
 
         // Add elements in pattern
@@ -2906,9 +2923,13 @@ namespace casadi {
           } while (*it<0);
 
           // Next element sought
-          el_col = *it % ncol_;
-          el_row = *it / ncol_;
-
+          if (col_major) {
+            el_row = *it % nrow_;
+            el_col = *it / nrow_;
+          } else {
+            el_col = *it % ncol_;
+            el_row = *it / ncol_;
+          }
         }
       }
     }

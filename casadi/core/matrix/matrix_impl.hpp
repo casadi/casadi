@@ -3153,7 +3153,7 @@ namespace casadi {
     std::vector<int> known_ind = sparsity().getElements(false);
 
     // Find the corresponding nonzeros in the return matrix
-    sp.elem(known_ind);
+    sp.elem(known_ind, false);
 
     // Set the element values
     const std::vector<DataType>& A_data = data();

@@ -617,7 +617,7 @@ namespace casadi {
   struct sortCompare {
     const std::vector<T> &v_;
     sortCompare(const std::vector<T> &v) : v_(v) {}
-    bool operator() (int i,int j) const { return v_[i]<v_[j];}
+    bool operator() (int i, int j) const { return v_[i]<v_[j];}
   };
 
   template<typename T>
