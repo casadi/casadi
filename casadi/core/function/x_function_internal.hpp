@@ -810,12 +810,12 @@ namespace casadi {
         }
 
         // Locate the nonzeros of the forward sensitivity matrix
-        output(oind).sparsity().getElements(nzmap, false);
-        fsens[d][oind].sparsity().elem(nzmap, false);
+        output(oind).sparsity().getElements(nzmap);
+        fsens[d][oind].sparsity().elem(nzmap, true);
 
         if (symmetric) {
-          input(iind).sparsity().getElements(nzmap2, false);
-          fsens[d][oind].sparsity().elem(nzmap2, false);
+          input(iind).sparsity().getElements(nzmap2);
+          fsens[d][oind].sparsity().elem(nzmap2, true);
         }
 
         // Assignments to the Jacobian
@@ -872,8 +872,8 @@ namespace casadi {
       for (int d=0; d<nadir_batch; ++d) {
 
         // Locate the nonzeros of the adjoint sensitivity matrix
-        input(iind).sparsity().getElements(nzmap, false);
-        asens[d][iind].sparsity().elem(nzmap, false);
+        input(iind).sparsity().getElements(nzmap);
+        asens[d][iind].sparsity().elem(nzmap, true);
 
         // For all the output nonzeros treated in the sweep
         for (int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el) {
