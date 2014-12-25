@@ -373,8 +373,19 @@ namespace casadi {
   }
 
   MX MX::getNZ(const Matrix<int>& kk) const {
+    // Get nonzeros of kk
     std::vector<int> k = kk.data();
     int sz = size();
+
+    // Check bounds
+    if (!inBounds(k, -sz, sz)) {
+      casadi_error("getNZ[kk] out of bounds. Your kk contains "
+                   << *std::min_element(k.begin(), k.end()) << " up to "
+                   << *std::max_element(k.begin(), k.end())
+                   << ", which is outside the range [" << -sz << ","<< sz <<  ").");
+    }
+
+    // Return reference to the nonzeros
     for (std::vector<int>::iterator i=k.begin(); i!=k.end(); ++i) if (*i<0) *i += sz;
     return (*this)->getGetNonzeros(kk.sparsity(), k);
   }

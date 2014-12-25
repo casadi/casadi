@@ -395,23 +395,24 @@ namespace casadi {
       return getNZ(kk.toSlice());
     }
 
-    // Get nonzeros
+    // Get nonzeros of kk
     const std::vector<int>& k = kk.data();
+    int sz = size();
 
-    try {
-      // Get nonzeros
-      int sz = size();
-      Matrix<DataType> ret = zeros(kk.sparsity());
-      for (int el=0; el<k.size(); ++el) {
-        ret.at(el) = at(k[el]>=0 ? k[el] : k[el]+sz); // Negative indices
-      }
-      return ret;
-    } catch(std::out_of_range& ex) {
-      std::stringstream ss;
-      ss << "Out of range error in Matrix<>::getNZ: " << k
-         << " not all in range [-" << size() << "," << size() << ")";
-      throw CasadiException(ss.str());
+    // Check bounds
+    if (!inBounds(k, -sz, sz)) {
+      casadi_error("getNZ[kk] out of bounds. Your kk contains "
+                   << *std::min_element(k.begin(), k.end()) << " up to "
+                   << *std::max_element(k.begin(), k.end())
+                   << ", which is outside the range [" << -sz << ","<< sz <<  ").");
     }
+
+    // Copy nonzeros
+    Matrix<DataType> ret = zeros(kk.sparsity());
+    for (int el=0; el<k.size(); ++el) {
+      ret.at(el) = at(k[el]>=0 ? k[el] : k[el]+sz); // Negative indices
+    }
+    return ret;
   }
 
   template<typename DataType>
