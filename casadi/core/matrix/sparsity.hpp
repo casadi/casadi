@@ -485,7 +485,7 @@ namespace casadi {
     Sparsity makeDense(std::vector<int>& mapping) const;
 
     /** \brief Erase rows and/or columns of a matrix */
-    std::vector<int> erase(const std::vector<int>& jj, const std::vector<int>& ii);
+    std::vector<int> erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
     /// Append another sparsity patten vertically (NOTE: only efficient if vector)
     void append(const Sparsity& sp);

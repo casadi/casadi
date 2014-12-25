@@ -2050,26 +2050,41 @@ namespace casadi {
     return std::pair<int, int>(nrow_, ncol_);
   }
 
-  vector<int> SparsityInternal::erase(const vector<int>& rr, const vector<int>& cc) {
-    if (!inBounds(rr, nrow_)) {
+  vector<int> SparsityInternal::erase(const vector<int>& rr, const vector<int>& cc, bool ind1) {
+    if (!inBounds(rr, -nrow_+ind1, nrow_+ind1)) {
       casadi_error("Slicing [rr, cc] out of bounds. Your rr contains " <<
                    *std::min_element(rr.begin(), rr.end()) << " up to " <<
                    *std::max_element(rr.begin(), rr.end()) <<
-                   ", which is outside of the matrix shape " << dimString() << ".");
+                   ", which is outside the range [" << -nrow_+ind1 << ","<< nrow_+ind1 <<  ").");
     }
-    if (!inBounds(cc, ncol_)) {
+    if (!inBounds(cc, -ncol_+ind1, ncol_+ind1)) {
       casadi_error("Slicing [rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+                   << ", which is outside the range [" << -ncol_+ind1 << ","<< ncol_+ind1 <<  ").");
+    }
+
+    // Handle index-1, negative indices
+    if (ind1 || *std::min_element(rr.begin(), rr.end())<0
+        ||  *std::min_element(cc.begin(), cc.end())<0) {
+      std::vector<int> rr_mod = rr;
+      for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += nrow_;
+      }
+      std::vector<int> cc_mod = cc;
+      for (vector<int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += ncol_;
+      }
+      return erase(rr_mod, cc_mod, false); // Call recursively
     }
 
     // Mapping
     vector<int> mapping;
 
     // Quick return if no elements
-    if (numel()==0)
-      return mapping;
+    if (numel()==0) return mapping;
 
     // Reserve memory
     mapping.reserve(size());

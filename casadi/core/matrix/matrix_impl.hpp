@@ -305,6 +305,9 @@ namespace casadi {
       }
     } else {
       // Sparse mode
+      // Remove submatrix to be replaced
+      erase(rr.data(), cc.data(), ind1);
+
       std::vector<int> r = rr.data(), c = cc.data();
       if (ind1) {
         for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
@@ -312,9 +315,6 @@ namespace casadi {
       }
       for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
       for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
-
-      // Remove submatrix to be replaced
-      erase(r, c);
 
       // Extend el to the same dimension as this
       Matrix<DataType> el_ext = m;
@@ -1411,7 +1411,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::erase(const std::vector<int>& rr, const std::vector<int>& cc) {
+  void Matrix<DataType>::erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1) {
     // Erase from sparsity pattern
     std::vector<int> mapping = sparsityRef().erase(rr, cc);
 
