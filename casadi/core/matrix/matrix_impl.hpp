@@ -189,15 +189,14 @@ namespace casadi {
 
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Sparsity& sp) const {
-    casadi_assert_message(
-      size1()==sp.size1() && size2()==sp.size2(),
-      "getSub(Sparsity sp): shape mismatch. This matrix has shape "
-      << size1() << " x " << size2()
-      << ", but supplied sparsity index has shape "
-      << sp.size1() << " x " << sp.size2() << ".");
+    casadi_assert_message(shape()==sp.shape(),
+                          "getSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          << shape() << ", but supplied sparsity index has shape "
+                          << sp.shape() << ".");
+    // Return value
     Matrix<DataType> ret(sp);
 
-    std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
+    std::vector<unsigned char> mapping;
     sparsity().patternCombine(sp, false, true, mapping);
 
     int k = 0;     // Flat index into non-zeros of this matrix
@@ -385,26 +384,21 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
-                                const Sparsity& sp) {
-    casadi_assert_message(
-      size2()==sp.size2() && size1()==sp.size1(),
-      "setSub(Sparsity sp): shape mismatch. This matrix has shape "
-      << size2() << " x " << size1()
-      << ", but supplied sparsity index has shape "
-      << sp.size2() << " x " << sp.size1() << ".");
-    // TODO(@jaeandersson): optimize this for speed
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Sparsity& sp) {
+    casadi_assert_message(shape()==sp.shape(),
+                          "setSub(Sparsity sp): shape mismatch. This matrix has shape " << shape()
+                          << ", but supplied sparsity index has shape " << sp.shape() << ".");
     Matrix<DataType> elm;
     if (m.isScalar()) {
-      elm = Matrix<DataType>(sp, m.at(0));
+      elm = Matrix<DataType>(sp, m.toScalar());
     } else {
       elm = m.getSub(ind1, sp);
     }
 
-    for (int i=0; i<sp.colind().size()-1; ++i) {
-      for (int k=sp.colind()[i]; k<sp.colind()[i+1]; ++k) {
-        int j=sp.row()[k];
-        elem(j, i)=elm.data()[k];
+    for (int cc=0; cc<sp.size2(); ++cc) {
+      for (int k=sp.colind(cc); k<sp.colind(cc+1); ++k) {
+        int rr=sp.row(k);
+        elem(rr, cc)=elm.at(k);
       }
     }
   }
