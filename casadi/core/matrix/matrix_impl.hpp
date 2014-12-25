@@ -90,7 +90,7 @@ namespace casadi {
       if (k>=0) {
         return at(k);
       } else {
-        return Matrix<DataType>::sparse(1,1);
+        return Matrix<DataType>::sparse(1, 1);
       }
     }
 
@@ -159,7 +159,7 @@ namespace casadi {
       if (k>=0) {
         return at(k);
       } else {
-        return Matrix<DataType>::sparse(1,1);
+        return Matrix<DataType>::sparse(1, 1);
       }
     }
 
