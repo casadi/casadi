@@ -117,16 +117,6 @@ namespace casadi {
   }
 
   const MX MX::getSub(bool ind1, const Slice& rr, const Slice& cc) const {
-    // Both are scalar
-    if (rr.isScalar() && cc.isScalar()) {
-      int ind = sparsity().elem(rr.toScalar(size1()), cc.toScalar(size2()));
-      if (ind>=0) {
-        return (*this)->getGetNonzeros(Sparsity::getScalar(), std::vector<int>(1, ind));
-      } else {
-        return (*this)->getGetNonzeros(Sparsity::getScalarSparse(), std::vector<int>(0));
-      }
-    }
-
     // Fall back on (IMatrix, IMatrix)
     return getSub(ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
@@ -142,9 +132,9 @@ namespace casadi {
   }
 
   const MX MX::getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
-    // Scalar
-    if (rr.isScalar() && cc.isScalar()) {
-      return getSub(ind1, rr.toSlice(ind1), cc.toSlice(ind1));
+    // Row vector rr (e.g. in MATLAB) is transposed to column vector
+    if (rr.size1()==1 && rr.size2()>1) {
+      return getSub(ind1, rr.T(), cc);
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
@@ -152,46 +142,42 @@ namespace casadi {
       return getSub(ind1, rr, cc.T());
     }
 
-    casadi_assert_message(rr.isDense() && cc.isDense(), "Matrix::sub: Index vectors must be dense");
-    casadi_assert_message(cc.isScalar() || (rr.isVector() && cc.isVector()),
-                          "Unknown overload of Matrix::sub");
+    casadi_assert_message(rr.isDense() && rr.isVector(),
+                          "Marix::getSub: First index must be a dense vector");
+    casadi_assert_message(cc.isDense() && cc.isVector(),
+                          "Marix::getSub: Second index must be a dense vector");
 
-    // Dimensions
-    int sz1 = size1(), sz2 = size2();
-
-    // Sought indices as vectors
-    // TODO(@jaeandersson): refactor Sparsity::sub to make the following unnecessary
-    std::vector<int> r = rr.data(), c = cc.data();
-    if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
-      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
-    }
-    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
-    for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
-
-    // Nonzero mapping from submatrix to full
+    // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
-
-    // Get the sparsity pattern
-    Sparsity sp = sparsity().sub(r, c, mapping);
+    Sparsity sp = sparsity().sub(rr.data(), cc.data(), mapping, ind1);
 
     // Create return MX
-    MX ret = (*this)->getGetNonzeros(sp, mapping);
-
-    // Reshape, if needed
-    if (!rr.isVector()) ret = reshape(ret, rr.shape());
-
-    // Return (RVO)
-    return ret;
+    return (*this)->getGetNonzeros(sp, mapping);
   }
 
   const MX MX::getSub(bool ind1, const Slice& rr) const {
     // Fall back on IMatrix
-    return getSub(ind1, rr.getAll(size1(), ind1));
+    return getSub(ind1, rr.getAll(numel(), ind1));
   }
 
   const MX MX::getSub(bool ind1, const Matrix<int>& rr) const {
-    return getSub(ind1, rr, ind1);
+    // If the indexed matrix is dense, use nonzero indexing
+    if (isDense()) {
+      if (ind1) {
+        IMatrix rr0 = rr;
+        for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) (*i)--;
+        return getNZ(rr0);
+      } else {
+        return getNZ(rr);
+      }
+    }
+
+    // Get the sparsity pattern - does bounds checking
+    std::vector<int> mapping;
+    Sparsity sp = sparsity().sub(rr.data(), rr.sparsity(), mapping, ind1);
+
+    // Create return MX
+    return (*this)->getGetNonzeros(sp, mapping);
   }
 
   const MX MX::getSub(bool ind1, const Sparsity& sp) const {
