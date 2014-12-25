@@ -186,7 +186,8 @@ namespace casadi {
   }
 
   const MX MX::getSub(bool ind1, const Slice& rr) const {
-    return getSub(ind1, rr, ind1);
+    // Fall back on IMatrix
+    return getSub(ind1, rr.getAll(size1(), ind1));
   }
 
   const MX MX::getSub(bool ind1, const Matrix<int>& rr) const {
@@ -243,52 +244,60 @@ namespace casadi {
   }
 
   void MX::setSub(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) {
-    casadi_assert_message(rr.isDense() && cc.isDense(),
-                          "MX::setSub: Index vectors must be dense");
-    casadi_assert_message(/*cc.isScalar() || */ (rr.isVector() && cc.isVector()),
-                          "Unknown overload of MX::setSub");
+    // Row vector rr (e.g. in MATLAB) is transposed to column vector
+    if (rr.size1()==1 && rr.size2()>1) {
+      return setSub(m, ind1, rr.T(), cc);
+    }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
       return setSub(m, ind1, rr, cc.T());
     }
 
+    // Make sure rr and cc are dense vectors
+    casadi_assert_message(rr.isDense() && rr.isVector(),
+                          "MX::setSub: First index not dense vector");
+    casadi_assert_message(cc.isDense() && cc.isVector(),
+                          "MX::setSub: Second index not dense vector");
+
     // Call recursively if m scalar, and submatrix isn't
-    if (m.isScalar() && (rr.numel()>1 || cc.numel()>1)) {
-      if (cc.isScalar()) {
-        return setSub(repmat(m, rr.shape()), ind1, rr, cc);
-      } else {
-        return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
-      }
+    if (m.isScalar() && (rr.size1()>1 || cc.size1()>1)) {
+      return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
     }
+
+    // Assert dimensions of assigning matrix
+    casadi_assert_message(cc.size1() == m.size2() && rr.size1() == m.size1(),
+                          "Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
+                          << cc.size1() << ", while rhs is " << m.shape());
 
     // Dimensions
     int sz1 = size1(), sz2 = size2();
 
-    // Sought indices as vectors
-    // TODO(@jaeandersson): refactor to make the following unnecessary
-    std::vector<int> r = rr.data(), c = cc.data();
-    if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
-      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
+    // Report out-of-bounds
+    if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
+      casadi_error("setSub[., r, c] out of bounds. Your rr contains "
+                   << *std::min_element(rr.begin(), rr.end()) << " up to "
+                   << *std::max_element(rr.begin(), rr.end())
+                   << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
-    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
-    for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
-
-    casadi_assert_message(r.size()==m.size1(),
-                          "Dimension mismatch." << "lhs is " << r.size() << " x " << c.size()
-                          << ", while rhs is " << m.dimString());
-    casadi_assert_message(c.size()==m.size2(),
-                          "Dimension mismatch." << "lhs is " << r.size() << " x " << c.size()
-                          << ", while rhs is " << m.dimString());
+    if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
+      casadi_error("setSub [., r, c] out of bounds. Your cc contains "
+                   << *std::min_element(cc.begin(), cc.end()) << " up to "
+                   << *std::max_element(cc.begin(), cc.end())
+                   << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
+    }
 
     if (isDense() && m.isDense()) {
       // Dense mode
       int ld = size1(), ld_el = m.size1(); // leading dimensions
       std::vector<int> kk1, kk2;
-      for (int i=0; i<c.size(); ++i) {
-        for (int j=0; j<r.size(); ++j) {
-          kk1.push_back(c[i]*ld + r[j]);
+      for (int i=0; i<cc.size1(); ++i) {
+        int c = cc.at(i) - ind1;
+        if (c<0) c += sz2;
+        for (int j=0; j<rr.size1(); ++j) {
+          int r = rr.at(j) - ind1;
+          if (r<0) r += sz1;
+          kk1.push_back(c*ld + r);
           kk2.push_back(i*ld_el+j);
         }
       }
@@ -297,11 +306,11 @@ namespace casadi {
       // Sparse mode
 
       // Remove submatrix to be replaced
-      erase(r, c);
+      erase(rr.data(), cc.data(), ind1);
 
       // Extend m to the same dimension as this
       MX el_ext = m;
-      el_ext.enlarge(size1(), size2(), r, c);
+      el_ext.enlarge(sz1, sz2, rr.data(), cc.data(), ind1);
 
       // Unite the sparsity patterns
       *this = unite(*this, el_ext);
@@ -309,11 +318,29 @@ namespace casadi {
   }
 
   void MX::setSub(const MX& m, bool ind1, const Slice& rr) {
-    setSub(m, ind1, rr, ind1);
+    // Fall back on IMatrix
+    setSub(m, ind1, rr.getAll(size1(), ind1));
   }
 
   void MX::setSub(const MX& m, bool ind1, const Matrix<int>& rr) {
-    setSub(m, ind1, rr, ind1);
+    // If the indexed matrix is dense, use nonzero indexing
+    if (isDense() && m.isDense()) {
+      if (ind1) {
+        IMatrix rr0 = rr;
+        for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) (*i)--;
+        return setNZ(m, rr0);
+      } else {
+        return setNZ(m, rr);
+      }
+    }
+
+    // Call recursively if m scalar, and submatrix isn't
+    if (m.isScalar() && rr.numel()>1) {
+      return setSub(repmat(m, rr.shape()), ind1, rr);
+    }
+
+    // TODO(@jaeandersson): Finish the following
+    casadi_error("Not implemented");
   }
 
   void MX::setSub(const MX& m, bool ind1, const Sparsity& sp) {
@@ -512,12 +539,12 @@ namespace casadi {
     return (*this)->sparsity_;
   }
 
-  void MX::erase(const std::vector<int>& rr, const std::vector<int>& cc) {
+  void MX::erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1) {
     // Get sparsity of the new matrix
     Sparsity sp = sparsity();
 
     // Erase from sparsity pattern
-    std::vector<int> mapping = sp.erase(rr, cc);
+    std::vector<int> mapping = sp.erase(rr, cc, ind1);
 
     // Create new matrix
     if (mapping.size()!=size()) {
@@ -526,11 +553,12 @@ namespace casadi {
     }
   }
 
-  void MX::enlarge(int nrow, int ncol, const std::vector<int>& rr, const std::vector<int>& cc) {
+  void MX::enlarge(int nrow, int ncol,
+                   const std::vector<int>& rr, const std::vector<int>& cc, bool ind1) {
     Sparsity sp = sparsity();
-    sp.enlarge(nrow, ncol, rr, cc);
+    sp.enlarge(nrow, ncol, rr, cc, ind1);
 
-    MX ret = (*this)->getGetNonzeros(sp, range(size()));
+    MX ret = (*this)->getGetNonzeros(sp, range(size())); // FIXME?
     *this = ret;
   }
 
