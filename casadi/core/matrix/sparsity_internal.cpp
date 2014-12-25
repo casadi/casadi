@@ -2260,20 +2260,30 @@ namespace casadi {
     sort(tmp, cc_sorted, cc_sorted_index, false);
     vector<int> columns, rows;
 
-    if (static_cast<double>(cc.size())*static_cast<double>(rr.size()) > size()) {
-      /// Time complexity: O(ii.size()*(nnz per column))
+    // With lookup vector
+    bool with_lookup = static_cast<double>(cc.size())*static_cast<double>(rr.size()) > size();
+    std::vector<int> rrlookup;
+    if (with_lookup) {
+      // Time complexity: O(ii.size()*(nnz per column))
       // Typical use case:
       // a = SX::sym("a", sp_diag(50000))
       // a[:, :]
-      std::vector<int> rrlookup = lookupvector(rr_sorted, nrow_);
+      rrlookup = lookupvector(rr_sorted, nrow_);
+      // Else: Time complexity: O(ii.size()*jj.size())
+      // Typical use case:
+      // a = DMatrix.ones(1000, 1000)
+      // a[[0, 1],[0, 1]]
+    }
 
-      // count the number of non-zeros
-      int nnz = 0;
+    // count the number of non-zeros
+    int nnz = 0;
 
-      // loop over the columns of the slice
-      for (int i=0;i<cc.size();++i) {
-        int it = cc_sorted[i];
-        for (int el=colind_[it]; el<colind_[it+1]; ++el) { // loop over the non-zeros of the matrix
+    // loop over the columns of the slice
+    for (int i=0; i<cc.size(); ++i) {
+      int it = cc_sorted[i];
+      if (with_lookup) {
+        // loop over the non-zeros of the matrix
+        for (int el=colind_[it]; el<colind_[it+1]; ++el) {
           int j = row_[el];
           int ji = rrlookup[j];
           if (ji!=-1) {
@@ -2281,17 +2291,30 @@ namespace casadi {
             while (ji>=0 && jv == rr_sorted[ji--]) nnz++;
           }
         }
+      } else {
+        // Loop over rr
+        int el = colind_[it];
+        for (int j=0; j<rr_sorted.size(); ++j) {
+          int jt=rr_sorted[j];
+          // Continue to the non-zero element
+          while (el<colind_[it+1] && row_[el]<jt) el++;
+          // Add the non-zero element, if there was an element in the location exists
+          if (el<colind_[it+1] && row_[el]== jt) nnz++;
+        }
       }
+    }
 
-      mapping.resize(nnz);
-      columns.resize(nnz);
-      rows.resize(nnz);
+    mapping.resize(nnz);
+    columns.resize(nnz);
+    rows.resize(nnz);
 
-      int k = 0;
-      // loop over the col of the slice
-      for (int i=0;i<cc.size();++i) {
-        int it = cc_sorted[i];
-        for (int el=colind_[it]; el<colind_[it+1]; ++el) { // loop over the non-zeros of the matrix
+    int k = 0;
+    // loop over the columns of the slice
+    for (int i=0; i<cc.size(); ++i) {
+      int it = cc_sorted[i];
+      if (with_lookup) {
+        // loop over the non-zeros of the matrix
+        for (int el=colind_[it]; el<colind_[it+1]; ++el) {
           int jt = row_[el];
           int ji = rrlookup[jt];
           if (ji!=-1) {
@@ -2305,46 +2328,18 @@ namespace casadi {
             }
           }
         }
-      }
-    } else {
-      /// Time complexity: O(ii.size()*jj.size())
-      // Typical use case:
-      // a = DMatrix.ones(1000, 1000)
-      // a[[0, 1],[0, 1]]
-      // count the number of non-zeros
-      int nnz = 0;
-
-      for (int i=0; i<cc.size(); ++i) {
-        int it = cc_sorted[i];
-        int el=colind_[it];
-        for (int j=0;j<rr_sorted.size();++j) {
+      } else {
+        // Loop over rr
+        int el = colind_[it];
+        for (int j=0; j<rr_sorted.size(); ++j) {
           int jt=rr_sorted[j];
           // Continue to the non-zero element
-          for (; el<colind_[it+1] && row_[el]<jt; ++el) {}
+          while (el<colind_[it+1] && row_[el]<jt) el++;
           // Add the non-zero element, if there was an element in the location exists
           if (el<colind_[it+1] && row_[el]== jt) {
-            nnz++;
-          }
-        }
-      }
-
-      mapping.resize(nnz);
-      columns.resize(nnz);
-      rows.resize(nnz);
-
-      int k=0;
-      for (int i=0; i<cc.size(); ++i) {
-        int it = cc_sorted[i];
-        int K = colind_[it];
-        for (int j=0;j<rr_sorted.size();++j) {
-          int jt=rr_sorted[j];
-          // Continue to the non-zero element
-          for (; K<colind_[it+1] && row_[K]<jt; ++K) {}
-          // Add the non-zero element, if there was an element in the location exists
-          if (K<colind_[it+1] && row_[K]== jt) {
             rows[k] = rr_sorted_index[j];
             columns[k] = cc_sorted_index[i];
-            mapping[k] = K;
+            mapping[k] = el;
             k++;
           }
         }
