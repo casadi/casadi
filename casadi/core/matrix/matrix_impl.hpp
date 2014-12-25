@@ -258,61 +258,67 @@ namespace casadi {
       return setSub(m, ind1, rr, cc.T());
     }
 
-    casadi_assert_message(rr.isDense() && rr.isVector() && cc.isDense() && cc.isVector(),
-                          "Matrix::setSub: Index vectors must be dense vectors");
+    // Make sure rr and cc are dense vectors
+    casadi_assert_message(rr.isDense() && rr.isVector(),
+                          "Matrix::setSub: First index not dense vector");
+    casadi_assert_message(cc.isDense() && cc.isVector(),
+                          "Matrix::setSub: Second index not dense vector");
 
     // Call recursively if m scalar, and submatrix isn't
-    if (m.isScalar() && (rr.numel()>1 || cc.numel()>1)) {
+    if (m.isScalar() && (rr.size1()>1 || cc.size1()>1)) {
       return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
     }
+
+    // Assert dimensions of assigning matrix
+    casadi_assert_message(cc.size1() == m.size2() && rr.size1() == m.size1(),
+                          "Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
+                          << cc.size1() << ", while rhs is " << m.shape());
 
     // Dimensions
     int sz1 = size1(), sz2 = size2();
 
-    // Sought indices as vectors
-    // TODO(@jaeandersson): refactor to make the following unnecessary
-    std::vector<int> r = rr.data(), c = cc.data();
-    if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
-      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
+    // Report out-of-bounds
+    if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
+      casadi_error("setSub[., r, c] out of bounds. Your rr contains "
+                   << *std::min_element(rr.begin(), rr.end()) << " up to "
+                   << *std::max_element(rr.begin(), rr.end())
+                   << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
-    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
-    for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
-
-    casadi_assert_message(c.size() == m.size2() && r.size() == m.size1(),
-                          "Dimension mismatch." << "lhs is " << r.size() << "-by-"
-                          << c.size() << ", while rhs is " << m.shape());
-
-    if (!inBounds(r, size1())) {
-      casadi_error("setSub[., r, c] out of bounds. Your r contains "
-                   << *std::min_element(r.begin(), r.end()) << " up to "
-                   << *std::max_element(r.begin(), r.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-    if (!inBounds(c, size2())) {
-      casadi_error("setSub [., r, c] out of bounds. Your c contains "
-                   << *std::min_element(c.begin(), c.end()) << " up to "
-                   << *std::max_element(c.begin(), c.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+    if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
+      casadi_error("setSub [., r, c] out of bounds. Your cc contains "
+                   << *std::min_element(cc.begin(), cc.end()) << " up to "
+                   << *std::max_element(cc.begin(), cc.end())
+                   << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
     }
 
     if (isDense() && m.isDense()) {
       // Dense mode
       int el=0;
-      for (int i=0; i<c.size(); ++i) {
-        for (int j=0; j<r.size(); ++j) {
-          at(c[i]*size1() + r[j]) = m.at(el++);
+      for (int i=0; i<cc.size1(); ++i) {
+        int c = cc.at(i) - ind1;
+        if (c<0) c += sz2;
+        for (int j=0; j<rr.size1(); ++j) {
+          int r = rr.at(j) - ind1;
+          if (r<0) r += sz1;
+          at(c*sz1 + r) = m.at(el++);
         }
       }
     } else {
       // Sparse mode
+      std::vector<int> r = rr.data(), c = cc.data();
+      if (ind1) {
+        for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
+        for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
+      }
+      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
+      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
 
       // Remove submatrix to be replaced
       erase(r, c);
 
       // Extend el to the same dimension as this
       Matrix<DataType> el_ext = m;
-      el_ext.enlarge(size1(), size2(), r, c);
+      el_ext.enlarge(sz1, sz2, r, c);
 
       // Unite the sparsity patterns
       *this = unite(*this, el_ext);
