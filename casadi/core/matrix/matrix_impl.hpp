@@ -85,8 +85,13 @@ namespace casadi {
   const Matrix<DataType> Matrix<DataType>::getSub(bool ind1,
                                                   const Slice& rr, const Slice& cc) const {
     // Both are scalar
-    if (rr.isScalar() && cc.isScalar()) {
-      return elem(rr.toScalar(size1()), cc.toScalar(size2()));
+    if (rr.isScalar(size1()) && cc.isScalar(size2())) {
+      int k = sparsity().elem(rr.toScalar(size1()), cc.toScalar(size2()));
+      if (k>=0) {
+        return at(k);
+      } else {
+        return Matrix<DataType>::sparse(1,1);
+      }
     }
 
     // Fall back on IMatrix-IMatrix
@@ -148,9 +153,14 @@ namespace casadi {
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Slice& rr) const {
     // Scalar
-    if (rr.isScalar()) {
+    if (rr.isScalar(numel())) {
       int r = rr.toScalar(numel());
-      return elem(r % size1(), r / size1());
+      int k = sparsity().elem(r % size1(), r / size1());
+      if (k>=0) {
+        return at(k);
+      } else {
+        return Matrix<DataType>::sparse(1,1);
+      }
     }
 
     // Fall back on IMatrix
@@ -217,7 +227,7 @@ namespace casadi {
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Slice& cc) {
     // Both are scalar
-    if (rr.isScalar() && cc.isScalar() && m.isDense()) {
+    if (rr.isScalar(size1()) && cc.isScalar(size2()) && m.isDense()) {
       elem(rr.toScalar(size1()), cc.toScalar(size2())) = m.toScalar();
       return;
     }
@@ -320,7 +330,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr) {
     // Scalar
-    if (rr.isScalar() && m.isDense()) {
+    if (rr.isScalar(numel()) && m.isDense()) {
       int r = rr.toScalar(numel());
       elem(r % size1(), r / size1()) = m.toScalar();
       return;
@@ -380,7 +390,7 @@ namespace casadi {
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::getNZ(const Slice& kk) const {
     // Scalar
-    if (kk.isScalar()) {
+    if (kk.isScalar(size())) {
       return at(kk.toScalar(size()));
     }
 
@@ -419,7 +429,7 @@ namespace casadi {
   void Matrix<DataType>::setNZ(const Matrix<DataType>& m, const Slice& kk) {
     try {
       // Scalar
-      if (kk.isScalar()) {
+      if (kk.isScalar(size())) {
          at(kk.toScalar(size())) = m.toScalar();
          return;
       }

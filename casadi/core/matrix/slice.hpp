@@ -69,7 +69,7 @@ namespace casadi {
     std::vector<int> getAll(const Slice& outer, int len) const;
 
     /// Is the slice a scalar
-    bool isScalar() const;
+    bool isScalar(int len) const;
 
     /// Get scalar (if isScalar)
     int toScalar(int len) const;

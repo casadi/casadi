@@ -223,15 +223,15 @@ namespace casadi {
     return ret;
   }
 
-  bool Slice::isScalar() const {
-    if (step_!=1) return false;
-    if (stop_==start_+1) return true;
-    if (start_==-1 && stop_ == std::numeric_limits<int>::max()) return true;
-    return false;
+  bool Slice::isScalar(int len) const {
+    int start = std::min(start_, len);
+    int stop = std::min(stop_, len);
+    int nret = (stop-start)/step_ + ((stop-start)%step_!=0);
+    return nret==1;
   }
 
   int Slice::toScalar(int len) const {
-    casadi_assert(isScalar());
+    casadi_assert(isScalar(len));
     casadi_assert_message(start_ >= -len && start_ < len, "Slice::getScalar: out of bounds");
     return start_ >= 0 ? start_ : start_+len;
   }
