@@ -410,34 +410,27 @@ namespace casadi {
     int sz = size();
 
     // Check bounds
-    if (!inBounds(k, -sz, sz)) {
+    if (!inBounds(k, -1, sz)) {
       casadi_error("getNZ[kk] out of bounds. Your kk contains "
                    << *std::min_element(k.begin(), k.end()) << " up to "
                    << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [" << -sz << ","<< sz <<  ").");
+                   << ", which is outside the range [-1,"<< sz <<  ").");
     }
 
     // Copy nonzeros
     Matrix<DataType> ret = zeros(kk.sparsity());
     for (int el=0; el<k.size(); ++el) {
-      ret.at(el) = at(k[el]>=0 ? k[el] : k[el]+sz); // Negative indices
+      ret.at(el) = k[el]>=0 ? at(k[el]) : 0;
     }
     return ret;
   }
 
   template<typename DataType>
   void Matrix<DataType>::setNZ(const Matrix<DataType>& m, const Slice& kk) {
-    try {
-      // Scalar
-      if (kk.isScalar(size())) {
-         at(kk.toScalar(size())) = m.toScalar();
-         return;
-      }
-    } catch(std::out_of_range& ex) {
-      std::stringstream ss;
-      ss << "Out of range error in Matrix<>::setNZ: " << kk
-         << " not all in range [-" << size() << "," << size() << ")";
-      throw CasadiException(ss.str());
+    // Scalar
+    if (kk.isScalar(size())) {
+      at(kk.toScalar(size())) = m.toScalar();
+      return;
     }
 
     // Fallback on IMatrix
@@ -453,20 +446,26 @@ namespace casadi {
 
     // Get nonzeros
     const std::vector<int>& k = kk.data();
+    int sz = size();
 
-    try {
-      // Get nonzeros
-      int sz = size();
-      bool is_scalar = m.isScalar();
+    // Check bounds
+    if (!inBounds(k, -1, sz)) {
+      casadi_error("setNZ[kk] out of bounds. Your kk contains "
+                   << *std::min_element(k.begin(), k.end()) << " up to "
+                   << *std::max_element(k.begin(), k.end())
+                   << ", which is outside the range [-1,"<< sz <<  ").");
+    }
+
+    // Get nonzeros
+    if (m.isScalar()) {
+      DataType s = m.toScalar();
       for (int el=0; el<k.size(); ++el) {
-        int k_pos = k[el]>=0 ? k[el] : k[el]+sz;
-        at(k_pos) = is_scalar ? m.toScalar() : m.at(el);
+        if (k[el]>=0) at(k[el]) =  s;
       }
-    } catch(std::out_of_range& ex) {
-      std::stringstream ss;
-      ss << "Out of range error in Matrix<>::setNZ: " << k
-         << " not all in range [-" << size() << "," << size() << ")";
-      throw CasadiException(ss.str());
+    } else {
+      for (int el=0; el<k.size(); ++el) {
+        if (k[el]>=0) at(k[el]) = m.at(el);
+      }
     }
   }
 
