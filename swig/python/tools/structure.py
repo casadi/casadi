@@ -569,17 +569,9 @@ class GetterDispatcher(Dispatcher):
       
       try:
         if type is None:
-          # FIXME(@jgillis)
-          if hasattr(self.master, 'nz'):
-            return self.master.nz[i]
-          else:
-            return self.master[i]
+          return self.master[i]
         elif type=="symm":
-          # FIXME(@jgillis)
-          if hasattr(self.master, 'nz'):
-            return triu2symm(self.master.nz[i])
-          else:
-            return triu2symm(self.master[i])
+          return triu2symm(self.master[i])
         else:
           raise Exception("Cannot handle type '%s'." % entry.type)
       except Exception as e:
@@ -597,11 +589,7 @@ class SetterDispatcher(Dispatcher):
       i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
       try:
         if type is None:
-          # FIXME(@jgillis)
-          if hasattr(self.master, 'nz'):
-            self.master.nz[i] = payload_
-          else:
-            self.master[i] = payload_
+          self.master[i] = payload_
         elif type=="symm":
           iflip = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry,flip=True)
           if payload_.isScalar():
@@ -611,13 +599,8 @@ class SetterDispatcher(Dispatcher):
             oi = performExtraIndex(DMatrix(entry.originalsparsity,1),extraIndex=extraIndex,entry=entry)
             if oi.sparsity()!=payload_.sparsity():
               raise Exception("Payload sparsity " + payload_.dimString() +  " does not match lhs sparisty " + oi.dimString() + "." )
-            # FIXME(@jgillis)
-            if hasattr(self.master, 'nz'):
-              self.master.nz[iflip] = payload_.T[iflip.sparsity()]
-              self.master.nz[i] = payload_[i.sparsity()]
-            else:
-              self.master[iflip] = payload_.T[iflip.sparsity()]
-              self.master[i] = payload_[i.sparsity()]
+            self.master[iflip] = payload_.T[iflip.sparsity()]
+            self.master[i] = payload_[i.sparsity()]
         else:
           raise Exception("Cannot handle type '%s'." % entry.type)
       except NotImplementedError as e:
