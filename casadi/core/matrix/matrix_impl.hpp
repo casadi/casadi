@@ -176,13 +176,12 @@ namespace casadi {
 
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense()) {
-      if (ind1) {
-        IMatrix rr0 = rr;
-        for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) (*i)--;
-        return getNZ(rr0);
-      } else {
-        return getNZ(rr);
+      IMatrix rr0 = rr;
+      for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += size();
       }
+      return getNZ(rr0);
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -348,14 +347,13 @@ namespace casadi {
     }
 
     // If the indexed matrix is dense, use nonzero indexing
-    if (isDense() && m.isDense()) {
-      if (ind1) {
-        IMatrix rr0 = rr;
-        for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) (*i)--;
-        return setNZ(m, rr0);
-      } else {
-        return setNZ(m, rr);
+    if (isDense()) {
+      IMatrix rr0 = rr;
+      for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += size();
       }
+      return setNZ(m, rr0);
     }
 
     // Call recursively if m scalar, and submatrix isn't
