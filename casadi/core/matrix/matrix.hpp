@@ -595,7 +595,8 @@ namespace casadi {
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns,
         keeping the existing non-zeros */
-    void enlarge(int nrow, int ncol, const std::vector<int>& rr, const std::vector<int>& cc);
+    void enlarge(int nrow, int ncol,
+                 const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
     /// Access the non-zero elements
     std::vector<DataType>& data();

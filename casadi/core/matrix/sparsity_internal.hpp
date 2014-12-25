@@ -284,10 +284,10 @@ namespace casadi {
                  const std::vector<int>& row) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
-    void enlargeRows(int nrow, const std::vector<int>& jj);
+    void enlargeRows(int nrow, const std::vector<int>& rr, bool ind1);
 
     /// Enlarge the matrix along the second dimension (i.e. insert columns)
-    void enlargeColumns(int ncol, const std::vector<int>& ii);
+    void enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1);
 
     /// Make a patten dense
     Sparsity makeDense(std::vector<int>& mapping) const;

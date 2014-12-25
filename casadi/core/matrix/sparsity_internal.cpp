@@ -2597,7 +2597,24 @@ namespace casadi {
     ncol_ += sp.ncol_;
   }
 
-  void SparsityInternal::enlargeColumns(int ncol, const std::vector<int>& cc) {
+  void SparsityInternal::enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) {
+    if (!inBounds(cc, -ncol+ind1, ncol+ind1)) {
+      casadi_error("enlargeColumns: out of bounds. Your cc contains "
+                   << *std::min_element(cc.begin(), cc.end()) << " up to "
+                   << *std::max_element(cc.begin(), cc.end())
+                   << ", which is outside the range [" << -ncol+ind1 << ","<< ncol+ind1 <<  ").");
+    }
+
+    // Handle index-1, negative indices
+    if (ind1 || *std::min_element(cc.begin(), cc.end())<0) {
+      std::vector<int> cc_mod = cc;
+      for (vector<int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += ncol;
+      }
+      return enlargeColumns(ncol, cc_mod, false); // Call recursively
+    }
+
     // Assert dimensions
     casadi_assert(cc.size() == ncol_);
 
@@ -2631,7 +2648,24 @@ namespace casadi {
     }
   }
 
-  void SparsityInternal::enlargeRows(int nrow, const std::vector<int>& rr) {
+  void SparsityInternal::enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) {
+    if (!inBounds(rr, -nrow+ind1, nrow+ind1)) {
+      casadi_error("enlargeRows: out of bounds. Your rr contains " <<
+                   *std::min_element(rr.begin(), rr.end()) << " up to " <<
+                   *std::max_element(rr.begin(), rr.end()) <<
+                   ", which is outside the range [" << -nrow+ind1 << ","<< nrow+ind1 <<  ").");
+    }
+
+    // Handle index-1, negative indices
+    if (ind1 || *std::min_element(rr.begin(), rr.end())<0) {
+      std::vector<int> rr_mod = rr;
+      for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += nrow;
+      }
+      return enlargeRows(nrow, rr_mod, false); // Call recursively
+    }
+
     // Assert dimensions
     casadi_assert(rr.size() == nrow_);
 

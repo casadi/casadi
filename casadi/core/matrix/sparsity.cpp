@@ -442,20 +442,20 @@ namespace casadi {
     return ret;
   }
 
-  void Sparsity::enlarge(int nrow, int ncol, const std::vector<int>& jj,
-                         const std::vector<int>& ii) {
-    enlargeColumns(ncol, ii);
-    enlargeRows(nrow, jj);
+  void Sparsity::enlarge(int nrow, int ncol, const std::vector<int>& rr,
+                         const std::vector<int>& cc, bool ind1) {
+    enlargeColumns(ncol, cc, ind1);
+    enlargeRows(nrow, rr, ind1);
   }
 
-  void Sparsity::enlargeColumns(int ncol, const std::vector<int>& ii) {
+  void Sparsity::enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) {
     makeUnique();
-    (*this)->enlargeColumns(ncol, ii);
+    (*this)->enlargeColumns(ncol, cc, ind1);
   }
 
-  void Sparsity::enlargeRows(int nrow, const std::vector<int>& jj) {
+  void Sparsity::enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) {
     makeUnique();
-    (*this)->enlargeRows(nrow, jj);
+    (*this)->enlargeRows(nrow, rr, ind1);
   }
 
   Sparsity Sparsity::diag(int nrow, int ncol) {

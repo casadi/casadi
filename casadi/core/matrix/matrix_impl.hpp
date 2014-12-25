@@ -308,17 +308,9 @@ namespace casadi {
       // Remove submatrix to be replaced
       erase(rr.data(), cc.data(), ind1);
 
-      std::vector<int> r = rr.data(), c = cc.data();
-      if (ind1) {
-        for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
-        for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) (*i)--;
-      }
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += sz1;
-      for (std::vector<int>::iterator i=c.begin(); i!=c.end(); ++i) if (*i<0) *i += sz2;
-
       // Extend el to the same dimension as this
       Matrix<DataType> el_ext = m;
-      el_ext.enlarge(sz1, sz2, r, c);
+      el_ext.enlarge(sz1, sz2, rr.data(), cc.data(), ind1);
 
       // Unite the sparsity patterns
       *this = unite(*this, el_ext);
@@ -1451,8 +1443,8 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::enlarge(int nrow, int ncol, const std::vector<int>& rr,
-                                 const std::vector<int>& cc) {
-    sparsityRef().enlarge(nrow, ncol, rr, cc);
+                                 const std::vector<int>& cc, bool ind1) {
+    sparsityRef().enlarge(nrow, ncol, rr, cc, ind1);
   }
 
   template<typename DataType>

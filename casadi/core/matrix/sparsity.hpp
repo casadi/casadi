@@ -473,13 +473,14 @@ namespace casadi {
 
         B[jj, ii] == A
     */
-    void enlarge(int nrow, int ncol, const std::vector<int>& jj, const std::vector<int>& ii);
+    void enlarge(int nrow, int ncol,
+                 const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
     /** \brief Enlarge the matrix along the first dimension (i.e. insert rows) */
-    void enlargeRows(int nrow, const std::vector<int>& jj);
+    void enlargeRows(int nrow, const std::vector<int>& rr, bool ind1=false);
 
     /** \brief Enlarge the matrix along the second dimension (i.e. insert columns) */
-    void enlargeColumns(int ncol, const std::vector<int>& ii);
+    void enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1=false);
 
     /** \brief Make a patten dense */
     Sparsity makeDense(std::vector<int>& mapping) const;
