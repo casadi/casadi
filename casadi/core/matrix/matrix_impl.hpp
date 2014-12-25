@@ -348,36 +348,12 @@ namespace casadi {
       }
     }
 
-    casadi_assert_message(rr.isDense(), "Matrix::setSub: Index vectors must be dense");
-
     // Call recursively if m scalar, and submatrix isn't
     if (m.isScalar() && rr.numel()>1) {
       return setSub(repmat(m, rr.shape()), ind1, rr);
     }
 
-    // Dimension
-    int nel = numel();
-
-    // Sought indices as vectors
-    // TODO(@jaeandersson): refactor to make the following unnecessary
-    std::vector<int> r = rr.data();
-    if (ind1) {
-      for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) (*i)--;
-    }
-    for (std::vector<int>::iterator i=r.begin(); i!=r.end(); ++i) if (*i<0) *i += nel;
-
-    casadi_assert_message(rr.shape()==m.shape(), "Dimension mismatch: "
-                          "Lhs has dimension " << rr.shape()
-                          << " while rhs has dimension " << m.shape());
-
-    if (!inBounds(r, nel)) {
-      casadi_error("setSub[., r] out of bounds. Your r contains "
-                   << *std::min_element(r.begin(), r.end()) << " up to "
-                   << *std::max_element(r.begin(), r.end())
-                   << ", which is outside of the matrix of length " << nel << ".");
-    }
-
-    // Sparse mode
+    // TODO(@jaeandersson): Finish the following
     casadi_error("Not implemented");
   }
 

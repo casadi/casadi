@@ -588,8 +588,8 @@ namespace casadi {
         Erase rows and/or columns of a matrix */
     void erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
-    /** \brief Remove cols or rows
-        Rremove/delete rows and/or columns of a matrix */
+    /** \brief Remove columns and rows
+        Remove/delete rows and/or columns of a matrix */
     void remove(const std::vector<int>& rr, const std::vector<int>& cc);
 
     /** \brief Enlarge matrix
