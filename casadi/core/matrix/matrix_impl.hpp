@@ -463,6 +463,7 @@ namespace casadi {
     if (kk.shape() != m.shape()) {
       if (m.isScalar()) {
         // m scalar means "set all"
+        if (!m.isDense()) return; // Nothing to set
         return setNZ(repmat(m, kk.sparsity()), kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()) {
         // m is transposed if necessary

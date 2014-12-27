@@ -412,28 +412,26 @@ namespace casadi {
                           "MX::setNZ: length of non-zero indices (" << kk.size() << ") " <<
                           "must match size of rhs (" << m.size() << ").");
 
-    // Assert sparsity of assigning matrix
-    if (kk.sparsity() != m.sparsity()) {
+    // Assert dimensions of assigning matrix
+    if (kk.shape() != m.shape()) {
       if (m.isScalar()) {
         // m scalar means "set all"
         if (!m.isDense()) return; // Nothing to set
         return setNZ(repmat(m, kk.sparsity()), kk);
+      } else if (kk.size1() == m.size2() && kk.size2() == m.size1()) {
+        // m is transposed if necessary
+        return setNZ(m.T(), kk);
+      } else {
+        // Error otherwise
+        casadi_error("Dimension mismatch." << "lhs is " << kk.shape()
+                     << ", while rhs is " << m.shape());
       }
-      // } else if (kk.size1() == m.size2() && kk.size2() == m.size1()) {
-      //   // m is transposed if necessary
-      //   return setNZ(m.T(), kk);
-      // } else {
-      //   // Error otherwise
-      //   casadi_error("Dimension mismatch." << "lhs is " << kk.shape()
-      //                << ", while rhs is " << m.shape());
-      // }
     }
 
     // Call recursively if points both objects point to the same node
     if (this==&m) {
       MX m_copy = m;
-      setNZ(m_copy, kk);
-      return;
+      return setNZ(m_copy, kk);
     }
 
     // Get nonzeros of kk
