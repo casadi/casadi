@@ -163,12 +163,7 @@ namespace casadi {
   const MX MX::getSub(bool ind1, const Matrix<int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense()) {
-      IMatrix rr0 = rr;
-      for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) {
-        if (ind1) (*i)--;
-        if (*i<0) *i += size();
-      }
-      return getNZ(false, rr0);
+      return getNZ(ind1, rr);
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -316,12 +311,7 @@ namespace casadi {
   void MX::setSub(const MX& m, bool ind1, const Matrix<int>& rr) {
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense() && m.isDense()) {
-      IMatrix rr0 = rr;
-      for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) {
-        if (ind1) (*i)--;
-        if (*i<0) *i += size();
-      }
-      return setNZ(m, false, rr0);
+      return setNZ(m, ind1, rr);
     }
 
     // Assert dimensions of assigning matrix
@@ -388,20 +378,30 @@ namespace casadi {
   }
 
   MX MX::getNZ(bool ind1, const Matrix<int>& kk) const {
-    // Get nonzeros of kk
-    const std::vector<int>& k = kk.data();
-    int sz = size();
+    // Quick return if no entries
+    if (kk.size()==0) return MX::zeros(kk.sparsity());
 
     // Check bounds
-    if (!inBounds(k, 0, sz)) {
+    int sz = size();
+    if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
       casadi_error("getNZ[kk] out of bounds. Your kk contains "
-                   << *std::min_element(k.begin(), k.end()) << " up to "
-                   << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [0,"<< sz <<  ").");
+                   << *std::min_element(kk.begin(), kk.end()) << " up to "
+                   << *std::max_element(kk.begin(), kk.end())
+                   << ", which is outside the range [" << -sz+ind1 << "," << sz+ind1 <<  ").");
+    }
+
+    // Handle index-1, negative indices
+    if (ind1 || *std::min_element(kk.begin(), kk.end())<0) {
+      Matrix<int> kk_mod = kk;
+      for (vector<int>::iterator i=kk_mod.begin(); i!=kk_mod.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += sz;
+      }
+      return getNZ(false, kk_mod); // Call recursively
     }
 
     // Return reference to the nonzeros
-    return (*this)->getGetNonzeros(kk.sparsity(), k);
+    return (*this)->getGetNonzeros(kk.sparsity(), kk.data());
   }
 
   void MX::setNZ(const MX& m, bool ind1, const Slice& kk) {
@@ -437,23 +437,30 @@ namespace casadi {
       return setNZ(m_copy, ind1, kk);
     }
 
-    // Get nonzeros of kk
-    const std::vector<int>& k = kk.data();
-    int sz = size();
-
     // Check bounds
-    if (!inBounds(k, 0, sz)) {
+    int sz = size();
+    if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
       casadi_error("setNZ[kk] out of bounds. Your kk contains "
-                   << *std::min_element(k.begin(), k.end()) << " up to "
-                   << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [" << 0 << ","<< sz <<  ").");
+                   << *std::min_element(kk.begin(), kk.end()) << " up to "
+                   << *std::max_element(kk.begin(), kk.end())
+                   << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
     }
 
     // Quick return if no assignments to be made
-    if (k.empty()) return;
+    if (kk.size()==0) return;
+
+    // Handle index-1, negative indices
+    if (ind1 || *std::min_element(kk.begin(), kk.end())<0) {
+      Matrix<int> kk_mod = kk;
+      for (vector<int>::iterator i=kk_mod.begin(); i!=kk_mod.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += sz;
+      }
+      return setNZ(m, false, kk_mod); // Call recursively
+    }
 
     // Create a nonzero assignment node
-    *this = m->getSetNonzeros(*this, k);
+    *this = m->getSetNonzeros(*this, kk.data());
     simplify(*this);
   }
 
