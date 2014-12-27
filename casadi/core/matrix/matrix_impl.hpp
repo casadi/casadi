@@ -116,7 +116,7 @@ namespace casadi {
   const Matrix<DataType>
   Matrix<DataType>::getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Scalar
-    if (rr.isScalar() && cc.isScalar()) {
+    if (rr.isScalar(true) && cc.isScalar(true)) {
       return getSub(ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
@@ -170,7 +170,7 @@ namespace casadi {
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Matrix<int>& rr) const {
     // Scalar
-    if (rr.isScalar()) {
+    if (rr.isScalar(true)) {
       return getSub(ind1, rr.toSlice(ind1));
     }
 
@@ -253,7 +253,7 @@ namespace casadi {
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Matrix<int>& cc) {
     // Scalar
-    if (rr.isScalar() && cc.isScalar() && m.isDense()) {
+    if (rr.isScalar(true) && cc.isScalar(true) && m.isDense()) {
       return setSub(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
@@ -342,7 +342,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) {
     // Scalar
-    if (rr.isScalar() && m.isDense()) {
+    if (rr.isScalar(true) && m.isDense()) {
       return setSub(m, ind1, rr.toSlice(ind1));
     }
 
@@ -399,7 +399,7 @@ namespace casadi {
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::getNZ(const Matrix<int>& kk) const {
     // Scalar
-    if (kk.isScalar()) {
+    if (kk.isScalar(true)) {
       return getNZ(kk.toSlice());
     }
 
@@ -438,7 +438,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::setNZ(const Matrix<DataType>& m, const Matrix<int>& kk) {
     // Scalar
-    if (kk.isScalar()) {
+    if (kk.isScalar(true)) {
       return setNZ(m, kk.toSlice());
     }
 
