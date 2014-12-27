@@ -412,6 +412,23 @@ namespace casadi {
                           "MX::setNZ: length of non-zero indices (" << kk.size() << ") " <<
                           "must match size of rhs (" << m.size() << ").");
 
+    // Assert sparsity of assigning matrix
+    if (kk.sparsity() != m.sparsity()) {
+      if (m.isScalar()) {
+        // m scalar means "set all"
+        if (!m.isDense()) return; // Nothing to set
+        return setNZ(repmat(m, kk.sparsity()), kk);
+      }
+      // } else if (kk.size1() == m.size2() && kk.size2() == m.size1()) {
+      //   // m is transposed if necessary
+      //   return setNZ(m.T(), kk);
+      // } else {
+      //   // Error otherwise
+      //   casadi_error("Dimension mismatch." << "lhs is " << kk.shape()
+      //                << ", while rhs is " << m.shape());
+      // }
+    }
+
     // Call recursively if points both objects point to the same node
     if (this==&m) {
       MX m_copy = m;
@@ -420,7 +437,7 @@ namespace casadi {
     }
 
     // Get nonzeros of kk
-    std::vector<int> k = kk.data();
+    const std::vector<int>& k = kk.data();
     int sz = size();
 
     // Check bounds
@@ -434,18 +451,8 @@ namespace casadi {
     // Quick return if no assignments to be made
     if (k.empty()) return;
 
-    // Temporary
-    MX x;
-
-    // Project scalars
-    if (k.size()!=m.size() && m.isScalar() && m.isDense()) {
-      MX new_m = m->getGetNonzeros(Sparsity::dense(1, k.size()), std::vector<int>(k.size(), 0));
-      x = new_m->getSetNonzeros(*this, k);
-    } else {
-      // Create a nonzero assignment node
-      x = m->getSetNonzeros(*this, k);
-    }
-    *this = x;
+    // Create a nonzero assignment node
+    *this = m->getSetNonzeros(*this, k);
     simplify(*this);
   }
 
