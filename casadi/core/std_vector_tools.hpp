@@ -174,6 +174,10 @@ namespace casadi {
   template<typename T>
   bool isStrictlyMonotone(const std::vector<T> &v);
 
+  /// Check if the vector has negative entries
+  template<typename T>
+  bool hasNegative(const std::vector<T> &v);
+
 #ifndef SWIG
   /// Print representation to string
   template<typename T>
@@ -507,6 +511,14 @@ namespace casadi {
   template<typename T>
   bool isStrictlyMonotone(const std::vector<T> &v) {
     return isDecreasing(v) || isIncreasing(v);
+  }
+
+  template<typename T>
+  bool hasNegative(const std::vector<T> &v) {
+    for (std::size_t i=0; i<v.size(); ++i) {
+      if (v[i]<0) return true;
+    }
+    return false;
   }
 
   template<typename T>

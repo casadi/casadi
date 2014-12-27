@@ -2065,8 +2065,7 @@ namespace casadi {
     }
 
     // Handle index-1, negative indices
-    if (ind1 || *std::min_element(rr.begin(), rr.end())<0
-        ||  *std::min_element(cc.begin(), cc.end())<0) {
+    if (ind1 || hasNegative(rr) || hasNegative(cc)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
@@ -2211,7 +2210,7 @@ namespace casadi {
     }
 
     // Handle index-1, negative indices
-    if (ind1 || *std::min_element(rr.begin(), rr.end())<0) {
+    if (ind1 || hasNegative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
@@ -2605,8 +2604,11 @@ namespace casadi {
                    << ", which is outside the range [" << -ncol+ind1 << ","<< ncol+ind1 <<  ").");
     }
 
+    // Quick return if cc empty
+    if (cc.empty()) return;
+
     // Handle index-1, negative indices
-    if (ind1 || *std::min_element(cc.begin(), cc.end())<0) {
+    if (ind1 || hasNegative(cc)) {
       std::vector<int> cc_mod = cc;
       for (vector<int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
         if (ind1) (*i)--;
@@ -2656,8 +2658,11 @@ namespace casadi {
                    ", which is outside the range [" << -nrow+ind1 << ","<< nrow+ind1 <<  ").");
     }
 
+    // Quick return if rr empty
+    if (rr.empty()) return;
+
     // Handle index-1, negative indices
-    if (ind1 || *std::min_element(rr.begin(), rr.end())<0) {
+    if (ind1 || hasNegative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
