@@ -245,15 +245,20 @@ namespace casadi {
     casadi_assert_message(cc.isDense() && cc.isVector(),
                           "MX::setSub: Second index not dense vector");
 
-    // Call recursively if m scalar, and submatrix isn't
-    if (m.isScalar() && (rr.size1()>1 || cc.size1()>1)) {
-      return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
-    }
-
     // Assert dimensions of assigning matrix
-    casadi_assert_message(cc.size1() == m.size2() && rr.size1() == m.size1(),
-                          "Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
-                          << cc.size1() << ", while rhs is " << m.shape());
+    if (cc.size1() != m.size2() || rr.size1() != m.size1()) {
+      if (m.isScalar()) {
+        // m scalar means "set all"
+        return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
+      } else if (cc.size1() == m.size1() && rr.size1() == m.size2()) {
+        // m is transposed if necessary
+        return setSub(m.T(), ind1, rr, cc);
+      } else {
+        // Error otherwise
+        casadi_error("Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
+                     << cc.size1() << ", while rhs is " << m.shape());
+      }
+    }
 
     // Dimensions
     int sz1 = size1(), sz2 = size2();
