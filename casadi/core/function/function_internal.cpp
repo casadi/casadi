@@ -2318,21 +2318,6 @@ namespace casadi {
     s << "}" << endl << endl;
   }
 
-  void FunctionInternal::assignIgnore(MX& y, const MX& x, const std::vector<int>& nz) {
-    y[nz] = x;
-  }
-
-  void FunctionInternal::assignIgnore(SX& y, const SX& x, const std::vector<int>& nz) {
-    vector<SXElement>& y_data = y.data();
-    const vector<SXElement>& x_data = x.data();
-    casadi_assert(nz.size()==x_data.size());
-    for (int k=0; k<nz.size(); ++k) {
-      if (nz[k]>=0) {
-        y_data.at(nz[k]) = x_data.at(k);
-      }
-    }
-  }
-
   Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,
                                                 std::string compiler) {
 #ifdef WITH_DL

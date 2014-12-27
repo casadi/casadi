@@ -668,8 +668,8 @@ namespace casadi {
     // Additions to the jacobian matrix
     std::vector<int> adds, adds2;
 
-    // A vector used to resolve collisions between directions
-    std::vector<int> hits;
+    // Temporary vector
+    std::vector<int> tmp;
 
     // Progress
     int progress = -10;
@@ -793,8 +793,8 @@ namespace casadi {
         // If symmetric, see how many times each output appears
         if (symmetric) {
           // Initialize to zero
-          hits.resize(output(oind).sparsity().size());
-          fill(hits.begin(), hits.end(), 0);
+          tmp.resize(output(oind).sparsity().size());
+          fill(tmp.begin(), tmp.end(), 0);
 
           // "Multiply" Jacobian sparsity by seed vector
           for (int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
@@ -804,7 +804,7 @@ namespace casadi {
 
             // Propagate dependencies
             for (int el_jsp=jsp_colind[c]; el_jsp<jsp_colind[c+1]; ++el_jsp) {
-              hits[jsp_row[el_jsp]]++;
+              tmp[jsp_row[el_jsp]]++;
             }
           }
         }
@@ -850,7 +850,7 @@ namespace casadi {
             int elJ = mapping[el_out];
 
             if (symmetric) {
-              if (hits[r_out]==1) {
+              if (tmp[r_out]==1) {
                 adds[f_out] = el_out;
                 adds2[f_out] = elJ;
               }
@@ -861,10 +861,36 @@ namespace casadi {
           }
         }
 
+        // Get entries in fsens[d][oind] with nonnegative indices
+        tmp.resize(adds.size());
+        int sz = 0;
+        for (int i=0; i<adds.size(); ++i) {
+          if (adds[i]>=0) {
+            adds[sz] = adds[i];
+            tmp[sz++] = i;
+          }
+        }
+        adds.resize(sz);
+        tmp.resize(sz);
+
         // Add contribution to the Jacobian
-        assignIgnore(ret, fsens[d][oind], adds);
+        ret[adds] = fsens[d][oind][tmp];
+
         if (symmetric) {
-          assignIgnore(ret, fsens[d][oind], adds2);
+          // Get entries in fsens[d][oind] with nonnegative indices
+          tmp.resize(adds2.size());
+          sz = 0;
+          for (int i=0; i<adds2.size(); ++i) {
+            if (adds2[i]>=0) {
+              adds2[sz] = adds2[i];
+              tmp[sz++] = i;
+            }
+          }
+          adds2.resize(sz);
+          tmp.resize(sz);
+
+          // Add contribution to the Jacobian
+          ret[adds2] = fsens[d][oind][tmp];
         }
       }
 
