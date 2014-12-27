@@ -275,7 +275,8 @@ namespace casadi {
       if (m.isScalar()) {
         // m scalar means "set all"
         return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
-      } else if (rr.size1() == m.size2() && cc.size1() == m.size1()) {
+      } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
+                 && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
         return setSub(m.T(), ind1, rr, cc);
       } else {
@@ -363,7 +364,8 @@ namespace casadi {
       if (m.isScalar()) {
         // m scalar means "set all"
         return setSub(repmat(m, rr.shape()), ind1, rr);
-      } else if (rr.size1() == m.size2() && rr.size2() == m.size1()) {
+      } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
+                 && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
         return setSub(m.T(), ind1, rr);
       } else {
@@ -465,7 +467,8 @@ namespace casadi {
         // m scalar means "set all"
         if (!m.isDense()) return; // Nothing to set
         return setNZ(repmat(m, kk.sparsity()), kk);
-      } else if (kk.size1() == m.size2() && kk.size2() == m.size1()) {
+      } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
+                 && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
         return setNZ(m.T(), kk);
       } else {
