@@ -146,7 +146,7 @@ namespace casadi {
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
     const MatType operator[](const K& k) const {
-      return static_cast<const MatType*>(this)->getNZ(k);
+      return static_cast<const MatType*>(this)->getNZ(false, k);
     }
 
     /** \brief  Access vector nonzero or slice of nonzeros */

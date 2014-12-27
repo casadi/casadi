@@ -178,7 +178,7 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += size();
       }
-      return getNZ(rr0);
+      return getNZ(ind1, rr0);
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -356,7 +356,7 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += size();
       }
-      return setNZ(m, rr0);
+      return setNZ(m, false, rr0);
     }
 
     // Assert dimensions of assigning matrix
@@ -405,21 +405,21 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getNZ(const Slice& kk) const {
+  const Matrix<DataType> Matrix<DataType>::getNZ(bool ind1, const Slice& kk) const {
     // Scalar
     if (kk.isScalar(size())) {
       return at(kk.toScalar(size()));
     }
 
     // Fall back on IMatrix
-    return getNZ(kk.getAll(size()));
+    return getNZ(ind1, kk.getAll(size()));
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getNZ(const Matrix<int>& kk) const {
+  const Matrix<DataType> Matrix<DataType>::getNZ(bool ind1, const Matrix<int>& kk) const {
     // Scalar
     if (kk.isScalar(true)) {
-      return getNZ(kk.toSlice());
+      return getNZ(ind1, kk.toSlice());
     }
 
     // Get nonzeros of kk
@@ -443,7 +443,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setNZ(const Matrix<DataType>& m, const Slice& kk) {
+  void Matrix<DataType>::setNZ(const Matrix<DataType>& m, bool ind1, const Slice& kk) {
     // Scalar
     if (kk.isScalar(size())) {
       at(kk.toScalar(size())) = m.toScalar();
@@ -451,14 +451,14 @@ namespace casadi {
     }
 
     // Fallback on IMatrix
-    setNZ(m, kk.getAll(size()));
+    setNZ(m, ind1, kk.getAll(size()));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setNZ(const Matrix<DataType>& m, const Matrix<int>& kk) {
+  void Matrix<DataType>::setNZ(const Matrix<DataType>& m, bool ind1, const Matrix<int>& kk) {
     // Scalar
     if (kk.isScalar(true)) {
-      return setNZ(m, kk.toSlice());
+      return setNZ(m, ind1, kk.toSlice());
     }
 
     // Assert dimensions of assigning matrix
@@ -466,11 +466,11 @@ namespace casadi {
       if (m.isScalar()) {
         // m scalar means "set all"
         if (!m.isDense()) return; // Nothing to set
-        return setNZ(repmat(m, kk.sparsity()), kk);
+        return setNZ(repmat(m, kk.sparsity()), ind1, kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return setNZ(m.T(), kk);
+        return setNZ(m.T(), ind1, kk);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << kk.shape()

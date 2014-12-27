@@ -168,7 +168,7 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += size();
       }
-      return getNZ(rr0);
+      return getNZ(ind1, rr0);
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -321,7 +321,7 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += size();
       }
-      return setNZ(m, rr0);
+      return setNZ(m, ind1, rr0);
     }
 
     // Assert dimensions of assigning matrix
@@ -382,12 +382,12 @@ namespace casadi {
     *this =  mm->getSetNonzeros((*this), nz);
   }
 
-  MX MX::getNZ(const Slice& kk) const {
+  MX MX::getNZ(bool ind1, const Slice& kk) const {
     // Fallback on IMatrix
-    return getNZ(kk.getAll(size()));
+    return getNZ(ind1, kk.getAll(size()));
   }
 
-  MX MX::getNZ(const Matrix<int>& kk) const {
+  MX MX::getNZ(bool ind1, const Matrix<int>& kk) const {
     // Get nonzeros of kk
     const std::vector<int>& k = kk.data();
     int sz = size();
@@ -404,12 +404,12 @@ namespace casadi {
     return (*this)->getGetNonzeros(kk.sparsity(), k);
   }
 
-  void MX::setNZ(const MX& m, const Slice& kk) {
+  void MX::setNZ(const MX& m, bool ind1, const Slice& kk) {
     // Fallback on IMatrix
-    setNZ(m, kk.getAll(size()));
+    setNZ(m, ind1, kk.getAll(size()));
   }
 
-  void MX::setNZ(const MX& m, const Matrix<int>& kk) {
+  void MX::setNZ(const MX& m, bool ind1, const Matrix<int>& kk) {
     casadi_assert_message(kk.size()==m.size() || m.size()==1,
                           "MX::setNZ: length of non-zero indices (" << kk.size() << ") " <<
                           "must match size of rhs (" << m.size() << ").");
@@ -419,11 +419,11 @@ namespace casadi {
       if (m.isScalar()) {
         // m scalar means "set all"
         if (!m.isDense()) return; // Nothing to set
-        return setNZ(repmat(m, kk.sparsity()), kk);
+        return setNZ(repmat(m, kk.sparsity()), ind1, kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return setNZ(m.T(), kk);
+        return setNZ(m.T(), ind1, kk);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << kk.shape()
@@ -434,7 +434,7 @@ namespace casadi {
     // Call recursively if points both objects point to the same node
     if (this==&m) {
       MX m_copy = m;
-      return setNZ(m_copy, kk);
+      return setNZ(m_copy, ind1, kk);
     }
 
     // Get nonzeros of kk
@@ -458,7 +458,7 @@ namespace casadi {
   }
 
   const MX MX::at(int k) const {
-    return getNZ(k);
+    return getNZ(false, k);
   }
 
   /// Access a non-zero element

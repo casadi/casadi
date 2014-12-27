@@ -866,9 +866,6 @@ except:
 %rename(mrdivide) __mrdivide__;
 %rename(mldivide) __mldivide__;
 %rename(transpose) T;
-
-%rename(getitemcurl) getNZ;
-%rename(setitemcurl) setNZ;
 %rename(size) shape;
 %rename(nnz) size;
 
@@ -895,10 +892,10 @@ class NZproxy:
     self.matrix = matrix
     
   def __getitem__(self,s):
-    return self.matrix.getNZ(s)
+    return self.matrix.getNZ(False, s)
 
   def __setitem__(self,s,val):
-    return self.matrix.setNZ(val, s)
+    return self.matrix.setNZ(val, False, s)
 
   def __len__(self):
     return self.matrix.size()
@@ -1025,6 +1022,14 @@ class NZproxy:
     void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
     void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
     void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
+
+    // Get nonzeros (index-1)
+    const Type getitemcurl(const Slice& rr) const { return $self->getNZ(true, rr);}
+    const Type getitemcurl(const Matrix<int>& rr) const { return $self->getNZ(true, rr);}
+
+    // Set nonzeros (index-1)
+    void setitemcurl(const Type& m, const Slice& rr) { $self->setNZ(m, true, rr);}
+    void setitemcurl(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
 
     // 'end' function (needed for end syntax in MATLAB)
     inline int end(int i, int n) const {

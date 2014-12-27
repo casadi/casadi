@@ -314,14 +314,14 @@ namespace casadi {
 
     ///@{
     /// Get a set of nonzeros
-    MX getNZ(const Slice& kk) const;
-    MX getNZ(const Matrix<int>& kk) const;
+    MX getNZ(bool ind1, const Slice& kk) const;
+    MX getNZ(bool ind1, const Matrix<int>& kk) const;
     ///@}
 
     ///@{
     /// Set a set of nonzeros
-    void setNZ(const MX& m, const Slice& kk);
-    void setNZ(const MX& m, const Matrix<int>& kk);
+    void setNZ(const MX& m, bool ind1, const Slice& kk);
+    void setNZ(const MX& m, bool ind1, const Matrix<int>& kk);
     ///@}
 
     /** \brief Append a matrix vertically (NOTE: only efficient if vector) */
