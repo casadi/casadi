@@ -246,11 +246,11 @@ namespace casadi {
                           "MX::setSub: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
-    if (cc.size1() != m.size2() || rr.size1() != m.size1()) {
+    if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
       if (m.isScalar()) {
         // m scalar means "set all"
         return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
-      } else if (cc.size1() == m.size1() && rr.size1() == m.size2()) {
+      } else if (rr.size1() == m.size2() && cc.size1() == m.size1()) {
         // m is transposed if necessary
         return setSub(m.T(), ind1, rr, cc);
       } else {
@@ -265,13 +265,13 @@ namespace casadi {
 
     // Report out-of-bounds
     if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
-      casadi_error("setSub[., r, c] out of bounds. Your rr contains "
+      casadi_error("setSub[., rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
                    << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
     if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
-      casadi_error("setSub [., r, c] out of bounds. Your cc contains "
+      casadi_error("setSub [., rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
                    << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
@@ -323,9 +323,19 @@ namespace casadi {
       return setNZ(m, rr0);
     }
 
-    // Call recursively if m scalar, and submatrix isn't
-    if (m.isScalar() && rr.numel()>1) {
-      return setSub(repmat(m, rr.shape()), ind1, rr);
+    // Assert dimensions of assigning matrix
+    if (rr.shape() != m.shape()) {
+      if (m.isScalar()) {
+        // m scalar means "set all"
+        return setSub(repmat(m, rr.shape()), ind1, rr);
+      } else if (rr.size1() == m.size2() && rr.size2() == m.size1()) {
+        // m is transposed if necessary
+        return setSub(m.T(), ind1, rr);
+      } else {
+        // Error otherwise
+        casadi_error("Dimension mismatch." << "lhs is " << rr.shape()
+                     << ", while rhs is " << m.shape());
+      }
     }
 
     // TODO(@jaeandersson): Finish the following

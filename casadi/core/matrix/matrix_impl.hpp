@@ -274,11 +274,11 @@ namespace casadi {
                           "Matrix::setSub: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
-    if (cc.size1() != m.size2() || rr.size1() != m.size1()) {
+    if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
       if (m.isScalar()) {
         // m scalar means "set all"
         return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
-      } else if (cc.size1() == m.size1() && rr.size1() == m.size2()) {
+      } else if (rr.size1() == m.size2() && cc.size1() == m.size1()) {
         // m is transposed if necessary
         return setSub(m.T(), ind1, rr, cc);
       } else {
@@ -359,6 +359,21 @@ namespace casadi {
         if (*i<0) *i += size();
       }
       return setNZ(m, rr0);
+    }
+
+    // Assert dimensions of assigning matrix
+    if (rr.shape() != m.shape()) {
+      if (m.isScalar()) {
+        // m scalar means "set all"
+        return setSub(repmat(m, rr.shape()), ind1, rr);
+      } else if (rr.size1() == m.size2() && rr.size2() == m.size1()) {
+        // m is transposed if necessary
+        return setSub(m.T(), ind1, rr);
+      } else {
+        // Error otherwise
+        casadi_error("Dimension mismatch." << "lhs is " << rr.shape()
+                     << ", while rhs is " << m.shape());
+      }
     }
 
     // Call recursively if m scalar, and submatrix isn't
