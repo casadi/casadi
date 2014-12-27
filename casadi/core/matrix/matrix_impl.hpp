@@ -427,17 +427,17 @@ namespace casadi {
     int sz = size();
 
     // Check bounds
-    if (!inBounds(k, -1, sz)) {
+    if (!inBounds(k, 0, sz)) {
       casadi_error("getNZ[kk] out of bounds. Your kk contains "
                    << *std::min_element(k.begin(), k.end()) << " up to "
                    << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [-1,"<< sz <<  ").");
+                   << ", which is outside the range [0,"<< sz <<  ").");
     }
 
     // Copy nonzeros
     Matrix<DataType> ret = zeros(kk.sparsity());
     for (int el=0; el<k.size(); ++el) {
-      ret.at(el) = k[el]>=0 ? at(k[el]) : 0;
+      ret.at(el) = at(k[el]);
     }
     return ret;
   }
@@ -483,16 +483,16 @@ namespace casadi {
     int sz = size();
 
     // Check bounds
-    if (!inBounds(k, -1, sz)) {
+    if (!inBounds(k, 0, sz)) {
       casadi_error("setNZ[kk] out of bounds. Your kk contains "
                    << *std::min_element(k.begin(), k.end()) << " up to "
                    << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [-1,"<< sz <<  ").");
+                   << ", which is outside the range [0,"<< sz <<  ").");
     }
 
     // Set nonzeros, ignoring negative indices
     for (int el=0; el<k.size(); ++el) {
-      if (k[el]>=0) at(k[el]) = m.at(el);
+      at(k[el]) = m.at(el);
     }
   }
 

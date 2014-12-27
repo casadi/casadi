@@ -393,11 +393,11 @@ namespace casadi {
     int sz = size();
 
     // Check bounds
-    if (!inBounds(k, -1, sz)) {
+    if (!inBounds(k, 0, sz)) {
       casadi_error("getNZ[kk] out of bounds. Your kk contains "
                    << *std::min_element(k.begin(), k.end()) << " up to "
                    << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [-1,"<< sz <<  ").");
+                   << ", which is outside the range [0,"<< sz <<  ").");
     }
 
     // Return reference to the nonzeros
@@ -442,11 +442,11 @@ namespace casadi {
     int sz = size();
 
     // Check bounds
-    if (!inBounds(k, -1, sz)) {
+    if (!inBounds(k, 0, sz)) {
       casadi_error("setNZ[kk] out of bounds. Your kk contains "
                    << *std::min_element(k.begin(), k.end()) << " up to "
                    << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [" << -1 << ","<< sz <<  ").");
+                   << ", which is outside the range [" << 0 << ","<< sz <<  ").");
     }
 
     // Quick return if no assignments to be made
