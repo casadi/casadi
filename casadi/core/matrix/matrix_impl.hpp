@@ -135,9 +135,6 @@ namespace casadi {
     casadi_assert_message(cc.isDense() && cc.isVector(),
                           "Marix::getSub: Second index must be a dense vector");
 
-    // Dimensions
-    int sz1 = size1(), sz2 = size2();
-
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
     Sparsity sp = sparsity().sub(rr.data(), cc.data(), mapping, ind1);
