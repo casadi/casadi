@@ -462,6 +462,21 @@ namespace casadi {
       return setNZ(m, kk.toSlice());
     }
 
+    // Assert dimensions of assigning matrix
+    if (kk.shape() != m.shape()) {
+      if (m.isScalar()) {
+        // m scalar means "set all"
+        return setNZ(repmat(m, kk.sparsity()), kk);
+      } else if (kk.size1() == m.size2() && kk.size2() == m.size1()) {
+        // m is transposed if necessary
+        return setNZ(m.T(), kk);
+      } else {
+        // Error otherwise
+        casadi_error("Dimension mismatch." << "lhs is " << kk.shape()
+                     << ", while rhs is " << m.shape());
+      }
+    }
+
     // Get nonzeros
     const std::vector<int>& k = kk.data();
     int sz = size();
@@ -474,16 +489,9 @@ namespace casadi {
                    << ", which is outside the range [-1,"<< sz <<  ").");
     }
 
-    // Get nonzeros
-    if (m.isScalar()) {
-      DataType s = m.toScalar();
-      for (int el=0; el<k.size(); ++el) {
-        if (k[el]>=0) at(k[el]) =  s;
-      }
-    } else {
-      for (int el=0; el<k.size(); ++el) {
-        if (k[el]>=0) at(k[el]) = m.at(el);
-      }
+    // Set nonzeros, ignoring negative indices
+    for (int el=0; el<k.size(); ++el) {
+      if (k[el]>=0) at(k[el]) = m.at(el);
     }
   }
 
