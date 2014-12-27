@@ -168,7 +168,7 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += size();
       }
-      return getNZ(ind1, rr0);
+      return getNZ(false, rr0);
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -321,7 +321,7 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += size();
       }
-      return setNZ(m, ind1, rr0);
+      return setNZ(m, false, rr0);
     }
 
     // Assert dimensions of assigning matrix
@@ -384,7 +384,7 @@ namespace casadi {
 
   MX MX::getNZ(bool ind1, const Slice& kk) const {
     // Fallback on IMatrix
-    return getNZ(ind1, kk.getAll(size()));
+    return getNZ(ind1, kk.getAll(size(), ind1));
   }
 
   MX MX::getNZ(bool ind1, const Matrix<int>& kk) const {
@@ -406,7 +406,7 @@ namespace casadi {
 
   void MX::setNZ(const MX& m, bool ind1, const Slice& kk) {
     // Fallback on IMatrix
-    setNZ(m, ind1, kk.getAll(size()));
+    setNZ(m, ind1, kk.getAll(size(), ind1));
   }
 
   void MX::setNZ(const MX& m, bool ind1, const Matrix<int>& kk) {

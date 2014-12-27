@@ -78,7 +78,7 @@ namespace casadi {
   template<typename DataType>
   Slice Matrix<DataType>::toSlice(bool ind1) const {
     throw CasadiException("\"toSlice\" not defined for instantiation");
-    return toSlice();
+    return Slice();
   }
 
   template<typename DataType>
@@ -173,12 +173,7 @@ namespace casadi {
 
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense()) {
-      IMatrix rr0 = rr;
-      for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) {
-        if (ind1) (*i)--;
-        if (*i<0) *i += size();
-      }
-      return getNZ(ind1, rr0);
+      return getNZ(ind1, rr);
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -351,12 +346,7 @@ namespace casadi {
 
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense()) {
-      IMatrix rr0 = rr;
-      for (std::vector<int>::iterator i=rr0.begin(); i!=rr0.end(); ++i) {
-        if (ind1) (*i)--;
-        if (*i<0) *i += size();
-      }
-      return setNZ(m, false, rr0);
+      return setNZ(m, ind1, rr);
     }
 
     // Assert dimensions of assigning matrix
@@ -412,14 +402,14 @@ namespace casadi {
     }
 
     // Fall back on IMatrix
-    return getNZ(ind1, kk.getAll(size()));
+    return getNZ(ind1, kk.getAll(size(), ind1));
   }
 
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::getNZ(bool ind1, const Matrix<int>& kk) const {
     // Scalar
     if (kk.isScalar(true)) {
-      return getNZ(ind1, kk.toSlice());
+      return getNZ(ind1, kk.toSlice(ind1));
     }
 
     // Get nonzeros of kk
@@ -427,17 +417,18 @@ namespace casadi {
     int sz = size();
 
     // Check bounds
-    if (!inBounds(k, 0, sz)) {
+    if (!inBounds(k, -sz+ind1, sz+ind1)) {
       casadi_error("getNZ[kk] out of bounds. Your kk contains "
                    << *std::min_element(k.begin(), k.end()) << " up to "
                    << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [0,"<< sz <<  ").");
+                   << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
     }
 
     // Copy nonzeros
     Matrix<DataType> ret = zeros(kk.sparsity());
     for (int el=0; el<k.size(); ++el) {
-      ret.at(el) = at(k[el]);
+      int k_el = k[el]-ind1;
+      ret.at(el) = at(k_el>=0 ? k_el : k_el+sz);
     }
     return ret;
   }
@@ -451,14 +442,14 @@ namespace casadi {
     }
 
     // Fallback on IMatrix
-    setNZ(m, ind1, kk.getAll(size()));
+    setNZ(m, ind1, kk.getAll(size(), ind1));
   }
 
   template<typename DataType>
   void Matrix<DataType>::setNZ(const Matrix<DataType>& m, bool ind1, const Matrix<int>& kk) {
     // Scalar
     if (kk.isScalar(true)) {
-      return setNZ(m, ind1, kk.toSlice());
+      return setNZ(m, ind1, kk.toSlice(ind1));
     }
 
     // Assert dimensions of assigning matrix
@@ -483,16 +474,17 @@ namespace casadi {
     int sz = size();
 
     // Check bounds
-    if (!inBounds(k, 0, sz)) {
+    if (!inBounds(k, -sz+ind1, sz+ind1)) {
       casadi_error("setNZ[kk] out of bounds. Your kk contains "
                    << *std::min_element(k.begin(), k.end()) << " up to "
                    << *std::max_element(k.begin(), k.end())
-                   << ", which is outside the range [0,"<< sz <<  ").");
+                   << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
     }
 
     // Set nonzeros, ignoring negative indices
     for (int el=0; el<k.size(); ++el) {
-      at(k[el]) = m.at(el);
+      int k_el = k[el]-ind1;
+      at(k_el>=0 ? k_el : k_el+sz) = m.at(el);
     }
   }
 
