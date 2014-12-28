@@ -2896,7 +2896,7 @@ namespace casadi {
           std::vector<int> indices_sorted, mapping;
           sort(indices, indices_sorted, mapping, false);
           elem(indices_sorted);
-          for (size_t i; i<indices.size(); ++i) {
+          for (size_t i=0; i<indices.size(); ++i) {
             indices[mapping[i]] = indices_sorted[i];
           }
           break;
