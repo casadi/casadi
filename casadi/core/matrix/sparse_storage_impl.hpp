@@ -33,7 +33,7 @@ namespace casadi {
 
   template<typename DataType>
   const DataType& SparseStorage<DataType>::elem(int rr, int cc) const {
-    int ind = sparsity().elem(rr, cc);
+    int ind = sparsity().getNZ(rr, cc);
     if (ind==-1)
       return casadi_limits<DataType>::zero;
     else

@@ -2155,7 +2155,7 @@ namespace casadi {
     return mapping;
   }
 
-  vector<int> SparsityInternal::elem(const vector<int>& rr, const vector<int>& cc) const {
+  vector<int> SparsityInternal::getNZ(const vector<int>& rr, const vector<int>& cc) const {
     if (!inBounds(rr, nrow_)) {
       casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
@@ -2222,7 +2222,7 @@ namespace casadi {
     // Find the nonzeros corresponding to rr
     mapping.resize(rr.size());
     std::copy(rr.begin(), rr.end(), mapping.begin());
-    elem(mapping);
+    getNZ(mapping);
 
     // Construct new pattern of the corresponding elements
     vector<int> ret_colind(sp.ncol_+1), ret_row;
@@ -2695,7 +2695,7 @@ namespace casadi {
     return Sparsity::dense(nrow_, ncol_);
   }
 
-  int SparsityInternal::elem(int rr, int cc) const {
+  int SparsityInternal::getNZ(int rr, int cc) const {
     // If negative index, count from the back
     if (rr<0) rr += nrow_;
     if (cc<0) cc += ncol_;
@@ -2878,7 +2878,7 @@ namespace casadi {
     }
   }
 
-  void SparsityInternal::elem(std::vector<int>& indices) const {
+  void SparsityInternal::getNZ(std::vector<int>& indices) const {
     // Quick return if no elements
     if (indices.empty()) return;
 
@@ -2891,7 +2891,7 @@ namespace casadi {
           // Sort rr in nondecreasing order, if needed
           std::vector<int> indices_sorted, mapping;
           sort(indices, indices_sorted, mapping, false);
-          elem(indices_sorted);
+          getNZ(indices_sorted);
           for (size_t i=0; i<indices.size(); ++i) {
             indices[mapping[i]] = indices_sorted[i];
           }

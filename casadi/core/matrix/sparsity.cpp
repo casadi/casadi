@@ -208,20 +208,20 @@ namespace casadi {
   }
 
   bool Sparsity::hasNZ(int rr, int cc) const {
-    return (*this)->elem(rr, cc)!=-1;
+    return getNZ(rr, cc)!=-1;
   }
 
 
-  int Sparsity::elem(int rr, int cc) const {
-    return (*this)->elem(rr, cc);
+  int Sparsity::getNZ(int rr, int cc) const {
+    return (*this)->getNZ(rr, cc);
   }
 
   Sparsity Sparsity::reshape(int nrow, int ncol) const {
     return (*this)->reshape(nrow, ncol);
   }
 
-  std::vector<int> Sparsity::elem(const std::vector<int>& rr, const std::vector<int>& cc) const {
-    return (*this)->elem(rr, cc);
+  std::vector<int> Sparsity::getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const {
+    return (*this)->getNZ(rr, cc);
   }
 
   bool Sparsity::isScalar(bool scalar_and_dense) const {
@@ -526,8 +526,8 @@ namespace casadi {
     (*this)->find(loc, ind1);
   }
 
-  void Sparsity::elem(std::vector<int>& indices) const {
-    (*this)->elem(indices);
+  void Sparsity::getNZ(std::vector<int>& indices) const {
+    (*this)->getNZ(indices);
   }
 
   Sparsity Sparsity::unidirectionalColoring(const Sparsity& AT, int cutoff) const {

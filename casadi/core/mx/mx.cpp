@@ -1943,7 +1943,7 @@ namespace casadi {
     std::vector< std::vector< MX > > blocks(size1(), std::vector< MX >(size2(), filler));
     for (int i=0; i<size1(); ++i) {
       for (int j=0; j<size2(); ++j) {
-        int k = a_sp.elem(i, j);
+        int k = a_sp.getNZ(i, j);
         if (k!=-1) {
           blocks[i][j] = (*this)[k]*b;
         }

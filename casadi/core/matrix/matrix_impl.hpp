@@ -39,7 +39,7 @@ namespace casadi {
 
   template<typename DataType>
   const DataType& Matrix<DataType>::elem(int rr, int cc) const {
-    int ind = sparsity().elem(rr, cc);
+    int ind = sparsity().getNZ(rr, cc);
     if (ind==-1)
       return casadi_limits<DataType>::zero;
     else
@@ -86,7 +86,7 @@ namespace casadi {
                                                   const Slice& rr, const Slice& cc) const {
     // Both are scalar
     if (rr.isScalar(size1()) && cc.isScalar(size2())) {
-      int k = sparsity().elem(rr.toScalar(size1()), cc.toScalar(size2()));
+      int k = sparsity().getNZ(rr.toScalar(size1()), cc.toScalar(size2()));
       if (k>=0) {
         return at(k);
       } else {
@@ -152,7 +152,7 @@ namespace casadi {
     // Scalar
     if (rr.isScalar(numel())) {
       int r = rr.toScalar(numel());
-      int k = sparsity().elem(r % size1(), r / size1());
+      int k = sparsity().getNZ(r % size1(), r / size1());
       if (k>=0) {
         return at(k);
       } else {
@@ -2984,7 +2984,7 @@ namespace casadi {
       blocks(size1(), std::vector< Matrix<DataType> >(size2(), filler));
     for (int i=0;i<size1();++i) {
       for (int j=0;j<size2();++j) {
-        int k = a_sp.elem(i, j);
+        int k = a_sp.getNZ(i, j);
         if (k!=-1) {
           blocks[i][j] = (*this)[k]*b;
         }
@@ -3115,7 +3115,7 @@ namespace casadi {
     std::vector<int> known_ind = sparsity().find();
 
     // Find the corresponding nonzeros in the return matrix
-    sp.elem(known_ind);
+    sp.getNZ(known_ind);
 
     // Set the element values
     const std::vector<DataType>& A_data = data();

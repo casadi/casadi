@@ -319,13 +319,13 @@ namespace casadi {
                  std::vector<int>& mapping, bool ind1) const;
 
     /// Get the index of an existing non-zero element
-    int elem(int rr, int cc) const;
+    int getNZ(int rr, int cc) const;
 
     /// Get a set of non-zero element - does bounds checking
-    std::vector<int> elem(const std::vector<int>& rr, const std::vector<int>& cc) const;
+    std::vector<int> getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const;
 
     /// Get the nonzero index for a set of elements (see description in public class)
-    void elem(std::vector<int>& indices) const;
+    void getNZ(std::vector<int>& indices) const;
 
     /// Does the rows appear sequentially on each col
     bool rowsSequential(bool strictly) const;
