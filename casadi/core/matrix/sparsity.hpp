@@ -404,9 +404,9 @@ namespace casadi {
         if the first argument is nonzero,
         the second bit indicates if the second argument is nonzero (note that none of,
         one of or both of the arguments can be nonzero) */
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero,
                             std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
     /// @}
 
     /// @{
@@ -626,10 +626,10 @@ namespace casadi {
         k = A.getElements()
         A[k] will contain the elements of A that are non-zero in B
     */
-    std::vector<int> getElements(bool col_major=true) const;
+    std::vector<int> getElements() const;
 
     /// Get the location of all nonzero elements (inplace version)
-    void getElements(std::vector<int>& loc, bool col_major=true) const;
+    void getElements(std::vector<int>& loc) const;
 
     /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
         (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */

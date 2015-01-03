@@ -2858,26 +2858,22 @@ namespace casadi {
     mapping.resize(k_strict);
   }
 
-  void SparsityInternal::getElements(std::vector<int>& loc, bool col_major) const {
+  void SparsityInternal::getElements(std::vector<int>& loc) const {
 
     // Element for each nonzero
     loc.resize(size());
 
     // Loop over columns
-    for (int i=0; i<ncol_; ++i) {
+    for (int cc=0; cc<ncol_; ++cc) {
 
       // Loop over the nonzeros
-      for (int el=colind_[i]; el<colind_[i+1]; ++el) {
+      for (int el=colind_[cc]; el<colind_[cc+1]; ++el) {
 
         // Get row
-        int j = row_[el];
+        int rr = row_[el];
 
         // Get the element
-        if (col_major) {
-          loc[el] = j+i*nrow_;
-        } else {
-          loc[el] = i+j*ncol_;
-        }
+        loc[el] = rr+cc*nrow_;
       }
     }
   }

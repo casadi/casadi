@@ -338,7 +338,7 @@ namespace casadi {
     void removeDuplicates(std::vector<int>& mapping);
 
     /// Get element index for each nonzero
-    void getElements(std::vector<int>& loc, bool col_major) const;
+    void getElements(std::vector<int>& loc) const;
 
     /// Hash the sparsity pattern
     std::size_t hash() const;

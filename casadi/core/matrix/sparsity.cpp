@@ -516,14 +516,14 @@ namespace casadi {
     (*this)->removeDuplicates(mapping);
   }
 
-  std::vector<int> Sparsity::getElements(bool col_major) const {
+  std::vector<int> Sparsity::getElements() const {
     std::vector<int> loc;
-    getElements(loc, col_major);
+    getElements(loc);
     return loc;
   }
 
-  void Sparsity::getElements(std::vector<int>& loc, bool col_major) const {
-    (*this)->getElements(loc, col_major);
+  void Sparsity::getElements(std::vector<int>& loc) const {
+    (*this)->getElements(loc);
   }
 
   void Sparsity::elem(std::vector<int>& indices) const {
