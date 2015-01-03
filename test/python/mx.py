@@ -858,7 +858,7 @@ class MXtests(casadiTestCase):
     def randsparsity(m,n):
       sp = Sparsity.sparse(m,n)
       for i in range((n*m)/2):
-        sp.elem(numpy.random.randint(m),numpy.random.randint(n))
+        sp.addNZ(numpy.random.randint(m),numpy.random.randint(n))
       return sp
       
     def gentest(m,n):
@@ -934,7 +934,7 @@ class MXtests(casadiTestCase):
         j = numpy.random.randint(n)
         if not(i == m/2):
           if n==1 or not(j == n/2):
-            sp.elem(i,j)
+            sp.addNZ(i,j)
       return sp
       
     def gentest(m,n):

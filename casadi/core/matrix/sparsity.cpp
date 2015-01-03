@@ -163,7 +163,7 @@ namespace casadi {
     (*this)->resize(nrow, ncol);
   }
 
-  int Sparsity::elem(int rr, int cc) {
+  int Sparsity::addNZ(int rr, int cc) {
     // If negative index, count from the back
     if (rr<0) rr += size1();
     if (cc<0) cc += size2();
@@ -842,7 +842,7 @@ namespace casadi {
 
   Sparsity Sparsity::unit(int n, int el) {
     Sparsity ret = Sparsity::sparse(n);
-    ret.elem(el, 0);
+    ret.addNZ(el, 0);
     return ret;
   }
 

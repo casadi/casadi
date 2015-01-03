@@ -1869,7 +1869,7 @@ namespace casadi {
 
         // Add element if nonzero on diagonal
         if (row_[el]==i) {
-          ret.elem(i, 0);
+          ret.addNZ(i, 0);
           mapping.push_back(el);
         }
       }
