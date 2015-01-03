@@ -346,6 +346,13 @@ namespace casadi {
     /** \brief Get the nonzero index for a set of elements
         The index vector is used both for input and outputs and must be sorted by increasing
         nonzero index, i.e. column-wise.
+        Elements not found in the sparsity pattern are added
+    */
+    void addNZ(std::vector<int>& SWIG_INOUT(indices));
+
+    /** \brief Get the nonzero index for a set of elements
+        The index vector is used both for input and outputs and must be sorted by increasing
+        nonzero index, i.e. column-wise.
         Elements not found in the sparsity pattern are set to -1.
     */
     void getNZ(std::vector<int>& SWIG_INOUT(indices)) const;
