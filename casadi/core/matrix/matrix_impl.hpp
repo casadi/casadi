@@ -194,24 +194,7 @@ namespace casadi {
                           "getSub(Sparsity sp): shape mismatch. This matrix has shape "
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
-    // Return value
-    Matrix<DataType> ret(sp);
-
-    std::vector<unsigned char> mapping;
-    sparsity().patternCombine(sp, false, true, mapping);
-
-    int k = 0;     // Flat index into non-zeros of this matrix
-    int j = 0;     // Flat index into non-zeros of the resultant matrix;
-    for (int i=0;i<mapping.size();++i) {
-      if (mapping[i] & 1) { // If the original matrix has a non-zero entry in the union
-        if (!(mapping[i] & 4)) ret.at(j) = at(k); // If this non-zero entry appears in the
-                                                  // intersection, add it to the mapping
-        k++;                 // Increment the original matrix' non-zero index counter
-      }
-      if (mapping[i] & 2) j++;
-    }
-
-    return ret;
+    return setSparse(sp);
   }
 
   template<typename DataType>
