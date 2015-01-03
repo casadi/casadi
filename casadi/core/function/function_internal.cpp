@@ -1118,7 +1118,7 @@ namespace casadi {
           casadi_assert(sp.size1()==output(oind).size());
 
           // New row for each old row
-          vector<int> row_map = output(oind).sparsity().getElements();
+          vector<int> row_map = output(oind).sparsity().find();
 
           // Insert rows
           sp.enlargeRows(output(oind).numel(), row_map);
@@ -1129,7 +1129,7 @@ namespace casadi {
           casadi_assert(sp.size2()==input(iind).size());
 
           // New column for each old column
-          vector<int> col_map = input(iind).sparsity().getElements();
+          vector<int> col_map = input(iind).sparsity().find();
 
           // Insert columns
           sp.enlargeColumns(input(iind).numel(), col_map);

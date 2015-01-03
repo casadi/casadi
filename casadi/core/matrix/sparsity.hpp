@@ -36,10 +36,16 @@
 #ifdef SWIG
 #define SWIG_OUTPUT(arg) OUTPUT
 #define SWIG_INOUT(arg) INOUT
-#else
+#ifdef SWIGMATLAB
+#define SWIG_IND1 true
+#else // SWIGMATLAB
+#define SWIG_IND1 false
+#endif // SWIGMATLAB
+#else // SWIG
 #define SWIG_OUTPUT(arg) arg
 #define SWIG_INOUT(arg) arg
-#endif
+#define SWIG_IND1 false
+#endif // SWIG
 
 // Cashing requires a multimap (preferably a hash map)
 #ifdef USE_CXX11
@@ -623,13 +629,15 @@ namespace casadi {
         A : DenseMatrix  4 x 3
         B : SparseMatrix 4 x 3 , 5 structural non-zeros
 
-        k = A.getElements()
+        k = A.find()
         A[k] will contain the elements of A that are non-zero in B
     */
-    std::vector<int> getElements() const;
+    std::vector<int> find(bool ind1=SWIG_IND1) const;
 
+#ifndef SWIG
     /// Get the location of all nonzero elements (inplace version)
-    void getElements(std::vector<int>& loc) const;
+    void find(std::vector<int>& loc, bool ind1=false) const;
+#endif // SWIG
 
     /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
         (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */

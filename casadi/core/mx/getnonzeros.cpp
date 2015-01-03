@@ -208,7 +208,7 @@ namespace casadi {
 
     // Get all input elements
     vector<int> el_input;
-    isp.getElements(el_input);
+    isp.find(el_input);
 
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
@@ -281,7 +281,7 @@ namespace casadi {
       MX asens0 = asens; // Sensitivity before addition
 
       // Get the corresponding nz locations in the output sparsity pattern
-      aseed.sparsity().getElements(r_nz);
+      aseed.sparsity().find(r_nz);
       osp.elem(r_nz);
 
       // Filter out ignored entries and check if there is anything to add at all

@@ -3112,7 +3112,7 @@ namespace casadi {
     Matrix<DataType> ret(sp, 0);
 
     // Get the elements of the known matrix
-    std::vector<int> known_ind = sparsity().getElements();
+    std::vector<int> known_ind = sparsity().find();
 
     // Find the corresponding nonzeros in the return matrix
     sp.elem(known_ind);

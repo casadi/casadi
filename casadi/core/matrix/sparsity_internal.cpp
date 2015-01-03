@@ -2858,7 +2858,7 @@ namespace casadi {
     mapping.resize(k_strict);
   }
 
-  void SparsityInternal::getElements(std::vector<int>& loc) const {
+  void SparsityInternal::find(std::vector<int>& loc, bool ind1) const {
 
     // Element for each nonzero
     loc.resize(size());
@@ -2873,7 +2873,7 @@ namespace casadi {
         int rr = row_[el];
 
         // Get the element
-        loc[el] = rr+cc*nrow_;
+        loc[el] = rr+cc*nrow_+ind1;
       }
     }
   }

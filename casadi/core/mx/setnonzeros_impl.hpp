@@ -125,7 +125,7 @@ namespace casadi {
 
     // Get all output elements (this time without duplicates)
     vector<int> el_output;
-    osp.getElements(el_output);
+    osp.find(el_output);
 
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
@@ -155,7 +155,7 @@ namespace casadi {
       }
 
       // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
-      arg.sparsity().getElements(r_nz);
+      arg.sparsity().find(r_nz);
       isp.elem(r_nz);
 
       // Filter out ignored entries and check if there is anything to add at all

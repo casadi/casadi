@@ -107,7 +107,7 @@ class Sparsitytests(casadiTestCase):
       
     A = DMatrix(a,1)
     Ad = DMatrix(array(A))
-    for i in a.getElements():
+    for i in a.find():
       self.assertEqual(Ad.nz[i],1)
 
   def test_enlarge(self):
