@@ -175,37 +175,11 @@ namespace casadi {
   }
 
   const MX MX::getSub(bool ind1, const Sparsity& sp) const {
-    casadi_assert_message(
-      size2()==sp.size2() && size1()==sp.size1(),
-      "getSub(Sparsity sp): shape mismatch. This matrix has shape "
-      << size2() << " x " << size1()
-      << ", but supplied sparsity index has shape "
-      << sp.size2() << " x " << sp.size1() << ".");
-    std::vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
-
-    // Quick return if sparsity matches MX's sparsity
-    if (sparsity()==sp) { return (*this); }
-
-    sparsity().patternCombine(sp, false, true, mappingc);
-    std::vector<int> nz(sp.size(), -1);
-
-    int k_this = 0;     // Non-zero of this matrix
-    int k_sp = 0;       // Non-zero of resulting matrix
-    for (std::vector<unsigned char>::const_iterator i=mappingc.begin(); i!=mappingc.end(); ++i) {
-      // In this matrix
-      if (*i & 1) {
-        if (*i & 4) {
-          k_this++;
-        } else {
-          nz[k_sp++] = k_this++; // In both this matrix and in resulting matrix
-        }
-      } else if (*i &2) {
-        k_sp++;
-      }
-    }
-
-    MX ret = (*this)->getGetNonzeros(sp, nz);
-    return ret;
+    casadi_assert_message(shape()==sp.shape(),
+                          "getSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          << shape() << ", but supplied sparsity index has shape "
+                          << sp.shape() << ".");
+    return setSparse(sp);
   }
 
   void MX::setSub(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {
