@@ -415,11 +415,14 @@ namespace casadi {
                           "must match size of rhs (" << m.size() << ").");
 
     // Assert dimensions of assigning matrix
-    if (kk.shape() != m.shape()) {
+    if (kk.sparsity() != m.sparsity()) {
       if (m.isScalar()) {
         // m scalar means "set all"
         if (!m.isDense()) return; // Nothing to set
         return setNZ(repmat(m, kk.sparsity()), ind1, kk);
+      } else if (kk.shape() == m.shape()) {
+        // Project sparsity if needed
+        return setNZ(m.setSparse(kk.sparsity()), ind1, kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
