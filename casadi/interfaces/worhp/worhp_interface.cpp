@@ -30,6 +30,7 @@
 #include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include <ctime>
+#include <cstring>
 
 using namespace std;
 
