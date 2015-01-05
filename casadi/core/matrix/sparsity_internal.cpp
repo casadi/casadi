@@ -2050,6 +2050,92 @@ namespace casadi {
     return std::pair<int, int>(nrow_, ncol_);
   }
 
+  vector<int> SparsityInternal::erase(const vector<int>& rr, bool ind1) {
+    // Quick return if nothing to erase
+    if (rr.empty()) return range(size());
+
+    if (!inBounds(rr, -numel()+ind1, numel()+ind1)) {
+      casadi_error("Slicing [rr] out of bounds. Your rr contains " <<
+                   *std::min_element(rr.begin(), rr.end()) << " up to " <<
+                   *std::max_element(rr.begin(), rr.end()) <<
+                   ", which is outside the range [" << -numel()+ind1 << ","<<
+                   numel()+ind1 <<  ").");
+    }
+
+    // Handle index-1, negative indices
+    if (ind1 || hasNegative(rr)) {
+      std::vector<int> rr_mod = rr;
+      for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+        if (ind1) (*i)--;
+        if (*i<0) *i += numel();
+      }
+      return erase(rr_mod, false); // Call recursively
+    }
+
+    // Sort rr in non-deceasing order, if needed
+    if (!isNonDecreasing(rr)) {
+      std::vector<int> rr_sorted = rr;
+      std::sort(rr_sorted.begin(), rr_sorted.end());
+      return erase(rr_sorted, false);
+    }
+
+    // Mapping
+    vector<int> mapping;
+
+    // Quick return if no elements
+    if (numel()==0) return mapping;
+
+    // Reserve memory
+    mapping.reserve(size());
+
+    // Number of non-zeros
+    int nz=0;
+
+    // Elements to be erased
+    vector<int>::const_iterator next_rr = rr.begin();
+
+    // First and last index for the column (note colind_ is being overwritten)
+    int k_first, k_last=0;
+
+    // Loop over columns
+    for (int j=0; j<ncol_; ++j) {
+      // Update k range
+      k_first = k_last;
+      k_last = colind_[j+1];
+
+      // Loop over nonzeros
+      for (int k=k_first; k<k_last; ++k) {
+        // Get row
+        int i=row_[k];
+
+        // Corresponding element
+        int el = i+j*nrow_;
+
+        // Continue to the next element to skip
+        while (next_rr!=rr.end() && *next_rr<el) next_rr++;
+
+        // Skip element if necessary
+        if (next_rr!=rr.end() && *next_rr==el) {
+          next_rr++;
+          continue;
+        }
+
+        // Keep element
+        mapping.push_back(k);
+
+        // Update row
+        row_[nz++] = i;
+      }
+
+      // Update colind
+      colind_[j+1] = nz;
+    }
+
+    // Truncate row vector
+    row_.resize(nz);
+    return mapping;
+  }
+
   vector<int> SparsityInternal::erase(const vector<int>& rr, const vector<int>& cc, bool ind1) {
     if (!inBounds(rr, -nrow_+ind1, nrow_+ind1)) {
       casadi_error("Slicing [rr, cc] out of bounds. Your rr contains " <<

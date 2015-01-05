@@ -327,16 +327,24 @@ namespace casadi {
       return setSub(m, ind1, rr.toSlice(ind1));
     }
 
-    // If the indexed matrix is dense, use nonzero indexing
-    if (isDense()) {
-      return setNZ(m, ind1, rr);
-    }
-
     // Assert dimensions of assigning matrix
-    if (rr.shape() != m.shape()) {
-      if (m.isScalar()) {
+    if (rr.sparsity() != m.sparsity()) {
+      if (rr.shape() == m.shape()) {
+        // Remove submatrix to be replaced
+        erase(rr.data(), ind1);
+
+        // Find the intersection between rr's and m's sparsity patterns
+        Sparsity sp = rr.sparsity() * m.sparsity();
+
+        // Project both matrices to this sparsity
+        return setSub(m.setSparse(sp), ind1, rr.setSparse(sp));
+      } else if (m.isScalar()) {
         // m scalar means "set all"
-        return setSub(repmat(m, rr.shape()), ind1, rr);
+        if (m.isDense()) {
+          return setSub(repmat(m, rr.sparsity()), ind1, rr);
+        } else {
+          return setSub(sparse(rr.shape()), ind1, rr);
+        }
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
@@ -348,13 +356,40 @@ namespace casadi {
       }
     }
 
-    // Call recursively if m scalar, and submatrix isn't
-    if (m.isScalar() && rr.numel()>1) {
-      return setSub(repmat(m, rr.shape()), ind1, rr);
+    // Dense mode
+    if (isDense() && m.isDense()) {
+      return setNZ(m, ind1, rr);
     }
 
-    // TODO(@jaeandersson): Finish the following
-    casadi_error("Not implemented");
+    // Dimensions of this
+    int sz1 = size1(), sz2 = size2(), sz = size(), rrsz = rr.size();
+
+    // Quick return if nothing to set
+    if (rrsz==0) return;
+
+    // Construct new sparsity pattern in triplet format
+    std::vector<int> new_row, new_col;
+    sparsity().getTriplet(new_row, new_col);
+    for (std::vector<int>::const_iterator i=rr.begin(); i!=rr.end(); ++i) {
+      new_row.push_back(*i % sz1);
+      new_col.push_back(*i / sz1);
+    }
+
+    // Reverse vectors since we want to keep the _last_ assignment
+    std::reverse(new_row.begin(), new_row.end());
+    std::reverse(new_col.begin(), new_col.end());
+
+    // Create new sparsity pattern
+    std::vector<int> v;
+    sparsity_ = Sparsity::triplet(sz1, sz2, new_row, new_col, v);
+
+    // Update data vector
+    std::vector<DataType> old_data(data());
+    data_.resize(v.size());
+    for (int i=0; i<v.size(); ++i) {
+      int ri = rrsz+sz-1-v[i];
+      data_.at(i) = ri<sz ? old_data.at(ri) : m.at(ri-sz);
+    }
   }
 
   template<typename DataType>
@@ -1396,7 +1431,7 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1) {
     // Erase from sparsity pattern
-    std::vector<int> mapping = sparsityRef().erase(rr, cc);
+    std::vector<int> mapping = sparsityRef().erase(rr, cc, ind1);
 
     // Update non-zero entries
     for (int k=0; k<mapping.size(); ++k)
@@ -1406,6 +1441,18 @@ namespace casadi {
     data().resize(mapping.size());
   }
 
+  template<typename DataType>
+  void Matrix<DataType>::erase(const std::vector<int>& rr, bool ind1) {
+    // Erase from sparsity pattern
+    std::vector<int> mapping = sparsityRef().erase(rr, ind1);
+
+    // Update non-zero entries
+    for (int k=0; k<mapping.size(); ++k)
+      data()[k] = data()[mapping[k]];
+
+    // Truncate nonzero vector
+    data().resize(mapping.size());
+  }
 
   template<typename DataType>
   void Matrix<DataType>::remove(const std::vector<int>& rr, const std::vector<int>& cc) {

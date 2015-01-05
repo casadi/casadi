@@ -584,9 +584,13 @@ namespace casadi {
     void reserve(int nnz);
     void reserve(int nnz, int ncol);
 
-    /** \brief Erase a submatrix
+    /** \brief Erase a submatrix (leaving structural zeros in its place)
         Erase rows and/or columns of a matrix */
     void erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
+
+    /** \brief Erase a submatrix (leaving structural zeros in its place)
+        Erase elements of a matrix */
+    void erase(const std::vector<int>& rr, bool ind1=false);
 
     /** \brief Remove columns and rows
         Remove/delete rows and/or columns of a matrix */
