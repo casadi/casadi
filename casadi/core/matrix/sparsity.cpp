@@ -530,35 +530,6 @@ namespace casadi {
     (*this)->getNZ(indices);
   }
 
-  void Sparsity::addNZ(std::vector<int>& indices) {
-    // Quick return if no elements
-    if (indices.empty()) return;
-
-    // Check if the indices already exists
-    std::vector<int> indices_test = indices;
-    getNZ(indices_test);
-
-    // Check if all elements exist
-    if (*std::min_element(indices_test.begin(), indices_test.end())>=0) {
-      indices.resize(indices_test.size());
-      std::copy(indices_test.begin(), indices_test.end(), indices.begin());
-      return;
-    }
-
-    // New sparsity pattern
-    std::vector<int> new_row = row(), new_col = getCol();
-    int sz1 = size1(), sz2 = size2();
-    for (size_t i=0; i<indices.size(); ++i) {
-      if (indices_test[i]<0) {
-        new_row.push_back(indices[i] % sz1);
-        new_col.push_back(indices[i] / sz1);
-      }
-    }
-    Sparsity sp = triplet(sz1, sz2, new_row, new_col, indices_test, false);
-    sp.getNZ(indices);
-    *this = sp;
-  }
-
   Sparsity Sparsity::unidirectionalColoring(const Sparsity& AT, int cutoff) const {
     if (AT.isNull()) {
       return (*this)->unidirectionalColoring(T(), cutoff);
