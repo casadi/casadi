@@ -26,20 +26,7 @@
 // Lower value means wil be checked first
 #define PRECEDENCE_IVector 92
 #define PRECEDENCE_PAIR_SLICE_SLICE 93
-// Why are SLICE and IndexVector the same precedence?
-// To circumvent an issue with typemap precedence.
-// Originally, we had slice precedence < IndexList precedence, but this caused the following order:
-//    indexed(Slice,Slice)
-//    indexed(Slice,Martix<int>)
-//    indexed(IndexList,IndexList)
-//    indexed(IndexList,Martix<int>)
-// While we intend it to be:
-//    indexed(Slice,Slice)
-//    indexed(IndexList,IndexList)
-//    indexed(Slice,Martix<int>)
-//    indexed(IndexList,Martix<int>)
 #define PRECEDENCE_SLICE 94
-#define PRECEDENCE_IndexVector 94
 #define PRECEDENCE_PAIR_IVector_IVector 96
 
 #define PRECEDENCE_IMatrix 97
@@ -232,7 +219,7 @@
   }
 }
 
-%typemap(out, fragment="from"{GenericType}) casadi::GenericType {
+%typemap(out, noblock=1, fragment="from"{GenericType}) casadi::GenericType {
   if(!($result = from_GenericType($1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 
@@ -263,7 +250,7 @@
     return p;
   }
 }
-%typemap(out, fragment="from"{Dictionary}) const casadi::GenericType::Dictionary&  {
+%typemap(out, noblock=1, fragment="from"{Dictionary}) const casadi::GenericType::Dictionary&  {
   if(!($result = from_Dictionary(*$1))) SWIG_exception_fail(SWIG_TypeError,"GenericType not yet implemented");
 }
 #endif // SWIGPYTHON
@@ -926,7 +913,6 @@
 %casadi_typemaps_genericmatrix(DMatrix, PRECEDENCE_DMatrix, casadi::Matrix<double>)
 %casadi_typemaps_vector(MX, PRECEDENCE_MXVector, casadi::MX)
 
-#ifdef SWIGPYTHON
 %fragment("to"{IMatrix}, "header", fragment="fwd,make_vector") {
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs) {
     casadi::IMatrix *m = static_cast<casadi::IMatrix*>(mv);
@@ -1007,6 +993,31 @@
     return true;
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
+    // In MATLAB, it is common to use floating point values to represent integers
+    if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
+      double* data = static_cast<double*>(mxGetData(p));
+
+      // Check if all integers
+      bool all_integers=true;
+      size_t sz = getNNZ(p);
+      for (size_t i=0; i<sz; ++i) {
+        if (data[i] != int(data[i])) {
+          all_integers = false;
+          break;
+        }
+      }
+
+      // If successful
+      if (all_integers) {
+        if (m) {
+          *m = casadi::IMatrix(getSparsity(p));
+          for (size_t i=0; i<sz; ++i) {
+            m->at(i) = int(data[i]);
+          }
+        }
+        return true;
+      }
+    }
 #endif // SWIGMATLAB
     return false;
   }
@@ -1018,7 +1029,6 @@
 %casadi_typemaps_vector(IMatrix, PRECEDENCE_IMatrixVector, casadi::Matrix<int>)
 %casadi_typemaps_vector2(DMatrix, PRECEDENCE_DMatrixVectorVector, casadi::Matrix<double>)
 %casadi_typemaps_vector2(IMatrix, PRECEDENCE_IMatrixVectorVector, casadi::Matrix<int>)
-#endif // SWIGPYTHON
 
 %define %my_value_output_typemaps(Type,...)
 %value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));

@@ -174,6 +174,10 @@ namespace casadi {
   template<typename T>
   bool isStrictlyMonotone(const std::vector<T> &v);
 
+  /// Check if the vector has negative entries
+  template<typename T>
+  bool hasNegative(const std::vector<T> &v);
+
 #ifndef SWIG
   /// Print representation to string
   template<typename T>
@@ -510,6 +514,14 @@ namespace casadi {
   }
 
   template<typename T>
+  bool hasNegative(const std::vector<T> &v) {
+    for (std::size_t i=0; i<v.size(); ++i) {
+      if (v[i]<0) return true;
+    }
+    return false;
+  }
+
+  template<typename T>
   std::string getRepresentation(const std::vector<T> &v) {
     std::stringstream ss;
     repr(v, ss);
@@ -612,38 +624,40 @@ namespace casadi {
       return &v.front();
   }
 
+  // Helper class
+  template<typename T>
+  struct sortCompare {
+    const std::vector<T> &v_;
+    sortCompare(const std::vector<T> &v) : v_(v) {}
+    bool operator() (int i, int j) const { return v_[i]<v_[j];}
+  };
+
   template<typename T>
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values,
             std::vector<int> &indices, bool invert_indices) {
-
-    // Create a list of (value, index) pairs
-    std::vector< std::pair<T, int> > pvalues(values.size());
-
-    for (int i=0;i<values.size();++i) {
-      pvalues[i].first  = values[i];
-      pvalues[i].second = i;
+    // Call recursively if indices need to be inverted
+    if (invert_indices) {
+      std::vector<int> inverted;
+      sort(values, sorted_values, inverted, false);
+      indices.resize(inverted.size());
+      for (size_t i=0; i<inverted.size(); ++i) {
+        indices[inverted[i]] = i;
+      }
+      return;
     }
+
+    // Create list of indices
+    indices.resize(values.size());
+    for (size_t i=0; i<indices.size(); ++i) indices[i] = i;
 
     // Sort this list by the values
-    std::sort(pvalues.begin(), pvalues.end());
+    std::sort(indices.begin(), indices.end(), sortCompare<T>(values));
 
-    // Read out the results
+    // Sort the values accordingly
     sorted_values.resize(values.size());
-    indices.resize(values.size());
-    if (invert_indices) {
-      for (int i=0;i<values.size();++i) {
-        sorted_values[i] = pvalues[i].first;
-        indices[pvalues[i].second]       =  i;
-      }
-    } else {
-      for (int i=0;i<values.size();++i) {
-        sorted_values[i] = pvalues[i].first;
-        indices[i]       =  pvalues[i].second;
-      }
+    for (size_t i=0; i<values.size(); ++i) {
+      sorted_values[i] = values[indices[i]];
     }
-
-
-
   }
 
   template<typename T>

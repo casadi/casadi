@@ -39,7 +39,7 @@ namespace casadi {
 
   template<typename DataType>
   const DataType& Matrix<DataType>::elem(int rr, int cc) const {
-    int ind = sparsity().elem(rr, cc);
+    int ind = sparsity().getNZ(rr, cc);
     if (ind==-1)
       return casadi_limits<DataType>::zero;
     else
@@ -56,7 +56,7 @@ namespace casadi {
   template<typename DataType>
   DataType& Matrix<DataType>::elem(int rr, int cc) {
     int oldsize = sparsity().size();
-    int ind = sparsityRef().elem(rr, cc);
+    int ind = sparsityRef().addNZ(rr, cc);
     if (oldsize != sparsity().size())
       data().insert(begin()+ind, DataType(0));
     return at(ind);
@@ -70,381 +70,439 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(int rr, int cc) const {
-    return elem(rr, cc);
+  bool Matrix<DataType>::isSlice(bool ind1) const {
+    throw CasadiException("\"isSlice\" not defined for instantiation");
+    return false;
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& jj,
-                                               const std::vector<int>& ii) const {
-    // Nonzero mapping from submatrix to full
-    std::vector<int> mapping;
+  Slice Matrix<DataType>::toSlice(bool ind1) const {
+    throw CasadiException("\"toSlice\" not defined for instantiation");
+    return Slice();
+  }
+
+  template<typename DataType>
+  const Matrix<DataType> Matrix<DataType>::getSub(bool ind1,
+                                                  const Slice& rr, const Slice& cc) const {
+    // Both are scalar
+    if (rr.isScalar(size1()) && cc.isScalar(size2())) {
+      int k = sparsity().getNZ(rr.toScalar(size1()), cc.toScalar(size2()));
+      if (k>=0) {
+        return at(k);
+      } else {
+        return Matrix<DataType>::sparse(1, 1);
+      }
+    }
+
+    // Fall back on IMatrix-IMatrix
+    return getSub(ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+  }
+
+  template<typename DataType>
+  const Matrix<DataType>
+  Matrix<DataType>::getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const {
+    // Fall back on IMatrix-IMatrix
+    return getSub(ind1, rr.getAll(size1(), ind1), cc);
+  }
+
+  template<typename DataType>
+  const Matrix<DataType>
+  Matrix<DataType>::getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const {
+    // Fall back on IMatrix-IMatrix
+    return getSub(ind1, rr, cc.getAll(size2(), ind1));
+  }
+
+  template<typename DataType>
+  const Matrix<DataType>
+  Matrix<DataType>::getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
+    // Scalar
+    if (rr.isScalar(true) && cc.isScalar(true)) {
+      return getSub(ind1, rr.toSlice(ind1), cc.toSlice(ind1));
+    }
+
+    // Row vector rr (e.g. in MATLAB) is transposed to column vector
+    if (rr.size1()==1 && rr.size2()>1) {
+      return getSub(ind1, rr.T(), cc);
+    }
+
+    // Row vector cc (e.g. in MATLAB) is transposed to column vector
+    if (cc.size1()==1 && cc.size2()>1) {
+      return getSub(ind1, rr, cc.T());
+    }
+
+    casadi_assert_message(rr.isDense() && rr.isVector(),
+                          "Marix::getSub: First index must be a dense vector");
+    casadi_assert_message(cc.isDense() && cc.isVector(),
+                          "Marix::getSub: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
-    Sparsity sp = sparsity().sub(jj, ii, mapping);
+    std::vector<int> mapping;
+    Sparsity sp = sparsity().sub(rr.data(), cc.data(), mapping, ind1);
 
-    // Create return object
+    // Copy nonzeros and return
     Matrix<DataType> ret(sp);
-
-    // Copy nonzeros
-    for (int k=0; k<mapping.size(); ++k)
-      ret.data()[k] = data()[mapping[k]];
+    for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
 
     // Return (RVO)
     return ret;
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& k,
-                                               const std::vector<int>& ii) const {
-    std::vector< int > rows = range(size1());
-    std::vector< Matrix<DataType> > temp;
-
-    if (!inBounds(ii, size2())) {
-      casadi_error("Slicing [ii, k] out of bounds. Your ii contains "
-                   << *std::min_element(ii.begin(), ii.end()) << " up to "
-                   << *std::max_element(ii.begin(), ii.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-
-    for (int i=0;i<ii.size();++i) {
-      Matrix<DataType> m = k;
-      for (int j=0;j<m.size();++j) {
-        m.data()[j] = elem(k.at(j), ii.at(i));
+  const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Slice& rr) const {
+    // Scalar
+    if (rr.isScalar(numel())) {
+      int r = rr.toScalar(numel());
+      int k = sparsity().getNZ(r % size1(), r / size1());
+      if (k>=0) {
+        return at(k);
+      } else {
+        return Matrix<DataType>::sparse(1, 1);
       }
-      temp.push_back(m);
     }
 
-    return horzcat(temp);
+    // Fall back on IMatrix
+    return getSub(ind1, rr.getAll(numel(), ind1));
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& jj,
-                                               const Matrix<int>& k) const {
-    std::vector< int > cols = range(size2());
-    std::vector< Matrix<DataType> > temp;
-
-    if (!inBounds(jj, size1())) {
-      casadi_error("Slicing [ii, k] out of bounds. Your jj contains "
-                   << *std::min_element(jj.begin(), jj.end()) << " up to "
-                   << *std::max_element(jj.begin(), jj.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+  const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Matrix<int>& rr) const {
+    // Scalar
+    if (rr.isScalar(true)) {
+      return getSub(ind1, rr.toSlice(ind1));
     }
 
-    for (int j=0;j<jj.size();++j) {
-      Matrix<DataType> m = k;
-      for (int i=0;i<m.size();++i) {
-        m.data()[i] = elem(jj.at(j), k.at(i));
-      }
-      temp.push_back(m);
+    // If the indexed matrix is dense, use nonzero indexing
+    if (isDense()) {
+      return getNZ(ind1, rr);
     }
 
-    return vertcat(temp);
-  }
+    // Get the sparsity pattern - does bounds checking
+    std::vector<int> mapping;
+    Sparsity sp = sparsity().sub(rr.data(), rr.sparsity(), mapping, ind1);
 
-  template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& j, const Matrix<int>& i) const {
-    casadi_assert_message(i.sparsity()==j.sparsity(),
-                          "sub(Imatrix i, Imatrix j): sparsities must match. Got "
-                          << i.dimString() << " and " << j.dimString() << ".");
-
-    Matrix<DataType> ret(i.sparsity());
-    for (int k=0;k<i.size();++k) {
-      ret.data()[k] = elem(j.at(k), i.at(k));
-    }
-
-    return ret;
-  }
-
-  template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::sub(const Sparsity& sp, int dummy) const {
-    casadi_assert_message(
-      size1()==sp.size1() && size2()==sp.size2(),
-      "sub(Sparsity sp): shape mismatch. This matrix has shape "
-      << size1() << " x " << size2()
-      << ", but supplied sparsity index has shape "
-      << sp.size1() << " x " << sp.size2() << ".");
+    // Copy nonzeros and return
     Matrix<DataType> ret(sp);
+    for (int k=0; k<mapping.size(); ++k) ret.at(k) = at(mapping[k]);
 
-    std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
-    sparsity().patternCombine(sp, false, true, mapping);
-
-    int k = 0;     // Flat index into non-zeros of this matrix
-    int j = 0;     // Flat index into non-zeros of the resultant matrix;
-    for (int i=0;i<mapping.size();++i) {
-      if (mapping[i] & 1) { // If the original matrix has a non-zero entry in the union
-        if (!(mapping[i] & 4)) ret.at(j) = at(k); // If this non-zero entry appears in the
-                                                  // intersection, add it to the mapping
-        k++;                 // Increment the original matrix' non-zero index counter
-      }
-      if (mapping[i] & 2) j++;
-    }
-
+    // Return (RVO)
     return ret;
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, int j, int i) {
-    if (m.isDense()) {
-      elem(j, i) = m.toScalar();
-    } else {
-      setSub(m, std::vector<int>(1, j), std::vector<int>(1, i));
-    }
+  const Matrix<DataType> Matrix<DataType>::getSub(bool ind1, const Sparsity& sp) const {
+    casadi_assert_message(shape()==sp.shape(),
+                          "getSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          << shape() << ", but supplied sparsity index has shape "
+                          << sp.shape() << ".");
+    return setSparse(sp);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const std::vector<int>& rr,
-                                const std::vector<int>& cc) {
-    casadi_assert_message(m.numel()==1 || (cc.size() == m.size2() && rr.size() == m.size1()),
-                          "Dimension mismatch." << std::endl << "lhs is " << rr.size() << " x "
-                          << cc.size() << ", while rhs is " << m.dimString());
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
+                                const Slice& rr, const Slice& cc) {
+    // Both are scalar
+    if (rr.isScalar(size1()) && cc.isScalar(size2()) && m.isDense()) {
+      elem(rr.toScalar(size1()), cc.toScalar(size2())) = m.toScalar();
+      return;
+    }
 
-    if (!inBounds(rr, size1())) {
-      casadi_error("setSub[., rr, cc] out of bounds. Your rr contains "
+    // Fall back on (IMatrix, IMatrix)
+    setSub(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
+                                const Slice& rr, const Matrix<int>& cc) {
+    // Fall back on (IMatrix, IMatrix)
+    setSub(m, ind1, rr.getAll(size1(), ind1), cc);
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
+                                const Matrix<int>& rr, const Slice& cc) {
+    // Fall back on (IMatrix, IMatrix)
+    setSub(m, ind1, rr, cc.getAll(size2(), ind1));
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
+                                const Matrix<int>& rr, const Matrix<int>& cc) {
+    // Scalar
+    if (rr.isScalar(true) && cc.isScalar(true) && m.isDense()) {
+      return setSub(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
+    }
+
+    // Row vector rr (e.g. in MATLAB) is transposed to column vector
+    if (rr.size1()==1 && rr.size2()>1) {
+      return setSub(m, ind1, rr.T(), cc);
+    }
+
+    // Row vector cc (e.g. in MATLAB) is transposed to column vector
+    if (cc.size1()==1 && cc.size2()>1) {
+      return setSub(m, ind1, rr, cc.T());
+    }
+
+    // Make sure rr and cc are dense vectors
+    casadi_assert_message(rr.isDense() && rr.isVector(),
+                          "Matrix::setSub: First index not dense vector");
+    casadi_assert_message(cc.isDense() && cc.isVector(),
+                          "Matrix::setSub: Second index not dense vector");
+
+    // Assert dimensions of assigning matrix
+    if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
+      if (m.isScalar()) {
+        // m scalar means "set all"
+        return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
+      } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
+                 && std::min(m.size1(), m.size2()) == 1) {
+        // m is transposed if necessary
+        return setSub(m.T(), ind1, rr, cc);
+      } else {
+        // Error otherwise
+        casadi_error("Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
+                     << cc.size1() << ", while rhs is " << m.shape());
+      }
+    }
+
+    // Dimensions
+    int sz1 = size1(), sz2 = size2();
+
+    // Report out-of-bounds
+    if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
+      casadi_error("setSub[., r, c] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+                   << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
-    if (!inBounds(cc, size2())) {
-      casadi_error("setSub [., rr, cc] out of bounds. Your cc contains "
+    if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
+      casadi_error("setSub [., r, c] out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
+                   << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
     }
 
-    // If m is scalar
-    if (m.numel() != cc.size() * rr.size()) {
-      setSub(Matrix<DataType>::repmat(m.toScalar(), rr.size(), cc.size()), rr, cc);
+    // If we are assigning with something sparse, first remove existing entries
+    if (!m.isDense()) {
+      erase(rr.data(), cc.data(), ind1);
+    }
+
+    // Collect all assignments
+    IMatrix el(m.sparsity());
+    for (int j=0; j<el.size2(); ++j) { // Loop over columns of m
+      int this_j = cc.at(j) - ind1; // Corresponding column in this
+      if (this_j<0) this_j += sz2;
+      for (int k=el.colind(j); k<el.colind(j+1); ++k) { // Loop over rows of m
+        int i = m.row(k);
+        int this_i = rr.at(i) - ind1; // Corresponding row in this
+        if (this_i<0) this_i += sz1;
+        el.at(k) = this_i + this_j*sz1;
+      }
+    }
+    return setSub(m, false, el);
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr) {
+    // Scalar
+    if (rr.isScalar(numel()) && m.isDense()) {
+      int r = rr.toScalar(numel());
+      elem(r % size1(), r / size1()) = m.toScalar();
       return;
     }
 
+    // Fall back on IMatrix
+    setSub(m, ind1, rr.getAll(numel(), ind1));
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) {
+    // Scalar
+    if (rr.isScalar(true) && m.isDense()) {
+      return setSub(m, ind1, rr.toSlice(ind1));
+    }
+
+    // Assert dimensions of assigning matrix
+    if (rr.sparsity() != m.sparsity()) {
+      if (rr.shape() == m.shape()) {
+        // Remove submatrix to be replaced
+        erase(rr.data(), ind1);
+
+        // Find the intersection between rr's and m's sparsity patterns
+        Sparsity sp = rr.sparsity() * m.sparsity();
+
+        // Project both matrices to this sparsity
+        return setSub(m.setSparse(sp), ind1, rr.setSparse(sp));
+      } else if (m.isScalar()) {
+        // m scalar means "set all"
+        if (m.isDense()) {
+          return setSub(repmat(m, rr.sparsity()), ind1, rr);
+        } else {
+          return setSub(sparse(rr.shape()), ind1, rr);
+        }
+      } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
+                 && std::min(m.size1(), m.size2()) == 1) {
+        // m is transposed if necessary
+        return setSub(m.T(), ind1, rr);
+      } else {
+        // Error otherwise
+        casadi_error("Dimension mismatch." << "lhs is " << rr.shape()
+                     << ", while rhs is " << m.shape());
+      }
+    }
+
+    // Dimensions of this
+    int sz1 = size1(), sz2 = size2(), sz = size(), nel = numel(), rrsz = rr.size();
+
+    // Quick return if nothing to set
+    if (rrsz==0) return;
+
+    // Check bounds
+    if (!inBounds(rr.data(), -nel+ind1, nel+ind1)) {
+      casadi_error("setSub[rr] out of bounds. Your rr contains "
+                   << *std::min_element(rr.begin(), rr.end()) << " up to "
+                   << *std::max_element(rr.begin(), rr.end())
+                   << ", which is outside the range [" << -nel+ind1 << ","<< nel+ind1 <<  ").");
+    }
+
+    // Dense mode
     if (isDense() && m.isDense()) {
-      // Dense mode
-      for (int i=0; i<cc.size(); ++i) {
-        for (int j=0; j<rr.size(); ++j) {
-          data()[cc[i]*size1() + rr[j]]=m.data()[i*m.size1()+j];
-        }
-      }
-    } else {
-      // Sparse mode
+      return setNZ(m, ind1, rr);
+    }
 
-      // Remove submatrix to be replaced
-      erase(rr, cc);
+    // Construct new sparsity pattern
+    std::vector<int> new_row, new_col, nz(rr.data());
+    new_row.reserve(sz+rrsz);
+    new_col.reserve(sz+rrsz);
+    nz.reserve(rrsz);
+    sparsity().getTriplet(new_row, new_col);
+    for (std::vector<int>::iterator i=nz.begin(); i!=nz.end(); ++i) {
+      if (ind1) (*i)--;
+      if (*i<0) *i += nel;
+      new_row.push_back(*i % sz1);
+      new_col.push_back(*i / sz1);
+    }
+    Sparsity sp = Sparsity::triplet(sz1, sz2, new_row, new_col);
 
-      // Extend el to the same dimension as this
-      Matrix<DataType> el_ext = m;
-      el_ext.enlarge(size1(), size2(), rr, cc);
+    // If needed, update pattern
+    if (sp != sparsity()) *this = setSparse(sp);
 
-      // Unite the sparsity patterns
-      *this = unite(*this, el_ext);
+    // Find the nonzeros corresponding to rr
+    sparsity().getNZ(nz);
+
+    // Carry out the assignments
+    for (int i=0; i<nz.size(); ++i) {
+      at(nz[i]) = m.at(i);
     }
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const std::vector<int>& jj,
-                                const Matrix<int>& i) {
-    // If el is scalar
-    if (m.isScalar() && (jj.size() > 1 || i.size() > 1)) {
-      setSub(repmat(Matrix<DataType>(i.sparsity(), m.toScalar()), jj.size(), 1), jj, i);
+  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Sparsity& sp) {
+    casadi_assert_message(shape()==sp.shape(),
+                          "setSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          << shape() << ", but supplied sparsity index has shape "
+                          << sp.shape() << ".");
+    std::vector<int> ii = sp.find();
+    if (m.isScalar()) {
+      (*this)(ii) = dense(m);
+    } else {
+      (*this)(ii) = dense(m(ii));
+    }
+  }
+
+  template<typename DataType>
+  const Matrix<DataType> Matrix<DataType>::getNZ(bool ind1, const Slice& kk) const {
+    // Scalar
+    if (kk.isScalar(size())) {
+      return at(kk.toScalar(size()));
+    }
+
+    // Fall back on IMatrix
+    return getNZ(ind1, kk.getAll(size(), ind1));
+  }
+
+  template<typename DataType>
+  const Matrix<DataType> Matrix<DataType>::getNZ(bool ind1, const Matrix<int>& kk) const {
+    // Scalar
+    if (kk.isScalar(true)) {
+      return getNZ(ind1, kk.toSlice(ind1));
+    }
+
+    // Get nonzeros of kk
+    const std::vector<int>& k = kk.data();
+    int sz = size();
+
+    // Check bounds
+    if (!inBounds(k, -sz+ind1, sz+ind1)) {
+      casadi_error("getNZ[kk] out of bounds. Your kk contains "
+                   << *std::min_element(k.begin(), k.end()) << " up to "
+                   << *std::max_element(k.begin(), k.end())
+                   << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
+    }
+
+    // Copy nonzeros
+    Matrix<DataType> ret = zeros(kk.sparsity());
+    for (int el=0; el<k.size(); ++el) {
+      int k_el = k[el]-ind1;
+      ret.at(el) = at(k_el>=0 ? k_el : k_el+sz);
+    }
+    return ret;
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setNZ(const Matrix<DataType>& m, bool ind1, const Slice& kk) {
+    // Scalar
+    if (kk.isScalar(size())) {
+      at(kk.toScalar(size())) = m.toScalar();
       return;
     }
 
-    if (!inBounds(jj, size1())) {
-      casadi_error(
-        "setSub[., i, jj] out of bounds. Your jj contains "
-        << *std::min_element(jj.begin(), jj.end()) << " up to "
-        << *std::max_element(jj.begin(), jj.end())
-        << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-
-    Sparsity result_sparsity = repmat(i, jj.size(), 1).sparsity();
-
-    casadi_assert_message(
-      result_sparsity == m.sparsity(),
-      "setSub(Imatrix" << i.dimString() << ", Ivector(length=" << jj.size()
-      << "), Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(IMatrix, "
-      << jj.size() << ",1) = " << result_sparsity.dimString()
-      << " must match the sparsity of Matrix<DataType> = "  << m.dimString()
-      << ".");
-
-    std::vector<int> slice_i = range(i.size2());
-
-    for (int k=0; k<jj.size(); ++k) {
-      Matrix<DataType> el_k = m(range(k*i.size1(), (k+1)*i.size1()), slice_i);
-      for (int j=0;j<i.size();++j) {
-        elem(jj[k], i.at(j))=el_k.at(j);
-      }
-    }
-
+    // Fallback on IMatrix
+    setNZ(m, ind1, kk.getAll(size(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& j,
-                                const std::vector<int>& ii) {
-
-    // If el is scalar
-    if (m.isScalar() && (ii.size() > 1 || j.size() > 1)) {
-      setSub(repmat(Matrix<DataType>(j.sparsity(), m.toScalar()), 1, ii.size()), j, ii);
-      return;
+  void Matrix<DataType>::setNZ(const Matrix<DataType>& m, bool ind1, const Matrix<int>& kk) {
+    // Scalar
+    if (kk.isScalar(true)) {
+      return setNZ(m, ind1, kk.toSlice(ind1));
     }
 
-    if (!inBounds(ii, size2())) {
-      casadi_error("setSub[., ii, j] out of bounds. Your ii contains "
-                   << *std::min_element(ii.begin(), ii.end()) << " up to "
-                   << *std::max_element(ii.begin(), ii.end())
-                   << ", which is outside of the matrix shape " << dimString() << ".");
-    }
-
-    Sparsity result_sparsity = repmat(j, 1, ii.size()).sparsity();
-
-
-    casadi_assert_message(
-        result_sparsity == m.sparsity(),
-        "setSub(Ivector(length=" << ii.size() << "), Imatrix" << j.dimString()
-        << ", Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(Imatrix,1, "
-        << ii.size() << ") = " << result_sparsity.dimString()
-        << " must match the sparsity of Matrix<DataType> = " << m.dimString() << ".");
-
-    std::vector<int> slice_j = range(j.size1());
-
-    for (int k=0; k<ii.size(); ++k) {
-      Matrix<DataType> el_k = m(slice_j, range(k*j.size2(), (k+1)*j.size2()));
-      for (int i=0;i<j.size();++i) {
-        elem(j.at(i), ii[k])=el_k.at(i);
+    // Assert dimensions of assigning matrix
+    if (kk.sparsity() != m.sparsity()) {
+      if (m.isScalar()) {
+        // m scalar means "set all"
+        if (!m.isDense()) return; // Nothing to set
+        return setNZ(repmat(m, kk.sparsity()), ind1, kk);
+      } else if (kk.shape() == m.shape()) {
+        // Project sparsity if needed
+        return setNZ(m.setSparse(kk.sparsity()), ind1, kk);
+      } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
+                 && std::min(m.size1(), m.size2()) == 1) {
+        // m is transposed if necessary
+        return setNZ(m.T(), ind1, kk);
+      } else {
+        // Error otherwise
+        casadi_error("Dimension mismatch." << "lhs is " << kk.shape()
+                     << ", while rhs is " << m.shape());
       }
     }
 
-  }
+    // Get nonzeros
+    const std::vector<int>& k = kk.data();
+    int sz = size();
 
-
-  template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& j,
-                                const Matrix<int>& i) {
-    casadi_assert_message(i.sparsity()==j.sparsity(),
-                          "setSub(., Imatrix i, Imatrix j): sparsities must match. Got "
-                          << i.dimString() << " for i and " << j.dimString() << " for j.");
-
-    // If m is scalar
-    if (m.isScalar() && i.numel() > 1) {
-      setSub(Matrix<DataType>(i.sparsity(), m.toScalar()), j, i);
-      return;
+    // Check bounds
+    if (!inBounds(k, -sz+ind1, sz+ind1)) {
+      casadi_error("setNZ[kk] out of bounds. Your kk contains "
+                   << *std::min_element(k.begin(), k.end()) << " up to "
+                   << *std::max_element(k.begin(), k.end())
+                   << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
     }
 
-    casadi_assert_message(
-      m.sparsity()==i.sparsity(),
-      "setSub(Matrix m, Imatrix i, Imatrix j): sparsities must match. Got "
-      << m.dimString() << " for m and " << j.dimString() << " for i and j.");
-
-    for (int k=0; k<i.size(); ++k) {
-      elem(j.at(k), i.at(k)) = m.at(k);
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy) {
-    casadi_assert_message(
-      size2()==sp.size2() && size1()==sp.size1(),
-      "sub(Sparsity sp): shape mismatch. This matrix has shape "
-      << size2() << " x " << size1()
-      << ", but supplied sparsity index has shape "
-      << sp.size2() << " x " << sp.size1() << ".");
-    // TODO(Joel): optimize this for speed
-    Matrix<DataType> elm;
-    if (m.isScalar()) {
-      elm = Matrix<DataType>(sp, m.at(0));
-    } else {
-      elm = m.sub(sp);
-    }
-
-    for (int i=0; i<sp.colind().size()-1; ++i) {
-      for (int k=sp.colind()[i]; k<sp.colind()[i+1]; ++k) {
-        int j=sp.row()[k];
-        elem(j, i)=elm.data()[k];
-      }
-    }
-  }
-
-  template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getNZ(const std::vector<int>& k) const {
-    try {
-      Matrix<DataType> ret = zeros(k.size());
-      for (int el=0; el<k.size(); ++el)
-        ret.data()[el] = data().at(k[el]);
-
-      return ret;
-    } catch(std::out_of_range& ex) {
-      std::stringstream ss;
-      ss << "Out of range error in Matrix<>::getNZ: " << k
-         << " not all in range [0, " << size() << ")";
-      throw CasadiException(ss.str());
-    }
-  }
-
-  template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getNZ(const Matrix<int>& k) const {
-    try {
-      Matrix<DataType> ret = zeros(k.sparsity());
-      for (int el=0; el<k.size(); ++el)
-        ret.data()[el] = data().at(k.at(el));
-
-      return ret;
-    } catch(std::out_of_range& ex) {
-      std::stringstream ss;
-      ss << "Out of range error in Matrix<>::getNZ: " << k
-         << " not all in range [0, " << size() << ")";
-      throw CasadiException(ss.str());
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setNZ(int k, const Matrix<DataType>& m) {
-    if (k<0) k+=size();
-    at(k) = m.toScalar();
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setNZ(const std::vector<int>& kk, const Matrix<DataType>& m) {
-    if (m.isScalar()) {
-      // Assign all elements with the same scalar
-      for (int k=0; k<kk.size(); ++k) {
-        setNZ(kk[k], m);
-      }
-    } else {
-      // Assignment elementwise
-      casadi_assert_message(kk.size()==m.size(),
-                            "Matrix<DataType>::setNZ: length of non-zero indices ("
-                            << kk.size() << ") " << std::endl << "must match size of rhs ("
-                            << m.size() << ").");
-      for (int k=0; k<kk.size(); ++k) {
-        setNZ(kk[k], m[k]);
-      }
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setNZ(const Matrix<int>& kk, const Matrix<DataType>& m) {
-    if (m.isScalar()) {
-      // Assign all elements with the same scalar
-      for (int k=0; k<kk.size(); ++k) {
-        setNZ(kk.at(k), m);
-      }
-    } else if (kk.isDense() && !m.isDense() && kk.size2()==m.size2() && kk.size1()==m.size1()) {
-      const std::vector<int>& row = m.sparsity().row();
-      const std::vector<int>& colind = m.sparsity().colind();
-      for (int i=0; i<colind.size()-1; ++i) {
-        for (int k=colind[i]; k<colind[i+1]; ++k) {
-          int j=row[k];
-          setNZ(kk.elem(j, i), m[k]);
-        }
-      }
-    } else {
-      casadi_assert_message(kk.sparsity()==m.sparsity(),
-                            "Matrix<DataType>::setNZ: sparsity of IMatrix index "
-                            << kk.dimString() << " " << std::endl
-                            << "must match sparsity of rhs " << m.dimString() << ".");
-      for (int k=0; k<kk.size(); ++k) {
-        setNZ(kk.at(k), m[k]);
-      }
+    // Set nonzeros, ignoring negative indices
+    for (int el=0; el<k.size(); ++el) {
+      int k_el = k[el]-ind1;
+      at(k_el>=0 ? k_el : k_el+sz) = m.at(el);
     }
   }
 
@@ -1368,9 +1426,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::erase(const std::vector<int>& rr, const std::vector<int>& cc) {
+  void Matrix<DataType>::erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1) {
     // Erase from sparsity pattern
-    std::vector<int> mapping = sparsityRef().erase(rr, cc);
+    std::vector<int> mapping = sparsityRef().erase(rr, cc, ind1);
 
     // Update non-zero entries
     for (int k=0; k<mapping.size(); ++k)
@@ -1380,6 +1438,18 @@ namespace casadi {
     data().resize(mapping.size());
   }
 
+  template<typename DataType>
+  void Matrix<DataType>::erase(const std::vector<int>& rr, bool ind1) {
+    // Erase from sparsity pattern
+    std::vector<int> mapping = sparsityRef().erase(rr, ind1);
+
+    // Update non-zero entries
+    for (int k=0; k<mapping.size(); ++k)
+      data()[k] = data()[mapping[k]];
+
+    // Truncate nonzero vector
+    data().resize(mapping.size());
+  }
 
   template<typename DataType>
   void Matrix<DataType>::remove(const std::vector<int>& rr, const std::vector<int>& cc) {
@@ -1408,8 +1478,8 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::enlarge(int nrow, int ncol, const std::vector<int>& rr,
-                                 const std::vector<int>& cc) {
-    sparsityRef().enlarge(nrow, ncol, rr, cc);
+                                 const std::vector<int>& cc, bool ind1) {
+    sparsityRef().enlarge(nrow, ncol, rr, cc, ind1);
   }
 
   template<typename DataType>
@@ -2277,7 +2347,7 @@ namespace casadi {
 
   template<typename DataType>
   bool Matrix<DataType>::isEqual(const Matrix<DataType> &ex2) const {
-    // TODO(Joel): Very inefficient, refactor
+    // TODO(@jaeandersson): Very inefficient, refactor
     if ((size()!=0 || ex2.size()!=0) && shape()!=ex2.shape()) return false;
     Matrix<DataType> difference = *this - ex2;
     return difference.isZero();
@@ -2958,7 +3028,7 @@ namespace casadi {
       blocks(size1(), std::vector< Matrix<DataType> >(size2(), filler));
     for (int i=0;i<size1();++i) {
       for (int j=0;j<size2();++j) {
-        int k = a_sp.elem(i, j);
+        int k = a_sp.getNZ(i, j);
         if (k!=-1) {
           blocks[i][j] = (*this)[k]*b;
         }
@@ -3086,10 +3156,10 @@ namespace casadi {
     Matrix<DataType> ret(sp, 0);
 
     // Get the elements of the known matrix
-    std::vector<int> known_ind = sparsity().getElements(false);
+    std::vector<int> known_ind = sparsity().find();
 
     // Find the corresponding nonzeros in the return matrix
-    sp.elem(known_ind);
+    sp.getNZ(known_ind);
 
     // Set the element values
     const std::vector<DataType>& A_data = data();

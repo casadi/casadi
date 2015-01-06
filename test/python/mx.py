@@ -713,104 +713,7 @@ class MXtests(casadiTestCase):
     f.evaluate()
     
     self.checkarray(f.getOutput(),array([[9,8],[2,4]]),"IMatrix indexing assignment")
-    
-  
-  def test_IMatrix_index_slice(self):
-    self.message("IMatrix combined with slice")
-
-    A = IMatrix.sparse(2,2)
-    A[0,0] = 0
-    A[1,1] = 1
-    A[0,1] = 2
-    A[1,0] = 0
-    
-    
-    B = MX(DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]]))
-    F = MX(DMatrix([[1,2],[4,5]]))
-
-    f = MXFunction([],[B[:,A]])
-    f.init()
-    f.evaluate()
-
-    self.checkarray(f.getOutput(),DMatrix([[1,3],[1,2],[4,6],[4,5],[7,9],[7,8],[10,12],[10,11]]),"B[:,A]")
-    
-    f = MXFunction([],[B[A,:]])
-    f.init()
-    f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([[1,7,2,8,3,9],[1,4,2,5,3,6]]),"B[A,:]")
-    
-    self.assertRaises(Exception, lambda : F[:,A])
-    
-    f = MXFunction([],[B[A,1]])
-    f.init()
-    f.evaluate()
-    
-    self.checkarray(f.getOutput(),DMatrix([[2,8],[2,5]]),"B[A,1]")
-
-    f = MXFunction([],[B[1,A]])
-    f.init()
-    f.evaluate()
-    
-    self.checkarray(f.getOutput(),DMatrix([[4,6],[4,5]]),"B[1,A]")
-
-    B = MX(DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]]))
-    A = IMatrix([2,0])
-    
-    B[1,A] = DMatrix([20,21])
-
-    f = MXFunction([],[B])
-    f.init()
-    f.evaluate()
-
-    self.checkarray(f.getOutput(),DMatrix([[1,2,3],[21,5,20],[7,8,9],[10,11,12]]),"B[1,A] setter")
-
-
-    B = MX(DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]]))
-    A = IMatrix([2,0])
-    
-    B[A,1] = DMatrix([20,21])
-
-    f = MXFunction([],[B])
-    f.init()
-    f.evaluate()
-
-    self.checkarray(f.getOutput(),DMatrix([[1,21,3],[4,5,6],[7,20,9],[10,11,12]]),"B[A,:] setter")
-    
-    
-    B = MX(DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]]))
-    A = IMatrix([2,0])
-    
-    B[A,:] = DMatrix([[20,21,22],[24,25,26]])
-
-    f = MXFunction([],[B])
-    f.init()
-    f.evaluate()
-
-    self.checkarray(f.getOutput(),DMatrix([[24,25,26],[4,5,6],[20,21,22],[10,11,12]]),"B[A,:] setter")
-    
-  def test_IMatrix_IMatrix_index(self):
-    self.message("IMatrix IMatrix index")
-
-    A = IMatrix.sparse(2,2)
-    A[0,0] = 0
-    A[1,1] = 1
-    A[0,1] = 2
-    
-    B = IMatrix.sparse(2,2)
-    B[0,0] = 2
-    B[1,1] = 1
-    B[0,1] = 0
-    
-    C = MX(DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]]))
-    F = MX(DMatrix([[1,2],[4,5]]))
-
-    f = MXFunction([],[C[A,B]])
-    f.init()
-    f.evaluate()
-    
-    self.checkarray(f.getOutput(),DMatrix([[3,7],[0,5]]),"C[A,B]")
-    self.assertRaises(Exception, lambda : F[A,B])
-
+        
   def test_subsass(self):
      self.message("Check subscripted assignment")
      
@@ -955,7 +858,7 @@ class MXtests(casadiTestCase):
     def randsparsity(m,n):
       sp = Sparsity.sparse(m,n)
       for i in range((n*m)/2):
-        sp.elem(numpy.random.randint(m),numpy.random.randint(n))
+        sp.addNZ(numpy.random.randint(m),numpy.random.randint(n))
       return sp
       
     def gentest(m,n):
@@ -1031,7 +934,7 @@ class MXtests(casadiTestCase):
         j = numpy.random.randint(n)
         if not(i == m/2):
           if n==1 or not(j == n/2):
-            sp.elem(i,j)
+            sp.addNZ(i,j)
       return sp
       
     def gentest(m,n):
@@ -1579,7 +1482,7 @@ class MXtests(casadiTestCase):
     i.printDense()
     print vecNZ(i.T)
 
-    T = X[i]
+    T = X.nz[i]
 
     f = MXFunction([X],[vecNZ(T.T)**2])
     f.init()
@@ -2629,7 +2532,7 @@ class MXtests(casadiTestCase):
 
     sp = Sparsity.triplet(3,3,[0,1,2,2],[0,0,1,2])
 
-    f = MXFunction([x],[x[IMatrix(sp,range(sp.size()))]])
+    f = MXFunction([x],[x.nz[IMatrix(sp,range(sp.size()))]])
     f.init()
 
     g = MXFunction([x],[MX(sp,x)])

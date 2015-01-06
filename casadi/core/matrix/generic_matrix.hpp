@@ -145,41 +145,38 @@ namespace casadi {
 #ifndef SWIG
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
-    const MatType operator[](const K& k) const
-    { return static_cast<const MatType*>(this)->getNZ(k); }
+    const MatType operator[](const K& k) const {
+      return static_cast<const MatType*>(this)->getNZ(false, k);
+    }
 
     /** \brief  Access vector nonzero or slice of nonzeros */
     template<typename K>
-    NonZeros<MatType, K> operator[](const K& k)
-    { return NonZeros<MatType, K>(static_cast<MatType&>(*this), k); }
+    NonZeros<MatType, K> operator[](const K& k) {
+      return NonZeros<MatType, K>(static_cast<MatType&>(*this), k);
+    }
 
     /** \brief  Get vector element or slice */
     template<typename RR>
-    const MatType operator()(const RR& rr) const
-    { return static_cast<const MatType*>(this)->sub(rr, 0);}
-
-    /** \brief  Get Sparsity slice */
-    const MatType operator()(const Sparsity& sp) const
-    { return static_cast<const MatType*>(this)->sub(sp); }
+    const MatType operator()(const RR& rr) const {
+      return static_cast<const MatType*>(this)->getSub(false, rr);
+    }
 
     /** \brief  Get Matrix element or slice */
     template<typename RR, typename CC>
     const MatType operator()(const RR& rr, const CC& cc) const
-    { return static_cast<const MatType*>(this)->sub(rr, cc); }
+    { return static_cast<const MatType*>(this)->getSub(false, rr, cc); }
 
-    /** \brief  Access vector element or slice */
+    /** \brief Access Matrix elements (one argument) */
     template<typename RR>
-    SubMatrix<MatType, RR, int> operator()(const RR& rr)
-    { return SubMatrix<MatType, RR, int>(static_cast<MatType&>(*this), rr, 0); }
+    SubIndex<MatType, RR> operator()(const RR& rr) {
+      return SubIndex<MatType, RR>(static_cast<MatType&>(*this), rr);
+    }
 
-    /** \brief  Access Sparsity slice */
-    SubMatrix<MatType, Sparsity, int> operator()(const Sparsity& sp)
-    { return SubMatrix<MatType, Sparsity, int>(static_cast<MatType&>(*this), sp, 0); }
-
-    /** \brief  Access Matrix element or slice */
+    /** \brief Access Matrix elements (two arguments) */
     template<typename RR, typename CC>
-    SubMatrix<MatType, RR, CC> operator()(const RR& rr, const CC& cc)
-    { return SubMatrix<MatType, RR, CC>(static_cast<MatType&>(*this), rr, cc); }
+    SubMatrix<MatType, RR, CC> operator()(const RR& rr, const CC& cc) {
+      return SubMatrix<MatType, RR, CC>(static_cast<MatType&>(*this), rr, cc);
+    }
 #endif // SWIG
 
     /** @name Construct symbolic primitives
@@ -190,12 +187,14 @@ namespace casadi {
     ///@{
 
     /** \brief Create an nrow-by-ncol symbolic primitive */
-    static MatType sym(const std::string& name, int nrow=1, int ncol=1)
-    { return sym(name, Sparsity::dense(nrow, ncol));}
+    static MatType sym(const std::string& name, int nrow=1, int ncol=1) {
+      return sym(name, Sparsity::dense(nrow, ncol));
+    }
 
     /** \brief  Construct a symbolic primitive with given dimensions */
-    static MatType sym(const std::string& name, const std::pair<int, int> &rc)
-    { return sym(name, rc.first, rc.second);}
+    static MatType sym(const std::string& name, const std::pair<int, int> &rc) {
+      return sym(name, rc.first, rc.second);
+    }
 
     /** \brief Create symbolic primitive with a given sparsity pattern */
     static MatType sym(const std::string& name, const Sparsity& sp);
@@ -205,8 +204,9 @@ namespace casadi {
     static std::vector<MatType > sym(const std::string& name, const Sparsity& sp, int p);
 
     /** \brief Create a vector of length p with nrow-by-ncol symbolic primitives */
-    static std::vector<MatType > sym(const std::string& name, int nrow, int ncol, int p)
-    { return sym(name, Sparsity::dense(nrow, ncol), p);}
+    static std::vector<MatType > sym(const std::string& name, int nrow, int ncol, int p) {
+      return sym(name, Sparsity::dense(nrow, ncol), p);
+    }
 
     /** \brief Create a vector of length r of vectors of length p with
      * symbolic primitives with given sparsity*/
@@ -216,8 +216,9 @@ namespace casadi {
     /** \brief Create a vector of length r of vectors of length p
      * with nrow-by-ncol symbolic primitives */
     static std::vector<std::vector<MatType> >
-      sym(const std::string& name, int nrow, int ncol, int p, int r)
-    { return sym(name, Sparsity::dense(nrow, ncol), p, r);}
+      sym(const std::string& name, int nrow, int ncol, int p, int r) {
+      return sym(name, Sparsity::dense(nrow, ncol), p, r);
+    }
     ///@}
 
     ///@{

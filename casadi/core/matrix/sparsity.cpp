@@ -163,7 +163,7 @@ namespace casadi {
     (*this)->resize(nrow, ncol);
   }
 
-  int Sparsity::elem(int rr, int cc) {
+  int Sparsity::addNZ(int rr, int cc) {
     // If negative index, count from the back
     if (rr<0) rr += size1();
     if (cc<0) cc += size2();
@@ -208,20 +208,20 @@ namespace casadi {
   }
 
   bool Sparsity::hasNZ(int rr, int cc) const {
-    return (*this)->elem(rr, cc)!=-1;
+    return getNZ(rr, cc)!=-1;
   }
 
 
-  int Sparsity::elem(int rr, int cc) const {
-    return (*this)->elem(rr, cc);
+  int Sparsity::getNZ(int rr, int cc) const {
+    return (*this)->getNZ(rr, cc);
   }
 
   Sparsity Sparsity::reshape(int nrow, int ncol) const {
     return (*this)->reshape(nrow, ncol);
   }
 
-  std::vector<int> Sparsity::elem(const std::vector<int>& rr, const std::vector<int>& cc) const {
-    return (*this)->elem(rr, cc);
+  std::vector<int> Sparsity::getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const {
+    return (*this)->getNZ(rr, cc);
   }
 
   bool Sparsity::isScalar(bool scalar_and_dense) const {
@@ -252,14 +252,25 @@ namespace casadi {
     return (*this)->isTriu();
   }
 
-  Sparsity Sparsity::sub(const std::vector<int>& jj, const std::vector<int>& ii,
-                         std::vector<int>& mapping) const {
-    return (*this)->sub(jj, ii, mapping);
+  Sparsity Sparsity::sub(const std::vector<int>& rr, const Sparsity& sp,
+                         std::vector<int>& mapping, bool ind1) const {
+    return (*this)->sub(rr, *sp, mapping, ind1);
   }
 
-  std::vector<int> Sparsity::erase(const std::vector<int>& jj, const std::vector<int>& ii) {
+  Sparsity Sparsity::sub(const std::vector<int>& rr, const std::vector<int>& cc,
+                         std::vector<int>& mapping, bool ind1) const {
+    return (*this)->sub(rr, cc, mapping, ind1);
+  }
+
+  std::vector<int> Sparsity::erase(const std::vector<int>& rr, const std::vector<int>& cc,
+                                   bool ind1) {
     makeUnique();
-    return (*this)->erase(jj, ii);
+    return (*this)->erase(rr, cc, ind1);
+  }
+
+  std::vector<int> Sparsity::erase(const std::vector<int>& rr, bool ind1) {
+    makeUnique();
+    return (*this)->erase(rr, ind1);
   }
 
   int Sparsity::sizeL() const {
@@ -436,20 +447,20 @@ namespace casadi {
     return ret;
   }
 
-  void Sparsity::enlarge(int nrow, int ncol, const std::vector<int>& jj,
-                         const std::vector<int>& ii) {
-    enlargeColumns(ncol, ii);
-    enlargeRows(nrow, jj);
+  void Sparsity::enlarge(int nrow, int ncol, const std::vector<int>& rr,
+                         const std::vector<int>& cc, bool ind1) {
+    enlargeColumns(ncol, cc, ind1);
+    enlargeRows(nrow, rr, ind1);
   }
 
-  void Sparsity::enlargeColumns(int ncol, const std::vector<int>& ii) {
+  void Sparsity::enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) {
     makeUnique();
-    (*this)->enlargeColumns(ncol, ii);
+    (*this)->enlargeColumns(ncol, cc, ind1);
   }
 
-  void Sparsity::enlargeRows(int nrow, const std::vector<int>& jj) {
+  void Sparsity::enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) {
     makeUnique();
-    (*this)->enlargeRows(nrow, jj);
+    (*this)->enlargeRows(nrow, rr, ind1);
   }
 
   Sparsity Sparsity::diag(int nrow, int ncol) {
@@ -510,18 +521,18 @@ namespace casadi {
     (*this)->removeDuplicates(mapping);
   }
 
-  std::vector<int> Sparsity::getElements(bool col_major) const {
+  std::vector<int> Sparsity::find(bool ind1) const {
     std::vector<int> loc;
-    getElements(loc, col_major);
+    find(loc, ind1);
     return loc;
   }
 
-  void Sparsity::getElements(std::vector<int>& loc, bool col_major) const {
-    (*this)->getElements(loc, col_major);
+  void Sparsity::find(std::vector<int>& loc, bool ind1) const {
+    (*this)->find(loc, ind1);
   }
 
-  void Sparsity::elem(std::vector<int>& indices) const {
-    (*this)->elem(indices);
+  void Sparsity::getNZ(std::vector<int>& indices) const {
+    (*this)->getNZ(indices);
   }
 
   Sparsity Sparsity::unidirectionalColoring(const Sparsity& AT, int cutoff) const {
@@ -836,7 +847,7 @@ namespace casadi {
 
   Sparsity Sparsity::unit(int n, int el) {
     Sparsity ret = Sparsity::sparse(n);
-    ret.elem(el, 0);
+    ret.addNZ(el, 0);
     return ret;
   }
 

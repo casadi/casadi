@@ -81,6 +81,17 @@
 #ifdef SWIGPYTHON
 %pythoncode %{
 
+import contextlib
+
+@contextlib.contextmanager
+def internalAPI():
+    backup = CasadiOptions.getAllowedInternalAPI()
+    CasadiOptions.setAllowedInternalAPI(True)
+    try:
+      yield
+    finally:
+      CasadiOptions.setAllowedInternalAPI(backup)
+
 class _copyableObject(_object):
   def __copy__(self):
     return self.__class__(self)
@@ -665,8 +676,6 @@ using namespace casadi;
 %fragment(SWIG_Traits_frag(casadi::Callback));
 %traits_swigtype(casadi::CustomEvaluate);
 %fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
-%traits_swigtype(casadi::IndexList);
-%fragment(SWIG_Traits_frag(casadi::IndexList));
 
 %template(Dictionary) std::map<std::string,casadi::GenericType>;
 
@@ -859,10 +868,6 @@ except:
 %rename(mrdivide) __mrdivide__;
 %rename(mldivide) __mldivide__;
 %rename(transpose) T;
-
-// Nonzeros are accessed with the syntax A{i} 0-based
-%rename(getitemcurl) getNZ;
-%rename(setitemcurl) setNZ;
 %rename(size) shape;
 %rename(nnz) size;
 
@@ -889,10 +894,10 @@ class NZproxy:
     self.matrix = matrix
     
   def __getitem__(self,s):
-    return self.matrix.__NZgetitem__(s)
+    return self.matrix.getNZ(False, s)
 
   def __setitem__(self,s,val):
-    return self.matrix.__NZsetitem__(s,val)
+    return self.matrix.setNZ(val, False, s)
 
   def __len__(self):
     return self.matrix.size()
@@ -928,15 +933,17 @@ class NZproxy:
     def T(self):
         return _casadi.transpose(self)
         
-    def __getitem__(self,s):
-        if isinstance(s,tuple) and len(s)==2:
-          return self.__Cgetitem__(s[0],s[1])  
-        return self.__Cgetitem__(s)
+    def __getitem__(self, s):
+        with internalAPI():
+          if isinstance(s, tuple) and len(s)==2:
+            return self.getSub(False, s[0], s[1])
+          return self.getSub(False, s)
 
     def __setitem__(self,s,val):
-        if isinstance(s,tuple) and len(s)==2:
-          return self.__Csetitem__(s[0],s[1],val)  
-        return self.__Csetitem__(s,val)
+        with internalAPI():
+          if isinstance(s,tuple) and len(s)==2:
+            return self.setSub(val, False, s[0], s[1])  
+          return self.setSub(val, False, s)
         
     @property
     def nz(self):
@@ -1000,23 +1007,46 @@ class NZproxy:
 
 #ifdef SWIGMATLAB
 %define %matrix_helpers(Type)
+    // Get a submatrix (index-1)
+    const Type getitem(const Slice& rr) const { return $self->getSub(true, rr);}
+    const Type getitem(const Matrix<int>& rr) const { return $self->getSub(true, rr);}
+    const Type getitem(const Sparsity& sp) const { return $self->getSub(true, sp);}
+    const Type getitem(const Slice& rr, const Slice& cc) const { return $self->getSub(true, rr, cc);}
+    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { return $self->getSub(true, rr, cc);}
+    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { return $self->getSub(true, rr, cc);}
+    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { return $self->getSub(true, rr, cc);}
+
+    // Set a submatrix (index-1)
+    void setitem(const Type& m, const Slice& rr) { $self->setSub(m, true, rr);}
+    void setitem(const Type& m, const Matrix<int>& rr) { $self->setSub(m, true, rr);}
+    void setitem(const Type& m, const Sparsity& sp) { $self->setSub(m, true, sp);}
+    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
+    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
+
+    // Get nonzeros (index-1)
+    const Type getitemcurl(const Slice& rr) const { return $self->getNZ(true, rr);}
+    const Type getitemcurl(const Matrix<int>& rr) const { return $self->getNZ(true, rr);}
+
+    // Set nonzeros (index-1)
+    void setitemcurl(const Type& m, const Slice& rr) { $self->setNZ(m, true, rr);}
+    void setitemcurl(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
+
+    // 'end' function (needed for end syntax in MATLAB)
+    inline int end(int i, int n) const {
+      return n==1 ? $self->numel() : i==1 ? $self->size1() : $self->size2();
+    }
+
+    // Transpose using the A' syntax in addition to A.'
+    Type ctranspose() const { return $self->T();}
+
 %enddef
 #endif
 
 #ifndef SWIGPYTHON
 %define %matrix_convertors
 %enddef
-#endif
-
-#ifdef SWIGPYTHON
-%rename(__Cgetitem__) indexed_zero_based;
-%rename(__Cgetitem__) indexed;
-%rename(__Csetitem__) indexed_zero_based_assignment;
-%rename(__Csetitem__) indexed_assignment;
-%rename(__NZgetitem__) nz_indexed_zero_based;
-%rename(__NZgetitem__) nz_indexed;
-%rename(__NZsetitem__) nz_indexed_zero_based_assignment;
-%rename(__NZsetitem__) nz_indexed_assignment;
 #endif
 
 #ifndef SWIGXML
@@ -1040,15 +1070,6 @@ class NZproxy:
 %include "sparsity_tools.i"
 %include "sx_tools.i"
 %include "mx_tools.i"
-
-
-#ifdef SWIGOCTAVE
-%rename(__paren__) indexed_one_based;
-#endif
-
-#ifdef SWIGPYTHON
-%rename(__getitem__) indexed_zero_based;
-#endif
 
 #ifdef SWIGPYTHON
 %pythoncode %{

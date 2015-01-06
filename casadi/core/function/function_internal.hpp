@@ -295,10 +295,6 @@ namespace casadi {
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SX> symbolicInputSX() const;
 
-    // Workaround helper functions: assign nonzeros but ignore all -1
-    static void assignIgnore(MX& y, const MX& x, const std::vector<int>& nz);
-    static void assignIgnore(SX& y, const SX& x, const std::vector<int>& nz);
-
     ///@{
     /** \brief Access input/output scheme */
     inline const IOScheme& inputScheme() const { return input_.scheme;}

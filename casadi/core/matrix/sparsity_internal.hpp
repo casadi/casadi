@@ -284,16 +284,19 @@ namespace casadi {
                  const std::vector<int>& row) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
-    void enlargeRows(int nrow, const std::vector<int>& jj);
+    void enlargeRows(int nrow, const std::vector<int>& rr, bool ind1);
 
     /// Enlarge the matrix along the second dimension (i.e. insert columns)
-    void enlargeColumns(int ncol, const std::vector<int>& ii);
+    void enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1);
 
     /// Make a patten dense
     Sparsity makeDense(std::vector<int>& mapping) const;
 
     /// Erase rows and/or columns - does bounds checking
-    std::vector<int> erase(const std::vector<int>& jj, const std::vector<int>& ii);
+    std::vector<int> erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1);
+
+    /// Erase elements
+    std::vector<int> erase(const std::vector<int>& rr, bool ind1);
 
     /// Append another sparsity patten vertically (vectors only)
     void append(const SparsityInternal& sp);
@@ -306,19 +309,26 @@ namespace casadi {
 
     /** \brief Get a submatrix
     * Does bounds checking
-    * ii and jj are not required to be monotonous
+    * rr and rr are not required to be monotonous
     */
-    Sparsity sub(const std::vector<int>& jj, const std::vector<int>& ii,
-                 std::vector<int>& mapping) const;
+    Sparsity sub(const std::vector<int>& rr, const std::vector<int>& cc,
+                 std::vector<int>& mapping, bool ind1) const;
+
+    /** \brief Get a set of elements
+    * Does bounds checking
+    * rr is not required to be monotonous
+    */
+    Sparsity sub(const std::vector<int>& rr, const SparsityInternal& sp,
+                 std::vector<int>& mapping, bool ind1) const;
 
     /// Get the index of an existing non-zero element
-    int elem(int rr, int cc) const;
+    int getNZ(int rr, int cc) const;
 
     /// Get a set of non-zero element - does bounds checking
-    std::vector<int> elem(const std::vector<int>& rr, const std::vector<int>& cc) const;
+    std::vector<int> getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const;
 
     /// Get the nonzero index for a set of elements (see description in public class)
-    void elem(std::vector<int>& indices) const;
+    void getNZ(std::vector<int>& indices) const;
 
     /// Does the rows appear sequentially on each col
     bool rowsSequential(bool strictly) const;
@@ -331,7 +341,7 @@ namespace casadi {
     void removeDuplicates(std::vector<int>& mapping);
 
     /// Get element index for each nonzero
-    void getElements(std::vector<int>& loc, bool col_major) const;
+    void find(std::vector<int>& loc, bool ind1) const;
 
     /// Hash the sparsity pattern
     std::size_t hash() const;
@@ -393,14 +403,6 @@ namespace casadi {
 
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spyMatlab(const std::string& mfile) const;
-
- private:
-    /// Time complexity: O(ii.size()*jj.size())
-    Sparsity sub1(const std::vector<int>& jj, const std::vector<int>& ii,
-                  std::vector<int>& mapping) const;
-    /// Time complexity: O(ii.size()*(nnz per column))
-    Sparsity sub2(const std::vector<int>& jj, const std::vector<int>& ii,
-                  std::vector<int>& mapping) const;
 };
 
 } // namespace casadi

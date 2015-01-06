@@ -117,7 +117,7 @@ namespace casadi {
 
       // Get element (note: may contain duplicates)
       if (onz_k>=0) {
-        with_duplicates[k] = ocol[onz_k] + orow[onz_k]*osp.size2();
+        with_duplicates[k] = ocol[onz_k]*osp.size1() + orow[onz_k];
       } else {
         with_duplicates[k] = -1;
       }
@@ -125,7 +125,7 @@ namespace casadi {
 
     // Get all output elements (this time without duplicates)
     vector<int> el_output;
-    osp.getElements(el_output, false);
+    osp.find(el_output);
 
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
@@ -148,15 +148,15 @@ namespace casadi {
         // Get the nz locations in res corresponding to the output sparsity pattern
         r_nz.resize(with_duplicates.size());
         copy(with_duplicates.begin(), with_duplicates.end(), r_nz.begin());
-        res.sparsity().elem(r_nz);
+        res.sparsity().getNZ(r_nz);
 
         // Zero out the corresponding entries
         res = MX::zeros(isp)->getSetNonzeros(res, r_nz);
       }
 
       // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
-      arg.sparsity().getElements(r_nz, false);
-      isp.elem(r_nz);
+      arg.sparsity().find(r_nz);
+      isp.getNZ(r_nz);
 
       // Filter out ignored entries and check if there is anything to add at all
       bool elements_to_add = false;
@@ -176,7 +176,7 @@ namespace casadi {
       // Get the nz locations in the argument corresponding to the inputs
       r_ind.resize(el_output.size());
       copy(el_output.begin(), el_output.end(), r_ind.begin());
-      res.sparsity().elem(r_ind);
+      res.sparsity().getNZ(r_ind);
 
       // Enlarge the sparsity pattern of the arguments if not all assignments fit
       for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
@@ -189,7 +189,7 @@ namespace casadi {
 
           // Recalculate the nz locations in the arguments corresponding to the inputs
           copy(el_output.begin(), el_output.end(), r_ind.begin());
-          res.sparsity().elem(r_ind);
+          res.sparsity().getNZ(r_ind);
 
           break;
         }
@@ -218,7 +218,7 @@ namespace casadi {
       // Get the matching nonzeros
       r_ind.resize(el_output.size());
       copy(el_output.begin(), el_output.end(), r_ind.begin());
-      aseed.sparsity().elem(r_ind);
+      aseed.sparsity().getNZ(r_ind);
 
       // Sparsity pattern for the result
       r_colind.resize(isp.size2()+1); // Col count

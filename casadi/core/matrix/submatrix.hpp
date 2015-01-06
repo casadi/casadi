@@ -32,26 +32,10 @@ namespace casadi {
   /** SubMatrix class for Matrix
       SubMatrix is the return type for operator() of the Matrix class, it allows access to the value as well as changing the parent object
       \author Joel Andersson
-      \date 2011
+      \date 2011-2014
   */
-
-  /// submatrix
   template<typename M, typename I, typename J>
   class CASADI_EXPORT SubMatrix : public M {
-  public:
-    /// Constructor
-    SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i, j)), mat_(mat), i_(i), j_(j) {}
-
-    ///@{
-    /// Methods that modify a part of the parent object (A(i, j) = ?, A(i, j) += ?, etc.)
-    const M& operator=(const SubMatrix<M, I, J> &y);
-    const M& operator=(const M &y);
-    M operator+=(const M &y);
-    M operator-=(const M &y);
-    M operator*=(const M &y);
-    M operator/=(const M &y);
-    ///@}
-
   private:
     /// A reference to the matrix that is allowed to be modified
     M& mat_;
@@ -59,51 +43,104 @@ namespace casadi {
     /// The element of the matrix that is allowed to be modified
     I i_;
     J j_;
+  public:
+    /// Constructor
+    SubMatrix(M& mat, const I& i, const J& j)
+      : M(mat.getSub(false, i, j)), mat_(mat), i_(i), j_(j) {}
+
+    ///@{
+    /// Methods that modify a part of the parent object (A(i, j) = ?, A(i, j) += ?, etc.)
+    inline const M& operator=(const SubMatrix<M, I, J> &y) {
+      mat_.setSub(y, false, i_, j_);
+      return y;
+    }
+
+    inline const M& operator=(const M &y) {
+      mat_.setSub(y, false, i_, j_);
+      return y;
+    }
+
+    inline M operator+=(const M &y) {
+      M s = *this+y;
+      mat_.setSub(s, false, i_, j_);
+      return s;
+    }
+
+    inline M operator-=(const M &y) {
+      M s = *this-y;
+      mat_.setSub(s, false, i_, j_);
+      return s;
+    }
+
+    inline M operator*=(const M &y) {
+      M s = *this*y;
+      mat_.setSub(s, false, i_, j_);
+      return s;
+    }
+
+    inline M operator/=(const M &y) {
+      M s = *this/y;
+      mat_.setSub(s, false, i_, j_);
+      return s;
+    }
+    ///@}
   };
 
-#ifdef casadi_implementation
-  // Implementation
-  template<typename M, typename I, typename J>
-  const M& SubMatrix<M, I, J>::operator=(const SubMatrix<M, I, J> &y) {
-    mat_.setSub(y, i_, j_);
-    return y;
-  }
+  /** SubIndex class for Matrix
+      Same as the above class but for single argument return for operator()
+      \author Joel Andersson
+      \date 2011-2014
+  */
+  template<typename M, typename I>
+  class CASADI_EXPORT SubIndex : public M {
+  private:
+    /// A reference to the matrix that is allowed to be modified
+    M& mat_;
 
-  // Implementation
-  template<typename M, typename I, typename J>
-  const M& SubMatrix<M, I, J>::operator=(const M &y) {
-    mat_.setSub(y, i_, j_);
-    return y;
-  }
+    /// The element of the matrix that is allowed to be modified
+    I i_;
+  public:
+    /// Constructor
+    SubIndex(M& mat, const I& i)
+      : M(mat.getSub(false, i)), mat_(mat), i_(i) {}
 
-  template<typename M, typename I, typename J>
-  M SubMatrix<M, I, J>::operator+=(const M &y) {
-    M s = *this+y;
-    mat_.setSub(s, i_, j_);
-    return s;
-  }
+    ///@{
+    /// Methods that modify a part of the parent object (A(i) = ?, A(i) += ?, etc.)
+    inline const M& operator=(const SubIndex<M, I> &y) {
+      mat_.setSub(y, false, i_);
+      return y;
+    }
 
-  template<typename M, typename I, typename J>
-  M SubMatrix<M, I, J>::operator-=(const M &y) {
-    M s = *this-y;
-    mat_.setSub(s, i_, j_);
-    return s;
-  }
+    inline const M& operator=(const M &y) {
+      mat_.setSub(y, false, i_);
+      return y;
+    }
 
-  template<typename M, typename I, typename J>
-  M SubMatrix<M, I, J>::operator*=(const M &y) {
-    M s = *this*y;
-    mat_.setSub(s, i_, j_);
-    return s;
-  }
+    inline M operator+=(const M &y) {
+      M s = *this+y;
+      mat_.setSub(s, false, i_);
+      return s;
+    }
 
-  template<typename M, typename I, typename J>
-  M SubMatrix<M, I, J>::operator/=(const M &y) {
-    M s = *this/y;
-    mat_.setSub(s, i_, j_);
-    return s;
-  }
-#endif
+    inline M operator-=(const M &y) {
+      M s = *this-y;
+      mat_.setSub(s, false, i_);
+      return s;
+    }
+
+    inline M operator*=(const M &y) {
+      M s = *this*y;
+      mat_.setSub(s, false, i_);
+      return s;
+    }
+
+    inline M operator/=(const M &y) {
+      M s = *this/y;
+      mat_.setSub(s, false, i_);
+      return s;
+    }
+    ///@}
+  };
 
 #define INSTANTIATE_SUBMATRIX(Mt)\
 template class SubMatrix< Mt , int, int >;\
@@ -119,7 +156,11 @@ template class SubMatrix< Mt , Slice, Slice >;\
 template class SubMatrix< Mt , Matrix<int> , int >;\
 template class SubMatrix< Mt , Matrix<int> , std::vector<int> >;\
 template class SubMatrix< Mt , Matrix<int> , Matrix<int> >;\
-template class SubMatrix< Mt , Sparsity , int >;
+template class SubIndex< Mt , int >;\
+template class SubIndex< Mt , std::vector<int> >;\
+template class SubIndex< Mt , Slice >;\
+template class SubIndex< Mt , Matrix<int> >;\
+template class SubIndex< Mt , Sparsity>;
 
 } // namespace casadi
 

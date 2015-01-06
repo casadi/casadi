@@ -407,10 +407,10 @@ void PyDECREFParent(PyObject* self) {
 
 // Convert reference output to a new data structure
 %define %outputRefNew(Type)
-%typemap(out) Type & {
+%typemap(out, noblock=1) Type & {
    $result = swig::from(static_cast< Type >(*$1));
 }
-%typemap(out) const Type & {
+%typemap(out, noblock=1) const Type & {
    $result = swig::from(static_cast< Type >(*$1));
 }
 %extend Type {
@@ -481,6 +481,22 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
     }
   }
  }
+
+// Number of nonzeros
+%fragment("get_nnz", "header") {
+  size_t getNNZ(const mxArray* p) {
+    // Dimensions
+    size_t nrow = mxGetM(p);
+    size_t ncol = mxGetN(p);
+    if (mxIsSparse(p)) {
+      // Sparse storage in MATLAB
+      mwIndex *Jc = mxGetJc(p);
+      return Jc[ncol];
+    } else {
+      return nrow*ncol;
+    }
+  }
+}
 #endif // SWIGMATLAB
 
 %{
@@ -491,7 +507,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 %fragment("fwd", "header",
           fragment="vector_size,to_vector,make_vector,make_vector2,conv_constref,conv_vector,conv_vector2,conv_genericmatrix,try_copy"
 #ifdef SWIGMATLAB
-          ,fragment="get_sparsity"
+          ,fragment="get_sparsity,get_nnz"
 #endif // SWIGMATLAB
           ) {
   int to_int(GUESTOBJECT *p, void *mv, int offs=0);
@@ -508,7 +524,6 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
   int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
-  int to_IndexList(GUESTOBJECT *p, void *mv, int offs=0);
   int to_string(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Function(GUESTOBJECT *p, void *mv, int offs=0);
 

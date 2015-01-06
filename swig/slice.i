@@ -36,6 +36,7 @@ namespace casadi{
    int to_Slice(GUESTOBJECT *p, void *mv, int offs) {
     casadi::Slice *m = static_cast<casadi::Slice*>(mv);
     if (m) m += offs;
+    // CasADi-Slice already
     if (is_a(p, $descriptor(casadi::Slice *))) {
       casadi::Slice *mp;
       if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::Slice *), 0) == -1)
@@ -44,6 +45,7 @@ namespace casadi{
       return true;
     }
 #ifdef SWIGPYTHON
+    // Python int
     if (PyInt_Check(p)) {
       if (m) {
         m->start_ = PyInt_AsLong(p);
@@ -51,7 +53,9 @@ namespace casadi{
         if (m->stop_==0) m->stop_ = std::numeric_limits<int>::max();
       }
       return true;
-    } else if (PySlice_Check(p)) {
+    }
+    // Python slice
+    if (PySlice_Check(p)) {
       PySliceObject *r = (PySliceObject*)(p);
       if (m) {
         m->start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) 
@@ -61,42 +65,23 @@ namespace casadi{
         if(r->step !=Py_None) m->step_  = PyInt_AsLong(r->step);
       }
       return true;
-    } else {
-      return false;
     }
-#else
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+    if (mxIsChar(p) && mxGetM(p)==1 && mxGetN(p)==1) {
+      char ch;
+      if(mxGetString(p, &ch,(mwSize)sizeof(&ch))) return SWIG_TypeError;
+      if (ch==':') {
+        if (m) *m = casadi::Slice();
+        return true;
+      }
+    }
+#endif // SWIGMATLAB
+    // Failure if reached this point
     return false;
-#endif
   }
 }
 %casadi_typemaps_constref(Slice, PRECEDENCE_SLICE, casadi::Slice)
-
-%fragment("to"{IndexList}, "header", fragment="fwd") {
-int to_IndexList(GUESTOBJECT *p, void *mv, int offs) {
-    casadi::IndexList *m = static_cast<casadi::IndexList*>(mv);
-    if (m) m += offs;
-    if (is_a(p, $descriptor(casadi::IndexList *))) {
-      casadi::IndexList *mp;
-      if (SWIG_ConvertPtr(p, (void **) &mp, $descriptor(casadi::IndexList *), 0) == -1) return false;
-      if (m) *m = *mp;
-      return true;
-    }
-    if (to_int(p, 0)) {
-      if (m) m->type = casadi::IndexList::INT;
-      to_int(p, m ? &m->i : 0);
-    } else if (to_IVector(p, 0)) {
-      if (m) m->type = casadi::IndexList::IVECTOR;
-      return to_IVector(p, m ? &m->iv : 0);
-    } else if (to_Slice(p, 0)) {
-      if (m) m->type = casadi::IndexList::SLICE;
-      return to_Slice(p, m ? &m->slice : 0);
-    } else {
-      return false;
-    }
-    return true;
-  }
-}
-%casadi_typemaps_constref(IndexList, PRECEDENCE_IndexVector, casadi::IndexList)
 
 #endif // SWIGXML
 

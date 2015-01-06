@@ -33,12 +33,13 @@ namespace casadi {
   }
 
   Slice::Slice(int i) : start_(i), stop_(i+1), step_(1) {
+    if (i==-1) stop_ = std::numeric_limits<int>::max();
   }
 
   Slice::Slice(int start, int stop, int step) : start_(start), stop_(stop), step_(step) {
   }
 
-  std::vector<int> Slice::getAll(int len) const {
+  std::vector<int> Slice::getAll(int len, bool ind1) const {
     int start;
     int stop;
     if (start_==std::numeric_limits<int>::min()) {
@@ -62,24 +63,7 @@ namespace casadi {
                           << ") out of bounds with start<0.");
     if ((stop>=start && step_<0) || (stop<=start && step_>0)) return std::vector<int>();
 
-    return range(start, stop, step_, len);
-  }
-
-  IndexList::IndexList() : type(NILL) {}
-  IndexList::IndexList(int i_) : i(i_), type(INT) {}
-  IndexList::IndexList(const std::vector<int> &i_) : iv(i_) , type(IVECTOR) {}
-  IndexList::IndexList(const Slice &s) : slice(s), type(SLICE) {}
-
-  std::vector<int> IndexList::getAll(int len) const {
-    if (type == INT)  {
-      if (i<0) return std::vector<int>(1, i+len);
-      return std::vector<int>(1, i);
-    } else if (type == IVECTOR) {
-      return iv;
-    } else {
-      casadi_assert(type == SLICE);
-      return slice.getAll(len);
-    }
+    return range(start+ind1, stop+ind1, step_, len+ind1);
   }
 
   void Slice::repr(std::ostream& stream, bool trailing_newline) const {
@@ -101,28 +85,28 @@ namespace casadi {
     if (trailing_newline) stream << std::endl;
   }
 
-  Slice::Slice(const std::vector<int>& v) {
-    casadi_assert_message(isSlice(v), "Cannot be represented as a Slice");
+  Slice::Slice(const std::vector<int>& v, bool ind1) {
+    casadi_assert_message(isSlice(v, ind1), "Cannot be represented as a Slice");
     if (v.size()==0) {
       start_=stop_=0;
       step_ = 1;
     } else if (v.size()==1) {
-      start_ = v.front();
+      start_ = v.front()-ind1;
       stop_ = start_ + 1;
       step_ = 1;
     } else {
-      start_ = v[0];
+      start_ = v[0]-ind1;
       step_ = v[1]-v[0];
       stop_ = start_ + step_*v.size();
     }
   }
 
-  bool Slice::isSlice(const std::vector<int>& v) {
+  bool Slice::isSlice(const std::vector<int>& v, bool ind1) {
     // Always false if negative numbers or non-increasing
     int last_v = -1;
     for (int i=0; i<v.size(); ++i) {
-      if (v[i]<=last_v) return false;
-      last_v = v[i];
+      if (v[i]-ind1<=last_v) return false;
+      last_v = v[i]-ind1;
     }
 
     // Always true if less than 2 elements
@@ -132,13 +116,13 @@ namespace casadi {
     if (v.size()==2) return v[0]!=v[1];
 
     // We can now get the beginning, end and step
-    int start = v[0];
+    int start = v[0]-ind1;
     int step = v[1]-v[0];
     //int stop = start + step*v.size();
 
     // Consistency check
     for (int i=2; i<v.size(); ++i) {
-      if (v[i]!=start+i*step) return false;
+      if (v[i]-ind1!=start+i*step) return false;
     }
 
     // True if reached this point
@@ -239,6 +223,18 @@ namespace casadi {
     return ret;
   }
 
+  bool Slice::isScalar(int len) const {
+    int start = std::min(start_, len);
+    int stop = std::min(stop_, len);
+    int nret = (stop-start)/step_ + ((stop-start)%step_!=0);
+    return nret==1;
+  }
+
+  int Slice::toScalar(int len) const {
+    casadi_assert(isScalar(len));
+    casadi_assert_message(start_ >= -len && start_ < len, "Slice::getScalar: out of bounds");
+    return start_ >= 0 ? start_ : start_+len;
+  }
 
 } // namespace casadi
 

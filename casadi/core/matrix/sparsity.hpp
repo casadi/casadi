@@ -36,10 +36,16 @@
 #ifdef SWIG
 #define SWIG_OUTPUT(arg) OUTPUT
 #define SWIG_INOUT(arg) INOUT
-#else
+#ifdef SWIGMATLAB
+#define SWIG_IND1 true
+#else // SWIGMATLAB
+#define SWIG_IND1 false
+#endif // SWIGMATLAB
+#else // SWIG
 #define SWIG_OUTPUT(arg) arg
 #define SWIG_INOUT(arg) arg
-#endif
+#define SWIG_IND1 false
+#endif // SWIG
 
 // Cashing requires a multimap (preferably a hash map)
 #ifdef USE_CXX11
@@ -57,10 +63,6 @@
 #define CACHING_MULTIMAP std::multimap
 #endif // USE_CXX11
 #include "../weak_ref.hpp"
-
-#ifdef SWIG
-  %rename(elem_const) elem(int, int) const;
-#endif
 
 namespace casadi {
 
@@ -328,25 +330,25 @@ namespace casadi {
 
     /** \brief Get the index of a non-zero element
         Add the element if it does not exist and copy object if it's not unique */
-    int elem(int rr, int cc);
+    int addNZ(int rr, int cc);
 
     /** \brief Get the index of an existing non-zero element
         return -1 if the element does not exist */
-    int elem(int rr, int cc) const;
+    int getNZ(int rr, int cc) const;
 
     /// Returns true if the pattern has a non-zero at location rr, cc
     bool hasNZ(int rr, int cc) const;
 
     /** \brief Get a set of non-zero element
         return -1 if the element does not exist */
-    std::vector<int> elem(const std::vector<int>& rr, const std::vector<int>& cc) const;
+    std::vector<int> getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const;
 
     /** \brief Get the nonzero index for a set of elements
         The index vector is used both for input and outputs and must be sorted by increasing
         nonzero index, i.e. column-wise.
         Elements not found in the sparsity pattern are set to -1.
     */
-    void elem(std::vector<int>& SWIG_INOUT(indices)) const;
+    void getNZ(std::vector<int>& SWIG_INOUT(indices)) const;
 
     /// Get nonzeros in lower triangular part
     std::vector<int> getLowerNZ() const;
@@ -368,8 +370,17 @@ namespace casadi {
      * Returns the sparsity of the submatrix, with a mapping such that
      *   submatrix[k] = originalmatrix[mapping[k]]
      */
-    Sparsity sub(const std::vector<int>& jj, const std::vector<int>& ii,
-                 std::vector<int>& SWIG_OUTPUT(mapping)) const;
+    Sparsity sub(const std::vector<int>& rr,
+                 const std::vector<int>& cc,
+                 std::vector<int>& SWIG_OUTPUT(mapping), bool ind1=false) const;
+
+    /** \brief Get a set of elements
+     *
+     * Returns the sparsity of the corresponding elements, with a mapping such that
+     *   submatrix[k] = originalmatrix[mapping[k]]
+     */
+    Sparsity sub(const std::vector<int>& rr, const Sparsity& sp,
+                 std::vector<int>& SWIG_OUTPUT(mapping), bool ind1=false) const;
 
     /// Transpose the matrix
     Sparsity T() const;
@@ -395,9 +406,9 @@ namespace casadi {
         if the first argument is nonzero,
         the second bit indicates if the second argument is nonzero (note that none of,
         one of or both of the arguments can be nonzero) */
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero,
                             std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
     /// @}
 
     /// @{
@@ -464,19 +475,23 @@ namespace casadi {
 
         B[jj, ii] == A
     */
-    void enlarge(int nrow, int ncol, const std::vector<int>& jj, const std::vector<int>& ii);
+    void enlarge(int nrow, int ncol,
+                 const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
     /** \brief Enlarge the matrix along the first dimension (i.e. insert rows) */
-    void enlargeRows(int nrow, const std::vector<int>& jj);
+    void enlargeRows(int nrow, const std::vector<int>& rr, bool ind1=false);
 
     /** \brief Enlarge the matrix along the second dimension (i.e. insert columns) */
-    void enlargeColumns(int ncol, const std::vector<int>& ii);
+    void enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1=false);
 
     /** \brief Make a patten dense */
     Sparsity makeDense(std::vector<int>& mapping) const;
 
     /** \brief Erase rows and/or columns of a matrix */
-    std::vector<int> erase(const std::vector<int>& jj, const std::vector<int>& ii);
+    std::vector<int> erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
+
+    /** \brief Erase elements of a matrix */
+    std::vector<int> erase(const std::vector<int>& rr, bool ind1=false);
 
     /// Append another sparsity patten vertically (NOTE: only efficient if vector)
     void append(const Sparsity& sp);
@@ -613,13 +628,15 @@ namespace casadi {
         A : DenseMatrix  4 x 3
         B : SparseMatrix 4 x 3 , 5 structural non-zeros
 
-        k = A.getElements()
+        k = A.find()
         A[k] will contain the elements of A that are non-zero in B
     */
-    std::vector<int> getElements(bool col_major=true) const;
+    std::vector<int> find(bool ind1=SWIG_IND1) const;
 
+#ifndef SWIG
     /// Get the location of all nonzero elements (inplace version)
-    void getElements(std::vector<int>& loc, bool col_major=true) const;
+    void find(std::vector<int>& loc, bool ind1=false) const;
+#endif // SWIG
 
     /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
         (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
