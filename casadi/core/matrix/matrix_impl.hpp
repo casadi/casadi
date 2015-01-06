@@ -367,28 +367,29 @@ namespace casadi {
     // Quick return if nothing to set
     if (rrsz==0) return;
 
-    // Construct new sparsity pattern in triplet format
+    // Construct new sparsity pattern
     std::vector<int> new_row, new_col;
+    new_row.reserve(sz+rrsz);
+    new_col.reserve(sz+rrsz);
     sparsity().getTriplet(new_row, new_col);
     for (std::vector<int>::const_iterator i=rr.begin(); i!=rr.end(); ++i) {
       new_row.push_back(*i % sz1);
       new_col.push_back(*i / sz1);
     }
+    Sparsity sp = Sparsity::triplet(sz1, sz2, new_row, new_col);
 
-    // Reverse vectors since we want to keep the _last_ assignment
-    std::reverse(new_row.begin(), new_row.end());
-    std::reverse(new_col.begin(), new_col.end());
+    // If needed, update pattern
+    if (sp != sparsity()) *this = setSparse(sp);
 
-    // Create new sparsity pattern
-    std::vector<int> v;
-    sparsity_ = Sparsity::triplet(sz1, sz2, new_row, new_col, v);
+    // Find the nonzeros corresponding to rr
+    std::vector<int>& nz = new_row; // reuse memory
+    nz.resize(rr.size());
+    std::copy(rr.begin(), rr.end(), nz.begin());
+    sparsity().getNZ(nz);
 
-    // Update data vector
-    std::vector<DataType> old_data(data());
-    data_.resize(v.size());
-    for (int i=0; i<v.size(); ++i) {
-      int ri = rrsz+sz-1-v[i];
-      data_.at(i) = ri<sz ? old_data.at(ri) : m.at(ri-sz);
+    // Carry out the assignments
+    for (int i=0; i<nz.size(); ++i) {
+      at(nz[i]) = m.at(i);
     }
   }
 
