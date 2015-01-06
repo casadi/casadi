@@ -161,11 +161,6 @@ namespace casadi {
       return static_cast<const MatType*>(this)->getSub(false, rr);
     }
 
-    /** \brief  Get Sparsity slice */
-    const MatType operator()(const Sparsity& sp) const {
-      return static_cast<const MatType*>(this)->getSub(false, sp);
-    }
-
     /** \brief  Get Matrix element or slice */
     template<typename RR, typename CC>
     const MatType operator()(const RR& rr, const CC& cc) const
