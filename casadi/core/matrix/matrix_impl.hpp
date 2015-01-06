@@ -398,20 +398,14 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Sparsity& sp) {
     casadi_assert_message(shape()==sp.shape(),
-                          "setSub(Sparsity sp): shape mismatch. This matrix has shape " << shape()
-                          << ", but supplied sparsity index has shape " << sp.shape() << ".");
-    Matrix<DataType> elm;
+                          "setSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          << shape() << ", but supplied sparsity index has shape "
+                          << sp.shape() << ".");
+    std::vector<int> ii = sp.find();
     if (m.isScalar()) {
-      elm = Matrix<DataType>(sp, m.toScalar());
+      (*this)(ii) = dense(m);
     } else {
-      elm = m.getSub(ind1, sp);
-    }
-
-    for (int cc=0; cc<sp.size2(); ++cc) {
-      for (int k=sp.colind(cc); k<sp.colind(cc+1); ++k) {
-        int rr=sp.row(k);
-        elem(rr, cc)=elm.at(k);
-      }
+      (*this)(ii) = dense(m(ii));
     }
   }
 
