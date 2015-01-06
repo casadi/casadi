@@ -2150,19 +2150,27 @@ namespace casadi {
                    << ", which is outside the range [" << -ncol_+ind1 << ","<< ncol_+ind1 <<  ").");
     }
 
-    // Handle index-1, negative indices
-    if (ind1 || hasNegative(rr) || hasNegative(cc)) {
+    // Handle index-1, negative indices, non-monotone rr and cc
+    if (ind1 || hasNegative(rr) || hasNegative(cc)
+        || !isNonDecreasing(rr) || !isNonDecreasing(cc)) {
+      // Create substitute rr
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += nrow_;
       }
+      std::sort(rr_mod.begin(), rr_mod.end());
+
+      // Create substitute cc
       std::vector<int> cc_mod = cc;
       for (vector<int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += ncol_;
       }
-      return erase(rr_mod, cc_mod, false); // Call recursively
+      std::sort(cc_mod.begin(), cc_mod.end());
+
+      // Call recursively
+      return erase(rr_mod, cc_mod, false);
     }
 
     // Mapping
