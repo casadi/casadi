@@ -2981,7 +2981,7 @@ namespace casadi {
           for (size_t i=0; i<indices.size(); ++i) {
             indices[mapping[i]] = indices_sorted[i];
           }
-          break;
+          return;
         }
         last = el;
       }
