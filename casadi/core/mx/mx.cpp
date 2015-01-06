@@ -283,16 +283,24 @@ namespace casadi {
   }
 
   void MX::setSub(const MX& m, bool ind1, const Matrix<int>& rr) {
-    // If the indexed matrix is dense, use nonzero indexing
-    if (isDense() && m.isDense()) {
-      return setNZ(m, ind1, rr);
-    }
-
     // Assert dimensions of assigning matrix
-    if (rr.shape() != m.shape()) {
-      if (m.isScalar()) {
+    if (rr.sparsity() != m.sparsity()) {
+      if (rr.shape() == m.shape()) {
+        // Remove submatrix to be replaced
+        erase(rr.data(), ind1);
+
+        // Find the intersection between rr's and m's sparsity patterns
+        Sparsity sp = rr.sparsity() * m.sparsity();
+
+        // Project both matrices to this sparsity
+        return setSub(m.setSparse(sp), ind1, rr.setSparse(sp));
+      } else if (m.isScalar()) {
         // m scalar means "set all"
-        return setSub(repmat(m, rr.shape()), ind1, rr);
+        if (m.isDense()) {
+          return setSub(repmat(m, rr.sparsity()), ind1, rr);
+        } else {
+          return setSub(sparse(rr.shape()), ind1, rr);
+        }
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
@@ -304,8 +312,48 @@ namespace casadi {
       }
     }
 
-    // TODO(@jaeandersson): Finish the following
-    casadi_error("Not implemented");
+    // Dimensions of this
+    int sz1 = size1(), sz2 = size2(), sz = size(), nel = numel(), rrsz = rr.size();
+
+    // Quick return if nothing to set
+    if (rrsz==0) return;
+
+    // Check bounds
+    if (!inBounds(rr.data(), -nel+ind1, nel+ind1)) {
+      casadi_error("setSub[rr] out of bounds. Your rr contains "
+                   << *std::min_element(rr.begin(), rr.end()) << " up to "
+                   << *std::max_element(rr.begin(), rr.end())
+                   << ", which is outside the range [" << -nel+ind1 << ","<< nel+ind1 <<  ").");
+    }
+
+    // Dense mode
+    if (isDense() && m.isDense()) {
+      return setNZ(m, ind1, rr);
+    }
+
+    // Construct new sparsity pattern
+    std::vector<int> new_row, new_col, nz(rr.data());
+    new_row.reserve(sz+rrsz);
+    new_col.reserve(sz+rrsz);
+    nz.reserve(rrsz);
+    sparsity().getTriplet(new_row, new_col);
+    for (std::vector<int>::iterator i=nz.begin(); i!=nz.end(); ++i) {
+      if (ind1) (*i)--;
+      if (*i<0) *i += nel;
+      new_row.push_back(*i % sz1);
+      new_col.push_back(*i / sz1);
+    }
+    Sparsity sp = Sparsity::triplet(sz1, sz2, new_row, new_col);
+
+    // If needed, update pattern
+    if (sp != sparsity()) *this = setSparse(sp);
+
+    // Find the nonzeros corresponding to rr
+    sparsity().getNZ(nz);
+
+    // Create a nonzero assignment node
+    *this = m->getSetNonzeros(*this, nz);
+    simplify(*this);
   }
 
   void MX::setSub(const MX& m, bool ind1, const Sparsity& sp) {
@@ -544,6 +592,20 @@ namespace casadi {
 
     // Erase from sparsity pattern
     std::vector<int> mapping = sp.erase(rr, cc, ind1);
+
+    // Create new matrix
+    if (mapping.size()!=size()) {
+      MX ret = (*this)->getGetNonzeros(sp, mapping);
+      *this = ret;
+    }
+  }
+
+  void MX::erase(const std::vector<int>& rr, bool ind1) {
+    // Get sparsity of the new matrix
+    Sparsity sp = sparsity();
+
+    // Erase from sparsity pattern
+    std::vector<int> mapping = sp.erase(rr, ind1);
 
     // Create new matrix
     if (mapping.size()!=size()) {

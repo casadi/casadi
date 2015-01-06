@@ -118,8 +118,13 @@ namespace casadi {
     /// Access the sparsity, make a copy if there are multiple references to it
     Sparsity& sparsityRef();
 
-    /** \brief Erase a submatrix */
+    /** \brief Erase a submatrix (leaving structural zeros in its place)
+        Erase rows and/or columns of a matrix */
     void erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
+
+    /** \brief Erase a submatrix (leaving structural zeros in its place)
+        Erase elements of a matrix */
+    void erase(const std::vector<int>& rr, bool ind1=false);
 
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
