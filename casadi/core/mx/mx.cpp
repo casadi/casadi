@@ -247,34 +247,24 @@ namespace casadi {
                    << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
     }
 
-    if (isDense() && m.isDense()) {
-      // Dense mode
-      int ld = size1(), ld_el = m.size1(); // leading dimensions
-      std::vector<int> kk1, kk2;
-      for (int i=0; i<cc.size1(); ++i) {
-        int c = cc.at(i) - ind1;
-        if (c<0) c += sz2;
-        for (int j=0; j<rr.size1(); ++j) {
-          int r = rr.at(j) - ind1;
-          if (r<0) r += sz1;
-          kk1.push_back(c*ld + r);
-          kk2.push_back(i*ld_el+j);
-        }
-      }
-      (*this)[kk1]=m[kk2];
-    } else {
-      // Sparse mode
-
-      // Remove submatrix to be replaced
+    // If we are assigning with something sparse, first remove existing entries
+    if (!m.isDense()) {
       erase(rr.data(), cc.data(), ind1);
-
-      // Extend m to the same dimension as this
-      MX el_ext = m;
-      el_ext.enlarge(sz1, sz2, rr.data(), cc.data(), ind1);
-
-      // Unite the sparsity patterns
-      *this = unite(*this, el_ext);
     }
+
+    // Collect all assignments
+    IMatrix el(m.sparsity());
+    for (int j=0; j<el.size2(); ++j) { // Loop over columns of m
+      int this_j = cc.at(j) - ind1; // Corresponding column in this
+      if (this_j<0) this_j += sz2;
+      for (int k=el.colind(j); k<el.colind(j+1); ++k) { // Loop over rows of m
+        int i = m.row(k);
+        int this_i = rr.at(i) - ind1; // Corresponding row in this
+        if (this_i<0) this_i += sz1;
+        el.at(k) = this_i + this_j*sz1;
+      }
+    }
+    return setSub(m, false, el);
   }
 
   void MX::setSub(const MX& m, bool ind1, const Slice& rr) {
