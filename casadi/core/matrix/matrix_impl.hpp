@@ -281,30 +281,24 @@ namespace casadi {
                    << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
     }
 
-    if (isDense() && m.isDense()) {
-      // Dense mode
-      int el=0;
-      for (int i=0; i<cc.size1(); ++i) {
-        int c = cc.at(i) - ind1;
-        if (c<0) c += sz2;
-        for (int j=0; j<rr.size1(); ++j) {
-          int r = rr.at(j) - ind1;
-          if (r<0) r += sz1;
-          at(c*sz1 + r) = m.at(el++);
-        }
-      }
-    } else {
-      // Sparse mode
-      // Remove submatrix to be replaced
+    // If we are assigning with something sparse, first remove existing entries
+    if (!m.isDense()) {
       erase(rr.data(), cc.data(), ind1);
-
-      // Extend el to the same dimension as this
-      Matrix<DataType> el_ext = m;
-      el_ext.enlarge(sz1, sz2, rr.data(), cc.data(), ind1);
-
-      // Unite the sparsity patterns
-      *this = unite(*this, el_ext);
     }
+
+    // Collect all assignments
+    IMatrix el(m.sparsity());
+    for (int j=0; j<el.size2(); ++j) { // Loop over columns of m
+      int this_j = cc.at(j) - ind1; // Corresponding column in this
+      if (this_j<0) this_j += sz2;
+      for (int k=el.colind(j); k<el.colind(j+1); ++k) { // Loop over rows of m
+        int i = m.row(k);
+        int this_i = rr.at(i) - ind1; // Corresponding row in this
+        if (this_i<0) this_i += sz1;
+        el.at(k) = this_i + this_j*sz1;
+      }
+    }
+    return setSub(m, false, el);
   }
 
   template<typename DataType>
