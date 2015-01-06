@@ -356,23 +356,34 @@ namespace casadi {
       }
     }
 
+    // Dimensions of this
+    int sz1 = size1(), sz2 = size2(), sz = size(), nel = numel(), rrsz = rr.size();
+
+    // Quick return if nothing to set
+    if (rrsz==0) return;
+
+    // Check bounds
+    if (!inBounds(rr.data(), -nel+ind1, nel+ind1)) {
+      casadi_error("setSub[rr] out of bounds. Your rr contains "
+                   << *std::min_element(rr.begin(), rr.end()) << " up to "
+                   << *std::max_element(rr.begin(), rr.end())
+                   << ", which is outside the range [" << -nel+ind1 << ","<< nel+ind1 <<  ").");
+    }
+
     // Dense mode
     if (isDense() && m.isDense()) {
       return setNZ(m, ind1, rr);
     }
 
-    // Dimensions of this
-    int sz1 = size1(), sz2 = size2(), sz = size(), rrsz = rr.size();
-
-    // Quick return if nothing to set
-    if (rrsz==0) return;
-
     // Construct new sparsity pattern
-    std::vector<int> new_row, new_col;
+    std::vector<int> new_row, new_col, nz(rr.data());
     new_row.reserve(sz+rrsz);
     new_col.reserve(sz+rrsz);
+    nz.reserve(rrsz);
     sparsity().getTriplet(new_row, new_col);
-    for (std::vector<int>::const_iterator i=rr.begin(); i!=rr.end(); ++i) {
+    for (std::vector<int>::iterator i=nz.begin(); i!=nz.end(); ++i) {
+      if (ind1) (*i)--;
+      if (*i<0) *i += nel;
       new_row.push_back(*i % sz1);
       new_col.push_back(*i / sz1);
     }
@@ -382,9 +393,6 @@ namespace casadi {
     if (sp != sparsity()) *this = setSparse(sp);
 
     // Find the nonzeros corresponding to rr
-    std::vector<int>& nz = new_row; // reuse memory
-    nz.resize(rr.size());
-    std::copy(rr.begin(), rr.end(), nz.begin());
     sparsity().getNZ(nz);
 
     // Carry out the assignments
