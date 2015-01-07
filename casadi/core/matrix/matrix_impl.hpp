@@ -2782,7 +2782,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::zz_all() const {
+  Matrix<DataType> Matrix<DataType>::zz_all() const {
     if (!isDense()) return false;
     DataType ret=1;
     for (int i=0;i<size();++i) {
@@ -2792,7 +2792,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::zz_any() const {
+  Matrix<DataType> Matrix<DataType>::zz_any() const {
     if (!isDense()) return false;
     DataType ret=0;
     for (int i=0;i<size();++i) {

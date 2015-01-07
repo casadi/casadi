@@ -519,8 +519,8 @@ namespace casadi {
     static Matrix<DataType> zz_vecNZcat(const std::vector< Matrix<DataType> >& comp);
     Matrix<DataType> zz_inner_prod(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_outer_prod(const Matrix<DataType> &y) const;
-    DataType zz_all() const;
-    DataType zz_any() const;
+    Matrix<DataType> zz_all() const;
+    Matrix<DataType> zz_any() const;
     Matrix<DataType> zz_norm_1() const;
     Matrix<DataType> zz_norm_2() const;
     Matrix<DataType> zz_norm_F() const;

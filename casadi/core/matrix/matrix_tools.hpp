@@ -320,11 +320,11 @@ namespace casadi {
 
   /// Returns true only if every element in the matrix is true
   template<typename DataType>
-  DataType all(const Matrix<DataType> &x) { return x.zz_all();}
+  Matrix<DataType> all(const Matrix<DataType> &x) { return x.zz_all();}
 
   /// Returns true if any element in the matrix is true
   template<typename DataType>
-  DataType any(const Matrix<DataType> &x) { return x.zz_any();}
+  Matrix<DataType> any(const Matrix<DataType> &x) { return x.zz_any();}
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
   template<typename DataType>
