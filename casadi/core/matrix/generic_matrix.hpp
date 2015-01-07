@@ -142,6 +142,13 @@ namespace casadi {
     /** \brief Access the sparsity, make a copy if there are multiple references to it */
     Sparsity& sparsityRef();
 
+    /// @{
+    /** \brief Accessed by SparsityInterface */
+    int zz_sprank() const {
+      return sprank(sparsity());
+    }
+    /// @}
+
 #ifndef SWIG
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>

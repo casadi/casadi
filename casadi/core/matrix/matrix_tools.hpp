@@ -264,10 +264,6 @@ namespace casadi {
   Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sp) {
     return A.zz_project(sp);
   }
-
-  /// Obtain the structural rank of a sparsity-pattern
-  template<typename DataType>
-  int sprank(const Matrix<DataType>& A) { return A.zz_sprank();}
 /*
 @}
 */

@@ -3095,7 +3095,7 @@ namespace casadi {
 
   template<typename DataType>
   int Matrix<DataType>::zz_sprank() const {
-    return rank(sparsity());
+    return sprank(sparsity());
   }
 
   template<typename DataType>

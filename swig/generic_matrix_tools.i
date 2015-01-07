@@ -57,6 +57,7 @@ MatType vecNZ(const MatType& a);
 MatType reshape(const MatType& a, const Sparsity& sp);
 MatType reshape(const MatType& a, int nrow, int ncol);
 MatType reshape(const MatType& a, std::pair<int, int> rc);
+int sprank(const MatType& A);
 %enddef
 
 #ifndef SWIGMATLAB

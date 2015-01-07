@@ -320,6 +320,11 @@ namespace casadi {
     inline friend MatType reshape(const MatType& a, const Sparsity& sp) {
       return a.zz_reshape(sp);
     }
+
+    /// Obtain the structural rank of a sparsity-pattern
+    inline friend int sprank(const MatType& A) {
+      return A.zz_sprank();
+    }
 #endif // SWIG
   };
 

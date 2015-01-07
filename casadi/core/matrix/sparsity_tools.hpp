@@ -34,9 +34,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /// Obtain the structural rank of a sparsity-pattern
-  CASADI_EXPORT int rank(const Sparsity& a);
-
   /// Get upper triangular part
   inline Sparsity triu(const Sparsity& sp, bool includeDiagonal=true)
   { return sp.getTriu(includeDiagonal);}

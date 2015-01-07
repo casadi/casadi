@@ -466,6 +466,7 @@ namespace casadi {
     Sparsity zz_vecNZ() const;
     Sparsity zz_reshape(int nrow, int ncol) const;
     Sparsity zz_reshape(const Sparsity& sp) const;
+    int zz_sprank() const;
     /// @}
 
     /** \brief Enlarge matrix

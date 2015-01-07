@@ -57,7 +57,6 @@
   MTT_INST(DataType, polyval)
   MTT_INST(DataType, addMultiple)
   MTT_INST(DataType, project)
-  MTT_INST(DataType, sprank)
   MTT_INST(DataType, kron)
   MTT_INST(DataType, sparse)
   MTT_INST(DataType, dense)

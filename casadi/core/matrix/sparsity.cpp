@@ -1030,7 +1030,7 @@ namespace casadi {
   bool Sparsity::isSingular() const {
     casadi_assert_message(isSquare(), "isSingular: only defined for square matrices, but got "
                           << dimString());
-    return rank(*this)!=size2();
+    return sprank(*this)!=size2();
   }
 
   std::vector<int> Sparsity::compress() const {
@@ -1240,6 +1240,12 @@ namespace casadi {
     }
 
     return ret;
+  }
+
+  int Sparsity::zz_sprank() const {
+    std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+    dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    return coarse_colblock.at(3);
   }
 
 } // namespace casadi
