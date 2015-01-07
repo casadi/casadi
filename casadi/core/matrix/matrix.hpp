@@ -492,7 +492,6 @@ namespace casadi {
     Matrix<DataType> zz_cofactor(int i, int j) const;
     Matrix<DataType> zz_getMinor(int i, int j) const;
     Matrix<DataType> zz_reshape(int nrow, int ncol) const;
-    Matrix<DataType> zz_reshape(std::pair<int, int> rc) const;
     Matrix<DataType> zz_reshape(const Sparsity& sp) const;
     Matrix<DataType> zz_trace() const;
     Matrix<DataType> zz_vecNZ() const;

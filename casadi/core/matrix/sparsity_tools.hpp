@@ -34,11 +34,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-
-  /** \brief Reshape the sparsity pattern keeping the relative location of the nonzeros
-   */
-  CASADI_EXPORT Sparsity reshape(const Sparsity& a, int nrow, int ncol);
-
   /** \brief Split up a sparsity pattern diagonally */
   CASADI_EXPORT
     std::vector<Sparsity> diagsplit(const Sparsity& sp,

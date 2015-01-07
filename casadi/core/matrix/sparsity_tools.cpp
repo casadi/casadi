@@ -33,10 +33,6 @@ using namespace std;
 
 namespace casadi {
 
-  Sparsity reshape(const Sparsity& a, int nrow, int ncol) {
-    return a.zz_reshape(nrow, ncol);
-  }
-
   int rank(const Sparsity& a) {
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
     a.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);

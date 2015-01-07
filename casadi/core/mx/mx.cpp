@@ -1240,10 +1240,6 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_reshape(std::pair<int, int> rc) const {
-    return reshape(*this, rc.first, rc.second);
-  }
-
   MX MX::zz_reshape(int nrow, int ncol) const {
     if (nrow==size1() && ncol==size2())
       return *this;
@@ -1253,8 +1249,7 @@ namespace casadi {
 
   MX MX::zz_reshape(const Sparsity& sp) const {
     // quick return if already the right shape
-    if (sp==sparsity())
-      return *this;
+    if (sp==sparsity()) return *this;
 
     // make sure that the patterns match
     casadi_assert(sp.isReshape(sparsity()));

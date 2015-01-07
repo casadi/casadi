@@ -2577,11 +2577,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_reshape(std::pair<int, int> rc) const {
-    return reshape(*this, rc.first, rc.second);
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_reshape(const Sparsity& sp) const {
     // quick return if already the right shape
     if (sp==sparsity()) return *this;

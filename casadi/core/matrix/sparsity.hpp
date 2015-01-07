@@ -325,9 +325,6 @@ namespace casadi {
     /// Resize
     void resize(int nrow, int ncol);
 
-    /// Reshape a sparsity, order of nonzeros remains the same
-    Sparsity zz_reshape(int nrow, int ncol) const;
-
     /** \brief Get the index of a non-zero element
         Add the element if it does not exist and copy object if it's not unique */
     int addNZ(int rr, int cc);
@@ -465,6 +462,8 @@ namespace casadi {
     }
     Sparsity zz_mtimes(const Sparsity& Y, const Sparsity& Z) const { return Z;}
     Sparsity zz_vecNZ() const;
+    Sparsity zz_reshape(int nrow, int ncol) const;
+    Sparsity zz_reshape(const Sparsity& sp) const;
     /// @}
 
     /** \brief Enlarge matrix

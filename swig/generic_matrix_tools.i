@@ -49,6 +49,9 @@ MatType mul(const std::vector< MatType > &args);
 MatType transpose(const MatType &X);
 MatType vec(const MatType& a);
 MatType vecNZ(const MatType& a);
+MatType reshape(const MatType& a, const Sparsity& sp);
+MatType reshape(const MatType& a, int nrow, int ncol);
+MatType reshape(const MatType& a, std::pair<int, int> rc);
 %enddef
 
 #ifndef SWIGMATLAB
@@ -74,7 +77,6 @@ GMTT_INST(MatType, isEqual)
 GMTT_INST(MatType, diagsplit)
 GMTT_INST(MatType, det)
 GMTT_INST(MatType, inv)
-GMTT_INST(MatType, reshape)
 GMTT_INST(MatType, trace)
 %enddef
 

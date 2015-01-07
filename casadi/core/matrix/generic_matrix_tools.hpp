@@ -156,23 +156,6 @@ namespace casadi {
     return mat(x).zz_cofactor(i, j);
   }
 
-  //! \brief Returns a reshaped version of the matrix
-  template<typename MatType>
-  MatType reshape(const GenericMatrix<MatType>& a, int nrow, int ncol) {
-    return mat(a).zz_reshape(nrow, ncol);
-  }
-
-  //! \brief Returns a reshaped version of the matrix, dimensions as a vector
-  template<typename MatType>
-  MatType reshape(const GenericMatrix<MatType>& a, std::pair<int, int> rc) {
-    return mat(a).zz_reshape(rc);
-  }
-
-  //! \brief Reshape the matrix
-  template<typename MatType>
-  MatType reshape(const GenericMatrix<MatType>& a,
-                  const Sparsity& sp) { return mat(a).zz_reshape(sp);}
-
   /** \brief Matrix trace */
   template<typename MatType>
   MatType trace(const GenericMatrix<MatType>& a) { return mat(a).zz_trace();}

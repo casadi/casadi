@@ -401,7 +401,6 @@ namespace casadi {
     MX zz_mtimes(const MX& y) const;
     MX zz_mtimes(const MX& y, const MX& z) const;
     void zz_simplify();
-    MX zz_reshape(std::pair<int, int> rc) const;
     MX zz_reshape(int nrow, int ncol) const;
     MX zz_reshape(const Sparsity& sp) const;
     MX zz_vecNZ() const;

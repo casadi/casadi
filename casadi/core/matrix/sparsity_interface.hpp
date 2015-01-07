@@ -248,6 +248,21 @@ namespace casadi {
     /** \brief Returns a flattened version of the matrix, preserving only nonzeros
      */
     inline friend MatType vecNZ(const MatType& a) { return a.zz_vecNZ();}
+
+    //! \brief Returns a reshaped version of the matrix
+    inline friend MatType reshape(const MatType& a, int nrow, int ncol) {
+      return a.zz_reshape(nrow, ncol);
+    }
+
+    //! \brief Returns a reshaped version of the matrix, dimensions as a vector
+    inline friend MatType reshape(const MatType& a, std::pair<int, int> rc) {
+      return reshape(a, rc.first, rc.second);
+    }
+
+    //! \brief Reshape the matrix
+    inline friend MatType reshape(const MatType& a, const Sparsity& sp) {
+      return a.zz_reshape(sp);
+    }
 #endif // SWIG
   };
 

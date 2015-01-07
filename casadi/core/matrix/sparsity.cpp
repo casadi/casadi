@@ -216,6 +216,11 @@ namespace casadi {
     return (*this)->getNZ(rr, cc);
   }
 
+  Sparsity Sparsity::zz_reshape(const Sparsity& sp) const {
+    casadi_assert(isReshape(sp));
+    return sp;
+  }
+
   Sparsity Sparsity::zz_reshape(int nrow, int ncol) const {
     return (*this)->zz_reshape(nrow, ncol);
   }
