@@ -37,7 +37,7 @@ namespace casadi {
   UnaryMX::UnaryMX(Operation op, MX x) : op_(op) {
     // Put a densifying node in between if necessary
     if (!operation_checker<F00Checker>(op_)) {
-      x.densify();
+      x.makeDense();
     }
 
     setDependencies(x);

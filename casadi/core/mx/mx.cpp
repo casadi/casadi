@@ -927,7 +927,7 @@ namespace casadi {
     }
   }
 
-  void MX::densify(const MX& val) {
+  void MX::makeDense(const MX& val) {
     casadi_assert(val.isScalar());
     if (isDense()) {
       return; // Already ok
@@ -1318,7 +1318,7 @@ namespace casadi {
 
   MX MX::zz_dense() const {
     MX ret = *this;
-    ret.densify();
+    ret.makeDense();
     return ret;
   }
 

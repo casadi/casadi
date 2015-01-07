@@ -296,7 +296,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> dense(const Matrix<DataType>& A) {
     Matrix<DataType> ret = A;
-    ret.densify();
+    ret.makeDense();
     return ret;
   }
 

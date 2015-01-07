@@ -362,7 +362,7 @@ namespace casadi {
     Matrix<DataType> setSparse(const Sparsity& sp, bool intersect=false) const;
 
     /// Make the matrix dense
-    void densify(const DataType& val = 0);
+    void makeDense(const DataType& val = 0);
 
     /** \brief  Make a matrix sparse by removing numerical zeros smaller
      * in absolute value than a specified tolerance */

@@ -462,7 +462,7 @@ namespace casadi {
     MX setSparse(const Sparsity& sp, bool intersect=false) const;
 
     /// Make the matrix dense
-    void densify(const MX& val = 0);
+    void makeDense(const MX& val = 0);
 
     /// Lift an expression
     void lift(const MX& x_guess);

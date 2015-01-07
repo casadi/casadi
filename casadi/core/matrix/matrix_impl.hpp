@@ -507,7 +507,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::densify(const DataType& val) {
+  void Matrix<DataType>::makeDense(const DataType& val) {
     // Quick return if possible
     if (isDense()) return;
 
@@ -881,7 +881,7 @@ namespace casadi {
       DataType fcn_0;
       casadi_math<DataType>::fun(op, 0, 0, fcn_0);
       if (!casadi_limits<DataType>::isZero(fcn_0)) { // Remove this if?
-        ret.densify(fcn_0);
+        ret.makeDense(fcn_0);
       }
     }
 
@@ -1947,7 +1947,7 @@ namespace casadi {
       DataType fcn_0;
       casadi_math<DataType>::fun(op, x_val, casadi_limits<DataType>::zero, fcn_0);
       if (!casadi_limits<DataType>::isZero(fcn_0)) { // Remove this if?
-        ret.densify(fcn_0);
+        ret.makeDense(fcn_0);
       }
     }
 
@@ -1978,7 +1978,7 @@ namespace casadi {
       DataType fcn_0;
       casadi_math<DataType>::fun(op, casadi_limits<DataType>::zero, y_val, fcn_0);
       if (!casadi_limits<DataType>::isZero(fcn_0)) { // Remove this if?
-        ret.densify(fcn_0);
+        ret.makeDense(fcn_0);
       }
     }
 
@@ -2038,7 +2038,7 @@ namespace casadi {
       DataType fcn_0;
       casadi_math<DataType>::fun(op, casadi_limits<DataType>::zero,
                                  casadi_limits<DataType>::zero, fcn_0);
-      r.densify(fcn_0);
+      r.makeDense(fcn_0);
     }
 
     return r;

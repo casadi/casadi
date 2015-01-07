@@ -498,7 +498,7 @@ namespace casadi {
       return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.isDense()) {
       DMatrix v = getMatrixValue();
-      v.densify();
+      v.makeDense();
       return v;
     } else {
       return MXNode::getSetSparse(sp);
