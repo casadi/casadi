@@ -41,6 +41,8 @@ namespace casadi {
   template<typename MatType>
   class CASADI_EXPORT SparsityInterface {
   public:
+    std::vector< std::vector< MatType > >
+      zz_blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const;
 #ifndef SWIG
     /** \brief Concatenate a list of matrices horizontally
      * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
@@ -137,6 +139,38 @@ namespace casadi {
       return vertcat(horzcat(A, B), horzcat(C, D));
     }
 
+    /** \brief  chop up into blocks
+     * \param vert_offset Defines the boundaries of the block rows
+     * \param horz_offset Defines the boundaries of the block columns
+     *
+     *   blockcat(blocksplit(x,..., ...)) = x
+     */
+    inline friend
+      std::vector< std::vector< MatType > > blocksplit(const MatType& x,
+                                                       const std::vector<int>& vert_offset,
+                                                       const std::vector<int>& horz_offset) {
+      return x.zz_blocksplit(vert_offset, horz_offset);
+    }
+
+    /** \brief  chop up into blocks
+     * \param vert_incr Defines the increment for block boundaries in row dimension
+     * \param horz_incr Defines the increment for block boundaries in column dimension
+     *
+     *   blockcat(blocksplit(x,..., ...)) = x
+     */
+    inline friend std::vector< std::vector< MatType > >
+      blocksplit(const MatType& x, int vert_incr=1, int horz_incr=1) {
+      casadi_assert(horz_incr>=1);
+      casadi_assert(vert_incr>=1);
+      int sz1 = static_cast<const MatType&>(x).size1();
+      std::vector<int> offset1 = range(0, sz1, vert_incr);
+      offset1.push_back(sz1);
+      int sz2 = static_cast<const MatType&>(x).size2();
+      std::vector<int> offset2 = range(0, sz2, horz_incr);
+      offset2.push_back(sz2);
+      return blocksplit(x, offset1, offset2);
+    }
+
     /** \brief Construct a matrix with given block on the diagonal */
     inline friend MatType blkdiag(const std::vector<MatType> &A) {
       return MatType::zz_blkdiag(A);
@@ -181,6 +215,19 @@ namespace casadi {
     }
 #endif // SWIG
   };
+
+#ifndef SWIG
+  template<typename MatType>
+  std::vector< std::vector< MatType > >
+  SparsityInterface<MatType>::zz_blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const {
+    std::vector< MatType > rows = vertsplit(static_cast<const MatType&>(*this), vert_offset);
+    std::vector< std::vector< MatType > > ret;
+    for (int i=0;i<rows.size();++i) {
+      ret.push_back(horzsplit(rows[i], horz_offset));
+    }
+    return ret;
+  }
+#endif // SWIG
 
 } // namespace casadi
 

@@ -38,30 +38,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-
-  /** \brief  chop up into blocks
-  * \brief vert_offset Defines the boundaries of the block cols
-  * \brief horz_offset Defines the boundaries of the block rows
-  *
-  *   blockcat(blocksplit(x,..., ...)) = x
-  */
-  inline std::vector< std::vector<MX > >
-  blocksplit(const MX& x, const std::vector<int>& vert_offset,
-             const std::vector<int>& horz_offset) {
-    return x.zz_blocksplit(vert_offset, horz_offset);
-  }
-
-  /** \brief  chop up into blocks
-  * \brief vert_incr Defines the increment for block boundaries in col dimension
-  * \brief horz_incr Defines the increment for block boundaries in row dimension
-  *
-  *   blockcat(blocksplit(x,..., ...)) = x
-  */
-  inline std::vector< std::vector<MX > >
-  blocksplit(const MX& x, int vert_incr = 1, int horz_incr = 1) {
-    return x.zz_blocksplit(vert_incr, horz_incr);
-  }
-
   /** \brief  concatenate diagonally
   *
   *  diagcat(diagsplit(x, ...)) = x

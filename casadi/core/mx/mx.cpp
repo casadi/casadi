@@ -1193,26 +1193,6 @@ namespace casadi {
     }
   }
 
-  std::vector< std::vector<MX> > MX::zz_blocksplit(const std::vector<int>& vert_offset,
-                                                   const std::vector<int>& horz_offset) const {
-    std::vector<MX> rows = vertsplit(*this, vert_offset);
-    std::vector< std::vector<MX> > ret;
-    for (int i=0; i<rows.size(); ++i) {
-      ret.push_back(horzsplit(rows[i], horz_offset));
-    }
-    return ret;
-  }
-
-  std::vector< std::vector<MX > > MX::zz_blocksplit(int vert_incr, int horz_incr) const {
-    casadi_assert(horz_incr>=1);
-    casadi_assert(vert_incr>=1);
-    vector<int> offset1 = range(0, size1(), vert_incr);
-    offset1.push_back(size1());
-    vector<int> offset2 = range(0, size2(), horz_incr);
-    offset2.push_back(size2());
-    return blocksplit(*this, offset1, offset2);
-  }
-
   MX MX::zz_veccat(const vector<MX>& comp) {
     vector<MX> ret = comp;
     for (vector<MX>::iterator i=ret.begin(); i!=ret.end(); ++i) {

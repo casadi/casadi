@@ -40,32 +40,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief  chop up into blocks
-   * \param vert_offset Defines the boundaries of the block rows
-   * \param horz_offset Defines the boundaries of the block columns
-   *
-   *   blockcat(blocksplit(x,..., ...)) = x
-   */
-  template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
-                                                            const std::vector<int>& vert_offset,
-                                                            const std::vector<int>& horz_offset) {
-    return x.zz_blocksplit(vert_offset, horz_offset);
-  }
-
-  /** \brief  chop up into blocks
-   * \param vert_incr Defines the increment for block boundaries in row dimension
-   * \param horz_incr Defines the increment for block boundaries in column dimension
-   *
-   *   blockcat(blocksplit(x,..., ...)) = x
-   */
-  template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
-                                                            int vert_incr=1,
-                                                            int horz_incr=1) {
-    return x.zz_blocksplit(vert_incr, horz_incr);
-  }
-
 /// \cond INTERNAL
 #ifndef SWIG
   /** \brief  split diagonally, retaining matrices
