@@ -46,14 +46,6 @@ namespace casadi {
    */
   CASADI_EXPORT Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
 
-  /** \brief Split up a sparsity pattern horizontally */
-  CASADI_EXPORT
-    std::vector<Sparsity> horzsplit(const Sparsity& sp, const std::vector<int>& output_offset);
-
-  /** \brief Split up a sparsity pattern vertically */
-  CASADI_EXPORT
-    std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& output_offset);
-
   /** \brief Split up a sparsity pattern diagonally */
   CASADI_EXPORT
     std::vector<Sparsity> diagsplit(const Sparsity& sp,

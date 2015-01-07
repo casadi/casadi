@@ -39,8 +39,6 @@
 %define MATRIX_TOOLS_TEMPLATES(DataType)
   MTT_INST(DataType, blockcat)
   MTT_INST(DataType, blocksplit)
-  MTT_INST(DataType, vertsplit)
-  MTT_INST(DataType, horzsplit)
   MTT_INST(DataType, inner_prod)
   MTT_INST(DataType, outer_prod)
   MTT_INST(DataType, norm_1)

@@ -26,6 +26,8 @@
 #ifndef CASADI_SPARSITY_INTERFACE_HPP
 #define CASADI_SPARSITY_INTERFACE_HPP
 
+#include "../std_vector_tools.hpp"
+
 namespace casadi {
   /** \brief Sparsity interface class
 
@@ -72,6 +74,54 @@ namespace casadi {
       v[0] = x;
       v[1] = y;
       return vertcat(v);
+    }
+
+    /** \brief  split horizontally, retaining groups of columns
+     * \param offset List of all start columns for each group
+     *      the last column group will run to the end.
+     *
+     *   horzcat(horzsplit(x, ...)) = x
+     */
+    inline friend std::vector<MatType > horzsplit(const MatType &v,
+                                                  const std::vector<int>& offset) {
+      return v.zz_horzsplit(offset);
+    }
+
+    /** \brief  split horizontally, retaining fixed-sized groups of columns
+     * \param incr Size of each group of columns
+     *
+     *   horzcat(horzsplit(x, ...)) = x
+     */
+    inline friend std::vector<MatType > horzsplit(const MatType &v, int incr=1) {
+      casadi_assert(incr>=1);
+      int sz2 = static_cast<const MatType&>(v).size2();
+      std::vector<int> offset2 = range(0, sz2, incr);
+      offset2.push_back(sz2);
+      return horzsplit(v, offset2);
+    }
+
+    /** \brief  split vertically, retaining groups of rows
+     * \param output_offset List of all start rows for each group
+     *      the last row group will run to the end.
+     *
+     *   vertcat(vertsplit(x, ...)) = x
+     */
+    inline friend std::vector<MatType > vertsplit(const MatType &v,
+                                                  const std::vector<int>& offset) {
+      return v.zz_vertsplit(offset);
+    }
+
+    /** \brief  split vertically, retaining fixed-sized groups of rows
+     * \param incr Size of each group of rows
+     *
+     *   vertcat(vertsplit(x, ...)) = x
+     */
+    inline friend std::vector<MatType > vertsplit(const MatType &v, int incr=1) {
+      casadi_assert(incr>=1);
+      int sz1 = static_cast<const MatType&>(v).size1();
+      std::vector<int> offset1 = range(0, sz1, incr);
+      offset1.push_back(sz1);
+      return vertsplit(v, offset1);
     }
 
     /** \brief Construct a matrix with given block on the diagonal */

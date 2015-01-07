@@ -57,50 +57,6 @@ namespace casadi {
   }
 #endif // SWIG
 
-  /** \brief  split horizontally, retaining groups of columns
-   * \param offset List of all start columns for each group
-   *      the last column group will run to the end.
-   *
-   *   horzcat(horzsplit(x, ...)) = x
-   */
-  template<typename DataType>
-  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v,
-                                           const std::vector<int>& offset) {
-    return v.zz_horzsplit(offset);
-  }
-
-  /** \brief  split horizontally, retaining fixed-sized groups of columns
-   * \param incr Size of each group of columns
-   *
-   *   horzcat(horzsplit(x, ...)) = x
-   */
-  template<typename DataType>
-  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1) {
-    return v.zz_horzsplit(incr);
-  }
-
-  /** \brief  split vertically, retaining groups of rows
-   * \param output_offset List of all start rows for each group
-   *      the last row group will run to the end.
-   *
-   *   vertcat(vertsplit(x, ...)) = x
-   */
-  template<typename DataType>
-  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v,
-                                           const std::vector<int>& offset) {
-    return v.zz_vertsplit(offset);
-  }
-
-  /** \brief  split vertically, retaining fixed-sized groups of rows
-   * \param incr Size of each group of rows
-   *
-   *   vertcat(vertsplit(x, ...)) = x
-   */
-  template<typename DataType>
-  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, int incr=1) {
-    return v.zz_vertsplit(incr);
-  }
-
   /** \brief  chop up into blocks
    * \param vert_offset Defines the boundaries of the block rows
    * \param horz_offset Defines the boundaries of the block columns

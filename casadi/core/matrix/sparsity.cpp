@@ -1137,4 +1137,59 @@ namespace casadi {
     return Sparsity(m, n, colind, row);
   }
 
+  std::vector<Sparsity> Sparsity::zz_horzsplit(const std::vector<int>& offset) const {
+    // Consistency check
+    casadi_assert(offset.size()>=1);
+    casadi_assert(offset.front()==0);
+    casadi_assert_message(offset.back()==size2(),
+                          "horzsplit(Sparsity, std::vector<int>): Last elements of offset "
+                          "(" << offset.back() << ") must equal the number of columns "
+                          "(" << size2() << ")");
+    casadi_assert(isMonotone(offset));
+
+    // Number of outputs
+    int n = offset.size()-1;
+
+    // Get the sparsity of the input
+    const vector<int>& colind_x = colind();
+    const vector<int>& row_x = row();
+
+    // Allocate result
+    std::vector<Sparsity> ret;
+    ret.reserve(n);
+
+    // Sparsity pattern as CCS vectors
+    vector<int> colind, row;
+    int ncol, nrow = size1();
+
+    // Get the sparsity patterns of the outputs
+    for (int i=0; i<n; ++i) {
+      int first_col = offset[i];
+      int last_col = offset[i+1];
+      ncol = last_col - first_col;
+
+      // Construct the sparsity pattern
+      colind.resize(ncol+1);
+      copy(colind_x.begin()+first_col, colind_x.begin()+last_col+1, colind.begin());
+      for (vector<int>::iterator it=colind.begin()+1; it!=colind.end(); ++it) *it -= colind[0];
+      colind[0] = 0;
+      row.resize(colind.back());
+      copy(row_x.begin()+colind_x[first_col], row_x.begin()+colind_x[last_col], row.begin());
+
+      // Append to the list
+      ret.push_back(Sparsity(nrow, ncol, colind, row));
+    }
+
+    // Return (RVO)
+    return ret;
+  }
+
+  std::vector<Sparsity> Sparsity::zz_vertsplit(const std::vector<int>& offset) const {
+    std::vector<Sparsity> ret = horzsplit(T(), offset);
+    for (std::vector<Sparsity>::iterator it=ret.begin(); it!=ret.end(); ++it) {
+      *it = it->T();
+    }
+    return ret;
+  }
+
 } // namespace casadi

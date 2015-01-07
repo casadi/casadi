@@ -2662,14 +2662,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  std::vector<Matrix<DataType> > Matrix<DataType>::zz_horzsplit(int incr) const {
-    casadi_assert(incr>=1);
-    std::vector<int> offset2 = range(0, size2(), incr);
-    offset2.push_back(size2());
-    return horzsplit(*this, offset2);
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_vertcat(const std::vector<Matrix<DataType> > &v) {
     Matrix<DataType> ret;
     for (int i=0; i<v.size(); ++i)
@@ -2686,14 +2678,6 @@ namespace casadi {
       *it = it->T();
     }
     return ret;
-  }
-
-  template<typename DataType>
-  std::vector< Matrix<DataType> > Matrix<DataType>::zz_vertsplit(int incr) const {
-    casadi_assert(incr>=1);
-    std::vector<int> offset1 = range(0, size1(), incr);
-    offset1.push_back(size1());
-    return vertsplit(*this, offset1);
   }
 
   template<typename DataType>

@@ -1153,13 +1153,6 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> MX::zz_horzsplit(int incr) const {
-    casadi_assert(incr>=1);
-    vector<int> offset2 = range(0, size2(), incr);
-    offset2.push_back(size2());
-    return horzsplit(*this, offset2);
-  }
-
   std::vector<MX> MX::zz_diagsplitNative(const std::vector<int>& offset1,
                                          const std::vector<int>& offset2) const {
     // Consistency check
@@ -1198,13 +1191,6 @@ namespace casadi {
       for (std::vector<MX>::iterator it=ret.begin(); it!=ret.end(); ++it) *it = it->T();
       return ret;
     }
-  }
-
-  std::vector<MX> MX::zz_vertsplit(int incr) const {
-    casadi_assert(incr>=1);
-    vector<int> offset1 = range(0, size1(), incr);
-    offset1.push_back(size1());
-    return vertsplit(*this, offset1);
   }
 
   std::vector< std::vector<MX> > MX::zz_blocksplit(const std::vector<int>& vert_offset,
