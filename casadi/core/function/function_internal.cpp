@@ -2751,7 +2751,11 @@ namespace casadi {
     //stream.precision(8);
 
     // Check if any constraint is violated
-    if (all(v <= ub + tol) && all(v >= lb - tol)) {
+    bool all_ok = true;
+    for (int i=0; all_ok && i<v.size(); ++i) {
+      all_ok = v.at(i) > ub.at(i) + tol || v.at(i) < lb.at(i) - tol;
+    }
+    if (all_ok) {
       stream << "All " << v.size() << " constraints on " << name << " are met: " << endl;
     } else {
       stream << "Problem with constraints on " << name << ": " << endl;
