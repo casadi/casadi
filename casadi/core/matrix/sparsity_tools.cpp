@@ -39,34 +39,4 @@ namespace casadi {
     return coarse_colblock.at(3);
   }
 
-  std::vector<Sparsity> diagsplit(const Sparsity& sp, const std::vector<int>& offset1,
-                                  const std::vector<int>& offset2) {
-    return sp.zz_diagsplit(offset1, offset2);
-  }
-
-  std::vector<Sparsity> diagsplit(const Sparsity& x, int incr) {
-    casadi_assert(incr>=1);
-    casadi_assert_message(x.isSquare(),
-      "diagsplit(x,incr)::input must be square but got " << x.dimString()  << ".");
-    vector<int> offset2 = range(0, x.size2(), incr);
-    offset2.push_back(x.size2());
-    return diagsplit(x, offset2);
-  }
-
-  std::vector<Sparsity> diagsplit(const Sparsity& x, int incr1, int incr2) {
-    casadi_assert(incr1>=1);
-    casadi_assert(incr2>=1);
-    vector<int> offset1 = range(0, x.size1(), incr1);
-    offset1.push_back(x.size1());
-    vector<int> offset2 = range(0, x.size2(), incr2);
-    offset2.push_back(x.size2());
-    return diagsplit(x, offset1, offset2);
-  }
-
-  std::vector<Sparsity> diagsplit(const Sparsity& x, const std::vector<int>& output_offset) {
-    casadi_assert_message(x.isSquare(),
-      "diagsplit(x,incr)::input must be square but got " << x.dimString()  << ".");
-    return diagsplit(x, output_offset, output_offset);
-  }
-
 } // namespace casadi

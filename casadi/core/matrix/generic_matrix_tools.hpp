@@ -92,46 +92,6 @@ namespace casadi {
     return mat(x).isEqual(mat(y));
   }
 
-  /** \brief  split diagonally, retaining groups of square matrices
-  * \param incr Size of each matrix
-  *
-  *  diagsplit(diagsplit(x, ...)) = x
-  */
-  template<typename MatType>
-  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x, int incr=1);
-
-  /** \brief  split diagonally, retaining fixed-sized matrices
-  * \param incr1 Row dimension of each matrix
-  * \param incr2 Column dimension of each matrix
-  *
-  *  diagsplit(diagsplit(x, ...)) = x
-  */
-  template<typename MatType>
-  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x, int incr1, int incr2);
-
-  /** \brief  split diagonally, retaining square matrices
-  * \param output_offset List of all start locations for each group
-  *      the last matrix will run to the end.
-  *
-  *   diagcat(diagsplit(x, ...)) = x
-  */
-  template<typename MatType>
-  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x,
-                                   const std::vector<int>& output_offset);
-
-  /** \brief  split diagonally, retaining square matrices
-  * \param output_offset1 List of all start locations (row) for each group
-  *      the last matrix will run to the end.
-  * \param output_offset2 List of all start locations (row) for each group
-  *      the last matrix will run to the end.
-  *
-  *   diagcat(diagsplit(x, ...)) = x
-  */
-  template<typename MatType>
-  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x,
-                                   const std::vector<int>& output_offset1,
-                                   const std::vector<int>& output_offset2);
-
   /** \brief Matrix determinant (experimental) */
   template<typename MatType>
   MatType det(const GenericMatrix<MatType>& A) { return mat(A).zz_det();}
@@ -251,46 +211,6 @@ namespace casadi {
   MatType tril(const GenericMatrix<MatType> &a_) {
     const MatType& a = mat(a_);
     return a.setSparse(a.sparsity().getTril());
-  }
-
-  template<typename MatType>
-  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_, int incr) {
-    const MatType& x = mat(x_);
-    casadi_assert(incr>=1);
-    casadi_assert_message(x.isSquare(),
-      "diagsplit(x,incr)::input must be square but got " << x.dimString()  << ".");
-    std::vector<int> offset2 = range(0, x.size2(), incr);
-    offset2.push_back(x.size2());
-    return diagsplit(x, offset2);
-  }
-
-  template<typename MatType>
-  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_, int incr1, int incr2) {
-    const MatType& x = mat(x_);
-    casadi_assert(incr1>=1);
-    casadi_assert(incr2>=1);
-    std::vector<int> offset1 = range(0, x.size1(), incr1);
-    offset1.push_back(x.size1());
-    std::vector<int> offset2 = range(0, x.size2(), incr2);
-    offset2.push_back(x.size2());
-    return diagsplit(x, offset1, offset2);
-  }
-
-  template<typename MatType>
-  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_,
-    const std::vector<int>& output_offset1,
-    const std::vector<int>& output_offset2) {
-    const MatType& x = mat(x_);
-    return x.zz_diagsplit(output_offset1, output_offset2);
-  }
-
-  template<typename MatType>
-  std::vector< MatType > diagsplit(const GenericMatrix<MatType>& x_,
-      const std::vector<int>& output_offset) {
-    const MatType& x = mat(x_);
-    casadi_assert_message(x.isSquare(),
-      "diagsplit(x,incr)::input must be square but got " << x.dimString()  << ".");
-    return diagsplit(x, output_offset, output_offset);
   }
 
   template<typename MatType>

@@ -41,6 +41,11 @@ std::vector< std::vector< MatType > >
 blocksplit(const MatType& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
 std::vector< std::vector< MatType > > blocksplit(const MatType& x, int vert_incr=1, int horz_incr=1);
 MatType diagcat(const std::vector< MatType > &v);
+std::vector< MatType > diagsplit(const MatType& x, const std::vector<int>& output_offset1,
+                                 const std::vector<int>& output_offset2);
+std::vector< MatType > diagsplit(const MatType& x, const std::vector<int>& output_offset);
+std::vector< MatType > diagsplit(const MatType& x, int incr=1);
+std::vector< MatType > diagsplit(const MatType& x, int incr1, int incr2);
 MatType veccat(const std::vector< MatType >& x);
 MatType vecNZcat(const std::vector< MatType >& x);
 MatType mul(const MatType &x, const MatType &y);
@@ -74,7 +79,6 @@ GMTT_INST(MatType, triu2symm)
 GMTT_INST(MatType, triu)
 GMTT_INST(MatType, tril)
 GMTT_INST(MatType, isEqual)
-GMTT_INST(MatType, diagsplit)
 GMTT_INST(MatType, det)
 GMTT_INST(MatType, inv)
 GMTT_INST(MatType, trace)
