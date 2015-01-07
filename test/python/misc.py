@@ -469,7 +469,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "diagsplit(SX ,int)" in e.message
+      assert "diagsplit(SX,int)" in e.message
       assert "diagsplit(array(double) ,int)" in e.message
       
   def test_callkw(self):
