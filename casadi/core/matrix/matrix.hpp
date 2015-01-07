@@ -500,8 +500,8 @@ namespace casadi {
     std::vector<Matrix<DataType> > zz_horzsplit(const std::vector<int>& offset) const;
     static Matrix<DataType> zz_vertcat(const std::vector<Matrix<DataType> > &v);
     std::vector< Matrix<DataType> > zz_vertsplit(const std::vector<int>& offset) const;
-    std::vector< Matrix<DataType> > zz_diagsplitNative(const std::vector<int>& offset1,
-                                                       const std::vector<int>& offset2) const;
+    std::vector< Matrix<DataType> > zz_diagsplit(const std::vector<int>& offset1,
+                                                 const std::vector<int>& offset2) const;
     Matrix<DataType> zz_inner_prod(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_outer_prod(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_all() const;

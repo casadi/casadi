@@ -62,7 +62,7 @@ namespace casadi {
   *   diagcat(diagsplit(x, ...)) = x
   */
   CASADI_EXPORT std::vector<Sparsity> diagsplit(const Sparsity& x,
-                                                   const std::vector<int>& output_offset);
+                                                const std::vector<int>& output_offset);
 
   /// Obtain the structural rank of a sparsity-pattern
   CASADI_EXPORT int rank(const Sparsity& a);

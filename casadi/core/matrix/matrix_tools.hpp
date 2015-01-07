@@ -40,22 +40,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-/// \cond INTERNAL
-#ifndef SWIG
-  /** \brief  split diagonally, retaining matrices
-  * \param output_offset1 List of all start locations (row) for each matrix
-  *      the last matrix will run to the end.
-  *   diagcat(diagsplit(x, ...)) = x
-  */
-  template<typename DataType>
-  std::vector< Matrix<DataType> > diagsplitNative(const Matrix<DataType>& x,
-                                                  const std::vector<int>& output_offset1,
-                                                  const std::vector<int>& output_offset2) {
-    return x.zz_diagsplitNative(output_offset1, output_offset2);
-  }
-#endif // SWIG
-/// \endcond
-
   /** \brief Inner product of two matrices
       Equals
       \code

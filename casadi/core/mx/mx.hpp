@@ -390,8 +390,8 @@ namespace casadi {
     static MX zz_diagcat(const std::vector<MX>& x);
     static MX zz_vertcat(const std::vector<MX>& x);
     std::vector<MX> zz_horzsplit(const std::vector<int>& offset) const;
-    std::vector<MX> zz_diagsplitNative(const std::vector<int>& offset1,
-                                       const std::vector<int>& offset2) const;
+    std::vector<MX> zz_diagsplit(const std::vector<int>& offset1,
+                                 const std::vector<int>& offset2) const;
     std::vector<MX> zz_vertsplit(const std::vector<int>& offset) const;
     static MX zz_blockcat(const std::vector< std::vector<MX > > &v);
     MX zz_norm_2() const;

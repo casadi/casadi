@@ -281,7 +281,7 @@ namespace casadi {
     const std::vector<int>& output_offset1,
     const std::vector<int>& output_offset2) {
     const MatType& x = mat(x_);
-    return diagsplitNative(x, output_offset1, output_offset2);
+    return x.zz_diagsplit(output_offset1, output_offset2);
   }
 
   template<typename MatType>

@@ -447,6 +447,8 @@ namespace casadi {
     static Sparsity zz_blkdiag(const std::vector< Sparsity > &v);
     std::vector<Sparsity> zz_horzsplit(const std::vector<int>& output_offset) const;
     std::vector<Sparsity> zz_vertsplit(const std::vector<int>& output_offset) const;
+    std::vector<Sparsity> zz_diagsplit(const std::vector<int>& offset1,
+                                       const std::vector<int>& offset2) const;
     Sparsity zz_mtimes(const Sparsity& y) const {
       if (isScalar()) {
         return isDense() ? y : Sparsity::sparse(y.shape());

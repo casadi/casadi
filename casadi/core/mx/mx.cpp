@@ -1153,8 +1153,8 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> MX::zz_diagsplitNative(const std::vector<int>& offset1,
-                                         const std::vector<int>& offset2) const {
+  std::vector<MX> MX::zz_diagsplit(const std::vector<int>& offset1,
+                                   const std::vector<int>& offset2) const {
     // Consistency check
     casadi_assert(offset1.size()>=1);
     casadi_assert(offset1.front()==0);

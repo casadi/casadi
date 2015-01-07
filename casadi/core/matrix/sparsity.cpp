@@ -1208,4 +1208,38 @@ namespace casadi {
     return Sparsity::dense(size());
   }
 
+  std::vector<Sparsity> Sparsity::zz_diagsplit(const std::vector<int>& offset1,
+                                               const std::vector<int>& offset2) const {
+    // Consistency check
+    casadi_assert(offset1.size()>=1);
+    casadi_assert(offset1.front()==0);
+    casadi_assert_message(offset1.back()==size1(),
+                          "diagsplit(Sparsity, offset1, offset2): Last elements of offset1 "
+                          "(" << offset1.back() << ") must equal the number of rows "
+                          "(" << size1() << ")");
+    casadi_assert_message(offset2.back()==size2(),
+                          "diagsplit(Sparsity, offset1, offset2): Last elements of offset2 "
+                          "(" << offset2.back() << ") must equal the number of rows "
+                          "(" << size2() << ")");
+    casadi_assert(isMonotone(offset1));
+    casadi_assert(isMonotone(offset2));
+    casadi_assert(offset1.size()==offset2.size());
+
+    // Number of outputs
+    int n = offset1.size()-1;
+
+    // Return value
+    std::vector<Sparsity> ret;
+
+    // Caveat: this is a very silly implementation
+    IMatrix x = IMatrix::zeros(*this);
+
+    for (int i=0;i<n;++i) {
+      ret.push_back(x(Slice(offset1[i], offset1[i+1]),
+                      Slice(offset2[i], offset2[i+1])).sparsity());
+    }
+
+    return ret;
+  }
+
 } // namespace casadi

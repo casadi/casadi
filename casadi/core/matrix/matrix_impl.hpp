@@ -2663,8 +2663,8 @@ namespace casadi {
 
   template<typename DataType>
   std::vector< Matrix<DataType> >
-  Matrix<DataType>::zz_diagsplitNative(const std::vector<int>& offset1,
-                                    const std::vector<int>& offset2) const {
+  Matrix<DataType>::zz_diagsplit(const std::vector<int>& offset1,
+                                 const std::vector<int>& offset2) const {
     // Consistency check
     casadi_assert(offset1.size()>=1);
     casadi_assert(offset1.front()==0);

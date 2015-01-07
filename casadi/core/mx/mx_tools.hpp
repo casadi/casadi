@@ -44,22 +44,6 @@ namespace casadi {
   */
   inline MX diagcat(const std::vector<MX>& x) { return MX::zz_diagcat(x);}
 
-/// \cond INTERNAL
-#ifndef SWIG
-  /** \brief  split diagonally, retaining matrices
-  * \param output_offset1 List of all start locations (row) for each matrix
-  * \param output_offset1 List of all start locations (column) for each matrix
-  *      the last matrix will run to the end.
-  *   diagcat(diagsplit(x, ...)) = x
-  */
-  inline std::vector<MX> diagsplitNative(const MX& x,
-                                         const std::vector<int>& output_offset1,
-                                         const std::vector<int>& output_offset2) {
-    return x.zz_diagsplitNative(output_offset1, output_offset2);
-  }
-#endif // SWIG
-/// \endcond
-
   /** \brief  Frobenius norm  */
   inline MX norm_F(const MX &x) { return x.zz_norm_F();}
 
