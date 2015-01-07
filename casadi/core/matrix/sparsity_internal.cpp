@@ -2817,7 +2817,7 @@ namespace casadi {
     return -1;
   }
 
-  Sparsity SparsityInternal::reshape(int nrow, int ncol) const {
+  Sparsity SparsityInternal::zz_reshape(int nrow, int ncol) const {
     casadi_assert_message(numel() == nrow*ncol,
                           "reshape: number of elements must remain the same. Old shape is "
                           << dimString() << ". New shape is " << nrow << "x" << ncol

@@ -2603,12 +2603,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_vec() const {
-    Matrix<DataType> ret = reshape(*this, numel(), 1);
-    return ret;
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_vecNZ() const {
     return Matrix<DataType>(data());
   }
@@ -2700,26 +2694,6 @@ namespace casadi {
     }
 
     return ret;
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_veccat(const std::vector< Matrix<DataType> >& x) {
-    std::vector< Matrix<DataType> > x_vec = x;
-    for (typename std::vector< Matrix<DataType> >::iterator it=x_vec.begin();
-         it!=x_vec.end(); ++it) {
-      *it = vec(*it);
-    }
-    return vertcat(x_vec);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_vecNZcat(const std::vector< Matrix<DataType> >& x) {
-    std::vector< Matrix<DataType> > x_vec = x;
-    for (typename std::vector< Matrix<DataType> >::iterator it=x_vec.begin();
-         it!=x_vec.end(); ++it) {
-      *it = vecNZ(*it);
-    }
-    return vertcat(x_vec);
   }
 
   template<typename DataType>

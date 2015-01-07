@@ -43,6 +43,9 @@ namespace casadi {
   public:
     std::vector< std::vector< MatType > >
       zz_blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const;
+    static MatType zz_veccat(const std::vector< MatType >& x);
+    static MatType zz_vecNZcat(const std::vector< MatType >& x);
+    MatType zz_vec() const;
 #ifndef SWIG
     /** \brief Concatenate a list of matrices horizontally
      * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
@@ -184,6 +187,16 @@ namespace casadi {
       return blkdiag(v);
     }
 
+    /** \brief  concatenate vertically while vectorizing all arguments with vec */
+    inline friend MatType veccat(const std::vector< MatType >& x) {
+      return MatType::zz_veccat(x);
+    }
+
+    /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
+    inline friend MatType vecNZcat(const std::vector< MatType >& x) {
+      return MatType::zz_vecNZcat(x);
+    }
+
     /** \brief Matrix product of two matrices:  */
     inline friend MatType mul(const MatType &X, const MatType &Y) {
       return X.zz_mtimes(Y);
@@ -213,19 +226,68 @@ namespace casadi {
     inline friend MatType transpose(const MatType& X) {
       return X.T();
     }
+
+    /** \brief  make a vector
+        Reshapes/vectorizes the matrix such that the shape becomes (expr.numel(), 1).
+        Columns are stacked on top of each other.
+        Same as reshape(expr, expr.numel(), 1)
+
+        a c \n
+        b d \n
+
+        turns into
+
+        a \n
+        b \n
+        c \n
+        d \n
+
+    */
+    inline friend MatType vec(const MatType& a) { return a.zz_vec();}
+
+    /** \brief Returns a flattened version of the matrix, preserving only nonzeros
+     */
+    inline friend MatType vecNZ(const MatType& a) { return a.zz_vecNZ();}
 #endif // SWIG
   };
 
 #ifndef SWIG
   template<typename MatType>
+  MatType SparsityInterface<MatType>::zz_vec() const {
+    const MatType& x = static_cast<const MatType&>(*this);
+    return reshape(x, x.numel(), 1);
+  }
+
+  template<typename MatType>
   std::vector< std::vector< MatType > >
-  SparsityInterface<MatType>::zz_blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const {
+  SparsityInterface<MatType>::zz_blocksplit(const std::vector<int>& vert_offset,
+                                            const std::vector<int>& horz_offset) const {
     std::vector< MatType > rows = vertsplit(static_cast<const MatType&>(*this), vert_offset);
     std::vector< std::vector< MatType > > ret;
     for (int i=0;i<rows.size();++i) {
       ret.push_back(horzsplit(rows[i], horz_offset));
     }
     return ret;
+  }
+
+  template<typename MatType>
+  MatType SparsityInterface<MatType>::zz_veccat(const std::vector< MatType >& x) {
+    std::vector< MatType > x_vec = x;
+    for (typename std::vector< MatType >::iterator it=x_vec.begin();
+         it!=x_vec.end(); ++it) {
+      *it = vec(*it);
+    }
+    return vertcat(x_vec);
+  }
+
+  template<typename MatType>
+  MatType SparsityInterface<MatType>::zz_vecNZcat(const std::vector< MatType >& x) {
+    std::vector< MatType > x_vec = x;
+    for (typename std::vector< MatType >::iterator it=x_vec.begin();
+         it!=x_vec.end(); ++it) {
+      *it = vecNZ(*it);
+    }
+    return vertcat(x_vec);
   }
 #endif // SWIG
 

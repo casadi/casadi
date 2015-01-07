@@ -60,12 +60,6 @@ namespace casadi {
 #endif // SWIG
 /// \endcond
 
-  /** \brief Concatenate vertically while vectorizing all arguments */
-  inline MX veccat(const std::vector<MX>& comp) { return MX::zz_veccat(comp);}
-
-  /** \brief  concatenate vertically while vecing all arguments with vecNZ */
-  inline MX vecNZcat(const std::vector<MX>& comp) { return MX::zz_vecNZcat(comp);}
-
   /** \brief  Frobenius norm  */
   inline MX norm_F(const MX &x) { return x.zz_norm_F();}
 

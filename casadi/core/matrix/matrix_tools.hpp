@@ -56,18 +56,6 @@ namespace casadi {
 #endif // SWIG
 /// \endcond
 
-  template<typename DataType>
-  /** \brief  concatenate vertically while vectorizing all arguments with vec */
-  Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& x) {
-    return Matrix<DataType>::zz_veccat(x);
-  }
-
-  template<typename DataType>
-  /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
-  Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& x) {
-    return Matrix<DataType>::zz_vecNZcat(x);
-  }
-
   /** \brief Inner product of two matrices
       Equals
       \code

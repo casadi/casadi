@@ -39,9 +39,6 @@ namespace casadi {
    */
   CASADI_EXPORT Sparsity reshape(const Sparsity& a, int nrow, int ncol);
 
-  /** \brief Vectorize the pattern */
-  CASADI_EXPORT Sparsity vec(const Sparsity& a);
-
   /** \brief Split up a sparsity pattern diagonally */
   CASADI_EXPORT
     std::vector<Sparsity> diagsplit(const Sparsity& sp,

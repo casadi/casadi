@@ -56,8 +56,6 @@
   MTT_INST(DataType, diag)
   MTT_INST(DataType, polyval)
   MTT_INST(DataType, addMultiple)
-  MTT_INST(DataType, veccat)
-  MTT_INST(DataType, vecNZcat)
   MTT_INST(DataType, project)
   MTT_INST(DataType, sprank)
   MTT_INST(DataType, kron)

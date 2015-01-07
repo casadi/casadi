@@ -216,8 +216,8 @@ namespace casadi {
     return (*this)->getNZ(rr, cc);
   }
 
-  Sparsity Sparsity::reshape(int nrow, int ncol) const {
-    return (*this)->reshape(nrow, ncol);
+  Sparsity Sparsity::zz_reshape(int nrow, int ncol) const {
+    return (*this)->zz_reshape(nrow, ncol);
   }
 
   std::vector<int> Sparsity::getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const {
@@ -1197,6 +1197,10 @@ namespace casadi {
     for (int i=0; i<v.size(); ++i)
       ret.push_back(horzcat(v[i]));
     return vertcat(ret);
+  }
+
+  Sparsity Sparsity::zz_vecNZ() const {
+    return Sparsity::dense(size());
   }
 
 } // namespace casadi

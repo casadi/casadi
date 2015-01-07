@@ -1193,22 +1193,6 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_veccat(const vector<MX>& comp) {
-    vector<MX> ret = comp;
-    for (vector<MX>::iterator i=ret.begin(); i!=ret.end(); ++i) {
-      *i = vec(*i);
-    }
-    return vertcat(ret);
-  }
-
-  MX MX::zz_vecNZcat(const vector<MX>& comp) {
-    vector<MX> ret = comp;
-    for (vector<MX>::iterator i=ret.begin(); i!=ret.end(); ++i) {
-      *i = vecNZ(*i);
-    }
-    return vertcat(ret);
-  }
-
   MX MX::zz_blockcat(const std::vector< std::vector<MX > > &v) {
     // Quick return if no block rows
     if (v.empty()) return MX::sparse(0, 0);
@@ -1264,7 +1248,7 @@ namespace casadi {
     if (nrow==size1() && ncol==size2())
       return *this;
     else
-      return reshape(*this, sparsity().reshape(nrow, ncol));
+      return reshape(*this, reshape(sparsity(), nrow, ncol));
   }
 
   MX MX::zz_reshape(const Sparsity& sp) const {
@@ -1277,14 +1261,6 @@ namespace casadi {
 
     // Create a reshape node
     return (*this)->getReshape(sp);
-  }
-
-  MX MX::zz_vec() const {
-    if (isVector()) {
-      return *this;
-    } else {
-      return reshape(*this, numel(), 1);
-    }
   }
 
   MX MX::zz_vecNZ() const {

@@ -187,7 +187,7 @@ namespace casadi {
     void resize(int nrow, int ncol);
 
     /// Reshape a sparsity, order of nonzeros remains the same
-    Sparsity reshape(int nrow, int ncol) const;
+    Sparsity zz_reshape(int nrow, int ncol) const;
 
     /// Number of structural non-zeros
     int size() const;

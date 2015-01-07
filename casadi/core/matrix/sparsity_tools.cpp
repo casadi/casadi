@@ -34,11 +34,7 @@ using namespace std;
 namespace casadi {
 
   Sparsity reshape(const Sparsity& a, int nrow, int ncol) {
-    return a.reshape(nrow, ncol);
-  }
-
-  Sparsity vec(const Sparsity& a) {
-    return reshape(a, a.numel(), 1);
+    return a.zz_reshape(nrow, ncol);
   }
 
   int rank(const Sparsity& a) {

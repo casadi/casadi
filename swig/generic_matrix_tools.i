@@ -41,10 +41,14 @@ std::vector< std::vector< MatType > >
 blocksplit(const MatType& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
 std::vector< std::vector< MatType > > blocksplit(const MatType& x, int vert_incr=1, int horz_incr=1);
 MatType blkdiag(const std::vector< MatType > &v);
+MatType veccat(const std::vector< MatType >& x);
+MatType vecNZcat(const std::vector< MatType >& x);
 MatType mul(const MatType &x, const MatType &y);
 MatType mul(const MatType &x, const MatType &y, const MatType &z);
 MatType mul(const std::vector< MatType > &args);
 MatType transpose(const MatType &X);
+MatType vec(const MatType& a);
+MatType vecNZ(const MatType& a);
 %enddef
 
 #ifndef SWIGMATLAB
@@ -71,8 +75,6 @@ GMTT_INST(MatType, diagsplit)
 GMTT_INST(MatType, det)
 GMTT_INST(MatType, inv)
 GMTT_INST(MatType, reshape)
-GMTT_INST(MatType, vec)
-GMTT_INST(MatType, vecNZ)
 GMTT_INST(MatType, trace)
 %enddef
 
