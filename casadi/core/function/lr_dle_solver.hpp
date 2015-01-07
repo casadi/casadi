@@ -67,7 +67,7 @@ namespace casadi {
 
   /// Output arguments of a \e dle solver [lrdleOut]
   enum LR_DLEOutput {
-    /// Y matrix, blkdiag form [y]
+    /// Y matrix, block diagonal form [y]
     LR_DLE_Y,
     LR_DLE_NUM_OUT
   };

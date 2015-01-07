@@ -1593,8 +1593,8 @@ class MXtests(casadiTestCase):
     with self.assertRaises(Exception):
       self.assertFalse(MX.sym("x",2).isRegular())
 
-  def test_blkdiag(self):
-    C = blkdiag([MX(DMatrix(([[-1.4,-3.2],[-3.2,-28]]))),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
+  def test_diagcat(self):
+    C = diagcat([MX(DMatrix(([[-1.4,-3.2],[-3.2,-28]]))),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
     self.assertTrue(isinstance(C,MX))
     r = DMatrix([[-1.4,-3.2,0,0,0,0,0],[-3.2,-28,0,0,0,0,0],[0,0,15,-12,2.1,0,0],[0,0,-12,16,-3.8,0,0],[0,0,2.1,-3.8,15,0,0],[0,0,0,0,0,1.8,0],[0,0,0,0,0,0,-4]])
     r = sparse(r)
@@ -2673,22 +2673,22 @@ class MXtests(casadiTestCase):
       x0 = c.zeros(0,10)      
       x1st = horzsplit(x0, [0,5,10])
       
-      x2 = blkdiag(x1s)
+      x2 = diagcat(x1s)
       self.checkarray(x2.shape,(10,0))
       
-      x2 = blkdiag([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
+      x2 = diagcat([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,0))
 
-      x2 = blkdiag(x1st)
+      x2 = diagcat(x1st)
       self.checkarray(x2.shape,(0,10))
       
-      x2 = blkdiag([c.zeros(0,0)] + x1st + [c.zeros(0,0)])
+      x2 = diagcat([c.zeros(0,0)] + x1st + [c.zeros(0,0)])
       self.checkarray(x2.shape,(0,10))
       
-      x2 = blkdiag(x1s+x1st)
+      x2 = diagcat(x1s+x1st)
       self.checkarray(x2.shape,(10,10))
       
-      x2 = blkdiag([c.zeros(0,0)] + x1s+x1st + [c.zeros(0,0)])
+      x2 = diagcat([c.zeros(0,0)] + x1s+x1st + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,10))
   def test_empty_symm_jac(self):
 

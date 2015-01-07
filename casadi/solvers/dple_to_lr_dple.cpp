@@ -115,7 +115,7 @@ namespace casadi {
       for (int kk=0;kk<hph.size();++kk) {
         hph[kk] = mul(hph[kk].T(), mul(Ps_[k], hph[kk]));
       }
-      HPH[k] = blkdiag(hph);
+      HPH[k] = diagcat(hph);
     }
 
 

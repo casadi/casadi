@@ -2982,7 +2982,7 @@ namespace casadi {
 
   /** \brief   Construct a matrix with given block on the diagonal */
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_blkdiag(const std::vector< Matrix<DataType> > &A) {
+  Matrix<DataType> Matrix<DataType>::zz_diagcat(const std::vector< Matrix<DataType> > &A) {
     std::vector<DataType> data;
 
     std::vector<Sparsity> sp;
@@ -2991,7 +2991,7 @@ namespace casadi {
       sp.push_back(A[i].sparsity());
     }
 
-    return Matrix<DataType>(blkdiag(sp), data);
+    return Matrix<DataType>(diagcat(sp), data);
   }
 
   template<typename DataType>

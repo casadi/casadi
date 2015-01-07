@@ -107,7 +107,7 @@ class Matrixtests(casadiTestCase):
     fMX.init()
     
     LSX = [ SX.sym("",i.sparsity()) for i in L ]
-    fSX = SXFunction(LSX,[blkdiag(LSX)])
+    fSX = SXFunction(LSX,[diagcat(LSX)])
     fSX.init()
 
     for f in [fMX,fSX]:
@@ -642,9 +642,9 @@ class Matrixtests(casadiTestCase):
     A.set(i,SPARSESYM)
     self.checkarray(A,D)
     
-  def test_blkdiag(self):
-    self.message("blkdiag")
-    C = blkdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
+  def test_diagcat(self):
+    self.message("diagcat")
+    C = diagcat([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
     r = DMatrix([[-1.4,-3.2,0,0,0,0,0],[-3.2,-28,0,0,0,0,0],[0,0,15,-12,2.1,0,0],[0,0,-12,16,-3.8,0,0],[0,0,2.1,-3.8,15,0,0],[0,0,0,0,0,1.8,0],[0,0,0,0,0,0,-4]])
     r = sparse(r)
     self.checkarray(C,r)
@@ -865,10 +865,10 @@ class Matrixtests(casadiTestCase):
         Sparsity.tril(n),
         Sparsity.tril(n).T,
         Sparsity.banded(n,1),
-        blkdiag([Sparsity.diag(n),Sparsity.dense(n,n)]),
-        blkdiag([Sparsity.diag(n),Sparsity.tril(n)]),
-        blkdiag([Sparsity.diag(n),Sparsity.tril(n).T]),
-        blkdiag([Sparsity.tril(n),Sparsity.tril(n).T]),
+        diagcat([Sparsity.diag(n),Sparsity.dense(n,n)]),
+        diagcat([Sparsity.diag(n),Sparsity.tril(n)]),
+        diagcat([Sparsity.diag(n),Sparsity.tril(n).T]),
+        diagcat([Sparsity.tril(n),Sparsity.tril(n).T]),
         Sparsity.diag(n)+Sparsity.rowcol([0],[n-1],n,n),
         Sparsity.diag(n)+Sparsity.rowcol([0,n-1],[n-1,0],n,n),
         Sparsity.diag(n)+Sparsity.triplet(n,n,[0],[n-1]),

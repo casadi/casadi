@@ -185,14 +185,14 @@ namespace casadi {
         input(LR_DPLE_H)  = DMatrix::zeros(horzcat(H_));
       }
     } else {
-      input(LR_DPLE_A)  = DMatrix::zeros(blkdiag(A_));
+      input(LR_DPLE_A)  = DMatrix::zeros(diagcat(A_));
     }
 
     /**for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
         input(1+i)  = DMatrix::zeros(horzcat(V_));
       } else {
-        input(1+i)  = DMatrix::zeros(blkdiag(V_));
+        input(1+i)  = DMatrix::zeros(diagcat(V_));
       }
     }*/
 
@@ -204,7 +204,7 @@ namespace casadi {
       if (const_dim_) {
         output(i) = DMatrix::zeros(horzcat(P));
       } else {
-        output(i) = DMatrix::zeros(blkdiag(P));
+        output(i) = DMatrix::zeros(diagcat(P));
       }
     }
 
@@ -238,25 +238,25 @@ namespace casadi {
     if (K==1) {
       A = As[0];
     } else {
-      Sparsity AL = blkdiag(vector_slice(As, range(As.size()-1)));
+      Sparsity AL = diagcat(vector_slice(As, range(As.size()-1)));
 
       Sparsity AL2 = horzcat(AL, Sparsity::sparse(AL.size1(), As[0].size2()));
       Sparsity AT = horzcat(Sparsity::sparse(As[0].size1(), AL.size2()), As.back());
       A = vertcat(AT, AL2);
     }
 
-    Sparsity V = blkdiag(Vs.back(), blkdiag(vector_slice(Vs, range(Vs.size()-1))));
+    Sparsity V = diagcat(Vs.back(), diagcat(vector_slice(Vs, range(Vs.size()-1))));
     Sparsity C;
 
     if (!st[LR_Dple_STRUCT_C].empty()) {
-      C = blkdiag(Cs.back(), blkdiag(vector_slice(Cs, range(Cs.size()-1))));
+      C = diagcat(Cs.back(), diagcat(vector_slice(Cs, range(Cs.size()-1))));
     }
     Sparsity H;
     std::vector<int> Hs_agg;
 
     std::vector<int> Hi(1, 0);
     if (Hs_.size()>0 && with_H) {
-      H = blkdiag(Hs.back(), blkdiag(vector_slice(Hs, range(Hs.size()-1))));
+      H = diagcat(Hs.back(), diagcat(vector_slice(Hs, range(Hs.size()-1))));
       casadi_assert(K==Hs_.size());
       for (int k=0;k<K;++k) {
         Hs_agg.insert(Hs_agg.end(), Hs_[k].begin(), Hs_[k].end());

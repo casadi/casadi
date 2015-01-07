@@ -474,8 +474,8 @@ def dpleIn(*dummy,**kwargs):
   
   Keyword arguments::
 
-    a -- A matrices (horzcat when const_dim, blkdiag otherwise) [DPLE_A]
-    v -- V matrices (horzcat when const_dim, blkdiag otherwise) [DPLE_V]
+    a -- A matrices (horzcat when const_dim, diagcat otherwise) [DPLE_A]
+    v -- V matrices (horzcat when const_dim, diagcat otherwise) [DPLE_V]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEInput,n)] for n in dummy[1:]]
@@ -524,7 +524,7 @@ def dpleOut(*dummy,**kwargs):
   
   Keyword arguments::
 
-    p -- Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [DPLE_P]
+    p -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [DPLE_P]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEOutput,n)] for n in dummy[1:]]
@@ -570,8 +570,8 @@ def dpleStruct(*dummy,**kwargs):
   
   Keyword arguments::
 
-    a -- Sparsities for A_i, blkdiag form [Dple_STRUCT_A]
-    v -- Sparsities for V_i, blkdiag form [Dple_STRUCT_V]
+    a -- Sparsities for A_i, block diagonal form [Dple_STRUCT_A]
+    v -- Sparsities for V_i, block diagonal form [Dple_STRUCT_V]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DpleVecStruct,n)] for n in dummy[1:]]
@@ -1346,7 +1346,7 @@ def lrdleOut(*dummy,**kwargs):
   
   Keyword arguments::
 
-    y -- Y matrix, blkdiag form [LR_DLE_Y]
+    y -- Y matrix, block diagonal form [LR_DLE_Y]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DLEOutput,n)] for n in dummy[1:]]
@@ -1440,8 +1440,8 @@ def lrdpleIn(*dummy,**kwargs):
   
   Keyword arguments::
 
-    a -- A matrices (horzcat when const_dim, blkdiag otherwise) [LR_DPLE_A]
-    v -- V matrices (horzcat when const_dim, blkdiag otherwise) [LR_DPLE_V]
+    a -- A matrices (horzcat when const_dim, diagcat otherwise) [LR_DPLE_A]
+    v -- V matrices (horzcat when const_dim, diagcat otherwise) [LR_DPLE_V]
     c -- C matrix [LR_DPLE_C]
     h -- H matrix: horizontal stack of all Hi [LR_DPLE_H]
   """
@@ -1498,7 +1498,7 @@ def lrdpleOut(*dummy,**kwargs):
   
   Keyword arguments::
 
-    y -- Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [LR_DPLE_Y]
+    y -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [LR_DPLE_Y]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DPLEOutput,n)] for n in dummy[1:]]
@@ -1544,10 +1544,10 @@ def lrdpleStruct(*dummy,**kwargs):
   
   Keyword arguments::
 
-    a -- Sparsities for A_i, blkdiag form [LR_Dple_STRUCT_A]
-    v -- Sparsities for V_i, blkdiag form [LR_Dple_STRUCT_V]
-    c -- Sparsities for C_i (defaults to unity), blkdiag form [LR_Dple_STRUCT_C]
-    h -- Sparsities for H_i (defaults to unity), blkdiag form [LR_Dple_STRUCT_H]
+    a -- Sparsities for A_i, block diagonal form [LR_Dple_STRUCT_A]
+    v -- Sparsities for V_i, block diagonal form [LR_Dple_STRUCT_V]
+    c -- Sparsities for C_i (defaults to unity), block diagonal form [LR_Dple_STRUCT_C]
+    h -- Sparsities for H_i (defaults to unity), block diagonal form [LR_Dple_STRUCT_H]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LrDpleVecStruct,n)] for n in dummy[1:]]

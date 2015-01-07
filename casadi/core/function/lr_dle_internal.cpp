@@ -213,7 +213,7 @@ namespace casadi {
       //   * norm_0 instead of constructing P
       Pprev = P;
       C = horzcat(C, mul(A, C));
-      V = blkdiag(V, V);
+      V = diagcat(V, V);
       A = mul(A, A);
       P = mul(mul(C, V), C.T());
     }
@@ -233,7 +233,7 @@ namespace casadi {
         sp[k] = mul(Hv_[k].T(), mul(P, Hv_[k]));
       }
 
-      return blkdiag(sp);
+      return diagcat(sp);
     } else {
       return P;
     }

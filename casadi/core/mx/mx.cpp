@@ -1386,17 +1386,6 @@ namespace casadi {
     return (*this)->getGetNonzeros(sp, mapping);
   }
 
-  MX MX::zz_blkdiag(const std::vector<MX> &A) {
-    return diagcat(A);
-  }
-
-  MX MX::zz_blkdiag(const MX& B) const {
-    std::vector<MX> ret;
-    ret.push_back(*this);
-    ret.push_back(B);
-    return blkdiag(ret);
-  }
-
   int MX::zz_countNodes() const {
     MXFunction f(vector<MX>(), *this);
     f.init();

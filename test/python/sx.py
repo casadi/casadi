@@ -1016,7 +1016,7 @@ class SXtests(casadiTestCase):
     
     x = SX.sym("x",2,2)
     y = SX.sym("y",2)
-    f = SXFunction([x,y],[eig_symbolic(blkdiag([x,c.diag(y)]))])
+    f = SXFunction([x,y],[eig_symbolic(diagcat([x,c.diag(y)]))])
     f.init()
     f.setInput(DMatrix([[2,0.1],[0.3,0.7]]),0)
     f.setInput([3,7],1)

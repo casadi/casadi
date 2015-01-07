@@ -123,7 +123,7 @@ void SdpSolverInternal::init() {
     full_blocks.push_back(SX::sym("block", block_sizes_[i], block_sizes_[i]));
   }
 
-  Pmapper_ = SXFunction(full_blocks, blkdiag(full_blocks)(lookupvector(p, p.size()),
+  Pmapper_ = SXFunction(full_blocks, diagcat(full_blocks)(lookupvector(p, p.size()),
                                                          lookupvector(p, p.size())));
   Pmapper_.init();
 

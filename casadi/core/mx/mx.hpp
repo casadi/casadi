@@ -413,8 +413,6 @@ namespace casadi {
     static MX zz_createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children);
     static MX zz_createParent(const std::vector<MX> &deps, std::vector<MX>& children);
     MX zz_diag() const;
-    static MX zz_blkdiag(const std::vector<MX> &A);
-    MX zz_blkdiag(const MX& B) const;
     int zz_countNodes() const;
     MX zz_sumCols() const;
     MX zz_sumRows() const;

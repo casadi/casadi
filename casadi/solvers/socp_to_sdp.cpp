@@ -139,7 +139,7 @@ namespace casadi {
         Fi_d.push_back(blockcat(Eik*MX::eye(ni_[i]), Gik, Gik.T(), Eik));
         i_start += ni_[i];
       }
-      Fi.push_back(blkdiag(Fi_d));
+      Fi.push_back(diagcat(Fi_d));
     }
     // The blocks that will end up on the diagonal of G of SDP
     std::vector<MX> G_d;
@@ -155,7 +155,7 @@ namespace casadi {
 
     std::vector<MX> out;
     out.push_back(-horzcat(Fi));
-    out.push_back(blkdiag(G_d));
+    out.push_back(diagcat(G_d));
 
     std::vector<MX> syms;
     syms.push_back(G);

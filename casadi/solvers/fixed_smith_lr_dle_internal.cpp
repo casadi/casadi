@@ -110,7 +110,7 @@ namespace casadi {
     if (with_C_) dle_in[LR_DLE_C] = C;
     if (with_H_) dle_in[LR_DLE_H] = H;
 
-    f_ = MXFunction(dle_in, lrdleOut("y", with_H_? blkdiag(HPH): out));
+    f_ = MXFunction(dle_in, lrdleOut("y", with_H_? diagcat(HPH): out));
     f_.init();
 
     Wrapper::checkDimensions();

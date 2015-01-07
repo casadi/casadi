@@ -107,13 +107,13 @@ namespace casadi {
       A = As;
     } else {
       if (form_==0) {
-        MX AL = blkdiag(vector_slice(As_, range(As_.size()-1)));
+        MX AL = diagcat(vector_slice(As_, range(As_.size()-1)));
 
         MX AL2 = horzcat(AL, MX::sparse(AL.size1(), As_[0].size2()));
         MX AT = horzcat(MX::sparse(As_[0].size1(), AL.size2()), As_.back());
         A = vertcat(AT, AL2);
       } else {
-        MX AL = blkdiag(reverse(vector_slice(As_, range(As_.size()-1))));
+        MX AL = diagcat(reverse(vector_slice(As_, range(As_.size()-1))));
 
         MX AL2 = horzcat(MX::sparse(AL.size1(), As_[0].size2()), AL);
         MX AT = horzcat(As_.back(), MX::sparse(As_[0].size1(), AL.size2()));
@@ -127,19 +127,19 @@ namespace casadi {
     MX H;
 
     if (form_==0) {
-      V = blkdiag(Vs_.back(), blkdiag(vector_slice(Vs_, range(Vs_.size()-1))));
+      V = diagcat(Vs_.back(), diagcat(vector_slice(Vs_, range(Vs_.size()-1))));
       if (with_C_) {
-        C = blkdiag(Cs_.back(), blkdiag(vector_slice(Cs_, range(Cs_.size()-1))));
+        C = diagcat(Cs_.back(), diagcat(vector_slice(Cs_, range(Cs_.size()-1))));
       }
     } else {
-      V = blkdiag(blkdiag(reverse(vector_slice(Vs_, range(Vs_.size()-1)))), Vs_.back());
+      V = diagcat(diagcat(reverse(vector_slice(Vs_, range(Vs_.size()-1)))), Vs_.back());
       if (with_C_) {
-        C = blkdiag(blkdiag(reverse(vector_slice(Cs_, range(Cs_.size()-1)))), Cs_.back());
+        C = diagcat(diagcat(reverse(vector_slice(Cs_, range(Cs_.size()-1)))), Cs_.back());
       }
     }
 
     if (with_H_) {
-      H = blkdiag(form_==0? Hs_ : reverse(Hs_));
+      H = diagcat(form_==0? Hs_ : reverse(Hs_));
     }
 
     // Create an LrDleSolver instance

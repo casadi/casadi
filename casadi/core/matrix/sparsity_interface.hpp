@@ -175,16 +175,16 @@ namespace casadi {
     }
 
     /** \brief Construct a matrix with given block on the diagonal */
-    inline friend MatType blkdiag(const std::vector<MatType> &A) {
-      return MatType::zz_blkdiag(A);
+    inline friend MatType diagcat(const std::vector<MatType> &A) {
+      return MatType::zz_diagcat(A);
     }
 
     /** \brief Concatenate along diagonal, two matrices */
-    inline friend MatType blkdiag(const MatType &x, const MatType &y) {
+    inline friend MatType diagcat(const MatType &x, const MatType &y) {
       std::vector<MatType> v(2);
       v[0] = x;
       v[1] = y;
-      return blkdiag(v);
+      return diagcat(v);
     }
 
     /** \brief  concatenate vertically while vectorizing all arguments with vec */

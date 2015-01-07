@@ -1117,7 +1117,7 @@ namespace casadi {
     }
   }
 
-  Sparsity Sparsity::zz_blkdiag(const std::vector< Sparsity > &v) {
+  Sparsity Sparsity::zz_diagcat(const std::vector< Sparsity > &v) {
     int n = 0;
     int m = 0;
 

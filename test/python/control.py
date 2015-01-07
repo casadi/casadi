@@ -279,12 +279,12 @@ class ControlTests(casadiTestCase):
 
         N = 100
         
-        V = blkdiag([Vs_[-1],blkdiag(Vs_[:-1])])
+        V = diagcat([Vs_[-1],diagcat(Vs_[:-1])])
         
-        Hn = blkdiag(Hs_)
-        An = blockcat([[MX.sparse(n,(K-1)*n),As_[-1]],[blkdiag(As_[:-1]),MX.sparse((K-1)*n,n)]])
-        Cn = blkdiag([Cs_[-1],blkdiag(Cs_[:-1])]) if with_C else None
-        Vn = blkdiag([Vs_[-1],blkdiag(Vs_[:-1])])
+        Hn = diagcat(Hs_)
+        An = blockcat([[MX.sparse(n,(K-1)*n),As_[-1]],[diagcat(As_[:-1]),MX.sparse((K-1)*n,n)]])
+        Cn = diagcat([Cs_[-1],diagcat(Cs_[:-1])]) if with_C else None
+        Vn = diagcat([Vs_[-1],diagcat(Vs_[:-1])])
 
         D = [Cn if with_C else DMatrix.eye(n*K)]
         for i in range(N):
@@ -298,9 +298,9 @@ class ControlTests(casadiTestCase):
 
       
         if with_H:
-          Y = [ blkdiag([ mul([mul(Li.T,DD),blkdiag([Vn]*(N+1)),mul(DD.T,Li)]) for Li in horzsplit(Hnn,Ls)]) for Hnn in horzsplit(Hn,__builtin__.sum(h))]
+          Y = [ diagcat([ mul([mul(Li.T,DD),diagcat([Vn]*(N+1)),mul(DD.T,Li)]) for Li in horzsplit(Hnn,Ls)]) for Hnn in horzsplit(Hn,__builtin__.sum(h))]
         else: 
-          Y = diagsplit(mul([DD,blkdiag([Vn]*(N+1)),DD.T]),n)
+          Y = diagsplit(mul([DD,diagcat([Vn]*(N+1)),DD.T]),n)
         
         
         if with_C:
@@ -411,20 +411,20 @@ class ControlTests(casadiTestCase):
         Ls = [0]+list(numpy.cumsum(h))
       
         if with_H:
-          Y = [ mul([mul(Li.T,DD),blkdiag([V]*(N+1)),mul(DD.T,Li)]) for Li in horzsplit(H,Ls)]
+          Y = [ mul([mul(Li.T,DD),diagcat([V]*(N+1)),mul(DD.T,Li)]) for Li in horzsplit(H,Ls)]
         else: 
-          Y = [ mul([DD,blkdiag([V]*(N+1)),DD.T]) ]
+          Y = [ mul([DD,diagcat([V]*(N+1)),DD.T]) ]
         
         if with_C:
           if with_H:
-            f = MXFunction(lrdleIn(a=A,c=C,v=Vs,h=H),[blkdiag(Y)])
+            f = MXFunction(lrdleIn(a=A,c=C,v=Vs,h=H),[diagcat(Y)])
           else:
-            f = MXFunction(lrdleIn(a=A,c=C,v=Vs),[blkdiag(Y)])
+            f = MXFunction(lrdleIn(a=A,c=C,v=Vs),[diagcat(Y)])
         else:
           if with_H:
-            f = MXFunction(lrdleIn(a=A,v=Vs,h=H),[blkdiag(Y)])
+            f = MXFunction(lrdleIn(a=A,v=Vs,h=H),[diagcat(Y)])
           else:
-            f = MXFunction(lrdleIn(a=A,v=Vs),[blkdiag(Y)])
+            f = MXFunction(lrdleIn(a=A,v=Vs),[diagcat(Y)])
         f.init()
         
         
@@ -596,7 +596,7 @@ class ControlTests(casadiTestCase):
           Vss = horzcat([(i+i.T)/2 for i in isigma(list(horzsplit(Vs,n))) ])
           
           
-          AA = blkdiag([c.kron(i,i) for i in horzsplit(As,n)])
+          AA = diagcat([c.kron(i,i) for i in horzsplit(As,n)])
 
           A_total = DMatrix.eye(n*n*K) - vertcat([AA[-n*n:,:],AA[:-n*n,:]])
           
@@ -615,13 +615,13 @@ class ControlTests(casadiTestCase):
           refsol.evaluate()
           Xref = list(horzsplit(refsol.getOutput(),n))
           
-          a0 = (mul([blkdiag(A_),blkdiag(X),blkdiag(A_).T])+blkdiag(V_))
-          a0ref = (mul([blkdiag(A_),blkdiag(Xref),blkdiag(A_).T])+blkdiag(V_))
+          a0 = (mul([diagcat(A_),diagcat(X),diagcat(A_).T])+diagcat(V_))
+          a0ref = (mul([diagcat(A_),diagcat(Xref),diagcat(A_).T])+diagcat(V_))
           
 
             
-          a1 = blkdiag(sigma(X))
-          a1ref = blkdiag(sigma(Xref))
+          a1 = diagcat(sigma(X))
+          a1ref = diagcat(sigma(Xref))
 
           self.checkarray(a0ref,a1ref,failmessage=str(Solver))
           self.checkarray(a0,a1,failmessage=str(Solver))

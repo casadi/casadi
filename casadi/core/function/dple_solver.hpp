@@ -51,16 +51,16 @@ namespace casadi {
 
   /// Input arguments of a \e dple solver [dpleIn]
   enum DPLEInput {
-    /// A matrices (horzcat when const_dim, blkdiag otherwise) [a]
+    /// A matrices (horzcat when const_dim, diagcat otherwise) [a]
     DPLE_A,
-    /// V matrices (horzcat when const_dim, blkdiag otherwise) [v]
+    /// V matrices (horzcat when const_dim, diagcat otherwise) [v]
     DPLE_V,
     DPLE_NUM_IN
   };
 
   /// Output arguments of a \e dple solver [dpleOut]
   enum DPLEOutput {
-    /// Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [p]
+    /// Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [p]
     DPLE_P,
     /// Number of arguments.
     DPLE_NUM_OUT
@@ -68,9 +68,9 @@ namespace casadi {
 
   /// Structure specification of a DPLE [dpleStruct]
   enum DpleVecStruct {
-    /// Sparsities for A_i, blkdiag form [a]
+    /// Sparsities for A_i, block diagonal form [a]
     Dple_STRUCT_A,
-    /// Sparsities for V_i, blkdiag form [v]
+    /// Sparsities for V_i, block diagonal form [v]
     Dple_STRUCT_V,
     Dple_STRUCT_NUM};
 

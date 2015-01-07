@@ -40,7 +40,7 @@ MatType blockcat(const std::vector< std::vector<MatType > > &v);
 std::vector< std::vector< MatType > >
 blocksplit(const MatType& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
 std::vector< std::vector< MatType > > blocksplit(const MatType& x, int vert_incr=1, int horz_incr=1);
-MatType blkdiag(const std::vector< MatType > &v);
+MatType diagcat(const std::vector< MatType > &v);
 MatType veccat(const std::vector< MatType >& x);
 MatType vecNZcat(const std::vector< MatType >& x);
 MatType mul(const MatType &x, const MatType &y);

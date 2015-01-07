@@ -144,7 +144,7 @@ namespace casadi {
       sp.push_back(x[i].sparsity());
     }
 
-    setSparsity(blkdiag(sp));
+    setSparsity(diagcat(sp));
   }
 
   void Diagcat::printPart(std::ostream &stream, int part) const {

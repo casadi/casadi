@@ -104,8 +104,8 @@
     \endverbatim
 
     You can cast this into the standard form with:
-    G  = blkdiag(Gj for all j)
-    Fi = blkdiag(F_ij for all j)
+    G  = diagcat(Gj for all j)
+    Fi = diagcat(F_ij for all j)
 
     Implementations of SdpSolver are encouraged to exploit this block structure.
 

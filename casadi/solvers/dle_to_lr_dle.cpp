@@ -99,7 +99,7 @@ namespace casadi {
     }
 
     f_ = MXFunction(lrdpleIn("a", A, "v", V, "c", C, "h", H),
-                    lrdleOut("y", blkdiag(HPH)));
+                    lrdleOut("y", diagcat(HPH)));
     f_.init();
 
     Wrapper::checkDimensions();

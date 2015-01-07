@@ -85,18 +85,18 @@ namespace casadi {
       MX gk = vertcat(g_socp(ALL, k), MX::sparse(1, 1));
       MX fk = -blockcat(znp, gk, gk.T(), MX::sparse(1, 1));
       // TODO(Joel): replace with ALL
-      fi.push_back(blkdiag(f_sdqp(ALL, Slice(f_sdqp.size1()*k, f_sdqp.size1()*(k+1))), fk));
+      fi.push_back(diagcat(f_sdqp(ALL, Slice(f_sdqp.size1()*k, f_sdqp.size1()*(k+1))), fk));
     }
     MX fin = en_socp*DMatrix::eye(n_+2);
     fin(n_, n_+1) = en_socp;
     fin(n_+1, n_) = en_socp;
 
-    fi.push_back(blkdiag(DMatrix::sparse(f_sdqp.size1(), f_sdqp.size1()), -fin));
+    fi.push_back(diagcat(DMatrix::sparse(f_sdqp.size1(), f_sdqp.size1()), -fin));
 
     MX h0 = vertcat(h_socp, DMatrix::sparse(1, 1));
     MX g = blockcat(f_socp*DMatrix::eye(n_+1), h0, h0.T(), f_socp);
 
-    g = blkdiag(g_sdqp, g);
+    g = diagcat(g_sdqp, g);
 
     IOScheme mappingIn("g_socp", "h_socp", "f_sdqp", "g_sdqp");
     IOScheme mappingOut("f", "g");

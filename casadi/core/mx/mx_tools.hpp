@@ -38,12 +38,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief  concatenate diagonally
-  *
-  *  diagcat(diagsplit(x, ...)) = x
-  */
-  inline MX diagcat(const std::vector<MX>& x) { return MX::zz_diagcat(x);}
-
   /** \brief  Frobenius norm  */
   inline MX norm_F(const MX &x) { return x.zz_norm_F();}
 

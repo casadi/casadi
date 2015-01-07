@@ -102,14 +102,14 @@ namespace casadi {
     if (const_dim_) {
       input(0)  = DMatrix::zeros(horzcat(A_));
     } else {
-      input(0)  = DMatrix::zeros(blkdiag(A_));
+      input(0)  = DMatrix::zeros(diagcat(A_));
     }
 
     for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
         input(1+i)  = DMatrix::zeros(horzcat(V_));
       } else {
-        input(1+i)  = DMatrix::zeros(blkdiag(V_));
+        input(1+i)  = DMatrix::zeros(diagcat(V_));
       }
     }
 
@@ -121,7 +121,7 @@ namespace casadi {
       if (const_dim_) {
         output(i) = DMatrix::zeros(horzcat(P));
       } else {
-        output(i) = DMatrix::zeros(blkdiag(P));
+        output(i) = DMatrix::zeros(diagcat(P));
       }
     }
 

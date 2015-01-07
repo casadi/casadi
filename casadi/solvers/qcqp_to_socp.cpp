@@ -187,7 +187,7 @@ namespace casadi {
 
       // Harvest Cholsesky sparsity patterns
       // Note that we add extra scalar to make room for the epigraph-reformulation variable
-      socp_g.push_back(blkdiag(
+      socp_g.push_back(diagcat(
         cholesky_[i].getFactorizationSparsity(false), Sparsity::dense(1, 1)));
     }
 
