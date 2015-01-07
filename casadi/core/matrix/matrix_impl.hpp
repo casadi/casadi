@@ -2623,14 +2623,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_blockcat(const Matrix<DataType> &A,
-                                              const Matrix<DataType> &B,
-                                              const Matrix<DataType> &C,
-                                              const Matrix<DataType> &D) {
-    return vertcat(horzcat(A, B), horzcat(C, D));
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_horzcat(const std::vector<Matrix<DataType> > &v) {
     Matrix<DataType> ret;
     for (int i=0; i<v.size(); ++i)

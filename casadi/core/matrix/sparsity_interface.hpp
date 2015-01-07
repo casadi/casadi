@@ -124,6 +124,19 @@ namespace casadi {
       return vertsplit(v, offset1);
     }
 
+    /** \brief Construct a matrix from a list of list of blocks.
+     */
+    inline friend MatType blockcat(const std::vector< std::vector<MatType > > &v) {
+      return MatType::zz_blockcat(v);
+    }
+
+    /** \brief Construct a matrix from 4 blocks
+     */
+    inline friend MatType blockcat(const MatType &A, const MatType &B,
+                                   const MatType &C, const MatType &D) {
+      return vertcat(horzcat(A, B), horzcat(C, D));
+    }
+
     /** \brief Construct a matrix with given block on the diagonal */
     inline friend MatType blkdiag(const std::vector<MatType> &A) {
       return MatType::zz_blkdiag(A);

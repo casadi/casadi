@@ -39,12 +39,6 @@ namespace casadi {
 @{
 */
 
-  /** \brief Construct a matrix from a list of list of blocks.
-  *
-  *   blockcat(blocksplit(x,..., ...)) = x
-  */
-  inline MX blockcat(const std::vector< std::vector<MX > > &v) { return MX::zz_blockcat(v);}
-
   /** \brief  chop up into blocks
   * \brief vert_offset Defines the boundaries of the block cols
   * \brief horz_offset Defines the boundaries of the block rows
@@ -67,13 +61,6 @@ namespace casadi {
   blocksplit(const MX& x, int vert_incr = 1, int horz_incr = 1) {
     return x.zz_blocksplit(vert_incr, horz_incr);
   }
-
-#ifndef SWIG
-  /** \brief Construct a matrix from a list of list of blocks.*/
-  inline MX blockcat(const MX &A, const MX &B, const MX &C, const MX &D) {
-    return MX::zz_blockcat(A, B, C, D);
-  }
-#endif // SWIG
 
   /** \brief  concatenate diagonally
   *

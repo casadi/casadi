@@ -38,6 +38,7 @@ std::vector<MatType > horzsplit(const MatType &v, int incr=1);
 std::vector<MatType > vertsplit(const MatType &v,
                                 const std::vector<int>& offset);
 std::vector<MatType > vertsplit(const MatType &v, int incr=1);
+MatType blockcat(const std::vector< std::vector<MatType > > &v);
 MatType blkdiag(const std::vector< MatType > &v);
 MatType mul(const MatType &x, const MatType &y);
 MatType mul(const MatType &x, const MatType &y, const MatType &z);

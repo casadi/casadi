@@ -498,10 +498,6 @@ namespace casadi {
     Matrix<DataType> zz_vec() const;
     Matrix<DataType> zz_vecNZ() const;
     static Matrix<DataType> zz_blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
-    static Matrix<DataType> zz_blockcat(const Matrix<DataType> &A,
-                                     const Matrix<DataType> &B,
-                                     const Matrix<DataType> &C,
-                                     const Matrix<DataType> &D);
     static Matrix<DataType> zz_horzcat(const std::vector<Matrix<DataType> > &v);
     std::vector<Matrix<DataType> > zz_horzsplit(const std::vector<int>& offset) const;
     static Matrix<DataType> zz_vertcat(const std::vector<Matrix<DataType> > &v);

@@ -40,23 +40,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief Construct a matrix from a list of list of blocks.
-   */
-  template<typename DataType>
-  Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
-    return Matrix<DataType>::zz_blockcat(v);
-  }
-
-#ifndef SWIG
-  /** \brief Construct a matrix from 4 blocks
-   */
-  template<typename DataType>
-  Matrix<DataType> blockcat(const Matrix<DataType> &A, const Matrix<DataType> &B,
-                            const Matrix<DataType> &C, const Matrix<DataType> &D) {
-    return Matrix<DataType>::zz_blockcat(A, B, C, D);
-  }
-#endif // SWIG
-
   /** \brief  chop up into blocks
    * \param vert_offset Defines the boundaries of the block rows
    * \param horz_offset Defines the boundaries of the block columns

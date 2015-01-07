@@ -1192,4 +1192,11 @@ namespace casadi {
     return ret;
   }
 
+  Sparsity Sparsity::zz_blockcat(const std::vector< std::vector< Sparsity > > &v) {
+    std::vector< Sparsity > ret;
+    for (int i=0; i<v.size(); ++i)
+      ret.push_back(horzcat(v[i]));
+    return vertcat(ret);
+  }
+
 } // namespace casadi

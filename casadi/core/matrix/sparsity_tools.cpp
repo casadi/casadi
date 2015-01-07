@@ -47,13 +47,6 @@ namespace casadi {
     return coarse_colblock.at(3);
   }
 
-  Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v) {
-    std::vector< Sparsity > ret;
-    for (int i=0; i<v.size(); ++i)
-      ret.push_back(horzcat(v[i]));
-    return vertcat(ret);
-  }
-
   std::vector<Sparsity> diagsplit(const Sparsity& sp,
      const std::vector<int>& offset1,
      const std::vector<int>& offset2) {

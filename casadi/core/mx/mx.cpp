@@ -1250,10 +1250,6 @@ namespace casadi {
     return vertcat(rows);
   }
 
-  MX MX::zz_blockcat(const MX &A, const MX &B, const MX &C, const MX &D) {
-    return vertcat(horzcat(A, B), horzcat(C, D));
-  }
-
   MX MX::zz_norm_2() const {
     if (isVector()) {
       return norm_F(*this);

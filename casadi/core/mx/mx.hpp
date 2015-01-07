@@ -398,7 +398,6 @@ namespace casadi {
     std::vector< std::vector<MX > > zz_blocksplit(int vert_incr=1, int horz_incr=1) const;
     static MX zz_veccat(const std::vector<MX>& comp);
     static MX zz_vecNZcat(const std::vector<MX>& comp);
-    static MX zz_blockcat(const MX &A, const MX &B, const MX &C, const MX &D);
     static MX zz_blockcat(const std::vector< std::vector<MX > > &v);
     MX zz_norm_2() const;
     MX zz_norm_F() const;

@@ -42,10 +42,6 @@ namespace casadi {
   /** \brief Vectorize the pattern */
   CASADI_EXPORT Sparsity vec(const Sparsity& a);
 
-  /** \brief Construct a sparsity from a list of list of sparsities.
-   */
-  CASADI_EXPORT Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
-
   /** \brief Split up a sparsity pattern diagonally */
   CASADI_EXPORT
     std::vector<Sparsity> diagsplit(const Sparsity& sp,
