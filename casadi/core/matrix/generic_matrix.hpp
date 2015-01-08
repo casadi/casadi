@@ -280,6 +280,27 @@ namespace casadi {
     /** \brief Return a row-wise summation of elements */
     inline friend MatType sumRows(const MatType &x) { return x.zz_sumRows();}
 
+    /** \brief Inner product of two matrices
+        Equals
+        \code
+        sumAll(x*y)
+        \endcode
+        with x and y matrices of the same dimension
+    */
+    inline friend MatType inner_prod(const MatType &x, const MatType &y) {
+      return x.zz_inner_prod(y);
+    }
+
+    /** \brief  Take the outer product of two vectors
+        Equals
+        \code
+        x*y.T()
+        \endcode
+        with x and y vectors
+    */
+    inline friend MatType outer_prod(const MatType &x, const MatType &y) {
+      return x.zz_outer_prod(y);
+    }
 #endif // SWIG
 
     /** @name Construct symbolic primitives

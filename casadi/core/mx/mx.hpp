@@ -336,8 +336,8 @@ namespace casadi {
     MX __constpow__(const MX& b) const;
     MX __mrdivide__(const MX& b) const;
     MX zz_mpower(const MX& b) const;
-    MX inner_prod(const MX& y) const;
-    MX outer_prod(const MX& y) const;
+    MX zz_inner_prod(const MX& y) const;
+    MX zz_outer_prod(const MX& y) const;
     MX constpow(const MX& y) const;
     MX zz_min(const MX& y) const;
     MX zz_max(const MX& y) const;

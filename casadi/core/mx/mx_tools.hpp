@@ -37,24 +37,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief  Take the inner product of two vectors
-      Equals
-      \code
-      trans(x)*y
-      \endcode
-      with x and y vectors
-  */
-  inline MX inner_prod(const MX &x, const MX &y) { return x.inner_prod(y);}
-
-  /** \brief  Take the outer product of two vectors
-      Equals
-      \code
-      x*trans(y)
-      \endcode
-      with x and y vectors
-  */
-  inline MX outer_prod(const MX &x, const MX &y) { return x.outer_prod(y);}
-
   /** \brief Branching on MX nodes
       Ternary operator, "cond ? if_true : if_false"
   */

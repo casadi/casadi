@@ -616,11 +616,11 @@ namespace casadi {
     }
   }
 
-  MX MX::inner_prod(const MX& y) const {
+  MX MX::zz_inner_prod(const MX& y) const {
     return (*this)->getInnerProd(y);
   }
 
-  MX MX::outer_prod(const MX& y) const {
+  MX MX::zz_outer_prod(const MX& y) const {
     return mul(*this, y.T());
   }
 

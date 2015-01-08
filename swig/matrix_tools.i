@@ -37,8 +37,6 @@
 
 // Define template instantiations
 %define MATRIX_TOOLS_TEMPLATES(DataType)
-  MTT_INST(DataType, inner_prod)
-  MTT_INST(DataType, outer_prod)
   MTT_INST(DataType, norm_0_mul_nn)
   MTT_INST(DataType, qr)
   MTT_INST(DataType, nullspace)
@@ -113,6 +111,8 @@ MatType norm_inf(const MatType &x);
 MatType sumAll(const MatType &x);
 MatType sumCols(const MatType &x);
 MatType sumRows(const MatType &x);
+MatType inner_prod(const MatType &x, const MatType &y);
+MatType outer_prod(const MatType &x, const MatType &y);
 %enddef
 
 %define MATRIX_DECL(MatType...)

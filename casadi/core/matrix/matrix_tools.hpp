@@ -37,31 +37,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief Inner product of two matrices
-      Equals
-      \code
-      sumAll(x*y)
-      \endcode
-      with x and y matrices of the same dimension
-  */
-  // inner product
-  template<typename DataType>
-  Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return x.zz_inner_prod(y);
-  }
-
-  /** \brief Outer product of two vectors
-      Equals
-      \code
-      x*transpose(y)
-      \endcode
-      with x and y vectors
-  */
-  template<typename DataType>
-  Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-    return x.zz_outer_prod(y);
-  }
-
   /** \brief  QR factorization using the modified Gram-Schmidt algorithm
    * More stable than the classical Gram-Schmidt, but may break down if the rows of A
    * are nearly linearly dependent
