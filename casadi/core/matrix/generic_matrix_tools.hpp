@@ -54,12 +54,6 @@ namespace casadi {
   template<typename MatType>
   MatType triu2symm(const GenericMatrix<MatType> &a);
 
-  /** \brief Check if two expressions are equal, assuming that they are comparable */
-  template<typename MatType>
-  bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y) {
-    return mat(x).isEqual(mat(y));
-  }
-
 #ifndef SWIG
   // Implementations
   template<typename MatType>

@@ -401,6 +401,7 @@ namespace casadi {
     Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mpower(const Matrix<DataType> &y) const;
     Matrix<DataType> __mrdivide__(const Matrix<DataType> &y) const;
+    bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
     ///@}
 
     /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
@@ -775,13 +776,6 @@ namespace casadi {
     /** \brief  check if the matrix is an identity matrix (note that false negative answers
      * are possible)*/
     bool isIdentity() const;
-
-    /** \brief Check if two expressions are equal
-     *  May give false negatives
-     *
-     *  Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
-     */
-    bool isEqual(const Matrix<DataType> &ex2) const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool hasNonStructuralZeros() const;

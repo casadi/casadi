@@ -507,22 +507,22 @@ namespace casadi {
       // Handle special operations (independent of type)
       switch (op) {
       case OP_ADD:
-        if (y.isEqual(this, maxDepth())) return getUnary(OP_TWICE);
+        if (y.zz_isEqual(this, maxDepth())) return getUnary(OP_TWICE);
         break;
       case OP_SUB:
       case OP_NE:
       case OP_LT:
-        if (y.isEqual(this, maxDepth())) return MX::zeros(sparsity());
+        if (y.zz_isEqual(this, maxDepth())) return MX::zeros(sparsity());
         break;
       case OP_DIV:
         if (y->isZero()) return MX::nan(sparsity());
         // fall-through
       case OP_EQ:
       case OP_LE:
-        if (y.isEqual(this, maxDepth())) return MX::ones(sparsity());
+        if (y.zz_isEqual(this, maxDepth())) return MX::ones(sparsity());
         break;
       case OP_MUL:
-        if (y.isEqual(this, maxDepth())) return getUnary(OP_SQ);
+        if (y.zz_isEqual(this, maxDepth())) return getUnary(OP_SQ);
         break;
       default: break; // no rule
       }
@@ -621,7 +621,7 @@ namespace casadi {
     if (getOp()!=node->getOp() || ndep()!=node->ndep())
       return false;
     for (int i=0; i<ndep(); ++i) {
-      if (!dep(i).isEqual(node->dep(i), depth-1))
+      if (!isEqual(dep(i), node->dep(i), depth-1))
         return false;
     }
     return true;

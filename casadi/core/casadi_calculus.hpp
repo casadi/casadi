@@ -301,6 +301,9 @@ namespace casadi {
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}
 
+  /// Compare if two values are equal, up to a depth
+  inline bool isEqual(double x, double y, int depth=0) { return x==y;}
+
   /// __copysign__ function
   template<class T> T copysign(const T &x, const T &y) {return x.__copysign__(y);}
 

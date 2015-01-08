@@ -56,7 +56,7 @@ namespace casadi {
       \date 2010-2014
   */
   class CASADI_EXPORT SXElement : public GenericExpression<SXElement>,
-                                       public PrintableObject<SXElement> {
+                                  public PrintableObject<SXElement> {
     friend class SXNode;
     friend class BinarySXNode;
     friend class Matrix<SXElement>;
@@ -160,16 +160,6 @@ namespace casadi {
     /// Checks if expression does not contain NaN or Inf
     bool isRegular() const;
 
-    /** \brief Check if two nodes are equivalent up to a given depth.
-     *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
-     *
-     *  a = x*x
-     *  b = x*x
-     *
-     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
-     */
-    bool isEqual(const SXElement& scalar, int depth=0) const;
-
     /** \brief Check if a value is always nonnegative (false negatives are allowed) */
     bool isNonNegative() const;
 
@@ -251,6 +241,7 @@ namespace casadi {
     Matrix<SXElement> constpow(const Matrix<SXElement>& n) const;
     Matrix<SXElement> __copysign__(const Matrix<SXElement>& n) const;
     Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;
+    bool zz_isEqual(const SXElement& scalar, int depth=0) const;
 
     /// \cond INTERNAL
     /// Get the temporary variable

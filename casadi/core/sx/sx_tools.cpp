@@ -38,7 +38,7 @@ namespace casadi {
     casadi_assert_message(w.isEmpty(), "gauss_quadrature: empty weights");
 
     // Change variables to [-1, 1]
-    if (!a.toScalar().isEqual(-1) || !b.toScalar().isEqual(1)) {
+    if (!isEqual(a.toScalar(), -1) || !isEqual(b.toScalar(), 1)) {
       SX q1 = (b-a)/2;
       SX q2 = (b+a)/2;
 
@@ -160,7 +160,7 @@ namespace casadi {
     // Quick return if all equal
     bool all_equal = true;
     for (int k=0; k<v.size(); ++k) {
-      if (!v[k].isEqual(vdef[k])) {
+      if (v[k].shape()!=vdef[k].shape() || !isEqual(v[k], vdef[k])) {
         all_equal = false;
         break;
       }
@@ -340,7 +340,7 @@ namespace casadi {
 #if 0
         // Find out if the switch has already been added
         for (int j=0; j<bexpr.size(); ++j)
-          if (bexpr[j].isEqual(algorithm[i]->child0)) {
+          if (isEqual(bexpr[j], algorithm[i]->child0)) {
             sw = bvar[j];
             break;
           }
@@ -1198,7 +1198,7 @@ namespace casadi {
       ret.append(-p - q + r -s);
 
       return ret;
-    } else if (p(p.size()-1).at(0).isEqual(0)) {
+    } else if (isEqual(p(p.size()-1).at(0), 0)) {
       SX ret = poly_roots(p(range(p.size()-1)));
       ret.append(0);
       return ret;

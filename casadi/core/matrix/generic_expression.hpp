@@ -100,6 +100,17 @@ class CASADI_EXPORT GenericExpression {
     /// Logic or
     inline friend ExType operator||(const ExType &x, const ExType &y) { return x.zz_or(y); }
 
+    /** \brief Check if two nodes are equivalent up to a given depth.
+     *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
+     *
+     *  a = x*x
+     *  b = x*x
+     *
+     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
+     */
+    inline friend bool isEqual(const ExType& x, const ExType& y, int depth=0) {
+      return x.zz_isEqual(y, depth);
+    }
     #endif // SWIG
 
     // \cond SWIGINTERNAL

@@ -75,6 +75,7 @@ MatType cross(const MatType &a, const MatType &b, int dim = -1);
 MatType det(const MatType& A);
 MatType inv(const MatType& A);
 MatType trace(const MatType& a);
+bool isEqual(const MatType& x, const MatType& y, int depth=0);
 %enddef
 
 %define MATRIX_DECL(MatType...)
@@ -94,7 +95,6 @@ SPARSITY_INTERFACE_DECL(MatType)
 GENERIC_MATRIX_DECL(MatType)
 GMTT_INST(MatType, tril2symm)
 GMTT_INST(MatType, triu2symm)
-GMTT_INST(MatType, isEqual)
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)

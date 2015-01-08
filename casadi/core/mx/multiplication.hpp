@@ -83,7 +83,7 @@ namespace casadi {
     virtual int numInplace() const { return 1;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const
+    virtual bool zz_isEqual(const MXNode* node, int depth) const
     { return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;}
 
     /// Get number of temporary variables needed

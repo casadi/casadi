@@ -215,12 +215,12 @@ namespace casadi {
 
     switch (op_) {
     case OP_ADD:
-      if (op==OP_SUB && y.isEqual(dep(0), maxDepth())) return dep(1);
-      if (op==OP_SUB && y.isEqual(dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && isEqual(y, dep(0), maxDepth())) return dep(1);
+      if (op==OP_SUB && isEqual(y, dep(1), maxDepth())) return dep(0);
       break;
     case OP_SUB:
-      if (op==OP_SUB && y.isEqual(dep(0), maxDepth())) return -dep(1);
-      if (op==OP_ADD && y.isEqual(dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && isEqual(y, dep(0), maxDepth())) return -dep(1);
+      if (op==OP_ADD && isEqual(y, dep(1), maxDepth())) return dep(0);
       break;
     default: break; // no rule
     }

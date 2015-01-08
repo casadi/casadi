@@ -69,7 +69,7 @@ virtual bool isConstant() const { return true; }
 virtual int getOp() const { return OP_CONST;}
 
 /** \brief Check if two nodes are equivalent up to a given depth */
-virtual bool isEqual(const SXNode* node, int depth) const {
+virtual bool zz_isEqual(const SXNode* node, int depth) const {
   const ConstantSX* n = dynamic_cast<const ConstantSX*>(node);
   return n && n->getValue()==getValue();
 }

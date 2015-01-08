@@ -404,7 +404,7 @@ namespace casadi {
     stream << "*rr++ = *tt;" << endl;
   }
 
-  bool GetNonzerosVector::isEqual(const MXNode* node, int depth) const {
+  bool GetNonzerosVector::zz_isEqual(const MXNode* node, int depth) const {
     // Check dependencies
     if (!sameOpAndDeps(node, depth)) return false;
 
@@ -422,7 +422,7 @@ namespace casadi {
     return true;
   }
 
-  bool GetNonzerosSlice::isEqual(const MXNode* node, int depth) const {
+  bool GetNonzerosSlice::zz_isEqual(const MXNode* node, int depth) const {
     // Check dependencies
     if (!sameOpAndDeps(node, depth)) return false;
 
@@ -439,7 +439,7 @@ namespace casadi {
     return true;
   }
 
-  bool GetNonzerosSlice2::isEqual(const MXNode* node, int depth) const {
+  bool GetNonzerosSlice2::zz_isEqual(const MXNode* node, int depth) const {
     // Check dependencies
     if (!sameOpAndDeps(node, depth)) return false;
 

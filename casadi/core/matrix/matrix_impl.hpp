@@ -2345,11 +2345,23 @@ namespace casadi {
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isEqual(const Matrix<DataType> &ex2) const {
-    // TODO(@jaeandersson): Very inefficient, refactor
-    if ((size()!=0 || ex2.size()!=0) && shape()!=ex2.shape()) return false;
-    Matrix<DataType> difference = *this - ex2;
-    return difference.isZero();
+  bool Matrix<DataType>::zz_isEqual(const Matrix<DataType> &ex2, int depth) const {
+    // Assert matching dimensions
+    casadi_assert_message(shape() == ex2.shape(), "Dimension mismatch");
+
+    // Project to union of patterns and call recursively if different sparsity
+    if (sparsity() != ex2.sparsity()) {
+      Sparsity sp = sparsity() + ex2.sparsity();
+      return isEqual(setSparse(sp), ex2.setSparse(sp), depth);
+    }
+
+    // Check individual elements
+    for (int k=0; k<size(); ++k) {
+      if (!isEqual(at(k), ex2.at(k), depth)) return false;
+    }
+
+    // True if reched this point
+    return true;
   }
 
   template<typename DataType>
