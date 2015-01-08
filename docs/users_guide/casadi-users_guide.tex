@@ -394,13 +394,13 @@ The following list summarizes the most commonly used ways of constructing new sp
   \item[\texttt{Sparsity.dense}(\emph{n,m})]: Create a dense \emph{n}-by-\emph{m} sparsity pattern
   \item[\texttt{Sparsity.sparse}(\emph{n,m})]: Create a sparse \emph{n}-by-\emph{m} sparsity pattern
   \item[\texttt{Sparsity.diag}(\emph{n})]: Create a diagonal \emph{n}-by-\emph{n} sparsity pattern
-  \item[\texttt{Sparsity.triu}(\emph{n})]: Create an upper triangular \emph{n}-by-\emph{n} sparsity pattern
-  \item[\texttt{Sparsity.tril}(\emph{n})]: Create a lower triangular \emph{n}-by-\emph{n} sparsity pattern
+  \item[\texttt{Sparsity.upper}(\emph{n})]: Create an upper triangular \emph{n}-by-\emph{n} sparsity pattern
+  \item[\texttt{Sparsity.lower}(\emph{n})]: Create a lower triangular \emph{n}-by-\emph{n} sparsity pattern
 \end{description}
 
 The \texttt{Sparsity} class can be used to create non-standard matrices, e.g.
 \begin{pytex}
-print SX.sym("x",Sparsity.tril(3))
+print SX.sym("x",Sparsity.lower(3))
 \end{pytex}
 
 %% \chapter{Overview of operations}
@@ -412,7 +412,7 @@ print SX.sym("x",Sparsity.tril(3))
 %%   \item[\texttt{Sparsity.dense}(\emph{nrow,ncol})]: Create a dense \emph{nrow}-by-\emph{ncol} pattern
 %%   \item[\texttt{Sparsity.sparse(\emph{nrow,ncol})}]: Create a sparse \emph{nrow}-by-\emph{ncol} pattern
 %%   \item[\texttt{Sparsity.diag(\emph{n})}]: Create a square \emph{n}-by-\emph{n} diagonal pattern
-%%   \item[\texttt{Sparsity.triu(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} upper triangular pattern
+%%   \item[\texttt{Sparsity.upper(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} upper triangular pattern
 %% \end{description}
 
 %% \section{Creating matrices}
@@ -705,8 +705,8 @@ print jacobian(mul(A,x),x)
 %% \end{itemize}
 
 %% \begin{pytex}
-%% print DMatrix.ones(Sparsity.tril(3))
-%% print DMatrix(Sparsity.tril(3),range(6))
+%% print DMatrix.ones(Sparsity.lower(3))
+%% print DMatrix(Sparsity.lower(3),range(6))
 %% \end{pytex}
 
 %% \paragraph{diagonal}
@@ -717,7 +717,7 @@ print jacobian(mul(A,x),x)
 %% \paragraph{triangular}
 
 %% \begin{pytex}
-%% Sparsity.tril(3).spy()
+%% Sparsity.lower(3).spy()
 %% \end{pytex}
 
 %% \paragraph{banded}
@@ -746,7 +746,7 @@ print jacobian(mul(A,x),x)
 
 %% The \texttt{*} operator is overloaded for sparsity patterns to perform an \emph{and} (pattern intersection) operation:
 %% \begin{pytex}
-%% (Sparsity.tril(4)*Sparsity.rowcol([2,3],range(4),4,4)).spy()
+%% (Sparsity.lower(4)*Sparsity.rowcol([2,3],range(4),4,4)).spy()
 %% \end{pytex}
 
 

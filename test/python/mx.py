@@ -1477,7 +1477,7 @@ class MXtests(casadiTestCase):
     self.message("reshape")
     X = MX.sym("X",10)
 
-    i = IMatrix(Sparsity.tril(3),range(6))
+    i = IMatrix(Sparsity.lower(3),range(6))
 
     i.printDense()
     print vecNZ(i.T)
@@ -1605,7 +1605,7 @@ class MXtests(casadiTestCase):
     self.checkarray(f.getOutput(),r)
     
   def test_tril2symm(self):
-    x = MX.sym("x",Sparsity.tril(3))
+    x = MX.sym("x",Sparsity.lower(3))
     f = MXFunction([x],[tril2symm(x)])
     f.init()
     f.setInput(range(6))
@@ -1716,7 +1716,7 @@ class MXtests(casadiTestCase):
       mul(MX.sym("X",4,5),MX.zeros(3,2))
       
   def test_vertsplit(self):
-    a = MX.sym("X",Sparsity.tril(5))
+    a = MX.sym("X",Sparsity.lower(5))
     v = vertsplit(a,[0,2,4,5])
     
     f = MXFunction([a],v)
@@ -1777,7 +1777,7 @@ class MXtests(casadiTestCase):
     self.checkarray(V[2],DMatrix([[3,7,10,12,0],[4,8,11,13,14]]))
  
   def test_horzsplit(self):
-    a = MX.sym("X",Sparsity.tril(5))
+    a = MX.sym("X",Sparsity.lower(5))
     v = horzsplit(a,[0,2,4,5])
     
     f = MXFunction([a],v)
@@ -1835,7 +1835,7 @@ class MXtests(casadiTestCase):
     self.checkarray(V[2],DMatrix([[0,0],[0,0],[0,0],[12,0],[13,14]]))
     
   def test_blocksplit(self):
-    a = MX.sym("X",Sparsity.tril(5))
+    a = MX.sym("X",Sparsity.lower(5))
     v = blocksplit(a,[0,2,4,5],[0,1,3,5])
     
     fs = [MXFunction([a],vr) for vr in v]
@@ -1912,7 +1912,7 @@ class MXtests(casadiTestCase):
   def test_MX_shapes(self):
       self.message("MX unary operations")
       
-      #self.checkarray(DMatrix(Sparsity.tril(4),1),DMatrix(Sparsity.dense(4,4),1))
+      #self.checkarray(DMatrix(Sparsity.lower(4),1),DMatrix(Sparsity.dense(4,4),1))
       
       for sp in [Sparsity.dense(0,0),Sparsity.dense(0,2),Sparsity.dense(2,0),Sparsity.dense(1,1),Sparsity.dense(2,2), Sparsity(4,3,[0,2,2,3],[1,2,1])]:
         for v in [0,1,0.2]:
@@ -1986,7 +1986,7 @@ class MXtests(casadiTestCase):
   def test_MXConstant(self):
       self.message("MX unary operations, constant")
       
-      #self.checkarray(DMatrix(Sparsity.tril(4),1),DMatrix(Sparsity.dense(4,4),1))
+      #self.checkarray(DMatrix(Sparsity.lower(4),1),DMatrix(Sparsity.dense(4,4),1))
       
       for sp in [Sparsity.dense(0,0),Sparsity.dense(0,2),Sparsity.dense(2,0),Sparsity.dense(1,1),Sparsity.dense(2,2), Sparsity(4,3,[0,2,2,3],[1,2,1])]:
         for v in [0,1,0.2]:
@@ -2135,8 +2135,8 @@ class MXtests(casadiTestCase):
     self.checkarray(c_,numpy.kron(a,b))
     
   def test_setSparse(self):
-    x = MX.sym("x",Sparsity.tril(3))
-    y = x.setSparse(Sparsity.tril(3).T)
+    x = MX.sym("x",Sparsity.lower(3))
+    y = x.setSparse(Sparsity.lower(3).T)
     
     f = MXFunction([x],[y])
     f.init()
@@ -2145,7 +2145,7 @@ class MXtests(casadiTestCase):
     f.evaluate()
     
     self.checkarray(f.getOutput(),DMatrix([[1,0,0],[0,4,0],[0,0,6]]))
-    self.checkarray(IMatrix(f.getOutput().sparsity(),1),IMatrix(Sparsity.tril(3).T,1))
+    self.checkarray(IMatrix(f.getOutput().sparsity(),1),IMatrix(Sparsity.lower(3).T,1))
     
   def test_repmat(self):
     a = DMatrix([[1,2],[3,4],[5,6]])

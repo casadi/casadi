@@ -98,7 +98,7 @@ class Matrixtests(casadiTestCase):
   def test_diagcat(self):
 
     x = MX.sym("x",2,2)
-    y = MX.sym("y",Sparsity_tril(3))
+    y = MX.sym("y",Sparsity.lower(3))
     z = MX.sym("z",4,2)
     
     L = [x,y,z]
@@ -408,7 +408,7 @@ class Matrixtests(casadiTestCase):
 
     n = 8
 
-    sp = Sparsity.tril(n)
+    sp = Sparsity.lower(n)
 
     x  = SX.sparse(sp,vertcat([SX.sym("a%d" % i) for i in range(sp.size())]))
 
@@ -420,7 +420,7 @@ class Matrixtests(casadiTestCase):
     # For a reducible matrix, struct(A^(-1)) = struct(A) 
     self.checkarray(x_,I_,"inv")
     
-    sp = Sparsity.tril(n)
+    sp = Sparsity.lower(n)
 
     x = SX.sym("a", sp)
     x[0,n-1] = 1 
@@ -606,7 +606,7 @@ class Matrixtests(casadiTestCase):
     check(IMatrix(Sparsity.dense(3,3),range(3*3)),[0,0,2],[0,0,2])
     check(IMatrix(Sparsity.dense(3,3),range(3*3)),[1,1,2],[1,1,2])
 
-    sp = Sparsity.tril(4)
+    sp = Sparsity.lower(4)
     d = IMatrix(sp,range(sp.size()))
     check(d,[0,1,3],[0,2,3])
     check(d.T,[0,1,3],[0,2,3])
@@ -621,7 +621,7 @@ class Matrixtests(casadiTestCase):
     check(IMatrix(Sparsity.dense(2,2),range(2*2)),[1,1,0],[1,1,0])
     check(IMatrix(Sparsity.dense(2,2),range(2*2)),[1,1,1],[1,1,1])
 
-    sp = Sparsity.tril(3)
+    sp = Sparsity.lower(3)
     d = IMatrix(sp,range(sp.size()))
     check(d,[0,1,2],[0,1,2])
     check(d.T,[0,1,2],[0,1,2])
@@ -731,7 +731,7 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeU(),3)
     
   def test_tril2symm(self):
-    a = DMatrix(Sparsity.triu(3),range(Sparsity.triu(3).size())).T
+    a = DMatrix(Sparsity.upper(3),range(Sparsity.upper(3).size())).T
     s = tril2symm(a)
     self.checkarray(s,DMatrix([[0,1,3],[1,2,4],[3,4,5]]))
     
@@ -745,12 +745,12 @@ class Matrixtests(casadiTestCase):
 
   def test_not_null(self):
     x = MX.sym('x',3,1)
-    sp = Sparsity.triu(2)
+    sp = Sparsity.upper(2)
     MX(sp,x)
 
   def test_segfault(self):
     x = MX.sym('x',10,1)
-    sp = Sparsity.triu(2)
+    sp = Sparsity.upper(2)
     y = triu2symm(MX(sp,x[1:4]))
     f = MXFunction([x],[y])
     f.init()
@@ -783,7 +783,7 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(v.size2(),0)
   
   def test_vertsplit(self):
-    a = DMatrix(Sparsity.triu(5),range(5*6/2)).T
+    a = DMatrix(Sparsity.upper(5),range(5*6/2)).T
     v = vertsplit(a,[0,2,4,5])
     
     self.assertEqual(len(v),3)
@@ -813,7 +813,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(v[2],DMatrix([[6,7,8,9,0],[10,11,12,13,14]]))
     
   def test_horzsplit(self):
-    a = DMatrix(Sparsity.triu(5),range(5*6/2)).T
+    a = DMatrix(Sparsity.upper(5),range(5*6/2)).T
     v = horzsplit(a,[0,2,4,5])
     
     self.assertEqual(len(v),3)
@@ -843,7 +843,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(v[2],DMatrix([[0,0],[0,0],[0,0],[9,0],[13,14]]))
     
   def test_blocksplit(self):
-    a = DMatrix(Sparsity.triu(5),range(5*6/2)).T
+    a = DMatrix(Sparsity.upper(5),range(5*6/2)).T
     v = blocksplit(a,[0,2,4,5],[0,1,3,5])
     
     self.checkarray(v[0][0],DMatrix([0,1]))
@@ -862,13 +862,13 @@ class Matrixtests(casadiTestCase):
       spA+= [
         Sparsity.diag(n),
         Sparsity.dense(n,n),
-        Sparsity.tril(n),
-        Sparsity.tril(n).T,
+        Sparsity.lower(n),
+        Sparsity.lower(n).T,
         Sparsity.banded(n,1),
         diagcat([Sparsity.diag(n),Sparsity.dense(n,n)]),
-        diagcat([Sparsity.diag(n),Sparsity.tril(n)]),
-        diagcat([Sparsity.diag(n),Sparsity.tril(n).T]),
-        diagcat([Sparsity.tril(n),Sparsity.tril(n).T]),
+        diagcat([Sparsity.diag(n),Sparsity.lower(n)]),
+        diagcat([Sparsity.diag(n),Sparsity.lower(n).T]),
+        diagcat([Sparsity.lower(n),Sparsity.lower(n).T]),
         Sparsity.diag(n)+Sparsity.rowcol([0],[n-1],n,n),
         Sparsity.diag(n)+Sparsity.rowcol([0,n-1],[n-1,0],n,n),
         Sparsity.diag(n)+Sparsity.triplet(n,n,[0],[n-1]),
@@ -880,7 +880,7 @@ class Matrixtests(casadiTestCase):
       random.seed(1)
       a = DMatrix(sA,[random.random() for i in range(sA.size())])
       A = SX.sym("a",a.sparsity())
-      for sB in [ Sparsity.dense(a.size1(),1), vertcat([Sparsity.dense(1,1),Sparsity.sparse(a.size1()-1,1)]),Sparsity.tril(a.size1()),Sparsity.tril(a.size1()).T]:
+      for sB in [ Sparsity.dense(a.size1(),1), vertcat([Sparsity.dense(1,1),Sparsity.sparse(a.size1()-1,1)]),Sparsity.lower(a.size1()),Sparsity.lower(a.size1()).T]:
 
         b = DMatrix(sB,[random.random() for i in range(sB.size())])
         B = SX.sym("B",b.sparsity())

@@ -774,8 +774,8 @@ namespace casadi {
     return Sparsity(nrow, ncol, colind, row);
   }
 
-  Sparsity Sparsity::triu(int n) {
-    casadi_assert_message(n>=0, "Sparsity::triu expects a positive integer as argument");
+  Sparsity Sparsity::upper(int n) {
+    casadi_assert_message(n>=0, "Sparsity::upper expects a positive integer as argument");
     int nrow=n, ncol=n;
     std::vector<int> colind, row;
     colind.reserve(ncol+1);
@@ -795,8 +795,8 @@ namespace casadi {
     return Sparsity(nrow, ncol, colind, row);
   }
 
-  Sparsity Sparsity::tril(int n) {
-    casadi_assert_message(n>=0, "Sparsity::tril expects a positive integer as argument");
+  Sparsity Sparsity::lower(int n) {
+    casadi_assert_message(n>=0, "Sparsity::lower expects a positive integer as argument");
     int nrow=n, ncol=n;
     std::vector<int> colind, row;
     colind.reserve(ncol+1);

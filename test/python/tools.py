@@ -105,12 +105,12 @@ class Toolstests(casadiTestCase):
     self.assertEqual(len(s["x"]),5)
     self.assertEqual(len(s["y"]),6)
     self.assertTrue(s.cat.nz[1].getName().startswith("y"))
-    s = struct_symSX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=Sparsity.triu(5))])
+    s = struct_symSX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=Sparsity.upper(5))])
     self.assertEqual(s.size,6+2+3+15)
     self.assertTrue(s["x"].sparsity()==Sparsity.dense(3,2))
     self.assertTrue(s["y"].sparsity()==Sparsity.dense(2,1))
     self.assertTrue(s["z"].sparsity()==Sparsity.dense(3,1))
-    self.assertTrue(s["w"].sparsity()==Sparsity.triu(5))
+    self.assertTrue(s["w"].sparsity()==Sparsity.upper(5))
     
     x  = SX.sym("x",2)
     x2 = SX.sym("x2",2)
@@ -234,12 +234,12 @@ class Toolstests(casadiTestCase):
     self.assertEqual(len(s["y"]),6)
    
     
-    s = struct_symMX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=Sparsity.triu(5))])
+    s = struct_symMX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=Sparsity.upper(5))])
     self.assertEqual(s.size,6+2+3+15)
     self.assertTrue(s["x"].sparsity()==Sparsity.dense(3,2))
     self.assertTrue(s["y"].sparsity()==Sparsity.dense(2,1))
     self.assertTrue(s["z"].sparsity()==Sparsity.dense(3,1))
-    self.assertTrue(s["w"].sparsity()==Sparsity.triu(5))
+    self.assertTrue(s["w"].sparsity()==Sparsity.upper(5))
     
     x  = MX.sym("x",2)
     x2 = MX.sym("x2",2)
@@ -712,24 +712,24 @@ class Toolstests(casadiTestCase):
     n = 3
     x_sx = struct_symSX([
         entry("x",shape=n),
-        entry("S",shape=Sparsity.triu(n))
+        entry("S",shape=Sparsity.upper(n))
     ])
     
     x_mx = struct_symSX([
         entry("x",shape=n),
-        entry("S",shape=Sparsity.triu(n))
+        entry("S",shape=Sparsity.upper(n))
     ])
     
     X_sx = struct_SX(x_sx)
     X_sx["x"] = DMatrix(range(n))
-    X_sx["S"] = DMatrix(Sparsity.triu(n),range(n,n+n*(n+1)/2))
+    X_sx["S"] = DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2))
    
     X_mx = struct_MX(x_sx)
     X_mx["x"] = DMatrix(range(n))
-    X_mx["S"] = DMatrix(Sparsity.triu(n),range(n,n+n*(n+1)/2))
+    X_mx["S"] = DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2))
     
-    self.checkarray(x_sx.struct.map[("S",)],DMatrix(Sparsity.triu(n),range(n,n+n*(n+1)/2)))
-    self.checkarray(x_mx.struct.map[("S",)],DMatrix(Sparsity.triu(n),range(n,n+n*(n+1)/2)))
+    self.checkarray(x_sx.struct.map[("S",)],DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2)))
+    self.checkarray(x_mx.struct.map[("S",)],DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2)))
     self.checkarray(X_sx.cat,DMatrix(range(n+n*(n+1)/2)))
     self.checkarray(X_mx.cat,DMatrix(range(n+n*(n+1)/2)))
     

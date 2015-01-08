@@ -337,7 +337,7 @@ class Misctests(casadiTestCase):
     
   def test_pickling(self):
 
-    a = Sparsity.tril(4)
+    a = Sparsity.lower(4)
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.assertTrue(a==b)
@@ -347,13 +347,13 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.assertTrue(a.isNull())
     
-    a = IMatrix(Sparsity.tril(4),range(10))
+    a = IMatrix(Sparsity.lower(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
 
 
-    a = DMatrix(Sparsity.tril(4),range(10))
+    a = DMatrix(Sparsity.lower(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)

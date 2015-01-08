@@ -82,7 +82,7 @@ simplestates = struct_symSX([
 states = struct_symSX([
     entry("x",shape=3),
     entry("y",shape=(2,2)),
-    entry("z",shape=Sparsity.tril(2))
+    entry("z",shape=Sparsity.lower(2))
   ])
   
 print states["x"]

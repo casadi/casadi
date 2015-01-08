@@ -682,13 +682,13 @@ class ControlTests(casadiTestCase):
         for z,zp,a,t in zip(Z,sigma(Z),A,T):
           self.checkarray(mul([z.T,a,zp]),t,digits=7)
           
-        hess = Sparsity.band(n,1)+Sparsity.triu(n)
+        hess = Sparsity.band(n,1)+Sparsity.upper(n)
         # T[0]  in hessenberg form
         self.checkarray(T[0][hess.patternInverse()],DMatrix.zeros(n,n),digits=12)
         
         # remainder of T is upper triangular
         for t in T[1:]:
-          self.checkarray(t[Sparsity.triu(n).patternInverse()],DMatrix.zeros(n,n),digits=12)
+          self.checkarray(t[Sparsity.upper(n).patternInverse()],DMatrix.zeros(n,n),digits=12)
           
         for z in Z:
           self.checkarray(mul(z,z.T),DMatrix.eye(n))

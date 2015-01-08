@@ -1258,7 +1258,7 @@ class CasadiStructEntry(StructEntry):
         if self.sparsity.size1() != self.sparsity.size2():
           raise Exception("You supplied a type 'symm', but matrix is not square. Got " % self.sparsity.dimString() + ".")
         self.originalsparsity = self.sparsity
-        self.sparsity = self.sparsity*Sparsity.triu(self.sparsity.size1())
+        self.sparsity = self.sparsity*Sparsity.upper(self.sparsity.size1())
         
          
       

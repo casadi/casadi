@@ -143,10 +143,10 @@ namespace casadi {
     ///@}
 
     /** \brief Create a upper triangular square sparsity pattern **/
-    static Sparsity triu(int n);
+    static Sparsity upper(int n);
 
     /** \brief Create a lower triangular square sparsity pattern **/
-    static Sparsity tril(int n);
+    static Sparsity lower(int n);
 
     /** \brief Create diagonal sparsity pattern **/
     ///@{

@@ -37,13 +37,13 @@ dotdraw(c)
 
 #! An SX
 
-dotdraw(SX.sym("x",Sparsity.tril(3)))
+dotdraw(SX.sym("x",Sparsity.lower(3)))
 
-dotdraw(SX.sym("x",Sparsity.tril(3))**2)
+dotdraw(SX.sym("x",Sparsity.lower(3))**2)
 
 #! An MX graph
-x = MX.sym("x",Sparsity.tril(2))
-y = MX.sym("y",Sparsity.tril(2))
+x = MX.sym("x",Sparsity.lower(2))
+y = MX.sym("y",Sparsity.lower(2))
 
 z = MX.sym("z",4,2)
 
