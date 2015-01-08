@@ -151,15 +151,11 @@ namespace casadi {
     MatType zz_triu(const MatType &a, bool includeDiagonal=true) const {
       return a.setSparse(triu(a.sparsity(), includeDiagonal));
     }
-    MatType zz_quad_form(const MatType &A) const {
-      return mul(self().T(), mul(A, self()));
-    }
-    MatType zz_quad_form() const {
-      return mul(self().T(), self());
-    }
-    MatType zz_sum_square() const {
-      return sumAll(self()*self());
-    }
+    MatType zz_quad_form(const MatType &A) const { return mul(self().T(), mul(A, self())); }
+    MatType zz_quad_form() const { return mul(self().T(), self()); }
+    MatType zz_sum_square() const { return sumAll(self()*self()); }
+    MatType zz_linspace(const MatType &b, int nsteps) const;
+    MatType zz_cross(const MatType &b, int dim=-1) const;
     /// @}
 
 #ifndef SWIG
@@ -211,6 +207,18 @@ namespace casadi {
     /** \brief Calculate some of squares: sum_ij X_ij^2  */
     inline friend MatType sum_square(const MatType &X) {
      return X.zz_sum_square();
+    }
+
+    /** \brief Matlab's \c linspace command
+     */
+    inline friend MatType linspace(const MatType &a, const MatType &b, int nsteps) {
+      return a.zz_linspace(b, nsteps);
+    }
+
+    /** \brief Matlab's \c cross command
+     */
+    inline friend MatType cross(const MatType &a, const MatType &b, int dim = -1) {
+      return a.zz_cross(b, dim);
     }
 #endif // SWIG
 
@@ -394,6 +402,55 @@ namespace casadi {
   template<typename MatType>
   MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp) {
     throw CasadiException("\"sym\" not defined for instantiation");
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::zz_linspace(const MatType &b, int nsteps) const {
+    std::vector<MatType> ret(nsteps);
+    ret[0] = self();
+    MatType step = (b-self())/(nsteps-1);
+
+    for (int i=1; i<nsteps-1; ++i)
+      ret[i] = ret[i-1] + step;
+
+    ret[nsteps-1] = b;
+    return vertcat(ret);
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::zz_cross(const MatType &b, int dim) const {
+    const MatType &a = self();
+    casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),
+                          "cross(a, b): Inconsistent dimensions. Dimension of a ("
+                          << a.dimString() << " ) must equal that of b ("
+                          << b.dimString() << ").");
+
+    casadi_assert_message(a.size1()==3 || a.size2()==3,
+                          "cross(a, b): One of the dimensions of a should have length 3, but got "
+                          << a.dimString() << ".");
+    casadi_assert_message(dim==-1 || dim==1 || dim==2,
+                          "cross(a, b, dim): Dim must be 1, 2 or -1 (automatic).");
+
+    std::vector<MatType> ret(3);
+
+    bool t = a.size1()==3;
+
+    if (dim==1) t = true;
+    if (dim==2) t = false;
+
+    MatType a1 = t ? a(0, ALL) : a(ALL, 0);
+    MatType a2 = t ? a(1, ALL) : a(ALL, 1);
+    MatType a3 = t ? a(2, ALL) : a(ALL, 2);
+
+    MatType b1 = t ? b(0, ALL) : b(ALL, 0);
+    MatType b2 = t ? b(1, ALL) : b(ALL, 1);
+    MatType b3 = t ? b(2, ALL) : b(ALL, 2);
+
+    ret[0] = a2*b3-a3*b2;
+    ret[1] = a3*b1-a1*b3;
+    ret[2] = a1*b2-a2*b1;
+
+    return t ? vertcat(ret) : horzcat(ret);
   }
 #endif
 

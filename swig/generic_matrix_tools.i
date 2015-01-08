@@ -70,6 +70,8 @@ SPARSITY_INTERFACE_DECL(casadi::Sparsity)
 MatType quad_form(const MatType &X, const MatType &A);
 MatType quad_form(const MatType &X);
 MatType sum_square(const MatType &X);
+MatType linspace(const MatType &a, const MatType &b, int nsteps);
+MatType cross(const MatType &a, const MatType &b, int dim = -1);
 %enddef
 
 // map the template name to the instantiated name
@@ -81,17 +83,12 @@ MatType sum_square(const MatType &X);
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
 SPARSITY_INTERFACE_DECL(MatType)
 GENERIC_MATRIX_DECL(MatType)
-GMTT_INST(MatType, cross)
 GMTT_INST(MatType, tril2symm)
 GMTT_INST(MatType, triu2symm)
 GMTT_INST(MatType, isEqual)
 GMTT_INST(MatType, det)
 GMTT_INST(MatType, inv)
 GMTT_INST(MatType, trace)
-%enddef
-
-%define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(MatType...)
-GMTT_INST(MatType, linspace)
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
@@ -106,11 +103,6 @@ GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(int)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(double)
 GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
-
-GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(casadi::Matrix<double>)
-GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(casadi::Matrix<casadi::SXElement>)
-GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(casadi::MX)
-
 #endif // SWIGMATLAB
 
 #endif // CASADI_GENERIC_MATRIX_TOOLS_I
