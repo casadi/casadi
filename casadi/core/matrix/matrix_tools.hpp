@@ -37,30 +37,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief  QR factorization using the modified Gram-Schmidt algorithm
-   * More stable than the classical Gram-Schmidt, but may break down if the rows of A
-   * are nearly linearly dependent
-   * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
-   * Note that in SWIG, Q and R are returned by value. */
-  template<typename DataType>
-  void qr(const Matrix<DataType>& A,
-          Matrix<DataType>& SWIG_OUTPUT(Q),
-          Matrix<DataType>& SWIG_OUTPUT(R)) {
-    return A.zz_qr(Q, R);
-  }
-
-  /** \brief Computes the nullspace of a matrix A
-  *
-  * Finds Z m-by-(m-n) such that AZ = 0
-  * with A n-by-m with m > n
-  *
-  * Assumes A is full rank
-  *
-  * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
-  */
-  template<typename DataType>
-  Matrix<DataType> nullspace(const Matrix<DataType>& A) { return A.zz_nullspace();}
-
   /** \brief  Solve a system of equations: A*x = b
       The solve routine works similar to Matlab's backslash when A is square and nonsingular.
       The algorithm used is the following:

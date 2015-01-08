@@ -164,17 +164,6 @@ namespace casadi {
   inline MX tangent(const MX &ex, const MX &arg) { return ex.zz_tangent(arg);}
   ///@}
 
-  /** \brief Computes the nullspace of a matrix A
-  *
-  * Finds Z m-by-(m-n) such that AZ = 0
-  * with A n-by-m with m > n
-  *
-  * Assumes A is full rank
-  *
-  * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
-  */
-  inline MX nullspace(const MX& A) { return A.zz_nullspace();}
-
   /** \brief Get all symbols contained in the supplied expression
   * Get all symbols on which the supplied expression depends
   * \see MXFunction::getFree()

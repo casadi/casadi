@@ -38,8 +38,6 @@
 // Define template instantiations
 %define MATRIX_TOOLS_TEMPLATES(DataType)
   MTT_INST(DataType, norm_0_mul_nn)
-  MTT_INST(DataType, qr)
-  MTT_INST(DataType, nullspace)
   MTT_INST(DataType, solve)
   MTT_INST(DataType, pinv)
   MTT_INST(DataType, repmat)
@@ -113,12 +111,14 @@ MatType sumCols(const MatType &x);
 MatType sumRows(const MatType &x);
 MatType inner_prod(const MatType &x, const MatType &y);
 MatType outer_prod(const MatType &x, const MatType &y);
+MatType nullspace(const MatType& A);
 %enddef
 
 %define MATRIX_DECL(MatType...)
 MatType adj(const MatType& A);
 MatType getMinor(const MatType &x, int i, int j);
 MatType cofactor(const MatType &x, int i, int j);
+void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)

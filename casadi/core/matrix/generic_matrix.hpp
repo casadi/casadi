@@ -301,6 +301,26 @@ namespace casadi {
     inline friend MatType outer_prod(const MatType &x, const MatType &y) {
       return x.zz_outer_prod(y);
     }
+
+    /** \brief  QR factorization using the modified Gram-Schmidt algorithm
+     * More stable than the classical Gram-Schmidt, but may break down if the rows of A
+     * are nearly linearly dependent
+     * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
+     * Note that in SWIG, Q and R are returned by value. */
+    inline friend void qr(const MatType& A, MatType& Q, MatType& R) {
+      return A.zz_qr(Q, R);
+    }
+
+    /** \brief Computes the nullspace of a matrix A
+     *
+     * Finds Z m-by-(m-n) such that AZ = 0
+     * with A n-by-m with m > n
+     *
+     * Assumes A is full rank
+     *
+     * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+     */
+    inline friend MatType nullspace(const MatType& A) { return A.zz_nullspace();}
 #endif // SWIG
 
     /** @name Construct symbolic primitives
