@@ -114,35 +114,9 @@ namespace casadi {
     return x.zz_norm_0_mul_nn(y, Bwork, Iwork);
   }
 
-  /// Returns true only if every element in the matrix is true
-  template<typename DataType>
-  Matrix<DataType> all(const Matrix<DataType> &x) { return x.zz_all();}
-
-  /// Returns true if any element in the matrix is true
-  template<typename DataType>
-  Matrix<DataType> any(const Matrix<DataType> &x) { return x.zz_any();}
-
   /** \brief Repeat matrix A n times vertically and m times horizontally */
   template<typename DataType>
   Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m) { return A.zz_repmat(n, m);}
-
-  /** \brief  Evaluate a polynomial with coefficients p in x */
-  template<typename DataType>
-  Matrix<DataType> polyval(const Matrix<DataType>& p, const Matrix<DataType>& x) {
-    return p.zz_polyval(x);
-  }
-
-  /** \brief   Get the diagonal of a matrix or construct a diagonal
-      When the input is square, the diagonal elements are returned.
-      If the input is vector-like, a diagonal matrix is constructed with it. */
-  template<typename DataType>
-  Matrix<DataType> diag(const Matrix<DataType> &A) { return A.zz_diag();}
-
-  /** \brief  Unite two matrices no overlapping sparsity */
-  template<typename DataType>
-  Matrix<DataType> unite(const Matrix<DataType>& A, const Matrix<DataType>& B) {
-    return A.zz_unite(B);
-  }
 
   /** \brief  Make a matrix dense */
   template<typename DataType>

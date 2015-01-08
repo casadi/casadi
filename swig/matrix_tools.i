@@ -41,9 +41,6 @@
   MTT_INST(DataType, solve)
   MTT_INST(DataType, pinv)
   MTT_INST(DataType, repmat)
-  MTT_INST(DataType, unite)
-  MTT_INST(DataType, diag)
-  MTT_INST(DataType, polyval)
   MTT_INST(DataType, addMultiple)
   MTT_INST(DataType, project)
   MTT_INST(DataType, sparse)
@@ -112,6 +109,9 @@ MatType sumRows(const MatType &x);
 MatType inner_prod(const MatType &x, const MatType &y);
 MatType outer_prod(const MatType &x, const MatType &y);
 MatType nullspace(const MatType& A);
+MatType polyval(const MatType& p, const MatType& x);
+MatType diag(const MatType &A);
+MatType unite(const MatType& A, const MatType& B);
 %enddef
 
 %define MATRIX_DECL(MatType...)
@@ -119,6 +119,8 @@ MatType adj(const MatType& A);
 MatType getMinor(const MatType &x, int i, int j);
 MatType cofactor(const MatType &x, int i, int j);
 void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
+//MatType all(const MatType &x);
+//MatType any(const MatType &x);
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)

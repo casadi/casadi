@@ -44,9 +44,6 @@ namespace casadi {
     return cond.zz_if_else(if_true, if_false);
   }
 
-  /** \brief  Unite two matrices no overlapping sparsity */
-  inline MX unite(const MX& A, const MX& B) { return A.zz_unite(B);}
-
   /** \brief  Simplify an expression */
   inline void simplify(MX& ex) { ex.zz_simplify();}
 
@@ -80,16 +77,6 @@ namespace casadi {
 
   /** Count number of nodes */
   inline int countNodes(const MX& A) { return A.zz_countNodes();}
-
-  /** \brief  Get the diagonal of a matrix or construct a diagonal
-
-      When the input is square, the diagonal elements are returned.
-      If the input is vector-like, a diagonal matrix is constructed with it.
-  */
-  inline MX diag(const MX& x) { return x.zz_diag();}
-
-  /** \brief  Evaluate a polynomial with coefficients p in x */
-  inline MX polyval(const MX& p, const MX& x) { return p.zz_polyval(x);}
 
   /** \brief Get a string representation for a binary MX, using custom arguments */
   inline std::string

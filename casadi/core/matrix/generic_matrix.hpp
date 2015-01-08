@@ -321,6 +321,28 @@ namespace casadi {
      * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
      */
     inline friend MatType nullspace(const MatType& A) { return A.zz_nullspace();}
+
+    /** \brief  Evaluate a polynomial with coefficients p in x */
+    inline friend MatType polyval(const MatType& p, const MatType& x) {
+      return p.zz_polyval(x);
+    }
+
+    /** \brief   Get the diagonal of a matrix or construct a diagonal
+        When the input is square, the diagonal elements are returned.
+        If the input is vector-like, a diagonal matrix is constructed with it. */
+    inline friend MatType diag(const MatType &A) { return A.zz_diag();}
+
+    /** \brief  Unite two matrices no overlapping sparsity */
+    inline friend MatType unite(const MatType& A, const MatType& B) {
+      return A.zz_unite(B);
+    }
+
+    /// Returns true only if every element in the matrix is true
+    inline friend MatType all(const MatType &x) { return x.zz_all();}
+
+    /// Returns true if any element in the matrix is true
+    inline friend MatType any(const MatType &x) { return x.zz_any();}
+
 #endif // SWIG
 
     /** @name Construct symbolic primitives
