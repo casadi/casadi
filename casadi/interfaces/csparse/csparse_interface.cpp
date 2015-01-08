@@ -133,7 +133,7 @@ namespace casadi {
     N_ = cs_lu(&A_, S_, tol) ;                 // numeric LU factorization
     if (N_==0) {
       DMatrix temp = input();
-      temp.sparsify();
+      temp.makeSparse();
       if (temp.sparsity().isSingular()) {
         stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed due to matrix"

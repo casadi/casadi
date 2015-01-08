@@ -536,7 +536,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::sparsify(double tol) {
+  void Matrix<DataType>::makeSparse(double tol) {
     // Quick return if there are no entries to be removed
     bool remove_nothing = true;
     for (typename std::vector<DataType>::iterator it=begin(); it!=end() && remove_nothing; ++it) {
@@ -2881,7 +2881,7 @@ namespace casadi {
       // If there are structurally nonzero entries that are known to be zero,
       // remove these and rerun the algorithm
       Matrix<DataType> A_sparse = *this;
-      A_sparse.sparsify();
+      A_sparse.makeSparse();
       return solve(A_sparse, b);
 
     } else {

@@ -684,7 +684,7 @@ namespace casadi {
             IMatrix duplicates =
                 IMatrix::triplet(lookup_row, lookup_col, lookup_value, bvec_size, coarse.size())
                 - lookup;
-            duplicates.sparsify();
+            duplicates.makeSparse();
             lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies

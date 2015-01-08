@@ -303,7 +303,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> sparse(const Matrix<DataType>& A, double tol) {
     Matrix<DataType> ret = A;
-    ret.sparsify(tol);
+    ret.makeSparse(tol);
     return ret;
   }
 

@@ -366,7 +366,7 @@ namespace casadi {
 
     /** \brief  Make a matrix sparse by removing numerical zeros smaller
      * in absolute value than a specified tolerance */
-    void sparsify(double tol=0);
+    void makeSparse(double tol=0);
 
     Matrix<DataType> operator+() const;
     Matrix<DataType> operator-() const;
