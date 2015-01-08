@@ -39,10 +39,6 @@
 %define MATRIX_TOOLS_TEMPLATES(DataType)
   MTT_INST(DataType, inner_prod)
   MTT_INST(DataType, outer_prod)
-  MTT_INST(DataType, norm_1)
-  MTT_INST(DataType, norm_2)
-  MTT_INST(DataType, norm_inf)
-  MTT_INST(DataType, norm_F)
   MTT_INST(DataType, norm_0_mul_nn)
   MTT_INST(DataType, qr)
   MTT_INST(DataType, nullspace)
@@ -50,14 +46,10 @@
   MTT_INST(DataType, pinv)
   MTT_INST(DataType, repmat)
   MTT_INST(DataType, unite)
-  MTT_INST(DataType, sumRows)
-  MTT_INST(DataType, sumCols)
-  MTT_INST(DataType, sumAll)
   MTT_INST(DataType, diag)
   MTT_INST(DataType, polyval)
   MTT_INST(DataType, addMultiple)
   MTT_INST(DataType, project)
-  MTT_INST(DataType, kron)
   MTT_INST(DataType, sparse)
   MTT_INST(DataType, dense)
 %enddef
@@ -113,6 +105,14 @@ MatType trace(const MatType& a);
 bool isEqual(const MatType& x, const MatType& y, int depth=0);
 MatType tril2symm(const MatType &a);
 MatType triu2symm(const MatType &a);
+MatType kron(const MatType& a, const MatType& b);
+MatType norm_F(const MatType &x);
+MatType norm_2(const MatType &x);
+MatType norm_1(const MatType &x);
+MatType norm_inf(const MatType &x);
+MatType sumAll(const MatType &x);
+MatType sumCols(const MatType &x);
+MatType sumRows(const MatType &x);
 %enddef
 
 %define MATRIX_DECL(MatType...)

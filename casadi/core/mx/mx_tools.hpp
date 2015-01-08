@@ -37,18 +37,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief  Frobenius norm  */
-  inline MX norm_F(const MX &x) { return x.zz_norm_F();}
-
-  /** \brief  2-norm  */
-  inline MX norm_2(const MX &x) { return x.zz_norm_2();}
-
-  /** \brief 1-norm  */
-  inline MX norm_1(const MX &x) { return x.zz_norm_1();}
-
-  /** \brief Infinity-norm */
-  inline MX norm_inf(const MX &x) { return x.zz_norm_inf();}
-
   /** \brief  Take the inner product of two vectors
       Equals
       \code
@@ -117,15 +105,6 @@ namespace casadi {
       If the input is vector-like, a diagonal matrix is constructed with it.
   */
   inline MX diag(const MX& x) { return x.zz_diag();}
-
-  /** \brief Return a col-wise summation of elements */
-  inline MX sumCols(const MX &x) { return x.zz_sumCols();}
-
-  /** \brief Return a row-wise summation of elements */
-  inline MX sumRows(const MX &x) { return x.zz_sumRows();}
-
-  /// Return summation of all elements
-  inline MX sumAll(const MX &x) { return x.zz_sumAll();}
 
   /** \brief  Evaluate a polynomial with coefficients p in x */
   inline MX polyval(const MX& p, const MX& x) { return p.zz_polyval(x);}
@@ -254,12 +233,6 @@ namespace casadi {
   matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary = std::vector<MX>()) {
     return MX::zz_matrix_expand(e, boundary);
   }
-
-  /** \brief Kronecker tensor product
-  *
-  * Creates a block matrix in which each element (i, j) is a_ij*b
-  */
-  inline MX kron(const MX& a, const MX& b) { return a.zz_kron(b);}
 
   /** \brief Solve a system of equations: A*x = b
   */

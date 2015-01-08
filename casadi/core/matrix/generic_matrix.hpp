@@ -252,6 +252,34 @@ namespace casadi {
     /** \brief Convert a upper triangular matrix to a symmetric one
      */
     inline friend MatType triu2symm(const MatType &a) { return a.zz_triu2symm();}
+
+    /** \brief Kronecker tensor product
+     *
+     * Creates a block matrix in which each element (i, j) is a_ij*b
+     */
+    inline friend MatType kron(const MatType& a, const MatType& b) { return a.zz_kron(b); }
+
+    /** \brief  Frobenius norm  */
+    inline friend MatType norm_F(const MatType &x) { return x.zz_norm_F();}
+
+    /** \brief  2-norm  */
+    inline friend MatType norm_2(const MatType &x) { return x.zz_norm_2();}
+
+    /** \brief 1-norm  */
+    inline friend MatType norm_1(const MatType &x) { return x.zz_norm_1();}
+
+    /** \brief Infinity-norm */
+    inline friend MatType norm_inf(const MatType &x) { return x.zz_norm_inf();}
+
+    /// Return summation of all elements
+    inline friend MatType sumAll(const MatType &x) { return x.zz_sumAll();}
+
+    /** \brief Return a col-wise summation of elements */
+    inline friend MatType sumCols(const MatType &x) { return x.zz_sumCols();}
+
+    /** \brief Return a row-wise summation of elements */
+    inline friend MatType sumRows(const MatType &x) { return x.zz_sumRows();}
+
 #endif // SWIG
 
     /** @name Construct symbolic primitives

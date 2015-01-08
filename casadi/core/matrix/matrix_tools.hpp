@@ -163,43 +163,6 @@ namespace casadi {
     return x.zz_norm_0_mul_nn(y, Bwork, Iwork);
   }
 
-  /** \brief Kronecker tensor product
-  *
-  * Creates a block matrix in which each element (i, j) is a_ij*b
-  */
-  template<typename DataType>
-  Matrix<DataType> kron(const Matrix<DataType>& a, const Matrix<DataType>& b) {
-    return a.zz_kron(b);
-  }
-
-  /** \brief  Frobenius norm  */
-  template<typename DataType>
-  Matrix<DataType> norm_F(const Matrix<DataType> &x) { return x.zz_norm_F();}
-
-  /** \brief  2-norm  */
-  template<typename DataType>
-  Matrix<DataType> norm_2(const Matrix<DataType> &x) { return x.zz_norm_2();}
-
-  /** \brief 1-norm  */
-  template<typename DataType>
-  Matrix<DataType> norm_1(const Matrix<DataType> &x) { return x.zz_norm_1();}
-
-  /** \brief Infinity-norm */
-  template<typename DataType>
-  Matrix<DataType> norm_inf(const Matrix<DataType> &x) { return x.zz_norm_inf();}
-
-  /// Return summation of all elements
-  template<typename DataType>
-  Matrix<DataType> sumAll(const Matrix<DataType> &x) { return x.zz_sumAll();}
-
-  /** \brief Return a col-wise summation of elements */
-  template<typename DataType>
-  Matrix<DataType> sumCols(const Matrix<DataType> &x) { return x.zz_sumCols();}
-
-  /** \brief Return a row-wise summation of elements */
-  template<typename DataType>
-  Matrix<DataType> sumRows(const Matrix<DataType> &x) { return x.zz_sumRows();}
-
   /// Returns true only if every element in the matrix is true
   template<typename DataType>
   Matrix<DataType> all(const Matrix<DataType> &x) { return x.zz_all();}
