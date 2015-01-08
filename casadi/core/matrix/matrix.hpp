@@ -531,6 +531,43 @@ namespace casadi {
     Matrix<DataType> zz_dense() const;
     ///@}
 
+#ifndef SWIG
+    /** \brief Matrix adjoint */
+    inline friend Matrix<DataType> adj(const Matrix<DataType>& A) { return A.zz_adj();}
+
+    /** \brief Get the (i,j) minor matrix */
+    inline friend Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) {
+      return x.zz_getMinor(i, j);
+    }
+
+    /** \brief Get the (i,j) cofactor matrix */
+    inline friend Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) {
+      return x.zz_cofactor(i, j);
+    }
+
+    /** \brief  QR factorization using the modified Gram-Schmidt algorithm
+     * More stable than the classical Gram-Schmidt, but may break down if the rows of A
+     * are nearly linearly dependent
+     * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
+     * Note that in SWIG, Q and R are returned by value. */
+    inline friend void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R) {
+      return A.zz_qr(Q, R);
+    }
+
+    /** \brief Create a new matrix with a given sparsity pattern but with the
+     * nonzeros taken from an existing matrix */
+    inline friend Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sp) {
+      return A.zz_project(sp);
+    }
+
+    /// Returns true only if every element in the matrix is true
+    inline friend Matrix<DataType> all(const Matrix<DataType> &x) { return x.zz_all();}
+
+    /// Returns true if any element in the matrix is true
+    inline friend Matrix<DataType> any(const Matrix<DataType> &x) { return x.zz_any();}
+#endif // SWIG
+
+
     /** \brief Set or reset the maximum number of calls to the
      * printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);

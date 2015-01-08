@@ -229,19 +229,6 @@ namespace casadi {
     /** \brief Matrix inverse (experimental) */
     inline friend MatType inv(const MatType& A) { return A.zz_inv();}
 
-    /** \brief Matrix adjoint */
-    inline friend MatType adj(const MatType& A) { return A.zz_adj();}
-
-    /** \brief Get the (i,j) minor matrix */
-    inline friend MatType getMinor(const MatType &x, int i, int j) {
-      return x.zz_getMinor(i, j);
-    }
-
-    /** \brief Get the (i,j) cofactor matrix */
-    inline friend MatType cofactor(const MatType &x, int i, int j) {
-      return x.zz_cofactor(i, j);
-    }
-
     /** \brief Matrix trace */
     inline friend MatType trace(const MatType& a) { return a.zz_trace();}
 
@@ -302,15 +289,6 @@ namespace casadi {
       return x.zz_outer_prod(y);
     }
 
-    /** \brief  QR factorization using the modified Gram-Schmidt algorithm
-     * More stable than the classical Gram-Schmidt, but may break down if the rows of A
-     * are nearly linearly dependent
-     * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
-     * Note that in SWIG, Q and R are returned by value. */
-    inline friend void qr(const MatType& A, MatType& Q, MatType& R) {
-      return A.zz_qr(Q, R);
-    }
-
     /** \brief Computes the nullspace of a matrix A
      *
      * Finds Z m-by-(m-n) such that AZ = 0
@@ -337,20 +315,8 @@ namespace casadi {
       return A.zz_unite(B);
     }
 
-    /// Returns true only if every element in the matrix is true
-    inline friend MatType all(const MatType &x) { return x.zz_all();}
-
-    /// Returns true if any element in the matrix is true
-    inline friend MatType any(const MatType &x) { return x.zz_any();}
-
     /** \brief  Make the matrix dense if not already */
     inline friend MatType dense(const MatType& x) { return x.zz_dense();}
-
-    /** \brief Create a new matrix with a given sparsity pattern but with the
-     * nonzeros taken from an existing matrix */
-    inline friend MatType project(const MatType& A, const Sparsity& sp) {
-      return A.zz_project(sp);
-    }
 #endif // SWIG
 
     /** @name Construct symbolic primitives
