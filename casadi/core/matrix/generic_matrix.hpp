@@ -156,6 +156,8 @@ namespace casadi {
     MatType zz_sum_square() const { return sumAll(self()*self()); }
     MatType zz_linspace(const MatType &b, int nsteps) const;
     MatType zz_cross(const MatType &b, int dim=-1) const;
+    MatType zz_tril2symm() const;
+    MatType zz_triu2symm() const;
     /// @}
 
 #ifndef SWIG
@@ -242,6 +244,14 @@ namespace casadi {
 
     /** \brief Matrix trace */
     inline friend MatType trace(const MatType& a) { return a.zz_trace();}
+
+    /** \brief Convert a lower triangular matrix to a symmetric one
+     */
+    inline friend MatType tril2symm(const MatType &a) { return a.zz_tril2symm();}
+
+    /** \brief Convert a upper triangular matrix to a symmetric one
+     */
+    inline friend MatType triu2symm(const MatType &a) { return a.zz_triu2symm();}
 #endif // SWIG
 
     /** @name Construct symbolic primitives
@@ -473,6 +483,28 @@ namespace casadi {
     ret[2] = a1*b2-a2*b1;
 
     return t ? vertcat(ret) : horzcat(ret);
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::zz_tril2symm() const {
+    casadi_assert_message(self().isSquare(),
+                          "Shape error in tril2symm. Expecting square shape but got "
+                          << self().dimString());
+    casadi_assert_message(self().sizeU()-self().sizeD()==0,
+                          "Sparsity error in tril2symm. Found above-diagonal entries in argument: "
+                          << self().dimString());
+    return self() +  self().T() - diag(diag(self()));
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::zz_triu2symm() const {
+    casadi_assert_message(self().isSquare(),
+                          "Shape error in triu2symm. Expecting square shape but got "
+                          << self().dimString());
+    casadi_assert_message(self().sizeL()-self().sizeD()==0,
+                          "Sparsity error in triu2symm. Found below-diagonal entries in argument: "
+                          << self().dimString());
+    return self() + self().T() - diag(diag(self()));
   }
 #endif
 

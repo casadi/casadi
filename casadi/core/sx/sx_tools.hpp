@@ -28,7 +28,6 @@
 
 #include "sx_element.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "../matrix/generic_matrix_tools.hpp"
 #include "../casadi_options.hpp"
 
 /** \defgroup expression_tools Expression tools

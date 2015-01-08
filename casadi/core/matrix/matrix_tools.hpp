@@ -31,8 +31,6 @@
 
 #include "../options_functionality.hpp"
 
-#include "generic_matrix_tools.hpp"
-
 namespace casadi {
 
 /**

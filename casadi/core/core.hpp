@@ -31,7 +31,6 @@
 
 // Generic tools
 #include "polynomial.hpp"
-#include "matrix/generic_matrix_tools.hpp"
 #include "matrix/generic_expression_tools.hpp"
 #include "std_vector_tools.hpp"
 #include "functor.hpp"

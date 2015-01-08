@@ -26,7 +26,6 @@
 
 %include "sx_element.i"
 %include "matrix_tools.i"
-%include "generic_matrix_tools.i"
 
 %include <casadi/core/sx/sx_tools.hpp>
 

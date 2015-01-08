@@ -1065,7 +1065,6 @@ class NZproxy:
 %include "sx_element.i"
 %include "mx.i"
 %include "matrix_tools.i"
-%include "generic_matrix_tools.i"
 %include "generic_expression_tools.i"
 %include "sx_tools.i"
 %include "mx_tools.i"

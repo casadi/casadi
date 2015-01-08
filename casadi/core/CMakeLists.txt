@@ -42,7 +42,6 @@ set(CASADI_SRCS
   matrix/generic_expression.hpp                         # Base class for SXElement MX and Matrix<>
   matrix/generic_expression_tools.hpp                   # Tools for SXElement MX and Matrix<>
   matrix/generic_matrix.hpp                             # Base class for Matrix<> and MX
-  matrix/generic_matrix_tools.hpp                       # Tools for both Matrix<> and MX
   matrix/matrix.hpp           matrix/matrix_impl.hpp   matrix/matrix.cpp    # The Matrix template class
   matrix/sparse_storage.hpp   matrix/sparse_storage_impl.hpp
   matrix/sparsity_interface.hpp

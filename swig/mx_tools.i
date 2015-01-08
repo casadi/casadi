@@ -25,7 +25,7 @@
 #define CASADI_MX_TOOLS_I
 
 %include "mx.i"
-%include "generic_matrix_tools.i"
+%include "matrix_tools.i"
 %include "generic_expression_tools.i"
 
 %include <casadi/core/mx/mx_tools.hpp>

@@ -68,4 +68,75 @@ MATRIX_TOOLS_TEMPLATES(double)
 MATRIX_TOOLS_TEMPLATES(casadi::SXElement)
 #endif // SWIGMATLAB
 
+%define SPARSITY_INTERFACE_DECL(MatType...)
+MatType horzcat(const std::vector< MatType > &v);
+std::vector<MatType > horzsplit(const MatType &v, const std::vector<int>& offset);
+std::vector<MatType > horzsplit(const MatType &v, int incr=1);
+MatType vertcat(const std::vector< MatType > &v);
+std::vector<MatType > vertsplit(const MatType &v, const std::vector<int>& offset);
+std::vector<MatType > vertsplit(const MatType &v, int incr=1);
+MatType blockcat(const std::vector< std::vector<MatType > > &v);
+std::vector< std::vector< MatType > >
+blocksplit(const MatType& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
+std::vector< std::vector< MatType > > blocksplit(const MatType& x, int vert_incr=1, int horz_incr=1);
+MatType diagcat(const std::vector< MatType > &v);
+std::vector< MatType > diagsplit(const MatType& x, const std::vector<int>& output_offset1,
+                                 const std::vector<int>& output_offset2);
+std::vector< MatType > diagsplit(const MatType& x, const std::vector<int>& output_offset);
+std::vector< MatType > diagsplit(const MatType& x, int incr=1);
+std::vector< MatType > diagsplit(const MatType& x, int incr1, int incr2);
+MatType veccat(const std::vector< MatType >& x);
+MatType vecNZcat(const std::vector< MatType >& x);
+MatType mul(const MatType &x, const MatType &y);
+MatType mul(const MatType &x, const MatType &y, const MatType &z);
+MatType mul(const std::vector< MatType > &args);
+MatType transpose(const MatType &X);
+MatType vec(const MatType& a);
+MatType vecNZ(const MatType& a);
+MatType reshape(const MatType& a, const Sparsity& sp);
+MatType reshape(const MatType& a, int nrow, int ncol);
+MatType reshape(const MatType& a, std::pair<int, int> rc);
+int sprank(const MatType& A);
+MatType triu(const MatType& a, bool includeDiagonal=true);
+MatType tril(const MatType& a, bool includeDiagonal=true);
+%enddef
+
+%define GENERIC_MATRIX_DECL(MatType...)
+MatType quad_form(const MatType &X, const MatType &A);
+MatType quad_form(const MatType &X);
+MatType sum_square(const MatType &X);
+MatType linspace(const MatType &a, const MatType &b, int nsteps);
+MatType cross(const MatType &a, const MatType &b, int dim = -1);
+MatType det(const MatType& A);
+MatType inv(const MatType& A);
+MatType trace(const MatType& a);
+bool isEqual(const MatType& x, const MatType& y, int depth=0);
+MatType tril2symm(const MatType &a);
+MatType triu2symm(const MatType &a);
+%enddef
+
+%define MATRIX_DECL(MatType...)
+MatType adj(const MatType& A);
+MatType getMinor(const MatType &x, int i, int j);
+MatType cofactor(const MatType &x, int i, int j);
+%enddef
+
+%define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
+SPARSITY_INTERFACE_DECL(MatType)
+GENERIC_MATRIX_DECL(MatType)
+%enddef
+
+%define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
+GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<DataType>)
+MATRIX_DECL(casadi::Matrix<DataType>)
+%enddef
+
+#ifndef SWIGMATLAB
+SPARSITY_INTERFACE_DECL(casadi::Sparsity)
+GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(int)
+GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(double)
+GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(casadi::SXElement)
+GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::MX)
+#endif // SWIGMATLAB
+
 #endif // CASADI_MATRIX_TOOLS_I
