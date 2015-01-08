@@ -72,6 +72,15 @@ MatType quad_form(const MatType &X);
 MatType sum_square(const MatType &X);
 MatType linspace(const MatType &a, const MatType &b, int nsteps);
 MatType cross(const MatType &a, const MatType &b, int dim = -1);
+MatType det(const MatType& A);
+MatType inv(const MatType& A);
+MatType trace(const MatType& a);
+%enddef
+
+%define MATRIX_DECL(MatType...)
+MatType adj(const MatType& A);
+MatType getMinor(const MatType &x, int i, int j);
+MatType cofactor(const MatType &x, int i, int j);
 %enddef
 
 // map the template name to the instantiated name
@@ -86,16 +95,11 @@ GENERIC_MATRIX_DECL(MatType)
 GMTT_INST(MatType, tril2symm)
 GMTT_INST(MatType, triu2symm)
 GMTT_INST(MatType, isEqual)
-GMTT_INST(MatType, det)
-GMTT_INST(MatType, inv)
-GMTT_INST(MatType, trace)
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<DataType>)
-GMTT_INST(casadi::Matrix<DataType>, adj)
-GMTT_INST(casadi::Matrix<DataType>, getMinor)
-GMTT_INST(casadi::Matrix<DataType>, cofactor)
+MATRIX_DECL(casadi::Matrix<DataType>)
 %enddef
 
 #ifndef SWIGMATLAB

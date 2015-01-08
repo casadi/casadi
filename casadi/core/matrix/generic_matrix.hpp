@@ -220,6 +220,28 @@ namespace casadi {
     inline friend MatType cross(const MatType &a, const MatType &b, int dim = -1) {
       return a.zz_cross(b, dim);
     }
+
+    /** \brief Matrix determinant (experimental) */
+    inline friend MatType det(const MatType& A) { return A.zz_det();}
+
+    /** \brief Matrix inverse (experimental) */
+    inline friend MatType inv(const MatType& A) { return A.zz_inv();}
+
+    /** \brief Matrix adjoint */
+    inline friend MatType adj(const MatType& A) { return A.zz_adj();}
+
+    /** \brief Get the (i,j) minor matrix */
+    inline friend MatType getMinor(const MatType &x, int i, int j) {
+      return x.zz_getMinor(i, j);
+    }
+
+    /** \brief Get the (i,j) cofactor matrix */
+    inline friend MatType cofactor(const MatType &x, int i, int j) {
+      return x.zz_cofactor(i, j);
+    }
+
+    /** \brief Matrix trace */
+    inline friend MatType trace(const MatType& a) { return a.zz_trace();}
 #endif // SWIG
 
     /** @name Construct symbolic primitives

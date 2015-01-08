@@ -60,34 +60,6 @@ namespace casadi {
     return mat(x).isEqual(mat(y));
   }
 
-  /** \brief Matrix determinant (experimental) */
-  template<typename MatType>
-  MatType det(const GenericMatrix<MatType>& A) { return mat(A).zz_det();}
-
-  /** \brief Matrix inverse (experimental) */
-  template<typename MatType>
-  MatType inv(const GenericMatrix<MatType>& A) { return mat(A).zz_inv();}
-
-  /** \brief Matrix adjoint */
-  template<typename MatType>
-  MatType adj(const GenericMatrix<MatType>& A) { return mat(A).zz_adj();}
-
-  /** \brief Get the (i,j) minor matrix */
-  template<typename MatType>
-  MatType getMinor(const GenericMatrix<MatType> &x, int i, int j) {
-    return mat(x).zz_getMinor(i, j);
-  }
-
-  /** \brief Get the (i,j) cofactor matrix */
-  template<typename MatType>
-  MatType cofactor(const GenericMatrix<MatType> &x, int i, int j) {
-    return mat(x).zz_cofactor(i, j);
-  }
-
-  /** \brief Matrix trace */
-  template<typename MatType>
-  MatType trace(const GenericMatrix<MatType>& a) { return mat(a).zz_trace();}
-
 #ifndef SWIG
   // Implementations
   template<typename MatType>
