@@ -66,6 +66,12 @@ MatType tril(const MatType& a, bool includeDiagonal=true);
 SPARSITY_INTERFACE_DECL(casadi::Sparsity)
 #endif // SWIGMATLAB
 
+%define GENERIC_MATRIX_DECL(MatType...)
+MatType quad_form(const MatType &X, const MatType &A);
+MatType quad_form(const MatType &X);
+MatType sum_square(const MatType &X);
+%enddef
+
 // map the template name to the instantiated name
 %define GMTT_INST(MatType, function_name...)
 %template(function_name) casadi::function_name< MatType >;
@@ -74,9 +80,8 @@ SPARSITY_INTERFACE_DECL(casadi::Sparsity)
 // Define template instantiations
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
 SPARSITY_INTERFACE_DECL(MatType)
+GENERIC_MATRIX_DECL(MatType)
 GMTT_INST(MatType, cross)
-GMTT_INST(MatType, quad_form)
-GMTT_INST(MatType, sum_square)
 GMTT_INST(MatType, tril2symm)
 GMTT_INST(MatType, triu2symm)
 GMTT_INST(MatType, isEqual)

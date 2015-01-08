@@ -44,18 +44,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /** \brief Calculate quadratic form X^T A X*/
-  template<typename MatType>
-  MatType quad_form(const GenericMatrix<MatType> &X, const GenericMatrix<MatType> &A);
-
-  /** \brief Calculate quadratic form X^T X*/
-  template<typename MatType>
-  MatType quad_form(const GenericMatrix<MatType> &X);
-
-  /** \brief Calculate some of squares: sum_ij X_ij^2  */
-  template<typename MatType>
-  MatType sum_square(const GenericMatrix<MatType> &X);
-
   /** \brief Matlab's \c linspace command
    */
   template<typename MatType>
@@ -189,25 +177,6 @@ namespace casadi {
                           "Sparsity error in triu2symm. Found below-diagonal entries in argument: "
                           << a.dimString());
     return a + a.T() - diag(diag(a));
-  }
-
-  template<typename MatType>
-  MatType quad_form(const GenericMatrix<MatType> &X_, const GenericMatrix<MatType> &A_) {
-    const MatType& X = mat(X_);
-    const MatType& A = mat(A_);
-    return mul(X.T(), mul(A, X));
-  }
-
-  template<typename MatType>
-  MatType quad_form(const GenericMatrix<MatType> &X_) {
-    const MatType& X = mat(X_);
-    return mul(X.T(), X);
-  }
-
-  template<typename MatType>
-  MatType sum_square(const GenericMatrix<MatType> &X_) {
-    const MatType& X = mat(X_);
-    return sumAll(X*X);
   }
 #endif // SWIG
 

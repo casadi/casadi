@@ -40,6 +40,12 @@ namespace casadi {
   */
   template<typename MatType>
   class CASADI_EXPORT SparsityInterface {
+#ifndef SWIG
+  protected:
+    // Helper functions
+    inline const MatType& self() const { return static_cast<const MatType&>(*this); }
+    inline MatType& self() { return static_cast<MatType&>(*this); }
+#endif // SWIG
   public:
     std::vector< std::vector< MatType > >
       zz_blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const;
@@ -343,15 +349,14 @@ namespace casadi {
 #ifndef SWIG
   template<typename MatType>
   MatType SparsityInterface<MatType>::zz_vec() const {
-    const MatType& x = static_cast<const MatType&>(*this);
-    return reshape(x, x.numel(), 1);
+    return reshape(self(), self().numel(), 1);
   }
 
   template<typename MatType>
   std::vector< std::vector< MatType > >
   SparsityInterface<MatType>::zz_blocksplit(const std::vector<int>& vert_offset,
                                             const std::vector<int>& horz_offset) const {
-    std::vector< MatType > rows = vertsplit(static_cast<const MatType&>(*this), vert_offset);
+    std::vector< MatType > rows = vertsplit(self(), vert_offset);
     std::vector< std::vector< MatType > > ret;
     for (int i=0;i<rows.size();++i) {
       ret.push_back(horzsplit(rows[i], horz_offset));

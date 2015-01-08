@@ -68,6 +68,7 @@ namespace casadi {
   */
   template<typename MatType>
   class CASADI_EXPORT GenericMatrix : public SparsityInterface<MatType> {
+    using SparsityInterface<MatType>::self;
   public:
 
     /** \brief Get the number of (structural) non-zero elements */
@@ -142,7 +143,7 @@ namespace casadi {
     Sparsity& sparsityRef();
 
     /// @{
-    /** \brief Accessed by SparsityInterface */
+    /** \brief Accessed by friend functions */
     int zz_sprank() const { return sprank(sparsity());}
     MatType zz_tril(const MatType &a, bool includeDiagonal=true) const {
       return a.setSparse(tril(a.sparsity(), includeDiagonal));
@@ -150,42 +151,66 @@ namespace casadi {
     MatType zz_triu(const MatType &a, bool includeDiagonal=true) const {
       return a.setSparse(triu(a.sparsity(), includeDiagonal));
     }
+    MatType zz_quad_form(const MatType &A) const {
+      return mul(self().T(), mul(A, self()));
+    }
+    MatType zz_quad_form() const {
+      return mul(self().T(), self());
+    }
+    MatType zz_sum_square() const {
+      return sumAll(self()*self());
+    }
     /// @}
 
 #ifndef SWIG
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
     const MatType operator[](const K& k) const {
-      return static_cast<const MatType*>(this)->getNZ(false, k);
+      return self().getNZ(false, k);
     }
 
     /** \brief  Access vector nonzero or slice of nonzeros */
     template<typename K>
     NonZeros<MatType, K> operator[](const K& k) {
-      return NonZeros<MatType, K>(static_cast<MatType&>(*this), k);
+      return NonZeros<MatType, K>(self(), k);
     }
 
     /** \brief  Get vector element or slice */
     template<typename RR>
     const MatType operator()(const RR& rr) const {
-      return static_cast<const MatType*>(this)->getSub(false, rr);
+      return self().getSub(false, rr);
     }
 
     /** \brief  Get Matrix element or slice */
     template<typename RR, typename CC>
     const MatType operator()(const RR& rr, const CC& cc) const
-    { return static_cast<const MatType*>(this)->getSub(false, rr, cc); }
+    { return self().getSub(false, rr, cc); }
 
     /** \brief Access Matrix elements (one argument) */
     template<typename RR>
     SubIndex<MatType, RR> operator()(const RR& rr) {
-      return SubIndex<MatType, RR>(static_cast<MatType&>(*this), rr);
+      return SubIndex<MatType, RR>(self(), rr);
     }
 
     /** \brief Access Matrix elements (two arguments) */
     template<typename RR, typename CC>
     SubMatrix<MatType, RR, CC> operator()(const RR& rr, const CC& cc) {
-      return SubMatrix<MatType, RR, CC>(static_cast<MatType&>(*this), rr, cc);
+      return SubMatrix<MatType, RR, CC>(self(), rr, cc);
+    }
+
+    /** \brief Calculate quadratic form X^T A X*/
+    inline friend MatType quad_form(const MatType &X, const MatType &A) {
+      return X.zz_quad_form(A);
+    }
+
+    /** \brief Calculate quadratic form X^T X*/
+    inline friend MatType quad_form(const MatType &X) {
+     return X.zz_quad_form();
+    }
+
+    /** \brief Calculate some of squares: sum_ij X_ij^2  */
+    inline friend MatType sum_square(const MatType &X) {
+     return X.zz_sum_square();
     }
 #endif // SWIG
 
@@ -264,12 +289,12 @@ namespace casadi {
 
   template<typename MatType>
   const Sparsity& GenericMatrix<MatType>::sparsity() const {
-    return static_cast<const MatType*>(this)->sparsity();
+    return self().sparsity();
   }
 
   template<typename MatType>
   Sparsity& GenericMatrix<MatType>::sparsityRef() {
-    return static_cast<MatType*>(this)->sparsityRef();
+    return self().sparsityRef();
   }
 
   template<typename MatType>
