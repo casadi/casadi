@@ -24,7 +24,6 @@
 
 
 #include "sparsity_internal.hpp"
-#include "sparsity_tools.hpp"
 #include "../std_vector_tools.hpp"
 #include <climits>
 #include <cstdlib>
@@ -3767,7 +3766,7 @@ namespace casadi {
     return true;
   }
 
-  Sparsity SparsityInternal::getTril(bool includeDiagonal) const {
+  Sparsity SparsityInternal::zz_tril(bool includeDiagonal) const {
     vector<int> colind, row;
     colind.reserve(ncol_+1);
     colind.push_back(0);
@@ -3783,7 +3782,7 @@ namespace casadi {
     return Sparsity(nrow_, ncol_, colind, row);
   }
 
-  Sparsity SparsityInternal::getTriu(bool includeDiagonal) const {
+  Sparsity SparsityInternal::zz_triu(bool includeDiagonal) const {
     vector<int> colind, row;
     colind.reserve(ncol_+1);
     colind.push_back(0);

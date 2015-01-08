@@ -30,7 +30,6 @@
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
 #include "sparsity.hpp"
-#include "sparsity_tools.hpp"
 #include "../casadi_math.hpp"
 #include "sparsity_interface.hpp"
 
@@ -144,8 +143,12 @@ namespace casadi {
 
     /// @{
     /** \brief Accessed by SparsityInterface */
-    int zz_sprank() const {
-      return sprank(sparsity());
+    int zz_sprank() const { return sprank(sparsity());}
+    MatType zz_tril(const MatType &a, bool includeDiagonal=true) const {
+      return a.setSparse(tril(a.sparsity(), includeDiagonal));
+    }
+    MatType zz_triu(const MatType &a, bool includeDiagonal=true) const {
+      return a.setSparse(triu(a.sparsity(), includeDiagonal));
     }
     /// @}
 

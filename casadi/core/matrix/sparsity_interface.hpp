@@ -325,6 +325,18 @@ namespace casadi {
     inline friend int sprank(const MatType& A) {
       return A.zz_sprank();
     }
+
+    /** \brief Get the upper triangular part of a matrix
+     */
+    inline friend MatType triu(const MatType& a, bool includeDiagonal=true) {
+      return a.zz_triu(includeDiagonal);
+    }
+
+    /** \brief Get the lower triangular part of a matrix
+     */
+    inline friend MatType tril(const MatType& a, bool includeDiagonal=true) {
+      return a.zz_tril(includeDiagonal);
+    }
 #endif // SWIG
   };
 

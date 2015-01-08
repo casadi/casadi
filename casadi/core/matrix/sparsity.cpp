@@ -24,7 +24,6 @@
 
 
 #include "sparsity_internal.hpp"
-#include "sparsity_tools.hpp"
 #include "../matrix/matrix.hpp"
 #include "../std_vector_tools.hpp"
 #include <climits>
@@ -728,12 +727,12 @@ namespace casadi {
     getCache().clear();
   }
 
-  Sparsity Sparsity::getTril(bool includeDiagonal) const {
-    return (*this)->getTril(includeDiagonal);
+  Sparsity Sparsity::zz_tril(bool includeDiagonal) const {
+    return (*this)->zz_tril(includeDiagonal);
   }
 
-  Sparsity Sparsity::getTriu(bool includeDiagonal) const {
-    return (*this)->getTriu(includeDiagonal);
+  Sparsity Sparsity::zz_triu(bool includeDiagonal) const {
+    return (*this)->zz_triu(includeDiagonal);
   }
 
   std::vector<int> Sparsity::getLowerNZ() const {

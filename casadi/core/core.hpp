@@ -41,7 +41,6 @@
 // Matrices
 #include "matrix/matrix.hpp"
 #include "matrix/matrix_tools.hpp"
-#include "matrix/sparsity_tools.hpp"
 
 // Scalar expressions
 #include "sx/sx_tools.hpp"

@@ -58,6 +58,8 @@ MatType reshape(const MatType& a, const Sparsity& sp);
 MatType reshape(const MatType& a, int nrow, int ncol);
 MatType reshape(const MatType& a, std::pair<int, int> rc);
 int sprank(const MatType& A);
+MatType triu(const MatType& a, bool includeDiagonal=true);
+MatType tril(const MatType& a, bool includeDiagonal=true);
 %enddef
 
 #ifndef SWIGMATLAB
@@ -77,8 +79,6 @@ GMTT_INST(MatType, quad_form)
 GMTT_INST(MatType, sum_square)
 GMTT_INST(MatType, tril2symm)
 GMTT_INST(MatType, triu2symm)
-GMTT_INST(MatType, triu)
-GMTT_INST(MatType, tril)
 GMTT_INST(MatType, isEqual)
 GMTT_INST(MatType, det)
 GMTT_INST(MatType, inv)

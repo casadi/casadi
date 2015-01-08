@@ -32,7 +32,6 @@
 #include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../function/sx_function.hpp"
-#include "../matrix/sparsity_tools.hpp"
 
 /// \cond INTERNAL
 

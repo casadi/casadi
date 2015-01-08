@@ -25,7 +25,6 @@
 
 #include "qcqp_solver_internal.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "../matrix/sparsity_tools.hpp"
 
 INPUTSCHEME(QcqpSolverInput)
 OUTPUTSCHEME(QcqpSolverOutput)

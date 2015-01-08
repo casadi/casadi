@@ -26,7 +26,6 @@
 
 #include "code_generator.hpp"
 #include "function_internal.hpp"
-#include "../matrix/sparsity_tools.hpp"
 #include <iomanip>
 #include "casadi/core/runtime/runtime_embedded.hpp"
 

@@ -242,10 +242,10 @@ namespace casadi {
     bool isTriu() const;
 
     /// Get upper triangular part
-    Sparsity getTriu(bool includeDiagonal) const;
+    Sparsity zz_triu(bool includeDiagonal) const;
 
     /// Get lower triangular part
-    Sparsity getTril(bool includeDiagonal) const;
+    Sparsity zz_tril(bool includeDiagonal) const;
 
     /// Get nonzeros in lower triangular part
     std::vector<int> getLowerNZ() const;

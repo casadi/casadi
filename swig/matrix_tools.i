@@ -26,7 +26,7 @@
 
 %include "matrix.i"
 %include "options_functionality.i"
-%include "sparsity_tools.i"
+%include "sparsity.i"
 
 %include <casadi/core/matrix/matrix_tools.hpp>
 

@@ -25,7 +25,6 @@
 
 #include "sqpmethod.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
 #include "casadi/core/sx/sx_tools.hpp"

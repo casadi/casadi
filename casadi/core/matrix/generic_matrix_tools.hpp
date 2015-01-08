@@ -76,16 +76,6 @@ namespace casadi {
   template<typename MatType>
   MatType triu2symm(const GenericMatrix<MatType> &a);
 
-  /** \brief Get the upper triangular part of a matrix
-   */
-  template<typename MatType>
-  MatType triu(const GenericMatrix<MatType> &a);
-
-  /** \brief Get the lower triangular part of a matrix
-   */
-  template<typename MatType>
-  MatType tril(const GenericMatrix<MatType> &a);
-
   /** \brief Check if two expressions are equal, assuming that they are comparable */
   template<typename MatType>
   bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y) {
@@ -199,18 +189,6 @@ namespace casadi {
                           "Sparsity error in triu2symm. Found below-diagonal entries in argument: "
                           << a.dimString());
     return a + a.T() - diag(diag(a));
-  }
-
-  template<typename MatType>
-  MatType triu(const GenericMatrix<MatType> &a_) {
-    const MatType& a = mat(a_);
-    return a.setSparse(a.sparsity().getTriu());
-  }
-
-  template<typename MatType>
-  MatType tril(const GenericMatrix<MatType> &a_) {
-    const MatType& a = mat(a_);
-    return a.setSparse(a.sparsity().getTril());
   }
 
   template<typename MatType>

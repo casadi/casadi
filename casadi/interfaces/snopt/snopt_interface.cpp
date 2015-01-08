@@ -35,7 +35,6 @@
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/mx/mx_tools.hpp"
-#include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 
 #include "snopt_interface.hpp"

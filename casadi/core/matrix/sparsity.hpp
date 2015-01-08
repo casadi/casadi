@@ -536,10 +536,10 @@ namespace casadi {
     bool isSingular() const;
 
     /// Get upper triangular part
-    Sparsity getTriu(bool includeDiagonal=true) const;
+    Sparsity zz_triu(bool includeDiagonal=true) const;
 
     /// Get lower triangular part
-    Sparsity getTril(bool includeDiagonal=true) const;
+    Sparsity zz_tril(bool includeDiagonal=true) const;
 
     /** \brief Do the rows appear sequentially on each column
     *

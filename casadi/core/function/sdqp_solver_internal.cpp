@@ -25,7 +25,6 @@
 
 #include "sdqp_solver_internal.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "../matrix/sparsity_tools.hpp"
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 

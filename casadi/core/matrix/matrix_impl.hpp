@@ -29,7 +29,6 @@
 // The declaration of the class is in a separate file
 #include "matrix.hpp"
 #include "matrix_tools.hpp"
-#include "sparsity_tools.hpp"
 #include "../std_vector_tools.hpp"
 
 /// \cond INTERNAL
