@@ -31,7 +31,7 @@
 * \sa
 * \code
 * casadi::Sparsity::stronglyConnectedComponents();
-* casadi::blkdiag();
+* casadi::diagcat();
 * \endcode
 *
 */
