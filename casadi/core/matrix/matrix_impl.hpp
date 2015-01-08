@@ -3220,6 +3220,13 @@ namespace casadi {
 
   }
 
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_dense() const {
+    Matrix<DataType> ret = *this;
+    ret.makeDense();
+    return ret;
+  }
+
 } // namespace casadi
 
 /// \endcond

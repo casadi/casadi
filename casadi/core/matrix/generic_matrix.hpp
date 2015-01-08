@@ -343,6 +343,14 @@ namespace casadi {
     /// Returns true if any element in the matrix is true
     inline friend MatType any(const MatType &x) { return x.zz_any();}
 
+    /** \brief  Make the matrix dense if not already */
+    inline friend MatType dense(const MatType& x) { return x.zz_dense();}
+
+    /** \brief Create a new matrix with a given sparsity pattern but with the
+     * nonzeros taken from an existing matrix */
+    inline friend MatType project(const MatType& A, const Sparsity& sp) {
+      return A.zz_project(sp);
+    }
 #endif // SWIG
 
     /** @name Construct symbolic primitives

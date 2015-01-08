@@ -118,10 +118,6 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m) { return A.zz_repmat(n, m);}
 
-  /** \brief  Make a matrix dense */
-  template<typename DataType>
-  Matrix<DataType> dense(const Matrix<DataType>& A);
-
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<typename DataType>
   Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0);
@@ -142,13 +138,6 @@ namespace casadi {
   template<typename DataType>
   const DataType* getPtr(const Matrix<DataType> &v);
   /// \endcond
-
-  /** \brief Create a new matrix with a given sparsity pattern but with the
-   * nonzeros taken from an existing matrix */
-  template<typename DataType>
-  Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sp) {
-    return A.zz_project(sp);
-  }
 /*
 @}
 */
@@ -176,13 +165,6 @@ namespace casadi {
       return 0;
     else
       return &v.front();
-  }
-
-  template<typename DataType>
-  Matrix<DataType> dense(const Matrix<DataType>& A) {
-    Matrix<DataType> ret = A;
-    ret.makeDense();
-    return ret;
   }
 
   template<typename DataType>

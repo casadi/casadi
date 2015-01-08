@@ -42,9 +42,7 @@
   MTT_INST(DataType, pinv)
   MTT_INST(DataType, repmat)
   MTT_INST(DataType, addMultiple)
-  MTT_INST(DataType, project)
   MTT_INST(DataType, sparse)
-  MTT_INST(DataType, dense)
 %enddef
 
 #ifndef SWIGMATLAB
@@ -121,6 +119,8 @@ MatType cofactor(const MatType &x, int i, int j);
 void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
 //MatType all(const MatType &x);
 //MatType any(const MatType &x);
+MatType project(const MatType& A, const Sparsity& sp);
+MatType dense(const MatType& x);
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)

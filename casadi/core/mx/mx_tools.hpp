@@ -50,9 +50,6 @@ namespace casadi {
   /** \brief Repeat matrix A n times vertically and m times horizontally */
   inline MX repmat(const MX &A, int n, int m) { return A.zz_repmat(n, m);}
 
-  /** \brief  Make the matrix dense if not already */
-  inline MX dense(const MX& x) { return x.zz_dense();}
-
   /** \brief  Create a parent MX on which all given MX's will depend.
 
       In some sense, this function is the inverse of

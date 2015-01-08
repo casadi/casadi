@@ -528,6 +528,7 @@ namespace casadi {
     int zz_norm_0_mul_nn(const Matrix<DataType>& B,
                          std::vector<bool>& Bwork,
                          std::vector<int>& Iwork) const;
+    Matrix<DataType> zz_dense() const;
     ///@}
 
     /** \brief Set or reset the maximum number of calls to the
