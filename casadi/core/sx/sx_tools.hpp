@@ -225,7 +225,7 @@ namespace casadi {
    * \verbatim >>   x \endverbatim
    */
   CASADI_EXPORT SX taylor(const SX& ex, const SX& x,
-                                   const SX& a=casadi_limits<SXElement>::zero, int order=1);
+                                   const SX& a=0, int order=1);
 
   /**
    * \brief multivariate Taylor series expansion
