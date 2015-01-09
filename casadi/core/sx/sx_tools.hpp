@@ -70,7 +70,7 @@ namespace casadi {
       \brief tval vector with the the discrete values of t (monotonically increasing)
       \brief val vector with the corresponding function values (same length as tval)
   */
-  CASADI_EXPORT SX pw_lin(const SXElement &t, const SX &tval, const SX &val);
+  CASADI_EXPORT SX pw_lin(const SX &t, const SX &tval, const SX &val);
 
   CASADI_EXPORT SX if_else(const SX &cond, const SX &if_true, const SX &if_false);
   /**  \brief Heaviside function

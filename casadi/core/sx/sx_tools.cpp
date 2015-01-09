@@ -93,7 +93,7 @@ namespace casadi {
     return ret;
   }
 
-  SX pw_lin(const SXElement &t, const SX &tval, const SX &val) {
+  SX pw_lin(const SX &t, const SX &tval, const SX &val) {
     // Number of points
     int N = tval.numel();
     casadi_assert_message(N>=2, "pw_lin: N>=2");
