@@ -48,7 +48,7 @@ namespace casadi {
 
   /** \brief  Expand the expression as a weighted sum (with constant weights)
   */
-  CASADI_EXPORT void expand(const SX& ex, SX &weights, SX& terms);
+  inline void expand(const SX& ex, SX &weights, SX& terms) { ex.zz_expand(weights, terms);}
 
   /** \brief Create a piecewise constant function
       Create a piecewise constant function with n=val.size() intervals
@@ -58,7 +58,7 @@ namespace casadi {
       \param tval vector with the discrete values of t at the interval transitions (length n-1)
       \param val vector with the value of the function for each interval (length n)
   */
-  CASADI_EXPORT SX pw_const(const SX &t, const SX &tval, const SX &val);
+  inline SX pw_const(const SX &t, const SX &tval, const SX &val) { return t.zz_pw_const(tval, val);}
 
   /** Create a piecewise linear function
       Create a piecewise linear function:
@@ -68,7 +68,7 @@ namespace casadi {
       \brief tval vector with the the discrete values of t (monotonically increasing)
       \brief val vector with the corresponding function values (same length as tval)
   */
-  CASADI_EXPORT SX pw_lin(const SX &t, const SX &tval, const SX &val);
+  inline SX pw_lin(const SX &t, const SX &tval, const SX &val) { return t.zz_pw_lin(tval, val);}
 
   CASADI_EXPORT SX if_else(const SX &cond, const SX &if_true, const SX &if_false);
   /**  \brief Heaviside function
@@ -185,6 +185,9 @@ namespace casadi {
    */
   CASADI_EXPORT SX getSymbols(const SX& e);
 
+  /** \brief Get all the free variables in an expression */
+  inline SX getFree(const SX& ex) { return getSymbols(ex);}
+
   ///@{
   /** \brief Calculate jacobian via source code transformation
 
@@ -269,9 +272,6 @@ namespace casadi {
   CASADI_EXPORT std::string getOperatorRepresentation(
                                        const SX& x,
                                        const std::vector<std::string>& args);
-
-  /** \brief Get all the free variables in an expression */
-  CASADI_EXPORT SX getFree(const SX& ex);
 
   /** \brief Extract shared subexpressions from an set of expressions */
   CASADI_EXPORT void extractShared(std::vector<SX>& ex,

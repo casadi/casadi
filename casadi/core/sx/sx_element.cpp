@@ -935,22 +935,177 @@ namespace casadi {
   }
 
   template<>
-  void SX::zz_expand(SX &weights, SX& terms) const {
-    throw CasadiException("\"expand\" not defined for instantiation");
+  void SX::zz_expand(SX &ww, SX& tt) const {
+    const SX& ex2 = *this;
+    casadi_assert(ex2.isScalar());
+    SXElement ex = ex2.toScalar();
+
+    // Terms, weights and indices of the nodes that are already expanded
+    std::vector<std::vector<SXNode*> > terms;
+    std::vector<std::vector<double> > weights;
+    std::map<SXNode*, int> indices;
+
+    // Stack of nodes that are not yet expanded
+    std::stack<SXNode*> to_be_expanded;
+    to_be_expanded.push(ex.get());
+
+    while (!to_be_expanded.empty()) { // as long as there are nodes to be expanded
+
+      // Check if the last element on the stack is already expanded
+      if (indices.find(to_be_expanded.top()) != indices.end()) {
+        // Remove from stack
+        to_be_expanded.pop();
+        continue;
+      }
+
+      // Weights and terms
+      std::vector<double> w; // weights
+      std::vector<SXNode*> f; // terms
+
+      if (to_be_expanded.top()->isConstant()) { // constant nodes are seen as multiples of one
+        w.push_back(to_be_expanded.top()->getValue());
+        f.push_back(casadi_limits<SXElement>::one.get());
+      } else if (to_be_expanded.top()->isSymbolic()) {
+        // symbolic nodes have weight one and itself as factor
+        w.push_back(1);
+        f.push_back(to_be_expanded.top());
+      } else { // binary node
+
+        casadi_assert(to_be_expanded.top()->hasDep()); // make sure that the node is binary
+
+        // Check if addition, subtracton or multiplication
+        SXNode* node = to_be_expanded.top();
+        // If we have a binary node that we can factorize
+        if (node->getOp() == OP_ADD || node->getOp() == OP_SUB ||
+           (node->getOp() == OP_MUL  && (node->dep(0)->isConstant() ||
+                                         node->dep(1)->isConstant()))) {
+          // Make sure that both children are factorized, if not - add to stack
+          if (indices.find(node->dep(0).get()) == indices.end()) {
+            to_be_expanded.push(node->dep(0).get());
+            continue;
+          }
+          if (indices.find(node->dep(1).get()) == indices.end()) {
+            to_be_expanded.push(node->dep(1).get());
+            continue;
+          }
+
+          // Get indices of children
+          int ind1 = indices[node->dep(0).get()];
+          int ind2 = indices[node->dep(1).get()];
+
+          // If multiplication
+          if (node->getOp() == OP_MUL) {
+            double fac;
+            if (node->dep(0)->isConstant()) { // Multiplication where the first factor is a constant
+              fac = node->dep(0)->getValue();
+              f = terms[ind2];
+              w = weights[ind2];
+            } else { // Multiplication where the second factor is a constant
+              fac = node->dep(1)->getValue();
+              f = terms[ind1];
+              w = weights[ind1];
+            }
+            for (int i=0; i<w.size(); ++i) w[i] *= fac;
+
+          } else { // if addition or subtraction
+            if (node->getOp() == OP_ADD) {          // Addition: join both sums
+              f = terms[ind1];      f.insert(f.end(), terms[ind2].begin(), terms[ind2].end());
+              w = weights[ind1];    w.insert(w.end(), weights[ind2].begin(), weights[ind2].end());
+            } else {      // Subtraction: join both sums with negative weights for second term
+              f = terms[ind1];      f.insert(f.end(), terms[ind2].begin(), terms[ind2].end());
+              w = weights[ind1];
+              w.reserve(f.size());
+              for (int i=0; i<weights[ind2].size(); ++i) w.push_back(-weights[ind2][i]);
+            }
+            // Eliminate multiple elements
+            std::vector<double> w_new; w_new.reserve(w.size());   // weights
+            std::vector<SXNode*> f_new;  f_new.reserve(f.size());   // terms
+            std::map<SXNode*, int> f_ind; // index in f_new
+
+            for (int i=0; i<w.size(); i++) {
+              // Try to locate the node
+              std::map<SXNode*, int>::iterator it = f_ind.find(f[i]);
+              if (it == f_ind.end()) { // if the term wasn't found
+                w_new.push_back(w[i]);
+                f_new.push_back(f[i]);
+                f_ind[f[i]] = f_new.size()-1;
+              } else { // if the term already exists
+                w_new[it->second] += w[i]; // just add the weight
+              }
+            }
+            w = w_new;
+            f = f_new;
+          }
+        } else { // if we have a binary node that we cannot factorize
+          // By default,
+          w.push_back(1);
+          f.push_back(node);
+
+        }
+      }
+
+      // Save factorization of the node
+      weights.push_back(w);
+      terms.push_back(f);
+      indices[to_be_expanded.top()] = terms.size()-1;
+
+      // Remove node from stack
+      to_be_expanded.pop();
+    }
+
+    // Save expansion to output
+    int thisind = indices[ex.get()];
+    ww = SX(weights[thisind]);
+
+    vector<SXElement> termsv(terms[thisind].size());
+    for (int i=0; i<termsv.size(); ++i)
+      termsv[i] = SXElement::create(terms[thisind][i]);
+    tt = SX(termsv);
   }
 
   template<>
   SX SX::zz_pw_const(const SX &tval,
                      const SX &val) const {
-    throw CasadiException("\"pw_const\" not defined for instantiation");
-    return SX();
+    const SX &t = *this;
+    // number of intervals
+    int n = val.numel();
+
+    casadi_assert_message(t.isScalar(), "t must be a scalar");
+    casadi_assert_message(tval.numel() == n-1, "dimensions do not match");
+
+    SX ret = val.at(0);
+    for (int i=0; i<n-1; ++i) {
+      ret += (val(0, i+1)-val(0, i)) * (t>=tval(0, i));
+    }
+
+    return ret;
   }
 
   template<>
   SX SX::zz_pw_lin(const SX &tval,
                    const SX &val) const {
-    throw CasadiException("\"pw_lin\" not defined for instantiation");
-    return SX();
+    const SX &t = *this;
+
+    // Number of points
+    int N = tval.numel();
+    casadi_assert_message(N>=2, "pw_lin: N>=2");
+
+    // Gradient for each line segment
+    SX g = SX::sparse(1, N-1);
+    for (int i=0; i<N-1; ++i) {
+      g(0, i) = (val(0, i+1)- val(0, i))/(tval(0, i+1)-tval(0, i));
+    }
+
+    // Line segments
+    SX lseg = SX::sparse(1, N-1);
+    for (int i=0; i<N-1; ++i)
+      lseg(0, i) = val(0, i) + g(0, i)*(t-tval(0, i));
+
+    // interior time points
+    SX tint = tval(0, range(N-2));
+
+    // Return piecewise linear function
+    return pw_const(t, tint, lseg);
   }
 
   template<>
