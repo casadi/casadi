@@ -91,16 +91,6 @@ namespace casadi {
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<typename DataType>
   Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0);
-
-  /// \cond INTERNAL
-  /// Get a pointer to the data contained in the vector
-  template<typename DataType>
-  DataType* getPtr(Matrix<DataType> &v);
-
-  /// Get a pointer to the data contained in the vector
-  template<typename DataType>
-  const DataType* getPtr(const Matrix<DataType> &v);
-  /// \endcond
 /*
 @}
 */
@@ -114,22 +104,6 @@ namespace casadi {
 
 namespace casadi {
   // Implementations
-  template<typename DataType>
-  DataType* getPtr(Matrix<DataType> &v) {
-    if (v.isEmpty())
-      return 0;
-    else
-      return &v.front();
-  }
-
-  template<typename DataType>
-  const DataType* getPtr(const Matrix<DataType> &v) {
-    if (v.isEmpty())
-      return 0;
-    else
-      return &v.front();
-  }
-
   template<typename DataType>
   Matrix<DataType> sparse(const Matrix<DataType>& A, double tol) {
     Matrix<DataType> ret = A;

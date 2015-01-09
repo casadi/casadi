@@ -673,13 +673,17 @@ namespace casadi {
     /// Const access the non-zero elements
     const std::vector<DataType>& data() const;
 
+#ifndef SWIG
     /// \cond INTERNAL
     /// Get a pointer to the data
     DataType* ptr() { return isEmpty() ? static_cast<DataType*>(0) : &front();}
+    friend inline DataType* getPtr(Matrix<DataType>& v) { return v.ptr();}
 
     /// Get a const pointer to the data
     const DataType* ptr() const { return isEmpty() ? static_cast<const DataType*>(0) : &front();}
+    friend inline const DataType* getPtr(const Matrix<DataType>& v) { return v.ptr();}
     /// \endcond
+#endif // SWIG
 
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const { return sparsity_; }
