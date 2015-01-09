@@ -1139,8 +1139,49 @@ namespace casadi {
                              const SX &a,
                              const SX &b, int order,
                              const SX& w) const {
-    throw CasadiException("\"gauss_quadrature\" not defined for instantiation");
-    return SX();
+    const SX &f = *this;
+    casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
+    casadi_assert_message(w.isEmpty(), "gauss_quadrature: empty weights");
+
+    // Change variables to [-1, 1]
+    if (!isEqual(a.toScalar(), -1) || !isEqual(b.toScalar(), 1)) {
+      SX q1 = (b-a)/2;
+      SX q2 = (b+a)/2;
+
+      SXFunction fcn(x, f);
+      fcn.init();
+
+      return q1*gauss_quadrature(fcn(q1*x+q2).at(0), x, -1, 1);
+    }
+
+    // Gauss points
+    vector<double> xi;
+    xi.push_back(-sqrt(5 + 2*sqrt(10.0/7))/3);
+    xi.push_back(-sqrt(5 - 2*sqrt(10.0/7))/3);
+    xi.push_back(0);
+    xi.push_back(sqrt(5 - 2*sqrt(10.0/7))/3);
+    xi.push_back(sqrt(5 + 2*sqrt(10.0/7))/3);
+
+    // Gauss weights
+    vector<double> wi;
+    wi.push_back((322-13*sqrt(70.0))/900.0);
+    wi.push_back((322+13*sqrt(70.0))/900.0);
+    wi.push_back(128/225.0);
+    wi.push_back((322+13*sqrt(70.0))/900.0);
+    wi.push_back((322-13*sqrt(70.0))/900.0);
+
+    // Evaluate at the Gauss points
+    SXFunction fcn(x, f);
+    vector<SXElement> f_val(5);
+    for (int i=0; i<5; ++i)
+      f_val[i] = fcn(SX(xi[i])).at(0).toScalar();
+
+    // Weighted sum
+    SXElement sum;
+    for (int i=0; i<5; ++i)
+      sum += wi[i]*f_val[i];
+
+    return sum;
   }
 
   template<>

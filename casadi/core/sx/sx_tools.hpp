@@ -129,8 +129,10 @@ namespace casadi {
   inline SX ramp(const SX &x) { return x.zz_ramp();}
 
   /** \brief  Integrate f from a to b using Gaussian quadrature with n points */
-  CASADI_EXPORT SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b,
-                                             int order=5, const SX& w=SX());
+  inline SX gauss_quadrature(const SX &f, const SX &x, const SX &a, const SX &b,
+                             int order=5, const SX& w=SX()) {
+    return f.zz_gauss_quadrature(x, a, b, order, w);
+  }
 
   /** \brief  Simplify an expression */
   CASADI_EXPORT void simplify(SX &ex);
