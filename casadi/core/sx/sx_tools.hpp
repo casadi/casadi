@@ -135,7 +135,7 @@ namespace casadi {
   }
 
   /** \brief  Simplify an expression */
-  CASADI_EXPORT void simplify(SX &ex);
+  inline void simplify(SX &ex) { ex = ex.zz_simplify();}
 
   /** \brief  Substitute variable v with expression vdef in an expression ex */
   CASADI_EXPORT SX substitute(const SX& ex, const SX& v, const SX& vdef);

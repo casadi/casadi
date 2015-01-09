@@ -1186,8 +1186,9 @@ namespace casadi {
 
   template<>
   SX SX::zz_simplify() const {
-    throw CasadiException("\"simplify\" not defined for instantiation");
-    return SX();
+    SX ex = *this;
+    for (int el=0; el<ex.size(); ++el) simplify(ex.at(el));
+    return ex;
   }
 
   template<>

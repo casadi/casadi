@@ -33,12 +33,6 @@ using namespace std;
 
 namespace casadi {
 
-  void simplify(SX &ex) {
-    // simplify all non-zero elements
-    for (int el=0; el<ex.size(); ++el)
-      simplify(ex.at(el));
-  }
-
   std::vector<SX> substitute(const std::vector<SX> &ex, const std::vector<SX> &v,
                              const std::vector<SX> &vdef) {
     // Assert consistent dimensions
