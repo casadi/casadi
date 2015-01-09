@@ -93,10 +93,13 @@ namespace casadi {
   * \param Iwork  A integer work vector that you must allocate
   *               Minimum size: y.size1()+x.size2()+1
   */
-  CASADI_EXPORT double norm_inf_mul_nn(const Matrix<double> &x,
-                              const Matrix<double> &y,
-                              std::vector<double>& Dwork,
-                              std::vector<int>& Iwork);
+  template<typename DataType>
+  inline DataType norm_inf_mul_nn(const Matrix<DataType> &x,
+                                  const Matrix<DataType> &y,
+                                  std::vector<DataType>& Dwork,
+                                  std::vector<int>& Iwork) {
+    return x.zz_norm_inf_mul_nn(y, Dwork, Iwork);
+  }
 
   /** 0-norm (nonzero count) of a Matrix-matrix product, no memory allocation
   *   mul(x, y)
@@ -107,7 +110,7 @@ namespace casadi {
   *               Minimum size: y.size1()+x.size2()+1
   */
   template<typename DataType>
-  int norm_0_mul_nn(const Matrix<DataType> &x,
+  inline int norm_0_mul_nn(const Matrix<DataType> &x,
                     const Matrix<DataType> &y,
                     std::vector<bool>& Bwork,
                     std::vector<int>& Iwork) {
