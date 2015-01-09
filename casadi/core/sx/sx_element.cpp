@@ -934,6 +934,223 @@ namespace casadi {
     return toScalar().getNdeps();
   }
 
+  template<>
+  void SX::zz_expand(SX &weights, SX& terms) const {
+    throw CasadiException("\"expand\" not defined for instantiation");
+  }
+
+  template<>
+  SX SX::zz_pw_const(const SX &tval,
+                     const SX &val) const {
+    throw CasadiException("\"pw_const\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_pw_lin(const SX &tval,
+                   const SX &val) const {
+    throw CasadiException("\"pw_lin\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_if_else(const SX &if_true,
+                    const SX &if_false) const {
+    throw CasadiException("\"if_else\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_heaviside() const {
+    throw CasadiException("\"heaviside\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_rectangle() const {
+    throw CasadiException("\"rectangle\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_triangle() const {
+    throw CasadiException("\"triangle\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_ramp() const {
+    throw CasadiException("\"ramp\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_gauss_quadrature(const SX &x,
+                             const SX &a,
+                             const SX &b, int order,
+                             const SX& w) const {
+    throw CasadiException("\"gauss_quadrature\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_simplify() const {
+    throw CasadiException("\"simplify\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_substitute(const SX& v,
+                       const SX& vdef) const {
+    throw CasadiException("\"substitute\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  std::vector<SX >
+  SX::zz_substitute(const std::vector<SX >& ex,
+                    const std::vector<SX >& v,
+                    const std::vector<SX >& vdef) {
+    throw CasadiException("\"substitute\" not defined for instantiation");
+    return std::vector<SX >();
+  }
+
+  template<>
+  void SX::zz_substituteInPlace(const std::vector<SX >& v,
+                                std::vector<SX >& vdef,
+                                std::vector<SX >& ex,
+                                bool reverse) {
+    throw CasadiException("\"substituteInPlace\" not defined for instantiation");
+  }
+
+  template<>
+  SX SX::zz_spy() const {
+    throw CasadiException("\"spy\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  bool SX::zz_dependsOn(const SX &arg) const {
+    throw CasadiException("\"dependsOn\" not defined for instantiation");
+    return false;
+  }
+
+  template<>
+  SX SX::zz_jacobian(const SX &arg) const {
+    throw CasadiException("\"jacobian\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_gradient(const SX &arg) const {
+    throw CasadiException("\"gradient\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_tangent(const SX &arg) const {
+    throw CasadiException("\"tangent\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_hessian(const SX &arg) const {
+    throw CasadiException("\"hessian\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  void SX::zz_hessian(const SX &ex,
+                      const SX &arg, SX &H,
+                      SX &g) {
+    throw CasadiException("\"hessian\" not defined for instantiation");
+  }
+
+  template<>
+  SX SX::zz_jacobianTimesVector(const SX &arg,
+                                const SX &v,
+                                bool transpose_jacobian) const {
+    throw CasadiException("\"jacobianTimesVector\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_taylor(const SX& x,
+                   const SX& a, int order) const {
+    throw CasadiException("\"taylor\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_mtaylor(const SX& x,
+                    const SX& a, int order) const {
+    throw CasadiException("\"mtaylor\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  SX SX::zz_mtaylor(const SX& x,
+                    const SX& a, int order,
+                    const std::vector<int>&order_contributions) const {
+    throw CasadiException("\"mtaylor\" not defined for instantiation");
+    return SX();
+  }
+
+  template<>
+  int SX::zz_countNodes() const {
+    throw CasadiException("\"countNodes\" not defined for instantiation");
+    return 0;
+  }
+
+  template<>
+  std::string
+  SX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const {
+    throw CasadiException("\"getOperatorRepresentation\" not defined for instantiation");
+    return std::string();
+  }
+
+  template<>
+  std::vector<SX > SX::zz_getSymbols() const {
+    throw CasadiException("\"getSymbols\" not defined for instantiation");
+    return std::vector<SX >();
+  }
+
+  template<>
+  std::vector<SX >
+  SX::zz_getSymbols(const std::vector<SX >& e) {
+    throw CasadiException("\"getSymbols\" not defined for instantiation");
+    return std::vector<SX >();
+  }
+
+  template<>
+  void SX::zz_extractShared(std::vector<SX >& ex,
+                            std::vector<SX >& v,
+                            std::vector<SX >& vdef,
+                            const std::string& v_prefix,
+                            const std::string& v_suffix) {
+    throw CasadiException("\"extractShared\" not defined for instantiation");
+  }
+
+  template<>
+  void SX::zz_printCompact(std::ostream &stream) const {
+    throw CasadiException("\"printCompact\" not defined for instantiation");
+  }
+
+  template<>
+  SX SX::zz_poly_coeff(const SX&x) const {
+    throw CasadiException("\"poly_coeff\" not defined for instantiation");
+  }
+
+  template<>
+  SX SX::zz_poly_roots() const {
+    throw CasadiException("\"poly_roots\" not defined for instantiation");
+  }
+
+  template<>
+  SX SX::zz_eig_symbolic() const {
+    throw CasadiException("\"eig_symbolic\" not defined for instantiation");
+  }
+
   SXElement SXElement::zz_simplify() const {
     // Start by expanding the node to a weighted sum
     SX terms, weights;

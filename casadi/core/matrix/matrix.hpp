@@ -402,6 +402,56 @@ namespace casadi {
     Matrix<DataType> zz_mpower(const Matrix<DataType> &y) const;
     Matrix<DataType> __mrdivide__(const Matrix<DataType> &y) const;
     bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
+    void zz_expand(Matrix<DataType> &weights, Matrix<DataType>& terms) const;
+    Matrix<DataType> zz_pw_const(const Matrix<DataType> &tval, const Matrix<DataType> &val) const;
+    Matrix<DataType> zz_pw_lin(const Matrix<DataType> &tval, const Matrix<DataType> &val) const;
+    Matrix<DataType> zz_if_else(const Matrix<DataType> &if_true,
+                                const Matrix<DataType> &if_false) const;
+    Matrix<DataType> zz_heaviside() const;
+    Matrix<DataType> zz_rectangle() const;
+    Matrix<DataType> zz_triangle() const;
+    Matrix<DataType> zz_ramp() const;
+    Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
+                                         const Matrix<DataType> &b, int order=5,
+                                         const Matrix<DataType>& w=Matrix<DataType>()) const;
+    Matrix<DataType> zz_simplify() const;
+    Matrix<DataType> zz_substitute(const Matrix<DataType>& v, const Matrix<DataType>& vdef) const;
+    static std::vector<Matrix<DataType> > zz_substitute(const std::vector<Matrix<DataType> >& ex,
+                                                        const std::vector<Matrix<DataType> >& v,
+                                                        const std::vector<Matrix<DataType> >& vdef);
+    static void zz_substituteInPlace(const std::vector<Matrix<DataType> >& v,
+                                     std::vector<Matrix<DataType> >& vdef,
+                                     std::vector<Matrix<DataType> >& ex,
+                                     bool reverse=false);
+    Matrix<DataType> zz_spy() const;
+    bool zz_dependsOn(const Matrix<DataType> &arg) const;
+    std::vector<Matrix<DataType> > zz_getSymbols() const;
+    static std::vector<Matrix<DataType> > zz_getSymbols(const std::vector<Matrix<DataType> >& e);
+    Matrix<DataType> zz_jacobian(const Matrix<DataType> &arg) const;
+    Matrix<DataType> zz_gradient(const Matrix<DataType> &arg) const;
+    Matrix<DataType> zz_tangent(const Matrix<DataType> &arg) const;
+    Matrix<DataType> zz_hessian(const Matrix<DataType> &arg) const;
+    void zz_hessian(const Matrix<DataType> &ex, const Matrix<DataType> &arg, Matrix<DataType> &H,
+                    Matrix<DataType> &g);
+    Matrix<DataType> zz_jacobianTimesVector(const Matrix<DataType> &arg, const Matrix<DataType> &v,
+                                            bool transpose_jacobian=false) const;
+    Matrix<DataType> zz_taylor(const Matrix<DataType>& x,
+                               const Matrix<DataType>& a=0, int order=1) const;
+    Matrix<DataType> zz_mtaylor(const Matrix<DataType>& x,
+                                const Matrix<DataType>& a, int order=1) const;
+    Matrix<DataType> zz_mtaylor(const Matrix<DataType>& x, const Matrix<DataType>& a, int order,
+                                const std::vector<int>&order_contributions) const;
+    int zz_countNodes() const;
+    std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+    static void zz_extractShared(std::vector<Matrix<DataType> >& ex,
+                                 std::vector<Matrix<DataType> >& v,
+                                 std::vector<Matrix<DataType> >& vdef,
+                                 const std::string& v_prefix="v_",
+                                 const std::string& v_suffix="");
+    void zz_printCompact(std::ostream &stream=CASADI_COUT) const;
+    Matrix<DataType> zz_poly_coeff(const Matrix<DataType>&x) const;
+    Matrix<DataType> zz_poly_roots() const;
+    Matrix<DataType> zz_eig_symbolic() const;
     ///@}
 
     /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector

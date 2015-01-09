@@ -339,8 +339,57 @@ namespace casadi {
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
   template<> long SX::getElementHash() const;
-
-
+  template<> void SX::zz_expand(SX &weights, SX& terms) const;
+  template<> SX SX::zz_pw_const(const SX &tval, const SX &val) const;
+  template<> SX SX::zz_pw_lin(const SX &tval, const SX &val) const;
+  template<> SX SX::zz_if_else(const SX &if_true,
+                               const SX &if_false) const;
+  template<> SX SX::zz_heaviside() const;
+  template<> SX SX::zz_rectangle() const;
+  template<> SX SX::zz_triangle() const;
+  template<> SX SX::zz_ramp() const;
+  template<> SX SX::zz_gauss_quadrature(const SX &x, const SX &a,
+                                        const SX &b, int order,
+                                        const SX& w) const;
+  template<> SX SX::zz_simplify() const;
+  template<> SX SX::zz_substitute(const SX& v, const SX& vdef) const;
+  template<> std::vector<SX > SX::zz_substitute(const std::vector<SX >& ex,
+                                                const std::vector<SX >& v,
+                                                const std::vector<SX >& vdef);
+  template<> void SX::zz_substituteInPlace(const std::vector<SX >& v,
+                                           std::vector<SX >& vdef,
+                                           std::vector<SX >& ex,
+                                           bool reverse);
+  template<> SX SX::zz_spy() const;
+  template<> bool SX::zz_dependsOn(const SX &arg) const;
+  template<> std::vector<SX > SX::zz_getSymbols() const;
+  template<> std::vector<SX > SX::zz_getSymbols(const std::vector<SX >& e);
+  template<> SX SX::zz_jacobian(const SX &arg) const;
+  template<> SX SX::zz_gradient(const SX &arg) const;
+  template<> SX SX::zz_tangent(const SX &arg) const;
+  template<> SX SX::zz_hessian(const SX &arg) const;
+  template<> void SX::zz_hessian(const SX &ex, const SX &arg, SX &H,
+                                 SX &g);
+  template<> SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v,
+                                           bool transpose_jacobian) const;
+  template<> SX SX::zz_taylor(const SX& x,
+                              const SX& a, int order) const;
+  template<> SX SX::zz_mtaylor(const SX& x,
+                               const SX& a, int order) const;
+  template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
+                               const std::vector<int>&order_contributions) const;
+  template<> int SX::zz_countNodes() const;
+  template<> std::string
+  SX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+  template<> void SX::zz_extractShared(std::vector<SX >& ex,
+                                       std::vector<SX >& v,
+                                       std::vector<SX >& vdef,
+                                       const std::string& v_prefix,
+                                       const std::string& v_suffix);
+  template<> void SX::zz_printCompact(std::ostream &stream) const;
+  template<> SX SX::zz_poly_coeff(const SX&x) const;
+  template<> SX SX::zz_poly_roots() const;
+  template<> SX SX::zz_eig_symbolic() const;
 } // namespace casadi
 
 #ifndef SWIG

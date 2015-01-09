@@ -35,22 +35,20 @@
 *
 */
 
-
 namespace casadi {
 
 /**
 \ingroup expression_tools
 @{
 */
-
-  /** \brief  Expand the expression as a weighted sum (with constant weights)
-  */
-  CASADI_EXPORT void expand(const SX& ex, SX &weights, SX& terms);
-
   /// \cond INTERNAL
   /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
   inline void simplify(SXElement& ex) { ex = ex.zz_simplify();}
   /// \endcond
+
+  /** \brief  Expand the expression as a weighted sum (with constant weights)
+  */
+  CASADI_EXPORT void expand(const SX& ex, SX &weights, SX& terms);
 
   /** \brief Create a piecewise constant function
       Create a piecewise constant function with n=val.size() intervals
@@ -309,7 +307,5 @@ namespace casadi {
 */
 
 } // namespace casadi
-
-
 
 #endif // CASADI_SX_TOOLS_HPP
