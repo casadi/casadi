@@ -886,12 +886,13 @@ namespace casadi {
     return horzcat(vv);
   }
 
-  void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v,
-                     std::vector<SXElement>& vdef,
-                     const std::string& v_prefix, const std::string& v_suffix) {
+  void extractShared(std::vector<SX>& ex, std::vector<SX>& v_sx,
+                     std::vector<SX>& vdef_sx,
+                     const std::string& v_prefix,
+                     const std::string& v_suffix) {
 
     // Sort the expression
-    SXFunction f(vector<SX>(), vector<SX>(1, ex));
+    SXFunction f(vector<SX>(), ex);
     f.init();
 
     // Get references to the internal data structures
@@ -911,11 +912,8 @@ namespace casadi {
     // Count how many times an expression has been used
     vector<int> usecount(work.size(), 0);
 
-    // New variables and definitions
-    v.clear();
-    vdef.clear();
-
     // Evaluate the algorithm
+    vector<SXElement> v, vdef;
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       // Increase usage counters
       switch (it->op) {
@@ -978,7 +976,7 @@ namespace casadi {
     // Evaluate the algorithm
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       switch (it->op) {
-      case OP_OUTPUT:     ex[it->i2] = work[it->i1];      break;
+      case OP_OUTPUT:     ex.at(it->i0).at(it->i2) = work[it->i1];      break;
       case OP_CONST:      work2[it->i0] = work[it->i0] = *c_it++; break;
       case OP_PARAMETER:  work2[it->i0] = work[it->i0] = *p_it++; break;
       default:
@@ -1002,22 +1000,28 @@ namespace casadi {
     for (vector<SXElement>::iterator it=marked.begin(); it!=marked.end(); ++it) {
       it->setTemp(0);
     }
+
+    // Save v, vdef
+    v_sx.resize(v.size());
+    std::copy(v.begin(), v.end(), v_sx.begin());
+    vdef_sx.resize(vdef.size());
+    std::copy(vdef.begin(), vdef.end(), vdef_sx.begin());
   }
 
   void printCompact(const SX& ex, std::ostream &stream) {
     // Extract shared subexpressions from ex
-    vector<SXElement> v, vdef;
-    SX ex_extracted = ex;
-    extractShared(ex_extracted.data(), v, vdef, "@", "");
+    vector<SX> v, vdef;
+    vector<SX> ex_extracted(1, ex);
+    extractShared(ex_extracted, v, vdef, "@", "");
 
     // Print the expression without shared subexpressions
-    ex_extracted.print(stream);
+    ex_extracted.at(0).print(stream);
 
     // Print the shared subexpressions
     if (!v.empty()) {
       stream << endl << "where:" << endl;
       for (int i=0; i<v.size(); ++i) {
-        stream << v[i] << " := " << vdef[i] << endl;
+        stream << v[i].toScalar() << " := " << vdef[i].toScalar() << endl;
       }
     }
   }

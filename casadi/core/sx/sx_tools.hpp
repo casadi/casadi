@@ -276,9 +276,10 @@ namespace casadi {
   CASADI_EXPORT SX getFree(const SX& ex);
 
   /** \brief Extract shared subexpressions from an set of expressions */
-  CASADI_EXPORT void extractShared(std::vector<SXElement>& ex,
-                     std::vector<SXElement>& v, std::vector<SXElement>& vdef,
-                     const std::string& v_prefix="v_", const std::string& v_suffix="");
+  CASADI_EXPORT void extractShared(std::vector<SX>& ex,
+                                   std::vector<SX>& v, std::vector<SX>& vdef,
+                                   const std::string& v_prefix="v_",
+                                   const std::string& v_suffix="");
 
   /** \brief Print compact, introducing new variables for shared subexpressions */
   CASADI_EXPORT void printCompact(const SX& ex, std::ostream &stream=CASADI_COUT);
