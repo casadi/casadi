@@ -178,63 +178,9 @@ namespace casadi {
 #ifndef SWIG
   // "operator?:" can not be overloaded
   template<typename T>
-  T if_else(const SXElement& cond, const T& if_true, const T &if_false);
-
-  /** \brief  Create a block matrix */
-  template<int n, int m>
-  SX blockmatrix(SX array[n][m]);
-
-  /** \brief  Create a block matrix (vector) */
-  template<int n>
-  SX blockmatrix(SX array[n]);
-
-#endif
-
-// Implementation
-#ifndef SWIG
-
-  template<typename T>
-  SX if_else(const SXElement& cond, const T& if_true, const T &if_false) {
+  T if_else(const SXElement& cond, const T& if_true, const T &if_false) {
     return if_false + (if_true-if_false)*cond;
   }
-
-  template<int n, int m>
-  SX blockmatrix(SX array[n][m]) {
-    /** \brief  Return matrix */
-    SX ret;
-
-    /** \brief  loop over cols */
-    for (int i=0; i<n; ++i) {
-      /** \brief  Create a col */
-      SX col;
-
-      /** \brief  append components to the col */
-      for (int j=0; j<m; ++j) {
-        col.appendColumns(array[i][j]);
-      }
-
-      /** \brief  append col to matrix */
-      ret.appendColumns(col.T());
-    }
-
-    return ret;
-  }
-
-  /** \brief  Create a block matrix (vector) */
-  template<int n>
-  SX blockmatrix(SX array[n]) {
-    /** \brief  Return matrix */
-    SX ret;
-
-    /** \brief  loop over cols */
-    for (int i=0; i<n; ++i) {
-      /** \brief  append components */
-      ret.appendColumns(array[i]);
-    }
-
-    return ret;
-  }
-
 #endif
 
   /** \brief Check if expression depends on the argument
