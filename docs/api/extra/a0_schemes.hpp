@@ -83,8 +83,8 @@
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::LR_DPLEInput  (LR_DPLE_NUM_IN = 4) [lrdpleIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LR_DPLE_A</td><td>a</td><td>A matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
-<tr><td>LR_DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
+<tr><td>LR_DPLE_A</td><td>a</td><td>A matrices (horzcat when const_dim, diagcat otherwise) .</td></tr>
+<tr><td>LR_DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, diagcat otherwise) .</td></tr>
 <tr><td>LR_DPLE_C</td><td>c</td><td>C matrix .</td></tr>
 <tr><td>LR_DPLE_H</td><td>h</td><td>H matrix: horizontal stack of all Hi .</td></tr>
 </table>
@@ -147,8 +147,8 @@
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::DPLEInput  (DPLE_NUM_IN = 2) [dpleIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DPLE_A</td><td>a</td><td>A matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
-<tr><td>DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
+<tr><td>DPLE_A</td><td>a</td><td>A matrices (horzcat when const_dim, diagcat otherwise) .</td></tr>
+<tr><td>DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, diagcat otherwise) .</td></tr>
 </table>
 */
 /** \defgroup scheme_CLEOutput
@@ -217,8 +217,8 @@
 <a name='schemes'></a><table>
 <caption>Struct scheme: casadi::DpleVecStruct  ( = 2) [dpleStruct]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>Dple_STRUCT_A</td><td>a</td><td>Sparsities for A_i, blkdiag form .</td></tr>
-<tr><td>Dple_STRUCT_V</td><td>v</td><td>Sparsities for V_i, blkdiag form .</td></tr>
+<tr><td>Dple_STRUCT_A</td><td>a</td><td>Sparsities for A_i, block diagonal form .</td></tr>
+<tr><td>Dple_STRUCT_V</td><td>v</td><td>Sparsities for V_i, block diagonal form .</td></tr>
 </table>
 */
 /** \defgroup scheme_QPStruct
@@ -352,7 +352,7 @@
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::LR_DPLEOutput  (LR_DPLE_NUM_OUT = 1) [lrdpleOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LR_DPLE_Y</td><td>y</td><td>Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) .</td></tr>
+<tr><td>LR_DPLE_Y</td><td>y</td><td>Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) .</td></tr>
 </table>
 */
 /** \defgroup scheme_RDAEOutput
@@ -490,10 +490,10 @@
 <a name='schemes'></a><table>
 <caption>Struct scheme: casadi::LrDpleVecStruct  ( = 4) [lrdpleStruct]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LR_Dple_STRUCT_A</td><td>a</td><td>Sparsities for A_i, blkdiag form .</td></tr>
-<tr><td>LR_Dple_STRUCT_V</td><td>v</td><td>Sparsities for V_i, blkdiag form .</td></tr>
-<tr><td>LR_Dple_STRUCT_C</td><td>c</td><td>Sparsities for C_i (defaults to unity), blkdiag form .</td></tr>
-<tr><td>LR_Dple_STRUCT_H</td><td>h</td><td>Sparsities for H_i (defaults to unity), blkdiag form .</td></tr>
+<tr><td>LR_Dple_STRUCT_A</td><td>a</td><td>Sparsities for A_i, block diagonal form .</td></tr>
+<tr><td>LR_Dple_STRUCT_V</td><td>v</td><td>Sparsities for V_i, block diagonal form .</td></tr>
+<tr><td>LR_Dple_STRUCT_C</td><td>c</td><td>Sparsities for C_i (defaults to unity), block diagonal form .</td></tr>
+<tr><td>LR_Dple_STRUCT_H</td><td>h</td><td>Sparsities for H_i (defaults to unity), block diagonal form .</td></tr>
 </table>
 */
 /** \defgroup scheme_JacGInput
@@ -508,7 +508,7 @@
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::LR_DLEOutput  (LR_DLE_NUM_OUT = 1) [lrdleOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LR_DLE_Y</td><td>y</td><td>Y matrix, blkdiag form .</td></tr>
+<tr><td>LR_DLE_Y</td><td>y</td><td>Y matrix, block diagonal form .</td></tr>
 </table>
 */
 /** \defgroup scheme_LpSolverInput
@@ -537,7 +537,7 @@
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::DPLEOutput  (DPLE_NUM_OUT = 1) [dpleOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) .</td></tr>
+<tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) .</td></tr>
 </table>
 */
 /** \defgroup scheme_HessLagInput
