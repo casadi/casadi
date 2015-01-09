@@ -199,7 +199,7 @@ namespace casadi {
 
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
-    SXElement mul(const SXElement& y) const { return zz_times(y);}
+    SXElement zz_mul(const SXElement& y) const { return zz_times(y);}
     SXElement zz_exp() const;
     SXElement zz_log() const;
     SXElement zz_sqrt() const;
@@ -242,6 +242,7 @@ namespace casadi {
     Matrix<SXElement> __copysign__(const Matrix<SXElement>& n) const;
     Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;
     bool zz_isEqual(const SXElement& scalar, int depth=0) const;
+    SXElement zz_simplify() const;
 
     /// \cond INTERNAL
     /// Get the temporary variable

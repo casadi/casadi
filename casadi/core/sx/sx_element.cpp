@@ -35,6 +35,7 @@
 #include "binary_sx.hpp"
 #include "../casadi_options.hpp"
 #include "../function/sx_function_internal.hpp"
+#include "sx_tools.hpp"
 
 using namespace std;
 namespace casadi {
@@ -931,6 +932,16 @@ namespace casadi {
   template<>
   int SX::getNdeps() const {
     return toScalar().getNdeps();
+  }
+
+  SXElement SXElement::zz_simplify() const {
+    // Start by expanding the node to a weighted sum
+    SX terms, weights;
+    expand(*this, weights, terms);
+
+    // Make a scalar product to get the simplified expression
+    SX s = mul(terms.T(), weights);
+    return s.toScalar();
   }
 
 } // namespace casadi

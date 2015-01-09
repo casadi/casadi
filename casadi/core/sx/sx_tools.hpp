@@ -49,7 +49,7 @@ namespace casadi {
 
   /// \cond INTERNAL
   /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
-  CASADI_EXPORT void simplify(SXElement& ex);
+  inline void simplify(SXElement& ex) { ex = ex.zz_simplify();}
   /// \endcond
 
   /** \brief Create a piecewise constant function
@@ -266,11 +266,6 @@ namespace casadi {
 
   /** \brief Count number of nodes */
   CASADI_EXPORT int countNodes(const SX& A);
-
-  /** \brief Get a string representation for a binary SX, using custom arguments */
-  CASADI_EXPORT std::string getOperatorRepresentation(
-                                       const SXElement& x,
-                                       const std::vector<std::string>& args);
 
   /** \brief Get a string representation for a binary SX, using custom arguments */
   CASADI_EXPORT std::string getOperatorRepresentation(

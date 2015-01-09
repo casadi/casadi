@@ -570,16 +570,6 @@ namespace casadi {
     tt = SX(termsv);
   }
 
-  void simplify(SXElement& ex) {
-    // Start by expanding the node to a weighted sum
-    SX terms, weights;
-    expand(ex, weights, terms);
-
-    // Make a scalar product to get the simplified expression
-    SX s = mul(terms.T(), weights);
-    ex = s.toScalar();
-  }
-
   SX taylor(const SX& ex, const SX& x, const SX& a, int order) {
     casadi_assert(x.isScalar() && a.isScalar());
     if (ex.size()!=ex.numel())
@@ -645,11 +635,8 @@ namespace casadi {
     return f.countNodes();
   }
 
-  std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args) {
-    return getOperatorRepresentation(x.toScalar(), args);
-  }
-
-  std::string getOperatorRepresentation(const SXElement& x, const std::vector<std::string>& args) {
+  std::string getOperatorRepresentation(const SX& X, const std::vector<std::string>& args) {
+    SXElement x = X.toScalar();
     if (!x.hasDep())
         throw CasadiException("getOperatorRepresentation: SXElement must be binary operator");
     if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2))
