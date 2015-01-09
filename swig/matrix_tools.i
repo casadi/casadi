@@ -37,11 +37,9 @@
 
 // Define template instantiations
 %define MATRIX_TOOLS_TEMPLATES(DataType)
-  MTT_INST(DataType, norm_0_mul_nn)
   MTT_INST(DataType, solve)
   MTT_INST(DataType, pinv)
   MTT_INST(DataType, repmat)
-  MTT_INST(DataType, addMultiple)
   MTT_INST(DataType, sparse)
 %enddef
 
@@ -131,6 +129,18 @@ GENERIC_MATRIX_DECL(MatType)
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<DataType>)
 MATRIX_DECL(casadi::Matrix<DataType>)
+DataType norm_inf_mul_nn(const casadi::Matrix<DataType> &x,
+                         const casadi::Matrix<DataType> &y,
+                         std::vector<DataType>& Dwork,
+                         std::vector<int>& Iwork);
+int norm_0_mul_nn(const casadi::Matrix<DataType> &x,
+                  const casadi::Matrix<DataType> &y,
+                  std::vector<bool>& Bwork,
+                  std::vector<int>& Iwork);
+void addMultiple(const casadi::Matrix<DataType>& A,
+                 const std::vector<DataType>& v,
+                 std::vector<DataType>& res,
+                 bool trans_A=false);
 %enddef
 
 #ifndef SWIGMATLAB

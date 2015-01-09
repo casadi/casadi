@@ -84,39 +84,6 @@ namespace casadi {
   CASADI_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
                                     const Dictionary& dict = Dictionary());
 
-
-  /** Inf-norm of a Matrix-matrix product, no memory allocation
-  *   mul(x, y)
-  *
-  * \param Dwork  A double work vector that you must allocate
-  *               Minimum size: y.size1()
-  * \param Iwork  A integer work vector that you must allocate
-  *               Minimum size: y.size1()+x.size2()+1
-  */
-  template<typename DataType>
-  inline DataType norm_inf_mul_nn(const Matrix<DataType> &x,
-                                  const Matrix<DataType> &y,
-                                  std::vector<DataType>& Dwork,
-                                  std::vector<int>& Iwork) {
-    return x.zz_norm_inf_mul_nn(y, Dwork, Iwork);
-  }
-
-  /** 0-norm (nonzero count) of a Matrix-matrix product, no memory allocation
-  *   mul(x, y)
-  *
-  * \param Bwork  A boolean work vector that you must allocate
-  *               Minimum size: y.size1()
-  * \param Iwork  A integer work vector that you must allocate
-  *               Minimum size: y.size1()+x.size2()+1
-  */
-  template<typename DataType>
-  inline int norm_0_mul_nn(const Matrix<DataType> &x,
-                    const Matrix<DataType> &y,
-                    std::vector<bool>& Bwork,
-                    std::vector<int>& Iwork) {
-    return x.zz_norm_0_mul_nn(y, Bwork, Iwork);
-  }
-
   /** \brief Repeat matrix A n times vertically and m times horizontally */
   template<typename DataType>
   Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m) { return A.zz_repmat(n, m);}
@@ -124,13 +91,6 @@ namespace casadi {
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<typename DataType>
   Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0);
-
-  /// same as: res += mul(A, v)
-  template<typename DataType>
-  void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v,
-                   std::vector<DataType>& res, bool trans_A=false) {
-    return A.zz_addMultiple(v, res, trans_A);
-  }
 
   /// \cond INTERNAL
   /// Get a pointer to the data contained in the vector
