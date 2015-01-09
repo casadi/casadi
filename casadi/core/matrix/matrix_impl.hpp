@@ -3237,9 +3237,11 @@ namespace casadi {
     int n_col = B.size1();
 
     casadi_assert_message(Dwork.size()>=n_col,
-                          "We need a bigger work vector (>=" << n_col << "), but got "<< Dwork.size() <<".");
+                          "We need a bigger work vector (>=" << n_col << "), but got "
+                          << Dwork.size() <<".");
     casadi_assert_message(Iwork.size()>=n_row+1+n_col,
-                          "We need a bigger work vector (>=" << n_row+1+n_col << "), but got "<< Iwork.size() <<".");
+                          "We need a bigger work vector (>=" << n_row+1+n_col << "), but got "
+                          << Iwork.size() <<".");
 
     const std::vector<int> &Aj = A.row();
     const std::vector<int> &Ap = A.colind();
