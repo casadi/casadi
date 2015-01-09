@@ -70,7 +70,9 @@ namespace casadi {
   */
   inline SX pw_lin(const SX &t, const SX &tval, const SX &val) { return t.zz_pw_lin(tval, val);}
 
-  CASADI_EXPORT SX if_else(const SX &cond, const SX &if_true, const SX &if_false);
+  inline SX if_else(const SX &cond, const SX &if_true, const SX &if_false) {
+    return cond.zz_if_else(if_true, if_false);
+  }
   /**  \brief Heaviside function
    *
    * \f[
@@ -81,7 +83,7 @@ namespace casadi {
    * \end {cases}
    * \f]
    */
-  CASADI_EXPORT SX heaviside(const SX &x);
+  inline SX heaviside(const SX &x) { return x.zz_heaviside();}
 
   /**
    * \brief rectangle function
@@ -96,7 +98,7 @@ namespace casadi {
    *
    * Also called: gate function, block function, band function, pulse function, window function
    */
-  CASADI_EXPORT SX rectangle(const SX &x);
+  inline SX rectangle(const SX &x) { return x.zz_rectangle();}
 
   /**
    * \brief triangle function
@@ -109,7 +111,7 @@ namespace casadi {
    * \f]
    *
    */
-  CASADI_EXPORT SX triangle(const SX &x);
+  inline SX triangle(const SX &x) { return x.zz_triangle();}
 
   /**
    * \brief ramp function
@@ -124,7 +126,7 @@ namespace casadi {
    *
    * Also called: slope function
    */
-  CASADI_EXPORT SX ramp(const SX &x);
+  inline SX ramp(const SX &x) { return x.zz_ramp();}
 
   /** \brief  Integrate f from a to b using Gaussian quadrature with n points */
   CASADI_EXPORT SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b,
@@ -132,9 +134,6 @@ namespace casadi {
 
   /** \brief  Simplify an expression */
   CASADI_EXPORT void simplify(SX &ex);
-
-  /** \brief  Remove identical calculations */
-  CASADI_EXPORT void compress(SX &ex, int level=5);
 
   /** \brief  Substitute variable v with expression vdef in an expression ex */
   CASADI_EXPORT SX substitute(const SX& ex, const SX& v, const SX& vdef);

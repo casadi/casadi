@@ -78,38 +78,10 @@ namespace casadi {
     return sum;
   }
 
-  SX if_else(const SX &cond, const SX &if_true, const SX &if_false) {
-    return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
-  }
-
-  SX heaviside(const SX& a) {
-    return (1+sign(a))/2;
-  }
-
-  SX ramp(const SX& a) {
-    return a*heaviside(a);
-  }
-
-  SX rectangle(const SX& a) {
-    return 0.5*(sign(a+0.5)-sign(a-0.5));
-  }
-
-  SX triangle(const SX& a) {
-    return rectangle(a.toScalar()/2)*(1-abs(a.toScalar()));
-  }
-
   void simplify(SX &ex) {
     // simplify all non-zero elements
     for (int el=0; el<ex.size(); ++el)
       simplify(ex.at(el));
-  }
-
-  void compress(SX &ex, int level) {
-
-    throw CasadiException("SX::compress: Not implemented");
-
-    if (level>0)
-      compress(ex, level-1);
   }
 
   std::vector<SX> substitute(const std::vector<SX> &ex, const std::vector<SX> &v,

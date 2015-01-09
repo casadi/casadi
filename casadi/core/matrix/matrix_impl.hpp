@@ -1410,7 +1410,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::if_else_zero(const Matrix<DataType>& y) const {
+  Matrix<DataType> Matrix<DataType>::zz_if_else_zero(const Matrix<DataType>& y) const {
     return binary(OP_IF_ELSE_ZERO, *this, y);
   }
 

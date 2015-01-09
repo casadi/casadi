@@ -234,7 +234,7 @@ namespace casadi {
     SXElement zz_not() const;
     SXElement zz_and(const SXElement& y) const;
     SXElement zz_or(const SXElement& y) const;
-    SXElement if_else_zero(const SXElement& y) const;
+    SXElement zz_if_else_zero(const SXElement& y) const;
 
     Matrix<SXElement> zz_min(const Matrix<SXElement>& b) const;
     Matrix<SXElement> zz_max(const Matrix<SXElement>& b) const;

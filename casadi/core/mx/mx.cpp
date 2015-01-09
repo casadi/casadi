@@ -804,7 +804,7 @@ namespace casadi {
     return MX::binary(OP_OR, *this, y);
   }
 
-  MX MX::if_else_zero(const MX& y) const {
+  MX MX::zz_if_else_zero(const MX& y) const {
     return MX::binary(OP_IF_ELSE_ZERO, *this, y);
   }
 

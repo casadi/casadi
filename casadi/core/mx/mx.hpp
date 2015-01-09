@@ -346,7 +346,7 @@ namespace casadi {
     MX zz_atan2(const MX& y) const;
     MX zz_and(const MX& y) const;
     MX zz_or(const MX& y) const;
-    MX if_else_zero(const MX& y) const;
+    MX zz_if_else_zero(const MX& y) const;
     MX __copysign__(const MX& y) const;
 
     // all unary operations

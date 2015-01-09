@@ -752,7 +752,7 @@ namespace casadi {
     return BinarySX::create(OP_OR, *this, y);
   }
 
-  SXElement SXElement::if_else_zero(const SXElement& y) const {
+  SXElement SXElement::zz_if_else_zero(const SXElement& y) const {
     if (y->isZero()) {
       return y;
     } else if (isConstant()) {
@@ -1111,32 +1111,27 @@ namespace casadi {
   template<>
   SX SX::zz_if_else(const SX &if_true,
                     const SX &if_false) const {
-    throw CasadiException("\"if_else\" not defined for instantiation");
-    return SX();
+    return if_else_zero(*this, if_true) + if_else_zero(!*this, if_false);
   }
 
   template<>
   SX SX::zz_heaviside() const {
-    throw CasadiException("\"heaviside\" not defined for instantiation");
-    return SX();
+    return (1+sign(*this))/2;
   }
 
   template<>
   SX SX::zz_rectangle() const {
-    throw CasadiException("\"rectangle\" not defined for instantiation");
-    return SX();
+    return 0.5*(sign(*this+0.5)-sign(*this-0.5));
   }
 
   template<>
   SX SX::zz_triangle() const {
-    throw CasadiException("\"triangle\" not defined for instantiation");
-    return SX();
+    return rectangle(toScalar()/2)*(1-abs(toScalar()));
   }
 
   template<>
   SX SX::zz_ramp() const {
-    throw CasadiException("\"ramp\" not defined for instantiation");
-    return SX();
+    return *this*heaviside(*this);
   }
 
   template<>
