@@ -1318,53 +1318,124 @@ namespace casadi {
 
   template<>
   SX SX::zz_spy() const {
-    throw CasadiException("\"spy\" not defined for instantiation");
-    return SX();
+    SX s = SX::sparse(size1(), size2());
+    for (int i=0; i<size2(); ++i)
+      for (int j=0; j<size1(); ++j)
+        if (!(*this)(j, i).toScalar()->isZero())
+          s(j, i) = 1;
+    return s;
   }
 
   template<>
   bool SX::zz_dependsOn(const SX &arg) const {
-    throw CasadiException("\"dependsOn\" not defined for instantiation");
+    const SX& ex = *this;
+    if (ex.size()==0) return false;
+
+    // Construct a temporary algorithm
+    SXFunction temp(arg, ex);
+    temp.init();
+    temp.spInit(true);
+
+    bvec_t* input_ =  get_bvec_t(temp.input().data());
+    // Make a column with all variables active
+    std::fill(input_, input_+temp.input().size(), bvec_t(1));
+    bvec_t* output_ = get_bvec_t(temp.output().data());
+    // Perform a single dependency sweep
+    temp.spEvaluate(true);
+
+    // Loop over results
+    for (int i=0;i<temp.output().size();++i) {
+      if (output_[i]) return true;
+    }
+
     return false;
   }
 
   template<>
   SX SX::zz_jacobian(const SX &arg) const {
-    throw CasadiException("\"jacobian\" not defined for instantiation");
-    return SX();
+    SXFunction temp(arg, *this); // make a runtime
+    temp.init();
+    return temp.jac();
   }
 
   template<>
   SX SX::zz_gradient(const SX &arg) const {
-    throw CasadiException("\"gradient\" not defined for instantiation");
-    return SX();
+    SXFunction temp(arg, *this); // make a runtime
+    temp.init();
+    return temp.grad();
   }
 
   template<>
   SX SX::zz_tangent(const SX &arg) const {
-    throw CasadiException("\"tangent\" not defined for instantiation");
-    return SX();
+    SXFunction temp(arg, *this); // make a runtime
+    temp.init();
+    return temp.tang();
   }
 
   template<>
   SX SX::zz_hessian(const SX &arg) const {
-    throw CasadiException("\"hessian\" not defined for instantiation");
-    return SX();
+    SX H, g;
+    hessian(*this, arg, H, g);
+    return H;
   }
 
   template<>
-  void SX::zz_hessian(const SX &ex,
-                      const SX &arg, SX &H,
-                      SX &g) {
-    throw CasadiException("\"hessian\" not defined for instantiation");
+  void SX::zz_hessian(const SX &arg, SX &H, SX &g) const {
+    g = gradient(*this, arg);
+
+    SXFunction temp(arg, g); // make a runtime
+    temp.init();
+    H = temp.jac(0, 0, false, true);
   }
 
   template<>
-  SX SX::zz_jacobianTimesVector(const SX &arg,
-                                const SX &v,
-                                bool transpose_jacobian) const {
-    throw CasadiException("\"jacobianTimesVector\" not defined for instantiation");
-    return SX();
+  SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v, bool transpose_jacobian) const {
+    SXFunction f(arg, *this);
+    f.init();
+
+    // Split up v
+    vector<SX> vv = horzsplit(v);
+
+    // Make sure well-posed
+    casadi_assert(vv.size() >= 1);
+    casadi_assert(isVector());
+    casadi_assert(arg.isVector());
+    if (transpose_jacobian) {
+      casadi_assert(v.size1()==size1());
+    } else {
+      casadi_assert(v.size1()==arg.size1());
+    }
+
+    // Number of sensitivities
+    int nfsens = transpose_jacobian ? 0 : vv.size();
+    int nasens = transpose_jacobian ? vv.size() : 0;
+
+    // Assemble arguments and directional derivatives
+    vector<SX> argv = f.inputExpr();
+    vector<SX> resv = f.outputExpr();
+    vector<vector<SX> > fseed(nfsens, argv), fsens(nfsens, resv),
+        aseed(nasens, resv), asens(nasens, argv);
+
+    for (int dir=0; dir<vv.size(); ++dir) {
+      if (transpose_jacobian) {
+        aseed[dir][0].set(vv[dir]);
+      } else {
+        fseed[dir][0].set(vv[dir]);
+      }
+    }
+
+    // Evaluate with directional derivatives, output is the same as the funciton inputs
+    f.callDerivative(argv, resv, fseed, fsens, aseed, asens);
+
+    // Get the results
+    for (int dir=0; dir<vv.size(); ++dir) {
+      if (transpose_jacobian) {
+        vv[dir] = asens[dir][0];
+      } else {
+        vv[dir] = fsens[dir][0];
+      }
+    }
+    return horzcat(vv);
   }
 
   template<>
@@ -1403,9 +1474,10 @@ namespace casadi {
   }
 
   template<>
-  std::vector<SX > SX::zz_getSymbols() const {
-    throw CasadiException("\"getSymbols\" not defined for instantiation");
-    return std::vector<SX >();
+  std::vector<SX> SX::zz_getSymbols() const {
+    SXFunction f(std::vector<SX>(), *this);
+    f.init();
+    return std::vector<SX>(1, f.getFree());
   }
 
   template<>

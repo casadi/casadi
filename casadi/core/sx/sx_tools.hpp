@@ -46,6 +46,17 @@ namespace casadi {
   inline void simplify(SXElement& ex) { ex = ex.zz_simplify();}
   /// \endcond
 
+  /** \brief Evaluate an SX graph numerically
+   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
+   */
+  CASADI_EXPORT Matrix<double> evalf(const SX &ex);
+
+  /** \brief Substitute variable v with value vdef in an expression ex, and evaluate numerically
+   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
+   */
+  CASADI_EXPORT Matrix<double> evalf(const SX &ex, const SX &v,
+                                              const Matrix<double> &vdef);
+
   /** \brief  Expand the expression as a weighted sum (with constant weights)
   */
   inline void expand(const SX& ex, SX &weights, SX& terms) { ex.zz_expand(weights, terms);}
@@ -175,31 +186,19 @@ namespace casadi {
     substituteInPlace(v, vdef, ex, reverse);
   }
 
-  /** \brief Evaluate an SX graph numerically
-   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
-   */
-  CASADI_EXPORT Matrix<double> evalf(const SX &ex);
-
-  /** \brief Substitute variable v with value vdef in an expression ex, and evaluate numerically
-   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
-   */
-  CASADI_EXPORT Matrix<double> evalf(const SX &ex, const SX &v,
-                                              const Matrix<double> &vdef);
-
   /** \brief  Get the sparsity pattern of a matrix */
-  CASADI_EXPORT SX spy(const SX& A);
+  inline SX spy(const SX& A) { return A.zz_spy();}
 
   /** \brief Check if expression depends on the argument
     The argument must be symbolic
   */
-  CASADI_EXPORT bool dependsOn(const SX& f, const SX &arg);
-
+  inline bool dependsOn(const SX& f, const SX &arg) { return f.zz_dependsOn(arg); }
 
   /** \brief Get all symbols contained in the supplied expression
    * Get all symbols on which the supplied expression depends
    * \see SXFunction::getFree()
    */
-  CASADI_EXPORT SX getSymbols(const SX& e);
+  inline SX getSymbols(const SX& e) { return e.zz_getSymbols().front();}
 
   /** \brief Get all the free variables in an expression */
   inline SX getFree(const SX& ex) { return getSymbols(ex);}
@@ -209,12 +208,15 @@ namespace casadi {
 
       Uses casadi::SXFunction::jac
   */
-  CASADI_EXPORT SX jacobian(const SX &ex, const SX &arg);
-  CASADI_EXPORT SX gradient(const SX &ex, const SX &arg);
-  CASADI_EXPORT SX tangent(const SX &ex, const SX &arg);
-  CASADI_EXPORT SX hessian(const SX &ex, const SX &arg);
-  // hessian and gradient:
-  CASADI_EXPORT void hessian(const SX &ex, const SX &arg, SX &H, SX &g);
+  inline SX jacobian(const SX &ex, const SX &arg) { return ex.zz_jacobian(arg);}
+  inline SX gradient(const SX &ex, const SX &arg) { return ex.zz_gradient(arg);}
+  inline SX tangent(const SX &ex, const SX &arg) { return ex.zz_tangent(arg);}
+  inline SX hessian(const SX &ex, const SX &arg) { return ex.zz_hessian(arg);}
+
+  // Hessian and gradient:
+  inline void hessian(const SX &ex, const SX &arg, SX &H, SX &g) {
+    return ex.zz_hessian(arg, H, g);
+  }
   ///@}
 
   /** \brief Calculate the Jacobian and multiply by a vector from the right
@@ -224,8 +226,10 @@ namespace casadi {
       expressions, it will use directional derivatives which is typically (but
       not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
   */
-  CASADI_EXPORT SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v,
-                                                bool transpose_jacobian=false);
+  inline SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v,
+                                bool transpose_jacobian=false) {
+    return ex.zz_jacobianTimesVector(arg, v, transpose_jacobian);
+  }
 
   /**
    * \brief univariate Taylor series expansion

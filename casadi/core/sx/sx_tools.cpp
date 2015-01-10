@@ -48,70 +48,6 @@ namespace casadi {
     return fcn.output();
   }
 
-  SX spy(const SX& A) {
-    SX s = SX::sparse(A.size1(), A.size2());
-    for (int i=0; i<A.size2(); ++i)
-      for (int j=0; j<A.size1(); ++j)
-        if (!A(j, i).toScalar()->isZero())
-          s(j, i) = 1;
-    return s;
-  }
-
-  bool dependsOn(const SX& ex, const SX &arg) {
-    if (ex.size()==0) return false;
-
-    // Construct a temporary algorithm
-    SXFunction temp(arg, ex);
-    temp.init();
-    temp.spInit(true);
-
-    bvec_t* input_ =  get_bvec_t(temp.input().data());
-    // Make a column with all variables active
-    std::fill(input_, input_+temp.input().size(), bvec_t(1));
-    bvec_t* output_ = get_bvec_t(temp.output().data());
-    // Perform a single dependency sweep
-    temp.spEvaluate(true);
-
-    // Loop over results
-    for (int i=0;i<temp.output().size();++i) {
-      if (output_[i]) return true;
-    }
-
-    return false;
-  }
-
-  SX gradient(const SX& ex, const SX &arg) {
-    SXFunction temp(arg, ex); // make a runtime
-    temp.init();
-    return temp.grad();
-  }
-
-  SX tangent(const SX& ex, const SX &arg) {
-    SXFunction temp(arg, ex); // make a runtime
-    temp.init();
-    return temp.tang();
-  }
-
-  SX jacobian(const SX& ex, const SX &arg) {
-    SXFunction temp(arg, ex); // make a runtime
-    temp.init();
-    return temp.jac();
-  }
-
-  void hessian(const SX& ex, const SX &arg, SX &H, SX &g) {
-    g = gradient(ex, arg);
-
-    SXFunction temp(arg, g); // make a runtime
-    temp.init();
-    H = temp.jac(0, 0, false, true);
-  }
-
-  SX hessian(const SX& ex, const SX &arg) {
-    SX H, g;
-    hessian(ex, arg, H, g);
-    return H;
-  }
-
   SX taylor(const SX& ex, const SX& x, const SX& a, int order) {
     casadi_assert(x.isScalar() && a.isScalar());
     if (ex.size()!=ex.numel())
@@ -373,55 +309,6 @@ namespace casadi {
     xe = SX(xev);
   }
 
-  SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v, bool transpose_jacobian) {
-    SXFunction f(arg, ex);
-    f.init();
-
-    // Split up v
-    vector<SX> vv = horzsplit(v);
-
-    // Make sure well-posed
-    casadi_assert(vv.size() >= 1);
-    casadi_assert(ex.isVector());
-    casadi_assert(arg.isVector());
-    if (transpose_jacobian) {
-      casadi_assert(v.size1()==ex.size1());
-    } else {
-      casadi_assert(v.size1()==arg.size1());
-    }
-
-    // Number of sensitivities
-    int nfsens = transpose_jacobian ? 0 : vv.size();
-    int nasens = transpose_jacobian ? vv.size() : 0;
-
-    // Assemble arguments and directional derivatives
-    vector<SX> argv = f.inputExpr();
-    vector<SX> resv = f.outputExpr();
-    vector<vector<SX> > fseed(nfsens, argv), fsens(nfsens, resv),
-        aseed(nasens, resv), asens(nasens, argv);
-
-    for (int dir=0; dir<vv.size(); ++dir) {
-      if (transpose_jacobian) {
-        aseed[dir][0].set(vv[dir]);
-      } else {
-        fseed[dir][0].set(vv[dir]);
-      }
-    }
-
-    // Evaluate with directional derivatives, output is the same as the funciton inputs
-    f.callDerivative(argv, resv, fseed, fsens, aseed, asens);
-
-    // Get the results
-    for (int dir=0; dir<vv.size(); ++dir) {
-      if (transpose_jacobian) {
-        vv[dir] = asens[dir][0];
-      } else {
-        vv[dir] = fsens[dir][0];
-      }
-    }
-    return horzcat(vv);
-  }
-
   void extractShared(std::vector<SX>& ex, std::vector<SX>& v_sx,
                      std::vector<SX>& vdef_sx,
                      const std::string& v_prefix,
@@ -560,12 +447,6 @@ namespace casadi {
         stream << v[i].toScalar() << " := " << vdef[i].toScalar() << endl;
       }
     }
-  }
-
-  SX getSymbols(const SX& e) {
-    SXFunction f(std::vector<SX>(), e);
-    f.init();
-    return f.getFree();
   }
 
   SX poly_coeff(const SX& ex, const SX&x) {

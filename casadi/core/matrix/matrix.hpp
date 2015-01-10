@@ -431,8 +431,7 @@ namespace casadi {
     Matrix<DataType> zz_gradient(const Matrix<DataType> &arg) const;
     Matrix<DataType> zz_tangent(const Matrix<DataType> &arg) const;
     Matrix<DataType> zz_hessian(const Matrix<DataType> &arg) const;
-    void zz_hessian(const Matrix<DataType> &ex, const Matrix<DataType> &arg, Matrix<DataType> &H,
-                    Matrix<DataType> &g);
+    void zz_hessian(const Matrix<DataType> &arg, Matrix<DataType> &H, Matrix<DataType> &g) const;
     Matrix<DataType> zz_jacobianTimesVector(const Matrix<DataType> &arg, const Matrix<DataType> &v,
                                             bool transpose_jacobian=false) const;
     Matrix<DataType> zz_taylor(const Matrix<DataType>& x,

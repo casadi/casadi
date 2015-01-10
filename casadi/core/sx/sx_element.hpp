@@ -368,8 +368,7 @@ namespace casadi {
   template<> SX SX::zz_gradient(const SX &arg) const;
   template<> SX SX::zz_tangent(const SX &arg) const;
   template<> SX SX::zz_hessian(const SX &arg) const;
-  template<> void SX::zz_hessian(const SX &ex, const SX &arg, SX &H,
-                                 SX &g);
+  template<> void SX::zz_hessian(const SX &arg, SX &H, SX &g) const;
   template<> SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v,
                                            bool transpose_jacobian) const;
   template<> SX SX::zz_taylor(const SX& x,

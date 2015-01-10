@@ -3464,9 +3464,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::zz_hessian(const Matrix<DataType> &ex,
-                                    const Matrix<DataType> &arg, Matrix<DataType> &H,
-                                    Matrix<DataType> &g) {
+  void Matrix<DataType>::zz_hessian(const Matrix<DataType> &arg, Matrix<DataType> &H,
+                                    Matrix<DataType> &g) const {
     throw CasadiException("\"hessian\" not defined for instantiation");
   }
 
