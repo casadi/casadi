@@ -1245,46 +1245,74 @@ namespace casadi {
                                 std::vector<SX >& vdef,
                                 std::vector<SX >& ex,
                                 bool reverse) {
+    // Assert correctness
     casadi_assert(v.size()==vdef.size());
+    for (int i=0; i<v.size(); ++i) {
+      casadi_assert_message(v[i].isSymbolic(), "the variable is not symbolic");
+      casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(), "the sparsity patterns of the "
+                            "expression and its defining bexpression do not match");
+    }
 
     // Quick return if empty or single expression
-    if (v.empty()) {
-      return;
-    } else if (v.size()==1) {
-      substituteInPlace(v.front(), vdef.front(), ex, reverse);
-      return;
-    }
+    if (v.empty()) return;
 
-    // Count number of scalar variables
-    int n =0;
-    for (int i=0; i<v.size(); ++i) {
-      casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(),
-                            "the sparsity patterns of the expression and its "
-                            "defining expression do not match");
-      n += v[i].size();
-    }
+    // Function inputs
+    std::vector<SX> f_in;
+    if (!reverse) f_in.insert(f_in.end(), v.begin(), v.end());
 
-    // Gather all variables
-    SX v_all = SX::zeros(1, n);
-    SX vdef_all = SX::zeros(1, n);
-    vector<SXElement>::iterator it_v = v_all.begin();
-    vector<SXElement>::iterator it_vdef = vdef_all.begin();
-    for (int i=0; i<v.size(); ++i) {
-      int nv = v[i].size();
-      copy(v[i].begin(), v[i].end(), it_v);
-      copy(vdef[i].begin(), vdef[i].end(), it_vdef);
-      it_v += nv;  it_vdef += nv;
-    }
+    // Function outputs
+    std::vector<SX> f_out = vdef;
+    f_out.insert(f_out.end(), ex.begin(), ex.end());
 
-    // Substitute
-    substituteInPlace(v_all, vdef_all, ex, reverse);
+    // Write the mapping function
+    SXFunction f(f_in, f_out);
+    f.init();
 
-    // Collect the result
-    it_vdef = vdef_all.begin();
-    for (int i=0; i<v.size(); ++i) {
-      int nv = v[i].size();
-      copy(it_vdef, it_vdef+nv, vdef[i].begin());
-      it_vdef += nv;
+    // Get references to the internal data structures
+    const vector<ScalarAtomic>& algorithm = f.algorithm();
+    vector<SXElement> work(f.getWorkSize());
+
+    // Iterator to the binary operations
+    vector<SXElement>::const_iterator b_it=f->operations_.begin();
+
+    // Iterator to stack of constants
+    vector<SXElement>::const_iterator c_it = f->constants_.begin();
+
+    // Iterator to free variables
+    vector<SXElement>::const_iterator p_it = f->free_vars_.begin();
+
+    // Evaluate the algorithm
+    for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
+      switch (it->op) {
+      case OP_INPUT:
+        // reverse is false, substitute out
+        work[it->i0] = vdef.at(it->i1).at(it->i2);
+        break;
+      case OP_OUTPUT:
+        if (it->i0 < v.size()) {
+          vdef.at(it->i0).at(it->i2) = work[it->i1];
+          if (reverse) {
+            // Use the new variable henceforth, substitute in
+            work[it->i1] = v.at(it->i0).at(it->i2);
+          }
+        } else {
+          // Auxillary output
+          ex.at(it->i0 - v.size()).at(it->i2) = work[it->i1];
+        }
+        break;
+      case OP_CONST:      work[it->i0] = *c_it++; break;
+      case OP_PARAMETER:  work[it->i0] = *p_it++; break;
+      default:
+        {
+          switch (it->op) {
+            CASADI_MATH_FUN_BUILTIN(work[it->i1], work[it->i2], work[it->i0])
+              }
+
+          // Avoid creating duplicates
+          const int depth = 2; // NOTE: a higher depth could possibly give more savings
+          work[it->i0].assignIfDuplicate(*b_it++, depth);
+        }
+      }
     }
   }
 

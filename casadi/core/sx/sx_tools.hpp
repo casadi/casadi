@@ -150,17 +150,22 @@ namespace casadi {
   }
 
   /** \brief Substitute variable var out of or into an expression expr,
-   *  with an arbitrary number of other expressions piggyback */
-  CASADI_EXPORT void substituteInPlace(const SX& v, SX &vdef,
-                                       std::vector<SX>& ex, bool reverse=false);
-
-  /** \brief Substitute variable var out of or into an expression expr,
    *  with an arbitrary number of other expressions piggyback (vector version) */
   inline void substituteInPlace(const std::vector<SX>& v,
                                 std::vector<SX>& vdef,
                                 std::vector<SX>& ex,
                                 bool reverse=false) {
     return SX::zz_substituteInPlace(v, vdef, ex, reverse);
+  }
+
+  /** \brief Substitute variable var out of or into an expression expr,
+   *  with an arbitrary number of other expressions piggyback */
+  inline void substituteInPlace(const SX& v, SX &vdef,
+                                std::vector<SX>& ex, bool reverse=false) {
+    std::vector<SX> v2(1, v);
+    std::vector<SX> vdef2(1, vdef);
+    substituteInPlace(v2, vdef2, ex, reverse);
+    vdef = vdef2.front();
   }
 
   /** \brief Substitute variable var out of or into an expression expr */
