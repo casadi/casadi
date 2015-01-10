@@ -2077,9 +2077,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::repmat(const Matrix<DataType>& x, const Sparsity& sp) {
-    casadi_assert_message(x.isScalar(),
-                          "repmat(Matrix<DataType> x, Sparsity sp) only defined for scalar x");
-    return Matrix<DataType>(sp, x.toScalar());
+    return x.zz_repmat(sp);
   }
 
   template<typename DataType>
@@ -2090,16 +2088,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::repmat(const Matrix<DataType>& x, int nrow, int ncol) {
-    if (x.isScalar()) {
-      if (x.isDense()) {
-        return Matrix<DataType>(Sparsity::dense(nrow, ncol), x.toScalar());
-      } else {
-        return sparse(nrow, ncol);
-      }
-    } else {
-      return vertcat(
-        std::vector< Matrix<DataType> >(nrow, horzcat(std::vector< Matrix<DataType> >(ncol, x))));
-    }
+    return x.zz_repmat(nrow, ncol);
   }
 
   template<typename DataType>
@@ -2965,12 +2954,28 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_repmat(int n, int m) const {
-    // First concatenate horizontally
-    Matrix<DataType> col = horzcat(std::vector<Matrix<DataType> >(m, *this));
+  Matrix<DataType> Matrix<DataType>::zz_repmat(const Sparsity& sp) const {
+    casadi_assert_message(isScalar(),
+                          "repmat(Matrix<DataType> x, Sparsity sp) only defined for scalar x");
+    return Matrix<DataType>(sp, toScalar());
+  }
 
-    // Then vertically
-    return vertcat(std::vector<Matrix<DataType> >(n, col));
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_repmat(int n, int m) const {
+    if (n==1 &&  m==1) {
+      // Quick return if possible
+      return *this;
+    } else if (isScalar()) {
+      if (isDense()) {
+        return Matrix<DataType>(Sparsity::dense(n, m), toScalar());
+      } else {
+        return sparse(n, m);
+      }
+    } else {
+      std::vector< Matrix<DataType> > v_hor(m, *this);
+      std::vector< Matrix<DataType> > v_ver(n, horzcat(v_hor));
+      return vertcat(v_ver);
+    }
   }
 
   template<typename DataType>

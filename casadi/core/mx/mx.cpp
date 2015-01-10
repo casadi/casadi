@@ -480,21 +480,15 @@ namespace casadi {
   }
 
   MX MX::repmat(const MX& x, const Sparsity& sp) {
-    casadi_assert_message(x.isScalar(), "repmat(MX x, Sparsity sp) only defined for scalar x");
-    return MX(sp, x);
+    return x.zz_repmat(sp);
   }
 
   MX MX::repmat(const MX& x, const std::pair<int, int> &rc) {
     return repmat(x, rc.first, rc.second);
   }
 
-  MX MX::repmat(const MX& x, int nrow, int ncol) {
-    if (x.isScalar()) {
-      return MX(Sparsity::dense(nrow, ncol), x);
-    } else {
-      casadi_assert_message(0, "not implemented");
-      return MX();
-    }
+  MX MX::repmat(const MX& x, int n, int m) {
+    return x.zz_repmat(n, m);
   }
 
   MX MX::inf(int nrow, int ncol) {
@@ -1305,15 +1299,26 @@ namespace casadi {
     return res;
   }
 
+  MX MX::zz_repmat(const Sparsity& sp) const {
+    casadi_assert_message(isScalar(), "repmat(MX x, Sparsity sp) only defined for scalar x");
+    return MX(sp, *this);
+  }
+
   MX MX::zz_repmat(int n, int m) const {
-    // Quick return if possible
-    if (n==1 &&  m==1) return *this;
-
-    // First concatenate horizontally
-    MX col = horzcat(std::vector<MX >(m, *this));
-
-    // Then vertically
-    return vertcat(std::vector<MX >(n, col));
+    if (n==1 &&  m==1) {
+      // Quick return if possible
+      return *this;
+    } else if (isScalar()) {
+      if (isDense()) {
+        return MX(Sparsity::dense(n, m), *this);
+      } else {
+        return sparse(n, m);
+      }
+    } else {
+      std::vector<MX> v_hor(m, *this);
+      std::vector<MX> v_ver(n, horzcat(v_hor));
+      return vertcat(v_ver);
+    }
   }
 
   MX MX::zz_dense() const {

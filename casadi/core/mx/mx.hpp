@@ -266,7 +266,7 @@ namespace casadi {
     ///@{
     /** \brief  create a matrix by repeating an existing matrix */
     static MX repmat(const MX& x, const Sparsity& sp);
-    static MX repmat(const MX& x, int nrow, int ncol=1);
+    static MX repmat(const MX& x, int n, int m=1);
     static MX repmat(const MX& x, const std::pair<int, int> &rc);
     ///@}
 
@@ -394,7 +394,8 @@ namespace casadi {
     MX zz_if_else(const MX &if_true, const MX &if_false) const;
     MX zz_unite(const MX& B) const;
     MX zz_trace() const;
-    MX zz_repmat(int n, int m) const;
+    MX zz_repmat(const Sparsity& sp) const;
+    MX zz_repmat(int n, int m=1) const;
     MX zz_dense() const;
     static MX zz_createParent(std::vector<MX> &deps);
     static MX zz_createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children);
