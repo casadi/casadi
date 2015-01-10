@@ -300,20 +300,24 @@ namespace casadi {
   }
 
   /** \brief Extract shared subexpressions from an set of expressions */
-  CASADI_EXPORT void extractShared(std::vector<SX>& ex,
-                                   std::vector<SX>& v, std::vector<SX>& vdef,
-                                   const std::string& v_prefix="v_",
-                                   const std::string& v_suffix="");
+  inline void extractShared(std::vector<SX>& ex,
+                            std::vector<SX>& v, std::vector<SX>& vdef,
+                            const std::string& v_prefix="v_",
+                            const std::string& v_suffix="") {
+    SX::zz_extractShared(ex, v, vdef, v_prefix, v_suffix);
+  }
 
   /** \brief Print compact, introducing new variables for shared subexpressions */
-  CASADI_EXPORT void printCompact(const SX& ex, std::ostream &stream=CASADI_COUT);
+  inline void printCompact(const SX& ex, std::ostream &stream=CASADI_COUT) {
+    ex.zz_printCompact(stream);
+  }
 
   /** \brief extracts polynomial coefficients from an expression
    *
    * \parameter ex Scalar expression that represents a polynomial
    * \paramater x  Scalar symbol that the polynomial is build up with
    */
-  CASADI_EXPORT SX poly_coeff(const SX& ex, const SX&x);
+  inline SX poly_coeff(const SX& ex, const SX&x) { return ex.zz_poly_coeff(x);}
 
   /** \brief Attempts to find the roots of a polynomial
    *
@@ -321,12 +325,12 @@ namespace casadi {
    *  It is assumed that the roots are real.
    *
    */
-  CASADI_EXPORT SX poly_roots(const SX& p);
+  inline SX poly_roots(const SX& p) { return p.zz_poly_roots();}
 
   /** \brief Attempts to find the eigenvalues of a symbolic matrix
    *  This will only work for up to 3x3 matrices
    */
-  CASADI_EXPORT SX eig_symbolic(const SX& m);
+  inline SX eig_symbolic(const SX& m) { return m.zz_eig_symbolic();}
 
 /*
 @}
