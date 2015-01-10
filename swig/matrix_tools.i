@@ -39,7 +39,6 @@
 %define MATRIX_TOOLS_TEMPLATES(DataType)
   MTT_INST(DataType, solve)
   MTT_INST(DataType, pinv)
-  MTT_INST(DataType, sparse)
 %enddef
 
 #ifndef SWIGMATLAB
@@ -107,7 +106,7 @@ MatType nullspace(const MatType& A);
 MatType polyval(const MatType& p, const MatType& x);
 MatType diag(const MatType &A);
 MatType unite(const MatType& A, const MatType& B);
-MatType dense(const MatType& x);
+MatType dense(const MatType& x); // TODO: rename to 'densify'
 MatType repmat(const MatType &A, int n, int m=1);
 MatType repmat(const MatType &A, const std::pair<int, int>& rc);
 MatType repmat(const MatType &A, const Sparsity& sp);
@@ -122,6 +121,7 @@ void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
 //MatType any(const MatType &x);
 MatType project(const MatType& A, const Sparsity& sp);
 MatType sparsify(const MatType& A, double tol=0);
+MatType sparse(const MatType& A, double tol=0); // TODO: Remove
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)

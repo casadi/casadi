@@ -83,10 +83,6 @@ namespace casadi {
   */
   CASADI_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
                                     const Dictionary& dict = Dictionary());
-
-  /** \brief  Make a matrix sparse by removing numerical zeros*/
-  template<typename DataType>
-  Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0) { return sparsify(A, tol);}
 /*
 @}
 */
