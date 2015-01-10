@@ -84,10 +84,6 @@ namespace casadi {
   CASADI_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
                                     const Dictionary& dict = Dictionary());
 
-  /** \brief Repeat matrix A n times vertically and m times horizontally */
-  template<typename DataType>
-  Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m) { return A.zz_repmat(n, m);}
-
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<typename DataType>
   Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0) { return sparsify(A, tol);}

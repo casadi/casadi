@@ -49,9 +49,6 @@ namespace casadi {
   /** \brief  Simplify an expression */
   inline void simplify(MX& ex) { ex.zz_simplify();}
 
-  /** \brief Repeat matrix A n times vertically and m times horizontally */
-  inline MX repmat(const MX &A, int n, int m) { return A.zz_repmat(n, m);}
-
   /** \brief  Create a parent MX on which all given MX's will depend.
 
       In some sense, this function is the inverse of

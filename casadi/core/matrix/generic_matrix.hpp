@@ -317,6 +317,22 @@ namespace casadi {
 
     /** \brief  Make the matrix dense if not already */
     inline friend MatType dense(const MatType& x) { return x.zz_dense();}
+
+    ///@{
+    /** \brief Repeat matrix A n times vertically and m times horizontally */
+    inline friend MatType repmat(const MatType &A, int n, int m=1) {
+      return A.zz_repmat(n, m);
+    }
+
+    inline friend MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
+      return A.zz_repmat(rc.first, rc.second);
+    }
+    ///@}
+
+    /** \brief Repeat a scalar to a new sparsity pattern */
+    inline friend MatType repmat(const MatType &A, const Sparsity& sp) {
+      return A.zz_repmat(sp);
+    }
 #endif // SWIG
 
     /** @name Construct symbolic primitives
