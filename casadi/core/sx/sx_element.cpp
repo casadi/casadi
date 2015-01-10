@@ -1441,36 +1441,82 @@ namespace casadi {
   template<>
   SX SX::zz_taylor(const SX& x,
                    const SX& a, int order) const {
-    throw CasadiException("\"taylor\" not defined for instantiation");
-    return SX();
+    casadi_assert(x.isScalar() && a.isScalar());
+    if (size()!=numel())
+      throw CasadiException("taylor: not implemented for sparse matrices");
+    SX ff = vec(T());
+
+    SX result = substitute(ff, x, a);
+    double nf=1;
+    SX dx = (x-a);
+    SX dxa = (x-a);
+    for (int i=1;i<=order;i++) {
+      ff = jacobian(ff, x);
+      nf*=i;
+      result+=1/nf * substitute(ff, x, a) * dxa;
+      dxa*=dx;
+    }
+    return reshape(result, size2(), size1()).T();
   }
 
   template<>
-  SX SX::zz_mtaylor(const SX& x,
-                    const SX& a, int order) const {
-    throw CasadiException("\"mtaylor\" not defined for instantiation");
-    return SX();
+  SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const {
+    return mtaylor(*this, x, a, order, std::vector<int>(x.size(), 1));
+  }
+
+  SX mtaylor_recursive(const SX& ex, const SX& x, const SX& a, int order,
+                       const std::vector<int>&order_contributions,
+                       const SXElement & current_dx=casadi_limits<SXElement>::one,
+                       double current_denom=1, int current_order=1) {
+    SX result = substitute(ex, x, a)*current_dx/current_denom;
+    for (int i=0;i<x.size();i++) {
+      if (order_contributions[i]<=order) {
+        result += mtaylor_recursive(
+                                    jacobian(ex, x.at(i)),
+                                    x, a,
+                                    order-order_contributions[i],
+                                    order_contributions,
+                                    current_dx*(x.at(i)-a.at(i)),
+                                    current_denom*current_order, current_order+1);
+      }
+    }
+    return result;
   }
 
   template<>
-  SX SX::zz_mtaylor(const SX& x,
-                    const SX& a, int order,
-                    const std::vector<int>&order_contributions) const {
-    throw CasadiException("\"mtaylor\" not defined for instantiation");
-    return SX();
+  SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
+                    const std::vector<int>& order_contributions) const {
+    casadi_assert_message(size()==numel() && x.size()==x.numel(),
+                          "mtaylor: not implemented for sparse matrices");
+
+    casadi_assert_message(x.size()==order_contributions.size(),
+                          "mtaylor: number of non-zero elements in x (" <<  x.size()
+                          << ") must match size of order_contributions ("
+                          << order_contributions.size() << ")");
+
+    return reshape(mtaylor_recursive(vec(*this), x, a, order,
+                                     order_contributions),
+                   size2(), size1()).T();
   }
 
   template<>
   int SX::zz_countNodes() const {
-    throw CasadiException("\"countNodes\" not defined for instantiation");
-    return 0;
+    SXFunction f(SX(), *this);
+    f.init();
+    return f.countNodes();
   }
 
   template<>
   std::string
   SX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const {
-    throw CasadiException("\"getOperatorRepresentation\" not defined for instantiation");
-    return std::string();
+    SXElement x = toScalar();
+    if (!x.hasDep())
+        throw CasadiException("getOperatorRepresentation: SXElement must be binary operator");
+    if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2))
+        throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
+    std::stringstream s;
+    casadi_math<double>::print(x.getOp(), s, args[0], args[1]);
+    return s.str();
   }
 
   template<>

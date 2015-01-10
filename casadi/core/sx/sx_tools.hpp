@@ -245,8 +245,8 @@ namespace casadi {
    * \endcode
    * \verbatim >>   x \endverbatim
    */
-  CASADI_EXPORT SX taylor(const SX& ex, const SX& x,
-                                   const SX& a=0, int order=1);
+  inline SX taylor(const SX& ex, const SX& x,
+                   const SX& a=0, int order=1) { return ex.zz_taylor(x, a, order);}
 
   /**
    * \brief multivariate Taylor series expansion
@@ -255,7 +255,10 @@ namespace casadi {
    * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
    *
    */
-  CASADI_EXPORT SX mtaylor(const SX& ex, const SX& x, const SX& a, int order=1);
+  inline SX mtaylor(const SX& ex, const SX& x, const SX& a, int order=1) {
+    return ex.zz_mtaylor(x, a, order);
+  }
+
   /**
    * \brief multivariate Taylor series expansion
    *
@@ -282,16 +285,19 @@ namespace casadi {
    * \f$  (-3 x^2 y-x^3)/6+y+x \f$
    *
    */
-  CASADI_EXPORT SX mtaylor(const SX& ex, const SX& x, const SX& a, int order,
-                                    const std::vector<int>&order_contributions);
+  inline SX mtaylor(const SX& ex, const SX& x, const SX& a, int order,
+                    const std::vector<int>& order_contributions) {
+    return ex.zz_mtaylor(x, a, order, order_contributions);
+  }
 
   /** \brief Count number of nodes */
-  CASADI_EXPORT int countNodes(const SX& A);
+  inline int countNodes(const SX& A) { return A.zz_countNodes();}
 
   /** \brief Get a string representation for a binary SX, using custom arguments */
-  CASADI_EXPORT std::string getOperatorRepresentation(
-                                       const SX& x,
-                                       const std::vector<std::string>& args);
+  inline std::string getOperatorRepresentation(const SX& x,
+                                               const std::vector<std::string>& args) {
+    return x.zz_getOperatorRepresentation(args);
+  }
 
   /** \brief Extract shared subexpressions from an set of expressions */
   CASADI_EXPORT void extractShared(std::vector<SX>& ex,

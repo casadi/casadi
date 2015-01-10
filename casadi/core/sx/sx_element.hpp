@@ -371,12 +371,10 @@ namespace casadi {
   template<> void SX::zz_hessian(const SX &arg, SX &H, SX &g) const;
   template<> SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v,
                                            bool transpose_jacobian) const;
-  template<> SX SX::zz_taylor(const SX& x,
-                              const SX& a, int order) const;
-  template<> SX SX::zz_mtaylor(const SX& x,
-                               const SX& a, int order) const;
+  template<> SX SX::zz_taylor(const SX& x, const SX& a, int order) const;
+  template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const;
   template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
-                               const std::vector<int>&order_contributions) const;
+                               const std::vector<int>& order_contributions) const;
   template<> int SX::zz_countNodes() const;
   template<> std::string
   SX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const;

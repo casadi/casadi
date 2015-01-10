@@ -439,7 +439,7 @@ namespace casadi {
     Matrix<DataType> zz_mtaylor(const Matrix<DataType>& x,
                                 const Matrix<DataType>& a, int order=1) const;
     Matrix<DataType> zz_mtaylor(const Matrix<DataType>& x, const Matrix<DataType>& a, int order,
-                                const std::vector<int>&order_contributions) const;
+                                const std::vector<int>& order_contributions) const;
     int zz_countNodes() const;
     std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
     static void zz_extractShared(std::vector<Matrix<DataType> >& ex,
