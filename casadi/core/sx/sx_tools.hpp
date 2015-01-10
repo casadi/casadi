@@ -57,6 +57,8 @@ namespace casadi {
   CASADI_EXPORT Matrix<double> evalf(const SX &ex, const SX &v,
                                               const Matrix<double> &vdef);
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+
   /** \brief  Expand the expression as a weighted sum (with constant weights)
   */
   inline void expand(const SX& ex, SX &weights, SX& terms) { ex.zz_expand(weights, terms);}
@@ -331,6 +333,8 @@ namespace casadi {
    *  This will only work for up to 3x3 matrices
    */
   inline SX eig_symbolic(const SX& m) { return m.zz_eig_symbolic();}
+
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
 /*
 @}

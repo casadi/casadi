@@ -37,6 +37,8 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
+#if !defined(SWIG) || !defined(SWIGMATLAB)
+
   /** \brief Branching on MX nodes
       Ternary operator, "cond ? if_true : if_false"
   */
@@ -203,6 +205,9 @@ namespace casadi {
   */
   inline MX pinv(const MX& A, const std::string& lsolver,
                  const Dictionary& dict = Dictionary()) { return A.zz_pinv(lsolver, dict);}
+
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
+
 /** @}
 */
 
