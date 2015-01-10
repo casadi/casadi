@@ -138,27 +138,37 @@ namespace casadi {
   inline void simplify(SX &ex) { ex = ex.zz_simplify();}
 
   /** \brief  Substitute variable v with expression vdef in an expression ex */
-  CASADI_EXPORT SX substitute(const SX& ex, const SX& v, const SX& vdef);
+  inline SX substitute(const SX& ex, const SX& v, const SX& vdef) {
+    return ex.zz_substitute(v, vdef);
+  }
 
   /** \brief  Substitute variable var with expression expr in multiple expressions */
-  CASADI_EXPORT std::vector<SX> substitute(const std::vector<SX>& ex,
-                                                    const std::vector<SX>& v,
-                                                    const std::vector<SX>& vdef);
-
-  /** \brief Substitute variable var out of or into an expression expr */
-  CASADI_EXPORT void substituteInPlace(const SX& v, SX &vdef, bool reverse=false);
+  inline std::vector<SX> substitute(const std::vector<SX>& ex,
+                                    const std::vector<SX>& v,
+                                    const std::vector<SX>& vdef) {
+    return SX::zz_substitute(ex, v, vdef);
+  }
 
   /** \brief Substitute variable var out of or into an expression expr,
    *  with an arbitrary number of other expressions piggyback */
   CASADI_EXPORT void substituteInPlace(const SX& v, SX &vdef,
-                                                std::vector<SX>& ex, bool reverse=false);
+                                       std::vector<SX>& ex, bool reverse=false);
 
   /** \brief Substitute variable var out of or into an expression expr,
    *  with an arbitrary number of other expressions piggyback (vector version) */
-  CASADI_EXPORT void substituteInPlace(const std::vector<SX>& v,
-                                                std::vector<SX>& vdef,
-                                                std::vector<SX>& ex,
-                                                bool reverse=false);
+  inline void substituteInPlace(const std::vector<SX>& v,
+                                std::vector<SX>& vdef,
+                                std::vector<SX>& ex,
+                                bool reverse=false) {
+    return SX::zz_substituteInPlace(v, vdef, ex, reverse);
+  }
+
+  /** \brief Substitute variable var out of or into an expression expr */
+  inline void substituteInPlace(const SX& v, SX &vdef, bool reverse=false) {
+    // Empty vector
+    std::vector<SX> ex;
+    substituteInPlace(v, vdef, ex, reverse);
+  }
 
   /** \brief Evaluate an SX graph numerically
    * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.

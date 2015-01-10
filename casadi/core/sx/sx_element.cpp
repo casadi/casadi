@@ -1194,8 +1194,7 @@ namespace casadi {
   template<>
   SX SX::zz_substitute(const SX& v,
                        const SX& vdef) const {
-    throw CasadiException("\"substitute\" not defined for instantiation");
-    return SX();
+    return substitute(vector<SX>(1, *this), vector<SX>(1, v), vector<SX>(1, vdef)).front();
   }
 
   template<>
@@ -1203,8 +1202,42 @@ namespace casadi {
   SX::zz_substitute(const std::vector<SX >& ex,
                     const std::vector<SX >& v,
                     const std::vector<SX >& vdef) {
-    throw CasadiException("\"substitute\" not defined for instantiation");
-    return std::vector<SX >();
+
+    // Assert consistent dimensions
+    casadi_assert_warning(v.size()==vdef.size(), "subtitute: number of symbols to replace ( "
+                          << v.size() << ") must match number of expressions (" << vdef.size()
+                          << ") to replace them with.");
+
+    // Quick return if all equal
+    bool all_equal = true;
+    for (int k=0; k<v.size(); ++k) {
+      if (v[k].shape()!=vdef[k].shape() || !isEqual(v[k], vdef[k])) {
+        all_equal = false;
+        break;
+      }
+    }
+    if (all_equal) return ex;
+
+    // Check sparsities
+    for (int k=0; k<v.size(); ++k) {
+      if (v[k].sparsity()!=vdef[k].sparsity()) {
+        // Expand vdef to sparsity of v if vdef is scalar
+        if (vdef[k].isScalar() && vdef[k].size()==1) {
+          std::vector<SX> vdef_mod = vdef;
+          vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0));
+          return substitute(ex, v, vdef_mod);
+        } else {
+          casadi_error("subsitute(ex, v, vdef): sparsities of v and vdef must match. Got v: "
+                       << v[k].dimString() << " and " << "vdef: " << vdef[k].dimString() << ".");
+        }
+      }
+    }
+
+
+    // Otherwise, evaluate symbolically
+    SXFunction F(v, ex);
+    F.init();
+    return F(vdef);
   }
 
   template<>
@@ -1212,7 +1245,47 @@ namespace casadi {
                                 std::vector<SX >& vdef,
                                 std::vector<SX >& ex,
                                 bool reverse) {
-    throw CasadiException("\"substituteInPlace\" not defined for instantiation");
+    casadi_assert(v.size()==vdef.size());
+
+    // Quick return if empty or single expression
+    if (v.empty()) {
+      return;
+    } else if (v.size()==1) {
+      substituteInPlace(v.front(), vdef.front(), ex, reverse);
+      return;
+    }
+
+    // Count number of scalar variables
+    int n =0;
+    for (int i=0; i<v.size(); ++i) {
+      casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(),
+                            "the sparsity patterns of the expression and its "
+                            "defining expression do not match");
+      n += v[i].size();
+    }
+
+    // Gather all variables
+    SX v_all = SX::zeros(1, n);
+    SX vdef_all = SX::zeros(1, n);
+    vector<SXElement>::iterator it_v = v_all.begin();
+    vector<SXElement>::iterator it_vdef = vdef_all.begin();
+    for (int i=0; i<v.size(); ++i) {
+      int nv = v[i].size();
+      copy(v[i].begin(), v[i].end(), it_v);
+      copy(vdef[i].begin(), vdef[i].end(), it_vdef);
+      it_v += nv;  it_vdef += nv;
+    }
+
+    // Substitute
+    substituteInPlace(v_all, vdef_all, ex, reverse);
+
+    // Collect the result
+    it_vdef = vdef_all.begin();
+    for (int i=0; i<v.size(); ++i) {
+      int nv = v[i].size();
+      copy(it_vdef, it_vdef+nv, vdef[i].begin());
+      it_vdef += nv;
+    }
   }
 
   template<>

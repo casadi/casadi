@@ -33,49 +33,6 @@ using namespace std;
 
 namespace casadi {
 
-  std::vector<SX> substitute(const std::vector<SX> &ex, const std::vector<SX> &v,
-                             const std::vector<SX> &vdef) {
-    // Assert consistent dimensions
-    casadi_assert_warning(v.size()==vdef.size(), "subtitute: number of symbols to replace ( "
-                          << v.size() << ") must match number of expressions (" << vdef.size()
-                          << ") to replace them with.");
-
-    // Quick return if all equal
-    bool all_equal = true;
-    for (int k=0; k<v.size(); ++k) {
-      if (v[k].shape()!=vdef[k].shape() || !isEqual(v[k], vdef[k])) {
-        all_equal = false;
-        break;
-      }
-    }
-    if (all_equal) return ex;
-
-    // Check sparsities
-    for (int k=0; k<v.size(); ++k) {
-      if (v[k].sparsity()!=vdef[k].sparsity()) {
-        // Expand vdef to sparsity of v if vdef is scalar
-        if (vdef[k].isScalar() && vdef[k].size()==1) {
-          std::vector<SX> vdef_mod = vdef;
-          vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0));
-          return substitute(ex, v, vdef_mod);
-        } else {
-          casadi_error("subsitute(ex, v, vdef): sparsities of v and vdef must match. Got v: "
-                       << v[k].dimString() << " and " << "vdef: " << vdef[k].dimString() << ".");
-        }
-      }
-    }
-
-
-    // Otherwise, evaluate symbolically
-    SXFunction F(v, ex);
-    F.init();
-    return F(vdef);
-  }
-
-  SX substitute(const SX &ex, const SX &v, const SX &vdef) {
-    return substitute(vector<SX>(1, ex), vector<SX>(1, v), vector<SX>(1, vdef)).front();
-  }
-
   Matrix<double> evalf(const SX &ex, const SX &v, const Matrix<double> &vdef) {
     SXFunction fcn(v, ex);
     fcn.init();
@@ -89,12 +46,6 @@ namespace casadi {
     fcn.init();
     fcn.evaluate();
     return fcn.output();
-  }
-
-  void substituteInPlace(const SX &v, SX &vdef, bool reverse) {
-    // Empty vector
-    vector<SX> ex;
-    substituteInPlace(v, vdef, ex, reverse);
   }
 
   void substituteInPlace(const SX &v, SX &vdef, std::vector<SX>& ex, bool reverse) {
@@ -163,104 +114,6 @@ namespace casadi {
       }
     }
   }
-
-#if 0
-  void replaceDerivatives(SX &ex, const SX &var, const SX &dvar) {
-    // Initialize with an empty expression
-    SXFunction fcn(ex);
-
-    // Map from the var-node to the new der-node
-    std::map<int, SX> dermap;
-    for (int i=0; i<var.size(); ++i)
-      dermap[fcn.treemap[var[i].get()]] = dvar[i];
-
-    // Replacement map
-    std::map<int, SX> replace;
-
-    // Go through all nodes and check if any node is a derivative
-    for (int i=0; i<fcn.algorithm.size(); ++i) {
-      if (fcn.algorithm[i].op == DER) {
-
-        // find the corresponding derivative
-        std::map<int, SX>::iterator r = dermap.find(fcn.algorithm[i].ch0);
-        casadi_assert(r != dermap.end());
-
-        replace[i] = r->second;
-      }
-    }
-    SX res;
-    SX repres;
-    fcn.eval_symbolic(SX(), res, replace, repres);
-    ex = res;
-
-    casadi_assert(0);
-
-  }
-#endif
-
-#if 0
-  void makeSmooth(SX &ex, SX &bvar, SX &bexpr) {
-    // Initialize
-    SXFunction fcn(SX(), ex);
-
-    casadi_assert(bexpr.isEmpty());
-
-    // Nodes to be replaced
-    std::map<int, SXElement> replace;
-
-    // Go through all nodes and check if any node is non-smooth
-    for (int i=0; i<fcn->algorithm.size(); ++i) {
-
-      // Check if we have a step node
-      if (fcn->algorithm[i].op == STEP) {
-
-        // Get the index of the child
-        int ch0 = fcn->algorithm[i].ch[0];
-
-        // Binary variable corresponding to the the switch
-        SX sw;
-
-#if 0
-        // Find out if the switch has already been added
-        for (int j=0; j<bexpr.size(); ++j)
-          if (isEqual(bexpr[j], algorithm[i]->child0)) {
-            sw = bvar[j];
-            break;
-          }
-#endif
-
-        if (sw.isEmpty()) { // the switch has not yet been added
-          // Get an approriate name of the switch
-          std::stringstream name;
-          name << "sw_" << bvar.size2();
-          sw = SXElement::sym(name.str());
-
-          // Add to list of switches
-          bvar << sw;
-          //        bexpr << algorithm[i]->child0;
-        }
-
-        // Add to the substition map
-        replace[i] = sw[0];
-      }
-    }
-    SX res;
-    fcn->eval(SX(), res, replace, bexpr);
-
-    for (int i=0; i<bexpr.size(); ++i)
-      bexpr[i] = bexpr[i]->dep(0);
-
-    ex = res;
-
-#if 0
-    // Make sure that the binding expression is smooth
-    bexpr.init(SX());
-    SX b;
-    bexpr.eval_symbolic(SX(), b, replace, bexpr);
-    bexpr = b;
-#endif
-  }
-#endif
 
   SX spy(const SX& A) {
     SX s = SX::sparse(A.size1(), A.size2());
@@ -773,51 +626,6 @@ namespace casadi {
       for (int i=0; i<v.size(); ++i) {
         stream << v[i].toScalar() << " := " << vdef[i].toScalar() << endl;
       }
-    }
-  }
-
-  void substituteInPlace(const std::vector<SX>& v, std::vector<SX>& vdef, std::vector<SX>& ex,
-                         bool reverse) {
-    casadi_assert(v.size()==vdef.size());
-
-    // Quick return if empty or single expression
-    if (v.empty()) {
-      return;
-    } else if (v.size()==1) {
-      substituteInPlace(v.front(), vdef.front(), ex, reverse);
-      return;
-    }
-
-    // Count number of scalar variables
-    int n =0;
-    for (int i=0; i<v.size(); ++i) {
-      casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(),
-                            "the sparsity patterns of the expression and its "
-                            "defining expression do not match");
-      n += v[i].size();
-    }
-
-    // Gather all variables
-    SX v_all = SX::zeros(1, n);
-    SX vdef_all = SX::zeros(1, n);
-    vector<SXElement>::iterator it_v = v_all.begin();
-    vector<SXElement>::iterator it_vdef = vdef_all.begin();
-    for (int i=0; i<v.size(); ++i) {
-      int nv = v[i].size();
-      copy(v[i].begin(), v[i].end(), it_v);
-      copy(vdef[i].begin(), vdef[i].end(), it_vdef);
-      it_v += nv;  it_vdef += nv;
-    }
-
-    // Substitute
-    substituteInPlace(v_all, vdef_all, ex, reverse);
-
-    // Collect the result
-    it_vdef = vdef_all.begin();
-    for (int i=0; i<v.size(); ++i) {
-      int nv = v[i].size();
-      copy(it_vdef, it_vdef+nv, vdef[i].begin());
-      it_vdef += nv;
     }
   }
 
