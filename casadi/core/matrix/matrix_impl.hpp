@@ -2076,11 +2076,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::repmat(const DataType& x, const Sparsity& sp) {
-    return Matrix<DataType>(sp, x);
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::repmat(const Matrix<DataType>& x, const Sparsity& sp) {
     casadi_assert_message(x.isScalar(),
                           "repmat(Matrix<DataType> x, Sparsity sp) only defined for scalar x");

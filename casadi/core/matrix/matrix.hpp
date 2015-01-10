@@ -852,7 +852,6 @@ namespace casadi {
 
     ///@{
     /** \brief  create a matrix by repeating an existing matrix */
-    static Matrix<DataType> repmat(const DataType& x, const Sparsity& sp);
     static Matrix<DataType> repmat(const Matrix<DataType>& x, const Sparsity& sp);
     static Matrix<DataType> repmat(const Matrix<DataType>& x, int nrow, int ncol=1);
     static Matrix<DataType> repmat(const Matrix<DataType>& x, const std::pair<int, int>& rc);
