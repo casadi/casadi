@@ -119,6 +119,7 @@ void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
 //MatType all(const MatType &x);
 //MatType any(const MatType &x);
 MatType project(const MatType& A, const Sparsity& sp);
+MatType sparsify(const MatType& A, double tol=0);
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)

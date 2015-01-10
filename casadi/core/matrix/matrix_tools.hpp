@@ -90,29 +90,11 @@ namespace casadi {
 
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<typename DataType>
-  Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0);
+  Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0) { return sparsify(A, tol);}
 /*
 @}
 */
 
 } // namespace casadi
-
-// Global namespace
-
-#ifndef SWIG
-#include <iterator>
-
-namespace casadi {
-  // Implementations
-  template<typename DataType>
-  Matrix<DataType> sparse(const Matrix<DataType>& A, double tol) {
-    Matrix<DataType> ret = A;
-    ret.makeSparse(tol);
-    return ret;
-  }
-
-} // namespace casadi
-
-#endif //SWIG
 
 #endif // CASADI_MATRIX_TOOLS_HPP

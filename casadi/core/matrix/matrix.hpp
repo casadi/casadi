@@ -451,6 +451,7 @@ namespace casadi {
     Matrix<DataType> zz_poly_coeff(const Matrix<DataType>&x) const;
     Matrix<DataType> zz_poly_roots() const;
     Matrix<DataType> zz_eig_symbolic() const;
+    Matrix<DataType> zz_sparsify(double tol=0) const;
     ///@}
 
     /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
@@ -654,6 +655,11 @@ namespace casadi {
                                    std::vector<DataType>& res,
                                    bool trans_A=false) {
       return A.zz_addMultiple(v, res, trans_A);
+    }
+
+    /** \brief  Make a matrix sparse by removing numerical zeros*/
+    inline friend Matrix<DataType> sparsify(const Matrix<DataType>& A, double tol=0) {
+      return A.zz_sparsify(tol);
     }
 #endif // SWIG
 

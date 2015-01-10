@@ -3554,6 +3554,13 @@ namespace casadi {
     throw CasadiException("\"eig_symbolic\" not defined for instantiation");
   }
 
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_sparsify(double tol) const {
+    Matrix<DataType> ret = *this;
+    ret.makeSparse(tol);
+    return ret;
+  }
+
 } // namespace casadi
 
 /// \endcond
