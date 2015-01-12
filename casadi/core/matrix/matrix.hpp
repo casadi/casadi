@@ -413,7 +413,7 @@ namespace casadi {
     Matrix<DataType> zz_ramp() const;
     Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
                                          const Matrix<DataType> &b, int order=5,
-                                         const Matrix<DataType>& w=Matrix<DataType>()) const;
+                                         const Matrix<DataType>& w=Matrix<DataType>::sparse(0, 0)) const;
     Matrix<DataType> zz_simplify() const;
     Matrix<DataType> zz_substitute(const Matrix<DataType>& v, const Matrix<DataType>& vdef) const;
     static std::vector<Matrix<DataType> > zz_substitute(const std::vector<Matrix<DataType> >& ex,
