@@ -668,12 +668,21 @@
 @copydoc scheme_DLEOutput
 */
 /// \cond INTERNAL
+/** \class casadi::DleToDple
+\n
+\par
+@copydoc scheme_DLEInput
+<br/>
+@copydoc scheme_DLEOutput
+*/
+/// \endcond
+/// \cond INTERNAL
 /** \class casadi::DleToLrDle
 \n
 \par
-@copydoc scheme_LR_DLEInput
+@copydoc scheme_DLEInput
 <br/>
-@copydoc scheme_LR_DLEOutput
+@copydoc scheme_DLEOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -693,21 +702,12 @@
 @copydoc scheme_DPLEOutput
 */
 /// \cond INTERNAL
-/** \class casadi::DpleToDle
-\n
-\par
-@copydoc scheme_DLEInput
-<br/>
-@copydoc scheme_DLEOutput
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::DpleToLrDple
 \n
 \par
 @copydoc scheme_LR_DPLEInput
 <br/>
-@copydoc scheme_LR_DPLEOutput
+@copydoc scheme_DPLEOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -911,9 +911,9 @@
 /** \class casadi::LrDleToDle
 \n
 \par
-@copydoc scheme_DLEInput
+@copydoc scheme_LR_DLEInput
 <br/>
-@copydoc scheme_DLEOutput
+@copydoc scheme_LR_DLEOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -938,7 +938,16 @@
 \par
 @copydoc scheme_LR_DPLEInput
 <br/>
-@copydoc scheme_DPLEOutput
+@copydoc scheme_LR_DPLEOutput
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::LrDpleToLrDle
+\n
+\par
+@copydoc scheme_DLEInput
+<br/>
+@copydoc scheme_LR_DLEOutput
 */
 /// \endcond
 /// \cond INTERNAL
