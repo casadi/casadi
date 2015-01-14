@@ -158,7 +158,7 @@ namespace casadi {
     intOpts_["Hessian flush"] = "999999 * no flushing";
 
     // * Frequencies
-    intOpts_["Check frequency"] = "60 * test row residuals kAx − sk";
+    intOpts_["Check frequency"] = "60 * test row residuals kAx - sk";
     intOpts_["Expand frequency"] = "10000 * for anti-cycling procedure";
     intOpts_["Factorization frequency"] = "50 * 100 for LPs";
     intOpts_["Save frequency"] = "100 * save basis map";

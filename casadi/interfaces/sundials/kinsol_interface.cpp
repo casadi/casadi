@@ -58,9 +58,9 @@ namespace casadi {
 
    0 then no constraint is imposed on \p ui. \n
    1 then \p ui will be constrained to be \p ui >= 0.0. \n
-   −1 then \p ui will be constrained to be \p ui <= 0.0. \n
+   -1 then \p ui will be constrained to be \p ui <= 0.0. \n
    2 then \p ui will be constrained to be \p ui > 0.0. \n
-   −2 then \p ui will be constrained to be \p ui < 0.0. \n
+   -2 then \p ui will be constrained to be \p ui < 0.0. \n
 
    *
    * \see ImplicitFunction for more information

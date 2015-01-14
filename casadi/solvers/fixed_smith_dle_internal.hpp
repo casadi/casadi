@@ -52,7 +52,7 @@
  X_{-1} = 0
  X_0 = V
  k = 0
- while ||X_k − X_{k−1} || < do
+ while ||X_k - X_{k-1} || < do
    X_{k+1} = A X_k A^T + V
    k += 1
  end
@@ -69,7 +69,7 @@
  V_0 = V
  A_0 = A
  k = 0
- while ||X_k − X_{k−1} || < do
+ while ||X_k - X_{k-1} || < do
    X_{k+1} = A_k X_k A_k^T + V_k
    V_{k+1} = A_k V_k A_k^T + V_k
    A_{k+1} = A_k A_k
