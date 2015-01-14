@@ -80,8 +80,9 @@ option(WITH_MATLAB "Compile the MATLAB front-end (experimental)" OFF)
 option(WITH_PYTHON "Compile the Python front-end" OFF)
 option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside Python front-end" OFF)
-
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
+option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
+
 # static on windows, shared on linux/osx by default
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
@@ -487,6 +488,10 @@ add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (
 if(WITH_PROFILING)
   find_library(RT rt)
   add_definitions(-DWITH_PROFILING)
+endif()
+
+if(WITH_DEEPBIND)
+  add_definitions(-DWITH_DEEPBIND)
 endif()
 
 ######################################################

@@ -196,14 +196,18 @@ namespace casadi {
     reg = (RegFcn)GetProcAddress(handle, TEXT(regName.c_str()));
     casadi_assert_message(reg!=0, "PluginInterface::loadPlugin: no \"" + regName + "\" found");
 #else // _WIN32
-    void* handle = dlopen(lib.c_str(), RTLD_LAZY | RTLD_LOCAL);
+    int flag = RTLD_LAZY | RTLD_LOCAL;
+#ifdef WITH_DEEPBIND
+    flag |= RTLD_DEEPBIND;
+#endif
+    void* handle = dlopen(lib.c_str(), flag);
     if (!handle) {
       errors += "\n  Tried " + lib + ":\n    Error code: " + dlerror();
 
       #ifdef PLUGIN_EXTRA_SEARCH_PATH
       // Try the second search path
       lib = PLUGIN_EXTRA_SEARCH_PATH "/" + lib;
-      handle = dlopen(lib.c_str(), RTLD_LAZY | RTLD_LOCAL);
+      handle = dlopen(lib.c_str(), flag);
       if (!handle) {
         errors += "\n  Tried " + lib + ":\n    Error code: " + dlerror();
       }
