@@ -144,7 +144,7 @@ namespace casadi {
     Sparsity& sparsityRef();
     /// \endcond
 
-    /// \cond INTERNAL
+    /// \cond CLUTTER
     /**  @{  */
     /** \brief Accessed by friend functions */
     int zz_sprank() const { return sprank(sparsity());}

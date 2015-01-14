@@ -48,7 +48,7 @@ namespace casadi {
 #endif // SWIG
   public:
 
-    /// \cond internal
+    /// \cond CLUTTER
     std::vector< std::vector< MatType > >
       zz_blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const;
     static MatType zz_veccat(const std::vector< MatType >& x);

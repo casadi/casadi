@@ -385,7 +385,7 @@ namespace casadi {
     ///@}
     /// \endcond
 
-    /// \cond INTERNAL
+    /// \cond CLUTTER
     ///@{
     /// Functions called by the corresponding friend functions -- MATLAB naming
     Matrix<DataType> zz_plus(const Matrix<DataType> &y) const;
@@ -502,6 +502,8 @@ namespace casadi {
     Matrix<DataType> T() const;
     ///@{
 
+    /// \cond CLUTTER
+    
     ///@{
     /// Operations called by the corresponding friend functions, MATLAB naming convention
     Matrix<DataType> zz_sin() const;
@@ -588,6 +590,8 @@ namespace casadi {
                                 std::vector<int>& Iwork) const;
     Matrix<DataType> zz_dense() const;
     ///@}
+    
+    /// \endcond
 
 /**
 \ingroup expression_tools

@@ -120,7 +120,7 @@ class CASADI_EXPORT GenericExpression {
     #endif // !SWIG || DOXYGEN
     /** @} */
 
-    // \cond INTERNAL
+    // \cond CLUTTER
 
     /// Matrix division from left
     inline ExType __mldivide__(const ExType& y) const

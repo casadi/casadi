@@ -324,7 +324,7 @@ namespace casadi {
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
 
-    /// \cond INTERNAL
+    /// \cond CLUTTER
     /// all binary operations
     MX zz_plus(const MX& y) const;
     MX zz_minus(const MX& y) const;
@@ -356,7 +356,7 @@ namespace casadi {
     /// \end CLUTTER
     MX printme(const MX& y) const;
 
-    /// \cond INTERNAL
+    /// \cond CLUTTER
 
     // all unary operations
     MX zz_exp() const;
