@@ -503,7 +503,7 @@ namespace casadi {
     ///@{
 
     /// \cond CLUTTER
-    
+
     ///@{
     /// Operations called by the corresponding friend functions, MATLAB naming convention
     Matrix<DataType> zz_sin() const;
@@ -590,7 +590,7 @@ namespace casadi {
                                 std::vector<int>& Iwork) const;
     Matrix<DataType> zz_dense() const;
     ///@}
-    
+
     /// \endcond
 
 /**
