@@ -3413,7 +3413,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>Backup basis file</td><td>OT_INTEGER</td><td>None</td><td>0 * output extra basis map</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>Central difference interval</td><td>OT_REAL</td><td>None</td><td>6.7e-5 * (Function precision)^1/3</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Check frequency</td><td>OT_INTEGER</td><td>None</td><td>60 * test row residuals kAx − sk</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>Check frequency</td><td>OT_INTEGER</td><td>None</td><td>60 * test row residuals kAx - sk</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>Crash option</td><td>OT_INTEGER</td><td>None</td><td>3 * first basis is essentially triangular</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>Crash tolerance</td><td>OT_REAL</td><td>None</td><td>0.1</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>Debug level</td><td>OT_INTEGER</td><td>None</td><td>0 * for developers</td><td>casadi::SnoptInterface</td></tr>
@@ -3507,7 +3507,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>Backup basis file</td><td>OT_INTEGER</td><td>None</td><td>0 * output extra basis map</td></tr>
 <tr><td>Central difference interval</td><td>OT_REAL</td><td>None</td><td>6.7e-5 * (Function precision)^1/3</td></tr>
-<tr><td>Check frequency</td><td>OT_INTEGER</td><td>None</td><td>60 * test row residuals kAx − sk</td></tr>
+<tr><td>Check frequency</td><td>OT_INTEGER</td><td>None</td><td>60 * test row residuals kAx - sk</td></tr>
 <tr><td>Crash option</td><td>OT_INTEGER</td><td>None</td><td>3 * first basis is essentially triangular</td></tr>
 <tr><td>Crash tolerance</td><td>OT_REAL</td><td>None</td><td>0.1</td></tr>
 <tr><td>Debug level</td><td>OT_INTEGER</td><td>None</td><td>0 * for developers</td></tr>
