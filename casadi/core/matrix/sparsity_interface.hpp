@@ -60,7 +60,7 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-#ifdef !SWIG || DOXYGEN
+#if !defined(SWIG) || defined(DOXYGEN)
     /** \brief Concatenate a list of matrices horizontally
      * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
      *

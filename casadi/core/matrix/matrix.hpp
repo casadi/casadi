@@ -593,7 +593,7 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-#ifdef !SWIG || DOXYGEN
+#if !defined(SWIG) || defined(DOXYGEN)
     /** \brief Matrix adjoint */
     inline friend Matrix<DataType> adj(const Matrix<DataType>& A) { return A.zz_adj();}
 

@@ -72,7 +72,7 @@ namespace casadi {
 @{
 */
 
-#ifndef !SWIG || DOXYGEN
+#if !defined(SWIG) || defined(DOXYGEN)
     /// Return a string with a description of the object, cf. str(Object) in Python
     inline friend std::string str(const PrintableObject<Derived>& obj) {
       return obj.getDescription();

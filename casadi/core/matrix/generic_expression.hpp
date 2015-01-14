@@ -105,7 +105,7 @@ class CASADI_EXPORT GenericExpression {
     \ingroup expression_tools
     @{
     */
-    #ifdef !SWIG || DOXYGEN
+    #if !defined(SWIG) || defined(DOXYGEN)
     /** \brief Check if two nodes are equivalent up to a given depth.
      *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
      *

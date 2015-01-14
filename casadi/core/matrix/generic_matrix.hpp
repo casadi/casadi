@@ -201,7 +201,7 @@ namespace casadi {
     }
 #endif // SWIG
 
-#ifdef !SWIG || DOXYGEN
+#if !defined(SWIG) || defined(DOXYGEN)
 
     /**
        \ingroup expression_tools
