@@ -46,7 +46,7 @@ namespace casadi {
 
     /// \cond UNSAFE
     /** \brief [UNSAFE] Obtain reference to inputs
-     * \seealso getInput, setInput
+     * \sa getInput, setInput
      */
     ///@{
     /// Access input argument
@@ -61,7 +61,7 @@ namespace casadi {
     ///@}
 
     /** \brief [UNSAFE] Obtain reference to outputs
-     * \seealso getOutput, getOutput
+     * \sa getOutput, getOutput
      */
     ///@{
     /// Access output argument
