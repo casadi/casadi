@@ -101,5 +101,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
 
 #endif // CASADI_SOLVE_HPP

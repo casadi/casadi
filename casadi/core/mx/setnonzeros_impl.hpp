@@ -678,4 +678,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
+
 #endif // CASADI_SETNONZEROS_IMPL_HPP

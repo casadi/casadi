@@ -84,4 +84,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
+
 #endif // CASADI_SUBASSIGN_HPP

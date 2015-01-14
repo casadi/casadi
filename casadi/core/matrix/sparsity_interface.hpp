@@ -47,12 +47,20 @@ namespace casadi {
     inline MatType& self() { return static_cast<MatType&>(*this); }
 #endif // SWIG
   public:
+
+    /// \cond internal
     std::vector< std::vector< MatType > >
       zz_blocksplit(const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) const;
     static MatType zz_veccat(const std::vector< MatType >& x);
     static MatType zz_vecNZcat(const std::vector< MatType >& x);
     MatType zz_vec() const;
-#ifndef SWIG
+    /// \endcond
+
+/**
+\ingroup expression_tools
+@{
+*/
+#ifdef !SWIG || DOXYGEN
     /** \brief Concatenate a list of matrices horizontally
      * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
      *
@@ -343,7 +351,8 @@ namespace casadi {
     inline friend MatType tril(const MatType& a, bool includeDiagonal=true) {
       return a.zz_tril(includeDiagonal);
     }
-#endif // SWIG
+#endif // !SWIG || DOXYGEN
+/** @} */
   };
 
 #ifndef SWIG

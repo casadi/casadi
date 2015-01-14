@@ -79,5 +79,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
 
 #endif // CASADI_SET_SPARSE_HPP

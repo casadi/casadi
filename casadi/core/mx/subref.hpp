@@ -85,4 +85,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
+
 #endif // CASADI_SUBREF_HPP

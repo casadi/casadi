@@ -589,7 +589,11 @@ namespace casadi {
     Matrix<DataType> zz_dense() const;
     ///@}
 
-#ifndef SWIG
+/**
+\ingroup expression_tools
+@{
+*/
+#ifdef !SWIG || DOXYGEN
     /** \brief Matrix adjoint */
     inline friend Matrix<DataType> adj(const Matrix<DataType>& A) { return A.zz_adj();}
 
@@ -671,8 +675,8 @@ namespace casadi {
     inline friend Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0) {
       return sparsify(A, tol);
     }
-#endif // SWIG
-
+#endif // !SWIG || DOXYGEN
+/** @} */
 
     /** \brief Set or reset the maximum number of calls to the
      * printing function when printing an expression */

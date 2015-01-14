@@ -66,7 +66,13 @@ namespace casadi {
       static_cast<const Derived&>(obj).repr(stream, false);
       return stream;
     }
+#endif // SWIG
+/**
+\ingroup expression_tools
+@{
+*/
 
+#ifndef !SWIG || DOXYGEN
     /// Return a string with a description of the object, cf. str(Object) in Python
     inline friend std::string str(const PrintableObject<Derived>& obj) {
       return obj.getDescription();
@@ -76,7 +82,8 @@ namespace casadi {
     inline friend std::string repr(const PrintableObject<Derived>& obj) {
       return obj.getRepresentation();
     }
-#endif // SWIG
+#endif // !SWIG || DOXYGEN
+/** @} */
   };
 } // namespace casadi
 

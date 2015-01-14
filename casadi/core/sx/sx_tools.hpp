@@ -316,8 +316,8 @@ namespace casadi {
 
   /** \brief extracts polynomial coefficients from an expression
    *
-   * \parameter ex Scalar expression that represents a polynomial
-   * \paramater x  Scalar symbol that the polynomial is build up with
+   * \param ex Scalar expression that represents a polynomial
+   * \param x  Scalar symbol that the polynomial is build up with
    */
   inline SX poly_coeff(const SX& ex, const SX&x) { return ex.zz_poly_coeff(x);}
 

@@ -33,7 +33,7 @@
  Solving the Discrete Lyapunov Equations
  with a fixed number of smith iterations.
  
- @copdyoc DleSolversmith
+ @copydoc DleSolversmith
 
 */
 /** \defgroup DleSolversmith

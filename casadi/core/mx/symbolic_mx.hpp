@@ -84,5 +84,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
 
 #endif // CASADI_SYMBOLIC_MX_HPP

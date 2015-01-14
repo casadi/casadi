@@ -95,5 +95,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
 
 #endif // CASADI_UNARY_MX_HPP

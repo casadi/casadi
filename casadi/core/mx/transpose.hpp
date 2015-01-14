@@ -140,4 +140,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
+
 #endif // CASADI_TRANSPOSE_HPP

@@ -171,4 +171,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
+
 #endif // CASADI_SPLIT_HPP

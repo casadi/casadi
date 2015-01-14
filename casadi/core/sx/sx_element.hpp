@@ -273,10 +273,15 @@ namespace casadi {
     /// Pointer to node (SXElement is only a reference class)
     SXNode* node;
 
+    /**
+    \ingroup expression_tools
+    @{
+    */
     /** \brief inline if-test */
     /// replaces the ternary conditional operator "?:", which cannot be overloaded
     friend SXElement if_else(const SXElement& cond, const SXElement& if_true,
                              const SXElement& if_false);
+    /** @} */
   };
 
   /// \cond INTERNAL

@@ -93,5 +93,7 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
+
 
 #endif // CASADI_WEAK_REF_HPP

@@ -324,6 +324,7 @@ namespace casadi {
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
 
+    /// \cond INTERNAL
     /// all binary operations
     MX zz_plus(const MX& y) const;
     MX zz_minus(const MX& y) const;
@@ -333,23 +334,29 @@ namespace casadi {
     MX zz_le(const MX& y) const;
     MX zz_eq(const MX& y) const;
     MX zz_ne(const MX& y) const;
-    MX __truediv__(const MX& y) const { return zz_rdivide(y);}
     MX zz_power(const MX& b) const;
-    MX __constpow__(const MX& b) const;
-    MX __mrdivide__(const MX& b) const;
     MX zz_mpower(const MX& b) const;
     MX zz_inner_prod(const MX& y) const;
     MX zz_outer_prod(const MX& y) const;
-    MX constpow(const MX& y) const;
     MX zz_min(const MX& y) const;
     MX zz_max(const MX& y) const;
     MX zz_mod(const MX& y) const;
-    MX printme(const MX& y) const;
     MX zz_atan2(const MX& y) const;
     MX zz_and(const MX& y) const;
     MX zz_or(const MX& y) const;
     MX zz_if_else_zero(const MX& y) const;
+    /// \endcond
+
+    /// \cond CLUTTER
+    MX __truediv__(const MX& y) const { return zz_rdivide(y);}
+    MX __constpow__(const MX& b) const;
+    MX __mrdivide__(const MX& b) const;
     MX __copysign__(const MX& y) const;
+    MX constpow(const MX& y) const;
+    /// \end CLUTTER
+    MX printme(const MX& y) const;
+
+    /// \cond INTERNAL
 
     // all unary operations
     MX zz_exp() const;
@@ -445,6 +452,8 @@ namespace casadi {
 #ifndef SWIG
     bool zz_isEqual(const MXNode* y, int depth=0) const;
 #endif // SWIG
+
+    /// \endcond
 
     /** \brief returns itself, but with an assertion attached
     *

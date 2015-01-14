@@ -439,6 +439,7 @@ namespace casadi {
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity patternInverse() const;
 
+    /// \cond INTERNAL
     /// @{
     /** \brief Accessed by SparsityInterface */
     static Sparsity zz_horzcat(const std::vector<Sparsity> & sp);
@@ -468,6 +469,7 @@ namespace casadi {
     Sparsity zz_reshape(const Sparsity& sp) const;
     int zz_sprank() const;
     /// @}
+    /// \endcond
 
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros
@@ -535,11 +537,13 @@ namespace casadi {
     /// Check whether the sparsity-pattern indicates structural singularity
     bool isSingular() const;
 
+    /// \cond INTERNAL
     /// Get upper triangular part
     Sparsity zz_triu(bool includeDiagonal=true) const;
 
     /// Get lower triangular part
     Sparsity zz_tril(bool includeDiagonal=true) const;
+    /// \endcond
 
     /** \brief Do the rows appear sequentially on each column
     *

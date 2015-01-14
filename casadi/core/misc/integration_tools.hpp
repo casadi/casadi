@@ -51,8 +51,10 @@ namespace casadi {
   \param[out] C interpolating coefficients to obtain derivatives
       Length: order+1, order + 1
 
+    \verbatim
       dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
-
+    \endverbatim
+    
   \param[out] D interpolating coefficients to obtain end state
       Length: order+1
   */

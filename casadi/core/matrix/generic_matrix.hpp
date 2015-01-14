@@ -139,10 +139,13 @@ namespace casadi {
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
 
+    /// \cond INTERNAL
     /** \brief Access the sparsity, make a copy if there are multiple references to it */
     Sparsity& sparsityRef();
+    /// \endcond
 
-    /// @{
+    /// \cond INTERNAL
+    /**  @{  */
     /** \brief Accessed by friend functions */
     int zz_sprank() const { return sprank(sparsity());}
     MatType zz_tril(const MatType &a, bool includeDiagonal=true) const {
@@ -158,7 +161,8 @@ namespace casadi {
     MatType zz_cross(const MatType &b, int dim=-1) const;
     MatType zz_tril2symm() const;
     MatType zz_triu2symm() const;
-    /// @}
+    /** @}  */
+    /// \endcond
 
 #ifndef SWIG
     /** \brief  Get vector nonzero or slice of nonzeros */
@@ -195,6 +199,13 @@ namespace casadi {
     SubMatrix<MatType, RR, CC> operator()(const RR& rr, const CC& cc) {
       return SubMatrix<MatType, RR, CC>(self(), rr, cc);
     }
+#endif // SWIG
+
+#ifdef !SWIG || DOXYGEN
+
+    /**
+       \ingroup expression_tools
+     * @{ */
 
     /** \brief Calculate quadratic form X^T A X*/
     inline friend MatType quad_form(const MatType &X, const MatType &A) {
@@ -318,22 +329,24 @@ namespace casadi {
     /** \brief  Make the matrix dense if not already */
     inline friend MatType dense(const MatType& x) { return x.zz_dense();}
 
-    ///@{
     /** \brief Repeat matrix A n times vertically and m times horizontally */
     inline friend MatType repmat(const MatType &A, int n, int m=1) {
       return A.zz_repmat(n, m);
     }
 
+    /** \brief Repeat matrix A n times vertically and m times horizontally */
     inline friend MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
       return A.zz_repmat(rc.first, rc.second);
     }
-    ///@}
 
     /** \brief Repeat a scalar to a new sparsity pattern */
     inline friend MatType repmat(const MatType &A, const Sparsity& sp) {
       return A.zz_repmat(sp);
     }
-#endif // SWIG
+
+    /** @} */
+
+#endif // !SWIG || DOXYGEN
 
     /** @name Construct symbolic primitives
         The "sym" function is intended to work in a similar way as "sym" used
