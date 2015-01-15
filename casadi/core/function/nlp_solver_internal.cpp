@@ -153,16 +153,27 @@ namespace casadi {
   }
 
   void NlpSolverInternal::checkInitialBounds() {
+    const std::vector<double>& x0 = input(NLP_SOLVER_X0).data();
+    const std::vector<double>& lbx = input(NLP_SOLVER_LBX).data();
+    const std::vector<double>& ubx = input(NLP_SOLVER_UBX).data();
+    const std::vector<double>& lbg = input(NLP_SOLVER_LBG).data();
+    const std::vector<double>& ubg = input(NLP_SOLVER_UBG).data();
+    const double inf = std::numeric_limits<double>::infinity();
+
+    // Detect ill-posed problems (simple bounds)
+    bool violated = false;
+    for (int i=0; !violated && i<nx_; ++i)
+      violated = lbx[i]==inf || lbx[i]>ubx[i] || ubx[i]==-inf;
+    casadi_assert_message(!violated, "Ill-posed problem detected (x bounds)");
+
+    // Detect ill-posed problems (nonlinear bounds)
+    for (int i=0; !violated && i<ng_; ++i)
+      violated = lbg[i]==inf || lbg[i]>ubg[i] || ubg[i]==-inf;
+    casadi_assert_message(!violated, "Ill-posed problem detected (g bounds)");
+
+    // Warn if initial condition violates bounds
     if (static_cast<bool>(getOption("warn_initial_bounds"))) {
-      bool violated = false;
-      for (int k=0;k<input(NLP_SOLVER_X0).size();++k) {
-        if (input(NLP_SOLVER_X0).at(k)>input(NLP_SOLVER_UBX).at(k)) {
-          violated = true;
-        }
-        if (input(NLP_SOLVER_X0).at(k)<input(NLP_SOLVER_LBX).at(k)) {
-          violated = true;
-        }
-      }
+      for (int k=0; !violated && k<nx_; ++k) violated = x0[k]>ubx[k] || x0[k]<lbx[k];
       if (violated) casadi_warning("NlpSolver: The initial guess does not satisfy LBX and UBX. "
                                    "Option 'warn_initial_bounds' controls this warning.");
     }

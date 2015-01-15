@@ -768,10 +768,8 @@ namespace casadi {
       casadi_assert(m == ng_);
       input(NLP_SOLVER_LBX).getArray(x_l, n);
       input(NLP_SOLVER_UBX).getArray(x_u, n);
-      for (int i=0; i<n; ++i) casadi_assert_message(x_l[i]<=x_u[i], "Ill-posed bound detected");
       input(NLP_SOLVER_LBG).getArray(g_l, m);
       input(NLP_SOLVER_UBG).getArray(g_u, m);
-      for (int i=0; i<m; ++i) casadi_assert_message(g_l[i]<=g_u[i], "Ill-posed bound detected");
       return true;
     } catch(exception& ex) {
       cerr << "get_bounds_info failed: " << ex.what() << endl;
