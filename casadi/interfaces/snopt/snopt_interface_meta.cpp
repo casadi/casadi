@@ -44,7 +44,7 @@
 "| interval        |                 |                 | precision)^1/3  |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
 "| Check frequency | OT_INTEGER      | None            | 60 * test row   |\n"
-"|                 |                 |                 | residuals kAx   |\n"
+"|                 |                 |                 | residuals kAx - |\n"
 "|                 |                 |                 | sk              |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
 "| Crash option    | OT_INTEGER      | None            | 3 * first basis |\n"
