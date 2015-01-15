@@ -15,7 +15,7 @@ before_install:
 install: 
 - mkdir build
 - cd build
-- cmake ..
+- cmake -D WITH_PYTHON=ON ..
 - make
 - sudo make install
 python: 
