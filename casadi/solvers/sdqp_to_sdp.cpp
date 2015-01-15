@@ -40,7 +40,7 @@ namespace casadi {
     plugin->creator = SdqpToSdp::creator;
     plugin->name = "sdp";
     plugin->doc = SdqpToSdp::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     plugin->adaptorHasPlugin = SdpSolver::hasPlugin;
     return 0;
   }
