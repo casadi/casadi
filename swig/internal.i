@@ -883,6 +883,9 @@
 %exception  casadi::GenericExpression< SXElement  >::zz_gt(const SXElement &y) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix< MatType >::sparsityRef() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericType::is_a() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2635,9 +2638,6 @@
 %exception  casadi::Matrix< T >::rend() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< T >::zz_gauss_quadrature(const Matrix< DataType > &x, const Matrix< DataType > &a, const Matrix< DataType > &b, int order=5) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::MinusInfSX::getValue() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3898,6 +3898,51 @@
 %exception  casadi::Sparsity::rowRef() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Sparsity::zz_blockcat(const std::vector< std::vector< Sparsity > > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_diagcat(const std::vector< Sparsity > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_diagsplit(const std::vector< int > &offset1, const std::vector< int > &offset2) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_horzcat(const std::vector< Sparsity > &sp) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_horzsplit(const std::vector< int > &output_offset) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_mtimes(const Sparsity &Y, const Sparsity &Z) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_mtimes(const Sparsity &y) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_reshape(const Sparsity &sp) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_reshape(int nrow, int ncol) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_sprank() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_tril(bool includeDiagonal=true) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_triu(bool includeDiagonal=true) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_vecNZ() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_vertcat(const std::vector< Sparsity > &sp) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::zz_vertsplit(const std::vector< int > &output_offset) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Split::evaluateD(const DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4627,9 +4672,6 @@
 %exception  casadi::get_bvec_t(std::vector< double > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::has_empty(const vector< MX > &x, bool both=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::hash_combine(std::size_t &seed, T v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4783,19 +4825,10 @@
 %exception  casadi::toVector(const T &v0, const T &v1, const T &v2) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::trim_empty(const vector< MX > &x, bool both=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::twice(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::vector_slice(const std::vector< T > &v, const std::vector< int > &i) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  repmat(const MatType &A, const std::pair< int, int > &rc) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  repmat(const MatType &A, int n, int m=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  sqicDestroy() {
