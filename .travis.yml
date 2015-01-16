@@ -10,8 +10,10 @@ before_install:
 - git clone https://github.com/casadi/testbot.git
 - pushd testbot && recipes/setup.sh && popd
 - testbot/recipes/fetch.sh libhsl.tar.gz && mkdir libhsl && tar -xvf libhsl.tar.gz -C libhsl
+- testbot/recipes/fetch.sh swig.tar.gz && mkdir swig && tar -xvf swig.tar.gz -C swig
+- export PATH=/home/travis/build/swig/bin:/home/travis/build/swig/share/swig/2.0.11:$PATH
 - sudo apt-get update -qq
-- sudo apt-get install -y gcc g++ gfortran git cmake liblapack-dev swig ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev
+- sudo apt-get install -y gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev
 install: 
 - mkdir build
 - cd build
