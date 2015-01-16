@@ -11,6 +11,7 @@ before_install:
 - pushd testbot && recipes/setup.sh && popd
 - testbot/recipes/fetch.sh libhsl.tar.gz && mkdir libhsl && tar -xvf libhsl.tar.gz -C libhsl
 - mkdir -p /home/travis/build/casadi/testbot
+- ls -al
 - travis_retry testbot/recipes/fetch.sh swig.tar.gz && mkdir swig && tar -xvf swig.tar.gz -C swig
 - pushd /home/travis/build/casadi/testbot && ln -s  /home/travis/build/swig  swig-install  && popd
 - export PATH=/home/travis/build/swig/bin:$PATH
@@ -28,7 +29,4 @@ script:
 - cd ../test
 - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
 - make unittests_py examples_code_py
-os: 
-- linux
-- osx
 language: cpp
