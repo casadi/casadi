@@ -212,6 +212,11 @@ namespace casadi {
       return getDep(0);
     else if (y.isOp(OP_SUB) && isEqual(*this, y.getDep(1), SXNode::eq_depth_))
       return y.getDep(0);
+    else if (isOp(OP_SQ) && y.isOp(OP_SQ) &&
+             ((getDep().isOp(OP_SIN) && y.getDep().isOp(OP_COS))
+              || (getDep().isOp(OP_COS) && y.getDep().isOp(OP_SIN)))
+             && isEqual(getDep().getDep(), y.getDep().getDep(), SXNode::eq_depth_))
+      return 1; // sin^2 + cos^2 -> 1
     else // create a new branch
       return BinarySX::create(OP_ADD, *this, y);
   }
