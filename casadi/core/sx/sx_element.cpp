@@ -280,6 +280,10 @@ namespace casadi {
     else if (y.isOp(OP_DIV) &&
              isEqual(y.getDep(1), *this, SXNode::eq_depth_)) // ((2/x)*x)
       return y.getDep(0);
+    else if (isOp(OP_NEG))
+      return -(getDep() * y);
+    else if (y.isOp(OP_NEG))
+      return -(*this * y.getDep());
     else     // create a new branch
       return BinarySX::create(OP_MUL, *this, y);
   }
@@ -333,6 +337,10 @@ namespace casadi {
       return 1;
     else if (isOp(OP_DIV) && isEqual(y, getDep(0), SXNode::eq_depth_))
       return getDep(1).inv();
+    else if (isOp(OP_NEG))
+      return -(getDep() / y);
+    else if (y.isOp(OP_NEG))
+      return -(*this / y.getDep());
     else // create a new branch
       return BinarySX::create(OP_DIV, *this, y);
   }
