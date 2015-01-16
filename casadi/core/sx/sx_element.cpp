@@ -149,13 +149,13 @@ namespace casadi {
   }
 
   SXElement SXElement::operator-() const {
-    if (node->hasDep() && node->getOp() == OP_NEG)
-      return node->dep(0);
-    else if (node->isZero())
+    if (isOp(OP_NEG))
+      return getDep();
+    else if (isZero())
       return 0;
-    else if (node->isMinusOne())
+    else if (isMinusOne())
       return 1;
-    else if (node->isOne())
+    else if (isOne())
       return -1;
     else
       return UnarySX::create(OP_NEG, *this);
@@ -190,30 +190,33 @@ namespace casadi {
 
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_ADD, *this, y);
 
-    if (node->isZero())
+    if (isZero())
       return y;
     else if (y->isZero()) // term2 is zero
       return *this;
-    else if (y.hasDep() && y.getOp()==OP_NEG) // x + (-y) -> x - y
+    else if (y.isOp(OP_NEG))  // x + (-y) -> x - y
       return zz_minus(-y);
-    else if (hasDep() && getOp()==OP_NEG) // (-x) + y -> y - x
+    else if (isOp(OP_NEG)) // (-x) + y -> y - x
       return y.zz_minus(getDep());
-    else if (hasDep() && getOp()==OP_MUL &&
-            y.hasDep() && y.getOp()==OP_MUL &&
+    else if (isOp(OP_MUL) && y.isOp(OP_MUL) &&
             getDep(0).isConstant() && getDep(0).getValue()==0.5 &&
             y.getDep(0).isConstant() && y.getDep(0).getValue()==0.5 &&
              isEqual(y.getDep(1), getDep(1), SXNode::eq_depth_)) // 0.5x+0.5x = x
       return getDep(1);
-    else if (hasDep() && getOp()==OP_DIV &&
-            y.hasDep() && y.getOp()==OP_DIV &&
-            getDep(1).isConstant() && getDep(1).getValue()==2 &&
-            y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
+    else if (isOp(OP_DIV) && y.isOp(OP_DIV) &&
+             getDep(1).isConstant() && getDep(1).getValue()==2 &&
+             y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
              isEqual(y.getDep(0), getDep(0), SXNode::eq_depth_)) // x/2+x/2 = x
       return getDep(0);
-    else if (hasDep() && getOp()==OP_SUB && isEqual(getDep(1), y, SXNode::eq_depth_))
+    else if (isOp(OP_SUB) && isEqual(getDep(1), y, SXNode::eq_depth_))
       return getDep(0);
-    else if (y.hasDep() && y.getOp()==OP_SUB && isEqual(*this, y.getDep(1), SXNode::eq_depth_))
+    else if (y.isOp(OP_SUB) && isEqual(*this, y.getDep(1), SXNode::eq_depth_))
       return y.getDep(0);
+    else if (isOp(OP_SQ) && y.isOp(OP_SQ) &&
+             ((getDep().isOp(OP_SIN) && y.getDep().isOp(OP_COS))
+              || (getDep().isOp(OP_COS) && y.getDep().isOp(OP_SIN)))
+             && isEqual(getDep().getDep(), y.getDep().getDep(), SXNode::eq_depth_))
+      return 1; // sin^2 + cos^2 -> 1
     else // create a new branch
       return BinarySX::create(OP_ADD, *this, y);
   }
@@ -225,20 +228,22 @@ namespace casadi {
 
     if (y->isZero()) // term2 is zero
       return *this;
-    if (node->isZero()) // term1 is zero
+    if (isZero()) // term1 is zero
       return -y;
     if (isEqual(*this, y, SXNode::eq_depth_)) // the terms are equal
       return 0;
-    else if (y.hasDep() && y.getOp()==OP_NEG) // x - (-y) -> x + y
-      return zz_plus(-y);
-    else if (hasDep() && getOp()==OP_ADD && isEqual(getDep(1), y, SXNode::eq_depth_))
+    else if (y.isOp(OP_NEG)) // x - (-y) -> x + y
+      return *this + y.getDep();
+    else if (isOp(OP_ADD) && isEqual(getDep(1), y, SXNode::eq_depth_))
       return getDep(0);
-    else if (hasDep() && getOp()==OP_ADD && isEqual(getDep(0), y, SXNode::eq_depth_))
+    else if (isOp(OP_ADD) && isEqual(getDep(0), y, SXNode::eq_depth_))
       return getDep(1);
-    else if (y.hasDep() && y.getOp()==OP_ADD && isEqual(*this, y.getDep(1), SXNode::eq_depth_))
+    else if (y.isOp(OP_ADD) && isEqual(*this, y.getDep(1), SXNode::eq_depth_))
       return -y.getDep(0);
-    else if (y.hasDep() && y.getOp()==OP_ADD && isEqual(*this, y.getDep(0), SXNode::eq_depth_))
+    else if (y.isOp(OP_ADD) && isEqual(*this, y.getDep(0), SXNode::eq_depth_))
       return -y.getDep(1);
+    else if (isOp(OP_NEG))
+      return -(getDep() + y);
     else // create a new branch
       return BinarySX::create(OP_SUB, *this, y);
   }
@@ -252,38 +257,42 @@ namespace casadi {
       return sq();
     else if (!isConstant() && y.isConstant())
       return y.zz_times(*this);
-    else if (node->isZero() || y->isZero()) // one of the terms is zero
+    else if (isZero() || y->isZero()) // one of the terms is zero
       return 0;
-    else if (node->isOne()) // term1 is one
+    else if (isOne()) // term1 is one
       return y;
     else if (y->isOne()) // term2 is one
       return *this;
     else if (y->isMinusOne())
       return -(*this);
-    else if (node->isMinusOne())
+    else if (isMinusOne())
       return -y;
-    else if (y.hasDep() && y.getOp()==OP_INV)
+    else if (y.isOp(OP_INV))
       return (*this)/y.inv();
-    else if (hasDep() && getOp()==OP_INV)
+    else if (isOp(OP_INV))
       return y/inv();
-    else if (isConstant() && y.hasDep() && y.getOp()==OP_MUL && y.getDep(0).isConstant() &&
+    else if (isConstant() && y.isOp(OP_MUL) && y.getDep(0).isConstant() &&
             getValue()*y.getDep(0).getValue()==1) // 5*(0.2*x) = x
       return y.getDep(1);
-    else if (isConstant() && y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isConstant() &&
+    else if (isConstant() && y.isOp(OP_DIV) && y.getDep(1).isConstant() &&
             getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
       return y.getDep(0);
-    else if (hasDep() && getOp()==OP_DIV && isEqual(getDep(1), y, SXNode::eq_depth_)) // ((2/x)*x)
+    else if (isOp(OP_DIV) && isEqual(getDep(1), y, SXNode::eq_depth_)) // ((2/x)*x)
       return getDep(0);
-    else if (y.hasDep() && y.getOp()==OP_DIV &&
+    else if (y.isOp(OP_DIV) &&
              isEqual(y.getDep(1), *this, SXNode::eq_depth_)) // ((2/x)*x)
       return y.getDep(0);
+    else if (isOp(OP_NEG))
+      return -(getDep() * y);
+    else if (y.isOp(OP_NEG))
+      return -(*this * y.getDep());
     else     // create a new branch
       return BinarySX::create(OP_MUL, *this, y);
   }
 
 
   bool SXElement::isDoubled() const {
-    return isOp(OP_ADD) && isEqual(node->dep(0), node->dep(1), SXNode::eq_depth_);
+    return isOp(OP_ADD) && isEqual(getDep(0), getDep(1), SXNode::eq_depth_);
   }
 
   SXElement SXElement::zz_rdivide(const SXElement& y) const {
@@ -293,7 +302,7 @@ namespace casadi {
 
     if (y->isZero()) // term2 is zero
       return casadi_limits<SXElement>::nan;
-    else if (node->isZero()) // term1 is zero
+    else if (isZero()) // term1 is zero
       return 0;
     else if (y->isOne()) // term2 is one
       return *this;
@@ -302,42 +311,45 @@ namespace casadi {
     else if (isEqual(*this, y, SXNode::eq_depth_)) // terms are equal
       return 1;
     else if (isDoubled() && isEqual(y, 2))
-      return node->dep(0);
-    else if (isOp(OP_MUL) && isEqual(y, node->dep(0), SXNode::eq_depth_))
-      return node->dep(1);
-    else if (isOp(OP_MUL) && isEqual(y, node->dep(1), SXNode::eq_depth_))
-      return node->dep(0);
-    else if (node->isOne())
+      return getDep(0);
+    else if (isOp(OP_MUL) && isEqual(y, getDep(0), SXNode::eq_depth_))
+      return getDep(1);
+    else if (isOp(OP_MUL) && isEqual(y, getDep(1), SXNode::eq_depth_))
+      return getDep(0);
+    else if (isOne())
       return y.inv();
-    else if (y.hasDep() && y.getOp()==OP_INV)
+    else if (y.isOp(OP_INV))
       return (*this)*y.inv();
     else if (isDoubled() && y.isDoubled())
-      return node->dep(0) / y->dep(0);
-    else if (y.isConstant() && hasDep() && getOp()==OP_DIV && getDep(1).isConstant() &&
+      return getDep(0) / y->dep(0);
+    else if (y.isConstant() && isOp(OP_DIV) && getDep(1).isConstant() &&
             y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2
       return getDep(0);
-    else if (y.hasDep() && y.getOp()==OP_MUL &&
+    else if (y.isOp(OP_MUL) &&
              isEqual(y.getDep(1), *this, SXNode::eq_depth_)) // x/(2*x) = 1/2
       return BinarySX::create(OP_DIV, 1, y.getDep(0));
-    else if (hasDep() && getOp()==OP_NEG &&
+    else if (isOp(OP_NEG) &&
              isEqual(getDep(0), y, SXNode::eq_depth_))      // (-x)/x = -1
       return -1;
-    else if (y.hasDep() && y.getOp()==OP_NEG &&
+    else if (y.isOp(OP_NEG) &&
              isEqual(y.getDep(0), *this, SXNode::eq_depth_))      // x/(-x) = 1
       return -1;
-    else if (y.hasDep() && y.getOp()==OP_NEG && hasDep() &&
-             getOp()==OP_NEG &&
+    else if (y.isOp(OP_NEG) && isOp(OP_NEG) &&
              isEqual(getDep(0), y.getDep(0), SXNode::eq_depth_))  // (-x)/(-x) = 1
       return 1;
-    else if (isOp(OP_DIV) && isEqual(y, node->dep(0), SXNode::eq_depth_))
-      return node->dep(1).inv();
+    else if (isOp(OP_DIV) && isEqual(y, getDep(0), SXNode::eq_depth_))
+      return getDep(1).inv();
+    else if (isOp(OP_NEG))
+      return -(getDep() / y);
+    else if (y.isOp(OP_NEG))
+      return -(*this / y.getDep());
     else // create a new branch
       return BinarySX::create(OP_DIV, *this, y);
   }
 
   SXElement SXElement::inv() const {
-    if (node->hasDep() && node->getOp()==OP_INV) {
-      return node->dep(0);
+    if (isOp(OP_INV)) {
+      return getDep(0);
     } else {
       return UnarySX::create(OP_INV, *this);
     }
@@ -414,7 +426,7 @@ namespace casadi {
 
   bool SXElement::isLeaf() const {
     if (!node) return true;
-    return node->isConstant() || node->isSymbolic();
+    return isConstant() || isSymbolic();
   }
 
   bool SXElement::isCommutative() const {
@@ -581,14 +593,16 @@ namespace casadi {
 
   SXElement SXElement::zz_sqrt() const {
     if (isOp(OP_SQ))
-      return fabs(node->dep(0));
+      return fabs(getDep());
     else
       return UnarySX::create(OP_SQRT, *this);
   }
 
   SXElement SXElement::sq() const {
     if (isOp(OP_SQRT))
-      return node->dep(0);
+      return getDep();
+    else if (isOp(OP_NEG))
+      return getDep().sq();
     else
       return UnarySX::create(OP_SQ, *this);
   }
@@ -618,42 +632,42 @@ namespace casadi {
   }
 
   SXElement SXElement::zz_sinh() const {
-    if (node->isZero())
+    if (isZero())
       return 0;
     else
       return UnarySX::create(OP_SINH, *this);
   }
 
   SXElement SXElement::zz_cosh() const {
-    if (node->isZero())
+    if (isZero())
       return 1;
     else
       return UnarySX::create(OP_COSH, *this);
   }
 
   SXElement SXElement::zz_tanh() const {
-    if (node->isZero())
+    if (isZero())
       return 0;
     else
       return UnarySX::create(OP_TANH, *this);
   }
 
   SXElement SXElement::zz_atanh() const {
-    if (node->isZero())
+    if (isZero())
       return 0;
     else
       return UnarySX::create(OP_ATANH, *this);
   }
 
   SXElement SXElement::zz_acosh() const {
-    if (node->isOne())
+    if (isOne())
       return 0;
     else
       return UnarySX::create(OP_ACOSH, *this);
   }
 
   SXElement SXElement::zz_asinh() const {
-    if (node->isZero())
+    if (isZero())
       return 0;
     else
       return UnarySX::create(OP_ASINH, *this);
@@ -737,7 +751,7 @@ namespace casadi {
   }
 
   SXElement SXElement::zz_not() const {
-    if (hasDep() && getOp() == OP_NOT) {
+    if (isOp(OP_NOT)) {
       return getDep();
     } else {
       return UnarySX::create(OP_NOT, *this);
