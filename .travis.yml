@@ -1,21 +1,27 @@
 env: 
   global: 
     - IPOPT_DEFAULT_LINEAR_SOLVER=ma57
-    - LD_LIBRARY_PATH=/home/travis/build/casadi/casadi/libhsl
+    - LD_LIBRARY_PATH=/home/travis/build/libhsl
     - secure: KvMG4VORV7Ja09shvmsMpiaRMoWqupR76dKxOd7W28I//F4YDIn5ZZefM4aoXsmRgs4G9YqloU8JjVpHutZARmKn2drUwHVMA+96iKb9eDODwZaKXgFYsrQIX5c/OgO8ZpsXynD2daqH3bMK8Mjz1+4fjbFToPFXHggxqQuHm1U=
 compiler: 
 - gcc
 - clang
 before_install:
-- git clone https://github.com/casadi/testbot.git
+- pushd ../../ && git clone https://github.com/casadi/testbot.git
 - pushd testbot && recipes/setup.sh && popd
-- testbot/recipes/fetch.sh libhsl.tar.gz && mkdir libhsl && tar -xvf libhsl.tar.gz -C libhsl
+- travis_retry testbot/recipes/fetch.sh libhsl.tar.gz && mkdir libhsl && tar -xvf libhsl.tar.gz -C libhsl
+- mkdir -p /home/travis/build/casadi/testbot
+- ls -al
+- travis_retry testbot/recipes/fetch.sh swig.tar.gz && mkdir swig && tar -xvf swig.tar.gz -C swig
+- pushd /home/travis/build/casadi/testbot && ln -s  /home/travis/build/swig  swig-install  && popd
+- export PATH=/home/travis/build/swig/bin:$PATH
+- popd
 - sudo apt-get update -qq
-- sudo apt-get install -y gcc g++ gfortran git cmake liblapack-dev swig ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev
+- sudo apt-get install -y gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev
 install: 
 - mkdir build
 - cd build
-- cmake ..
+- cmake -D WITH_PYTHON=ON ..
 - make
 - sudo make install
 python: 
@@ -24,7 +30,4 @@ script:
 - cd ../test
 - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
 - make unittests_py examples_code_py
-os: 
-- linux
-- osx
 language: cpp
