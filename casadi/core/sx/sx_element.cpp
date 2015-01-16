@@ -233,7 +233,7 @@ namespace casadi {
     if (isEqual(*this, y, SXNode::eq_depth_)) // the terms are equal
       return 0;
     else if (y.isOp(OP_NEG)) // x - (-y) -> x + y
-      return zz_plus(-y);
+      return *this + y.getDep();
     else if (isOp(OP_ADD) && isEqual(getDep(1), y, SXNode::eq_depth_))
       return getDep(0);
     else if (isOp(OP_ADD) && isEqual(getDep(0), y, SXNode::eq_depth_))
@@ -242,6 +242,8 @@ namespace casadi {
       return -y.getDep(0);
     else if (y.isOp(OP_ADD) && isEqual(*this, y.getDep(0), SXNode::eq_depth_))
       return -y.getDep(1);
+    else if (isOp(OP_NEG))
+      return -(getDep() + y);
     else // create a new branch
       return BinarySX::create(OP_SUB, *this, y);
   }
