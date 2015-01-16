@@ -586,6 +586,8 @@ namespace casadi {
   SXElement SXElement::sq() const {
     if (isOp(OP_SQRT))
       return getDep();
+    else if(isOp(OP_NEG))
+      return getDep().sq();
     else
       return UnarySX::create(OP_SQ, *this);
   }
