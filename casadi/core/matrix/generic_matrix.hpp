@@ -148,11 +148,11 @@ namespace casadi {
     /**  @{  */
     /** \brief Accessed by friend functions */
     int zz_sprank() const { return sprank(sparsity());}
-    MatType zz_tril(const MatType &a, bool includeDiagonal=true) const {
-      return a.setSparse(tril(a.sparsity(), includeDiagonal));
+    MatType zz_tril(bool includeDiagonal=true) const {
+      return self().setSparse(tril(sparsity(), includeDiagonal));
     }
-    MatType zz_triu(const MatType &a, bool includeDiagonal=true) const {
-      return a.setSparse(triu(a.sparsity(), includeDiagonal));
+    MatType zz_triu(bool includeDiagonal=true) const {
+      return self().setSparse(triu(sparsity(), includeDiagonal));
     }
     MatType zz_quad_form(const MatType &A) const { return mul(self().T(), mul(A, self())); }
     MatType zz_quad_form() const { return mul(self().T(), self()); }
