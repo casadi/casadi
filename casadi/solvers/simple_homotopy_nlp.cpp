@@ -44,7 +44,7 @@ namespace casadi {
     plugin->creator = SimpleHomotopyNlp::creator;
     plugin->name = "simple";
     plugin->doc = SimpleHomotopyNlp::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 

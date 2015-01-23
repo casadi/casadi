@@ -45,7 +45,7 @@ namespace casadi {
     plugin->creator = LrDleToDle::creator;
     plugin->name = "dle";
     plugin->doc = LrDleToDle::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     plugin->adaptorHasPlugin = DleSolver::hasPlugin;
     return 0;
   }

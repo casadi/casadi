@@ -215,6 +215,8 @@
       p = swig::from(a.toStringVector());
     } else if (a.isDictionary()) {
       p = from_Dictionary(a.toDictionary());
+    } else if (a.isFunction()) {
+      p = swig::from( a.toFunction());
     } else if (a.isNull()) {
       p = Py_None;
     }

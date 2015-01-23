@@ -40,7 +40,7 @@ namespace casadi {
     plugin->creator = QpoasesInterface::creator;
     plugin->name = "qpoases";
     plugin->doc = QpoasesInterface::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
