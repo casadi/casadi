@@ -673,11 +673,6 @@ namespace casadi {
     inline friend Matrix<DataType> sparsify(const Matrix<DataType>& A, double tol=0) {
       return A.zz_sparsify(tol);
     }
-
-    /** \brief DEPRECATED: alias for sparsify */
-    inline friend Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0) {
-      return sparsify(A, tol);
-    }
 #endif // !SWIG || DOXYGEN
 /** @} */
 
