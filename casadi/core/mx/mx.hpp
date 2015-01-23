@@ -396,7 +396,6 @@ namespace casadi {
     MX zz_trace() const;
     MX zz_repmat(const Sparsity& sp) const;
     MX zz_repmat(int n, int m=1) const;
-    MX zz_dense() const;
     static MX zz_createParent(std::vector<MX> &deps);
     static MX zz_createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children);
     static MX zz_createParent(const std::vector<MX> &deps, std::vector<MX>& children);

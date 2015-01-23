@@ -402,9 +402,9 @@ namespace casadi {
                           << sp.shape() << ".");
     std::vector<int> ii = sp.find();
     if (m.isScalar()) {
-      (*this)(ii) = dense(m);
+      (*this)(ii) = densify(m);
     } else {
-      (*this)(ii) = dense(m(ii));
+      (*this)(ii) = densify(m(ii));
     }
   }
 
@@ -3313,13 +3313,6 @@ namespace casadi {
     }
 
     return res;
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_dense() const {
-    Matrix<DataType> ret = *this;
-    ret.makeDense();
-    return ret;
   }
 
   template<typename DataType>

@@ -432,9 +432,9 @@ namespace casadi {
       f_in[DAE_X] = aug_x;
       f_in[DAE_Z] = aug_z;
       f_in[DAE_P] = aug_p;
-      if (!f_ode.empty()) f_out[DAE_ODE] = dense(horzcat(f_ode));
-      if (!f_alg.empty()) f_out[DAE_ALG] = dense(horzcat(f_alg));
-      if (!f_quad.empty()) f_out[DAE_QUAD] = dense(horzcat(f_quad));
+      if (!f_ode.empty()) f_out[DAE_ODE] = densify(horzcat(f_ode));
+      if (!f_alg.empty()) f_out[DAE_ALG] = densify(horzcat(f_alg));
+      if (!f_quad.empty()) f_out[DAE_QUAD] = densify(horzcat(f_quad));
       MXFunction f_mx(f_in, f_out);
 
       // Expand to SXFuncion?
@@ -456,9 +456,9 @@ namespace casadi {
       g_in[RDAE_RX] = aug_rx;
       g_in[RDAE_RZ] = aug_rz;
       g_in[RDAE_RP] = aug_rp;
-      if (!g_ode.empty()) g_out[RDAE_ODE] = dense(horzcat(g_ode));
-      if (!g_alg.empty()) g_out[RDAE_ALG] = dense(horzcat(g_alg));
-      if (!g_quad.empty()) g_out[RDAE_QUAD] = dense(horzcat(g_quad));
+      if (!g_ode.empty()) g_out[RDAE_ODE] = densify(horzcat(g_ode));
+      if (!g_alg.empty()) g_out[RDAE_ALG] = densify(horzcat(g_alg));
+      if (!g_quad.empty()) g_out[RDAE_QUAD] = densify(horzcat(g_quad));
       MXFunction g_mx(g_in, g_out);
 
       // Expand to SXFuncion?

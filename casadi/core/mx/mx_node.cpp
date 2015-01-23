@@ -358,9 +358,9 @@ namespace casadi {
 
   MX MXNode::getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const {
     if (tr) {
-      return MX::create(new Solve<true>(dense(r), shared_from_this<MX>(), linear_solver));
+      return MX::create(new Solve<true>(densify(r), shared_from_this<MX>(), linear_solver));
     } else {
-      return MX::create(new Solve<false>(dense(r), shared_from_this<MX>(), linear_solver));
+      return MX::create(new Solve<false>(densify(r), shared_from_this<MX>(), linear_solver));
     }
   }
 
@@ -587,7 +587,7 @@ namespace casadi {
         return MX::create(new BinaryMX<true, false>(Operation(op), shared_from_this<MX>(), y));
       } else {
         // Put a densification node in between
-        return getBinary(op, dense(y), true, false);
+        return getBinary(op, densify(y), true, false);
       }
     } else if (scY) {
       // Check if it is ok to loop over nonzeros only
@@ -596,7 +596,7 @@ namespace casadi {
         return MX::create(new BinaryMX<false, true>(Operation(op), shared_from_this<MX>(), y));
       } else {
         // Put a densification node in between
-        return dense(shared_from_this<MX>())->getBinary(op, y, false, true);
+        return densify(shared_from_this<MX>())->getBinary(op, y, false, true);
       }
     } else {
       // Loop over nonzeros only

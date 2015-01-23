@@ -2174,7 +2174,7 @@ class MXtests(casadiTestCase):
 
     As = MX.sym("As",A.sparsity())
 
-    f = MXFunction([As],[dense(As.T),dense(As).T,As.T,As,dense(As)])
+    f = MXFunction([As],[densify(As.T),densify(As).T,As.T,As,densify(As)])
     f.init()
 
     f.setInput(A)
@@ -2218,7 +2218,7 @@ class MXtests(casadiTestCase):
 
     r= MXFunction([As,Bs],[solve(Ast,Bs,"csparse")])
     r.init()
-    R= MXFunction([As,Bs],[solve(dense(Ast),Bs,"csparse")])
+    R= MXFunction([As,Bs],[solve(densify(Ast),Bs,"csparse")])
     R.init()
 
     for i in [r,R]:

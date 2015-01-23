@@ -85,7 +85,7 @@ namespace casadi {
       }
     } else {
       casadi_assert(val.isVector() && sp.size()==val.size1());
-      *this = dense(val)->getGetNonzeros(sp, range(sp.size()));
+      *this = densify(val)->getGetNonzeros(sp, range(sp.size()));
     }
   }
 
@@ -353,9 +353,9 @@ namespace casadi {
                           << sp.shape() << ".");
     std::vector<int> ii = sp.find();
     if (m.isScalar()) {
-      (*this)(ii) = dense(m);
+      (*this)(ii) = densify(m);
     } else {
-      (*this)(ii) = dense(m(ii));
+      (*this)(ii) = densify(m(ii));
     }
   }
 
@@ -1307,12 +1307,6 @@ namespace casadi {
       std::vector<MX> v_ver(n, horzcat(v_hor));
       return vertcat(v_ver);
     }
-  }
-
-  MX MX::zz_dense() const {
-    MX ret = *this;
-    ret.makeDense();
-    return ret;
   }
 
   MX MX::zz_createParent(std::vector<MX> &deps) {

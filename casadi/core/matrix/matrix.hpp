@@ -588,7 +588,6 @@ namespace casadi {
     DataType zz_norm_inf_mul_nn(const Matrix<DataType> &y,
                                 std::vector<DataType>& Dwork,
                                 std::vector<int>& Iwork) const;
-    Matrix<DataType> zz_dense() const;
     ///@}
 
     /// \endcond

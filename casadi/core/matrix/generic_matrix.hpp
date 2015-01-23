@@ -161,6 +161,11 @@ namespace casadi {
     MatType zz_cross(const MatType &b, int dim=-1) const;
     MatType zz_tril2symm() const;
     MatType zz_triu2symm() const;
+    MatType zz_densify() const {
+      MatType ret = self();
+      ret.makeDense();
+      return ret;
+    }
     /** @}  */
     /// \endcond
 
@@ -327,7 +332,7 @@ namespace casadi {
     }
 
     /** \brief  Make the matrix dense if not already */
-    inline friend MatType dense(const MatType& x) { return x.zz_dense();}
+    inline friend MatType densify(const MatType& x) { return x.zz_densify();}
 
     /** \brief Repeat matrix A n times vertically and m times horizontally */
     inline friend MatType repmat(const MatType &A, int n, int m=1) {

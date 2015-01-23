@@ -106,7 +106,7 @@ MatType nullspace(const MatType& A);
 MatType polyval(const MatType& p, const MatType& x);
 MatType diag(const MatType &A);
 MatType unite(const MatType& A, const MatType& B);
-MatType dense(const MatType& x); // TODO: rename to 'densify'
+MatType densify(const MatType& x);
 MatType repmat(const MatType &A, int n, int m=1);
 MatType repmat(const MatType &A, const std::pair<int, int>& rc);
 MatType repmat(const MatType &A, const Sparsity& sp);
