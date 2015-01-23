@@ -26,7 +26,7 @@
 #! More about SX
 from casadi import *
 from numpy import *
-#! The identity of an SXElement node is very persistant.
+#! The identity of an SX node is very persistant.
 #! We demonstrate this with the help of symbolic substitution.
 x=SX.sym("x")
 y=x**2

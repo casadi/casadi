@@ -189,7 +189,7 @@ class Functiontests(casadiTestCase):
 
   def test_set_wrong(self):
     self.message("setter, wrong sparsity")
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[x])
     f.init()
@@ -200,7 +200,7 @@ class Functiontests(casadiTestCase):
     
   def test_issue304(self):
     self.message("regression test for #304") # this code used to segfault
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[x**2,x**3])
     f.init()
@@ -263,8 +263,8 @@ class Functiontests(casadiTestCase):
       self.checkarray(sp.colind(),sp2.colind());   
 
     for i in range(5):
-      test(Sparsity.tril(i))
-      test(Sparsity.tril(i).T)
+      test(Sparsity.lower(i))
+      test(Sparsity.lower(i).T)
       test(Sparsity.dense(i,i))
       test(Sparsity.diag(i))
     
@@ -309,8 +309,8 @@ class Functiontests(casadiTestCase):
     test(sp.T)
     
     for i in [63,64,65,127,128,129]:
-      test(Sparsity.tril(i))
-      test(Sparsity.tril(i).T)
+      test(Sparsity.lower(i))
+      test(Sparsity.lower(i).T)
     
     for n in ([63,64,65,127,128,129] if args.run_slow else [63,64,65]):
       for m in ([63,64,65,127,128,129] if args.run_slow else [63,64,65]):
@@ -348,7 +348,7 @@ class Functiontests(casadiTestCase):
   def test_hessians(self):
     def test(sp):
       x = SX.sym("x",sp.size2())
-      self.assertTrue(sp==sp.transpose())
+      self.assertTrue(sp==sp.T)
       f = SXFunction([x],[mul([x.T,DMatrix(sp,1),x])])
       f.init()
       J = f.hessian()
@@ -1156,6 +1156,15 @@ class Functiontests(casadiTestCase):
     
     H.setInput([0.1])
     H.evaluate()
+    
+  def test_simple_scheme_call(self):
+
+    x = SX.sym("x")
+
+    f = SXFunction(daeIn(x=x),[x**2])
+    f.init()
+
+    self.checkarray(f(x=0.3)[0],DMatrix(0.09))
     
 if __name__ == '__main__':
     unittest.main()

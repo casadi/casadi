@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.6)
 
 include_directories(../)
 include_directories(${SNOPT_INCLUDE_DIR})
@@ -23,8 +23,3 @@ if(WITH_SNOPT_FORCE_DUMMY)
 else()
   casadi_plugin_link_libraries(NlpSolver snopt ${SNOPT_LIBRARIES})
 endif()
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/snopt
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

@@ -36,7 +36,7 @@
 namespace casadi {
 
   /// Internal class
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   ImplicitFunctionInternal : public FunctionInternal,
                              public PluginInterface<ImplicitFunctionInternal> {
   public:
@@ -105,6 +105,9 @@ namespace casadi {
 
     // Creator function for internal class
     typedef ImplicitFunctionInternal* (*Creator)(const Function& f);
+
+    // No static functions exposed
+    struct Exposed{ };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

@@ -41,7 +41,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT MultipleOutput : public MXNode {
+  class CASADI_EXPORT MultipleOutput : public MXNode {
     friend class OutputNode;
   public:
 
@@ -65,7 +65,7 @@ namespace casadi {
 
   };
 
-  class CASADI_CORE_EXPORT OutputNode : public MXNode {
+  class CASADI_EXPORT OutputNode : public MXNode {
   public:
 
     /** \brief  Constructor */

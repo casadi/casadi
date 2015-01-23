@@ -45,7 +45,7 @@ namespace casadi {
     plugin->creator = DpleToDle::creator;
     plugin->name = "dple";
     plugin->doc = DpleToDle::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
@@ -62,7 +62,7 @@ namespace casadi {
 
     addOption("dple_solver",            OT_STRING, GenericType(),
               "User-defined DPLE solver class.");
-    addOption("dple_solver_options",    OT_DICTIONARY,   GenericType(),
+    addOption("dple",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the DPLE solver.");
 
   }
@@ -81,8 +81,8 @@ namespace casadi {
       std::vector<Sparsity>(1,A_), "v",std::vector<Sparsity>(1,V_),"c",std::vector<Sparsity>(1,C_),"h",std::vector<Sparsity>(1,H_))
     );
 
-    if (hasSetOption("dple_solver_options")) {
-      dplesolver_.setOption(getOption("dple_solver_options"));
+    if (hasSetOption("dple")) {
+      dplesolver_.setOption(getOption("dple"));
     }
 
     // Initialize the NLP solver

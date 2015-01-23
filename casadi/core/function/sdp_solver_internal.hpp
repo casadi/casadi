@@ -35,7 +35,7 @@
 namespace casadi {
 
   /// Internal class
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   SdpSolverInternal : public FunctionInternal,
                       public PluginInterface<SdpSolverInternal> {
   public:
@@ -66,6 +66,9 @@ namespace casadi {
 
     // Creator function for internal class
     typedef SdpSolverInternal* (*Creator)(const SDPStructure& st);
+
+    // No static functions exposed
+    struct Exposed{ };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

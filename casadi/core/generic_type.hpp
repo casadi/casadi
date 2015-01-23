@@ -40,6 +40,7 @@ namespace casadi {
     OT_REAL,
     OT_STRING,
     OT_INTEGERVECTOR,
+    OT_INTEGERVECTORVECTOR,
     OT_BOOLVECTOR,
     OT_REALVECTOR,
     OT_STRINGVECTOR,
@@ -54,7 +55,7 @@ namespace casadi {
   \author Joel Andersson
   \date 2010
   Return type when getting an option, can be converted into bool, int, string, vector, etc */
-  class CASADI_CORE_EXPORT GenericType : public SharedObject {
+  class CASADI_EXPORT GenericType : public SharedObject {
     public:
     GenericType();
     GenericType(bool b);
@@ -63,6 +64,7 @@ namespace casadi {
     GenericType(const std::string& s);
     GenericType(const std::vector<bool>& iv);
     GenericType(const std::vector<int>& iv);
+    GenericType(const std::vector< std::vector<int> >& ivv);
     GenericType(const std::vector<double>& dv);
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
@@ -97,6 +99,7 @@ namespace casadi {
     operator double() const { return toDouble();}
     operator const std::string& () const { return toString();}
     operator const std::vector<int>& () const { return toIntVector();}
+    operator const std::vector<std::vector<int> >& () const { return toIntVectorVector();}
     operator const std::vector<double>& () const { return toDoubleVector();}
     operator const std::vector<std::string>& () const { return toStringVector();}
     operator const Function& () const { return toFunction();}
@@ -104,6 +107,7 @@ namespace casadi {
     operator const std::map<std::string, GenericType>& () const;
 
     operator std::vector<int>& () { return toIntVector();}
+    operator std::vector< std::vector<int> >& () { return toIntVectorVector();}
     operator std::vector<double>& () { return toDoubleVector();}
     operator std::map<std::string, GenericType>& ();
 
@@ -133,6 +137,9 @@ namespace casadi {
 
     //! \brief Is a vector of ints?
     bool isIntVector() const;
+
+    //! \brief Is a vector of vector of ints?
+    bool isIntVectorVector() const;
 
     //! \brief Is a vector of doubles?
     bool isDoubleVector() const;
@@ -164,12 +171,18 @@ namespace casadi {
     //! \brief Convert to vector of ints
     const std::vector<int>& toIntVector() const;
 
+    //! \brief Convert to vector of ints
+    const std::vector< std::vector<int> >& toIntVectorVector() const;
+
     //! \brief Convert to vector of doubles
     const std::vector<double>& toDoubleVector() const;
 
     #ifndef SWIG
     //! \brief Convert to vector of ints
     std::vector<int>& toIntVector();
+
+    //! \brief Convert to vector of ints
+    std::vector< std::vector<int> >& toIntVectorVector();
 
     //! \brief Convert to vector of doubles
     std::vector<double>& toDoubleVector();
@@ -201,7 +214,7 @@ namespace casadi {
 
     #ifndef SWIG
     //! \brief Print
-    CASADI_CORE_EXPORT friend std::ostream& operator<<(std::ostream &stream,
+    CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
                                                            const GenericType& ref);
     #endif
 
@@ -213,10 +226,10 @@ namespace casadi {
 
    private:
     opt_type type_;
-
-
   };
 
+  /// C++ version of Python's dictionary
+  typedef GenericType::Dictionary Dictionary;
 
 } // namespace casadi
 

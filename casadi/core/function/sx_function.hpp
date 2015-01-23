@@ -58,7 +58,7 @@ namespace casadi {
         \author Joel Andersson
         \date 2010-2013
   */
-  class CASADI_CORE_EXPORT SXFunction : public Function {
+  class CASADI_EXPORT SXFunction : public Function {
 
   public:
     /// Default constructor
@@ -205,7 +205,7 @@ namespace casadi {
     void clearSymbolic();
 
     /** \brief Get all the free variables of the function */
-    std::vector<SXElement> getFree() const;
+    SX getFree() const;
 
     /** \brief Get the corresponding matrix type */
     typedef SX MatType;

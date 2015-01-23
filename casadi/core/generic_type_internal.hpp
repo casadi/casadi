@@ -34,7 +34,7 @@
 namespace casadi {
 
   template<typename T>
-  class CASADI_CORE_EXPORT GenericTypeInternal : public SharedObjectNode {
+  class CASADI_EXPORT GenericTypeInternal : public SharedObjectNode {
     public:
       explicit GenericTypeInternal(const T& d) : d_(d) {}
       virtual ~GenericTypeInternal() {}

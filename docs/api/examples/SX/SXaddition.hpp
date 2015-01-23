@@ -32,6 +32,6 @@
 *
 * \sa
 * \code
-*  SXElement casadi::SX::operator+(const SXElement &, const SXElement &);
+*  SX casadi::SX::operator+(const SX &, const SX &);
 * \endcode
 */

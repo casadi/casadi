@@ -46,7 +46,7 @@ namespace casadi {
     plugin->creator = SimpleIndefDpleInternal::creator;
     plugin->name = "simple";
     plugin->doc = SimpleIndefDpleInternal::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
@@ -100,7 +100,7 @@ namespace casadi {
       AA_list[k] = kron(Ass[k], Ass[k]);
     }
 
-    MX AA = blkdiag(AA_list);
+    MX AA = diagcat(AA_list);
 
     MX A_total = DMatrix::eye(n_*n_*K_) -
         vertcat(AA(range(K_*n_*n_-n_*n_, K_*n_*n_), range(K_*n_*n_)),

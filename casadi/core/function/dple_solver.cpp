@@ -79,5 +79,15 @@ namespace casadi {
     assignNode(DpleInternal::instantiatePlugin(name, st));
   }
 
-} // namespace casadi
+  void DpleSolver::periodic_schur(const std::string& name,
+                                  const std::vector< Matrix<double> > & A,
+                                  std::vector< Matrix<double> > & T,
+                                  std::vector< Matrix<double> > & Z,
+                                  std::vector<double> &eig_real,
+                                  std::vector<double> &eig_imag,
+                                  double num_zero) {
+    check_exposed(DpleInternal::getPlugin(name).exposed.periodic_shur)
+      (A, T, Z, eig_real, eig_imag, num_zero);
+  }
 
+} // namespace casadi

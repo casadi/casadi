@@ -175,7 +175,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT Integrator : public Function {
+  class CASADI_EXPORT Integrator : public Function {
   public:
     /// Default constructor
     Integrator();
@@ -200,7 +200,7 @@ namespace casadi {
     Integrator clone() const;
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=std::cout) const;
+    void printStats(std::ostream &stream=CASADI_COUT) const;
 
     /// Access functions of the node
     IntegratorInternal* operator->();

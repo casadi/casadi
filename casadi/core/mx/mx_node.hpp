@@ -77,7 +77,7 @@ namespace casadi {
       \date 2010
       Internal class.
   */
-  class CASADI_CORE_EXPORT MXNode : public SharedObjectNode {
+  class CASADI_EXPORT MXNode : public SharedObjectNode {
     friend class MX;
 
   public:
@@ -177,7 +177,7 @@ namespace casadi {
     virtual int getOp() const = 0;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const { return false;}
+    virtual bool zz_isEqual(const MXNode* node, int depth) const { return false;}
 
     /** \brief Get equality checking depth */
     inline static bool maxDepth() { return MX::getEqualityCheckingDepth();}
@@ -303,11 +303,8 @@ namespace casadi {
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;
 
-    /** \brief Matrix multiplication
-    *
-    *  The optimal argument sp_z will be used as the sparsity pattern of the result
-    */
-    virtual MX getMultiplication(const MX& y, const Sparsity& sp_z=Sparsity()) const;
+    /** \brief Matrix multiplication and addition */
+    virtual MX getMultiplication(const MX& y, const MX& z) const;
 
     /** \brief Solve a system of linear equations
     *

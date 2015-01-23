@@ -40,7 +40,7 @@ class Misctests(casadiTestCase):
     
   def test_issue179A(self):
     self.message('Regression test #179 (A)')
-    x = SXElement.sym("x")
+    x = SX.sym("x")
     f = SXFunction([x], [2 * x])
     f.init()
     y = f.call([x])[0].data()
@@ -49,7 +49,7 @@ class Misctests(casadiTestCase):
   def test_issue179B(self):
     self.message('Regression test #179 (B)')
     def calc_sparsity():
-      x = casadi.SXElement.sym("x")
+      x = casadi.SX.sym("x")
       f = casadi.SXFunction([x], [x ** 2])
       f.init()
       return f.jacSparsity()
@@ -72,7 +72,7 @@ class Misctests(casadiTestCase):
   
   def test_setoptionerrors(self):
     self.message("option errors")
-    x = SXElement.sym("x")
+    x = SX.sym("x")
     f = SXFunction([x],[x])
     
     f.setOption("name","foobar")
@@ -123,7 +123,7 @@ class Misctests(casadiTestCase):
 
   def test_copyconstr_refcount_lazy(self):
     self.message("Copy constructor for refcounted classes - lazy")
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[2*x])
     f.init()
@@ -167,7 +167,7 @@ class Misctests(casadiTestCase):
   def test_copy_refcount_lazy(self):
     self.message("Shallow copy for refcounted classes - lazy")
     import copy
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[2*x])
     f.init()
@@ -210,7 +210,7 @@ class Misctests(casadiTestCase):
   def test_deepcopy_refcount_lazy(self):
     self.message("Deep copy for refcounted classes - lazy")
     import copy
-    x = SXElement.sym("x")
+    x = SX.sym("x")
 
     f = SXFunction([x],[2*x])
     f.init()
@@ -337,7 +337,7 @@ class Misctests(casadiTestCase):
     
   def test_pickling(self):
 
-    a = Sparsity.tril(4)
+    a = Sparsity.lower(4)
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.assertTrue(a==b)
@@ -347,13 +347,13 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.assertTrue(a.isNull())
     
-    a = IMatrix(Sparsity.tril(4),range(10))
+    a = IMatrix(Sparsity.lower(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
 
 
-    a = DMatrix(Sparsity.tril(4),range(10))
+    a = DMatrix(Sparsity.lower(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
@@ -419,14 +419,12 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except TypeError as e:
       print e.message
-      assert "You try to do: [SX] + SX" in e.message
 
     try:
       x + [x]
       self.assertTrue(False)
     except TypeError as e:
       print e.message
-      assert "You try to do: SX + [SX]" in e.message
 
 
     try:
@@ -471,7 +469,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "diagsplit(SX ,int)" in e.message
+      assert "diagsplit(SX,int)" in e.message
       assert "diagsplit(array(double) ,int)" in e.message
       
   def test_callkw(self):

@@ -31,7 +31,6 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
-#include "../matrix/sparsity_tools.hpp"
 #include "external_function.hpp"
 
 #include "../casadi_options.hpp"
@@ -684,10 +683,8 @@ namespace casadi {
             IMatrix duplicates =
                 IMatrix::triplet(lookup_row, lookup_col, lookup_value, bvec_size, coarse.size())
                 - lookup;
-            duplicates.sparsify();
-            // NOTE: Not intended use of SubMatrix:
-            SubMatrix<Matrix<int>, Sparsity, int> temp(lookup, duplicates.sparsity(), 0);
-            temp = -bvec_size;
+            duplicates.makeSparse();
+            lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies
             spEvaluate(true);
@@ -1120,7 +1117,7 @@ namespace casadi {
           casadi_assert(sp.size1()==output(oind).size());
 
           // New row for each old row
-          vector<int> row_map = output(oind).sparsity().getElements();
+          vector<int> row_map = output(oind).sparsity().find();
 
           // Insert rows
           sp.enlargeRows(output(oind).numel(), row_map);
@@ -1131,7 +1128,7 @@ namespace casadi {
           casadi_assert(sp.size2()==input(iind).size());
 
           // New column for each old column
-          vector<int> col_map = input(iind).sparsity().getElements();
+          vector<int> col_map = input(iind).sparsity().find();
 
           // Insert columns
           sp.enlargeColumns(input(iind).numel(), col_map);
@@ -2021,7 +2018,7 @@ namespace casadi {
       // Append the sparsity patterns, keep track of col offsets
       vector<int> col_offset(1, 0);
       for (int i=0; i<getNumInputs(); ++i) {
-        sp_arg.appendColumns(input(i).sparsity().reshape(1, input(i).numel()));
+        sp_arg.appendColumns(reshape(input(i).sparsity(), 1, input(i).numel()));
         col_offset.push_back(sp_arg.numel());
       }
 
@@ -2318,21 +2315,6 @@ namespace casadi {
     s << "  *row = sp + 2 + (*ncol + 1);" << endl;
     s << "  return 0;" << endl;
     s << "}" << endl << endl;
-  }
-
-  void FunctionInternal::assignIgnore(MX& y, const MX& x, const std::vector<int>& nz) {
-    y[nz] = x;
-  }
-
-  void FunctionInternal::assignIgnore(SX& y, const SX& x, const std::vector<int>& nz) {
-    vector<SXElement>& y_data = y.data();
-    const vector<SXElement>& x_data = x.data();
-    casadi_assert(nz.size()==x_data.size());
-    for (int k=0; k<nz.size(); ++k) {
-      if (nz[k]>=0) {
-        y_data.at(nz[k]) = x_data.at(k);
-      }
-    }
   }
 
   Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,
@@ -2768,7 +2750,11 @@ namespace casadi {
     //stream.precision(8);
 
     // Check if any constraint is violated
-    if (all(v <= ub + tol) && all(v >= lb - tol)) {
+    bool all_ok = true;
+    for (int i=0; all_ok && i<v.size(); ++i) {
+      all_ok = v.at(i) > ub.at(i) + tol || v.at(i) < lb.at(i) - tol;
+    }
+    if (all_ok) {
       stream << "All " << v.size() << " constraints on " << name << " are met: " << endl;
     } else {
       stream << "Problem with constraints on " << name << ": " << endl;

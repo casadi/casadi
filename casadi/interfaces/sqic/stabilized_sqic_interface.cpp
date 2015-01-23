@@ -25,7 +25,6 @@
 
 #include "stabilized_sqic_interface.hpp"
 
-#include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/mx/mx_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
@@ -44,7 +43,7 @@ namespace casadi {
     plugin->creator = StabilizedSqicInterface::creator;
     plugin->name = "sqic";
     plugin->doc = StabilizedSqicInterface::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 

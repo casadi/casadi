@@ -305,15 +305,15 @@ class Integrationtests(casadiTestCase):
               ]
               
     def checks():  
-      t=SXElement.sym("t")
-      x=SXElement.sym("x")
-      rx=SXElement.sym("rx")
-      p=SXElement.sym("p")
-      dp=SXElement.sym("dp")
+      t=SX.sym("t")
+      x=SX.sym("x")
+      rx=SX.sym("rx")
+      p=SX.sym("p")
+      dp=SX.sym("dp")
 
-      z=SXElement.sym("z")
-      rz=SXElement.sym("rz")
-      rp=SXElement.sym("rp")    
+      z=SX.sym("z")
+      rz=SX.sym("rz")
+      rp=SX.sym("rp")    
       solutionin = {'x0':x, 'p': p, 'rx0': rx,'rp' : rp}            
       pointA = {'x0':7.1,'p': 2, 'rx0': 0.13, 'rp': 0.127}
       ti = (0.2,2.3)
@@ -543,15 +543,15 @@ class Integrationtests(casadiTestCase):
 
 #              reproduce = """
 #from casadi import *
-#t=SXElement.sym("t")
-#x=SXElement.sym("x")
-#rx=SXElement.sym("rx")
-#p=SXElement.sym("p")
-#dp=SXElement.sym("dp")
+#t=SX.sym("t")
+#x=SX.sym("x")
+#rx=SX.sym("rx")
+#p=SX.sym("p")
+#dp=SX.sym("dp")
 
-#z=SXElement.sym("z")
-#rz=SXElement.sym("rz")
-#rp=SXElement.sym("rp")
+#z=SX.sym("z")
+#rz=SX.sym("rz")
+#rp=SX.sym("rp")
 #f = SXFunction(daeIn(**{din}),daeOut(**{dout}))
 #f.init()
 #g = SXFunction(rdaeIn(**{rdin}),rdaeOut(**{rdout}))
@@ -637,9 +637,9 @@ class Integrationtests(casadiTestCase):
   
   def test_issue92c(self):
     self.message("regression check for issue 92")
-    t=SXElement.sym("t")
-    x=SXElement.sym("x")
-    y=SXElement.sym("y")
+    t=SX.sym("t")
+    x=SX.sym("x")
+    y=SX.sym("y")
     z=x*exp(t)
     f=SXFunction(daeIn(t=t, x=vertcat([x,y])),[vertcat([z,z])])
     f.init()
@@ -653,9 +653,9 @@ class Integrationtests(casadiTestCase):
   
   def test_issue92b(self):
     self.message("regression check for issue 92")
-    t=SXElement.sym("t")
-    x=SXElement.sym("x")
-    y=SXElement.sym("y")
+    t=SX.sym("t")
+    x=SX.sym("x")
+    y=SX.sym("y")
     f=SXFunction(daeIn(t=t, x=vertcat([x,y])),daeOut(ode=vertcat([x,(1+1e-9)*x])))
     integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
@@ -671,11 +671,11 @@ class Integrationtests(casadiTestCase):
     
   def test_issue92(self):
     self.message("regression check for issue 92")
-    t=SXElement.sym("t")
-    x=SXElement.sym("x")
+    t=SX.sym("t")
+    x=SX.sym("x")
     var = MX.sym("var",2,1)
 
-    q = vertcat([x,SXElement.sym("problem")])
+    q = vertcat([x,SX.sym("problem")])
 
     dq=vertcat([x,x])
     f=SXFunction(daeIn(t=t,x=q),daeOut(ode=dq))
@@ -767,9 +767,9 @@ class Integrationtests(casadiTestCase):
     yc0=dy0=A[1]
     te=0.4
 
-    t=SXElement.sym("t")
+    t=SX.sym("t")
     q=SX.sym("y",3,1)
-    p=SXElement.sym("p")
+    p=SX.sym("p")
 
     dh = p+q[0]**2
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],dh])))

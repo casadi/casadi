@@ -170,7 +170,7 @@ namespace casadi {
   SX SXFunctionInternal::hess(int iind, int oind) {
     casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
     SX g = grad(iind, oind);
-    g.densify();
+    g.makeDense();
     if (verbose())  cout << "SXFunctionInternal::hess: calculating gradient done " << endl;
 
     // Create function
@@ -634,7 +634,7 @@ namespace casadi {
     bool output_given = true;
     for (int i=0; i<arg1.size() && output_given; ++i) {
       for (int j=0; j<arg1[i].size() && output_given; ++j) {
-        if (!arg1[i].at(j).isEqual(inputv_[i].at(j), checking_depth)) {
+        if (!isEqual(arg1[i].at(j), inputv_[i].at(j), checking_depth)) {
           output_given = false;
         }
       }

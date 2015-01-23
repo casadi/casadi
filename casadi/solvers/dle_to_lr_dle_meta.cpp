@@ -28,12 +28,6 @@
 
       const std::string casadi::DleToLrDle::meta_doc=
       "\n"
-"Solving the Low-Rank Discrete Lyapunov Equations with a regular\n"
-"Discrete Lyapunov Equations solver\n"
-"\n"
-"Solving the Discrete Lyapunov Equations with a Low-rank Discrete\n"
-"Lyapunov Equations solver\n"
-"\n"
 "\n"
 ">List of available options\n"
 "\n"

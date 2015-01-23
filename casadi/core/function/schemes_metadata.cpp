@@ -589,15 +589,15 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==1) return "The matrix V";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DPLEInput:
-      if (i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "A matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "V matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DPLEOutput:
-      if (i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DpleVecStruct:
-      if (i==0) return "Sparsities for A_i, blkdiag form";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Sparsities for V_i, blkdiag form";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Sparsities for A_i, block diagonal form";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Sparsities for V_i, block diagonal form";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_HNLPInput:
       if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
@@ -676,7 +676,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==3) return "H matrix: horizontal stack of all Hi";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LR_DLEOutput:
-      if (i==0) return "Y matrix, blkdiag form";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Y matrix, block diagonal form";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LrDleStruct:
       if (i==0) return "The matrix A";  // NOLINT(whitespace/line_length)
@@ -685,19 +685,19 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==3) return "H matrix: horizontal stack of all Hi";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LR_DPLEInput:
-      if (i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
-      if (i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "A matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "V matrices (horzcat when const_dim, diagcat otherwise)";  // NOLINT(whitespace/line_length)
       if (i==2) return "C matrix";  // NOLINT(whitespace/line_length)
       if (i==3) return "H matrix: horizontal stack of all Hi";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LR_DPLEOutput:
-      if (i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LrDpleVecStruct:
-      if (i==0) return "Sparsities for A_i, blkdiag form";  // NOLINT(whitespace/line_length)
-      if (i==1) return "Sparsities for V_i, blkdiag form";  // NOLINT(whitespace/line_length)
-      if (i==2) return "Sparsities for C_i (defaults to unity), blkdiag form";  // NOLINT(whitespace/line_length)
-      if (i==3) return "Sparsities for H_i (defaults to unity), blkdiag form";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Sparsities for A_i, block diagonal form";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Sparsities for V_i, block diagonal form";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Sparsities for C_i (defaults to unity), block diagonal form";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Sparsities for H_i (defaults to unity), block diagonal form";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPInput:
       if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)

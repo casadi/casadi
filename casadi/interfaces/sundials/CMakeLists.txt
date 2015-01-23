@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.6)
 
 include_directories(../)
 include_directories(${SUNDIALS_INCLUDE_DIR})
@@ -31,9 +31,3 @@ casadi_plugin(ImplicitFunction kinsol
    kinsol_interface_meta.cpp
    )
 casadi_plugin_link_libraries(ImplicitFunction kinsol  ${SUNDIALS_LIBRARIES})
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/sundials
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)
-

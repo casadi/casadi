@@ -51,16 +51,16 @@ namespace casadi {
 
   /// Input arguments of a \e dple solver [dpleIn]
   enum DPLEInput {
-    /// A matrices (horzcat when const_dim, blkdiag otherwise) [a]
+    /// A matrices (horzcat when const_dim, diagcat otherwise) [a]
     DPLE_A,
-    /// V matrices (horzcat when const_dim, blkdiag otherwise) [v]
+    /// V matrices (horzcat when const_dim, diagcat otherwise) [v]
     DPLE_V,
     DPLE_NUM_IN
   };
 
   /// Output arguments of a \e dple solver [dpleOut]
   enum DPLEOutput {
-    /// Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [p]
+    /// Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [p]
     DPLE_P,
     /// Number of arguments.
     DPLE_NUM_OUT
@@ -68,9 +68,9 @@ namespace casadi {
 
   /// Structure specification of a DPLE [dpleStruct]
   enum DpleVecStruct {
-    /// Sparsities for A_i, blkdiag form [a]
+    /// Sparsities for A_i, block diagonal form [a]
     Dple_STRUCT_A,
-    /// Sparsities for V_i, blkdiag form [v]
+    /// Sparsities for V_i, block diagonal form [v]
     Dple_STRUCT_V,
     Dple_STRUCT_NUM};
 
@@ -88,7 +88,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_CORE_EXPORT DpleSolver : public Function {
+  class CASADI_EXPORT DpleSolver : public Function {
   public:
     /// Default constructor
     DpleSolver();
@@ -110,7 +110,7 @@ namespace casadi {
                const std::vector<Sparsity> & V);
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=std::cout) const;
+    void printStats(std::ostream &stream=CASADI_COUT) const;
 
     /// Access functions of the node
     DpleInternal* operator->();
@@ -129,6 +129,30 @@ namespace casadi {
 
     /// Get solver specific documentation
     static std::string doc(const std::string& name);
+
+    /** \brief Obtain Periodic Schur Form of a set of matrices
+     *
+     *  Finds Z_i such that
+     \verbatim
+     Z_1' * A_1 * Z_2 = T_1,
+     Z_2' * A_2 * Z_3 = T_2,
+     ...
+     Z_K' * A_K * Z_1 = T_K,
+     \endverbatim
+     *
+     *  with T_1 in Hessenberg form (upper triangular + one band below 
+     *  the diagonal) and T_2..T_K  upper diagonal
+     *
+     *  with <tt>Z_k Z_k' = eye(n) = Z_k' Z_k</tt>
+     *
+     */
+    static void periodic_schur(const std::string& name,
+                               const std::vector< Matrix<double> > & A,
+                               std::vector< Matrix<double> > & SWIG_OUTPUT(T),
+                               std::vector< Matrix<double> > & SWIG_OUTPUT(Z),
+                               std::vector<double> &SWIG_OUTPUT(eig_real),
+                               std::vector<double> &SWIG_OUTPUT(eig_imag),
+                               double num_zero=0);
   };
 
 } // namespace casadi

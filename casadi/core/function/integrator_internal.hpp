@@ -40,7 +40,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   IntegratorInternal : public FunctionInternal,
                        public PluginInterface<IntegratorInternal> {
   public:
@@ -164,6 +164,9 @@ namespace casadi {
 
     // Creator function for internal class
     typedef IntegratorInternal* (*Creator)(const Function& f, const Function& g);
+
+    // No static functions exposed
+    struct Exposed{ };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

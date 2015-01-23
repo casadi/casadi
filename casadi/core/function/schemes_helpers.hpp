@@ -36,7 +36,7 @@ namespace casadi {
 /// Helper function for 'CLEInput'
 
 template<class M>
-class CASADI_CORE_EXPORT CLEInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT CLEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit CLEInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_CLEInput) {}
@@ -78,7 +78,7 @@ std::vector<M> cleIn(const std::vector<M>& args,
 /// Helper function for 'CLEOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT CLEOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT CLEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit CLEOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_CLEOutput) {}
@@ -116,7 +116,7 @@ std::vector<M> cleOut(const std::vector<M>& args,
 /// Helper function for 'CleStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT CleStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT CleStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit CleStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_CleStruct) {}
@@ -162,7 +162,7 @@ std::vector<M> cleStruct(const std::vector<M>& args,
 /// Helper function for 'ControlledDAEInput'
 
 template<class M>
-class CASADI_CORE_EXPORT ControlledDAEInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT ControlledDAEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit ControlledDAEInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_ControlledDAEInput) {}
@@ -232,7 +232,7 @@ std::vector<M> controldaeIn(const std::vector<M>& args,
 /// Helper function for 'ControlSimulatorInput'
 
 template<class M>
-class CASADI_CORE_EXPORT ControlSimulatorInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT ControlSimulatorInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit ControlSimulatorInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_ControlSimulatorInput) {}
@@ -278,7 +278,7 @@ std::vector<M> controlsimulatorIn(const std::vector<M>& args,
 /// Helper function for 'DLEInput'
 
 template<class M>
-class CASADI_CORE_EXPORT DLEInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT DLEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DLEInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_DLEInput) {}
@@ -320,7 +320,7 @@ std::vector<M> dleIn(const std::vector<M>& args,
 /// Helper function for 'DLEOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT DLEOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT DLEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DLEOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_DLEOutput) {}
@@ -358,7 +358,7 @@ std::vector<M> dleOut(const std::vector<M>& args,
 /// Helper function for 'DleStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT DleStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT DleStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DleStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_DleStruct) {}
@@ -400,7 +400,7 @@ std::vector<M> dleStruct(const std::vector<M>& args,
 /// Helper function for 'DPLEInput'
 
 template<class M>
-class CASADI_CORE_EXPORT DPLEInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT DPLEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DPLEInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_DPLEInput) {}
@@ -442,7 +442,7 @@ std::vector<M> dpleIn(const std::vector<M>& args,
 /// Helper function for 'DPLEOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT DPLEOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT DPLEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DPLEOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_DPLEOutput) {}
@@ -480,7 +480,7 @@ std::vector<M> dpleOut(const std::vector<M>& args,
 /// Helper function for 'DpleVecStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT DpleVecStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT DpleVecStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DpleVecStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_DpleVecStruct) {}
@@ -522,7 +522,7 @@ std::vector<M> dpleStruct(const std::vector<M>& args,
 /// Helper function for 'HNLPInput'
 
 template<class M>
-class CASADI_CORE_EXPORT HNLPInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT HNLPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit HNLPInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_HNLPInput) {}
@@ -568,7 +568,7 @@ std::vector<M> hnlpIn(const std::vector<M>& args,
 /// Helper function for 'DAEInput'
 
 template<class M>
-class CASADI_CORE_EXPORT DAEInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT DAEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DAEInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_DAEInput) {}
@@ -618,7 +618,7 @@ std::vector<M> daeIn(const std::vector<M>& args,
 /// Helper function for 'DAEOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT DAEOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT DAEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DAEOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_DAEOutput) {}
@@ -664,7 +664,7 @@ std::vector<M> daeOut(const std::vector<M>& args,
 /// Helper function for 'RDAEInput'
 
 template<class M>
-class CASADI_CORE_EXPORT RDAEInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT RDAEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit RDAEInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_RDAEInput) {}
@@ -726,7 +726,7 @@ std::vector<M> rdaeIn(const std::vector<M>& args,
 /// Helper function for 'RDAEOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT RDAEOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT RDAEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit RDAEOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_RDAEOutput) {}
@@ -772,7 +772,7 @@ std::vector<M> rdaeOut(const std::vector<M>& args,
 /// Helper function for 'IntegratorInput'
 
 template<class M>
-class CASADI_CORE_EXPORT IntegratorInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT IntegratorInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit IntegratorInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_IntegratorInput) {}
@@ -830,7 +830,7 @@ std::vector<M> integratorIn(const std::vector<M>& args,
 /// Helper function for 'IntegratorOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT IntegratorOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT IntegratorOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit IntegratorOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_IntegratorOutput) {}
@@ -888,7 +888,7 @@ std::vector<M> integratorOut(const std::vector<M>& args,
 /// Helper function for 'LinsolInput'
 
 template<class M>
-class CASADI_CORE_EXPORT LinsolInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LinsolInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LinsolInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LinsolInput) {}
@@ -930,7 +930,7 @@ std::vector<M> linsolIn(const std::vector<M>& args,
 /// Helper function for 'LinsolOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT LinsolOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LinsolOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LinsolOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LinsolOutput) {}
@@ -968,7 +968,7 @@ std::vector<M> linsolOut(const std::vector<M>& args,
 /// Helper function for 'LpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT LpSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LpSolverInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LpSolverInput) {}
@@ -1026,7 +1026,7 @@ std::vector<M> lpIn(const std::vector<M>& args,
 /// Helper function for 'LpSolverOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT LpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LpSolverOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LpSolverOutput) {}
@@ -1076,7 +1076,7 @@ std::vector<M> lpOut(const std::vector<M>& args,
 /// Helper function for 'LPStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT LPStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LPStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LPStruct) {}
@@ -1114,7 +1114,7 @@ std::vector<M> lpStruct(const std::vector<M>& args,
 /// Helper function for 'LR_DLEInput'
 
 template<class M>
-class CASADI_CORE_EXPORT LR_DLEInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LR_DLEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LR_DLEInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LR_DLEInput) {}
@@ -1164,7 +1164,7 @@ std::vector<M> lrdleIn(const std::vector<M>& args,
 /// Helper function for 'LR_DLEOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT LR_DLEOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LR_DLEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LR_DLEOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LR_DLEOutput) {}
@@ -1202,7 +1202,7 @@ std::vector<M> lrdleOut(const std::vector<M>& args,
 /// Helper function for 'LrDleStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT LrDleStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LrDleStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LrDleStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LrDleStruct) {}
@@ -1252,7 +1252,7 @@ std::vector<M> lrdleStruct(const std::vector<M>& args,
 /// Helper function for 'LR_DPLEInput'
 
 template<class M>
-class CASADI_CORE_EXPORT LR_DPLEInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LR_DPLEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LR_DPLEInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LR_DPLEInput) {}
@@ -1302,7 +1302,7 @@ std::vector<M> lrdpleIn(const std::vector<M>& args,
 /// Helper function for 'LR_DPLEOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT LR_DPLEOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LR_DPLEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LR_DPLEOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LR_DPLEOutput) {}
@@ -1340,7 +1340,7 @@ std::vector<M> lrdpleOut(const std::vector<M>& args,
 /// Helper function for 'LrDpleVecStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT LrDpleVecStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT LrDpleVecStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LrDpleVecStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_LrDpleVecStruct) {}
@@ -1390,7 +1390,7 @@ std::vector<M> lrdpleStruct(const std::vector<M>& args,
 /// Helper function for 'NLPInput'
 
 template<class M>
-class CASADI_CORE_EXPORT NLPInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT NLPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit NLPInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_NLPInput) {}
@@ -1432,7 +1432,7 @@ std::vector<M> nlpIn(const std::vector<M>& args,
 /// Helper function for 'NLPOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT NLPOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT NLPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit NLPOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_NLPOutput) {}
@@ -1474,7 +1474,7 @@ std::vector<M> nlpOut(const std::vector<M>& args,
 /// Helper function for 'GradFInput'
 
 template<class M>
-class CASADI_CORE_EXPORT GradFInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT GradFInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit GradFInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_GradFInput) {}
@@ -1516,7 +1516,7 @@ std::vector<M> gradFIn(const std::vector<M>& args,
 /// Helper function for 'GradFOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT GradFOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT GradFOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit GradFOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_GradFOutput) {}
@@ -1562,7 +1562,7 @@ std::vector<M> gradFOut(const std::vector<M>& args,
 /// Helper function for 'JacGInput'
 
 template<class M>
-class CASADI_CORE_EXPORT JacGInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT JacGInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit JacGInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_JacGInput) {}
@@ -1604,7 +1604,7 @@ std::vector<M> jacGIn(const std::vector<M>& args,
 /// Helper function for 'JacGOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT JacGOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT JacGOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit JacGOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_JacGOutput) {}
@@ -1650,7 +1650,7 @@ std::vector<M> jacGOut(const std::vector<M>& args,
 /// Helper function for 'HessLagInput'
 
 template<class M>
-class CASADI_CORE_EXPORT HessLagInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT HessLagInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit HessLagInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_HessLagInput) {}
@@ -1700,7 +1700,7 @@ std::vector<M> hessLagIn(const std::vector<M>& args,
 /// Helper function for 'HessLagOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT HessLagOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT HessLagOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit HessLagOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_HessLagOutput) {}
@@ -1754,7 +1754,7 @@ std::vector<M> hessLagOut(const std::vector<M>& args,
 /// Helper function for 'NlpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT NlpSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT NlpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit NlpSolverInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_NlpSolverInput) {}
@@ -1820,7 +1820,7 @@ std::vector<M> nlpSolverIn(const std::vector<M>& args,
 /// Helper function for 'NlpSolverOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT NlpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT NlpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit NlpSolverOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_NlpSolverOutput) {}
@@ -1878,7 +1878,7 @@ std::vector<M> nlpSolverOut(const std::vector<M>& args,
 /// Helper function for 'QcqpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT QcqpSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT QcqpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QcqpSolverInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_QcqpSolverInput) {}
@@ -1960,7 +1960,7 @@ std::vector<M> qcqpIn(const std::vector<M>& args,
 /// Helper function for 'QcqpSolverOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT QcqpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT QcqpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QcqpSolverOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_QcqpSolverOutput) {}
@@ -2010,7 +2010,7 @@ std::vector<M> qcqpOut(const std::vector<M>& args,
 /// Helper function for 'QCQPStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT QCQPStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT QCQPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QCQPStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_QCQPStruct) {}
@@ -2056,7 +2056,7 @@ std::vector<M> qcqpStruct(const std::vector<M>& args,
 /// Helper function for 'QpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT QpSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT QpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QpSolverInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_QpSolverInput) {}
@@ -2126,7 +2126,7 @@ std::vector<M> qpIn(const std::vector<M>& args,
 /// Helper function for 'QpSolverOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT QpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT QpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QpSolverOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_QpSolverOutput) {}
@@ -2176,7 +2176,7 @@ std::vector<M> qpOut(const std::vector<M>& args,
 /// Helper function for 'QPStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT QPStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT QPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QPStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_QPStruct) {}
@@ -2218,7 +2218,7 @@ std::vector<M> qpStruct(const std::vector<M>& args,
 /// Helper function for 'SDPInput'
 
 template<class M>
-class CASADI_CORE_EXPORT SDPInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT SDPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDPInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_SDPInput) {}
@@ -2284,7 +2284,7 @@ std::vector<M> sdpIn(const std::vector<M>& args,
 /// Helper function for 'SDPOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT SDPOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT SDPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDPOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_SDPOutput) {}
@@ -2346,7 +2346,7 @@ std::vector<M> sdpOut(const std::vector<M>& args,
 /// Helper function for 'SDPStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT SDPStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT SDPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDPStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_SDPStruct) {}
@@ -2392,7 +2392,7 @@ std::vector<M> sdpStruct(const std::vector<M>& args,
 /// Helper function for 'SDQPInput'
 
 template<class M>
-class CASADI_CORE_EXPORT SDQPInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT SDQPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDQPInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_SDQPInput) {}
@@ -2462,7 +2462,7 @@ std::vector<M> sdqpIn(const std::vector<M>& args,
 /// Helper function for 'SDQPOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT SDQPOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT SDQPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDQPOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_SDQPOutput) {}
@@ -2524,7 +2524,7 @@ std::vector<M> sdqpOut(const std::vector<M>& args,
 /// Helper function for 'SDQPStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT SDQPStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT SDQPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDQPStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_SDQPStruct) {}
@@ -2574,7 +2574,7 @@ std::vector<M> sdqpStruct(const std::vector<M>& args,
 /// Helper function for 'SOCPInput'
 
 template<class M>
-class CASADI_CORE_EXPORT SOCPInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT SOCPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SOCPInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_SOCPInput) {}
@@ -2648,7 +2648,7 @@ std::vector<M> socpIn(const std::vector<M>& args,
 /// Helper function for 'SOCPOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT SOCPOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT SOCPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SOCPOutputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_SOCPOutput) {}
@@ -2698,7 +2698,7 @@ std::vector<M> socpOut(const std::vector<M>& args,
 /// Helper function for 'SOCPStruct'
 
 template<class M>
-class CASADI_CORE_EXPORT SOCPStructIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT SOCPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SOCPStructIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_SOCPStruct) {}
@@ -2740,7 +2740,7 @@ std::vector<M> socpStruct(const std::vector<M>& args,
 /// Helper function for 'StabilizedQpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT StabilizedQpSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT StabilizedQpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit StabilizedQpSolverInputIOSchemeVector(const std::vector<M>& t)
       : IOSchemeVector<M>(t, SCHEME_StabilizedQpSolverInput) {}

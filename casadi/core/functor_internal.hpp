@@ -36,7 +36,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_CORE_EXPORT FunctorInternal : public SharedObjectNode {
+  class CASADI_EXPORT FunctorInternal : public SharedObjectNode {
     friend class Functor;
 
   };
@@ -49,12 +49,12 @@ namespace casadi {
       P ptr_;
   };
 
-  class CASADI_CORE_EXPORT DerivativeGeneratorInternal : public FunctorInternal {
+  class CASADI_EXPORT DerivativeGeneratorInternal : public FunctorInternal {
     friend class DerivativeGenerator;
     virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data)=0;
   };
 
-  class CASADI_CORE_EXPORT DerivativeGeneratorCInternal :
+  class CASADI_EXPORT DerivativeGeneratorCInternal :
         public DerivativeGeneratorInternal, FunctorCInternal<DerivativeGeneratorCPtr> {
     friend class DerivativeGenerator;
 
@@ -63,12 +63,12 @@ namespace casadi {
     virtual DerivativeGeneratorCInternal* clone() const;
   };
 
-  class CASADI_CORE_EXPORT CustomEvaluateInternal : public FunctorInternal {
+  class CASADI_EXPORT CustomEvaluateInternal : public FunctorInternal {
     friend class CustomEvaluate;
     virtual void call(CustomFunction& fcn, void* user_data)=0;
   };
 
-  class CASADI_CORE_EXPORT CustomEvaluateCInternal :
+  class CASADI_EXPORT CustomEvaluateCInternal :
         public CustomEvaluateInternal, FunctorCInternal<CustomEvaluateCPtr> {
     friend class CustomEvaluate;
 
@@ -77,12 +77,12 @@ namespace casadi {
     virtual CustomEvaluateCInternal* clone() const;
   };
 
-  class CASADI_CORE_EXPORT CallbackInternal : public FunctorInternal {
+  class CASADI_EXPORT CallbackInternal : public FunctorInternal {
     friend class Callback;
     virtual int call(Function& fcn, void* user_data)=0;
   };
 
-  class CASADI_CORE_EXPORT CallbackCInternal :
+  class CASADI_EXPORT CallbackCInternal :
         public CallbackInternal, FunctorCInternal<CallbackCPtr> {
     friend class Callback;
 

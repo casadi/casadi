@@ -37,7 +37,7 @@ namespace casadi {
   /** Internal class
       @copydoc LinearSolver_doc
   */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   LinearSolverInternal : public FunctionInternal,
                          public PluginInterface<LinearSolverInternal> {
   public:
@@ -114,6 +114,9 @@ namespace casadi {
 
     // Creator function for internal class
     typedef LinearSolverInternal* (*Creator)(const Sparsity& sp, int nrhs);
+
+    // No static functions exposed
+    struct Exposed{ };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

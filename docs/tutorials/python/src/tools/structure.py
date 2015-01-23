@@ -82,7 +82,7 @@ simplestates = struct_symSX([
 states = struct_symSX([
     entry("x",shape=3),
     entry("y",shape=(2,2)),
-    entry("z",shape=Sparsity.tril(2))
+    entry("z",shape=Sparsity.lower(2))
   ])
   
 print states["x"]
@@ -369,6 +369,18 @@ P[0,"x","y"] = 2
 P[:,"y","x"] = 3
 
 print P0
+
+#! Finally, we present the 'product' helper construct
+controls = struct(["u","v"])
+
+J0 = DMatrix.zeros(states.size,controls.size)
+
+J = states.product(controls,J0)
+
+J[:,"u"] = 3
+J[["x","z"],:] = 2
+
+print J()
 
 #! Saving and loading
 #! -------------------

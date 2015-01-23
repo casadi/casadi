@@ -37,7 +37,7 @@ namespace casadi {
     plugin->creator = CSparseCholeskyInternal::creator;
     plugin->name = "csparsecholesky";
     plugin->doc = CSparseCholeskyInternal::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
@@ -166,14 +166,14 @@ namespace casadi {
     L_ = cs_chol(&AT_, S_) ;                 // numeric Cholesky factorization
     if (L_==0) {
       DMatrix temp = input();
-      temp.sparsify();
+      temp.makeSparse();
       if (temp.sparsity().isSingular()) {
         stringstream ss;
         ss << "CSparseCholeskyInternal::prepare: factorization failed due "
           "to matrix being singular. Matrix contains numerical zeros which are"
           " structurally non-zero. Promoting these zeros to be structural "
           "zeros, the matrix was found to be structurally rank deficient. "
-          "sprank: " << rank(temp.sparsity()) << " <-> " << temp.size2() << endl;
+          "sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
           input(LINSOL_A).sparsity().print(ss); // print detailed

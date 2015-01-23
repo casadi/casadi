@@ -69,7 +69,7 @@ class MXFunctionInternal;
   \author Joel Andersson
   \date 2010
 */
-class CASADI_CORE_EXPORT MXFunction : public Function {
+class CASADI_EXPORT MXFunction : public Function {
 public:
 
   /** \brief  Default constructor */

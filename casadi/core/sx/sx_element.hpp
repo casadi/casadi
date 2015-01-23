@@ -46,18 +46,17 @@ namespace casadi {
   /** \brief  forward declaration of Node and Matrix */
   class SXNode; // include will follow in the end
 
+  /** SXElement is exposed only as an empty struct to SWIG */
 #ifdef SWIG
-#ifdef WITH_IMPLICITCONV
-  %implicitconv SXElement;
-#endif // WITH_IMPLICITCONV
-#endif // SWIG
+  struct SXElement {};
+#else // SWIG
 
   /** \brief The basic scalar symbolic class of CasADi
       \author Joel Andersson
       \date 2010-2014
   */
-  class CASADI_CORE_EXPORT SXElement : public GenericExpression<SXElement>,
-                                       public PrintableObject<SXElement> {
+  class CASADI_EXPORT SXElement : public GenericExpression<SXElement>,
+                                  public PrintableObject<SXElement> {
     friend class SXNode;
     friend class BinarySXNode;
     friend class Matrix<SXElement>;
@@ -84,8 +83,6 @@ namespace casadi {
     */
     static SXElement sym(const std::string& name);
 
-#ifndef SWIG
-
     /// \cond INTERNAL
     /// Create an expression from a node: extra dummy argument to avoid ambiguity for 0/NULL
     SXElement(SXNode* node, bool dummy);
@@ -111,10 +108,10 @@ namespace casadi {
     operator Matrix<SXElement>() const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /** \brief  print to stream, limited */
     void print(std::ostream &stream, long& remaining_calls) const;
@@ -128,8 +125,6 @@ namespace casadi {
     const SXNode* operator->() const;
     SXNode* operator->();
     /// \endcond
-
-#endif // SWIG
 
     /** \brief  Perform operations by ID */
     static SXElement binary(int op, const SXElement& x, const SXElement& y);
@@ -165,16 +160,6 @@ namespace casadi {
     /// Checks if expression does not contain NaN or Inf
     bool isRegular() const;
 
-    /** \brief Check if two nodes are equivalent up to a given depth.
-     *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
-     *
-     *  a = x*x
-     *  b = x*x
-     *
-     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
-     */
-    bool isEqual(const SXElement& scalar, int depth=0) const;
-
     /** \brief Check if a value is always nonnegative (false negatives are allowed) */
     bool isNonNegative() const;
 
@@ -197,69 +182,67 @@ namespace casadi {
     SXElement operator-() const;
 
     //  all binary operations
-    SXElement __add__(const SXElement& y) const;
-    SXElement __sub__(const SXElement& y) const;
-    SXElement __mul__(const SXElement& y) const;
-    SXElement __div__(const SXElement& y) const;
-    SXElement __lt__(const SXElement& y) const;
-    SXElement __le__(const SXElement& y) const;
-    SXElement __eq__(const SXElement& y) const;
-    SXElement __ne__(const SXElement& y) const;
-    using GenericExpression<SXElement>::__gt__;
-    using GenericExpression<SXElement>::__ge__;
-    using GenericExpression<SXElement>::__mldivide__;
-    SXElement __truediv__(const SXElement &y) const {return __div__(y);}
-    SXElement __pow__(const SXElement& b) const;
+    SXElement zz_plus(const SXElement& y) const;
+    SXElement zz_minus(const SXElement& y) const;
+    SXElement zz_times(const SXElement& y) const;
+    SXElement zz_rdivide(const SXElement& y) const;
+    SXElement zz_lt(const SXElement& y) const;
+    SXElement zz_le(const SXElement& y) const;
+    SXElement zz_eq(const SXElement& y) const;
+    SXElement zz_ne(const SXElement& y) const;
+    SXElement __truediv__(const SXElement &y) const {return zz_rdivide(y);}
+    SXElement zz_power(const SXElement& b) const;
     SXElement __constpow__(const SXElement& b) const;
 
     SXElement __mrdivide__(const SXElement& b) const {  return *this / b;}
-    SXElement __mpower__(const SXElement& b) const {return (*this).__pow__(b);}
-    SXElement trans() const { return *this;}
+    SXElement zz_mpower(const SXElement& b) const {return pow(*this, b);}
 
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
-    SXElement mul(const SXElement& y) const { return __mul__(y);}
-    SXElement exp() const;
-    SXElement log() const;
-    SXElement sqrt() const;
+    SXElement zz_mul(const SXElement& y) const { return zz_times(y);}
+    SXElement zz_exp() const;
+    SXElement zz_log() const;
+    SXElement zz_sqrt() const;
     SXElement sq() const;
-    SXElement sin() const;
-    SXElement cos() const;
-    SXElement tan() const;
-    SXElement arcsin() const;
-    SXElement arccos() const;
-    SXElement arctan() const;
-    SXElement floor() const;
-    SXElement ceil() const;
-    SXElement fmod(const SXElement &y) const;
-    SXElement erf() const;
-    SXElement erfinv() const;
-    SXElement fabs() const;
-    SXElement fmin(const SXElement &y) const;
-    SXElement fmax(const SXElement &y) const;
+    SXElement zz_sin() const;
+    SXElement zz_cos() const;
+    SXElement zz_tan() const;
+    SXElement zz_asin() const;
+    SXElement zz_acos() const;
+    SXElement zz_atan() const;
+    SXElement zz_floor() const;
+    SXElement zz_ceil() const;
+    SXElement zz_mod(const SXElement &y) const;
+    SXElement zz_erf() const;
+    SXElement zz_erfinv() const;
+    SXElement zz_abs() const;
+    SXElement zz_min(const SXElement &y) const;
+    SXElement zz_max(const SXElement &y) const;
     SXElement inv() const;
-    SXElement sinh() const;
-    SXElement cosh() const;
-    SXElement tanh() const;
-    SXElement arcsinh() const;
-    SXElement arccosh() const;
-    SXElement arctanh() const;
-    SXElement arctan2(const SXElement &y) const;
-    SXElement log10() const;
+    SXElement zz_sinh() const;
+    SXElement zz_cosh() const;
+    SXElement zz_tanh() const;
+    SXElement zz_asinh() const;
+    SXElement zz_acosh() const;
+    SXElement zz_atanh() const;
+    SXElement zz_atan2(const SXElement &y) const;
+    SXElement zz_log10() const;
     SXElement printme(const SXElement &y) const;
-    SXElement sign() const;
+    SXElement zz_sign() const;
     SXElement __copysign__(const SXElement &y) const;
     SXElement constpow(const SXElement& y) const;
-    SXElement logic_not() const;
-    SXElement logic_and(const SXElement& y) const;
-    SXElement logic_or(const SXElement& y) const;
-    SXElement if_else_zero(const SXElement& y) const;
+    SXElement zz_not() const;
+    SXElement zz_and(const SXElement& y) const;
+    SXElement zz_or(const SXElement& y) const;
+    SXElement zz_if_else_zero(const SXElement& y) const;
 
-    Matrix<SXElement> fmin(const Matrix<SXElement>& b) const;
-    Matrix<SXElement> fmax(const Matrix<SXElement>& b) const;
+    Matrix<SXElement> zz_min(const Matrix<SXElement>& b) const;
+    Matrix<SXElement> zz_max(const Matrix<SXElement>& b) const;
     Matrix<SXElement> constpow(const Matrix<SXElement>& n) const;
     Matrix<SXElement> __copysign__(const Matrix<SXElement>& n) const;
-    Matrix<SXElement> arctan2(const Matrix<SXElement>& b) const;
+    Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;
+    bool zz_isEqual(const SXElement& scalar, int depth=0) const;
+    SXElement zz_simplify() const;
 
     /// \cond INTERNAL
     /// Get the temporary variable
@@ -286,27 +269,28 @@ namespace casadi {
     /** \brief SXElement nodes are not allowed to be null */
     inline bool isNull() {return false;}
 
-#ifndef SWIG
   private:
     /// Pointer to node (SXElement is only a reference class)
     SXNode* node;
 
+    /**
+    \ingroup expression_tools
+    @{
+    */
     /** \brief inline if-test */
     /// replaces the ternary conditional operator "?:", which cannot be overloaded
     friend SXElement if_else(const SXElement& cond, const SXElement& if_true,
                              const SXElement& if_false);
-#endif // SWIG
-
+    /** @} */
   };
 
-/// \cond INTERNAL
-#ifndef SWIG
+  /// \cond INTERNAL
   // Template specializations
   template<>
-  CASADI_CORE_EXPORT bool Matrix<SXElement>::__nonzero__() const;
+  CASADI_EXPORT bool Matrix<SXElement>::__nonzero__() const;
 
   template<>
-  class CASADI_CORE_EXPORT casadi_limits<SXElement>{
+  class CASADI_EXPORT casadi_limits<SXElement>{
   public:
     static bool isZero(const SXElement& val);
     static bool isAlmostZero(const SXElement& val, double tol);
@@ -347,18 +331,68 @@ namespace casadi {
   template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
   template<> bool SX::isRegular() const;
   template<> bool SX::isSmooth() const;
+  template<> bool SX::isLeaf() const;
+  template<> bool SX::isCommutative() const;
   template<> bool SX::isSymbolic() const;
   template<> bool SX::isSymbolicSparse() const;
   template<> double SX::getValue() const;
+  template<> SX SX::getDep(int ch) const;
+  template<> int SX::getNdeps() const;
   template<> std::string SX::getName() const;
   template<> void SX::setMaxNumCallsInPrint(long num);
   template<> long SX::getMaxNumCallsInPrint();
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
-
+  template<> long SX::getElementHash() const;
+  template<> void SX::zz_expand(SX &weights, SX& terms) const;
+  template<> SX SX::zz_pw_const(const SX &tval, const SX &val) const;
+  template<> SX SX::zz_pw_lin(const SX &tval, const SX &val) const;
+  template<> SX SX::zz_if_else(const SX &if_true,
+                               const SX &if_false) const;
+  template<> SX SX::zz_heaviside() const;
+  template<> SX SX::zz_rectangle() const;
+  template<> SX SX::zz_triangle() const;
+  template<> SX SX::zz_ramp() const;
+  template<> SX SX::zz_gauss_quadrature(const SX &x, const SX &a,
+                                        const SX &b, int order,
+                                        const SX& w) const;
+  template<> SX SX::zz_simplify() const;
+  template<> SX SX::zz_substitute(const SX& v, const SX& vdef) const;
+  template<> std::vector<SX > SX::zz_substitute(const std::vector<SX >& ex,
+                                                const std::vector<SX >& v,
+                                                const std::vector<SX >& vdef);
+  template<> void SX::zz_substituteInPlace(const std::vector<SX >& v,
+                                           std::vector<SX >& vdef,
+                                           std::vector<SX >& ex,
+                                           bool reverse);
+  template<> SX SX::zz_spy() const;
+  template<> bool SX::zz_dependsOn(const SX &arg) const;
+  template<> std::vector<SX > SX::zz_getSymbols() const;
+  template<> std::vector<SX > SX::zz_getSymbols(const std::vector<SX >& e);
+  template<> SX SX::zz_jacobian(const SX &arg) const;
+  template<> SX SX::zz_gradient(const SX &arg) const;
+  template<> SX SX::zz_tangent(const SX &arg) const;
+  template<> SX SX::zz_hessian(const SX &arg) const;
+  template<> void SX::zz_hessian(const SX &arg, SX &H, SX &g) const;
+  template<> SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v,
+                                           bool transpose_jacobian) const;
+  template<> SX SX::zz_taylor(const SX& x, const SX& a, int order) const;
+  template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const;
+  template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
+                               const std::vector<int>& order_contributions) const;
+  template<> int SX::zz_countNodes() const;
+  template<> std::string
+  SX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+  template<> void SX::zz_extractShared(std::vector<SX >& ex,
+                                       std::vector<SX >& v,
+                                       std::vector<SX >& vdef,
+                                       const std::string& v_prefix,
+                                       const std::string& v_suffix);
+  template<> void SX::zz_printCompact(std::ostream &stream) const;
+  template<> SX SX::zz_poly_coeff(const SX&x) const;
+  template<> SX SX::zz_poly_roots() const;
+  template<> SX SX::zz_eig_symbolic() const;
 } // namespace casadi
-
-
 
 #ifndef SWIG
 
@@ -371,7 +405,7 @@ namespace casadi {
 
 namespace std {
   template<>
-  class CASADI_CORE_EXPORT numeric_limits<casadi::SXElement>{
+  class CASADI_EXPORT numeric_limits<casadi::SXElement>{
   public:
     static const bool is_specialized = true;
     static casadi::SXElement min() throw();

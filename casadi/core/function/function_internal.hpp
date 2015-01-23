@@ -50,7 +50,7 @@ namespace casadi {
       \date 2010
       A regular user should never work with any Node class. Use Function directly.
   */
-  class CASADI_CORE_EXPORT FunctionInternal : public OptionsFunctionalityNode,
+  class CASADI_EXPORT FunctionInternal : public OptionsFunctionalityNode,
                                                   public IOInterface<FunctionInternal>{
     friend class Function;
 
@@ -67,6 +67,9 @@ namespace casadi {
 
     /** \brief  Evaluate */
     virtual void evaluate() = 0;
+
+    /** \brief  Obtain solver name from Adaptor */
+    virtual std::string getAdaptorSolverName() const { return ""; }
 
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation.
@@ -294,10 +297,6 @@ namespace casadi {
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SX> symbolicInputSX() const;
-
-    // Workaround helper functions: assign nonzeros but ignore all -1
-    static void assignIgnore(MX& y, const MX& x, const std::vector<int>& nz);
-    static void assignIgnore(SX& y, const SX& x, const std::vector<int>& nz);
 
     ///@{
     /** \brief Access input/output scheme */

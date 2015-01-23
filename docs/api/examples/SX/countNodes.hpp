@@ -30,8 +30,8 @@
 *
 * \sa
 * \code
-* casadi::countNodes(const Matrix<SXElement>& A);
-* casadi::countNodesFull(const Matrix<SXElement>& A);
+* casadi::countNodes(const SX& A);
+* casadi::countNodesFull(const SX& A);
 * \endcode
 *
 */

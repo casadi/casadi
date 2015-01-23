@@ -51,9 +51,9 @@ namespace casadi {
 
   /// Input arguments of a \e dple solver [lrdpleIn]
   enum LR_DPLEInput {
-    /// A matrices (horzcat when const_dim, blkdiag otherwise) [a]
+    /// A matrices (horzcat when const_dim, diagcat otherwise) [a]
     LR_DPLE_A,
-    /// V matrices (horzcat when const_dim, blkdiag otherwise) [v]
+    /// V matrices (horzcat when const_dim, diagcat otherwise) [v]
     LR_DPLE_V,
     /// C matrix [c]
     LR_DPLE_C,
@@ -64,7 +64,7 @@ namespace casadi {
 
   /// Output arguments of a \e dple solver [lrdpleOut]
   enum LR_DPLEOutput {
-    /// Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [y]
+    /// Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [y]
     LR_DPLE_Y,
     /// Number of arguments.
     LR_DPLE_NUM_OUT
@@ -72,13 +72,13 @@ namespace casadi {
 
   /// Structure specification of a DPLE [lrdpleStruct]
   enum LrDpleVecStruct {
-    /// Sparsities for A_i, blkdiag form [a]
+    /// Sparsities for A_i, block diagonal form [a]
     LR_Dple_STRUCT_A,
-    /// Sparsities for V_i, blkdiag form [v]
+    /// Sparsities for V_i, block diagonal form [v]
     LR_Dple_STRUCT_V,
-    /// Sparsities for C_i (defaults to unity), blkdiag form [c]
+    /// Sparsities for C_i (defaults to unity), block diagonal form [c]
     LR_Dple_STRUCT_C,
-    /// Sparsities for H_i (defaults to unity), blkdiag form [h]
+    /// Sparsities for H_i (defaults to unity), block diagonal form [h]
     LR_Dple_STRUCT_H,
     LR_Dple_STRUCT_NUM};
 
@@ -96,7 +96,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_CORE_EXPORT LrDpleSolver : public Function {
+  class CASADI_EXPORT LrDpleSolver : public Function {
   public:
     /// Default constructor
     LrDpleSolver();
@@ -109,11 +109,10 @@ namespace casadi {
     * \param st \structargument{LrDple}
     */
     LrDpleSolver(const std::string& name,
-               const LrDpleStructure & st,
-               const std::vector< std::vector<int> > &Hs=std::vector< std::vector<int> >());
+               const LrDpleStructure & st);
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=std::cout) const;
+    void printStats(std::ostream &stream=CASADI_COUT) const;
 
     /// Access functions of the node
     LrDpleInternal* operator->();

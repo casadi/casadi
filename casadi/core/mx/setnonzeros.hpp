@@ -39,7 +39,7 @@ namespace casadi {
       \date 2013
   */
   template<bool Add>
-  class CASADI_CORE_EXPORT SetNonzeros : public MXNode {
+  class CASADI_EXPORT SetNonzeros : public MXNode {
   public:
 
     /// Constructor
@@ -76,7 +76,7 @@ namespace casadi {
       \date 2013
   */
   template<bool Add>
-  class CASADI_CORE_EXPORT SetNonzerosVector : public SetNonzeros<Add>{
+  class CASADI_EXPORT SetNonzerosVector : public SetNonzeros<Add>{
   public:
 
     /// Constructor
@@ -114,7 +114,7 @@ namespace casadi {
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const;
+    virtual bool zz_isEqual(const MXNode* node, int depth) const;
 
     /// Operation sequence
     std::vector<int> nz_;
@@ -122,7 +122,7 @@ namespace casadi {
 
   // Specialization of the above when nz_ is a Slice
   template<bool Add>
-  class CASADI_CORE_EXPORT SetNonzerosSlice : public SetNonzeros<Add>{
+  class CASADI_EXPORT SetNonzerosSlice : public SetNonzeros<Add>{
   public:
 
     /// Constructor
@@ -166,7 +166,7 @@ namespace casadi {
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const;
+    virtual bool zz_isEqual(const MXNode* node, int depth) const;
 
     // Data member
     Slice s_;
@@ -174,7 +174,7 @@ namespace casadi {
 
   // Specialization of the above when nz_ is a nested Slice
   template<bool Add>
-  class CASADI_CORE_EXPORT SetNonzerosSlice2 : public SetNonzeros<Add>{
+  class CASADI_EXPORT SetNonzerosSlice2 : public SetNonzeros<Add>{
   public:
 
     /// Constructor
@@ -213,7 +213,7 @@ namespace casadi {
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const;
+    virtual bool zz_isEqual(const MXNode* node, int depth) const;
 
     // Data members
     Slice inner_, outer_;

@@ -32,9 +32,6 @@
 
 namespace casadi {
 
-  /// C++ version of Python's dictionary
-  typedef GenericType::Dictionary Dictionary;
-
   // Forward declaration
   class OptionsFunctionalityNode;
 
@@ -52,7 +49,7 @@ namespace casadi {
   Joel Andersson, K.U. Leuven 2010
   joel.andersson@esat.kuleuven.be
 */
-class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
+class CASADI_EXPORT OptionsFunctionality : public SharedObject {
   public:
     /// Default constructor
     OptionsFunctionality();
@@ -95,7 +92,7 @@ class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
     bool hasSetOption(const std::string &str) const;
 
     /** \brief  Print options to a stream */
-    void printOptions(std::ostream &stream=std::cout) const;
+    void printOptions(std::ostream &stream=CASADI_COUT) const;
 
     /** \brief  Copy all options from another object*/
     void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);
@@ -131,7 +128,7 @@ class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
 
     /** \brief Set a certain option by giving an enum value */
     void setOptionByEnumValue(const std::string &name, int v);
-    /// \endcond INTERNAL
+    /// \endcond
 
     /** \brief Get the default of a certain option */
     GenericType getOptionDefault(const std::string &str) const;
@@ -147,7 +144,7 @@ class CASADI_CORE_EXPORT OptionsFunctionality : public SharedObject {
   \author Joel Andersson
   \date 2010
 */
-class CASADI_CORE_EXPORT OptionsFunctionalityNode : public SharedObjectNode {
+class CASADI_EXPORT OptionsFunctionalityNode : public SharedObjectNode {
   friend class OptionsFunctionality;
   public:
 
@@ -208,10 +205,10 @@ virtual ~OptionsFunctionalityNode();
   bool hasSetOption(const std::string &str) const;
 
   /** \brief  Print options to a stream */
-  void printOptions(std::ostream &stream=std::cout) const;
+  void printOptions(std::ostream &stream=CASADI_COUT) const;
 
   /** \brief  Print all information there is to know about a certain option */
-  void printOption(const std::string &name, std::ostream &stream = std::cout) const;
+  void printOption(const std::string &name, std::ostream &stream = CASADI_COUT) const;
 
   /** \brief  get an option value */
   GenericType getOption(const std::string &str) const;

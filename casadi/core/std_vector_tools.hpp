@@ -76,7 +76,7 @@ namespace casadi {
   * Elements larger than or equal to stop are chopped off.
   *
   */
-  CASADI_CORE_EXPORT std::vector<int> range(int start, int stop, int step=1,
+  CASADI_EXPORT std::vector<int> range(int start, int stop, int step=1,
                                                 int len=std::numeric_limits<int>::max());
 
   /**  \brief Range function
@@ -84,7 +84,7 @@ namespace casadi {
   *
   * \return list [0, 1, 2...stop-1]
   */
-  CASADI_CORE_EXPORT std::vector<int> range(int stop);
+  CASADI_EXPORT std::vector<int> range(int stop);
 
   /**  \brief Slicing vector
   *  \param v Vector to slice
@@ -100,11 +100,11 @@ namespace casadi {
 
   /// Print representation
   template<typename T>
-  void repr(const std::vector<T> &v, std::ostream &stream=std::cout);
+  void repr(const std::vector<T> &v, std::ostream &stream=CASADI_COUT);
 
   /// Print description
   template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream=std::cout);
+  void print(const std::vector<T> &v, std::ostream &stream=CASADI_COUT);
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
@@ -121,7 +121,7 @@ namespace casadi {
   * The supplied vector will be checked for bounds
   * The result vector is guaranteed to be monotonously increasing
   */
-  CASADI_CORE_EXPORT std::vector<int> complement(const std::vector<int> &v, int size);
+  CASADI_EXPORT std::vector<int> complement(const std::vector<int> &v, int size);
 
   /** \brief Returns a vector for quickly looking up entries of supplied list
   *
@@ -130,7 +130,7 @@ namespace casadi {
   *
   *  Duplicates are treated by looking up last occurrence
   */
-  CASADI_CORE_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
+  CASADI_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
 
 
   /// \cond INTERNAL
@@ -174,6 +174,10 @@ namespace casadi {
   template<typename T>
   bool isStrictlyMonotone(const std::vector<T> &v);
 
+  /// Check if the vector has negative entries
+  template<typename T>
+  bool hasNegative(const std::vector<T> &v);
+
 #ifndef SWIG
   /// Print representation to string
   template<typename T>
@@ -207,10 +211,10 @@ namespace casadi {
 
   /// \cond INTERNAL
   /// Get an pointer of sets of booleans from a double vector
-  CASADI_CORE_EXPORT bvec_t* get_bvec_t(std::vector<double>& v);
+  CASADI_EXPORT bvec_t* get_bvec_t(std::vector<double>& v);
 
   /// Get an pointer of sets of booleans from a double vector
-  CASADI_CORE_EXPORT const bvec_t* get_bvec_t(const std::vector<double>& v);
+  CASADI_EXPORT const bvec_t* get_bvec_t(const std::vector<double>& v);
 
   /// Get an pointer of sets of booleans from a double vector
   template<typename T>
@@ -326,7 +330,7 @@ namespace casadi {
 
 // Implementations
 #ifndef SWIG
-//#ifdef casadi_core_EXPORTS
+//#ifdef casadi_EXPORTS
 namespace std {
 
   /// Enables flushing an std::vector to a stream (prints representation)
@@ -510,6 +514,14 @@ namespace casadi {
   }
 
   template<typename T>
+  bool hasNegative(const std::vector<T> &v) {
+    for (std::size_t i=0; i<v.size(); ++i) {
+      if (v[i]<0) return true;
+    }
+    return false;
+  }
+
+  template<typename T>
   std::string getRepresentation(const std::vector<T> &v) {
     std::stringstream ss;
     repr(v, ss);
@@ -612,38 +624,40 @@ namespace casadi {
       return &v.front();
   }
 
+  // Helper class
+  template<typename T>
+  struct sortCompare {
+    const std::vector<T> &v_;
+    sortCompare(const std::vector<T> &v) : v_(v) {}
+    bool operator() (int i, int j) const { return v_[i]<v_[j];}
+  };
+
   template<typename T>
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values,
             std::vector<int> &indices, bool invert_indices) {
-
-    // Create a list of (value, index) pairs
-    std::vector< std::pair<T, int> > pvalues(values.size());
-
-    for (int i=0;i<values.size();++i) {
-      pvalues[i].first  = values[i];
-      pvalues[i].second = i;
+    // Call recursively if indices need to be inverted
+    if (invert_indices) {
+      std::vector<int> inverted;
+      sort(values, sorted_values, inverted, false);
+      indices.resize(inverted.size());
+      for (size_t i=0; i<inverted.size(); ++i) {
+        indices[inverted[i]] = i;
+      }
+      return;
     }
+
+    // Create list of indices
+    indices.resize(values.size());
+    for (size_t i=0; i<indices.size(); ++i) indices[i] = i;
 
     // Sort this list by the values
-    std::sort(pvalues.begin(), pvalues.end());
+    std::sort(indices.begin(), indices.end(), sortCompare<T>(values));
 
-    // Read out the results
+    // Sort the values accordingly
     sorted_values.resize(values.size());
-    indices.resize(values.size());
-    if (invert_indices) {
-      for (int i=0;i<values.size();++i) {
-        sorted_values[i] = pvalues[i].first;
-        indices[pvalues[i].second]       =  i;
-      }
-    } else {
-      for (int i=0;i<values.size();++i) {
-        sorted_values[i] = pvalues[i].first;
-        indices[i]       =  pvalues[i].second;
-      }
+    for (size_t i=0; i<values.size(); ++i) {
+      sorted_values[i] = values[indices[i]];
     }
-
-
-
   }
 
   template<typename T>

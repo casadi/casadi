@@ -37,16 +37,16 @@ OUTPUTSCHEME(LR_DLEOutput)
 using namespace std;
 namespace casadi {
 
-  LrDleInternal::LrDleInternal(const LrDleStructure& st, const std::vector<int> &Hs,
+  LrDleInternal::LrDleInternal(const LrDleStructure& st,
                              int nrhs,
                              bool transp) :
-      st_(st), nrhs_(nrhs), transp_(transp), Hs_(Hs) {
+      st_(st), nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
 
     addOption("pos_def", OT_BOOLEAN, false, "Assume P positive definite");
-
+    addOption("Hs",      OT_INTEGERVECTOR, std::vector<int>(), "Column-sizes of H_i");
     addOption("error_unstable", OT_BOOLEAN, false,
               "Throw an exception when it is detected that Product(A_i, i=N..1) "
               "has eigenvalues greater than 1-eps_unstable");
@@ -72,7 +72,7 @@ namespace casadi {
     pos_def_ = getOption("pos_def");
     error_unstable_ = getOption("error_unstable");
     eps_unstable_ = getOption("eps_unstable");
-
+    Hs_ = getOption("Hs");
 
     A_ = st_[LR_DLE_STRUCT_A];
     V_ = st_[LR_DLE_STRUCT_V];
@@ -213,7 +213,7 @@ namespace casadi {
       //   * norm_0 instead of constructing P
       Pprev = P;
       C = horzcat(C, mul(A, C));
-      V = blkdiag(V, V);
+      V = diagcat(V, V);
       A = mul(A, A);
       P = mul(mul(C, V), C.T());
     }
@@ -233,7 +233,7 @@ namespace casadi {
         sp[k] = mul(Hv_[k].T(), mul(P, Hv_[k]));
       }
 
-      return blkdiag(sp);
+      return diagcat(sp);
     } else {
       return P;
     }

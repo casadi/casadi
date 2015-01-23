@@ -45,8 +45,8 @@ macro(casadi_library_or_plugin name is_plugin)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h
   DESTINATION include/${RELPATH})
   
-  if(NOT "${name}" STREQUAL "casadi_core")
-    target_link_libraries(${name} casadi_core)
+  if(NOT "${name}" STREQUAL "casadi")
+    target_link_libraries(${name} casadi)
   endif()
 
   # If it's a plugin, we install to lib/casadi and
@@ -79,9 +79,9 @@ macro(casadi_library_or_plugin name is_plugin)
   set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
 endmacro()
 
-add_subdirectory(core)  # needed by all except external_packages
-add_subdirectory(interfaces)             # needs external_packages
-add_subdirectory(solvers)                # needs interfaces
+add_subdirectory(core)        # needed by all except external_packages
+add_subdirectory(interfaces)  # needs external_packages
+add_subdirectory(solvers)     # needs interfaces
 
 get_property(LINT_TARGETS GLOBAL PROPERTY LINT_TARGETS)
 get_property(SPELL_TARGETS GLOBAL PROPERTY SPELL_TARGETS)
@@ -97,12 +97,10 @@ add_custom_target(spell
   VERBATIM)
 
 get_property(CASADI_MODULES GLOBAL PROPERTY CASADI_MODULES)
-get_property(CASADI_SWIG_MODULES GLOBAL PROPERTY CASADI_SWIG_MODULES)
 get_property(CASADI_PLUGINS GLOBAL PROPERTY CASADI_PLUGINS)
 
 set(CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)
 set(CASADI_PLUGINS ${CASADI_PLUGINS} PARENT_SCOPE)
-set(CASADI_SWIG_MODULES ${CASADI_SWIG_MODULES} PARENT_SCOPE)
 
 add_custom_target(libs ALL DEPENDS ${CASADI_MODULES})
 

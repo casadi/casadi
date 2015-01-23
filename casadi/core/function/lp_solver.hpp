@@ -105,7 +105,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_CORE_EXPORT LpSolver : public Function {
+  class CASADI_EXPORT LpSolver : public Function {
   public:
 
     /// Default constructor

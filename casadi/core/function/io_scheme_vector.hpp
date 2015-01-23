@@ -36,7 +36,7 @@ namespace casadi {
   A class
 */
   template<typename T>
-  class CASADI_CORE_EXPORT IOSchemeVector : public PrintableObject<IOSchemeVector<T> > {
+  class CASADI_EXPORT IOSchemeVector : public PrintableObject<IOSchemeVector<T> > {
     // Data members (all public)
   public:
     /// Vector of data
@@ -69,7 +69,7 @@ namespace casadi {
     std::vector<T> vector() const { return this->data; }
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const {
+    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const {
       stream << "IOSchemeVector(" ;
       for (int i=0;i<this->data.size();++i) {
         stream << this->scheme.entry(i) << "=" << this->data[i];
@@ -81,7 +81,7 @@ namespace casadi {
     }
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const {
+    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const {
       print(stream, trailing_newline);
     }
   };

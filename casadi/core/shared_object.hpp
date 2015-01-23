@@ -78,7 +78,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT SharedObject : public PrintableObject<SharedObject> {
+  class CASADI_EXPORT SharedObject : public PrintableObject<SharedObject> {
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
     template<class B> friend const B shared_cast(const SharedObject& A);
@@ -132,14 +132,14 @@ namespace casadi {
 #endif // SWIG
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class
-    void printPtr(std::ostream &stream=std::cout) const;
+    void printPtr(std::ostream &stream=CASADI_COUT) const;
     /// \endcond
 
     /** \brief Initialize or re-initialize the object:
@@ -167,7 +167,7 @@ namespace casadi {
      *  and point to this new object
      */
     void makeUnique(bool clone_members=true);
-    /// \endcond SWIGINTERNAL
+    /// \endcond
     /// \cond INTERNAL
 #ifndef SWIG
     void makeUnique(std::map<SharedObjectNode*, SharedObject>& already_copied,
@@ -193,7 +193,7 @@ namespace casadi {
 #ifndef SWIG
   /// \cond INTERNAL
   /// Internal class for the reference counting framework, see comments on the public class.
-  class CASADI_CORE_EXPORT SharedObjectNode {
+  class CASADI_EXPORT SharedObjectNode {
     friend class SharedObject;
   public:
 

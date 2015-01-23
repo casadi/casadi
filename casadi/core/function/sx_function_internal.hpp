@@ -74,7 +74,7 @@ namespace casadi {
   \author Joel Andersson
   \date 2010
 */
-class CASADI_CORE_EXPORT SXFunctionInternal :
+class CASADI_EXPORT SXFunctionInternal :
         public XFunctionInternal<SXFunction, SXFunctionInternal, Matrix<SXElement>, SXNode>{
   friend class SXFunction;
 

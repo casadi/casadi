@@ -52,7 +52,7 @@ namespace casadi {
                 }
         \endcode
 */
-class CASADI_CORE_EXPORT CasadiException : public std::exception {
+class CASADI_EXPORT CasadiException : public std::exception {
   public:
   //! \brief Default constructor
   CasadiException() {

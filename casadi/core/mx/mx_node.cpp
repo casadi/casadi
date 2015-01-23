@@ -49,7 +49,6 @@
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
-#include "multiplication_impl.hpp"
 #include "solve_impl.hpp"
 #include "binary_mx_impl.hpp"
 
@@ -340,28 +339,20 @@ namespace casadi {
   }
 
 
-  MX MXNode::getMultiplication(const MX& y, const Sparsity& sp_z) const {
+  MX MXNode::getMultiplication(const MX& y, const MX& z) const {
     // Get reference to transposed first argument
-    MX trans_x = shared_from_this<MX>().T();
+    MX x = shared_from_this<MX>();
 
-    // Form result of the right sparsity
-    MX z;
-    if (sp_z.isNull()) {
-      Sparsity sp_z_ = sparsity().patternProductNew(y.sparsity());
-      z = MX::zeros(sp_z_);
-    } else {
-      z = MX::zeros(sp_z);
-    }
     casadi_assert_message(y.size2()==z.size2(), "Dimension error. Got y=" << y.size2()
                           << " and z=" << z.dimString() << ".");
-    casadi_assert_message(trans_x.size2()==z.size1(), "Dimension error. Got trans_x="
-                          << trans_x.dimString() << " and z=" << z.dimString() << ".");
-    casadi_assert_message(y.size1()==trans_x.size1(), "Dimension error. Got y=" << y.size1()
-                          << " and trans_x" << trans_x.dimString() << ".");
-    if (trans_x.isDense() && y.isDense()) {
-      return MX::create(new DenseMultiplication<true, false>(z, trans_x, y));
+    casadi_assert_message(x.size1()==z.size1(), "Dimension error. Got x="
+                          << x.dimString() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.size1()
+                          << " and x" << x.dimString() << ".");
+    if (x.isDense() && y.isDense()) {
+      return MX::create(new DenseMultiplication(z, x, y));
     } else {
-      return MX::create(new Multiplication<true, false>(z, trans_x, y));
+      return MX::create(new Multiplication(z, x, y));
     }
   }
 
@@ -516,22 +507,22 @@ namespace casadi {
       // Handle special operations (independent of type)
       switch (op) {
       case OP_ADD:
-        if (y.isEqual(this, maxDepth())) return getUnary(OP_TWICE);
+        if (y.zz_isEqual(this, maxDepth())) return getUnary(OP_TWICE);
         break;
       case OP_SUB:
       case OP_NE:
       case OP_LT:
-        if (y.isEqual(this, maxDepth())) return MX::zeros(sparsity());
+        if (y.zz_isEqual(this, maxDepth())) return MX::zeros(sparsity());
         break;
       case OP_DIV:
         if (y->isZero()) return MX::nan(sparsity());
         // fall-through
       case OP_EQ:
       case OP_LE:
-        if (y.isEqual(this, maxDepth())) return MX::ones(sparsity());
+        if (y.zz_isEqual(this, maxDepth())) return MX::ones(sparsity());
         break;
       case OP_MUL:
-        if (y.isEqual(this, maxDepth())) return getUnary(OP_SQ);
+        if (y.zz_isEqual(this, maxDepth())) return getUnary(OP_SQ);
         break;
       default: break; // no rule
       }
@@ -616,7 +607,7 @@ namespace casadi {
         // Get the value for the structural zeros
         double fcn_0(0);
         casadi_math<double>::fun(op, 0, 0, fcn_0);
-        rr.densify(fcn_0);
+        rr.makeDense(fcn_0);
       }
       return rr;
     }
@@ -630,7 +621,7 @@ namespace casadi {
     if (getOp()!=node->getOp() || ndep()!=node->ndep())
       return false;
     for (int i=0; i<ndep(); ++i) {
-      if (!dep(i).isEqual(node->dep(i), depth-1))
+      if (!isEqual(dep(i), node->dep(i), depth-1))
         return false;
     }
     return true;

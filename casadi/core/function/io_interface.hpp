@@ -41,12 +41,12 @@ namespace casadi {
       \date 2013
   */
   template<class Derived>
-  class CASADI_CORE_EXPORT IOInterface {
+  class CASADI_EXPORT IOInterface {
   public:
 
     /// \cond UNSAFE
     /** \brief [UNSAFE] Obtain reference to inputs
-     * \seealso getInput, setInput
+     * \sa getInput, setInput
      */
     ///@{
     /// Access input argument
@@ -61,7 +61,7 @@ namespace casadi {
     ///@}
 
     /** \brief [UNSAFE] Obtain reference to outputs
-     * \seealso getOutput, getOutput
+     * \sa getOutput, getOutput
      */
     ///@{
     /// Access output argument

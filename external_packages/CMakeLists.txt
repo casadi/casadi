@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.6)
 
 macro(casadi_external_library name)
   # cmake_policy use MACOSX_RPATH=ON by default

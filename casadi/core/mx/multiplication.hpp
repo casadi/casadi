@@ -36,8 +36,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  template<bool TrX, bool TrY>
-  class CASADI_CORE_EXPORT Multiplication : public MXNode {
+  class CASADI_EXPORT Multiplication : public MXNode {
   public:
 
     /** \brief  Constructor */
@@ -74,7 +73,8 @@ namespace casadi {
                             bool output_given);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+                                   std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_MATMUL;}
@@ -83,12 +83,11 @@ namespace casadi {
     virtual int numInplace() const { return 1;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const
-    { return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication<TrX, TrY>*>(node)!=0;}
+    virtual bool zz_isEqual(const MXNode* node, int depth) const
+    { return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;}
 
-    /// Helper class
-    template<bool Tr>
-    static MX tr(const MX& x) { return Tr ? x.T() : x;}
+    /// Get number of temporary variables needed
+    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=sparsity().size1();}
   };
 
 
@@ -97,13 +96,12 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  template<bool TrX, bool TrY>
-  class CASADI_CORE_EXPORT DenseMultiplication : public Multiplication<TrX, TrY>{
+  class CASADI_EXPORT DenseMultiplication : public Multiplication{
   public:
 
     /** \brief  Constructor */
     DenseMultiplication(const MX& z, const MX& x, const MX& y)
-        : Multiplication<TrX, TrY>(z, x, y) {}
+        : Multiplication(z, x, y) {}
 
     /** \brief  Destructor */
     virtual ~DenseMultiplication() {}

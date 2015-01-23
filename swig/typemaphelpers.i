@@ -23,25 +23,11 @@
  */
 
 
-%{
-#include "casadi/core/matrix/sparsity.hpp"
-#include "casadi/core/matrix/matrix.hpp"
-#include <sstream>
-#include "casadi/core/casadi_exception.hpp"
-
-// to allow for typechecking
-#include "casadi/core/sx/sx_element.hpp"
-
-// to typecheck for MX
-#include "casadi/core/mx/mx.hpp"
-%}
-
 #ifndef SWIGXML
 %include "typemaps.i"
 #endif
 
 /// Generic typemap structure
-%inline %{
 
   /// Data structure in the target language holding data
 #ifdef SWIGPYTHON
@@ -52,146 +38,277 @@
 #define GUESTOBJECT void
 #endif
 
-#ifndef SWIGXML
-/** Check if Guest object is of a particular SWIG type */
-bool istype(GUESTOBJECT *p, swig_type_info *type) {
-	void *dummy = 0 ; 
-  return SWIG_IsOK(SWIG_ConvertPtr(p, &dummy, type, 0)); 
-}
-#endif
-
-template<class T>
-class meta {
-  public:
-    /// Check if Python object is of type T
-    static bool isa(GUESTOBJECT *p) {
-      #ifdef SWIGPYTHON
-      if (p == Py_None) return false;
-      #endif
-      #ifdef SWIGMATLAB
-      if (p == 0) return false;
-      #endif
-      return istype(p,*meta<T>::name);
-    };
-    /// Convert Python object to pointer of type T
-    static T* get_ptr(GUESTOBJECT *p) {
-      void *pd = 0 ;
-      int res = SWIG_ConvertPtr(p, &pd, *meta<T>::name, 0 );
-      if (!SWIG_IsOK(res)) {
-        return 0;
-      } else {
-        return reinterpret_cast< T *>(pd);
-      }
-    };
-    /// Convert Guest object to type T
-    /// This function must work when isa(GUESTOBJECT *p) too
-    static int as(GUESTOBJECT *p, T& m) {
-        T *t = 0;
-        int res = swig::asptr(p, &t);
-        bool succes = SWIG_CheckState(res) && t;
-        if (succes) m=*t;
-        if (succes && SWIG_IsNewObj(res)) delete t;
-        return succes;
-    }
-    /// Check if Guest object could ultimately be converted to type T
-    /// may return true when isa(GUESTOBJECT *p), but this is not required.
-    static bool couldbe(GUESTOBJECT *p) {
-        //int res = swig::asptr(p, (T**)(0));
-        //if SWIG_CheckState(res) return true;
-        T m;
-        return as(p,m);
-    }
-    static swig_type_info** name;
-    static char expected_message[];
-    
-    // Vector specific stuff
-    
-    #ifdef SWIGPYTHON
-    static bool couldbe_sequence(PyObject * p) {
-      if(PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
-        PyObject *it = PyObject_GetIter(p);
-        if (!it) return false;
-        PyObject *pe;
-        while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-          if (!meta< T >::couldbe(pe)) {
-            Py_DECREF(pe);Py_DECREF(it);return false;
-          }
-          Py_DECREF(pe);
-        }
-        Py_DECREF(it);
-        if (PyErr_Occurred()) { PyErr_Clear(); return false; }
-        return true;
-      } else {
-        return false;
-      }
-    }
-    #endif // SWIGPYTHON
-    
-    // Assumes that p is a PYTHON sequence
-    static int as_vector(GUESTOBJECT * p, std::vector<T> &m) {
+/// Check if Python object is of type T
+%fragment("is_a", "header") {
+  bool is_null(GUESTOBJECT *p) {
 #ifdef SWIGPYTHON
-      if (PySequence_Check(p) && !PyString_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p) && !meta< casadi::Matrix<int> >::isa(p) && !meta< casadi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
-        PyObject *it = PyObject_GetIter(p);
-        if (!it) { PyErr_Clear();  return false;}
-        PyObject *pe;
-        int size = PySequence_Size(p);
-        if (size==-1) { PyErr_Clear();  return false;}
-        m.resize(size);
-        int i=0;
-        while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-          bool result=meta< T >::as(pe,m[i++]);
-          if (!result) {
-            Py_DECREF(pe);Py_DECREF(it);
-            return false;
-          }
-          Py_DECREF(pe);
-        }
-        Py_DECREF(it);
-        return true;
-      }
-#endif // SWIGPYTHON
+    if (p == Py_None) return true;
+#endif
 #ifdef SWIGMATLAB
-      if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
-        int sz = mxGetN(p);
-        m.resize(sz);
-        for (int i=0; i<sz; ++i) {
-          GUESTOBJECT *pi = mxGetCell(p,i);
-          if (pi==0 || !meta< T >::as(pi, m[i])) return false;
-        }
-        return true;
-      }
-#endif // SWIGMATLAB
-      return false;
-    }
+    if (p == 0) return true;
+#endif
+    return false;
+  }
 
-    #ifdef SWIGPYTHON
-    // Would love to make this const T&, but looks like not allowed
-    static bool toPython(const T &, PyObject *&p);
-    #endif //SWIGPYTHON
-};
-
-%}
-
-%inline %{
-#define NATIVERETURN(Type, m) if (meta<Type>::isa(p)) { Type *mp = meta< Type >::get_ptr(p); if (mp==0) return false; m=*mp; return true;}
-%}
-
-
-%define %my_generic_const_typemap(Precedence,Type...) 
-%typemap(in) const Type & (Type m) {
-  $1 = meta< Type >::get_ptr($input);
-  if ($1 == 0) {
-    if (!meta< Type >::as($input,m)) SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
-    $1 = &m;
+  bool is_a(GUESTOBJECT *p, swig_type_info *type) {
+    void *dummy = 0;
+    return !is_null(p) && SWIG_ConvertPtr(p, &dummy, type, 0) >= 0;
   }
 }
 
-%typemap(typecheck,precedence=Precedence) const Type & { $1 = meta< Type >::isa($input) || meta< Type >::couldbe($input); }
-%typemap(freearg) const Type  & {}
+%fragment("vector_size", "header", fragment="is_a") {
+  int vector_size(GUESTOBJECT * p) {
+#ifdef SWIGPYTHON
+    if (PySequence_Check(p)
+        && !PyString_Check(p)
+        && !is_a(p, $descriptor(casadi::SX*))
+        && !is_a(p, $descriptor(casadi::MX*))
+        && !is_a(p, $descriptor(casadi::Matrix<int>*))
+        && !is_a(p, $descriptor(casadi::Matrix<double>*))
+        && !PyObject_HasAttrString(p,"__DMatrix__")
+        && !PyObject_HasAttrString(p,"__SX__")
+        && !PyObject_HasAttrString(p,"__MX__")) {
+      return PySequence_Size(p);
+    } else {
+      return -1;
+    }
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+    if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
+      return mxGetN(p);
+    } else {
+      return -1;
+    }
+#endif // SWIGMATLAB
+    return -1;
+  }
+ }
 
+%fragment("to_vector", "header") {
+  int to_vector(GUESTOBJECT * p, void *mv, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+#ifdef SWIGPYTHON
+    PyObject *it = PyObject_GetIter(p);
+    if (!it) {
+      PyErr_Clear();
+      return false;
+    }
+    PyObject *pe;
+    int size = PySequence_Size(p);
+    if (size==-1) {
+      PyErr_Clear();
+      return false;
+    }
+    int i=0;
+    while ((pe = PyIter_Next(it))) {
+      // Iterate over the sequence inside the sequence
+      if (!f(pe, mv, i++)) {
+        Py_DECREF(pe);
+        Py_DECREF(it);
+        return false;
+      }
+      Py_DECREF(pe);
+    }
+    Py_DECREF(it);
+    return true;
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+    if (mxGetClassID(p)==mxCELL_CLASS && mxGetM(p)==1) {
+      int sz = mxGetN(p);
+      for (int i=0; i<sz; ++i) {
+        GUESTOBJECT *pi = mxGetCell(p, i);
+        if (pi==0 || !f(pi, mv, i)) return false;
+      }
+      return true;
+    }
+#endif // SWIGMATLAB
+    return false;
+  }
+ }
+
+%fragment("make_vector", "header", fragment="vector_size,to_vector") {
+  template<typename T>
+  bool make_vector(GUESTOBJECT * p, std::vector<T>* m, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+    int sz = vector_size(p);
+    if (sz<0) return false;
+    if (m) m->resize(sz);
+    if (sz>0 && !to_vector(p, m ? &m->front() : 0, f)) return false;
+    return true;
+  }
+ }
+
+%fragment("make_vector2", "header", fragment="make_vector") {
+  template<typename T>
+    bool make_vector2(GUESTOBJECT * p, std::vector<std::vector<T> >* m, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+    int sz = vector_size(p);
+    if (sz<0) return false;
+    if (m) m->resize(sz);
+#ifdef SWIGPYTHON
+    PyObject *it = PyObject_GetIter(p);
+    if (!it) { PyErr_Clear();  return false;}
+    PyObject *pe;
+    int i=0;
+    while ((pe = PyIter_Next(it))) {
+      if (!make_vector(pe, m ? &m->at(i++) : 0, f)) {
+        Py_DECREF(pe);
+        Py_DECREF(it);
+        return false;
+      }
+      Py_DECREF(pe);
+    }
+    Py_DECREF(it);
+    return true;
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+    for (int i=0; i<sz; ++i) {
+      GUESTOBJECT *pi = mxGetCell(p, i);
+      if (pi==0 || !make_vector(pi, m ? &m->at(i) : 0, f)) return false;
+    }
+    return true;
+#endif // SWIGMATLAB
+    return false;
+  }
+}
+
+%define %casadi_in_typemap(xName, xType...)
+%typemap(in, noblock=1, fragment="to"{xName}) xType (xType m) {
+  if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+  $1 = m;
+}
 %enddef
 
+%fragment("conv_constref", "header") {
+  template<typename T>
+  bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+    if (SWIG_ConvertPtr(p, (void **)&ptr, type, 0) == -1) {
+      if (!f(p, &m, 0)) return false;
+      ptr = &m;
+    }
+    return true;
+  }
+ }
 
+%define %casadi_in_typemap_constref(xName, xType...)
+%typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
+  if (!conv_constref($input, $1, m, $1_descriptor, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+ }
+%enddef
+
+%fragment("conv_vector", "header", fragment="make_vector") {
+  template<typename T>
+  bool conv_vector(GUESTOBJECT *p, std::vector<T>* &ptr, std::vector<T> &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+    if (SWIG_ConvertPtr(p, (void **) &ptr, type, 0) == -1) {
+      if (!make_vector(p, &m, f)) return false;
+      ptr = &m;
+    }
+    return true;
+  }
+ }
+
+%define %casadi_in_typemap_vector(xName,xType...)
+%typemap(in, noblock=1, fragment="to"{xName}) const std::vector< xType > & (std::vector< xType > m) {
+  if (!conv_vector($input, $1, m, $1_descriptor, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector<xName>.");
+ }
+%enddef
+
+%fragment("conv_vector2", "header", fragment="make_vector2") {
+template<typename T>
+bool conv_vector2(GUESTOBJECT *p, std::vector< std::vector<T> >* &ptr, std::vector< std::vector<T> > &m,
+                 swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+  if (SWIG_ConvertPtr(p, (void **) &ptr, type, 0) == -1) {
+    if (!make_vector2(p, &m, f)) return false;
+    ptr = &m;
+  }
+  return true;
+ }
+}
+
+%define %casadi_in_typemap_vector2(xName,xType...)
+%typemap(in, noblock=1, fragment="conv_vector2") const std::vector< std::vector< xType > > & (std::vector< std::vector< xType > > m) {
+  if (!conv_vector2($input, $1, m, $1_descriptor, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Cannot convert input to std::vector< std::vector<xName> >.");
+ }
+%enddef
+
+%define %casadi_freearg_typemap(xType...)
+%typemap(freearg, noblock=1) xType {}
+%enddef
+
+%define %casadi_typecheck_typemap(xName, xPrec, xType...)
+%typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) xType {
+  $1 = to_##xName($input, 0);
+ }
+%enddef
+
+%define %casadi_typecheck_typemap_constref(xName, xPrec, xType...)
+%typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) const xType& {
+  $1 = to_##xName($input, 0);
+ }
+%enddef
+
+%define %casadi_typecheck_typemap_vector(xName, xPrec, xType...)
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="is_a,to_vector") const std::vector< xType > & {
+  $1 = is_a($input,$1_descriptor) || make_vector< xType >($input, 0, to_##xName);
+ }
+%enddef
+
+%define %casadi_typecheck_typemap_vector2(xName, xPrec, xType...)
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="is_a,make_vector2") const std::vector< std::vector< xType > > & {
+  $1 = is_a($input, $1_descriptor) || make_vector2< xType >($input, 0, to_##xName);
+ }
+%enddef
+
+%fragment("conv_genericmatrix", "header", fragment="is_a") {
+template<typename T>
+bool conv_genericmatrix(GUESTOBJECT *p, casadi::GenericMatrix< T >* &ptr, T &m,
+                        swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
+  if (is_null(p) || SWIG_ConvertPtr(p, (void **) &ptr, type, 0) == -1) {
+    if (!f(p, &m, 0)) return false;
+    ptr = &m;
+  }
+  return true;
+ }
+}
+
+%define %casadi_in_typemap_genericmatrix(xName, xType...) 
+%typemap(in, noblock=1, fragment="conv_genericmatrix") const casadi::GenericMatrix< xType > & (xType m) {
+  if (!conv_genericmatrix($input, $1, m, $descriptor(xType *), to_##xName)) SWIG_exception_fail(SWIG_TypeError, "Input type conversion failure ($1_type)");
+ }
+%enddef
+
+%define %casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType...)
+%typemap(typecheck, noblock=1, precedence=xPrec, fragment="is_a") const casadi::GenericMatrix< xType > & {
+  $1 = is_a($input, $descriptor(xType *)) || to_##xName($input, 0);
+ }
+%enddef
+
+%define %casadi_typemaps(xName, xPrec, xType...)
+%casadi_in_typemap(xName, xType)
+%casadi_freearg_typemap(xType)
+%casadi_typecheck_typemap(xName, xPrec, xType)
+%enddef
+
+%define %casadi_typemaps_constref(xName, xPrec, xType...)
+%casadi_in_typemap_constref(xName, xType)
+%casadi_freearg_typemap(const xType&)
+%casadi_typecheck_typemap_constref(xName, xPrec, xType)
+%enddef
+
+%define %casadi_typemaps_vector(xName, xPrec, xType...)
+%casadi_in_typemap_vector(xName, xType)
+%casadi_freearg_typemap(const std::vector< xType >&)
+%casadi_typecheck_typemap_vector(xName, xPrec, xType)
+%enddef
+
+%define %casadi_typemaps_vector2(xName, xPrec, xType...)
+%casadi_in_typemap_vector2(xName, xType)
+%casadi_freearg_typemap(const std::vector< std::vector< xType > >&)
+%casadi_typecheck_typemap_vector2(xName, xPrec, xType)
+%enddef
+
+%define %casadi_typemaps_genericmatrix(xName, xPrec, xType...)
+%casadi_in_typemap_genericmatrix(xName, xType)
+%casadi_freearg_typemap(const casadi::GenericMatrix< xType >  &)
+%casadi_typecheck_typemap_genericmatrix(xName, xPrec, xType)
+%enddef
 
 #ifdef SWIGPYTHON
 
@@ -233,8 +350,8 @@ class meta {
 
 // Create an output typemap for a const ref such that a copy is made
 %define %outputConstRefCopy(Type)
-%typemap(out) const Type & {
-   $result = SWIG_NewPointerObj((new Type(*$1)), *meta< Type >::name, SWIG_POINTER_OWN |  0 );
+%typemap(out, noblock=1) const Type & {
+  $result = SWIG_NewPointerObj((new Type(*$1)), $descriptor(Type*), SWIG_POINTER_OWN |  0 );
 }
 %enddef
 
@@ -269,19 +386,19 @@ void PyDECREFParent(PyObject* self) {
 // We do not really imply that this SWIG objects owns the pointer
 // We are actually abusing the term SWIG_POINTER_OWN: a non-const ref is usually created with SWIG_NewPointerObj(..., 0 |  0 )
 %define %outputRefOwn(Type)
-%typemap(out) Type & {
-   $result = SWIG_NewPointerObj($1, *meta< Type >::name, 0 |  0 );
-   PySetParent($result, obj0);
+%typemap(out, noblock=1) Type & {
+  $result = SWIG_NewPointerObj($1, $descriptor(Type*), 0 |  0 );
+  PySetParent($result, obj0);
 }
-%typemap(out) const Type & {
+%typemap(out, noblock=1) const Type & {
    $result = swig::from(static_cast< Type * >($1));
    PySetParent($result, obj0);
 }
 %extend Type {
 %pythoncode%{
     def __del__(self):
-      if not(_casadi_core is None):
-         _casadi_core.PyDECREFParent(self)
+      if not(_casadi is None):
+         _casadi.PyDECREFParent(self)
 
 %}
 
@@ -290,76 +407,22 @@ void PyDECREFParent(PyObject* self) {
 
 // Convert reference output to a new data structure
 %define %outputRefNew(Type)
-%typemap(out) Type & {
+%typemap(out, noblock=1) Type & {
    $result = swig::from(static_cast< Type >(*$1));
 }
-%typemap(out) const Type & {
+%typemap(out, noblock=1) const Type & {
    $result = swig::from(static_cast< Type >(*$1));
 }
 %extend Type {
 %pythoncode%{
     def __del__(self):
-      if not(_casadi_core is None):
-         _casadi_core.PyDECREFParent(self)
+      if not(_casadi is None):
+         _casadi.PyDECREFParent(self)
 
 %}
 
 }
 %enddef
-
-%inline %{
-/// std::vector< Type >
-#define meta_vector(Type) \
-template<> char meta< std::vector< Type > >::expected_message[] = "Expecting sequence(Type)"; \
- \
-template <> \
-int meta< std::vector< Type > >::as(GUESTOBJECT *p, std::vector< Type > &m) { \
-  NATIVERETURN(std::vector< Type >,m) \
-  return meta< Type >::as_vector(p,m); \
-} \
-
-%}
-
-
-/// std::pair< TypeA, TypeB >
-#ifdef SWIGPYTHON
-%define %meta_pair(TypeA,TypeB) 
-%inline %{
-template <>
-int meta< std::pair<TypeA, TypeB> >::as(PyObject * p,std::pair< TypeA, TypeB > &m) {
-  std::pair< TypeA, TypeB > *tm = meta< std::pair< TypeA, TypeB > >::get_ptr(p);
-  if (tm!=0) {
-    m = *tm;
-    return true;
-  }
-  if(!PySequence_Check(p)) return false;
-  if(PySequence_Size(p)!=2) return false;
-  PyObject * first =  PySequence_GetItem(p,0);
-  PyObject * second = PySequence_GetItem(p,1);
-  bool result = meta< TypeA  >::as(p,m.first) && meta< TypeB  >::as(p,m.second);
-  
-  Py_DECREF(first);Py_DECREF(second);
-  return result;   
-}
-
-template <>
-bool meta < std::pair< TypeA, TypeB > >::toPython(const std::pair< TypeA, TypeB > &m, PyObject *&p) {
-  p = PyTuple_New(2);
-  PyObject *first = 0;
-  first  = SWIG_NewPointerObj((new TypeA(static_cast< const TypeA& >(m.first ))), *meta< TypeA >::name , SWIG_POINTER_OWN |  0 );
-  PyObject *second = 0;
-  second = SWIG_NewPointerObj((new TypeB(static_cast< const TypeB& >(m.second))), *meta< TypeB >::name , SWIG_POINTER_OWN |  0 );
-  
-  if (first==0 || second==0) return false;
-  
-  PyTuple_SetItem(p, 0, first);
-  PyTuple_SetItem(p, 1, second);
-  
-  return true;
-}
-%}
-%enddef
-#endif //SWIGPYTHON
 
 #ifdef SWIGPYTHON
 %inline%{
@@ -373,13 +436,102 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 	return ret;
 }
 
-bool PyIsSequence(PyObject* p) {
-  return PySequence_Check(p) && !meta< casadi::SX >::isa(p) && !meta< casadi::MX >::isa(p);
-}
-
 %}
 #endif // SWIGPYTHON
+
+%fragment("try_copy", "header") {
+  template<typename FromType>
+  struct CopyTraits {
+    template<typename ToType>
+    static bool try_copy(GUESTOBJECT *p, swig_type_info *type, ToType* m) {
+      FromType *mp = 0;
+      if (SWIG_ConvertPtr(p, (void **) &mp, type, 0) != -1) {
+        if (m) *m=*mp;
+        return true;
+      }
+      return false;
+    }
+  };
+}
+#define TRY_COPY(fromPtr, fromClass, fromType, toPtr) CopyTraits<fromClass>::try_copy(fromPtr, fromType, toPtr)
+
+#ifdef SWIGMATLAB
+// Get sparsity pattern
+%fragment("get_sparsity", "header") {
+  Sparsity getSparsity(const mxArray* p) {
+    // Get sparsity pattern
+    size_t nrow = mxGetM(p);
+    size_t ncol = mxGetN(p);
+
+    if (mxIsSparse(p)) {
+      // Sparse storage in MATLAB
+      mwIndex *Jc = mxGetJc(p);
+      mwIndex *Ir = mxGetIr(p);
+
+      // Store in vectors
+      std::vector<int> colind(ncol+1);
+      std::copy(Jc, Jc+ncol+1, colind.begin());
+      std::vector<int> row(colind.back());
+      std::copy(Ir, Ir+ncol+1, row.begin());
+
+      // Create pattern and return
+      return casadi::Sparsity(nrow, ncol, colind, row);
+    } else {
+      return casadi::Sparsity::dense(nrow, ncol);
+    }
+  }
+ }
+
+// Number of nonzeros
+%fragment("get_nnz", "header") {
+  size_t getNNZ(const mxArray* p) {
+    // Dimensions
+    size_t nrow = mxGetM(p);
+    size_t ncol = mxGetN(p);
+    if (mxIsSparse(p)) {
+      // Sparse storage in MATLAB
+      mwIndex *Jc = mxGetJc(p);
+      return Jc[ncol];
+    } else {
+      return nrow*ncol;
+    }
+  }
+}
+#endif // SWIGMATLAB
 
 %{
 #define SWIG_Error_return(code, msg)  { std::cerr << "Error occured in CasADi SWIG interface code:" << std::endl << "  "<< msg << std::endl;SWIG_Error(code, msg); return 0; }
 %}
+
+// Forward declarations
+%fragment("fwd", "header",
+          fragment="vector_size,to_vector,make_vector,make_vector2,conv_constref,conv_vector,conv_vector2,conv_genericmatrix,try_copy"
+#ifdef SWIGMATLAB
+          ,fragment="get_sparsity,get_nnz"
+#endif // SWIGMATLAB
+          ) {
+  int to_int(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_double(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_Dictionary(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_GenericType(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_DerivativeGenerator(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_CustomEvaluate(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_Callback(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_DVector(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_IVector(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_SX(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_MX(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_DMatrix(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_IMatrix(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_string(GUESTOBJECT *p, void *mv, int offs=0);
+  int to_Function(GUESTOBJECT *p, void *mv, int offs=0);
+
+  GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
+  GUESTOBJECT * from_Dictionary(const casadi::GenericType::Dictionary &a);
+
+  swig_type_info * type_SX() { return $descriptor(casadi::Matrix<casadi::SXElement> *); }
+  swig_type_info * type_DMatrix() { return $descriptor(casadi::Matrix<double> *); }
+  swig_type_info * type_IMatrix() { return $descriptor(casadi::Matrix<int> *); }
+  swig_type_info * type_MX() { return $descriptor(casadi::MX *); }
+}

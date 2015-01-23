@@ -46,7 +46,8 @@ namespace casadi {
     plugin->creator = LiftingIndefDpleInternal::creator;
     plugin->name = "lifting";
     plugin->doc = LiftingIndefDpleInternal::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
+    plugin->adaptorHasPlugin = DleSolver::hasPlugin;
     return 0;
   }
 
@@ -100,16 +101,16 @@ namespace casadi {
       A = As;
     } else {
       if (form_==0) {
-        MX AL = blkdiag(vector_slice(As_, range(As_.size()-1)));
+        MX AL = diagcat(vector_slice(As_, range(As_.size()-1)));
 
-        MX AL2 = horzcat(AL, Sparsity::sparse(AL.size1(), As_[0].size2()));
-        MX AT = horzcat(Sparsity::sparse(As_[0].size1(), AL.size2()), As_.back());
+        MX AL2 = horzcat(AL, MX::sparse(AL.size1(), As_[0].size2()));
+        MX AT = horzcat(MX::sparse(As_[0].size1(), AL.size2()), As_.back());
         A = vertcat(AT, AL2);
       } else {
-        MX AL = blkdiag(reverse(vector_slice(As_, range(As_.size()-1))));
+        MX AL = diagcat(reverse(vector_slice(As_, range(As_.size()-1))));
 
-        MX AL2 = horzcat(Sparsity::sparse(AL.size1(), As_[0].size2()), AL);
-        MX AT = horzcat(As_.back(), Sparsity::sparse(As_[0].size1(), AL.size2()));
+        MX AL2 = horzcat(MX::sparse(AL.size1(), As_[0].size2()), AL);
+        MX AT = horzcat(As_.back(), MX::sparse(As_[0].size1(), AL.size2()));
         A = vertcat(AL2, AT);
       }
     }
@@ -117,9 +118,9 @@ namespace casadi {
     MX V;
 
     if (form_==0) {
-      V = blkdiag(Vs_.back(), blkdiag(vector_slice(Vs_, range(Vs_.size()-1))));
+      V = diagcat(Vs_.back(), diagcat(vector_slice(Vs_, range(Vs_.size()-1))));
     } else {
-      V = blkdiag(blkdiag(reverse(vector_slice(Vs_, range(Vs_.size()-1)))), Vs_.back());
+      V = diagcat(diagcat(reverse(vector_slice(Vs_, range(Vs_.size()-1)))), Vs_.back());
     }
 
     // Create an dlesolver instance

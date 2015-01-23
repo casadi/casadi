@@ -195,7 +195,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT NlpSolver : public Function {
+  class CASADI_EXPORT NlpSolver : public Function {
   public:
 
     /// Default constructor
@@ -234,7 +234,7 @@ namespace casadi {
     static std::string doc(const std::string& name);
 
     /// Prints out a human readable report about possible constraint violations, after solving
-    void reportConstraints(std::ostream &stream=std::cout);
+    void reportConstraints(std::ostream &stream=CASADI_COUT);
 
     std::string getReportConstraints()
     { std::stringstream s; reportConstraints(s); return s.str(); }

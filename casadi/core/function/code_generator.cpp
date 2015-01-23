@@ -26,7 +26,6 @@
 
 #include "code_generator.hpp"
 #include "function_internal.hpp"
-#include "../matrix/sparsity_tools.hpp"
 #include <iomanip>
 #include "casadi/core/runtime/runtime_embedded.hpp"
 
@@ -263,8 +262,8 @@ namespace casadi {
     case AUX_FILL:
       auxiliaries_ << codegen_str_fill << endl;
       break;
-    case AUX_MM_TN_SPARSE:
-      auxiliaries_ << codegen_str_mm_tn_sparse << endl;
+    case AUX_MM_SPARSE:
+      auxiliaries_ << codegen_str_mm_sparse << endl;
       break;
     case AUX_SQ:
       auxSq();

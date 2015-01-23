@@ -29,7 +29,7 @@ from numpy import *
 A = MX.sym("A",2,1)         # Here a matrix
 B = MX.sym("B",1,2)         # There a matrix
 C = MX.sym("C")             # And an other little matrix
-D = MX.sym("D",Sparsity.tril(4))  # Triangular matrix
+D = MX.sym("D",Sparsity.lower(4))  # Triangular matrix
 
 
 L = [A,B,C,D]

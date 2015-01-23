@@ -70,7 +70,7 @@ namespace casadi {
 
   /// Sparse matrix-matrix multiplication, the first argument is transposed: z <- z + x'*y
   template<typename real_t>
-  void casadi_mm_tn_sparse(const real_t* trans_x, const int* sp_trans_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z);
+  void casadi_mm_sparse(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
 
   /// NRM2: ||x||_2 -> return
   template<typename real_t>
@@ -227,7 +227,12 @@ namespace casadi {
   }
 
   template<typename real_t>
-  void casadi_mm_tn_sparse(const real_t* trans_x, const int* sp_trans_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z) {
+  void casadi_mm_sparse(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+    /*int nrow_x = sp_x[0];*/
+    int ncol_x = sp_x[1];
+    const int* colind_x = sp_x+2;
+    const int* row_x = sp_x + 2 + ncol_x+1;
+    /*int nnz_x = colind_x[ncol_x];*/
 
     /*int nrow_y = sp_y[0];*/
     int ncol_y = sp_y[1];
@@ -235,36 +240,25 @@ namespace casadi {
     const int* row_y = sp_y + 2 + ncol_y+1;
     /*int nnz_y = colind_y[ncol_y];*/
 
-    /*int ncol_x = sp_trans_x[0];*/
-    int nrow_x = sp_trans_x[1];
-    const int* rowind_x = sp_trans_x+2;
-    const int* col_x = sp_trans_x + 2 + nrow_x+1;
-    /*int nnz_x = rowind_x[nrow_x];*/
-
     /*int nrow_z = sp_z[0];*/
     int ncol_z = sp_z[1];
     const int* colind_z = sp_z+2;
     const int* row_z = sp_z + 2 + ncol_z+1;
     /*int nnz_z = colind_z[ncol_z];*/
 
-    int i;
-    for (i=0; i<ncol_z; ++i) {
-      int el;
-      for (el=colind_z[i]; el<colind_z[i+1]; ++el) {
-        int j = row_z[el];
-        int el1 = colind_y[i];
-        int el2 = rowind_x[j];
-        while (el1 < colind_y[i+1] && el2 < rowind_x[j+1]) {
-          int j1 = row_y[el1];
-          int i2 = col_x[el2];
-          if (j1==i2) {
-            z[el] += y[el1++] * trans_x[el2++];
-          } else if (j1<i2) {
-            el1++;
-          } else {
-            el2++;
-          }
+    for (int cc=0; cc<ncol_y; ++cc) {
+      for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        w[row_z[kk]] = z[kk];
+      }
+      for (int kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+        int rr = row_y[kk];
+        real_t yy = y[kk];
+        for (int kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+          w[row_x[kk1]] += x[kk1]*yy;
         }
+      }
+      for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        z[kk] = w[row_z[kk]];
       }
     }
   }

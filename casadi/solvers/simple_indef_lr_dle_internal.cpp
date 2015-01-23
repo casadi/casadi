@@ -45,7 +45,7 @@ namespace casadi {
     plugin->creator = SimpleIndefDleInternal::creator;
     plugin->name = "simple";
     plugin->doc = SimpleIndefDleInternal::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
@@ -120,7 +120,7 @@ namespace casadi {
     if (with_C_) dle_in[DLE_C] = Cs;
     if (with_H_) dle_in[DLE_H] = Hs;
 
-    f_ = MXFunction(dle_in,dleOut("p",with_H_? blkdiag(HPH) : P(output().sparsity())));
+    f_ = MXFunction(dle_in,dleOut("p",with_H_? diagcat(HPH) : P(output().sparsity())));
 
     f_.init();
 

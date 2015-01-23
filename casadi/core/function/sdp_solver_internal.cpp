@@ -25,7 +25,6 @@
 
 #include "sdp_solver_internal.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "../matrix/sparsity_tools.hpp"
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 
@@ -52,7 +51,7 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
   const Sparsity& G = st_[SDP_STRUCT_G];
   const Sparsity& F = st_[SDP_STRUCT_F];
 
-  casadi_assert_message(G==G.transpose(), "SdpSolverInternal: Supplied G sparsity must "
+  casadi_assert_message(G==G.T(), "SdpSolverInternal: Supplied G sparsity must "
                         "symmetric but got " << G.dimString());
 
   m_ = G.size1();
@@ -81,7 +80,7 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
 
   for (int i=0;i<n_;i++) {
     Sparsity s = input(SDP_SOLVER_F)(ALL, Slice(i*m_, (i+1)*m_)).sparsity();
-    casadi_assert_message(s==s.transpose(),
+    casadi_assert_message(s==s.T(),
                           "SdpSolverInternal: Each supplied Fi must be symmetric. "
                           "But got " << s.dimString() <<  " for i = " << i << ".");
   }
@@ -123,7 +122,7 @@ void SdpSolverInternal::init() {
     full_blocks.push_back(SX::sym("block", block_sizes_[i], block_sizes_[i]));
   }
 
-  Pmapper_ = SXFunction(full_blocks, blkdiag(full_blocks)(lookupvector(p, p.size()),
+  Pmapper_ = SXFunction(full_blocks, diagcat(full_blocks)(lookupvector(p, p.size()),
                                                          lookupvector(p, p.size())));
   Pmapper_.init();
 

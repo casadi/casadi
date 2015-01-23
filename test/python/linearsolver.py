@@ -413,7 +413,7 @@ class LinearSolverTests(casadiTestCase):
     numpy.random.seed(0)
     n = 10
     L = self.randDMatrix(n,n,sparsity=0.2) +  1.5*c.diag(range(1,n+1))
-    L = L[Sparsity.tril(n)]
+    L = L[Sparsity.lower(n)]
     M = mul(L,L.T)
     b = self.randDMatrix(n,1)
     

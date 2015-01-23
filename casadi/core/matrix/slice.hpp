@@ -39,34 +39,40 @@ namespace casadi {
    * Note that Python or Octave do not need to use this class.
    * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
    */
-  class CASADI_CORE_EXPORT Slice : public PrintableObject<Slice> {
+  class CASADI_EXPORT Slice : public PrintableObject<Slice> {
   public:
     /// Default constructor - all elements
     Slice();
 
-    /// A single element
-    Slice(int i);
+    /// A single element (explicit to avoid ambiguity with IMatrix overload
+    explicit Slice(int i);
 
     /// A slice
     Slice(int start, int stop, int step=1);
 
     /// Construct from an index vector (requires isSlice(v) to be true)
-    explicit Slice(const std::vector<int>& v);
+    explicit Slice(const std::vector<int>& v, bool ind1=false);
 
     /// Construct nested slices from an index vector (requires isSlice2(v) to be true)
     explicit Slice(const std::vector<int>& v, Slice& outer);
 
     /// Check if an index vector can be represented more efficiently as a slice
-    static bool isSlice(const std::vector<int>& v);
+    static bool isSlice(const std::vector<int>& v, bool ind1=false);
 
     /// Check if an index vector can be represented more efficiently as two nested slices
     static bool isSlice2(const std::vector<int>& v);
 
     /// Get a vector of indices
-    std::vector<int> getAll(int len) const;
+    std::vector<int> getAll(int len, bool ind1=false) const;
 
     /// Get a vector of indices (nested slice)
     std::vector<int> getAll(const Slice& outer, int len) const;
+
+    /// Is the slice a scalar
+    bool isScalar(int len) const;
+
+    /// Get scalar (if isScalar)
+    int toScalar(int len) const;
 
     /// Check equality
     bool operator==(const Slice& other) const
@@ -76,10 +82,10 @@ namespace casadi {
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=std::cout, bool trailing_newline=true) const;
+    void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// start value: negative values will get added to length
     int start_;
@@ -91,31 +97,6 @@ namespace casadi {
 #ifndef SWIG
   static Slice ALL;
 #endif // SWIG
-
-  /// \cond INTERNAL
-  /**  Class representing a non-regular (and thus non-slice) index list
-   */
-  class CASADI_CORE_EXPORT IndexList {
-  private:
-
-  public:
-    enum Type {NILL, INT, SLICE, IVECTOR};
-    /// Constructor
-    IndexList();
-    explicit IndexList(int i);
-    explicit IndexList(const std::vector<int> &i);
-    explicit IndexList(const Slice &i);
-
-    /// Get a vector of indices
-    std::vector<int> getAll(int len) const;
-
-    /// Data members (all public)
-    Slice slice;
-    int i;
-    std::vector<int> iv;
-    Type type;
-  };
-  /// \endcond
 
 } // namespace casadi
 

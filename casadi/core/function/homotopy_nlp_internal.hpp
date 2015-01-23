@@ -41,7 +41,7 @@ namespace casadi {
   \author Joris Gillis
   \date 2013-2014
 */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   HomotopyNLPInternal : public FunctionInternal,
                         public PluginInterface<HomotopyNLPInternal> {
   public:
@@ -63,6 +63,9 @@ namespace casadi {
 
     // Creator function for internal class
     typedef HomotopyNLPInternal* (*Creator)(const Function& hnlp);
+
+    // No static functions exposed
+    struct Exposed{ };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

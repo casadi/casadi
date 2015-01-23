@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.6)
 
 # Base classes for fixed-step integrators
 casadi_library(casadi_integrators
@@ -85,27 +85,32 @@ casadi_plugin(DleSolver fixed_smith
   fixed_smith_dle_internal.cpp
   fixed_smith_dle_internal_meta.cpp)
   
-casadi_plugin(LrDpleSolver dple
+casadi_plugin(DpleSolver lrdple
   dple_to_lr_dple.hpp
   dple_to_lr_dple.cpp
   dple_to_lr_dple_meta.cpp) 
   
-casadi_plugin(LrDleSolver dle
+casadi_plugin(DleSolver lrdle
   dle_to_lr_dle.hpp
   dle_to_lr_dle.cpp
   dle_to_lr_dle_meta.cpp) 
   
-casadi_plugin(DleSolver lrdle
+casadi_plugin(LrDleSolver dle
   lr_dle_to_dle.hpp
   lr_dle_to_dle.cpp
   lr_dle_to_dle_meta.cpp)
   
 casadi_plugin(DleSolver dple
-  dple_to_dle.hpp
-  dple_to_dle.cpp
-  dple_to_dle_meta.cpp)
+  dle_to_dple.hpp
+  dle_to_dple.cpp
+  dle_to_dple_meta.cpp)
+  
+#casadi_plugin(LrDleSolver lrdple
+#  lr_dple_to_lr_dle.hpp
+#  lr_dple_to_lr_dle.cpp
+#  lr_dple_to_lr_dle_meta.cpp)
 
-casadi_plugin(DpleSolver lrdple
+casadi_plugin(LrDpleSolver dple
   lr_dple_to_dple.hpp
   lr_dple_to_dple.cpp
   lr_dple_to_dple_meta.cpp)
@@ -137,8 +142,3 @@ if(WITH_CSPARSE)
   casadi_plugin(SdqpSolver sdp
     sdqp_to_sdp.cpp sdqp_to_sdp.hpp sdqp_to_sdp_meta.cpp)
 endif()
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/solvers
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

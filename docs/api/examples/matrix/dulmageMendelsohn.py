@@ -27,7 +27,7 @@ import numpy
 #! Let's construct a block diagonal structure
 b1 = DMatrix([[2,3],[4,5]])
 b2 = DMatrix([[6,7,8],[9,10,11],[12,13,14]])
-A = blkdiag([1,b1,b2,15])
+A = diagcat([1,b1,b2,15])
 
 print "original: "
 print A

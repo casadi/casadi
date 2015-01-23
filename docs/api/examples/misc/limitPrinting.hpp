@@ -31,7 +31,7 @@
 *
 * \sa
 * \code
-* SXElement.max_num_calls_in_print;
+* SX.max_num_calls_in_print;
 * MX.max_num_calls_in_print;
 * \endcode
 */

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.6)
 
 include_directories(../)
 include_directories(${SQIC_INCLUDE_DIR})
@@ -32,8 +32,3 @@ target_link_libraries(sqic_fortran_c_bridge ${SQIC_LIBRARIES})
 install(TARGETS sqic_fortran_c_bridge
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
-
-install(DIRECTORY ./
-  DESTINATION include/casadi/interfaces/sqic
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE)

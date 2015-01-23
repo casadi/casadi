@@ -25,7 +25,6 @@
 
 #include "sdqp_solver_internal.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "../matrix/sparsity_tools.hpp"
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 
@@ -50,10 +49,10 @@ namespace casadi {
     const Sparsity& F = st_[SDQP_STRUCT_F];
     const Sparsity& H = st_[SDQP_STRUCT_H];
 
-    casadi_assert_message(G==G.transpose(),
+    casadi_assert_message(G==G.T(),
                           "SdqpSolverInternal: Supplied G sparsity must symmetric but got "
                           << G.dimString());
-    casadi_assert_message(H==H.transpose(),
+    casadi_assert_message(H==H.T(),
                           "SdqpSolverInternal: Supplied H sparsity must symmetric but got "
                           << H.dimString());
 
@@ -89,7 +88,7 @@ namespace casadi {
 
     for (int i=0;i<n_;i++) {
       Sparsity s = input(SDQP_SOLVER_F)(ALL, Slice(i*m_, (i+1)*m_)).sparsity();
-      casadi_assert_message(s==s.transpose(),
+      casadi_assert_message(s==s.T(),
                             "SdqpSolverInternal: Each supplied Fi must be symmetric. "
                             "But got " << s.dimString() <<  " for i = " << i << ".");
     }

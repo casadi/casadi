@@ -76,7 +76,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2014
   */
-  class CASADI_CORE_EXPORT HomotopyNlpSolver : public Function {
+  class CASADI_EXPORT HomotopyNlpSolver : public Function {
   public:
 
     /// Default constructor

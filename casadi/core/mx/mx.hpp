@@ -28,6 +28,7 @@
 #include "../shared_object.hpp"
 #include "../matrix/matrix.hpp"
 #include "../matrix/generic_expression.hpp"
+#include "../generic_type.hpp"
 #include <vector>
 namespace casadi {
 
@@ -54,7 +55,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010-2011
   */
-  class CASADI_CORE_EXPORT MX : public GenericExpression<MX>,
+  class CASADI_EXPORT MX : public GenericExpression<MX>,
                                 public GenericMatrix<MX>,
                                 public SharedObject {
   public:
@@ -106,142 +107,6 @@ namespace casadi {
     /// Returns the truth value of an MX expression
     bool __nonzero__() const;
 
-    /// \cond CLUTTER
-    ///@{
-    /// Indexing for interfaced languages
-
-    /// get a non-zero
-    const MX nz_indexed_one_based(int k) const { return at(k-1);}
-    const MX nz_indexed_zero_based(int k) const { return at(k);}
-    const MX nz_indexed(const IndexList &k) const {
-      return (*this)[k.getAll(size())];
-    }
-    const MX nz_indexed(const Slice &k) const {
-      return (*this)[k.getAll(size())];
-    }
-    const MX nz_indexed(const Matrix<int> &k) const {
-      return (*this)[k];
-    }
-
-    /// get a matrix element
-    const MX indexed_one_based(int rr, int cc) const { return (*this)(rr-1, cc-1);}
-    const MX indexed_zero_based(int rr, int cc) const { return (*this)(rr, cc);}
-    const MX indexed(const IndexList &rr, const IndexList &cc) const {
-      return (*this)(rr.getAll(size1()), cc.getAll(size2()));
-    }
-    const MX indexed(const Slice &rr, const Slice &cc) const {
-      return (*this)(rr.getAll(size1()), cc.getAll(size2()));
-    }
-    const MX indexed(const Matrix<int> &k) const {
-      return (*this)(k);
-    }
-    const MX indexed(const Sparsity &sp) const {
-      return (*this)(sp);
-    }
-    const MX indexed(const Slice &rr, const Matrix<int>& cc) const { return (*this)(rr, cc); }
-    const MX indexed(const Matrix<int>& rr, const IndexList& cc) const {
-      return (*this)(rr, cc.getAll(size2()));
-    }
-    const MX indexed(const Matrix<int>& rr, const Slice& cc) const { return (*this)(rr, cc); }
-    const MX indexed(const IndexList& rr, const Matrix<int>& cc) const {
-      return (*this)(rr.getAll(size1()), cc);
-    }
-    const MX indexed(const Matrix<int>& rr, const Matrix<int>& cc) const {
-      return (*this)(rr, cc);
-    }
-
-    // get a vector element
-    const MX indexed_one_based(int rr) const {
-      casadi_assert_message(isDense() && isVector(),
-                            "Matrix must be a dense vector, but got " << dimString() << ".");
-      return (*this)(rr-1);
-    }
-    const MX indexed_zero_based(int rr) const {
-      casadi_assert_message(isDense() && isVector(),
-                            "Matrix must be a dense vector, but got " << dimString() << ".");
-      return (*this)(rr);
-    }
-    const MX indexed(const IndexList &rr) const {
-      casadi_assert_message(isDense() && isVector(), "Matrix must be a dense vector, but got "
-                            << dimString() << ".");
-      return (*this)(rr.getAll(size1()));
-    }
-    const MX indexed(const Slice &rr) const {
-      casadi_assert_message(isDense() && isVector(), "Matrix must be a dense vector, but got "
-                            << dimString() << ".");
-      return (*this)(rr.getAll(size1()));
-    }
-
-    /// set a non-zero
-    void nz_indexed_one_based_assignment(int k, const MX &m) { at(k-1) = m(0, 0);}
-    void nz_indexed_zero_based_assignment(int k, const MX &m) { at(k) = m(0, 0);}
-    void nz_indexed_assignment(const IndexList &k, const MX &m) {
-      (*this)[k.getAll(size())] = m;
-    }
-    void nz_indexed_assignment(const Slice &k, const MX &m) {
-      (*this)[k.getAll(size())] = m;
-    }
-    void nz_indexed_assignment(const Matrix<int> &k, const MX &m) {
-      (*this)[k] = m;
-    }
-
-    /// set a matrix element
-    void indexed_one_based_assignment(int rr, int cc, const MX &m) { (*this)(rr-1, cc-1) = m;}
-    void indexed_zero_based_assignment(int rr, int cc, const MX &m) { (*this)(rr, cc) = m;}
-    void indexed_assignment(const IndexList &rr, const IndexList &cc, const MX &m) {
-      setSub(m, rr.getAll(size1()), cc.getAll(size2()));
-    }
-
-    void indexed_assignment(const Slice &rr, const Slice &cc, const MX &m) {
-      (*this)(rr.getAll(size1()), cc.getAll(size2())) = m;
-    }
-
-    void indexed_zero_based_assignment(const Matrix<int>& k, const MX &m) {
-      (*this)[k] = m;
-    }
-    void indexed_assignment(const Sparsity& sp, const MX &m) {
-      (*this)(sp) = m;
-    }
-    void indexed_assignment(const Matrix<int> &rr, const Slice& cc, const MX& m) {
-      (*this)(rr, cc.getAll(size2())) = m;
-    }
-    void indexed_assignment(const Slice& rr, const Matrix<int>& cc, const MX& m) {
-      (*this)(rr.getAll(size1()), cc) = m;
-    }
-    void indexed_assignment(const Matrix<int>& rr, const IndexList& cc, const MX& m) {
-      (*this)(rr, cc.getAll(size2())) = m;
-    }
-    void indexed_assignment(const IndexList& rr, const Matrix<int>& cc, const MX& m) {
-      (*this)(rr.getAll(size1()), cc) = m;
-    }
-    void indexed_assignment(const Matrix<int>& rr, const Matrix<int>& cc, const MX& m) {
-      (*this)(rr, cc) = m;
-    }
-    ///@}
-
-    // set a vector element
-    void indexed_one_based_assignment(int rr, const MX &m) {
-      casadi_assert_message(isDense() && isVector(),
-                            "Matrix must be a dense vector, but got " << dimString() << ".");
-      (*this)(rr-1) = m;
-    }
-    void indexed_zero_based_assignment(int rr, const MX &m) {
-      casadi_assert_message(isDense() && isVector(),
-                            "Matrix must be a dense vector, but got " << dimString() << ".");
-      (*this)(rr) = m;
-    }
-    void indexed_assignment(const IndexList &rr, const MX &m) {
-      casadi_assert_message(isDense() && isVector(),
-                            "Matrix must be a dense vector, but got " << dimString() << ".");
-      (*this)(rr.getAll(size1())) = m;
-    }
-
-    void indexed_assignment(const Slice &rr, const MX &m) {
-      (*this)(rr.getAll(size1())) = m;
-    }
-
-    /// \endcond
-
     /// \cond INTERNAL
     /// Scalar type
     typedef MX ScalarType;
@@ -253,17 +118,27 @@ namespace casadi {
     /// Access the sparsity, make a copy if there are multiple references to it
     Sparsity& sparsityRef();
 
-    /** \brief Erase a submatrix */
-    void erase(const std::vector<int>& rr, const std::vector<int>& cc);
+    /** \brief Erase a submatrix (leaving structural zeros in its place)
+        Erase rows and/or columns of a matrix */
+    void erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
+
+    /** \brief Erase a submatrix (leaving structural zeros in its place)
+        Erase elements of a matrix */
+    void erase(const std::vector<int>& rr, bool ind1=false);
 
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
-    void enlarge(int nrow, int ncol, const std::vector<int>& rr, const std::vector<int>& cc);
+    void enlarge(int nrow, int ncol,
+                 const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
     MX operator-() const;
 
+#ifndef SWIG
     /// \cond INTERNAL
     ///@{
+    /// Const access the non-zero elements (dummy implementation)
+    const MX& data() const { return *this; }
+
     /** \brief  Access a member of the node */
     MXNode* operator->();
 
@@ -271,6 +146,7 @@ namespace casadi {
     const MXNode* operator->() const;
     ///@}
     /// \endcond
+#endif // SWIG
 
     /** \brief Get the nth dependency as MX */
     MX getDep(int ch=0) const;
@@ -354,19 +230,6 @@ namespace casadi {
     /// Get operation type
     int getOp() const;
 
-    /** \brief Check if two nodes are equivalent up to a given depth.
-     *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
-     *
-     *  a = x*x
-     *  b = x*x
-     *
-     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
-     */
-    bool isEqual(const MX& y, int depth=0) const;
-#ifndef SWIG
-    bool isEqual(const MXNode* y, int depth=0) const;
-#endif // SWIG
-
     /** \brief Returns a number that is unique for a given MXNode.
      * If the MX does not point to any node, 0 is returned.
      */
@@ -400,63 +263,60 @@ namespace casadi {
     static MX nan(const std::pair<int, int>& rc);
     ///@}
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
     ///@{
     /** \brief  create a matrix by repeating an existing matrix */
     static MX repmat(const MX& x, const Sparsity& sp);
-    static MX repmat(const MX& x, int nrow, int ncol=1);
+    static MX repmat(const MX& x, int n, int m=1);
     static MX repmat(const MX& x, const std::pair<int, int> &rc);
     ///@}
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     /** \brief  Identity matrix */
     static MX eye(int ncol);
 
+    ///@{
+    /// Get a submatrix, single argument
+    const MX getSub(bool ind1, const Slice& rr) const;
+    const MX getSub(bool ind1, const Matrix<int>& rr) const;
+    const MX getSub(bool ind1, const Sparsity& sp) const;
+    ///@}
 
-    /// \cond INTERNAL
-    const MX sub(int rr, int cc) const;
-    const MX sub(const std::vector<int>& rr, int cc) const;
-    const MX sub(int rr, const std::vector<int>& cc) const;
-    const MX sub(const std::vector<int>& rr, const std::vector<int>& cc) const;
-    const MX sub(const Sparsity& sp, int dummy=0) const;
-    const MX sub(const Matrix<int>& rr, int cc) const { return sub(rr, Slice(cc));}
-    const MX sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
-    const MX sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
-    const MX sub(int rr, const Slice& cc) const {return sub(rr, cc.getAll(size2()));}
-    const MX sub(const Slice& rr, int cc) const {return sub(rr.getAll(size1()), cc);}
-    const MX sub(const Slice& rr, const Slice& cc) const
-    { return sub(rr.getAll(size1()), cc.getAll(size2())); }
-    const MX sub(const Matrix<int>& rr, const Slice& cc) const
-    { return sub(rr, cc.getAll(size2())); }
-    const MX sub(const Slice& rr, const Matrix<int>& cc) const
-    { return sub(rr.getAll(size1()), cc); }
-    const MX sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
-    const MX sub(int rr, const Matrix<int>& cc) const { return sub(Slice(rr), cc);}
+    /// Get a submatrix, two arguments
+    ///@{
+    const MX getSub(bool ind1, const Slice& rr, const Slice& cc) const;
+    const MX getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
+    const MX getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
+    const MX getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
+    ///@}
 
-    void setSub(const MX& m, int rr, int cc);
-    void setSub(const MX& m, const std::vector<int>& rr, int cc);
-    void setSub(const MX& m, int rr, const std::vector<int>& cc);
-    void setSub(const MX& m, const std::vector<int>& rr, const std::vector<int>& cc);
-    void setSub(const MX& m, const std::vector<int>& rr, Slice cc)
-    { setSub(m, rr, cc.getAll(size2()));}
-    void setSub(const MX& m, const Matrix<int>& rr, const std::vector<int>& cc);
-    void setSub(const MX& m, const Matrix<int>& rr, int cc)
-    { setSub(m, rr, std::vector<int>(1, cc)); }
-    void setSub(const MX& m, const std::vector<int>& rr, const Matrix<int>& cc);
-    void setSub(const MX& m, int rr, const Matrix<int>& cc)
-    { setSub(m, std::vector<int>(1, rr), cc); }
-    void setSub(const MX& m, const Slice& rr, const Slice& cc);
-    void setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc);
-    void setSub(const MX& m, const Sparsity& sp, int dummy);
+    ///@{
+    /// Set a submatrix, single argument
+    void setSub(const MX& m, bool ind1, const Slice& rr);
+    void setSub(const MX& m, bool ind1, const Matrix<int>& rr);
+    void setSub(const MX& m, bool ind1, const Sparsity& sp);
+    ///@}
 
-    MX getNZ(int k) const;
-    MX getNZ(const std::vector<int>& k) const;
-    MX getNZ(const Slice& k) const { return getNZ(k.getAll(size()));}
-    MX getNZ(const Matrix<int>& k) const;
-    void setNZ(int k, const MX& el);
-    void setNZ(const std::vector<int>& k, const MX& el);
-    void setNZ(const Slice& k, const MX& m) { setNZ(k.getAll(size()), m);}
-    void setNZ(const Matrix<int>& k, const MX& m);
-    /// \endcond
+    ///@{
+    /// Set a submatrix, two arguments
+    ///@}
+    void setSub(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
+    void setSub(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
+    void setSub(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
+    void setSub(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
+    ///@}
 
+    ///@{
+    /// Get a set of nonzeros
+    MX getNZ(bool ind1, const Slice& kk) const;
+    MX getNZ(bool ind1, const Matrix<int>& kk) const;
+    ///@}
+
+    ///@{
+    /// Set a set of nonzeros
+    void setNZ(const MX& m, bool ind1, const Slice& kk);
+    void setNZ(const MX& m, bool ind1, const Matrix<int>& kk);
+    ///@}
 
     /** \brief Append a matrix vertically (NOTE: only efficient if vector) */
     void append(const MX& y);
@@ -464,62 +324,136 @@ namespace casadi {
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
 
-    /// \cond SWIGINTERNAL
+    /// \cond CLUTTER
     /// all binary operations
-    MX __add__(const MX& y) const;
-    MX __sub__(const MX& y) const;
-    MX __mul__(const MX& y) const;
-    MX __div__(const MX& y) const;
-    MX __lt__(const MX& y) const;
-    MX __le__(const MX& y) const;
-    MX __eq__(const MX& y) const;
-    MX __ne__(const MX& y) const;
-    MX __truediv__(const MX& y) const { return __div__(y);}
-    MX __pow__(const MX& b) const;
-    MX __constpow__(const MX& b) const;
-    MX __mrdivide__(const MX& b) const;
-    MX __mpower__(const MX& b) const;
+    MX zz_plus(const MX& y) const;
+    MX zz_minus(const MX& y) const;
+    MX zz_times(const MX& y) const;
+    MX zz_rdivide(const MX& y) const;
+    MX zz_lt(const MX& y) const;
+    MX zz_le(const MX& y) const;
+    MX zz_eq(const MX& y) const;
+    MX zz_ne(const MX& y) const;
+    MX zz_power(const MX& b) const;
+    MX zz_mpower(const MX& b) const;
+    MX zz_inner_prod(const MX& y) const;
+    MX zz_outer_prod(const MX& y) const;
+    MX zz_min(const MX& y) const;
+    MX zz_max(const MX& y) const;
+    MX zz_mod(const MX& y) const;
+    MX zz_atan2(const MX& y) const;
+    MX zz_and(const MX& y) const;
+    MX zz_or(const MX& y) const;
+    MX zz_if_else_zero(const MX& y) const;
     /// \endcond
 
-    MX mul(const MX& y, const Sparsity &sp_z=Sparsity()) const;
-    MX mul_full(const MX& y, const Sparsity &sp_z=Sparsity()) const;
-    MX inner_prod(const MX& y) const;
-    MX outer_prod(const MX& y) const;
-    MX constpow(const MX& y) const;
-    MX fmin(const MX& y) const;
-    MX fmax(const MX& y) const;
-    MX fmod(const MX& y) const;
-    MX printme(const MX& y) const;
-    MX arctan2(const MX& y) const;
-    MX logic_and(const MX& y) const;
-    MX logic_or(const MX& y) const;
-    MX if_else_zero(const MX& y) const;
+    /// \cond CLUTTER
+    MX __truediv__(const MX& y) const { return zz_rdivide(y);}
+    MX __constpow__(const MX& b) const;
+    MX __mrdivide__(const MX& b) const;
     MX __copysign__(const MX& y) const;
+    MX constpow(const MX& y) const;
+    /// \end CLUTTER
+    MX printme(const MX& y) const;
+
+    /// \cond CLUTTER
 
     // all unary operations
-    MX exp() const;
-    MX log() const;
-    MX log10() const;
-    MX sqrt() const;
-    MX sin() const;
-    MX cos() const;
-    MX tan() const;
-    MX arcsin() const;
-    MX arccos() const;
-    MX arctan() const;
-    MX floor() const;
-    MX ceil() const;
-    MX fabs() const;
-    MX sign() const;
-    MX erfinv() const;
-    MX erf() const;
-    MX sinh() const;
-    MX cosh() const;
-    MX tanh() const;
-    MX arcsinh() const;
-    MX arccosh() const;
-    MX arctanh() const;
-    MX logic_not() const;
+    MX zz_exp() const;
+    MX zz_log() const;
+    MX zz_log10() const;
+    MX zz_sqrt() const;
+    MX zz_sin() const;
+    MX zz_cos() const;
+    MX zz_tan() const;
+    MX zz_asin() const;
+    MX zz_acos() const;
+    MX zz_atan() const;
+    MX zz_floor() const;
+    MX zz_ceil() const;
+    MX zz_abs() const;
+    MX zz_sign() const;
+    MX zz_erfinv() const;
+    MX zz_erf() const;
+    MX zz_sinh() const;
+    MX zz_cosh() const;
+    MX zz_tanh() const;
+    MX zz_asinh() const;
+    MX zz_acosh() const;
+    MX zz_atanh() const;
+    MX zz_not() const;
+    static MX zz_horzcat(const std::vector<MX>& x);
+    static MX zz_diagcat(const std::vector<MX>& x);
+    static MX zz_vertcat(const std::vector<MX>& x);
+    std::vector<MX> zz_horzsplit(const std::vector<int>& offset) const;
+    std::vector<MX> zz_diagsplit(const std::vector<int>& offset1,
+                                 const std::vector<int>& offset2) const;
+    std::vector<MX> zz_vertsplit(const std::vector<int>& offset) const;
+    static MX zz_blockcat(const std::vector< std::vector<MX > > &v);
+    MX zz_norm_2() const;
+    MX zz_norm_F() const;
+    MX zz_norm_1() const;
+    MX zz_norm_inf() const;
+    MX zz_mtimes(const MX& y) const;
+    MX zz_mtimes(const MX& y, const MX& z) const;
+    void zz_simplify();
+    MX zz_reshape(int nrow, int ncol) const;
+    MX zz_reshape(const Sparsity& sp) const;
+    MX zz_vecNZ() const;
+    MX zz_if_else(const MX &if_true, const MX &if_false) const;
+    MX zz_unite(const MX& B) const;
+    MX zz_trace() const;
+    MX zz_repmat(const Sparsity& sp) const;
+    MX zz_repmat(int n, int m=1) const;
+    MX zz_dense() const;
+    static MX zz_createParent(std::vector<MX> &deps);
+    static MX zz_createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children);
+    static MX zz_createParent(const std::vector<MX> &deps, std::vector<MX>& children);
+    MX zz_diag() const;
+    int zz_countNodes() const;
+    MX zz_sumCols() const;
+    MX zz_sumRows() const;
+    MX zz_sumAll() const;
+    MX zz_polyval(const MX& x) const;
+    std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+    static void zz_substituteInPlace(const std::vector<MX>& v,
+                                     std::vector<MX>& vdef, bool reverse=false);
+    static void zz_substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
+                              std::vector<MX>& ex, bool reverse=false);
+    MX zz_substitute(const MX& v, const MX& vdef) const;
+    static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
+                                         const std::vector<MX> &v,
+                                         const std::vector<MX> &vdef);
+    MX zz_graph_substitute(const std::vector<MX> &v, const std::vector<MX> &vdef) const;
+    static std::vector<MX> zz_graph_substitute(const std::vector<MX> &ex,
+                                               const std::vector<MX> &expr,
+                                               const std::vector<MX> &exprs);
+    static void zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
+                                 const std::string& v_prefix="v_", const std::string& v_suffix="");
+    void zz_printCompact(std::ostream &stream=CASADI_COUT) const;
+    MX zz_jacobian(const MX &arg) const;
+    MX zz_gradient(const MX &arg) const;
+    MX zz_tangent(const MX &arg) const;
+    MX zz_det() const;
+    MX zz_inv() const;
+    std::vector<MX> zz_getSymbols() const;
+    static std::vector<MX> zz_getSymbols(const std::vector<MX>& e);
+    bool zz_dependsOn(const std::vector<MX> &arg) const;
+    static MX zz_matrix_expand(const MX& e,
+                               const std::vector<MX> &boundary = std::vector<MX>());
+    static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,
+                                            const std::vector<MX>& boundary = std::vector<MX>());
+    MX zz_kron(const MX& b) const;
+    MX zz_solve(const MX& b, const std::string& lsolver,
+                const Dictionary& dict = Dictionary()) const;
+    MX zz_pinv(const std::string& lsolver, const Dictionary& dict = Dictionary()) const;
+    MX zz_nullspace() const;
+    bool zz_isEqual(const MX& y, int depth=0) const;
+#ifndef SWIG
+    bool zz_isEqual(const MXNode* y, int depth=0) const;
+#endif // SWIG
+
+    /// \endcond
 
     /** \brief returns itself, but with an assertion attached
     *
@@ -531,7 +465,7 @@ namespace casadi {
     MX setSparse(const Sparsity& sp, bool intersect=false) const;
 
     /// Make the matrix dense
-    void densify(const MX& val = 0);
+    void makeDense(const MX& val = 0);
 
     /// Lift an expression
     void lift(const MX& x_guess);
@@ -540,12 +474,7 @@ namespace casadi {
     void addToSum(const MX& x);
 
     /// Transpose the matrix
-    MX trans() const;
-
-#ifndef SWIG
-    /// Transpose the matrix (shorthand)
-    MX T() const { return trans();}
-#endif
+    MX T() const;
 
     /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;

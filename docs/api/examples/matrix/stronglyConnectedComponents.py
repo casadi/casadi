@@ -25,7 +25,7 @@ from casadi import *
 import numpy
 
 # Let's construct a block diagonal structure
-A = blkdiag([1,DMatrix([[2,3],[3,4]]),DMatrix([[5,6,7],[6,8,9],[7,9,10]]),11])
+A = diagcat([1,DMatrix([[2,3],[3,4]]),DMatrix([[5,6,7],[6,8,9],[7,9,10]]),11])
 print A
 A.sparsity().spy()
 

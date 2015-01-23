@@ -32,10 +32,10 @@ import itertools
 class ADtests(casadiTestCase):
 
   def setUp(self):
-    x=SXElement.sym("x")
-    y=SXElement.sym("y")
-    z=SXElement.sym("z")
-    w=SXElement.sym("w")
+    x=SX.sym("x")
+    y=SX.sym("y")
+    z=SX.sym("z")
+    w=SX.sym("w")
     
     out=SX.sparse(6,1)
     out[0,0]=x
@@ -57,10 +57,10 @@ class ADtests(casadiTestCase):
             "dense": [vertcat([x,y,z,w])],
             "sparse": [inp] }
         , "row": {
-            "dense":  [SX([x,y,z,w]).T],
+            "dense":  [vertcat([x,y,z,w]).T],
             "sparse": [inp.T]
        }, "matrix": {
-          "dense": [c.reshape(SX([x,y,z,w]),2,2)],
+          "dense": [c.reshape(vertcat([x,y,z,w]),2,2)],
           "sparse": [c.reshape(inp,3,2)]
         }
     }
@@ -119,10 +119,10 @@ class ADtests(casadiTestCase):
         "dense": [vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w])],
         "sparse": [out]
         }, "row": {
-          "dense":  [SX([x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
+          "dense":  [vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
           "sparse": [out.T]
       }, "matrix" : {
-          "dense":  [c.reshape(SX([x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
+          "dense":  [c.reshape(vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
           "sparse": [c.reshape(out,3,2)]
       }
     }
@@ -331,7 +331,7 @@ class ADtests(casadiTestCase):
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            self.message("jacobian on SXElement (SCT). Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            self.message("jacobian on SX (SCT). Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             Jf=SXFunction(
               self.sxinputs[inputshape][inputtype],
               [
@@ -445,8 +445,8 @@ class ADtests(casadiTestCase):
     
   def test_bugglibc(self):
     self.message("Code that used to throw a glibc error")
-    x=SXElement.sym("x")
-    y=SXElement.sym("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
 
     inp=SX.sparse(5,1)
     inp[0,0]=x
@@ -585,8 +585,8 @@ class ADtests(casadiTestCase):
           (in1,v1,yyy[:,0],sparse(DMatrix([[0,1],[1,0]]))),
           (in1,v1,mul(y,x),y),
           (in1,v1,mul(x.T,y.T),y),
-          (in1,v1,mul(y,x,Sparsity.triplet(2,1,[1],[0])),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
-          (in1,v1,mul(x.T,y.T,Sparsity.triplet(2,1,[1],[0]).T),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
+          (in1,v1,mul(y,x,DMatrix.zeros(Sparsity.triplet(2,1,[1],[0]))),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
+          (in1,v1,mul(x.T,y.T,DMatrix.zeros(Sparsity.triplet(2,1,[1],[0]).T)),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
           (in1,v1,mul(y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],x),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
           (in1,v1,mul(x.T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
           (in1,v1,mul(y,x**2),y*2*vertcat([x.T,x.T])),
@@ -743,7 +743,7 @@ class ADtests(casadiTestCase):
               storage[storagekey] = []
             storage[storagekey].append([vf.getOutput(i) for i in range(vf.getNumOutputs())])
             
-            # Added to make sure that the same seeds are used for SXElement and MX
+            # Added to make sure that the same seeds are used for SX and MX
             if Function is MXFunction:
               vf_mx = vf
 

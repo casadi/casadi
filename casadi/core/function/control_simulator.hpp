@@ -96,7 +96,7 @@ namespace casadi {
       \date 2011
   */
 
-  class CASADI_CORE_EXPORT ControlSimulator : public Function {
+  class CASADI_EXPORT ControlSimulator : public Function {
   public:
 
     /// Default constructor

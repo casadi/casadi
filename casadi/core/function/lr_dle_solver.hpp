@@ -67,7 +67,7 @@ namespace casadi {
 
   /// Output arguments of a \e dle solver [lrdleOut]
   enum LR_DLEOutput {
-    /// Y matrix, blkdiag form [y]
+    /// Y matrix, block diagonal form [y]
     LR_DLE_Y,
     LR_DLE_NUM_OUT
   };
@@ -98,7 +98,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_CORE_EXPORT LrDleSolver : public Function {
+  class CASADI_EXPORT LrDleSolver : public Function {
   public:
     /// Default constructor
     LrDleSolver();
@@ -109,13 +109,11 @@ namespace casadi {
     /** \brief LrDleSolver solver factory
     * \param name \pluginargument{LrDleSolver}
     * \param st \structargument{LrDle}
-    * \param Hs Column-sizes of H_i
     */
-    LrDleSolver(const std::string& name, const LrDleStructure& st,
-      const std::vector<int> &Hs=std::vector<int>());
+    LrDleSolver(const std::string& name, const LrDleStructure& st);
 
     /// Print solver statistics
-    void printStats(std::ostream &stream=std::cout) const;
+    void printStats(std::ostream &stream=CASADI_COUT) const;
 
     /// Access functions of the node
     LrDleInternal* operator->();

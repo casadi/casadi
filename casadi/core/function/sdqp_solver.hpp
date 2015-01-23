@@ -103,7 +103,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT SdqpSolver : public Function {
+  class CASADI_EXPORT SdqpSolver : public Function {
   public:
 
     /// Default constructor

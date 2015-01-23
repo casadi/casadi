@@ -40,7 +40,7 @@ namespace casadi {
   \author Joel Andersson
   \date 2010-2013
 */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   NlpSolverInternal : public FunctionInternal,
                       public PluginInterface<NlpSolverInternal> {
 
@@ -146,6 +146,9 @@ namespace casadi {
 
     // Creator function for internal class
     typedef NlpSolverInternal* (*Creator)(const Function& nlp);
+
+    // No static functions exposed
+    struct Exposed{ };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

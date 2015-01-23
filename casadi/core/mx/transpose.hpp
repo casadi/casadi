@@ -37,7 +37,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_CORE_EXPORT Transpose : public MXNode {
+  class CASADI_EXPORT Transpose : public MXNode {
   public:
 
     /// Constructor
@@ -91,14 +91,16 @@ namespace casadi {
     // return dep()->getSolve(r, !tr, linear_solver);} // FIXME #1001
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node, depth);}
+    virtual bool zz_isEqual(const MXNode* node, int depth) const {
+      return sameOpAndDeps(node, depth);
+    }
   };
 
   /** \brief Matrix transpose (dense)
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_CORE_EXPORT DenseTranspose : public Transpose {
+  class CASADI_EXPORT DenseTranspose : public Transpose {
   public:
 
     /// Constructor
@@ -137,5 +139,7 @@ namespace casadi {
 
 
 } // namespace casadi
+
+/// \endcond
 
 #endif // CASADI_TRANSPOSE_HPP

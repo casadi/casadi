@@ -33,6 +33,7 @@
 #include <vector>
 
 #include "casadi_common.hpp"
+#include "casadi_types.hpp"
 
 namespace casadi {
 
@@ -41,7 +42,7 @@ namespace casadi {
       \date 2010-2014
   */
   template<class Derived>
-  class CASADI_CORE_EXPORT PrintableObject {
+  class CASADI_EXPORT PrintableObject {
   public:
 
     /// Return a string with a description (for SWIG)
@@ -65,7 +66,13 @@ namespace casadi {
       static_cast<const Derived&>(obj).repr(stream, false);
       return stream;
     }
+#endif // SWIG
+/**
+\ingroup expression_tools
+@{
+*/
 
+#if !defined(SWIG) || defined(DOXYGEN)
     /// Return a string with a description of the object, cf. str(Object) in Python
     inline friend std::string str(const PrintableObject<Derived>& obj) {
       return obj.getDescription();
@@ -75,9 +82,9 @@ namespace casadi {
     inline friend std::string repr(const PrintableObject<Derived>& obj) {
       return obj.getRepresentation();
     }
-#endif // SWIG
+#endif // !SWIG || DOXYGEN
+/** @} */
   };
-
 } // namespace casadi
 
 

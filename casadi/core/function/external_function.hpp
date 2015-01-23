@@ -39,7 +39,7 @@ class ExternalFunctionInternal;
   \author Joel Andersson
   \date 2011
   */
-class CASADI_CORE_EXPORT ExternalFunction : public Function {
+class CASADI_EXPORT ExternalFunction : public Function {
 
 public:
 

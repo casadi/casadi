@@ -96,7 +96,7 @@ namespace casadi {
     return false;
   }
 
-  bool SXNode::isEqual(const SXNode* node, int depth) const {
+  bool SXNode::zz_isEqual(const SXNode* node, int depth) const {
     return false;
   }
 

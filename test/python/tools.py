@@ -93,7 +93,7 @@ class Toolstests(casadiTestCase):
     self.assertEqual(s.size,12)
     self.assertEqual(len(s["x"]),5)
     self.assertEqual(len(s["y"]),6)
-    self.assertTrue(s.cat.at(1).getName().startswith("x"))
+    self.assertTrue(s.cat.nz[1].getName().startswith("x"))
     s = struct_symSX([(entry('x',repeat=5),entry('y',repeat=[6,5])),entry('z')])
     
         
@@ -104,18 +104,18 @@ class Toolstests(casadiTestCase):
     self.assertEqual(s.size,36)
     self.assertEqual(len(s["x"]),5)
     self.assertEqual(len(s["y"]),6)
-    self.assertTrue(s.cat.at(1).getName().startswith("y"))
-    s = struct_symSX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=Sparsity.triu(5))])
+    self.assertTrue(s.cat.nz[1].getName().startswith("y"))
+    s = struct_symSX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=Sparsity.upper(5))])
     self.assertEqual(s.size,6+2+3+15)
     self.assertTrue(s["x"].sparsity()==Sparsity.dense(3,2))
     self.assertTrue(s["y"].sparsity()==Sparsity.dense(2,1))
     self.assertTrue(s["z"].sparsity()==Sparsity.dense(3,1))
-    self.assertTrue(s["w"].sparsity()==Sparsity.triu(5))
+    self.assertTrue(s["w"].sparsity()==Sparsity.upper(5))
     
     x  = SX.sym("x",2)
     x2 = SX.sym("x2",2)
     s = struct_symSX([entry('a',sym=x),'y','z'])
-    self.assertTrue(s.cat.at(0).getName().startswith("x"))
+    self.assertTrue(s.cat.nz[0].getName().startswith("x"))
     self.assertEqual(s.size,4)
     with self.assertRaises(Exception):
       struct_symSX([entry('a',sym=x+x),'y','z'])
@@ -129,9 +129,9 @@ class Toolstests(casadiTestCase):
     s = struct_symSX(['x','y','z'])
  
     S = struct_symSX([entry("X",sym=s)])
-    self.assertTrue(S.cat.at(0).getName()=="x")
+    self.assertTrue(S.cat.nz[0].getName()=="x")
     S = struct_symSX([entry("X",struct=s)])
-    self.assertTrue(S.cat.at(0).getName()=="X_x")
+    self.assertTrue(S.cat.nz[0].getName()=="X_x")
     S = struct_symSX([entry("X",repeat=[5],struct=s)])
     self.assertEqual(S.size,15)
     
@@ -156,7 +156,6 @@ class Toolstests(casadiTestCase):
     self.checkarray(num["P",indexf[["x","y"]],indexf[["z","x"]]],DMatrix([[3,1],[6,4]]))
     
     self.checkarray(num["P",index[list,vertcat,["x","y"]],index[list,vertcat,["z","x"]]],DMatrix([[3,1],[6,4]]))
-    self.checkarray(num["P",index[vertcat,["x","y"]],index[vertcat,["z","x"]]],DMatrix([3,4]))
     
     S = struct_symSX([entry("P",shapestruct=s0)])
     
@@ -186,7 +185,6 @@ class Toolstests(casadiTestCase):
     self.checkarray(num["P",:,indexf[["z","x"]]],DMatrix([[3,1],[6,4],[9,7]]))
     
     self.checkarray(num["P",:,index[list,vertcat,["z","x"]]],DMatrix([[3,1],[6,4],[9,7]]))
-    self.checkarray(num["P",:,index[vertcat,["z","x"]]],DMatrix([3,1,6,4,9,7]))
     
     S = struct_symSX([entry("P",shapestruct=s0)])
  
@@ -236,12 +234,12 @@ class Toolstests(casadiTestCase):
     self.assertEqual(len(s["y"]),6)
    
     
-    s = struct_symMX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=Sparsity.triu(5))])
+    s = struct_symMX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=Sparsity.upper(5))])
     self.assertEqual(s.size,6+2+3+15)
     self.assertTrue(s["x"].sparsity()==Sparsity.dense(3,2))
     self.assertTrue(s["y"].sparsity()==Sparsity.dense(2,1))
     self.assertTrue(s["z"].sparsity()==Sparsity.dense(3,1))
-    self.assertTrue(s["w"].sparsity()==Sparsity.triu(5))
+    self.assertTrue(s["w"].sparsity()==Sparsity.upper(5))
     
     x  = MX.sym("x",2)
     x2 = MX.sym("x2",2)
@@ -435,7 +433,7 @@ class Toolstests(casadiTestCase):
     for i in range(shooting.size):
       ci = shooting.getCanonicalIndex(i)
       self.assertEqual(i, init.__getitem__(ci))
-      self.assertTrue("_".join(map(str,ci)).startswith(shooting.cat.at(i).getName()))
+      self.assertTrue("_".join(map(str,ci)).startswith(shooting.cat.nz[i].getName()))
       
   def test_structure_prefix(self):
     self.message("structure prefix")
@@ -714,24 +712,24 @@ class Toolstests(casadiTestCase):
     n = 3
     x_sx = struct_symSX([
         entry("x",shape=n),
-        entry("S",shape=Sparsity.triu(n))
+        entry("S",shape=Sparsity.upper(n))
     ])
     
     x_mx = struct_symSX([
         entry("x",shape=n),
-        entry("S",shape=Sparsity.triu(n))
+        entry("S",shape=Sparsity.upper(n))
     ])
     
     X_sx = struct_SX(x_sx)
     X_sx["x"] = DMatrix(range(n))
-    X_sx["S"] = DMatrix(Sparsity.triu(n),range(n,n+n*(n+1)/2))
+    X_sx["S"] = DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2))
    
     X_mx = struct_MX(x_sx)
     X_mx["x"] = DMatrix(range(n))
-    X_mx["S"] = DMatrix(Sparsity.triu(n),range(n,n+n*(n+1)/2))
+    X_mx["S"] = DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2))
     
-    self.checkarray(x_sx.struct.map[("S",)],DMatrix(Sparsity.triu(n),range(n,n+n*(n+1)/2)))
-    self.checkarray(x_mx.struct.map[("S",)],DMatrix(Sparsity.triu(n),range(n,n+n*(n+1)/2)))
+    self.checkarray(x_sx.struct.map[("S",)],DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2)))
+    self.checkarray(x_mx.struct.map[("S",)],DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2)))
     self.checkarray(X_sx.cat,DMatrix(range(n+n*(n+1)/2)))
     self.checkarray(X_mx.cat,DMatrix(range(n+n*(n+1)/2)))
     
@@ -768,6 +766,50 @@ class Toolstests(casadiTestCase):
     b = DMatrix(v["A"])
     
     self.checkarray(a,b)
+
+  def test_jacobian(self):
+    states = struct_symSX(["x","y"])
+    controls = struct_symSX(["u","v","w"])
+
+    #   u v w
+    # x 1 3 5
+    # y 2 4 6
+
+    for t,F in [(SX,SXFunction), (MX,MXFunction)]:
+
+
+      J = t.sym("J",states.size,controls.size)
+
+      J = states.product(controls,J)
+
+      f = F([J],[J["x","v"], J["x",:] , J["y",["v","w"]],  J[:,"u"] ])
+      f.init()
+      f.setInput(range(1,7))
+
+      f.evaluate()
+
+      self.checkarray(f.output(0),DMatrix([3]))
+      self.checkarray(f.output(1),DMatrix([1,3,5]).T)
+      self.checkarray(f.output(2),DMatrix([4,6]).T)
+      self.checkarray(f.output(3),DMatrix([1,2]))
+   
+  def test_empty_bug(self):
+    
+    Params = struct_symMX([ ])
+    params = Params()
+    
+    self.checkarray(params.shape,(0,1))
+
+  def test_empty_expr_bug(self):
+    
+    eq = MX.sym("X")
+
+    g = struct_MX([ entry( 'equality', expr = eq),
+                    entry( 'inequality', expr = [] )   ])
+    
+    self.checkarray(g.shape,(1,1))
+    
+    self.assertTrue(len(g["inequality"])==0)
     
 if __name__ == '__main__':
     unittest.main()

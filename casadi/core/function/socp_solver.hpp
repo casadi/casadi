@@ -119,7 +119,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_CORE_EXPORT SocpSolver : public Function {
+  class CASADI_EXPORT SocpSolver : public Function {
   public:
 
     /// Default constructor

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.6)
 
 # Make the shared library prefix and suffix available in C++
 add_definitions(-DSHARED_LIBRARY_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
@@ -42,15 +42,14 @@ set(CASADI_SRCS
   matrix/generic_expression.hpp                         # Base class for SXElement MX and Matrix<>
   matrix/generic_expression_tools.hpp                   # Tools for SXElement MX and Matrix<>
   matrix/generic_matrix.hpp                             # Base class for Matrix<> and MX
-  matrix/generic_matrix_tools.hpp                       # Tools for both Matrix<> and MX
-  matrix/matrix.hpp           matrix/matrix_impl.hpp    # The Matrix template class
+  matrix/matrix.hpp           matrix/matrix_impl.hpp   matrix/matrix.cpp    # The Matrix template class
   matrix/sparse_storage.hpp   matrix/sparse_storage_impl.hpp
-  matrix/sparsity.hpp     matrix/sparsity.cpp   matrix/sparsity_internal.hpp   matrix/sparsity_internal.cpp    # reference counted sparsity pattern
+  matrix/sparsity_interface.hpp
+  matrix/sparsity.hpp         matrix/sparsity.cpp  matrix/sparsity_internal.hpp   matrix/sparsity_internal.cpp    # reference counted sparsity pattern
   matrix/slice.hpp            matrix/slice.cpp          # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
   matrix/submatrix.hpp                                  # A reference to a block of the matrix to allow operations such as A(:,3) = ...
   matrix/nonzeros.hpp                                   # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
   matrix/matrix_tools.hpp     matrix/matrix_tools.cpp   # Set of functions
-  matrix/sparsity_tools.hpp   matrix/sparsity_tools.cpp # Set of functions for sparsity
 
   # Directed, acyclic graph representation with scalar expressions
   sx/sx_element.hpp          sx/sx_element.cpp          # Symbolic expression class (scalar-valued atomics)
@@ -68,7 +67,7 @@ set(CASADI_SRCS
   mx/symbolic_mx.hpp         mx/symbolic_mx.cpp         # A symbolic MX variable
   mx/unary_mx.hpp            mx/unary_mx.cpp            # Unary operation
   mx/binary_mx.hpp           mx/binary_mx_impl.hpp      # Binary operation
-  mx/multiplication.hpp      mx/multiplication_impl.hpp # Matrix multiplication
+  mx/multiplication.hpp      mx/multiplication.cpp      # Matrix multiplication
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
   mx/call_function.hpp       mx/call_function.cpp       # Function evaluation node
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
@@ -86,7 +85,7 @@ set(CASADI_SRCS
   mx/inner_prod.hpp          mx/inner_prod.cpp          # Inner product
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/assertion.hpp           mx/assertion.cpp           # Assertion
-  mx/mx_tools.hpp            mx/mx_tools.cpp
+  mx/mx_tools.hpp
 
   # A dynamically created function with AD capabilities
   function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
@@ -139,24 +138,23 @@ set(CASADI_SRCS
 
 set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )
 
-casadi_library(casadi_core ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
-set_property(GLOBAL APPEND PROPERTY CASADI_SWIG_MODULES casadi_core)
+casadi_library(casadi ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
 
-add_dependencies(casadi_core casadi_runtime_embedded)
+add_dependencies(casadi casadi_runtime_embedded)
 
 if(WITH_DL)
   # Core needs support for dynamic linking
-  target_link_libraries(casadi_core ${CMAKE_DL_LIBS})
+  target_link_libraries(casadi ${CMAKE_DL_LIBS})
 endif()
 
 if(WITH_OPENCL)
   # Core depends on OpenCL for GPU calculations
-  target_link_libraries(casadi_core ${OPENCL_LIBRARIES})
+  target_link_libraries(casadi ${OPENCL_LIBRARIES})
 endif()
 
 if(RT)
   # Realtime library
-  target_link_libraries(casadi_core ${RT})
+  target_link_libraries(casadi ${RT})
 endif()
 
 install(DIRECTORY ./

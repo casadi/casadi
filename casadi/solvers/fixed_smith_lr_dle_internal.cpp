@@ -46,7 +46,7 @@ namespace casadi {
     plugin->creator = FixedSmithLrDleInternal::creator;
     plugin->name = "fixed_smith";
     plugin->doc = FixedSmithLrDleInternal::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
@@ -56,8 +56,8 @@ namespace casadi {
   }
 
   FixedSmithLrDleInternal::FixedSmithLrDleInternal(
-      const LrDleStructure& st, const std::vector<int> &Hs) :
-      LrDleInternal(st, Hs) {
+      const LrDleStructure& st) :
+      LrDleInternal(st) {
 
     // set default options
     setOption("name", "unnamed_fixed_smith_indef_dle_solver"); // name of the function
@@ -110,7 +110,7 @@ namespace casadi {
     if (with_C_) dle_in[LR_DLE_C] = C;
     if (with_H_) dle_in[LR_DLE_H] = H;
 
-    f_ = MXFunction(dle_in, lrdleOut("y", with_H_? blkdiag(HPH): out));
+    f_ = MXFunction(dle_in, lrdleOut("y", with_H_? diagcat(HPH): out));
     f_.init();
 
     Wrapper::checkDimensions();
@@ -132,7 +132,7 @@ namespace casadi {
 
   FixedSmithLrDleInternal* FixedSmithLrDleInternal::clone() const {
     // Return a deep copy
-    FixedSmithLrDleInternal* node = new FixedSmithLrDleInternal(st_, Hs_);
+    FixedSmithLrDleInternal* node = new FixedSmithLrDleInternal(st_);
     node->setOption(dictionary());
     return node;
   }

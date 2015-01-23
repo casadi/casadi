@@ -42,7 +42,7 @@ namespace casadi {
      \author Joris Gillis
       \date 2014
   */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   DpleInternal : public FunctionInternal,
                  public PluginInterface<DpleInternal> {
   public:
@@ -113,6 +113,19 @@ namespace casadi {
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
+
+    // Static functions exposed
+    struct Exposed {
+      void (*periodic_shur)(const std::vector< Matrix<double> > & A,
+                            std::vector< Matrix<double> > & T,
+                            std::vector< Matrix<double> > & Z,
+                            std::vector<double> &eig_real,
+                            std::vector<double> &eig_imag,
+                            double num_zero);
+
+      // Constructor
+      Exposed() { periodic_shur = 0; }
+    };
 
     /// Infix
     static const std::string infix_;

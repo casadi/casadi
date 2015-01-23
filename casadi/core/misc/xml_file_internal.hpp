@@ -31,7 +31,7 @@
 
 namespace casadi {
 
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   XmlFileInternal : public OptionsFunctionalityNode,
                     public PluginInterface<XmlFileInternal> {
   public:
@@ -49,6 +49,9 @@ namespace casadi {
 
     // Creator function for internal class
     typedef XmlFileInternal* (*Creator)();
+
+    // No static functions exposed
+    struct Exposed{ };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

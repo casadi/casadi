@@ -42,7 +42,7 @@
 
 namespace casadi {
 
-class CASADI_CORE_EXPORT ExternalFunctionInternal : public FunctionInternal {
+class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
   friend class ExternalFunction;
   public:
 

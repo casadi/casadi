@@ -42,7 +42,7 @@ namespace casadi {
    * \author Joris Gillis
    * \date 2013
    */
-class CASADI_CORE_EXPORT IOScheme : public SharedObject {
+class CASADI_EXPORT IOScheme : public SharedObject {
 
   public:
 
@@ -239,7 +239,7 @@ class CASADI_CORE_EXPORT IOScheme : public SharedObject {
 
   template<class M>
     IOSchemeVector<M> fromVector(const std::vector<M> & arg_m) {
-    casadi_assert(size()==arg_m.size());
+    casadi_assert(!known() || size()==arg_m.size());
     return IOSchemeVector<M>(arg_m, *this);
   }
 };

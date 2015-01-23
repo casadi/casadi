@@ -264,7 +264,7 @@ class Simulatortests(casadiTestCase):
 
     self.checkarray(sim.getOutput().T,DMatrix(q0*exp(t**3/(3*p))),"Evaluation output mismatch",digits=9)
 
-    tv = SXElement.sym("t")
+    tv = SX.sym("t")
     out = SXFunction(daeIn(t=tv),[tv])
     
     out.init()
@@ -276,7 +276,7 @@ class Simulatortests(casadiTestCase):
 
     self.checkarray(sim.getOutput().T,t,"Evaluation output mismatch")
 
-    pv = SXElement.sym("p")
+    pv = SX.sym("p")
     out = SXFunction(daeIn(p=pv),[pv])
     
     out.init()
@@ -289,7 +289,7 @@ class Simulatortests(casadiTestCase):
     
     self.checkarray(sim.getOutput(),DMatrix.ones(sim.getOutput().shape)*p,"Evaluation output mismatch")
 
-    #yv = SXElement.sym("y")
+    #yv = SX.sym("y")
     #out = SXFunction(daeIn(),[yv])
     
     #out.init()

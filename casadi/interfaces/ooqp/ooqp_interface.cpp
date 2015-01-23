@@ -25,9 +25,7 @@
 
 #include "ooqp_interface.hpp"
 #include "casadi/core/function/qp_solver.hpp"
-#include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
-#include "casadi/core/matrix/generic_matrix_tools.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 
 // OOQP headers
@@ -48,7 +46,7 @@ namespace casadi {
     plugin->creator = OoqpInterface::creator;
     plugin->name = "ooqp";
     plugin->doc = OoqpInterface::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
@@ -99,7 +97,7 @@ namespace casadi {
     x_index_.resize(n_);
     c_index_.resize(nc_);
     p_.resize(n_);
-    AT_ = DMatrix::zeros(input(QP_SOLVER_A).sparsity().transpose());
+    AT_ = DMatrix::zeros(input(QP_SOLVER_A).sparsity().T());
     AT_tmp_.resize(nc_);
 
     // Solution

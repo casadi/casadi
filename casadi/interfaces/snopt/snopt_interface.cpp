@@ -35,7 +35,6 @@
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/mx/mx_tools.hpp"
-#include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/function/mx_function.hpp"
 
 #include "snopt_interface.hpp"
@@ -48,7 +47,7 @@ namespace casadi {
     plugin->creator = SnoptInterface::creator;
     plugin->name = "snopt";
     plugin->doc = SnoptInterface::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
@@ -159,7 +158,7 @@ namespace casadi {
     intOpts_["Hessian flush"] = "999999 * no flushing";
 
     // * Frequencies
-    intOpts_["Check frequency"] = "60 * test row residuals kAx − sk";
+    intOpts_["Check frequency"] = "60 * test row residuals kAx - sk";
     intOpts_["Expand frequency"] = "10000 * for anti-cycling procedure";
     intOpts_["Factorization frequency"] = "50 * 100 for LPs";
     intOpts_["Save frequency"] = "100 * save basis map";

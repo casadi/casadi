@@ -31,7 +31,7 @@
 * \sa
 * \code
 * casadi::SXFunction::eval(const vector<SX>& arg);
-* casadi::substitute(const Matrix<SXElement> &ex, const Matrix<SXElement> &var, const Matrix<SXElement> &expr);
+* casadi::substitute(const SX &ex, const SX &var, const SX &expr);
 * \endcode
 *
 */

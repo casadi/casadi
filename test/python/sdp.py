@@ -240,8 +240,8 @@ class SDPtests(casadiTestCase):
     n1 = 2.1
     n2 = 1.3
     c = DMatrix([n1])
-    Fi = [ blkdiag([n3,-n3])]
-    G = -blkdiag([n2,-n2])
+    Fi = [ diagcat([n3,-n3])]
+    G = -diagcat([n2,-n2])
     F = -horzcat(Fi)
     for sdpsolver, sdp_options in sdpsolvers:
       sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
@@ -274,8 +274,8 @@ class SDPtests(casadiTestCase):
     A = DMatrix.sparse(0,2)
     
     c = DMatrix([2,3])
-    Fi = [ blkdiag([1,1,0]), blkdiag([1,0,1])]
-    G = -blkdiag([1,0,0])
+    Fi = [ diagcat([1,1,0]), diagcat([1,0,1])]
+    G = -diagcat([1,0,0])
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
@@ -309,8 +309,8 @@ class SDPtests(casadiTestCase):
     A = DMatrix.sparse(0,2)
     
     c = DMatrix([2,3])
-    Fi = [ blkdiag([1]), blkdiag([1])]
-    G = -blkdiag([1])
+    Fi = [ diagcat([1]), diagcat([1])]
+    G = -diagcat([1])
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
@@ -405,8 +405,8 @@ class SDPtests(casadiTestCase):
     #
     # solution:  x0=0 , x1=0
     c = DMatrix([2,3])
-    Fi = [ blkdiag([-1,1,0]), blkdiag([-1,0,1])]
-    G = -blkdiag([-1,0,0])
+    Fi = [ diagcat([-1,1,0]), diagcat([-1,0,1])]
+    G = -diagcat([-1,0,0])
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
@@ -445,9 +445,9 @@ class SDPtests(casadiTestCase):
     #                x1     >= 0
     
     c = DMatrix([2,4])
-    Fi = [ blkdiag([1,-1,1,0]), blkdiag([1,-1,0,1])]
+    Fi = [ diagcat([1,-1,1,0]), diagcat([1,-1,0,1])]
     e = 1e-6
-    G = -blkdiag([1,-(1+e),0,0])
+    G = -diagcat([1,-(1+e),0,0])
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
@@ -543,7 +543,7 @@ class SDPtests(casadiTestCase):
 
     A = DMatrix.sparse(0,5)
 
-    G = -blkdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0]);
+    G = -diagcat([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0]);
     
     sp = G.sparsity()
     
@@ -585,7 +585,7 @@ class SDPtests(casadiTestCase):
     perm = [5,2,1,0,6,3,4]
     permi = lookupvector(perm,len(perm))
     
-    G = -blkdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0]);
+    G = -diagcat([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0]);
 
     sp = G.sparsity()
     

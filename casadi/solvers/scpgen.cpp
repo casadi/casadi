@@ -44,7 +44,7 @@ namespace casadi {
     plugin->creator = Scpgen::creator;
     plugin->name = "scpgen";
     plugin->doc = Scpgen::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
@@ -241,7 +241,7 @@ namespace casadi {
       f = inner_prod(vdef_out[0], vdef_out[0])/2;
       gL_defL = vdef_out[0];
       b_gn_.resize(gL_defL.size(), numeric_limits<double>::quiet_NaN());
-
+      work_.resize(gL_defL.size());
     } else {
       // Scalar objective function
       f = vdef_out[0];
@@ -489,8 +489,8 @@ namespace casadi {
     MX b_g = mfcn_fwdSens[0][mod_g_];
 
     // Make sure that the vectors are dense
-    b_gf.densify();
-    b_g.densify();
+    b_gf.makeDense();
+    b_g.makeDense();
 
     // Tangent function
     vector<MX> vec_fcn_out;
@@ -575,7 +575,7 @@ namespace casadi {
 
     // Allocate QP data
     Sparsity sp_B_obj = mat_fcn_.output(mat_hes_).sparsity();
-    qpH_ = DMatrix(sp_B_obj.patternProduct(sp_B_obj));
+    qpH_ = DMatrix(sp_B_obj.T().patternProduct(sp_B_obj));
     qpA_ = mat_fcn_.output(mat_jac_);
     qpB_.resize(ng_);
 
@@ -940,11 +940,11 @@ namespace casadi {
       // Gauss-Newton Hessian
       const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
       fill(qpH_.begin(), qpH_.end(), 0);
-      DMatrix::mul_no_alloc_tn(B_obj, B_obj, qpH_);
+      DMatrix::mul_no_alloc(B_obj, B_obj, qpH_, work_, true);
 
       // Gradient of the objective in Gauss-Newton
       fill(gf_.begin(), gf_.end(), 0);
-      DMatrix::mul_no_alloc_tn(B_obj, b_gn_, gf_);
+      DMatrix::mul_no_alloc(B_obj, b_gn_, gf_, true);
     } else {
       // Exact Hessian
       mat_fcn_.getOutput(qpH_, mat_hes_);

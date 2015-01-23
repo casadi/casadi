@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "2.1.3")
-set(PACKAGE_SO_VERSION "2.1")
+set(PACKAGE_VERSION "2.2.0")
+set(PACKAGE_SO_VERSION "2.3")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson")
 set(PACKAGE_MAINTAINER "Joris Gillis")
@@ -51,8 +51,6 @@ option(WITH_DL "Enable dynamic loading of functions" ON)
 option(WITH_DOC "Enable documentation generation" OFF)
 option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
 option(WITH_EXAMPLES "Build examples" ON)
-option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
-# option(WITH_GSL "Compile the GSL interface" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SQIC "Enable SQIC interface" OFF)
@@ -78,8 +76,13 @@ option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
-option(WITH_MATLAB "Compile with support for MATLAB front-end (experimental)" OFF)
+option(WITH_MATLAB "Compile the MATLAB front-end (experimental)" OFF)
+option(WITH_PYTHON "Compile the Python front-end" OFF)
+option(WITH_JSON "Compile the JSON front-end" OFF)
+option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside Python front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
+option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
+
 # static on windows, shared on linux/osx by default
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
@@ -118,27 +121,19 @@ include(GenerateExportHeader)
 ############################################################
 # Enforce cmake2.4+ style behaviour for
 # mixed filename/full path linker directives
-if(COMMAND cmake_policy)
 cmake_policy(SET CMP0003 NEW)
-endif()
 
 # cmake_policy propagation rules
-if(COMMAND cmake_policy)
 if(POLICY CMP0011)
 cmake_policy(SET CMP0011 OLD)
 endif()
-endif()
 
 # cmake_policy avoid escaping in add_definitions
-if(COMMAND cmake_policy)
 cmake_policy(SET CMP0005 OLD)
-endif()
 
 # cmake_policy use MACOSX_RPATH=ON by default
-if(COMMAND cmake_policy)
-  if(CMAKE_MAJOR_VERSION GREATER 2)
-    cmake_policy(SET CMP0042 NEW)
-  endif()
+if(POLICY CMP0042)
+  cmake_policy(SET CMP0042 NEW)
 endif()
 
 ############################################################
@@ -495,6 +490,10 @@ if(WITH_PROFILING)
   add_definitions(-DWITH_PROFILING)
 endif()
 
+if(WITH_DEEPBIND)
+  add_definitions(-DWITH_DEEPBIND)
+endif()
+
 ######################################################
 ##################### paths ##########################
 ######################################################
@@ -520,15 +519,8 @@ endif()
 #####################################################
 ######################### swig ######################
 #####################################################
-find_package(SWIG)
-  if(SWIG_FOUND)
-    add_subdirectory(swig)
-    add_custom_target(python     DEPENDS _python_modules)
-
-    if(WITH_MATLAB)
-        add_custom_target(matlab DEPENDS _matlab_modules)
-    endif()
-    add_custom_target(json DEPENDS _json_modules)
+if(WITH_PYTHON OR WITH_MATLAB OR WITH_JSON)
+  add_subdirectory(swig)
 endif()
 
 #####################################################

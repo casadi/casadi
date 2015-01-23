@@ -44,7 +44,7 @@ namespace casadi {
                           << sparsity.dimString());
     casadi_assert_message(!sparsity.isSingular(),
                           "LinearSolverInternal::init: singularity - the matrix is structurally "
-                          "rank-deficient. sprank(J)=" << rank(sparsity)
+                          "rank-deficient. sprank(J)=" << sprank(sparsity)
                           << " (in stead of "<< sparsity.size2() << ")");
 
     // Calculate the Dulmage-Mendelsohn decomposition
@@ -207,9 +207,9 @@ namespace casadi {
 
         // Propagate to A
         if (!tr) {
-          adjSens[d][1]->addToSum(-mul(rhs[i], X.T(), A.sparsity()));
+          adjSens[d][1]->addToSum(-mul(rhs[i], X.T(), MX::zeros(A.sparsity())));
         } else {
-          adjSens[d][1]->addToSum(-mul(X, rhs[i].T(), A.sparsity()));
+          adjSens[d][1]->addToSum(-mul(X, rhs[i].T(), MX::zeros(A.sparsity())));
         }
 
         // Propagate to B

@@ -209,7 +209,7 @@ def minimize(f,gl=[],verbose=False):
   if A.shape[1]==0:
     A = DMatrix.zeros(0,X.size)
     
-  G_nsd_block = blkdiag(g_nsd)
+  G_nsd_block = diagcat(g_nsd)
   
   Fi = []
   for j in range(X.size):

@@ -41,7 +41,7 @@ namespace casadi {
      \author Joris Gillis
       \date 2014
   */
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   CleInternal : public FunctionInternal,
                  public PluginInterface<CleInternal> {
   public:
@@ -103,6 +103,9 @@ namespace casadi {
 
     // Creator function for internal class
     typedef CleInternal* (*Creator)(const CleStructure& st);
+
+    // No static functions exposed
+    struct Exposed{ };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

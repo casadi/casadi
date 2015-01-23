@@ -34,7 +34,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT UnaryMX : public MXNode {
+  class CASADI_EXPORT UnaryMX : public MXNode {
   public:
 
     /** \brief  Constructor is private, use "create" below */
@@ -85,7 +85,9 @@ namespace casadi {
     virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node, depth);}
+    virtual bool zz_isEqual(const MXNode* node, int depth) const {
+      return sameOpAndDeps(node, depth);
+    }
 
     //! \brief operation
     Operation op_;
@@ -93,5 +95,6 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
 
 #endif // CASADI_UNARY_MX_HPP

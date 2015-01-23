@@ -21,14 +21,17 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+#ifndef CASADI_MX_I
+#define CASADI_MX_I
 
+%include "shared_object.i"
+%include "matrix.i"
+%include "generic_expression.i"
 
-%{
-#include "casadi/core/mx/mx.hpp"
-#include "casadi/core/mx/mx_tools.hpp"
-%}
+%include <casadi/core/mx/mx.hpp>
 
-%include "casadi/core/mx/mx.hpp"
+// Template instantiations
+%template(Pair_MX_MXVector) std::pair<casadi::MX, std::vector<casadi::MX> >;
 
 %extend casadi::MX{
   
@@ -50,11 +53,12 @@
   %}
   #endif //SWIGPYTHON
   
+#ifdef SWIGPYTHON
   binopsrFull(casadi::MX)
+#endif // SWIGPYTHON
 };
-
-
 
 VECTOR_REPR(casadi::MX)
 VECTOR_REPR(std::vector<casadi::MX>)
 
+#endif // CASADI_MX_I

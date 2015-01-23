@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_CASADI_WEAK_REF_HPP
-#define CASADI_CASADI_WEAK_REF_HPP
+#ifndef CASADI_WEAK_REF_HPP
+#define CASADI_WEAK_REF_HPP
 
 #include "shared_object.hpp"
 
@@ -41,7 +41,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_CORE_EXPORT WeakRef : public SharedObject {
+  class CASADI_EXPORT WeakRef : public SharedObject {
   public:
     friend class SharedObjectNode;
 
@@ -74,7 +74,7 @@ namespace casadi {
  };
 
 #ifndef SWIG
-  class CASADI_CORE_EXPORT WeakRefInternal : public SharedObjectNode {
+  class CASADI_EXPORT WeakRefInternal : public SharedObjectNode {
   public:
     // Constructor
     WeakRefInternal(SharedObjectNode* raw);
@@ -93,5 +93,7 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
 
-#endif // CASADI_CASADI_WEAK_REF_HPP
+
+#endif // CASADI_WEAK_REF_HPP

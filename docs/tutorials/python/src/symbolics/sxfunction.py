@@ -24,7 +24,7 @@
 #! CasADi tutorial 2
 #! ==================
 #! This tutorial file explains the use of CasADi's SXFunction in a python context.
-#! We assume you have read trough the SXElement tutorial.
+#! We assume you have read trough the SX tutorial.
 #! 
 #! Introduction
 #! --------------------
@@ -39,7 +39,7 @@ print z
 #! This is not the case. This is what's going on under the hood:
 #!
 #! The expression tree of z does not contain two subexpressions x*x, rather it contains two pointers to a signle subexpression x*x.
-#! In fact, in the C++ implementation, an SXElement object is really not more than a collection of pointers. It are SXNode objects which really contain the data associated with subexpressions.
+#! In fact, in the C++ implementation, an S object is really not more than a collection of pointers. It are SXNode objects which really contain the data associated with subexpressions.
 #!
 #! CasADi generates SXnodes at a very fine-grained level. Even 'sin(y)' is an SXNode, even though we have not ourselves declared a variable to point to it.
 #! 

@@ -28,7 +28,6 @@
 
 #include "sx_element.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "../matrix/generic_matrix_tools.hpp"
 #include "../casadi_options.hpp"
 
 /** \defgroup expression_tools Expression tools
@@ -36,22 +35,33 @@
 *
 */
 
-
 namespace casadi {
 
 /**
 \ingroup expression_tools
 @{
 */
+  /// \cond INTERNAL
+  /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
+  inline void simplify(SXElement& ex) { ex = ex.zz_simplify();}
+  /// \endcond
+
+  /** \brief Evaluate an SX graph numerically
+   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
+   */
+  CASADI_EXPORT Matrix<double> evalf(const SX &ex);
+
+  /** \brief Substitute variable v with value vdef in an expression ex, and evaluate numerically
+   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
+   */
+  CASADI_EXPORT Matrix<double> evalf(const SX &ex, const SX &v,
+                                              const Matrix<double> &vdef);
+
+#if !defined(SWIG) || !defined(SWIGMATLAB)
 
   /** \brief  Expand the expression as a weighted sum (with constant weights)
   */
-  CASADI_CORE_EXPORT void expand(const SX& ex, SX &weights, SX& terms);
-
-  /// \cond INTERNAL
-  /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
-  CASADI_CORE_EXPORT void simplify(SXElement& ex);
-  /// \endcond
+  inline void expand(const SX& ex, SX &weights, SX& terms) { ex.zz_expand(weights, terms);}
 
   /** \brief Create a piecewise constant function
       Create a piecewise constant function with n=val.size() intervals
@@ -61,7 +71,7 @@ namespace casadi {
       \param tval vector with the discrete values of t at the interval transitions (length n-1)
       \param val vector with the value of the function for each interval (length n)
   */
-  CASADI_CORE_EXPORT SX pw_const(const SX &t, const SX &tval, const SX &val);
+  inline SX pw_const(const SX &t, const SX &tval, const SX &val) { return t.zz_pw_const(tval, val);}
 
   /** Create a piecewise linear function
       Create a piecewise linear function:
@@ -71,9 +81,11 @@ namespace casadi {
       \brief tval vector with the the discrete values of t (monotonically increasing)
       \brief val vector with the corresponding function values (same length as tval)
   */
-  CASADI_CORE_EXPORT SX pw_lin(const SXElement &t, const SX &tval, const SX &val);
+  inline SX pw_lin(const SX &t, const SX &tval, const SX &val) { return t.zz_pw_lin(tval, val);}
 
-  CASADI_CORE_EXPORT SX if_else(const SX &cond, const SX &if_true, const SX &if_false);
+  inline SX if_else(const SX &cond, const SX &if_true, const SX &if_false) {
+    return cond.zz_if_else(if_true, if_false);
+  }
   /**  \brief Heaviside function
    *
    * \f[
@@ -84,7 +96,7 @@ namespace casadi {
    * \end {cases}
    * \f]
    */
-  CASADI_CORE_EXPORT SX heaviside(const SX &x);
+  inline SX heaviside(const SX &x) { return x.zz_heaviside();}
 
   /**
    * \brief rectangle function
@@ -99,7 +111,7 @@ namespace casadi {
    *
    * Also called: gate function, block function, band function, pulse function, window function
    */
-  CASADI_CORE_EXPORT SX rectangle(const SX &x);
+  inline SX rectangle(const SX &x) { return x.zz_rectangle();}
 
   /**
    * \brief triangle function
@@ -112,7 +124,7 @@ namespace casadi {
    * \f]
    *
    */
-  CASADI_CORE_EXPORT SX triangle(const SX &x);
+  inline SX triangle(const SX &x) { return x.zz_triangle();}
 
   /**
    * \brief ramp function
@@ -127,140 +139,86 @@ namespace casadi {
    *
    * Also called: slope function
    */
-  CASADI_CORE_EXPORT SX ramp(const SX &x);
+  inline SX ramp(const SX &x) { return x.zz_ramp();}
 
   /** \brief  Integrate f from a to b using Gaussian quadrature with n points */
-  CASADI_CORE_EXPORT SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b,
-                                             int order=5, const SX& w=SX());
+  inline SX gauss_quadrature(const SX &f, const SX &x, const SX &a, const SX &b,
+                             int order=5, const SX& w=SX()) {
+    return f.zz_gauss_quadrature(x, a, b, order, w);
+  }
 
   /** \brief  Simplify an expression */
-  CASADI_CORE_EXPORT void simplify(SX &ex);
-
-  /** \brief  Remove identical calculations */
-  CASADI_CORE_EXPORT void compress(SX &ex, int level=5);
+  inline void simplify(SX &ex) { ex = ex.zz_simplify();}
 
   /** \brief  Substitute variable v with expression vdef in an expression ex */
-  CASADI_CORE_EXPORT SX substitute(const SX& ex, const SX& v, const SX& vdef);
+  inline SX substitute(const SX& ex, const SX& v, const SX& vdef) {
+    return ex.zz_substitute(v, vdef);
+  }
 
   /** \brief  Substitute variable var with expression expr in multiple expressions */
-  CASADI_CORE_EXPORT std::vector<SX> substitute(const std::vector<SX>& ex,
-                                                    const std::vector<SX>& v,
-                                                    const std::vector<SX>& vdef);
-
-  /** \brief Substitute variable var out of or into an expression expr */
-  CASADI_CORE_EXPORT void substituteInPlace(const SX& v, SX &vdef, bool reverse=false);
-
-  /** \brief Substitute variable var out of or into an expression expr,
-   *  with an arbitrary number of other expressions piggyback */
-  CASADI_CORE_EXPORT void substituteInPlace(const SX& v, SX &vdef,
-                                                std::vector<SX>& ex, bool reverse=false);
+  inline std::vector<SX> substitute(const std::vector<SX>& ex,
+                                    const std::vector<SX>& v,
+                                    const std::vector<SX>& vdef) {
+    return SX::zz_substitute(ex, v, vdef);
+  }
 
   /** \brief Substitute variable var out of or into an expression expr,
    *  with an arbitrary number of other expressions piggyback (vector version) */
-  CASADI_CORE_EXPORT void substituteInPlace(const std::vector<SX>& v,
-                                                std::vector<SX>& vdef,
-                                                std::vector<SX>& ex,
-                                                bool reverse=false);
+  inline void substituteInPlace(const std::vector<SX>& v,
+                                std::vector<SX>& vdef,
+                                std::vector<SX>& ex,
+                                bool reverse=false) {
+    return SX::zz_substituteInPlace(v, vdef, ex, reverse);
+  }
 
-  /** \brief Evaluate an SX graph numerically
-   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
-   */
-  CASADI_CORE_EXPORT Matrix<double> evalf(const SX &ex);
+  /** \brief Substitute variable var out of or into an expression expr,
+   *  with an arbitrary number of other expressions piggyback */
+  inline void substituteInPlace(const SX& v, SX &vdef,
+                                std::vector<SX>& ex, bool reverse=false) {
+    std::vector<SX> v2(1, v);
+    std::vector<SX> vdef2(1, vdef);
+    substituteInPlace(v2, vdef2, ex, reverse);
+    vdef = vdef2.front();
+  }
 
-  /** \brief Substitute variable v with value vdef in an expression ex, and evaluate numerically
-   * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
-   */
-  CASADI_CORE_EXPORT Matrix<double> evalf(const SX &ex, const SX &v,
-                                              const Matrix<double> &vdef);
+  /** \brief Substitute variable var out of or into an expression expr */
+  inline void substituteInPlace(const SX& v, SX &vdef, bool reverse=false) {
+    // Empty vector
+    std::vector<SX> ex;
+    substituteInPlace(v, vdef, ex, reverse);
+  }
 
   /** \brief  Get the sparsity pattern of a matrix */
-  CASADI_CORE_EXPORT SX spy(const SX& A);
-
-#ifndef SWIG
-  // "operator?:" can not be overloaded
-  template<typename T>
-  T if_else(const SXElement& cond, const T& if_true, const T &if_false);
-
-  /** \brief  Create a block matrix */
-  template<int n, int m>
-  SX blockmatrix(SX array[n][m]);
-
-  /** \brief  Create a block matrix (vector) */
-  template<int n>
-  SX blockmatrix(SX array[n]);
-
-#endif
-
-// Implementation
-#ifndef SWIG
-
-  template<typename T>
-  SX if_else(const SXElement& cond, const T& if_true, const T &if_false) {
-    return if_false + (if_true-if_false)*cond;
-  }
-
-  template<int n, int m>
-  SX blockmatrix(SX array[n][m]) {
-    /** \brief  Return matrix */
-    SX ret;
-
-    /** \brief  loop over cols */
-    for (int i=0; i<n; ++i) {
-      /** \brief  Create a col */
-      SX col;
-
-      /** \brief  append components to the col */
-      for (int j=0; j<m; ++j) {
-        col.appendColumns(array[i][j]);
-      }
-
-      /** \brief  append col to matrix */
-      ret.appendColumns(col.T());
-    }
-
-    return ret;
-  }
-
-  /** \brief  Create a block matrix (vector) */
-  template<int n>
-  SX blockmatrix(SX array[n]) {
-    /** \brief  Return matrix */
-    SX ret;
-
-    /** \brief  loop over cols */
-    for (int i=0; i<n; ++i) {
-      /** \brief  append components */
-      ret.appendColumns(array[i]);
-    }
-
-    return ret;
-  }
-
-#endif
+  inline SX spy(const SX& A) { return A.zz_spy();}
 
   /** \brief Check if expression depends on the argument
     The argument must be symbolic
   */
-  CASADI_CORE_EXPORT bool dependsOn(const SX& f, const SX &arg);
-
+  inline bool dependsOn(const SX& f, const SX &arg) { return f.zz_dependsOn(arg); }
 
   /** \brief Get all symbols contained in the supplied expression
    * Get all symbols on which the supplied expression depends
    * \see SXFunction::getFree()
    */
-  CASADI_CORE_EXPORT std::vector<SXElement> getSymbols(const SX& e);
+  inline SX getSymbols(const SX& e) { return e.zz_getSymbols().front();}
+
+  /** \brief Get all the free variables in an expression */
+  inline SX getFree(const SX& ex) { return getSymbols(ex);}
 
   ///@{
   /** \brief Calculate jacobian via source code transformation
 
       Uses casadi::SXFunction::jac
   */
-  CASADI_CORE_EXPORT SX jacobian(const SX &ex, const SX &arg);
-  CASADI_CORE_EXPORT SX gradient(const SX &ex, const SX &arg);
-  CASADI_CORE_EXPORT SX tangent(const SX &ex, const SX &arg);
-  CASADI_CORE_EXPORT SX hessian(const SX &ex, const SX &arg);
-  // hessian and gradient:
-  CASADI_CORE_EXPORT void hessian(const SX &ex, const SX &arg, SX &H, SX &g);
+  inline SX jacobian(const SX &ex, const SX &arg) { return ex.zz_jacobian(arg);}
+  inline SX gradient(const SX &ex, const SX &arg) { return ex.zz_gradient(arg);}
+  inline SX tangent(const SX &ex, const SX &arg) { return ex.zz_tangent(arg);}
+  inline SX hessian(const SX &ex, const SX &arg) { return ex.zz_hessian(arg);}
+
+  // Hessian and gradient:
+  inline void hessian(const SX &ex, const SX &arg, SX &H, SX &g) {
+    return ex.zz_hessian(arg, H, g);
+  }
   ///@}
 
   /** \brief Calculate the Jacobian and multiply by a vector from the right
@@ -270,8 +228,10 @@ namespace casadi {
       expressions, it will use directional derivatives which is typically (but
       not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
   */
-  CASADI_CORE_EXPORT SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v,
-                                                bool transpose_jacobian=false);
+  inline SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v,
+                                bool transpose_jacobian=false) {
+    return ex.zz_jacobianTimesVector(arg, v, transpose_jacobian);
+  }
 
   /**
    * \brief univariate Taylor series expansion
@@ -287,8 +247,8 @@ namespace casadi {
    * \endcode
    * \verbatim >>   x \endverbatim
    */
-  CASADI_CORE_EXPORT SX taylor(const SX& ex, const SX& x,
-                                   const SX& a=casadi_limits<SXElement>::zero, int order=1);
+  inline SX taylor(const SX& ex, const SX& x,
+                   const SX& a=0, int order=1) { return ex.zz_taylor(x, a, order);}
 
   /**
    * \brief multivariate Taylor series expansion
@@ -297,7 +257,10 @@ namespace casadi {
    * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
    *
    */
-  CASADI_CORE_EXPORT SX mtaylor(const SX& ex, const SX& x, const SX& a, int order=1);
+  inline SX mtaylor(const SX& ex, const SX& x, const SX& a, int order=1) {
+    return ex.zz_mtaylor(x, a, order);
+  }
+
   /**
    * \brief multivariate Taylor series expansion
    *
@@ -324,34 +287,39 @@ namespace casadi {
    * \f$  (-3 x^2 y-x^3)/6+y+x \f$
    *
    */
-  CASADI_CORE_EXPORT SX mtaylor(const SX& ex, const SX& x, const SX& a, int order,
-                                    const std::vector<int>&order_contributions);
+  inline SX mtaylor(const SX& ex, const SX& x, const SX& a, int order,
+                    const std::vector<int>& order_contributions) {
+    return ex.zz_mtaylor(x, a, order, order_contributions);
+  }
 
   /** \brief Count number of nodes */
-  CASADI_CORE_EXPORT int countNodes(const SX& A);
+  inline int countNodes(const SX& A) { return A.zz_countNodes();}
 
   /** \brief Get a string representation for a binary SX, using custom arguments */
-  CASADI_CORE_EXPORT std::string getOperatorRepresentation(
-                                       const SXElement& x,
-                                       const std::vector<std::string>& args);
-
-  /** \brief Get all the free variables in an expression */
-  CASADI_CORE_EXPORT SX getFree(const SX& ex);
+  inline std::string getOperatorRepresentation(const SX& x,
+                                               const std::vector<std::string>& args) {
+    return x.zz_getOperatorRepresentation(args);
+  }
 
   /** \brief Extract shared subexpressions from an set of expressions */
-  CASADI_CORE_EXPORT void extractShared(std::vector<SXElement>& ex,
-                     std::vector<SXElement>& v, std::vector<SXElement>& vdef,
-                     const std::string& v_prefix="v_", const std::string& v_suffix="");
+  inline void extractShared(std::vector<SX>& ex,
+                            std::vector<SX>& v, std::vector<SX>& vdef,
+                            const std::string& v_prefix="v_",
+                            const std::string& v_suffix="") {
+    SX::zz_extractShared(ex, v, vdef, v_prefix, v_suffix);
+  }
 
   /** \brief Print compact, introducing new variables for shared subexpressions */
-  CASADI_CORE_EXPORT void printCompact(const SX& ex, std::ostream &stream=std::cout);
+  inline void printCompact(const SX& ex, std::ostream &stream=CASADI_COUT) {
+    ex.zz_printCompact(stream);
+  }
 
   /** \brief extracts polynomial coefficients from an expression
    *
-   * \parameter ex Scalar expression that represents a polynomial
-   * \paramater x  Scalar symbol that the polynomial is build up with
+   * \param ex Scalar expression that represents a polynomial
+   * \param x  Scalar symbol that the polynomial is build up with
    */
-  CASADI_CORE_EXPORT SX poly_coeff(const SX& ex, const SX&x);
+  inline SX poly_coeff(const SX& ex, const SX&x) { return ex.zz_poly_coeff(x);}
 
   /** \brief Attempts to find the roots of a polynomial
    *
@@ -359,19 +327,19 @@ namespace casadi {
    *  It is assumed that the roots are real.
    *
    */
-  CASADI_CORE_EXPORT SX poly_roots(const SX& p);
+  inline SX poly_roots(const SX& p) { return p.zz_poly_roots();}
 
   /** \brief Attempts to find the eigenvalues of a symbolic matrix
    *  This will only work for up to 3x3 matrices
    */
-  CASADI_CORE_EXPORT SX eig_symbolic(const SX& m);
+  inline SX eig_symbolic(const SX& m) { return m.zz_eig_symbolic();}
+
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
 /*
 @}
 */
 
 } // namespace casadi
-
-
 
 #endif // CASADI_SX_TOOLS_HPP

@@ -35,7 +35,7 @@
 
 namespace casadi {
 
-  class CASADI_CORE_EXPORT CodeGenerator {
+  class CASADI_EXPORT CodeGenerator {
   public:
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
@@ -81,7 +81,7 @@ namespace casadi {
       // Misc
       AUX_SQ,
       AUX_SIGN,
-      AUX_MM_TN_SPARSE,
+      AUX_MM_SPARSE,
       AUX_COPY_SPARSE,
       AUX_TRANS
     };

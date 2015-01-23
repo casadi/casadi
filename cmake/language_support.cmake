@@ -23,7 +23,7 @@ function(workaround_9220 language language_works)
   #message("DEBUG: language = ${language}")
   set(text
     "project(test NONE)
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.6)
 enable_language(${language} OPTIONAL)
 "
     )

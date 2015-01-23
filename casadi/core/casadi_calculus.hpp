@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_CASADI_CALCULUS_HPP
-#define CASADI_CASADI_CALCULUS_HPP
+#ifndef CASADI_CALCULUS_HPP
+#define CASADI_CALCULUS_HPP
 
 #include <iostream>
 #include <string>
@@ -168,47 +168,47 @@ namespace casadi {
 
   ///@{
   /** \brief  Pre-C99 elementary functions from the 'math.h' ('cmath') header */
-  template<class T> T sqrt(const T &x) {return x.sqrt();}
+  template<class T> T sqrt(const T &x) {return x.zz_sqrt();}
   using std::sqrt;
 
-  template<class T> T sin(const T &x) {return x.sin();}
+  template<class T> T sin(const T &x) {return x.zz_sin();}
   using std::sin;
 
-  template<class T> T cos(const T &x) {return x.cos();}
+  template<class T> T cos(const T &x) {return x.zz_cos();}
   using std::cos;
 
-  template<class T> T tan(const T &x) {return x.tan();}
+  template<class T> T tan(const T &x) {return x.zz_tan();}
   using std::tan;
 
-  template<class T> T atan(const T &x) {return x.arctan();}
+  template<class T> T atan(const T &x) {return x.zz_atan();}
   using std::atan;
 
-  template<class T> T asin(const T &x) {return x.arcsin();}
+  template<class T> T asin(const T &x) {return x.zz_asin();}
   using std::asin;
 
-  template<class T> T acos(const T &x) {return x.arccos();}
+  template<class T> T acos(const T &x) {return x.zz_acos();}
   using std::acos;
 
-  template<class T> T sinh(const T &x) {return x.sinh();}
+  template<class T> T sinh(const T &x) {return x.zz_sinh();}
   using std::sinh;
 
-  template<class T> T cosh(const T &x) {return x.cosh();}
+  template<class T> T cosh(const T &x) {return x.zz_cosh();}
   using std::cosh;
 
-  template<class T> T tanh(const T &x) {return x.tanh();}
+  template<class T> T tanh(const T &x) {return x.zz_tanh();}
   using std::tanh;
 
-  template<class T> T asinh(const T &x) {return x.arcsinh();}
-  template<class T> T acosh(const T &x) {return x.arccosh();}
-  template<class T> T atanh(const T &x) {return x.arctanh();}
+  template<class T> T asinh(const T &x) {return x.zz_asinh();}
+  template<class T> T acosh(const T &x) {return x.zz_acosh();}
+  template<class T> T atanh(const T &x) {return x.zz_atanh();}
 
-  template<class T> T exp(const T &x) {return x.exp();}
+  template<class T> T exp(const T &x) {return x.zz_exp();}
   using std::exp;
 
-  template<class T> T log(const T &x) {return x.log();}
+  template<class T> T log(const T &x) {return x.zz_log();}
   using std::log;
 
-  template<class T> T log10(const T &x) {return x.log10();}
+  template<class T> T log10(const T &x) {return x.zz_log10();}
   using std::log10;
 
   inline double atanh(double x) throw() {
@@ -225,36 +225,36 @@ namespace casadi {
     return log(x + sqrt(1+x)*sqrt(x-1));
   }
 
-  template<class T> T pow(const T &x, const T &n) { return x.__pow__(n);}
-  template<class T> T pow(const T &x,   double n) { return x.__pow__(n);}
-  template<class T> T pow(double   x, const T &n) { return T(x).__pow__(n);}
+  template<class T> T pow(const T &x, const T &n) { return x.zz_power(n);}
+  template<class T> T pow(const T &x,   double n) { return x.zz_power(n);}
+  template<class T> T pow(double   x, const T &n) { return T(x).zz_power(n);}
   using std::pow;
 
-  template<class T> T abs(const T &x) {return x.fabs();}
+  template<class T> T abs(const T &x) {return x.zz_abs();}
   using std::abs;
 
-  template<class T> T fabs(const T &x) {return x.fabs();}
+  template<class T> T fabs(const T &x) {return x.zz_abs();}
   using std::fabs;
 
-  template<class T> T floor(const T &x) {return x.floor();}
+  template<class T> T floor(const T &x) {return x.zz_floor();}
   using std::floor;
 
-  template<class T> T ceil(const T &x) {return x.ceil();}
+  template<class T> T ceil(const T &x) {return x.zz_ceil();}
   using std::ceil;
 
-  template<class T> T fmod(const T &x, const T &y) {return x.fmod(y);}
+  template<class T> T fmod(const T &x, const T &y) {return x.zz_mod(y);}
   using std::fmod;
 
-  template<class T> T atan2(const T &x, const T &n) { return x.arctan2(n);}
-  template<class T> T atan2(const T &x,   double n) { return x.arctan2(n);}
-  template<class T> T atan2(double   x, const T &n) { return T(x).arctan2(n);}
+  template<class T> T atan2(const T &x, const T &n) { return x.zz_atan2(n);}
+  template<class T> T atan2(const T &x,   double n) { return x.zz_atan2(n);}
+  template<class T> T atan2(double   x, const T &n) { return T(x).zz_atan2(n);}
   using std::atan2;
 
   ///@}
 
   ///@{
   /** \brief  C99 elementary functions from the 'math.h' header */
-  template<class T> T erf(const T &x) {return x.erf();}
+  template<class T> T erf(const T &x) {return x.zz_erf();}
 #ifdef HAS_ERF
   using ::erf;
 #else // HAS ERF
@@ -270,15 +270,15 @@ namespace casadi {
   }
 #endif // HAS ERF
 
-  template<class T> T fmin(const T &x, const T &n) { return x.fmin(n);}
-  template<class T> T fmin(const T &x,   double n) { return x.fmin(n);}
-  template<class T> T fmin(double   x, const T &n) { return T(x).fmin(n);}
+  template<class T> T fmin(const T &x, const T &n) { return x.zz_min(n);}
+  template<class T> T fmin(const T &x,   double n) { return x.zz_min(n);}
+  template<class T> T fmin(double   x, const T &n) { return T(x).zz_min(n);}
   inline double fmin(double x, double y) throw() { return std::min(x, y);}
   inline int fmin(int x, int y) throw() { return std::min(x, y);}
 
-  template<class T> T fmax(const T &x, const T &n) { return x.fmax(n);}
-  template<class T> T fmax(const T &x,   double n) { return x.fmax(n);}
-  template<class T> T fmax(double   x, const T &n) { return T(x).fmax(n);}
+  template<class T> T fmax(const T &x, const T &n) { return x.zz_max(n);}
+  template<class T> T fmax(const T &x,   double n) { return x.zz_max(n);}
+  template<class T> T fmax(double   x, const T &n) { return T(x).zz_max(n);}
   inline double fmax(double x, double y) throw() { return std::max(x, y);}
   inline int fmax(int x, int y) throw() { return std::max(x, y);}
 
@@ -296,10 +296,13 @@ namespace casadi {
   }
 
   /// Sign function, note that sign(nan) == nan
-  template<class T> T sign(const T &x) {return x.sign();}
+  template<class T> T sign(const T &x) {return x.zz_sign();}
 
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}
+
+  /// Compare if two values are equal, up to a depth
+  inline bool isEqual(double x, double y, int depth=0) { return x==y;}
 
   /// __copysign__ function
   template<class T> T copysign(const T &x, const T &y) {return x.__copysign__(y);}
@@ -312,13 +315,13 @@ namespace casadi {
   #endif //HAS_COPYSIGN
 
   /// Conditional assignment
-  template<class T> T if_else_zero(const T &x, const T &y) {return x.if_else_zero(y);}
+  template<class T> T if_else_zero(const T &x, const T &y) {return x.zz_if_else_zero(y);}
 
   /// Conditional assignment
   inline double if_else_zero(double x, double y) { return x ? y : 0;}
 
   /// Inverse of the error function
-  template<class T> T erfinv(const T &x) {return x.erfinv();}
+  template<class T> T erfinv(const T &x) {return x.zz_erfinv();}
 #ifdef HAS_ERFINV
   using ::erfinv;
 #else // HAS ERFINV
@@ -992,4 +995,4 @@ namespace casadi {
 
 /// \endcond
 
-#endif // CASADI_CASADI_CALCULUS_HPP
+#endif // CASADI_CALCULUS_HPP

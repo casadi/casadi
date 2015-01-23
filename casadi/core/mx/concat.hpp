@@ -37,7 +37,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_CORE_EXPORT Concat : public MXNode {
+  class CASADI_EXPORT Concat : public MXNode {
   public:
 
     /// Constructor
@@ -69,7 +69,9 @@ namespace casadi {
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node, depth);}
+    virtual bool zz_isEqual(const MXNode* node, int depth) const {
+      return sameOpAndDeps(node, depth);
+    }
   };
 
 
@@ -77,7 +79,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_CORE_EXPORT Horzcat : public Concat {
+  class CASADI_EXPORT Horzcat : public Concat {
   public:
 
     /// Constructor
@@ -105,7 +107,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_CORE_EXPORT Vertcat : public Concat {
+  class CASADI_EXPORT Vertcat : public Concat {
   public:
 
     /// Constructor
@@ -133,7 +135,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2014
   */
-  class CASADI_CORE_EXPORT Diagcat : public Concat {
+  class CASADI_EXPORT Diagcat : public Concat {
   public:
 
     /// Constructor

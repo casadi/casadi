@@ -169,7 +169,7 @@ SXFunction::SXFunction(const Function& f) {
   }
 }
 
-std::vector<SXElement> SXFunction::getFree() const {
+SX SXFunction::getFree() const {
   return (*this)->free_vars_;
 }
 

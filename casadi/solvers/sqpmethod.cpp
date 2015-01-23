@@ -25,7 +25,6 @@
 
 #include "sqpmethod.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/matrix/sparsity_tools.hpp"
 #include "casadi/core/matrix/matrix_tools.hpp"
 #include "casadi/core/function/sx_function.hpp"
 #include "casadi/core/sx/sx_tools.hpp"
@@ -45,7 +44,7 @@ namespace casadi {
     plugin->creator = Sqpmethod::creator;
     plugin->name = "sqpmethod";
     plugin->doc = Sqpmethod::meta_doc.c_str();
-    plugin->version = 21;
+    plugin->version = 22;
     return 0;
   }
 
@@ -282,7 +281,7 @@ namespace casadi {
 
     // Evaluate the initial gradient of the Lagrangian
     copy(gf_.begin(), gf_.end(), gLag_.begin());
-    if (ng_>0) DMatrix::mul_no_alloc_tn(Jk_, mu_, gLag_);
+    if (ng_>0) DMatrix::mul_no_alloc(Jk_, mu_, gLag_, true);
     // gLag += mu_x_;
     transform(gLag_.begin(), gLag_.end(), mu_x_.begin(), gLag_.begin(), plus<double>());
 
@@ -498,7 +497,7 @@ namespace casadi {
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
         copy(gf_.begin(), gf_.end(), gLag_old_.begin());
-        if (ng_>0) DMatrix::mul_no_alloc_tn(Jk_, mu_, gLag_old_);
+        if (ng_>0) DMatrix::mul_no_alloc(Jk_, mu_, gLag_old_, true);
         // gLag_old += mu_x_;
         transform(gLag_old_.begin(), gLag_old_.end(), mu_x_.begin(), gLag_old_.begin(),
                   plus<double>());
@@ -514,7 +513,7 @@ namespace casadi {
 
       // Evaluate the gradient of the Lagrangian with the new x and new mu
       copy(gf_.begin(), gf_.end(), gLag_.begin());
-      if (ng_>0) DMatrix::mul_no_alloc_tn(Jk_, mu_, gLag_);
+      if (ng_>0) DMatrix::mul_no_alloc(Jk_, mu_, gLag_, true);
       // gLag += mu_x_;
       transform(gLag_.begin(), gLag_.end(), mu_x_.begin(), gLag_.begin(), plus<double>());
 

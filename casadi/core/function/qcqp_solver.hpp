@@ -127,7 +127,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_CORE_EXPORT QcqpSolver : public Function {
+  class CASADI_EXPORT QcqpSolver : public Function {
   public:
 
     /// Default constructor

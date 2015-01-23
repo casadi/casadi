@@ -40,7 +40,7 @@ namespace casadi {
   \date 2010
   A regular user should never work with any Node class. Use CustomFunction directly.
   */
-class CASADI_CORE_EXPORT CustomFunctionInternal : public FunctionInternal {
+class CASADI_EXPORT CustomFunctionInternal : public FunctionInternal {
   friend class CustomFunction;
   public:
 

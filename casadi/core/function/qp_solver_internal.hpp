@@ -34,7 +34,7 @@
 namespace casadi {
 
   /// Internal class
-  class CASADI_CORE_EXPORT
+  class CASADI_EXPORT
   QpSolverInternal : public FunctionInternal,
                      public PluginInterface<QpSolverInternal> {
   public:
@@ -65,6 +65,9 @@ namespace casadi {
 
     // Creator function for internal class
     typedef QpSolverInternal* (*Creator)(const QPStructure& st);
+
+    // No static functions exposed
+    struct Exposed{ };
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

@@ -30,7 +30,6 @@
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
-#include "../matrix/sparsity_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../std_vector_tools.hpp"
@@ -216,12 +215,12 @@ namespace casadi {
 
     switch (op_) {
     case OP_ADD:
-      if (op==OP_SUB && y.isEqual(dep(0), maxDepth())) return dep(1);
-      if (op==OP_SUB && y.isEqual(dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && isEqual(y, dep(0), maxDepth())) return dep(1);
+      if (op==OP_SUB && isEqual(y, dep(1), maxDepth())) return dep(0);
       break;
     case OP_SUB:
-      if (op==OP_SUB && y.isEqual(dep(0), maxDepth())) return -dep(1);
-      if (op==OP_ADD && y.isEqual(dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && isEqual(y, dep(0), maxDepth())) return -dep(1);
+      if (op==OP_ADD && isEqual(y, dep(1), maxDepth())) return dep(0);
       break;
     default: break; // no rule
     }

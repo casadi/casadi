@@ -29,7 +29,6 @@
 #include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../function/sx_function.hpp"
-#include "../matrix/sparsity_tools.hpp"
 
 using namespace std;
 
@@ -208,7 +207,7 @@ namespace casadi {
 
     // Get all input elements
     vector<int> el_input;
-    isp.getElements(el_input, false);
+    isp.find(el_input);
 
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
@@ -224,7 +223,7 @@ namespace casadi {
       // Get the matching nonzeros
       r_ind.resize(el_input.size());
       copy(el_input.begin(), el_input.end(), r_ind.begin());
-      arg.sparsity().getNZInplace(r_ind);
+      arg.sparsity().getNZ(r_ind);
 
       // Sparsity pattern for the result
       r_colind.resize(osp.size2()+1); // Col count
@@ -281,8 +280,8 @@ namespace casadi {
       MX asens0 = asens; // Sensitivity before addition
 
       // Get the corresponding nz locations in the output sparsity pattern
-      aseed.sparsity().getElements(r_nz, false);
-      osp.getNZInplace(r_nz);
+      aseed.sparsity().find(r_nz);
+      osp.getNZ(r_nz);
 
       // Filter out ignored entries and check if there is anything to add at all
       bool elements_to_add = false;
@@ -302,7 +301,7 @@ namespace casadi {
       // Get the nz locations in the adjoint sensitivity corresponding to the inputs
       r_ind.resize(el_input.size());
       copy(el_input.begin(), el_input.end(), r_ind.begin());
-      asens0.sparsity().getNZInplace(r_ind);
+      asens0.sparsity().getNZ(r_ind);
 
       // Enlarge the sparsity pattern of the sensitivity if not all additions fit
       for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
@@ -314,7 +313,7 @@ namespace casadi {
 
           // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
           copy(el_input.begin(), el_input.end(), r_ind.begin());
-          asens0.sparsity().getNZInplace(r_ind);
+          asens0.sparsity().getNZ(r_ind);
 
           break;
         }
@@ -405,7 +404,7 @@ namespace casadi {
     stream << "*rr++ = *tt;" << endl;
   }
 
-  bool GetNonzerosVector::isEqual(const MXNode* node, int depth) const {
+  bool GetNonzerosVector::zz_isEqual(const MXNode* node, int depth) const {
     // Check dependencies
     if (!sameOpAndDeps(node, depth)) return false;
 
@@ -423,7 +422,7 @@ namespace casadi {
     return true;
   }
 
-  bool GetNonzerosSlice::isEqual(const MXNode* node, int depth) const {
+  bool GetNonzerosSlice::zz_isEqual(const MXNode* node, int depth) const {
     // Check dependencies
     if (!sameOpAndDeps(node, depth)) return false;
 
@@ -440,7 +439,7 @@ namespace casadi {
     return true;
   }
 
-  bool GetNonzerosSlice2::isEqual(const MXNode* node, int depth) const {
+  bool GetNonzerosSlice2::zz_isEqual(const MXNode* node, int depth) const {
     // Check dependencies
     if (!sameOpAndDeps(node, depth)) return false;
 

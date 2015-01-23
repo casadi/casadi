@@ -31,7 +31,7 @@
 * \sa
 * \code
 * casadi::Sparsity::dulmageMendelsohn();
-* casadi::blkdiag();
+* casadi::diagcat();
 * \endcode
 *
 */

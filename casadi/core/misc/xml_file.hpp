@@ -41,7 +41,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
    */
-  class CASADI_CORE_EXPORT XmlFile : public OptionsFunctionality {
+  class CASADI_EXPORT XmlFile : public OptionsFunctionality {
   public:
     // Default constructor
     XmlFile();

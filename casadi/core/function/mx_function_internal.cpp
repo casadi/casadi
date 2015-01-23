@@ -665,7 +665,7 @@ namespace casadi {
     const int checking_depth = 2;
     bool input_given = true;
     for (int i=0; i<arg.size() && input_given; ++i) {
-      if (!arg[i].isEqual(inputv_[i], checking_depth)) {
+      if (!isEqual(arg[i], inputv_[i], checking_depth)) {
         input_given = false;
       }
     }
@@ -695,7 +695,7 @@ namespace casadi {
     const int checking_depth = 2;
     bool output_given = true;
     for (int i=0; i<arg1.size() && output_given; ++i) {
-      if (!arg1[i].isEqual(inputv_[i], checking_depth)) {
+      if (!isEqual(arg1[i], inputv_[i], checking_depth)) {
         output_given = false;
       }
     }

@@ -26,38 +26,38 @@
 #ifndef CASADI_LR_DLE_TO_DLE_HPP
 #define CASADI_LR_DLE_TO_DLE_HPP
 
-#include "../core/function/dle_internal.hpp"
 #include "../core/function/lr_dle_internal.hpp"
-#include "../core/function/adaptor.hpp"
-#include <casadi/solvers/casadi_dlesolver_lrdle_export.h>
+#include "../core/function/dle_internal.hpp"
+#include <casadi/solvers/casadi_lrdlesolver_dle_export.h>
 
 /** \defgroup plugin_LrDleSolver_dle
- Solving the Discrete Lyapunov Equations with a
- Low-rank Discrete Lyapunov Equations solver
+ Solving the Low-Rank Discrete Lyapunov Equations with a
+ regular Discrete Lyapunov Equations solver
 
 */
-/** \pluginsection{DleSolver,lrdle} */
+/** \pluginsection{LrDleSolver,dle} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{DleSolver,lrdle}
+  /** \brief \pluginbrief{LrDleSolver,dle}
 
-   @copydoc DLE_doc
-   @copydoc plugin_DleSolver_lrdle
+   @copydoc LR_DLE_doc
+   @copydoc plugin_LrDleSolver_dle
 
        \author Joris Gillis
       \date 2014
 
   */
-  class CASADI_DLESOLVER_LRDLE_EXPORT LrDleToDle : public DleInternal,
-    public Adaptor<LrDleToDle, LrDleInternal>,
-    public Wrapper<LrDleToDle>   {
+  class CASADI_LRDLESOLVER_DLE_EXPORT LrDleToDle : public LrDleInternal,
+    public Adaptor<LrDleToDle, DleInternal>,
+    public Wrapper<LrDleToDle> {
   public:
     /** \brief  Constructor
-     * \param st \structargument{Dle}
+     * \param st \structargument{LrDle}
+     * \param Hs Column-sizes of H_i
      */
-    LrDleToDle(const DleStructure& st);
+    LrDleToDle(const LrDleStructure& st);
 
     /** \brief  Destructor */
     virtual ~LrDleToDle();
@@ -69,11 +69,11 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual LrDleToDle* create(const DleStructure& st) const {
+    virtual LrDleToDle* create(const LrDleStructure& st) const {
         return new LrDleToDle(st);}
 
     /** \brief  Create a new DLE Solver */
-    static DleInternal* creator(const DleStructure& st)
+    static LrDleInternal* creator(const LrDleStructure& st)
     { return new LrDleToDle(st);}
 
     /** \brief  Print solver statistics */
@@ -94,9 +94,9 @@ namespace casadi {
     static const std::string meta_doc;
 
     /// Solve with
-    LrDleSolver solver_;
+    DleSolver solver_;
   };
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_LR_DLE_TO_LR_DLE_HPP
+#endif // CASADI_LR_DLE_TO_DLE_HPP
