@@ -868,15 +868,6 @@ namespace casadi {
     static Matrix<DataType> nan(const std::pair<int, int>& rc);
     ///@}
 
-#if !defined(SWIG) || !defined(SWIGMATLAB)
-    ///@{
-    /** \brief  create a matrix by repeating an existing matrix */
-    static Matrix<DataType> repmat(const Matrix<DataType>& x, const Sparsity& sp);
-    static Matrix<DataType> repmat(const Matrix<DataType>& x, int nrow, int ncol=1);
-    static Matrix<DataType> repmat(const Matrix<DataType>& x, const std::pair<int, int>& rc);
-    ///@}
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
-
     /** \brief  create an n-by-n identity matrix */
     static Matrix<DataType> eye(int ncol);
 

@@ -263,15 +263,6 @@ namespace casadi {
     static MX nan(const std::pair<int, int>& rc);
     ///@}
 
-#if !defined(SWIG) || !defined(SWIGMATLAB)
-    ///@{
-    /** \brief  create a matrix by repeating an existing matrix */
-    static MX repmat(const MX& x, const Sparsity& sp);
-    static MX repmat(const MX& x, int n, int m=1);
-    static MX repmat(const MX& x, const std::pair<int, int> &rc);
-    ///@}
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
-
     /** \brief  Identity matrix */
     static MX eye(int ncol);
 

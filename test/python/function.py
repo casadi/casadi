@@ -195,7 +195,7 @@ class Functiontests(casadiTestCase):
     f.init()
     A = DMatrix.sparse(1,1)
     #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
-    B = DMatrix.repmat(2,1,2)
+    B = repmat(DMatrix(2),1,2)
     #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
     
   def test_issue304(self):

@@ -2076,22 +2076,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::repmat(const Matrix<DataType>& x, const Sparsity& sp) {
-    return x.zz_repmat(sp);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::repmat(const Matrix<DataType>& x,
-                                            const std::pair<int, int>& rc) {
-    return repmat(x, rc.first, rc.second);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::repmat(const Matrix<DataType>& x, int nrow, int ncol) {
-    return x.zz_repmat(nrow, ncol);
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::eye(int n) {
     return Matrix<DataType>(Sparsity::diag(n), 1);
   }

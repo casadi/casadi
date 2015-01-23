@@ -479,18 +479,6 @@ namespace casadi {
     return static_cast<const MXNode*>(SharedObject::operator->());
   }
 
-  MX MX::repmat(const MX& x, const Sparsity& sp) {
-    return x.zz_repmat(sp);
-  }
-
-  MX MX::repmat(const MX& x, const std::pair<int, int> &rc) {
-    return repmat(x, rc.first, rc.second);
-  }
-
-  MX MX::repmat(const MX& x, int n, int m) {
-    return x.zz_repmat(n, m);
-  }
-
   MX MX::inf(int nrow, int ncol) {
     return inf(Sparsity::dense(nrow, ncol));
   }

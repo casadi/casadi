@@ -544,7 +544,7 @@ namespace casadi {
           case OP_ADD:
           case OP_SUB:
             if (y->isZero())
-                return scX ? MX::repmat(shared_from_this<MX>(), y.shape()) : shared_from_this<MX>();
+                return scX ? repmat(shared_from_this<MX>(), y.shape()) : shared_from_this<MX>();
             break;
           case OP_MUL:
             if (y->isValue(1)) return shared_from_this<MX>();

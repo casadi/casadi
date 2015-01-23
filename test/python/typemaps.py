@@ -678,7 +678,7 @@ class typemaptests(casadiTestCase):
     A = IMatrix.ones(2,2)
     B = A + 1
     self.assertEqual(type(B),type(A))
-    self.checkarray(array(B),DMatrix.repmat(2,2,2),"Imatrix")
+    self.checkarray(array(B),repmat(DMatrix(2),2,2),"Imatrix")
     
   def test_issue314(self):
     self.message("regression test for #314: SX sparsity constructor")
