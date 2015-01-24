@@ -1201,7 +1201,7 @@ namespace casadi {
   template<>
   SX SX::zz_simplify() const {
     SX ex = *this;
-    for (int el=0; el<ex.nnz(); ++el) ex.at(el) = simplifyNew(ex.at(el));
+    for (int el=0; el<ex.nnz(); ++el) ex.at(el) = simplify(ex.at(el));
     return ex;
   }
 

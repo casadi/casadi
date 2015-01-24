@@ -101,7 +101,7 @@ class CASADI_EXPORT GenericExpression {
     inline friend ExType operator||(const ExType &x, const ExType &y) { return x.zz_or(y); }
 
     /** \brief  Simplify an expression */
-    inline friend ExType simplifyNew(const ExType &x) { return x.zz_simplify();}
+    inline friend ExType simplify(const ExType &x) { return x.zz_simplify();}
     #endif // SWIG
     /**
     \ingroup expression_tools

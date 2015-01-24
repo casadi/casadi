@@ -342,7 +342,7 @@ namespace casadi {
     sparsity().getNZ(nz);
 
     // Create a nonzero assignment node
-    *this = simplifyNew(m->getSetNonzeros(*this, nz));
+    *this = simplify(m->getSetNonzeros(*this, nz));
   }
 
   void MX::setSub(const MX& m, bool ind1, const Sparsity& sp) {
@@ -449,7 +449,7 @@ namespace casadi {
     }
 
     // Create a nonzero assignment node
-    *this = simplifyNew(m->getSetNonzeros(*this, kk.data()));
+    *this = simplify(m->getSetNonzeros(*this, kk.data()));
   }
 
   const MX MX::at(int k) const {
