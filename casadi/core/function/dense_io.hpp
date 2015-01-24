@@ -70,12 +70,12 @@ void DenseIO<Derived>::init() {
 
   for (int i=0;i< d->getNumInputs();++i) {
     if (!d->input(i).isDense()) {
-      dense_inputs_[i] = dense(d->input(i));
+      dense_inputs_[i] = densify(d->input(i));
     }
   }
   for (int i=0;i< d->getNumOutputs();++i) {
     if (!d->output(i).isDense()) {
-      dense_outputs_[i] = dense(d->output(i));
+      dense_outputs_[i] = densify(d->output(i));
     }
   }
 
