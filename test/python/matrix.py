@@ -80,7 +80,7 @@ class Matrixtests(casadiTestCase):
     C = vertcat([A,B])
     
     self.checkarray(C.shape,(6,3),"vertcat shape")
-    self.assertEqual(C.size(),A.size(),"vertcat size")
+    self.assertEqual(C.nnz(),A.nnz(),"vertcat size")
     
     self.assertRaises(RuntimeError,lambda : horzcat([A,B]))
     
@@ -91,7 +91,7 @@ class Matrixtests(casadiTestCase):
     C = horzcat([A,B])
     
     self.checkarray(C.shape,(3,6),"horzcat shape")
-    self.assertEqual(C.size(),A.size(),"vertcat size")
+    self.assertEqual(C.nnz(),A.nnz(),"vertcat size")
     
     self.assertRaises(RuntimeError,lambda : vertcat([A,B]))
     
@@ -112,7 +112,7 @@ class Matrixtests(casadiTestCase):
 
     for f in [fMX,fSX]:
       for i in range(3):
-        f.setInput(range(f.input(i).size()),i)
+        f.setInput(range(f.input(i).nnz()),i)
       
     self.checkfunction(fMX,fSX)
     
@@ -129,7 +129,7 @@ class Matrixtests(casadiTestCase):
     C = veccat([A,B])
     
     self.checkarray(C.shape,(9,1),"veccat shape")
-    self.assertEqual(C.size(),A.size()+B.size(),"veccat size")
+    self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"veccat size")
     
     self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
 
@@ -227,7 +227,7 @@ class Matrixtests(casadiTestCase):
     C = vecNZcat([A,B])
     
     self.checkarray(C.shape,(6,1),"vecNZcat shape")
-    self.assertEqual(C.size(),A.size()+B.size(),"vecNZcat size")
+    self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"vecNZcat size")
     
     self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
     
@@ -410,7 +410,7 @@ class Matrixtests(casadiTestCase):
 
     sp = Sparsity.lower(n)
 
-    x  = SX.sparse(sp,vertcat([SX.sym("a%d" % i) for i in range(sp.size())]))
+    x  = SX.sparse(sp,vertcat([SX.sym("a%d" % i) for i in range(sp.nnz())]))
 
     
     x_ = DMatrix(x.sparsity(),1)
@@ -607,12 +607,12 @@ class Matrixtests(casadiTestCase):
     check(IMatrix(Sparsity.dense(3,3),range(3*3)),[1,1,2],[1,1,2])
 
     sp = Sparsity.lower(4)
-    d = IMatrix(sp,range(sp.size()))
+    d = IMatrix(sp,range(sp.nnz()))
     check(d,[0,1,3],[0,2,3])
     check(d.T,[0,1,3],[0,2,3])
 
     sp = Sparsity.rowcol([0,1,2],[0,1],4,4)
-    d = IMatrix(sp,range(sp.size()))
+    d = IMatrix(sp,range(sp.nnz()))
     check(d,[0,3],[0,2])
     
     # getSub2
@@ -622,12 +622,12 @@ class Matrixtests(casadiTestCase):
     check(IMatrix(Sparsity.dense(2,2),range(2*2)),[1,1,1],[1,1,1])
 
     sp = Sparsity.lower(3)
-    d = IMatrix(sp,range(sp.size()))
+    d = IMatrix(sp,range(sp.nnz()))
     check(d,[0,1,2],[0,1,2])
     check(d.T,[0,1,2],[0,1,2])
     
     sp = Sparsity.rowcol([0,2],[0,1],4,4)
-    d = IMatrix(sp,range(sp.size()))
+    d = IMatrix(sp,range(sp.nnz()))
     check(d,[0,1,3],[0,2,3])
 
   def test_sparsesym(self):
@@ -731,7 +731,7 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(sparsify(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeU(),3)
     
   def test_tril2symm(self):
-    a = DMatrix(Sparsity.upper(3),range(Sparsity.upper(3).size())).T
+    a = DMatrix(Sparsity.upper(3),range(Sparsity.upper(3).nnz())).T
     s = tril2symm(a)
     self.checkarray(s,DMatrix([[0,1,3],[1,2,4],[3,4,5]]))
     
@@ -878,11 +878,11 @@ class Matrixtests(casadiTestCase):
     for sA in spA:
 
       random.seed(1)
-      a = DMatrix(sA,[random.random() for i in range(sA.size())])
+      a = DMatrix(sA,[random.random() for i in range(sA.nnz())])
       A = SX.sym("a",a.sparsity())
       for sB in [ Sparsity.dense(a.size1(),1), vertcat([Sparsity.dense(1,1),Sparsity.sparse(a.size1()-1,1)]),Sparsity.lower(a.size1()),Sparsity.lower(a.size1()).T]:
 
-        b = DMatrix(sB,[random.random() for i in range(sB.size())])
+        b = DMatrix(sB,[random.random() for i in range(sB.nnz())])
         B = SX.sym("B",b.sparsity())
         C = solve(A,B)
         
@@ -923,7 +923,7 @@ class Matrixtests(casadiTestCase):
     
     self.assertEqual(c_.size1(),a.size1()*b.size1())
     self.assertEqual(c_.size2(),a.size2()*b.size2())
-    self.assertEqual(c_.size(),a.size()*b.size())
+    self.assertEqual(c_.nnz(),a.nnz()*b.nnz())
     
     self.checkarray(c_,numpy.kron(a,b))
     
@@ -982,7 +982,7 @@ class Matrixtests(casadiTestCase):
     iwork = IVector(range(10+1+8))
     
     self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
-    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).size())
+    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).nnz())
     
     # Sparse
     for i in range(5):
@@ -993,7 +993,7 @@ class Matrixtests(casadiTestCase):
     B = sparsify(B)
     
     self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
-    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).size())
+    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).nnz())
     
     
     A = numpy.random.random((8,2))
@@ -1003,7 +1003,7 @@ class Matrixtests(casadiTestCase):
     iwork = IVector(range(10+1+8))
     
     self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
-    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).size())
+    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).nnz())
     
     # Sparse
     for i in range(5):
@@ -1014,7 +1014,7 @@ class Matrixtests(casadiTestCase):
     B = sparsify(B)
     
     self.checkarray(DMatrix(norm_inf_mul_nn(A,B,dwork,iwork)),norm_inf(mul(A,B)))
-    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).size())
+    self.checkarray(DMatrix(norm_0_mul_nn(A,B,bwork,iwork)),mul(A,B).nnz())
     
 if __name__ == '__main__':
     unittest.main()

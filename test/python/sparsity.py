@@ -61,8 +61,8 @@ class Sparsitytests(casadiTestCase):
         self.assertEquals(w[k],2)
         
     c = a + b
-    self.assertEquals(c.size(),len(nza.union(nzb)))
-    for k in range(c.size()):
+    self.assertEquals(c.nnz(),len(nza.union(nzb)))
+    for k in range(c.nnz()):
       ind = (c.row(k),c.getCol()[k])
       self.assertTrue(ind in nza or ind in nzb)
 
@@ -87,13 +87,13 @@ class Sparsitytests(casadiTestCase):
       b.addNZ(i[0],i[1])
     
     c,_=a.patternIntersection(b)
-    for k in range(c.size()):
+    for k in range(c.nnz()):
       ind = (c.row(k),c.getCol()[k])
       self.assertTrue(ind in nza and ind in nzb)
         
     c = a * b
-    self.assertEquals(c.size(),len(nza.intersection(nzb)))
-    for k in range(c.size()):
+    self.assertEquals(c.nnz(),len(nza.intersection(nzb)))
+    for k in range(c.nnz()):
       ind = (c.row(k),c.getCol()[k])
       self.assertTrue(ind in nza and ind in nzb)
        
@@ -141,7 +141,7 @@ class Sparsitytests(casadiTestCase):
     
   def tomatrix(self,s):
     d = DMatrix(s,1)
-    for k in range(d.size()):
+    for k in range(d.nnz()):
       d.nz[k] = k+1
     return d
 
@@ -506,7 +506,7 @@ class Sparsitytests(casadiTestCase):
     J.setOption("verbose",True)
     J.init()
     
-    self.assertTrue(J.getOutput()[:,:X.size()].sparsity()==Sparsity.diag(100))
+    self.assertTrue(J.getOutput()[:,:X.nnz()].sparsity()==Sparsity.diag(100))
 
     X = SX.sym("X",100)
     P = SX.sym("P",1000)
@@ -521,7 +521,7 @@ class Sparsitytests(casadiTestCase):
     J.setOption("verbose",True)
     J.init()
     
-    self.assertTrue(J.getOutput()[:X.size(),:].sparsity()==Sparsity.diag(100))
+    self.assertTrue(J.getOutput()[:X.nnz(),:].sparsity()==Sparsity.diag(100))
     
   def test_rowcol(self):
     n = 3

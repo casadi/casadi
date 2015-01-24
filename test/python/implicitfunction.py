@@ -129,7 +129,7 @@ class NLPtests(casadiTestCase):
       solver=ImplicitFunction(Solver,f)
       solver.setOption(options)
       # Cholesky is only unique for positive diagonal entries
-      solver.setOption("constraints",[1]*s.size())
+      solver.setOption("constraints",[1]*s.nnz())
       solver.init()
       
       X = MX.sym("X",x.sparsity())
@@ -137,7 +137,7 @@ class NLPtests(casadiTestCase):
       
       trial = MXFunction([X],[R])
       trial.init()
-      trial.setInput([abs(cos(i)) for i in range(x.size())])
+      trial.setInput([abs(cos(i)) for i in range(x.nnz())])
       trial.evaluate()
 
       f.setInput(trial.getOutput(),0)

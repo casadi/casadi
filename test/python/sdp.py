@@ -509,7 +509,7 @@ class SDPtests(casadiTestCase):
         
       V = struct_symSX([
             entry("L",shape=G.shape),
-            entry("x",shape=c.size())
+            entry("x",shape=c.nnz())
           ])
       L = V["L"]
       x = V["x"] 

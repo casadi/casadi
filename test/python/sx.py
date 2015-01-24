@@ -911,7 +911,7 @@ class SXtests(casadiTestCase):
     c = SX.sym("c")
     e = cos(a*b) + c
     w = getSymbols(e)
-    self.assertEqual(w.size(),3)
+    self.assertEqual(w.nnz(),3)
     if CasadiOptions.getSimplificationOnTheFly():
       self.assertTrue(isEqual(w[0],a))
       self.assertTrue(isEqual(w[1],b))
@@ -1116,7 +1116,7 @@ class SXtests(casadiTestCase):
 
     A = pickle.load(file("../data/apoa1-2.pkl",'r'))
 
-    H = DMatrix(A,range(A.size()))
+    H = DMatrix(A,range(A.nnz()))
     H = H + H.T
     
     H = H[:20000,:20000]
@@ -1174,14 +1174,14 @@ class SXtests(casadiTestCase):
      
      c = mul(a,b)
      
-     self.assertEqual(c.size(),0)
+     self.assertEqual(c.nnz(),0)
      
      a = SX.sparse(5,3)
      b = SX.sparse(3,4)
      
      c = mul(a,b)
      
-     self.assertEqual(c.size(),0)
+     self.assertEqual(c.nnz(),0)
      
   def  test_mxnullop(self):
     c = SX.sparse(0,0)
