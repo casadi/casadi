@@ -38,14 +38,6 @@ namespace casadi {
 @{
 */
 #if !defined(SWIG) || !defined(SWIGMATLAB)
-
-  /** \brief Branching on MX nodes
-      Ternary operator, "cond ? if_true : if_false"
-  */
-  inline MX if_else(const MX &cond, const MX &if_true, const MX &if_false) {
-    return cond.zz_if_else(if_true, if_false);
-  }
-
   /** \brief  Create a parent MX on which all given MX's will depend.
 
       In some sense, this function is the inverse of

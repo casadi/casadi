@@ -111,6 +111,7 @@ MatType repmat(const MatType &A, int n, int m=1);
 MatType repmat(const MatType &A, const std::pair<int, int>& rc);
 MatType repmat(const MatType &A, const Sparsity& sp);
 MatType simplify(const MatType &x);
+MatType if_else(const MatType &cond, const MatType &if_true, const MatType &if_false);
 %enddef
 
 %define MATRIX_DECL(MatType...)

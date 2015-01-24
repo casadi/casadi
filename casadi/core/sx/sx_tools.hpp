@@ -78,9 +78,6 @@ namespace casadi {
   */
   inline SX pw_lin(const SX &t, const SX &tval, const SX &val) { return t.zz_pw_lin(tval, val);}
 
-  inline SX if_else(const SX &cond, const SX &if_true, const SX &if_false) {
-    return cond.zz_if_else(if_true, if_false);
-  }
   /**  \brief Heaviside function
    *
    * \f[

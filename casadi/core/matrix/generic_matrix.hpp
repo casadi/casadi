@@ -354,6 +354,21 @@ namespace casadi {
       return A.zz_repmat(sp);
     }
 
+    /** \brief Check if expression depends on the argument
+        The argument must be symbolic
+    */
+    //inline friend bool dependsOn(const MatType& f, const MatType &arg) {
+    //return f.zz_dependsOn(arg);
+    //}
+
+    /** \brief Branching on MX nodes
+        Ternary operator, "cond ? if_true : if_false"
+    */
+    inline friend MatType if_else(const MatType &cond,
+                                  const MatType &if_true,
+                                  const MatType &if_false) {
+      return cond.zz_if_else(if_true, if_false);
+    }
     /** @} */
 
 #endif // !SWIG || DOXYGEN
