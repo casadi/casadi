@@ -73,5 +73,5 @@ color(A+Sparsity.triplet(5,5,[0]*5,range(5))+Sparsity.triplet(5,5,range(5),[0]*5
 #! Let's take an example from the paper
 
 A = IMatrix([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-A = sparse(A)
+A = sparsify(A)
 color(A.sparsity())
