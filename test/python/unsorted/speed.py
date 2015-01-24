@@ -148,7 +148,7 @@ for sol in solvers:
   print "durations for operations:                ", dur_operation
   print "number of non-zeros for the last matrix: ",
   if sol=="casadi":
-    print M.size()
+    print M.nnz()
   else:
     print M.getnnz()
 

@@ -253,7 +253,7 @@ class Functiontests(casadiTestCase):
   
     x = SX.sym("x")
     
-    self.assertEqual(jacobian(5,x).size(),0)
+    self.assertEqual(jacobian(5,x).nnz(),0)
     
     
     def test(sp):
@@ -1020,7 +1020,7 @@ class Functiontests(casadiTestCase):
     J.init()
     J.evaluate()
     
-    self.assertEqual(J.output().size(),4)
+    self.assertEqual(J.output().nnz(),4)
     
     f = MXFunction([x],[x])
     f.init()
@@ -1030,7 +1030,7 @@ class Functiontests(casadiTestCase):
     J.init()
     J.evaluate()
     
-    self.assertEqual(J.output().size(),16)
+    self.assertEqual(J.output().nnz(),16)
       
   def test_setjacobian(self):
     x = MX.sym("x")

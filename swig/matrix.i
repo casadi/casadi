@@ -292,7 +292,7 @@ PyObject* arrayView() {
   def __float__(self):
     if self.numel()!=1:
       raise Exception("Only a scalar can be cast to a float")
-    if self.size()==0:
+    if self.nnz()==0:
       return 0.0
     return self.toScalar()
 %}
@@ -301,7 +301,7 @@ PyObject* arrayView() {
   def __int__(self):
     if self.numel()!=1:
       raise Exception("Only a scalar can be cast to an int")
-    if self.size()==0:
+    if self.nnz()==0:
       return 0
     return int(self.toScalar())
 %}
@@ -310,7 +310,7 @@ PyObject* arrayView() {
   def __nonzero__(self):
     if self.numel()!=1:
       raise Exception("Only a scalar can be cast to a float")
-    if self.size()==0:
+    if self.nnz()==0:
       return 0
     return self.toScalar()!=0
 %}
@@ -347,7 +347,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
     def __float__(self):
       if self.numel()!=1:
         raise Exception("Only a scalar can be cast to a float")
-      if self.size()==0:
+      if self.nnz()==0:
         return 0.0
       return float(self.toScalar())
   %}
@@ -356,7 +356,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
     def __int__(self):
       if self.numel()!=1:
         raise Exception("Only a scalar can be cast to an int")
-      if self.size()==0:
+      if self.nnz()==0:
         return 0
       return self.toScalar()
   %}

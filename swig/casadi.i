@@ -899,7 +899,7 @@ class NZproxy:
     return self.matrix.setNZ(val, False, s)
 
   def __len__(self):
-    return self.matrix.size()
+    return self.matrix.nnz()
     
   def __iter__(self):
     for k in range(len(self)):

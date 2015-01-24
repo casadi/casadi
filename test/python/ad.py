@@ -530,7 +530,7 @@ class ADtests(casadiTestCase):
 
     def remove_last(x):
       ret = DMatrix(x)
-      if ret.size()>0:
+      if ret.nnz()>0:
         ret[ret.sparsity().row()[-1],ret.sparsity().getCol()[-1]] = DMatrix.sparse(1,1)
         return ret
       else:
@@ -659,8 +659,8 @@ class ADtests(casadiTestCase):
           d.setInput(v,i)
         
         for d in range(ndir):
-          f.setInput(DMatrix(inputs[0].sparsity(),random.random(inputs[0].size())),num_in+d*num_in + d)
-          f.setAdjSeed(DMatrix(out.sparsity(),random.random(out.size())),num_in+d*num_in + 0)
+          f.setInput(DMatrix(inputs[0].sparsity(),random.random(inputs[0].nnz())),num_in+d*num_in + d)
+          f.setAdjSeed(DMatrix(out.sparsity(),random.random(out.nnz())),num_in+d*num_in + 0)
           f.setFwdSeed(0,1,d)
           f.setAdjSeed(0,1,d)
           
@@ -691,8 +691,8 @@ class ADtests(casadiTestCase):
             with internalAPI():
               res,fwdsens,adjsens = f.callDerivative(inputss,fseeds,aseeds,True)
             
-            fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].size())) for d in range(ndir) ]
-            aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].size())) for d in range(ndir) ]
+            fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
+            aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
             vf = Function(inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
             
             vf.init()
@@ -735,7 +735,7 @@ class ADtests(casadiTestCase):
             # Complete random seeding
             random.seed(1)
             for i in range(vf.getNumInputs()):
-              vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())),i)
+              vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).nnz())),i)
             
             vf.evaluate()
             storagekey = (spmod,spmod2)
@@ -767,7 +767,7 @@ class ADtests(casadiTestCase):
                 
               random.seed(1)
               for i in range(vf2.getNumInputs()):
-                vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())),i)
+                vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).nnz())),i)
               
               vf2.evaluate()
               storagekey = (spmod,spmod2)
@@ -780,8 +780,8 @@ class ADtests(casadiTestCase):
         for stk,st in store.items():
           for i in range(len(st)-1):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-              if b.numel()==0 and sparsify(a).size()==0: continue
-              if a.numel()==0 and sparsify(b).size()==0: continue
+              if b.numel()==0 and sparsify(a).nnz()==0: continue
+              if a.numel()==0 and sparsify(b).nnz()==0: continue
               self.checkarray(sparsify(a),sparsify(b),("%s, output(%d)" % (order,k))+str(vf2.getInput(0)))
               
       for f in [fun.expand(),fun]:
