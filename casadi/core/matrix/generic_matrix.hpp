@@ -74,7 +74,9 @@ namespace casadi {
     /** \brief Get the number of (structural) non-zero elements */
     int nnz() const;
 
-    /** \brief DEPRECATED: Alias for nnz */
+    /** \brief DEPRECATED: Alias for nnz
+        \see nnz()
+    */
     int size() const { return nnz();}
 
     /** \brief Get the number of non-zeros in the lower triangular half */
