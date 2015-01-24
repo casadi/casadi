@@ -886,6 +886,11 @@ class typemaptests(casadiTestCase):
       d.set(D)
       self.checkarray(d,DMatrix([[1,2],[3,4]]))
 
+  def test_issue1217(self):
+    a = numpy.matrix([0,SX.sym("x")])
+
+    print if_else(0,a,a)
+
   def test_vector_generic_return(self):
 
     states = SX.sym("x",2)
