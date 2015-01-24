@@ -123,7 +123,7 @@ namespace casadi {
     Sparsity P = V;
     Sparsity Pprev = Sparsity::sparse(n, n);
 
-    while (Pprev.size()!=P.size()) {
+    while (Pprev.nnz()!=P.nnz()) {
       Pprev = P;
       P = mul(mul(A, P), A.T()) + V;
       V = mul(mul(A, V), A.T()) + V;

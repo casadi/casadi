@@ -121,7 +121,7 @@ namespace casadi {
                                             CodeGenerator& gen) const {
 
     // Print loop and right hand side
-    stream << "  for (i=0; i<" << sparsity().size() << "; ++i) ";
+    stream << "  for (i=0; i<" << sparsity().nnz() << "; ++i) ";
     stream << res.at(0) << "[i]";
 
     // Check if inplace
@@ -187,7 +187,7 @@ namespace casadi {
     bvec_t *input0 = get_bvec_t(input[0]->data());
     bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
-    for (int el=0; el<output[0]->size(); ++el) {
+    for (int el=0; el<output[0]->nnz(); ++el) {
       if (fwd) {
         outputd[el] = input0[ScX ? 0 : el] | input1[ScY ? 0 : el];
       } else {

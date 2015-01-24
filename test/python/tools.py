@@ -566,9 +566,9 @@ class Toolstests(casadiTestCase):
       b["P"] = DMatrix([[11,1,2],[1,4,5],[2,5,8]])
       
     with self.assertRaises(Exception):
-      b["P"] = sparse(DMatrix([[11,0,1],[1,4,5],[0,5,8]]))
+      b["P"] = sparsify(DMatrix([[11,0,1],[1,4,5],[0,5,8]]))
     
-    b["P"] = sparse(DMatrix([[11,1,0],[1,4,5],[0,5,8]]))
+    b["P"] = sparsify(DMatrix([[11,1,0],[1,4,5],[0,5,8]]))
     
     self.checkarray(b["P"],DMatrix([[11,1,0],[1,4,5],[0,5,8]]))
     
@@ -578,10 +578,10 @@ class Toolstests(casadiTestCase):
     with self.assertRaises(Exception):
       b["P",0,:] = DMatrix([1,2,3]).T
       
-    b["P",:,0] = sparse(DMatrix([1,2,0]))
+    b["P",:,0] = sparsify(DMatrix([1,2,0]))
     self.checkarray(b["P"],DMatrix([[1,2,0],[2,4,5],[0,5,8]]))
 
-    b["P",0,:] = sparse(DMatrix([11,12,0])).T
+    b["P",0,:] = sparsify(DMatrix([11,12,0])).T
     self.checkarray(b["P"],DMatrix([[11,12,0],[12,4,5],[0,5,8]]))
     
   def test_callableExtraIndex(self):

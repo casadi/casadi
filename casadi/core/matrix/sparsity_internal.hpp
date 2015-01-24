@@ -190,7 +190,7 @@ namespace casadi {
     Sparsity zz_reshape(int nrow, int ncol) const;
 
     /// Number of structural non-zeros
-    int size() const;
+    int nnz() const;
 
     /// Number of elements
     int numel() const;

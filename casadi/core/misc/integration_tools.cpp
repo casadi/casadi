@@ -252,9 +252,9 @@ namespace casadi {
     collocationInterpolators(tau_root, C, D);
 
     // Retrieve problem dimensions
-    int nx = f.input(DAE_X).size();
-    int nz = f.input(DAE_Z).size();
-    int np = f.input(DAE_P).size();
+    int nx = f.input(DAE_X).nnz();
+    int nz = f.input(DAE_Z).nnz();
+    int np = f.input(DAE_P).nnz();
 
     //Variables for one finite element
     MX X = MX::sym("X", nx);

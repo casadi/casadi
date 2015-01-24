@@ -100,14 +100,14 @@ namespace casadi {
     dae_in_[DAE_X]    = MX::sym("x", control_dae_.input(CONTROL_DAE_X).sparsity());
     dae_in_[DAE_Z]    = MX::sym("z", control_dae_.input(CONTROL_DAE_Z).sparsity());
 
-    np_ = control_dae_.input(CONTROL_DAE_P).size();
+    np_ = control_dae_.input(CONTROL_DAE_P).nnz();
 
     Sparsity u_sparsity = control_dae_.input(CONTROL_DAE_U).sparsity();
-    if (control_dae_.input(CONTROL_DAE_U_INTERP).size()!=0) {
+    if (control_dae_.input(CONTROL_DAE_U_INTERP).nnz()!=0) {
       u_sparsity = control_dae_.input(CONTROL_DAE_U_INTERP).sparsity();
     }
 
-    nu_ = control_dae_.input(CONTROL_DAE_U).size();
+    nu_ = control_dae_.input(CONTROL_DAE_U).nnz();
 
     if (!control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty() && nu_!=0) {
       casadi_assert_message(
@@ -119,10 +119,10 @@ namespace casadi {
         << control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
     }
 
-    int nu_end   = control_dae_.input(CONTROL_DAE_U_INTERP).size();
+    int nu_end   = control_dae_.input(CONTROL_DAE_U_INTERP).nnz();
     nu_ = std::max(nu_end, nu_);
 
-    ny_ = control_dae_.input(CONTROL_DAE_X).size();
+    ny_ = control_dae_.input(CONTROL_DAE_X).nnz();
 
     // Structure of DAE_P : T0 TF P Ustart Uend Y_MAJOR
 
@@ -348,8 +348,8 @@ namespace casadi {
     FunctionInternal::init();
 
     // Variables on which the chain of simulator calls (all_output_) depend
-    MX Xk = MX::sym("Xk", input(CONTROLSIMULATOR_X0).size());
-    MX P = MX::sym("P", input(CONTROLSIMULATOR_P).size());
+    MX Xk = MX::sym("Xk", input(CONTROLSIMULATOR_X0).nnz());
+    MX P = MX::sym("P", input(CONTROLSIMULATOR_P).nnz());
     MX U = MX::sym("U", input(CONTROLSIMULATOR_U).sparsity());
 
     // Group these variables as an input list for all_output_
@@ -379,7 +379,7 @@ namespace casadi {
       if (nu_>0) {
         P_eval[3] = U(range(nu_), k);
       }
-      if (control_dae_.input(CONTROL_DAE_U_INTERP).size()>0) {
+      if (control_dae_.input(CONTROL_DAE_U_INTERP).nnz()>0) {
         if (k+1==U.size2()) {
           P_eval[4] = P_eval[3];
         } else {

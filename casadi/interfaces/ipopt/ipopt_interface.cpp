@@ -820,10 +820,10 @@ namespace casadi {
       m = ng_;               // number of constraints
 
       // Get Jacobian sparsity pattern
-      if (nlp_.output(NL_G).size()==0)
+      if (nlp_.output(NL_G).nnz()==0)
         nnz_jac_g = 0;
       else
-        nnz_jac_g = jacG().output().size();
+        nnz_jac_g = jacG().output().nnz();
 
       // Get Hessian sparsity pattern
       if (exact_hessian_)

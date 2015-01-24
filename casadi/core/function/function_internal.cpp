@@ -391,10 +391,10 @@ namespace casadi {
 
   Sparsity FunctionInternal::getJacSparsityPlain(int iind, int oind) {
     // Number of nonzero inputs
-    int nz_in = input(iind).size();
+    int nz_in = input(iind).nnz();
 
     // Number of nonzero outputs
-    int nz_out = output(oind).size();
+    int nz_out = output(oind).nnz();
 
     // Number of forward sweeps we must make
     int nsweep_fwd = nz_in/bvec_size;
@@ -522,7 +522,7 @@ namespace casadi {
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
 
     casadi_log("Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", "
-               << ret.size() << " nonzeros, " << (100.0*ret.size())/ret.numel() << " % nonzeros).");
+               << ret.nnz() << " nonzeros, " << (100.0*ret.nnz())/ret.numel() << " % nonzeros).");
     casadi_log("FunctionInternal::getJacSparsity end ");
 
     // Return sparsity pattern
@@ -533,7 +533,7 @@ namespace casadi {
     casadi_assert(spCanEvaluate(true));
 
     // Number of nonzero inputs
-    int nz = input(iind).size();
+    int nz = input(iind).nnz();
 
     // Clear the forward seeds/adjoint sensitivities
     for (int ind=0; ind<getNumInputs(); ++ind) {
@@ -754,17 +754,17 @@ namespace casadi {
 
     casadi_log("Number of sweeps: " << nsweeps);
     casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
-               ", " << r.size() << " nonzeros, " << (100.0*r.size())/r.numel() << " % nonzeros).");
+               ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
 
     return r.T();
   }
 
   Sparsity FunctionInternal::getJacSparsityHierarchical(int iind, int oind) {
     // Number of nonzero inputs
-    int nz_in = input(iind).size();
+    int nz_in = input(iind).nnz();
 
     // Number of nonzero outputs
-    int nz_out = output(oind).size();
+    int nz_out = output(oind).nnz();
 
     // Clear the forward seeds/adjoint sensitivities
     for (int ind=0; ind<getNumInputs(); ++ind) {
@@ -1059,7 +1059,7 @@ namespace casadi {
     }
     casadi_log("Number of sweeps: " << nsweeps);
     casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
-               ", " << r.size() << " nonzeros, " << (100.0*r.size())/r.numel() << " % nonzeros).");
+               ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
 
     return r.T();
   }
@@ -1068,7 +1068,7 @@ namespace casadi {
     // Check if we are able to propagate dependencies through the function
     if (spCanEvaluate(true) || spCanEvaluate(false)) {
 
-      if (input(iind).size()>3*bvec_size && output(oind).size()>3*bvec_size) {
+      if (input(iind).nnz()>3*bvec_size && output(oind).nnz()>3*bvec_size) {
         if (symmetric) {
           return getJacSparsityHierarchicalSymm(iind, oind);
         } else {
@@ -1081,7 +1081,7 @@ namespace casadi {
 
     } else {
       // Dense sparsity by default
-      return Sparsity::dense(output(oind).size(), input(iind).size());
+      return Sparsity::dense(output(oind).nnz(), input(iind).nnz());
     }
   }
 
@@ -1114,7 +1114,7 @@ namespace casadi {
 
         // Enlarge if sparse output
         if (output(oind).numel()!=sp.size1()) {
-          casadi_assert(sp.size1()==output(oind).size());
+          casadi_assert(sp.size1()==output(oind).nnz());
 
           // New row for each old row
           vector<int> row_map = output(oind).sparsity().find();
@@ -1125,7 +1125,7 @@ namespace casadi {
 
         // Enlarge if sparse input
         if (input(iind).numel()!=sp.size2()) {
-          casadi_assert(sp.size2()==input(iind).size());
+          casadi_assert(sp.size2()==input(iind).nnz());
 
           // New column for each old column
           vector<int> col_map = input(iind).sparsity().find();
@@ -1141,7 +1141,7 @@ namespace casadi {
 
     // If still null, not dependent
     if (jsp.isNull()) {
-      jsp = Sparsity::sparse(output(oind).size(), input(iind).size());
+      jsp = Sparsity::sparse(output(oind).nnz(), input(iind).nnz());
     }
 
     // Return a reference to the block
@@ -1403,7 +1403,7 @@ namespace casadi {
       for (int iind=0; iind<getNumInputs(); ++iind) {
         const DMatrix& m = inputNoCheck(iind);
         const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
-        for (int i=0; i<m.size(); ++i) {
+        for (int i=0; i<m.nnz(); ++i) {
           all_depend |= v[i];
         }
       }
@@ -1412,7 +1412,7 @@ namespace casadi {
       for (int oind=0; oind<getNumOutputs(); ++oind) {
         DMatrix& m = outputNoCheck(oind);
         bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-        for (int i=0; i<m.size(); ++i) {
+        for (int i=0; i<m.nnz(); ++i) {
           v[i] = all_depend;
         }
       }
@@ -1423,7 +1423,7 @@ namespace casadi {
       for (int oind=0; oind<getNumOutputs(); ++oind) {
         const DMatrix& m = outputNoCheck(oind);
         const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
-        for (int i=0; i<m.size(); ++i) {
+        for (int i=0; i<m.nnz(); ++i) {
           all_depend |= v[i];
         }
       }
@@ -1432,7 +1432,7 @@ namespace casadi {
       for (int iind=0; iind<getNumInputs(); ++iind) {
         DMatrix& m = inputNoCheck(iind);
         bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-        for (int i=0; i<m.size(); ++i) {
+        for (int i=0; i<m.nnz(); ++i) {
           v[i] |= all_depend;
         }
       }
@@ -1445,7 +1445,7 @@ namespace casadi {
       for (int oind = 0; oind < getNumOutputs(); ++oind) {
         // Get data array for output and clear it
         bvec_t *outputd = get_bvec_t(output(oind).data());
-        fill_n(outputd, output(oind).size(), 0);
+        fill_n(outputd, output(oind).nnz(), 0);
       }
     }
 
@@ -1467,7 +1467,7 @@ namespace casadi {
 
         // Get the sparsity of the Jacobian block
         Sparsity sp = jacSparsity(iind, oind, true, false);
-        if (sp.isNull() || sp.size() == 0)
+        if (sp.isNull() || sp.nnz() == 0)
           continue; // Skip if zero
 
         const int d1 = sp.size2();
@@ -1681,7 +1681,7 @@ namespace casadi {
     int ind=0;
     for (int d=-1; d<nfwd; ++d) {
       for (int i=0; i<getNumInputs(); ++i, ++ind) {
-        if (ret.input(ind).size()!=0 && ret.input(ind).sparsity()!=input(i).sparsity()) {
+        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=input(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \""
                        << i_names.at(ind) << "\". Expected " << input(i).dimString()
                        << " but got " << ret.input(ind).dimString());
@@ -1690,7 +1690,7 @@ namespace casadi {
     }
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<getNumOutputs(); ++i, ++ind) {
-        if (ret.input(ind).size()!=0 && ret.input(ind).sparsity()!=output(i).sparsity()) {
+        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=output(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind <<
                        " \"" << i_names.at(ind) << "\". Expected " << output(i).dimString()
                        << " but got " << ret.input(ind).dimString());
@@ -1702,7 +1702,7 @@ namespace casadi {
     ind=0;
     for (int d=-1; d<nfwd; ++d) {
       for (int i=0; i<getNumOutputs(); ++i, ++ind) {
-        if (ret.output(ind).size()!=0 && ret.output(ind).sparsity()!=output(i).sparsity()) {
+        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=output(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind <<
                        " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dimString()
                        << " but got " << ret.output(ind).dimString());
@@ -1711,7 +1711,7 @@ namespace casadi {
     }
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<getNumInputs(); ++i, ++ind) {
-        if (ret.output(ind).size()!=0 && ret.output(ind).sparsity()!=input(i).sparsity()) {
+        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=input(i).sparsity()) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \""
                        << o_names.at(ind) << "\". Expected " << input(i).dimString()
                        << " but got " << ret.output(ind).dimString());
@@ -1853,7 +1853,7 @@ namespace casadi {
   int FunctionInternal::getNumInputNonzeros() const {
     int ret=0;
     for (int iind=0; iind<getNumInputs(); ++iind) {
-      ret += input(iind).size();
+      ret += input(iind).nnz();
     }
     return ret;
   }
@@ -1861,7 +1861,7 @@ namespace casadi {
   int FunctionInternal::getNumOutputNonzeros() const {
     int ret=0;
     for (int oind=0; oind<getNumOutputs(); ++oind) {
-      ret += output(oind).size();
+      ret += output(oind).nnz();
     }
     return ret;
   }
@@ -2147,12 +2147,12 @@ namespace casadi {
 
       // Declare input buffers
       for (int i=0; i<n_in; ++i) {
-        cfile << "  d t_x" << i << "[" << input(i).sparsity().size() << "];" << std::endl;
+        cfile << "  d t_x" << i << "[" << input(i).sparsity().nnz() << "];" << std::endl;
       }
 
       // Declare output buffers
       for (int i=0; i<n_out; ++i) {
-        cfile << "  d t_r" << i << "[" << output(i).sparsity().size() << "];" << std::endl;
+        cfile << "  d t_r" << i << "[" << output(i).sparsity().nnz() << "];" << std::endl;
       }
 
       // Repeat 10 times
@@ -2160,7 +2160,7 @@ namespace casadi {
 
       // Dummy input values
       for (int i=0; i<n_in; ++i) {
-        cfile << "    for (i=0; i<" << input(i).sparsity().size() << "; ++i) t_x"
+        cfile << "    for (i=0; i<" << input(i).sparsity().nnz() << "; ++i) t_x"
               << i << "[i] = sin(2.2*i+sqrt(4.3/(j+1)));" << std::endl;
       }
 
@@ -2183,7 +2183,7 @@ namespace casadi {
 
       // Dummy printout
       for (int i=0; i<n_out; ++i) {
-        int n = output(i).sparsity().size();
+        int n = output(i).sparsity().nnz();
         for (int j=0; j<n && j<5; ++j) {
           cfile << "    printf(\"%g \", t_r" << i << "[" << j << "]);" << std::endl;
         }
@@ -2541,7 +2541,7 @@ namespace casadi {
         // Copy output
         output(oind).sparsity().set(
           get_bvec_t(output(oind).data()), get_bvec_t(res[oind]->data()), res[oind]->sparsity());
-        if (!use_fwd) fill_n(get_bvec_t(res[oind]->data()), res[oind]->size(), bvec_t(0));
+        if (!use_fwd) fill_n(get_bvec_t(res[oind]->data()), res[oind]->nnz(), bvec_t(0));
       }
     }
 
@@ -2596,7 +2596,7 @@ namespace casadi {
     for (int i=0; i<getNumInputs(); ++i) {
       if (node->dep(i).sparsity()!=input(i).sparsity()) {
         arg_mod[i] = "rrr+" + CodeGenerator::numToString(nr);
-        nr += input(i).size();
+        nr += input(i).nnz();
 
         // Codegen "copy sparse"
         gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
@@ -2639,7 +2639,7 @@ namespace casadi {
     // Add memory for all inputs with nonmatching sparsity
     for (int i=0; i<getNumInputs(); ++i) {
       if (node->dep(i).isNull() || node->dep(i).sparsity()!=input(i).sparsity()) {
-        nr += input(i).size();
+        nr += input(i).nnz();
       }
     }
   }
@@ -2751,11 +2751,11 @@ namespace casadi {
 
     // Check if any constraint is violated
     bool all_ok = true;
-    for (int i=0; all_ok && i<v.size(); ++i) {
+    for (int i=0; all_ok && i<v.nnz(); ++i) {
       all_ok = v.at(i) > ub.at(i) + tol || v.at(i) < lb.at(i) - tol;
     }
     if (all_ok) {
-      stream << "All " << v.size() << " constraints on " << name << " are met: " << endl;
+      stream << "All " << v.nnz() << " constraints on " << name << " are met: " << endl;
     } else {
       stream << "Problem with constraints on " << name << ": " << endl;
     }
@@ -2772,7 +2772,7 @@ namespace casadi {
     int indicator_length = 15;
 
     // Loop over the elements of v
-    for (int i=0;i<v.size();i++) {
+    for (int i=0;i<v.nnz();i++) {
 
       stream.width(5);
       stream << i << ". |   ";

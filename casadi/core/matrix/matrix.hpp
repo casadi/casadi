@@ -163,6 +163,7 @@ namespace casadi {
 
     /// Expose base class functions
     using B::size;
+    using B::nnz;
     using B::sizeL;
     using B::sizeU;
     using B::numel;
@@ -217,7 +218,7 @@ namespace casadi {
     /** \brief  Create a matrix from a matrix with a different type of matrix entries
      * (assuming that the scalar conversion is valid) */
     template<typename A>
-    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.size())) {
+    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.nnz())) {
       copy(x.begin(), x.end(), begin());
     }
 
@@ -248,11 +249,11 @@ namespace casadi {
     /// Access a non-zero element
     inline DataType& at(int k) {
       try {
-        if (k<0) k+=size();
+        if (k<0) k+=nnz();
         return data().at(k);
       } catch(std::out_of_range& /* unnamed */) {
         std::stringstream ss;
-        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0, " << size() << ")";
+        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0, " << nnz() << ")";
         throw CasadiException(ss.str());
       }
     }
@@ -260,11 +261,11 @@ namespace casadi {
     /// Access a non-zero element
     DataType at(int k) {
       try {
-        if (k<0) k+=size();
+        if (k<0) k+=nnz();
         return data().at(k);
       } catch(std::out_of_range& /* unnamed */) {
         std::stringstream ss;
-        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0, " << size() << ")";
+        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0, " << nnz() << ")";
         throw CasadiException(ss.str());
       }
     }

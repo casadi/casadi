@@ -135,7 +135,7 @@ namespace casadi {
 
   void SdqpToSdp::evaluate() {
     cholesky_.setInput(input(SDQP_SOLVER_H));
-    for (int k=0;k<cholesky_.input(0).size();++k) {
+    for (int k=0;k<cholesky_.input(0).nnz();++k) {
       cholesky_.input().at(k)*=0.5;
     }
     cholesky_.prepare();
@@ -144,7 +144,7 @@ namespace casadi {
               input(SDQP_SOLVER_C).end(),
               mapping_.input("h_socp").begin());
     cholesky_.solveL(&mapping_.input("h_socp").data().front(), 1, true);
-    for (int k=0;k<mapping_.input("h_socp").size();++k) {
+    for (int k=0;k<mapping_.input("h_socp").nnz();++k) {
       mapping_.input("h_socp").at(k)*= 0.5;
     }
 
@@ -185,11 +185,11 @@ namespace casadi {
               SDQP_SOLVER_DUAL_COST);
     if (!output(SDQP_SOLVER_DUAL).isEmpty())
         std::copy(solver_.output(SDP_SOLVER_DUAL).begin(),
-                  solver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).size(),
+                  solver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).nnz(),
                   output(SDQP_SOLVER_DUAL).begin());
     if (!output(SDQP_SOLVER_P).isEmpty())
         std::copy(solver_.output(SDP_SOLVER_P).begin(),
-                  solver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).size(),
+                  solver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).nnz(),
                   output(SDQP_SOLVER_P).begin());
     std::copy(solver_.output(SDP_SOLVER_X).begin(),
               solver_.output(SDP_SOLVER_X).begin()+n_,

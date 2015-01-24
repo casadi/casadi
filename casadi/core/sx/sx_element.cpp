@@ -846,7 +846,7 @@ namespace casadi {
     } else {
       // Scalar
       std::stringstream ss;
-      for (int k=0; k<sp.size(); ++k) {
+      for (int k=0; k<sp.nnz(); ++k) {
         ss.str("");
         ss << name << "_" << k;
         retv.push_back(SXElement::sym(ss.str()));
@@ -872,14 +872,14 @@ namespace casadi {
   template<>
   bool SX::isRegular() const {
     // First pass: ignore symbolics
-    for (int i=0; i<size(); ++i) {
+    for (int i=0; i<nnz(); ++i) {
       const SXElement& x = at(i);
       if (x.isConstant()) {
         if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
       }
     }
     // Second pass: don't ignore symbolics
-    for (int i=0; i<size(); ++i) {
+    for (int i=0; i<nnz(); ++i) {
       if (!at(i).isRegular()) return false;
     }
     return true;
@@ -921,7 +921,7 @@ namespace casadi {
 
   template<>
   bool SX::isSymbolicSparse() const {
-    for (int k=0; k<size(); ++k) // loop over non-zero elements
+    for (int k=0; k<nnz(); ++k) // loop over non-zero elements
       if (!at(k)->isSymbolic()) // if an element is not symbolic
         return false;
 
@@ -1201,7 +1201,7 @@ namespace casadi {
   template<>
   SX SX::zz_simplify() const {
     SX ex = *this;
-    for (int el=0; el<ex.size(); ++el) simplify(ex.at(el));
+    for (int el=0; el<ex.nnz(); ++el) simplify(ex.at(el));
     return ex;
   }
 
@@ -1236,7 +1236,7 @@ namespace casadi {
     for (int k=0; k<v.size(); ++k) {
       if (v[k].sparsity()!=vdef[k].sparsity()) {
         // Expand vdef to sparsity of v if vdef is scalar
-        if (vdef[k].isScalar() && vdef[k].size()==1) {
+        if (vdef[k].isScalar() && vdef[k].nnz()==1) {
           std::vector<SX> vdef_mod = vdef;
           vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0));
           return substitute(ex, v, vdef_mod);
@@ -1343,7 +1343,7 @@ namespace casadi {
   template<>
   bool SX::zz_dependsOn(const SX &arg) const {
     const SX& ex = *this;
-    if (ex.size()==0) return false;
+    if (ex.nnz()==0) return false;
 
     // Construct a temporary algorithm
     SXFunction temp(arg, ex);
@@ -1352,13 +1352,13 @@ namespace casadi {
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());
     // Make a column with all variables active
-    std::fill(input_, input_+temp.input().size(), bvec_t(1));
+    std::fill(input_, input_+temp.input().nnz(), bvec_t(1));
     bvec_t* output_ = get_bvec_t(temp.output().data());
     // Perform a single dependency sweep
     temp.spEvaluate(true);
 
     // Loop over results
-    for (int i=0;i<temp.output().size();++i) {
+    for (int i=0;i<temp.output().nnz();++i) {
       if (output_[i]) return true;
     }
 
@@ -1456,7 +1456,7 @@ namespace casadi {
   SX SX::zz_taylor(const SX& x,
                    const SX& a, int order) const {
     casadi_assert(x.isScalar() && a.isScalar());
-    if (size()!=numel())
+    if (nnz()!=numel())
       throw CasadiException("taylor: not implemented for sparse matrices");
     SX ff = vec(T());
 
@@ -1475,7 +1475,7 @@ namespace casadi {
 
   template<>
   SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const {
-    return mtaylor(*this, x, a, order, std::vector<int>(x.size(), 1));
+    return mtaylor(*this, x, a, order, std::vector<int>(x.nnz(), 1));
   }
 
   SX mtaylor_recursive(const SX& ex, const SX& x, const SX& a, int order,
@@ -1483,7 +1483,7 @@ namespace casadi {
                        const SXElement & current_dx=casadi_limits<SXElement>::one,
                        double current_denom=1, int current_order=1) {
     SX result = substitute(ex, x, a)*current_dx/current_denom;
-    for (int i=0;i<x.size();i++) {
+    for (int i=0;i<x.nnz();i++) {
       if (order_contributions[i]<=order) {
         result += mtaylor_recursive(
                                     jacobian(ex, x.at(i)),
@@ -1500,11 +1500,11 @@ namespace casadi {
   template<>
   SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
                     const std::vector<int>& order_contributions) const {
-    casadi_assert_message(size()==numel() && x.size()==x.numel(),
+    casadi_assert_message(nnz()==numel() && x.nnz()==x.numel(),
                           "mtaylor: not implemented for sparse matrices");
 
-    casadi_assert_message(x.size()==order_contributions.size(),
-                          "mtaylor: number of non-zero elements in x (" <<  x.size()
+    casadi_assert_message(x.nnz()==order_contributions.size(),
+                          "mtaylor: number of non-zero elements in x (" <<  x.nnz()
                           << ") must match size of order_contributions ("
                           << order_contributions.size() << ")");
 
@@ -1705,7 +1705,7 @@ namespace casadi {
     for (int i=0;i<1000;++i) {
       ret.append(f(SX(0)).at(0)/mult);
       SX j = f.jac();
-      if (j.size()==0) {
+      if (j.nnz()==0) {
         success = true;
         break;
       }
@@ -1803,8 +1803,8 @@ namespace casadi {
       ret.append(-p - q + r -s);
 
       return ret;
-    } else if (isEqual(p(p.size()-1).at(0), 0)) {
-      SX ret = poly_roots(p(range(p.size()-1)));
+    } else if (isEqual(p(p.nnz()-1).at(0), 0)) {
+      SX ret = poly_roots(p(range(p.nnz()-1)));
       ret.append(0);
       return ret;
     } else {

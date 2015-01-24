@@ -425,10 +425,10 @@ namespace casadi {
     }
 
     // Make sure that the dimensions are consistent at this point
-    casadi_assert_warning(this->s.size()==this->dae.size(),
+    casadi_assert_warning(this->s.nnz()==this->dae.nnz(),
                           "The number of differential-algebraic equations does not match "
                           "the number of implicitly defined states.");
-    casadi_assert_warning(this->z.size()==this->alg.size(),
+    casadi_assert_warning(this->z.nnz()==this->alg.nnz(),
                           "The number of algebraic equations (equations not involving "
                           "differentiated variables) does not match the number of "
                           "algebraic variables.");
@@ -545,17 +545,17 @@ namespace casadi {
 
   void SymbolicOCP::print(ostream &stream, bool trailing_newline) const {
     stream << "Dimensions: ";
-    stream << "#s = " << this->s.size() << ", ";
-    stream << "#x = " << this->x.size() << ", ";
-    stream << "#z = " << this->z.size() << ", ";
-    stream << "#q = " << this->q.size() << ", ";
-    stream << "#y = " << this->y.size() << ", ";
-    stream << "#pi = " << this->pi.size() << ", ";
-    stream << "#pd = " << this->pd.size() << ", ";
-    stream << "#pf = " << this->p.size() << ", ";
-    stream << "#ci =  " << this->ci.size() << ", ";
-    stream << "#cd =  " << this->cd.size() << ", ";
-    stream << "#u = " << this->u.size() << ", ";
+    stream << "#s = " << this->s.nnz() << ", ";
+    stream << "#x = " << this->x.nnz() << ", ";
+    stream << "#z = " << this->z.nnz() << ", ";
+    stream << "#q = " << this->q.nnz() << ", ";
+    stream << "#y = " << this->y.nnz() << ", ";
+    stream << "#pi = " << this->pi.nnz() << ", ";
+    stream << "#pd = " << this->pd.nnz() << ", ";
+    stream << "#pf = " << this->p.nnz() << ", ";
+    stream << "#ci =  " << this->ci.nnz() << ", ";
+    stream << "#cd =  " << this->cd.nnz() << ", ";
+    stream << "#u = " << this->u.nnz() << ", ";
     stream << endl << endl;
 
     // Variables in the class hierarchy
@@ -579,7 +579,7 @@ namespace casadi {
 
     if (!this->dae.isEmpty()) {
       stream << "Fully-implicit differential-algebraic equations" << endl;
-      for (int k=0; k<this->dae.size(); ++k) {
+      for (int k=0; k<this->dae.nnz(); ++k) {
         stream << "0 == " << this->dae.at(k) << endl;
       }
       stream << endl;
@@ -587,7 +587,7 @@ namespace casadi {
 
     if (!this->x.isEmpty()) {
       stream << "Differential equations" << endl;
-      for (int k=0; k<this->x.size(); ++k) {
+      for (int k=0; k<this->x.nnz(); ++k) {
         stream << str(der(this->x[k])) << " == " << str(ode(this->x[k])) << endl;
       }
       stream << endl;
@@ -595,7 +595,7 @@ namespace casadi {
 
     if (!this->alg.isEmpty()) {
       stream << "Algebraic equations" << endl;
-      for (int k=0; k<this->z.size(); ++k) {
+      for (int k=0; k<this->z.nnz(); ++k) {
         stream << "0 == " << str(this->alg[k]) << endl;
       }
       stream << endl;
@@ -603,7 +603,7 @@ namespace casadi {
 
     if (!this->q.isEmpty()) {
       stream << "Quadrature equations" << endl;
-      for (int k=0; k<this->q.size(); ++k) {
+      for (int k=0; k<this->q.nnz(); ++k) {
         stream << str(der(this->q[k])) << " == " << str(ode(this->q[k])) << endl;
       }
       stream << endl;
@@ -619,56 +619,56 @@ namespace casadi {
 
     if (!this->pi.isEmpty()) {
       stream << "Independent parameters" << endl;
-      for (int i=0; i<this->pi.size(); ++i)
+      for (int i=0; i<this->pi.nnz(); ++i)
         stream << this->pi.at(i) << " == " << str(beq(this->pi.at(i))) << endl;
       stream << endl;
     }
 
     if (!this->pd.isEmpty()) {
       stream << "Dependent parameters" << endl;
-      for (int i=0; i<this->pd.size(); ++i)
+      for (int i=0; i<this->pd.nnz(); ++i)
         stream << this->pd.at(i) << " == " << str(beq(this->pd.at(i))) << endl;
       stream << endl;
     }
 
     if (!this->ci.isEmpty()) {
       stream << "Independent constants" << endl;
-      for (int i=0; i<this->ci.size(); ++i)
+      for (int i=0; i<this->ci.nnz(); ++i)
         stream << this->ci.at(i) << " == " << str(beq(this->ci.at(i))) << endl;
       stream << endl;
     }
 
     if (!this->cd.isEmpty()) {
       stream << "Dependent constants" << endl;
-      for (int i=0; i<this->cd.size(); ++i)
+      for (int i=0; i<this->cd.nnz(); ++i)
         stream << this->cd.at(i) << " == " << str(beq(this->cd.at(i))) << endl;
       stream << endl;
     }
 
     if (!this->y.isEmpty()) {
       stream << "Output variables" << endl;
-      for (int i=0; i<this->y.size(); ++i)
+      for (int i=0; i<this->y.nnz(); ++i)
         stream << this->y.at(i) << " == " << str(beq(this->y.at(i))) << endl;
       stream << endl;
     }
 
     if (!this->mterm.isEmpty()) {
       stream << "Mayer objective terms" << endl;
-      for (int i=0; i<this->mterm.size(); ++i)
+      for (int i=0; i<this->mterm.nnz(); ++i)
         stream << this->mterm.at(i) << endl;
       stream << endl;
     }
 
     if (!this->lterm.isEmpty()) {
       stream << "Lagrange objective terms" << endl;
-      for (int i=0; i<this->lterm.size(); ++i)
+      for (int i=0; i<this->lterm.nnz(); ++i)
         stream << this->lterm.at(i) << endl;
       stream << endl;
     }
 
     if (!this->path.isEmpty()) {
       stream << "Path constraints" << endl;
-      for (int i=0; i<this->path.size(); ++i)
+      for (int i=0; i<this->path.nnz(); ++i)
         stream << str(max(this->path.at(i))) << " <= "
                << this->path.at(i) << " <= " << str(max(this->path.at(i))) << endl;
       stream << endl;
@@ -676,7 +676,7 @@ namespace casadi {
 
     if (!this->point.isEmpty()) {
       stream << "Point constraints" << endl;
-      for (int i=0; i<this->point.size(); ++i)
+      for (int i=0; i<this->point.nnz(); ++i)
         stream << str(max(this->point.at(i))) << " <= "
                << this->point.at(i) << " <= " << str(max(this->point.at(i))) << endl;
       stream << endl;
@@ -1406,43 +1406,43 @@ namespace casadi {
     if (!p.isEmpty()) {
       datfile << "*  global model parameter start values, scale factors, and bounds" << endl;
       datfile << "p" << endl;
-      for (int k=0; k<p.size(); ++k) {
+      for (int k=0; k<p.nnz(); ++k) {
         datfile << k << ": " << start(p[k]) << endl;
       }
       datfile << endl;
 
       datfile << "p_sca" << endl;
-      for (int k=0; k<p.size(); ++k) {
+      for (int k=0; k<p.nnz(); ++k) {
         datfile << k << ": " << nominal(p[k]) << endl;
       }
       datfile << endl;
 
       datfile << "p_min" << endl;
-      for (int k=0; k<p.size(); ++k) {
+      for (int k=0; k<p.nnz(); ++k) {
         datfile << k << ": " << min(p[k]) << endl;
       }
       datfile << endl;
 
       datfile << "p_max" << endl;
-      for (int k=0; k<p.size(); ++k) {
+      for (int k=0; k<p.nnz(); ++k) {
         datfile << k << ": " << max(p[k]) << endl;
       }
       datfile << endl;
 
       datfile << "p_fix" << endl;
-      for (int k=0; k<p.size(); ++k) {
+      for (int k=0; k<p.nnz(); ++k) {
         datfile << k << ": " << (min(p[k])==max(p[k])) << endl;
       }
       datfile << endl;
 
       datfile << "p_name" << endl;
-      for (int k=0; k<p.size(); ++k) {
+      for (int k=0; k<p.nnz(); ++k) {
         datfile << k << ": " << p[k].getName() << endl;
       }
       datfile << endl;
 
       datfile << "p_unit" << endl;
-      for (int k=0; k<p.size(); ++k) {
+      for (int k=0; k<p.nnz(); ++k) {
         datfile << k << ": " << unit(p[k]) << endl;
       }
       datfile << endl;
@@ -1452,43 +1452,43 @@ namespace casadi {
     if (!this->x.isEmpty()) {
       datfile << "*  differential state start values, scale factors, and bounds" << endl;
       datfile << "sd(*,*)" << endl;
-      for (int k=0; k<this->x.size(); ++k) {
+      for (int k=0; k<this->x.nnz(); ++k) {
         datfile << k << ": " << start(this->x[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sd_sca(*,*)" << endl;
-      for (int k=0; k<this->x.size(); ++k) {
+      for (int k=0; k<this->x.nnz(); ++k) {
         datfile << k << ": " << nominal(this->x[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sd_min(*,*)" << endl;
-      for (int k=0; k<this->x.size(); ++k) {
+      for (int k=0; k<this->x.nnz(); ++k) {
         datfile << k << ": " << min(this->x[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sd_max(*,*)" << endl;
-      for (int k=0; k<this->x.size(); ++k) {
+      for (int k=0; k<this->x.nnz(); ++k) {
         datfile << k << ": " << max(this->x[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sd_fix(*,*)" << endl;
-      for (int k=0; k<this->x.size(); ++k) {
+      for (int k=0; k<this->x.nnz(); ++k) {
         datfile << k << ": " << (min(this->x[k])==max(this->x[k])) << endl;
       }
       datfile << endl;
 
       datfile << "xd_name" << endl;
-      for (int k=0; k<this->x.size(); ++k) {
+      for (int k=0; k<this->x.nnz(); ++k) {
         datfile << k << ": " << this->x[k].getName() << endl;
       }
       datfile << endl;
 
       datfile << "xd_unit" << endl;
-      for (int k=0; k<this->x.size(); ++k) {
+      for (int k=0; k<this->x.nnz(); ++k) {
         datfile << k << ": " << unit(this->x[k]) << endl;
       }
       datfile << endl;
@@ -1498,43 +1498,43 @@ namespace casadi {
     if (!this->z.isEmpty()) {
       datfile << "*  algebraic state start values, scale factors, and bounds" << endl;
       datfile << "sa(*,*)" << endl;
-      for (int k=0; k<this->z.size(); ++k) {
+      for (int k=0; k<this->z.nnz(); ++k) {
         datfile << k << ": " << start(this->z[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sa_sca(*,*)" << endl;
-      for (int k=0; k<this->z.size(); ++k) {
+      for (int k=0; k<this->z.nnz(); ++k) {
         datfile << k << ": " << nominal(this->z[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sa_min(*,*)" << endl;
-      for (int k=0; k<this->z.size(); ++k) {
+      for (int k=0; k<this->z.nnz(); ++k) {
         datfile << k << ": " << min(this->z[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sa_max(*,*)" << endl;
-      for (int k=0; k<this->z.size(); ++k) {
+      for (int k=0; k<this->z.nnz(); ++k) {
         datfile << k << ": " << max(this->z[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sa_fix(*,*)" << endl;
-      for (int k=0; k<this->z.size(); ++k) {
+      for (int k=0; k<this->z.nnz(); ++k) {
         datfile << k << ": " << (min(this->z[k])==max(this->z[k])) << endl;
       }
       datfile << endl;
 
       datfile << "xa_name" << endl;
-      for (int k=0; k<this->z.size(); ++k) {
+      for (int k=0; k<this->z.nnz(); ++k) {
         datfile << k << ": " << this->z[k].getName() << endl;
       }
       datfile << endl;
 
       datfile << "xa_unit" << endl;
-      for (int k=0; k<this->z.size(); ++k) {
+      for (int k=0; k<this->z.nnz(); ++k) {
         datfile << k << ": " << unit(this->z[k]) << endl;
       }
       datfile << endl;
@@ -1544,43 +1544,43 @@ namespace casadi {
     if (!this->u.isEmpty()) {
       datfile << "* control start values, scale factors, and bounds" << endl;
       datfile << "u(*,*)" << endl;
-      for (int k=0; k<this->u.size(); ++k) {
+      for (int k=0; k<this->u.nnz(); ++k) {
         datfile << k << ": " << start(this->u[k]) << endl;
       }
       datfile << endl;
 
       datfile << "u_sca(*,*)" << endl;
-      for (int k=0; k<this->u.size(); ++k) {
+      for (int k=0; k<this->u.nnz(); ++k) {
         datfile << k << ": " << nominal(this->u[k]) << endl;
       }
       datfile << endl;
 
       datfile << "u_min(*,*)" << endl;
-      for (int k=0; k<this->u.size(); ++k) {
+      for (int k=0; k<this->u.nnz(); ++k) {
         datfile << k << ": " << min(this->u[k]) << endl;
       }
       datfile << endl;
 
       datfile << "u_max(*,*)" << endl;
-      for (int k=0; k<this->u.size(); ++k) {
+      for (int k=0; k<this->u.nnz(); ++k) {
         datfile << k << ": " << max(this->u[k]) << endl;
       }
       datfile << endl;
 
       datfile << "u_fix(*,*)" << endl;
-      for (int k=0; k<this->u.size(); ++k) {
+      for (int k=0; k<this->u.nnz(); ++k) {
         datfile << k << ": " << (min(this->u[k])==max(this->u[k])) << endl;
       }
       datfile << endl;
 
       datfile << "u_name" << endl;
-      for (int k=0; k<this->u.size(); ++k) {
+      for (int k=0; k<this->u.nnz(); ++k) {
         datfile << k << ": " << this->u[k].getName() << endl;
       }
       datfile << endl;
 
       datfile << "u_unit" << endl;
-      for (int k=0; k<this->u.size(); ++k) {
+      for (int k=0; k<this->u.nnz(); ++k) {
         datfile << k << ": " << unit(this->u[k]) << endl;
       }
       datfile << endl;
@@ -1601,7 +1601,7 @@ namespace casadi {
   SX SymbolicOCP::der(const SX& var) const {
     casadi_assert(var.isVector() && var.isSymbolic());
     SX ret = SX::zeros(var.sparsity());
-    for (int i=0; i<ret.size(); ++i) {
+    for (int i=0; i<ret.nnz(); ++i) {
       ret[i] = der(var.at(i).getName());
     }
     return ret;
@@ -1630,7 +1630,7 @@ namespace casadi {
   SX SymbolicOCP::ode(const SX& var) const {
     casadi_assert(var.isVector() && var.isSymbolic());
     SX ret = SX::zeros(var.sparsity());
-    for (int i=0; i<ret.size(); ++i) {
+    for (int i=0; i<ret.nnz(); ++i) {
       ret[i] = ode(var.at(i).getName());
     }
     return ret;
@@ -1643,7 +1643,7 @@ namespace casadi {
   void SymbolicOCP::setOde(const SX& var, const SX& val) {
     casadi_assert(var.isVector() && var.isSymbolic());
     casadi_assert(var.sparsity()==val.sparsity());
-    for (int i=0; i<var.size(); ++i) {
+    for (int i=0; i<var.nnz(); ++i) {
       setOde(var.at(i).getName(), val.at(i));
     }
   }
@@ -1667,8 +1667,8 @@ namespace casadi {
     f.init();
 
     // Number of s
-    int ns = f.input().size();
-    casadi_assert(f.output().size()==ns);
+    int ns = f.input().nnz();
+    casadi_assert(f.output().nnz()==ns);
 
     // Input/output arrays
     bvec_t* f_sdot = reinterpret_cast<bvec_t*>(f.input().ptr());
@@ -1717,7 +1717,7 @@ namespace casadi {
     }
 
     // Make sure split was successful
-    casadi_assert(new_dae.size()==new_s.size());
+    casadi_assert(new_dae.nnz()==new_s.nnz());
 
     // Divide up the s and dae
     this->dae = new_dae;
@@ -1737,7 +1737,7 @@ namespace casadi {
       return "n/a";
     } else {
       string ret = unit(var.at(0).getName());
-      for (int i=1; i<var.size(); ++i) {
+      for (int i=1; i<var.nnz(); ++i) {
         casadi_assert_message(ret == unit(var.at(i).getName()),
                               "SymbolicOCP::unit: Argument has mixed units");
       }
@@ -1760,7 +1760,7 @@ namespace casadi {
   std::vector<double> SymbolicOCP::nominal(const SX& var) const {
     casadi_assert_message(var.isVector() && var.isSymbolic(),
                           "SymbolicOCP::nominal: Argument must be a symbolic vector");
-    std::vector<double> ret(var.size());
+    std::vector<double> ret(var.nnz());
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = nominal(var.at(i).getName());
     }
@@ -1770,7 +1770,7 @@ namespace casadi {
   void SymbolicOCP::setNominal(const SX& var, const std::vector<double>& val) {
     casadi_assert_message(var.isVector() && var.isSymbolic(),
                           "SymbolicOCP::nominal: Argument must be a symbolic vector");
-    casadi_assert_message(var.size()==var.size(), "SymbolicOCP::nominal: Dimension mismatch");
+    casadi_assert_message(var.nnz()==var.nnz(), "SymbolicOCP::nominal: Dimension mismatch");
     for (int i=0; i<val.size(); ++i) {
       setNominal(var.at(i).getName(), val.at(i));
     }
@@ -1779,7 +1779,7 @@ namespace casadi {
   std::vector<double> SymbolicOCP::attribute(getAtt f, const SX& var, bool normalized) const {
     casadi_assert_message(var.isVector() && var.isSymbolic(),
                           "SymbolicOCP::attribute: Argument must be a symbolic vector");
-    std::vector<double> ret(var.size());
+    std::vector<double> ret(var.nnz());
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = (this->*f)(var.at(i).getName(), normalized);
     }
@@ -1790,7 +1790,7 @@ namespace casadi {
     casadi_assert_message(var.isVector() && var.isSymbolic(),
                           "SymbolicOCP::attribute: Argument must be a symbolic vector");
     SX ret = SX::zeros(var.sparsity());
-    for (int i=0; i<ret.size(); ++i) {
+    for (int i=0; i<ret.nnz(); ++i) {
       ret[i] = (this->*f)(var.at(i).getName());
     }
     return ret;
@@ -1800,7 +1800,7 @@ namespace casadi {
                                  bool normalized) {
     casadi_assert_message(var.isVector() && var.isSymbolic(),
                           "SymbolicOCP::setAttribute: Argument must be a symbolic vector");
-    casadi_assert_message(var.size()==val.size(), "SymbolicOCP::setAttribute: Dimension mismatch");
+    casadi_assert_message(var.nnz()==val.size(), "SymbolicOCP::setAttribute: Dimension mismatch");
     for (int i=0; i<val.size(); ++i) {
       (this->*f)(var.at(i).getName(), val.at(i), normalized);
     }
@@ -1811,7 +1811,7 @@ namespace casadi {
                           "SymbolicOCP::setAttribute: Argument must be a symbolic vector");
     casadi_assert_message(var.sparsity()==val.sparsity(),
                           "SymbolicOCP::setAttribute: Sparsity mismatch");
-    for (int i=0; i<val.size(); ++i) {
+    for (int i=0; i<val.nnz(); ++i) {
       (this->*f)(var.at(i).getName(), val.at(i));
     }
   }

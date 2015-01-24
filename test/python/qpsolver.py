@@ -270,7 +270,7 @@ class QpSolverTests(casadiTestCase):
     
     G = DMatrix([-2,-6,1,0,0])
     A =  DMatrix([[1, 0,0.1,0.7,-1],[0.1, 2,-0.3,4,0.1]])
-    A = sparse(A)
+    A = sparsify(A)
     
     LBA = DMatrix([-inf])
     UBA = DMatrix([2, 2])
@@ -427,7 +427,7 @@ class QpSolverTests(casadiTestCase):
     self.message("Degenerate hessian")
     
     H = DMatrix([[1,-1,0],[-1,2,0],[0,0,0]])
-    H = sparse(H)
+    H = sparsify(H)
     G = DMatrix([-2,-6,1])
     A =  DMatrix([[1, 1,1]])
 

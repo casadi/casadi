@@ -35,7 +35,7 @@ using namespace std;
 namespace casadi {
 
   Reshape::Reshape(const MX& x, Sparsity sp) {
-    casadi_assert(x.size()==sp.size());
+    casadi_assert(x.nnz()==sp.nnz());
     setDependencies(x);
     setSparsity(sp);
   }
@@ -121,7 +121,7 @@ namespace casadi {
     // Quick return if inplace
     if (arg[0].compare(res[0])==0) return;
 
-    stream << "  for (i=0; i<" << size() << "; ++i) " << res.front()
+    stream << "  for (i=0; i<" << nnz() << "; ++i) " << res.front()
            << "[i] = " << arg.front() << "[i];" << endl;
   }
 

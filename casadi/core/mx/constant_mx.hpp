@@ -381,7 +381,7 @@ namespace casadi {
 
     if (ScX && !operation_checker<Function0Checker>(op)) {
       double ret;
-      casadi_math<double>::fun(op, size()> 0 ? v_.value: 0, 0, ret);
+      casadi_math<double>::fun(op, nnz()> 0 ? v_.value: 0, 0, ret);
 
       if (ret!=0) {
         Sparsity f = Sparsity::dense(y.size1(), y.size2());
@@ -392,7 +392,7 @@ namespace casadi {
       bool grow = true;
       if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
         double ret;
-        casadi_math<double>::fun(op, 0, y.size()>0 ? y->getValue() : 0, ret);
+        casadi_math<double>::fun(op, 0, y.nnz()>0 ? y->getValue() : 0, ret);
         grow = ret!=0;
       }
       if (grow) {
@@ -429,9 +429,9 @@ namespace casadi {
     // Constant folding
     // NOTE: ugly, should use a function instead of a cast
     if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
-      double y_value = y.size()>0 ? y->getValue() : 0;
+      double y_value = y.nnz()>0 ? y->getValue() : 0;
       double ret;
-      casadi_math<double>::fun(op, size()> 0 ? v_.value: 0, y_value, ret);
+      casadi_math<double>::fun(op, nnz()> 0 ? v_.value: 0, y_value, ret);
 
       return MX(y.sparsity(), ret);
     }
@@ -459,7 +459,7 @@ namespace casadi {
                                           const std::vector<std::string>& res,
                                           CodeGenerator& gen) const {
     // Copy the constant to the work vector
-    stream << "  for (i=0; i<" << sparsity().size() << "; ++i) ";
+    stream << "  for (i=0; i<" << sparsity().nnz() << "; ++i) ";
     stream << res.at(0) << "[i]=";
     std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
     // full precision NOTE: hex better?
@@ -509,7 +509,7 @@ namespace casadi {
   void Constant<Value>::printPart(std::ostream &stream, int part) const {
     if (sparsity().isScalar()) {
       // Print scalar
-      if (sparsity().size()==0) {
+      if (sparsity().nnz()==0) {
         stream << "00";
       } else {
         stream << v_.value;

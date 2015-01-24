@@ -72,7 +72,10 @@ namespace casadi {
   public:
 
     /** \brief Get the number of (structural) non-zero elements */
-    int size() const;
+    int nnz() const;
+
+    /** \brief DEPRECATED: Alias for nnz */
+    int size() const { return nnz();}
 
     /** \brief Get the number of non-zeros in the lower triangular half */
     int sizeL() const;
@@ -437,8 +440,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::size() const {
-    return sparsity().size();
+  int GenericMatrix<MatType>::nnz() const {
+    return sparsity().nnz();
   }
 
   template<typename MatType>
@@ -489,7 +492,7 @@ namespace casadi {
   template<typename MatType>
   int GenericMatrix<MatType>::size(SparsityType sp) const {
     if (sp==SPARSE) {
-      return size();
+      return nnz();
     } else if (sp==SPARSESYM) {
       return sizeU();
     } else if (sp==DENSE) {

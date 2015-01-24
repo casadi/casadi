@@ -1473,7 +1473,7 @@ namespace casadi {
     }
 
     // Solve the (possibly factorized) system
-    casadi_assert(linsol_.output().size() == NV_LENGTH_S(z));
+    casadi_assert(linsol_.output().nnz() == NV_LENGTH_S(z));
     linsol_.solve(NV_DATA_S(z), 1, false);
 
     // Log time duration
@@ -1493,7 +1493,7 @@ namespace casadi {
     }
 
     // Solve the (possibly factorized) system
-    casadi_assert(linsolB_.output().size() == NV_LENGTH_S(zvecB));
+    casadi_assert(linsolB_.output().nnz() == NV_LENGTH_S(zvecB));
     linsolB_.solve(NV_DATA_S(zvecB), 1, false);
 
     // Log time duration

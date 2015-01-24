@@ -344,7 +344,7 @@ namespace casadi {
     // Check if the nonzeros follow in increasing order
     if (s_.start_ != 0) return false;
     if (s_.step_ != 1) return false;
-    if (s_.stop_ != size()) return false;
+    if (s_.stop_ != nnz()) return false;
 
     // True if reached this point
     return true;

@@ -99,7 +99,7 @@ namespace casadi {
       output[0]->sparsity().set(outputd, inputd, input[0]->sparsity());
     } else {
       input[0]->sparsity().bor(inputd, outputd, output[0]->sparsity());
-      fill(outputd, outputd+output[0]->size(), bvec_t(0));
+      fill(outputd, outputd+output[0]->nnz(), bvec_t(0));
     }
   }
 

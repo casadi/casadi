@@ -869,7 +869,6 @@ except:
 %rename(mldivide) __mldivide__;
 %rename(transpose) T;
 %rename(size) shape;
-%rename(nnz) size;
 
 // Workarounds, pending proper fix
 %rename(casadi_vertcat) zz_vertcat;

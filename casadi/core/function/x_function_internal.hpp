@@ -525,8 +525,8 @@ namespace casadi {
                           "Only gradients of scalar functions allowed. Use jacobian instead.");
 
     // Quick return if trivially empty
-    if (input(iind).size()==0 || output(oind).size()==0 ||
-       jacSparsity(iind, oind, true, false).size()==0) {
+    if (input(iind).nnz()==0 || output(oind).nnz()==0 ||
+       jacSparsity(iind, oind, true, false).nnz()==0) {
       return MatType::sparse(input(iind).shape());
     }
 
@@ -598,10 +598,10 @@ namespace casadi {
     if (verbose()) std::cout << "XFunctionInternal::jac begin" << std::endl;
 
     // Quick return if trivially empty
-    if (input(iind).size()==0 || output(oind).size()==0) {
+    if (input(iind).nnz()==0 || output(oind).nnz()==0) {
       std::pair<int, int> jac_shape;
-      jac_shape.first = compact ? output(oind).size() : output(oind).numel();
-      jac_shape.second = compact ? input(iind).size() : input(iind).numel();
+      jac_shape.first = compact ? output(oind).nnz() : output(oind).numel();
+      jac_shape.second = compact ? input(iind).nnz() : input(iind).numel();
       return MatType::sparse(jac_shape);
     }
 
@@ -614,7 +614,7 @@ namespace casadi {
     if (verbose()) std::cout << "XFunctionInternal::jac allocated return value" << std::endl;
 
     // Quick return if empty
-    if (ret.size()==0) {
+    if (ret.nnz()==0) {
       return ret.T();
     }
 
@@ -792,7 +792,7 @@ namespace casadi {
         // If symmetric, see how many times each output appears
         if (symmetric) {
           // Initialize to zero
-          tmp.resize(output(oind).sparsity().size());
+          tmp.resize(output(oind).sparsity().nnz());
           fill(tmp.begin(), tmp.end(), 0);
 
           // "Multiply" Jacobian sparsity by seed vector
@@ -818,7 +818,7 @@ namespace casadi {
         }
 
         // Assignments to the Jacobian
-        adds.resize(fsens[d][oind].size());
+        adds.resize(fsens[d][oind].nnz());
         fill(adds.begin(), adds.end(), -1);
         if (symmetric) {
           adds2.resize(adds.size());

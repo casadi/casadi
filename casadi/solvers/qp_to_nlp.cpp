@@ -71,10 +71,10 @@ namespace casadi {
 
     std::copy(input(QP_SOLVER_H).data().begin(),
               input(QP_SOLVER_H).data().end(),
-              solver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_H).size();
+              solver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_H).nnz();
     std::copy(input(QP_SOLVER_G).data().begin(),
               input(QP_SOLVER_G).data().end(),
-              solver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_G).size();
+              solver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_G).nnz();
     std::copy(input(QP_SOLVER_A).data().begin(),
               input(QP_SOLVER_A).data().end(),
               solver_.input(NLP_SOLVER_P).data().begin()+k);

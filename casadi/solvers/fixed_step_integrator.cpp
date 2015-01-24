@@ -63,9 +63,9 @@ namespace casadi {
 
     // Get discrete time dimensions
     Z_ = F_.input(DAE_Z);
-    nZ_ = Z_.size();
+    nZ_ = Z_.nnz();
     RZ_ = G_.isNull() ? DMatrix() : G_.input(RDAE_RZ);
-    nRZ_ =  RZ_.size();
+    nRZ_ =  RZ_.nnz();
 
     // Allocate tape if backward states are present
     if (nrx_>0) {

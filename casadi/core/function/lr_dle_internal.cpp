@@ -178,7 +178,7 @@ namespace casadi {
       std::vector<Sparsity> sp = diagsplit(Pnew, Hi_);
       for (int k=0;k<Hs_.size();++k) {
         Pv_[k] = DMatrix::zeros(sp[k]);
-        Pi_[k+1] = Pi_[k] + sp[k].size();
+        Pi_[k+1] = Pi_[k] + sp[k].nnz();
       }
     }
 
@@ -207,7 +207,7 @@ namespace casadi {
     Sparsity P = mul(mul(C, V), C.T());
     Sparsity Pprev = Sparsity::sparse(n, n);
 
-    while (Pprev.size()!=P.size()) {
+    while (Pprev.nnz()!=P.nnz()) {
       // This can be much improved:
       //   * No need to make C and V grow
       //   * norm_0 instead of constructing P

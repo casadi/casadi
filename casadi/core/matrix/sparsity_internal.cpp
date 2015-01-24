@@ -34,7 +34,7 @@ using namespace std;
 
 namespace casadi {
 
-  int SparsityInternal::size() const {
+  int SparsityInternal::nnz() const {
     return row_.size();
   }
 
@@ -140,7 +140,7 @@ namespace casadi {
   }
 
   vector<int> SparsityInternal::getCol() const {
-    vector<int> col(size());
+    vector<int> col(nnz());
     for (int r=0; r<ncol_; ++r) {
       for (int el = colind_[r]; el < colind_[r+1]; ++el) {
         col[el] = r;
@@ -817,7 +817,7 @@ namespace casadi {
 
     // Row for each nonzero
     vector<int>& row_C = C.rowRef();
-    row_C.resize(size());
+    row_C.resize(nnz());
 
     int nz = 0;
     for (int k = 0; k<ncol_; ++k) {
@@ -1261,7 +1261,7 @@ namespace casadi {
       len[k] = Cp[k+1]-Cp[k];
 
     len[n] = 0;
-    nzmax = C.size();
+    nzmax = C.nnz();
     Ci = &C.rowRef().front() ;
     for (i=0; i<=n; ++i) {
       // degree list i is empty
@@ -1776,8 +1776,8 @@ namespace casadi {
 
     int* Cp = &C.colindRef().front();
     for (int j=0; j<n; ++j) {
-      if (nz+m > C.size()) {
-        C.rowRef().resize(2*(C.size())+m);
+      if (nz+m > C.nnz()) {
+        C.rowRef().resize(2*(C.nnz())+m);
       }
 
       // row j of C starts here
@@ -1847,7 +1847,7 @@ namespace casadi {
     if (ncol_==nrow_) {
       // Return object
       Sparsity ret = Sparsity::sparse(0, 1);
-      ret.reserve(std::min(size(), ncol_), ncol_);
+      ret.reserve(std::min(nnz(), ncol_), ncol_);
 
       // Mapping
       mapping.clear();
@@ -1864,7 +1864,7 @@ namespace casadi {
           el++;
         }
 
-        if (el>=size()) return ret;
+        if (el>=nnz()) return ret;
 
         // Add element if nonzero on diagonal
         if (row_[el]==i) {
@@ -1889,23 +1889,23 @@ namespace casadi {
 
       // Return object
       mapping.clear();
-      mapping.resize(size());
+      mapping.resize(nnz());
 
       std::vector<int> colind(sp->nrow_+1, 0);
-      std::vector<int> row(sp->size());
+      std::vector<int> row(sp->nnz());
 
       int i_prev = 0;
 
       // Loop over nonzero
-      for (int k=0;k<size();k++) {
-        mapping[k]=k; // mapping will just be a range(size())
+      for (int k=0;k<nnz();k++) {
+        mapping[k]=k; // mapping will just be a range(nnz())
 
         int i = sp->row_[k];
         std::fill(colind.begin()+i_prev+1, colind.begin()+i+1, k);
         row[k]=i;
         i_prev = i;
       }
-      std::fill(colind.begin()+i_prev+1, colind.end(), size());
+      std::fill(colind.begin()+i_prev+1, colind.end(), nnz());
 
       return Sparsity(sp->nrow_, sp->nrow_, colind, row);
     } else {
@@ -1916,10 +1916,10 @@ namespace casadi {
 
   std::string SparsityInternal::dimString() const {
     std::stringstream ss;
-    if (numel()==size()) {
+    if (numel()==nnz()) {
       ss << nrow_ << "-by-" << ncol_ << " (dense)";
     } else {
-      ss << nrow_ << "-by-" << ncol_ << " (" << size() << "/" << numel() << " nz)";
+      ss << nrow_ << "-by-" << ncol_ << " (" << nnz() << "/" << numel() << " nz)";
     }
     return ss.str();
   }
@@ -1977,11 +1977,11 @@ namespace casadi {
   }
 
   bool SparsityInternal::isScalar(bool scalar_and_dense) const {
-    return ncol_==1 && nrow_==1 && (!scalar_and_dense || size()==1);
+    return ncol_==1 && nrow_==1 && (!scalar_and_dense || nnz()==1);
   }
 
   bool SparsityInternal::isDense() const {
-    return size() == numel();
+    return nnz() == numel();
   }
 
   bool SparsityInternal::isEmpty(bool both) const {
@@ -1993,10 +1993,10 @@ namespace casadi {
     if (ncol_ != nrow_) return false;
 
     // Check if correct number of non-zeros (one per col)
-    if (size() != ncol_) return false;
+    if (nnz() != ncol_) return false;
 
     // Check that the row indices are correct
-    for (int i=0; i<size(); ++i) {
+    for (int i=0; i<nnz(); ++i) {
       if (row_[i]!=i)
         return false;
     }
@@ -2051,7 +2051,7 @@ namespace casadi {
 
   vector<int> SparsityInternal::erase(const vector<int>& rr, bool ind1) {
     // Quick return if nothing to erase
-    if (rr.empty()) return range(size());
+    if (rr.empty()) return range(nnz());
 
     if (!inBounds(rr, -numel()+ind1, numel()+ind1)) {
       casadi_error("Slicing [rr] out of bounds. Your rr contains " <<
@@ -2085,7 +2085,7 @@ namespace casadi {
     if (numel()==0) return mapping;
 
     // Reserve memory
-    mapping.reserve(size());
+    mapping.reserve(nnz());
 
     // Number of non-zeros
     int nz=0;
@@ -2179,7 +2179,7 @@ namespace casadi {
     if (numel()==0) return mapping;
 
     // Reserve memory
-    mapping.reserve(size());
+    mapping.reserve(nnz());
 
     // Number of non-zeros
     int nz=0;
@@ -2291,7 +2291,7 @@ namespace casadi {
 
   Sparsity SparsityInternal::sub(const vector<int>& rr, const SparsityInternal& sp,
                                  vector<int>& mapping, bool ind1) const {
-    casadi_assert(rr.size()==sp.size());
+    casadi_assert(rr.size()==sp.nnz());
 
     // Check bounds
     if (!inBounds(rr, -numel()+ind1, numel()+ind1)) {
@@ -2368,7 +2368,7 @@ namespace casadi {
     vector<int> columns, rows;
 
     // With lookup vector
-    bool with_lookup = static_cast<double>(cc.size())*static_cast<double>(rr.size()) > size();
+    bool with_lookup = static_cast<double>(cc.size())*static_cast<double>(rr.size()) > nnz();
     std::vector<int> rrlookup;
     if (with_lookup) {
       // Time complexity: O(ii.size()*(nnz per column))
@@ -2484,7 +2484,7 @@ namespace casadi {
     // Quick return if identical
     if (isEqual(y)) {
       if (with_mapping) {
-        mapping.resize(y.size());
+        mapping.resize(y.nnz());
         fill(mapping.begin(), mapping.end(), 1 | 2);
       }
       return y;
@@ -2620,11 +2620,11 @@ namespace casadi {
   bool SparsityInternal::isEqual(int nrow, int ncol, const std::vector<int>& colind,
                                  const std::vector<int>& row) const {
     // First check dimensions and number of non-zeros
-    if (size()!=row.size() || ncol_!=ncol || nrow_!=nrow)
+    if (nnz()!=row.size() || ncol_!=ncol || nrow_!=nrow)
       return false;
 
     // Check if dense
-    if (size()==numel())
+    if (nnz()==numel())
       return true;
 
     // Check the number of non-zeros per col
@@ -2717,13 +2717,13 @@ namespace casadi {
     ncol_ = ncol;
 
     // Sparsify the columns
-    colind_.resize(ncol+1, size());
+    colind_.resize(ncol+1, nnz());
 
     // Quick return if matrix had no columns before
     if (cc.empty()) return;
 
     int ik=cc.back(); // need only to update from the last new index
-    int nz=size(); // number of nonzeros up till this col
+    int nz=nnz(); // number of nonzeros up till this col
     for (int i=cc.size()-1; i>=0; --i) {
       // Update colindex for new columns
       for (; ik>cc[i]; --ik) {
@@ -2777,7 +2777,7 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::makeDense(std::vector<int>& mapping) const {
-    mapping.resize(size());
+    mapping.resize(nnz());
     for (int i=0; i<ncol_; ++i) {
       for (int el=colind_[i]; el<colind_[i+1]; ++el) {
         int j = row_[el];
@@ -2803,7 +2803,7 @@ namespace casadi {
     if (isDense()) return rr+cc*nrow_;
 
     // Quick return if past the end
-    if (colind_[cc]==size() || (colind_[cc+1]==size() && row_.back()<rr)) return -1;
+    if (colind_[cc]==nnz() || (colind_[cc+1]==nnz() && row_.back()<rr)) return -1;
 
     // Find sparse element
     for (int ind=colind_[cc]; ind<colind_[cc+1]; ++ind) {
@@ -2822,10 +2822,10 @@ namespace casadi {
                           << dimString() << ". New shape is " << nrow << "x" << ncol
                           << "=" << nrow*ncol << ".");
     Sparsity ret = Sparsity::sparse(nrow, ncol);
-    ret.reserve(size(), ncol);
+    ret.reserve(nnz(), ncol);
 
-    std::vector<int> col(size());
-    std::vector<int> row(size());
+    std::vector<int> col(nnz());
+    std::vector<int> row(nnz());
     for (int i=0; i<ncol_; ++i) {
       for (int el=colind_[i]; el<colind_[i+1]; ++el) {
         int j = row_[el];
@@ -2876,7 +2876,7 @@ namespace casadi {
         // Make larger: Very cheap operation
         ncol_ = ncol;
         nrow_ = nrow;
-        colind_.resize(ncol_+1, size());
+        colind_.resize(ncol_+1, nnz());
       }
     }
   }
@@ -2904,7 +2904,7 @@ namespace casadi {
   }
 
   void SparsityInternal::removeDuplicates(std::vector<int>& mapping) {
-    casadi_assert(mapping.size()==size());
+    casadi_assert(mapping.size()==nnz());
 
     // Nonzero counter without duplicates
     int k_strict=0;
@@ -2954,7 +2954,7 @@ namespace casadi {
   void SparsityInternal::find(std::vector<int>& loc, bool ind1) const {
 
     // Element for each nonzero
-    loc.resize(size());
+    loc.resize(nnz());
 
     // Loop over columns
     for (int cc=0; cc<ncol_; ++cc) {
@@ -3174,7 +3174,7 @@ namespace casadi {
     vector<int> Tmapping;
     transpose(Tmapping);
 
-    vector<int> star(size());
+    vector<int> star(nnz());
     int k = 0;
     for (int i=0; i<ncol_; ++i) {
       for (int j_el=colind_[i]; j_el<colind_[i+1]; ++j_el) {
@@ -3587,11 +3587,11 @@ namespace casadi {
 
   bool SparsityInternal::isTranspose(const SparsityInternal& y) const {
     // Assert dimensions and number of nonzeros
-    if (ncol_!=y.nrow_ || nrow_!=y.ncol_ || size()!=y.size())
+    if (ncol_!=y.nrow_ || nrow_!=y.ncol_ || nnz()!=y.nnz())
       return false;
 
     // Quick return if empty interior or dense
-    if (size()==0 || isDense())
+    if (nnz()==0 || isDense())
       return true;
 
     // Run algorithm on the pattern with the least number of rows
@@ -3636,11 +3636,11 @@ namespace casadi {
       return isEqual(y.nrow_, y.ncol_, y.colind_, y.row_);
 
     // Assert dimensions and number of nonzeros
-    if (ncol_*nrow_!=y.nrow_*y.ncol_ || size()!=y.size())
+    if (ncol_*nrow_!=y.nrow_*y.ncol_ || nnz()!=y.nnz())
       return false;
 
     // Quick return if empty interior or dense
-    if (size()==0 || isDense()) return true;
+    if (nnz()==0 || isDense()) return true;
 
     // Loop over the elements
     for (int cc=0; cc<ncol_; ++cc) {

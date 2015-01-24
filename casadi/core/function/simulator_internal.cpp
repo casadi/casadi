@@ -174,13 +174,13 @@ namespace casadi {
       }
 
       // Pass integrator output to the output function
-      if (output_fcn_.input(DAE_T).size()!=0)
+      if (output_fcn_.input(DAE_T).nnz()!=0)
         output_fcn_.setInput(grid_[k], DAE_T);
-      if (output_fcn_.input(DAE_X).size()!=0)
+      if (output_fcn_.input(DAE_X).nnz()!=0)
         output_fcn_.setInput(integrator_.output(INTEGRATOR_XF), DAE_X);
-      if (output_fcn_.input(DAE_Z).size()!=0)
+      if (output_fcn_.input(DAE_Z).nnz()!=0)
         output_fcn_.setInput(integrator_.output(INTEGRATOR_ZF), DAE_Z);
-      if (output_fcn_.input(DAE_P).size()!=0)
+      if (output_fcn_.input(DAE_P).nnz()!=0)
         output_fcn_.setInput(input(INTEGRATOR_P), DAE_P);
 
       // Evaluate output function
@@ -190,7 +190,7 @@ namespace casadi {
       for (int i=0; i<getNumOutputs(); ++i) {
         const Matrix<double> &res = output_fcn_.output(i);
         copy(res.begin(), res.end(), output_its_.at(i));
-        output_its_.at(i) += res.size();
+        output_its_.at(i) += res.nnz();
       }
     }
 

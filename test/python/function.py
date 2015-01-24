@@ -326,7 +326,7 @@ class Functiontests(casadiTestCase):
           for j in range(m):
             if random.random()<0.5:
               I[i,j] = 0
-        I = sparse(I)
+        I = sparsify(I)
         
         sp_holes = I.sparsity()
         
@@ -358,31 +358,31 @@ class Functiontests(casadiTestCase):
       self.checkarray(sp.colind(),sp2.colind())
       
     A = IMatrix([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-    A = sparse(A)
+    A = sparsify(A)
     C = A.sparsity()
     
     test(C)
     
     A = IMatrix([[1,0,0,0,0,0],[0,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-    A = sparse(A)
+    A = sparsify(A)
     C = A.sparsity()
     
     test(C)
     
     A = IMatrix([[1,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-    A = sparse(A)
+    A = sparsify(A)
     C = A.sparsity()
       
     test(C)
 
     A = IMatrix([[0,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-    A = sparse(A)
+    A = sparsify(A)
     C = A.sparsity()
       
     test(C)
 
     A = IMatrix([[0,0,0,0,0,0],[0,1,0,0,1,0],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,0,0,1,0,1]])
-    A = sparse(A)
+    A = sparsify(A)
     C = A.sparsity()
       
     test(C)
@@ -415,7 +415,7 @@ class Functiontests(casadiTestCase):
           if random.random()<0.5:
             I[ii,jj] = 0
             I[jj,ii] = 0
-      I = sparse(I)
+      I = sparsify(I)
       
       sp_holes = I.sparsity()
       

@@ -42,9 +42,9 @@ namespace casadi {
 
   template<typename DataType>
   DataType& SparseStorage<DataType>::elem(int rr, int cc) {
-    int oldsize = sparsity().size();
+    int oldsize = sparsity().nnz();
     int ind = sparsityRef().addNZ(rr, cc);
-    if (oldsize != sparsity().size())
+    if (oldsize != sparsity().nnz())
       data().insert(begin()+ind, DataType(0));
     return at(ind);
   }
@@ -149,12 +149,12 @@ namespace casadi {
 
   template<typename DataType>
   SparseStorage<DataType>::SparseStorage(const Sparsity& sparsity, const DataType& val) :
-    sparsity_(sparsity), data_(sparsity.size(), val) {}
+    sparsity_(sparsity), data_(sparsity.nnz(), val) {}
 
   template<typename DataType>
   SparseStorage<DataType>::SparseStorage(const Sparsity& sparsity, const std::vector<DataType>& d)
       : sparsity_(sparsity), data_(d) {
-    casadi_assert_message(sparsity.size()==d.size(),
+    casadi_assert_message(sparsity.nnz()==d.size(),
                           "Size mismatch." << std::endl << "You supplied a sparsity of "
                           << sparsity_.dimString()
                           << ", but the supplied vector is of length " << d.size());

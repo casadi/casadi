@@ -78,7 +78,7 @@ namespace casadi {
 
   void ConstantMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
     bvec_t *outputd = get_bvec_t(output[0]->data());
-    fill_n(outputd, output[0]->size(), 0);
+    fill_n(outputd, output[0]->nnz(), 0);
   }
 
   void ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
@@ -88,14 +88,14 @@ namespace casadi {
     int ind = gen.getConstant(x_.data(), true);
 
     // Copy the constant to the work vector
-    stream << "  for (i=0; i<" << sparsity().size() << "; ++i) ";
+    stream << "  for (i=0; i<" << sparsity().nnz() << "; ++i) ";
     stream << res.at(0) << "[i]=";
     stream << "c" << ind << "[i];" << endl;
   }
 
   bool ConstantMX::__nonzero__() const {
     if (numel()!=1) casadi_error("Can only determine truth value of scalar MX.");
-    if (size()!=1) casadi_error("Can only determine truth value of dense scalar MX.");
+    if (nnz()!=1) casadi_error("Can only determine truth value of dense scalar MX.");
     return !isZero();
   }
 
@@ -126,7 +126,7 @@ namespace casadi {
   }
 
   ConstantMX* ConstantMX::create(const Matrix<double>& val) {
-    if (val.size()==0) {
+    if (val.nnz()==0) {
       return create(val.sparsity(), 0);
     } else if (val.isScalar()) {
       return create(val.sparsity(), val.toScalar());

@@ -99,7 +99,7 @@ namespace casadi {
     bvec_t& res = *get_bvec_t(output[0]->data());
     bvec_t* arg0 = get_bvec_t(input[0]->data());
     bvec_t* arg1 = get_bvec_t(input[1]->data());
-    const int n = input[0]->size();
+    const int n = input[0]->nnz();
     if (fwd) {
       res = 0;
       for (int i=0; i<n; ++i) {
@@ -117,7 +117,7 @@ namespace casadi {
   void InnerProd::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                     const std::vector<std::string>& res, CodeGenerator& gen) const {
     stream << "  *" << res.front() << " = "
-           << gen.casadi_dot(dep().size(), arg.at(0), 1, arg.at(1), 1) << ";" << endl;
+           << gen.casadi_dot(dep().nnz(), arg.at(0), 1, arg.at(1), 1) << ";" << endl;
   }
 
 } // namespace casadi

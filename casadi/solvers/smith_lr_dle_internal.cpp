@@ -114,8 +114,8 @@ namespace casadi {
         DTHvi_.push_back(std::vector<int>(Hs_.size()+1, 0));
         VDTHvi_.push_back(std::vector<int>(Hs_.size()+1, 0));
         for (int i=0;i<Hs_.size();++i) {
-          DTHvi_[j][i+1]  = DTHvi_[j][i] + DTHv_[j][i].size();
-          VDTHvi_[j][i+1] = VDTHvi_[j][i] + VDTHv_[j][i].size();
+          DTHvi_[j][i+1]  = DTHvi_[j][i] + DTHv_[j][i].nnz();
+          VDTHvi_[j][i+1] = VDTHvi_[j][i] + VDTHv_[j][i].nnz();
         }
       }
     }
@@ -450,8 +450,8 @@ namespace casadi {
             DMatrix::mul_no_alloc_nn(VDTHv_[j][k], Yb, DTHv_ad_[j][k]);
             DMatrix::mul_no_alloc_nn(DTHv_[j][k], Yb, VDTHv_ad_[j][k]);
 
-            for (int kk=0;kk<DTHv_ad_[j][k].size();++kk) DTHv_ad_[j][k][kk]*=0.5;
-            for (int kk=0;kk<VDTHv_ad_[j][k].size();++kk) VDTHv_ad_[j][k][kk]*=0.5;
+            for (int kk=0;kk<DTHv_ad_[j][k].nnz();++kk) DTHv_ad_[j][k][kk]*=0.5;
+            for (int kk=0;kk<VDTHv_ad_[j][k].nnz();++kk) VDTHv_ad_[j][k][kk]*=0.5;
 
             std::copy(DTHv_ad_[j][k].begin(),
                      DTHv_ad_[j][k].end(),
@@ -468,8 +468,8 @@ namespace casadi {
           DMatrix::mul_no_alloc_nn(VDTH_[j], Yb, DTH_ad_[j]);
           DMatrix::mul_no_alloc_nn(DTH_[j], Yb, VDTH_ad_[j]);
 
-          for (int kk=0;kk<DTH_ad_[j].size();++kk) DTH_ad_[j][kk]*=0.5;
-          for (int kk=0;kk<VDTH_ad_[j].size();++kk) VDTH_ad_[j][kk]*=0.5;
+          for (int kk=0;kk<DTH_ad_[j].nnz();++kk) DTH_ad_[j][kk]*=0.5;
+          for (int kk=0;kk<VDTH_ad_[j].nnz();++kk) VDTH_ad_[j][kk]*=0.5;
 
         }
         DMatrix::mul_no_alloc_nt(VDTH_ad_[j], DTH_[j], Vb);

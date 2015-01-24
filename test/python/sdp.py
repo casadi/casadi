@@ -57,13 +57,13 @@ class SDPtests(casadiTestCase):
 
     F = -horzcat([DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])])
 
-    F = sparse(F)
+    F = sparsify(F)
 
     print F
 
     G = -DMatrix([[-11,0],[0,23]])
 
-    G = sparse(G)
+    G = sparsify(G)
     
     for sdpsolver, sdp_options in sdpsolvers:
       sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
@@ -76,12 +76,12 @@ class SDPtests(casadiTestCase):
     c = DMatrix([48,-8,20])
 
     F = -horzcat([DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])])
-    F = sparse(F)
+    F = sparsify(F)
 
     print F
 
     G = -DMatrix([[-11,0],[0,23]])
-    G = sparse(G)
+    G = sparsify(G)
 
     for sdpsolver, sdp_options in sdpsolvers:
       sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
@@ -204,7 +204,7 @@ class SDPtests(casadiTestCase):
     c = DMatrix(n1)
     Fi = [DMatrix(n3)]
     F = -horzcat(Fi)
-    F = sparse(F)
+    F = sparsify(F)
     G = -DMatrix(n2)
     for sdpsolver, sdp_options in sdpsolvers:
       sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
@@ -477,12 +477,12 @@ class SDPtests(casadiTestCase):
     Fi = [-DMatrix([[10,4],[4,0]]),-DMatrix([[0,0],[0,-8]]),-DMatrix([[0,-8],[-8,-2]])]
 
     F = horzcat(Fi)
-    F = sparse(F)
+    F = sparsify(F)
 
     print F
 
     G = -DMatrix([[-11,0],[0,23]])
-    G = sparse(G)
+    G = sparsify(G)
 
     for sdpsolver, sdp_options in sdpsolvers:
       sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
@@ -554,7 +554,7 @@ class SDPtests(casadiTestCase):
   [-6.5,-5.4,-5.4,-6.6,6.7,-7.2,-3.6,-7.2,7.3,-3.0,-3.6,-3.0,-1.4,6.1,-1.5]]
 
     F = -horzcat([DMatrix(sp,data) for data in flatdata])
-    F = sparse(F)
+    F = sparsify(F)
 
 
     for sdpsolver, sdp_options in sdpsolvers:
@@ -596,7 +596,7 @@ class SDPtests(casadiTestCase):
   [-6.5,-5.4,-5.4,-6.6,6.7,-7.2,-3.6,-7.2,7.3,-3.0,-3.6,-3.0,-1.4,6.1,-1.5]]
 
     F = -horzcat([DMatrix(sp,data)[perm,perm] for data in flatdata])
-    F = sparse(F)
+    F = sparsify(F)
     
     G = G[perm,perm]
     for sdpsolver, sdp_options in sdpsolvers:

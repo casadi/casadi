@@ -136,7 +136,7 @@ class casadiTestCase(unittest.TestCase):
     if sparsity < 1:
       spp = self.randDMatrix(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) ,symm=symm)
       spm = (spp < sparsity)
-      spm = sparse(spm)
+      spm = sparsify(spm)
       ret = DMatrix(spm.sparsity(),[valuegenerator() for i in range(spm.size())])
       if symm:
         return (ret + ret.T)/2
@@ -512,8 +512,8 @@ class casadiTestCase(unittest.TestCase):
         for stk,st in store.items():
           for i in range(len(st)-1):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-              if b.numel()==0 and sparse(a).size()==0: continue
-              if a.numel()==0 and sparse(b).size()==0: continue
+              if b.numel()==0 and sparsify(a).size()==0: continue
+              if a.numel()==0 and sparsify(b).size()==0: continue
               #self.checkarray(IMatrix(a.sparsity(),1),IMatrix(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               self.checkarray(a,b,("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               

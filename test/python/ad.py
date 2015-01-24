@@ -558,31 +558,31 @@ class ADtests(casadiTestCase):
           (in1,v1,x[0],DMatrix.eye(2)[0,:]),
           (in1,v1,(x**2)[0],horzcat([2*x[0],MX.sparse(1,1)])),
           (in1,v1,x[0]+x[1],DMatrix.ones(1,2)),
-          (in1,v1,vertcat([x[1],x[0]]),sparse(DMatrix([[0,1],[1,0]]))),
-          (in1,v1,vertsplit(x,[0,1,2])[1],sparse(DMatrix([[0,1]]))),
+          (in1,v1,vertcat([x[1],x[0]]),sparsify(DMatrix([[0,1],[1,0]]))),
+          (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DMatrix([[0,1]]))),
           (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX.sparse(1,1),2*x[1]],[2*x[0],MX.sparse(1,1)]])),
           (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX.sparse(1,1),2*x[1]]])),
           (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX.sparse(1,1),6*x[1]**5]])),
-          (in1,v1,horzcat([x[1],x[0]]).T,sparse(DMatrix([[0,1],[1,0]]))),
+          (in1,v1,horzcat([x[1],x[0]]).T,sparsify(DMatrix([[0,1],[1,0]]))),
           (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX.sparse(1,1),2*x[1]],[2*x[0],MX.sparse(1,1)]])),
           (in1,v1,diagcat([x[1]**2,y,x[0]**2]),
             blockcat(  [[MX.sparse(1,1),2*x[1]]] + ([[MX.sparse(1,1),MX.sparse(1,1)]]*14)  + [[2*x[0],MX.sparse(1,1)]] )
           ),
           (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX.sparse(1,1),2*x[1]],[2*x[0],MX.sparse(1,1)]])),
-          (in1,v1,x[[0,1]],sparse(DMatrix([[1,0],[0,1]]))),
+          (in1,v1,x[[0,1]],sparsify(DMatrix([[1,0],[0,1]]))),
           (in1,v1,(x**2)[[0,1]],2*c.diag(x)),
-          (in1,v1,x[[0,0,1,1]],sparse(DMatrix([[1,0],[1,0],[0,1],[0,1]]))),
+          (in1,v1,x[[0,0,1,1]],sparsify(DMatrix([[1,0],[1,0],[0,1],[0,1]]))),
           (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX.sparse(1,1)],[2*x[0],MX.sparse(1,1)],[MX.sparse(1,1),2*x[1]],[MX.sparse(1,1),2*x[1]]])),
-          (in1,v1,wwr,sparse(DMatrix([[2,0],[0,2]]))),
-          (in1,v1,x[[1,0]],sparse(DMatrix([[0,1],[1,0]]))), 
-          (in1,v1,x[[1,0],0],sparse(DMatrix([[0,1],[1,0]]))),
-          (in1,v1,w,sparse(DMatrix([[1,0],[0,2]]))),
+          (in1,v1,wwr,sparsify(DMatrix([[2,0],[0,2]]))),
+          (in1,v1,x[[1,0]],sparsify(DMatrix([[0,1],[1,0]]))), 
+          (in1,v1,x[[1,0],0],sparsify(DMatrix([[0,1],[1,0]]))),
+          (in1,v1,w,sparsify(DMatrix([[1,0],[0,2]]))),
           (in1,v1,w2,blockcat([[1,MX.sparse(1,1)],[x[1],x[0]]])),
           (in1,v1,ww,2*c.diag(x)),
           (in1,v1,wwf,vertcat([x[[1,0]].T,x[[1,0]].T])),
           (in1,v1,yy[:,0],DMatrix.eye(2)),
           (in1,v1,yy2[:,0],2*c.diag(x)),
-          (in1,v1,yyy[:,0],sparse(DMatrix([[0,1],[1,0]]))),
+          (in1,v1,yyy[:,0],sparsify(DMatrix([[0,1],[1,0]]))),
           (in1,v1,mul(y,x),y),
           (in1,v1,mul(x.T,y.T),y),
           (in1,v1,mul(y,x,DMatrix.zeros(Sparsity.triplet(2,1,[1],[0]))),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
@@ -611,7 +611,7 @@ class ADtests(casadiTestCase):
           #(in1,v1,f1.call([x**2,[]])[1],DMatrix.zeros(2,2)),
           #(in1,v1,f1.call([[],y])[1],DMatrix.zeros(2,2)),
           (in1,v1,vertcat([x,DMatrix.sparse(0,1)]),DMatrix.eye(2)),
-          (in1,v1,(x**2).setSparse(sparse(DMatrix([0,1])).sparsity()),blockcat([[MX.sparse(1,1),MX.sparse(1,1)],[MX.sparse(1,1),2*x[1]]])),
+          (in1,v1,(x**2).setSparse(sparsify(DMatrix([0,1])).sparsity()),blockcat([[MX.sparse(1,1),MX.sparse(1,1)],[MX.sparse(1,1),2*x[1]]])),
           (in1,v1,c.inner_prod(x,y[:,0]),y[:,0].T),
           (in1,v1,x.nz[IMatrix([[1,0]])]*y.nz[IMatrix([[0,2]])],blockcat([[MX.sparse(1,1),y.nz[0]],[y.nz[2],MX.sparse(1,1)]])),
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX.sparse(1,1),y.nz[0]],[MX.sparse(1,1),MX.sparse(1,1)],[MX.sparse(1,1),MX.sparse(1,1)],[y.nz[2],MX.sparse(1,1)]])),
@@ -780,9 +780,9 @@ class ADtests(casadiTestCase):
         for stk,st in store.items():
           for i in range(len(st)-1):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-              if b.numel()==0 and sparse(a).size()==0: continue
-              if a.numel()==0 and sparse(b).size()==0: continue
-              self.checkarray(sparse(a),sparse(b),("%s, output(%d)" % (order,k))+str(vf2.getInput(0)))
+              if b.numel()==0 and sparsify(a).size()==0: continue
+              if a.numel()==0 and sparsify(b).size()==0: continue
+              self.checkarray(sparsify(a),sparsify(b),("%s, output(%d)" % (order,k))+str(vf2.getInput(0)))
               
       for f in [fun.expand(),fun]:
         #  jacobian()

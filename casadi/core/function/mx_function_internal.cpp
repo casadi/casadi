@@ -584,7 +584,7 @@ namespace casadi {
     for (vector<pair<DMatrix, int> >::iterator it=work_.begin(); it!=work_.end(); ++it) {
       //Get a pointer to the int array
       bvec_t *iwork = get_bvec_t(it->first.data());
-      fill_n(iwork, it->first.size(), bvec_t(0));
+      fill_n(iwork, it->first.nnz(), bvec_t(0));
     }
   }
 
@@ -714,7 +714,7 @@ namespace casadi {
     bool skip_fwd = true;
     for (vector<vector<MX> >::const_iterator i=fseed.begin(); i!=fseed.end() && skip_fwd; ++i) {
       for (vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_fwd; ++j) {
-        if (j->size()>0) {
+        if (j->nnz()>0) {
           skip_fwd = false;
         }
       }
@@ -724,7 +724,7 @@ namespace casadi {
     bool skip_adj = true;
     for (vector<vector<MX> >::const_iterator i=aseed.begin(); i!=aseed.end() && skip_adj; ++i) {
       for (vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_adj; ++j) {
-        if (j->size()>0) {
+        if (j->nnz()>0) {
           skip_adj = false;
         }
       }
@@ -1221,7 +1221,7 @@ namespace casadi {
 
     // Declare all work variables
     for (int i=0; i<work_.size(); ++i) {
-      stream << "    d a" << i << "[" << work_[i].first.size() << "];" << endl;
+      stream << "    d a" << i << "[" << work_[i].first.nnz() << "];" << endl;
     }
 
     // Finalize work structure
@@ -1290,9 +1290,9 @@ namespace casadi {
 
       // Print the operation
       if (it->op==OP_OUTPUT) {
-        gen.copyVector(stream, arg.front(), output(it->res.front()).size(), res.front(), "i", true);
+        gen.copyVector(stream, arg.front(), output(it->res.front()).nnz(), res.front(), "i", true);
       } else if (it->op==OP_INPUT) {
-        gen.copyVector(stream, arg.front(), input(it->arg.front()).size(), res.front(), "i", false);
+        gen.copyVector(stream, arg.front(), input(it->arg.front()).nnz(), res.front(), "i", false);
       } else {
         it->data->generateOperation(stream, arg, res, gen);
       }

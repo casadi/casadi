@@ -62,7 +62,7 @@ namespace casadi {
     vector<double> &outputd = output[0]->data();
     const vector<double> &inputd = input[0]->data();
 
-    for (int i=0; i<size(); ++i) {
+    for (int i=0; i<nnz(); ++i) {
       casadi_math<double>::fun(op_, inputd[i], nan, outputd[i]);
     }
   }
@@ -73,7 +73,7 @@ namespace casadi {
     const vector<SXElement> &xd = input[0]->data();
     vector<SXElement> &od = output[0]->data();
 
-    for (int el=0; el<size(); ++el) {
+    for (int el=0; el<nnz(); ++el) {
       casadi_math<SXElement>::fun(op_, xd[el], 0, od[el]);
     }
   }
@@ -123,7 +123,7 @@ namespace casadi {
     bvec_t *inputd = get_bvec_t(input[0]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
     if (fwd) {
-      copy(inputd, inputd+size(), outputd);
+      copy(inputd, inputd+nnz(), outputd);
     } else {
       int nz = input[0]->data().size();
       for (int el=0; el<nz; ++el) {
@@ -136,7 +136,7 @@ namespace casadi {
 
   void UnaryMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                   const std::vector<std::string>& res, CodeGenerator& gen) const {
-    stream << "  for (i=0; i<" << sparsity().size() << "; ++i) ";
+    stream << "  for (i=0; i<" << sparsity().nnz() << "; ++i) ";
     stream << res.at(0) << "[i]=";
     casadi_math<double>::printPre(op_, stream);
     stream << arg.at(0) << "[i]";

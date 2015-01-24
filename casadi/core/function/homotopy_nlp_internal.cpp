@@ -64,9 +64,9 @@ namespace casadi {
     const Sparsity& g_sparsity = hnlp_.output(NL_G).sparsity();
 
     // Get dimensions
-    nx_ = x_sparsity.size();
-    np_ = p_sparsity.size();
-    ng_ = g_sparsity.size();
+    nx_ = x_sparsity.nnz();
+    np_ = p_sparsity.nnz();
+    ng_ = g_sparsity.nnz();
 
     // Allocate space for inputs
     setNumInputs(NLP_SOLVER_NUM_IN);

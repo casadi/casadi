@@ -67,11 +67,11 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			  $2 = array_size(p,0)*array_size(p,1);
 			  $1 = (double*) array_data(p);
 			} else if (array_numdims(p)==1) {
-				if (!(array_size(p,0)==arg1->size()) ) {
+				if (!(array_size(p,0)==arg1->nnz()) ) {
 				  std::stringstream s;
 				  s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
 				  s << "Array is not of correct size. Should match number of non-zero elements.";
-				  s << "Expecting " << array_size(p,0) << " non-zeros, but got " << arg1->size() <<" instead.";
+				  s << "Expecting " << array_size(p,0) << " non-zeros, but got " << arg1->nnz() <<" instead.";
           const std::string tmp(s.str());
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
@@ -88,11 +88,11 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			if (!(array_is_contiguous(narray) && array_is_native(narray) && array_type(narray)==NPY_DOUBLE))
 			  SWIG_exception_fail(SWIG_TypeError, "csc_matrix should be contiguous, native & of datatype double");
 			$2 = array_size(narray,0);
-			if (!(array_size(narray,0)==arg1->size() ) ) {
+			if (!(array_size(narray,0)==arg1->nnz() ) ) {
 					std::stringstream s;
 				  s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
 				  s << "csc_matrix does not have correct number of non-zero elements.";
-				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(narray,0) << " instead.";
+				  s << "Expecting " << arg1->nnz() << " non-zeros, but got " << array_size(narray,0) << " instead.";
           const std::string tmp(s.str());
           const char* cstr = tmp.c_str();
 		      Py_DECREF(narray);
@@ -129,11 +129,11 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 			  $2 = array_size(array,0)*array_size(array,1);
 			  $1 = (double*) array_data(array);
 			} else if (array_numdims(array)==1) {
-				if (!(array_size(array,0)==arg1->size()) ) {
+				if (!(array_size(array,0)==arg1->nnz()) ) {
 				  std::stringstream s;
 				  s << "SWIG::typemap(in) (const double *val,int len,SparsityType sp) " << std::endl;
 				  s << "Array is not of correct size. Should match number of non-zero elements.";
-				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(array,0) << " instead.";
+				  s << "Expecting " << arg1->nnz() << " non-zeros, but got " << array_size(array,0) << " instead.";
           const std::string tmp(s.str());
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
@@ -148,11 +148,11 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
 			$3 = casadi::SPARSE;
 			PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
 			$2 = array_size(narray,0);
-			if (!(array_size(narray,0)==arg1->size() ) ) {
+			if (!(array_size(narray,0)==arg1->nnz() ) ) {
 					std::stringstream s;
 				  s << "SWIG::typemap(in) (const double *val,int len,SparsityType sp) " << std::endl;
 				  s << "csc_matrix does not have correct number of non-zero elements.";
-				  s << "Expecting " << arg1->size() << " non-zeros, but got " << array_size(narray,0) << " instead.";
+				  s << "Expecting " << arg1->nnz() << " non-zeros, but got " << array_size(narray,0) << " instead.";
           const std::string tmp(s.str());
           const char* cstr = tmp.c_str();
           Py_DECREF(narray);
@@ -233,7 +233,7 @@ namespace casadi{
 /// Create a 2D contiguous NP_DOUBLE numpy.ndarray
 
 PyObject* arrayView() {
-  if ($self->size()!=$self->numel()) 
+  if ($self->nnz()!=$self->numel()) 
     throw  casadi::CasadiException("Matrix<double>::arrayview() can only construct arrayviews for dense DMatrices.");
   npy_intp dims[2];
   dims[0] = $self->size2();

@@ -146,12 +146,12 @@ namespace casadi {
     /// Access a non-zero element
     inline DataType& at(int k) {
       try {
-        if (k<0) k+=sparsity_.size();
+        if (k<0) k+=sparsity_.nnz();
         return data().at(k);
       } catch(std::out_of_range& ex) {
         std::stringstream ss;
         ss << "Out of range error in SparseStorage<>::at: " << k
-           << " not in range [0, " << sparsity_.size() << ")";
+           << " not in range [0, " << sparsity_.nnz() << ")";
         throw CasadiException(ss.str());
       }
     }
@@ -159,7 +159,7 @@ namespace casadi {
     /// Access a non-zero element
     DataType at(int k) {
       try {
-        if (k<0) k+=sparsity_.size();
+        if (k<0) k+=sparsity_.nnz();
         return data().at(k);
       } catch(std::out_of_range& ex) {
         std::stringstream ss;

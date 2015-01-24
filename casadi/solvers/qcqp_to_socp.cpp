@@ -76,11 +76,11 @@ namespace casadi {
     cholesky_[0].input(0).setArray(&input(QCQP_SOLVER_H).data().front()+qcqp_p_offset);
     for (int i=0;i<nq_;++i) {
       cholesky_[i+1].input(0).setArray(&input(QCQP_SOLVER_P).data().front()+qcqp_p_offset);
-      qcqp_p_offset+= cholesky_[i+1].input(0).size();
+      qcqp_p_offset+= cholesky_[i+1].input(0).nnz();
     }
 
     for (int i=0;i<nq_+1;++i) {
-      for (int k=0;k<cholesky_[i].input(0).size();++k) {
+      for (int k=0;k<cholesky_[i].input(0).nnz();++k) {
         cholesky_[i].input(0).at(k)*=0.5;
       }
     }
@@ -90,7 +90,7 @@ namespace casadi {
       cholesky_[i].prepare();
       DMatrix G = cholesky_[i].getFactorization(true);
       std::copy(G.begin(), G.end(), solver_.input(SOCP_SOLVER_G).begin()+socp_g_offset);
-      socp_g_offset += G.size()+1;
+      socp_g_offset += G.nnz()+1;
     }
 
     // Transform QCQP_SOLVER_Q to SOCP_SOLVER_H (needs SOCP_SOLVER_G)
@@ -107,7 +107,7 @@ namespace casadi {
       x_offset += n_+1;
     }
 
-    for (int k=0;k<solver_.input(SOCP_SOLVER_H).size();++k) {
+    for (int k=0;k<solver_.input(SOCP_SOLVER_H).nnz();++k) {
       solver_.input(SOCP_SOLVER_H).at(k)*= 0.5;
     }
 
@@ -130,7 +130,7 @@ namespace casadi {
     solver_.input(SOCP_SOLVER_E)[n_] = 0.5/solver_.input(SOCP_SOLVER_F)[0];
 
     // Fix the first qc arising from epigraph reformulation: we must make use of e here.
-    solver_.input(SOCP_SOLVER_G)[cholesky_[0].getFactorization().size()] =
+    solver_.input(SOCP_SOLVER_G)[cholesky_[0].getFactorization().nnz()] =
       solver_.input(SOCP_SOLVER_E)[n_];
 
     /// Objective of the epigraph form

@@ -132,9 +132,9 @@ namespace casadi {
     string compiler = getOption("compiler");
     gauss_newton_ = getOption("hessian_approximation") == "gauss-newton";
     if (gauss_newton_) {
-      casadi_assert(nlp_.output(NL_F).size()>1);
+      casadi_assert(nlp_.output(NL_F).nnz()>1);
     } else {
-      casadi_assert(nlp_.output(NL_F).size()==1);
+      casadi_assert(nlp_.output(NL_F).nnz()==1);
     }
 
     // Name the components
@@ -195,7 +195,7 @@ namespace casadi {
     for (int i=0; i<v_.size(); ++i) {
       v_[i].v = vdef_in.at(i+2);
       v_[i].v_def = vdef_out.at(i+2);
-      v_[i].n = v_[i].v.size();
+      v_[i].n = v_[i].v.nnz();
     }
 
     // Allocate memory
@@ -240,8 +240,8 @@ namespace casadi {
       // Least square objective
       f = inner_prod(vdef_out[0], vdef_out[0])/2;
       gL_defL = vdef_out[0];
-      b_gn_.resize(gL_defL.size(), numeric_limits<double>::quiet_NaN());
-      work_.resize(gL_defL.size());
+      b_gn_.resize(gL_defL.nnz(), numeric_limits<double>::quiet_NaN());
+      work_.resize(gL_defL.nnz());
     } else {
       // Scalar objective function
       f = vdef_out[0];
@@ -598,12 +598,12 @@ namespace casadi {
 
     // Residual
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      it->res.resize(it->d.size(), 0);
+      it->res.resize(it->d.nnz(), 0);
     }
 
     if (!gauss_newton_) {
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        it->resL.resize(it->d_lam.size(), 0);
+        it->resL.resize(it->d_lam.nnz(), 0);
       }
     }
 

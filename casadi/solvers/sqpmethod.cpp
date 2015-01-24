@@ -223,8 +223,8 @@ namespace casadi {
       cout << endl;
       cout << "Number of variables:                       " << setw(9) << nx_ << endl;
       cout << "Number of constraints:                     " << setw(9) << ng_ << endl;
-      cout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.size() << endl;
-      cout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.size() << endl;
+      cout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.nnz() << endl;
+      cout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.nnz() << endl;
       cout << endl;
     }
   }

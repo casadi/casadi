@@ -88,7 +88,7 @@ namespace casadi {
 
   void NormF::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                 const std::vector<std::string>& res, CodeGenerator& gen) const {
-    stream << "  *" << res.front() << " = sqrt(" << gen.casadi_dot(dep().size(),
+    stream << "  *" << res.front() << " = sqrt(" << gen.casadi_dot(dep().nnz(),
                                                                    arg.front(), 1,
                                                                    arg.front(), 1) << ");" << endl;
   }

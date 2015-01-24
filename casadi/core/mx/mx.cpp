@@ -77,15 +77,15 @@ namespace casadi {
         if (val.isConstant()) {
           assignNode(ConstantMX::create(sp, val.getValue()));
         } else {
-          *this = val->getGetNonzeros(sp, std::vector<int>(sp.size(), 0));
+          *this = val->getGetNonzeros(sp, std::vector<int>(sp.nnz(), 0));
         }
       } else {
         // Empty matrix
         assignNode(ConstantMX::create(Sparsity::sparse(sp.shape()), 0));
       }
     } else {
-      casadi_assert(val.isVector() && sp.size()==val.size1());
-      *this = densify(val)->getGetNonzeros(sp, range(sp.size()));
+      casadi_assert(val.isVector() && sp.nnz()==val.size1());
+      *this = densify(val)->getGetNonzeros(sp, range(sp.nnz()));
     }
   }
 
@@ -105,7 +105,7 @@ namespace casadi {
       ret[i] = MX::create(new OutputNode(x, i));
       if (ret[i].isEmpty(true)) {
         ret[i] = MX::sparse(0, 0);
-      } else if (ret[i].size()==0) {
+      } else if (ret[i].nnz()==0) {
         ret[i] = MX::sparse(ret[i].shape());
       }
     }
@@ -303,7 +303,7 @@ namespace casadi {
     }
 
     // Dimensions of this
-    int sz1 = size1(), sz2 = size2(), sz = size(), nel = numel(), rrsz = rr.size();
+    int sz1 = size1(), sz2 = size2(), sz = nnz(), nel = numel(), rrsz = rr.nnz();
 
     // Quick return if nothing to set
     if (rrsz==0) return;
@@ -361,15 +361,15 @@ namespace casadi {
 
   MX MX::getNZ(bool ind1, const Slice& kk) const {
     // Fallback on IMatrix
-    return getNZ(ind1, kk.getAll(size(), ind1));
+    return getNZ(ind1, kk.getAll(nnz(), ind1));
   }
 
   MX MX::getNZ(bool ind1, const Matrix<int>& kk) const {
     // Quick return if no entries
-    if (kk.size()==0) return MX::zeros(kk.sparsity());
+    if (kk.nnz()==0) return MX::zeros(kk.sparsity());
 
     // Check bounds
-    int sz = size();
+    int sz = nnz();
     if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
       casadi_error("getNZ[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk.begin(), kk.end()) << " up to "
@@ -393,13 +393,13 @@ namespace casadi {
 
   void MX::setNZ(const MX& m, bool ind1, const Slice& kk) {
     // Fallback on IMatrix
-    setNZ(m, ind1, kk.getAll(size(), ind1));
+    setNZ(m, ind1, kk.getAll(nnz(), ind1));
   }
 
   void MX::setNZ(const MX& m, bool ind1, const Matrix<int>& kk) {
-    casadi_assert_message(kk.size()==m.size() || m.size()==1,
-                          "MX::setNZ: length of non-zero indices (" << kk.size() << ") " <<
-                          "must match size of rhs (" << m.size() << ").");
+    casadi_assert_message(kk.nnz()==m.nnz() || m.nnz()==1,
+                          "MX::setNZ: length of non-zero indices (" << kk.nnz() << ") " <<
+                          "must match size of rhs (" << m.nnz() << ").");
 
     // Assert dimensions of assigning matrix
     if (kk.sparsity() != m.sparsity()) {
@@ -428,7 +428,7 @@ namespace casadi {
     }
 
     // Check bounds
-    int sz = size();
+    int sz = nnz();
     if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
       casadi_error("setNZ[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk.begin(), kk.end()) << " up to "
@@ -437,7 +437,7 @@ namespace casadi {
     }
 
     // Quick return if no assignments to be made
-    if (kk.size()==0) return;
+    if (kk.nnz()==0) return;
 
     // Handle index-1, negative indices
     if (ind1 || *std::min_element(kk.begin(), kk.end())<0) {
@@ -541,7 +541,7 @@ namespace casadi {
     std::vector<int> mapping = sp.erase(rr, cc, ind1);
 
     // Create new matrix
-    if (mapping.size()!=size()) {
+    if (mapping.size()!=nnz()) {
       MX ret = (*this)->getGetNonzeros(sp, mapping);
       *this = ret;
     }
@@ -555,7 +555,7 @@ namespace casadi {
     std::vector<int> mapping = sp.erase(rr, ind1);
 
     // Create new matrix
-    if (mapping.size()!=size()) {
+    if (mapping.size()!=nnz()) {
       MX ret = (*this)->getGetNonzeros(sp, mapping);
       *this = ret;
     }
@@ -566,7 +566,7 @@ namespace casadi {
     Sparsity sp = sparsity();
     sp.enlarge(nrow, ncol, rr, cc, ind1);
 
-    MX ret = (*this)->getGetNonzeros(sp, range(size())); // FIXME?
+    MX ret = (*this)->getGetNonzeros(sp, range(nnz())); // FIXME?
     *this = ret;
   }
 
@@ -956,7 +956,7 @@ namespace casadi {
   }
 
   bool MX::isZero() const {
-    if (size()==0) {
+    if (nnz()==0) {
       return true;
     } else {
       return (*this)->isZero();
@@ -1244,7 +1244,7 @@ namespace casadi {
     if (isDense()) {
       return vec(*this);
     } else {
-      return (*this)->getGetNonzeros(Sparsity::dense(size(), 1), range(size()));
+      return (*this)->getGetNonzeros(Sparsity::dense(nnz(), 1), range(nnz()));
     }
   }
 
@@ -1319,7 +1319,7 @@ namespace casadi {
     // Collect the sizes of the depenencies
     std::vector<int> index(deps.size()+1, 0);
     for (int k=0;k<deps.size();k++) {
-      index[k+1] =  index[k] + deps[k].size();
+      index[k+1] =  index[k] + deps[k].nnz();
     }
 
     // Create the parent
@@ -1339,7 +1339,7 @@ namespace casadi {
     // Collect the sizes of the depenencies
     std::vector<int> index(deps.size()+1, 0);
     for (int k=0;k<deps.size();k++) {
-      index[k+1] =  index[k] + deps[k].size();
+      index[k+1] =  index[k] + deps[k].nnz();
     }
 
     // Create the parent
@@ -1394,9 +1394,9 @@ namespace casadi {
 
   MX MX::zz_polyval(const MX& x) const {
     casadi_assert_message(isDense(), "polynomial coefficients vector must be a vector");
-    casadi_assert_message(isVector() && size()>0, "polynomial coefficients must be a vector");
+    casadi_assert_message(isVector() && nnz()>0, "polynomial coefficients must be a vector");
     MX ret = (*this)[0];
-    for (int i=1; i<size(); ++i) {
+    for (int i=1; i<nnz(); ++i) {
       ret = ret*x + (*this)[i];
     }
     return ret;
@@ -1819,7 +1819,7 @@ namespace casadi {
   }
 
   bool MX::zz_dependsOn(const std::vector<MX> &arg) const {
-    if (size()==0) return false;
+    if (nnz()==0) return false;
 
     // Construct a temporary algorithm
     MXFunction temp(arg, *this);
@@ -1828,14 +1828,14 @@ namespace casadi {
 
     for (int i=0;i<temp.getNumInputs();++i) {
       bvec_t* input_ =  get_bvec_t(temp.input(i).data());
-      std::fill(input_, input_+temp.input(i).size(), bvec_t(1));
+      std::fill(input_, input_+temp.input(i).nnz(), bvec_t(1));
     }
     bvec_t* output_ = get_bvec_t(temp.output().data());
     // Perform a single dependency sweep
     temp.spEvaluate(true);
 
     // Loop over results
-    for (int i=0;i<temp.output().size();++i) {
+    for (int i=0;i<temp.output().nnz();++i) {
       if (output_[i]) return true;
     }
 

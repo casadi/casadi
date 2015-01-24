@@ -227,7 +227,7 @@ namespace casadi {
     }
 
     // Check offset for consistency
-    casadi_assert(offset==V.size());
+    casadi_assert(offset==V.nnz());
 
     // Constraints
     vector<MX> g;
@@ -346,7 +346,7 @@ namespace casadi {
 
 
     // Make sure that the dimension is consistent with the number of unknowns
-    casadi_assert_message(gv.size()==V.size(),
+    casadi_assert_message(gv.nnz()==V.nnz(),
                           "Implicit function unknowns and equations do not match");
 
     // Implicit function

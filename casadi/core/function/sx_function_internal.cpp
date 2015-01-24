@@ -371,7 +371,7 @@ namespace casadi {
     // Current output and nonzero, start with the first one
     int curr_oind, curr_nz=0;
     for (curr_oind=0; curr_oind<outputv_.size(); ++curr_oind) {
-      if (outputv_[curr_oind].size()!=0) {
+      if (outputv_[curr_oind].nnz()!=0) {
         break;
       }
     }
@@ -409,11 +409,11 @@ namespace casadi {
 
         // Go to the next nonzero
         curr_nz++;
-        if (curr_nz>=outputv_[curr_oind].size()) {
+        if (curr_nz>=outputv_[curr_oind].nnz()) {
           curr_nz=0;
           curr_oind++;
           for (; curr_oind<outputv_.size(); ++curr_oind) {
-            if (outputv_[curr_oind].size()!=0) {
+            if (outputv_[curr_oind].nnz()!=0) {
               break;
             }
           }
@@ -633,7 +633,7 @@ namespace casadi {
     const int checking_depth = 2;
     bool output_given = true;
     for (int i=0; i<arg1.size() && output_given; ++i) {
-      for (int j=0; j<arg1[i].size() && output_given; ++j) {
+      for (int j=0; j<arg1[i].nnz() && output_given; ++j) {
         if (!isEqual(arg1[i].at(j), inputv_[i].at(j), checking_depth)) {
           output_given = false;
         }

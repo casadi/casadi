@@ -261,7 +261,7 @@ namespace casadi {
     if (use_fwd) {
       // Set input influence
       for (int j=inind_[task]; j<inind_[task+1]; ++j) {
-        int nv = input(j).size();
+        int nv = input(j).nnz();
         const bvec_t* p_v = get_bvec_t(input(j).data());
         bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
         copy(p_v, p_v+nv, f_v);
@@ -272,7 +272,7 @@ namespace casadi {
 
       // Get output dependence
       for (int j=outind_[task]; j<outind_[task+1]; ++j) {
-        int nv = output(j).size();
+        int nv = output(j).nnz();
         bvec_t* p_v = get_bvec_t(output(j).data());
         const bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
         copy(f_v, f_v+nv, p_v);
@@ -282,7 +282,7 @@ namespace casadi {
 
       // Set output influence
       for (int j=outind_[task]; j<outind_[task+1]; ++j) {
-        int nv = output(j).size();
+        int nv = output(j).nnz();
         const bvec_t* p_v = get_bvec_t(output(j).data());
         bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
         copy(p_v, p_v+nv, f_v);
@@ -293,7 +293,7 @@ namespace casadi {
 
       // Get input dependence
       for (int j=inind_[task]; j<inind_[task+1]; ++j) {
-        int nv = input(j).size();
+        int nv = input(j).nnz();
         bvec_t* p_v = get_bvec_t(input(j).data());
         const bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
         copy(f_v, f_v+nv, p_v);

@@ -79,13 +79,13 @@ namespace casadi {
   }
 
   void LpSolverInternal::checkInputs() const {
-    for (int i=0;i<input(LP_SOLVER_LBX).size();++i) {
+    for (int i=0;i<input(LP_SOLVER_LBX).nnz();++i) {
       casadi_assert_message(input(LP_SOLVER_LBX).at(i)<=input(LP_SOLVER_UBX).at(i),
                             "LBX[i] <= UBX[i] was violated for i=" << i
                             << ". Got LBX[i] " << input(LP_SOLVER_LBX).at(i)
                             << " and UBX[i] " << input(LP_SOLVER_UBX).at(i));
     }
-    for (int i=0;i<input(LP_SOLVER_LBA).size();++i) {
+    for (int i=0;i<input(LP_SOLVER_LBA).nnz();++i) {
       casadi_assert_message(input(LP_SOLVER_LBA).at(i)<=input(LP_SOLVER_UBA).at(i),
                             "LBA[i] <= UBA[i] was violated for i=" << i
                             << ". Got LBA[i] " << input(LP_SOLVER_LBA).at(i)

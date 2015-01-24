@@ -164,14 +164,14 @@ void profileWriteName(std::ofstream &f, T *a, const std::string &name,
     ProfilingData_IO ss;
     ss.nrow = a->input(i).size1();
     ss.ncol = a->input(i).size2();
-    ss.ndata = a->input(i).size();
+    ss.ndata = a->input(i).nnz();
     profileWriteBare(f, ss);
   }
   for (int i=0;i<s.numout;++i) {
     ProfilingData_IO ss;
     ss.nrow = a->output(i).size1();
     ss.ncol = a->output(i).size2();
-    ss.ndata = a->output(i).size();
+    ss.ndata = a->output(i).nnz();
     profileWriteBare(f, ss);
   }
 }

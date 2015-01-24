@@ -82,12 +82,12 @@ namespace casadi {
                           "Residual must be a dense vector");
     casadi_assert_message(f_.input(iin_).isDense() && f_.input(iin_).isVector(),
                           "Unknown must be a dense vector");
-    n_ = f_.output(iout_).size();
-    casadi_assert_message(n_ == f_.input(iin_).size(),
+    n_ = f_.output(iout_).nnz();
+    casadi_assert_message(n_ == f_.input(iin_).nnz(),
                           "Dimension mismatch. Input size is "
-                          << f_.input(iin_).size()
+                          << f_.input(iin_).nnz()
                           << ", while output size is "
-                          << f_.output(iout_).size());
+                          << f_.output(iout_).nnz());
 
     // Allocate inputs
     setNumInputs(f_.getNumInputs());

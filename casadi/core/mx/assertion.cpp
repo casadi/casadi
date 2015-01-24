@@ -92,7 +92,7 @@ namespace casadi {
     bvec_t *input0 = get_bvec_t(input[0]->data());
     //    bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
-    for (int el=0; el<output[0]->size(); ++el) {
+    for (int el=0; el<output[0]->nnz(); ++el) {
       if (fwd) {
         outputd[el] = input0[el];
       } else {

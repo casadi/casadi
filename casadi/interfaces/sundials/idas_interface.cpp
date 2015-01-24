@@ -1719,8 +1719,8 @@ namespace casadi {
     }
 
     // Solve the (possibly factorized) system
-    casadi_assert_message(linsol_.output().size() == NV_LENGTH_S(zvec), "Assertion error: "
-                          << linsol_.output().size() << " == " << NV_LENGTH_S(zvec));
+    casadi_assert_message(linsol_.output().nnz() == NV_LENGTH_S(zvec), "Assertion error: "
+                          << linsol_.output().nnz() << " == " << NV_LENGTH_S(zvec));
     linsol_.solve(NV_DATA_S(zvec), 1, false);
 
     // Log time duration
@@ -1746,8 +1746,8 @@ namespace casadi {
     casadi_assert(!linsolB_.isNull());
 
     // Solve the (possibly factorized) system
-    casadi_assert_message(linsolB_.output().size() == NV_LENGTH_S(zvecB),
-                          "Assertion error: " << linsolB_.output().size()
+    casadi_assert_message(linsolB_.output().nnz() == NV_LENGTH_S(zvecB),
+                          "Assertion error: " << linsolB_.output().nnz()
                           << " == " << NV_LENGTH_S(zvecB));
     if (monitored("psolveB")) {
       cout << "zvecB = " << std::endl;

@@ -96,10 +96,10 @@ namespace casadi {
                           "Wrong number of inputs for the DAE callback function");
     casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT,
                           "Wrong number of outputs for the DAE callback function");
-    nx_ = f_.input(DAE_X).size();
-    nz_ = f_.input(DAE_Z).size();
-    nq_ = f_.output(DAE_QUAD).size();
-    np_  = f_.input(DAE_P).size();
+    nx_ = f_.input(DAE_X).nnz();
+    nz_ = f_.input(DAE_Z).nnz();
+    nq_ = f_.output(DAE_QUAD).nnz();
+    np_  = f_.input(DAE_P).nnz();
 
     // Initialize and get dimensions for the backward integration
     if (g_.isNull()) {
@@ -111,10 +111,10 @@ namespace casadi {
                             "Wrong number of inputs for the backwards DAE callback function");
       casadi_assert_message(g_.getNumOutputs()==RDAE_NUM_OUT,
                             "Wrong number of outputs for the backwards DAE callback function");
-      nrx_ = g_.input(RDAE_RX).size();
-      nrz_ = g_.input(RDAE_RZ).size();
-      nrp_ = g_.input(RDAE_RP).size();
-      nrq_ = g_.output(RDAE_QUAD).size();
+      nrx_ = g_.input(RDAE_RX).nnz();
+      nrz_ = g_.input(RDAE_RZ).nnz();
+      nrp_ = g_.input(RDAE_RP).nnz();
+      nrq_ = g_.output(RDAE_QUAD).nnz();
     }
 
     // Allocate space for inputs

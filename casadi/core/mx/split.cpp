@@ -113,7 +113,7 @@ namespace casadi {
     for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
         it!=output_sparsity_.end();
         ++it) {
-      offset_.push_back(offset_.back() + it->size());
+      offset_.push_back(offset_.back() + it->nnz());
     }
   }
 
@@ -186,10 +186,10 @@ namespace casadi {
     for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
         it!=output_sparsity_.end();
         ++it) {
-      offset_.push_back(offset_.back() + it->size());
+      offset_.push_back(offset_.back() + it->nnz());
     }
 
-    casadi_assert_message(offset_.back()==x.size(),
+    casadi_assert_message(offset_.back()==x.nnz(),
       "DiagSplit:: the presence of nonzeros outside the diagonal blocks in unsupported.");
   }
 
@@ -264,7 +264,7 @@ namespace casadi {
     for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
         it!=output_sparsity_.end();
         ++it) {
-      offset_.push_back(offset_.back() + it->size());
+      offset_.push_back(offset_.back() + it->nnz());
     }
   }
 

@@ -83,7 +83,7 @@ namespace casadi {
    after the corresponding column. All the non-zero elements of a particular i are thus the elements
    with index el that fulfills: colind[i] <= el < colind[i+1].
 
-   2. "row" [same length as the number of non-zero elements, size()] The rows for each of the
+   2. "row" [same length as the number of non-zero elements, nnz()] The rows for each of the
    structural non-zeros.
 
    Note that with this format, it is cheap to loop over all the non-zero elements of a particular
@@ -261,7 +261,7 @@ namespace casadi {
     int size2() const;
 
     /** \brief The total number of elements, including structural zeros, i.e. size2()*size1()
-        \see size()  */
+        \see nnz()  */
     int numel() const;
 
     /** \brief Check if the sparsity is empty
@@ -273,7 +273,10 @@ namespace casadi {
 
     /** \brief Get the number of (structural) non-zeros
         \see numel() */
-    int size() const;
+    int nnz() const;
+
+    /** \brief DEPRECATED: Alias for nnz */
+    int size() const { return nnz();}
 
     /** \brief Number of non-zeros in the upper triangular half,
      * i.e. the number of elements (i, j) with j>=i */
@@ -750,13 +753,13 @@ namespace casadi {
   template<typename DataType>
   void Sparsity::set(DataType* data, const DataType* val_data, const Sparsity& val_sp) const {
     // Get dimensions of this
-    const int sz = size();
+    const int sz = nnz();
     const int sz1 = size1();
     const int sz2 = size2();
     const int nel = sz1*sz2;
 
     // Get dimensions of assigning matrix
-    const int val_sz = val_sp.size();
+    const int val_sz = val_sp.nnz();
     const int val_sz1 = val_sp.size1();
     const int val_sz2 = val_sp.size2();
     const int val_nel = val_sz1*val_sz2;
@@ -826,13 +829,13 @@ namespace casadi {
   template<typename DataType>
   void Sparsity::add(DataType* data, const DataType* val_data, const Sparsity& val_sp) const {
     // Get dimensions of this
-    const int sz = size();
+    const int sz = nnz();
     const int sz1 = size1();
     const int sz2 = size2();
     const int nel = sz1*sz2;
 
     // Get dimensions of assigning matrix
-    const int val_sz = val_sp.size();
+    const int val_sz = val_sp.nnz();
     const int val_sz1 = val_sp.size1();
     const int val_sz2 = val_sp.size2();
     const int val_nel = val_sz1*val_sz2;
@@ -907,13 +910,13 @@ namespace casadi {
   template<typename DataType>
   void Sparsity::bor(DataType* data, const DataType* val_data, const Sparsity& val_sp) const {
     // Get dimensions of this
-    const int sz = size();
+    const int sz = nnz();
     const int sz1 = size1();
     const int sz2 = size2();
     const int nel = sz1*sz2;
 
     // Get dimensions of assigning matrix
-    const int val_sz = val_sp.size();
+    const int val_sz = val_sp.nnz();
     const int val_sz1 = val_sp.size1();
     const int val_sz2 = val_sp.size2();
     const int val_nel = val_sz1*val_sz2;

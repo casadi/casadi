@@ -68,7 +68,7 @@ namespace casadi {
     // Call the init method of the base class
     LinearSolverInternal::init();
 
-    A_.nzmax = input().size();  // maximum number of entries
+    A_.nzmax = input().nnz();  // maximum number of entries
     A_.m = input().size1(); // number of rows
     A_.n = input().size2(); // number of columns
     A_.p = const_cast<int*>(&input().colind().front()); // column pointers (size n+1)

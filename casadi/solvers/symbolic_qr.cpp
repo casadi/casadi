@@ -214,7 +214,7 @@ namespace casadi {
       solv.setInput(x, 2);
       solv.evaluate();
       solv.getOutput(x);
-      x += solv.output().size();
+      x += solv.output().nnz();
     }
   }
 
@@ -262,19 +262,19 @@ namespace casadi {
 
     // Data structures to hold A, Q and R
     stream << "  static int prepared = 0;" << endl;
-    stream << "  static d A[" << input(LINSOL_A).size() << "];" << endl;
-    stream << "  static d Q[" << Q_.size() << "];" << endl;
-    stream << "  static d R[" << R_.size() << "];" << endl;
+    stream << "  static d A[" << input(LINSOL_A).nnz() << "];" << endl;
+    stream << "  static d Q[" << Q_.nnz() << "];" << endl;
+    stream << "  static d R[" << R_.nnz() << "];" << endl;
 
     // Check if the factorization is up-to-date
     stream << "  int i;" << endl;
-    stream << "  for (i=0; prepared && i<" << input(LINSOL_A).size()
+    stream << "  for (i=0; prepared && i<" << input(LINSOL_A).nnz()
            << "; ++i) prepared=A[i]!=x0[i];" << endl;
 
     // Factorize if needed
     int fact_ind = gen.getDependency(fact_fcn_);
     stream << "  if (!prepared) {" << endl;
-    stream << "    for (i=0; i<" << input(LINSOL_A).size() << "; ++i) A[i]=x0[i];" << endl;
+    stream << "    for (i=0; i<" << input(LINSOL_A).nnz() << "; ++i) A[i]=x0[i];" << endl;
     stream << "    f" << fact_ind << "(A, Q, R);" << endl;
     stream << "    prepared = 1;" << endl;
     stream << "  }" << endl;

@@ -119,8 +119,8 @@ namespace casadi {
     return (*this)->isEmpty(both);
   }
 
-  int Sparsity::size() const {
-    return (*this)->size();
+  int Sparsity::nnz() const {
+    return (*this)->nnz();
   }
 
   std::pair<int, int> Sparsity::shape() const {
@@ -175,7 +175,7 @@ namespace casadi {
     if (isDense()) return rr+cc*size1();
 
     // Quick return if we are adding an element to the end
-    if (colind(cc)==size() || (colind(cc+1)==size() && row().back()<rr)) {
+    if (colind(cc)==nnz() || (colind(cc+1)==nnz() && row().back()<rr)) {
       std::vector<int>& rowv = rowRef();
       std::vector<int>& colindv = colindRef();
       rowv.push_back(rr);
@@ -1135,7 +1135,7 @@ namespace casadi {
       }
       n+= v[i].size2();
       m+= v[i].size1();
-      nz+= v[i].size();
+      nz+= v[i].nnz();
     }
 
     return Sparsity(m, n, colind, row);
@@ -1204,7 +1204,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::zz_vecNZ() const {
-    return Sparsity::dense(size());
+    return Sparsity::dense(nnz());
   }
 
   std::vector<Sparsity> Sparsity::zz_diagsplit(const std::vector<int>& offset1,

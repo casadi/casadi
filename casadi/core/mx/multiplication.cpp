@@ -110,7 +110,7 @@ namespace casadi {
                                          bool fwd) {
     bvec_t *zd = get_bvec_t(input[0]->data());
     bvec_t *rd = get_bvec_t(output[0]->data());
-    const size_t n = this->size();
+    const size_t n = this->nnz();
     if (fwd) {
       if (zd!=rd) copy(zd, zd+n, rd);
       DMatrix::mul_sparsity<true>(*input[1], *input[2], *input[0], rtmp);
@@ -134,7 +134,7 @@ namespace casadi {
 
     // Copy first argument if not inplace
     if (!inplace) {
-      stream << "  for (i=0; i<" << this->size() << "; ++i) " << res.front()
+      stream << "  for (i=0; i<" << this->nnz() << "; ++i) " << res.front()
              << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
@@ -155,7 +155,7 @@ namespace casadi {
 
     // Copy first argument if not inplace
     if (!inplace) {
-      stream << "  for (i=0; i<" << this->size() << "; ++i) " << res.front()
+      stream << "  for (i=0; i<" << this->nnz() << "; ++i) " << res.front()
              << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 

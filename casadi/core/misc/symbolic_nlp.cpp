@@ -592,13 +592,13 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
 void SymbolicNLP::print(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP:" << endl;
   stream << "x = " << x << endl;
-  stream << "#f=" << f.size() << endl;
-  stream << "#g=" << g.size() << endl;
+  stream << "#f=" << f.nnz() << endl;
+  stream << "#g=" << g.nnz() << endl;
   if (trailing_newline) stream << endl;
 }
 
 void SymbolicNLP::repr(std::ostream &stream, bool trailing_newline) const {
-  stream << "NLP(#f=" << f.size() << ",#g="<< g.size() << ")";
+  stream << "NLP(#f=" << f.nnz() << ",#g="<< g.nnz() << ")";
   if (trailing_newline) stream << endl;
 }
 

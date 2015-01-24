@@ -1597,7 +1597,7 @@ class MXtests(casadiTestCase):
     C = diagcat([MX(DMatrix(([[-1.4,-3.2],[-3.2,-28]]))),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
     self.assertTrue(isinstance(C,MX))
     r = DMatrix([[-1.4,-3.2,0,0,0,0,0],[-3.2,-28,0,0,0,0,0],[0,0,15,-12,2.1,0,0],[0,0,-12,16,-3.8,0,0],[0,0,2.1,-3.8,15,0,0],[0,0,0,0,0,1.8,0],[0,0,0,0,0,0,-4]])
-    r = sparse(r)
+    r = sparsify(r)
     f = MXFunction([],[C])
     f.init()
     f.evaluate()
@@ -1619,7 +1619,7 @@ class MXtests(casadiTestCase):
     B = MX.sym("B",2,5)
     
     A = IMatrix([[1,1,0,0,0],[0,0,1,0,0]])
-    A = sparse(A)
+    A = sparsify(A)
     sp = A.sparsity()
     import copy
     
@@ -2113,8 +2113,8 @@ class MXtests(casadiTestCase):
     print outs
     
   def test_kron(self):
-    a = sparse(DMatrix([[1,0,6],[2,7,0]]))
-    b = sparse(DMatrix([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))
+    a = sparsify(DMatrix([[1,0,6],[2,7,0]]))
+    b = sparsify(DMatrix([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))
     
     A = MX.sym("A",a.sparsity())
     B = MX.sym("B",b.sparsity())
@@ -2170,7 +2170,7 @@ class MXtests(casadiTestCase):
      [00,00,00,0.00166876,0.000848291,0.000930959,-0.0100419,-0.00217066,0.005858,0.00374247,0.00052268,0,-0.000868032,00,-0.000874062]
      ]
      
-    A = sparse(DMatrix(A))
+    A = sparsify(DMatrix(A))
 
     As = MX.sym("As",A.sparsity())
 
@@ -2206,7 +2206,7 @@ class MXtests(casadiTestCase):
      [00,00,00,0.00166876,0.000848291,0.000930959,-0.0100419,-0.00217066,0.005858,0.00374247,0.00052268,0,-0.000868032,00,-0.000874062]
      ]
      
-    A = sparse(DMatrix(A))
+    A = sparsify(DMatrix(A))
 
     b = DMatrix(range(15))
     H = 5

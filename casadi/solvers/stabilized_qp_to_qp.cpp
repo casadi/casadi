@@ -94,7 +94,7 @@ namespace casadi {
     std::copy(input(STABILIZED_QP_SOLVER_H).begin(),
               input(STABILIZED_QP_SOLVER_H).end(),
               H_qp.begin());
-    std::fill(H_qp.begin()+input(STABILIZED_QP_SOLVER_H).size(), H_qp.end(), muR);
+    std::fill(H_qp.begin()+input(STABILIZED_QP_SOLVER_H).nnz(), H_qp.end(), muR);
 
     // Linear constraints
     if (nc_>0) {
@@ -106,7 +106,7 @@ namespace casadi {
       DMatrix& A_qp = qp_solver_.input(QP_SOLVER_A);
       DMatrix& A = input(STABILIZED_QP_SOLVER_A);
       std::copy(A.begin(), A.end(), A_qp.begin());
-      std::fill(A_qp.begin()+A.size(), A_qp.end(), -muR);
+      std::fill(A_qp.begin()+A.nnz(), A_qp.end(), -muR);
 
       // Add constant to linear inequality
       for (int i=0; i<mu.size(); ++i) {
@@ -134,7 +134,7 @@ namespace casadi {
     DMatrix &g = input(STABILIZED_QP_SOLVER_G);
     std::copy(g.begin(), g.end(), qp_solver_.input(QP_SOLVER_G).begin());
     for (int i=0;i<nc_;++i) {
-      qp_solver_.input(QP_SOLVER_G).at(g.size()+i) = muR * mu[i];
+      qp_solver_.input(QP_SOLVER_G).at(g.nnz()+i) = muR * mu[i];
     }
 
     // Hot-starting if possible

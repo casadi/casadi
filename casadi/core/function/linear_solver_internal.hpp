@@ -108,7 +108,7 @@ namespace casadi {
     /// Get sparsity pattern
     int nrow() const { return input(LINSOL_A).size1();}
     int ncol() const { return input(LINSOL_A).size2();}
-    int nnz() const { return input(LINSOL_A).size();}
+    int nnz() const { return input(LINSOL_A).nnz();}
     const std::vector<int>& row() const { return input(LINSOL_A).row();}
     const std::vector<int>& colind() const { return input(LINSOL_A).colind();}
 

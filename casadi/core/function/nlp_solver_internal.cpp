@@ -100,9 +100,9 @@ namespace casadi {
     const Sparsity& g_sparsity = nlp_.output(NL_G).sparsity();
 
     // Get dimensions
-    nx_ = x_sparsity.size();
-    np_ = p_sparsity.size();
-    ng_ = g_sparsity.size();
+    nx_ = x_sparsity.nnz();
+    np_ = p_sparsity.nnz();
+    ng_ = g_sparsity.nnz();
 
     // Allocate space for inputs
     setNumInputs(NLP_SOLVER_NUM_IN);
@@ -360,13 +360,13 @@ namespace casadi {
   }
 
   void NlpSolverInternal::checkInputs() const {
-    for (int i=0;i<input(NLP_SOLVER_LBX).size();++i) {
+    for (int i=0;i<input(NLP_SOLVER_LBX).nnz();++i) {
       casadi_assert_message(input(NLP_SOLVER_LBX).at(i)<=input(NLP_SOLVER_UBX).at(i),
                             "LBX[i] <= UBX[i] was violated for i=" << i
                             << ". Got LBX[i]=" << input(NLP_SOLVER_LBX).at(i)
                             << " and UBX[i]=" << input(NLP_SOLVER_UBX).at(i));
     }
-    for (int i=0;i<input(NLP_SOLVER_LBG).size();++i) {
+    for (int i=0;i<input(NLP_SOLVER_LBG).nnz();++i) {
       casadi_assert_message(input(NLP_SOLVER_LBG).at(i)<=input(NLP_SOLVER_UBG).at(i),
                             "LBG[i] <= UBG[i] was violated for i=" << i
                             << ". Got LBG[i]=" << input(NLP_SOLVER_LBG).at(i)

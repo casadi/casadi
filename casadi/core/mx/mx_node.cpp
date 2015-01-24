@@ -266,7 +266,7 @@ namespace casadi {
       for (DMatrixPtrV::const_iterator i=input.begin(); i!=input.end(); ++i) {
         const DMatrix& m = **i;
         const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
-        for (int i=0; i<m.size(); ++i) {
+        for (int i=0; i<m.nnz(); ++i) {
           all_depend |= v[i];
         }
       }
@@ -275,7 +275,7 @@ namespace casadi {
       for (DMatrixPtrV::iterator i=output.begin(); i!=output.end(); ++i) {
         DMatrix& m = **i;
         bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-        for (int i=0; i<m.size(); ++i) {
+        for (int i=0; i<m.nnz(); ++i) {
           v[i] = all_depend;
         }
       }
@@ -285,7 +285,7 @@ namespace casadi {
       for (DMatrixPtrV::iterator i=output.begin(); i!=output.end(); ++i) {
         DMatrix& m = **i;
         bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-        for (int i=0; i<m.size(); ++i) {
+        for (int i=0; i<m.nnz(); ++i) {
           all_depend |= v[i];
           v[i] = 0;
         }
@@ -295,7 +295,7 @@ namespace casadi {
       for (DMatrixPtrV::iterator i=input.begin(); i!=input.end(); ++i) {
         DMatrix& m = **i;
         bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-        for (int i=0; i<m.size(); ++i) {
+        for (int i=0; i<m.nnz(); ++i) {
           v[i] |= all_depend;
         }
       }
@@ -461,13 +461,13 @@ namespace casadi {
 
     // Create binary node
     if (sparsity().isScalar(false)) {
-      if (size()==0) {
+      if (nnz()==0) {
         return toMatrix(MX(0)->getBinary(op, y, true, false), y.sparsity());
       } else {
         return toMatrix(getBinary(op, y, true, false), y.sparsity());
       }
     } else if (y.isScalar()) {
-      if (y.size()==0) {
+      if (y.nnz()==0) {
         return toMatrix(getBinary(op, MX(0), false, true), sparsity());
       } else {
         return toMatrix(getBinary(op, y, false, true), sparsity());
@@ -648,7 +648,7 @@ namespace casadi {
       << size2() << ", " << size1() << ") and ("
       << y.size2() << ", " << y.size1() << ").");
     if (sparsity()==y.sparsity()) {
-      if (sparsity().size()==0) {
+      if (sparsity().nnz()==0) {
         return 0;
       } else if (sparsity().isScalar()) {
         return getBinarySwitch(OP_MUL, y);

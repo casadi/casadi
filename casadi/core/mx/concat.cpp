@@ -83,12 +83,12 @@ namespace casadi {
                                  const std::vector<std::string>& res, CodeGenerator& gen) const {
     int nz_offset = 0;
     for (int i=0; i<arg.size(); ++i) {
-      int nz = dep(i).size();
+      int nz = dep(i).nnz();
       stream << "  for (i=0; i<" << nz << "; ++i) " << res.front() << "[i+" << nz_offset
              << "] = " << arg.at(i) << "[i];" << endl;
       nz_offset += nz;
     }
-    casadi_assert(nz_offset == size());
+    casadi_assert(nz_offset == nnz());
   }
 
   MX Concat::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
@@ -109,7 +109,7 @@ namespace casadi {
     int i;
     for (i=0; i<ndep(); ++i) {
       begin = end;
-      end += dep(i).size();
+      end += dep(i).nnz();
       if (nz_test < end) break;
     }
 

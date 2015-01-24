@@ -50,7 +50,7 @@ namespace casadi {
       SetNonzeros<Add>(y, x), nz_(nz) {
     // Ignore duplicate assignments
     if (!Add) {
-      vector<bool> already_set(this->size(), false);
+      vector<bool> already_set(this->nnz(), false);
       for (vector<int>::reverse_iterator i=nz_.rbegin(); i!=nz_.rend(); ++i) {
         if (*i>=0) {
           if (already_set[*i]) {
@@ -388,7 +388,7 @@ namespace casadi {
     // Propagate sparsity
     if (fwd) {
       if (outputd != inputd0) {
-        copy(inputd0, inputd0+input[0]->size(), outputd);
+        copy(inputd0, inputd0+input[0]->nnz(), outputd);
       }
       for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++inputd) {
         if (Add) {
@@ -407,7 +407,7 @@ namespace casadi {
         }
       }
       if (outputd != inputd0) {
-        int n = input[0]->size();
+        int n = input[0]->nnz();
         for (int k=0; k<n; ++k) {
           inputd0[k] |= outputd[k];
           outputd[k] = 0;
@@ -426,7 +426,7 @@ namespace casadi {
     // Propagate sparsity
     if (fwd) {
       if (outputd != inputd0) {
-        copy(inputd0, inputd0+input[0]->size(), outputd);
+        copy(inputd0, inputd0+input[0]->nnz(), outputd);
       }
       for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
         if (Add) {
@@ -443,7 +443,7 @@ namespace casadi {
         }
       }
       if (outputd != inputd0) {
-        int n = input[0]->size();
+        int n = input[0]->nnz();
         for (int k=0; k<n; ++k) {
           inputd0[k] |= outputd[k];
           outputd[k] = 0;
@@ -463,7 +463,7 @@ namespace casadi {
     // Propagate sparsity
     if (fwd) {
       if (outputd != inputd0) {
-        copy(inputd0, inputd0+input[0]->size(), outputd);
+        copy(inputd0, inputd0+input[0]->nnz(), outputd);
       }
       for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
         for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
@@ -484,7 +484,7 @@ namespace casadi {
         }
       }
       if (outputd != inputd0) {
-        int n = input[0]->size();
+        int n = input[0]->nnz();
         for (int k=0; k<n; ++k) {
           inputd0[k] |= outputd[k];
           outputd[k] = 0;
@@ -590,7 +590,7 @@ namespace casadi {
     // Check if the nonzeros follow in increasing order
     if (s_.start_ != 0) return false;
     if (s_.step_ != 1) return false;
-    if (s_.stop_ != this->size()) return false;
+    if (s_.stop_ != this->nnz()) return false;
 
     // True if reached this point
     return true;
@@ -606,7 +606,7 @@ namespace casadi {
 
     // Copy first argument if not inplace
     if (!inplace) {
-      stream << "  for (i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]="
+      stream << "  for (i=0; i<" << this->nnz() << "; ++i) " << res.front() << "[i]="
              << arg.at(0) << "[i];" << endl;
     }
 
@@ -629,7 +629,7 @@ namespace casadi {
 
     // Copy first argument if not inplace
     if (!inplace) {
-      stream << "  for (i=0; i<" << this->size() << "; ++i) " << res.front()
+      stream << "  for (i=0; i<" << this->nnz() << "; ++i) " << res.front()
              << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
@@ -650,7 +650,7 @@ namespace casadi {
 
     // Copy first argument if not inplace
     if (!inplace) {
-      stream << "  for (i=0; i<" << this->size() << "; ++i) "
+      stream << "  for (i=0; i<" << this->nnz() << "; ++i) "
              << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
