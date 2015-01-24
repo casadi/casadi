@@ -46,9 +46,6 @@ namespace casadi {
     return cond.zz_if_else(if_true, if_false);
   }
 
-  /** \brief  Simplify an expression */
-  inline void simplify(MX& ex) { ex.zz_simplify();}
-
   /** \brief  Create a parent MX on which all given MX's will depend.
 
       In some sense, this function is the inverse of

@@ -378,8 +378,7 @@ namespace casadi {
       } else {
         ret = MX::create(new GetNonzerosVector(sp, shared_from_this<MX>(), nz));
       }
-      simplify(ret);
-      return ret;
+      return simplifyNew(ret);
     }
   }
 
@@ -406,8 +405,7 @@ namespace casadi {
     } else {
       ret = MX::create(new SetNonzerosVector<false>(y, shared_from_this<MX>(), nz));
     }
-    simplify(ret);
-    return ret;
+    return simplifyNew(ret);
   }
 
 
@@ -425,8 +423,7 @@ namespace casadi {
       } else {
         ret = MX::create(new SetNonzerosVector<true>(y, shared_from_this<MX>(), nz));
       }
-      simplify(ret);
-      return ret;
+      return simplifyNew(ret);
     }
   }
 

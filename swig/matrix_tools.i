@@ -110,6 +110,7 @@ MatType densify(const MatType& x);
 MatType repmat(const MatType &A, int n, int m=1);
 MatType repmat(const MatType &A, const std::pair<int, int>& rc);
 MatType repmat(const MatType &A, const Sparsity& sp);
+MatType simplifyNew(const MatType &x);
 %enddef
 
 %define MATRIX_DECL(MatType...)

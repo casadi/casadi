@@ -41,11 +41,6 @@ namespace casadi {
 \ingroup expression_tools
 @{
 */
-  /// \cond INTERNAL
-  /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
-  inline void simplify(SXElement& ex) { ex = ex.zz_simplify();}
-  /// \endcond
-
   /** \brief Evaluate an SX graph numerically
    * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
    */
@@ -146,9 +141,6 @@ namespace casadi {
                              int order=5, const SX& w=SX()) {
     return f.zz_gauss_quadrature(x, a, b, order, w);
   }
-
-  /** \brief  Simplify an expression */
-  inline void simplify(SX &ex) { ex = ex.zz_simplify();}
 
   /** \brief  Substitute variable v with expression vdef in an expression ex */
   inline SX substitute(const SX& ex, const SX& v, const SX& vdef) {

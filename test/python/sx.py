@@ -438,7 +438,7 @@ class SXtests(casadiTestCase):
   def test_SXFunctionc2(self):
     self.message("SXmatrix typemaps constructors")
     with internalAPI():
-      simplify(SX.sym("x"))
+      simplifyNew(SX.sym("x"))
     list = [    ("number",2.3, (1,1)),
                 ("SX", SX.sym("x"), (1,1))
     ];
