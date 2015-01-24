@@ -414,7 +414,7 @@ namespace casadi {
     }
 
     // Make it as sparse as you can
-    d = sparse(d);
+    d = sparsify(d);
 
     jacF_row_ = d.size() != 0;
     if (jacF_row_) {  // We need an objective gradient row
