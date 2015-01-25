@@ -470,9 +470,9 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 
       // Store in vectors
       std::vector<int> colind(ncol+1);
-      std::copy(Jc, Jc+ncol+1, colind.begin());
+      std::copy(Jc, Jc+colind.size(), colind.begin());
       std::vector<int> row(colind.back());
-      std::copy(Ir, Ir+ncol+1, row.begin());
+      std::copy(Ir, Ir+row.size(), row.begin());
 
       // Create pattern and return
       return casadi::Sparsity(nrow, ncol, colind, row);
