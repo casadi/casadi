@@ -226,6 +226,28 @@ namespace casadi{
   }
 }
 
+// Add the sparse and full functions to DMatrix
+namespace casadi{
+  %extend Matrix<double> {
+    GUESTOBJECT* full() const {
+#ifdef SWIGPYTHON
+      npy_intp dims[2] = {$self->size1(), $self->size2()};
+      PyObject* ret = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
+      double* d = static_cast<double*>(array_data(ret));
+      $self->get(d, DENSETRANS); // Row-major
+      return ret;
+#elif defined(SWIGMATLAB)
+      mxArray *ret  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
+      double* d = static_cast<double*>(mxGetData(ret));
+      $self->get(d, DENSE); // Column-major
+      return ret;
+#else
+      return 0;
+#endif
+    }
+  }
+} // namespace casadi
+
 
 #ifdef SWIGPYTHON
 namespace casadi{
