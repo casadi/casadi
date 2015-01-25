@@ -226,9 +226,10 @@ namespace casadi{
   }
 }
 
-// Add the sparse and full functions to DMatrix
+// Extend DMatrix with SWIG unique features
 namespace casadi{
   %extend Matrix<double> {
+    // Convert to a dense matrix
     GUESTOBJECT* full() const {
 #ifdef SWIGPYTHON
       npy_intp dims[2] = {$self->size1(), $self->size2()};
@@ -237,14 +238,25 @@ namespace casadi{
       $self->get(d, DENSETRANS); // Row-major
       return ret;
 #elif defined(SWIGMATLAB)
-      mxArray *ret  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
-      double* d = static_cast<double*>(mxGetData(ret));
+      mxArray *p  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
+      double* d = static_cast<double*>(mxGetData(p));
       $self->get(d, DENSE); // Column-major
-      return ret;
+      return p;
 #else
       return 0;
 #endif
     }
+
+#ifdef SWIGMATLAB
+    // Convert to a sparse matrix
+    GUESTOBJECT* to_sparse() const { // Todo: Fix naming
+      mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
+      $self->get(static_cast<double*>(mxGetData(p)));
+      std::copy($self->colind().begin(), $self->colind().end(), mxGetJc(p));
+      std::copy($self->row().begin(), $self->row().end(), mxGetIr(p));
+      return p;
+    }
+#endif
   }
 } // namespace casadi
 
