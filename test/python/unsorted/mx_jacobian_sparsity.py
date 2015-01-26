@@ -30,15 +30,15 @@ y2 = SX.sym("y")
 
 fcn = MXFunction([x,y],[4*vertcat((x[2:5],x[0:2])) + y*x])
 fcn.init()
-js = IMatrix(fcn.jacSparsity(),1)
+js = IMatrix.ones(fcn.jacSparsity())
 js.printDense()
 
 fcn2 = SXFunction([x2,y2],[4*vertcat((x2[2:5],x2[0:2])) + y2*x2])
 fcn2.init()
-js2 = IMatrix(fcn2.jacSparsity(),1)
+js2 = IMatrix.ones(fcn2.jacSparsity())
 js2.printDense()
 
 fcn3 = MXFunction([x,y],fcn2.call([x,y]))
 fcn3.init()
-js3 = IMatrix(fcn3.jacSparsity(),1)
+js3 = IMatrix.ones(fcn3.jacSparsity())
 js3.printDense()
