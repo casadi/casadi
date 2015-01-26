@@ -306,7 +306,7 @@ integrator.setOption("reltol",1e-16)
 integrator.setOption("stop_at_end",False)
 integrator.init()
 # Start from P = identity matrix
-u = dense(DMatrix.eye(ns))
+u = densify(DMatrix.eye(ns))
 integrator.reset()
 integrator.setInput(vec(u),"x0")
 integrator.integrate(0)
