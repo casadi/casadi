@@ -142,12 +142,12 @@ namespace casadi {
 
     MX operator-() const;
 
+    /// Get the non-zero elements
+    MX nonzeros() const;
+
 #ifndef SWIG
     /// \cond INTERNAL
     ///@{
-    /// Const access the non-zero elements (dummy implementation)
-    const MX& data() const { return *this; }
-
     /** \brief  Access a member of the node */
     MXNode* operator->();
 

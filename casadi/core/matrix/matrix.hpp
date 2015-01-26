@@ -761,6 +761,9 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
+    /// Get the non-zero elements
+    Matrix<DataType> nonzeros() const { return data();}
+
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const { return sparsity_; }
 
