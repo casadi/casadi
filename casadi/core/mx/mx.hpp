@@ -64,16 +64,12 @@ namespace casadi {
     MX();
 
     /** \brief Sparse matrix with a given sparsity and zero entries
-        Alias for MX::zeros(sparsity)
+        Same as MX::zeros(sparsity)
      */
     explicit MX(const Sparsity& sp);
 
-    ///@{
-    /** \brief Construct constant matrix with a given sparsity */
-    MX(const Sparsity& sp, int val, bool dummy);
-    MX(const Sparsity& sp, double val, bool dummy);
-    MX(const Sparsity& sp, const MX& val, bool dummy);
-    ///@}
+    /** \brief Construct matrix with a given sparsity and nonzeros */
+    MX(const Sparsity& sp, const MX& val, bool dummy=false);
 
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
@@ -492,6 +488,9 @@ namespace casadi {
     static bool testCast(const SharedObjectNode* ptr);
 
 #ifndef SWIG
+    /// Construct constant matrix with a given sparsity and all 
+    MX(const Sparsity& sp, int val, bool dummy);
+    MX(const Sparsity& sp, double val, bool dummy);
   private:
 
     /// Create an expression from a node: extra dummy arguments to avoid ambiguity for 0/NULL

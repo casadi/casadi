@@ -129,13 +129,8 @@ namespace casadi {
      */
     explicit Matrix(const Sparsity& sp);
 
-    ///@{
-    /// Sparse matrix with a given sparsity
-    Matrix(const Sparsity& sp, const DataType& val, bool dummy);
-    ///@}
-
-    /// Sparse matrix with a given sparsity and non-zero elements.
-    Matrix(const Sparsity& sp, const std::vector<DataType>& d, bool dummy);
+    /** \brief Construct matrix with a given sparsity and nonzeros */
+    Matrix(const Sparsity& sp, const Matrix<DataType>& d);
 
     /** \brief Check if the dimensions and colind, row vectors are compatible.
      * \param complete  set to true to also check elementwise
@@ -952,6 +947,13 @@ namespace casadi {
     static void setScientific(bool scientific) { stream_scientific_ = scientific; }
     // @}
 
+#ifndef SWIG
+    /// Sparse matrix with a given sparsity with all values same
+    Matrix(const Sparsity& sp, const DataType& val, bool dummy);
+
+    /// Sparse matrix with a given sparsity and non-zero elements.
+    Matrix(const Sparsity& sp, const std::vector<DataType>& d, bool dummy);
+
   private:
     /// Sparsity of the matrix in a compressed column storage (CCS) format
     Sparsity sparsity_;
@@ -963,7 +965,7 @@ namespace casadi {
     static int stream_precision_;
     static int stream_width_;
     static bool stream_scientific_;
-
+#endif // SWIG
   };
 
   // Template specialization declarations

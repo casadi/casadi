@@ -615,7 +615,6 @@ class Toolstests(casadiTestCase):
 
     s = pickle.dumps(y)
 
-    return # Temporarily disabled, cf. #1320
     w = pickle.loads(s)
 
     self.checkarray(w["b",:,2],DMatrix([12,12]))
@@ -724,14 +723,14 @@ class Toolstests(casadiTestCase):
     
     X_sx = struct_SX(x_sx)
     X_sx["x"] = DMatrix(range(n))
-    X_sx["S"] = DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2),False)
+    X_sx["S"] = DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2))
    
     X_mx = struct_MX(x_sx)
     X_mx["x"] = DMatrix(range(n))
-    X_mx["S"] = DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2),False)
+    X_mx["S"] = DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2))
     
-    self.checkarray(x_sx.struct.map[("S",)],DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2),False))
-    self.checkarray(x_mx.struct.map[("S",)],DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2),False))
+    self.checkarray(x_sx.struct.map[("S",)],DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2)))
+    self.checkarray(x_mx.struct.map[("S",)],DMatrix(Sparsity.upper(n),range(n,n+n*(n+1)/2)))
     self.checkarray(X_sx.cat,DMatrix(range(n+n*(n+1)/2)))
     self.checkarray(X_mx.cat,DMatrix(range(n+n*(n+1)/2)))
     

@@ -68,7 +68,7 @@ class typemaptests(casadiTestCase):
       
   def test_1(self):
     self.message("DMatrix -> DMatrix")
-    arrays = [DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8],False)]
+    arrays = [DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))
@@ -98,7 +98,7 @@ class typemaptests(casadiTestCase):
   def test_setget(self):
     self.message("DMatrix set/get")
     data = n.array([3,2.3,8])
-    dm=DMatrix(Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8],False)
+    dm=DMatrix(Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8])
     
     if scipy_available:
       c=dm.toCsc_matrix()
@@ -144,7 +144,7 @@ class typemaptests(casadiTestCase):
 
   def test_conversion(self):
     self.message("DMatrix conversions")
-    w = DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8],False)
+    w = DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
     
     list(w.data())
@@ -664,13 +664,13 @@ class typemaptests(casadiTestCase):
     self.message("std::vector<double> typemap.")
     a = array([0,2,2,3])
     b = array([0.738,0.39,0.99])
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99],False)
-    DMatrix(Sparsity(4,3,(0,2,2,3),[1,2,1]),[0.738,0.39,0.99],False)
-    DMatrix(Sparsity(4,3,list(a),[1,2,1]),[0.738,0.39,0.99],False)
-    DMatrix(Sparsity(4,3,a,[1,2,1]),[0.738,0.39,0.99],False)
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),(0.738,0.39,0.99),False)
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),list(b),False)
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),b,False)
+    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
+    DMatrix(Sparsity(4,3,(0,2,2,3),[1,2,1]),[0.738,0.39,0.99])
+    DMatrix(Sparsity(4,3,list(a),[1,2,1]),[0.738,0.39,0.99])
+    DMatrix(Sparsity(4,3,a,[1,2,1]),[0.738,0.39,0.99])
+    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),(0.738,0.39,0.99))
+    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),list(b))
+    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),b)
     
   def test_imatrix(self):
     self.message("IMatrix")

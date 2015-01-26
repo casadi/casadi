@@ -780,7 +780,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     for i in self.traverseCanonicalIndex():
       e = self.getStructEntryByCanonicalIndex(i)
       sp = Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
-      m = IMatrix(sp,range(k,k+sp.nnz()),False)
+      m = IMatrix(sp,range(k,k+sp.nnz()))
       k += sp.nnz()
       it = tuple(i)
       self.map[it] = m
@@ -967,7 +967,7 @@ class VertsplitStructure:
     for it, k, sp,e in zip(its,vertsplit(parent,ks),sps,es):
       if not(e.isPrimitive()):
         self.buildMap(struct=e.struct,parentIndex = parentIndex + it,parent=k)
-      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else MX(sp,k,False) #[IMatrix(sp,range(sp.nnz()))]      
+      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else MX(sp,k) #[IMatrix(sp,range(sp.nnz()))]      
     
 class msymStruct(CasadiStructured,MasterGettable,VertsplitStructure):
   description = "MX.sym"

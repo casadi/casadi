@@ -856,6 +856,22 @@ namespace casadi {
   }
 
   template<typename DataType>
+  Matrix<DataType>::Matrix(const Sparsity& sp, const Matrix<DataType>& d) {
+    if (d.isScalar()) {
+      *this = Matrix<DataType>(sp, d.toScalar(), false);
+    } else if (d.isVector() || d.size1()==1) {
+      casadi_assert(sp.nnz()==d.numel());
+      if (d.isDense()) {
+        *this = Matrix<DataType>(sp, d.data(), false);
+      } else {
+        *this = Matrix<DataType>(sp, densify(d).data(), false);
+      }
+    } else {
+      casadi_error("Matrix(Sparsisty, Matrix): Only allowed for scalars and vectors");
+    }
+  }
+
+  template<typename DataType>
   void Matrix<DataType>::setZero() {
     setAll(0);
   }

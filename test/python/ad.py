@@ -157,8 +157,8 @@ class ADtests(casadiTestCase):
             
             y = SX.sym("y",f.input().sparsity())
             
-            fseeds = map(lambda x: DMatrix(f.input().sparsity(),x,False), seeds)
-            aseeds = map(lambda x: DMatrix(f.output().sparsity(),x,False), seeds)
+            fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
+            aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
             with internalAPI():
               res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
@@ -204,8 +204,8 @@ class ADtests(casadiTestCase):
             
             y = MX.sym("y",f.input().sparsity())
             
-            fseeds = map(lambda x: DMatrix(f.input().sparsity(),x,False), seeds)
-            aseeds = map(lambda x: DMatrix(f.output().sparsity(),x,False), seeds)
+            fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
+            aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
             with internalAPI():
               res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds),True)
             fwdsens = map(lambda x: x[0],fwdsens)
@@ -691,8 +691,8 @@ class ADtests(casadiTestCase):
             with internalAPI():
               res,fwdsens,adjsens = f.callDerivative(inputss,fseeds,aseeds,True)
             
-            fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz()),False) for d in range(ndir) ]
-            aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz()),False) for d in range(ndir) ]
+            fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
+            aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
             vf = Function(inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
             
             vf.init()
@@ -735,7 +735,7 @@ class ADtests(casadiTestCase):
             # Complete random seeding
             random.seed(1)
             for i in range(vf.getNumInputs()):
-              vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).nnz()),False),i)
+              vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).nnz())),i)
             
             vf.evaluate()
             storagekey = (spmod,spmod2)
@@ -767,7 +767,7 @@ class ADtests(casadiTestCase):
                 
               random.seed(1)
               for i in range(vf2.getNumInputs()):
-                vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).nnz()),False),i)
+                vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).nnz())),i)
               
               vf2.evaluate()
               storagekey = (spmod,spmod2)

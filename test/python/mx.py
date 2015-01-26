@@ -520,7 +520,7 @@ class MXtests(casadiTestCase):
     sp=Sparsity(4,3,[0,2,2,3],[1,2,1])
     x=MX.sym("X",sp)
     sx0=[0.738,0.39,0.99]
-    x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99],False).toArray()
+    x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]).toArray()
     self.numpyEvaluationCheck(lambda x: x[0][0,0], lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
     self.numpyEvaluationCheck(lambda x: x[0][1,0], lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]",setx0=[sx0])
     self.numpyEvaluationCheck(lambda x: x[0][0,1], lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]",setx0=[sx0])
@@ -624,12 +624,12 @@ class MXtests(casadiTestCase):
       
       x=MX.sym("x",sp)
       if scipy_available:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99],False).toCsc_matrix()
+        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
         
         self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="MX",setx0=x0,excludeflags={'nozero'})
         self.numpyEvaluationCheckPool(self.matrixpool,[x],array(x0.todense()),name="MX",setx0=x0)
       else:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99],False).toArray()
+        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toArray()
         
         self.numpyEvaluationCheckPool(self.pool,[x],x0,name="MX",setx0=x0,excludeflags={'nozero'})
         self.numpyEvaluationCheckPool(self.matrixpool,[x],x0,name="MX",setx0=x0)
@@ -641,13 +641,13 @@ class MXtests(casadiTestCase):
       xx=MX.sym("x",spx)
       yy=MX.sym("y",spy)
       if scipy_available:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99],False).toCsc_matrix()
-        y0=DMatrix(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6],False).toCsc_matrix()
+        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
+        y0=DMatrix(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toCsc_matrix()
         
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="MX",setx0=[x0,y0])
       else:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99],False).toArray()
-        y0=DMatrix(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6],False).toArray()
+        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toArray()
+        y0=DMatrix(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toArray()
         
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[x0,y0],name="MX",setx0=[x0,y0])
 
@@ -1477,7 +1477,7 @@ class MXtests(casadiTestCase):
     self.message("reshape")
     X = MX.sym("X",10)
 
-    i = IMatrix(Sparsity.lower(3),range(6),False)
+    i = IMatrix(Sparsity.lower(3),range(6))
 
     i.printDense()
     print vecNZ(i.T)
@@ -1990,9 +1990,9 @@ class MXtests(casadiTestCase):
       
       for sp in [Sparsity.dense(0,0),Sparsity.dense(0,2),Sparsity.dense(2,0),Sparsity.dense(1,1),Sparsity.dense(2,2), Sparsity(4,3,[0,2,2,3],[1,2,1])]:
         for v in [0,1,0.2]:
-          x_ = DMatrix(sp,v,False)
+          x_ = DMatrix(sp,v)
           
-          x=MX(sp,v,False)
+          x=MX(sp,v)
           
           for (casadiop, numpyop,name, flags) in self.pool.zip():
             if 'nozero' in flags and (v==0 or not sp.isDense()): continue
@@ -2012,12 +2012,12 @@ class MXtests(casadiTestCase):
         
       for sp in [Sparsity.dense(1,1),Sparsity.sparse(1,1),Sparsity.sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
         for v1 in [0,1,0.2,-0.2]:
-          x1_ = DMatrix(sp,v1,False)
-          x1=MX(sp,v1,False)
+          x1_ = DMatrix(sp,v1)
+          x1=MX(sp,v1)
           for sp2 in [Sparsity.dense(1,1),Sparsity.sparse(1,1),Sparsity.sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
             for v2 in [0,1,0.2,-0.2]:
-              x2_ = DMatrix(sp2,v2,False)
-              x2=MX(sp2,v2,False)
+              x2_ = DMatrix(sp2,v2)
+              x2=MX(sp2,v2)
               for (casadiop, numpyop,name, flags) in self.matrixbinarypool.zip():
                 if "mul" in name and (sp.numel()==1 or sp2.numel()==1): continue
                 r = casadiop([x1,x2])
@@ -2532,10 +2532,10 @@ class MXtests(casadiTestCase):
 
     sp = Sparsity.triplet(3,3,[0,1,2,2],[0,0,1,2])
 
-    f = MXFunction([x],[x.nz[IMatrix(sp,range(sp.nnz()),False)]])
+    f = MXFunction([x],[x.nz[IMatrix(sp,range(sp.nnz()))]])
     f.init()
 
-    g = MXFunction([x],[MX(sp,x,False)])
+    g = MXFunction([x],[MX(sp,x)])
     g.init()
     
     f.setInput(range(1,5))

@@ -215,7 +215,7 @@ class Sparsitytests(casadiTestCase):
     
     
   def test_refcount(self):
-      x = DMatrix(Sparsity.lower(4),5,False)
+      x = DMatrix(Sparsity.lower(4),5)
       s = mul(x,x).sparsity()
       self.assertEqual(s.numel(),16)
       
