@@ -89,7 +89,7 @@ namespace casadi {
       if (k>=0) {
         return at(k);
       } else {
-        return Matrix<DataType>::sparse(1, 1);
+        return Matrix<DataType>(1, 1);
       }
     }
 
@@ -155,7 +155,7 @@ namespace casadi {
       if (k>=0) {
         return at(k);
       } else {
-        return Matrix<DataType>::sparse(1, 1);
+        return Matrix<DataType>(1, 1);
       }
     }
 
@@ -336,7 +336,7 @@ namespace casadi {
         if (m.isDense()) {
           return setSub(repmat(m, rr.sparsity()), ind1, rr);
         } else {
-          return setSub(sparse(rr.shape()), ind1, rr);
+          return setSub(Matrix<DataType>(rr.shape()), ind1, rr);
         }
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
@@ -2095,7 +2095,7 @@ namespace casadi {
                                              const std::vector<DataType>& d,
                                              int nrow, int ncol) {
     casadi_assert_message(col.size()==row.size() && col.size()==d.size(),
-                          "Argument error in Matrix<DataType>::sparse(row, col, d): "
+                          "Argument error in Matrix<DataType>::triplet(row, col, d): "
                           "supplied lists must all be of equal length, but got: "
                           << row.size() << ", " << col.size()  << " and " << d.size());
     std::vector<int> mapping;
@@ -2496,7 +2496,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_sumAll() const {
     // Quick return if empty
-    if (isEmpty()) return Matrix<DataType>::sparse(1, 1);
+    if (isEmpty()) return Matrix<DataType>(1, 1);
     // Sum non-zero elements
     DataType res=0;
     for (int k=0; k<nnz(); k++) {
@@ -2524,7 +2524,7 @@ namespace casadi {
     if (n==1) return 1;
 
     // Remove col i and row j
-    Matrix<DataType> M = Matrix<DataType>::sparse(n-1, n-1);
+    Matrix<DataType> M = Matrix<DataType>(n-1, n-1);
 
     std::vector<int> col = sparsity().getCol();
     const std::vector<int> &row = sparsity().row();
@@ -2563,7 +2563,7 @@ namespace casadi {
     Matrix<DataType> temp;
 
     // Cofactor matrix
-    Matrix<DataType> C = Matrix<DataType>::sparse(n, n);
+    Matrix<DataType> C = Matrix<DataType>(n, n);
     for (int i=0; i<n; ++i)
       for (int j=0; j<n; ++j) {
         temp = cofactor(*this, i, j);
@@ -2775,7 +2775,7 @@ namespace casadi {
       Matrix<DataType> ai = (*this)(ALL, i);
       Matrix<DataType> qi = ai;
       // The i-th column of R
-      Matrix<DataType> ri = Matrix<DataType>::sparse(size2(), 1);
+      Matrix<DataType> ri = Matrix<DataType>(size2(), 1);
 
       // subtract the projection of qi in the previous directions from ai
       for (int j=0; j<i; ++j) {
@@ -2954,7 +2954,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_kron(const Matrix<DataType>& b) const {
     const Sparsity &a_sp = sparsity();
-    Matrix<DataType> filler = Matrix<DataType>::sparse(b.shape());
+    Matrix<DataType> filler = Matrix<DataType>(b.shape());
     std::vector< std::vector< Matrix<DataType> > >
       blocks(size1(), std::vector< Matrix<DataType> >(size2(), filler));
     for (int i=0;i<size1();++i) {
@@ -2984,7 +2984,7 @@ namespace casadi {
       if (isDense()) {
         return Matrix<DataType>(Sparsity::dense(n, m), toScalar(), false);
       } else {
-        return sparse(n, m);
+        return Matrix<DataType>(n, m);
       }
     } else {
       std::vector< Matrix<DataType> > v_hor(m, *this);

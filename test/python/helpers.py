@@ -416,7 +416,7 @@ class casadiTestCase(unittest.TestCase):
       def remove_first(x):
         ret = DMatrix(x)
         if ret.numel()>0:
-          ret[0,0] = DMatrix.sparse(1,1)
+          ret[0,0] = DMatrix(1,1)
           return ret
         else:
           return ret
@@ -424,7 +424,7 @@ class casadiTestCase(unittest.TestCase):
       def remove_last(x):
         ret = DMatrix(x)
         if ret.nnz()>0:
-          ret[ret.sparsity().row()[-1],ret.sparsity().getCol()[-1]] = DMatrix.sparse(1,1)
+          ret[ret.sparsity().row()[-1],ret.sparsity().getCol()[-1]] = DMatrix(1,1)
           return ret
         else:
           return x

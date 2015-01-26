@@ -748,7 +748,7 @@ namespace casadi {
       fsens[d].resize(outputv_.size());
       if (skip_fwd) {
         for (int i=0; i<fsens[d].size(); ++i) {
-          fsens[d][i] = MX::sparse(output(i).shape());
+          fsens[d][i] = MX(output(i).shape());
         }
       }
     }
@@ -762,7 +762,7 @@ namespace casadi {
       asens[d].resize(inputv_.size());
       if (skip_adj) {
         for (int i=0; i<asens[d].size(); ++i) {
-          asens[d][i] = MX::sparse(input(i).shape());
+          asens[d][i] = MX(input(i).shape());
         }
       }
     }
@@ -871,7 +871,7 @@ namespace casadi {
             // Give zero seed if null
             if (el>=0 && dwork[el][d].isEmpty(true)) {
               if (d==0) {
-                dwork[el][d] = MX::sparse(input_p[iind]->shape());
+                dwork[el][d] = MX(input_p[iind]->shape());
               } else {
                 dwork[el][d] = dwork[el][0];
               }
@@ -883,7 +883,7 @@ namespace casadi {
             int el = it->res[oind];
             fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
             if (el>=0 && dwork[el][d].isEmpty(true)) {
-              dwork[el][d] = MX::sparse(output_p[oind]->shape());
+              dwork[el][d] = MX(output_p[oind]->shape());
             }
           }
         }
@@ -954,7 +954,7 @@ namespace casadi {
           // Collect the symbolic adjoint sensitivities
           for (int d=0; d<nadir; ++d) {
             if (dwork[it->res.front()][d].isEmpty(true)) {
-              asens[d][it->arg.front()] = MX::sparse(input(it->arg.front()).shape());
+              asens[d][it->arg.front()] = MX(input(it->arg.front()).shape());
             } else {
               asens[d][it->arg.front()] = dwork[it->res.front()][d];
             }
@@ -1001,7 +1001,7 @@ namespace casadi {
 
               // Provide a zero seed if no seed exists
               if (el>=0 && dwork[el][d].isEmpty(true)) {
-                dwork[el][d] = MX::sparse(swork[el].shape());
+                dwork[el][d] = MX(swork[el].shape());
               }
             }
 
@@ -1012,7 +1012,7 @@ namespace casadi {
 
               // Set sensitivities to zero if not yet used
               if (el>=0 && dwork[el][d].isEmpty(true)) {
-                dwork[el][d] = MX::sparse(swork[el].shape());
+                dwork[el][d] = MX(swork[el].shape());
               }
             }
           }

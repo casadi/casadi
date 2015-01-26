@@ -876,13 +876,13 @@ namespace casadi {
 
   Function SXFunctionInternal::getFullJacobian() {
     // Get all the inputs
-    SX arg = SX::sparse(1, 0);
+    SX arg(1, 0);
     for (vector<SX>::const_iterator i=inputv_.begin(); i!=inputv_.end(); ++i) {
       arg.appendColumns(vec(*i).T());
     }
 
     // Get all the outputs
-    SX res = SX::sparse(1, 0);
+    SX res(1, 0);
     for (vector<SX>::const_iterator i=outputv_.begin(); i!=outputv_.end(); ++i) {
       res.appendColumns(vec(*i).T());
     }

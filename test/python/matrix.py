@@ -68,7 +68,7 @@ class Matrixtests(casadiTestCase):
     
   def test_trans(self):
     self.message("trans")
-    a = DMatrix.sparse(0,1)
+    a = DMatrix(0,1)
     b = a.T
     self.assertEquals(b.size1(),1)
     self.assertEquals(b.size2(),0)
@@ -76,7 +76,7 @@ class Matrixtests(casadiTestCase):
   def test_vertcat(self):
     self.message("vertcat")
     A = DMatrix.ones(2,3)
-    B = DMatrix.sparse(4,3)
+    B = DMatrix(4,3)
     C = vertcat([A,B])
     
     self.checkarray(C.shape,(6,3),"vertcat shape")
@@ -87,7 +87,7 @@ class Matrixtests(casadiTestCase):
   def test_horzcat(self):
     self.message("horcat")
     A = DMatrix.ones(3,2)
-    B = DMatrix.sparse(3,4)
+    B = DMatrix(3,4)
     C = horzcat([A,B])
     
     self.checkarray(C.shape,(3,6),"horzcat shape")
@@ -118,11 +118,11 @@ class Matrixtests(casadiTestCase):
     
   def test_veccat(self):
     self.message("vecccat")
-    A = DMatrix.sparse(2,3)
+    A = DMatrix(2,3)
     A[0,1] = 2
     A[1,0] = 1
     A[1,2] = 3
-    B = DMatrix.sparse(3,1)
+    B = DMatrix(3,1)
     B[0,0] = 4
     B[1,0] = 5
     B[2,0] = 6
@@ -216,11 +216,11 @@ class Matrixtests(casadiTestCase):
     
   def test_vecNZcat(self):
     self.message("vecNZcat")
-    A = DMatrix.sparse(2,3)
+    A = DMatrix(2,3)
     A[0,1] = 2
     A[1,0] = 1
     A[1,2] = 3
-    B = DMatrix.sparse(3,1)
+    B = DMatrix(3,1)
     B[0,0] = 4
     B[1,0] = 5
     B[2,0] = 6
@@ -233,7 +233,7 @@ class Matrixtests(casadiTestCase):
     
   def test_IMatrix_indexing(self):
     self.message("IMatrix")
-    A = IMatrix.sparse(2,2)
+    A = IMatrix(2,2)
     A[0,0] = 1
     A[1,1] = 3
     A[0,1] = 2
@@ -264,7 +264,7 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(array(B),DMatrix([1,1,2,4,3]),"Imatrix indexing assignement")
     
-    B = DMatrix.sparse(5,1)
+    B = DMatrix(5,1)
    
     self.assertRaises(Exception, lambda : B.nz[A])
 
@@ -310,32 +310,32 @@ class Matrixtests(casadiTestCase):
     
   def test_issue298(self):
     self.message("Issue #298")
-    a = DMatrix.sparse(4,1)
+    a = DMatrix(4,1)
     b = c.reshape(a,2,2)
     self.assertEqual(type(a),type(b))
 
-    a = IMatrix.sparse(4,1)
+    a = IMatrix(4,1)
     b = DMatrix(a)
     self.assertTrue(isinstance(b,DMatrix))
     
-    a = DMatrix.sparse(4,1)
+    a = DMatrix(4,1)
     self.assertRaises(RuntimeError,lambda : IMatrix(a))
     
   def test_det(self):
     self.message("Determinant")
     npy_det = numpy.linalg.det
     
-    a = DMatrix.sparse(1,1)
+    a = DMatrix(1,1)
     a[0,0] = 5
     self.checkarray(det(a),npy_det(a),"det()")
 
-    a = DMatrix.sparse(5,5)
+    a = DMatrix(5,5)
     for i in range(5):
       a[i,i] = i+1
 
     self.checkarray(det(a),npy_det(a),"det()")
     
-    a = DMatrix.sparse(5,5)
+    a = DMatrix(5,5)
     for i in range(4):
       a[i,i] = i+1
     a[0,4] = 3
@@ -343,28 +343,28 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(det(a),npy_det(a),"det()")
     
-    a = DMatrix.sparse(5,5)
+    a = DMatrix(5,5)
     for i in range(5):
       for j in range(5):
         a[i,j] = i+j
     
     self.checkarray(det(a),npy_det(a),"det()")
 
-    a = DMatrix.sparse(5,5)
+    a = DMatrix(5,5)
     for i in range(4):
       for j in range(5):
         a[i,j] = i+j
     
     self.checkarray(det(a),npy_det(a),"det()")
     
-    a = DMatrix.sparse(5,5)
+    a = DMatrix(5,5)
     for i in range(5):
       for j in range(4):
         a[i,j] = i+j
     
     self.checkarray(det(a),npy_det(a),"det()")
     
-    a = DMatrix.sparse(5,5)
+    a = DMatrix(5,5)
     for i in range(4):
       for j in range(5):
         a[i,j] = i+j
@@ -372,7 +372,7 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(det(a),npy_det(a),"det()")
     
-    a = DMatrix.sparse(5,5)
+    a = DMatrix(5,5)
     for i in range(5):
       for j in range(4):
         a[i,j] = i+j
@@ -380,7 +380,7 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(det(a),npy_det(a),"det()")
     
-    a = DMatrix.sparse(5,5)
+    a = DMatrix(5,5)
     for i in range(4):
       for j in range(5):
         a[i,j] = i+j
@@ -388,7 +388,7 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(det(a),npy_det(a),"det()")
     
-    a = DMatrix.sparse(5,5)
+    a = DMatrix(5,5)
     for i in range(5):
       for j in range(4):
         a[i,j] = i+j
@@ -396,7 +396,7 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(det(a),npy_det(a),"det()")
     
-    a = DMatrix.sparse(50,50)
+    a = DMatrix(50,50)
     for i in range(50):
       a[i,i] = i+1
 
@@ -410,7 +410,7 @@ class Matrixtests(casadiTestCase):
 
     sp = Sparsity.lower(n)
 
-    x  = SX.sparse(sp,vertcat([SX.sym("a%d" % i) for i in range(sp.nnz())]))
+    x  = SX(sp,vertcat([SX.sym("a%d" % i) for i in range(sp.nnz())]))
 
     
     x_ = DMatrix.ones(x.sparsity())
@@ -688,7 +688,7 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(sprank(DMatrix.ones(3,3)),3)
     self.assertEqual(sprank(DMatrix.ones(3,3)),3)
     
-    A = DMatrix.sparse(6,4)
+    A = DMatrix(6,4)
     A[0,0] = 1
     A[1,2] = 1
     A[2,2] = 1
@@ -756,27 +756,27 @@ class Matrixtests(casadiTestCase):
     f.init()
       
   def test_append_empty(self):
-    a = DMatrix.sparse(0,0)
-    a.append(DMatrix.sparse(0,2))
+    a = DMatrix(0,0)
+    a.append(DMatrix(0,2))
     
     self.assertEqual(a.size1(),0)
     self.assertEqual(a.size2(),2)
 
-    a = DMatrix.sparse(0,0)
-    a.append(DMatrix.sparse(2,0))
-    a.append(DMatrix.sparse(3,0))
+    a = DMatrix(0,0)
+    a.append(DMatrix(2,0))
+    a.append(DMatrix(3,0))
     
     self.assertEqual(a.size1(),5)
     self.assertEqual(a.size2(),0)
     
   def test_vertcat_empty(self):
-    a = DMatrix.sparse(0,2)
+    a = DMatrix(0,2)
     v = vertcat([a,a])
     
     self.assertEqual(v.size1(),0)
     self.assertEqual(v.size2(),2)
 
-    a = DMatrix.sparse(2,0)
+    a = DMatrix(2,0)
     v = vertcat([a,a])
     
     self.assertEqual(v.size1(),4)

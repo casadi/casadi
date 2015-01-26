@@ -166,7 +166,7 @@ namespace casadi {
             v.push_back(*x_i);
             *x_i = MX();
           } else {
-            v.push_back(MX::sparse(output_sparsity_[i].shape()));
+            v.push_back(MX(output_sparsity_[i].shape()));
           }
         }
         adjSens[d][0]->addToSum(horzcat(v));
@@ -246,7 +246,7 @@ namespace casadi {
             v.push_back(*x_i);
             *x_i = MX();
           } else {
-            v.push_back(MX::sparse(output_sparsity_[i].shape()));
+            v.push_back(MX(output_sparsity_[i].shape()));
           }
         }
         adjSens[d][0]->addToSum(diagcat(v));
@@ -317,7 +317,7 @@ namespace casadi {
             v.push_back(*x_i);
             *x_i = MX();
           } else {
-            v.push_back(MX::sparse(output_sparsity_[i].shape()));
+            v.push_back(MX(output_sparsity_[i].shape()));
           }
         }
         adjSens[d][0]->addToSum(vertcat(v));

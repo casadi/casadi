@@ -116,9 +116,9 @@ namespace casadi {
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = MX::create(new OutputNode(x, i));
       if (ret[i].isEmpty(true)) {
-        ret[i] = MX::sparse(0, 0);
+        ret[i] = MX(0, 0);
       } else if (ret[i].nnz()==0) {
-        ret[i] = MX::sparse(ret[i].shape());
+        ret[i] = MX(ret[i].shape());
       }
     }
     return ret;
@@ -301,7 +301,7 @@ namespace casadi {
         if (m.isDense()) {
           return setSub(repmat(m, rr.sparsity()), ind1, rr);
         } else {
-          return setSub(sparse(rr.shape()), ind1, rr);
+          return setSub(MX(rr.shape()), ind1, rr);
         }
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
@@ -1186,7 +1186,7 @@ namespace casadi {
 
   MX MX::zz_blockcat(const std::vector< std::vector<MX > > &v) {
     // Quick return if no block rows
-    if (v.empty()) return MX::sparse(0, 0);
+    if (v.empty()) return MX(0, 0);
 
     // Make sure same number of block columns
     int ncols = v.front().size();
@@ -1195,7 +1195,7 @@ namespace casadi {
     }
 
     // Quick return if no block columns
-    if (v.front().empty()) return MX::sparse(0, 0);
+    if (v.front().empty()) return MX(0, 0);
 
     // Horizontally concatenate all columns for each row, then vertically concatenate rows
     std::vector<MX> rows;
@@ -1309,7 +1309,7 @@ namespace casadi {
       if (isDense()) {
         return MX(Sparsity::dense(n, m), *this);
       } else {
-        return sparse(n, m);
+        return MX(n, m);
       }
     } else {
       std::vector<MX> v_hor(m, *this);
@@ -1884,7 +1884,7 @@ namespace casadi {
 
   MX MX::zz_kron(const MX& b) const {
     const Sparsity &a_sp = sparsity();
-    MX filler = MX::sparse(b.shape());
+    MX filler(b.shape());
     std::vector< std::vector< MX > > blocks(size1(), std::vector< MX >(size2(), filler));
     for (int i=0; i<size1(); ++i) {
       for (int j=0; j<size2(); ++j) {

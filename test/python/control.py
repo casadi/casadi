@@ -187,7 +187,7 @@ class ControlTests(casadiTestCase):
         V = diagcat([Vs_[-1],diagcat(Vs_[:-1])])
         
         Hn = diagcat(Hs_)
-        An = blockcat([[MX.sparse(n,(K-1)*n),As_[-1]],[diagcat(As_[:-1]),MX.sparse((K-1)*n,n)]])
+        An = blockcat([[MX(n,(K-1)*n),As_[-1]],[diagcat(As_[:-1]),MX((K-1)*n,n)]])
         Cn = diagcat([Cs_[-1],diagcat(Cs_[:-1])]) if with_C else None
         Vn = diagcat([Vs_[-1],diagcat(Vs_[:-1])])
 

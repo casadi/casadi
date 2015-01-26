@@ -193,7 +193,7 @@ class Functiontests(casadiTestCase):
 
     f = SXFunction([x],[x])
     f.init()
-    A = DMatrix.sparse(1,1)
+    A = DMatrix(1,1)
     #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
     B = repmat(DMatrix(2),1,2)
     #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
@@ -332,7 +332,7 @@ class Functiontests(casadiTestCase):
         
         test(sp_holes)
         
-        z = IMatrix.sparse(sp_holes.shape)
+        z = IMatrix(sp_holes.size1(), sp_holes.size2())
         
         R = 5
         v = []
@@ -421,7 +421,7 @@ class Functiontests(casadiTestCase):
       
       test(sp_holes)
       
-      z = IMatrix.sparse(sp_holes.shape)
+      z = IMatrix(sp_holes.size1(), sp_holes.size2())
       
       R = 5
       v = []

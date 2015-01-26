@@ -110,7 +110,7 @@ class LpSolverTests(casadiTestCase):
     #
     #  s.t.     bounds on x
 
-    A = DMatrix.sparse(0,2)
+    A = DMatrix(0,2)
     LBX = DMatrix([ -inf, 0 ])
     UBX = DMatrix([ inf, inf ])
     c = DMatrix([ 2.0, 1.0 ])

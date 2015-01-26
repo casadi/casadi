@@ -527,7 +527,7 @@ namespace casadi {
     // Quick return if trivially empty
     if (input(iind).nnz()==0 || output(oind).nnz()==0 ||
        jacSparsity(iind, oind, true, false).nnz()==0) {
-      return MatType::sparse(input(iind).shape());
+      return MatType(input(iind).shape());
     }
 
     // Dummy forward seeds and sensitivities
@@ -610,7 +610,7 @@ namespace casadi {
       std::pair<int, int> jac_shape;
       jac_shape.first = compact ? output(oind).nnz() : output(oind).numel();
       jac_shape.second = compact ? input(iind).nnz() : input(iind).numel();
-      return MatType::sparse(jac_shape);
+      return MatType(jac_shape);
     }
 
     if (symmetric) {
@@ -735,7 +735,7 @@ namespace casadi {
           if (ind==iind) {
             fseed[d][ind] = MatType::ones(Sparsity::triplet(nrow, ncol, seed_row, seed_col));
           } else {
-            fseed[d][ind] = MatType::sparse(nrow, ncol);
+            fseed[d][ind] = MatType(nrow, ncol);
           }
         }
       }
@@ -765,7 +765,7 @@ namespace casadi {
           if (ind==oind) {
             aseed[d][ind] = MatType::ones(Sparsity::triplet(nrow, ncol, seed_row, seed_col));
           } else {
-            aseed[d][ind] = MatType::sparse(nrow, ncol);
+            aseed[d][ind] = MatType(nrow, ncol);
           }
         }
       }

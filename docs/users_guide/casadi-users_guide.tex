@@ -204,7 +204,7 @@ print "f = ", f
 You can also create constant \texttt{SX} instances \emph{without} any symbolic primitives:
 \begin{pytex} 
 B1 = SX.zeros(4,5)  # a dense 4-by-5 empty matrix with all zeros
-B2 = SX.sparse(4,5) # a sparse 4-by-5 empty matrix with all zeros
+B2 = SX(4,5)        # a sparse 4-by-5 empty matrix with all zeros
 B4 = SX.eye(4)      # a sparse 4-by-4 matrix with ones on the diagonal
 \end{pytex}
 
@@ -217,7 +217,7 @@ The following list summarizes the most commonly used ways of constructing new \t
 \begin{description}
   \item[\texttt{SX.sym}(\emph{name,n,m})]: Create a \emph{n}-by-\emph{m} symbolic primitive
   \item[\texttt{SX.zeros(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} dense matrix with all zeros
-  \item[\texttt{SX.sparse(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} sparse matrix with all \emph{structural} zeros
+  \item[\texttt{SX(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} sparse matrix with all \emph{structural} zeros
   \item[\texttt{SX.ones(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} dense matrix with all ones
   \item[\texttt{SX.repmat(\emph{v,n,m})}]: Repeat expression \emph{v} \emph{n} times vertically and \emph{m} times horizontally. \verb|SX.repmat(3,2,1)| will create a 2-by-1 matrix with all elements 3.
   \item[\texttt{SX.eye(\emph{n})}]: Create a \emph{n}-by-\emph{n} diagonal matrix with ones on the diagonal and structural zeros elsewhere.
@@ -261,7 +261,7 @@ The following list summarizes the most commonly used ways of constructing new \t
 
 \texttt{DMatrix} is mainly used for storing matrices in \CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
 \begin{pytex}
-C = DMatrix.sparse(2,3)
+C = DMatrix(2,3)
 C[:,2] = 5
 print type(C),
 print C
@@ -319,7 +319,7 @@ The output should be understood as an expression that is equal to the first (i.e
 Similar results can be expected when trying to set elements (cf. Section~\ref{sec:getset}):
 \begin{pytex}
 x = MX.sym("x",2)
-A = MX.sparse(2,2)
+A = MX(2,2)
 A[0,0] = x[0]
 A[1,1] = x[0]+x[1]
 print A
@@ -420,7 +420,7 @@ print SX.sym("x",Sparsity.lower(3))
 %% \begin{description}
 %%   \item[\texttt{SX.sym}(\emph{name,n,m})]: Create a \emph{n}-by-\emph{m} symbolic primitive
 %%   \item[\texttt{SX.zeros(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} dense matrix with all zeros
-%%   \item[\texttt{SX.sparse(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} sparse matrix with all \emph{structural} zeros
+%%   \item[\texttt{SX(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} sparse matrix with all \emph{structural} zeros
 %%   \item[\texttt{SX.ones(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} dense matrix with all ones
 %%   \item[\texttt{SX.repmat(\emph{v,n,m})}]: Repeat expression \emph{v} \emph{n} times vertically and \emph{m} times horizontally. \verb|SX.repmat(3,2,1)| will create a 2-by-1 matrix with all elements 3.
 %%   \item[\texttt{SX.eye(\emph{n})}]: Create a \emph{n}-by-\emph{n} diagonal matrix with ones on the diagonal and structural zeros elsewhere.

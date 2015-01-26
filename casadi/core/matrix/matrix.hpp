@@ -188,7 +188,7 @@ namespace casadi {
     using B::row;
     using B::dimString;
     using B::sym;
-    using B::sparse;
+    //using B::sparse;
     using B::zeros;
     using B::ones;
     using B::operator[];

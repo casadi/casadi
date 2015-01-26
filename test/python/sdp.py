@@ -51,7 +51,7 @@ class SDPtests(casadiTestCase):
     self.message("memleak1")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
     
-    A = DMatrix.sparse(0,3)
+    A = DMatrix(0,3)
     
     c = DMatrix([48,-8,20])
 
@@ -71,7 +71,7 @@ class SDPtests(casadiTestCase):
   def test_memleak2(self):
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
     
-    A = DMatrix.sparse(0,3)
+    A = DMatrix(0,3)
     
     c = DMatrix([48,-8,20])
 
@@ -110,7 +110,7 @@ class SDPtests(casadiTestCase):
   def test_simple_sdp_A(self):
     self.message("scalar")
     
-    A = DMatrix.sparse(0,1)
+    A = DMatrix(0,1)
      
     #
     # min  x
@@ -146,7 +146,7 @@ class SDPtests(casadiTestCase):
   def test_simple_sdp(self):
     self.message("scalar")
     
-    A = DMatrix.sparse(0,2)
+    A = DMatrix(0,2)
      
     #
     # min  2*x+y
@@ -188,7 +188,7 @@ class SDPtests(casadiTestCase):
   def test_scalar(self):
     self.message("scalar")
     
-    A = DMatrix.sparse(0,1)
+    A = DMatrix(0,1)
      
     #
     # min  n1*x
@@ -225,7 +225,7 @@ class SDPtests(casadiTestCase):
 
   def test_linear_equality(self):
   
-    A = DMatrix.sparse(0,1)
+    A = DMatrix(0,1)
     self.message("linear equality")
     
     #  min   n1*x
@@ -271,7 +271,7 @@ class SDPtests(casadiTestCase):
     #                 
     #  solution: x0=1, x1=0
     
-    A = DMatrix.sparse(0,2)
+    A = DMatrix(0,2)
     
     c = DMatrix([2,3])
     Fi = [ diagcat([1,1,0]), diagcat([1,0,1])]
@@ -306,7 +306,7 @@ class SDPtests(casadiTestCase):
     #                 
     #  solution: x0=1, x1=0
     
-    A = DMatrix.sparse(0,2)
+    A = DMatrix(0,2)
     
     c = DMatrix([2,3])
     Fi = [ diagcat([1]), diagcat([1])]
@@ -395,7 +395,7 @@ class SDPtests(casadiTestCase):
   def test_linear_interpolation2(self):
     self.message("linear interpolation2")
 
-    A = DMatrix.sparse(0,2)
+    A = DMatrix(0,2)
      
     #  min     2*x0 + 3*x1
     #   x0,x1
@@ -428,7 +428,7 @@ class SDPtests(casadiTestCase):
   def test_linear_interpolation(self):
     self.message("linear interpolation")
     
-    A = DMatrix.sparse(0,2)
+    A = DMatrix(0,2)
     
     #  min  2*a + (1-a)*4
     #   a
@@ -472,7 +472,7 @@ class SDPtests(casadiTestCase):
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
     c = DMatrix([48,-8,20])
     
-    A = DMatrix.sparse(0,3)
+    A = DMatrix(0,3)
     
     Fi = [-DMatrix([[10,4],[4,0]]),-DMatrix([[0,0],[0,-8]]),-DMatrix([[0,-8],[-8,-2]])]
 
@@ -541,7 +541,7 @@ class SDPtests(casadiTestCase):
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
     c = DMatrix([1.1, -10, 6.6 , 19 , 4.1])
 
-    A = DMatrix.sparse(0,5)
+    A = DMatrix(0,5)
 
     G = -diagcat([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0]);
     
@@ -579,7 +579,7 @@ class SDPtests(casadiTestCase):
     self.message("Example2_permuted")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
     
-    A = DMatrix.sparse(0,5)
+    A = DMatrix(0,5)
     c = DMatrix([1.1, -10, 6.6 , 19 , 4.1])
 
     perm = [5,2,1,0,6,3,4]
@@ -620,7 +620,7 @@ class SDPtests(casadiTestCase):
   def test_simple_sdqp(self):
     self.message("scalar")
     
-    A = DMatrix.sparse(0,2)
+    A = DMatrix(0,2)
      
     #  active
     #
@@ -666,7 +666,7 @@ class SDPtests(casadiTestCase):
   def test_simple_sdqp_inactive(self):
     self.message("scalar")
     
-    A = DMatrix.sparse(0,2)
+    A = DMatrix(0,2)
      
     #  inactive
     #

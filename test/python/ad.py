@@ -37,13 +37,13 @@ class ADtests(casadiTestCase):
     z=SX.sym("z")
     w=SX.sym("w")
     
-    out=SX.sparse(6,1)
+    out=SX(6,1)
     out[0,0]=x
     out[2,0]=x+2*y**2
     out[4,0]=x+2*y**3+3*z**4
     out[5,0]=w
 
-    inp=SX.sparse(6,1)
+    inp=SX(6,1)
     inp[0,0]=x
     inp[2,0]=y
     inp[4,0]=z
@@ -81,7 +81,7 @@ class ADtests(casadiTestCase):
     }
     
     def temp1(xyz):
-      X=MX.sparse(6,1)
+      X=MX(6,1)
       X[0,0]=xyz.nz[0]
       X[2,0]=xyz.nz[0]+2*xyz.nz[1]**2
       X[4,0]=xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4
@@ -89,7 +89,7 @@ class ADtests(casadiTestCase):
       return [X]
     
     def temp2(xyz):
-      X=MX.sparse(1,6)
+      X=MX(1,6)
       X[0,0]=xyz.nz[0]
       X[0,2]=xyz.nz[0]+2*xyz.nz[1]**2
       X[0,4]=xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4
@@ -427,7 +427,7 @@ class ADtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
 
-    inp=SX.sparse(5,1)
+    inp=SX(5,1)
     inp[0,0]=x
     inp[3,0]=y
 
@@ -448,7 +448,7 @@ class ADtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
 
-    inp=SX.sparse(5,1)
+    inp=SX(5,1)
     inp[0,0]=x
     inp[3,0]=y
 
@@ -523,7 +523,7 @@ class ADtests(casadiTestCase):
     def remove_first(x):
       ret = DMatrix(x)
       if ret.numel()>0:
-        ret[0,0] = DMatrix.sparse(1,1)
+        ret[0,0] = DMatrix(1,1)
         return ret
       else:
         return ret
@@ -531,7 +531,7 @@ class ADtests(casadiTestCase):
     def remove_last(x):
       ret = DMatrix(x)
       if ret.nnz()>0:
-        ret[ret.sparsity().row()[-1],ret.sparsity().getCol()[-1]] = DMatrix.sparse(1,1)
+        ret[ret.sparsity().row()[-1],ret.sparsity().getCol()[-1]] = DMatrix(1,1)
         return ret
       else:
         return x
@@ -556,28 +556,28 @@ class ADtests(casadiTestCase):
           (in1,v1,x*y.nz[0],DMatrix.eye(2)*y.nz[0]),
           (in1,v1,x*y[0,0],DMatrix.eye(2)*y[0,0]),
           (in1,v1,x[0],DMatrix.eye(2)[0,:]),
-          (in1,v1,(x**2)[0],horzcat([2*x[0],MX.sparse(1,1)])),
+          (in1,v1,(x**2)[0],horzcat([2*x[0],MX(1,1)])),
           (in1,v1,x[0]+x[1],DMatrix.ones(1,2)),
           (in1,v1,vertcat([x[1],x[0]]),sparsify(DMatrix([[0,1],[1,0]]))),
           (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DMatrix([[0,1]]))),
-          (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX.sparse(1,1),2*x[1]],[2*x[0],MX.sparse(1,1)]])),
-          (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX.sparse(1,1),2*x[1]]])),
-          (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX.sparse(1,1),6*x[1]**5]])),
+          (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
+          (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX(1,1),2*x[1]]])),
+          (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX(1,1),6*x[1]**5]])),
           (in1,v1,horzcat([x[1],x[0]]).T,sparsify(DMatrix([[0,1],[1,0]]))),
-          (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX.sparse(1,1),2*x[1]],[2*x[0],MX.sparse(1,1)]])),
+          (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
           (in1,v1,diagcat([x[1]**2,y,x[0]**2]),
-            blockcat(  [[MX.sparse(1,1),2*x[1]]] + ([[MX.sparse(1,1),MX.sparse(1,1)]]*14)  + [[2*x[0],MX.sparse(1,1)]] )
+            blockcat(  [[MX(1,1),2*x[1]]] + ([[MX(1,1),MX(1,1)]]*14)  + [[2*x[0],MX(1,1)]] )
           ),
-          (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX.sparse(1,1),2*x[1]],[2*x[0],MX.sparse(1,1)]])),
+          (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
           (in1,v1,x[[0,1]],sparsify(DMatrix([[1,0],[0,1]]))),
           (in1,v1,(x**2)[[0,1]],2*c.diag(x)),
           (in1,v1,x[[0,0,1,1]],sparsify(DMatrix([[1,0],[1,0],[0,1],[0,1]]))),
-          (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX.sparse(1,1)],[2*x[0],MX.sparse(1,1)],[MX.sparse(1,1),2*x[1]],[MX.sparse(1,1),2*x[1]]])),
+          (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX(1,1)],[2*x[0],MX(1,1)],[MX(1,1),2*x[1]],[MX(1,1),2*x[1]]])),
           (in1,v1,wwr,sparsify(DMatrix([[2,0],[0,2]]))),
           (in1,v1,x[[1,0]],sparsify(DMatrix([[0,1],[1,0]]))), 
           (in1,v1,x[[1,0],0],sparsify(DMatrix([[0,1],[1,0]]))),
           (in1,v1,w,sparsify(DMatrix([[1,0],[0,2]]))),
-          (in1,v1,w2,blockcat([[1,MX.sparse(1,1)],[x[1],x[0]]])),
+          (in1,v1,w2,blockcat([[1,MX(1,1)],[x[1],x[0]]])),
           (in1,v1,ww,2*c.diag(x)),
           (in1,v1,wwf,vertcat([x[[1,0]].T,x[[1,0]].T])),
           (in1,v1,yy[:,0],DMatrix.eye(2)),
@@ -610,11 +610,11 @@ class ADtests(casadiTestCase):
           (in1,v1,f4.call([x**2,y])[0],DMatrix.zeros(0,2)),
           #(in1,v1,f1.call([x**2,[]])[1],DMatrix.zeros(2,2)),
           #(in1,v1,f1.call([[],y])[1],DMatrix.zeros(2,2)),
-          (in1,v1,vertcat([x,DMatrix.sparse(0,1)]),DMatrix.eye(2)),
-          (in1,v1,(x**2).setSparse(sparsify(DMatrix([0,1])).sparsity()),blockcat([[MX.sparse(1,1),MX.sparse(1,1)],[MX.sparse(1,1),2*x[1]]])),
+          (in1,v1,vertcat([x,DMatrix(0,1)]),DMatrix.eye(2)),
+          (in1,v1,(x**2).setSparse(sparsify(DMatrix([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
           (in1,v1,c.inner_prod(x,y[:,0]),y[:,0].T),
-          (in1,v1,x.nz[IMatrix([[1,0]])]*y.nz[IMatrix([[0,2]])],blockcat([[MX.sparse(1,1),y.nz[0]],[y.nz[2],MX.sparse(1,1)]])),
-          (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX.sparse(1,1),y.nz[0]],[MX.sparse(1,1),MX.sparse(1,1)],[MX.sparse(1,1),MX.sparse(1,1)],[y.nz[2],MX.sparse(1,1)]])),
+          (in1,v1,x.nz[IMatrix([[1,0]])]*y.nz[IMatrix([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),
+          (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]])),
      ]:
       print out
       fun = MXFunction(inputs,[out,jac])

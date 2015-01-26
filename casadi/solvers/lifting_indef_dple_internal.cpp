@@ -103,14 +103,14 @@ namespace casadi {
       if (form_==0) {
         MX AL = diagcat(vector_slice(As_, range(As_.size()-1)));
 
-        MX AL2 = horzcat(AL, MX::sparse(AL.size1(), As_[0].size2()));
-        MX AT = horzcat(MX::sparse(As_[0].size1(), AL.size2()), As_.back());
+        MX AL2 = horzcat(AL, MX(AL.size1(), As_[0].size2()));
+        MX AT = horzcat(MX(As_[0].size1(), AL.size2()), As_.back());
         A = vertcat(AT, AL2);
       } else {
         MX AL = diagcat(reverse(vector_slice(As_, range(As_.size()-1))));
 
-        MX AL2 = horzcat(MX::sparse(AL.size1(), As_[0].size2()), AL);
-        MX AT = horzcat(As_.back(), MX::sparse(As_[0].size1(), AL.size2()));
+        MX AL2 = horzcat(MX(AL.size1(), As_[0].size2()), AL);
+        MX AT = horzcat(As_.back(), MX(As_[0].size1(), AL.size2()));
         A = vertcat(AL2, AT);
       }
     }

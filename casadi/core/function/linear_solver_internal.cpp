@@ -133,7 +133,7 @@ namespace casadi {
     // Nondifferentiated output
     if (!output_given) {
       if (B.isZero()) {
-        X = MX::sparse(B.shape());
+        X = MX(B.shape());
       } else {
         X = solve(A, B, tr);
       }
@@ -157,7 +157,7 @@ namespace casadi {
 
       // Simplifiy if zero
       if (rhs_d.isZero()) {
-        *fwdSens[d][0] = MX::sparse(rhs_d.shape());
+        *fwdSens[d][0] = MX(rhs_d.shape());
       } else {
         rhs.push_back(rhs_d);
         rhs_ind.push_back(d);

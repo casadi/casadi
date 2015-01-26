@@ -1105,13 +1105,13 @@ namespace casadi {
     casadi_assert_message(N>=2, "pw_lin: N>=2");
 
     // Gradient for each line segment
-    SX g = SX::sparse(1, N-1);
+    SX g = SX(1, N-1);
     for (int i=0; i<N-1; ++i) {
       g(0, i) = (val(0, i+1)- val(0, i))/(tval(0, i+1)-tval(0, i));
     }
 
     // Line segments
-    SX lseg = SX::sparse(1, N-1);
+    SX lseg = SX(1, N-1);
     for (int i=0; i<N-1; ++i)
       lseg(0, i) = val(0, i) + g(0, i)*(t-tval(0, i));
 
@@ -1332,7 +1332,7 @@ namespace casadi {
 
   template<>
   SX SX::zz_spy() const {
-    SX s = SX::sparse(size1(), size2());
+    SX s = SX(size1(), size2());
     for (int i=0; i<size2(); ++i)
       for (int j=0; j<size1(); ++j)
         if (!(*this)(j, i).toScalar()->isZero())
