@@ -65,7 +65,7 @@ namespace casadi {
 
     ///@{
     /** \brief Construct constant matrix with a given sparsity */
-    MX(const Sparsity& sp, int val=0);
+    explicit MX(const Sparsity& sp, int val=0);
     MX(const Sparsity& sp, double val);
     MX(const Sparsity& sp, const MX& val);
     ///@}
