@@ -204,7 +204,7 @@ Wt  = states["Wt"]
 t1 = te
 
 # Initial conditions
-e = dense(DMatrix.eye(ns))
+e = densify(DMatrix.eye(ns))
 states_ = states(0)
 states_["eAt"] = e
 states_["Wt"] = 0
