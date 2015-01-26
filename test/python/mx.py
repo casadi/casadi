@@ -1932,7 +1932,7 @@ class MXtests(casadiTestCase):
             self.checkarray(f.getOutput(),numpyop(x_))
             
             a = IMatrix(f.getOutput().sparsity(),1)
-            b = IMatrix(DMatrix(numpyop(x_)).sparsity(),1)
+            b = IMatrix.ones(DMatrix(numpyop(x_)).sparsity())
             
             c = b-a
             if c.nnz()>0:
@@ -1971,8 +1971,8 @@ class MXtests(casadiTestCase):
                 
                 
                 if "mul" not in name:
-                  a = IMatrix(f.getOutput().sparsity(),1)
-                  b = IMatrix(g.getOutput().sparsity(),1)
+                  a = IMatrix.ones(f.getOutput().sparsity())
+                  b = IMatrix.ones(g.getOutput().sparsity())
                   
                   c = b-a
                   if c.nnz()>0:
