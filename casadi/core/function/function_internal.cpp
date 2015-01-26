@@ -108,8 +108,8 @@ namespace casadi {
 
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ =
-        SparseStorage<Sparsity>(Sparsity::sparse(getNumOutputs(), getNumInputs()));
-    jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity::sparse(getNumOutputs(), getNumInputs()));
+        SparseStorage<Sparsity>(Sparsity(getNumOutputs(), getNumInputs()));
+    jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(getNumOutputs(), getNumInputs()));
 
     if (hasSetOption("user_data")) {
       user_data_ = getOption("user_data").toVoidPointer();
@@ -1141,7 +1141,7 @@ namespace casadi {
 
     // If still null, not dependent
     if (jsp.isNull()) {
-      jsp = Sparsity::sparse(output(oind).nnz(), input(iind).nnz());
+      jsp = Sparsity(output(oind).nnz(), input(iind).nnz());
     }
 
     // Return a reference to the block
@@ -2013,7 +2013,7 @@ namespace casadi {
       // Need to create a new symbolic primitive
 
       // Sparsity pattern for the symbolic input
-      Sparsity sp_arg = Sparsity::sparse(1, 0);
+      Sparsity sp_arg(1, 0);
 
       // Append the sparsity patterns, keep track of col offsets
       vector<int> col_offset(1, 0);

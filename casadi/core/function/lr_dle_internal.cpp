@@ -86,7 +86,7 @@ namespace casadi {
     // Default H: unity
     if (H_.isNull() || H_.isEmpty()) {
       //H_ = Sparsity::diag(n);
-      H_ = Sparsity::sparse(0, 0);
+      H_ = Sparsity(0, 0);
       //casadi_assert(Hs_.size()==0);
       with_H_ = false;
     }
@@ -113,7 +113,7 @@ namespace casadi {
 
     with_C_ = true;
     if (C_.isNull()  || C_.isEmpty()) {
-      C_ = Sparsity::sparse(0, 0);
+      C_ = Sparsity(0, 0);
       //C_ = Sparsity::diag(n);
       //st_[Dle_STRUCT_C] = C_;
       with_C_ = false;
@@ -205,7 +205,7 @@ namespace casadi {
     }
 
     Sparsity P = mul(mul(C, V), C.T());
-    Sparsity Pprev = Sparsity::sparse(n, n);
+    Sparsity Pprev(n, n);
 
     while (Pprev.nnz()!=P.nnz()) {
       // This can be much improved:

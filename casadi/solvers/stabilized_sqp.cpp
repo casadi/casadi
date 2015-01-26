@@ -171,7 +171,7 @@ namespace casadi {
     Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity()
         : Sparsity::dense(nx_, nx_);
     H_sparsity = H_sparsity + Sparsity::diag(nx_);
-    Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_)
+    Sparsity A_sparsity = jacG().isNull() ? Sparsity(0, nx_)
         : jacG().output().sparsity();
 
     std::string stabilized_qp_solver_name = getOption("stabilized_qp_solver");

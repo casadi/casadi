@@ -196,7 +196,7 @@ namespace casadi {
     solver_ = SocpSolver(getOption(solvername()),
                          socpStruct("g", horzcat(socp_g),
                                     "a", horzcat(input(QCQP_SOLVER_A).sparsity(),
-                                                 Sparsity::sparse(nc_, 1))));
+                                                 Sparsity(nc_, 1))));
     //solver_.setQCQPOptions();
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
 

@@ -810,7 +810,7 @@ namespace casadi {
   Sparsity SparsityInternal::permute(const std::vector<int>& pinv,
                                      const std::vector<int>& q, int values) const {
     // alloc result
-    Sparsity C = Sparsity::sparse(nrow_, ncol_);
+    Sparsity C = Sparsity(nrow_, ncol_);
 
     // Col offset
     vector<int>& colind_C = C.colindRef();
@@ -1771,7 +1771,7 @@ namespace casadi {
     vector<int> w(m);
 
     // allocate result
-    Sparsity C = Sparsity::sparse(m, n);
+    Sparsity C(m, n);
     C.colindRef().resize(anz + bnz);
 
     int* Cp = &C.colindRef().front();
@@ -1846,7 +1846,7 @@ namespace casadi {
   Sparsity SparsityInternal::getDiag(std::vector<int>& mapping) const {
     if (ncol_==nrow_) {
       // Return object
-      Sparsity ret = Sparsity::sparse(0, 1);
+      Sparsity ret(0, 1);
       ret.reserve(std::min(nnz(), ncol_), ncol_);
 
       // Mapping
@@ -1932,7 +1932,7 @@ namespace casadi {
     // Quick return if both are dense
     if (isDense() && y.isDense()) {
       return !isEmpty() && !y.isEmpty() ? Sparsity::dense(d1, d2) :
-        Sparsity::sparse(d1, d2);
+        Sparsity(d1, d2);
     }
 
     // Quick return if first factor is diagonal
@@ -2580,7 +2580,7 @@ namespace casadi {
   Sparsity SparsityInternal::patternInverse() const {
     // Quick return clauses
     if (isEmpty()) return Sparsity::dense(nrow_, ncol_);
-    if (isDense()) return Sparsity::sparse(nrow_, ncol_);
+    if (isDense()) return Sparsity(nrow_, ncol_);
 
     // Sparsity of the result
     std::vector<int> row_ret;
@@ -2821,7 +2821,7 @@ namespace casadi {
                           "reshape: number of elements must remain the same. Old shape is "
                           << dimString() << ". New shape is " << nrow << "x" << ncol
                           << "=" << nrow*ncol << ".");
-    Sparsity ret = Sparsity::sparse(nrow, ncol);
+    Sparsity ret(nrow, ncol);
     ret.reserve(nnz(), ncol);
 
     std::vector<int> col(nnz());
@@ -3106,7 +3106,7 @@ namespace casadi {
     }
 
     // Create return sparsity containing the coloring
-    Sparsity ret = Sparsity::sparse(ncol_, forbiddenColors.size());
+    Sparsity ret(ncol_, forbiddenColors.size());
     vector<int>& colind = ret.colindRef();
     vector<int>& row = ret.rowRef();
 
@@ -3358,7 +3358,7 @@ namespace casadi {
     }
 
     // Create return sparsity containing the coloring
-    Sparsity ret = Sparsity::sparse(ncol_, forbiddenColors.size());
+    Sparsity ret(ncol_, forbiddenColors.size());
     vector<int>& colind = ret.colindRef();
     vector<int>& row = ret.rowRef();
 

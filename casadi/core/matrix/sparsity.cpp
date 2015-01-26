@@ -853,7 +853,7 @@ namespace casadi {
 
   Sparsity Sparsity::banded(int n, int p) {
     // This is not an efficient implementation
-    Sparsity ret = Sparsity::sparse(n, n);
+    Sparsity ret = Sparsity(n, n);
     for (int i=-p;i<=p;++i) {
       ret = ret + Sparsity::band(n, i);
     }
@@ -861,9 +861,10 @@ namespace casadi {
   }
 
   Sparsity Sparsity::unit(int n, int el) {
-    Sparsity ret = Sparsity::sparse(n);
-    ret.addNZ(el, 0);
-    return ret;
+    std::vector<int> row(1, el), colind(2);
+    colind[0] = 0;
+    colind[1] = 1;
+    return Sparsity(n, 1, colind, row);
   }
 
   Sparsity Sparsity::rowcol(const std::vector<int>& row, const std::vector<int>& col,
@@ -889,7 +890,7 @@ namespace casadi {
     casadi_assert_message(col.size()==row.size(), "inconsistent lengths");
 
     // Create the return sparsity pattern and access vectors
-    Sparsity ret = Sparsity::sparse(nrow, ncol);
+    Sparsity ret = Sparsity(nrow, ncol);
     std::vector<int> &r_colind = ret.colindRef();
     std::vector<int> &r_row = ret.rowRef();
     r_row.reserve(row.size());

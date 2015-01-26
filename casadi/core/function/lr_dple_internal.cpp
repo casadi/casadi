@@ -242,8 +242,8 @@ namespace casadi {
     } else {
       Sparsity AL = diagcat(vector_slice(As, range(As.size()-1)));
 
-      Sparsity AL2 = horzcat(AL, Sparsity::sparse(AL.size1(), As[0].size2()));
-      Sparsity AT = horzcat(Sparsity::sparse(As[0].size1(), AL.size2()), As.back());
+      Sparsity AL2 = horzcat(AL, Sparsity(AL.size1(), As[0].size2()));
+      Sparsity AT = horzcat(Sparsity(As[0].size1(), AL.size2()), As.back());
       A = vertcat(AT, AL2);
     }
 

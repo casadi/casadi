@@ -44,7 +44,7 @@ if QpSolver.hasPlugin("ooqp"):
 # try:  
 #   QpSolver.loadPlugin("dsdp")
 #   def SDPLpSolver(st):
-#     return DSdpSolver(sdpStruct(a=st["a"],f=Sparsity.sparse(0,0),g=Sparsity.sparse(0,0)))
+#     return DSdpSolver(sdpStruct(a=st["a"],f=Sparsity(0,0),g=Sparsity(0,0)))
 #   lpsolvers.append((SDPLpSolver,{},False))
 # except:
 #  pass

@@ -1117,7 +1117,7 @@ class Functiontests(casadiTestCase):
     def dummy_jac(f):
       f.setOutput(1,1)
 
-    foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [Sparsity.sparse(1,1),Sparsity.dense(1,1)] )
+    foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [Sparsity(1,1),Sparsity.dense(1,1)] )
     foo_jac.setOption("name","foo_jac")
     foo_jac.init()
     foo.setFullJacobian(foo_jac)

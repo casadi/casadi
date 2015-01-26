@@ -856,7 +856,7 @@ class MXtests(casadiTestCase):
     numpy.random.seed(42)
     
     def randsparsity(m,n):
-      sp = Sparsity.sparse(m,n)
+      sp = Sparsity(m,n)
       for i in range((n*m)/2):
         sp.addNZ(numpy.random.randint(m),numpy.random.randint(n))
       return sp
@@ -928,7 +928,7 @@ class MXtests(casadiTestCase):
     numpy.random.seed(42)
     
     def randsparsity(m,n):
-      sp = Sparsity.sparse(m,n)
+      sp = Sparsity(m,n)
       for k in range((n*m)/2):
         i = numpy.random.randint(m)
         j = numpy.random.randint(n)
@@ -1939,14 +1939,14 @@ class MXtests(casadiTestCase):
               # At least as sparse as DMatrix calculus
               self.assertTrue(min(c)>=0,str([sp,v,name]))
 
-      for sp in [Sparsity.sparse(1,1),Sparsity.dense(1,1),Sparsity.sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
+      for sp in [Sparsity(1,1),Sparsity.dense(1,1),Sparsity(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
         for v1 in [0,1,0.2,-0.2]:
           x1_ = DMatrix(sp,v1)
           xx1 = MX.sym("x",sp.size1(),sp.size2())
           x1=xx1[sp]
           xx1s = SX.sym("x",sp.size1(),sp.size2())
           x1s=xx1s[sp]
-          for sp2 in [Sparsity.sparse(1,1),Sparsity.dense(1,1),Sparsity.sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
+          for sp2 in [Sparsity(1,1),Sparsity.dense(1,1),Sparsity(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
             for v2 in [0,1,0.2,-0.2]:
               x2_ = DMatrix(sp2,v2)
               xx2 = MX.sym("x",sp2.size1(),sp2.size2())
@@ -2010,11 +2010,11 @@ class MXtests(casadiTestCase):
               # At least as sparse as DMatrix calculus
               self.assertTrue(min(c)>=0,str([sp,v,name]))
         
-      for sp in [Sparsity.dense(1,1),Sparsity.sparse(1,1),Sparsity.sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
+      for sp in [Sparsity.dense(1,1),Sparsity(1,1),Sparsity(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
         for v1 in [0,1,0.2,-0.2]:
           x1_ = DMatrix(sp,v1)
           x1=MX(sp,v1)
-          for sp2 in [Sparsity.dense(1,1),Sparsity.sparse(1,1),Sparsity.sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
+          for sp2 in [Sparsity.dense(1,1),Sparsity(1,1),Sparsity(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
             for v2 in [0,1,0.2,-0.2]:
               x2_ = DMatrix(sp2,v2)
               x2=MX(sp2,v2)

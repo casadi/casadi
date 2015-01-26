@@ -93,7 +93,7 @@ namespace casadi {
 
     // Create a QpSolver instance
     solver_ = QpSolver(getOption(solvername()),
-                       qpStruct("h", Sparsity::sparse(n_, n_),
+                       qpStruct("h", Sparsity(n_, n_),
                                 "a", input(LP_SOLVER_A).sparsity()));
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();

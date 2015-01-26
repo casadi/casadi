@@ -466,9 +466,9 @@ namespace casadi {
                                        const std::vector<int>& offset2) const;
     Sparsity zz_mtimes(const Sparsity& y) const {
       if (isScalar()) {
-        return isDense() ? y : Sparsity::sparse(y.shape());
+        return isDense() ? y : Sparsity(y.shape());
       } else if (y.isScalar()) {
-        return y.isDense() ? *this : Sparsity::sparse(shape());
+        return y.isDense() ? *this : Sparsity(shape());
       } else {
         // Check dimensions
         casadi_assert_message(size2()==y.size1(),

@@ -392,7 +392,7 @@ Like the matrix classes of \CasADi, the sparsity patterns are \emph{mutable} obj
 The following list summarizes the most commonly used ways of constructing new sparsity patterns:
 \begin{description}
   \item[\texttt{Sparsity.dense}(\emph{n,m})]: Create a dense \emph{n}-by-\emph{m} sparsity pattern
-  \item[\texttt{Sparsity.sparse}(\emph{n,m})]: Create a sparse \emph{n}-by-\emph{m} sparsity pattern
+  \item[\texttt{Sparsity}(\emph{n,m})]: Create a sparse \emph{n}-by-\emph{m} sparsity pattern
   \item[\texttt{Sparsity.diag}(\emph{n})]: Create a diagonal \emph{n}-by-\emph{n} sparsity pattern
   \item[\texttt{Sparsity.upper}(\emph{n})]: Create an upper triangular \emph{n}-by-\emph{n} sparsity pattern
   \item[\texttt{Sparsity.lower}(\emph{n})]: Create a lower triangular \emph{n}-by-\emph{n} sparsity pattern
@@ -410,7 +410,7 @@ print SX.sym("x",Sparsity.lower(3))
 %% The following functions can be used to create new sparsity patterns:
 %% \begin{description}
 %%   \item[\texttt{Sparsity.dense}(\emph{nrow,ncol})]: Create a dense \emph{nrow}-by-\emph{ncol} pattern
-%%   \item[\texttt{Sparsity.sparse(\emph{nrow,ncol})}]: Create a sparse \emph{nrow}-by-\emph{ncol} pattern
+%%   \item[\texttt{Sparsity(\emph{nrow,ncol})}]: Create a sparse \emph{nrow}-by-\emph{ncol} pattern
 %%   \item[\texttt{Sparsity.diag(\emph{n})}]: Create a square \emph{n}-by-\emph{n} diagonal pattern
 %%   \item[\texttt{Sparsity.upper(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} upper triangular pattern
 %% \end{description}

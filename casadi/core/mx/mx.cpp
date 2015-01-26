@@ -81,7 +81,7 @@ namespace casadi {
         }
       } else {
         // Empty matrix
-        assignNode(ConstantMX::create(Sparsity::sparse(sp.shape()), 0));
+        assignNode(ConstantMX::create(Sparsity(sp.shape()), 0));
       }
     } else {
       casadi_assert(val.isVector() && sp.nnz()==val.size1());

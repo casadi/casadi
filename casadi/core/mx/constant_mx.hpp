@@ -156,7 +156,7 @@ namespace casadi {
   class CASADI_EXPORT ZeroByZero : public ConstantMX {
   private:
     /** \brief Private constructor (singleton design pattern) */
-    explicit ZeroByZero() : ConstantMX(Sparsity::sparse(0, 0)) {
+    explicit ZeroByZero() : ConstantMX(Sparsity(0, 0)) {
       initSingleton();
     }
 

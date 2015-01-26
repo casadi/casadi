@@ -121,7 +121,7 @@ namespace casadi {
     int n = A.size1();
     Sparsity V = st[Dle_STRUCT_V];
     Sparsity P = V;
-    Sparsity Pprev = Sparsity::sparse(n, n);
+    Sparsity Pprev(n, n);
 
     while (Pprev.nnz()!=P.nnz()) {
       Pprev = P;

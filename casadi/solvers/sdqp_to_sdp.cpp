@@ -112,7 +112,7 @@ namespace casadi {
                         sdpStruct("g", mapping_.output("g").sparsity(),
                                   "f", mapping_.output("f").sparsity(),
                                   "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
-                                               Sparsity::sparse(nc_, 1))));
+                                               Sparsity(nc_, 1))));
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 

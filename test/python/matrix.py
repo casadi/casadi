@@ -880,7 +880,7 @@ class Matrixtests(casadiTestCase):
       random.seed(1)
       a = DMatrix(sA,[random.random() for i in range(sA.nnz())])
       A = SX.sym("a",a.sparsity())
-      for sB in [ Sparsity.dense(a.size1(),1), vertcat([Sparsity.dense(1,1),Sparsity.sparse(a.size1()-1,1)]),Sparsity.lower(a.size1()),Sparsity.lower(a.size1()).T]:
+      for sB in [ Sparsity.dense(a.size1(),1), vertcat([Sparsity.dense(1,1),Sparsity(a.size1()-1,1)]),Sparsity.lower(a.size1()),Sparsity.lower(a.size1()).T]:
 
         b = DMatrix(sB,[random.random() for i in range(sB.nnz())])
         B = SX.sym("B",b.sparsity())

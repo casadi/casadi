@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  SparseStorage<DataType>::SparseStorage() : sparsity_(Sparsity::sparse(0, 0)) {
+  SparseStorage<DataType>::SparseStorage() : sparsity_(Sparsity(0, 0)) {
   }
 
   template<typename DataType>
@@ -115,7 +115,7 @@ namespace casadi {
 
   template<typename DataType>
   void SparseStorage<DataType>::clear() {
-    sparsity_ = Sparsity::sparse(0, 0);
+    sparsity_ = Sparsity(0, 0);
     data().clear();
   }
 
