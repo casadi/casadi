@@ -93,6 +93,14 @@ namespace casadi {
     assignNode(ConstantMX::create(sp, 0));
   }
 
+  MX::MX(int nrow, int ncol) {
+    assignNode(ConstantMX::create(Sparsity(nrow, ncol), 0));
+  }
+
+  MX::MX(const std::pair<int, int>& rc) {
+    assignNode(ConstantMX::create(Sparsity(rc), 0));
+  }
+
   MX::MX(const Sparsity& sp, int val, bool dummy) {
     assignNode(ConstantMX::create(sp, val));
   }

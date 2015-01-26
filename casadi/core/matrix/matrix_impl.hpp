@@ -577,7 +577,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType>::Matrix() : sparsity_(Sparsity::sparse(0, 0)) {
+  Matrix<DataType>::Matrix() : sparsity_(Sparsity(0, 0)) {
   }
 
   template<typename DataType>
@@ -800,7 +800,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::clear() {
-    sparsity_ = Sparsity::sparse(0, 0);
+    sparsity_ = Sparsity(0, 0);
     data().clear();
   }
 
@@ -840,6 +840,15 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType>::Matrix(const Sparsity& sp) :
       sparsity_(sp), data_(sp.nnz(), 0) {
+  }
+
+
+  template<typename DataType>
+  Matrix<DataType>::Matrix(int nrow, int ncol) : sparsity_(nrow, ncol) {
+  }
+
+  template<typename DataType>
+  Matrix<DataType>::Matrix(const std::pair<int, int>& rc) : sparsity_(rc) {
   }
 
   template<typename DataType>

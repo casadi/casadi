@@ -124,6 +124,14 @@ namespace casadi {
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<DataType> >& m);
 
+    /** \brief Create a sparse matrix with all structural zeros */
+    Matrix(int nrow, int ncol);
+
+#ifndef SWIG
+    /** \brief Create a sparse matrix with all structural zeros */
+    explicit Matrix(const std::pair<int, int>& rc);
+#endif // SWIG
+
     /** \brief Sparse matrix with a given sparsity and zero entries
         Alias for Matrix::zeros(sparsity)
      */

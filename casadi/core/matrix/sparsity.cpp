@@ -71,6 +71,18 @@ namespace casadi {
     return ret;
   }
 
+  Sparsity::Sparsity(int nrow, int ncol) {
+    std::vector<int> row, colind(ncol+1, 0);
+    assignCached(nrow, ncol, colind, row);
+    sanityCheck(true);
+  }
+
+  Sparsity::Sparsity(const std::pair<int, int>& rc) {
+    std::vector<int> row, colind(rc.second+1, 0);
+    assignCached(rc.first, rc.second, colind, row);
+    sanityCheck(true);
+  }
+
   Sparsity::Sparsity(int nrow, int ncol, const std::vector<int>& colind,
                      const std::vector<int>& row) {
     assignCached(nrow, ncol, colind, row);
@@ -769,8 +781,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::sparse(int nrow, int ncol) {
-    std::vector<int> row, colind(ncol+1, 0);
-    return Sparsity(nrow, ncol, colind, row);
+    return Sparsity(nrow, ncol);
   }
 
   Sparsity Sparsity::upper(int n) {

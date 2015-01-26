@@ -63,6 +63,14 @@ namespace casadi {
     /** \brief  Default constructor */
     MX();
 
+    /** \brief Create a sparse matrix with all structural zeros */
+    MX(int nrow, int ncol);
+
+#ifndef SWIG
+    /** \brief Create a sparse matrix with all structural zeros */
+    explicit MX(const std::pair<int, int>& rc);
+#endif // SWIG
+
     /** \brief Sparse matrix with a given sparsity and zero entries
         Same as MX::zeros(sparsity)
      */
@@ -488,7 +496,7 @@ namespace casadi {
     static bool testCast(const SharedObjectNode* ptr);
 
 #ifndef SWIG
-    /// Construct constant matrix with a given sparsity and all 
+    /// Construct constant matrix with a given sparsity and all
     MX(const Sparsity& sp, int val, bool dummy);
     MX(const Sparsity& sp, double val, bool dummy);
   private:

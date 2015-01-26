@@ -110,6 +110,14 @@ namespace casadi {
     /// Default constructor
     explicit Sparsity(int dummy=0);
 
+    /** \brief Pattern with all structural zeros */
+    Sparsity(int nrow, int ncol);
+
+#ifndef SWIG
+    /** \brief Create a sparse matrix with all structural zeros */
+    explicit Sparsity(const std::pair<int, int>& rc);
+#endif // SWIG
+
     /// Construct from sparsity pattern vectors given in compressed column storage format
     Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
 
@@ -121,7 +129,7 @@ namespace casadi {
     /** \brief Create a scalar sparsity pattern **/
     ///@{
     static Sparsity scalar(bool dense_scalar=true)
-    { return dense_scalar ? dense(1, 1) : sparse(1, 1); }
+    { return dense_scalar ? dense(1, 1) : Sparsity(1, 1); }
     ///@}
 
     /** \brief Create a dense rectangular sparsity pattern **/
@@ -130,7 +138,8 @@ namespace casadi {
     static Sparsity dense(const std::pair<int, int> &rc) { return dense(rc.first, rc.second);}
     ///@}
 
-    /** \brief Create a sparse (empty) rectangular sparsity pattern **/
+    /** \brief Create a sparse (empty) rectangular sparsity pattern
+        DEPRECATED: Use Sparse(nrow, ncol) instead **/
     ///@{
     static Sparsity sparse(int nrow, int ncol=1);
     static Sparsity sparse(const std::pair<int, int> &rc) { return sparse(rc.first, rc.second);}
