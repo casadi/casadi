@@ -69,7 +69,7 @@ namespace casadi {
     explicit MX(const Sparsity& sp);
 
     /** \brief Construct matrix with a given sparsity and nonzeros */
-    MX(const Sparsity& sp, const MX& val, bool dummy=false);
+    MX(const Sparsity& sp, const MX& val);
 
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);

@@ -360,7 +360,7 @@ namespace casadi {
     double ret(0);
     casadi_math<double>::fun(op, v_.value, 0.0, ret);
     if (operation_checker<F0XChecker>(op) || sparsity().isDense()) {
-      return MX(sparsity(), ret, false);
+      return MX(sparsity(), ret);
     } else {
       if (v_.value==0) {
         if (isZero() && operation_checker<F0XChecker>(op)) {
@@ -387,7 +387,7 @@ namespace casadi {
       if (ret!=0) {
         Sparsity f = Sparsity::dense(y.size1(), y.size2());
         MX yy = y.setSparse(f);
-        return MX(f, shared_from_this<MX>(), false)->getBinary(op, yy, false, false);
+        return MX(f, shared_from_this<MX>())->getBinary(op, yy, false, false);
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
@@ -399,7 +399,7 @@ namespace casadi {
       if (grow) {
         Sparsity f = Sparsity::dense(size1(), size2());
         MX xx = shared_from_this<MX>().setSparse(f);
-        return xx->getBinary(op, MX(f, y, false), false, false);
+        return xx->getBinary(op, MX(f, y), false, false);
       }
     }
 

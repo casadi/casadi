@@ -419,8 +419,7 @@ namespace casadi {
 
     /** \brief Create a sparse matrix with nonzeros given as a (dense) vector */
     static MatType sparse(const Sparsity& sp, const MatType& nz) {
-      casadi_assert_message(nz.isVector() && nz.isDense(), "Nonzeros not a dense vector");
-      return MatType(sp, nz.data(), false);
+      return MatType(sp, nz);
     }
 
     ///@{
