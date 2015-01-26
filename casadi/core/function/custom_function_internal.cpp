@@ -41,11 +41,11 @@ CustomFunctionInternal::CustomFunctionInternal(
   setNumOutputs(outputscheme.size());
 
   for (int k=0;k<inputscheme.size();k++) {
-    input(k) = DMatrix(inputscheme[k], 0);
+    input(k) = DMatrix::zeros(inputscheme[k]);
   }
 
   for (int k=0;k<outputscheme.size();k++) {
-    output(k) = DMatrix(outputscheme[k], 0);
+    output(k) = DMatrix::zeros(outputscheme[k]);
   }
 
   // Make the ref object a non-refence counted pointer to this (as reference counting

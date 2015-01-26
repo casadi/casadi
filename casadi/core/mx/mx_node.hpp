@@ -251,7 +251,7 @@ namespace casadi {
       if (x.shape()==sp.shape()) {
         return x;
       } else {
-        return MX(sp, x);
+        return MX(sp, x, false);
       }
     }
 

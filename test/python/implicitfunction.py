@@ -122,7 +122,7 @@ class NLPtests(casadiTestCase):
       x=SX.sym("x",s)
 
       y=SX.sym("y",s)
-      y0 = DMatrix(Sparsity.diag(N),0.1)
+      y0 = DMatrix(Sparsity.diag(N),0.1,False)
 
       f=SXFunction([vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
       f.init()

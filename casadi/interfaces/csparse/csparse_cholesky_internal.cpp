@@ -138,7 +138,7 @@ namespace casadi {
     std::copy(L->i, L->i+nz, row.begin());
     std::vector< double > data(nz);
     std::copy(L->x, L->x+nz, data.begin());
-    DMatrix ret(Sparsity(n, m, colind, row), data);
+    DMatrix ret(Sparsity(n, m, colind, row), data, false);
 
     return transpose? ret.T() : ret;
   }

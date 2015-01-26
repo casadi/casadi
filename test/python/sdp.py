@@ -553,7 +553,7 @@ class SDPtests(casadiTestCase):
   [-2.4,-2.5,-2.5,-2.9,3.4,-3.2,-4.5,-3.2,3.0,-4.8,-4.5,-4.8,3.6,4.8,9.7],
   [-6.5,-5.4,-5.4,-6.6,6.7,-7.2,-3.6,-7.2,7.3,-3.0,-3.6,-3.0,-1.4,6.1,-1.5]]
 
-    F = -horzcat([DMatrix(sp,data) for data in flatdata])
+    F = -horzcat([DMatrix(sp,data,False) for data in flatdata])
     F = sparsify(F)
 
 
@@ -572,8 +572,8 @@ class SDPtests(casadiTestCase):
       self.checkarray(sdp.getOutput("dual_cost"),DMatrix(3.20626923535e1),digits=5)
       self.checkarray(sdp.getOutput("x"),DMatrix([1.551644595,0.6709672545,0.9814916693,1.406569511,0.9421687787]),digits=5)
       
-      self.checkarray(sdp.getOutput("dual"),DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0]),digits=5)
-      self.checkarray(sdp.getOutput("p"),DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489]),digits=5)
+      self.checkarray(sdp.getOutput("dual"),DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0],False),digits=5)
+      self.checkarray(sdp.getOutput("p"),DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489],False),digits=5)
 
   def test_example2_perm(self):
     self.message("Example2_permuted")
@@ -595,7 +595,7 @@ class SDPtests(casadiTestCase):
   [-2.4,-2.5,-2.5,-2.9,3.4,-3.2,-4.5,-3.2,3.0,-4.8,-4.5,-4.8,3.6,4.8,9.7],
   [-6.5,-5.4,-5.4,-6.6,6.7,-7.2,-3.6,-7.2,7.3,-3.0,-3.6,-3.0,-1.4,6.1,-1.5]]
 
-    F = -horzcat([DMatrix(sp,data)[perm,perm] for data in flatdata])
+    F = -horzcat([DMatrix(sp,data,False)[perm,perm] for data in flatdata])
     F = sparsify(F)
     
     G = G[perm,perm]
@@ -614,8 +614,8 @@ class SDPtests(casadiTestCase):
       self.checkarray(sdp.getOutput("dual_cost"),DMatrix(3.20626923535e1),digits=5)
       self.checkarray(sdp.getOutput("x"),DMatrix([1.551644595,0.6709672545,0.9814916693,1.406569511,0.9421687787]),digits=5)
       
-      self.checkarray(sdp.getOutput("dual")[permi,permi],DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0]),digits=5)
-      self.checkarray(sdp.getOutput("p")[permi,permi],DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489]),digits=5)
+      self.checkarray(sdp.getOutput("dual")[permi,permi],DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0],False),digits=5)
+      self.checkarray(sdp.getOutput("p")[permi,permi],DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489],False),digits=5)
 
   def test_simple_sdqp(self):
     self.message("scalar")

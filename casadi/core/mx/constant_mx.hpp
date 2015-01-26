@@ -274,7 +274,7 @@ namespace casadi {
 
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const {
-      return Matrix<double>(sparsity(), v_.value);
+      return Matrix<double>(sparsity(), v_.value, false);
     }
 
     /// Get densification
@@ -323,7 +323,7 @@ namespace casadi {
     for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
       sp.appendColumns(i->sparsity());
     }
-    return MX(sp, v_.value);
+    return MX(sp, v_.value, false);
   }
 
   template<typename Value>
@@ -341,7 +341,7 @@ namespace casadi {
     for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
       sp.append(i->sparsity());
     }
-    return MX(sp, v_.value);
+    return MX(sp, v_.value, false);
   }
 
   template<typename Value>
@@ -360,18 +360,19 @@ namespace casadi {
     double ret(0);
     casadi_math<double>::fun(op, v_.value, 0.0, ret);
     if (operation_checker<F0XChecker>(op) || sparsity().isDense()) {
-      return MX(sparsity(), ret);
+      return MX(sparsity(), ret, false);
     } else {
       if (v_.value==0) {
         if (isZero() && operation_checker<F0XChecker>(op)) {
-          return MX(sparsity(), ret);
+          return MX(sparsity(), ret, false);
         } else {
           return repmat(MX(ret), size1(), size2());
         }
       }
       double ret2;
       casadi_math<double>::fun(op, 0, 0.0, ret2);
-      return DMatrix(sparsity(), ret)+DMatrix(sparsity().patternInverse(), ret2);
+      return DMatrix(sparsity(), ret, false)
+        + DMatrix(sparsity().patternInverse(), ret2, false);
     }
   }
 
@@ -386,7 +387,7 @@ namespace casadi {
       if (ret!=0) {
         Sparsity f = Sparsity::dense(y.size1(), y.size2());
         MX yy = y.setSparse(f);
-        return MX(f, shared_from_this<MX>())->getBinary(op, yy, false, false);
+        return MX(f, shared_from_this<MX>(), false)->getBinary(op, yy, false, false);
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
@@ -398,7 +399,7 @@ namespace casadi {
       if (grow) {
         Sparsity f = Sparsity::dense(size1(), size2());
         MX xx = shared_from_this<MX>().setSparse(f);
-        return xx->getBinary(op, MX(f, y), false, false);
+        return xx->getBinary(op, MX(f, y, false), false, false);
       }
     }
 
@@ -433,7 +434,7 @@ namespace casadi {
       double ret;
       casadi_math<double>::fun(op, nnz()> 0 ? v_.value: 0, y_value, ret);
 
-      return MX(y.sparsity(), ret);
+      return MX(y.sparsity(), ret, false);
     }
 
     // Fallback

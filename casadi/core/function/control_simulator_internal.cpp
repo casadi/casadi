@@ -130,14 +130,14 @@ namespace casadi {
 
     int iT0 = 0;
     int iTF = 1;
-    IMatrix iP  = 2+IMatrix(control_dae_.input(CONTROL_DAE_P).sparsity(), range(np_));
-    IMatrix iUstart  = 2+np_ + IMatrix(u_sparsity, range(nu_));
+    IMatrix iP  = 2+IMatrix(control_dae_.input(CONTROL_DAE_P).sparsity(), range(np_), false);
+    IMatrix iUstart  = 2+np_ + IMatrix(u_sparsity, range(nu_), false);
     IMatrix iUend    = 2+np_ + nu_ + IMatrix(control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),
-                                             range(nu_end));
+                                             range(nu_end), false);
     IMatrix iYM;
     if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty()) {
       iYM = 2+np_ + nu_ + nu_end + IMatrix(control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity(),
-                                           range(ny_));
+                                           range(ny_), false);
     }
 
     vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);

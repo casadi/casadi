@@ -420,20 +420,20 @@ namespace casadi {
     /** \brief Create a sparse matrix with nonzeros given as a (dense) vector */
     static MatType sparse(const Sparsity& sp, const MatType& nz) {
       casadi_assert_message(nz.isVector() && nz.isDense(), "Nonzeros not a dense vector");
-      return MatType(sp, nz.data());
+      return MatType(sp, nz.data(), false);
     }
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero */
     static MatType zeros(int nrow=1, int ncol=1) { return zeros(Sparsity::dense(nrow, ncol)); }
-    static MatType zeros(const Sparsity& sp) { return MatType(sp, 0);}
+    static MatType zeros(const Sparsity& sp) { return MatType(sp, 0, false);}
     static MatType zeros(const std::pair<int, int>& rc) { return zeros(rc.first, rc.second);}
     ///@}
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries one */
     static MatType ones(int nrow=1, int ncol=1) { return ones(Sparsity::dense(nrow, ncol)); }
-    static MatType ones(const Sparsity& sp) { return MatType(sp, 1);}
+    static MatType ones(const Sparsity& sp) { return MatType(sp, 1, false);}
     static MatType ones(const std::pair<int, int>& rc) { return ones(rc.first, rc.second);}
     ///@}
   };

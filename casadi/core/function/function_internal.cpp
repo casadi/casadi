@@ -2650,7 +2650,7 @@ namespace casadi {
     // Create input arguments
     vector<SX> argv(arg.size());
     for (int i=0; i<arg.size(); ++i) {
-      argv[i] = SX(input(i).sparsity(), 0.);
+      argv[i] = SX::zeros(input(i).sparsity());
       if (arg[i] != 0)
         argv[i].set(*arg[i]);
     }

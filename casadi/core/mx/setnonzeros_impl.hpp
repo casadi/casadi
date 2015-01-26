@@ -523,7 +523,7 @@ namespace casadi {
   template<bool Add>
   Matrix<int> SetNonzeros<Add>::mapping() const {
     vector<int> nz = getAll();
-    return Matrix<int>(this->dep(1).sparsity(), nz);
+    return Matrix<int>(this->dep(1).sparsity(), nz, false);
   }
 
   template<bool Add>

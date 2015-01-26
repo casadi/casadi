@@ -333,7 +333,7 @@ namespace casadi {
             nitmp = std::max(nitmp, ni);
             nrtmp = std::max(nrtmp, nr);
             if (work_[it->res[c]].first.isEmpty()) {
-              work_[it->res[c]].first = Matrix<double>(it->data->sparsity(c), 0);
+              work_[it->res[c]].first = Matrix<double>::zeros(it->data->sparsity(c));
             }
           }
         }

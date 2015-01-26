@@ -124,13 +124,18 @@ namespace casadi {
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<DataType> >& m);
 
+    /** \brief Sparse matrix with a given sparsity and zero entries
+        Alias for Matrix::zeros(sparsity)
+     */
+    explicit Matrix(const Sparsity& sp);
+
     ///@{
     /// Sparse matrix with a given sparsity
-    explicit Matrix(const Sparsity& sparsity, const DataType& val=DataType(0));
+    Matrix(const Sparsity& sp, const DataType& val, bool dummy);
     ///@}
 
     /// Sparse matrix with a given sparsity and non-zero elements.
-    Matrix(const Sparsity& sparsity, const std::vector<DataType>& d);
+    Matrix(const Sparsity& sp, const std::vector<DataType>& d, bool dummy);
 
     /** \brief Check if the dimensions and colind, row vectors are compatible.
      * \param complete  set to true to also check elementwise

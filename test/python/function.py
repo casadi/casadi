@@ -258,7 +258,7 @@ class Functiontests(casadiTestCase):
     
     def test(sp):
       x = SX.sym("x",sp.size2())
-      sp2 = jacobian(mul(DMatrix(sp,1),x),x).sparsity()
+      sp2 = jacobian(mul(DMatrix.ones(sp),x),x).sparsity()
       self.checkarray(sp.row(),sp2.row());
       self.checkarray(sp.colind(),sp2.colind());   
 
@@ -277,7 +277,7 @@ class Functiontests(casadiTestCase):
       b = Sparsity.band(i,-1) + Sparsity.band(i,1)
       test(b + Sparsity.rowcol([0],[5],i,i))
       
-    m = IMatrix(Sparsity.diag(129),1)
+    m = IMatrix.ones(Sparsity.diag(129))
     m[:50,0] = 1
     m[60:,0] = 1
     m[6:9,6] = 1
@@ -288,7 +288,7 @@ class Functiontests(casadiTestCase):
     test(sp)
     #test(sp.T)
     
-    m = IMatrix(Sparsity.diag(64),1)
+    m = IMatrix.ones(Sparsity.diag(64))
     m[:50,0] = 1
     m[60:,0] = 1
 
@@ -321,7 +321,7 @@ class Functiontests(casadiTestCase):
         
         random.seed(0)
         
-        I = IMatrix(sp,1)
+        I = IMatrix.ones(sp)
         for i in range(n):
           for j in range(m):
             if random.random()<0.5:
@@ -349,7 +349,7 @@ class Functiontests(casadiTestCase):
     def test(sp):
       x = SX.sym("x",sp.size2())
       self.assertTrue(sp==sp.T)
-      f = SXFunction([x],[mul([x.T,DMatrix(sp,1),x])])
+      f = SXFunction([x],[mul([x.T,DMatrix.ones(sp),x])])
       f.init()
       J = f.hessian()
       J.init()
@@ -409,7 +409,7 @@ class Functiontests(casadiTestCase):
         
       random.seed(0)
       
-      I = IMatrix(sp,1)
+      I = IMatrix.ones(sp)
       for ii in range(i):
         for jj in range(i):
           if random.random()<0.5:

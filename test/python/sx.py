@@ -212,11 +212,11 @@ class SXtests(casadiTestCase):
       z=SX.sym("z")
       x=SX.sparse(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([x,y,z]))
       if scipy_available:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
+        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99],False).toCsc_matrix()
       
         self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SX",setx0=x0,excludeflags={'nozero'})
       else:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toArray()
+        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99],False).toArray()
       
         self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SX",setx0=x0,excludeflags={'nozero'})
       
@@ -241,8 +241,8 @@ class SXtests(casadiTestCase):
       yy=SX.sparse(Sparsity(4,3,[0,2,2,3],[0,2,3]),vertcat([x2,z2,y2]))
       
       if scipy_available:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
-        y0=DMatrix(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toCsc_matrix()
+        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99],False).toCsc_matrix()
+        y0=DMatrix(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6],False).toCsc_matrix()
         
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SX",setx0=[x0,y0])
       else:
@@ -285,7 +285,7 @@ class SXtests(casadiTestCase):
       
       x=SX.sparse(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([SX.sym("x"),SX.sym("y"),SX.sym("z")]))
       sx0=[0.738,0.39,0.99]
-      x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]).toArray()
+      x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99],False).toArray()
       self.numpyEvaluationCheck(lambda x: SX(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: SX(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: SX(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]",setx0=[sx0])
@@ -471,8 +471,8 @@ class SXtests(casadiTestCase):
       
   def test_sparseconstr(self):
     self.message("Check sparsity constructors")
-    self.checkarray(DMatrix(Sparsity.lower(3),1).toArray(),matrix([[1,0,0],[1,1,0],[1,1,1]]),"tril")
-    self.checkarray(DMatrix(Sparsity.diag(3),1).toArray(),matrix([[1,0,0],[0,1,0],[0,0,1]]),"diag")
+    self.checkarray(DMatrix.ones(Sparsity.lower(3)).toArray(),matrix([[1,0,0],[1,1,0],[1,1,1]]),"tril")
+    self.checkarray(DMatrix.ones(Sparsity.diag(3)).toArray(),matrix([[1,0,0],[0,1,0],[0,0,1]]),"diag")
     
   def test_subsassignment(self):
     self.message("Check subscripted assignment")
@@ -1105,7 +1105,7 @@ class SXtests(casadiTestCase):
     f.evaluate()
     g.evaluate()
     
-    self.checkarray(IMatrix(filt,1),IMatrix(g.output().sparsity(),1))
+    self.checkarray(IMatrix.ones(filt),IMatrix.ones(g.output().sparsity()))
     
     self.checkarray(f.output()[filt],g.output())
     
@@ -1116,7 +1116,7 @@ class SXtests(casadiTestCase):
 
     A = pickle.load(file("../data/apoa1-2.pkl",'r'))
 
-    H = DMatrix(A,range(A.nnz()))
+    H = DMatrix(A,range(A.nnz()),False)
     H = H + H.T
     
     H = H[:20000,:20000]

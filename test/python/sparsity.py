@@ -105,7 +105,7 @@ class Sparsitytests(casadiTestCase):
     for i in nza:
       a.addNZ(i[0],i[1])
       
-    A = DMatrix(a,1)
+    A = DMatrix.ones(a)
     Ad = DMatrix(array(A))
     with internalAPI():
       for i in a.find():
@@ -127,20 +127,20 @@ class Sparsitytests(casadiTestCase):
       for j in row:
         z[i,j]=1
 
-    self.checkarray(DMatrix(sp,1),z,"enlarge")
+    self.checkarray(DMatrix.ones(sp),z,"enlarge")
     self.message(":sparse")
     sp = Sparsity(4,3,[0,2,2,3],[1,2,1]).T
-    n = DMatrix(sp,1)
+    n = DMatrix.ones(sp)
     z = numpy.zeros((7,8))
     for i in range(3):
       for j in range(4):
           z[col[i],row[j]]= n[i,j]
     sp.enlarge(7,8,[1,2,4],[0,3,4,6])
     
-    self.checkarray(DMatrix(sp,1),z,"enlarge")
+    self.checkarray(DMatrix.ones(sp),z,"enlarge")
     
   def tomatrix(self,s):
-    d = DMatrix(s,1)
+    d = DMatrix.ones(s)
     for k in range(d.nnz()):
       d.nz[k] = k+1
     return d
@@ -215,7 +215,7 @@ class Sparsitytests(casadiTestCase):
     
     
   def test_refcount(self):
-      x = DMatrix(Sparsity.lower(4),5)
+      x = DMatrix(Sparsity.lower(4),5,False)
       s = mul(x,x).sparsity()
       self.assertEqual(s.numel(),16)
       
@@ -234,7 +234,7 @@ class Sparsitytests(casadiTestCase):
     A.addNZ(3,3)
     
     sp, mapping = A.getDiag()
-    B = DMatrix(sp,1)
+    B = DMatrix.ones(sp)
     
     self.checkarray(array([[0],[1],[0],[1],[0]]),B,"getDiag(matrix)")
     self.checkarray(array([0,1]),array(list(mapping)),"getDiag(vector)")
@@ -247,7 +247,7 @@ class Sparsitytests(casadiTestCase):
     A.addNZ(4,0)
     
     sp, mapping = A.getDiag()
-    B = DMatrix(sp,1)
+    B = DMatrix.ones(sp)
     
     self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"getDiag(vector)")
     
@@ -259,7 +259,7 @@ class Sparsitytests(casadiTestCase):
     A.addNZ(0,4)
     
     sp, mapping = A.getDiag()
-    B = DMatrix(sp,1)
+    B = DMatrix.ones(sp)
     
     self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"getDiag(vector)")
     
@@ -537,12 +537,12 @@ class Sparsitytests(casadiTestCase):
     
     for sp in [sp,Sparsity.dense(4,4),Sparsity.sparse(4,4),Sparsity.lower(4),Sparsity.lower(4).T]:
     
-      d = IMatrix(sp,1)
+      d = IMatrix.ones(sp)
       
       dt = sparsify(1-d)
-      dt = IMatrix(dt.sparsity(),1)
+      dt = IMatrix.ones(dt.sparsity())
       
-      trial = IMatrix(sp.patternInverse(),1)
+      trial = IMatrix.ones(sp.patternInverse())
       
       d.printDense()
       dt.printDense()

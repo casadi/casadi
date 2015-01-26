@@ -76,10 +76,10 @@ namespace casadi {
 
     // Input arguments
     setNumInputs(SDQP_SOLVER_NUM_IN);
-    input(SDQP_SOLVER_H) = DMatrix(H, 0);
-    input(SDQP_SOLVER_G) = DMatrix(G, 0);
-    input(SDQP_SOLVER_F) = DMatrix(F, 0);
-    input(SDQP_SOLVER_A) = DMatrix(A, 0);
+    input(SDQP_SOLVER_H) = DMatrix::zeros(H);
+    input(SDQP_SOLVER_G) = DMatrix::zeros(G);
+    input(SDQP_SOLVER_F) = DMatrix::zeros(F);
+    input(SDQP_SOLVER_A) = DMatrix::zeros(A);
     input(SDQP_SOLVER_C) = DMatrix::zeros(n_);
     input(SDQP_SOLVER_LBX) = -DMatrix::inf(n_);
     input(SDQP_SOLVER_UBX) = DMatrix::inf(n_);

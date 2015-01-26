@@ -38,7 +38,7 @@
             return _casadi.transpose(self)
             
         def __array__(self,*args,**kwargs):
-            return DMatrix(self,1).toArray()
+            return DMatrix.ones(self).toArray()
     %}
 };
 

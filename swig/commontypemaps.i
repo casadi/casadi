@@ -865,7 +865,7 @@
         int* colindd=(int*) array_data(array_colind);
         std::vector<int> colindv(colindd,colindd+(ncols+1));
       
-        if (m) *m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v);
+        if (m) *m = casadi::Matrix<double>(casadi::Sparsity(nrows,ncols,colindv,rowv), v, false);
       
         ret = true;
       }

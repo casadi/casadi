@@ -697,7 +697,7 @@ namespace casadi {
   }
 
   SXElement::operator SX() const {
-    return SX(Sparsity::scalar(), *this);
+    return SX(Sparsity::scalar(), *this, false);
   }
 
   SXElement SXElement::zz_min(const SXElement &b) const {
@@ -857,7 +857,7 @@ namespace casadi {
     if (sp.isScalar(true)) {
       return SX(retv);
     } else {
-      return SX(sp, retv);
+      return SX(sp, retv, false);
     }
   }
 
@@ -1238,7 +1238,7 @@ namespace casadi {
         // Expand vdef to sparsity of v if vdef is scalar
         if (vdef[k].isScalar() && vdef[k].nnz()==1) {
           std::vector<SX> vdef_mod = vdef;
-          vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0));
+          vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0), false);
           return substitute(ex, v, vdef_mod);
         } else {
           casadi_error("subsitute(ex, v, vdef): sparsities of v and vdef must match. Got v: "

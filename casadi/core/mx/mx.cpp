@@ -68,7 +68,7 @@ namespace casadi {
     assignNode(ConstantMX::create(DMatrix(x)));
   }
 
-  MX::MX(const Sparsity& sp, const MX& val) {
+  MX::MX(const Sparsity& sp, const MX& val, bool dummy) {
     if (sp.isReshape(val.sparsity())) {
       *this = reshape(val, sp);
     } else if (val.isScalar()) {
@@ -89,11 +89,15 @@ namespace casadi {
     }
   }
 
-  MX::MX(const Sparsity& sp, int val) {
+  MX::MX(const Sparsity& sp) {
+    assignNode(ConstantMX::create(sp, 0));
+  }
+
+  MX::MX(const Sparsity& sp, int val, bool dummy) {
     assignNode(ConstantMX::create(sp, val));
   }
 
-  MX::MX(const Sparsity& sp, double val) {
+  MX::MX(const Sparsity& sp, double val, bool dummy) {
     assignNode(ConstantMX::create(sp, val));
   }
 
@@ -502,8 +506,7 @@ namespace casadi {
   }
 
   MX MX::eye(int n) {
-    Matrix<double> I(Sparsity::diag(n), 1);
-    return MX(I);
+    return MX(Matrix<double>::eye(n));
   }
 
   MX MX::operator-() const {
@@ -1287,7 +1290,7 @@ namespace casadi {
 
   MX MX::zz_repmat(const Sparsity& sp) const {
     casadi_assert_message(isScalar(), "repmat(MX x, Sparsity sp) only defined for scalar x");
-    return MX(sp, *this);
+    return MX(sp, *this, false);
   }
 
   MX MX::zz_repmat(int n, int m) const {
@@ -1296,7 +1299,7 @@ namespace casadi {
       return *this;
     } else if (isScalar()) {
       if (isDense()) {
-        return MX(Sparsity::dense(n, m), *this);
+        return MX(Sparsity::dense(n, m), *this, false);
       } else {
         return sparse(n, m);
       }
@@ -1327,7 +1330,7 @@ namespace casadi {
 
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      deps[k] = MX(deps[k].sparsity(), Ps[k]);
+      deps[k] = MX(deps[k].sparsity(), Ps[k], false);
     }
 
     return P;
@@ -1348,7 +1351,7 @@ namespace casadi {
 
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      children[k] =  MX(deps[k], Ps[k]);
+      children[k] =  MX(deps[k], Ps[k], false);
     }
 
     return P;

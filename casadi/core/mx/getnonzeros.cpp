@@ -333,7 +333,7 @@ namespace casadi {
 
   Matrix<int> GetNonzeros::mapping() const {
     vector<int> nz = getAll();
-    return Matrix<int>(sparsity(), nz);
+    return Matrix<int>(sparsity(), nz, false);
   }
 
   bool GetNonzerosSlice::isIdentity() const {

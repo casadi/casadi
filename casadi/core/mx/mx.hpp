@@ -56,18 +56,23 @@ namespace casadi {
       \date 2010-2011
   */
   class CASADI_EXPORT MX : public GenericExpression<MX>,
-                                public GenericMatrix<MX>,
-                                public SharedObject {
+                           public GenericMatrix<MX>,
+                           public SharedObject {
   public:
 
     /** \brief  Default constructor */
     MX();
 
+    /** \brief Sparse matrix with a given sparsity and zero entries
+        Alias for MX::zeros(sparsity)
+     */
+    explicit MX(const Sparsity& sp);
+
     ///@{
     /** \brief Construct constant matrix with a given sparsity */
-    explicit MX(const Sparsity& sp, int val=0);
-    MX(const Sparsity& sp, double val);
-    MX(const Sparsity& sp, const MX& val);
+    MX(const Sparsity& sp, int val, bool dummy);
+    MX(const Sparsity& sp, double val, bool dummy);
+    MX(const Sparsity& sp, const MX& val, bool dummy);
     ///@}
 
     /** \brief  Create scalar constant (also implicit type conversion) */

@@ -101,9 +101,9 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
 
     // Save to inputs/outputs
     if (i<n_in) {
-      input(i) = Matrix<double>(sp, 0);
+      input(i) = Matrix<double>::zeros(sp);
     } else {
-      output(i-n_in) = Matrix<double>(sp, 0);
+      output(i-n_in) = Matrix<double>::zeros(sp);
     }
   }
 

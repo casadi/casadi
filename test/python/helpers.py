@@ -137,7 +137,7 @@ class casadiTestCase(unittest.TestCase):
       spp = self.randDMatrix(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) ,symm=symm)
       spm = (spp < sparsity)
       spm = sparsify(spm)
-      ret = DMatrix(spm.sparsity(),[valuegenerator() for i in range(spm.nnz())])
+      ret = DMatrix(spm.sparsity(),[valuegenerator() for i in range(spm.nnz())], False)
       if symm:
         return (ret + ret.T)/2
       else:
@@ -469,7 +469,7 @@ class casadiTestCase(unittest.TestCase):
           # Complete random seeding
           random.seed(1)
           for i in range(f.getNumInputs(),vf.getNumInputs()):
-            vf.setInput(DMatrix(vf.getInput(i).sparsity(),random.random(vf.getInput(i).nnz())),i)
+            vf.setInput(DMatrix(vf.getInput(i).sparsity(),random.random(vf.getInput(i).nnz()),False),i)
           
           vf.evaluate()
           storagekey = (spmod,spmod2)
@@ -499,7 +499,7 @@ class casadiTestCase(unittest.TestCase):
             
               random.seed(1)
               for i in range(f.getNumInputs(),vf2.getNumInputs()):
-                vf2.setInput(DMatrix(vf2.getInput(i).sparsity(),random.random(vf2.getInput(i).nnz())),i)
+                vf2.setInput(DMatrix(vf2.getInput(i).sparsity(),random.random(vf2.getInput(i).nnz()),False),i)
               
               vf2.evaluate()
               storagekey = (spmod,spmod2)
