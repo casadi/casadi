@@ -603,11 +603,11 @@ namespace casadi {
     t_mainloop_ += (time2-time1)/CLOCKS_PER_SEC;
 
     // Copy outputs
-    output(NLP_SOLVER_X).setArray(worhp_o_.X, worhp_o_.n, DENSE);
+    output(NLP_SOLVER_X).setArray(worhp_o_.X, worhp_o_.n, SP_DENSE);
     output(NLP_SOLVER_F).set(worhp_o_.F);
-    output(NLP_SOLVER_G).setArray(worhp_o_.G, worhp_o_.m, DENSE);
+    output(NLP_SOLVER_G).setArray(worhp_o_.G, worhp_o_.m, SP_DENSE);
     output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda, worhp_o_.n);
-    output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu, worhp_o_.m, DENSE);
+    output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu, worhp_o_.m, SP_DENSE);
 
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
 
@@ -864,7 +864,7 @@ namespace casadi {
       gradF_.evaluate();
 
       // Get the result
-      gradF_.output().get(grad_f, DENSE);
+      gradF_.output().get(grad_f, SP_DENSE);
 
       // Scale
       for (int i=0; i<nx_; ++i) {

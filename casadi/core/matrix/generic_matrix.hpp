@@ -34,10 +34,6 @@
 #include "sparsity_interface.hpp"
 
 namespace casadi {
-
-  /** Sparsity format for getting and setting inputs and outputs */
-  enum SparsityType {SPARSE, SPARSESYM, DENSE, DENSESYM, DENSETRANS};
-
   /** \brief Matrix base class
 
       This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
@@ -508,13 +504,13 @@ namespace casadi {
 
   template<typename MatType>
   int GenericMatrix<MatType>::size(SparsityType sp) const {
-    if (sp==SPARSE) {
+    if (sp==SP_SPARSE) {
       return nnz();
-    } else if (sp==SPARSESYM) {
+    } else if (sp==SP_SPARSESYM) {
       return sizeU();
-    } else if (sp==DENSE) {
+    } else if (sp==SP_DENSE) {
       return numel();
-    } else if (sp==DENSESYM) {
+    } else if (sp==SP_DENSESYM) {
       return (numel()+size2())/2;
     } else {
       throw CasadiException("Matrix<T>::size(Sparsity): unknown sparsity");

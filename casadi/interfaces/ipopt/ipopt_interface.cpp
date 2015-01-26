@@ -564,7 +564,7 @@ namespace casadi {
         hessLag_.evaluate();
 
         // Get results
-        hessLag_.output().get(values, SPARSESYM);
+        hessLag_.output().get(values, SP_SPARSESYM);
 
         if (monitored("eval_h")) {
           cout << "x = " << hessLag_.input(NL_X).data() << endl;
@@ -738,7 +738,7 @@ namespace casadi {
       gradF_.evaluate();
 
       // Get the result
-      gradF_.output().getArray(grad_f, n, DENSE);
+      gradF_.output().getArray(grad_f, n, SP_DENSE);
 
       // Printing
       if (monitored("eval_grad_f")) {

@@ -636,10 +636,10 @@ class Matrixtests(casadiTestCase):
     D = sparsify(D)
     i = DVector([0]*5)
     
-    D.get(i,SPARSESYM)
+    D.get(i,SP_SPARSESYM)
     #self.checkarray(list(i),[1,2,-1,-3,5])
     A = 2*D
-    A.set(i,SPARSESYM)
+    A.set(i,SP_SPARSESYM)
     self.checkarray(A,D)
     
   def test_diagcat(self):

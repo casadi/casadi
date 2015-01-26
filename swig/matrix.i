@@ -63,7 +63,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			  }
-			  $5 = casadi::DENSETRANS;
+			  $5 = casadi::SP_DENSETRANS;
 			  $2 = array_size(p,0)*array_size(p,1);
 			  $1 = (double*) array_data(p);
 			} else if (array_numdims(p)==1) {
@@ -76,14 +76,14 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			  }
-			  $5 = casadi::SPARSE;
+			  $5 = casadi::SP_SPARSE;
 			  $2 = array_size(p,0);
 			  $1 = (double*) array_data(p);
 			} else {
 			  SWIG_exception_fail(SWIG_TypeError, "Expecting 1D or 2D numpy.ndarray");
 			}
 	} else if (PyObjectHasClassName(p,"csc_matrix")) {
-			$5 = casadi::SPARSE;
+			$5 = casadi::SP_SPARSE;
 			PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
 			if (!(array_is_contiguous(narray) && array_is_native(narray) && array_type(narray)==NPY_DOUBLE))
 			  SWIG_exception_fail(SWIG_TypeError, "csc_matrix should be contiguous, native & of datatype double");
@@ -125,7 +125,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			  }
-			  $3 = casadi::DENSETRANS;
+			  $3 = casadi::SP_DENSETRANS;
 			  $2 = array_size(array,0)*array_size(array,1);
 			  $1 = (double*) array_data(array);
 			} else if (array_numdims(array)==1) {
@@ -138,14 +138,14 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
           const char* cstr = tmp.c_str();
 			    SWIG_exception_fail(SWIG_TypeError,  cstr);
 			  }
-			  $3 = casadi::SPARSE;
+			  $3 = casadi::SP_SPARSE;
 			  $2 = array_size(array,0);
 			  $1 = (double*) array_data(array);
 			} else {
 			  SWIG_exception_fail(SWIG_TypeError, "Expecting 1D or 2D numpy.ndarray");
 			}
 	} else if (PyObjectHasClassName(p,"csc_matrix")) {
-			$3 = casadi::SPARSE;
+			$3 = casadi::SP_SPARSE;
 			PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
 			$2 = array_size(narray,0);
 			if (!(array_size(narray,0)==arg1->nnz() ) ) {
@@ -235,12 +235,12 @@ namespace casadi{
       npy_intp dims[2] = {$self->size1(), $self->size2()};
       PyObject* ret = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
       double* d = static_cast<double*>(array_data(ret));
-      $self->get(d, DENSETRANS); // Row-major
+      $self->get(d, SP_DENSETRANS); // Row-major
       return ret;
 #elif defined(SWIGMATLAB)
       mxArray *p  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
       double* d = static_cast<double*>(mxGetData(p));
-      $self->get(d, DENSE); // Column-major
+      $self->get(d, SP_DENSE); // Column-major
       return p;
 #else
       return 0;

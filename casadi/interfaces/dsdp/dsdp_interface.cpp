@@ -157,7 +157,7 @@ namespace casadi {
             pattern_[i][j][nz++] = cc*(cc + 1)/2 + rr; // DSDP is row-major --> indices swapped
           }
         }
-        mapping_.output(i*nb_+j).get(values_[i][j], SPARSESYM);
+        mapping_.output(i*nb_+j).get(values_[i][j], SP_SPARSESYM);
       }
     }
 
@@ -293,7 +293,7 @@ namespace casadi {
 
       for (int i=0;i<n_+1;++i) {
         for (int j=0;j<nb_;++j) {
-          mapping_.output(i*nb_+j).get(values_[i][j], SPARSESYM);
+          mapping_.output(i*nb_+j).get(values_[i][j], SP_SPARSESYM);
         }
       }
     }
@@ -327,7 +327,7 @@ namespace casadi {
       for (int j=0;j<nb_;++j) {
         info = SDPConeComputeX(sdpcone_, j, block_sizes_[j],
                                getPtr(store_X_[j]), store_X_[j].size());
-        Pmapper_.input(j).set(store_X_[j], SPARSESYM);
+        Pmapper_.input(j).set(store_X_[j], SP_SPARSESYM);
       }
       Pmapper_.evaluate();
       std::copy(Pmapper_.output().data().begin(),
@@ -339,7 +339,7 @@ namespace casadi {
       for (int j=0;j<nb_;++j) {
         info = SDPConeComputeS(sdpcone_, j, 1.0,  output(SDP_SOLVER_X).ptr(), n_, 0,
                                block_sizes_[j] , getPtr(store_P_[j]), store_P_[j].size());
-        Pmapper_.input(j).set(store_P_[j], SPARSESYM);
+        Pmapper_.input(j).set(store_P_[j], SP_SPARSESYM);
       }
       Pmapper_.evaluate();
       std::copy(Pmapper_.output().data().begin(),

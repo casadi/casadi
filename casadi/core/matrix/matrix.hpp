@@ -761,22 +761,22 @@ namespace casadi {
 
     /// \cond INTERNAL
     /** \brief  Set the non-zero elements, scalar */
-    void set(DataType val, SparsityType sp=SPARSE);
+    void set(DataType val, SparsityType sp=SP_SPARSE);
 
     /** \brief  Get the non-zero elements, scalar */
-    void get(DataType& val, SparsityType sp=SPARSE) const;
+    void get(DataType& val, SparsityType sp=SP_SPARSE) const;
 
     /** \brief  Set the non-zero elements, vector */
-    void set(const std::vector<DataType>& val, SparsityType sp=SPARSE);
+    void set(const std::vector<DataType>& val, SparsityType sp=SP_SPARSE);
 
     /** \brief  Get the non-zero elements, vector */
-    void get(std::vector<DataType>& val, SparsityType sp=SPARSE) const;
+    void get(std::vector<DataType>& val, SparsityType sp=SP_SPARSE) const;
 
     /** \brief  Set the non-zero elements, Matrix */
-    void set(const Matrix<DataType>& val, SparsityType sp=SPARSE);
+    void set(const Matrix<DataType>& val, SparsityType sp=SP_SPARSE);
 
     /** \brief  Get the non-zero elements, Matrix */
-    void get(Matrix<DataType>& val, SparsityType sp=SPARSE) const;
+    void get(Matrix<DataType>& val, SparsityType sp=SP_SPARSE) const;
 
 #ifdef SWIG
     %rename(get) getStridedArray;
@@ -784,10 +784,10 @@ namespace casadi {
 #endif
 
     /** \brief  Get the non-zero elements, array */
-    void getArray(DataType* val, int len, SparsityType sp=SPARSE) const;
+    void getArray(DataType* val, int len, SparsityType sp=SP_SPARSE) const;
 
     /** \brief  Set the non-zero elements, array */
-    void setArray(const DataType* val, int len, SparsityType sp=SPARSE);
+    void setArray(const DataType* val, int len, SparsityType sp=SP_SPARSE);
 
     /** \brief  Get the non-zero elements, array, sparse and correct length */
     void getArray(DataType* val) const;
@@ -797,14 +797,14 @@ namespace casadi {
 
     /** \brief  Get the non-zero elements, strided array */
     void getStridedArray(DataType* val, int len, int stride1, int stride2,
-                         SparsityType sp=SPARSE) const;
+                         SparsityType sp=SP_SPARSE) const;
 
 #ifndef SWIG
     /** \brief  Legacy - use getArray instead */
-    void get(DataType* val, SparsityType sp=SPARSE) const;
+    void get(DataType* val, SparsityType sp=SP_SPARSE) const;
 
     /** \brief  Legacy - use setArray instead */
-    void set(const DataType* val, SparsityType sp=SPARSE);
+    void set(const DataType* val, SparsityType sp=SP_SPARSE);
 
     /** Bitwise set, reinterpreting the data as a bvec_t array */
     void setZeroBV();

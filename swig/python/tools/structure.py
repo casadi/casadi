@@ -1370,7 +1370,7 @@ class DataReferenceRepeated(DataReference):
     
   def __setitem__(self,a,b):
     self.v.setNZ(b, False, a)
-    self.a.set(self.v.data(),DENSE)
+    self.a.set(self.v.data(),SP_DENSE)
 
   def __getitem__(self,a):
     return self.v.getNZ(False, a)
@@ -1426,7 +1426,7 @@ class DataReferenceSquaredRepeated(DataReference):
     
   def __setitem__(self,a,b):
     self.v.setNZ(b, False, a)
-    self.a.set(self.v.data(),DENSE)
+    self.a.set(self.v.data(),SP_DENSE)
 
   def __getitem__(self,a):
     return self.v.getNZ(False, a)

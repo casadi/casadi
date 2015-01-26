@@ -358,7 +358,7 @@ namespace casadi {
 
     // Get the result
     nlp_.output(NL_F).get(obj);
-    nlp_.output(NL_G).get(c, DENSE);
+    nlp_.output(NL_G).get(c, SP_DENSE);
 
     // Printing
     if (monitored("eval_f")) {
@@ -380,7 +380,7 @@ namespace casadi {
     gradF_.evaluate();
 
     // Get the result
-    gradF_.output().get(objGrad, DENSE);
+    gradF_.output().get(objGrad, SP_DENSE);
 
     // Printing
     if (monitored("eval_grad_f")) {
@@ -418,7 +418,7 @@ namespace casadi {
     hessLag_.evaluate();
 
     // Get results
-    hessLag_.output().get(hessian, SPARSESYM);
+    hessLag_.output().get(hessian, SP_SPARSESYM);
 
     // Printing
     if (monitored("eval_h")) {
