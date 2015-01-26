@@ -249,7 +249,7 @@ namespace casadi{
 
 #ifdef SWIGMATLAB
     // Convert to a sparse matrix
-    GUESTOBJECT* to_sparse() const { // Todo: Fix naming
+    GUESTOBJECT* zz_sparse() const {
       mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
       $self->get(static_cast<double*>(mxGetData(p)));
       std::copy($self->colind().begin(), $self->colind().end(), mxGetJc(p));

@@ -411,16 +411,18 @@ namespace casadi {
     }
     ///@}
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
     ///@{
-    /** \brief Create a sparse matrix with all zeros */
-    static MatType sparse(int nrow=1, int ncol=1) { return MatType(Sparsity(nrow, ncol));}
-    static MatType sparse(const std::pair<int, int>& rc) { return sparse(rc.first, rc.second);}
+    /** \brief Create a sparse matrix with all zeros 
+        DEPRECATED: Use MatType(nrow, ncol) instead **/
+    static MatType sparse(int nrow=1, int ncol=1) { return MatType(nrow, ncol);}
+    static MatType sparse(const std::pair<int, int>& rc) { return MatType(rc);}
     ///@}
 
-    /** \brief Create a sparse matrix with nonzeros given as a (dense) vector */
-    static MatType sparse(const Sparsity& sp, const MatType& nz) {
-      return MatType(sp, nz);
-    }
+    /** \brief Create a sparse matrix with nonzeros given as a (dense) vector 
+        DEPRECATED: Use MatType(Sparsity, nz) instead **/
+    static MatType sparse(const Sparsity& sp, const MatType& nz) { return MatType(sp, nz); }
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero */

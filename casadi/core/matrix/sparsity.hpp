@@ -138,12 +138,14 @@ namespace casadi {
     static Sparsity dense(const std::pair<int, int> &rc) { return dense(rc.first, rc.second);}
     ///@}
 
+#if !defined(SWIG) || !defined(SWIGMATLAB)
     /** \brief Create a sparse (empty) rectangular sparsity pattern
         DEPRECATED: Use Sparse(nrow, ncol) instead **/
     ///@{
     static Sparsity sparse(int nrow, int ncol=1);
     static Sparsity sparse(const std::pair<int, int> &rc) { return sparse(rc.first, rc.second);}
     ///@}
+#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     /** \brief Create the sparsity pattern for a unit vector of length n and a nonzero on
      * position el **/
