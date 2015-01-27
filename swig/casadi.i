@@ -875,6 +875,9 @@ except:
 %feature("nonstatic","1") zz_vertcat;
 %feature("nonstatic","1") zz_horzcat;
 
+// Explicit type conversion of the first argument of const member functions i.e. this/self
+%feature("convertself","1");
+
 // Workarounds, pending proper fix
 %rename(truediv) __truediv__;
 %rename(nonzero) __nonzero__;
