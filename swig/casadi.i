@@ -868,11 +868,14 @@ except:
 %rename(mrdivide) __mrdivide__;
 %rename(mldivide) __mldivide__;
 %rename(transpose) T;
+%ignore size;
 %rename(size) shape;
+%feature("varargin","1") zz_vertcat;
+%feature("varargin","1") zz_horzcat;
+%feature("nonstatic","1") zz_vertcat;
+%feature("nonstatic","1") zz_horzcat;
 
 // Workarounds, pending proper fix
-%rename(casadi_vertcat) zz_vertcat;
-%rename(casadi_horzcat) zz_horzcat;
 %rename(truediv) __truediv__;
 %rename(nonzero) __nonzero__;
 %rename(constpow) __constpow__;
