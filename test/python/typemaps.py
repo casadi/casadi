@@ -132,7 +132,6 @@ class typemaptests(casadiTestCase):
 
       dm = dm * 2
       dm.get(c)
-      dm.shape = (dm.size1(),dm.size2())
 
       self.checkarray(c,dm,"get(csr_matrix)")
       
