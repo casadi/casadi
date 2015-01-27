@@ -769,7 +769,6 @@ namespace casadi {
     const int sz = nnz();
     const int sz1 = size1();
     const int sz2 = size2();
-    const int nel = sz1*sz2;
 
     // Get dimensions of assigning matrix
     const int val_sz = val_sp.nnz();
