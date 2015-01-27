@@ -545,9 +545,10 @@ namespace casadi {
       double time1 = clock();
       if (values == NULL) {
         int nz=0;
-        const vector<int>& colind = hessLag_.output().colind();
-        const vector<int>& row = hessLag_.output().row();
-        for (int cc=0; cc<colind.size()-1; ++cc)
+        const int* colind = hessLag_.output().colindPtr();
+        int ncol = hessLag_.output().size2();
+        const int* row = hessLag_.output().rowPtr();
+        for (int cc=0; cc<ncol; ++cc)
           for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
             iRow[nz] = row[el];
             jCol[nz] = cc;
@@ -605,9 +606,10 @@ namespace casadi {
       double time1 = clock();
       if (values == NULL) {
         int nz=0;
-        const vector<int>& colind = jacG.output().colind();
-        const vector<int>& row = jacG.output().row();
-        for (int cc=0; cc<colind.size()-1; ++cc)
+        const int* colind = jacG.output().colindPtr();
+        int ncol = jacG.output().size2();
+        const int* row = jacG.output().rowPtr();
+        for (int cc=0; cc<ncol; ++cc)
           for (int el=colind[cc]; el<colind[cc+1]; ++el) {
             int rr = row[el];
             iRow[nz] = rr;

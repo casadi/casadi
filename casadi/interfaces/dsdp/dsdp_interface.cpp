@@ -229,8 +229,8 @@ namespace casadi {
     }
     if (nc_>0) {
       DSDPCreateLPCone(dsdp_, &lpcone_);
-      LPConeSetData(lpcone_, nc_*2, getPtr(mappingA_.output().colind()),
-                    getPtr(mappingA_.output().row()), mappingA_.output().ptr());
+      LPConeSetData(lpcone_, nc_*2, mappingA_.output().colindPtr(),
+                    mappingA_.output().rowPtr(), mappingA_.output().ptr());
     }
 
     DSDPCreateBCone(dsdp_, &bcone_);

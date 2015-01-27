@@ -188,17 +188,20 @@ namespace casadi {
     vector<int> Jcol, Jrow;
     if (!jacG_.isNull()) {
       Jcol = jacG_.output().sparsity().getCol();
-      Jrow = jacG_.output().row();
+      int sz = jacG_.output().nnz();
+      const int* row = jacG_.output().rowPtr();
+      Jrow = vector<int>(row, row+sz);
     }
 
     // Hessian sparsity
     int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().sizeL();
     vector<int> Hcol(nnzH), Hrow(nnzH);
     if (nnzH>0) {
-      const vector<int> &colind = hessLag_.output().colind();
-      const vector<int> &row = hessLag_.output().row();
+      const int* colind = hessLag_.output().colindPtr();
+      int ncol = hessLag_.output().size2();
+      const int* row = hessLag_.output().rowPtr();
       int nz=0;
-      for (int cc=0; cc<colind.size()-1; ++cc) {
+      for (int cc=0; cc<ncol; ++cc) {
         for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
           Hcol[nz] = cc;
           Hrow[nz] = row[el];

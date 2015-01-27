@@ -1380,12 +1380,13 @@ namespace casadi {
     jac_.evaluate();
 
     // Get sparsity and non-zero elements
-    const vector<int>& colind = jac_.output().colind();
-    const vector<int>& row = jac_.output().row();
+    const int* colind = jac_.output().colindPtr();
+    int ncol = jac_.output().size2();
+    const int* row = jac_.output().rowPtr();
     const vector<double>& val = jac_.output().data();
 
     // Loop over columns
-    for (int cc=0; cc<colind.size()-1; ++cc) {
+    for (int cc=0; cc<ncol; ++cc) {
       // Loop over non-zero entries
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
 
@@ -1463,12 +1464,13 @@ namespace casadi {
     }
 
     // Get sparsity and non-zero elements
-    const vector<int>& colind = jacB_.output().colind();
-    const vector<int>& row = jacB_.output().row();
+    const int* colind = jacB_.output().colindPtr();
+    int ncol = jacB_.output().size2();
+    const int* row = jacB_.output().rowPtr();
     const vector<double>& val = jacB_.output().data();
 
     // Loop over columns
-    for (int cc=0; cc<colind.size()-1; ++cc) {
+    for (int cc=0; cc<ncol; ++cc) {
       // Loop over non-zero entries
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
 
@@ -1518,12 +1520,13 @@ namespace casadi {
     jac_.evaluate();
 
     // Get sparsity and non-zero elements
-    const vector<int>& colind = jac_.output().colind();
-    const vector<int>& row = jac_.output().row();
+    const int* colind = jac_.output().colindPtr();
+    int ncol = jac_.output().size2();
+    const int* row = jac_.output().rowPtr();
     const vector<double>& val = jac_.output().data();
 
     // Loop over columns
-    for (int cc=0; cc<colind.size()-1; ++cc) {
+    for (int cc=0; cc<ncol; ++cc) {
       // Loop over non-zero entries
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         // Get row
@@ -1603,12 +1606,13 @@ namespace casadi {
     }
 
     // Get sparsity and non-zero elements
-    const vector<int>& colind = jacB_.output().colind();
-    const vector<int>& row = jacB_.output().row();
+    const int* colind = jacB_.output().colindPtr();
+    int ncol = jacB_.output().size2();
+    const int* row = jacB_.output().rowPtr();
     const vector<double>& val = jacB_.output().data();
 
     // Loop over columns
-    for (int cc=0; cc<colind.size()-1; ++cc) {
+    for (int cc=0; cc<ncol; ++cc) {
       // Loop over non-zero entries
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         // Get row

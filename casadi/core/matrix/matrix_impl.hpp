@@ -513,8 +513,8 @@ namespace casadi {
     // Get sparsity pattern
     int nrow = size1();
     int ncol = size2();
-    const std::vector<int>& colind = this->colind();
-    const std::vector<int>& row = this->row();
+    const int* colind = this->colindPtr();
+    const int* row = this->rowPtr();
 
     // Resize data and copy
     data_.resize(nrow*ncol, val);
@@ -546,8 +546,8 @@ namespace casadi {
     // Get the current sparsity pattern
     int size1 = this->size1();
     int size2 = this->size2();
-    const std::vector<int>& colind = this->colind();
-    const std::vector<int>& row = this->row();
+    const int* colind = this->colindPtr();
+    const int* row = this->rowPtr();
 
     // Construct the new sparsity pattern
     std::vector<int> new_colind(1, 0), new_row;
@@ -653,7 +653,8 @@ namespace casadi {
     }
 
     // Access data structures
-    const std::vector<int>& r = row();
+    const int* r = rowPtr();
+    int sz = nnz();
 
     // Nonzero
     int el=0;
@@ -665,7 +666,7 @@ namespace casadi {
       if (rr!=0) stream << ", ";
 
       // Check if nonzero
-      if (el<r.size() && rr==r[el]) {
+      if (el<sz && rr==r[el]) {
         stream << at(el++);
       } else {
         stream << "00";
@@ -698,7 +699,9 @@ namespace casadi {
     }
 
     // Index counter for each column
-    std::vector<int> cind = colind();
+    const int* cptr = this->colindPtr();
+    int ncol = size2();
+    std::vector<int> cind(cptr, cptr+ncol+1);
 
     // Loop over rows
     for (int rr=0; rr<size1(); ++rr) {
@@ -711,7 +714,7 @@ namespace casadi {
       }
 
       // Loop over columns
-      for (int cc=0; cc<size2(); ++cc) {
+      for (int cc=0; cc<ncol; ++cc) {
         // Separating comma
         if (cc>0) stream << ", ";
 
@@ -1107,8 +1110,8 @@ namespace casadi {
     const std::vector<DataType> &data = this->data();
     const int size1 = this->size1();
     const int size2 = this->size2();
-    const std::vector<int>& colind = this->colind();
-    const std::vector<int>& row = this->row();
+    const int* colind = this->colindPtr();
+    const int* row = this->rowPtr();
 
     if (sp==SP_SPARSE || (sp==SP_DENSE && isDense())) {
       casadi_assert_message(len==nnz(),
@@ -1174,8 +1177,8 @@ namespace casadi {
     const std::vector<DataType> &data = this->data();
     //const int size1 = this->size1();
     const int size2 = this->size2();
-    const std::vector<int>& colind = this->colind();
-    const std::vector<int>& row = this->row();
+    const int* colind = this->colindPtr();
+    const int* row = this->rowPtr();
 
     if (sp==SP_SPARSE) {
       throw CasadiException("Matrix<DataType>::getArray: strided SPARSE not implemented");
@@ -1210,8 +1213,8 @@ namespace casadi {
     std::vector<DataType> &data = this->data();
     const int size1 = this->size1();
     const int size2 = this->size2();
-    const std::vector<int>& colind = this->colind();
-    const std::vector<int>& row = this->row();
+    const int* colind = this->colindPtr();
+    const int* row = this->rowPtr();
 
     if (sp==SP_SPARSE || (sp==SP_DENSE && numel()==nnz())) {
       casadi_assert_message(len==nnz(),
@@ -1581,14 +1584,14 @@ namespace casadi {
     }
 
     // Direct access to the arrays
-    const std::vector<int> &y_colind = y.colind();
-    const std::vector<int> &y_row = y.row();
+    const int* y_colind = y.colindPtr();
+    const int* y_row = y.rowPtr();
     const std::vector<DataType> &y_data = y.data();
-    const std::vector<int> &x_colind = x.colind();
-    const std::vector<int> &x_row = x.row();
+    const int* x_colind = x.colindPtr();
+    const int* x_row = x.rowPtr();
     const std::vector<DataType> &x_data = x.data();
-    const std::vector<int> &z_colind = z.colind();
-    const std::vector<int> &z_row = z.row();
+    const int* z_colind = z.colindPtr();
+    const int* z_row = z.rowPtr();
     std::vector<DataType> &z_data = z.data();
 
     // Loop over the columns of y and z
@@ -1648,18 +1651,19 @@ namespace casadi {
                           << " and x=" << x.dimString() << ".");
 
     // Direct access to the arrays
-    const std::vector<int> &y_colind = y.colind();
-    const std::vector<int> &y_row = y.row();
+    int y_ncol = y.size2();
+    const int* y_colind = y.colindPtr();
+    const int* y_row = y.rowPtr();
     const std::vector<DataType> &y_data = y.data();
-    const std::vector<int> &x_colind = x.colind();
-    const std::vector<int> &x_row = x.row();
+    const int* x_colind = x.colindPtr();
+    const int* x_row = x.rowPtr();
     const std::vector<DataType> &x_data = x.data();
-    const std::vector<int> &z_colind = z.colind();
-    const std::vector<int> &z_row = z.row();
+    const int* z_colind = z.colindPtr();
+    const int* z_row = z.rowPtr();
     std::vector<DataType> &z_data = z.data();
 
     // loop over the cols of the first argument
-    for (int i=0; i<y_colind.size()-1; ++i) {
+    for (int i=0; i<y_ncol; ++i) {
       // loop over the non-zeros of the first argument
       for (int el=y_colind[i]; el<y_colind[i+1]; ++el) {
         int j = y_row[el];
@@ -1693,12 +1697,13 @@ namespace casadi {
                           << ", x=" << x.dimString() << " and y=" << y.size() << ".");
 
     // Direct access to the arrays
-    const std::vector<int> &x_colind = x.colind();
-    const std::vector<int> &x_row = x.row();
+    int x_ncol = x.size2();
+    const int* x_colind = x.colindPtr();
+    const int* x_row = x.rowPtr();
     const std::vector<DataType> &x_data = x.data();
 
     // loop over the columns of the matrix
-    for (int i=0; i<x_colind.size()-1; ++i) {
+    for (int i=0; i<x_ncol; ++i) {
       // loop over the non-zeros of the matrix
       for (int el=x_colind[i]; el<x_colind[i+1]; ++el) {
         int j = x_row[el];
@@ -1738,18 +1743,19 @@ namespace casadi {
                           << y_trans.dimString() << " and x=" << x.dimString() << ".");
 
     // Direct access to the arrays
-    const std::vector<int> &y_rowind = y_trans.colind();
-    const std::vector<int> &y_col = y_trans.row();
+    const int* y_rowind = y_trans.colindPtr();
+    int y_nrow = y_trans.size2();
+    const int* y_col = y_trans.rowPtr();
     const std::vector<DataType> &y_trans_data = y_trans.data();
-    const std::vector<int> &x_colind = x.colind();
-    const std::vector<int> &x_row = x.row();
+    const int* x_colind = x.colindPtr();
+    const int* x_row = x.rowPtr();
     const std::vector<DataType> &x_data = x.data();
-    const std::vector<int> &z_colind = z.colind();
-    const std::vector<int> &z_row = z.row();
+    const int* z_colind = z.colindPtr();
+    const int* z_row = z.rowPtr();
     std::vector<DataType> &z_data = z.data();
 
     // loop over the rows of the first argument
-    for (int i=0; i<y_rowind.size()-1; ++i) {
+    for (int i=0; i<y_nrow; ++i) {
       // loop over the non-zeros of the first argument
       for (int el=y_rowind[i]; el<y_rowind[i+1]; ++el) {
         int j = y_col[el];
@@ -1783,18 +1789,19 @@ namespace casadi {
                           << y.dimString() << " and x_trans=" << x_trans.dimString() << ".");
 
     // Direct access to the arrays
-    const std::vector<int> &y_colind = y.colind();
-    const std::vector<int> &y_row = y.row();
+    const int* y_colind = y.colindPtr();
+    const int* y_row = y.rowPtr();
     const std::vector<DataType> &y_data = y.data();
-    const std::vector<int> &x_rowind = x_trans.colind();
-    const std::vector<int> &x_col = x_trans.row();
+    const int* x_rowind = x_trans.colindPtr();
+    const int* x_col = x_trans.rowPtr();
     const std::vector<DataType> &x_trans_data = x_trans.data();
-    const std::vector<int> &z_colind = z.colind();
-    const std::vector<int> &z_row = z.row();
+    int z_ncol = z.size2();
+    const int* z_colind = z.colindPtr();
+    const int* z_row = z.rowPtr();
     std::vector<DataType> &z_data = z.data();
 
     // loop over the cols of the resulting matrix
-    for (int i=0; i<z_colind.size()-1; ++i) {
+    for (int i=0; i<z_ncol; ++i) {
       // loop over the non-zeros of the resulting matrix
       for (int el=z_colind[i]; el<z_colind[i+1]; ++el) {
         int j = z_row[el];
@@ -1832,12 +1839,12 @@ namespace casadi {
                           "Work vector too small: " << work.size() << " < " << z.size1());
 
     // Direct access to the arrays
-    const std::vector<int> &y_colind = y.colind();
-    const std::vector<int> &y_row = y.row();
-    const std::vector<int> &x_colind = x.colind();
-    const std::vector<int> &x_row = x.row();
-    const std::vector<int> &z_colind = z.colind();
-    const std::vector<int> &z_row = z.row();
+    const int* y_colind = y.colindPtr();
+    const int* y_row = y.rowPtr();
+    const int* x_colind = x.colindPtr();
+    const int* x_row = x.rowPtr();
+    const int* z_colind = z.colindPtr();
+    const int* z_row = z.rowPtr();
 
     // Convert data array to arrays of integers
     bvec_t *y_data = get_bvec_t(y.data());
@@ -1887,8 +1894,8 @@ namespace casadi {
                           "Dimension mismatch. Got x=" << x.size() << " and A=" << A.dimString());
 
     // Access the internal data of A
-    const std::vector<int> &A_colind = A.colind();
-    const std::vector<int> &A_row = A.row();
+    const int* A_colind = A.colindPtr();
+    const int* A_row = A.rowPtr();
     const std::vector<DataType> &A_data = A.data();
 
     // Return value
@@ -2527,7 +2534,7 @@ namespace casadi {
     Matrix<DataType> M = Matrix<DataType>(n-1, n-1);
 
     std::vector<int> col = sparsity().getCol();
-    const std::vector<int> &row = sparsity().row();
+    const int* row = sparsity().rowPtr();
 
     for (int k=0;k<nnz();++k) {
       int i1 = col[k];
@@ -2855,8 +2862,8 @@ namespace casadi {
     if (isTril()) {
       // forward substitution if lower triangular
       Matrix<DataType> x = b;
-      const std::vector<int> & Arow = row();
-      const std::vector<int> & Acolind = colind();
+      const int*  Arow = rowPtr();
+      const int*  Acolind = colindPtr();
       const std::vector<DataType> & Adata = data();
       for (int i=0; i<size2(); ++i) { // loop over columns forwards
         for (int k=0; k<b.size2(); ++k) { // for every right hand side
@@ -2872,8 +2879,8 @@ namespace casadi {
     } else if (isTriu()) {
       // backward substitution if upper triangular
       Matrix<DataType> x = b;
-      const std::vector<int> & Arow = row();
-      const std::vector<int> & Acolind = colind();
+      const int*  Arow = rowPtr();
+      const int*  Acolind = colindPtr();
       const std::vector<DataType> & Adata = data();
       for (int i=size2()-1; i>=0; --i) { // loop over columns backwards
         for (int k=0; k<b.size2(); ++k) { // for every right hand side
@@ -3063,8 +3070,8 @@ namespace casadi {
                                      std::vector<DataType>& res, bool trans_A) const {
     // Get dimension and sparsity
     int d1=size2(), d2=size1();
-    const std::vector<int> &colind=this->colind();
-    const std::vector<int> &row=this->row();
+    const int* colind=this->colindPtr();
+    const int* row=this->rowPtr();
     const std::vector<DataType>& data = this->data();
 
     // Assert consistent dimensions
@@ -3143,14 +3150,14 @@ namespace casadi {
     casadi_assert_message(Iwork.size()>=n_row+1+n_col,
       "We need a bigger work vector (>=" << n_row+1+n_col << "), but got "<< Iwork.size() <<".");
 
-    const std::vector<int> &Aj = A.row();
-    const std::vector<int> &Ap = A.colind();
+    const int* Aj = A.rowPtr();
+    const int* Ap = A.colindPtr();
 
-    const std::vector<int> &Bj = row();
-    const std::vector<int> &Bp = colind();
+    const int* Bj = rowPtr();
+    const int* Bp = colindPtr();
 
-    int *Cp = &Iwork[0];
-    int *mask = &Iwork[n_row+1];
+    int *Cp = getPtr(Iwork);
+    int *mask = Cp+n_row+1;
 
     // Implementation borrowed from Scipy's sparsetools/csr.h
 
@@ -3181,7 +3188,7 @@ namespace casadi {
     }
 
     // Pass 2
-    int *next = &Iwork[n_row+1];
+    int *next = getPtr(Iwork) + n_row+1;
     std::fill(next, next+n_col, -1);
 
     std::vector<bool> & sums = Bwork;
@@ -3258,16 +3265,16 @@ namespace casadi {
                           "We need a bigger work vector (>=" << n_row+1+n_col
                           << "), but got " << Iwork.size() <<".");
 
-    const std::vector<int> &Aj = A.row();
-    const std::vector<int> &Ap = A.colind();
+    const int* Aj = A.rowPtr();
+    const int* Ap = A.colindPtr();
     const std::vector<DataType> &Ax = A.data();
 
-    const std::vector<int> &Bj = B.row();
-    const std::vector<int> &Bp = B.colind();
+    const int* Bj = B.rowPtr();
+    const int* Bp = B.colindPtr();
     const std::vector<DataType> &Bx = B.data();
 
-    int *Cp = &Iwork[0];
-    int *mask = &Iwork[n_row+1];
+    int *Cp = getPtr(Iwork);
+    int *mask = Cp + n_row+1;
 
     // Implementation borrowed from Scipy's sparsetools/csr.h
 

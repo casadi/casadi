@@ -772,10 +772,11 @@ namespace casadi {
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0) {
           // Reset Hessian approximation by dropping all off-diagonal entries
-          const vector<int>& colind = Bk_.colind();      // Access sparsity (column offset)
-          const vector<int>& row = Bk_.row();            // Access sparsity (row)
+          const int* colind = Bk_.colindPtr();      // Access sparsity (column offset)
+          int ncol = Bk_.size2();
+          const int* row = Bk_.rowPtr();            // Access sparsity (row)
           vector<double>& data = Bk_.data();             // Access nonzero elements
-          for (int cc=0; cc<colind.size()-1; ++cc) {       // Loop over the columns of the Hessian
+          for (int cc=0; cc<ncol; ++cc) {       // Loop over the columns of the Hessian
             for (int el=colind[cc]; el<colind[cc+1]; ++el) {
               // Loop over the nonzero elements of the column
               if (cc!=row[el]) data[el] = 0;               // Remove if off-diagonal entries
@@ -861,8 +862,8 @@ namespace casadi {
     casadi_assert(x.size()==A.size1() && x.size()==A.size2());
 
     // Access the internal data of A
-    const std::vector<int> &A_colind = A.colind();
-    const std::vector<int> &A_row = A.row();
+    const int* A_colind = A.colindPtr();
+    const int* A_row = A.rowPtr();
     const std::vector<double> &A_data = A.data();
 
     // Return value
@@ -897,11 +898,12 @@ namespace casadi {
   }
 
   double StabilizedSqp::getRegularization(const Matrix<double>& H) {
-    const vector<int>& colind = H.colind();
-    const vector<int>& row = H.row();
+    const int* colind = H.colindPtr();
+    int ncol = H.size2();
+    const int* row = H.rowPtr();
     const vector<double>& data = H.data();
     double reg_param = 0;
-    for (int cc=0; cc<colind.size()-1; ++cc) {
+    for (int cc=0; cc<ncol; ++cc) {
       double mineig = 0;
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         int rr = row[el];
@@ -917,11 +919,12 @@ namespace casadi {
   }
 
   void StabilizedSqp::regularize(Matrix<double>& H, double reg) {
-    const vector<int>& colind = H.colind();
-    const vector<int>& row = H.row();
+    const int* colind = H.colindPtr();
+    int ncol = H.size2();
+    const int* row = H.rowPtr();
     vector<double>& data = H.data();
 
-    for (int cc=0; cc<colind.size()-1; ++cc) {
+    for (int cc=0; cc<ncol; ++cc) {
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         int rr = row[el];
         if (rr==cc) {
@@ -1151,10 +1154,11 @@ namespace casadi {
   double StabilizedSqp::norm1matrix(const DMatrix& A) {
     // Access the arrays
     const std::vector<double>& v = A.data();
-    const std::vector<int>& colind = A.colind();
+    const int* colind = A.colindPtr();
+    int ncol = A.size2();
     double ret = 0;
     std::vector<double> sums(A.size2(), 0);
-    for (int cc=0; cc<colind.size()-1; ++cc) {
+    for (int cc=0; cc<ncol; ++cc) {
       double colsum = 0;
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         colsum += abs(v[el]);
@@ -1194,8 +1198,8 @@ void StabilizedSqp::mat_vectran(const std::vector<double>& x,
     casadi_assert(x.size()==A.size1() && y.size()==A.size2());
 
     // Access the internal data of A
-    const std::vector<int> &A_colind = A.colind();
-    const std::vector<int> &A_row = A.row();
+    const int* A_colind = A.colindPtr();
+    const int* A_row = A.rowPtr();
     const std::vector<double> &A_data = A.data();
 
 
@@ -1221,8 +1225,8 @@ void StabilizedSqp::mat_vectran(const std::vector<double>& x,
     casadi_assert(x.size()==A.size2() && y.size()==A.size1());
 
     // Access the internal data of A
-    const std::vector<int> &A_colind = A.colind();
-    const std::vector<int> &A_row = A.row();
+    const int* A_colind = A.colindPtr();
+    const int* A_row = A.rowPtr();
     const std::vector<double> &A_data = A.data();
 
 

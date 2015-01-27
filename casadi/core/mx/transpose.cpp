@@ -63,15 +63,17 @@ namespace casadi {
 
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
-    const vector<int>& x_row = input[0]->row();
-    const vector<int>& xT_colind = output[0]->colind();
+    const int* x_row = input[0]->rowPtr();
+    int x_sz = input[0]->nnz();
+    const int* xT_colind = output[0]->colindPtr();
+    int xT_ncol = output[0]->size2();
 
     const vector<T>& x = input[0]->data();
     vector<T>& xT = output[0]->data();
 
     // Transpose
-    copy(xT_colind.begin(), xT_colind.end(), itmp.begin());
-    for (int el=0; el<x_row.size(); ++el) {
+    copy(xT_colind, xT_colind+xT_ncol+1, itmp.begin());
+    for (int el=0; el<x_sz; ++el) {
       xT[itmp[x_row[el]]++] = x[el];
     }
   }
@@ -97,18 +99,20 @@ namespace casadi {
                                     std::vector<double>& rtmp, bool fwd) {
     // Access the input
     bvec_t *x = get_bvec_t(input[0]->data());
-    //const vector<int>& x_colind = input[0]->colind();
-    const vector<int>& x_row = input[0]->row();
+    //const int* x_colind = input[0]->colindPtr();
+    const int* x_row = input[0]->rowPtr();
+    int x_sz = input[0]->nnz();
 
     // Access the output
     bvec_t *xT = get_bvec_t(output[0]->data());
-    const vector<int>& xT_colind = output[0]->colind();
+    const int* xT_colind = output[0]->colindPtr();
+    int xT_ncol = output[0]->size2();
 
     // Offset for each col of the result
-    copy(xT_colind.begin(), xT_colind.end(), itmp.begin());
+    copy(xT_colind, xT_colind+xT_ncol+1, itmp.begin());
 
     // Loop over the nonzeros of the argument
-    for (int el=0; el<x_row.size(); ++el) {
+    for (int el=0; el<x_sz; ++el) {
 
       // Get the row
       int j = x_row[el];
