@@ -332,12 +332,6 @@ namespace casadi {
 
     /** \brief Get a reference to the colindex of all column element (see class description) */
     const int* colindPtr() const;
-
-    /** \brief Get a reference to the rows of all non-zero element (copy if not unique!) */
-    std::vector<int>& rowRef();
-
-    /** \brief Get a reference to the colindex of all column element (copy if not unique!) */
-    std::vector<int>& colindRef();
 #endif
 
     /** \brief Get the column for each non-zero entry

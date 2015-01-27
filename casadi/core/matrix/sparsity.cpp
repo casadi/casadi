@@ -155,16 +155,6 @@ namespace casadi {
     return (*this)->colind_;
   }
 
-  std::vector<int>& Sparsity::rowRef() {
-    makeUnique();
-    return (*this)->row_;
-  }
-
-  std::vector<int>& Sparsity::colindRef() {
-    makeUnique();
-    return (*this)->colind_;
-  }
-
   int Sparsity::row(int el) const {
     if (el<0 || el>=nnz()) {
       std::stringstream ss;
@@ -206,8 +196,8 @@ namespace casadi {
 
     // Quick return if we are adding an element to the end
     if (colind(cc)==nnz() || (colind(cc+1)==nnz() && row(nnz()-1)<rr)) {
-      std::vector<int>& rowv = rowRef();
-      std::vector<int>& colindv = colindRef();
+      std::vector<int>& rowv = (*this)->row_;
+      std::vector<int>& colindv = (*this)->colind_;
       rowv.push_back(rr);
       for (int c=cc; c<size2(); ++c) {
         colindv[c+1]++;
@@ -226,8 +216,8 @@ namespace casadi {
     }
 
     // insert the element
-    std::vector<int>& rowv = rowRef();
-    std::vector<int>& colindv = colindRef();
+    std::vector<int>& rowv = (*this)->row_;
+    std::vector<int>& colindv = (*this)->colind_;
     rowv.insert(rowv.begin()+ind, rr);
     for (int c=cc+1; c<size2()+1; ++c)
       colindv[c]++;
@@ -915,8 +905,8 @@ namespace casadi {
 
     // Create the return sparsity pattern and access vectors
     Sparsity ret = Sparsity(nrow, ncol);
-    std::vector<int> &r_colind = ret.colindRef();
-    std::vector<int> &r_row = ret.rowRef();
+    std::vector<int>& r_colind = ret->colind_;
+    std::vector<int>& r_row = ret->row_;
     r_row.reserve(row.size());
 
     // Consistency check and check if elements are already perfectly ordered with no duplicates

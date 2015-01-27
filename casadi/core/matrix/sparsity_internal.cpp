@@ -674,7 +674,7 @@ namespace casadi {
     // C=A(p, q) (it will hold A(R2, C2))
     Sparsity C = permute(pinv, colperm, 0);
 
-    vector<int>& colind_C = C.colindRef();
+    vector<int>& colind_C = C->colind_;
 
     // delete rows C0, C1, and C3 from C
     int nc = coarse_colblock[3] - coarse_colblock[2];
@@ -813,10 +813,10 @@ namespace casadi {
     Sparsity C = Sparsity(nrow_, ncol_);
 
     // Col offset
-    vector<int>& colind_C = C.colindRef();
+    vector<int>& colind_C = C->colind_;
 
     // Row for each nonzero
-    vector<int>& row_C = C.rowRef();
+    vector<int>& row_C = C->row_;
     row_C.resize(nnz());
 
     int nz = 0;
@@ -1196,8 +1196,8 @@ namespace casadi {
     } else if (order==2) {
 
       // drop dense rows from AT
-      vector<int>& AT_colind = AT.colindRef();
-      vector<int>& AT_row = AT.rowRef();
+      vector<int>& AT_colind = AT->colind_;
+      vector<int>& AT_row = AT->row_;
       for (p2=0, j=0; j<m; ++j) {
 
         // row j of AT starts here
@@ -1235,7 +1235,7 @@ namespace casadi {
     // drop diagonal entries
     C->drop(diag, 0);
 
-    Cp = &C.colindRef().front();
+    Cp = &C->colind_.front();
     cnz = Cp[n] ;
 
     // allocate result
@@ -1262,7 +1262,7 @@ namespace casadi {
 
     len[n] = 0;
     nzmax = C.nnz();
-    Ci = &C.rowRef().front() ;
+    Ci = &C->row_.front() ;
     for (i=0; i<=n; ++i) {
       // degree list i is empty
       head[i] = -1;
@@ -1740,7 +1740,7 @@ namespace casadi {
     int i, p;
     const int *Ap = &colind_.front();
     const int *Ai = &row_.front();
-    int *Ci = &C.rowRef().front();
+    int *Ci = &C->row_.front();
 
     for (p = Ap[j]; p<Ap[j+1]; ++p) {
       // A(i, j) is nonzero
@@ -1772,12 +1772,12 @@ namespace casadi {
 
     // allocate result
     Sparsity C(m, n);
-    C.colindRef().resize(anz + bnz);
+    C->colind_.resize(anz + bnz);
 
-    int* Cp = &C.colindRef().front();
+    int* Cp = &C->colind_.front();
     for (int j=0; j<n; ++j) {
       if (nz+m > C.nnz()) {
-        C.rowRef().resize(2*(C.nnz())+m);
+        C->row_.resize(2*(C.nnz())+m);
       }
 
       // row j of C starts here
@@ -1789,7 +1789,7 @@ namespace casadi {
 
     // finalize the last row of C
     Cp[n] = nz;
-    C.rowRef().resize(nz);
+    C->row_.resize(nz);
 
     // Success
     return C;
@@ -3107,8 +3107,8 @@ namespace casadi {
 
     // Create return sparsity containing the coloring
     Sparsity ret(ncol_, forbiddenColors.size());
-    vector<int>& colind = ret.colindRef();
-    vector<int>& row = ret.rowRef();
+    vector<int>& colind = ret->colind_;
+    vector<int>& row = ret->row_;
 
     // Get the number of rows for each col
     for (int i=0; i<color.size(); ++i) {
@@ -3359,8 +3359,8 @@ namespace casadi {
 
     // Create return sparsity containing the coloring
     Sparsity ret(ncol_, forbiddenColors.size());
-    vector<int>& colind = ret.colindRef();
-    vector<int>& row = ret.rowRef();
+    vector<int>& colind = ret->colind_;
+    vector<int>& row = ret->row_;
 
     // Get the number of rows for each col
     for (int i=0; i<color.size(); ++i) {
