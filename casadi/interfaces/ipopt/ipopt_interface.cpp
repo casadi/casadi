@@ -848,8 +848,9 @@ namespace casadi {
 
         // Loop over the cols
         const Sparsity& spHessLag = this->spHessLag();
-        const vector<int>& colind = spHessLag.colind();
-        for (int i=0; i<colind.size()-1; ++i) {
+        const int* colind = spHessLag.colindPtr();
+        int ncol = spHessLag.size2();
+        for (int i=0; i<ncol; ++i) {
           // If the col contains any non-zeros, the corresponding variable appears nonlinearily
           if (colind[i]!=colind[i+1])
             nv++;
@@ -871,8 +872,9 @@ namespace casadi {
 
       // Loop over the cols
       const Sparsity& spHessLag = this->spHessLag();
-      const vector<int>& colind = spHessLag.colind();
-      for (int i=0; i<colind.size()-1; ++i) {
+      const int* colind = spHessLag.colindPtr();
+      int ncol = spHessLag.size2();
+      for (int i=0; i<ncol; ++i) {
         // If the col contains any non-zeros, the corresponding variable appears nonlinearily
         if (colind[i]!=colind[i+1]) {
           pos_nonlin_vars[el++] = i;

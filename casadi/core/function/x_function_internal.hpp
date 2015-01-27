@@ -650,8 +650,8 @@ namespace casadi {
 
     // Get the sparsity of the Jacobian block
     Sparsity jsp = jacSparsity(iind, oind, true, symmetric).T();
-    const std::vector<int>& jsp_colind = jsp.colind();
-    const std::vector<int>& jsp_row = jsp.row();
+    const int* jsp_colind = jsp.colindPtr();
+    const int* jsp_row = jsp.rowPtr();
 
     // Input sparsity
     std::vector<int> input_col = input(iind).sparsity().getCol();

@@ -80,17 +80,17 @@ namespace casadi {
 
     // Output sparsity
     const Sparsity &osp = sparsity();
-    const vector<int>& orow = osp.row();
+    const int* orow = osp.rowPtr();
     vector<int> ocol = osp.getCol();
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
-    const vector<int>& irow = isp.row();
+    const int* irow = isp.rowPtr();
     vector<int> icol = isp.getCol();
 
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero
-    vector<int> onz_count(orow.size()+2, 0);
+    vector<int> onz_count(osp.nnz()+2, 0);
     for (vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it) {
       onz_count[*it+2]++;
     }

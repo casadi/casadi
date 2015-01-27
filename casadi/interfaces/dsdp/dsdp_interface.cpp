@@ -148,9 +148,10 @@ namespace casadi {
         pattern_[i][j].resize(CAij.sizeU());
         values_[i][j].resize(pattern_[i][j].size());
         int nz=0;
-        const vector<int>& colind = CAij.colind();
-        const vector<int>& row = CAij.row();
-        for (int cc=0; cc<colind.size()-1; ++cc) {
+        const int* colind = CAij.colindPtr();
+        int ncol = CAij.size2();
+        const int* row = CAij.rowPtr();
+        for (int cc=0; cc<ncol; ++cc) {
           int rr;
           // upper triangular part (= lower triangular part for row-major)
           for (int el=colind[cc]; el<colind[cc+1] && (rr=row[el])<=cc; ++el) {

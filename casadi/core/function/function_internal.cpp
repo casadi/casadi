@@ -632,8 +632,8 @@ namespace casadi {
         while (!f_finished) {
 
           // Loop over all coarse rows that are found in the coloring for this coarse seed direction
-          for (int k=D.colind()[csd]; k<D.colind()[csd+1]; ++k) {
-            int cci = D.row()[k];
+          for (int k=D.colind(csd); k<D.colind(csd+1); ++k) {
+            int cci = D.row(k);
 
             // The first and last rows of the fine block
             int fci_start = fine_lookup[coarse[cci]];
@@ -651,8 +651,8 @@ namespace casadi {
 
               // Loop over the coarse block cols that appear in the
               // coloring for the current coarse seed direction
-              for (int cri=r.colind()[cci];cri<r.colind()[cci+1];++cri) {
-                lookup_col.push_back(r.row()[cri]);
+              for (int cri=r.colind(cci);cri<r.colind(cci+1);++cri) {
+                lookup_col.push_back(r.row(cri));
                 lookup_row.push_back(bvec_i+bvec_i_mod);
                 lookup_value.push_back(value);
               }
@@ -940,8 +940,8 @@ namespace casadi {
         while (!f_finished) {
 
           // Loop over all coarse rows that are found in the coloring for this coarse seed direction
-          for (int k=D.colind()[csd]; k<D.colind()[csd+1]; ++k) {
-            int cci = D.row()[k];
+          for (int k=D.colind(csd); k<D.colind(csd+1); ++k) {
+            int cci = D.row(k);
 
             // The first and last rows of the fine block
             int fci_start = fine_row_lookup[coarse_row[cci]];
@@ -957,8 +957,8 @@ namespace casadi {
 
               // Loop over the coarse block cols that appear in the coloring
               // for the current coarse seed direction
-              for (int cri=rT.colind()[cci];cri<rT.colind()[cci+1];++cri) {
-                lookup_col.push_back(rT.row()[cri]);
+              for (int cri=rT.colind(cci);cri<rT.colind(cci+1);++cri) {
+                lookup_col.push_back(rT.row(cri));
                 lookup_row.push_back(bvec_i+bvec_i_mod);
                 lookup_value.push_back(value);
               }
@@ -1472,8 +1472,8 @@ namespace casadi {
 
         const int d1 = sp.size2();
         //const int d2 = sp.size1();
-        const vector<int>& colind = sp.colind();
-        const vector<int>& row = sp.row();
+        const int* colind = sp.colindPtr();
+        const int* row = sp.rowPtr();
 
         // Get data array for output
         bvec_t *outputd = get_bvec_t(output(oind).data());

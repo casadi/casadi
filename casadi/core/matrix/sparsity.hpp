@@ -322,8 +322,8 @@ namespace casadi {
     /** \brief Get a reference to the colindex of all column element (see class description) */
     const std::vector<int>& colind() const;
 
-    /** \brief  Get a reference to the colindex of col i (see class description) */
-    int colind(int i) const;
+    /** \brief  Get a reference to the colindex of column cc (see class description) */
+    int colind(int cc) const;
 
 #ifndef SWIG
     /** \brief Get a reference to row-vector,

@@ -197,7 +197,7 @@ namespace casadi {
 
     // Output sparsity
     const Sparsity& osp = sparsity();
-    const vector<int>& orow = osp.row();
+    const int* orow = osp.rowPtr();
     vector<int> ocol = osp.getCol();
 
     // Input sparsity

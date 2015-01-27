@@ -1110,8 +1110,8 @@ namespace casadi {
         first[j] = k;
     }
 
-    const int* ATp = &AT.colind().front();
-    const int* ATi = &AT.row().front();
+    const int* ATp = AT.colindPtr();
+    const int* ATi = AT.rowPtr();
     if (ata) AT->init_ata(post, &w.front(), &head, &next);
 
     // each node in its own set
@@ -1763,8 +1763,8 @@ namespace casadi {
     int m = nrow_;
     int anz = colind_[ncol_];
     int n = B.size2();
-    const int* Bp = &B.colind().front();
-    const int* Bi = &B.row().front();
+    const int* Bp = B.colindPtr();
+    const int* Bi = B.rowPtr();
     int bnz = Bp[n];
 
     // get workspace
@@ -1944,8 +1944,8 @@ namespace casadi {
     // Direct access to the vectors
     const vector<int> &x_row = row_;
     const vector<int> &x_colind = colind_;
-    const vector<int> &y_row = y.row();
-    const vector<int> &y_colind = y.colind();
+    const int* y_row = y.rowPtr();
+    const int* y_colind = y.colindPtr();
 
     // Sparsity pattern of the result
     vector<int> row, col;
@@ -2511,8 +2511,8 @@ namespace casadi {
     casadi_assert_message(ncol_==y.size2() && nrow_==y.size1(), "Dimension mismatch");
 
     // Sparsity pattern of the argument
-    const vector<int>& y_colind = y.colind();
-    const vector<int>& y_row = y.row();
+    const int* y_colind = y.colindPtr();
+    const int* y_row = y.rowPtr();
 
     // Sparsity pattern of the result
     vector<int> ret_colind(ncol_+1, 0);
@@ -2574,7 +2574,7 @@ namespace casadi {
     if (this == y.get()) return true;
 
     // Otherwise, compare the patterns
-    return isEqual(y.size1(), y.size2(), y.colind(), y.row());
+    return isEqual(y.size1(), y.size2(), y->colind_, y->row_);
   }
 
   Sparsity SparsityInternal::patternInverse() const {
@@ -3056,8 +3056,8 @@ namespace casadi {
     vector<int> color(ncol_, 0);
 
     // Access the sparsity of the transpose
-    const vector<int>& AT_colind = AT.colind();
-    const vector<int>& AT_row = AT.row();
+    const int* AT_colind = AT.colindPtr();
+    const int* AT_row = AT.rowPtr();
 
     // Loop over columns
     for (int i=0; i<ncol_; ++i) {
