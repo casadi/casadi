@@ -309,8 +309,16 @@ namespace casadi {
     return (*this)->sizeD();
   }
 
+  std::vector<int> Sparsity::getColind() const {
+    return (*this)->colind_;
+  }
+
   std::vector<int> Sparsity::getCol() const {
     return (*this)->getCol();
+  }
+
+  std::vector<int> Sparsity::getRow() const {
+    return (*this)->row_;
   }
 
   void Sparsity::getCCS(std::vector<int>& cind, std::vector<int>& r) const {

@@ -312,19 +312,6 @@ namespace casadi {
     std::pair<int, int> shape() const;
     /// @}
 
-    /** \brief Get a reference to row-vector,
-     * containing rows for all non-zero elements (see class description) */
-    const std::vector<int>& row() const;
-
-    /** \brief Get the row of a non-zero element */
-    int row(int el) const;
-
-    /** \brief Get a reference to the colindex of all column element (see class description) */
-    const std::vector<int>& colind() const;
-
-    /** \brief  Get a reference to the colindex of column cc (see class description) */
-    int colind(int cc) const;
-
 #ifndef SWIG
     /** \brief Get a reference to row-vector,
      * containing rows for all non-zero elements (see class description) */
@@ -332,7 +319,31 @@ namespace casadi {
 
     /** \brief Get a reference to the colindex of all column element (see class description) */
     const int* colindPtr() const;
+
+    /** \brief Get the row for each non-zero entry
+        Together with the column-vector, this vector gives the sparsity of the matrix in
+        sparse triplet format, and together with the colind vector, one obtains the sparsity
+        in column compressed format. */
+    std::vector<int> getRow() const;
+
+    /** \brief Get the column index for each column
+        Together with the row-vector, one obtains the sparsity pattern in the
+        column compressed format. */
+    std::vector<int> getColind() const;
 #endif
+
+    /** \brief  Get a reference to the colindex of column cc (see class description) */
+    int colind(int cc) const;
+
+    /** \brief Get the row of a non-zero element */
+    int row(int el) const;
+
+    /** \brief Get a reference to the colindex of all column element (see class description) */
+    const std::vector<int>& colind() const;
+
+    /** \brief Get a reference to row-vector,
+     * containing rows for all non-zero elements (see class description) */
+    const std::vector<int>& row() const;
 
     /** \brief Get the column for each non-zero entry
         Together with the row-vector, this vector gives the sparsity of the matrix in
