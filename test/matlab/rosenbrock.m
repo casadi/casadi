@@ -40,7 +40,7 @@ solver = NlpSolver('ipopt', nlp);
 solver.init();
  
 % Pass solution guess
-solver.setInput([2.5 3.0 0.75]', 'x0');
+solver.setInput([2.5 3.0 0.75], 'x0');
  
 % Set variable bounds
 solver.setInput(0, 'lbg');

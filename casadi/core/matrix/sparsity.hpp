@@ -788,28 +788,21 @@ namespace casadi {
       return;
     } else if (val_nel==1) { // if scalar
       std::fill(data, data+sz, val_sz==0 ? DataType(0) : val_data[0]);
-    } else {
-      // Quick return if empty
-      if (nel==0 && val_nel==0) return;
-
-      // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
-                            "Sparsity::set<DataType>: shape mismatch. lhs is matrix of shape "
-                            << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
-
+    } else if (sz2==val_sz2 && sz1==val_sz1) {
+      // Matching dimensions
       // Sparsity
       const std::vector<int>& c = row();
       const std::vector<int>& rind = colind();
       const std::vector<int>& v_c = val_sp.row();
       const std::vector<int>& v_rind = val_sp.colind();
 
-      // For all cols
+      // For all columns
       for (int i=0; i<sz2; ++i) {
 
         // Nonzero of the assigning matrix
         int v_el = v_rind[i];
 
-        // First nonzero of the following col
+        // First nonzero of the following column
         int v_el_end = v_rind[i+1];
 
         // Next row of the assigning matrix
@@ -836,6 +829,29 @@ namespace casadi {
           }
         }
       }
+    } else if (sz1==val_sz2 && sz2==val_sz1 && sz2 == 1) {
+      // Assign transposed (this is column)
+      const std::vector<int>& v_cind = val_sp.colind();
+      const std::vector<int>& r = row();
+      for (int el=0; el<sz; ++el) {
+        int rr=r[el];
+        data[el] = v_cind[rr]==v_cind[rr+1] ? 0 : val_data[v_cind[rr]];
+      }
+    } else if (sz1==val_sz2 && sz2==val_sz1 && sz1 == 1) {
+      // Assign transposed (this is row)
+      for (int el=0; el<sz; ++el) data[el] = 0;
+      const std::vector<int>& cind = colind();
+      const std::vector<int>& v_r = val_sp.row();
+      for (int el=0; el<val_sz; ++el) {
+        int rr=v_r[el];
+        if (cind[rr]!=cind[rr+1]) {
+          data[cind[rr]] = val_data[el];
+        }
+      }
+    } else {
+      // Make sure that dimension matches
+      casadi_error("Sparsity::set<DataType>: shape mismatch. lhs is matrix of shape "
+                   << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
     }
   }
 
