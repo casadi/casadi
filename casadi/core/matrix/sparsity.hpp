@@ -326,6 +326,13 @@ namespace casadi {
     int colind(int i) const;
 
 #ifndef SWIG
+    /** \brief Get a reference to row-vector,
+     * containing rows for all non-zero elements (see class description) */
+    const int* rowPtr() const;
+
+    /** \brief Get a reference to the colindex of all column element (see class description) */
+    const int* colindPtr() const;
+
     /** \brief Get a reference to the rows of all non-zero element (copy if not unique!) */
     std::vector<int>& rowRef();
 
