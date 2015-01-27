@@ -1517,13 +1517,11 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::sanityCheck(bool complete) const {
     sparsity_.sanityCheck(complete);
-    if (data_.size()!=sparsity_.row().size()) {
+    if (data_.size()!=sparsity_.nnz()) {
       std::stringstream s;
-      s << "Matrix:Compressed Col Storage is not sane. The following must hold:" << std::endl;
-      s << "  data.size() = nrow, but got   row.size()  = " << data_.size()
-        << "   and   nrow = "  << sparsity_.row().size() << std::endl;
-      s << "  Note that the signature is as follows: DMatrix (ncol, nrow, row, colind, data)."
-        << std::endl;
+      s << "Matrix is not sane. The following must hold:" << std::endl;
+      s << "  data().size() = sparsity().nnz(), but got data().size()  = " << data_.size()
+        << "   and sparsity().nnz() = "  << sparsity_.nnz() << std::endl;
       casadi_error(s.str());
     }
   }
@@ -2489,11 +2487,11 @@ namespace casadi {
 
       Matrix<DataType> col = (*this)(Slice(0, n), i);
 
-      const std::vector< int > &row_i = col.sparsity().row();
+      const int* row_i = col.rowPtr();
 
       for (int k=0; k<col.nnz(); ++k) {
         // Sum up the cofactors
-        ret += col.at(k)*cofactor(*this, i, row_i.at(k));
+        ret += col.at(k)*cofactor(*this, i, row_i[k]);
       }
       return ret;
     }

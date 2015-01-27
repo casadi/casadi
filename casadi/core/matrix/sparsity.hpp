@@ -797,10 +797,10 @@ namespace casadi {
     } else if (sz2==val_sz2 && sz1==val_sz1) {
       // Matching dimensions
       // Sparsity
-      const std::vector<int>& c = row();
-      const std::vector<int>& rind = colind();
-      const std::vector<int>& v_c = val_sp.row();
-      const std::vector<int>& v_rind = val_sp.colind();
+      const int* c = rowPtr();
+      const int* rind = colindPtr();
+      const int* v_c = val_sp.rowPtr();
+      const int* v_rind = val_sp.colindPtr();
 
       // For all columns
       for (int i=0; i<sz2; ++i) {
@@ -837,8 +837,8 @@ namespace casadi {
       }
     } else if (sz1==val_sz2 && sz2==val_sz1 && sz2 == 1) {
       // Assign transposed (this is column)
-      const std::vector<int>& v_cind = val_sp.colind();
-      const std::vector<int>& r = row();
+      const int* v_cind = val_sp.colindPtr();
+      const int* r = rowPtr();
       for (int el=0; el<sz; ++el) {
         int rr=r[el];
         data[el] = v_cind[rr]==v_cind[rr+1] ? 0 : val_data[v_cind[rr]];
@@ -846,8 +846,8 @@ namespace casadi {
     } else if (sz1==val_sz2 && sz2==val_sz1 && sz1 == 1) {
       // Assign transposed (this is row)
       for (int el=0; el<sz; ++el) data[el] = 0;
-      const std::vector<int>& cind = colind();
-      const std::vector<int>& v_r = val_sp.row();
+      const int* cind = colindPtr();
+      const int* v_r = val_sp.rowPtr();
       for (int el=0; el<val_sz; ++el) {
         int rr=v_r[el];
         if (cind[rr]!=cind[rr+1]) {
@@ -903,10 +903,10 @@ namespace casadi {
                             << val_sp.dimString() << ".");
 
       // Sparsity
-      const std::vector<int>& c = row();
-      const std::vector<int>& rind = colind();
-      const std::vector<int>& v_c = val_sp.row();
-      const std::vector<int>& v_rind = val_sp.colind();
+      const int* c = rowPtr();
+      const int* rind = colindPtr();
+      const int* v_c = val_sp.rowPtr();
+      const int* v_rind = val_sp.colindPtr();
 
       // For all cols
       for (int i=0; i<sz2; ++i) {
@@ -983,10 +983,10 @@ namespace casadi {
                             << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
 
       // Sparsity
-      const std::vector<int>& c = row();
-      const std::vector<int>& rind = colind();
-      const std::vector<int>& v_c = val_sp.row();
-      const std::vector<int>& v_rind = val_sp.colind();
+      const int* c = rowPtr();
+      const int* rind = colindPtr();
+      const int* v_c = val_sp.rowPtr();
+      const int* v_rind = val_sp.colindPtr();
 
       // For all columns
       for (int i=0; i<sz2; ++i) {
