@@ -2292,7 +2292,7 @@ namespace casadi {
 
     for (int i=0;i<cc.size();++i) {
       int it = cc[i];
-      int el=colind_[it];
+      int el=colind[it];
       for (int j=0;j<rr_sorted.size();++j) {
         int jt=rr_sorted[j];
         // Continue to the non-zero element
@@ -3068,12 +3068,13 @@ namespace casadi {
     // Access the sparsity of the transpose
     const int* AT_colind = AT.colind();
     const int* AT_row = AT.row();
+    const int* colind = this->colind();
 
     // Loop over columns
     for (int i=0; i<size2(); ++i) {
 
       // Loop over nonzero elements
-      for (int el=colind_[i]; el<colind_[i+1]; ++el) {
+      for (int el=colind[i]; el<colind[i+1]; ++el) {
 
         // Get row
         int c = row_[el];
@@ -3153,6 +3154,7 @@ namespace casadi {
 
     // TODO(Joel): What we need here, is a distance-2 smallest last ordering
     // Reorder, if necessary
+    const int* colind = this->colind();
     if (ordering!=0) {
       casadi_assert(ordering==1);
 
@@ -3187,7 +3189,7 @@ namespace casadi {
     vector<int> star(nnz());
     int k = 0;
     for (int i=0; i<size2(); ++i) {
-      for (int j_el=colind_[i]; j_el<colind_[i+1]; ++j_el) {
+      for (int j_el=colind[i]; j_el<colind[i+1]; ++j_el) {
         int j = row_[j_el];
         if (i<j) {
           star[j_el] = k;
@@ -3205,7 +3207,7 @@ namespace casadi {
     for (int v=0; v<size2(); ++v) {
 
       // 4: for each colored w \in N1(v) do
-      for (int w_el=colind_[v]; w_el<colind_[v+1]; ++w_el) {
+      for (int w_el=colind[v]; w_el<colind[v+1]; ++w_el) {
           int w = row_[w_el];
           int colorW = color[w];
           if (colorW==-1) continue;
@@ -3226,7 +3228,7 @@ namespace casadi {
               // 9: treat(v, q)  < forbid colors of neighbors of q
 
                 // treat@2: for each colored x \in N1 (q) do
-                for (int x_el=colind_[q]; x_el<colind_[q+1]; ++x_el) {
+                for (int x_el=colind[q]; x_el<colind[q+1]; ++x_el) {
                   int x = row_[x_el];
                   if (color[x]==-1) continue;
 
@@ -3241,7 +3243,7 @@ namespace casadi {
             // 10: treat(v, w) < forbid colors of neighbors of w
 
               // treat@2: for each colored x \in N1 (w) do
-              for (int x_el=colind_[w]; x_el<colind_[w+1]; ++x_el) {
+              for (int x_el=colind[w]; x_el<colind[w+1]; ++x_el) {
                 int x = row_[x_el];
                 if (color[x]==-1) continue;
 
@@ -3261,9 +3263,9 @@ namespace casadi {
             firstNeighborQ_el[colorW] = w_el;
 
             // 13: for each colored vertex x \in N1 (w) do
-            int x_el_end = colind_[w+1];
+            int x_el_end = colind[w+1];
             int x, colorx;
-            for (int x_el=colind_[w]; x_el < x_el_end; ++x_el) {
+            for (int x_el=colind[w]; x_el < x_el_end; ++x_el) {
               x = row_[x_el];
               colorx = color[x];
               if (colorx==-1 || x==v) continue;
@@ -3305,7 +3307,7 @@ namespace casadi {
       // 17: updateStars(v)
 
         // updateStars@2: for each colored w \in N1 (v) do
-        for (int w_el=colind_[v]; w_el<colind_[v+1]; ++w_el) {
+        for (int w_el=colind[v]; w_el<colind[v+1]; ++w_el) {
             int w = row_[w_el];
             int colorW = color[w];
             if (colorW==-1) continue;
@@ -3314,7 +3316,7 @@ namespace casadi {
             bool check = false;
             int x;
             int x_el;
-            for (x_el=colind_[w]; x_el<colind_[w+1]; ++x_el) {
+            for (x_el=colind[w]; x_el<colind[w+1]; ++x_el) {
               x = row_[x_el];
               if (x==v || color[x]!=color[v]) continue;
               check = true;
@@ -3681,7 +3683,8 @@ namespace casadi {
   void SparsityInternal::spy(std::ostream &stream) const {
 
     // Index counter for each column
-    std::vector<int> cind = colind_;
+    std::vector<int> cind = getColind();
+    const int* colind = this->colind();
 
     // Loop over rows
     for (int rr=0; rr<size1(); ++rr) {
@@ -3689,7 +3692,7 @@ namespace casadi {
       // Loop over columns
       for (int cc=0; cc<size2(); ++cc) {
         // Check if nonzero
-        if (cind[cc]<colind_[cc+1] && row_[cind[cc]]==rr) {
+        if (cind[cc]<colind[cc+1] && row_[cind[cc]]==rr) {
           stream << "*";
           cind[cc]++;
         } else {
@@ -3718,10 +3721,11 @@ namespace casadi {
     const int index_offset = 1;
 
     // Print columns
+    const int* colind = this->colind();
     mfile << "i = [";
     bool first = true;
     for (int i=0; i<size2(); ++i) {
-      for (int el=colind_[i]; el<colind_[i+1]; ++el) {
+      for (int el=colind[i]; el<colind[i+1]; ++el) {
         if (!first) mfile << ", ";
         mfile << (i+index_offset);
         first = false;
@@ -3753,11 +3757,12 @@ namespace casadi {
   }
 
   bool SparsityInternal::isTril() const {
+    const int* colind = this->colind();
     // loop over columns
     for (int i=0; i<size2(); ++i) {
-      if (colind_[i] != colind_[i+1]) { // if there are any elements of the column
+      if (colind[i] != colind[i+1]) { // if there are any elements of the column
         // check row of the top-most element of the column
-        int row = row_[colind_[i]];
+        int row = row_[colind[i]];
 
         // not lower triangular if row>i
         if (row<i) return false;
@@ -3768,11 +3773,12 @@ namespace casadi {
   }
 
   bool SparsityInternal::isTriu() const {
+    const int* colind = this->colind();
     // loop over columns
     for (int i=0; i<size2(); ++i) {
-      if (colind_[i] != colind_[i+1]) { // if there are any elements of the column
+      if (colind[i] != colind[i+1]) { // if there are any elements of the column
         // check row of the bottom-most element of the column
-        int row = row_[colind_[i+1]-1];
+        int row = row_[colind[i+1]-1];
 
         // not upper triangular if row>i
         if (row>i) return false;
@@ -3783,11 +3789,12 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::zz_tril(bool includeDiagonal) const {
+    const int* colind = this->colind();
     vector<int> ret_colind, ret_row;
     ret_colind.reserve(size2()+1);
     ret_colind.push_back(0);
     for (int cc=0; cc<size2(); ++cc) {
-      for (int el=colind_[cc]; el<colind_[cc+1]; ++el) {
+      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         int rr=row_[el];
         if (rr>cc || (includeDiagonal && rr==cc)) {
           ret_row.push_back(rr);
@@ -3799,11 +3806,12 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::zz_triu(bool includeDiagonal) const {
+    const int* colind = this->colind();
     vector<int> ret_colind, ret_row;
     ret_colind.reserve(size2()+1);
     ret_colind.push_back(0);
     for (int cc=0; cc<size2(); ++cc) {
-      for (int el=colind_[cc]; el<colind_[cc+1]; ++el) {
+      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         int rr=row_[el];
         if (rr<cc || (includeDiagonal && rr==cc)) {
           ret_row.push_back(rr);
@@ -3815,9 +3823,10 @@ namespace casadi {
   }
 
   std::vector<int> SparsityInternal::getLowerNZ() const {
+    const int* colind = this->colind();
     vector<int> ret;
     for (int cc=0; cc<size2(); ++cc) {
-      for (int el = colind_[cc]; el<colind_[cc+1]; ++el) {
+      for (int el = colind[cc]; el<colind[cc+1]; ++el) {
         if (row_[el]>=cc) {
           ret.push_back(el);
         }
@@ -3827,9 +3836,10 @@ namespace casadi {
   }
 
   std::vector<int> SparsityInternal::getUpperNZ() const {
+    const int* colind = this->colind();
     vector<int> ret;
     for (int cc=0; cc<size2(); ++cc) {
-      for (int el = colind_[cc]; el<colind_[cc+1] && row_[el]<=cc; ++el) {
+      for (int el = colind[cc]; el<colind[cc+1] && row_[el]<=cc; ++el) {
         ret.push_back(el);
       }
     }
