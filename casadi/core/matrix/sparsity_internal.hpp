@@ -233,7 +233,7 @@ namespace casadi {
     std::vector<int> getCol() const;
 
     /// Resize
-    void resize(int nrow, int ncol);
+    Sparsity zz_resize(int nrow, int ncol) const;
 
     /// Reshape a sparsity, order of nonzeros remains the same
     Sparsity zz_reshape(int nrow, int ncol) const;

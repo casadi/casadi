@@ -2857,42 +2857,28 @@ namespace casadi {
     return Sparsity::triplet(nrow, ncol, row, col);
   }
 
-  void SparsityInternal::resize(int nrow, int ncol) {
-    if (ncol != size2() || nrow != size1()) {
-      if (ncol < size2() || nrow < size1()) {
-        // Col and row index of the new
-        vector<int> row_new, colind_new(ncol+1, 0);
+  Sparsity SparsityInternal::zz_resize(int nrow, int ncol) const {
+    // Col and row index of the new
+    vector<int> row_new, colind_new(ncol+1, 0);
 
-        // Loop over the columns which may contain nonzeros
-        int i;
-        for (i=0; i<size2() && i<ncol; ++i) {
-          // First nonzero element of the col
-          colind_new[i] = row_new.size();
+    // Loop over the columns which may contain nonzeros
+    int i;
+    for (i=0; i<size2() && i<ncol; ++i) {
+      // First nonzero element of the col
+      colind_new[i] = row_new.size();
 
-          // Record rows of the nonzeros
-          for (int el=colind_[i]; el<colind_[i+1] && row_[el]<nrow; ++el) {
-            row_new.push_back(row_[el]);
-          }
-        }
-
-        // Save col-indices for the rest of the columns
-        for (; i<ncol+1; ++i) {
-          colind_new[i] = row_new.size();
-        }
-
-        // Save the sparsity
-        ncol_ = ncol;
-        nrow_ = nrow;
-        row_.swap(row_new);
-        colind_.swap(colind_new);
-
-      } else {
-        // Make larger: Very cheap operation
-        ncol_ = ncol;
-        nrow_ = nrow;
-        colind_.resize(size2()+1, nnz());
+      // Record rows of the nonzeros
+      for (int el=colind_[i]; el<colind_[i+1] && row_[el]<nrow; ++el) {
+        row_new.push_back(row_[el]);
       }
     }
+
+    // Save col-indices for the rest of the columns
+    for (; i<ncol+1; ++i) {
+      colind_new[i] = row_new.size();
+    }
+
+    return Sparsity(nrow, ncol, colind_new, row_new);
   }
 
   bool SparsityInternal::rowsSequential(bool strictly) const {

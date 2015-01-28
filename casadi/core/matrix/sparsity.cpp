@@ -170,8 +170,9 @@ namespace casadi {
   }
 
   void Sparsity::resize(int nrow, int ncol) {
-    makeUnique();
-    (*this)->resize(nrow, ncol);
+    if (size1()!=nrow || size2() != ncol) {
+      *this = (*this)->zz_resize(nrow, ncol);
+    }
   }
 
   int Sparsity::addNZ(int rr, int cc) {
