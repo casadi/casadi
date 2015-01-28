@@ -2680,27 +2680,24 @@ namespace casadi {
     nrow_ += sp.size1();
   }
 
-  void SparsityInternal::appendColumns(const SparsityInternal& sp) {
-    // NOTE: Works also if this == &sp
-
+  Sparsity SparsityInternal::zz_appendColumns(const SparsityInternal& sp) const {
     casadi_assert_message(size1()== sp.size1(),
-      "SparsityInternal::appendColumns(sp): row sizes must match but got " << size1() <<
-      " for lhs, and " << sp.size1() << " for rhs.");
+      "SparsityInternal::zz_appendColumns(sp): row sizes must match but got " << size1()
+                          << " for lhs, and " << sp.size1() << " for rhs.");
 
-    // Get current number of non-zeros
-    int sz = row_.size();
+    // Append rows
+    vector<int> new_row = getRow();
+    const int* sp_row = sp.row();
+    new_row.insert(new_row.end(), sp_row, sp_row+sp.nnz());
 
-    // Add row indices
-    row_.resize(sz + sp.row_.size());
-    for (int i=sz; i<row_.size(); ++i) row_[i] = sp.row_[i-sz];
+    // Get column indices
+    vector<int> new_colind = getColind();
+    const int* sp_colind = sp.colind();
+    new_colind.resize(size2() + sp.size2() + 1);
+    for (int i = size2()+1; i<new_colind.size(); ++i)
+      new_colind[i] = sp_colind[i-size2()] + nnz();
 
-    // Add column indices
-    colind_.resize(size2() + sp.size2() + 1);
-    for (int i = size2()+1; i<colind_.size(); ++i)
-      colind_[i] = sp.colind_[i-size2()] + sz;
-
-    // Update dimensions
-    ncol_ += sp.size2();
+    return Sparsity(size1(), size2()+sp.size2(), new_colind, new_row);
   }
 
   void SparsityInternal::enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) {

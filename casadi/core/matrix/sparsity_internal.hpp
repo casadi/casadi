@@ -351,7 +351,7 @@ namespace casadi {
     void append(const SparsityInternal& sp);
 
     /// Append another sparsity patten horizontally
-    void appendColumns(const SparsityInternal& sp);
+    Sparsity zz_appendColumns(const SparsityInternal& sp) const;
 
     /// Reserve space
     void reserve(int nnz, int ncol);

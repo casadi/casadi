@@ -457,9 +457,8 @@ namespace casadi {
         // No columns before
         *this = sp;
       } else {
-        // Append to matrix (efficient)
-        makeUnique();
-        (*this)->appendColumns(*sp);
+        // Append to matrix (expensive)
+        *this = (*this)->zz_appendColumns(*sp);
       }
     }
   }
