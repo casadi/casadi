@@ -32,6 +32,19 @@
 namespace casadi {
 
   class CASADI_EXPORT SparsityInternal : public SharedObjectNode {
+  private:
+    /// Number of rows
+    int nrow_;
+
+    /// Number of cols
+    int ncol_;
+
+    /// vector of length n+1 containing the index of the last non-zero element up till each col
+    std::vector<int> colind_;
+
+    /// vector of length nnz containing the rows for all the indices of the non-zero elements
+    std::vector<int> row_;
+
   public:
     /// Construct a sparsity pattern from vectors
     SparsityInternal(int nrow, int ncol, const std::vector<int>& colind,
@@ -187,11 +200,17 @@ namespace casadi {
      */
     int scatter(int j, std::vector<int>& w, int mark, Sparsity& C, int nz) const;
 
-    /** \brief Get row indices (see public class) */
-    const int* row() const;
+    /** \brief Get number of rows (see public class) */
+    int size1() const { return nrow_;}
+
+    /** \brief Get number of columns (see public class) */
+    int size2() const { return ncol_;}
 
     /** \brief Get column offsets (see public class) */
     const int* colind() const;
+
+    /** \brief Get row indices (see public class) */
+    const int* row() const;
 
     /// Get row() as a vector
     std::vector<int> getRow() const;
@@ -376,18 +395,6 @@ namespace casadi {
 
     /// Print description
     virtual void print(std::ostream &stream) const;
-
-    /// Number of rows
-    int nrow_;
-
-    /// Number of cols
-    int ncol_;
-
-    /// vector of length n+1 containing the index of the last non-zero element up till each col
-    std::vector<int> colind_;
-
-    /// vector of length nnz containing the rows for all the indices of the non-zero elements
-    std::vector<int> row_;
 
     /** \brief Perform a unidirectional coloring
      *

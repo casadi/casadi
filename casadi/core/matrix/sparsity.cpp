@@ -116,11 +116,11 @@ namespace casadi {
   }
 
   int Sparsity::size1() const {
-    return (*this)->nrow_;
+    return (*this)->size1();
   }
 
   int Sparsity::size2() const {
-    return (*this)->ncol_;
+    return (*this)->size2();
   }
 
   int Sparsity::numel() const {
