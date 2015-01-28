@@ -918,9 +918,8 @@ namespace casadi {
     casadi_assert_message(col.size()==row.size(), "inconsistent lengths");
 
     // Create the return sparsity pattern and access vectors
-    Sparsity ret = Sparsity(nrow, ncol);
-    std::vector<int>& r_colind = ret->colind_;
-    std::vector<int>& r_row = ret->row_;
+    std::vector<int> r_colind(ncol+1, 0);
+    std::vector<int> r_row;
     r_row.reserve(row.size());
 
     // Consistency check and check if elements are already perfectly ordered with no duplicates
@@ -957,7 +956,7 @@ namespace casadi {
         mapping[k] = k;
 
       // Quick return
-      return ret;
+      return Sparsity(nrow, ncol, r_colind, r_row);
     }
 
     // Reuse data
@@ -1057,7 +1056,7 @@ namespace casadi {
       mapping1.resize(r_el);
     }
 
-    return ret;
+    return Sparsity(nrow, ncol, r_colind, r_row);
   }
 
   Sparsity Sparsity::triplet(int nrow, int ncol, const std::vector<int>& row,
