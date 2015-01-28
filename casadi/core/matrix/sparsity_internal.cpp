@@ -1744,11 +1744,10 @@ namespace casadi {
     return P;
   }
 
-  int SparsityInternal::scatter(int j, std::vector<int>& w, int mark, Sparsity& C, int nz) const {
+  int SparsityInternal::scatter(int j, std::vector<int>& w, int mark, int* Ci, int nz) const {
     int i, p;
     const int *Ap = colind();
     const int *Ai = row();
-    int *Ci = &C->row_.front();
 
     for (p = Ap[j]; p<Ap[j+1]; ++p) {
       // A(i, j) is nonzero
@@ -1779,28 +1778,29 @@ namespace casadi {
     vector<int> w(m);
 
     // allocate result
-    Sparsity C(m, n);
-    C->colind_.resize(anz + bnz);
+    vector<int> C_colind(n+1, 0), C_row;
 
-    int* Cp = &C->colind_.front();
+    C_colind.resize(anz + bnz);
+
+    int* Cp = &C_colind.front();
     for (int j=0; j<n; ++j) {
-      if (nz+m > C.nnz()) {
-        C->row_.resize(2*(C.nnz())+m);
+      if (nz+m > C_row.size()) {
+        C_row.resize(2*(C_row.size())+m);
       }
 
       // row j of C starts here
       Cp[j] = nz;
       for (int p = Bp[j] ; p<Bp[j+1] ; ++p) {
-        nz = scatter(Bi[p], w, j+1, C, nz);
+        nz = scatter(Bi[p], w, j+1, &C_row.front(), nz);
       }
     }
 
     // finalize the last row of C
     Cp[n] = nz;
-    C->row_.resize(nz);
+    C_row.resize(nz);
 
     // Success
-    return C;
+    return Sparsity(m, n, C_colind, C_row);
   }
 
   void SparsityInternal::prefactorize(int order, int qr, std::vector<int>& S_pinv,

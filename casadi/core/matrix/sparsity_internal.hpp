@@ -221,7 +221,7 @@ namespace casadi {
     /** x = x + beta * A(:, j), where x is a dense vector and A(:, j) is sparse:
      * See cs_scatter in CSparse
      */
-    int scatter(int j, std::vector<int>& w, int mark, Sparsity& C, int nz) const;
+    int scatter(int j, std::vector<int>& w, int mark, int* Ci, int nz) const;
 
     /// Get row() as a vector
     std::vector<int> getRow() const;
