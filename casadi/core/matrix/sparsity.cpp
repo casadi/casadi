@@ -188,12 +188,13 @@ namespace casadi {
 
     // Quick return if we are adding an element to the end
     if (colind(cc)==nnz() || (colind(cc+1)==nnz() && row(nnz()-1)<rr)) {
-      std::vector<int>& rowv = (*this)->row_;
-      std::vector<int>& colindv = (*this)->colind_;
+      std::vector<int> rowv = getRow();
+      std::vector<int> colindv = getColind();
       rowv.push_back(rr);
       for (int c=cc; c<size2(); ++c) {
         colindv[c+1]++;
       }
+      assignCached(size1(), size2(), colindv, rowv);
       return rowv.size()-1;
     }
 
@@ -208,13 +209,14 @@ namespace casadi {
     }
 
     // insert the element
-    std::vector<int>& rowv = (*this)->row_;
-    std::vector<int>& colindv = (*this)->colind_;
+    std::vector<int> rowv = getRow();
+    std::vector<int> colindv = getColind();
     rowv.insert(rowv.begin()+ind, rr);
     for (int c=cc+1; c<size2()+1; ++c)
       colindv[c]++;
 
     // Return the location of the new element
+    assignCached(size1(), size2(), colindv, rowv);
     return ind;
   }
 
