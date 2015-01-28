@@ -2699,16 +2699,14 @@ namespace casadi {
     return Sparsity(size1(), size2()+sp.size2(), new_colind, new_row);
   }
 
-  void SparsityInternal::enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) {
+  Sparsity SparsityInternal::zz_enlargeColumns(int ncol, const std::vector<int>& cc,
+                                               bool ind1) const {
     if (!inBounds(cc, -ncol+ind1, ncol+ind1)) {
       casadi_error("enlargeColumns: out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
                    << ", which is outside the range [" << -ncol+ind1 << ","<< ncol+ind1 <<  ").");
     }
-
-    // Quick return if cc empty
-    if (cc.empty()) return;
 
     // Handle index-1, negative indices
     if (ind1 || hasNegative(cc)) {
@@ -2717,40 +2715,33 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += ncol;
       }
-      return enlargeColumns(ncol, cc_mod, false); // Call recursively
+      return zz_enlargeColumns(ncol, cc_mod, false); // Call recursively
     }
 
-    // Assert dimensions
-    casadi_assert(cc.size() == size2());
-
-    // Update dimensions
-    ncol_ = ncol;
-
     // Sparsify the columns
-    colind_.resize(ncol+1, nnz());
-
-    // Quick return if matrix had no columns before
-    if (cc.empty()) return;
+    vector<int> new_colind = getColind();
+    new_colind.resize(ncol+1, nnz());
 
     int ik=cc.back(); // need only to update from the last new index
-    int nz=nnz(); // number of nonzeros up till this col
+    int nz=nnz(); // number of nonzeros up till this column
     for (int i=cc.size()-1; i>=0; --i) {
       // Update colindex for new columns
       for (; ik>cc[i]; --ik) {
-        colind_[ik] = nz;
+        new_colind[ik] = nz;
       }
 
       // Update non-zero counter
-      nz = colind_[i];
+      nz = new_colind[i];
 
       // Update colindex for old colums
-      colind_[cc[i]] = nz;
+      new_colind[cc[i]] = nz;
     }
 
     // Append zeros to the beginning
     for (; ik>=0; --ik) {
-      colind_[ik] = 0;
+      new_colind[ik] = 0;
     }
+    return Sparsity(size1(), ncol, new_colind, getRow());
   }
 
   void SparsityInternal::enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) {

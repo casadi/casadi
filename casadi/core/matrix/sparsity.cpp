@@ -489,13 +489,23 @@ namespace casadi {
   }
 
   void Sparsity::enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) {
-    makeUnique();
-    (*this)->enlargeColumns(ncol, cc, ind1);
+    casadi_assert(cc.size() == size2());
+    if (cc.empty()) {
+      *this = Sparsity(size1(), ncol);
+    } else {
+      *this = (*this)->zz_enlargeColumns(ncol, cc, ind1);
+    }
   }
 
   void Sparsity::enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) {
-    makeUnique();
-    (*this)->enlargeRows(nrow, rr, ind1);
+    casadi_assert(rr.size() == size1());
+    if (rr.empty()) {
+      *this = Sparsity(nrow, size2());
+    } else {
+      makeUnique();
+      (*this)->enlargeRows(nrow, rr, ind1);
+      //*this = (*this)->zz_enlargeRows(nrow, rr, ind1);
+    }
   }
 
   Sparsity Sparsity::diag(int nrow, int ncol) {
