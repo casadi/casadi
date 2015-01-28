@@ -143,16 +143,8 @@ namespace casadi {
     return getPtr((*this)->row_);
   }
 
-  const std::vector<int>& Sparsity::row() const {
-    return (*this)->row_;
-  }
-
   const int* Sparsity::colindPtr() const {
     return getPtr((*this)->colind_);
-  }
-
-  const std::vector<int>& Sparsity::colind() const {
-    return (*this)->colind_;
   }
 
   int Sparsity::row(int el) const {
