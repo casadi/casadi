@@ -883,25 +883,25 @@
 %exception  casadi::GenericExpression< SXElement  >::zz_gt(const SXElement &y) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix< MX  >::colindPtr() const {
+%exception  casadi::GenericMatrix< MX  >::colind() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix< MX  >::rowPtr() const {
+%exception  casadi::GenericMatrix< MX  >::row() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix< MatType >::colindPtr() const  {
+%exception  casadi::GenericMatrix< MatType >::colind() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix< MatType >::rowPtr() const  {
+%exception  casadi::GenericMatrix< MatType >::row() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix< MatType >::sparsityRef() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix< Matrix< DataType >  >::colindPtr() const {
+%exception  casadi::GenericMatrix< Matrix< DataType >  >::colind() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix< Matrix< DataType >  >::rowPtr() const {
+%exception  casadi::GenericMatrix< Matrix< DataType >  >::row() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::is_a() const  {
@@ -1582,7 +1582,7 @@
 %exception  casadi::LinearSolver::spSolve(DMatrix &X, const DMatrix &B, bool transpose=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearSolverInternal::colindPtr() const  {
+%exception  casadi::LinearSolverInternal::colind() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearSolverInternal::evaluate() {
@@ -1615,7 +1615,7 @@
 %exception  casadi::LinearSolverInternal::propagateSparsityGen(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd, bool transpose) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearSolverInternal::rowPtr() const  {
+%exception  casadi::LinearSolverInternal::row() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearSolverInternal::solve(bool transpose) {
@@ -3823,7 +3823,7 @@
 %exception  casadi::SparseStorage< DataType >::toScalar() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::colindPtr() const  {
+%exception  casadi::Sparsity::colind() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Sparsity::find(bool ind1=SWIG_IND1) const  {
@@ -3832,16 +3832,10 @@
 %exception  casadi::Sparsity::find(std::vector< int > &loc, bool ind1=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::getColind() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::getRow() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Sparsity::reCache() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::rowPtr() const  {
+%exception  casadi::Sparsity::row() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Sparsity::zz_blockcat(const std::vector< std::vector< Sparsity > > &v) {
