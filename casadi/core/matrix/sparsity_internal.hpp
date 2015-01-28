@@ -33,40 +33,39 @@ namespace casadi {
 
   class CASADI_EXPORT SparsityInternal : public SharedObjectNode {
   private:
-    /// Number of rows
-    int nrow_;
-
-    /// Number of cols
-    int ncol_;
-
-    /// vector of length n+1 containing the index of the last non-zero element up till each col
-    std::vector<int> colind_;
-
-    /// vector of length nnz containing the rows for all the indices of the non-zero elements
-    std::vector<int> row_;
+    /* \brief Sparsity pattern in compressed column storage (CCS) format
+       The first two entries are the number of rows (nrow) and columns (ncol).
+       The next (ncol+1) entries are the column offsets (colind). This means that
+       the number of nonzeros (nnz) is given as sp_[sp_[1]+2].
+       The last nnz entries are the rows of the nonzeros (row). See public class
+       for more info about the CCS format used in CasADi. */
+    std::vector<int> sp_;
 
   public:
     /// Construct a sparsity pattern from arrays
     SparsityInternal(int nrow, int ncol, const int* colind, const int* row) :
-      nrow_(nrow), ncol_(ncol),
-      colind_(colind, colind+ncol+1), row_(row, row+colind[ncol]) {
-        sanityCheck(false);
-      }
+      sp_(2 + ncol+1 + colind[ncol]) {
+      sp_[0] = nrow;
+      sp_[1] = ncol;
+      std::copy(colind, colind+ncol+1, sp_.begin()+2);
+      std::copy(row, row+colind[ncol], sp_.begin()+2+ncol+1);
+      sanityCheck(false);
+    }
 
     /** \brief Get number of rows (see public class) */
-    inline int size1() const { return nrow_;}
+    inline int size1() const { return sp_[0];}
 
     /** \brief Get number of columns (see public class) */
-    inline int size2() const { return ncol_;}
+    inline int size2() const { return sp_[1];}
 
     /** \brief Get column offsets (see public class) */
-    inline const int* colind() const { return colind_.empty() ? 0 : &colind_.front();}
+    inline const int* colind() const { return &sp_.front()+2;}
 
     /** \brief Get row indices (see public class) */
-    inline const int* row() const { return row_.empty() ? 0 : &row_.front();}
+    inline const int* row() const { return colind()+size2()+1;}
 
     /// Number of structural non-zeros
-    inline int nnz() const { return row_.size();}
+    inline int nnz() const { return colind()[size2()];}
 
     /// Check if the dimensions and colind, row vectors are compatible
     void sanityCheck(bool complete=false) const;

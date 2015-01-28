@@ -60,72 +60,39 @@ namespace casadi {
   }
 
   void SparsityInternal::sanityCheck(bool complete) const {
+    int nrow = size1();
+    int ncol = size2();
     const int* colind = this->colind();
     const int* row = this->row();
-    casadi_assert_message(size1() >=0,
+    int nnz = this->nnz();
+    casadi_assert_message(nrow >=0,
                           "SparsityInternal: number of rows must be positive, but got "
-                          << size1() << ".");
-    casadi_assert_message(size2()>=0 ,
+                          << nrow << ".");
+    casadi_assert_message(ncol>=0 ,
                           "SparsityInternal: number of columns must be positive, but got "
-                          << size2() << ".");
-    if (colind_.size() != size2()+1) {
-      std::stringstream s;
-      s << "SparsityInternal:Compressed Column Storage is not sane. The following must hold:"
-        << std::endl;
-      s << "  colind.size() = ncol + 1, but got   colind.size() = "
-        << colind_.size() << "   and   ncol = "  << size2() << std::endl;
-      s << "  Note that the signature is as follows: Sparsity (nrow, ncol, colind, row)."
-        << std::endl;
-      casadi_error(s.str());
-    }
+                          << ncol << ".");
     if (complete) {
 
-      if (colind_.size()>0) {
-        for (int k=1;k<colind_.size();k++) {
-          casadi_assert_message(colind[k]>=colind[k-1],
-                                "SparsityInternal:Compressed Column Storage is not sane. "
-                                "colind must be monotone. Note that the signature is as "
-                                "follows: Sparsity (nrow, ncol, colind, row).");
-        }
-
-        casadi_assert_message(colind[0]==0,
+      for (int k=0; k<ncol; k++) {
+        casadi_assert_message(colind[k+1]>=colind[k],
                               "SparsityInternal:Compressed Column Storage is not sane. "
-                              "First element of colind must be zero. Note that the signature "
-                              "is as follows: Sparsity (nrow, ncol, colind, row).");
-        if (colind[(colind_.size()-1)]!=row_.size()) {
-          std::stringstream s;
-          s << "SparsityInternal:Compressed Column Storage is not sane. The following must hold:"
-            << std::endl;
-          s << "  colind[lastElement] = row.size(), but got   colind[lastElement] = "
-            << colind[(colind_.size()-1)] << "   and   row.size() = "  << row_.size() << std::endl;
-          s << "  Note that the signature is as follows: Sparsity (nrow, ncol, colind, row)."
-            << std::endl;
-          casadi_error(s.str());
-        }
-        if (row_.size()>size2()*size1()) {
-          std::stringstream s;
-          s << "SparsityInternal:Compressed Column Storage is not sane. The following must hold:"
-            << std::endl;
-          s << "  row.size() <= nrow * ncol, but got   row.size()  = " << row_.size()
-            << "   and   ncol * nrow = "  << size1()*size2() << std::endl;
-          s << "  Note that the signature is as follows: Sparsity (nrow, ncol, colind, row)."
-            << std::endl;
-          casadi_error(s.str());
-        }
+                              "colind must be monotone.");
       }
-      for (int k=0;k<row_.size();k++) {
-        if (row[k]>=size1() || row[k] < 0) {
+
+      casadi_assert_message(colind[0]==0,
+                            "SparsityInternal:Compressed Column Storage is not sane. "
+                            "First element of colind must be zero.");
+
+      for (int k=0; k<nnz; k++) {
+        if (row[k]>=nrow || row[k] < 0) {
           std::stringstream s;
           s << "SparsityInternal:Compressed Column Storage is not sane. The following must hold:"
             << std::endl;
           s << "  0 <= row[i] < nrow for each i, but got   row[i] = " << row[k]
-            << "   and   nrow = "  << size1() << std::endl;
-          s << "  Note that the signature is as follows: Sparsity (nrow, ncol, colind, row)."
-            << std::endl;
+            << "   and   nrow = "  << nrow << std::endl;
           casadi_error(s.str());
         }
       }
-
     }
   }
 
@@ -2964,7 +2931,7 @@ namespace casadi {
       for (int k=ret_colind[i]; k<ret_colind[i+1]; ++k) {
 
         // Make sure that the rows appear sequentially
-        casadi_assert_message(row_[k] >= lastrow, "rows are not sequential");
+        casadi_assert_message(ret_row[k] >= lastrow, "rows are not sequential");
 
         // Skip if duplicate
         if (ret_row[k] == lastrow) continue;
@@ -3546,7 +3513,7 @@ namespace casadi {
   }
 
   std::vector<int> SparsityInternal::largestFirstOrdering() const {
-    vector<int> degree = colind_;
+    vector<int> degree = getColind();
     int max_degree = 0;
     for (int k=0; k<size2(); ++k) {
       degree[k] = degree[k+1]-degree[k];
@@ -3922,12 +3889,14 @@ namespace casadi {
     return bw;
   }
 
-  std::vector<int> SparsityInternal::getColind() const {
-    return colind_;
+  vector<int> SparsityInternal::getColind() const {
+    const int* colind = this->colind();
+    return vector<int>(colind, colind+size2()+1);
   }
 
-  std::vector<int> SparsityInternal::getRow() const {
-    return row_;
+  vector<int> SparsityInternal::getRow() const {
+    const int* row = this->row();
+    return vector<int>(row, row+nnz());
   }
 
 } // namespace casadi
