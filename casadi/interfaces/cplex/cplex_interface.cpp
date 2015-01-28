@@ -158,13 +158,13 @@ namespace casadi {
     // Matrix A, count the number of elements per column
     const Sparsity& A_sp = input(QP_SOLVER_A).sparsity();
     matcnt_.resize(A_sp.size2());
-    transform(A_sp.colind().begin()+1, A_sp.colind().end(), A_sp.colind().begin(), matcnt_.begin(),
+    transform(A_sp.colind()+1, A_sp.colind() + A_sp.size2()+1, A_sp.colind(), matcnt_.begin(),
               minus<int>());
 
     // Matrix H, count the number of elements per column
     const Sparsity& H_sp = input(QP_SOLVER_H).sparsity();
     qmatcnt_.resize(H_sp.size2());
-    transform(H_sp.colind().begin()+1, H_sp.colind().end(), H_sp.colind().begin(), qmatcnt_.begin(),
+    transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), qmatcnt_.begin(),
               minus<int>());
 
     casadi_assert(lp_==0);
@@ -213,8 +213,8 @@ namespace casadi {
 
     // Copying objective, constraints, and bounds.
     const Sparsity& A_sp = input(QP_SOLVER_A).sparsity();
-    const int* matbeg = getPtr(A_sp.colind());
-    const int* matind = getPtr(A_sp.row());
+    const int* matbeg = A_sp.colind();
+    const int* matind = A_sp.row();
     const double* matval = input(QP_SOLVER_A).ptr();
     const double* obj = input(QP_SOLVER_G).ptr();
     const double* lb = input(QP_SOLVER_LBX).ptr();
@@ -224,8 +224,8 @@ namespace casadi {
 
     // Preparing coefficient matrix Q
     const Sparsity& H_sp = input(QP_SOLVER_H).sparsity();
-    const int* qmatbeg = getPtr(H_sp.colind());
-    const int* qmatind = getPtr(H_sp.row());
+    const int* qmatbeg = H_sp.colind();
+    const int* qmatind = H_sp.row();
     const double* qmatval = input(QP_SOLVER_H).ptr();
     status = CPXcopyquad(env_, lp_, qmatbeg, getPtr(qmatcnt_), qmatind, qmatval);
 
