@@ -333,7 +333,7 @@ namespace casadi {
     bool isEqual(int nrow, int ncol, const int* colind, const int* row) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
-    void enlargeRows(int nrow, const std::vector<int>& rr, bool ind1);
+    Sparsity zz_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const;
 
     /// Enlarge the matrix along the second dimension (i.e. insert columns)
     Sparsity zz_enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) const;

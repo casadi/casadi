@@ -2744,16 +2744,13 @@ namespace casadi {
     return Sparsity(size1(), ncol, new_colind, getRow());
   }
 
-  void SparsityInternal::enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) {
+  Sparsity SparsityInternal::zz_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const {
     if (!inBounds(rr, -nrow+ind1, nrow+ind1)) {
       casadi_error("enlargeRows: out of bounds. Your rr contains " <<
                    *std::min_element(rr.begin(), rr.end()) << " up to " <<
                    *std::max_element(rr.begin(), rr.end()) <<
                    ", which is outside the range [" << -nrow+ind1 << ","<< nrow+ind1 <<  ").");
     }
-
-    // Quick return if rr empty
-    if (rr.empty()) return;
 
     // Handle index-1, negative indices
     if (ind1 || hasNegative(rr)) {
@@ -2762,19 +2759,18 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += nrow;
       }
-      return enlargeRows(nrow, rr_mod, false); // Call recursively
+      return zz_enlargeRows(nrow, rr_mod, false); // Call recursively
     }
 
     // Assert dimensions
     casadi_assert(rr.size() == size1());
 
-    // Update dimensions
-    nrow_ = nrow;
-
     // Begin by sparsify the rows
+    vector<int> new_row = getRow();
     for (int k=0; k<row_.size(); ++k) {
-      row_[k] = rr[row_[k]];
+      new_row[k] = rr[new_row[k]];
     }
+    return Sparsity(nrow, size2(), getColind(), new_row);
   }
 
   Sparsity SparsityInternal::makeDense(std::vector<int>& mapping) const {

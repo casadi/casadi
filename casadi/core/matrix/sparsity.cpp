@@ -502,9 +502,7 @@ namespace casadi {
     if (rr.empty()) {
       *this = Sparsity(nrow, size2());
     } else {
-      makeUnique();
-      (*this)->enlargeRows(nrow, rr, ind1);
-      //*this = (*this)->zz_enlargeRows(nrow, rr, ind1);
+      *this = (*this)->zz_enlargeRows(nrow, rr, ind1);
     }
   }
 
