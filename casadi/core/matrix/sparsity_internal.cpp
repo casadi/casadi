@@ -1903,8 +1903,8 @@ namespace casadi {
       mapping.clear();
       mapping.resize(nnz());
 
-      std::vector<int> colind(sp->size1()+1, 0);
-      std::vector<int> row(sp->nnz());
+      std::vector<int> ret_colind(sp->size1()+1, 0);
+      std::vector<int> ret_row(sp->nnz());
 
       int i_prev = 0;
 
@@ -1913,13 +1913,13 @@ namespace casadi {
         mapping[k]=k; // mapping will just be a range(nnz())
 
         int i = sp->row_[k];
-        std::fill(colind.begin()+i_prev+1, colind.begin()+i+1, k);
-        row[k]=i;
+        std::fill(ret_colind.begin()+i_prev+1, ret_colind.begin()+i+1, k);
+        ret_row[k]=i;
         i_prev = i;
       }
-      std::fill(colind.begin()+i_prev+1, colind.end(), nnz());
+      std::fill(ret_colind.begin()+i_prev+1, ret_colind.end(), nnz());
 
-      return Sparsity(sp->size1(), sp->size1(), colind, row);
+      return Sparsity(sp->size1(), sp->size1(), ret_colind, ret_row);
     } else {
       casadi_error("diag: wrong argument shape. Expecting square matrix or vector-like, but got "
                    << dimString() << " instead.");
@@ -2598,7 +2598,7 @@ namespace casadi {
     if (this == y.get()) return true;
 
     // Otherwise, compare the patterns
-    return isEqual(y.size1(), y.size2(), y->colind_, y->row_);
+    return isEqual(y.size1(), y.size2(), y.colind(), y.row());
   }
 
   Sparsity SparsityInternal::patternInverse() const {
@@ -2642,19 +2642,19 @@ namespace casadi {
   }
 
 
-  bool SparsityInternal::isEqual(int nrow, int ncol, const std::vector<int>& colind,
-                                 const std::vector<int>& row) const {
-    casadi_assert(colind.size()==ncol+1);
-    casadi_assert(row.size()==colind.back());
-    return isEqual(nrow, ncol, getPtr(colind), getPtr(row));
+  bool SparsityInternal::isEqual(int y_nrow, int y_ncol, const std::vector<int>& y_colind,
+                                 const std::vector<int>& y_row) const {
+    casadi_assert(y_colind.size()==y_ncol+1);
+    casadi_assert(y_row.size()==y_colind.back());
+    return isEqual(y_nrow, y_ncol, getPtr(y_colind), getPtr(y_row));
   }
 
-  bool SparsityInternal::isEqual(int nrow, int ncol, const int* colind, const int* row) const {
+  bool SparsityInternal::isEqual(int y_nrow, int y_ncol, const int* y_colind, const int* y_row) const {
     // Get number of nonzeros
-    int nz = colind[ncol];
+    int nz = y_colind[y_ncol];
 
     // First check dimensions and number of non-zeros
-    if (nnz()!=nz || size2()!=ncol || size1()!=nrow)
+    if (nnz()!=nz || size2()!=y_ncol || size1()!=y_nrow)
       return false;
 
     // Check if dense
@@ -2662,11 +2662,11 @@ namespace casadi {
       return true;
 
     // Check the number of non-zeros per col
-    if (!equal(colind_.begin(), colind_.end(), colind))
+    if (!equal(colind_.begin(), colind_.end(), y_colind))
       return false;
 
     // Finally check the row indices
-    if (!equal(row_.begin(), row_.end(), row))
+    if (!equal(row_.begin(), row_.end(), y_row))
       return false;
 
     // Equal if reached this point
@@ -3117,30 +3117,30 @@ namespace casadi {
 
     // Create return sparsity containing the coloring
     Sparsity ret(size2(), forbiddenColors.size());
-    vector<int>& colind = ret->colind_;
-    vector<int>& row = ret->row_;
+    vector<int>& ret_colind = ret->colind_;
+    vector<int>& ret_row = ret->row_;
 
     // Get the number of rows for each col
     for (int i=0; i<color.size(); ++i) {
-      colind[color[i]+1]++;
+      ret_colind[color[i]+1]++;
     }
 
     // Cumsum
     for (int j=0; j<forbiddenColors.size(); ++j) {
-      colind[j+1] += colind[j];
+      ret_colind[j+1] += ret_colind[j];
     }
 
     // Get row for each col
-    row.resize(color.size());
-    for (int j=0; j<row.size(); ++j) {
-      row[colind[color[j]]++] = j;
+    ret_row.resize(color.size());
+    for (int j=0; j<ret_row.size(); ++j) {
+      ret_row[ret_colind[color[j]]++] = j;
     }
 
     // Swap index back one step
-    for (int j=colind.size()-2; j>=0; --j) {
-      colind[j+1] = colind[j];
+    for (int j=ret_colind.size()-2; j>=0; --j) {
+      ret_colind[j+1] = ret_colind[j];
     }
-    colind[0] = 0;
+    ret_colind[0] = 0;
 
     // Return the coloring
     return ret;
@@ -3369,30 +3369,30 @@ namespace casadi {
 
     // Create return sparsity containing the coloring
     Sparsity ret(size2(), forbiddenColors.size());
-    vector<int>& colind = ret->colind_;
-    vector<int>& row = ret->row_;
+    vector<int>& ret_colind = ret->colind_;
+    vector<int>& ret_row = ret->row_;
 
     // Get the number of rows for each col
     for (int i=0; i<color.size(); ++i) {
-      colind[color[i]+1]++;
+      ret_colind[color[i]+1]++;
     }
 
     // Cumsum
     for (int j=0; j<forbiddenColors.size(); ++j) {
-      colind[j+1] += colind[j];
+      ret_colind[j+1] += ret_colind[j];
     }
 
     // Get row for each col
-    row.resize(color.size());
-    for (int j=0; j<row.size(); ++j) {
-      row[colind[color[j]]++] = j;
+    ret_row.resize(color.size());
+    for (int j=0; j<ret_row.size(); ++j) {
+      ret_row[ret_colind[color[j]]++] = j;
     }
 
     // Swap index back one step
-    for (int j=colind.size()-2; j>=0; --j) {
-      colind[j+1] = colind[j];
+    for (int j=ret_colind.size()-2; j>=0; --j) {
+      ret_colind[j+1] = ret_colind[j];
     }
-    colind[0] = 0;
+    ret_colind[0] = 0;
 
     // Return the coloring
     return ret;
@@ -3783,35 +3783,35 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::zz_tril(bool includeDiagonal) const {
-    vector<int> colind, row;
-    colind.reserve(size2()+1);
-    colind.push_back(0);
+    vector<int> ret_colind, ret_row;
+    ret_colind.reserve(size2()+1);
+    ret_colind.push_back(0);
     for (int cc=0; cc<size2(); ++cc) {
       for (int el=colind_[cc]; el<colind_[cc+1]; ++el) {
         int rr=row_[el];
         if (rr>cc || (includeDiagonal && rr==cc)) {
-          row.push_back(rr);
+          ret_row.push_back(rr);
         }
       }
-      colind.push_back(row.size());
+      ret_colind.push_back(ret_row.size());
     }
-    return Sparsity(size1(), size2(), colind, row);
+    return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
   Sparsity SparsityInternal::zz_triu(bool includeDiagonal) const {
-    vector<int> colind, row;
-    colind.reserve(size2()+1);
-    colind.push_back(0);
+    vector<int> ret_colind, ret_row;
+    ret_colind.reserve(size2()+1);
+    ret_colind.push_back(0);
     for (int cc=0; cc<size2(); ++cc) {
       for (int el=colind_[cc]; el<colind_[cc+1]; ++el) {
         int rr=row_[el];
         if (rr<cc || (includeDiagonal && rr==cc)) {
-          row.push_back(rr);
+          ret_row.push_back(rr);
         }
       }
-      colind.push_back(row.size());
+      ret_colind.push_back(ret_row.size());
     }
-    return Sparsity(size1(), size2(), colind, row);
+    return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
   std::vector<int> SparsityInternal::getLowerNZ() const {

@@ -326,11 +326,11 @@ namespace casadi {
     bool isEqual(const Sparsity& y) const;
 
     /// Check if two sparsity patterns are the same
-    bool isEqual(int nrow, int ncol, const std::vector<int>& colind,
-                 const std::vector<int>& row) const;
+    bool isEqual(int y_nrow, int y_ncol, const std::vector<int>& y_colind,
+                 const std::vector<int>& y_row) const;
 
     /// Check if two sparsity patterns are the same
-    bool isEqual(int nrow, int ncol, const int* colind, const int* row) const;
+    bool isEqual(int y_nrow, int y_ncol, const int* y_colind, const int* y_row) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
     Sparsity zz_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const;
