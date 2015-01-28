@@ -883,7 +883,25 @@
 %exception  casadi::GenericExpression< SXElement  >::zz_gt(const SXElement &y) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix< MX  >::colindPtr() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix< MX  >::rowPtr() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix< MatType >::colindPtr() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix< MatType >::rowPtr() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericMatrix< MatType >::sparsityRef() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix< Matrix< DataType >  >::colindPtr() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix< Matrix< DataType >  >::rowPtr() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::is_a() const  {
@@ -1564,7 +1582,7 @@
 %exception  casadi::LinearSolver::spSolve(DMatrix &X, const DMatrix &B, bool transpose=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearSolverInternal::colind() const  {
+%exception  casadi::LinearSolverInternal::colindPtr() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearSolverInternal::evaluate() {
@@ -1597,7 +1615,7 @@
 %exception  casadi::LinearSolverInternal::propagateSparsityGen(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd, bool transpose) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearSolverInternal::row() const  {
+%exception  casadi::LinearSolverInternal::rowPtr() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearSolverInternal::solve(bool transpose) {
@@ -3772,31 +3790,7 @@
 %exception  casadi::Solve< Tr >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparseStorage< DataType >::at(int k) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::at(int k) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::back() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::back() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::begin() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::begin() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SparseStorage< DataType >::clear() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::colind() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::colind(int col) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparseStorage< DataType >::data() const  {
@@ -3805,40 +3799,10 @@
 %exception  casadi::SparseStorage< DataType >::data() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparseStorage< DataType >::elem(int rr, int cc=0) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::elem(int rr, int cc=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::end() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::end() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::front() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::front() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::getElement(int rr, int cc=0) const  {
+%exception  casadi::SparseStorage< DataType >::elem(int rr, int cc) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparseStorage< DataType >::hasNZ(int rr, int cc) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::rbegin() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::rbegin() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::rend() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::rend() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparseStorage< DataType >::reserve(int nnz) {
@@ -3850,15 +3814,6 @@
 %exception  casadi::SparseStorage< DataType >::resize(int nrow, int ncol) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparseStorage< DataType >::row() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::row(int el) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::sanityCheck(bool complete=false) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SparseStorage< DataType >::sparsity() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3868,7 +3823,7 @@
 %exception  casadi::SparseStorage< DataType >::toScalar() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::colindRef() {
+%exception  casadi::Sparsity::colindPtr() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Sparsity::find(bool ind1=SWIG_IND1) const  {
@@ -3877,10 +3832,16 @@
 %exception  casadi::Sparsity::find(std::vector< int > &loc, bool ind1=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Sparsity::getColind() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sparsity::getRow() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Sparsity::reCache() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::rowRef() {
+%exception  casadi::Sparsity::rowPtr() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Sparsity::zz_blockcat(const std::vector< std::vector< Sparsity > > &v) {
@@ -5341,31 +5302,10 @@
 %exception casadi::SparseStorage< DataType >::SparseStorage() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< A > &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception casadi::SparseStorage< DataType >::SparseStorage(const SparseStorage< DataType > &m) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const DataType &val=DataType(0)) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SparseStorage< DataType >::SparseStorage(const Sparsity &sparsity, const std::vector< DataType > &d) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< A > &x, int nrow, int ncol) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< DataType > &x, int nrow, int ncol) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SparseStorage< DataType >::SparseStorage(const std::vector< std::vector< DataType > > &m) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Sparsity::Sparsity(const std::pair< int, int > &rc) {
