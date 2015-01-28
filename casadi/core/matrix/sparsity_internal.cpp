@@ -55,7 +55,7 @@ namespace casadi {
     } else if (isDiagonal()) {
       stream << ", diagonal";
     } else {
-      stream << ", " << row_.size() << " nnz";
+      stream << ", " << nnz() << " nnz";
     }
   }
 
@@ -2671,24 +2671,23 @@ namespace casadi {
 
   bool SparsityInternal::isEqual(int y_nrow, int y_ncol,
                                  const int* y_colind, const int* y_row) const {
+    const int* colind = this->colind();
+    const int* row = this->row();
+
     // Get number of nonzeros
     int nz = y_colind[y_ncol];
 
     // First check dimensions and number of non-zeros
-    if (nnz()!=nz || size2()!=y_ncol || size1()!=y_nrow)
-      return false;
+    if (nnz()!=nz || size2()!=y_ncol || size1()!=y_nrow) return false;
 
     // Check if dense
-    if (nnz()==numel())
-      return true;
+    if (nnz()==numel()) return true;
 
     // Check the number of non-zeros per col
-    if (!equal(colind_.begin(), colind_.end(), y_colind))
-      return false;
+    if (!equal(colind, colind+size2()+1, y_colind)) return false;
 
     // Finally check the row indices
-    if (!equal(row_.begin(), row_.end(), y_row))
-      return false;
+    if (!equal(row, row+nz, y_row)) return false;
 
     // Equal if reached this point
     return true;
@@ -2705,7 +2704,7 @@ namespace casadi {
        << size2() << " columns for lhs, and " << sp.size2() << " columns for rhs.");
 
     // Get current number of non-zeros
-    int sz = row_.size();
+    int sz = nnz();
 
     // Add row indices
     vector<int> new_row = getRow();
@@ -2808,7 +2807,7 @@ namespace casadi {
 
     // Begin by sparsify the rows
     vector<int> new_row = getRow();
-    for (int k=0; k<row_.size(); ++k) {
+    for (int k=0; k<nnz(); ++k) {
       new_row[k] = rr[new_row[k]];
     }
     return Sparsity(nrow, size2(), getColind(), new_row);
