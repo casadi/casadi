@@ -90,7 +90,7 @@ namespace casadi {
   }
 
   void Sparsity::reCache() {
-    assignCached(size1(), size2(), (*this)->colind_, (*this)->row_);
+    assignCached(size1(), size2(), colind(), row());
   }
 
   SparsityInternal* Sparsity::operator->() {
@@ -140,11 +140,11 @@ namespace casadi {
   }
 
   const int* Sparsity::row() const {
-    return getPtr((*this)->row_);
+    return (*this)->row();
   }
 
   const int* Sparsity::colind() const {
-    return getPtr((*this)->colind_);
+    return (*this)->colind();
   }
 
   int Sparsity::row(int el) const {
@@ -302,7 +302,7 @@ namespace casadi {
   }
 
   std::vector<int> Sparsity::getColind() const {
-    return (*this)->colind_;
+    return (*this)->getColind();
   }
 
   std::vector<int> Sparsity::getCol() const {
@@ -310,7 +310,7 @@ namespace casadi {
   }
 
   std::vector<int> Sparsity::getRow() const {
-    return (*this)->row_;
+    return (*this)->getRow();
   }
 
   void Sparsity::getCCS(std::vector<int>& cind, std::vector<int>& r) const {
@@ -380,6 +380,10 @@ namespace casadi {
 
   bool Sparsity::isEqual(int nrow, int ncol, const std::vector<int>& colind,
                          const std::vector<int>& row) const {
+    return (*this)->isEqual(nrow, ncol, colind, row);
+  }
+
+  bool Sparsity::isEqual(int nrow, int ncol, const int* colind, const int* row) const {
     return (*this)->isEqual(nrow, ncol, colind, row);
   }
 
@@ -612,14 +616,19 @@ namespace casadi {
 
   void Sparsity::assignCached(int nrow, int ncol, const std::vector<int>& colind,
                               const std::vector<int>& row) {
+    casadi_assert(colind.size()==ncol+1);
+    casadi_assert(row.size()==colind.back());
+    assignCached(nrow, ncol, getPtr(colind), getPtr(row));
+  }
 
+  void Sparsity::assignCached(int nrow, int ncol, const int* colind, const int* row) {
     // Scalars and empty patterns are handled separately
     if (ncol==0 && nrow==0) {
       // If empty
       *this = getEmpty();
       return;
     } else if (ncol==1 && nrow==1) {
-      if (row.empty()) {
+      if (colind[ncol]==0) {
         // If sparse scalar
         *this = getScalarSparse();
         return;
@@ -769,14 +778,19 @@ namespace casadi {
     return (*this)->getUpperNZ();
   }
 
+
   std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& colind,
                             const std::vector<int>& row) {
+    return hash_sparsity(nrow, ncol, getPtr(colind), getPtr(row));
+  }
+
+  std::size_t hash_sparsity(int nrow, int ncol, const int* colind, const int* row) {
     // Condense the sparsity pattern to a single, deterministric number
     std::size_t ret=0;
     hash_combine(ret, nrow);
     hash_combine(ret, ncol);
-    hash_combine(ret, colind);
-    hash_combine(ret, row);
+    hash_combine(ret, colind, ncol+1);
+    hash_combine(ret, row, colind[ncol]);
     return ret;
   }
 

@@ -2619,8 +2619,17 @@ namespace casadi {
 
   bool SparsityInternal::isEqual(int nrow, int ncol, const std::vector<int>& colind,
                                  const std::vector<int>& row) const {
+    casadi_assert(colind.size()==ncol+1);
+    casadi_assert(row.size()==colind.back());
+    return isEqual(nrow, ncol, getPtr(colind), getPtr(row));
+  }
+
+  bool SparsityInternal::isEqual(int nrow, int ncol, const int* colind, const int* row) const {
+    // Get number of nonzeros
+    int nz = colind[ncol];
+
     // First check dimensions and number of non-zeros
-    if (nnz()!=row.size() || ncol_!=ncol || nrow_!=nrow)
+    if (nnz()!=nz || ncol_!=ncol || nrow_!=nrow)
       return false;
 
     // Check if dense
@@ -2628,11 +2637,11 @@ namespace casadi {
       return true;
 
     // Check the number of non-zeros per col
-    if (!equal(colind_.begin(), colind_.end(), colind.begin()))
+    if (!equal(colind_.begin(), colind_.end(), colind))
       return false;
 
     // Finally check the row indices
-    if (!equal(row_.begin(), row_.end(), row.begin()))
+    if (!equal(row_.begin(), row_.end(), row))
       return false;
 
     // Equal if reached this point
@@ -3840,6 +3849,22 @@ namespace casadi {
       }
     }
     return bw;
+  }
+
+  const int* SparsityInternal::row() const {
+    return getPtr(row_);
+  }
+
+  const int* SparsityInternal::colind() const {
+    return getPtr(colind_);
+  }
+
+  std::vector<int> SparsityInternal::getColind() const {
+    return colind_;
+  }
+
+  std::vector<int> SparsityInternal::getRow() const {
+    return row_;
   }
 
 } // namespace casadi

@@ -256,6 +256,10 @@ namespace casadi {
     bool isEqual(const Sparsity& y) const;
     bool isEqual(int nrow, int ncol, const std::vector<int>& colind,
                  const std::vector<int>& row) const;
+#ifndef SWIG
+    bool isEqual(int nrow, int ncol, const int* colind, const int* row) const;
+#endif // SWIG
+
     bool operator==(const Sparsity& y) const { return isEqual(y);}
     /// @}
 
@@ -741,6 +745,9 @@ namespace casadi {
     void assignCached(int nrow, int ncol, const std::vector<int>& colind,
                       const std::vector<int>& row);
 
+    /// Construct a sparsity pattern from vectors, reuse cached pattern if possible
+    void assignCached(int nrow, int ncol, const int* colind, const int* row);
+
 #endif //SWIG
   };
 
@@ -755,15 +762,24 @@ namespace casadi {
     seed ^= hash_value(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
   }
 
+  /** \brief Generate a hash value incrementally, array */
+  inline void hash_combine(std::size_t& seed, const int* v, int sz) {
+    for (int i=0; i<sz; ++i) hash_combine(seed, v[i]);
+  }
+
   /** \brief Generate a hash value incrementally (function taken from boost) */
   inline void hash_combine(std::size_t& seed, const std::vector<int>& v) {
-    for (std::vector<int>::const_iterator i=v.begin(); i!=v.end(); ++i) hash_combine(seed, *i);
+    hash_combine(seed, getPtr(v), v.size());
   }
 
   /** \brief Hash a sparsity pattern */
   CASADI_EXPORT std::size_t hash_sparsity(int nrow, int ncol,
-                                                   const std::vector<int>& colind,
-                                                   const std::vector<int>& row);
+                                          const std::vector<int>& colind,
+                                          const std::vector<int>& row);
+
+  CASADI_EXPORT std::size_t hash_sparsity(int nrow, int ncol,
+                                          const int* colind,
+                                          const int* row);
   /// \endcond
 
 #ifndef SWIG

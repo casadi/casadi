@@ -38,6 +38,13 @@ namespace casadi {
                      const std::vector<int>& row) :
         nrow_(nrow), ncol_(ncol), colind_(colind), row_(row) { sanityCheck(false); }
 
+    /// Construct a sparsity pattern from arrays
+    SparsityInternal(int nrow, int ncol, const int* colind, const int* row) :
+      nrow_(nrow), ncol_(ncol),
+      colind_(colind, colind+ncol+1), row_(row, row+colind[ncol]) {
+        sanityCheck(false);
+      }
+
     /// Check if the dimensions and colind, row vectors are compatible
     void sanityCheck(bool complete=false) const;
 
@@ -180,6 +187,18 @@ namespace casadi {
      */
     int scatter(int j, std::vector<int>& w, int mark, Sparsity& C, int nz) const;
 
+    /** \brief Get row indices (see public class) */
+    const int* row() const;
+
+    /** \brief Get column offsets (see public class) */
+    const int* colind() const;
+
+    /// Get row() as a vector
+    std::vector<int> getRow() const;
+
+    /// Get colind() as a vector
+    std::vector<int> getColind() const;
+
     /// Get the column for each nonzero
     std::vector<int> getCol() const;
 
@@ -282,6 +301,9 @@ namespace casadi {
     /// Check if two sparsity patterns are the same
     bool isEqual(int nrow, int ncol, const std::vector<int>& colind,
                  const std::vector<int>& row) const;
+
+    /// Check if two sparsity patterns are the same
+    bool isEqual(int nrow, int ncol, const int* colind, const int* row) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
     void enlargeRows(int nrow, const std::vector<int>& rr, bool ind1);
