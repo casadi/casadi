@@ -1201,6 +1201,8 @@ namespace casadi {
 
     //-- Construct matrix C -----------------------------------------------
     Sparsity AT = T() ;              // compute A'
+    vector<int> AT_colind = AT.getColind();
+    vector<int> AT_row = AT.getRow();
 
     int m = size1();
     int n = size2();
@@ -1214,8 +1216,6 @@ namespace casadi {
     } else if (order==2) {
 
       // drop dense rows from AT
-      vector<int>& AT_colind = AT->colind_;
-      vector<int>& AT_row = AT->row_;
       for (p2=0, j=0; j<m; ++j) {
 
         // row j of AT starts here
@@ -1237,9 +1237,10 @@ namespace casadi {
 
       // Resize row vector
       AT_row.resize(p2);
+      AT = Sparsity(AT.size1(), AT.size2(), AT_colind, AT_row);
 
       // A2 = AT'
-      Sparsity A2 = AT->T();
+      Sparsity A2 = AT.T();
 
       // C=A'*A with no dense columns
       C = AT->multiply(A2);
@@ -1247,13 +1248,15 @@ namespace casadi {
       // C=A'*A
       C = AT->multiply(shared_from_this<Sparsity>());
     }
+    vector<int> C_colind = C.getColind();
+    vector<int> C_row = C.getRow();
 
     // Free memory
     AT = Sparsity();
     // drop diagonal entries
-    drop(diag, 0, C->size1(), C->size2(), C->colind_, C->row_);
+    drop(diag, 0, C.size1(), C.size2(), C_colind, C_row);
 
-    Cp = &C->colind_.front();
+    Cp = &C_colind.front();
     cnz = Cp[n] ;
 
     // allocate result
@@ -1280,7 +1283,7 @@ namespace casadi {
 
     len[n] = 0;
     nzmax = C.nnz();
-    Ci = &C->row_.front() ;
+    Ci = &C_row.front() ;
     for (i=0; i<=n; ++i) {
       // degree list i is empty
       head[i] = -1;
