@@ -2083,11 +2083,12 @@ namespace casadi {
     return std::pair<int, int>(size1(), size2());
   }
 
-  void SparsityInternal::erase(const vector<int>& rr, bool ind1, std::vector<int>& mapping) {
+  Sparsity SparsityInternal::zz_erase(const vector<int>& rr, bool ind1,
+                                      std::vector<int>& mapping) const {
     // Quick return if nothing to erase
     if (rr.empty()) {
       mapping = range(nnz());
-      return;
+      return shared_from_this<Sparsity>();
     }
 
     if (!inBounds(rr, -numel()+ind1, numel()+ind1)) {
@@ -2105,21 +2106,21 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += numel();
       }
-      return erase(rr_mod, false, mapping); // Call recursively
+      return zz_erase(rr_mod, false, mapping); // Call recursively
     }
 
     // Sort rr in non-deceasing order, if needed
     if (!isNonDecreasing(rr)) {
       std::vector<int> rr_sorted = rr;
       std::sort(rr_sorted.begin(), rr_sorted.end());
-      return erase(rr_sorted, false, mapping);
+      return zz_erase(rr_sorted, false, mapping);
     }
 
     // Mapping
     mapping.resize(0);
 
     // Quick return if no elements
-    if (numel()==0) return;
+    if (numel()==0) return shared_from_this<Sparsity>();
 
     // Reserve memory
     mapping.reserve(nnz());
@@ -2130,6 +2131,9 @@ namespace casadi {
     // Elements to be erased
     vector<int>::const_iterator next_rr = rr.begin();
 
+    // Return value
+    vector<int> ret_colind = getColind(), ret_row = getRow();
+
     // First and last index for the column (note colind_ is being overwritten)
     int k_first, k_last=0;
 
@@ -2137,12 +2141,12 @@ namespace casadi {
     for (int j=0; j<size2(); ++j) {
       // Update k range
       k_first = k_last;
-      k_last = colind_[j+1];
+      k_last = ret_colind[j+1];
 
       // Loop over nonzeros
       for (int k=k_first; k<k_last; ++k) {
         // Get row
-        int i=row_[k];
+        int i=ret_row[k];
 
         // Corresponding element
         int el = i+j*size1();
@@ -2160,19 +2164,21 @@ namespace casadi {
         mapping.push_back(k);
 
         // Update row
-        row_[nz++] = i;
+        ret_row[nz++] = i;
       }
 
       // Update colind
-      colind_[j+1] = nz;
+      ret_colind[j+1] = nz;
     }
 
     // Truncate row vector
-    row_.resize(nz);
+    ret_row.resize(nz);
+
+    return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
-  void SparsityInternal::erase(const vector<int>& rr, const vector<int>& cc, bool ind1,
-                               std::vector<int>& mapping) {
+  Sparsity SparsityInternal::zz_erase(const vector<int>& rr, const vector<int>& cc,
+                                      bool ind1, std::vector<int>& mapping) const {
     if (!inBounds(rr, -size1()+ind1, size1()+ind1)) {
       casadi_error("Slicing [rr, cc] out of bounds. Your rr contains " <<
                    *std::min_element(rr.begin(), rr.end()) << " up to " <<
@@ -2208,17 +2214,20 @@ namespace casadi {
       std::sort(cc_mod.begin(), cc_mod.end());
 
       // Call recursively
-      return erase(rr_mod, cc_mod, false, mapping);
+      return zz_erase(rr_mod, cc_mod, false, mapping);
     }
 
     // Mapping
     mapping.resize(0);
 
     // Quick return if no elements
-    if (numel()==0) return;
+    if (numel()==0) return shared_from_this<Sparsity>();
 
     // Reserve memory
     mapping.reserve(nnz());
+
+    // Return value
+    vector<int> ret_colind = getColind(), ret_row = getRow();
 
     // Number of non-zeros
     int nz=0;
@@ -2233,7 +2242,7 @@ namespace casadi {
     for (int i=0; i<size2(); ++i) {
       // Update beginning and end of non-zero indices
       el_first = el_last;
-      el_last = colind_[i+1];
+      el_last = ret_colind[i+1];
 
       // Is it a col that can be deleted
       bool deletable_col = ie!=cc.end() && *ie==i;
@@ -2246,7 +2255,7 @@ namespace casadi {
         // Loop over nonzero elements of the col
         for (int el=el_first; el<el_last; ++el) {
           // Row
-          int j=row_[el];
+          int j=ret_row[el];
 
           // Continue to the next row to skip
           for (; je!=rr.end() && *je<j; ++je) {}
@@ -2261,28 +2270,30 @@ namespace casadi {
           mapping.push_back(el);
 
           // Update row and increase nonzero counter
-          row_[nz++] = j;
+          ret_row[nz++] = j;
         }
       } else {
         // Loop over nonzero elements of the col
         for (int el=el_first; el<el_last; ++el) {
           // Row
-          int j=row_[el];
+          int j=ret_row[el];
 
           // Save old nonzero for each new nonzero
           mapping.push_back(el);
 
           // Update row and increase nonzero counter
-          row_[nz++] = j;
+          ret_row[nz++] = j;
         }
       }
 
       // Register last nonzero of the col
-      colind_[i+1]=nz;
+      ret_colind[i+1]=nz;
     }
 
     // Truncate row matrix
-    row_.resize(nz);
+    ret_row.resize(nz);
+
+    return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
   vector<int> SparsityInternal::getNZ(const vector<int>& rr, const vector<int>& cc) const {

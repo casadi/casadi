@@ -283,16 +283,14 @@ namespace casadi {
 
   std::vector<int> Sparsity::erase(const std::vector<int>& rr, const std::vector<int>& cc,
                                    bool ind1) {
-    makeUnique();
     vector<int> mapping;
-    (*this)->erase(rr, cc, ind1, mapping);
+    *this = (*this)->zz_erase(rr, cc, ind1, mapping);
     return mapping;
   }
 
   std::vector<int> Sparsity::erase(const std::vector<int>& rr, bool ind1) {
-    makeUnique();
     vector<int> mapping;
-    (*this)->erase(rr, ind1, mapping);
+    *this = (*this)->zz_erase(rr, ind1, mapping);
     return mapping;
   }
 
