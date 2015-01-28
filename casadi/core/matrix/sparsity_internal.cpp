@@ -2083,9 +2083,12 @@ namespace casadi {
     return std::pair<int, int>(size1(), size2());
   }
 
-  vector<int> SparsityInternal::erase(const vector<int>& rr, bool ind1) {
+  void SparsityInternal::erase(const vector<int>& rr, bool ind1, std::vector<int>& mapping) {
     // Quick return if nothing to erase
-    if (rr.empty()) return range(nnz());
+    if (rr.empty()) {
+      mapping = range(nnz());
+      return;
+    }
 
     if (!inBounds(rr, -numel()+ind1, numel()+ind1)) {
       casadi_error("Slicing [rr] out of bounds. Your rr contains " <<
@@ -2102,21 +2105,21 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += numel();
       }
-      return erase(rr_mod, false); // Call recursively
+      return erase(rr_mod, false, mapping); // Call recursively
     }
 
     // Sort rr in non-deceasing order, if needed
     if (!isNonDecreasing(rr)) {
       std::vector<int> rr_sorted = rr;
       std::sort(rr_sorted.begin(), rr_sorted.end());
-      return erase(rr_sorted, false);
+      return erase(rr_sorted, false, mapping);
     }
 
     // Mapping
-    vector<int> mapping;
+    mapping.resize(0);
 
     // Quick return if no elements
-    if (numel()==0) return mapping;
+    if (numel()==0) return;
 
     // Reserve memory
     mapping.reserve(nnz());
@@ -2166,10 +2169,10 @@ namespace casadi {
 
     // Truncate row vector
     row_.resize(nz);
-    return mapping;
   }
 
-  vector<int> SparsityInternal::erase(const vector<int>& rr, const vector<int>& cc, bool ind1) {
+  void SparsityInternal::erase(const vector<int>& rr, const vector<int>& cc, bool ind1,
+                               std::vector<int>& mapping) {
     if (!inBounds(rr, -size1()+ind1, size1()+ind1)) {
       casadi_error("Slicing [rr, cc] out of bounds. Your rr contains " <<
                    *std::min_element(rr.begin(), rr.end()) << " up to " <<
@@ -2205,14 +2208,14 @@ namespace casadi {
       std::sort(cc_mod.begin(), cc_mod.end());
 
       // Call recursively
-      return erase(rr_mod, cc_mod, false);
+      return erase(rr_mod, cc_mod, false, mapping);
     }
 
     // Mapping
-    vector<int> mapping;
+    mapping.resize(0);
 
     // Quick return if no elements
-    if (numel()==0) return mapping;
+    if (numel()==0) return;
 
     // Reserve memory
     mapping.reserve(nnz());
@@ -2280,8 +2283,6 @@ namespace casadi {
 
     // Truncate row matrix
     row_.resize(nz);
-
-    return mapping;
   }
 
   vector<int> SparsityInternal::getNZ(const vector<int>& rr, const vector<int>& cc) const {

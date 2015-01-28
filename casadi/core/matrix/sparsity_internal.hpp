@@ -342,10 +342,11 @@ namespace casadi {
     Sparsity makeDense(std::vector<int>& mapping) const;
 
     /// Erase rows and/or columns - does bounds checking
-    std::vector<int> erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1);
+    void erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1,
+               std::vector<int>& mapping);
 
     /// Erase elements
-    std::vector<int> erase(const std::vector<int>& rr, bool ind1);
+    void erase(const std::vector<int>& rr, bool ind1, std::vector<int>& mapping);
 
     /// Append another sparsity patten vertically (vectors only)
     Sparsity zz_appendVector(const SparsityInternal& sp) const;
