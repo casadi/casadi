@@ -58,6 +58,21 @@ namespace casadi {
         sanityCheck(false);
       }
 
+    /** \brief Get number of rows (see public class) */
+    inline int size1() const { return nrow_;}
+
+    /** \brief Get number of columns (see public class) */
+    inline int size2() const { return ncol_;}
+
+    /** \brief Get column offsets (see public class) */
+    inline const int* colind() const { return colind_.empty() ? 0 : &colind_.front();}
+
+    /** \brief Get row indices (see public class) */
+    inline const int* row() const { return row_.empty() ? 0 : &row_.front();}
+
+    /// Number of structural non-zeros
+    inline int nnz() const { return row_.size();}
+
     /// Check if the dimensions and colind, row vectors are compatible
     void sanityCheck(bool complete=false) const;
 
@@ -200,18 +215,6 @@ namespace casadi {
      */
     int scatter(int j, std::vector<int>& w, int mark, Sparsity& C, int nz) const;
 
-    /** \brief Get number of rows (see public class) */
-    int size1() const { return nrow_;}
-
-    /** \brief Get number of columns (see public class) */
-    int size2() const { return ncol_;}
-
-    /** \brief Get column offsets (see public class) */
-    const int* colind() const;
-
-    /** \brief Get row indices (see public class) */
-    const int* row() const;
-
     /// Get row() as a vector
     std::vector<int> getRow() const;
 
@@ -226,9 +229,6 @@ namespace casadi {
 
     /// Reshape a sparsity, order of nonzeros remains the same
     Sparsity zz_reshape(int nrow, int ncol) const;
-
-    /// Number of structural non-zeros
-    int nnz() const;
 
     /// Number of elements
     int numel() const;
