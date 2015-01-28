@@ -364,12 +364,14 @@ namespace casadi {
     if (tail == 0) return;
 
     Sparsity trans;
-    const SparsityInternal *C;
+    const int *C_row, *C_colind;
     if (mark == 1) {
-      C = this;
+      C_row = row();
+      C_colind = colind();
     } else {
       trans = T();
-      C = static_cast<const SparsityInternal *>(trans.get());
+      C_row = trans.row();
+      C_colind = trans.colind();
     }
 
     // while queue is not empty
@@ -377,8 +379,8 @@ namespace casadi {
 
       // get the head of the queue
       j = queue[head++];
-      for (p = C->colind_[j] ; p < C->colind_[j+1] ; p++) {
-        i = C->row_[p] ;
+      for (p = C_colind[j] ; p < C_colind[j+1] ; p++) {
+        i = C_row[p] ;
 
         // skip if i is marked
         if (wi[i] >= 0) continue;
