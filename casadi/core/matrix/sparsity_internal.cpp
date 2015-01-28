@@ -668,9 +668,8 @@ namespace casadi {
     vector<int> pinv = invertPermutation(rowperm);
 
     // C=A(p, q) (it will hold A(R2, C2))
-    Sparsity C = permute(pinv, colperm, 0);
-
-    vector<int>& colind_C = C->colind_;
+    std::vector<int> colind_C, row_C;
+    permute(pinv, colperm, 0, colind_C, row_C);
 
     // delete rows C0, C1, and C3 from C
     int nc = coarse_colblock[3] - coarse_colblock[2];
@@ -678,24 +677,24 @@ namespace casadi {
       for (int j = coarse_colblock[2]; j <= coarse_colblock[3]; ++j)
         colind_C[j-coarse_colblock[2]] = colind_C[j];
     }
-    C->ncol_ = nc;
+    int ncol_C = nc;
 
-    C->colind_.resize(nc+1);
+    colind_C.resize(nc+1);
     // delete columns R0, R1, and R3 from C
     if (coarse_rowblock[2] - coarse_rowblock[1] < size1()) {
-      drop(rprune, &coarse_rowblock, C->size1(), C->size2(), C->colind_, C->row_);
+      drop(rprune, &coarse_rowblock, size1(), ncol_C, colind_C, row_C);
       int cnz = colind_C[nc];
-      vector<int>& row_C = C->row_;
       if (coarse_rowblock[1] > 0)
         for (int k=0; k<cnz; ++k)
           row_C[k] -= coarse_rowblock[1];
     }
-    C->row_.resize(C->colind_.back());
-    C->nrow_ = nc ;
+    row_C.resize(colind_C.back());
+    int nrow_C = nc ;
+    Sparsity C(nrow_C, ncol_C, colind_C, row_C);
 
     // find strongly connected components of C
     vector<int> scc_p, scc_r;
-    int scc_nb = C->stronglyConnectedComponents(scc_p, scc_r);
+    int scc_nb = C.stronglyConnectedComponents(scc_p, scc_r);
 
     // --- Combine coarse and fine decompositions ---------------------------
 
