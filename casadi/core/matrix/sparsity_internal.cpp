@@ -131,14 +131,15 @@ namespace casadi {
   void SparsityInternal::print(ostream &stream) const {
     repr(stream);
     stream << endl;
-    stream << "colind: " << colind_ << endl;
-    stream << "row:    " << row_ << endl;
+    stream << "colind: " << getColind() << endl;
+    stream << "row:    " << getRow() << endl;
   }
 
   vector<int> SparsityInternal::getCol() const {
+    const int* colind = this->colind();
     vector<int> col(nnz());
     for (int r=0; r<size2(); ++r) {
-      for (int el = colind_[r]; el < colind_[r+1]; ++el) {
+      for (int el = colind[r]; el < colind[r+1]; ++el) {
         col[el] = r;
       }
     }
@@ -168,6 +169,7 @@ namespace casadi {
     // Allocate workspace
     vector<int> ancestor(size2());
     vector<int> prev(ata ? size1() : 0, -1);
+    const int* colind = this->colind();
 
     // Loop over columns
     for (int k=0; k<size2(); ++k) {
@@ -176,7 +178,7 @@ namespace casadi {
       ancestor[k] = -1;
 
       // Loop over nonzeros
-      for (int p=colind_[k]; p<colind_[k+1]; ++p) {
+      for (int p=colind[k]; p<colind[k+1]; ++p) {
 
         // What is this?
         int i=ata ? (prev[row_[p]]) : (row_[p]);
@@ -213,6 +215,7 @@ namespace casadi {
                                          std::vector<int>& pstack, const std::vector<int>& pinv,
                                          std::vector<bool>& marked) const {
     int head = 0;
+    const int* colind = this->colind();
 
     // initialize the recursion stack
     xi[0] = j;
@@ -225,12 +228,12 @@ namespace casadi {
 
         // mark node j as visited
         marked[j]=true;
-        pstack[head] = (jnew < 0) ? 0 : colind_[jnew];
+        pstack[head] = (jnew < 0) ? 0 : colind[jnew];
       }
 
       // node j done if no unvisited neighbors
       int done = 1;
-      int p2 = (jnew < 0) ? 0 : colind_[jnew+1];
+      int p2 = (jnew < 0) ? 0 : colind[jnew+1];
 
       // examine all neighbors of j
       for (int p = pstack[head]; p< p2; ++p) {
@@ -446,6 +449,7 @@ namespace casadi {
                                         std::vector<int>& w, int *js, int *is, int *ps) const {
     // NOTE: This implementation has been copied from CSparse and then modified,
     // it needs cleaning up to be proper C++
+    const int* colind = this->colind();
 
     int found = 0, p, i = -1, head = 0, j ;
 
@@ -463,7 +467,7 @@ namespace casadi {
 
         // mark j as visited for kth path
         w[j] = k;
-        for (p = cheap[j] ; p < colind_[j+1] && !found; ++p) {
+        for (p = cheap[j] ; p < colind[j+1] && !found; ++p) {
           i = row_[p] ;            /* try a cheap assignment (i, j) */
           found = (jmatch[i] == -1) ;
         }
@@ -479,11 +483,11 @@ namespace casadi {
         }
 
         // no cheap match: start dfs for j
-        ps[head] = colind_[j];
+        ps[head] = colind[j];
       }
 
       // --- Depth-first-search of neighbors of j -------------------------
-      for (p = ps[head]; p<colind_[j+1]; ++p) {
+      for (p = ps[head]; p<colind[j+1]; ++p) {
 
         // consider col i
         i = row_[p];
@@ -503,7 +507,7 @@ namespace casadi {
       }
 
       // node j is done; pop from stack
-      if (p == colind_[j+1]) head--;
+      if (p == colind[j+1]) head--;
     } // augment the match if path found:
 
     if (found)
@@ -515,6 +519,7 @@ namespace casadi {
                                         Sparsity& trans, int seed) const {
     // NOTE: This implementation has been copied from CSparse and then modified,
     // it needs cleaning up to be proper C++
+    const int* colind = this->colind();
 
     int n2 = 0, m2 = 0;
 
@@ -526,8 +531,8 @@ namespace casadi {
     // count nonempty columns and rows
     int k=0;
     for (int j=0; j<size2(); ++j) {
-      n2 += (colind_[j] < colind_[j+1]);
-      for (int p=colind_[j]; p < colind_[j+1]; ++p) {
+      n2 += (colind[j] < colind[j+1]);
+      for (int p=colind[j]; p < colind[j+1]; ++p) {
         w[row_[p]] = 1;
 
         // count entries already on diagonal
@@ -554,6 +559,7 @@ namespace casadi {
 
     // Get pointer to sparsity
     const SparsityInternal* C = m2 < n2 ? static_cast<const SparsityInternal*>(trans.get()) : this;
+    const int* C_colind = C->colind();
 
     std::vector<int>& Cjmatch = m2 < n2 ? imatch : jmatch;
     std::vector<int>& Cimatch = m2 < n2 ? jmatch : imatch;
@@ -568,7 +574,7 @@ namespace casadi {
 
     // for cheap assignment
     for (int j=0; j<C->size2(); ++j)
-      cheap[j] = C->colind_[j];
+      cheap[j] = C_colind[j];
 
     // all rows unflagged
     for (int j=0; j<C->size2(); ++j)
@@ -1740,8 +1746,8 @@ namespace casadi {
 
   int SparsityInternal::scatter(int j, std::vector<int>& w, int mark, Sparsity& C, int nz) const {
     int i, p;
-    const int *Ap = &colind_.front();
-    const int *Ai = &row_.front();
+    const int *Ap = colind();
+    const int *Ai = row();
     int *Ci = &C->row_.front();
 
     for (p = Ap[j]; p<Ap[j+1]; ++p) {
@@ -1763,7 +1769,7 @@ namespace casadi {
     int nz = 0;
     casadi_assert_message(size2() == B.size1(), "Dimension mismatch.");
     int m = size1();
-    int anz = colind_[size2()];
+    int anz = nnz();
     int n = B.size2();
     const int* Bp = B.colind();
     const int* Bi = B.row();
