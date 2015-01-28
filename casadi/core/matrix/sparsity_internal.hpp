@@ -348,7 +348,7 @@ namespace casadi {
     std::vector<int> erase(const std::vector<int>& rr, bool ind1);
 
     /// Append another sparsity patten vertically (vectors only)
-    void append(const SparsityInternal& sp);
+    Sparsity zz_appendVector(const SparsityInternal& sp) const;
 
     /// Append another sparsity patten horizontally
     Sparsity zz_appendColumns(const SparsityInternal& sp) const;

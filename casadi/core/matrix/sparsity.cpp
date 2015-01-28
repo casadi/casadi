@@ -428,9 +428,8 @@ namespace casadi {
         // No rows before
         *this = sp;
       } else if (isVector()) {
-        // Append to vector (efficient)
-        makeUnique();
-        (*this)->append(*sp);
+        // Append to vector (inefficient)
+        *this = (*this)->zz_appendVector(*sp);
       } else {
         // Append to matrix (inefficient)
         *this = vertcat(*this, sp);
