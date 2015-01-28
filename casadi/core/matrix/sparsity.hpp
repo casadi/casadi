@@ -266,6 +266,14 @@ namespace casadi {
     /// Check if two sparsity patterns are difference
     bool operator!=(const Sparsity& y) const {return !isEqual(y);}
 
+#ifndef SWIG
+    /** \brief Implicit or explicit type conversion to C representation
+        In the C runtime, sparsity patterns are represented as a "const int*".
+        This enables using the C runtime functions using a natural syntax.
+    */
+    operator const int*() const;
+#endif // SWIG
+
     /// \name Size and element counting
     /// @{
 

@@ -1078,21 +1078,7 @@ namespace casadi {
   }
 
   std::vector<int> Sparsity::compress() const {
-    // Get the sparsity pattern
-    int nrow = this->size1();
-    int ncol = this->size2();
-    int sz = this->nnz();
-    const int* colind = this->colind();
-    const int* row = this->row();
-
-    // Create compressed pattern
-    vector<int> ret;
-    ret.reserve(2 + ncol + 1 + sz);
-    ret.push_back(nrow);
-    ret.push_back(ncol);
-    ret.insert(ret.end(), colind, colind+ncol+1);
-    ret.insert(ret.end(), row, row + sz);
-    return ret;
+    return (*this)->sp();
   }
 
   Sparsity Sparsity::compressed(const std::vector<int>& v) {
@@ -1293,6 +1279,10 @@ namespace casadi {
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
     dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
     return coarse_colblock.at(3);
+  }
+
+  Sparsity::operator const int*() const {
+    return &(*this)->sp().front();
   }
 
 } // namespace casadi

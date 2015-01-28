@@ -53,6 +53,9 @@ namespace casadi {
     }
 
     /** \brief Get number of rows (see public class) */
+    inline const std::vector<int>& sp() const { return sp_;}
+
+    /** \brief Get number of rows (see public class) */
     inline int size1() const { return sp_[0];}
 
     /** \brief Get number of columns (see public class) */
