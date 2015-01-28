@@ -168,6 +168,12 @@ namespace casadi {
     /// C = A(p, q) where p and q are permutations of 0..m-1 and 0..n-1.: see cs_permute in CSparse
     Sparsity permute(const std::vector<int>& pinv, const std::vector<int>& q, int values) const;
 
+    /// C = A(p, q) where p and q are permutations of 0..m-1 and 0..n-1.: see cs_permute in CSparse
+    void permute(const std::vector<int>& pinv,
+                 const std::vector<int>& q, int values,
+                 std::vector<int>& colind_C,
+                 std::vector<int>& row_C) const;
+
     /// consider A(i, j), node j in ith col subtree and return lca(jprev, j): See cs_leaf in CSparse
     static int leaf(int i, int j, const int *first, int *maxfirst,
                      int *prevleaf, int *ancestor, int *jleaf);

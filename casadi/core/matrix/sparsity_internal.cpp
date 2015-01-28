@@ -805,16 +805,20 @@ namespace casadi {
 
   Sparsity SparsityInternal::permute(const std::vector<int>& pinv,
                                      const std::vector<int>& q, int values) const {
-    // alloc result
-    Sparsity C = Sparsity(size1(), size2());
+    std::vector<int> colind_C, row_C;
+    permute(pinv, q, values, colind_C, row_C);
+    return Sparsity(size1(), size2(), colind_C, row_C);
+  }
 
-    // Col offset
-    vector<int>& colind_C = C->colind_;
+  void SparsityInternal::permute(const std::vector<int>& pinv,
+                                 const std::vector<int>& q, int values,
+                                 std::vector<int>& colind_C,
+                                 std::vector<int>& row_C) const {
+    // alloc column offsets
+    colind_C.resize(size2()+1);
 
     // Row for each nonzero
-    vector<int>& row_C = C->row_;
     row_C.resize(nnz());
-
     int nz = 0;
     for (int k = 0; k<size2(); ++k) {
       // row k of C is row q[k] of A
@@ -829,7 +833,6 @@ namespace casadi {
 
     // finalize the last row of C
     colind_C[size2()] = nz;
-    return C;
   }
 
   int SparsityInternal::drop(int (*fkeep)(int, int, double, void *), void *other) {
