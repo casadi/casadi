@@ -3395,9 +3395,7 @@ namespace casadi {
     }
 
     // Create return sparsity containing the coloring
-    Sparsity ret(size2(), forbiddenColors.size());
-    vector<int>& ret_colind = ret->colind_;
-    vector<int>& ret_row = ret->row_;
+    vector<int> ret_colind(forbiddenColors.size()+1, 0), ret_row;
 
     // Get the number of rows for each col
     for (int i=0; i<color.size(); ++i) {
@@ -3422,8 +3420,7 @@ namespace casadi {
     ret_colind[0] = 0;
 
     // Return the coloring
-    return ret;
-
+    return Sparsity(size2(), forbiddenColors.size(), ret_colind, ret_row);
   }
 
   Sparsity SparsityInternal::starColoring(int ordering, int cutoff) const {
