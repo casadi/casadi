@@ -683,7 +683,7 @@ namespace casadi {
     C->colind_.resize(nc+1);
     // delete columns R0, R1, and R3 from C
     if (coarse_rowblock[2] - coarse_rowblock[1] < size1()) {
-      C->drop(rprune, &coarse_rowblock);
+      drop(rprune, &coarse_rowblock, C->size1(), C->size2(), C->colind_, C->row_);
       int cnz = colind_C[nc];
       vector<int>& row_C = C->row_;
       if (coarse_rowblock[1] > 0)
@@ -835,25 +835,27 @@ namespace casadi {
     colind_C[size2()] = nz;
   }
 
-  int SparsityInternal::drop(int (*fkeep)(int, int, double, void *), void *other) {
+  int SparsityInternal::drop(int (*fkeep)(int, int, double, void *),
+                             void *other, int nrow, int ncol,
+                             std::vector<int>& colind, std::vector<int>& row) {
     int nz = 0;
 
-    for (int j = 0; j<size2(); ++j) {
+    for (int j = 0; j<ncol; ++j) {
       // get current location of row j
-      int p = colind_[j];
+      int p = colind[j];
 
       // record new location of row j
-      colind_[j] = nz;
-      for ( ; p < colind_[j+1] ; ++p) {
-        if (fkeep(row_[p], j, 1, other)) {
+      colind[j] = nz;
+      for ( ; p < colind[j+1] ; ++p) {
+        if (fkeep(row[p], j, 1, other)) {
           // keep A(i, j)
-          row_[nz++] = row_[p] ;
+          row[nz++] = row[p] ;
         }
       }
     }
 
     // finalize A
-    colind_[size2()] = nz;
+    colind[ncol] = nz;
     return nz ;
   }
 
@@ -1232,7 +1234,7 @@ namespace casadi {
     // Free memory
     AT = Sparsity();
     // drop diagonal entries
-    C->drop(diag, 0);
+    drop(diag, 0, C->size1(), C->size2(), C->colind_, C->row_);
 
     Cp = &C->colind_.front();
     cnz = Cp[n] ;
@@ -1758,7 +1760,7 @@ namespace casadi {
 
   Sparsity SparsityInternal::multiply(const Sparsity& B) const {
     int nz = 0;
-    casadi_assert_message(ncol_ == B.size1(), "Dimension mismatch.");
+    casadi_assert_message(size2() == B.size1(), "Dimension mismatch.");
     int m = size1();
     int anz = colind_[size2()];
     int n = B.size2();
@@ -1879,7 +1881,7 @@ namespace casadi {
       const SparsityInternal *sp;
 
       // Have a col vector
-      if (ncol_ == 1) {
+      if (size2() == 1) {
         sp = this;
       } else {
         trans = T();
@@ -2011,7 +2013,7 @@ namespace casadi {
   }
 
   bool SparsityInternal::isSquare() const {
-    return ncol_ == size1();
+    return size2() == size1();
   }
 
   bool SparsityInternal::isSymmetric() const {
@@ -2659,7 +2661,7 @@ namespace casadi {
   void SparsityInternal::append(const SparsityInternal& sp) {
     // NOTE: Works also if this == &sp
 
-    casadi_assert_message(ncol_ == sp.size2(),
+    casadi_assert_message(size2() == sp.size2(),
       "SparsityInternal::append(sp): column sizes must match but got " << size2() <<
       " for lhs, and " << sp.size2() << " for rhs.");
 

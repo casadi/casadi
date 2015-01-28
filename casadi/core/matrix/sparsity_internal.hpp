@@ -127,7 +127,9 @@ namespace casadi {
     /** \brief drop entries for which fkeep(A(i, j)) is false; return nz if OK, else -1: :
      * see cs_fkeep in CSparse
      */
-    int drop(int (*fkeep)(int, int, double, void *), void *other);
+    static int drop(int (*fkeep)(int, int, double, void *), void *other,
+                    int nrow, int ncol,
+                    std::vector<int>& colind, std::vector<int>& row);
 
     /// Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse
     int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm,
