@@ -557,8 +557,7 @@ namespace casadi {
   }
 
   void Sparsity::removeDuplicates(std::vector<int>& mapping) {
-    makeUnique();
-    (*this)->removeDuplicates(mapping);
+    *this = (*this)->zz_removeDuplicates(mapping);
   }
 
   std::vector<int> Sparsity::find(bool ind1) const {

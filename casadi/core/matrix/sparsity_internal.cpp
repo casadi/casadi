@@ -2942,8 +2942,11 @@ namespace casadi {
     return true;
   }
 
-  void SparsityInternal::removeDuplicates(std::vector<int>& mapping) {
+  Sparsity SparsityInternal::zz_removeDuplicates(std::vector<int>& mapping) const {
     casadi_assert(mapping.size()==nnz());
+
+    // Return value (to be hashed)
+    vector<int> ret_colind = getColind(), ret_row = getRow();
 
     // Nonzero counter without duplicates
     int k_strict=0;
@@ -2958,36 +2961,36 @@ namespace casadi {
       int new_colind = k_strict;
 
       // Loop over nonzeros (including duplicates)
-      for (int k=colind_[i]; k<colind_[i+1]; ++k) {
+      for (int k=ret_colind[i]; k<ret_colind[i+1]; ++k) {
 
         // Make sure that the rows appear sequentially
         casadi_assert_message(row_[k] >= lastrow, "rows are not sequential");
 
         // Skip if duplicate
-        if (row_[k] == lastrow)
-          continue;
+        if (ret_row[k] == lastrow) continue;
 
         // update last row encounterd on the col
-        lastrow = row_[k];
+        lastrow = ret_row[k];
 
         // Update mapping
         mapping[k_strict] = mapping[k];
 
         // Update row index
-        row_[k_strict] = row_[k];
+        ret_row[k_strict] = ret_row[k];
 
         // Increase the strict nonzero counter
         k_strict++;
       }
 
       // Update col offset
-      colind_[i] = new_colind;
+      ret_colind[i] = new_colind;
     }
 
     // Finalize the sparsity pattern
-    colind_[size2()] = k_strict;
-    row_.resize(k_strict);
+    ret_colind[size2()] = k_strict;
+    ret_row.resize(k_strict);
     mapping.resize(k_strict);
+    return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
   void SparsityInternal::find(std::vector<int>& loc, bool ind1) const {

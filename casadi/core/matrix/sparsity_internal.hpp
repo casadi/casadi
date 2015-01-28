@@ -386,7 +386,7 @@ namespace casadi {
      * The same indices will be removed from the mapping vector,
      * which must have the same length as the number of nonzeros
      */
-    void removeDuplicates(std::vector<int>& mapping);
+    Sparsity zz_removeDuplicates(std::vector<int>& mapping) const;
 
     /// Get element index for each nonzero
     void find(std::vector<int>& loc, bool ind1) const;
