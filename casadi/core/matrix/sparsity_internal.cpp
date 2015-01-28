@@ -2669,7 +2669,8 @@ namespace casadi {
     return isEqual(y_nrow, y_ncol, getPtr(y_colind), getPtr(y_row));
   }
 
-  bool SparsityInternal::isEqual(int y_nrow, int y_ncol, const int* y_colind, const int* y_row) const {
+  bool SparsityInternal::isEqual(int y_nrow, int y_ncol,
+                                 const int* y_colind, const int* y_row) const {
     // Get number of nonzeros
     int nz = y_colind[y_ncol];
 
