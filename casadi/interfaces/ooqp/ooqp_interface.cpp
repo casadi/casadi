@@ -160,8 +160,8 @@ namespace casadi {
 
     // Get quadratic term
     const vector<double>& H = input(QP_SOLVER_H).data();
-    const vector<int>& H_colind = input(QP_SOLVER_H).colind();
-    const vector<int>& H_row = input(QP_SOLVER_H).row();
+    const int* H_colind = input(QP_SOLVER_H).colind();
+    const int* H_row = input(QP_SOLVER_H).row();
     int nnzQ = 0;
     // Loop over the columns of the quadratic term
     for (int cc=0; cc<n_; ++cc) {
@@ -201,12 +201,12 @@ namespace casadi {
 
     // Get the transpose of the sparsity pattern to be able to loop over the constraints
     const vector<double>& A = input(QP_SOLVER_A).data();
-    const vector<int>& A_colind = input(QP_SOLVER_A).colind();
-    const vector<int>& A_row = input(QP_SOLVER_A).row();
+    const int* A_colind = input(QP_SOLVER_A).colind();
+    const int* A_row = input(QP_SOLVER_A).row();
     vector<double>& AT = AT_.data();
-    const vector<int>& AT_colind = AT_.colind();
-    const vector<int>& AT_row = AT_.row();
-    std::copy(AT_colind.begin(), AT_colind.begin()+nc_, AT_tmp_.begin());
+    const int* AT_colind = AT_.colind();
+    const int* AT_row = AT_.row();
+    std::copy(AT_colind, AT_colind+nc_, AT_tmp_.begin());
     for (int cc=0; cc<n_; ++cc) {
       for (int el=A_colind[cc]; el<A_colind[cc+1]; ++el) {
         int rr=A_row[el];
