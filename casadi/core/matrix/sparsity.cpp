@@ -37,7 +37,8 @@ namespace casadi {
   class EmptySparsity : public Sparsity {
   public:
     EmptySparsity() {
-      std::vector<int> colind(1, 0), row;
+      const int colind[1] = {0};
+      const int row[0] = {};
       assignNode(new SparsityInternal(0, 0, colind, row));
     }
   };
@@ -45,9 +46,8 @@ namespace casadi {
   class ScalarSparsity : public Sparsity {
   public:
     ScalarSparsity() {
-      std::vector<int> colind(2), row(1, 0);
-      colind[0] = 0;
-      colind[1] = 1;
+      const int colind[2] = {0, 1};
+      const int row[1] = {0};
       assignNode(new SparsityInternal(1, 1, colind, row));
     }
   };
@@ -55,7 +55,8 @@ namespace casadi {
   class ScalarSparseSparsity : public Sparsity {
   public:
     ScalarSparseSparsity() {
-      std::vector<int> colind(2, 0), row;
+      const int colind[2] = {0, 0};
+      const int row[1] = {0};
       assignNode(new SparsityInternal(1, 1, colind, row));
     }
   };

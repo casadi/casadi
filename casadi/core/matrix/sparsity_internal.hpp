@@ -46,11 +46,6 @@ namespace casadi {
     std::vector<int> row_;
 
   public:
-    /// Construct a sparsity pattern from vectors
-    SparsityInternal(int nrow, int ncol, const std::vector<int>& colind,
-                     const std::vector<int>& row) :
-        nrow_(nrow), ncol_(ncol), colind_(colind), row_(row) { sanityCheck(false); }
-
     /// Construct a sparsity pattern from arrays
     SparsityInternal(int nrow, int ncol, const int* colind, const int* row) :
       nrow_(nrow), ncol_(ncol),
