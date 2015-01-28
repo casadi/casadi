@@ -2694,9 +2694,9 @@ namespace casadi {
       new_row[i] = sp_row[i-sz] + size1();
 
     // New column indices
-    int new_colind[2] = {0, new_row.size()};
-
-    return Sparsity(size1()+sp.size1(), 1, vector<int>(new_colind, new_colind+2), new_row);
+    vector<int> new_colind(2, 0);
+    new_colind[1] = new_row.size();
+    return Sparsity(size1()+sp.size1(), 1, new_colind, new_row);
   }
 
   Sparsity SparsityInternal::zz_appendColumns(const SparsityInternal& sp) const {
