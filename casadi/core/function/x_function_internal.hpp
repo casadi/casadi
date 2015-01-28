@@ -650,16 +650,16 @@ namespace casadi {
 
     // Get the sparsity of the Jacobian block
     Sparsity jsp = jacSparsity(iind, oind, true, symmetric).T();
-    const int* jsp_colind = jsp.colindPtr();
-    const int* jsp_row = jsp.rowPtr();
+    const int* jsp_colind = jsp.colind();
+    const int* jsp_row = jsp.row();
 
     // Input sparsity
     std::vector<int> input_col = input(iind).sparsity().getCol();
-    const int* input_row = input(iind).rowPtr();
+    const int* input_row = input(iind).row();
 
     // Output sparsity
     std::vector<int> output_col = output(oind).sparsity().getCol();
-    const int* output_row = output(oind).rowPtr();
+    const int* output_row = output(oind).row();
 
     // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
     if (verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;

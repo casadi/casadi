@@ -252,8 +252,8 @@ namespace casadi{
     GUESTOBJECT* zz_sparse() const {
       mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
       $self->get(static_cast<double*>(mxGetData(p)));
-      std::copy($self->colindPtr(), $self->colindPtr()+$self->size2()+1, mxGetJc(p));
-      std::copy($self->rowPtr(), $self->rowPtr()+$self->size2()+1, mxGetIr(p));
+      std::copy($self->colind(), $self->colind()+$self->size2()+1, mxGetJc(p));
+      std::copy($self->row(), $self->row()+$self->size2()+1, mxGetIr(p));
       return p;
     }
 #endif

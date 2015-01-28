@@ -148,9 +148,9 @@ namespace casadi {
         pattern_[i][j].resize(CAij.sizeU());
         values_[i][j].resize(pattern_[i][j].size());
         int nz=0;
-        const int* colind = CAij.colindPtr();
+        const int* colind = CAij.colind();
         int ncol = CAij.size2();
-        const int* row = CAij.rowPtr();
+        const int* row = CAij.row();
         for (int cc=0; cc<ncol; ++cc) {
           int rr;
           // upper triangular part (= lower triangular part for row-major)
@@ -230,8 +230,8 @@ namespace casadi {
     }
     if (nc_>0) {
       DSDPCreateLPCone(dsdp_, &lpcone_);
-      LPConeSetData(lpcone_, nc_*2, mappingA_.output().colindPtr(),
-                    mappingA_.output().rowPtr(), mappingA_.output().ptr());
+      LPConeSetData(lpcone_, nc_*2, mappingA_.output().colind(),
+                    mappingA_.output().row(), mappingA_.output().ptr());
     }
 
     DSDPCreateBCone(dsdp_, &bcone_);

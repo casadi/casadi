@@ -71,9 +71,9 @@ namespace casadi {
     A_.nzmax = input().nnz();  // maximum number of entries
     A_.m = input().size1(); // number of rows
     A_.n = input().size2(); // number of columns
-    A_.p = const_cast<int*>(input().colindPtr()); // column pointers (size n+1)
+    A_.p = const_cast<int*>(input().colind()); // column pointers (size n+1)
                                                         // or col indices (size nzmax)
-    A_.i = const_cast<int*>(input().rowPtr()); // row indices, size nzmax
+    A_.i = const_cast<int*>(input().row()); // row indices, size nzmax
     A_.x = &input().front(); // numerical values, size nzmax
     A_.nz = -1; // of entries in triplet matrix, -1 for compressed-col
 

@@ -189,7 +189,7 @@ namespace casadi {
     if (!jacG_.isNull()) {
       Jcol = jacG_.output().sparsity().getCol();
       int sz = jacG_.output().nnz();
-      const int* row = jacG_.output().rowPtr();
+      const int* row = jacG_.output().row();
       Jrow = vector<int>(row, row+sz);
     }
 
@@ -197,9 +197,9 @@ namespace casadi {
     int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().sizeL();
     vector<int> Hcol(nnzH), Hrow(nnzH);
     if (nnzH>0) {
-      const int* colind = hessLag_.output().colindPtr();
+      const int* colind = hessLag_.output().colind();
       int ncol = hessLag_.output().size2();
-      const int* row = hessLag_.output().rowPtr();
+      const int* row = hessLag_.output().row();
       int nz=0;
       for (int cc=0; cc<ncol; ++cc) {
         for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {

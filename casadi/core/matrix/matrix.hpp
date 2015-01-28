@@ -186,8 +186,6 @@ namespace casadi {
     using B::isTriu;
     using B::colind;
     using B::row;
-    using B::colindPtr;
-    using B::rowPtr;
     using B::dimString;
     using B::sym;
     //using B::sparse;

@@ -229,8 +229,8 @@ namespace casadi {
     // Sparsities
     const Sparsity& r_sp = input[0]->sparsity();
     const Sparsity& A_sp = input[1]->sparsity();
-    const int* A_colind = A_sp.colindPtr();
-    const int* A_row = A_sp.rowPtr();
+    const int* A_colind = A_sp.colind();
+    const int* A_row = A_sp.row();
     int nrhs = r_sp.size2();
     int n = r_sp.size1();
     //    int nnz = A_sp.size();
@@ -299,8 +299,8 @@ namespace casadi {
   void LinearSolverInternal::spSolve(bvec_t* X, const bvec_t* B, bool transpose) const {
 
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
-    const int* A_colind = A_sp.colindPtr();
-    const int* A_row = A_sp.rowPtr();
+    const int* A_colind = A_sp.colind();
+    const int* A_row = A_sp.row();
     int nb = rowblock_.size()-1; // number of blocks
 
     if (!transpose) {

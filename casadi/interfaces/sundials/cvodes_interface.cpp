@@ -1191,9 +1191,9 @@ namespace casadi {
     }
 
     // Get sparsity and non-zero elements
-    const int* colind = jac_.output().colindPtr();
+    const int* colind = jac_.output().colind();
     int ncol = jac_.output().size2();
-    const int* row = jac_.output().rowPtr();
+    const int* row = jac_.output().row();
     const vector<double>& val = jac_.output().data();
 
     // Loop over columns
@@ -1249,9 +1249,9 @@ namespace casadi {
     }
 
     // Get sparsity and non-zero elements
-    const int* colind = jacB_.output().colindPtr();
+    const int* colind = jacB_.output().colind();
     int ncol = jacB_.output().size2();
-    const int* row = jacB_.output().rowPtr();
+    const int* row = jacB_.output().row();
     const vector<double>& val = jacB_.output().data();
 
     // Loop over columns
@@ -1318,9 +1318,9 @@ namespace casadi {
     jac_.evaluate();
 
     // Get sparsity and non-zero elements
-    const int* colind = jac_.output().colindPtr();
+    const int* colind = jac_.output().colind();
     int ncol = jac_.output().size2();
-    const int* row = jac_.output().rowPtr();
+    const int* row = jac_.output().row();
     const vector<double>& val = jac_.output().data();
 
     // Loop over cols
@@ -1378,9 +1378,9 @@ namespace casadi {
     }
 
     // Get sparsity and non-zero elements
-    const int* colind = jacB_.output().colindPtr();
+    const int* colind = jacB_.output().colind();
     int ncol = jacB_.output().size2();
-    const int* row = jacB_.output().rowPtr();
+    const int* row = jacB_.output().row();
     const vector<double>& val = jacB_.output().data();
 
     // Loop over columns

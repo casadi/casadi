@@ -523,9 +523,9 @@ namespace casadi {
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0) {
           // Reset Hessian approximation by dropping all off-diagonal entries
-          const int* colind = Bk_.colindPtr();      // Access sparsity (column offset)
+          const int* colind = Bk_.colind();      // Access sparsity (column offset)
           int ncol = Bk_.size2();
-          const int* row = Bk_.rowPtr();            // Access sparsity (row)
+          const int* row = Bk_.row();            // Access sparsity (row)
           vector<double>& data = Bk_.data();             // Access nonzero elements
           for (int cc=0; cc<ncol; ++cc) {     // Loop over the columns of the Hessian
             for (int el=colind[cc]; el<colind[cc+1]; ++el) {
@@ -653,8 +653,8 @@ namespace casadi {
     casadi_assert(x.size()==A.size1() && x.size()==A.size2());
 
     // Access the internal data of A
-    const int* A_colind = A.colindPtr();
-    const int* A_row = A.rowPtr();
+    const int* A_colind = A.colind();
+    const int* A_row = A.row();
     const std::vector<double> &A_data = A.data();
 
     // Return value
@@ -689,9 +689,9 @@ namespace casadi {
   }
 
   double Sqpmethod::getRegularization(const Matrix<double>& H) {
-    const int* colind = H.colindPtr();
+    const int* colind = H.colind();
     int ncol = H.size2();
-    const int* row = H.rowPtr();
+    const int* row = H.row();
     const vector<double>& data = H.data();
     double reg_param = 0;
     for (int cc=0; cc<ncol; ++cc) {
@@ -710,9 +710,9 @@ namespace casadi {
   }
 
   void Sqpmethod::regularize(Matrix<double>& H, double reg) {
-    const int* colind = H.colindPtr();
+    const int* colind = H.colind();
     int ncol = H.size2();
-    const int* row = H.rowPtr();
+    const int* row = H.row();
     vector<double>& data = H.data();
 
     for (int cc=0; cc<ncol; ++cc) {

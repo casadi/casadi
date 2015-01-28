@@ -134,8 +134,8 @@ namespace casadi {
     std::vector<int> getRow() const { return sparsity().getRow(); }
     std::vector<int> getColind() const { return sparsity().getColind(); }
 #ifndef SWIG
-    const int* rowPtr() const { return sparsity().rowPtr(); }
-    const int* colindPtr() const { return sparsity().colindPtr(); }
+    const int* row() const { return sparsity().row(); }
+    const int* colind() const { return sparsity().colind(); }
 #endif
     int row(int el) const { return sparsity().row(el); }
     int colind(int col) const { return sparsity().colind(col); }

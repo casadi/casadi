@@ -63,9 +63,9 @@ namespace casadi {
 
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
-    const int* x_row = input[0]->rowPtr();
+    const int* x_row = input[0]->row();
     int x_sz = input[0]->nnz();
-    const int* xT_colind = output[0]->colindPtr();
+    const int* xT_colind = output[0]->colind();
     int xT_ncol = output[0]->size2();
 
     const vector<T>& x = input[0]->data();
@@ -99,13 +99,13 @@ namespace casadi {
                                     std::vector<double>& rtmp, bool fwd) {
     // Access the input
     bvec_t *x = get_bvec_t(input[0]->data());
-    //const int* x_colind = input[0]->colindPtr();
-    const int* x_row = input[0]->rowPtr();
+    //const int* x_colind = input[0]->colind();
+    const int* x_row = input[0]->row();
     int x_sz = input[0]->nnz();
 
     // Access the output
     bvec_t *xT = get_bvec_t(output[0]->data());
-    const int* xT_colind = output[0]->colindPtr();
+    const int* xT_colind = output[0]->colind();
     int xT_ncol = output[0]->size2();
 
     // Offset for each col of the result

@@ -952,9 +952,9 @@ namespace casadi {
 
     // Calculate the gradient of the lagrangian
     const vector<double> &qpA_data = qpA_.data();
-    const int* qpA_colind = qpA_.colindPtr();
+    const int* qpA_colind = qpA_.colind();
     int qpA_ncol = qpA_.size2();
-    const int* qpA_row = qpA_.rowPtr();
+    const int* qpA_row = qpA_.row();
     for (int i=0; i<nx_; ++i)  gL_[i] = gf_[i] + x_lam_[i];
     for (int cc=0; cc<qpA_ncol; ++cc) {
       for (int el=qpA_colind[cc]; el<qpA_colind[cc+1]; ++el) {

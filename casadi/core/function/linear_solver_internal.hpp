@@ -109,8 +109,8 @@ namespace casadi {
     int nrow() const { return input(LINSOL_A).size1();}
     int ncol() const { return input(LINSOL_A).size2();}
     int nnz() const { return input(LINSOL_A).nnz();}
-    const int* rowPtr() const { return input(LINSOL_A).rowPtr();}
-    const int* colindPtr() const { return input(LINSOL_A).colindPtr();}
+    const int* row() const { return input(LINSOL_A).row();}
+    const int* colind() const { return input(LINSOL_A).colind();}
 
     // Creator function for internal class
     typedef LinearSolverInternal* (*Creator)(const Sparsity& sp, int nrhs);

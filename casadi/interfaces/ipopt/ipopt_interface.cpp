@@ -545,9 +545,9 @@ namespace casadi {
       double time1 = clock();
       if (values == NULL) {
         int nz=0;
-        const int* colind = hessLag_.output().colindPtr();
+        const int* colind = hessLag_.output().colind();
         int ncol = hessLag_.output().size2();
-        const int* row = hessLag_.output().rowPtr();
+        const int* row = hessLag_.output().row();
         for (int cc=0; cc<ncol; ++cc)
           for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
             iRow[nz] = row[el];
@@ -606,9 +606,9 @@ namespace casadi {
       double time1 = clock();
       if (values == NULL) {
         int nz=0;
-        const int* colind = jacG.output().colindPtr();
+        const int* colind = jacG.output().colind();
         int ncol = jacG.output().size2();
-        const int* row = jacG.output().rowPtr();
+        const int* row = jacG.output().row();
         for (int cc=0; cc<ncol; ++cc)
           for (int el=colind[cc]; el<colind[cc+1]; ++el) {
             int rr = row[el];
@@ -848,7 +848,7 @@ namespace casadi {
 
         // Loop over the cols
         const Sparsity& spHessLag = this->spHessLag();
-        const int* colind = spHessLag.colindPtr();
+        const int* colind = spHessLag.colind();
         int ncol = spHessLag.size2();
         for (int i=0; i<ncol; ++i) {
           // If the col contains any non-zeros, the corresponding variable appears nonlinearily
@@ -872,7 +872,7 @@ namespace casadi {
 
       // Loop over the cols
       const Sparsity& spHessLag = this->spHessLag();
-      const int* colind = spHessLag.colindPtr();
+      const int* colind = spHessLag.colind();
       int ncol = spHessLag.size2();
       for (int i=0; i<ncol; ++i) {
         // If the col contains any non-zeros, the corresponding variable appears nonlinearily

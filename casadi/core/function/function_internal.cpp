@@ -1472,8 +1472,8 @@ namespace casadi {
 
         const int d1 = sp.size2();
         //const int d2 = sp.size1();
-        const int* colind = sp.colindPtr();
-        const int* row = sp.rowPtr();
+        const int* colind = sp.colind();
+        const int* row = sp.row();
 
         // Get data array for output
         bvec_t *outputd = get_bvec_t(output(oind).data());
