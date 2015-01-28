@@ -293,8 +293,8 @@ namespace casadi {
 
       // Get the sparsity pattern of the Hessian
       const Sparsity& spHessLag = this->spHessLag();
-      const vector<int>& colind = spHessLag.colind();
-      const vector<int>& row = spHessLag.row();
+      const int* colind = spHessLag.colind();
+      const int* row = spHessLag.row();
 
       // Get number of nonzeros in the lower triangular part of the Hessian including full diagonal
       worhp_w_.HM.nnz = nx_; // diagonal entries
@@ -324,8 +324,8 @@ namespace casadi {
       const DMatrix & J = jacG_.output(JACG_JAC);
 
       int nz=0;
-      const vector<int>& colind = J.colind();
-      const vector<int>& row = J.row();
+      const int* colind = J.colind();
+      const int* row = J.row();
       for (int c=0; c<nx_; ++c) {
         for (int el=colind[c]; el<colind[c+1]; ++el) {
           int r = row[el];
@@ -339,8 +339,8 @@ namespace casadi {
     if (worhp_w_.HM.NeedStructure) {
       // Get the sparsity pattern of the Hessian
       const Sparsity& spHessLag = this->spHessLag();
-      const vector<int>& colind = spHessLag.colind();
-      const vector<int>& row = spHessLag.row();
+      const int* colind = spHessLag.colind();
+      const int* row = spHessLag.row();
 
       int nz=0;
 
@@ -683,8 +683,8 @@ namespace casadi {
 
       // Get results
       const DMatrix& H = hessLag.output();
-      const vector<int>& colind = H.colind();
-      const vector<int>& row = H.row();
+      const int* colind = H.colind();
+      const int* row = H.row();
       const vector<double>& data = H.data();
 
       // The Hessian values are divided into strictly upper (in WORHP lower) triangular and diagonal
