@@ -793,7 +793,6 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::reserve(int nnz, int ncol) {
     data().reserve(nnz);
-    sparsity_.reserve(nnz, ncol);
   }
 
   template<typename DataType>

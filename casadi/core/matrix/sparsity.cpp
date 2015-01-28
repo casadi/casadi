@@ -405,11 +405,6 @@ namespace casadi {
     return (*this)->patternInverse();
   }
 
-  void Sparsity::reserve(int nnz, int ncol) {
-    makeUnique();
-    (*this)->reserve(nnz, ncol);
-  }
-
   void Sparsity::append(const Sparsity& sp) {
     if (sp.size1()==0 && sp.size2()==0) {
       // Appending pattern is empty

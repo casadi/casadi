@@ -532,8 +532,10 @@ namespace casadi {
     /// Append another sparsity patten horizontally
     void appendColumns(const Sparsity& sp);
 
-    /// Reserve space
-    void reserve(int nnz, int ncol);
+    /// DEPRECATED: Reserve space
+    void reserve(int nnz, int ncol) {
+      casadi_warning("Sparsity::reserve: Deprecated function. Ignored.");
+    }
 
     /// Is scalar?
     bool isScalar(bool scalar_and_dense=false) const;

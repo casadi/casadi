@@ -67,7 +67,6 @@ namespace casadi {
   template<typename DataType>
   void SparseStorage<DataType>::reserve(int nnz, int ncol) {
     data().reserve(nnz);
-    sparsity_.reserve(nnz, ncol);
   }
 
   template<typename DataType>

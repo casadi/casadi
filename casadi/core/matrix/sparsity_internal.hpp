@@ -355,9 +355,6 @@ namespace casadi {
     /// Append another sparsity patten horizontally
     Sparsity zz_appendColumns(const SparsityInternal& sp) const;
 
-    /// Reserve space
-    void reserve(int nnz, int ncol);
-
     /** \brief Get a submatrix
     * Does bounds checking
     * rr and rr are not required to be monotonous

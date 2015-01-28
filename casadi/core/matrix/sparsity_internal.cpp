@@ -1872,7 +1872,6 @@ namespace casadi {
     if (size2()==size1()) {
       // Return object
       Sparsity ret(0, 1);
-      ret.reserve(std::min(nnz(), size2()), size2());
 
       // Mapping
       mapping.clear();
@@ -2706,11 +2705,6 @@ namespace casadi {
 
     // Equal if reached this point
     return true;
-  }
-
-  void SparsityInternal::reserve(int nnz, int ncol) {
-    row_.reserve(nnz);
-    colind_.reserve(ncol+1);
   }
 
   Sparsity SparsityInternal::zz_appendVector(const SparsityInternal& sp) const {
