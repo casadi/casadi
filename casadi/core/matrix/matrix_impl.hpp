@@ -29,8 +29,6 @@
 // The declaration of the class is in a separate file
 #include "matrix.hpp"
 #include "matrix_tools.hpp"
-#include "../std_vector_tools.hpp"
-#include "../runtime/runtime.hpp"
 
 /// \cond INTERNAL
 
@@ -1559,54 +1557,6 @@ namespace casadi {
       casadi_mm_sparse(ptr(), sparsity(), y.ptr(), y.sparsity(),
                        ret.ptr(), ret.sparsity(), getPtr(work));
       return ret;
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType> &y,
-                                      Matrix<DataType>& z, std::vector<DataType>& work,
-                                      bool transpose_x) {
-
-    // Assert dimensions
-    if (transpose_x) {
-      casadi_assert_message(z.size1()==x.size2() && x.size1()==y.size1() && y.size2()==z.size2(),
-                            "Dimension error. Got x=" << x.dimString() << ", y=" << y.dimString()
-                            << " and z=" << z.dimString() << ".");
-      casadi_assert_message(work.size()>=y.size1(),
-                            "Work vector too small: " << work.size() << " < " << y.size1());
-    } else {
-      casadi_assert_message(z.size1()==x.size1() && x.size2()==y.size1() && y.size2()==z.size2(),
-                            "Dimension error. Got x=" << x.dimString() << ", y=" << y.dimString()
-                            << " and z=" << z.dimString() << ".");
-      casadi_assert_message(work.size()>=z.size1(),
-                            "Work vector too small: " << work.size() << " < " << z.size1());
-    }
-
-    if (transpose_x) {
-      casadi_mm_sparse_t(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
-                         z.ptr(), z.sparsity(), getPtr(work));
-    } else {
-      casadi_mm_sparse(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
-                       z.ptr(), z.sparsity(), getPtr(work));
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::mul_no_alloc(const Matrix<DataType> &x,
-                                      const std::vector<DataType> &y,
-                                      std::vector<DataType>& z, bool transpose_x) {
-    // Assert dimensions
-    casadi_assert_message(z.size()==transpose_x ? x.size2() : x.size1(),
-                          "Dimension error. Got transpose_x=" << transpose_x
-                          << ", x=" << x.dimString() << " and z=" << z.size() << ".");
-    casadi_assert_message(y.size()==transpose_x ? x.size1() : x.size2(),
-                          "Dimension error. Got transpose_x=" << transpose_x
-                          << ", x=" << x.dimString() << " and y=" << y.size() << ".");
-
-    if (transpose_x) {
-      casadi_mv_t(x.ptr(), x.sparsity(), getPtr(y), getPtr(z));
-    } else {
-      casadi_mv(x.ptr(), x.sparsity(), getPtr(y), getPtr(z));
     }
   }
 

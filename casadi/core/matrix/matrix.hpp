@@ -32,6 +32,7 @@
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
 #include "../std_vector_tools.hpp"
+#include "../runtime/runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
 
@@ -466,15 +467,6 @@ namespace casadi {
     Matrix<DataType> zz_eig_symbolic() const;
     Matrix<DataType> zz_sparsify(double tol=0) const;
     ///@}
-
-    /// Matrix-matrix product, no memory allocation: z += mul(x, y), with work vector
-    static void mul_no_alloc(const Matrix<DataType> &x, const Matrix<DataType>& y,
-                             Matrix<DataType>& z, std::vector<DataType>& work,
-                             bool transpose_x=false);
-
-    /// Matrix-vector product, no memory allocation: z += mul(trans(x), y)
-    static void mul_no_alloc(const Matrix<DataType>& x, const std::vector<DataType> &y,
-                             std::vector<DataType>& z, bool transpose_x=false);
 
     /** \brief Propagate sparsity using 0-1 logic through a matrix product,
      * no memory allocation: <tt>z = mul(x, y)</tt> with work vector

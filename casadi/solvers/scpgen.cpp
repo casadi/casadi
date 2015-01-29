@@ -940,11 +940,12 @@ namespace casadi {
       // Gauss-Newton Hessian
       const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
       fill(qpH_.begin(), qpH_.end(), 0);
-      DMatrix::mul_no_alloc(B_obj, B_obj, qpH_, work_, true);
+      casadi_mm_sparse_t(B_obj.ptr(), B_obj.sparsity(), B_obj.ptr(), B_obj.sparsity(),
+                         qpH_.ptr(), qpH_.sparsity(), getPtr(work_));
 
       // Gradient of the objective in Gauss-Newton
       fill(gf_.begin(), gf_.end(), 0);
-      DMatrix::mul_no_alloc(B_obj, b_gn_, gf_, true);
+      casadi_mv_t(B_obj.ptr(), B_obj.sparsity(), getPtr(b_gn_), getPtr(gf_));
     } else {
       // Exact Hessian
       mat_fcn_.getOutput(qpH_, mat_hes_);

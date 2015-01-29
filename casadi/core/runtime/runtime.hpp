@@ -70,11 +70,11 @@ namespace casadi {
 
   /// Sparse matrix-matrix multiplication: z <- z + x*y
   template<typename real_t>
-  void casadi_sparse_mm(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+  void casadi_mm_sparse(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
 
   /// Sparse matrix-matrix multiplication, first factor transposed: z <- z + trans(x)*y
   template<typename real_t>
-  void casadi_sparse_mm_t(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+  void casadi_mm_sparse_t(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
 
   /// Sparse matrix-vector multiplication: z <- z + x*y
   template<typename real_t>
