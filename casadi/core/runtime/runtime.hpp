@@ -369,7 +369,7 @@ namespace casadi {
     /* Get sparsities */
     int nrow_x = sp_x[0], ncol_x = sp_x[1];
     const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
-    int nrow_y = sp_y[0], ncol_y = sp_y[1];
+    int ncol_y = sp_y[1];
     const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
 
     /* Implementation borrowed from Scipy's sparsetools/csr.h */
