@@ -153,6 +153,7 @@ namespace casadi {
     /**  @{  */
     /** \brief Accessed by friend functions */
     int zz_sprank() const { return sprank(sparsity());}
+    int zz_norm_0_mul(const MatType &A) const { return norm_0_mul(sparsity(), A.sparsity());}
     MatType zz_tril(bool includeDiagonal=true) const {
       return self().setSparse(tril(sparsity(), includeDiagonal));
     }

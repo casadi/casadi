@@ -78,6 +78,7 @@ MatType reshape(const MatType& a, std::pair<int, int> rc);
 int sprank(const MatType& A);
 MatType triu(const MatType& a, bool includeDiagonal=true);
 MatType tril(const MatType& a, bool includeDiagonal=true);
+int norm_0_mul(const MatType &x, const MatType &y);
 %enddef
 
 %define GENERIC_MATRIX_DECL(MatType...)
@@ -134,10 +135,6 @@ GENERIC_MATRIX_DECL(MatType)
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<DataType>)
 MATRIX_DECL(casadi::Matrix<DataType>)
-int norm_0_mul_nn(const casadi::Matrix<DataType> &x,
-                  const casadi::Matrix<DataType> &y,
-                  std::vector<bool>& Bwork,
-                  std::vector<int>& Iwork);
 void addMultiple(const casadi::Matrix<DataType>& A,
                  const std::vector<DataType>& v,
                  std::vector<DataType>& res,

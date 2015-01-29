@@ -1334,4 +1334,86 @@ namespace casadi {
     return &(*this)->sp().front();
   }
 
+  int Sparsity::zz_norm_0_mul(const Sparsity& A) const {
+    // Implementation borrowed from Scipy's sparsetools/csr.h
+    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dimString()
+                          << " times " << A.dimString() << ".");
+
+    int n_row = A.size2();
+    int n_col = size1();
+
+    // Allocate work vectors
+    std::vector<bool> Bwork(n_col);
+    std::vector<int> Iwork(n_row+1+n_col);
+
+    const int* Aj = A.row();
+    const int* Ap = A.colind();
+    const int* Bj = row();
+    const int* Bp = colind();
+    int *Cp = getPtr(Iwork);
+    int *mask = Cp+n_row+1;
+
+    // Pass 1
+    // method that uses O(n) temp storage
+    std::fill(mask, mask+n_col, -1);
+
+    Cp[0] = 0;
+    int nnz = 0;
+    for (int i = 0; i < n_row; i++) {
+      int row_nnz = 0;
+      for (int jj = Ap[i]; jj < Ap[i+1]; jj++) {
+        int j = Aj[jj];
+        for (int kk = Bp[j]; kk < Bp[j+1]; kk++) {
+          int k = Bj[kk];
+          if (mask[k] != i) {
+            mask[k] = i;
+            row_nnz++;
+          }
+        }
+      }
+      int next_nnz = nnz + row_nnz;
+      nnz = next_nnz;
+      Cp[i+1] = nnz;
+    }
+
+    // Pass 2
+    int *next = getPtr(Iwork) + n_row+1;
+    std::fill(next, next+n_col, -1);
+    std::vector<bool> & sums = Bwork;
+    std::fill(sums.begin(), sums.end(), false);
+    nnz = 0;
+    Cp[0] = 0;
+    for (int i = 0; i < n_row; i++) {
+      int head   = -2;
+      int length =  0;
+      int jj_start = Ap[i];
+      int jj_end   = Ap[i+1];
+      for (int jj = jj_start; jj < jj_end; jj++) {
+        int j = Aj[jj];
+        int kk_start = Bp[j];
+        int kk_end   = Bp[j+1];
+        for (int kk = kk_start; kk < kk_end; kk++) {
+          int k = Bj[kk];
+          sums[k] = true;
+          if (next[k] == -1) {
+            next[k] = head;
+            head  = k;
+            length++;
+          }
+        }
+      }
+      for (int jj = 0; jj < length; jj++) {
+        if (sums[head]) {
+          nnz++;
+        }
+        int temp = head;
+        head = next[head];
+        next[temp] = -1; //clear arrays
+        sums[temp] =  0;
+      }
+      Cp[i+1] = nnz;
+    }
+    return nnz;
+  }
+
 } // namespace casadi

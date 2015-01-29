@@ -501,6 +501,7 @@ namespace casadi {
     Sparsity zz_reshape(int nrow, int ncol) const;
     Sparsity zz_reshape(const Sparsity& sp) const;
     int zz_sprank() const;
+    int zz_norm_0_mul(const Sparsity& B) const;
     /// @}
     /// \endcond
 

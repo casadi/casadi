@@ -189,7 +189,6 @@ namespace casadi {
     using B::row;
     using B::dimString;
     using B::sym;
-    //using B::sparse;
     using B::zeros;
     using B::ones;
     using B::operator[];
@@ -562,10 +561,6 @@ namespace casadi {
     void zz_addMultiple(const std::vector<DataType>& v,
                         std::vector<DataType>& res, bool trans_A=false) const;
     Matrix<DataType> zz_project(const Sparsity& sparsity) const;
-    int zz_sprank() const;
-    int zz_norm_0_mul_nn(const Matrix<DataType>& B,
-                         std::vector<bool>& Bwork,
-                         std::vector<int>& Iwork) const;
     Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
     ///@}
 
@@ -614,21 +609,6 @@ namespace casadi {
     inline friend Matrix<DataType>
       norm_inf_mul(const Matrix<DataType> &x, const Matrix<DataType> &y) {
       return x.zz_norm_inf_mul(y);
-    }
-
-    /** 0-norm (nonzero count) of a Matrix-matrix product, no memory allocation
-     *   mul(x, y)
-     *
-     * \param Bwork  A boolean work vector that you must allocate
-     *               Minimum size: y.size1()
-     * \param Iwork  A integer work vector that you must allocate
-     *               Minimum size: y.size1()+x.size2()+1
-     */
-    inline friend int norm_0_mul_nn(const Matrix<DataType> &x,
-                                    const Matrix<DataType> &y,
-                                    std::vector<bool>& Bwork,
-                                    std::vector<int>& Iwork) {
-      return x.zz_norm_0_mul_nn(y, Bwork, Iwork);
     }
 
     /// same as: res += mul(A, v)

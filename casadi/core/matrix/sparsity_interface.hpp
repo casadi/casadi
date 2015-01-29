@@ -340,6 +340,11 @@ namespace casadi {
       return A.zz_sprank();
     }
 
+    /** 0-norm (nonzero count) of a Matrix-matrix product,*/
+    inline friend int norm_0_mul(const MatType &x, const MatType &y) {
+      return x.zz_norm_0_mul(y);
+    }
+
     /** \brief Get the upper triangular part of a matrix
      */
     inline friend MatType triu(const MatType& a, bool includeDiagonal=true) {
