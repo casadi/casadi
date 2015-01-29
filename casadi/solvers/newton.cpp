@@ -219,10 +219,11 @@ namespace casadi {
       // Update Xk+1 = Xk - J^(-1) F
       std::transform(u.begin(), u.end(), F.begin(), u.begin(), std::minus<double>());
 
-      // Get auxiliary outputs
-      for (int i=0; i<getNumOutputs(); ++i) {
-        if (i!=iout_) jac_.getOutput(output(i), 1+i);
-      }
+    }
+
+    // Get auxiliary outputs
+    for (int i=0; i<getNumOutputs(); ++i) {
+      if (i!=iout_) jac_.getOutput(output(i), 1+i);
     }
 
     // Store the iteration count

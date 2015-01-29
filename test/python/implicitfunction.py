@@ -48,6 +48,42 @@ except:
   pass
 
 class NLPtests(casadiTestCase):
+  def test_linear(self):
+    for Solver, options in solvers:
+      self.message(Solver)
+      x=SX.sym("x",2)
+      A_ = DMatrix([[1,2],[3,2.1]])
+      C_ = DMatrix([[1.6,2.1],[1,1.3]])
+      b_ = DMatrix([0.7,0.6])
+      f=SXFunction([x],[mul(A_,x)-b_, mul(C_,x)])
+      f.init()
+      solver=ImplicitFunction(Solver,f)
+      solver.setOption(options)
+      solver.init()
+      solver.evaluate()
+      
+      refsol = SXFunction([x],[solve(A_,b_), mul(C_,solve(A_,b_))])
+      refsol.init()
+      self.checkfunction(solver,refsol,digits=10)         
+      
+      A = SX.sym("A",2,2)
+      b = SX.sym("b",2)
+      f=SXFunction([x,A,b],[mul(A,x)-b])
+      f.init()
+      solver=ImplicitFunction(Solver,f)
+      solver.setOption(options)
+      solver.init()
+      solver.setInput(A_,1)
+      solver.setInput(b_,2)
+      solver.evaluate()
+      
+      refsol = SXFunction([x,A,b],[solve(A,b)])      
+      refsol.init()
+      refsol.setInput(A_,1)
+      refsol.setInput(b_,2)      
+      self.checkfunction(solver,refsol,digits=10)         
+   
+
   def test_scalar1(self):
     self.message("Scalar implicit problem, n=0")
     for Solver, options in solvers:
