@@ -1603,23 +1603,10 @@ namespace casadi {
                           "Dimension error. Got transpose_x=" << transpose_x
                           << ", x=" << x.dimString() << " and y=" << y.size() << ".");
 
-    // Direct access to the arrays
-    int x_ncol = x.size2();
-    const int* x_colind = x.colind();
-    const int* x_row = x.row();
-    const std::vector<DataType> &x_data = x.data();
-
-    // loop over the columns of the matrix
-    for (int i=0; i<x_ncol; ++i) {
-      // loop over the non-zeros of the matrix
-      for (int el=x_colind[i]; el<x_colind[i+1]; ++el) {
-        int j = x_row[el];
-        if (transpose_x) {
-          z[i] += x_data[el] * y[j];
-        } else {
-          z[j] += x_data[el] * y[i];
-        }
-      }
+    if (transpose_x) {
+      casadi_mv_t(x.ptr(), x.sparsity(), getPtr(y), getPtr(z));
+    } else {
+      casadi_mv(x.ptr(), x.sparsity(), getPtr(y), getPtr(z));
     }
   }
 

@@ -76,6 +76,14 @@ namespace casadi {
   template<typename real_t>
   void casadi_sparse_mm_t(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
 
+  /// Sparse matrix-vector multiplication: z <- z + x*y
+  template<typename real_t>
+  void casadi_mv(const real_t* x, const int* sp_x, const real_t* y, real_t* z);
+
+  /// Sparse matrix-vector multiplication, first factor transposed: z <- z + trans(x)*y
+  template<typename real_t>
+  void casadi_mv_t(const real_t* x, const int* sp_x, const real_t* y, real_t* z);
+
   /// NRM2: ||x||_2 -> return
   template<typename real_t>
   real_t casadi_nrm2(int n, const real_t* x, int inc_x);
@@ -284,6 +292,36 @@ namespace casadi {
         for (int kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
           z[kk] += x[kk1] * w[row_x[kk1]];
         }
+      }
+    }
+  }
+
+  template<typename real_t>
+  void casadi_mv(const real_t* x, const int* sp_x, const real_t* y, real_t* z) {
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+
+    /* loop over the columns of x */
+    for (int i=0; i<ncol_x; ++i) {
+      /* loop over the non-zeros of x */
+      for (int el=colind_x[i]; el<colind_x[i+1]; ++el) {
+        z[row_x[el]] += x[el] * y[i];
+      }
+    }
+  }
+
+  template<typename real_t>
+  void casadi_mv_t(const real_t* x, const int* sp_x, const real_t* y, real_t* z) {
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+
+    /* loop over the columns of x */
+    for (int i=0; i<ncol_x; ++i) {
+      /* loop over the non-zeros of x */
+      for (int el=colind_x[i]; el<colind_x[i+1]; ++el) {
+        z[i] += x[el] * y[row_x[el]];
       }
     }
   }
