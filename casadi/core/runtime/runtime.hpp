@@ -26,12 +26,10 @@
 #ifndef CASADI_CASADI_RUNTIME_HPP
 #define CASADI_CASADI_RUNTIME_HPP
 
-
 #include <math.h>
 
 /// \cond INTERNAL
 namespace casadi {
-
   /// COPY: y <-x
   template<typename real_t>
   void casadi_copy(int n, const real_t* x, int inc_x, real_t* y, int inc_y);
@@ -92,10 +90,24 @@ namespace casadi {
   template<typename real_t>
   void casadi_trans(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, int *tmp);
 
+  /** Inf-norm of a Matrix-matrix product,*
+   * \param dwork  A real work vector that you must allocate
+   *               Minimum size: y.size1()
+   * \param iwork  A integer work vector that you must allocate
+   *               Minimum size: y.size1()+x.size2()+1
+   */
+  template<typename real_t>
+  real_t casadi_norm_inf_mul(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y,
+                             real_t *dwork, int *iwork);
+}
+
+// Helper functions
+namespace casadi {
+  /// Check if entry is zero (false negative allowed)
+  inline bool iszero(double x) { return x==0;}
 }
 
 // Implementations
-
 
 // Note: due to restrictions of cmake IO processing, make sure that
 //      1)   semicolons (;) are never immediately preceded by whitespace
@@ -351,6 +363,81 @@ namespace casadi {
     }
   }
 
+  template<typename real_t>
+  real_t casadi_norm_inf_mul(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t *dwork, int *iwork) {
+    real_t res = 0;
+    /* Get sparsities */
+    int nrow_x = sp_x[0], ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int nrow_y = sp_y[0], ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+
+    /* Implementation borrowed from Scipy's sparsetools/csr.h */
+    /* method that uses O(n) temp storage */
+    int *mask = iwork + ncol_y+1;
+
+    // Pass 1
+    for (int i=0; i<nrow_x; ++i) mask[i] = -1;
+    iwork[0] = 0;
+    int nnz = 0;
+    for (int i=0; i<ncol_y; ++i) {
+      int row_nnz = 0;
+      for (int jj=colind_y[i]; jj < colind_y[i+1]; jj++) {
+        int j = row_y[jj];
+        for (int kk=colind_x[j]; kk < colind_x[j+1]; kk++) {
+          int k = row_x[kk];
+          if (mask[k] != i) {
+            mask[k] = i;
+            row_nnz++;
+          }
+        }
+      }
+      int next_nnz = nnz + row_nnz;
+      nnz = next_nnz;
+      iwork[i+1] = nnz;
+    }
+
+    // Pass 2
+    int *next = iwork + ncol_y+1;
+    for (int i=0; i<nrow_x; ++i) next[i] = -1;
+    real_t* sums = dwork;
+    for (int i=0; i<nrow_x; ++i) sums[i] = 0;
+    nnz = 0;
+    iwork[0] = 0;
+    for (int i=0; i<ncol_y; ++i) {
+      int head   = -2;
+      int length =  0;
+      int jj_start = colind_y[i];
+      int jj_end   = colind_y[i+1];
+      for (int jj=jj_start; jj<jj_end; ++jj) {
+        int j = row_y[jj];
+        real_t v = y[jj];
+        int kk_start = colind_x[j];
+        int kk_end   = colind_x[j+1];
+        for (int kk = kk_start; kk<kk_end; ++kk) {
+          int k = row_x[kk];
+          sums[k] += v*x[kk];
+          if (next[k] == -1) {
+            next[k] = head;
+            head  = k;
+            length++;
+          }
+        }
+      }
+      for (int jj=0; jj<length; ++jj) {
+        if (!iszero(sums[head])) {
+          res = fmax(res, fabs(sums[head]));
+          nnz++;
+        }
+        int temp = head;
+        head = next[head];
+        next[temp] = -1; //clear arrays
+        sums[temp] =  0;
+      }
+      iwork[i+1] = nnz;
+    }
+    return res;
+  }
 }
 
 /// \endcond

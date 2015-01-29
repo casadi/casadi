@@ -2984,18 +2984,10 @@ namespace casadi {
   DataType Matrix<DataType>::zz_norm_inf_mul_nn(const Matrix<DataType> &A,
                                                 std::vector<DataType>& Dwork,
                                                 std::vector<int>& Iwork) const {
-    const Matrix<DataType> &B = *this;
-    // Note: because the algorithm works with compressed row storage,
-    // we have x=B and y=A
-    DataType res = 0;
-
-    casadi_assert_message(A.size1()==B.size2(), "Dimension error. Got " << B.dimString()
+    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dimString()
                           << " times " << A.dimString() << ".");
-
-
     int n_row = A.size2();
-    int n_col = B.size1();
-
+    int n_col = size1();
     casadi_assert_message(Dwork.size()>=n_col,
                           "We need a bigger work vector (>="
                           << n_col << "), but got " << Dwork.size() <<".");
@@ -3003,92 +2995,8 @@ namespace casadi {
                           "We need a bigger work vector (>=" << n_row+1+n_col
                           << "), but got " << Iwork.size() <<".");
 
-    const int* Aj = A.row();
-    const int* Ap = A.colind();
-    const std::vector<DataType> &Ax = A.data();
-
-    const int* Bj = B.row();
-    const int* Bp = B.colind();
-    const std::vector<DataType> &Bx = B.data();
-
-    int *Cp = getPtr(Iwork);
-    int *mask = Cp + n_row+1;
-
-    // Implementation borrowed from Scipy's sparsetools/csr.h
-
-    // Pass 1
-
-    // method that uses O(n) temp storage
-    std::fill(mask, mask+n_col, -1);
-
-    Cp[0] = 0;
-    int nnz = 0;
-
-    for (int i = 0; i < n_row; i++) {
-      int row_nnz = 0;
-      for (int jj = Ap[i]; jj < Ap[i+1]; jj++) {
-        int j = Aj[jj];
-        for (int kk = Bp[j]; kk < Bp[j+1]; kk++) {
-          int k = Bj[kk];
-          if (mask[k] != i) {
-            mask[k] = i;
-            row_nnz++;
-          }
-        }
-      }
-      int next_nnz = nnz + row_nnz;
-
-      nnz = next_nnz;
-      Cp[i+1] = nnz;
-    }
-
-    // Pass 2
-    int *next = &Iwork[n_row+1];
-    std::fill(next, next+n_col, -1);
-
-    DataType* sums = &Dwork[0];
-    std::fill(sums, sums+n_col, 0);
-
-    nnz = 0;
-
-    Cp[0] = 0;
-
-    for (int i = 0; i < n_row; i++) {
-      int head   = -2;
-      int length =  0;
-      int jj_start = Ap[i];
-      int jj_end   = Ap[i+1];
-      for (int jj = jj_start; jj < jj_end; jj++) {
-        int j = Aj[jj];
-        DataType v = Ax[jj];
-        int kk_start = Bp[j];
-        int kk_end   = Bp[j+1];
-        for (int kk = kk_start; kk < kk_end; kk++) {
-          int k = Bj[kk];
-          sums[k] += v*Bx[kk];
-          if (next[k] == -1) {
-            next[k] = head;
-            head  = k;
-            length++;
-          }
-        }
-      }
-
-      for (int jj = 0; jj < length; jj++) {
-        if (!casadi_limits<DataType>::isZero(sums[head])) {
-          res = fmax(res, abs(sums[head]));
-          nnz++;
-        }
-        int temp = head;
-        head = next[head];
-        next[temp] = -1; //clear arrays
-        sums[temp] =  0;
-      }
-
-      Cp[i+1] = nnz;
-    }
-
-    return res;
+    return casadi_norm_inf_mul(ptr(), sparsity(), A.ptr(), A.sparsity(),
+                               getPtr(Dwork), getPtr(Iwork));
   }
 
   template<typename DataType>

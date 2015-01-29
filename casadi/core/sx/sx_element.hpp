@@ -281,6 +281,7 @@ namespace casadi {
     /// replaces the ternary conditional operator "?:", which cannot be overloaded
     friend SXElement if_else(const SXElement& cond, const SXElement& if_true,
                              const SXElement& if_false);
+    friend inline bool iszero(const SXElement& x) { return x.isZero();}
     /** @} */
   };
 
