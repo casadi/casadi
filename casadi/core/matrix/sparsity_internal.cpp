@@ -1833,72 +1833,52 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::getDiag(std::vector<int>& mapping) const {
+    int nrow = this->size1();
+    int ncol = this->size2();
     const int* colind = this->colind();
     const int* row = this->row();
 
-    if (size2()==size1()) {
-      // Return object
-      Sparsity ret(0, 1);
+    // Mapping
+    mapping.clear();
 
-      // Mapping
-      mapping.clear();
+    if (nrow==ncol) {
+      // Sparsity pattern
+      vector<int> ret_colind(2, 0), ret_row;
 
-      // Loop over nonzero
-      for (int i=0; i<size2(); ++i) {
-
-        // Enlarge the return matrix
-        ret.resize(i+1, 1);
-
-        // Get to the right nonzero of the col
-        int el = colind[i];
-        while (el<colind[i+1] && row[el]<i) {
-          el++;
-        }
-
-        if (el>=nnz()) return ret;
-
-        // Add element if nonzero on diagonal
-        if (row[el]==i) {
-          ret.addNZ(i, 0);
-          mapping.push_back(el);
+      // Loop over diagonal entries
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el = colind[cc]; el<colind[cc+1]; ++el) {
+          if (row[el]==cc) {
+            ret_row.push_back(row[el]);
+            mapping.push_back(el);
+          }
         }
       }
+      ret_colind[1] = ret_row.size();
 
-      return ret;
+      // Construct sparsity pattern
+      return Sparsity(ncol, 1, ret_colind, ret_row);
 
-    } else if (size2()==1 || size1()==1) {
-      Sparsity trans;
-      const SparsityInternal *sp;
+    } else if (nrow==1 || ncol==1) {
+      // Sparsity pattern
+      int ret_nrow = std::max(nrow, ncol);
+      vector<int> ret_colind(ret_nrow+1, 0), ret_row;
 
-      // Have a col vector
-      if (size2() == 1) {
-        sp = this;
-      } else {
-        trans = T();
-        sp = static_cast<const SparsityInternal *>(trans.get());
+      // Loop over all entries
+      int ret_i=0;
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int k = colind[cc]; k<colind[cc+1]; ++k) {
+          int rr=row[k];
+          int el=rr+nrow*cc; // Corresponding row in the return matrix
+          while (ret_i<=el) ret_colind[ret_i++]=ret_row.size();
+          ret_row.push_back(el);
+          mapping.push_back(k);
+        }
       }
+      while (ret_i<=ret_nrow) ret_colind[ret_i++]=ret_row.size();
 
-      // Return object
-      mapping.clear();
-      mapping.resize(nnz());
-
-      std::vector<int> ret_colind(sp->size1()+1, 0);
-      std::vector<int> ret_row(sp->nnz());
-
-      int i_prev = 0;
-
-      // Loop over nonzero
-      for (int k=0;k<nnz();k++) {
-        mapping[k]=k; // mapping will just be a range(nnz())
-
-        int i = sp->row()[k];
-        std::fill(ret_colind.begin()+i_prev+1, ret_colind.begin()+i+1, k);
-        ret_row[k]=i;
-        i_prev = i;
-      }
-      std::fill(ret_colind.begin()+i_prev+1, ret_colind.end(), nnz());
-
-      return Sparsity(sp->size1(), sp->size1(), ret_colind, ret_row);
+      // Construct sparsity pattern
+      return Sparsity(ret_nrow, ret_nrow, ret_colind, ret_row);
     } else {
       casadi_error("diag: wrong argument shape. Expecting square matrix or vector-like, but got "
                    << dimString() << " instead.");

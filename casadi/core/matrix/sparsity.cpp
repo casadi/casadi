@@ -38,8 +38,7 @@ namespace casadi {
   public:
     EmptySparsity() {
       const int colind[1] = {0};
-      const int row[0] = {};
-      assignNode(new SparsityInternal(0, 0, colind, row));
+      assignNode(new SparsityInternal(0, 0, colind, 0));
     }
   };
 
