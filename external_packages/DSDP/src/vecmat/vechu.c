@@ -110,7 +110,7 @@ static int VechMatGetRowNnz(void* AA, int trow, int nz[], int *nnzz,int nn){
   int i=0,j,k,t;
   const int *ind=A->ind, ishift=A->ishift,nnz=A->nnzeros;
   *nnzz=0;
-  for (k=0; k<nnz; ++k,ind){
+  for (k=0; k<nnz; ++k /*,ind*/){ /* Commented out by @jaeandersson */
     t=ind[k]-ishift;
     i=GETI(t,nn);
     j=GETJ(t,nn);
