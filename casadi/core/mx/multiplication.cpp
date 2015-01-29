@@ -75,7 +75,9 @@ namespace casadi {
     if (input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
-    Matrix<T>::mul_no_alloc(*input[1], *input[2], *output[0], rtmp);
+    casadi_mm_sparse(input[1]->ptr(), input[1]->sparsity(),
+                     input[2]->ptr(), input[2]->sparsity(),
+                     output[0]->ptr(), output[0]->sparsity(), getPtr(rtmp));
   }
 
   void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output,

@@ -30,6 +30,7 @@
 #include "matrix.hpp"
 #include "matrix_tools.hpp"
 #include "../std_vector_tools.hpp"
+#include "../runtime/runtime.hpp"
 
 /// \cond INTERNAL
 
@@ -1555,7 +1556,8 @@ namespace casadi {
       // Carry out the matrix product
       Matrix<DataType> ret = z;
       std::vector<DataType> work(size1());
-      mul_no_alloc(*this, y, ret, work);
+      casadi_mm_sparse(ptr(), sparsity(), y.ptr(), y.sparsity(),
+                       ret.ptr(), ret.sparsity(), getPtr(work));
       return ret;
     }
   }
