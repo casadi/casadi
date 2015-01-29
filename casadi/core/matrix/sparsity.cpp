@@ -1118,15 +1118,44 @@ namespace casadi {
   }
 
   Sparsity Sparsity::zz_horzcat(const std::vector<Sparsity> & sp) {
-    if (sp.empty()) {
-      return Sparsity();
-    } else {
-      Sparsity ret = sp[0];
-      for (int i=1; i<sp.size(); ++i) {
-        ret.appendColumns(sp[i]);
+    // Quick return if possible
+    if (sp.empty()) return Sparsity();
+    if (sp.size()==1) return sp.front();
+
+    // Count total nnz
+    int nnz_total = 0;
+    for (int i=0; i<sp.size(); ++i) nnz_total += sp[i].nnz();
+
+    // Construct from vectors (triplet format)
+    vector<int> ret_row, ret_col;
+    ret_row.reserve(nnz_total);
+    ret_col.reserve(nnz_total);
+    int ret_ncol = 0;
+    int ret_nrow = sp[0].size1();
+
+    // Append all patterns
+    int ret_ = 0;
+    for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
+      // Get sparsity pattern
+      int sp_nrow = i->size1();
+      int sp_ncol = i->size2();
+      const int* sp_colind = i->colind();
+      const int* sp_row = i->row();
+      casadi_assert_message(sp_nrow==ret_nrow,
+                            "Sparsity::zz_horzcat: Mismatching number of rows");
+
+      // Add entries to pattern
+      for (int cc=0; cc<sp_ncol; ++cc) {
+        for (int k=sp_colind[cc]; k<sp_colind[cc+1]; ++k) {
+          ret_row.push_back(sp_row[k]);
+          ret_col.push_back(cc + ret_ncol);
+        }
       }
-      return ret;
+
+      // Update offset
+      ret_ncol += sp_ncol;
     }
+    return Sparsity::triplet(ret_nrow, ret_ncol, ret_row, ret_col);
   }
 
   Sparsity Sparsity::zz_vertcat(const std::vector<Sparsity> & sp) {
