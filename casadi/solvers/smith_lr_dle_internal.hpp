@@ -202,6 +202,20 @@ namespace casadi {
     /// Prepare intermediate variables and AD tape
     void smith_prepare();
 
+    /** \brief Matrix-matrix product, no memory allocation: z += mul(x, y)
+        Should be replaced with more efficient implementations in C runtime.
+     */
+    static void mul_no_alloc_nn(const DMatrix &x, const DMatrix& y, DMatrix& z);
+
+    /** \brief Matrix-matrix product, no memory allocation: z += mul(trans(x), y)
+        Should be replaced with more efficient implementations in C runtime.
+     */
+    static void mul_no_alloc_tn(const DMatrix &trans_x, const DMatrix &y, DMatrix& z);
+
+    /** \brief Matrix-matrix product, no memory allocation: z += mul(x, trans(y))
+        Should be replaced with more efficient implementations in C runtime.
+     */
+    static void mul_no_alloc_nt(const DMatrix& x, const DMatrix &trans_y, DMatrix& z);
   };
 
 } // namespace casadi

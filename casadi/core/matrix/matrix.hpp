@@ -476,26 +476,6 @@ namespace casadi {
     static void mul_no_alloc(const Matrix<DataType>& x, const std::vector<DataType> &y,
                              std::vector<DataType>& z, bool transpose_x=false);
 
-    /// DEPRECATED: Matrix-matrix product, no memory allocation: z += mul(x, y)
-    static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y,
-                                Matrix<DataType>& z);
-
-    /// DEPRECATED: Matrix-matrix product, no memory allocation: z += mul(trans(x), y)
-    static void mul_no_alloc_tn(const Matrix<DataType> &trans_x, const Matrix<DataType> &y,
-                                Matrix<DataType>& z);
-
-    /// DEPRECATED: Matrix-matrix product, no memory allocation: z += mul(x, trans(y))
-    static void mul_no_alloc_nt(const Matrix<DataType>& x, const Matrix<DataType> &trans_y,
-                                Matrix<DataType>& z);
-
-    /// DEPRECATED: Matrix-vector product, no memory allocation: z += mul(trans(x), y)
-    static void mul_no_alloc_tn(const Matrix<DataType>& trans_x, const std::vector<DataType> &y,
-                                std::vector<DataType>& z);
-
-    /// DEPRECATED: vector-matrix product, no memory allocation: z += mul(x, y)
-    static void mul_no_alloc_nn(const Matrix<DataType>& x, const std::vector<DataType> &y,
-                                std::vector<DataType>& z);
-
     /** \brief Propagate sparsity using 0-1 logic through a matrix product,
      * no memory allocation: <tt>z = mul(x, y)</tt> with work vector
      */

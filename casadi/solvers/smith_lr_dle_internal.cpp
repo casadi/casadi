@@ -220,15 +220,15 @@ namespace casadi {
 
     // Symmetrize V
     Vsymm_.setAll(0);
-    DMatrix::mul_no_alloc_nn(V, em_, Vsymm_);
-    DMatrix::mul_no_alloc_tn(V, em_, Vsymm_);
+    mul_no_alloc_nn(V, em_, Vsymm_);
+    mul_no_alloc_tn(V, em_, Vsymm_);
 
     // Initializing D
     D_[0].set(with_C_? C : e_);
 
     // Computing VC^T
     VD_[0].setAll(0); // Clear variable
-    DMatrix::mul_no_alloc_nt(Vsymm_, with_C_? C : e_, VD_[0]);
+    mul_no_alloc_nt(Vsymm_, with_C_? C : e_, VD_[0]);
 
     // Iteraton counter
     int i = 0;
@@ -239,10 +239,10 @@ namespace casadi {
       VD_[i+1].setAll(0);
 
       // The heart of the algorithm; obtaining a new D-entry
-      DMatrix::mul_no_alloc_nn(A, D_[i], D_[i+1]);
+      mul_no_alloc_nn(A, D_[i], D_[i+1]);
 
       // Calculate the stopping criterion
-      DMatrix::mul_no_alloc_nt(Vsymm_, D_[i+1], VD_[i+1]);
+      mul_no_alloc_nt(Vsymm_, D_[i+1], VD_[i+1]);
       double norm = norm_inf_mul_nn(D_[i+1], VD_[i+1], Dwork_norm_, Iwork_norm_);
 
       if (print_iteration_) {
@@ -291,12 +291,12 @@ namespace casadi {
       // Obtain H_j^T P H_j without ever calculating P:
       // Instead work with products of D and H_j
       if (with_H_) {
-        DMatrix::mul_no_alloc_tn(D_[j], H, DTH_[j]);
+        mul_no_alloc_tn(D_[j], H, DTH_[j]);
       } else {
-        DMatrix::mul_no_alloc_tn(D_[j], e_, DTH_[j]);
+        mul_no_alloc_tn(D_[j], e_, DTH_[j]);
       }
 
-      DMatrix::mul_no_alloc_nn(V, DTH_[j], VDTH_[j]);
+      mul_no_alloc_nn(V, DTH_[j], VDTH_[j]);
 
       if (with_H_) {
         for (int k=0;k<Hs_.size();++k) {
@@ -308,13 +308,13 @@ namespace casadi {
                     VDTH_[j].begin()+VDTHvi_[j][k+1],
                     VDTHv_[j][k].begin());
 
-          DMatrix::mul_no_alloc_tn(DTHv_[j][k], VDTHv_[j][k], Pv_[k]);
+          mul_no_alloc_tn(DTHv_[j][k], VDTHv_[j][k], Pv_[k]);
           std::copy(Pv_[k].begin(),
                     Pv_[k].end(),
                     output(LR_DLE_Y).begin()+Pi_[k]);
         }
       } else {
-        DMatrix::mul_no_alloc_tn(DTH_[j], VDTH_[j], output(LR_DLE_Y));
+        mul_no_alloc_tn(DTH_[j], VDTH_[j], output(LR_DLE_Y));
       }
     }
 
@@ -329,8 +329,8 @@ namespace casadi {
 
       // Symmetrize Vd
       Vdsymm_.setAll(0);
-      DMatrix::mul_no_alloc_nn(Vd, em_, Vdsymm_);
-      DMatrix::mul_no_alloc_tn(Vd, em_, Vdsymm_);
+      mul_no_alloc_nn(Vd, em_, Vdsymm_);
+      mul_no_alloc_tn(Vd, em_, Vdsymm_);
 
       if (with_C_) {
         std::copy(Cd.begin(), Cd.end(), D_ad_[0].begin());
@@ -341,16 +341,16 @@ namespace casadi {
 
       VD_ad_[0].setAll(0); // Clear variable
 
-      DMatrix::mul_no_alloc_nt(Vdsymm_, with_C_ ? C : e_, VD_ad_[0]);
+      mul_no_alloc_nt(Vdsymm_, with_C_ ? C : e_, VD_ad_[0]);
       if (with_C_) {
-        DMatrix::mul_no_alloc_nt(V, Cd, VD_ad_[0]);
+        mul_no_alloc_nt(V, Cd, VD_ad_[0]);
       }
 
       // Replay main-loop
       for (int i=0;i<r;++i) {
        D_ad_[i+1].setAll(0);
-       DMatrix::mul_no_alloc_nn(A, D_ad_[i], D_ad_[i+1]);
-       DMatrix::mul_no_alloc_nn(Ad, D_[i], D_ad_[i+1]);
+       mul_no_alloc_nn(A, D_ad_[i], D_ad_[i+1]);
+       mul_no_alloc_nn(Ad, D_[i], D_ad_[i+1]);
       }
 
       if (with_H_) {
@@ -369,13 +369,13 @@ namespace casadi {
         VDTH_ad_[j].setAll(0);
 
         if (with_H_) {
-          DMatrix::mul_no_alloc_tn(D_ad_[j], H, DTH_ad_[j]);
-          DMatrix::mul_no_alloc_tn(D_[j], Hd, DTH_ad_[j]);
+          mul_no_alloc_tn(D_ad_[j], H, DTH_ad_[j]);
+          mul_no_alloc_tn(D_[j], Hd, DTH_ad_[j]);
         } else {
-          DMatrix::mul_no_alloc_tn(D_ad_[j], e_, DTH_ad_[j]);
+          mul_no_alloc_tn(D_ad_[j], e_, DTH_ad_[j]);
         }
-        DMatrix::mul_no_alloc_nn(Vdsymm_, DTH_[j], VDTH_ad_[j]);
-        DMatrix::mul_no_alloc_nn(V, DTH_ad_[j], VDTH_ad_[j]);
+        mul_no_alloc_nn(Vdsymm_, DTH_[j], VDTH_ad_[j]);
+        mul_no_alloc_nn(V, DTH_ad_[j], VDTH_ad_[j]);
 
         if (with_H_) {
           for (int k=0;k<Hs_.size();++k) {
@@ -383,13 +383,13 @@ namespace casadi {
               DTH_ad_[j].begin()+DTHvi_[j][k+1], DTHv_ad_[j][k].begin());
             std::copy(VDTH_ad_[j].begin()+VDTHvi_[j][k],
               VDTH_ad_[j].begin()+VDTHvi_[j][k+1], VDTHv_ad_[j][k].begin());
-            DMatrix::mul_no_alloc_tn(DTHv_ad_[j][k], VDTHv_[j][k], Pv_[k]);
-            DMatrix::mul_no_alloc_tn(DTHv_[j][k], VDTHv_ad_[j][k], Pv_[k]);
+            mul_no_alloc_tn(DTHv_ad_[j][k], VDTHv_[j][k], Pv_[k]);
+            mul_no_alloc_tn(DTHv_[j][k], VDTHv_ad_[j][k], Pv_[k]);
 
           }
         } else {
-          DMatrix::mul_no_alloc_tn(DTH_ad_[j], VDTH_[j], output(LR_DLE_NUM_OUT*(d+1)+LR_DLE_Y));
-          DMatrix::mul_no_alloc_tn(DTH_[j], VDTH_ad_[j], output(LR_DLE_NUM_OUT*(d+1)+LR_DLE_Y));
+          mul_no_alloc_tn(DTH_ad_[j], VDTH_[j], output(LR_DLE_NUM_OUT*(d+1)+LR_DLE_Y));
+          mul_no_alloc_tn(DTH_[j], VDTH_ad_[j], output(LR_DLE_NUM_OUT*(d+1)+LR_DLE_Y));
         }
       }
 
@@ -444,11 +444,11 @@ namespace casadi {
           for (int k=0;k<Hs_.size();++k) {
             DMatrix & Yb = Pv_[k];
 
-            DMatrix::mul_no_alloc_nt(VDTHv_[j][k], Yb, DTHv_ad_[j][k]);
-            DMatrix::mul_no_alloc_nt(DTHv_[j][k], Yb, VDTHv_ad_[j][k]);
+            mul_no_alloc_nt(VDTHv_[j][k], Yb, DTHv_ad_[j][k]);
+            mul_no_alloc_nt(DTHv_[j][k], Yb, VDTHv_ad_[j][k]);
 
-            DMatrix::mul_no_alloc_nn(VDTHv_[j][k], Yb, DTHv_ad_[j][k]);
-            DMatrix::mul_no_alloc_nn(DTHv_[j][k], Yb, VDTHv_ad_[j][k]);
+            mul_no_alloc_nn(VDTHv_[j][k], Yb, DTHv_ad_[j][k]);
+            mul_no_alloc_nn(DTHv_[j][k], Yb, VDTHv_ad_[j][k]);
 
             for (int kk=0;kk<DTHv_ad_[j][k].nnz();++kk) DTHv_ad_[j][k][kk]*=0.5;
             for (int kk=0;kk<VDTHv_ad_[j][k].nnz();++kk) VDTHv_ad_[j][k][kk]*=0.5;
@@ -462,38 +462,38 @@ namespace casadi {
           }
         } else {
           DMatrix & Yb = input(LR_DLE_NUM_IN*(nfwd_+1)+LR_DLE_NUM_OUT*d+LR_DLE_Y);
-          DMatrix::mul_no_alloc_nt(VDTH_[j], Yb, DTH_ad_[j]);
-          DMatrix::mul_no_alloc_nt(DTH_[j], Yb, VDTH_ad_[j]);
+          mul_no_alloc_nt(VDTH_[j], Yb, DTH_ad_[j]);
+          mul_no_alloc_nt(DTH_[j], Yb, VDTH_ad_[j]);
 
-          DMatrix::mul_no_alloc_nn(VDTH_[j], Yb, DTH_ad_[j]);
-          DMatrix::mul_no_alloc_nn(DTH_[j], Yb, VDTH_ad_[j]);
+          mul_no_alloc_nn(VDTH_[j], Yb, DTH_ad_[j]);
+          mul_no_alloc_nn(DTH_[j], Yb, VDTH_ad_[j]);
 
           for (int kk=0;kk<DTH_ad_[j].nnz();++kk) DTH_ad_[j][kk]*=0.5;
           for (int kk=0;kk<VDTH_ad_[j].nnz();++kk) VDTH_ad_[j][kk]*=0.5;
 
         }
-        DMatrix::mul_no_alloc_nt(VDTH_ad_[j], DTH_[j], Vb);
-        DMatrix::mul_no_alloc_tn(V, VDTH_ad_[j], DTH_ad_[j]);
+        mul_no_alloc_nt(VDTH_ad_[j], DTH_[j], Vb);
+        mul_no_alloc_tn(V, VDTH_ad_[j], DTH_ad_[j]);
 
         if (with_H_)  {
-          DMatrix::mul_no_alloc_nn(D_[j], DTH_ad_[j], Hb);
+          mul_no_alloc_nn(D_[j], DTH_ad_[j], Hb);
         }
-        DMatrix::mul_no_alloc_nt(with_H_? H : e_, DTH_ad_[j], D_ad_[j]);
+        mul_no_alloc_nt(with_H_? H : e_, DTH_ad_[j], D_ad_[j]);
 
       }
       // Replay main-loop in reverse order
       for (int i=r;i>=0;--i) {
-       DMatrix::mul_no_alloc_nt(D_ad_[i+1], D_[i], Ab);
-       DMatrix::mul_no_alloc_tn(A, D_ad_[i+1], D_ad_[i]);
+       mul_no_alloc_nt(D_ad_[i+1], D_[i], Ab);
+       mul_no_alloc_tn(A, D_ad_[i+1], D_ad_[i]);
       }
 
       if (with_C_) {
-        DMatrix::mul_no_alloc_tn(VD_ad_[0], V, Cb);
+        mul_no_alloc_tn(VD_ad_[0], V, Cb);
       }
-      DMatrix::mul_no_alloc_nn(VD_ad_[0], with_C_? C : e_, Vb);
+      mul_no_alloc_nn(VD_ad_[0], with_C_? C : e_, Vb);
 
       if (with_C_) {
-        DMatrix::mul_no_alloc_nn(e_, D_ad_[0], Cb);
+        mul_no_alloc_nn(e_, D_ad_[0], Cb);
       }
 
       // Clear adjoint seeds
@@ -527,7 +527,138 @@ namespace casadi {
     return node;
   }
 
+  void SmithLrDleInternal::mul_no_alloc_nn(const DMatrix &x, const DMatrix &y,
+                                           DMatrix& z) {
+    // Assert dimensions
+    casadi_assert_message(x.size1()==z.size1(), "Dimension error. Got x=" << x.dimString()
+                          << " and z=" << z.dimString() << ".");
+    casadi_assert_message(y.size2()==z.size2(), "Dimension error. Got y=" << y.dimString()
+                          << " and z=" << z.dimString() << ".");
+    casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.dimString()
+                          << " and x=" << x.dimString() << ".");
+
+    // Direct access to the arrays
+    int y_ncol = y.size2();
+    const int* y_colind = y.colind();
+    const int* y_row = y.row();
+    const std::vector<double> &y_data = y.data();
+    const int* x_colind = x.colind();
+    const int* x_row = x.row();
+    const std::vector<double> &x_data = x.data();
+    const int* z_colind = z.colind();
+    const int* z_row = z.row();
+    std::vector<double> &z_data = z.data();
+
+    // loop over the cols of the first argument
+    for (int i=0; i<y_ncol; ++i) {
+      // loop over the non-zeros of the first argument
+      for (int el=y_colind[i]; el<y_colind[i+1]; ++el) {
+        int j = y_row[el];
+        int el1 = z_colind[i];
+        int el2 = x_colind[j];
+        while (el1 < z_colind[i+1] && el2 < x_colind[j+1]) { // loop over matching non-zero elements
+          int j1 = z_row[el1];
+          int i2 = x_row[el2];
+          if (j1==i2) {
+            z_data[el1++] += y_data[el]*x_data[el2++];
+          } else if (j1<i2) {
+            el1++;
+          } else {
+            el2++;
+          }
+        }
+      }
+    }
+  }
+
+  void SmithLrDleInternal::mul_no_alloc_nt(const DMatrix &x, const DMatrix& y_trans,
+                                           DMatrix &z) {
+    // Assert dimensions
+    casadi_assert_message(y_trans.size1()==z.size2(), "Dimension error. Got y_trans="
+                          << y_trans.dimString() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(x.size1()==z.size1(), "Dimension error. Got x=" << x.dimString()
+                          << " and z=" << z.dimString() << ".");
+    casadi_assert_message(y_trans.size2()==x.size2(), "Dimension error. Got y_trans="
+                          << y_trans.dimString() << " and x=" << x.dimString() << ".");
+
+    // Direct access to the arrays
+    const int* y_rowind = y_trans.colind();
+    int y_nrow = y_trans.size2();
+    const int* y_col = y_trans.row();
+    const std::vector<double> &y_trans_data = y_trans.data();
+    const int* x_colind = x.colind();
+    const int* x_row = x.row();
+    const std::vector<double> &x_data = x.data();
+    const int* z_colind = z.colind();
+    const int* z_row = z.row();
+    std::vector<double> &z_data = z.data();
+
+    // loop over the rows of the first argument
+    for (int i=0; i<y_nrow; ++i) {
+      // loop over the non-zeros of the first argument
+      for (int el=y_rowind[i]; el<y_rowind[i+1]; ++el) {
+        int j = y_col[el];
+        int el1 = x_colind[i];
+        int el2 = z_colind[j];
+        while (el1 < x_colind[i+1] && el2 < z_colind[j+1]) { // loop over matching non-zero elements
+          int j1 = x_row[el1];
+          int i2 = z_row[el2];
+          if (j1==i2) {
+            z_data[el2++] += y_trans_data[el] * x_data[el1++];
+          } else if (j1<i2) {
+            el1++;
+          } else {
+            el2++;
+          }
+        }
+      }
+    }
+  }
+
+  void SmithLrDleInternal::mul_no_alloc_tn(const DMatrix &x_trans,
+                                           const DMatrix &y, DMatrix& z) {
+    // Assert dimensions
+    casadi_assert_message(y.size2()==z.size2(), "Dimension error. Got y="
+                          << y.dimString() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(x_trans.size2()==z.size1(), "Dimension error. Got x_trans="
+                          << x_trans.dimString() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(y.size1()==x_trans.size1(), "Dimension error. Got y="
+                          << y.dimString() << " and x_trans=" << x_trans.dimString() << ".");
+
+    // Direct access to the arrays
+    const int* y_colind = y.colind();
+    const int* y_row = y.row();
+    const std::vector<double> &y_data = y.data();
+    const int* x_rowind = x_trans.colind();
+    const int* x_col = x_trans.row();
+    const std::vector<double> &x_trans_data = x_trans.data();
+    int z_ncol = z.size2();
+    const int* z_colind = z.colind();
+    const int* z_row = z.row();
+    std::vector<double> &z_data = z.data();
+
+    // loop over the cols of the resulting matrix
+    for (int i=0; i<z_ncol; ++i) {
+      // loop over the non-zeros of the resulting matrix
+      for (int el=z_colind[i]; el<z_colind[i+1]; ++el) {
+        int j = z_row[el];
+        int el1 = y_colind[i];
+        int el2 = x_rowind[j];
+        while (el1 < y_colind[i+1] && el2 < x_rowind[j+1]) { // loop over non-zero elements
+          int j1 = y_row[el1];
+          int i2 = x_col[el2];
+          if (j1==i2) {
+            z_data[el] += y_data[el1++] * x_trans_data[el2++];
+          } else if (j1<i2) {
+            el1++;
+          } else {
+            el2++;
+          }
+        }
+      }
+    }
+  }
+
+
 
 } // namespace casadi
-
-
