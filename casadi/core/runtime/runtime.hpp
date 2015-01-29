@@ -70,7 +70,11 @@ namespace casadi {
 
   /// Sparse matrix-matrix multiplication: z <- z + x*y
   template<typename real_t>
-  void casadi_mm_sparse(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+  void casadi_sparse_mm(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+
+  /// Sparse matrix-matrix multiplication, first factor transposed: z <- z + trans(x)*y
+  template<typename real_t>
+  void casadi_sparse_mm_t(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
 
   /// NRM2: ||x||_2 -> return
   template<typename real_t>
@@ -228,37 +232,58 @@ namespace casadi {
 
   template<typename real_t>
   void casadi_mm_sparse(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
-    /*int nrow_x = sp_x[0];*/
+    /* Get sparsities */
     int ncol_x = sp_x[1];
-    const int* colind_x = sp_x+2;
-    const int* row_x = sp_x + 2 + ncol_x+1;
-    /*int nnz_x = colind_x[ncol_x];*/
-
-    /*int nrow_y = sp_y[0];*/
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
     int ncol_y = sp_y[1];
-    const int* colind_y = sp_y+2;
-    const int* row_y = sp_y + 2 + ncol_y+1;
-    /*int nnz_y = colind_y[ncol_y];*/
-
-    /*int nrow_z = sp_z[0];*/
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
     int ncol_z = sp_z[1];
-    const int* colind_z = sp_z+2;
-    const int* row_z = sp_z + 2 + ncol_z+1;
-    /*int nnz_z = colind_z[ncol_z];*/
+    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
 
+    /* Loop over the columns of y and z */
     for (int cc=0; cc<ncol_y; ++cc) {
+      /* Get the dense column of z */
       for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
         w[row_z[kk]] = z[kk];
       }
+      /* Loop over the nonzeros of y */
       for (int kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
         int rr = row_y[kk];
-        real_t yy = y[kk];
+        /* Loop over corresponding columns of x */
         for (int kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
-          w[row_x[kk1]] += x[kk1]*yy;
+          w[row_x[kk1]] += x[kk1]*y[kk];
         }
       }
+      /* Get the sparse column of z */
       for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
         z[kk] = w[row_z[kk]];
+      }
+    }
+  }
+
+  template<typename real_t>
+  void casadi_mm_sparse_t(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    int ncol_z = sp_z[1];
+    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
+
+    /* Loop over the columns of y and z */
+    for (int cc=0; cc<ncol_z; ++cc) {
+      /* Get the dense column of y */
+      for (int kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+        w[row_y[kk]] = y[kk];
+      }
+      /* Loop over the nonzeros of z */
+      for (int kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+        int rr = row_z[kk];
+        /* Loop over corresponding columns of x */
+        for (int kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+          z[kk] += x[kk1] * w[row_x[kk1]];
+        }
       }
     }
   }

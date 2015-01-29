@@ -1582,59 +1582,12 @@ namespace casadi {
                             "Work vector too small: " << work.size() << " < " << z.size1());
     }
 
-    // Direct access to the arrays
-    const int* y_colind = y.colind();
-    const int* y_row = y.row();
-    const std::vector<DataType> &y_data = y.data();
-    const int* x_colind = x.colind();
-    const int* x_row = x.row();
-    const std::vector<DataType> &x_data = x.data();
-    const int* z_colind = z.colind();
-    const int* z_row = z.row();
-    std::vector<DataType> &z_data = z.data();
-
-    // Loop over the columns of y and z
-    int ncol = z.size2();
-    for (int cc=0; cc<ncol; ++cc) {
-      if (transpose_x) { // Transposed variant, loop over z
-
-        // Get the dense column of y
-        for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
-          work[y_row[kk]] = y_data[kk];
-        }
-
-        // Loop over the nonzeros of z
-        for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
-          int rr = z_row[kk];
-
-          // Loop over corresponding columns of x
-          for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
-            z_data[kk] += x_data[kk1] * work[x_row[kk1]];
-          }
-        }
-
-      } else { // Non-transposed variant, loop over y
-
-        // Get the dense column of z
-        for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
-          work[z_row[kk]] = z_data[kk];
-        }
-
-        // Loop over the nonzeros of y
-        for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
-          int rr = y_row[kk];
-
-          // Loop over corresponding columns of x
-          for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
-            work[x_row[kk1]] += x_data[kk1] * y_data[kk];
-          }
-        }
-
-        // Get the sparse column of z
-        for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
-          z_data[kk] = work[z_row[kk]];
-        }
-      }
+    if (transpose_x) {
+      casadi_mm_sparse_t(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
+                         z.ptr(), z.sparsity(), getPtr(work));
+    } else {
+      casadi_mm_sparse(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
+                       z.ptr(), z.sparsity(), getPtr(work));
     }
   }
 
