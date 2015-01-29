@@ -1134,7 +1134,6 @@ namespace casadi {
     int ret_nrow = sp[0].size1();
 
     // Append all patterns
-    int ret_ = 0;
     for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
       // Get sparsity pattern
       int sp_nrow = i->size1();
@@ -1175,7 +1174,6 @@ namespace casadi {
     int ret_ncol = sp[0].size2();
 
     // Append all patterns
-    int ret_ = 0;
     for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
       // Get sparsity pattern
       int sp_nrow = i->size1();
