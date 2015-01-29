@@ -123,6 +123,7 @@ void qr(const MatType& A, MatType& OUTPUT, MatType& OUTPUT);
 //MatType any(const MatType &x);
 MatType project(const MatType& A, const Sparsity& sp);
 MatType sparsify(const MatType& A, double tol=0);
+MatType norm_inf_mul(const MatType &x, const MatType &y);
 %enddef
 
 %define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType...)
@@ -133,10 +134,6 @@ GENERIC_MATRIX_DECL(MatType)
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<DataType>)
 MATRIX_DECL(casadi::Matrix<DataType>)
-DataType norm_inf_mul_nn(const casadi::Matrix<DataType> &x,
-                         const casadi::Matrix<DataType> &y,
-                         std::vector<DataType>& Dwork,
-                         std::vector<int>& Iwork);
 int norm_0_mul_nn(const casadi::Matrix<DataType> &x,
                   const casadi::Matrix<DataType> &y,
                   std::vector<bool>& Bwork,

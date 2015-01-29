@@ -566,9 +566,7 @@ namespace casadi {
     int zz_norm_0_mul_nn(const Matrix<DataType>& B,
                          std::vector<bool>& Bwork,
                          std::vector<int>& Iwork) const;
-    DataType zz_norm_inf_mul_nn(const Matrix<DataType> &y,
-                                std::vector<DataType>& Dwork,
-                                std::vector<int>& Iwork) const;
+    Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
     ///@}
 
     /// \endcond
@@ -612,19 +610,10 @@ namespace casadi {
     /// Returns true if any element in the matrix is true
     inline friend Matrix<DataType> any(const Matrix<DataType> &x) { return x.zz_any();}
 
-    /** Inf-norm of a Matrix-matrix product, no memory allocation
-     *   mul(x, y)
-     *
-     * \param Dwork  A double work vector that you must allocate
-     *               Minimum size: y.size1()
-     * \param Iwork  A integer work vector that you must allocate
-     *               Minimum size: y.size1()+x.size2()+1
-     */
-    inline friend DataType norm_inf_mul_nn(const Matrix<DataType> &x,
-                                           const Matrix<DataType> &y,
-                                           std::vector<DataType>& Dwork,
-                                           std::vector<int>& Iwork) {
-      return x.zz_norm_inf_mul_nn(y, Dwork, Iwork);
+    /** Inf-norm of a Matrix-Matrix product */
+    inline friend Matrix<DataType>
+      norm_inf_mul(const Matrix<DataType> &x, const Matrix<DataType> &y) {
+      return x.zz_norm_inf_mul(y);
     }
 
     /** 0-norm (nonzero count) of a Matrix-matrix product, no memory allocation

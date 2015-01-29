@@ -243,7 +243,9 @@ namespace casadi {
 
       // Calculate the stopping criterion
       mul_no_alloc_nt(Vsymm_, D_[i+1], VD_[i+1]);
-      double norm = norm_inf_mul_nn(D_[i+1], VD_[i+1], Dwork_norm_, Iwork_norm_);
+      double norm = casadi_norm_inf_mul(D_[i+1].ptr(), D_[i+1].sparsity(),
+                                        VD_[i+1].ptr(), VD_[i+1].sparsity(),
+                                        getPtr(Dwork_norm_), getPtr(Iwork_norm_));
 
       if (print_iteration_) {
         // Only print iteration header oncein a while

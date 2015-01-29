@@ -2981,22 +2981,19 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::zz_norm_inf_mul_nn(const Matrix<DataType> &A,
-                                                std::vector<DataType>& Dwork,
-                                                std::vector<int>& Iwork) const {
-    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dimString()
-                          << " times " << A.dimString() << ".");
+  Matrix<DataType> Matrix<DataType>::zz_norm_inf_mul(const Matrix<DataType> &A) const {
     int n_row = A.size2();
     int n_col = size1();
-    casadi_assert_message(Dwork.size()>=n_col,
-                          "We need a bigger work vector (>="
-                          << n_col << "), but got " << Dwork.size() <<".");
-    casadi_assert_message(Iwork.size()>=n_row+1+n_col,
-                          "We need a bigger work vector (>=" << n_row+1+n_col
-                          << "), but got " << Iwork.size() <<".");
+    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dimString()
+                          << " times " << A.dimString() << ".");
 
+    // Allocate work vectors
+    std::vector<DataType> dwork(n_col);
+    std::vector<int> iwork(n_row+1+n_col);
+
+    // Call C runtime
     return casadi_norm_inf_mul(ptr(), sparsity(), A.ptr(), A.sparsity(),
-                               getPtr(Dwork), getPtr(Iwork));
+                               getPtr(dwork), getPtr(iwork));
   }
 
   template<typename DataType>
