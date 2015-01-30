@@ -2428,9 +2428,6 @@
 %exception  casadi::Matrix< DataType >::zz_ne(const Matrix< DataType > &y) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::zz_norm_0_mul_nn(const Matrix< DataType > &B, std::vector< bool > &Bwork, std::vector< int > &Iwork) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< DataType >::zz_norm_1() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2443,7 +2440,7 @@
 %exception  casadi::Matrix< DataType >::zz_norm_inf() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::zz_norm_inf_mul_nn(const Matrix< DataType > &y, std::vector< DataType > &Dwork, std::vector< int > &Iwork) const  {
+%exception  casadi::Matrix< DataType >::zz_norm_inf_mul(const Matrix< DataType > &y) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::zz_not() const  {
@@ -2528,9 +2525,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::zz_sparsify(double tol=0) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::zz_sprank() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::zz_spy() const  {
@@ -3859,6 +3853,9 @@
 %exception  casadi::Sparsity::zz_mtimes(const Sparsity &y) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Sparsity::zz_norm_0_mul(const Sparsity &B) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Sparsity::zz_reshape(const Sparsity &sp) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4643,6 +4640,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::isnan(double x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::iszero(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::linspace(std::vector< T > &v, const F &first, const L &last) {
