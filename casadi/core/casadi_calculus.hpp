@@ -174,6 +174,7 @@ namespace casadi {
   using std::tan;
   using std::atan;
   using std::asin;
+  using std::acos;
   using std::sinh;
   using std::cosh;
   using std::tanh;
