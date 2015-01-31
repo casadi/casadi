@@ -273,10 +273,10 @@ namespace casadi {
     cfile.close();
   }
 
-  void Function::generateCode(std::string& str, bool generate_main) {
+  std::string Function::generateCodeStr(bool generate_main) {
     std::ostringstream cfile;
     generateCode(cfile, generate_main);
-    str = cfile.str();
+    return cfile.str();
   }
 
   void Function::generateCode(std::ostream &stream, bool generate_main) {

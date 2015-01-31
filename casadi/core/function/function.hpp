@@ -412,10 +412,10 @@ NOTE: Does _not_ take ownership, only weak references to the derivatives are kep
     void generateCode(const std::string& filename, bool generate_main=false);
 
     /** \brief Generate C code for the function */
-    void generateCode(std::string& SWIG_OUTPUT(str), bool generate_main=false);
+    void generateCode(std::ostream& filename, bool generate_main=false);
 
     /** \brief Generate C code for the function */
-    void generateCode(std::ostream& filename, bool generate_main=false);
+    std::string generateCodeStr(bool generate_main=false);
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
