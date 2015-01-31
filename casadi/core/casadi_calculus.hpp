@@ -187,8 +187,6 @@ namespace casadi {
   using std::pow;
   using std::fmod;
   using std::atan2;
-  using std::fmin;
-  using std::fmax;
   ///@}
 
   ///@{
@@ -215,6 +213,12 @@ namespace casadi {
 
   /// Compare if two values are equal, up to a depth
   inline bool isEqual(double x, double y, int depth=0) { return x==y;}
+
+  /// fmin, fmax and erf should be available if C99 and/or C++11 required
+  inline double fmin(double x, double y) throw() { return std::min(x, y);}
+  inline int fmin(int x, int y) throw() { return std::min(x, y);}
+  inline double fmax(double x, double y) throw() { return std::max(x, y);}
+  inline int fmax(int x, int y) throw() { return std::max(x, y);}
   ///@}
 
 #ifdef HAS_ERF
