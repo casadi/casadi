@@ -220,6 +220,9 @@ namespace casadi {
   inline int fmin(int x, int y) throw() { return std::min(x, y);}
   inline double fmax(double x, double y) throw() { return std::max(x, y);}
   inline int fmax(int x, int y) throw() { return std::max(x, y);}
+
+  /// fabs(int) was added in C++11
+  inline int fabs(int x) throw() { return std::abs(x);}
   ///@}
 
 #ifdef HAS_ERF
