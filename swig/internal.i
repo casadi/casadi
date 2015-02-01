@@ -4450,49 +4450,16 @@
 %exception  casadi::ZeroSX::isZero() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::abs(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::acos(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::acosh(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::acosh(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::asin(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::asinh(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::asinh(double x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::atan(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::atan2(const T &x, const T &n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::atan2(const T &x, double n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::atan2(double x, const T &n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::atanh(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::atanh(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::casadi_load_linearsolver_csparsecholesky() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ceil(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::check_exposed(T t) {
@@ -4513,12 +4480,6 @@
 %exception  casadi::copysign(double x, double y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::cos(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::cosh(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::cumsum(const std::vector< T > &values) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4526,9 +4487,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::deepcopy(const A &a) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::erf(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::erf(double x) {
@@ -4540,22 +4498,7 @@
 %exception  casadi::erfinv(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::exp(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::fabs(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::floor(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::fmax(const T &x, const T &n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::fmax(const T &x, double n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::fmax(double x, const T &n) {
+%exception  casadi::fabs(int x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::fmax(double x, double y) {
@@ -4564,22 +4507,10 @@
 %exception  casadi::fmax(int x, int y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::fmin(const T &x, const T &n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::fmin(const T &x, double n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::fmin(double x, const T &n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::fmin(double x, double y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::fmin(int x, int y) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::fmod(const T &x, const T &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::getDescription(const std::vector< T > &v) {
@@ -4648,12 +4579,6 @@
 %exception  casadi::linspace(std::vector< T > &v, const F &first, const L &last) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::log(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::log10(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::makeVector(int size, int ind0=-1, const T &val0=T(), int ind1=-1, const T &val1=T(), int ind2=-1, const T &val2=T(), int ind3=-1, const T &val3=T(), int ind4=-1, const T &val4=T(), int ind5=-1, const T &val5=T(), int ind6=-1, const T &val6=T(), int ind7=-1, const T &val7=T(), int ind8=-1, const T &val8=T(), int ind9=-1, const T &val9=T(), int ind10=-1, const T &val10=T(), int ind11=-1, const T &val11=T(), int ind12=-1, const T &val12=T(), int ind13=-1, const T &val13=T(), int ind14=-1, const T &val14=T(), int ind15=-1, const T &val15=T(), int ind16=-1, const T &val16=T(), int ind17=-1, const T &val17=T(), int ind18=-1, const T &val18=T(), int ind19=-1, const T &val19=T()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4670,15 +4595,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::operation_checker(unsigned int op) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::pow(const T &x, const T &n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::pow(const T &x, double n) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::pow(double x, const T &n) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::print(const std::vector< T > &v, std::ostream &stream=CASADI_COUT) {
@@ -4726,31 +4642,13 @@
 %exception  casadi::shared_cast(const SharedObject &A) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::sign(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::sign(double x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::sin(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::sinh(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::sort(const std::vector< T > &values, std::vector< T > &sorted_values, std::vector< int > &indices, bool invert_indices=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::sq(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::sqrt(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::tan(const T &x) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::tanh(const T &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::toVector(const T &v0) {
