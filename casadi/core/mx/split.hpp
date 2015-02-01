@@ -52,13 +52,15 @@ namespace casadi {
     /** \brief  Get the sparsity of output oind */
     virtual const Sparsity& sparsity(int oind) const { return output_sparsity_.at(oind);}
 
+    /// Evaluate the function (template)
+    template<typename T, typename Mat>
+    void evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp);
+
     /// Evaluate the function numerically
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                           std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                            std::vector<SXElement>& rtmp);
+    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
 
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
@@ -66,10 +68,6 @@ namespace casadi {
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
-
-    /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV>
-    void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     // Sparsity pattern of the outputs
     std::vector<int> offset_;

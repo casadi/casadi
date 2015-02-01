@@ -43,29 +43,26 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                        std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void Split::evaluateD(const DMatrix** input, DMatrix** output,
+                        int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void Split::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                         std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void Split::evaluateSX(const SX** input, SX** output,
+                         int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void Split::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                          std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void Split::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     // Number of derivatives
     int nx = offset_.size()-1;
 
-    const MatV& arg = input;
-    MatV& res = output;
     for (int i=0; i<nx; ++i) {
       int nz_first = offset_[i];
       int nz_last = offset_[i+1];
-      if (res[i]!=0) {
-        copy(arg[0]->begin()+nz_first, arg[0]->begin()+nz_last, res[i]->begin());
+      if (output[i]!=0) {
+        copy(input[0]->ptr()+nz_first, input[0]->ptr()+nz_last, output[i]->ptr());
       }
     }
   }

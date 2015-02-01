@@ -41,24 +41,23 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                         std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void Concat::evaluateD(const DMatrix** input, DMatrix** output,
+                         int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void Concat::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                          std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void Concat::evaluateSX(const SX** input, SX** output,
+                          int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void Concat::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                           std::vector<T>& rtmp) {
-    typename vector<T>::iterator res_it = output[0]->data().begin();
-    for (int i=0; i<input.size(); ++i) {
-      const vector<T>& arg_i = input[i]->data();
-      copy(arg_i.begin(), arg_i.end(), res_it);
-      res_it += arg_i.size();
+  template<typename T, typename Mat>
+  void Concat::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+    T* res = output[0]->ptr();
+    for (int i=0; i<ndep(); ++i) {
+      const T* arg_i = input[i]->ptr();
+      copy(arg_i, arg_i+dep(i).nnz(), res);
+      res += dep(i).nnz();
     }
   }
 
