@@ -1157,6 +1157,22 @@ namespace casadi {
     return Sparsity::triplet(ret_nrow, ret_ncol, ret_row, ret_col);
   }
 
+  Sparsity Sparsity::zz_kron(const Sparsity& b) const {
+    const Sparsity &a_sp = (*this);
+    Sparsity filler = Sparsity(b.shape());
+    std::vector< std::vector< Sparsity > >
+      blocks(size1(), std::vector< Sparsity >(size2(), filler));
+    for (int i=0;i<size1();++i) {
+      for (int j=0;j<size2();++j) {
+        int k = a_sp.getNZ(i, j);
+        if (k!=-1) {
+          blocks[i][j] = b;
+        }
+      }
+    }
+    return blockcat(blocks);
+  }
+
   Sparsity Sparsity::zz_vertcat(const std::vector<Sparsity> & sp) {
     // Quick return if possible
     if (sp.empty()) return Sparsity();

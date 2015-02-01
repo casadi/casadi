@@ -356,6 +356,15 @@ namespace casadi {
     inline friend MatType tril(const MatType& a, bool includeDiagonal=true) {
       return a.zz_tril(includeDiagonal);
     }
+
+    /** \brief Kronecker tensor product
+     *
+     * Creates a block matrix in which each element (i, j) is a_ij*b
+     */
+    inline friend MatType kron(const MatType& a, const MatType& b) {
+      return a.zz_kron(b);
+    }
+
 #endif // !SWIG || DOXYGEN
 /** @} */
   };

@@ -262,12 +262,6 @@ namespace casadi {
      */
     inline friend MatType triu2symm(const MatType &a) { return a.zz_triu2symm();}
 
-    /** \brief Kronecker tensor product
-     *
-     * Creates a block matrix in which each element (i, j) is a_ij*b
-     */
-    inline friend MatType kron(const MatType& a, const MatType& b) { return a.zz_kron(b); }
-
     /** \brief  Frobenius norm  */
     inline friend MatType norm_F(const MatType &x) { return x.zz_norm_F();}
 

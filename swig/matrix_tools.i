@@ -79,6 +79,7 @@ int sprank(const MatType& A);
 MatType triu(const MatType& a, bool includeDiagonal=true);
 MatType tril(const MatType& a, bool includeDiagonal=true);
 int norm_0_mul(const MatType &x, const MatType &y);
+MatType kron(const MatType& a, const MatType& b);
 %enddef
 
 %define GENERIC_MATRIX_DECL(MatType...)
@@ -93,7 +94,6 @@ MatType trace(const MatType& a);
 bool isEqual(const MatType& x, const MatType& y, int depth=0);
 MatType tril2symm(const MatType &a);
 MatType triu2symm(const MatType &a);
-MatType kron(const MatType& a, const MatType& b);
 MatType norm_F(const MatType &x);
 MatType norm_2(const MatType &x);
 MatType norm_1(const MatType &x);

@@ -559,6 +559,18 @@ class Sparsitytests(casadiTestCase):
       
       with internalAPI():
         s.reCache()
+
+  def test_kron(self):
+    a = sparsify(DMatrix([[1,0,6],[2,7,0]]))
+    b = sparsify(DMatrix([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))
+    
+    c_ = c.kron(a.sparsity(),b.sparsity())
+    
+    self.assertEqual(c_.size1(),a.size1()*b.size1())
+    self.assertEqual(c_.size2(),a.size2()*b.size2())
+    self.assertEqual(c_.nnz(),a.nnz()*b.nnz())
+    
+    self.checkarray(IMatrix(c_,1),IMatrix(c.kron(a,b).sparsity(),1))
     
 if __name__ == '__main__':
     unittest.main()
