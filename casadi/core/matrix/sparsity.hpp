@@ -176,8 +176,8 @@ namespace casadi {
 
     /** \brief Create banded square sparsity pattern
      *
-     * band(n, 0) is equivalent to diag(n) \n
-     * band(n, 1) is tri-diagonal matrix \n
+     * banded(n, 0) is equivalent to diag(n) \n
+     * banded(n, 1) is tri-diagonal matrix \n
      **/
     static Sparsity banded(int n, int p);
 
