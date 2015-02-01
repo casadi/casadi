@@ -39,72 +39,65 @@ namespace casadi {
     setDependencies(y);
   }
 
-  void GetNonzerosVector::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                    std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void GetNonzerosVector::evaluateD(const DMatrix** input, DMatrix** output,
+                                    int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void GetNonzerosVector::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                                     std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void GetNonzerosVector::evaluateSX(const SX** input, SX** output,
+                                     int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosVector::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                                      std::vector<T>& rtmp) {
-    const vector<T>& idata = input[0]->data();
-    typename vector<T>::iterator odata_it = output[0]->begin();
+  template<typename T, typename Mat>
+  void GetNonzerosVector::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+    const T* idata = input[0]->ptr();
+    T* odata = output[0]->ptr();
     for (vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k) {
-      *odata_it++ = *k>=0 ? idata[*k] : 0;
+      *odata++ = *k>=0 ? idata[*k] : 0;
     }
   }
 
-  void GetNonzerosSlice::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                   std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void GetNonzerosSlice::evaluateD(const DMatrix** input, DMatrix** output,
+                                   int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void GetNonzerosSlice::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                                    std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void GetNonzerosSlice::evaluateSX(const SX** input, SX** output,
+                                    int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosSlice::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                                     std::vector<T>& rtmp) {
-
-    const vector<T>& idata = input[0]->data();
-    const T* idata_ptr = getPtr(idata) + s_.start_;
-    const T* idata_stop = getPtr(idata) + s_.stop_;
-    T* odata_ptr = getPtr(output[0]->data());
-    for (; idata_ptr != idata_stop; idata_ptr += s_.step_) {
-      *odata_ptr++ = *idata_ptr;
+  template<typename T, typename Mat>
+  void GetNonzerosSlice::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+    const T* idata = input[0]->ptr() + s_.start_;
+    const T* idata_stop = input[0]->ptr() + s_.stop_;
+    T* odata = output[0]->ptr();
+    for (; idata != idata_stop; idata += s_.step_) {
+      *odata++ = *idata;
     }
   }
 
-  void GetNonzerosSlice2::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                    std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void GetNonzerosSlice2::evaluateD(const DMatrix** input, DMatrix** output,
+                                    int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void GetNonzerosSlice2::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                                     std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void GetNonzerosSlice2::evaluateSX(const SX** input, SX** output,
+                                     int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosSlice2::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                                      std::vector<T>& rtmp) {
-
-    const vector<T>& idata = input[0]->data();
-    const T* outer_ptr = getPtr(idata) + outer_.start_;
-    const T* outer_stop = getPtr(idata) + outer_.stop_;
-    T* odata_ptr = getPtr(output[0]->data());
-    for (; outer_ptr != outer_stop; outer_ptr += outer_.step_) {
-      for (const T* inner_ptr = outer_ptr+inner_.start_;
-          inner_ptr != outer_ptr+inner_.stop_;
-          inner_ptr += inner_.step_) {
-        *odata_ptr++ = *inner_ptr;
+  template<typename T, typename Mat>
+  void GetNonzerosSlice2::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+    const T* outer = input[0]->ptr() + outer_.start_;
+    const T* outer_stop = input[0]->ptr() + outer_.stop_;
+    T* odata = output[0]->ptr();
+    for (; outer != outer_stop; outer += outer_.step_) {
+      for (const T* inner = outer+inner_.start_;
+          inner != outer+inner_.stop_;
+          inner += inner_.step_) {
+        *odata++ = *inner;
       }
     }
   }

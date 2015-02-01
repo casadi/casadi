@@ -272,106 +272,97 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                         std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void SetNonzerosVector<Add>::evaluateD(const DMatrix** input, DMatrix** output,
+                                         int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output,
-                                          std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void SetNonzerosVector<Add>::evaluateSX(const SX** input, SX** output,
+                                          int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  template<typename T, typename MatV, typename MatVV>
-  void SetNonzerosVector<Add>::evaluateGen(const MatV& input, MatV& output,
-                                           std::vector<int>& itmp, std::vector<T>& rtmp) {
-
-    const vector<T>& idata0 = input[0]->data();
-    typename vector<T>::const_iterator idata_it = input[1]->begin();
-    vector<T>& odata = output[0]->data();
-    if (&idata0 != &odata) {
-      copy(idata0.begin(), idata0.end(), odata.begin());
+  template<typename T, typename Mat>
+  void SetNonzerosVector<Add>::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+    const T* idata0 = input[0]->ptr();
+    const T* idata = input[1]->ptr();
+    T* odata = output[0]->ptr();
+    if (idata0 != odata) {
+      copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
-    for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++idata_it) {
+    for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++idata) {
       if (Add) {
-        if (*k>=0) odata[*k] += *idata_it;
+        if (*k>=0) odata[*k] += *idata;
       } else {
-        if (*k>=0) odata[*k] = *idata_it;
+        if (*k>=0) odata[*k] = *idata;
       }
     }
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                        std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void SetNonzerosSlice<Add>::evaluateD(const DMatrix** input, DMatrix** output,
+                                    int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output,
-                                         std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void SetNonzerosSlice<Add>::evaluateSX(const SX** input, SX** output,
+                                         int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  template<typename T, typename MatV, typename MatVV>
-  void SetNonzerosSlice<Add>::evaluateGen(const MatV& input, MatV& output,
-                                          std::vector<int>& itmp, std::vector<T>& rtmp) {
-
-    const vector<T>& idata0 = input[0]->data();
-    vector<T>& odata = output[0]->data();
-    if (&idata0 != &odata) {
-      copy(idata0.begin(), idata0.end(), odata.begin());
+  template<typename T, typename Mat>
+  void SetNonzerosSlice<Add>::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+    const T* idata0 = input[0]->ptr();
+    const T* idata = input[1]->ptr();
+    T* odata = output[0]->ptr();
+    if (idata0 != odata) {
+      copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
-    const vector<T>& idata = input[1]->data();
-    const T* idata_ptr = getPtr(idata);
-    T* odata_ptr = getPtr(odata) + s_.start_;
-    T* odata_stop = getPtr(odata) + s_.stop_;
-    for (; odata_ptr != odata_stop; odata_ptr += s_.step_) {
+    T* odata_stop = odata + s_.stop_;
+    for (odata += s_.start_; odata != odata_stop; odata += s_.step_) {
       if (Add) {
-        *odata_ptr += *idata_ptr++;
+        *odata += *idata++;
       } else {
-        *odata_ptr = *idata_ptr++;
+        *odata = *idata++;
       }
     }
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                         std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void SetNonzerosSlice2<Add>::evaluateD(const DMatrix** input, DMatrix** output,
+                                         int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output,
-                                          std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void SetNonzerosSlice2<Add>::evaluateSX(const SX** input, SX** output,
+                                          int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  template<typename T, typename MatV, typename MatVV>
-  void SetNonzerosSlice2<Add>::evaluateGen(const MatV& input, MatV& output,
-                                           std::vector<int>& itmp, std::vector<T>& rtmp) {
-
-    const vector<T>& idata0 = input[0]->data();
-    vector<T>& odata = output[0]->data();
-    if (&idata0 != &odata) {
-      copy(idata0.begin(), idata0.end(), odata.begin());
+  template<typename T, typename Mat>
+  void SetNonzerosSlice2<Add>::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+    const T* idata0 = input[0]->ptr();
+    const T* idata = input[1]->ptr();
+    T* odata = output[0]->ptr();
+    if (idata0 != odata) {
+      copy(idata0, idata0 + this->dep(0).nnz(), odata);
     }
-    const vector<T>& idata = input[1]->data();
-    const T* idata_ptr = getPtr(idata);
-    T* outer_ptr = getPtr(odata) + outer_.start_;
-    T* outer_stop = getPtr(odata) + outer_.stop_;
-    for (; outer_ptr != outer_stop; outer_ptr += outer_.step_) {
-      for (T* inner_ptr = outer_ptr+inner_.start_;
-          inner_ptr != outer_ptr+inner_.stop_;
-          inner_ptr += inner_.step_) {
+    T* outer_stop = odata + outer_.stop_;
+    T* outer = odata + outer_.start_;
+    for (; outer != outer_stop; outer += outer_.step_) {
+      for (T* inner = outer+inner_.start_;
+          inner != outer+inner_.stop_;
+          inner += inner_.step_) {
         if (Add) {
-          *inner_ptr += *idata_ptr++;
+          *inner += *idata++;
         } else {
-          *inner_ptr = *idata_ptr++;
+          *inner = *idata++;
         }
       }
     }
