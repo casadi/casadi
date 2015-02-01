@@ -134,10 +134,12 @@ namespace casadi {
     /** \brief  Evaluate numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                            std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                             std::vector<SXElement>& rtmp);
+    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output,

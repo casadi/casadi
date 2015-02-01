@@ -74,18 +74,18 @@ namespace casadi {
     }
   }
 
-  void Assertion::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                             std::vector<SXElement>& rtmp) {
-    *output[0] = *input[0];
+  void Assertion::evaluateSX(const SX** input, SX** output,
+                             int* itmp, SXElement* rtmp) {
+    copy(input[0]->begin(), input[0]->end(), output[0]->begin());
   }
 
-  void Assertion::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                            std::vector<double>& rtmp) {
+  void Assertion::evaluateD(const DMatrix** input, DMatrix** output,
+                            int* itmp, double* rtmp) {
     if ((*input[1]).at(0)!=1) {
       casadi_error("Assertion error: " << fail_message_);
     }
 
-    *output[0] = *input[0];
+    copy(input[0]->begin(), input[0]->end(), output[0]->begin());
   }
 
   void Assertion::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {

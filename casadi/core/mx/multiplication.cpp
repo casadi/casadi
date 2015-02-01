@@ -59,25 +59,24 @@ namespace casadi {
     }
   }
 
-  void Multiplication::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                 std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void Multiplication::evaluateD(const DMatrix** input, DMatrix** output,
+                                 int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void Multiplication::evaluateSX(const SXPtrV& input, SXPtrV& output,
-                                  std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void Multiplication::evaluateSX(const SX** input, SX** output,
+                                  int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void Multiplication::evaluateGen(const MatV& input, MatV& output,
-                                   std::vector<int>& itmp, std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void Multiplication::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     if (input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
-    casadi_mm_sparse(input[1]->ptr(), input[1]->sparsity(),
-                     input[2]->ptr(), input[2]->sparsity(),
-                     output[0]->ptr(), output[0]->sparsity(), getPtr(rtmp));
+    casadi_mm_sparse(input[1]->ptr(), dep(1).sparsity(),
+                     input[2]->ptr(), dep(2).sparsity(),
+                     output[0]->ptr(), sparsity(), rtmp);
   }
 
   void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output,
@@ -91,15 +90,15 @@ namespace casadi {
     int nfwd = fwdSens.size();
     for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = *fwdSeed[d][0]
-        + mul(*input[1], *fwdSeed[d][2], MX::zeros(input[0]->sparsity()))
-        + mul(*fwdSeed[d][1], *input[2], MX::zeros(input[0]->sparsity()));
+        + mul(*input[1], *fwdSeed[d][2], MX::zeros(dep(0).sparsity()))
+        + mul(*fwdSeed[d][1], *input[2], MX::zeros(dep(0).sparsity()));
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for (int d=0; d<nadj; ++d) {
-      adjSens[d][1]->addToSum(mul(*adjSeed[d][0], input[2]->T(), MX::zeros(input[1]->sparsity())));
-      adjSens[d][2]->addToSum(mul(input[1]->T(), *adjSeed[d][0], MX::zeros(input[2]->sparsity())));
+      adjSens[d][1]->addToSum(mul(*adjSeed[d][0], input[2]->T(), MX::zeros(dep(1).sparsity())));
+      adjSens[d][2]->addToSum(mul(input[1]->T(), *adjSeed[d][0], MX::zeros(dep(2).sparsity())));
       if (adjSeed[d][0]!=adjSens[d][0]) {
         adjSens[d][0]->addToSum(*adjSeed[d][0]);
         *adjSeed[d][0] = MX();
