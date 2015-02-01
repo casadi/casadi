@@ -56,26 +56,20 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                          std::vector<int>& itmp, std::vector<double>& rtmp) {
-    double nan = numeric_limits<double>::quiet_NaN();
-    vector<double> &outputd = output[0]->data();
-    const vector<double> &inputd = input[0]->data();
-
-    for (int i=0; i<nnz(); ++i) {
-      casadi_math<double>::fun(op_, inputd[i], nan, outputd[i]);
-    }
+  void UnaryMX::evaluateD(const DMatrix** input, DMatrix** output,
+                          int* itmp, double* rtmp) {
+    double dummy = numeric_limits<double>::quiet_NaN();
+    double* outputd = output[0]->ptr();
+    const double* inputd = input[0]->ptr();
+    casadi_math<double>::fun(op_, inputd, dummy, outputd, nnz());
   }
 
-  void UnaryMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                           std::vector<SXElement>& rtmp) {
-    // Do the operation on all non-zero elements
-    const vector<SXElement> &xd = input[0]->data();
-    vector<SXElement> &od = output[0]->data();
-
-    for (int el=0; el<nnz(); ++el) {
-      casadi_math<SXElement>::fun(op_, xd[el], 0, od[el]);
-    }
+  void UnaryMX::evaluateSX(const SX** input, SX** output,
+                           int* itmp, SXElement* rtmp) {
+    SXElement dummy = 0;
+    SXElement* outputd = output[0]->ptr();
+    const SXElement* inputd = input[0]->ptr();
+    casadi_math<SXElement>::fun(op_, inputd, dummy, outputd, nnz());
   }
 
   void UnaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,

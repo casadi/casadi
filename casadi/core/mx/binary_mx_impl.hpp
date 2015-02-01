@@ -153,32 +153,31 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                    std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void BinaryMX<ScX, ScY>::evaluateD(const DMatrix** input, DMatrix** output,
+                                     int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                                     std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void BinaryMX<ScX, ScY>::evaluateSX(const SX** input, SX** output,
+                                      int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
   template<bool ScX, bool ScY>
-  template<typename T, typename MatV, typename MatVV>
-  void BinaryMX<ScX, ScY>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                                      std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void BinaryMX<ScX, ScY>::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     // Get data
-    vector<T>& output0 = output[0]->data();
-    const vector<T> &input0 = input[0]->data();
-    const vector<T> &input1 = input[1]->data();
+    T* output0 = output[0]->ptr();
+    const T* input0 = input[0]->ptr();
+    const T* input1 = input[1]->ptr();
 
     if (!ScX && !ScY) {
-      casadi_math<T>::fun(op_, getPtr(input0), getPtr(input1), getPtr(output0), output0.size());
+      casadi_math<T>::fun(op_, input0, input1, output0, nnz());
     } else if (ScX) {
-      casadi_math<T>::fun(op_, input0[0],      getPtr(input1), getPtr(output0), output0.size());
+      casadi_math<T>::fun(op_, *input0, input1, output0, nnz());
     } else {
-      casadi_math<T>::fun(op_, getPtr(input0), input1[0],      getPtr(output0), output0.size());
+      casadi_math<T>::fun(op_, input0, *input1, output0, nnz());
     }
   }
 
