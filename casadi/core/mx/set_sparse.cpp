@@ -54,20 +54,19 @@ namespace casadi {
     }
   }
 
-  template<typename T, typename Mat>
-  void SetSparse::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
-    casadi_copy_sparse(input[0]->ptr(), dep().sparsity(),
-                       output[0]->ptr(), sparsity());
+  template<typename T>
+  void SetSparse::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+    casadi_copy_sparse(input[0], dep().sparsity(), output[0], sparsity());
   }
 
-  void SetSparse::evaluateD(const DMatrix** input, DMatrix** output,
+  void SetSparse::evaluateD(const double** input, double** output,
                             int* itmp, double* rtmp) {
-    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
+    evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void SetSparse::evaluateSX(const SX** input, SX** output,
+  void SetSparse::evaluateSX(const SXElement** input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
+    evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -92,14 +91,14 @@ namespace casadi {
     }
   }
 
-  void SetSparse::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
-    bvec_t *inputd = get_bvec_t(input[0]->data());
-    bvec_t *outputd = get_bvec_t(output[0]->data());
+  void SetSparse::propagateSparsity(double** input, double** output, bool fwd) {
+    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
     if (fwd) {
-      output[0]->sparsity().set(outputd, inputd, input[0]->sparsity());
+      sparsity().set(outputd, inputd, dep().sparsity());
     } else {
-      input[0]->sparsity().bor(inputd, outputd, output[0]->sparsity());
-      fill(outputd, outputd+output[0]->nnz(), bvec_t(0));
+      dep().sparsity().bor(inputd, outputd, sparsity());
+      fill(outputd, outputd + nnz(), bvec_t(0));
     }
   }
 

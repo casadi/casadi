@@ -54,10 +54,11 @@ namespace casadi {
                             bool output_given);
 
     /// Evaluate the function numerically
-    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
+    virtual void evaluateD(const double** input, double** output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
+    virtual void evaluateSX(const SXElement** input, SXElement** output,
+                            int* itmp, SXElement* rtmp);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -65,7 +66,7 @@ namespace casadi {
     /** \brief Get the operation */
     virtual int getOp() const { return OP_ASSERTION;}
 
-    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
+    virtual void propagateSparsity(double** input, double** output, bool fwd);
 
 
   private:

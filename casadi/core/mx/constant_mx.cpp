@@ -40,11 +40,11 @@ namespace casadi {
   ConstantMX::~ConstantMX() {
   }
 
-  void ConstantMX::evaluateD(const DMatrix** input, DMatrix** output,
+  void ConstantMX::evaluateD(const double** input, double** output,
                              int* itmp, double* rtmp) {
   }
 
-  void ConstantMX::evaluateSX(const SX** input, SX** output,
+  void ConstantMX::evaluateSX(const SXElement** input, SXElement** output,
                               int* itmp, SXElement* rtmp) {
   }
 
@@ -76,9 +76,9 @@ namespace casadi {
     }
   }
 
-  void ConstantMX::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-    fill_n(outputd, output[0]->nnz(), 0);
+  void ConstantMX::propagateSparsity(double** input, double** output, bool fwd) {
+    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
+    fill_n(outputd, nnz(), 0);
   }
 
   void ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,

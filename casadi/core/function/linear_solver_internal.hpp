@@ -69,11 +69,11 @@ namespace casadi {
     MX solve(const MX& A, const MX& B, bool transpose);
 
     /// Evaluate numerically, possibly transposed
-    virtual void evaluateDGen(const DMatrix** arg, DMatrix** res,
+    virtual void evaluateDGen(const double** arg, double** res,
                               int* itmp, double* rtmp, bool tr, int nrhs);
 
     /// Evaluate MX, possibly transposed
-    virtual void evaluateSXGen(const SX** arg, SX** res,
+    virtual void evaluateSXGen(const SXElement** arg, SXElement** res,
                                int* itmp, SXElement* rtmp, bool tr, int nrhs);
 
     /// Evaluate MX, possibly transposed
@@ -82,7 +82,7 @@ namespace casadi {
                                bool output_given, bool tr);
 
     /// Propagate sparsity, possibly transposed
-    void propagateSparsityGen(DMatrix** arg, DMatrix** res,
+    void propagateSparsityGen(double** arg, double** res,
                               int* itmp, bvec_t* rtmp, bool fwd, bool tr);
 
     ///@{

@@ -56,19 +56,19 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::evaluateD(const DMatrix** input, DMatrix** output,
+  void UnaryMX::evaluateD(const double** input, double** output,
                           int* itmp, double* rtmp) {
     double dummy = numeric_limits<double>::quiet_NaN();
-    double* outputd = output[0]->ptr();
-    const double* inputd = input[0]->ptr();
+    double* outputd = output[0];
+    const double* inputd = input[0];
     casadi_math<double>::fun(op_, inputd, dummy, outputd, nnz());
   }
 
-  void UnaryMX::evaluateSX(const SX** input, SX** output,
+  void UnaryMX::evaluateSX(const SXElement** input, SXElement** output,
                            int* itmp, SXElement* rtmp) {
     SXElement dummy = 0;
-    SXElement* outputd = output[0]->ptr();
-    const SXElement* inputd = input[0]->ptr();
+    SXElement* outputd = output[0];
+    const SXElement* inputd = input[0];
     casadi_math<SXElement>::fun(op_, inputd, dummy, outputd, nnz());
   }
 
@@ -110,16 +110,16 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
+  void UnaryMX::propagateSparsity(double** input, double** output, bool fwd) {
     // Quick return if inplace
     if (input[0]==output[0]) return;
 
-    bvec_t *inputd = get_bvec_t(input[0]->data());
-    bvec_t *outputd = get_bvec_t(output[0]->data());
+    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
     if (fwd) {
       copy(inputd, inputd+nnz(), outputd);
     } else {
-      int nz = input[0]->data().size();
+      int nz = dep(0).nnz();
       for (int el=0; el<nz; ++el) {
         bvec_t s = outputd[el];
         outputd[el] = bvec_t(0);

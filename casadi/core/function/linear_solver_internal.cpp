@@ -222,12 +222,12 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::propagateSparsityGen(DMatrix** arg, DMatrix** res,
+  void LinearSolverInternal::propagateSparsityGen(double** arg, double** res,
                                                   int* itmp, bvec_t* rtmp,
                                                   bool fwd, bool tr) {
     // Sparsities
-    const Sparsity& r_sp = arg[0]->sparsity();
-    const Sparsity& A_sp = arg[1]->sparsity();
+    const Sparsity& r_sp = input(0).sparsity();
+    const Sparsity& A_sp = input(1).sparsity();
     const int* A_colind = A_sp.colind();
     const int* A_row = A_sp.row();
     int nrhs = r_sp.size2();
@@ -235,9 +235,9 @@ namespace casadi {
     //    int nnz = A_sp.size();
 
     // Get pointers to data
-    bvec_t* B_ptr = reinterpret_cast<bvec_t*>(arg[0]->ptr());
-    bvec_t* A_ptr = reinterpret_cast<bvec_t*>(arg[1]->ptr());
-    bvec_t* X_ptr = reinterpret_cast<bvec_t*>(res[0]->ptr());
+    bvec_t* B_ptr = reinterpret_cast<bvec_t*>(arg[0]);
+    bvec_t* A_ptr = reinterpret_cast<bvec_t*>(arg[1]);
+    bvec_t* X_ptr = reinterpret_cast<bvec_t*>(res[0]);
     bvec_t* tmp_ptr = rtmp;
 
     // For all right-hand-sides
@@ -360,21 +360,21 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evaluateDGen(const DMatrix** arg, DMatrix** res,
+  void LinearSolverInternal::evaluateDGen(const double** arg, double** res,
                                           int* itmp, double* rtmp, bool tr, int nrhs) {
 
     // Factorize the matrix
-    setInput(arg[1]->ptr(), LINSOL_A);
+    setInput(arg[1], LINSOL_A);
     prepare();
 
     // Solve for nondifferentiated output
     if (arg[0]!=res[0]) {
-      copy(arg[0]->ptr(), arg[0]->ptr()+input(LINSOL_A).size2(), res[0]->ptr());
+      copy(arg[0], arg[0]+input(LINSOL_A).size2(), res[0]);
     }
-    solve(res[0]->ptr(), nrhs, tr);
+    solve(res[0], nrhs, tr);
   }
 
-  void LinearSolverInternal::evaluateSXGen(const SX** arg, SX** res,
+  void LinearSolverInternal::evaluateSXGen(const SXElement** arg, SXElement** res,
                                            int* itmp, SXElement* rtmp, bool tr, int nrhs) {
     casadi_error("LinearSolverInternal::evaluateSXGen not defined for class "
                  << typeid(*this).name());

@@ -47,17 +47,17 @@ namespace casadi {
     virtual ~Concat() = 0;
 
     /// Evaluate the function (template)
-    template<typename T, typename Mat>
-    void evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp);
+    template<typename T>
+    void evaluateGen(const T** input, T** output, int* itmp, T* rtmp);
 
     /// Evaluate the function numerically
-    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
+    virtual void evaluateD(const double** input, double** output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
+    virtual void evaluateSX(const SXElement** input, SXElement** output, int* itmp, SXElement* rtmp);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
+    virtual void propagateSparsity(double** input, double** output, bool fwd);
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,

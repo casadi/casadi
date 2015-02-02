@@ -272,23 +272,23 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateD(const DMatrix** input, DMatrix** output,
+  void SetNonzerosVector<Add>::evaluateD(const double** input, double** output,
                                          int* itmp, double* rtmp) {
-    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
+    evaluateGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateSX(const SX** input, SX** output,
+  void SetNonzerosVector<Add>::evaluateSX(const SXElement** input, SXElement** output,
                                           int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
+    evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  template<typename T, typename Mat>
-  void SetNonzerosVector<Add>::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
-    const T* idata0 = input[0]->ptr();
-    const T* idata = input[1]->ptr();
-    T* odata = output[0]->ptr();
+  template<typename T>
+  void SetNonzerosVector<Add>::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+    const T* idata0 = input[0];
+    const T* idata = input[1];
+    T* odata = output[0];
     if (idata0 != odata) {
       copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
@@ -302,23 +302,23 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateD(const DMatrix** input, DMatrix** output,
+  void SetNonzerosSlice<Add>::evaluateD(const double** input, double** output,
                                     int* itmp, double* rtmp) {
-    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
+    evaluateGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateSX(const SX** input, SX** output,
+  void SetNonzerosSlice<Add>::evaluateSX(const SXElement** input, SXElement** output,
                                          int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
+    evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  template<typename T, typename Mat>
-  void SetNonzerosSlice<Add>::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
-    const T* idata0 = input[0]->ptr();
-    const T* idata = input[1]->ptr();
-    T* odata = output[0]->ptr();
+  template<typename T>
+  void SetNonzerosSlice<Add>::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+    const T* idata0 = input[0];
+    const T* idata = input[1];
+    T* odata = output[0];
     if (idata0 != odata) {
       copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
@@ -333,23 +333,23 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateD(const DMatrix** input, DMatrix** output,
+  void SetNonzerosSlice2<Add>::evaluateD(const double** input, double** output,
                                          int* itmp, double* rtmp) {
-    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
+    evaluateGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateSX(const SX** input, SX** output,
+  void SetNonzerosSlice2<Add>::evaluateSX(const SXElement** input, SXElement** output,
                                           int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
+    evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  template<typename T, typename Mat>
-  void SetNonzerosSlice2<Add>::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
-    const T* idata0 = input[0]->ptr();
-    const T* idata = input[1]->ptr();
-    T* odata = output[0]->ptr();
+  template<typename T>
+  void SetNonzerosSlice2<Add>::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+    const T* idata0 = input[0];
+    const T* idata = input[1];
+    T* odata = output[0];
     if (idata0 != odata) {
       copy(idata0, idata0 + this->dep(0).nnz(), odata);
     }
@@ -369,17 +369,17 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::propagateSparsity(DMatrix** input, DMatrix** output,
+  void SetNonzerosVector<Add>::propagateSparsity(double** input, double** output,
                                                  bool fwd) {
     // Get references to the assignment operations and data
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-    bvec_t *inputd0 = get_bvec_t(input[0]->data());
-    bvec_t *inputd = get_bvec_t(input[1]->data());
+    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
+    bvec_t *inputd0 = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[1]);
 
     // Propagate sparsity
     if (fwd) {
       if (outputd != inputd0) {
-        copy(inputd0, inputd0+input[0]->nnz(), outputd);
+        copy(inputd0, inputd0+this->dep(0).nnz(), outputd);
       }
       for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++inputd) {
         if (Add) {
@@ -398,7 +398,7 @@ namespace casadi {
         }
       }
       if (outputd != inputd0) {
-        int n = input[0]->nnz();
+        int n = this->dep(0).nnz();
         for (int k=0; k<n; ++k) {
           inputd0[k] |= outputd[k];
           outputd[k] = 0;
@@ -408,16 +408,16 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
+  void SetNonzerosSlice<Add>::propagateSparsity(double** input, double** output, bool fwd) {
     // Get references to the assignment operations and data
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-    bvec_t *inputd0 = get_bvec_t(input[0]->data());
-    bvec_t *inputd = get_bvec_t(input[1]->data());
+    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
+    bvec_t *inputd0 = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[1]);
 
     // Propagate sparsity
     if (fwd) {
       if (outputd != inputd0) {
-        copy(inputd0, inputd0+input[0]->nnz(), outputd);
+        copy(inputd0, inputd0+this->dep(0).nnz(), outputd);
       }
       for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
         if (Add) {
@@ -434,7 +434,7 @@ namespace casadi {
         }
       }
       if (outputd != inputd0) {
-        int n = input[0]->nnz();
+        int n = this->dep(0).nnz();
         for (int k=0; k<n; ++k) {
           inputd0[k] |= outputd[k];
           outputd[k] = 0;
@@ -444,17 +444,17 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::propagateSparsity(DMatrix** input, DMatrix** output,
+  void SetNonzerosSlice2<Add>::propagateSparsity(double** input, double** output,
                                                  bool fwd) {
     // Get references to the assignment operations and data
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-    bvec_t *inputd0 = get_bvec_t(input[0]->data());
-    bvec_t *inputd = get_bvec_t(input[1]->data());
+    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
+    bvec_t *inputd0 = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[1]);
 
     // Propagate sparsity
     if (fwd) {
       if (outputd != inputd0) {
-        copy(inputd0, inputd0+input[0]->nnz(), outputd);
+        copy(inputd0, inputd0+this->dep(0).nnz(), outputd);
       }
       for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
         for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
@@ -475,7 +475,7 @@ namespace casadi {
         }
       }
       if (outputd != inputd0) {
-        int n = input[0]->nnz();
+        int n = this->dep(0).nnz();
         for (int k=0; k<n; ++k) {
           inputd0[k] |= outputd[k];
           outputd[k] = 0;

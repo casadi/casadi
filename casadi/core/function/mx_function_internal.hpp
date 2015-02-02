@@ -128,8 +128,8 @@ namespace casadi {
     void updatePointers(const AlgEl& el);
 
     // Vectors to hold pointers during evaluation
-    DMatrixPtrV mx_input_;
-    DMatrixPtrV mx_output_;
+    std::vector<double*> mx_input_;
+    std::vector<double*> mx_output_;
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const { return inputv_;}
