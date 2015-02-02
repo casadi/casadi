@@ -38,19 +38,18 @@ namespace casadi {
     return new SubAssign(*this);
   }
 
-  void SubAssign::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                            std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void SubAssign::evaluateD(const DMatrix** input, DMatrix** output,
+                            int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void SubAssign::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                             std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void SubAssign::evaluateSX(const SX** input, SX** output,
+                             int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void SubAssign::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                              std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void SubAssign::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     casadi_error("not ready");
   }
 

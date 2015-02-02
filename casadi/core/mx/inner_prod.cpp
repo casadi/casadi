@@ -72,27 +72,26 @@ namespace casadi {
     }
   }
 
-  void InnerProd::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                            std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void InnerProd::evaluateD(const DMatrix** input, DMatrix** output,
+                            int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void InnerProd::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                             std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void InnerProd::evaluateSX(const SX** input, SX** output,
+                             int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void InnerProd::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                              std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void InnerProd::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     // Get data
-    T& res = output[0]->data().front();
-    const vector<T> &arg0 = input[0]->data();
-    const vector<T> &arg1 = input[1]->data();
-    const int n = arg0.size();
+    T* res = output[0]->ptr();
+    const T* arg0 = input[0]->ptr();
+    const T* arg1 = input[1]->ptr();
+    const int n = dep(0).nnz();
 
     // Perform the inner product
-    res = casadi_dot(n, getPtr(arg0), 1, getPtr(arg1), 1);
+    *res = casadi_dot(n, arg0, 1, arg1, 1);
   }
 
   void InnerProd::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {

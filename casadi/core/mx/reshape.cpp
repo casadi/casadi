@@ -44,25 +44,24 @@ namespace casadi {
     return new Reshape(*this);
   }
 
-  void Reshape::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                          std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void Reshape::evaluateD(const DMatrix** input, DMatrix** output,
+                          int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void Reshape::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                           std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void Reshape::evaluateSX(const SX** input, SX** output,
+                           int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void Reshape::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                            std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void Reshape::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     // Quick return if inplace
     if (input[0]==output[0]) return;
 
-    vector<T>& res = output[0]->data();
-    const vector<T>& arg = input[0]->data();
-    copy(arg.begin(), arg.end(), res.begin());
+    T* res = output[0]->ptr();
+    const T* arg = input[0]->ptr();
+    copy(arg, arg+nnz(), res);
   }
 
   void Reshape::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {

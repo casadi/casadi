@@ -37,19 +37,18 @@ namespace casadi {
     return new SubRef(*this);
   }
 
-  void SubRef::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                         std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void SubRef::evaluateD(const DMatrix** input, DMatrix** output,
+                         int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void SubRef::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                          std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void SubRef::evaluateSX(const SX** input, SX** output,
+                          int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void SubRef::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                           std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void SubRef::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     *output[0] = input[0]->getSub(false, i_, j_);
   }
 

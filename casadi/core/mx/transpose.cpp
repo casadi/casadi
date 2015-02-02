@@ -37,29 +37,28 @@ namespace casadi {
     setSparsity(x.sparsity().T());
   }
 
-  void Transpose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                            std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void Transpose::evaluateD(const DMatrix** input, DMatrix** output,
+                            int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
- void DenseTranspose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+ void DenseTranspose::evaluateD(const DMatrix** input, DMatrix** output,
+                                int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void Transpose::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                             std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void Transpose::evaluateSX(const SX** input, SX** output,
+                             int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  void DenseTranspose::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                                  std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void DenseTranspose::evaluateSX(const SX** input, SX** output,
+                                  int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void Transpose::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                              std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void Transpose::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
 
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
@@ -72,15 +71,14 @@ namespace casadi {
     vector<T>& xT = output[0]->data();
 
     // Transpose
-    copy(xT_colind, xT_colind+xT_ncol+1, itmp.begin());
+    copy(xT_colind, xT_colind+xT_ncol+1, itmp);
     for (int el=0; el<x_sz; ++el) {
       xT[itmp[x_row[el]]++] = x[el];
     }
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void DenseTranspose::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                                   std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void DenseTranspose::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
 
     // Get sparsity patterns
     int x_ncol = input[0]->size2();
