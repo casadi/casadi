@@ -60,9 +60,9 @@ namespace casadi {
     fcn_->printPart(this, stream, part);
   }
 
-  void CallFunction::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp,
-                               std::vector<double>& rtmp) {
-    fcn_->evaluateD(this, arg, res, itmp, rtmp);
+  void CallFunction::evaluateD(const DMatrix** input, DMatrix** output,
+                               int* itmp, double* rtmp) {
+    fcn_->evaluateD(this, input, output, itmp, rtmp);
   }
 
   int CallFunction::getNumOutputs() const {
@@ -77,9 +77,9 @@ namespace casadi {
     return fcn_;
   }
 
-  void CallFunction::evaluateSX(const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp,
-                                std::vector<SXElement>& rtmp) {
-    fcn_->evaluateSX(this, arg, res, itmp, rtmp);
+  void CallFunction::evaluateSX(const SX** input, SX** output,
+                                int* itmp, SXElement* rtmp) {
+    fcn_->evaluateSX(this, input, output, itmp, rtmp);
   }
 
   void CallFunction::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,

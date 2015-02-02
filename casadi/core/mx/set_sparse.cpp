@@ -54,20 +54,20 @@ namespace casadi {
     }
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void SetSparse::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                              std::vector<T>& rtmp) {
-    output[0]->set(*input[0]);
+  template<typename T, typename Mat>
+  void SetSparse::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+    casadi_copy_sparse(input[0]->ptr(), dep().sparsity(),
+                       output[0]->ptr(), sparsity());
   }
 
-  void SetSparse::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                            std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void SetSparse::evaluateD(const DMatrix** input, DMatrix** output,
+                            int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void SetSparse::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                             std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void SetSparse::evaluateSX(const SX** input, SX** output,
+                             int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
   void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,

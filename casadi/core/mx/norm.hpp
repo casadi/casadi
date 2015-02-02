@@ -59,17 +59,15 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~NormF() {}
 
-    /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                           std::vector<double>& rtmp);
-
-    /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                            std::vector<SXElement>& rtmp);
-
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV>
-    void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
+    template<typename T, typename Mat>
+    void evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp);
+
+    /// Evaluate the function numerically
+    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
+
+    /// Evaluate the function symbolically (SX)
+    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,

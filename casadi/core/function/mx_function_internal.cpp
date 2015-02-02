@@ -469,8 +469,8 @@ namespace casadi {
         updatePointers(*it);
 
         // Evaluate
-        it->data->evaluateD(mx_input_, mx_output_, itmp_, rtmp_);
-
+        it->data->evaluateD(const_cast<const DMatrix**>(getPtr(mx_input_)),
+                            getPtr(mx_output_), getPtr(itmp_), getPtr(rtmp_));
       }
 
       // Write out profiling information
@@ -1104,7 +1104,8 @@ namespace casadi {
           int ind = it->res[c];
           sxres[c] = ind<0 ? 0 : &swork[ind];
         }
-        it->data->evaluateSX(sxarg, sxres, itmp_, rtmp);
+        it->data->evaluateSX(const_cast<const SX**>(getPtr(sxarg)),
+                             getPtr(sxres), getPtr(itmp_), getPtr(rtmp));
       }
     }
   }

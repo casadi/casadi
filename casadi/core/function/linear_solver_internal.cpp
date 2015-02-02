@@ -361,7 +361,8 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evaluateDGen(const DMatrixPtrV& input, DMatrixPtrV& output, bool tr) {
+  void LinearSolverInternal::evaluateDGen(const DMatrix** input, DMatrix** output,
+                                          int* itmp, double* rtmp, bool tr) {
 
     // Factorize the matrix
     setInput(*input[1], LINSOL_A);
@@ -371,10 +372,11 @@ namespace casadi {
     if (input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
-    solve(getPtr(output[0]->data()), output[0]->size2(), tr);
+    solve(output[0]->ptr(), output[0]->size2(), tr);
   }
 
-  void LinearSolverInternal::evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr) {
+  void LinearSolverInternal::evaluateSXGen(const SX** input, SX** output,
+                                           int* itmp, SXElement* rtmp, bool tr) {
     casadi_error("LinearSolverInternal::evaluateSXGen not defined for class "
                  << typeid(*this).name());
   }

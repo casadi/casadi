@@ -46,12 +46,12 @@ namespace casadi {
     stream << name_;
   }
 
-  void SymbolicMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                             std::vector<int>& itmp, std::vector<double>& rtmp) {
+  void SymbolicMX::evaluateD(const DMatrix** input, DMatrix** output,
+                             int* itmp, double* rtmp) {
   }
 
-  void SymbolicMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                              std::vector<SXElement>& rtmp) {
+  void SymbolicMX::evaluateSX(const SX** input, SX** output,
+                              int* itmp, SXElement* rtmp) {
   }
 
   void SymbolicMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,

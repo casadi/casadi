@@ -232,21 +232,9 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                         std::vector<double>& rtmp) {
-    evaluateD(const_cast<const DMatrix**>(getPtr(input)),
-              const_cast<DMatrix**>(getPtr(output)), getPtr(itmp), getPtr(rtmp));
-  }
-
   void MXNode::evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp) {
     throw CasadiException(string("MXNode::evaluateD not defined for class ")
                           + typeid(*this).name());
-  }
-
-  void MXNode::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                          std::vector<SXElement>& rtmp) {
-    evaluateSX(const_cast<const SX**>(getPtr(input)),
-               const_cast<SX**>(getPtr(output)), getPtr(itmp), getPtr(rtmp));
   }
 
   void MXNode::evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp) {

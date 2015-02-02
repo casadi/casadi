@@ -40,12 +40,12 @@ namespace casadi {
   ConstantMX::~ConstantMX() {
   }
 
-  void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                             std::vector<int>& itmp, std::vector<double>& rtmp) {
+  void ConstantMX::evaluateD(const DMatrix** input, DMatrix** output,
+                             int* itmp, double* rtmp) {
   }
 
-  void ConstantMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                              std::vector<SXElement>& rtmp) {
+  void ConstantMX::evaluateSX(const SX** input, SX** output,
+                              int* itmp, SXElement* rtmp) {
   }
 
   void ConstantMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,

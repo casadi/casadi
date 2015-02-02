@@ -70,15 +70,15 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                            std::vector<double>& rtmp) {
-    linear_solver_->evaluateDGen(input, output, Tr);
+  void Solve<Tr>::evaluateD(const DMatrix** input, DMatrix** output,
+                            int* itmp, double* rtmp) {
+    linear_solver_->evaluateDGen(input, output, itmp, rtmp, Tr);
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                             std::vector<SXElement>& rtmp) {
-    linear_solver_->evaluateSXGen(input, output, Tr);
+  void Solve<Tr>::evaluateSX(const SX** input, SX** output,
+                             int* itmp, SXElement* rtmp) {
+    linear_solver_->evaluateSXGen(input, output, itmp, rtmp, Tr);
   }
 
   template<bool Tr>

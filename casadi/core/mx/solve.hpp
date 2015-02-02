@@ -63,17 +63,15 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const;
 
     /// Evaluate the function numerically
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                           std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
+
+    /// Evaluate the function symbolically (SX)
+    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                             bool output_given);
-
-    /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                            std::vector<SXElement>& rtmp);
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,

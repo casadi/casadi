@@ -2644,12 +2644,16 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::evaluateSX(MXNode* node, const SXPtrV& arg, SXPtrV& res,
-                                    std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
+  void FunctionInternal::evaluateSX(MXNode* node, const SX** arg, SX** res,
+                                    int* itmp, SXElement* rtmp) {
+
+    // Number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
 
     // Create input arguments
-    vector<SX> argv(arg.size());
-    for (int i=0; i<arg.size(); ++i) {
+    vector<SX> argv(num_in);
+    for (int i=0; i<num_in; ++i) {
       argv[i] = SX::zeros(input(i).sparsity());
       if (arg[i] != 0)
         argv[i].set(*arg[i]);
@@ -2661,14 +2665,14 @@ namespace casadi {
     evalSX(argv, resv, dummy, dummy, dummy, dummy);
 
     // Collect the result
-    for (int i = 0; i < res.size(); ++i) {
+    for (int i = 0; i < num_out; ++i) {
       if (res[i] != 0)
         *res[i] = resv[i];
     }
   }
 
-  void FunctionInternal::evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res,
-                                   std::vector<int>& itmp, std::vector<double>& rtmp) {
+  void FunctionInternal::evaluateD(MXNode* node, const DMatrix** arg, DMatrix** res,
+                                   int* itmp, double* rtmp) {
 
     // Set up timers for profiling
     double time_zero=0;
@@ -2686,7 +2690,7 @@ namespace casadi {
 
     // Pass the inputs to the function
     for (int i = 0; i < num_in; ++i) {
-      DMatrix *a = arg[i];
+      const DMatrix *a = arg[i];
       if (a != 0) {
         setInput(*a, i);
       } else {

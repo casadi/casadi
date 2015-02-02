@@ -56,13 +56,11 @@ namespace casadi {
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
 
-    /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                           std::vector<double>& rtmp);
+    /// Evaluate the function numerically
+    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
 
-    /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                            std::vector<SXElement>& rtmp);
+    /// Evaluate the function symbolically (SX)
+    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,

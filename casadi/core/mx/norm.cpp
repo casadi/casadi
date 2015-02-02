@@ -43,26 +43,24 @@ namespace casadi {
     }
   }
 
-  void NormF::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                        std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
+  void NormF::evaluateD(const DMatrix** input, DMatrix** output,
+                        int* itmp, double* rtmp) {
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void NormF::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                         std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
+  void NormF::evaluateSX(const SX** input, SX** output,
+                         int* itmp, SXElement* rtmp) {
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename MatV, typename MatVV>
-  void NormF::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                          std::vector<T>& rtmp) {
+  template<typename T, typename Mat>
+  void NormF::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     // Get data
-    T& res = output[0]->data().front();
-    const vector<T> &arg = input[0]->data();
-    const int n = arg.size();
+    T* res = output[0]->ptr();
+    const T* arg = input[0]->ptr();
 
     // Perform the inner product
-    res = sqrt(casadi_dot(n, getPtr(arg), 1, getPtr(arg), 1));
+    *res = sqrt(casadi_dot(dep().nnz(), arg, 1, arg, 1));
   }
 
   void NormF::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
