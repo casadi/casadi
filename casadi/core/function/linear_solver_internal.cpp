@@ -361,22 +361,22 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evaluateDGen(const DMatrix** input, DMatrix** output,
-                                          int* itmp, double* rtmp, bool tr) {
+  void LinearSolverInternal::evaluateDGen(const DMatrix** arg, DMatrix** res,
+                                          int* itmp, double* rtmp, bool tr, int nrhs) {
 
     // Factorize the matrix
-    setInput(*input[1], LINSOL_A);
+    setInput(arg[1]->ptr(), LINSOL_A);
     prepare();
 
     // Solve for nondifferentiated output
-    if (input[0]!=output[0]) {
-      copy(input[0]->begin(), input[0]->end(), output[0]->begin());
+    if (arg[0]!=res[0]) {
+      copy(arg[0]->ptr(), arg[0]->ptr()+input(LINSOL_A).size2(), res[0]->ptr());
     }
-    solve(output[0]->ptr(), output[0]->size2(), tr);
+    solve(res[0]->ptr(), nrhs, tr);
   }
 
-  void LinearSolverInternal::evaluateSXGen(const SX** input, SX** output,
-                                           int* itmp, SXElement* rtmp, bool tr) {
+  void LinearSolverInternal::evaluateSXGen(const SX** arg, SX** res,
+                                           int* itmp, SXElement* rtmp, bool tr, int nrhs) {
     casadi_error("LinearSolverInternal::evaluateSXGen not defined for class "
                  << typeid(*this).name());
   }

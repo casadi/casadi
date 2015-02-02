@@ -69,12 +69,12 @@ namespace casadi {
     MX solve(const MX& A, const MX& B, bool transpose);
 
     /// Evaluate numerically, possibly transposed
-    virtual void evaluateDGen(const DMatrix** input, DMatrix** output,
-                              int* itmp, double* rtmp, bool tr);
+    virtual void evaluateDGen(const DMatrix** arg, DMatrix** res,
+                              int* itmp, double* rtmp, bool tr, int nrhs);
 
     /// Evaluate MX, possibly transposed
-    virtual void evaluateSXGen(const SX** input, SX** output,
-                               int* itmp, SXElement* rtmp, bool tr);
+    virtual void evaluateSXGen(const SX** arg, SX** res,
+                               int* itmp, SXElement* rtmp, bool tr, int nrhs);
 
     /// Evaluate MX, possibly transposed
     virtual void evaluateMXGen(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
