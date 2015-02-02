@@ -43,18 +43,18 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::evaluateD(const double** input, double** output,
+  void Split::evaluateD(const DMatrix** input, DMatrix** output,
                         int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void Split::evaluateSX(const SXElement** input, SXElement** output,
+  void Split::evaluateSX(const SX** input, SX** output,
                          int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T>
-  void Split::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  template<typename T, typename Mat>
+  void Split::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     // Number of derivatives
     int nx = offset_.size()-1;
 
@@ -62,19 +62,19 @@ namespace casadi {
       int nz_first = offset_[i];
       int nz_last = offset_[i+1];
       if (output[i]!=0) {
-        copy(input[0]+nz_first, input[0]+nz_last, output[i]);
+        copy(input[0]->ptr()+nz_first, input[0]->ptr()+nz_last, output[i]->ptr());
       }
     }
   }
 
-  void Split::propagateSparsity(double** input, double** output, bool fwd) {
+  void Split::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (output[i]!=0) {
-        bvec_t *arg_ptr = reinterpret_cast<bvec_t*>(input[0]) + offset_[i];
-        int n_i = sparsity(i).nnz();
-        bvec_t *res_i_ptr = reinterpret_cast<bvec_t*>(output[i]);
-        for (int k=0; k<n_i; ++k) {
+        bvec_t *arg_ptr = get_bvec_t(input[0]->data()) + offset_[i];
+        vector<double>& res_i = output[i]->data();
+        bvec_t *res_i_ptr = get_bvec_t(res_i);
+        for (int k=0; k<res_i.size(); ++k) {
           if (fwd) {
             *res_i_ptr++ = *arg_ptr++;
           } else {

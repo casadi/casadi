@@ -408,7 +408,7 @@ namespace casadi {
       for (int i=0; i<mx_input_.size(); ++i) {
         if (el.arg[i]>=0) {
           int k = el.arg[i];
-          mx_input_[i] = work_[k].first.ptr();
+          mx_input_[i] = &work_[k].first;
         } else {
           mx_input_[i] = 0;
         }
@@ -418,7 +418,7 @@ namespace casadi {
     if (el.op!=OP_OUTPUT) {
       for (int i=0; i<mx_output_.size(); ++i) {
         if (el.res[i]>=0) {
-          mx_output_[i] = work_[el.res[i]].first.ptr();
+          mx_output_[i] = &work_[el.res[i]].first;
         } else {
           mx_output_[i] = 0;
         }
@@ -469,7 +469,7 @@ namespace casadi {
         updatePointers(*it);
 
         // Evaluate
-        it->data->evaluateD(const_cast<const double**>(getPtr(mx_input_)),
+        it->data->evaluateD(const_cast<const DMatrix**>(getPtr(mx_input_)),
                             getPtr(mx_output_), getPtr(itmp_), getPtr(rtmp_));
       }
 
@@ -1084,8 +1084,8 @@ namespace casadi {
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
-    vector<const SXElement*> sxarg;
-    vector<SXElement*> sxres;
+    vector<SX*> sxarg;
+    vector<SX*> sxres;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op==OP_INPUT) {
         // Pass the input
@@ -1099,14 +1099,15 @@ namespace casadi {
         sxarg.resize(it->arg.size());
         for (int c=0; c<sxarg.size(); ++c) {
           int ind = it->arg[c];
-          sxarg[c] = ind<0 ? 0 : swork[ind].ptr();
+          sxarg[c] = ind<0 ? 0 : &swork[ind];
         }
         sxres.resize(it->res.size());
         for (int c=0; c<sxres.size(); ++c) {
           int ind = it->res[c];
-          sxres[c] = ind<0 ? 0 : swork[ind].ptr();
+          sxres[c] = ind<0 ? 0 : &swork[ind];
         }
-        it->data->evaluateSX(getPtr(sxarg), getPtr(sxres), getPtr(itmp_), getPtr(rtmp));
+        it->data->evaluateSX(const_cast<const SX**>(getPtr(sxarg)),
+                             getPtr(sxres), getPtr(itmp_), getPtr(rtmp));
       }
     }
   }

@@ -37,38 +37,38 @@ namespace casadi {
     setSparsity(x.sparsity().T());
   }
 
-  void Transpose::evaluateD(const double** input, double** output,
+  void Transpose::evaluateD(const DMatrix** input, DMatrix** output,
                             int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
- void DenseTranspose::evaluateD(const double** input, double** output,
+ void DenseTranspose::evaluateD(const DMatrix** input, DMatrix** output,
                                 int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void Transpose::evaluateSX(const SXElement** input, SXElement** output,
+  void Transpose::evaluateSX(const SX** input, SX** output,
                              int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  void DenseTranspose::evaluateSX(const SXElement** input, SXElement** output,
+  void DenseTranspose::evaluateSX(const SX** input, SX** output,
                                   int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T>
-  void Transpose::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  template<typename T, typename Mat>
+  void Transpose::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
 
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
-    const int* x_row = dep(0).row();
-    int x_sz = dep(0).nnz();
-    const int* xT_colind = sparsity().colind();
-    int xT_ncol = sparsity().size2();
+    const int* x_row = input[0]->row();
+    int x_sz = input[0]->nnz();
+    const int* xT_colind = output[0]->colind();
+    int xT_ncol = output[0]->size2();
 
-    const T* x = input[0];
-    T* xT = output[0];
+    const vector<T>& x = input[0]->data();
+    vector<T>& xT = output[0]->data();
 
     // Transpose
     copy(xT_colind, xT_colind+xT_ncol+1, itmp);
@@ -77,15 +77,15 @@ namespace casadi {
     }
   }
 
-  template<typename T>
-  void DenseTranspose::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  template<typename T, typename Mat>
+  void DenseTranspose::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
 
     // Get sparsity patterns
-    int x_nrow = dep().size1();
-    int x_ncol = dep().size2();
+    int x_ncol = input[0]->size2();
+    int x_nrow = input[0]->size1();
 
-    const T* x = input[0];
-    T* xT = output[0];
+    const vector<T>& x = input[0]->data();
+    vector<T>& xT = output[0]->data();
     for (int i=0; i<x_ncol; ++i) {
       for (int j=0; j<x_nrow; ++j) {
         xT[i+j*x_ncol] = x[j+i*x_nrow];
@@ -93,18 +93,18 @@ namespace casadi {
     }
   }
 
-  void Transpose::propagateSparsity(double** input, double** output, int* itmp,
+  void Transpose::propagateSparsity(DMatrix** input, DMatrix** output, int* itmp,
                                     bvec_t* rtmp, bool fwd) {
     // Access the input
-    bvec_t *x = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t *x = get_bvec_t(input[0]->data());
     //const int* x_colind = input[0]->colind();
-    const int* x_row = dep().row();
-    int x_sz = dep().nnz();
+    const int* x_row = input[0]->row();
+    int x_sz = input[0]->nnz();
 
     // Access the output
-    bvec_t *xT = reinterpret_cast<bvec_t*>(output[0]);
-    const int* xT_colind = sparsity().colind();
-    int xT_ncol = sparsity().size2();
+    bvec_t *xT = get_bvec_t(output[0]->data());
+    const int* xT_colind = output[0]->colind();
+    int xT_ncol = output[0]->size2();
 
     // Offset for each col of the result
     copy(xT_colind, xT_colind+xT_ncol+1, itmp);
@@ -126,15 +126,15 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::propagateSparsity(double** input, double** output,
+  void DenseTranspose::propagateSparsity(DMatrix** input, DMatrix** output,
                                          int* itmp, bvec_t* rtmp, bool fwd) {
     // Access the input
-    bvec_t *x = reinterpret_cast<bvec_t*>(input[0]);
-    int x_ncol = dep(0).size2();
-    int x_nrow = dep(0).size1();
+    bvec_t *x = get_bvec_t(input[0]->data());
+    int x_ncol = input[0]->size2();
+    int x_nrow = input[0]->size1();
 
     // Access the output
-    bvec_t *xT = reinterpret_cast<bvec_t*>(output[0]);
+    bvec_t *xT = get_bvec_t(output[0]->data());
 
     // Loop over the elements
     for (int i=0; i<x_ncol; ++i) {

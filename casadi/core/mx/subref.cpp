@@ -37,22 +37,22 @@ namespace casadi {
     return new SubRef(*this);
   }
 
-  void SubRef::evaluateD(const double** input, double** output,
+  void SubRef::evaluateD(const DMatrix** input, DMatrix** output,
                          int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void SubRef::evaluateSX(const SXElement** input, SXElement** output,
+  void SubRef::evaluateSX(const SX** input, SX** output,
                           int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T>
-  void SubRef::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
-    casadi_error("not ready");
+  template<typename T, typename Mat>
+  void SubRef::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+    *output[0] = input[0]->getSub(false, i_, j_);
   }
 
-  void SubRef::propagateSparsity(double** input, double** output, bool fwd) {
+  void SubRef::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     casadi_error("not ready");
   }
 

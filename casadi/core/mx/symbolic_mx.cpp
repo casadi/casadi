@@ -46,11 +46,11 @@ namespace casadi {
     stream << name_;
   }
 
-  void SymbolicMX::evaluateD(const double** input, double** output,
+  void SymbolicMX::evaluateD(const DMatrix** input, DMatrix** output,
                              int* itmp, double* rtmp) {
   }
 
-  void SymbolicMX::evaluateSX(const SXElement** input, SXElement** output,
+  void SymbolicMX::evaluateSX(const SX** input, SX** output,
                               int* itmp, SXElement* rtmp) {
   }
 
@@ -63,9 +63,9 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::propagateSparsity(double** input, double** output, bool fwd) {
-    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
-    fill_n(outputd, nnz(), 0);
+  void SymbolicMX::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
+    bvec_t *outputd = get_bvec_t(output[0]->data());
+    fill_n(outputd, output[0]->nnz(), 0);
   }
 
 

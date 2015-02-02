@@ -336,14 +336,14 @@ namespace casadi {
     /// The following functions are called internally from EvaluateMX.
     /// For documentation, see the MXNode class
     ///@{
-    virtual void evaluateD(MXNode* node, const double** arg, double** res,
+    virtual void evaluateD(MXNode* node, const DMatrix** arg, DMatrix** res,
                            int* itmp, double* rtmp);
-    virtual void evaluateSX(MXNode* node, const SXElement** arg, SXElement** res,
+    virtual void evaluateSX(MXNode* node, const SX** arg, SX** res,
                             int* itmp, SXElement* rtmp);
     virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res,
                             const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed,
                             MXPtrVV& asens, bool output_given);
-    virtual void propagateSparsity(MXNode* node, double** arg, double** res,
+    virtual void propagateSparsity(MXNode* node, DMatrix** arg, DMatrix** res,
                                    int* itmp, bvec_t* rtmp, bool fwd);
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);
     virtual void generateOperation(const MXNode* node, std::ostream &stream,

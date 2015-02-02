@@ -70,13 +70,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateD(const double** input, double** output,
+  void Solve<Tr>::evaluateD(const DMatrix** input, DMatrix** output,
                             int* itmp, double* rtmp) {
     linear_solver_->evaluateDGen(input, output, itmp, rtmp, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateSX(const SXElement** input, SXElement** output,
+  void Solve<Tr>::evaluateSX(const SX** input, SX** output,
                              int* itmp, SXElement* rtmp) {
     linear_solver_->evaluateSXGen(input, output, itmp, rtmp, Tr, dep(0).size2());
   }
@@ -90,7 +90,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::propagateSparsity(double** input, double** output,
+  void Solve<Tr>::propagateSparsity(DMatrix** input, DMatrix** output,
                                     int* itmp, bvec_t* rtmp, bool fwd) {
     linear_solver_->propagateSparsityGen(input, output, itmp, rtmp, fwd, Tr);
   }

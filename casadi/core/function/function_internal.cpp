@@ -2510,7 +2510,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::propagateSparsity(MXNode* node, double** arg, double** res,
+  void FunctionInternal::propagateSparsity(MXNode* node, DMatrix** arg, DMatrix** res,
                                            int* itmp, bvec_t* rtmp, bool use_fwd) {
     // Pass/clear forward seeds/adjoint sensitivities
     for (int i=0; i<getNumInputs(); ++i) {
@@ -2520,7 +2520,7 @@ namespace casadi {
         // Set to zero if not used
         fill_n(input_i, input(i).nnz(), bvec_t(0));
       } else {
-        const bvec_t* arg_i = reinterpret_cast<const bvec_t*>(arg[i]);
+        const bvec_t* arg_i = reinterpret_cast<const bvec_t*>(arg[i]->ptr());
         copy(arg_i, arg_i+input(i).nnz(), input_i);
       }
     }
@@ -2533,7 +2533,7 @@ namespace casadi {
         // Set to zero if not used
         fill_n(output_i, output(i).nnz(), bvec_t(0));
       } else {
-        const bvec_t* res_i = reinterpret_cast<const bvec_t*>(res[i]);
+        const bvec_t* res_i = reinterpret_cast<const bvec_t*>(res[i]->ptr());
         copy(res_i, res_i+output(i).nnz(), output_i);
       }
     }
@@ -2550,7 +2550,7 @@ namespace casadi {
     if (use_fwd) {
       for (int i=0; i<getNumOutputs(); ++i) {
         if (res[i] != 0) {
-          bvec_t* res_i = reinterpret_cast<bvec_t*>(res[i]);
+          bvec_t* res_i = reinterpret_cast<bvec_t*>(res[i]->ptr());
           const bvec_t* output_i = reinterpret_cast<const bvec_t*>(output(i).ptr());
           copy(output_i, output_i+output(i).nnz(), res_i);
         }
@@ -2559,7 +2559,7 @@ namespace casadi {
       for (int i=0; i<getNumInputs(); ++i) {
         if (arg[i] != 0) {
           int n = input(i).nnz();
-          bvec_t* arg_i = reinterpret_cast<bvec_t*>(arg[i]);
+          bvec_t* arg_i = reinterpret_cast<bvec_t*>(arg[i]->ptr());
           const bvec_t* input_i = reinterpret_cast<const bvec_t*>(input(i).ptr());
           for (int k=0; k<n; ++k) *arg_i++ |= *input_i++;
         }
@@ -2611,7 +2611,7 @@ namespace casadi {
     nr=0;
   }
 
-  void FunctionInternal::evaluateSX(MXNode* node, const SXElement** arg, SXElement** res,
+  void FunctionInternal::evaluateSX(MXNode* node, const SX** arg, SX** res,
                                     int* itmp, SXElement* rtmp) {
 
     // Number of inputs and outputs
@@ -2622,7 +2622,7 @@ namespace casadi {
     vector<SX> argv(num_in);
     for (int i=0; i<num_in; ++i) {
       argv[i] = SX::zeros(input(i).sparsity());
-      if (arg[i] != 0) argv[i].set(arg[i]);
+      if (arg[i] != 0) argv[i].set(arg[i]->ptr());
     }
 
     // Evaluate symbolically
@@ -2632,11 +2632,11 @@ namespace casadi {
 
     // Collect the result
     for (int i = 0; i < num_out; ++i) {
-      if (res[i] != 0) resv[i].get(res[i]);
+      if (res[i] != 0) resv[i].get(res[i]->ptr());
     }
   }
 
-  void FunctionInternal::evaluateD(MXNode* node, const double** arg, double** res,
+  void FunctionInternal::evaluateD(MXNode* node, const DMatrix** arg, DMatrix** res,
                                    int* itmp, double* rtmp) {
 
     // Set up timers for profiling
@@ -2655,8 +2655,9 @@ namespace casadi {
 
     // Pass the inputs to the function
     for (int i = 0; i < num_in; ++i) {
-      if (arg[i] != 0) {
-        setInput(arg[i], i);
+      const DMatrix *a = arg[i];
+      if (a != 0) {
+        setInput(a->ptr(), i);
       } else {
         setInput(0., i);
       }
@@ -2673,8 +2674,8 @@ namespace casadi {
     }
 
     // Get the outputs
-    for (int i=0; i<num_out; ++i) {
-      if (res[i] != 0) getOutput(res[i], i);
+    for (int i = 0; i < num_out; ++i) {
+      if (res[i] != 0) getOutput(*res[i], i);
     }
 
     // Write out profiling information

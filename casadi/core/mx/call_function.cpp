@@ -77,7 +77,7 @@ namespace casadi {
     fcn_->printPart(this, stream, part);
   }
 
-  void CallFunction::evaluateD(const double** input, double** output,
+  void CallFunction::evaluateD(const DMatrix** input, DMatrix** output,
                                int* itmp, double* rtmp) {
     fcn_->evaluateD(this, input, output, itmp, rtmp);
   }
@@ -94,7 +94,7 @@ namespace casadi {
     return fcn_;
   }
 
-  void CallFunction::evaluateSX(const SXElement** input, SXElement** output,
+  void CallFunction::evaluateSX(const SX** input, SX** output,
                                 int* itmp, SXElement* rtmp) {
     fcn_->evaluateSX(this, input, output, itmp, rtmp);
   }
@@ -110,7 +110,7 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void CallFunction::propagateSparsity(double** input, double** output,
+  void CallFunction::propagateSparsity(DMatrix** input, DMatrix** output,
                                        int* itmp, bvec_t* rtmp, bool use_fwd) {
     fcn_->propagateSparsity(this, input, output, itmp, rtmp, use_fwd);
   }

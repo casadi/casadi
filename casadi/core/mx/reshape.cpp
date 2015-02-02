@@ -44,37 +44,37 @@ namespace casadi {
     return new Reshape(*this);
   }
 
-  void Reshape::evaluateD(const double** input, double** output,
+  void Reshape::evaluateD(const DMatrix** input, DMatrix** output,
                           int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
   }
 
-  void Reshape::evaluateSX(const SXElement** input, SXElement** output,
+  void Reshape::evaluateSX(const SX** input, SX** output,
                            int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
   }
 
-  template<typename T>
-  void Reshape::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  template<typename T, typename Mat>
+  void Reshape::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
     // Quick return if inplace
     if (input[0]==output[0]) return;
 
-    T* res = output[0];
-    const T* arg = input[0];
+    T* res = output[0]->ptr();
+    const T* arg = input[0]->ptr();
     copy(arg, arg+nnz(), res);
   }
 
-  void Reshape::propagateSparsity(double** input, double** output, bool fwd) {
+  void Reshape::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     // Quick return if inplace
     if (input[0]==output[0]) return;
 
-    bvec_t *res_ptr = reinterpret_cast<bvec_t*>(output[0]);
-    int n = dep().nnz();
-    bvec_t *arg_ptr = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t *res_ptr = get_bvec_t(output[0]->data());
+    vector<double>& arg = input[0]->data();
+    bvec_t *arg_ptr = get_bvec_t(arg);
     if (fwd) {
-      copy(arg_ptr, arg_ptr+n, res_ptr);
+      copy(arg_ptr, arg_ptr+arg.size(), res_ptr);
     } else {
-      for (int k=0; k<n; ++k) {
+      for (int k=0; k<arg.size(); ++k) {
         *arg_ptr++ |= *res_ptr;
         *res_ptr++ = 0;
       }
