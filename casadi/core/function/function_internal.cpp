@@ -2514,34 +2514,28 @@ namespace casadi {
                                            std::vector<int>& itmp,
                                            std::vector<double>& rtmp, bool use_fwd) {
     // Pass/clear forward seeds/adjoint sensitivities
-    for (int iind = 0; iind < getNumInputs(); ++iind) {
+    for (int i=0; i<getNumInputs(); ++i) {
       // Input vector
-      vector<double> &v = input(iind).data();
-      if (v.empty()) continue; // FIXME: remove?
-
-      if (arg[iind] == 0) {
+      bvec_t* input_i = reinterpret_cast<bvec_t*>(input(i).ptr());
+      if (arg[i] == 0) {
         // Set to zero if not used
-        fill_n(get_bvec_t(v), v.size(), bvec_t(0));
+        fill_n(input_i, input(i).nnz(), bvec_t(0));
       } else {
-        // Copy output
-        input(iind).sparsity().set(
-          get_bvec_t(input(iind).data()), get_bvec_t(arg[iind]->data()), arg[iind]->sparsity());
+        const bvec_t* arg_i = reinterpret_cast<const bvec_t*>(arg[i]->ptr());
+        copy(arg_i, arg_i+input(i).nnz(), input_i);
       }
     }
 
     // Pass/clear adjoint seeds/forward sensitivities
-    for (int oind = 0; oind < getNumOutputs(); ++oind) {
+    for (int i=0; i<getNumOutputs(); ++i) {
       // Output vector
-      vector<double> &v = output(oind).data();
-      if (v.empty()) continue; // FIXME: remove?
-      if (res[oind] == 0) {
+      bvec_t* output_i = reinterpret_cast<bvec_t*>(output(i).ptr());
+      if (res[i] == 0) {
         // Set to zero if not used
-        fill_n(get_bvec_t(v), v.size(), bvec_t(0));
+        fill_n(output_i, output(i).nnz(), bvec_t(0));
       } else {
-        // Copy output
-        output(oind).sparsity().set(
-          get_bvec_t(output(oind).data()), get_bvec_t(res[oind]->data()), res[oind]->sparsity());
-        if (!use_fwd) fill_n(get_bvec_t(res[oind]->data()), res[oind]->nnz(), bvec_t(0));
+        const bvec_t* res_i = reinterpret_cast<const bvec_t*>(res[i]->ptr());
+        copy(res_i, res_i+output(i).nnz(), output_i);
       }
     }
 
@@ -2555,19 +2549,20 @@ namespace casadi {
 
     // Get the sensitivities
     if (use_fwd) {
-      for (int oind = 0; oind < res.size(); ++oind) {
-        if (res[oind] != 0) {
-          res[oind]->sparsity().set(
-            get_bvec_t(res[oind]->data()),
-            get_bvec_t(output(oind).data()),
-            output(oind).sparsity());
+      for (int i=0; i<getNumOutputs(); ++i) {
+        if (res[i] != 0) {
+          bvec_t* res_i = reinterpret_cast<bvec_t*>(res[i]->ptr());
+          const bvec_t* output_i = reinterpret_cast<const bvec_t*>(output(i).ptr());
+          copy(output_i, output_i+output(i).nnz(), res_i);
         }
       }
     } else {
-      for (int iind = 0; iind < arg.size(); ++iind) {
-        if (arg[iind] != 0) {
-          arg[iind]->sparsity().bor(
-            get_bvec_t(arg[iind]->data()), get_bvec_t(input(iind).data()), input(iind).sparsity());
+      for (int i=0; i<getNumInputs(); ++i) {
+        if (arg[i] != 0) {
+          int n = input(i).nnz();
+          bvec_t* arg_i = reinterpret_cast<bvec_t*>(arg[i]->ptr());
+          const bvec_t* input_i = reinterpret_cast<const bvec_t*>(input(i).ptr());
+          for (int k=0; k<n; ++k) *arg_i++ |= *input_i++;
         }
       }
     }
@@ -2588,33 +2583,13 @@ namespace casadi {
                                            const std::vector<std::string>& res,
                                            CodeGenerator& gen) const {
 
-    // Running index of the temporary used
-    int nr=0;
-
-    // Copy arguments with nonmatching sparsities to the temp vector
-    vector<string> arg_mod = arg;
-    for (int i=0; i<getNumInputs(); ++i) {
-      if (node->dep(i).sparsity()!=input(i).sparsity()) {
-        arg_mod[i] = "rrr+" + CodeGenerator::numToString(nr);
-        nr += input(i).nnz();
-
-        // Codegen "copy sparse"
-        gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
-
-        int sp_arg = gen.getSparsity(node->dep(i).sparsity());
-        int sp_input = gen.addSparsity(input(i).sparsity());
-        stream << "  casadi_copy_sparse(" << arg[i] << ", s" << sp_arg << ", " << arg_mod[i]
-               << ", s" << sp_input << ");" << std::endl;
-      }
-    }
-
     // Get the index of the function
     int f = gen.getDependency(shared_from_this<Function>());
     stream << "  f" << f << "(";
 
     // Pass inputs to the function input buffers
     for (int i=0; i<arg.size(); ++i) {
-      stream << arg_mod.at(i);
+      stream << arg.at(i);
       if (i+1<arg.size()+res.size()) stream << ", ";
     }
 
@@ -2635,13 +2610,6 @@ namespace casadi {
     // Start with no extra memory
     ni=0;
     nr=0;
-
-    // Add memory for all inputs with nonmatching sparsity
-    for (int i=0; i<getNumInputs(); ++i) {
-      if (node->dep(i).isNull() || node->dep(i).sparsity()!=input(i).sparsity()) {
-        nr += input(i).nnz();
-      }
-    }
   }
 
   void FunctionInternal::evaluateSX(MXNode* node, const SX** arg, SX** res,
@@ -2655,8 +2623,7 @@ namespace casadi {
     vector<SX> argv(num_in);
     for (int i=0; i<num_in; ++i) {
       argv[i] = SX::zeros(input(i).sparsity());
-      if (arg[i] != 0)
-        argv[i].set(*arg[i]);
+      if (arg[i] != 0) argv[i].set(arg[i]->ptr());
     }
 
     // Evaluate symbolically
@@ -2666,8 +2633,7 @@ namespace casadi {
 
     // Collect the result
     for (int i = 0; i < num_out; ++i) {
-      if (res[i] != 0)
-        *res[i] = resv[i];
+      if (res[i] != 0) resv[i].get(res[i]->ptr());
     }
   }
 
@@ -2692,7 +2658,7 @@ namespace casadi {
     for (int i = 0; i < num_in; ++i) {
       const DMatrix *a = arg[i];
       if (a != 0) {
-        setInput(*a, i);
+        setInput(a->ptr(), i);
       } else {
         setInput(0., i);
       }
