@@ -5,6 +5,8 @@
 
 #include "snopt.h"
 
+/// \cond INTERNAL
+
 /* File snoptProblem.hpp
  *   C++ interface for SNOPT
  *
@@ -189,5 +191,7 @@ public:
   void setFuncon     ( snConB funcon );
   void setFunobj     ( snObjB funobj );
 };
+
+/// \endcond
 
 #endif /* SNOPTPROBLEM_H */

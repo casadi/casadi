@@ -29,6 +29,7 @@
 #include "xml_file.hpp"
 #include "../function/plugin_interface.hpp"
 
+/// \cond INTERNAL
 namespace casadi {
 
   class CASADI_EXPORT
@@ -61,5 +62,7 @@ namespace casadi {
   };
 
 } // namespace casadi
+
+/// \endcond
 
 #endif // CASADI_XML_FILE_INTERNAL_HPP
