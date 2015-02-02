@@ -113,9 +113,19 @@ namespace casadi {
     const size_t n = this->nnz();
     if (fwd) {
       if (zd!=rd) copy(zd, zd+n, rd);
-      DMatrix::mul_sparsity<true>(*input[1], *input[2], *input[0], rtmp);
+      Sparsity::mul_sparsityF(reinterpret_cast<bvec_t*>(input[1]->ptr()),
+                              dep(1).sparsity(),
+                              reinterpret_cast<bvec_t*>(input[2]->ptr()),
+                              dep(2).sparsity(),
+                              reinterpret_cast<bvec_t*>(input[0]->ptr()),
+                              dep(0).sparsity(), rtmp);
     } else {
-      DMatrix::mul_sparsity<false>(*input[1], *input[2], *output[0], rtmp);
+      Sparsity::mul_sparsityR(reinterpret_cast<bvec_t*>(input[1]->ptr()),
+                              dep(1).sparsity(),
+                              reinterpret_cast<bvec_t*>(input[2]->ptr()),
+                              dep(2).sparsity(),
+                              reinterpret_cast<bvec_t*>(output[0]->ptr()),
+                              sparsity(), rtmp);
       if (zd!=rd) {
         for (int i=0; i<n; ++i) {
           zd[i] |= rd[i];

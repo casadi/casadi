@@ -472,6 +472,26 @@ namespace casadi {
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity patternInverse() const;
 
+#ifndef SWIG
+    /** \brief Propagate sparsity using 0-1 logic through a matrix product,
+     * no memory allocation: <tt>z = mul(x, y)</tt> with work vector
+     * Forward mode.
+     */
+    static void mul_sparsityF(bvec_t* x, const Sparsity& x_sp,
+                              bvec_t* y, const Sparsity& y_sp,
+                              bvec_t* z, const Sparsity& z_sp,
+                              bvec_t* w);
+
+    /** \brief Propagate sparsity using 0-1 logic through a matrix product,
+     * no memory allocation: <tt>z = mul(x, y)</tt> with work vector
+     * Reverse mode.
+     */
+    static void mul_sparsityR(bvec_t* x, const Sparsity& x_sp,
+                              bvec_t* y, const Sparsity& y_sp,
+                              bvec_t* z, const Sparsity& z_sp,
+                              bvec_t* w);
+#endif //SWIG
+
     /// \cond INTERNAL
     /// @{
     /** \brief Accessed by SparsityInterface */

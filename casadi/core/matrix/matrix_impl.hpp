@@ -1561,66 +1561,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  template<bool Fwd>
-  void Matrix<DataType>::mul_sparsity(Matrix<DataType> &x,
-                                      Matrix<DataType> &y,
-                                      Matrix<DataType>& z,
-                                      bvec_t* w) {
-
-    // Assert dimensions
-    casadi_assert_message(z.size1()==x.size1() && x.size2()==y.size1() && y.size2()==z.size2(),
-                          "Dimension error. Got x=" << x.dimString() << ", y=" << y.dimString()
-                          << " and z=" << z.dimString() << ".");
-
-    // Direct access to the arrays
-    const int* y_colind = y.colind();
-    const int* y_row = y.row();
-    const int* x_colind = x.colind();
-    const int* x_row = x.row();
-    const int* z_colind = z.colind();
-    const int* z_row = z.row();
-
-    // Convert data array to arrays of integers
-    bvec_t *y_data = get_bvec_t(y.data());
-    bvec_t *x_data = get_bvec_t(x.data());
-    bvec_t *z_data = get_bvec_t(z.data());
-
-    // Loop over the columns of y and z
-    int ncol = z.size2();
-    for (int cc=0; cc<ncol; ++cc) {
-      // Get the dense column of z
-      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
-        w[z_row[kk]] = z_data[kk];
-      }
-
-      // Loop over the nonzeros of y
-      for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
-        int rr = y_row[kk];
-
-        // Loop over corresponding columns of x
-        if (Fwd) {
-          bvec_t yy = y_data[kk];
-          for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
-            w[x_row[kk1]] |= x_data[kk1] | yy;
-          }
-        } else {
-          bvec_t yy = 0;
-          for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
-            yy |= w[x_row[kk1]];
-            x_data[kk1] |= w[x_row[kk1]];
-          }
-          y_data[kk] |= yy;
-        }
-      }
-
-      // Get the sparse column of z
-      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
-        z_data[kk] = w[z_row[kk]];
-      }
-    }
-  }
-
-  template<typename DataType>
   DataType Matrix<DataType>::quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A) {
     // Assert dimensions
     casadi_assert_message(x.size()==A.size2() && x.size()==A.size1(),

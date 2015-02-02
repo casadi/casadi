@@ -1432,4 +1432,96 @@ namespace casadi {
     return nnz;
   }
 
+  void Sparsity::mul_sparsityF(bvec_t* x, const Sparsity& x_sp,
+                               bvec_t* y, const Sparsity& y_sp,
+                               bvec_t* z, const Sparsity& z_sp,
+                               bvec_t* w) {
+    // Assert dimensions
+    casadi_assert_message(z_sp.size1()==x_sp.size1() && x_sp.size2()==y_sp.size1()
+                          && y_sp.size2()==z_sp.size2(),
+                          "Dimension error. Got x=" << x_sp.dimString()
+                          << ", y=" << y_sp.dimString()
+                          << " and z=" << z_sp.dimString() << ".");
+
+    // Direct access to the arrays
+    const int* y_colind = y_sp.colind();
+    const int* y_row = y_sp.row();
+    const int* x_colind = x_sp.colind();
+    const int* x_row = x_sp.row();
+    const int* z_colind = z_sp.colind();
+    const int* z_row = z_sp.row();
+
+    // Loop over the columns of y and z
+    int ncol = z_sp.size2();
+    for (int cc=0; cc<ncol; ++cc) {
+      // Get the dense column of z
+      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+        w[z_row[kk]] = z[kk];
+      }
+
+      // Loop over the nonzeros of y
+      for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
+        int rr = y_row[kk];
+
+        // Loop over corresponding columns of x
+        bvec_t yy = y[kk];
+        for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
+          w[x_row[kk1]] |= x[kk1] | yy;
+        }
+      }
+
+      // Get the sparse column of z
+      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+        z[kk] = w[z_row[kk]];
+      }
+    }
+  }
+
+  void Sparsity::mul_sparsityR(bvec_t* x, const Sparsity& x_sp,
+                               bvec_t* y, const Sparsity& y_sp,
+                               bvec_t* z, const Sparsity& z_sp,
+                               bvec_t* w) {
+    // Assert dimensions
+    casadi_assert_message(z_sp.size1()==x_sp.size1() && x_sp.size2()==y_sp.size1()
+                          && y_sp.size2()==z_sp.size2(),
+                          "Dimension error. Got x=" << x_sp.dimString()
+                          << ", y=" << y_sp.dimString()
+                          << " and z=" << z_sp.dimString() << ".");
+
+    // Direct access to the arrays
+    const int* y_colind = y_sp.colind();
+    const int* y_row = y_sp.row();
+    const int* x_colind = x_sp.colind();
+    const int* x_row = x_sp.row();
+    const int* z_colind = z_sp.colind();
+    const int* z_row = z_sp.row();
+
+    // Loop over the columns of y and z
+    int ncol = z_sp.size2();
+    for (int cc=0; cc<ncol; ++cc) {
+      // Get the dense column of z
+      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+        w[z_row[kk]] = z[kk];
+      }
+
+      // Loop over the nonzeros of y
+      for (int kk=y_colind[cc]; kk<y_colind[cc+1]; ++kk) {
+        int rr = y_row[kk];
+
+        // Loop over corresponding columns of x
+        bvec_t yy = 0;
+        for (int kk1=x_colind[rr]; kk1<x_colind[rr+1]; ++kk1) {
+          yy |= w[x_row[kk1]];
+          x[kk1] |= w[x_row[kk1]];
+        }
+        y[kk] |= yy;
+      }
+
+      // Get the sparse column of z
+      for (int kk=z_colind[cc]; kk<z_colind[cc+1]; ++kk) {
+        z[kk] = w[z_row[kk]];
+      }
+    }
+  }
+
 } // namespace casadi

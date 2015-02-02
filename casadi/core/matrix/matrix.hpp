@@ -467,13 +467,6 @@ namespace casadi {
     Matrix<DataType> zz_sparsify(double tol=0) const;
     ///@}
 
-    /** \brief Propagate sparsity using 0-1 logic through a matrix product,
-     * no memory allocation: <tt>z = mul(x, y)</tt> with work vector
-     */
-    template<bool Fwd>
-    static void mul_sparsity(Matrix<DataType> &x, Matrix<DataType> &y, Matrix<DataType>& z,
-                             bvec_t* w);
-
     /// Calculates inner_prod(x, mul(A, x)) without memory allocation
     static DataType quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A);
     /// \endcond
