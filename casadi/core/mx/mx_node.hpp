@@ -146,8 +146,8 @@ namespace casadi {
     void evaluateMX(const MXPtrV& input, MXPtrV& output);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                                   std::vector<double>& rtmp, bool fwd)
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+                                   int* itmp, bvec_t* rtmp, bool fwd)
     { propagateSparsity(input, output, fwd);}
 
     /** \brief  Get the name */

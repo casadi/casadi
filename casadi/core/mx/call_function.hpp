@@ -68,8 +68,8 @@ namespace casadi {
                             bool output_given);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                                   std::vector<double>& rtmp, bool fwd);
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+                                   int* itmp, bvec_t* rtmp, bool fwd);
 
     /** \brief  Get function reference */
     virtual Function& getFunction();

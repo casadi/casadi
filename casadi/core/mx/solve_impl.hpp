@@ -90,8 +90,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                                    std::vector<double>& rtmp, bool fwd) {
+  void Solve<Tr>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+                                    int* itmp, bvec_t* rtmp, bool fwd) {
     linear_solver_->propagateSparsityGen(input, output, itmp, rtmp, fwd, Tr);
   }
 

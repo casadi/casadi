@@ -223,9 +223,8 @@ namespace casadi {
   }
 
   void LinearSolverInternal::propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output,
-                                                  std::vector<int>& itmp, std::vector<double>& rtmp,
-                                                  bool fwd, bool transpose) {
-
+                                                  int* itmp, bvec_t* rtmp,
+                                                  bool fwd, bool tr) {
     // Sparsities
     const Sparsity& r_sp = input[0]->sparsity();
     const Sparsity& A_sp = input[1]->sparsity();
@@ -239,7 +238,7 @@ namespace casadi {
     bvec_t* B_ptr = reinterpret_cast<bvec_t*>(input[0]->ptr());
     bvec_t* A_ptr = reinterpret_cast<bvec_t*>(input[1]->ptr());
     bvec_t* X_ptr = reinterpret_cast<bvec_t*>(output[0]->ptr());
-    bvec_t* tmp_ptr = reinterpret_cast<bvec_t*>(getPtr(rtmp));
+    bvec_t* tmp_ptr = rtmp;
 
     // For all right-hand-sides
     for (int r=0; r<nrhs; ++r) {
@@ -253,19 +252,19 @@ namespace casadi {
         for (int cc=0; cc<n; ++cc) {
           for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
             int rr = A_row[k];
-            tmp_ptr[transpose ? cc : rr] |= A_ptr[k];
+            tmp_ptr[tr ? cc : rr] |= A_ptr[k];
           }
         }
 
         // Propagate to X_ptr
         std::fill(X_ptr, X_ptr+n, 0);
-        spSolve(X_ptr, tmp_ptr, transpose);
+        spSolve(X_ptr, tmp_ptr, tr);
 
       } else { // adjoint
 
         // Solve transposed
         std::fill(tmp_ptr, tmp_ptr+n, 0);
-        spSolve(tmp_ptr, B_ptr, !transpose);
+        spSolve(tmp_ptr, B_ptr, !tr);
 
         // Clear seeds
         std::fill(B_ptr, B_ptr+n, 0);
@@ -279,7 +278,7 @@ namespace casadi {
         for (int cc=0; cc<n; ++cc) {
           for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
             int rr = A_row[k];
-            A_ptr[k] |= tmp_ptr[transpose ? cc : rr];
+            A_ptr[k] |= tmp_ptr[tr ? cc : rr];
           }
         }
       }

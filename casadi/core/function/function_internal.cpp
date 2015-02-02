@@ -2511,8 +2511,7 @@ namespace casadi {
   }
 
   void FunctionInternal::propagateSparsity(MXNode* node, DMatrixPtrV& arg, DMatrixPtrV& res,
-                                           std::vector<int>& itmp,
-                                           std::vector<double>& rtmp, bool use_fwd) {
+                                           int* itmp, bvec_t* rtmp, bool use_fwd) {
     // Pass/clear forward seeds/adjoint sensitivities
     for (int i=0; i<getNumInputs(); ++i) {
       // Input vector

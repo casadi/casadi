@@ -107,8 +107,7 @@ namespace casadi {
   }
 
   void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
-                                         std::vector<int>& itmp, std::vector<double>& rtmp,
-                                         bool fwd) {
+                                         int* itmp, bvec_t* rtmp, bool fwd) {
     bvec_t *zd = get_bvec_t(input[0]->data());
     bvec_t *rd = get_bvec_t(output[0]->data());
     const size_t n = this->nnz();

@@ -72,7 +72,7 @@ namespace casadi {
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
-                                   std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
+                                   int* itmp, bvec_t* rtmp, bool fwd);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_MATMUL;}

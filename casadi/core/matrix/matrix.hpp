@@ -472,7 +472,7 @@ namespace casadi {
      */
     template<bool Fwd>
     static void mul_sparsity(Matrix<DataType> &x, Matrix<DataType> &y, Matrix<DataType>& z,
-                             std::vector<DataType>& work);
+                             bvec_t* w);
 
     /// Calculates inner_prod(x, mul(A, x)) without memory allocation
     static DataType quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A);

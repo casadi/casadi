@@ -93,8 +93,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                                    std::vector<double>& rtmp, bool fwd) {
+  void Transpose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, int* itmp,
+                                    bvec_t* rtmp, bool fwd) {
     // Access the input
     bvec_t *x = get_bvec_t(input[0]->data());
     //const int* x_colind = input[0]->colind();
@@ -107,7 +107,7 @@ namespace casadi {
     int xT_ncol = output[0]->size2();
 
     // Offset for each col of the result
-    copy(xT_colind, xT_colind+xT_ncol+1, itmp.begin());
+    copy(xT_colind, xT_colind+xT_ncol+1, itmp);
 
     // Loop over the nonzeros of the argument
     for (int el=0; el<x_sz; ++el) {
@@ -127,8 +127,7 @@ namespace casadi {
   }
 
   void DenseTranspose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
-                                         std::vector<int>& itmp,
-                                         std::vector<double>& rtmp, bool fwd) {
+                                         int* itmp, bvec_t* rtmp, bool fwd) {
     // Access the input
     bvec_t *x = get_bvec_t(input[0]->data());
     int x_ncol = input[0]->size2();

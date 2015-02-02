@@ -1565,16 +1565,12 @@ namespace casadi {
   void Matrix<DataType>::mul_sparsity(Matrix<DataType> &x,
                                       Matrix<DataType> &y,
                                       Matrix<DataType>& z,
-                                      std::vector<DataType>& work) {
+                                      bvec_t* w) {
 
     // Assert dimensions
     casadi_assert_message(z.size1()==x.size1() && x.size2()==y.size1() && y.size2()==z.size2(),
                           "Dimension error. Got x=" << x.dimString() << ", y=" << y.dimString()
                           << " and z=" << z.dimString() << ".");
-
-    // Make sure work vector large enough
-    casadi_assert_message(work.size()>=z.size1(),
-                          "Work vector too small: " << work.size() << " < " << z.size1());
 
     // Direct access to the arrays
     const int* y_colind = y.colind();
@@ -1588,7 +1584,6 @@ namespace casadi {
     bvec_t *y_data = get_bvec_t(y.data());
     bvec_t *x_data = get_bvec_t(x.data());
     bvec_t *z_data = get_bvec_t(z.data());
-    bvec_t *w = get_bvec_t(work);
 
     // Loop over the columns of y and z
     int ncol = z.size2();

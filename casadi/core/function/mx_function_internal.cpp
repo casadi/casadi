@@ -610,7 +610,8 @@ namespace casadi {
           updatePointers(*it);
 
           // Propagate sparsity forwards
-          it->data->propagateSparsity(mx_input_, mx_output_, itmp_, rtmp_, true);
+          it->data->propagateSparsity(mx_input_, mx_output_, getPtr(itmp_),
+                                      reinterpret_cast<bvec_t*>(getPtr(rtmp_)), true);
         }
       }
 
@@ -640,7 +641,8 @@ namespace casadi {
           updatePointers(*it);
 
           // Propagate sparsity backwards
-          it->data->propagateSparsity(mx_input_, mx_output_, itmp_, rtmp_, false);
+          it->data->propagateSparsity(mx_input_, mx_output_, getPtr(itmp_),
+                                      reinterpret_cast<bvec_t*>(getPtr(rtmp_)), false);
         }
       }
     }

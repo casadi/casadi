@@ -82,8 +82,8 @@ namespace casadi {
                                bool output_given, bool tr);
 
     /// Propagate sparsity, possibly transposed
-    void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                              std::vector<double>& rtmp, bool fwd, bool transpose);
+    void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output,
+                              int* itmp, bvec_t* rtmp, bool fwd, bool tr);
 
     ///@{
     /// Propagate sparsity through a linear solve

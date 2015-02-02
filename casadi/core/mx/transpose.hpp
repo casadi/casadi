@@ -66,7 +66,7 @@ namespace casadi {
 
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
-                                   std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
+                                   int* itmp, bvec_t* rtmp, bool fwd);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -121,8 +121,8 @@ namespace casadi {
     virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                                   std::vector<double>& rtmp, bool fwd);
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+                                   int* itmp, bvec_t* rtmp, bool fwd);
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
