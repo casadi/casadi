@@ -92,7 +92,7 @@ namespace casadi {
     }
   }
 
-  void SetSparse::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void SetSparse::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     bvec_t *inputd = get_bvec_t(input[0]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
     if (fwd) {

@@ -65,7 +65,7 @@ namespace casadi {
                             MXPtrVV& adjSens, bool output_given);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output,
                                    int* itmp, bvec_t* rtmp, bool fwd);
 
     /// Print a part of the expression */
@@ -121,7 +121,7 @@ namespace casadi {
     virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output,
                                    int* itmp, bvec_t* rtmp, bool fwd);
 
     /** \brief Generate code for the operation */

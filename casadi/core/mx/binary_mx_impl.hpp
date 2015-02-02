@@ -182,7 +182,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void BinaryMX<ScX, ScY>::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     bvec_t *input0 = get_bvec_t(input[0]->data());
     bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());

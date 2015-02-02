@@ -102,7 +102,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosVector::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void GetNonzerosVector::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());
@@ -120,7 +120,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void GetNonzerosSlice::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());
@@ -138,7 +138,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice2::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void GetNonzerosSlice2::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());

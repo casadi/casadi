@@ -93,7 +93,7 @@ namespace casadi {
     }
   }
 
-  void Transpose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, int* itmp,
+  void Transpose::propagateSparsity(DMatrix** input, DMatrix** output, int* itmp,
                                     bvec_t* rtmp, bool fwd) {
     // Access the input
     bvec_t *x = get_bvec_t(input[0]->data());
@@ -126,7 +126,7 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+  void DenseTranspose::propagateSparsity(DMatrix** input, DMatrix** output,
                                          int* itmp, bvec_t* rtmp, bool fwd) {
     // Access the input
     bvec_t *x = get_bvec_t(input[0]->data());

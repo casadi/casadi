@@ -64,7 +64,7 @@ namespace casadi {
                             bool output_given);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;

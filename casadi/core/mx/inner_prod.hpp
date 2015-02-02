@@ -60,7 +60,7 @@ namespace casadi {
     virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
 
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,

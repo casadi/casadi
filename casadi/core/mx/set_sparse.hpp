@@ -69,7 +69,7 @@ namespace casadi {
                            const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_SET_SPARSE;}

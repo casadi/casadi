@@ -67,7 +67,7 @@ namespace casadi {
     }
   }
 
-  void Split::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void Split::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (output[i]!=0) {

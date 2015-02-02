@@ -110,7 +110,7 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void UnaryMX::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     // Quick return if inplace
     if (input[0]==output[0]) return;
 

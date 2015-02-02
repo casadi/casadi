@@ -61,9 +61,9 @@ namespace casadi {
     }
   }
 
-  void Concat::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void Concat::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     bvec_t *res_ptr = get_bvec_t(output[0]->data());
-    for (int i=0; i<input.size(); ++i) {
+    for (int i=0; i<ndep(); ++i) {
       vector<double>& arg_i = input[i]->data();
       bvec_t *arg_i_ptr = get_bvec_t(arg_i);
       if (fwd) {

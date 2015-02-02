@@ -77,12 +77,12 @@ namespace casadi {
                                int* itmp, SXElement* rtmp, bool tr, int nrhs);
 
     /// Evaluate MX, possibly transposed
-    virtual void evaluateMXGen(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                               MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+    virtual void evaluateMXGen(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed,
+                               MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens,
                                bool output_given, bool tr);
 
     /// Propagate sparsity, possibly transposed
-    void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output,
+    void propagateSparsityGen(DMatrix** arg, DMatrix** res,
                               int* itmp, bvec_t* rtmp, bool fwd, bool tr);
 
     ///@{

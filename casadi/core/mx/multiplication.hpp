@@ -71,7 +71,7 @@ namespace casadi {
                             bool output_given);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output,
                                    int* itmp, bvec_t* rtmp, bool fwd);
 
     /** \brief Get the operation */

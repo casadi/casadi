@@ -64,7 +64,7 @@ namespace casadi {
     copy(arg, arg+nnz(), res);
   }
 
-  void Reshape::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void Reshape::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     // Quick return if inplace
     if (input[0]==output[0]) return;
 

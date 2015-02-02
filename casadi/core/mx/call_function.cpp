@@ -110,9 +110,9 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void CallFunction::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res,
+  void CallFunction::propagateSparsity(DMatrix** input, DMatrix** output,
                                        int* itmp, bvec_t* rtmp, bool use_fwd) {
-    fcn_->propagateSparsity(this, arg, res, itmp, rtmp, use_fwd);
+    fcn_->propagateSparsity(this, input, output, itmp, rtmp, use_fwd);
   }
 
   void CallFunction::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,

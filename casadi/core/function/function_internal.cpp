@@ -2510,7 +2510,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::propagateSparsity(MXNode* node, DMatrixPtrV& arg, DMatrixPtrV& res,
+  void FunctionInternal::propagateSparsity(MXNode* node, DMatrix** arg, DMatrix** res,
                                            int* itmp, bvec_t* rtmp, bool use_fwd) {
     // Pass/clear forward seeds/adjoint sensitivities
     for (int i=0; i<getNumInputs(); ++i) {
@@ -2567,11 +2567,11 @@ namespace casadi {
     }
 
     // Clear seeds and sensitivities
-    for (int iind = 0; iind < arg.size(); ++iind) {
+    for (int iind=0; iind<getNumInputs(); ++iind) {
       vector<double> &v = input(iind).data();
       fill(v.begin(), v.end(), 0);
     }
-    for (int oind = 0; oind < res.size(); ++oind) {
+    for (int oind=0; oind<getNumOutputs(); ++oind) {
       vector<double> &v = output(oind).data();
       fill(v.begin(), v.end(), 0);
     }

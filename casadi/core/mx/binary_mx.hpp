@@ -62,7 +62,7 @@ namespace casadi {
                             bool output_given);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
 
     /// Evaluate the function (template)
     template<typename T, typename Mat>

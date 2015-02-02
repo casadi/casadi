@@ -61,7 +61,7 @@ namespace casadi {
                             bool output_given);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
 
     /** \brief Check if unary operation */
     virtual bool isUnaryOp() const { return true;}

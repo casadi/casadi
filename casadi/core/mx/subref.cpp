@@ -52,7 +52,7 @@ namespace casadi {
     *output[0] = input[0]->getSub(false, i_, j_);
   }
 
-  void SubRef::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void SubRef::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     casadi_error("not ready");
   }
 

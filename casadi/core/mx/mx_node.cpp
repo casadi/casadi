@@ -254,15 +254,15 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void MXNode::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
     if (fwd) {
 
       // Get dependencies of all inputs
-      for (DMatrixPtrV::const_iterator i=input.begin(); i!=input.end(); ++i) {
-        const DMatrix& m = **i;
+      for (int k=0; k<ndep(); ++k) {
+        const DMatrix& m = *input[k];
         const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
         for (int i=0; i<m.nnz(); ++i) {
           all_depend |= v[i];
@@ -270,8 +270,8 @@ namespace casadi {
       }
 
       // Propagate to all outputs
-      for (DMatrixPtrV::iterator i=output.begin(); i!=output.end(); ++i) {
-        DMatrix& m = **i;
+      for (int k=0; k<getNumOutputs(); ++k) {
+        DMatrix& m = *output[k];
         bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
         for (int i=0; i<m.nnz(); ++i) {
           v[i] = all_depend;
@@ -280,8 +280,8 @@ namespace casadi {
     } else {
 
       // Get dependencies of all outputs
-      for (DMatrixPtrV::iterator i=output.begin(); i!=output.end(); ++i) {
-        DMatrix& m = **i;
+      for (int k=0; k<getNumOutputs(); ++k) {
+        DMatrix& m = *output[k];
         bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
         for (int i=0; i<m.nnz(); ++i) {
           all_depend |= v[i];
@@ -290,8 +290,8 @@ namespace casadi {
       }
 
       // Propagate to all inputs
-      for (DMatrixPtrV::iterator i=input.begin(); i!=input.end(); ++i) {
-        DMatrix& m = **i;
+      for (int k=0; k<ndep(); ++k) {
+        DMatrix& m = *input[k];
         bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
         for (int i=0; i<m.nnz(); ++i) {
           v[i] |= all_depend;

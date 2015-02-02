@@ -343,7 +343,7 @@ namespace casadi {
     virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res,
                             const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed,
                             MXPtrVV& asens, bool output_given);
-    virtual void propagateSparsity(MXNode* node, DMatrixPtrV& arg, DMatrixPtrV& res,
+    virtual void propagateSparsity(MXNode* node, DMatrix** arg, DMatrix** res,
                                    int* itmp, bvec_t* rtmp, bool fwd);
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);
     virtual void generateOperation(const MXNode* node, std::ostream &stream,

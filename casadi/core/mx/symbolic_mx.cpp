@@ -63,7 +63,7 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void SymbolicMX::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     bvec_t *outputd = get_bvec_t(output[0]->data());
     fill_n(outputd, output[0]->nnz(), 0);
   }

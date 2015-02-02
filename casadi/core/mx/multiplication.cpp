@@ -106,7 +106,7 @@ namespace casadi {
     }
   }
 
-  void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+  void Multiplication::propagateSparsity(DMatrix** input, DMatrix** output,
                                          int* itmp, bvec_t* rtmp, bool fwd) {
     bvec_t *zd = get_bvec_t(input[0]->data());
     bvec_t *rd = get_bvec_t(output[0]->data());

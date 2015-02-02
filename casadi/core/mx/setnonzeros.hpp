@@ -102,7 +102,7 @@ namespace casadi {
     virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -142,7 +142,7 @@ namespace casadi {
     virtual void simplifyMe(MX& ex);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
 
     /// Evaluate the function (template)
     template<typename T, typename Mat>
@@ -187,7 +187,7 @@ namespace casadi {
     virtual std::vector<int> getAll() const { return inner_.getAll(outer_, outer_.stop_);}
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
 
     /// Evaluate the function (template)
     template<typename T, typename Mat>

@@ -94,7 +94,7 @@ namespace casadi {
     *res = casadi_dot(n, arg0, 1, arg1, 1);
   }
 
-  void InnerProd::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void InnerProd::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     bvec_t& res = *get_bvec_t(output[0]->data());
     bvec_t* arg0 = get_bvec_t(input[0]->data());
     bvec_t* arg1 = get_bvec_t(input[1]->data());

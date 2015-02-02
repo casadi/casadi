@@ -53,7 +53,7 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void SubAssign::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
     casadi_error("not ready");
   }
 
