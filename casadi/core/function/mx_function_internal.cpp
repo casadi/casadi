@@ -322,7 +322,7 @@ namespace casadi {
 
     // Allocate work vectors (numeric)
     work_.resize(0);
-    work_.resize(worksize, DMatrix());
+    work_.resize(worksize, vector<double>());
     tapeloc_.resize(worksize);
     fill(tapeloc_.begin(), tapeloc_.end(), 0);
     size_t nitmp=0, nrtmp=0;
@@ -334,8 +334,8 @@ namespace casadi {
             it->data->nTmp(ni, nr);
             nitmp = std::max(nitmp, ni);
             nrtmp = std::max(nrtmp, nr);
-            if (work_[it->res[c]].isEmpty()) {
-              work_[it->res[c]] = Matrix<double>::zeros(it->data->sparsity(c));
+            if (work_[it->res[c]].empty()) {
+              work_[it->res[c]] = vector<double>(it->data->sparsity(c).nnz(), 0);
             }
           }
         }
@@ -410,7 +410,7 @@ namespace casadi {
       for (int i=0; i<mx_input_.size(); ++i) {
         if (el.arg[i]>=0) {
           int k = el.arg[i];
-          mx_input_[i] = work_[k].ptr();
+          mx_input_[i] = getPtr(work_[k]);
         } else {
           mx_input_[i] = 0;
         }
@@ -420,7 +420,7 @@ namespace casadi {
     if (el.op!=OP_OUTPUT) {
       for (int i=0; i<mx_output_.size(); ++i) {
         if (el.res[i]>=0) {
-          mx_output_[i] = work_[el.res[i]].ptr();
+          mx_output_[i] = getPtr(work_[el.res[i]]);
         } else {
           mx_output_[i] = 0;
         }
@@ -461,10 +461,10 @@ namespace casadi {
 
       if (it->op==OP_INPUT) {
         // Pass an input
-        work_[it->res.front()].set(input(it->arg.front()));
+        input(it->arg.front()).get(getPtr(work_[it->res.front()]));
       } else if (it->op==OP_OUTPUT) {
         // Get an output
-        work_[it->arg.front()].get(output(it->res.front()));
+        output(it->res.front()).set(getPtr(work_[it->arg.front()]));
       } else {
 
         // Point pointers to the data corresponding to the element
@@ -583,10 +583,10 @@ namespace casadi {
 
   void MXFunctionInternal::spInit(bool fwd) {
     // Start by setting all elements of the work vector to zero
-    for (vector<DMatrix>::iterator it=work_.begin(); it!=work_.end(); ++it) {
+    for (vector<vector<double> >::iterator it=work_.begin(); it!=work_.end(); ++it) {
       //Get a pointer to the int array
-      bvec_t *iwork = get_bvec_t(it->data());
-      fill_n(iwork, it->nnz(), bvec_t(0));
+      bvec_t *iwork = get_bvec_t(*it);
+      fill_n(iwork, it->size(), bvec_t(0));
     }
   }
 
@@ -597,13 +597,13 @@ namespace casadi {
       for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
         if (it->op==OP_INPUT) {
           // Pass input seeds
-          vector<double> &w = work_[it->res.front()].data();
+          vector<double> &w = work_[it->res.front()];
           bvec_t* iwork = get_bvec_t(w);
           bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
           copy(swork, swork+w.size(), iwork);
         } else if (it->op==OP_OUTPUT) {
           // Get the output sensitivities
-          vector<double> &w = work_[it->arg.front()].data();
+          vector<double> &w = work_[it->arg.front()];
           bvec_t* iwork = get_bvec_t(w);
           bvec_t* swork = get_bvec_t(output(it->res.front()).data());
           copy(iwork, iwork+w.size(), swork);
@@ -623,7 +623,7 @@ namespace casadi {
       for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
         if (it->op==OP_INPUT) {
           // Get the input sensitivities and clear it from the work vector
-          vector<double> &w = work_[it->res.front()].data();
+          vector<double> &w = work_[it->res.front()];
           bvec_t* iwork = get_bvec_t(w);
           bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
           for (int k=0; k<w.size(); ++k) {
@@ -632,7 +632,7 @@ namespace casadi {
           }
         } else if (it->op==OP_OUTPUT) {
           // Pass output seeds
-          vector<double> &w = work_[it->arg.front()].data();
+          vector<double> &w = work_[it->arg.front()];
           bvec_t* iwork = get_bvec_t(w);
           bvec_t* swork = get_bvec_t(output(it->res.front()).data());
           for (int k=0; k<w.size(); ++k) {
@@ -1071,12 +1071,12 @@ namespace casadi {
     casadi_assert_message(adjSeed.empty(), "Not implemented");
 
     // Create a work array
-    vector<SX> swork(work_.size());
+    vector<vector<SXElement> > swork(work_.size());
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op!=OP_OUTPUT) {
         for (int i=0; i<it->res.size(); ++i) {
           if (it->res[i]>=0)
-            swork[it->res[i]] = SX(it->data->sparsity(i));
+            swork[it->res[i]].resize(it->data->sparsity(i).nnz(), 0);
         }
       }
     }
@@ -1091,22 +1091,22 @@ namespace casadi {
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op==OP_INPUT) {
         // Pass the input
-        swork[it->res.front()].set(input_s[it->arg.front()]);
+        input_s[it->arg.front()].get(getPtr(swork[it->res.front()]));
       } else if (it->op==OP_OUTPUT) {
         // Get the outputs
-        swork[it->arg.front()].get(output_s[it->res.front()]);
+        output_s[it->res.front()].set(getPtr(swork[it->arg.front()]));
       } else if (it->op==OP_PARAMETER) {
         continue; // FIXME
       } else {
         sxarg.resize(it->arg.size());
         for (int c=0; c<sxarg.size(); ++c) {
           int ind = it->arg[c];
-          sxarg[c] = ind<0 ? 0 : swork[ind].ptr();
+          sxarg[c] = ind<0 ? 0 : getPtr(swork[ind]);
         }
         sxres.resize(it->res.size());
         for (int c=0; c<sxres.size(); ++c) {
           int ind = it->res[c];
-          sxres[c] = ind<0 ? 0 : swork[ind].ptr();
+          sxres[c] = ind<0 ? 0 : getPtr(swork[ind]);
         }
         it->data->evaluateSX(getPtr(sxarg), getPtr(sxres), getPtr(itmp_), getPtr(rtmp));
       }
@@ -1158,7 +1158,7 @@ namespace casadi {
 
   void MXFunctionInternal::printWork(ostream &stream) {
     for (int k=0; k<work_.size(); ++k) {
-      stream << "work[" << k << "] = " << work_[k].data() << endl;
+      stream << "work[" << k << "] = " << work_[k] << endl;
     }
   }
 
@@ -1220,7 +1220,7 @@ namespace casadi {
 
     // Declare all work variables
     for (int i=0; i<work_.size(); ++i) {
-      stream << "    d a" << i << "[" << work_[i].nnz() << "];" << endl;
+      stream << "    d a" << i << "[" << work_[i].size() << "];" << endl;
     }
 
     // Finalize work structure

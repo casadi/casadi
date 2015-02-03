@@ -55,7 +55,7 @@ namespace casadi {
     std::vector<AlgEl> algorithm_;
 
     /** \brief  Working vector for numeric calculation */
-    std::vector<DMatrix> work_;
+    std::vector<std::vector<double> > work_;
 
     /** \brief  Temporary vectors needed for the evaluation (integer) */
     std::vector<int> itmp_;
