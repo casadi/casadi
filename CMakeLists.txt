@@ -19,7 +19,7 @@ OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
 
-execute_process(COMMAND git describe HEAD
+execute_process(COMMAND git describe --first-parent HEAD
 OUTPUT_VARIABLE git_describe
 OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
