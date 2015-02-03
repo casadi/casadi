@@ -3430,6 +3430,9 @@
 %exception  casadi::SetSparse::getOp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SetSparse::nTmp(size_t &ni, size_t &nr) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SetSparse::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
