@@ -56,7 +56,7 @@ namespace casadi {
 
   template<typename T>
   void SetSparse::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
-    casadi_copy_sparse(input[0], dep().sparsity(), output[0], sparsity());
+    casadi_project(input[0], dep().sparsity(), output[0], sparsity(), rtmp);
   }
 
   void SetSparse::evaluateD(const double* const* input, double** output,
@@ -105,13 +105,13 @@ namespace casadi {
   void SetSparse::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                     const std::vector<std::string>& res, CodeGenerator& gen) const {
     // Codegen "copy sparse"
-    gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
+    gen.addAuxiliary(CodeGenerator::AUX_PROJECT);
 
     // Codegen the operation
     int sp_arg = gen.addSparsity(dep(0).sparsity());
     int sp_res = gen.addSparsity(sparsity());
-    stream << "  casadi_copy_sparse(" << arg.front() << ", s" << sp_arg << ", " << res.front()
-           << ", s" << sp_res << ");" << std::endl;
+    stream << "  casadi_project(" << arg.front() << ", s" << sp_arg << ", " << res.front()
+           << ", s" << sp_res << ", rrr);" << std::endl;
   }
 
 

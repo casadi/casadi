@@ -423,7 +423,11 @@ namespace casadi {
   }
 
   MX MXNode::getSetSparse(const Sparsity& sp) const {
-    return MX::create(new SetSparse(shared_from_this<MX>(), sp));
+    if (sp==sparsity()) {
+      return shared_from_this<MX>();
+    } else {
+      return MX::create(new SetSparse(shared_from_this<MX>(), sp));
+    }
   }
 
   MX MXNode::getSubRef(const Slice& i, const Slice& j) const {

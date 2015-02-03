@@ -74,6 +74,9 @@ namespace casadi {
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_SET_SPARSE;}
+
+    /// Get number of temporary variables needed
+    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=size1();}
   };
 
 } // namespace casadi

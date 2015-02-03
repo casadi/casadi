@@ -38,9 +38,9 @@ namespace casadi {
   template<typename real_t>
   void casadi_swap(int n, real_t* x, int inc_x, real_t* y, int inc_y);
 
-  /// COPY sparse: y <- x
+  /// Sparse copy: y <- x, w work vector (length >= number of rows)
   template<typename real_t>
-  void casadi_copy_sparse(const real_t* x, const int* sp_x, real_t* y, const int* sp_y);
+  void casadi_project(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w);
 
   /// SCAL: x <- alpha*x
   template<typename real_t>
@@ -145,40 +145,20 @@ namespace casadi {
   }
 
   template<typename real_t>
-  void casadi_copy_sparse(const real_t* x, const int* sp_x, real_t* y, const int* sp_y) {
-    int nrow_x = sp_x[0];
+  void casadi_project(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w) {
     int ncol_x = sp_x[1];
-    const int* colind_x = sp_x+2;
-    const int* row_x = sp_x + 2 + ncol_x+1;
-    int nnz_x = colind_x[ncol_x];
-    /*int nrow_y = sp_y[0];*/
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
     int ncol_y = sp_y[1];
-    const int* colind_y = sp_y+2;
-    const int* row_y = sp_y + 2 + ncol_y+1;
-    /* int nnz_y = colind_y[ncol_y];*/
-    if (sp_x==sp_y) {
-      casadi_copy(nnz_x, x, 1, y, 1);
-    } else {
-      int i;
-      for (i=0; i<ncol_x; ++i) {
-        int el_x = colind_x[i];
-        int el_x_end = colind_x[i+1];
-        int j_x = el_x<el_x_end ? row_x[el_x] : nrow_x;
-        int el_y;
-        for (el_y=colind_y[i]; el_y!=colind_y[i+1]; ++el_y) {
-          int j=row_y[el_y];
-          while (j_x<j) {
-            el_x++;
-            j_x = el_x<el_x_end ? row_x[el_x] : nrow_x;
-          }
-          if (j_x==j) {
-            y[el_y] = x[el_x++];
-            j_x = el_x<el_x_end ? row_x[el_x] : nrow_x;
-          } else {
-            y[el_y] = 0;
-          }
-        }
-      }
+    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
+    /* Loop over columns of x and y */
+    int i, el;
+    for (i=0; i<ncol_x; ++i) {
+      /* Zero out requested entries in y */
+      for (el=colind_y[i]; el<colind_y[i+1]; ++el) w[row_y[el]] = 0;
+      /* Set x entries */
+      for (el=colind_x[i]; el<colind_x[i+1]; ++el) w[row_x[el]] = x[el];
+      /* Retrieve requested entries in y */
+      for (el=colind_y[i]; el<colind_y[i+1]; ++el) y[el] = w[row_y[el]];
     }
   }
 

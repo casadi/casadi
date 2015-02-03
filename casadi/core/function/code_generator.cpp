@@ -271,9 +271,9 @@ namespace casadi {
     case AUX_SIGN:
       auxSign();
       break;
-    case AUX_COPY_SPARSE:
+    case AUX_PROJECT:
       addAuxiliary(AUX_COPY);
-      auxiliaries_ << codegen_str_copy_sparse << endl;
+      auxiliaries_ << codegen_str_project << endl;
       break;
     case AUX_TRANS:
       auxiliaries_ << codegen_str_trans << endl;
