@@ -232,52 +232,13 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp) {
-    vector<const double*> input2(ndep());
-    for (int i=0; i<input2.size(); ++i) {
-      if (input[i]==0) {
-        input2[i] = 0;
-      } else {
-        input2[i] = input[i]->ptr();
-      }
-    }
-    vector<double*> output2(getNumOutputs());
-    for (int i=0; i<output2.size(); ++i) {
-      if (output[i]==0) {
-        output2[i] = 0;
-      } else {
-        output2[i] = output[i]->ptr();
-      }
-    }
-    evaluateD(getPtr(input2), getPtr(output2), itmp, rtmp);
-  }
-
   void MXNode::evaluateD(const double** input, double** output, int* itmp, double* rtmp) {
     throw CasadiException(string("MXNode::evaluateD not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp) {
-    vector<const SXElement*> input2(ndep());
-    for (int i=0; i<input2.size(); ++i) {
-      if (input[i]==0) {
-        input2[i] = 0;
-      } else {
-        input2[i] = input[i]->ptr();
-      }
-    }
-    vector<SXElement*> output2(getNumOutputs());
-    for (int i=0; i<output2.size(); ++i) {
-      if (output[i]==0) {
-        output2[i] = 0;
-      } else {
-        output2[i] = output[i]->ptr();
-      }
-    }
-    evaluateSX(getPtr(input2), getPtr(output2), itmp, rtmp);
-  }
-
-  void MXNode::evaluateSX(const SXElement** input, SXElement** output, int* itmp, SXElement* rtmp) {
+  void MXNode::evaluateSX(const SXElement** input, SXElement** output,
+                          int* itmp, SXElement* rtmp) {
     throw CasadiException(string("MXNode::evaluateSX not defined for class ")
                           + typeid(*this).name());
   }
@@ -292,26 +253,6 @@ namespace casadi {
                           const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {
     throw CasadiException(string("MXNode::evaluateMX not defined for class ")
                           + typeid(*this).name());
-  }
-
-  void MXNode::propagateSparsity(DMatrix** input, DMatrix** output, int* itmp, bvec_t* rtmp, bool fwd) {
-    vector<double*> input2(ndep());
-    for (int i=0; i<input2.size(); ++i) {
-      if (input[i]==0) {
-        input2[i] = 0;
-      } else {
-        input2[i] = input[i]->ptr();
-      }
-    }
-    vector<double*> output2(getNumOutputs());
-    for (int i=0; i<output2.size(); ++i) {
-      if (output[i]==0) {
-        output2[i] = 0;
-      } else {
-        output2[i] = output[i]->ptr();
-      }
-    }
-    propagateSparsity(getPtr(input2), getPtr(output2), itmp, rtmp, fwd);
   }
 
   void MXNode::propagateSparsity(double** input, double** output, bool fwd) {
