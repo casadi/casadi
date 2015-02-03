@@ -52,9 +52,6 @@
 %exception  casadi::Assertion::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Assertion::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::BinaryMX< ScX, ScY >::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -80,9 +77,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::BinaryMX< ScX, ScY >::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::BinaryMX< ScX, ScY >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::BinarySX::dep(int i) const  {
@@ -134,9 +128,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CallFunction::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CallFunction::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CallFunction::sparsity(int oind) const  {
@@ -197,9 +188,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Concat::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Concat::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Constant< Value >::clone() const  {
@@ -299,9 +287,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ConstantMX::getValue() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ConstantMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ConstantSX::getOp() const  {
@@ -413,9 +398,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DenseTranspose::nTmp(size_t &ni, size_t &nr) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseTranspose::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Determinant::clone() const  {
@@ -901,9 +883,6 @@
 %exception  casadi::GetNonzerosSlice2::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GetNonzerosSlice2::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::GetNonzerosSlice::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -919,9 +898,6 @@
 %exception  casadi::GetNonzerosSlice::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GetNonzerosSlice::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::GetNonzerosSlice::simplifyMe(MX &ex) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -935,9 +911,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GetNonzerosVector::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GetNonzerosVector::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Horzcat::clone() const  {
@@ -1273,9 +1246,6 @@
 %exception  casadi::InnerProd::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::InnerProd::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::IntegerSX::getIntValue() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1495,7 +1465,7 @@
 %exception  casadi::LinearSolverInternal::evaluate() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearSolverInternal::evaluateMXGen(const MXPtrV &input, MXPtrV &output, const MXPtrVV &fwdSeed, MXPtrVV &fwdSens, const MXPtrVV &adjSeed, MXPtrVV &adjSens, bool output_given, bool tr) {
+%exception  casadi::LinearSolverInternal::evaluateMXGen(const MXPtrV &arg, MXPtrV &res, const MXPtrVV &fseed, MXPtrVV &fsens, const MXPtrVV &aseed, MXPtrVV &asens, bool output_given, bool tr) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearSolverInternal::getFactorization(bool transpose) const  {
@@ -1511,9 +1481,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearSolverInternal::nrow() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::LinearSolverInternal::propagateSparsityGen(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd, bool transpose) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearSolverInternal::row() const  {
@@ -1811,12 +1778,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXNode::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXNode::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::repr(std::ostream &stream) const  {
@@ -2581,9 +2542,6 @@
 %exception  casadi::Multiplication::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Multiplication::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::NanSX::getValue() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2981,9 +2939,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Reshape::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Reshape::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::RkIntegrator::clone() const  {
@@ -3433,9 +3388,6 @@
 %exception  casadi::SetNonzerosSlice2< Add >::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SetNonzerosSlice2< Add >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SetNonzerosSlice< Add >::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3449,9 +3401,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SetNonzerosSlice< Add >::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SetNonzerosSlice< Add >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SetNonzerosSlice< Add >::simplifyMe(MX &ex) {
@@ -3469,9 +3418,6 @@
 %exception  casadi::SetNonzerosVector< Add >::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SetNonzerosVector< Add >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SetSparse::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3485,9 +3431,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SetSparse::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SetSparse::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObject::assertInit() const  {
@@ -3607,9 +3550,6 @@
 %exception  casadi::Solve< Tr >::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Solve< Tr >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SparseStorage< DataType >::clear() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3713,9 +3653,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Split::getNumOutputs() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Split::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Split::sparsity(int oind) const  {
@@ -3889,9 +3826,6 @@
 %exception  casadi::SubAssign::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SubAssign::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SubRef::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3905,9 +3839,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SubRef::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SubRef::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SundialsInterface::getBandwidth() const  {
@@ -3944,9 +3875,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SymbolicMX::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SymbolicMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SymbolicQr::clone() const  {
@@ -4003,9 +3931,6 @@
 %exception  casadi::Transpose::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Transpose::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::UnaryMX::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4031,9 +3956,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::UnaryMX::printPart(std::ostream &stream, int part) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::UnaryMX::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::UnarySX::dep(int i) const  {
