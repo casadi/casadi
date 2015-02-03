@@ -41,13 +41,37 @@ namespace casadi {
 
   /** \brief  Internal node class for MXFunction
       \author Joel Andersson
-      \date 2010
+      \date 2010-2015
   */
   class CASADI_EXPORT MXFunctionInternal :
         public XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>{
     friend class MXFunction;
 
   public:
+    /** \brief  An element of the algorithm, namely an MX node */
+    typedef MXAlgEl AlgEl;
+
+    /** \brief  All the runtime elements in the order of evaluation */
+    std::vector<AlgEl> algorithm_;
+
+    /** \brief  Working vector for numeric calculation */
+    std::vector<DMatrix> work_;
+
+    /** \brief  Temporary vectors needed for the evaluation (integer) */
+    std::vector<int> itmp_;
+
+    /** \brief  Temporary vectors needed for the evaluation (real) */
+    std::vector<double> rtmp_;
+
+    /** \brief  Location in the tape vector for each variable */
+    std::vector<int> tapeloc_;
+
+    /// Free variables
+    std::vector<MX> free_vars_;
+
+    // Vectors to hold pointers during evaluation
+    std::vector<double*> mx_input_;
+    std::vector<double*> mx_output_;
 
     /** \brief  Multiple input, multiple output constructor, only to be accessed from MXFunction,
         therefore protected */
@@ -86,27 +110,6 @@ namespace casadi {
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
     virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
 
-    /** \brief  An element of the algorithm, namely an MX node */
-    typedef MXAlgEl AlgEl;
-
-    /** \brief  All the runtime elements in the order of evaluation */
-    std::vector<AlgEl> algorithm_;
-
-    /** \brief  Working vector for numeric calculation */
-    std::vector<std::pair<DMatrix, int> > work_;
-
-    /** \brief  Temporary vectors needed for the evaluation (integer) */
-    std::vector<int> itmp_;
-
-    /** \brief  Temporary vectors needed for the evaluation (real) */
-    std::vector<double> rtmp_;
-
-    /** \brief  "Tape" with spilled variables */
-    std::vector<std::pair<std::pair<int, int>, DMatrix> > tape_;
-
-    /// Free variables
-    std::vector<MX> free_vars_;
-
     /** \brief Evaluate symbolically, SXElement type*/
     virtual void evalSXsparse(const std::vector<SX>& input, std::vector<SX>& output,
                               const std::vector<std::vector<SX> >& fwdSeed,
@@ -126,10 +129,6 @@ namespace casadi {
 
     // Update pointers to a particular element
     void updatePointers(const AlgEl& el);
-
-    // Vectors to hold pointers during evaluation
-    std::vector<double*> mx_input_;
-    std::vector<double*> mx_output_;
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const { return inputv_;}

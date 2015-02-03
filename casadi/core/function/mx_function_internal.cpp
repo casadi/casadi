@@ -322,7 +322,9 @@ namespace casadi {
 
     // Allocate work vectors (numeric)
     work_.resize(0);
-    work_.resize(worksize, make_pair(DMatrix(), 0));
+    work_.resize(worksize, DMatrix());
+    tapeloc_.resize(worksize);
+    fill(tapeloc_.begin(), tapeloc_.end(), 0);
     size_t nitmp=0, nrtmp=0;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (it->op!=OP_OUTPUT) {
@@ -332,8 +334,8 @@ namespace casadi {
             it->data->nTmp(ni, nr);
             nitmp = std::max(nitmp, ni);
             nrtmp = std::max(nrtmp, nr);
-            if (work_[it->res[c]].first.isEmpty()) {
-              work_[it->res[c]].first = Matrix<double>::zeros(it->data->sparsity(c));
+            if (work_[it->res[c]].isEmpty()) {
+              work_[it->res[c]] = Matrix<double>::zeros(it->data->sparsity(c));
             }
           }
         }
@@ -408,7 +410,7 @@ namespace casadi {
       for (int i=0; i<mx_input_.size(); ++i) {
         if (el.arg[i]>=0) {
           int k = el.arg[i];
-          mx_input_[i] = work_[k].first.ptr();
+          mx_input_[i] = work_[k].ptr();
         } else {
           mx_input_[i] = 0;
         }
@@ -418,7 +420,7 @@ namespace casadi {
     if (el.op!=OP_OUTPUT) {
       for (int i=0; i<mx_output_.size(); ++i) {
         if (el.res[i]>=0) {
-          mx_output_[i] = work_[el.res[i]].first.ptr();
+          mx_output_[i] = work_[el.res[i]].ptr();
         } else {
           mx_output_[i] = 0;
         }
@@ -459,10 +461,10 @@ namespace casadi {
 
       if (it->op==OP_INPUT) {
         // Pass an input
-        work_[it->res.front()].first.set(input(it->arg.front()));
+        work_[it->res.front()].set(input(it->arg.front()));
       } else if (it->op==OP_OUTPUT) {
         // Get an output
-        work_[it->arg.front()].first.get(output(it->res.front()));
+        work_[it->arg.front()].get(output(it->res.front()));
       } else {
 
         // Point pointers to the data corresponding to the element
@@ -581,10 +583,10 @@ namespace casadi {
 
   void MXFunctionInternal::spInit(bool fwd) {
     // Start by setting all elements of the work vector to zero
-    for (vector<pair<DMatrix, int> >::iterator it=work_.begin(); it!=work_.end(); ++it) {
+    for (vector<DMatrix>::iterator it=work_.begin(); it!=work_.end(); ++it) {
       //Get a pointer to the int array
-      bvec_t *iwork = get_bvec_t(it->first.data());
-      fill_n(iwork, it->first.nnz(), bvec_t(0));
+      bvec_t *iwork = get_bvec_t(it->data());
+      fill_n(iwork, it->nnz(), bvec_t(0));
     }
   }
 
@@ -595,13 +597,13 @@ namespace casadi {
       for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
         if (it->op==OP_INPUT) {
           // Pass input seeds
-          vector<double> &w = work_[it->res.front()].first.data();
+          vector<double> &w = work_[it->res.front()].data();
           bvec_t* iwork = get_bvec_t(w);
           bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
           copy(swork, swork+w.size(), iwork);
         } else if (it->op==OP_OUTPUT) {
           // Get the output sensitivities
-          vector<double> &w = work_[it->arg.front()].first.data();
+          vector<double> &w = work_[it->arg.front()].data();
           bvec_t* iwork = get_bvec_t(w);
           bvec_t* swork = get_bvec_t(output(it->res.front()).data());
           copy(iwork, iwork+w.size(), swork);
@@ -621,7 +623,7 @@ namespace casadi {
       for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
         if (it->op==OP_INPUT) {
           // Get the input sensitivities and clear it from the work vector
-          vector<double> &w = work_[it->res.front()].first.data();
+          vector<double> &w = work_[it->res.front()].data();
           bvec_t* iwork = get_bvec_t(w);
           bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
           for (int k=0; k<w.size(); ++k) {
@@ -630,7 +632,7 @@ namespace casadi {
           }
         } else if (it->op==OP_OUTPUT) {
           // Pass output seeds
-          vector<double> &w = work_[it->arg.front()].first.data();
+          vector<double> &w = work_[it->arg.front()].data();
           bvec_t* iwork = get_bvec_t(w);
           bvec_t* swork = get_bvec_t(output(it->res.front()).data());
           for (int k=0; k<w.size(); ++k) {
@@ -947,7 +949,7 @@ namespace casadi {
         if (it->op!=OP_OUTPUT) {
           for (vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c) {
             if (*c >=0 && tt>=0 && tape[tt].first==make_pair(alg_counter, *c)) {
-              work_[*c].second = 1 + tt--;
+              tapeloc_[*c] = 1 + tt--;
             }
           }
         }
@@ -981,8 +983,8 @@ namespace casadi {
             if (el<0) {
               input_p[i] = 0;
             } else {
-              int tmp = work_[el].second; // Positive if the data should be retrieved from the
-                                          // tape instead of the work vector
+              int tmp = tapeloc_[el]; // Positive if the data should be retrieved from the
+                                      // tape instead of the work vector
               input_p[i] = tmp==0 ? &swork[el] : &tape[tmp-1].second;
             }
           }
@@ -1049,9 +1051,9 @@ namespace casadi {
         // (delayed for inplace operations)
         if (it->op!=OP_OUTPUT) {
           for (vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c) {
-            if (*c >=0 && work_[*c].second > 0) {
-              swork[*c] = tape[work_[*c].second-1].second;
-              work_[*c].second = 0;
+            if (*c >=0 && tapeloc_[*c] > 0) {
+              swork[*c] = tape[tapeloc_[*c]-1].second;
+              tapeloc_[*c] = 0;
             }
           }
         }
@@ -1156,7 +1158,7 @@ namespace casadi {
 
   void MXFunctionInternal::printWork(ostream &stream) {
     for (int k=0; k<work_.size(); ++k) {
-      stream << "work[" << k << "] = " << work_[k].first.data() << endl;
+      stream << "work[" << k << "] = " << work_[k].data() << endl;
     }
   }
 
@@ -1199,7 +1201,7 @@ namespace casadi {
 
     // Add sparsity patterns in the intermediate variables
     for (int i=0; i<work_.size(); ++i) {
-      gen.addSparsity(work_[i].first.sparsity());
+      gen.addSparsity(work_[i].sparsity());
     }
 
     // Generate code for the embedded functions
@@ -1223,7 +1225,7 @@ namespace casadi {
 
     // Declare all work variables
     for (int i=0; i<work_.size(); ++i) {
-      stream << "    d a" << i << "[" << work_[i].first.nnz() << "];" << endl;
+      stream << "    d a" << i << "[" << work_[i].nnz() << "];" << endl;
     }
 
     // Finalize work structure
