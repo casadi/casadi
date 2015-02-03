@@ -74,25 +74,24 @@ namespace casadi {
     }
   }
 
-  void Assertion::evaluateSX(const SX** input, SX** output,
+  void Assertion::evaluateSX(const SXElement** input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
-    copy(input[0]->begin(), input[0]->end(), output[0]->begin());
+    copy(input[0], input[0]+dep().nnz(), output[0]);
   }
 
-  void Assertion::evaluateD(const DMatrix** input, DMatrix** output,
+  void Assertion::evaluateD(const double** input, double** output,
                             int* itmp, double* rtmp) {
-    if ((*input[1]).at(0)!=1) {
+    if (input[1][0]!=1) {
       casadi_error("Assertion error: " << fail_message_);
     }
 
-    copy(input[0]->begin(), input[0]->end(), output[0]->begin());
+    copy(input[0], input[0]+dep().nnz(), output[0]);
   }
 
-  void Assertion::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
-    bvec_t *input0 = get_bvec_t(input[0]->data());
-    //    bvec_t *input1 = get_bvec_t(input[1]->data());
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-    for (int el=0; el<output[0]->nnz(); ++el) {
+  void Assertion::propagateSparsity(double** input, double** output, bool fwd) {
+    bvec_t *input0 = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
+    for (int el=0; el<nnz(); ++el) {
       if (fwd) {
         outputd[el] = input0[el];
       } else {

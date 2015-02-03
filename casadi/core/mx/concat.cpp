@@ -41,36 +41,36 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::evaluateD(const DMatrix** input, DMatrix** output,
+  void Concat::evaluateD(const double** input, double** output,
                          int* itmp, double* rtmp) {
-    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
+    evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void Concat::evaluateSX(const SX** input, SX** output,
+  void Concat::evaluateSX(const SXElement** input, SXElement** output,
                           int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
+    evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename Mat>
-  void Concat::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
-    T* res = output[0]->ptr();
+  template<typename T>
+  void Concat::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+    T* res = output[0];
     for (int i=0; i<ndep(); ++i) {
-      const T* arg_i = input[i]->ptr();
+      const T* arg_i = input[i];
       copy(arg_i, arg_i+dep(i).nnz(), res);
       res += dep(i).nnz();
     }
   }
 
-  void Concat::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
-    bvec_t *res_ptr = get_bvec_t(output[0]->data());
+  void Concat::propagateSparsity(double** input, double** output, bool fwd) {
+    bvec_t *res_ptr = reinterpret_cast<bvec_t*>(output[0]);
     for (int i=0; i<ndep(); ++i) {
-      vector<double>& arg_i = input[i]->data();
-      bvec_t *arg_i_ptr = get_bvec_t(arg_i);
+      int n_i = dep(i).nnz();
+      bvec_t *arg_i_ptr = reinterpret_cast<bvec_t*>(input[i]);
       if (fwd) {
-        copy(arg_i_ptr, arg_i_ptr+arg_i.size(), res_ptr);
-        res_ptr += arg_i.size();
+        copy(arg_i_ptr, arg_i_ptr+n_i, res_ptr);
+        res_ptr += n_i;
       } else {
-        for (int k=0; k<arg_i.size(); ++k) {
+        for (int k=0; k<n_i; ++k) {
           *arg_i_ptr++ |= *res_ptr;
           *res_ptr++ = 0;
         }

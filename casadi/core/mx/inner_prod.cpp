@@ -72,44 +72,37 @@ namespace casadi {
     }
   }
 
-  void InnerProd::evaluateD(const DMatrix** input, DMatrix** output,
+  void InnerProd::evaluateD(const double** input, double** output,
                             int* itmp, double* rtmp) {
-    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
+    evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void InnerProd::evaluateSX(const SX** input, SX** output,
+  void InnerProd::evaluateSX(const SXElement** input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
+    evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename Mat>
-  void InnerProd::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
-    // Get data
-    T* res = output[0]->ptr();
-    const T* arg0 = input[0]->ptr();
-    const T* arg1 = input[1]->ptr();
+  template<typename T>
+  void InnerProd::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+    *output[0] = casadi_dot(dep(0).nnz(), input[0], 1, input[1], 1);
+  }
+
+  void InnerProd::propagateSparsity(double** input, double** output, bool fwd) {
+    bvec_t* res = reinterpret_cast<bvec_t*>(output[0]);
+    bvec_t* arg0 = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t* arg1 = reinterpret_cast<bvec_t*>(input[1]);
     const int n = dep(0).nnz();
-
-    // Perform the inner product
-    *res = casadi_dot(n, arg0, 1, arg1, 1);
-  }
-
-  void InnerProd::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
-    bvec_t& res = *get_bvec_t(output[0]->data());
-    bvec_t* arg0 = get_bvec_t(input[0]->data());
-    bvec_t* arg1 = get_bvec_t(input[1]->data());
-    const int n = input[0]->nnz();
     if (fwd) {
-      res = 0;
+      *res = 0;
       for (int i=0; i<n; ++i) {
-        res |= *arg0++ | *arg1++;
+        *res |= *arg0++ | *arg1++;
       }
     } else {
       for (int i=0; i<n; ++i) {
-        *arg0++ |= res;
-        *arg1++ |= res;
+        *arg0++ |= *res;
+        *arg1++ |= *res;
       }
-      res = 0;
+      *res = 0;
     }
   }
 

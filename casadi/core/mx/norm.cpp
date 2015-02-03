@@ -43,21 +43,21 @@ namespace casadi {
     }
   }
 
-  void NormF::evaluateD(const DMatrix** input, DMatrix** output,
+  void NormF::evaluateD(const double** input, double** output,
                         int* itmp, double* rtmp) {
-    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
+    evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void NormF::evaluateSX(const SX** input, SX** output,
+  void NormF::evaluateSX(const SXElement** input, SXElement** output,
                          int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
+    evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
-  template<typename T, typename Mat>
-  void NormF::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+  template<typename T>
+  void NormF::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
     // Get data
-    T* res = output[0]->ptr();
-    const T* arg = input[0]->ptr();
+    T* res = output[0];
+    const T* arg = input[0];
 
     // Perform the inner product
     *res = sqrt(casadi_dot(dep().nnz(), arg, 1, arg, 1));

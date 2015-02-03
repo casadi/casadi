@@ -294,7 +294,7 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
+  void MXNode::propagateSparsity(DMatrix** input, DMatrix** output, int* itmp, bvec_t* rtmp, bool fwd) {
     vector<double*> input2(ndep());
     for (int i=0; i<input2.size(); ++i) {
       if (input[i]==0) {
@@ -311,7 +311,7 @@ namespace casadi {
         output2[i] = output[i]->ptr();
       }
     }
-    propagateSparsity(getPtr(input2), getPtr(output2), fwd);
+    propagateSparsity(getPtr(input2), getPtr(output2), itmp, rtmp, fwd);
   }
 
   void MXNode::propagateSparsity(double** input, double** output, bool fwd) {

@@ -149,6 +149,8 @@ namespace casadi {
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrix** input, DMatrix** output,
+                                   int* itmp, bvec_t* rtmp, bool fwd);
+    virtual void propagateSparsity(double** input, double** output,
                                    int* itmp, bvec_t* rtmp, bool fwd)
     { propagateSparsity(input, output, fwd);}
 
@@ -379,7 +381,6 @@ namespace casadi {
     Sparsity sparsity_;
 
     /** \brief  Propagate sparsity, no work */
-    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
     virtual void propagateSparsity(double** input, double** output, bool fwd);
 
     /** \brief Free adjoint memory (MX) */

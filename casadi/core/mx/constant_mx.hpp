@@ -63,10 +63,10 @@ namespace casadi {
     virtual ConstantMX* clone() const = 0;
 
     /// Evaluate the function numerically
-    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
+    virtual void evaluateD(const double** input, double** output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
+    virtual void evaluateSX(const SXElement** input, SXElement** output, int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -74,7 +74,7 @@ namespace casadi {
                             bool output_given);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
+    virtual void propagateSparsity(double** input, double** output, bool fwd);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_CONST;}
@@ -114,16 +114,16 @@ namespace casadi {
     }
 
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrix** input, DMatrix** output,
+    virtual void evaluateD(const double** input, double** output,
                            int* itmp, double* rtmp) {
-      output[0]->set(x_);
+      std::copy(x_.begin(), x_.end(), output[0]);
       ConstantMX::evaluateD(input, output, itmp, rtmp);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SX** input, SX** output,
+    virtual void evaluateSX(const SXElement** input, SXElement** output,
                             int* itmp, SXElement* rtmp) {
-      output[0]->set(SX(x_));
+      std::copy(x_.begin(), x_.end(), output[0]);
       ConstantMX::evaluateSX(input, output, itmp, rtmp);
     }
 
@@ -178,10 +178,10 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp) {}
+    virtual void evaluateD(const double** input, double** output, int* itmp, double* rtmp) {}
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp) {}
+    virtual void evaluateSX(const SXElement** input, SXElement** output, int* itmp, SXElement* rtmp) {}
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
@@ -248,10 +248,10 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
+    virtual void evaluateD(const double** input, double** output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
+    virtual void evaluateSX(const SXElement** input, SXElement** output, int* itmp, SXElement* rtmp);
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
@@ -438,16 +438,16 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::evaluateD(const DMatrix** input, DMatrix** output,
+  void Constant<Value>::evaluateD(const double** input, double** output,
                                   int* itmp, double* rtmp) {
-    output[0]->set(static_cast<double>(v_.value));
+    std::fill(output[0], output[0]+nnz(), static_cast<double>(v_.value));
     ConstantMX::evaluateD(input, output, itmp, rtmp);
   }
 
   template<typename Value>
-  void Constant<Value>::evaluateSX(const SX** input, SX** output,
+  void Constant<Value>::evaluateSX(const SXElement** input, SXElement** output,
                                    int* itmp, SXElement* rtmp) {
-    output[0]->set(SXElement(v_.value));
+    std::fill(output[0], output[0]+nnz(), SXElement(v_.value));
     ConstantMX::evaluateSX(input, output, itmp, rtmp);
   }
 

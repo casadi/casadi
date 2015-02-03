@@ -153,24 +153,24 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evaluateD(const DMatrix** input, DMatrix** output,
+  void BinaryMX<ScX, ScY>::evaluateD(const double** input, double** output,
                                      int* itmp, double* rtmp) {
-    evaluateGen<double, DMatrix>(input, output, itmp, rtmp);
+    evaluateGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evaluateSX(const SX** input, SX** output,
+  void BinaryMX<ScX, ScY>::evaluateSX(const SXElement** input, SXElement** output,
                                       int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement, SX>(input, output, itmp, rtmp);
+    evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool ScX, bool ScY>
-  template<typename T, typename Mat>
-  void BinaryMX<ScX, ScY>::evaluateGen(const Mat** input, Mat** output, int* itmp, T* rtmp) {
+  template<typename T>
+  void BinaryMX<ScX, ScY>::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
     // Get data
-    T* output0 = output[0]->ptr();
-    const T* input0 = input[0]->ptr();
-    const T* input1 = input[1]->ptr();
+    T* output0 = output[0];
+    const T* input0 = input[0];
+    const T* input1 = input[1];
 
     if (!ScX && !ScY) {
       casadi_math<T>::fun(op_, input0, input1, output0, nnz());
@@ -182,11 +182,11 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::propagateSparsity(DMatrix** input, DMatrix** output, bool fwd) {
-    bvec_t *input0 = get_bvec_t(input[0]->data());
-    bvec_t *input1 = get_bvec_t(input[1]->data());
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-    for (int el=0; el<output[0]->nnz(); ++el) {
+  void BinaryMX<ScX, ScY>::propagateSparsity(double** input, double** output, bool fwd) {
+    bvec_t *input0 = reinterpret_cast<bvec_t*>(input[0]);
+    bvec_t *input1 = reinterpret_cast<bvec_t*>(input[1]);
+    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
+    for (int el=0; el<nnz(); ++el) {
       if (fwd) {
         outputd[el] = input0[ScX ? 0 : el] | input1[ScY ? 0 : el];
       } else {
