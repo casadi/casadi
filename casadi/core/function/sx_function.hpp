@@ -79,7 +79,30 @@ namespace casadi {
     /// Multiple (matrix valued) input, multiple (matrix valued) output
     SXFunction(const IOSchemeVector< SX >& arg, const std::vector< SX>& res);
 
-    /// Multiple (matrix valued) input, multiple (matrix valued) output
+    /** \brief Multiple (matrix valued) input, multiple (matrix valued) output
+    
+    \doctest
+    X = SX.sym("X")
+    f = SXFunction(daeIn(x=X),daeOut(ode=X**2))
+    f.init()
+    print f
+    \doctestout
+     Inputs (DAEInput: 4):
+      0. (DAE_X aka 'x')   1-by-1 (dense)
+      1. (DAE_Z aka 'z')   0-by-0 (dense)
+      2. (DAE_P aka 'p')   0-by-0 (dense)
+      3. (DAE_T aka 't')   0-by-0 (dense)
+     Outputs (DAEOutput: 3):
+      0. (DAE_ODE aka 'ode')   1-by-1 (dense)
+      1. (DAE_ALG aka 'alg')   0-by-0 (dense)
+      2. (DAE_QUAD aka 'quad')   0-by-0 (dense)
+    @0 = input[0][0];
+    @0 = sq(@0);
+    output[0][0] = @0;
+    <BLANKLINE>
+    \enddoctest
+    
+    */
     SXFunction(const IOSchemeVector< SX >& arg, const IOSchemeVector< SX >& res);
 
 #ifndef SWIG

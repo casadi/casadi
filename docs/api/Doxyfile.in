@@ -193,6 +193,10 @@ ALIASES                += pluginbrief{2}="'\2' plugin for \1"
 ALIASES                += generalsection{1}="### General information \n @copydoc general_\1 \n"
 ALIASES                += structargument{1}="\n \parblock \n Problem structure. @copydoc scheme_\1Struct \n \endparblock"
 
+ALIASES                += doctest="\htmlonly <div class='doctest'> <div class='doctestcode'> \endhtmlonly \code{.py}"
+ALIASES                += doctestout="\endcode \htmlonly </div> \endhtmlonly \htmlonly <div class='doctestout'> \endhtmlonly \verbatim"
+ALIASES                += enddoctest="\endverbatim \htmlonly </div> </div> \endhtmlonly"
+
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
 # For instance, some of the names that are used will be different. The list 

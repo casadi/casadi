@@ -42,7 +42,7 @@ for line in file('../Doxyfile.in','r'):
 print aliases
 
 
-def astext(node,whitespace=False,escape=True):
+def astext(node,whitespace=False,escape=True,strictspacing=False):
   r = []
   if node.nodeType == node.TEXT_NODE:
     d = node.data
@@ -52,10 +52,15 @@ def astext(node,whitespace=False,escape=True):
     if not(whitespace):
       d = d.strip()
     r.append(d)
+  elif hasattr(node,'tagName') and node.tagName=="sp":
+    return " "
   elif hasattr(node,'childNodes'):
     for node in node.childNodes:
-      r.append(astext(node,whitespace=whitespace,escape=escape))
-  return (" ".join(r)).strip()
+      r.append(astext(node,whitespace=whitespace,escape=escape,strictspacing=strictspacing))
+  if strictspacing:
+    return ("".join(r))
+  else:
+    return (" ".join(r)).strip()
 
 
 class Doxy2SWIG_X(Doxy2SWIG):
@@ -74,6 +79,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
     self.active_docstring = None
     self.add_text_counter = 0
     self.src = args[0]
+    del self.ignores[self.ignores.index("programlisting")]
 
 
   def generic_parse(self, node, pad=0):
@@ -183,9 +189,26 @@ class Doxy2SWIG_X(Doxy2SWIG):
       self.add_text(("="*length) + "\n\n")
     else:
       self.add_text(("-"*length) + "\n\n")
-      
+
+  def do_htmlonly(self,node):
+    pass
+    
+  def do_programlisting(self,node):
+    if hasattr(node.previousSibling,'tagName') and node.previousSibling.tagName=="htmlonly" and "doctest" in node.previousSibling.firstChild.data:
+      self.add_text("\n\n::\n\n")
+      for codeline in node.getElementsByTagName("codeline"):
+        self.add_text("  >>> " + astext(codeline,strictspacing=True).replace("\n","%%newline%%")+"\n")
+    
+    
   def do_verbatim(self, node):
-    self.add_text("\n\n::\n\n")
+    skipheader = False
+    try:
+      if node.previousSibling.tagName=="htmlonly" and "doctest" in node.previousSibling.firstChild.data:
+        skipheader = True
+    except:
+      pass
+    if not skipheader:
+      self.add_text("\n\n::\n\n")
     text = node.firstChild.data
     text = "\n".join(["  " +i for i in text.split("\n")])
     

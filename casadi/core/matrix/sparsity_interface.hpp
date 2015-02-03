@@ -134,6 +134,28 @@ namespace casadi {
      * \param incr Size of each group of rows
      *
      *   vertcat(vertsplit(x, ...)) = x
+     
+       \doctest
+       print vertsplit(SX.sym("a",4))
+       \doctestout
+       [SX(a_0), SX(a_1), SX(a_2), SX(a_3)]
+       \enddoctest
+     
+       \doctest
+       print vertsplit(SX.sym("a",4),2)
+       \doctestout
+       [SX([a_0, a_1]), SX([a_2, a_3])]
+       \enddoctest
+     
+       If the number of rows is not a multiple of \p incr,
+       the last entry returned will have a size smaller than \p incr.
+     
+       \doctest
+       print vertsplit(DMatrix([0,1,2,3,4]),2)
+       \doctestout
+       [DMatrix([0, 1]), DMatrix([2, 3]), DMatrix(4)]
+       \enddoctest
+     *
      */
     inline friend std::vector<MatType > vertsplit(const MatType &v, int incr=1) {
       casadi_assert(incr>=1);
