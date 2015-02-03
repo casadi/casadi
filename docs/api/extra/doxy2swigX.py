@@ -292,8 +292,11 @@ class Doxy2SWIG_X(Doxy2SWIG):
               # Get the full function name.
               anc_node = anc.getElementsByTagName('compoundname')
               cname = anc_node[0].firstChild.data
-              target = '%s::%s'%(cname, name)
-
+              if kind=="friend":
+                target = name
+              else:
+                target = '%s::%s'%(cname, name)
+              
           self.start_docstring(target,defn)
           for n in node.childNodes:
               if n not in first.values():
