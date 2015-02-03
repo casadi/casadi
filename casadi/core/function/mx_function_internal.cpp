@@ -1199,11 +1199,6 @@ namespace casadi {
                    << free_vars_ << " are free.");
     }
 
-    // Add sparsity patterns in the intermediate variables
-    for (int i=0; i<work_.size(); ++i) {
-      gen.addSparsity(work_[i].sparsity());
-    }
-
     // Generate code for the embedded functions
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
