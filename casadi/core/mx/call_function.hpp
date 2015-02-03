@@ -57,10 +57,11 @@ namespace casadi {
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Evaluate the function numerically
-    virtual void evaluateD(const double** input, double** output, int* itmp, double* rtmp);
+    virtual void evaluateD(const double* const* input, double** output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXElement** input, SXElement** output, int* itmp, SXElement* rtmp);
+    virtual void evaluateSX(const SXElement* const* input, SXElement** output,
+                            int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,

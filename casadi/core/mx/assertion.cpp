@@ -74,12 +74,12 @@ namespace casadi {
     }
   }
 
-  void Assertion::evaluateSX(const SXElement** input, SXElement** output,
+  void Assertion::evaluateSX(const SXElement* const* input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
     copy(input[0], input[0]+dep().nnz(), output[0]);
   }
 
-  void Assertion::evaluateD(const double** input, double** output,
+  void Assertion::evaluateD(const double* const* input, double** output,
                             int* itmp, double* rtmp) {
     if (input[1][0]!=1) {
       casadi_error("Assertion error: " << fail_message_);

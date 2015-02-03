@@ -56,7 +56,7 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::evaluateD(const double** input, double** output,
+  void UnaryMX::evaluateD(const double* const* input, double** output,
                           int* itmp, double* rtmp) {
     double dummy = numeric_limits<double>::quiet_NaN();
     double* outputd = output[0];
@@ -64,7 +64,7 @@ namespace casadi {
     casadi_math<double>::fun(op_, inputd, dummy, outputd, nnz());
   }
 
-  void UnaryMX::evaluateSX(const SXElement** input, SXElement** output,
+  void UnaryMX::evaluateSX(const SXElement* const* input, SXElement** output,
                            int* itmp, SXElement* rtmp) {
     SXElement dummy = 0;
     SXElement* outputd = output[0];

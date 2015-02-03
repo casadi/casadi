@@ -153,20 +153,20 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evaluateD(const double** input, double** output,
+  void BinaryMX<ScX, ScY>::evaluateD(const double* const* input, double** output,
                                      int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evaluateSX(const SXElement** input, SXElement** output,
+  void BinaryMX<ScX, ScY>::evaluateSX(const SXElement* const* input, SXElement** output,
                                       int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool ScX, bool ScY>
   template<typename T>
-  void BinaryMX<ScX, ScY>::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void BinaryMX<ScX, ScY>::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
     // Get data
     T* output0 = output[0];
     const T* input0 = input[0];

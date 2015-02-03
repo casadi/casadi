@@ -37,28 +37,28 @@ namespace casadi {
     setSparsity(x.sparsity().T());
   }
 
-  void Transpose::evaluateD(const double** input, double** output,
+  void Transpose::evaluateD(const double* const* input, double** output,
                             int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
- void DenseTranspose::evaluateD(const double** input, double** output,
+ void DenseTranspose::evaluateD(const double* const* input, double** output,
                                 int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void Transpose::evaluateSX(const SXElement** input, SXElement** output,
+  void Transpose::evaluateSX(const SXElement* const* input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
-  void DenseTranspose::evaluateSX(const SXElement** input, SXElement** output,
+  void DenseTranspose::evaluateSX(const SXElement* const* input, SXElement** output,
                                   int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Transpose::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void Transpose::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
 
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
@@ -78,7 +78,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void DenseTranspose::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void DenseTranspose::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
 
     // Get sparsity patterns
     int x_nrow = dep().size1();

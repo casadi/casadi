@@ -77,7 +77,7 @@ namespace casadi {
     fcn_->printPart(this, stream, part);
   }
 
-  void CallFunction::evaluateD(const double** input, double** output,
+  void CallFunction::evaluateD(const double* const* input, double** output,
                                int* itmp, double* rtmp) {
     fcn_->evaluateD(this, input, output, itmp, rtmp);
   }
@@ -94,7 +94,7 @@ namespace casadi {
     return fcn_;
   }
 
-  void CallFunction::evaluateSX(const SXElement** input, SXElement** output,
+  void CallFunction::evaluateSX(const SXElement* const* input, SXElement** output,
                                 int* itmp, SXElement* rtmp) {
     fcn_->evaluateSX(this, input, output, itmp, rtmp);
   }

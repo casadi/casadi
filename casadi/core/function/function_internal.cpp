@@ -2611,7 +2611,7 @@ namespace casadi {
     nr=0;
   }
 
-  void FunctionInternal::evaluateSX(MXNode* node, const SXElement** arg, SXElement** res,
+  void FunctionInternal::evaluateSX(MXNode* node, const SXElement* const* arg, SXElement** res,
                                     int* itmp, SXElement* rtmp) {
 
     // Number of inputs and outputs
@@ -2636,7 +2636,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::evaluateD(MXNode* node, const double** arg, double** res,
+  void FunctionInternal::evaluateD(MXNode* node, const double* const* arg, double** res,
                                    int* itmp, double* rtmp) {
 
     // Set up timers for profiling

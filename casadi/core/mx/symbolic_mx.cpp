@@ -46,11 +46,11 @@ namespace casadi {
     stream << name_;
   }
 
-  void SymbolicMX::evaluateD(const double** input, double** output,
+  void SymbolicMX::evaluateD(const double* const* input, double** output,
                              int* itmp, double* rtmp) {
   }
 
-  void SymbolicMX::evaluateSX(const SXElement** input, SXElement** output,
+  void SymbolicMX::evaluateSX(const SXElement* const* input, SXElement** output,
                               int* itmp, SXElement* rtmp) {
   }
 

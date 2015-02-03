@@ -37,18 +37,18 @@ namespace casadi {
     return new SubRef(*this);
   }
 
-  void SubRef::evaluateD(const double** input, double** output,
+  void SubRef::evaluateD(const double* const* input, double** output,
                          int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void SubRef::evaluateSX(const SXElement** input, SXElement** output,
+  void SubRef::evaluateSX(const SXElement* const* input, SXElement** output,
                           int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void SubRef::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void SubRef::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
     casadi_error("not ready");
   }
 

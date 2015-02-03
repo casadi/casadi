@@ -272,20 +272,20 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateD(const double** input, double** output,
+  void SetNonzerosVector<Add>::evaluateD(const double* const* input, double** output,
                                          int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateSX(const SXElement** input, SXElement** output,
+  void SetNonzerosVector<Add>::evaluateSX(const SXElement* const* input, SXElement** output,
                                           int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosVector<Add>::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void SetNonzerosVector<Add>::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
     const T* idata0 = input[0];
     const T* idata = input[1];
     T* odata = output[0];
@@ -302,20 +302,20 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateD(const double** input, double** output,
+  void SetNonzerosSlice<Add>::evaluateD(const double* const* input, double** output,
                                     int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateSX(const SXElement** input, SXElement** output,
+  void SetNonzerosSlice<Add>::evaluateSX(const SXElement* const* input, SXElement** output,
                                          int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice<Add>::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void SetNonzerosSlice<Add>::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
     const T* idata0 = input[0];
     const T* idata = input[1];
     T* odata = output[0];
@@ -333,20 +333,20 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateD(const double** input, double** output,
+  void SetNonzerosSlice2<Add>::evaluateD(const double* const* input, double** output,
                                          int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateSX(const SXElement** input, SXElement** output,
+  void SetNonzerosSlice2<Add>::evaluateSX(const SXElement* const* input, SXElement** output,
                                           int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice2<Add>::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void SetNonzerosSlice2<Add>::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
     const T* idata0 = input[0];
     const T* idata = input[1];
     T* odata = output[0];

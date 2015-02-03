@@ -55,16 +55,16 @@ namespace casadi {
   }
 
   template<typename T>
-  void SetSparse::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void SetSparse::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
     casadi_copy_sparse(input[0], dep().sparsity(), output[0], sparsity());
   }
 
-  void SetSparse::evaluateD(const double** input, double** output,
+  void SetSparse::evaluateD(const double* const* input, double** output,
                             int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void SetSparse::evaluateSX(const SXElement** input, SXElement** output,
+  void SetSparse::evaluateSX(const SXElement* const* input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }

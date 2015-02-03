@@ -43,18 +43,18 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::evaluateD(const double** input, double** output,
+  void Split::evaluateD(const double* const* input, double** output,
                         int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void Split::evaluateSX(const SXElement** input, SXElement** output,
+  void Split::evaluateSX(const SXElement* const* input, SXElement** output,
                          int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Split::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void Split::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
     // Number of derivatives
     int nx = offset_.size()-1;
 

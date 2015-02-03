@@ -357,7 +357,7 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evaluateDGen(const double** arg, double** res,
+  void LinearSolverInternal::evaluateDGen(const double* const* arg, double** res,
                                           int* itmp, double* rtmp, bool tr, int nrhs) {
 
     // Factorize the matrix
@@ -371,7 +371,7 @@ namespace casadi {
     solve(res[0], nrhs, tr);
   }
 
-  void LinearSolverInternal::evaluateSXGen(const SXElement** arg, SXElement** res,
+  void LinearSolverInternal::evaluateSXGen(const SXElement* const* arg, SXElement** res,
                                            int* itmp, SXElement* rtmp, bool tr, int nrhs) {
     casadi_error("LinearSolverInternal::evaluateSXGen not defined for class "
                  << typeid(*this).name());

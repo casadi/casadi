@@ -70,13 +70,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateD(const double** input, double** output,
+  void Solve<Tr>::evaluateD(const double* const* input, double** output,
                             int* itmp, double* rtmp) {
     linear_solver_->evaluateDGen(input, output, itmp, rtmp, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateSX(const SXElement** input, SXElement** output,
+  void Solve<Tr>::evaluateSX(const SXElement* const* input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
     linear_solver_->evaluateSXGen(input, output, itmp, rtmp, Tr, dep(0).size2());
   }

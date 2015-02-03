@@ -469,8 +469,8 @@ namespace casadi {
         updatePointers(*it);
 
         // Evaluate
-        it->data->evaluateD(const_cast<const double**>(getPtr(mx_input_)),
-                            getPtr(mx_output_), getPtr(itmp_), getPtr(rtmp_));
+        it->data->evaluateD(getPtr(mx_input_), getPtr(mx_output_),
+                            getPtr(itmp_), getPtr(rtmp_));
       }
 
       // Write out profiling information

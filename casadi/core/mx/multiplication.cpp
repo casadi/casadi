@@ -59,18 +59,18 @@ namespace casadi {
     }
   }
 
-  void Multiplication::evaluateD(const double** input, double** output,
+  void Multiplication::evaluateD(const double* const* input, double** output,
                                  int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void Multiplication::evaluateSX(const SXElement** input, SXElement** output,
+  void Multiplication::evaluateSX(const SXElement* const* input, SXElement** output,
                                   int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Multiplication::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void Multiplication::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
     if (input[0]!=output[0]) {
       copy(input[0], input[0]+dep(0).nnz(), output[0]);
     }

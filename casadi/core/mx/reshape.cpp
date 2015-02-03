@@ -44,18 +44,18 @@ namespace casadi {
     return new Reshape(*this);
   }
 
-  void Reshape::evaluateD(const double** input, double** output,
+  void Reshape::evaluateD(const double* const* input, double** output,
                           int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);
   }
 
-  void Reshape::evaluateSX(const SXElement** input, SXElement** output,
+  void Reshape::evaluateSX(const SXElement* const* input, SXElement** output,
                            int* itmp, SXElement* rtmp) {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Reshape::evaluateGen(const T** input, T** output, int* itmp, T* rtmp) {
+  void Reshape::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
     // Quick return if inplace
     if (input[0]==output[0]) return;
 
