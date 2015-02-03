@@ -353,7 +353,7 @@ namespace casadi {
     MX __mrdivide__(const MX& b) const;
     MX __copysign__(const MX& y) const;
     MX constpow(const MX& y) const;
-    /// \end CLUTTER
+    /// \endcond
     MX printme(const MX& y) const;
 
     /// \cond CLUTTER

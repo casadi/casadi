@@ -45,7 +45,11 @@ doxpublish:
 
 swig:
 	sh extra/doc2swig.sh
-	
+
+doxtest:
+	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' | doxygen - 2>&1 | if grep -e "File ended in the middle of a comment block" -e "Found unknown command" -e "warning: expected whitespace" -e "warning: Conditional section"; then exit 1; else exit 0;fi
+
+
 doxexport:
 	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_cluttered /' | doxygen -
 	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             WITHOUT_PRE_1_9_X//' | sed 's/PREDEFINED+=             SWIG//' | doxygen -

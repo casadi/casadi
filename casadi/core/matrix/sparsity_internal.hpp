@@ -75,7 +75,7 @@ namespace casadi {
 
     /** \brief Get the diagonal of the matrix/create a diagonal matrix
      *
-     * \param[out mapping will contain the nonzero mapping
+     * \param[out] mapping will contain the nonzero mapping
      */
     Sparsity getDiag(std::vector<int>& mapping) const;
 

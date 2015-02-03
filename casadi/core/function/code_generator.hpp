@@ -62,7 +62,7 @@ namespace casadi {
     /** \brief Print a constant in a lossless but compact manner */
     static void printConstant(std::ostream& s, double v);
 
-    /** \bried Codegen casadi_dot */
+    /** \brief Codegen casadi_dot */
     std::string casadi_dot(int n, const std::string& x, int inc_x, const std::string& y, int inc_y);
 
     /** \brief Auxiliary functions */
