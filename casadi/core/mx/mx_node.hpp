@@ -133,9 +133,11 @@ namespace casadi {
 
     /** \brief  Evaluate numerically */
     virtual void evaluateD(const DMatrix** input, DMatrix** output, int* itmp, double* rtmp);
+    virtual void evaluateD(const double** input, double** output, int* itmp, double* rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const SX** input, SX** output, int* itmp, SXElement* rtmp);
+    virtual void evaluateSX(const SXElement** input, SXElement** output, int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output,
@@ -378,6 +380,7 @@ namespace casadi {
 
     /** \brief  Propagate sparsity, no work */
     virtual void propagateSparsity(DMatrix** input, DMatrix** output, bool fwd);
+    virtual void propagateSparsity(double** input, double** output, bool fwd);
 
     /** \brief Free adjoint memory (MX) */
     static void clearVector(const std::vector<std::vector<MX*> > v);
