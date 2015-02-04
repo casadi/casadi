@@ -1553,6 +1553,8 @@ namespace casadi {
   }
 
   Function FunctionInternal::derivative(int nfwd, int nadj) {
+    casadi_assert_message(nfwd==0 || nadj==0, "No longer supported, cf. #1336");
+
     // Quick return if 0x0
     if (nfwd==0 && nadj==0) return shared_from_this<Function>();
 
