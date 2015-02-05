@@ -222,6 +222,92 @@ namespace casadi {
     }
   }
 
+  void LinearSolverInternal::evalFwdLinsol(const MX& X, const MXPtrVV& fseed, MXPtrVV& fsens, bool tr) {
+    const MX& A = X->dep(1);
+    std::vector<int> rhs_ind;
+    std::vector<MX> rhs;
+    std::vector<int> col_offset(1, 0);
+    for (int d=0; d<fsens.size(); ++d) {
+      const MX& B_hat = *fseed[d][0];
+      const MX& A_hat = *fseed[d][1];
+
+      // Get right hand side
+      MX rhs_d;
+      if (tr) {
+        rhs_d = B_hat - mul(A_hat.T(), X);
+      } else {
+        rhs_d = B_hat - mul(A_hat, X);
+      }
+
+      // Simplifiy if zero
+      if (rhs_d.isZero()) {
+        *fsens[d][0] = MX(rhs_d.shape());
+      } else {
+        rhs.push_back(rhs_d);
+        rhs_ind.push_back(d);
+        col_offset.push_back(col_offset.back()+rhs_d.size2());
+      }
+    }
+
+    if (!rhs.empty()) {
+      // Solve for all directions at once
+      rhs = horzsplit(solve(A, horzcat(rhs), tr), col_offset);
+
+      // Save result
+      for (int i=0; i<rhs.size(); ++i) {
+        *fsens[rhs_ind[i]][0] = rhs[i];
+      }
+    }
+  }
+
+  void LinearSolverInternal::evalAdjLinsol(const MX& X, MXPtrVV& aseed, MXPtrVV& asens, bool tr) {
+    const MX& A = X->dep(1);
+    std::vector<int> rhs_ind;
+    std::vector<MX> rhs;
+    std::vector<int> col_offset(1, 0);
+    for (int d=0; d<aseed.size(); ++d) {
+      MX& X_bar = *aseed[d][0];
+
+      // Simplifiy if zero
+      if (X_bar.isZero()) {
+        if (aseed[d][0]!=asens[d][0]) {
+          *asens[d][0] = X_bar;
+          X_bar = MX();
+        }
+      } else {
+        rhs.push_back(X_bar);
+        rhs_ind.push_back(d);
+        col_offset.push_back(col_offset.back()+X_bar.size2());
+
+        // Delete seed
+        X_bar = MX();
+      }
+    }
+
+    if (!rhs.empty()) {
+      // Solve for all directions at once
+      rhs = horzsplit(solve(A, horzcat(rhs), !tr), col_offset);
+
+      for (int i=0; i<rhs.size(); ++i) {
+        int d = rhs_ind[i];
+
+        // Propagate to A
+        if (!tr) {
+          asens[d][1]->addToSum(-mul(rhs[i], X.T(), MX::zeros(A.sparsity())));
+        } else {
+          asens[d][1]->addToSum(-mul(X, rhs[i].T(), MX::zeros(A.sparsity())));
+        }
+
+        // Propagate to B
+        if (aseed[d][0]==asens[d][0]) {
+          *asens[d][0] = rhs[i];
+        } else {
+          asens[d][0]->addToSum(rhs[i]);
+        }
+      }
+    }
+  }
+
   void LinearSolverInternal::propagateSparsityGen(double** arg, double** res,
                                                   int* itmp, bvec_t* rtmp,
                                                   bool fwd, bool tr, int nrhs) {

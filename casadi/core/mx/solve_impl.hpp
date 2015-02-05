@@ -90,6 +90,16 @@ namespace casadi {
   }
 
   template<bool Tr>
+  void Solve<Tr>::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    linear_solver_->evalFwdLinsol(shared_from_this<MX>(), fwdSeed, fwdSens, Tr);
+  }
+
+  template<bool Tr>
+  void Solve<Tr>::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    linear_solver_->evalAdjLinsol(shared_from_this<MX>(), adjSeed, adjSens, Tr);
+  }
+
+  template<bool Tr>
   void Solve<Tr>::propagateSparsity(double** input, double** output,
                                     int* itmp, bvec_t* rtmp, bool fwd) {
     linear_solver_->propagateSparsityGen(input, output, itmp, rtmp, fwd, Tr, dep(0).size2());

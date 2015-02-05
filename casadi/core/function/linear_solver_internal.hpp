@@ -81,6 +81,12 @@ namespace casadi {
                                MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens,
                                bool output_given, bool tr);
 
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwdLinsol(const MX& X, const MXPtrVV& fseed, MXPtrVV& fsens, bool tr);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdjLinsol(const MX& X, MXPtrVV& aseed, MXPtrVV& asens, bool tr);
+
     /// Propagate sparsity, possibly transposed
     void propagateSparsityGen(double** arg, double** res,
                               int* itmp, bvec_t* rtmp, bool fwd, bool tr, int nrhs);
