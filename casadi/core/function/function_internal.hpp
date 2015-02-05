@@ -415,8 +415,19 @@ namespace casadi {
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
 
+    /** \brief Can a derivative direction be skipped */
+    template<typename MatType>
+    static bool purgable(const std::vector<MatType>& seed);
   };
 
+  // Template implementations
+  template<typename MatType>
+  bool FunctionInternal::purgable(const std::vector<MatType>& v) {
+    for (typename std::vector<MatType>::const_iterator i=v.begin(); i!=v.end(); ++i) {
+      if (!i->isZero()) return false;
+    }
+    return true;
+  }
 
 } // namespace casadi
 

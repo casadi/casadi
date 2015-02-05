@@ -140,7 +140,6 @@ namespace casadi {
                     const std::vector<std::vector<MatType*> >& sens,
                     std::vector<std::vector<MatType*> >& seed_purged,
                     std::vector<std::vector<MatType*> >& sens_purged, bool forward);
-
   };
 
 #ifdef casadi_implementation
