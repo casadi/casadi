@@ -150,7 +150,7 @@ namespace casadi {
     virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const MXPtrVV& adjSeed, MXPtrVV& adjSens);
+    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(double** input, double** output,

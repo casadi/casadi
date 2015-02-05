@@ -79,6 +79,25 @@ namespace casadi {
                      output[0], sparsity(), rtmp);
   }
 
+  void Multiplication::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    for (int d=0; d<fwdSens.size(); ++d) {
+      *fwdSens[d][0] = *fwdSeed[d][0]
+        + mul(dep(1), *fwdSeed[d][2], MX::zeros(dep(0).sparsity()))
+        + mul(*fwdSeed[d][1], dep(2), MX::zeros(dep(0).sparsity()));
+    }
+  }
+
+  void Multiplication::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    for (int d=0; d<adjSeed.size(); ++d) {
+      adjSens[d][1]->addToSum(mul(*adjSeed[d][0], dep(2).T(), MX::zeros(dep(1).sparsity())));
+      adjSens[d][2]->addToSum(mul(dep(1).T(), *adjSeed[d][0], MX::zeros(dep(2).sparsity())));
+      if (adjSeed[d][0]!=adjSens[d][0]) {
+        adjSens[d][0]->addToSum(*adjSeed[d][0]);
+        *adjSeed[d][0] = MX();
+      }
+    }
+  }
+
   void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output,
                                   const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
                                   const MXPtrVV& adjSeed, MXPtrVV& adjSens,

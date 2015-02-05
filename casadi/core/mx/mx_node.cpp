@@ -268,7 +268,7 @@ namespace casadi {
     evaluateMX(input_p, output_p, fwdSeed, fwdSens, adjSeed, adjSens, true);
   }
 
-  void MXNode::evalAdj(const MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void MXNode::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
     MXPtrV input_p(ndep());
     for (int i=0; i<input_p.size(); ++i) input_p[i] = &dep(i);
     vector<MX> outputv(getNumOutputs());
