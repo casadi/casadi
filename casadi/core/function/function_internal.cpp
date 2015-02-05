@@ -2510,6 +2510,55 @@ namespace casadi {
     }
   }
 
+  void FunctionInternal::evalFwdNode(const MX& f, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    // Collect inputs and seeds
+    vector<MX> arg(f->ndep());
+    for (int i=0; i<arg.size(); ++i) arg[i] = f->dep(i);
+    vector<MX> res;
+
+    // Collect seeds
+    vector<vector<MX> > fseed = MXNode::getVector(fwdSeed);
+
+    // Evaluate symbolically
+    vector<vector<MX> > fsens, dummy;
+    createCallDerivative(arg, res, fseed, fsens, dummy, dummy);
+
+    // Store the forward sensitivities
+    for (int d=0; d<fwdSens.size(); ++d) {
+      for (int i=0; i<fwdSens[d].size(); ++i) {
+        if (fwdSens[d][i]!=0) {
+          *fwdSens[d][i] = fsens[d][i];
+        }
+      }
+    }
+  }
+
+  void FunctionInternal::evalAdjNode(const MX& f, MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    // Collect inputs and seeds
+    vector<MX> arg(f->ndep());
+    for (int i=0; i<arg.size(); ++i) arg[i] = f->dep(i);
+    vector<MX> res;
+
+    // Collect seeds
+    vector<vector<MX> > aseed = MXNode::getVector(adjSeed);
+
+    // Free adjoint seeds
+    MXNode::clearVector(adjSeed);
+
+    // Evaluate symbolically
+    vector<vector<MX> > asens, dummy;
+    createCallDerivative(arg, res, dummy, dummy, aseed, asens);
+
+    // Store the adjoint sensitivities
+    for (int d=0; d<adjSens.size(); ++d) {
+      for (int i=0; i<adjSens[d].size(); ++i) {
+        if (adjSens[d][i]!=0 && !asens[d][i].isEmpty(true) && !(*adjSens[d][i]).isEmpty(true)) {
+          adjSens[d][i]->addToSum(asens[d][i]);
+        }
+      }
+    }
+  }
+
   void FunctionInternal::propagateSparsity(MXNode* node, double** arg, double** res,
                                            int* itmp, bvec_t* rtmp, bool use_fwd) {
     // Pass/clear forward seeds/adjoint sensitivities

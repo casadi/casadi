@@ -222,7 +222,8 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evalFwdLinsol(const MX& X, const MXPtrVV& fseed, MXPtrVV& fsens, bool tr) {
+  void LinearSolverInternal::evalFwdLinsol(const MX& X, const MXPtrVV& fseed, MXPtrVV& fsens,
+                                           bool tr) {
     const MX& A = X->dep(1);
     std::vector<int> rhs_ind;
     std::vector<MX> rhs;

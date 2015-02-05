@@ -256,29 +256,13 @@ namespace casadi {
   }
 
   void MXNode::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
-    MXPtrV input_p(ndep());
-    for (int i=0; i<input_p.size(); ++i) input_p[i] = &dep(i);
-    vector<MX> outputv(getNumOutputs());
-    MXPtrV output_p(outputv.size());
-    for (int i=0; i<output_p.size(); ++i) {
-      outputv[i] = getOutput(i);
-      output_p[i] = &outputv[i];
-    }
-    MXPtrVV adjSeed, adjSens;
-    evaluateMX(input_p, output_p, fwdSeed, fwdSens, adjSeed, adjSens, true);
+    throw CasadiException(string("MXNode::evalFwd not defined for class ")
+                          + typeid(*this).name());
   }
 
   void MXNode::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
-    MXPtrV input_p(ndep());
-    for (int i=0; i<input_p.size(); ++i) input_p[i] = &dep(i);
-    vector<MX> outputv(getNumOutputs());
-    MXPtrV output_p(outputv.size());
-    for (int i=0; i<output_p.size(); ++i) {
-      outputv[i] = getOutput(i);
-      output_p[i] = &outputv[i];
-    }
-    MXPtrVV fwdSeed, fwdSens;
-    evaluateMX(input_p, output_p, fwdSeed, fwdSens, adjSeed, adjSens, true);
+    throw CasadiException(string("MXNode::evalAdj not defined for class ")
+                          + typeid(*this).name());
   }
 
   void MXNode::propagateSparsity(double** input, double** output, bool fwd) {

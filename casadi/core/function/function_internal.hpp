@@ -343,6 +343,13 @@ namespace casadi {
     virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res,
                             const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed,
                             MXPtrVV& asens, bool output_given);
+
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwdNode(const MX& f, const MXPtrVV& fseed, MXPtrVV& fsens);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdjNode(const MX& f, MXPtrVV& aseed, MXPtrVV& asens);
+
     virtual void propagateSparsity(MXNode* node, double** arg, double** res,
                                    int* itmp, bvec_t* rtmp, bool fwd);
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);

@@ -105,6 +105,14 @@ namespace casadi {
     fcn_->evaluateMX(this, input, output, fwdSeed, fwdSens, adjSeed, adjSens, output_given);
   }
 
+  void CallFunction::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    fcn_->evalFwdNode(shared_from_this<MX>(), fwdSeed, fwdSens);
+  }
+
+  void CallFunction::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    fcn_->evalAdjNode(shared_from_this<MX>(), adjSeed, adjSens);
+  }
+
   void CallFunction::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     MXNode::deepCopyMembers(already_copied);
     fcn_ = deepcopy(fcn_, already_copied);
