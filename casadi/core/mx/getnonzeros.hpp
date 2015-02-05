@@ -51,6 +51,12 @@ namespace casadi {
                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                             bool output_given);
 
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+
     /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 

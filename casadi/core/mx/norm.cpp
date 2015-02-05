@@ -84,6 +84,21 @@ namespace casadi {
     }
   }
 
+  void NormF::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    MX self = shared_from_this<MX>();
+    for (int d=0; d<fwdSens.size(); ++d) {
+      *fwdSens[d][0] = dep(0)->getInnerProd(*fwdSeed[d][0]) / self;
+    }
+  }
+
+  void NormF::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    MX self = shared_from_this<MX>();
+    for (int d=0; d<adjSeed.size(); ++d) {
+      adjSens[d][0]->addToSum(((*adjSeed[d][0])/self) * dep(0));
+      *adjSeed[d][0] = MX();
+    }
+  }
+
   void NormF::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                 const std::vector<std::string>& res, CodeGenerator& gen) const {
     stream << "  *" << res.front() << " = sqrt(" << gen.casadi_dot(dep().nnz(),

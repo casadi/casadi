@@ -76,4 +76,23 @@ namespace casadi {
     }
   }
 
+  void Determinant::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    const MX& X = dep();
+    MX det_X = shared_from_this<MX>();
+    MX trans_inv_X = inv(X).T();
+    for (int d=0; d<fwdSens.size(); ++d) {
+      *fwdSens[d][0] = det_X * inner_prod(trans_inv_X, *fwdSeed[d][0]);
+    }
+  }
+
+  void Determinant::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    const MX& X = dep();
+    MX det_X = shared_from_this<MX>();
+    MX trans_inv_X = inv(X).T();
+    for (int d=0; d<adjSeed.size(); ++d) {
+      adjSens[d][0]->addToSum((*adjSeed[d][0]*det_X) * trans_inv_X);
+      *adjSeed[d][0] = MX();
+    }
+  }
+
 } // namespace casadi

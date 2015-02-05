@@ -98,6 +98,12 @@ namespace casadi {
                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                             bool output_given);
 
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+
     /** \brief Get the operation */
     virtual int getOp() const { return OP_HORZCAT;}
   };
@@ -126,6 +132,12 @@ namespace casadi {
                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                             bool output_given);
 
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+
     /** \brief Get the operation */
     virtual int getOp() const { return OP_VERTCAT;}
   };
@@ -153,6 +165,12 @@ namespace casadi {
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                             bool output_given);
+
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_DIAGCAT;}

@@ -59,6 +59,12 @@ namespace casadi {
                               bool output_given) {
   }
 
+  void SymbolicMX::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  }
+
+  void SymbolicMX::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  }
+
   const std::string& SymbolicMX::getName() const {
     return name_;
   }

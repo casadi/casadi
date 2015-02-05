@@ -74,6 +74,21 @@ namespace casadi {
     }
   }
 
+  void Assertion::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    int nfwd = fwdSens.size();
+    for (int d=0; d<nfwd; ++d) {
+      *fwdSens[d][0] = *fwdSeed[d][0];
+    }
+  }
+
+  void Assertion::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    int nadj = adjSeed.size();
+    for (int d=0; d<nadj; ++d) {
+      adjSens[d][0]->addToSum(*adjSeed[d][0]);
+      *adjSeed[d][0] = MX();
+    }
+  }
+
   void Assertion::evaluateSX(const SXElement* const* input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
     copy(input[0], input[0]+dep().nnz(), output[0]);

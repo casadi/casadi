@@ -72,6 +72,21 @@ namespace casadi {
     }
   }
 
+  void InnerProd::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    for (int d=0; d<fwdSens.size(); ++d) {
+      *fwdSens[d][0] = dep(0)->getInnerProd(*fwdSeed[d][1])
+        + (*fwdSeed[d][0])->getInnerProd(dep(1));
+    }
+  }
+
+  void InnerProd::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    for (int d=0; d<adjSeed.size(); ++d) {
+      adjSens[d][0]->addToSum(*adjSeed[d][0] * dep(1));
+      adjSens[d][1]->addToSum(*adjSeed[d][0] * dep(0));
+      *adjSeed[d][0] = MX();
+    }
+  }
+
   void InnerProd::evaluateD(const double* const* input, double** output,
                             int* itmp, double* rtmp) {
     evaluateGen<double>(input, output, itmp, rtmp);

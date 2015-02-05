@@ -76,6 +76,23 @@ namespace casadi {
     }
   }
 
+ void ConstantMX::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+   MX zero_sens(size1(), size2());
+   for (int d=0; d<fwdSens.size(); ++d) {
+     if (fwdSens[d][0]!=0) {
+       *fwdSens[d][0] = zero_sens;
+     }
+   }
+ }
+
+  void ConstantMX::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    for (int d=0; d<adjSeed.size(); ++d) {
+      if (adjSeed[d][0]!=0) {
+        *adjSeed[d][0] = MX();
+      }
+    }
+  }
+
   void ConstantMX::propagateSparsity(double** input, double** output, bool fwd) {
     bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
     fill_n(outputd, nnz(), 0);

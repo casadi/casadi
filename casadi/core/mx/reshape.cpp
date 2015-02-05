@@ -115,6 +115,19 @@ namespace casadi {
     }
   }
 
+  void Reshape::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    for (int d = 0; d<fwdSens.size(); ++d) {
+      *fwdSens[d][0] = reshape(*fwdSeed[d][0], shape());
+    }
+  }
+
+  void Reshape::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    for (int d=0; d<adjSeed.size(); ++d) {
+      adjSens[d][0]->addToSum(reshape(*adjSeed[d][0], dep().shape()));
+      *adjSeed[d][0] = MX();
+    }
+  }
+
   void Reshape::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                   const std::vector<std::string>& res, CodeGenerator& gen) const {
     // Quick return if inplace

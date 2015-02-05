@@ -195,6 +195,36 @@ namespace casadi {
     }
   }
 
+  void Diagcat::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    int nfwd = fwdSens.size();
+    for (int d = 0; d<nfwd; ++d) {
+      *fwdSens[d][0] = diagcat(getVector(fwdSeed[d]));
+    }
+  }
+
+  void Diagcat::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    // Get offsets for each row and column
+    vector<int> offset1(ndep()+1, 0);
+    vector<int> offset2(ndep()+1, 0);
+    for (int i=0; i<ndep(); ++i) {
+      int ncol = dep(i).sparsity().size2();
+      int nrow = dep(i).sparsity().size1();
+      offset2[i+1] = offset2[i] + ncol;
+      offset1[i+1] = offset1[i] + nrow;
+    }
+
+    // Adjoint sensitivities
+    int nadj = adjSeed.size();
+    for (int d=0; d<nadj; ++d) {
+      MX& aseed = *adjSeed[d][0];
+      vector<MX> s = diagsplit(aseed, offset1, offset2);
+      aseed = MX();
+      for (int i=0; i<ndep(); ++i) {
+        adjSens[d][i]->addToSum(s[i]);
+      }
+    }
+  }
+
   Horzcat::Horzcat(const std::vector<MX>& x) : Concat(x) {
     // Construct the sparsity
     casadi_assert(!x.empty());
@@ -243,6 +273,33 @@ namespace casadi {
     }
 
     // Adjoint sensitivities
+    for (int d=0; d<nadj; ++d) {
+      MX& aseed = *adjSeed[d][0];
+      vector<MX> s = horzsplit(aseed, col_offset);
+      aseed = MX();
+      for (int i=0; i<ndep(); ++i) {
+        adjSens[d][i]->addToSum(s[i]);
+      }
+    }
+  }
+
+  void Horzcat::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    int nfwd = fwdSens.size();
+    for (int d = 0; d<nfwd; ++d) {
+      *fwdSens[d][0] = horzcat(getVector(fwdSeed[d]));
+    }
+  }
+
+  void Horzcat::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    // Get offsets for each column
+    vector<int> col_offset(ndep()+1, 0);
+    for (int i=0; i<ndep(); ++i) {
+      int ncol = dep(i).sparsity().size2();
+      col_offset[i+1] = col_offset[i] + ncol;
+    }
+
+    // Adjoint sensitivities
+    int nadj = adjSeed.size();
     for (int d=0; d<nadj; ++d) {
       MX& aseed = *adjSeed[d][0];
       vector<MX> s = horzsplit(aseed, col_offset);
@@ -310,5 +367,33 @@ namespace casadi {
       }
     }
   }
+
+  void Vertcat::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    int nfwd = fwdSens.size();
+    for (int d = 0; d<nfwd; ++d) {
+      *fwdSens[d][0] = vertcat(getVector(fwdSeed[d]));
+    }
+  }
+
+  void Vertcat::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    // Get offsets for each row
+    vector<int> row_offset(ndep()+1, 0);
+    for (int i=0; i<ndep(); ++i) {
+      int nrow = dep(i).sparsity().size1();
+      row_offset[i+1] = row_offset[i] + nrow;
+    }
+
+    // Adjoint sensitivities
+    int nadj = adjSeed.size();
+    for (int d=0; d<nadj; ++d) {
+      MX& aseed = *adjSeed[d][0];
+      vector<MX> s = vertsplit(aseed, row_offset);
+      aseed = MX();
+      for (int i=0; i<ndep(); ++i) {
+        adjSens[d][i]->addToSum(s[i]);
+      }
+    }
+  }
+
 
 } // namespace casadi

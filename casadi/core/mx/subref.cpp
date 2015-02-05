@@ -70,6 +70,14 @@ namespace casadi {
     casadi_error("not ready");
   }
 
+  void SubRef::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    casadi_error("not ready");
+  }
+
+  void SubRef::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    casadi_error("not ready");
+  }
+
   void SubRef::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                  const std::vector<std::string>& res, CodeGenerator& gen) const {
     casadi_error("not ready");

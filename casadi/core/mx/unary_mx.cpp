@@ -110,6 +110,32 @@ namespace casadi {
     }
   }
 
+  void UnaryMX::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    // Get partial derivatives
+    MX pd[2];
+    MX dummy; // Function value, dummy second argument
+    casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
+
+    // Propagate forward seeds
+    for (int d=0; d<fwdSens.size(); ++d) {
+      *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]);
+    }
+  }
+
+  void UnaryMX::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    // Get partial derivatives
+    MX pd[2];
+    MX dummy; // Function value, dummy second argument
+    casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
+
+    // Propagate adjoint seeds
+    for (int d=0; d<adjSeed.size(); ++d) {
+      MX s = *adjSeed[d][0];
+      *adjSeed[d][0] = MX();
+      adjSens[d][0]->addToSum(pd[0]*s);
+    }
+  }
+
   void UnaryMX::propagateSparsity(double** input, double** output, bool fwd) {
     // Quick return if inplace
     if (input[0]==output[0]) return;

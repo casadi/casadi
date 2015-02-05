@@ -91,6 +91,21 @@ namespace casadi {
     }
   }
 
+  void SetSparse::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    int nfwd = fwdSens.size();
+    for (int d=0; d<nfwd; ++d) {
+      *fwdSens[d][0] = fwdSeed[d][0]->setSparse(sparsity(), true);
+    }
+  }
+
+  void SetSparse::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    int nadj = adjSeed.size();
+    for (int d=0; d<nadj; ++d) {
+      adjSens[d][0]->addToSum(adjSeed[d][0]->setSparse(dep().sparsity(), true));
+      *adjSeed[d][0] = MX();
+    }
+  }
+
   void SetSparse::propagateSparsity(double** input, double** output, bool fwd) {
     bvec_t *inputd = reinterpret_cast<bvec_t*>(input[0]);
     bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);

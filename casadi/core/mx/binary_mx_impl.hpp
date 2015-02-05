@@ -115,6 +115,44 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
+  void BinaryMX<ScX, ScY>::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    // Get partial derivatives
+    MX pd[2];
+    casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
+
+    // Propagate forward seeds
+    for (int d=0; d<fwdSens.size(); ++d) {
+      *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
+    }
+  }
+
+  template<bool ScX, bool ScY>
+  void BinaryMX<ScX, ScY>::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    // Get partial derivatives
+    MX pd[2];
+    casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
+
+    // Propagate adjoint seeds
+    for (int d=0; d<adjSeed.size(); ++d) {
+      MX s = *adjSeed[d][0];
+      *adjSeed[d][0] = MX();
+      for (int c=0; c<2; ++c) {
+        // Get increment of sensitivity c
+        MX t = pd[c]*s;
+
+        // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
+        if (!t.isScalar() && t.shape() != dep(c).shape()) {
+          if (pd[c].shape()!=s.shape()) pd[c] = MX(s.sparsity(), pd[c]);
+          t = inner_prod(pd[c], s);
+        }
+
+        // Propagate the seeds
+        adjSens[d][c]->addToSum(t);
+      }
+    }
+  }
+
+  template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::generateOperation(std::ostream &stream,
                                             const std::vector<std::string>& arg,
                                             const std::vector<std::string>& res,

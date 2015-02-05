@@ -66,16 +66,16 @@ namespace casadi {
     virtual void evaluateSX(const SXElement* const* input, SXElement** output,
                             int* itmp, SXElement* rtmp);
 
+    /** \brief  Evaluate the function symbolically (MX) */
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                            bool output_given);
+
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
 
     /** \brief Calculate reverse mode directional derivatives */
     virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
-
-    /** \brief  Evaluate the function symbolically (MX) */
-    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                            bool output_given);
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(double** input, double** output,

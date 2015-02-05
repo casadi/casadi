@@ -1183,7 +1183,7 @@ namespace casadi {
         // Call the evaluation function
         if (it->data->getOp()==OP_CALL) {
           purgeSeeds(fseed_p, fsens_p, fseed_purged, fsens_purged, true);
-          if (fsens_purged.size()!=0 ) {
+          if (fsens_purged.size()!=0) {
             it->data->evalFwd(fseed_p, fsens_p);
           }
         } else {

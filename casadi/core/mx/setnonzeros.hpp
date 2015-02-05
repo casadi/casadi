@@ -60,6 +60,12 @@ namespace casadi {
                     const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                     bool output_given);
 
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+
     /** \brief Get the operation */
     virtual int getOp() const { return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}
 

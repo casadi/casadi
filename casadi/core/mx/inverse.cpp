@@ -73,4 +73,20 @@ namespace casadi {
     }
   }
 
+  void Inverse::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+    MX inv_X = shared_from_this<MX>();
+    for (int d=0; d<fwdSens.size(); ++d) {
+      *fwdSens[d][0] = -mul(inv_X, mul(*fwdSeed[d][0], inv_X));
+    }
+  }
+
+  void Inverse::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+    MX inv_X = shared_from_this<MX>();
+    MX trans_inv_X = inv_X.T();
+    for (int d=0; d<adjSeed.size(); ++d) {
+      adjSens[d][0]->addToSum(-mul(trans_inv_X, mul(*adjSeed[d][0], trans_inv_X)));
+      *adjSeed[d][0] = MX();
+    }
+  }
+
 } // namespace casadi
