@@ -1333,8 +1333,9 @@
 <tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td>complete+2x2</td><td>Matching strategy to be used by Pardiso (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_max_droptol_corrections</td><td>OT_INTEGER</td><td>4</td><td>Maximal number of decreases of drop tolerance during one solve. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_max_iter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of Krylov-Subspace Iteration (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>pardiso_max_iterative_refinement_steps</td><td>OT_INTEGER</td><td>0</td><td>Limit on number of iterative refinement steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td>0</td><td>Pardiso message level (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td>0</td><td>Enables out-of-core variant of Pardiso (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>pardiso_order</td><td>OT_STRING</td><td>five</td><td>Controls the fill-in reduction ordering algorithm for the input matrix. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_redo_symbolic_fact_only_if_inertia_wrong</td><td>OT_STRING</td><td>no</td><td>Toggle for handling case when elements were perturbed by Pardiso. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_repeated_perturbation_means_singular</td><td>OT_STRING</td><td>no</td><td>Interpretation of perturbed elements. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pardiso_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -1644,8 +1645,9 @@
 <tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td>complete+2x2</td><td>Matching strategy to be used by Pardiso (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_max_droptol_corrections</td><td>OT_INTEGER</td><td>4</td><td>Maximal number of decreases of drop tolerance during one solve. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_max_iter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of Krylov-Subspace Iteration (see IPOPT documentation)</td></tr>
+<tr><td>pardiso_max_iterative_refinement_steps</td><td>OT_INTEGER</td><td>0</td><td>Limit on number of iterative refinement steps. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td>0</td><td>Pardiso message level (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td>0</td><td>Enables out-of-core variant of Pardiso (see IPOPT documentation)</td></tr>
+<tr><td>pardiso_order</td><td>OT_STRING</td><td>five</td><td>Controls the fill-in reduction ordering algorithm for the input matrix. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_redo_symbolic_fact_only_if_inertia_wrong</td><td>OT_STRING</td><td>no</td><td>Toggle for handling case when elements were perturbed by Pardiso. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_repeated_perturbation_means_singular</td><td>OT_STRING</td><td>no</td><td>Interpretation of perturbed elements. (see IPOPT documentation)</td></tr>
 <tr><td>pardiso_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td></tr>
