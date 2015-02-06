@@ -387,6 +387,9 @@ namespace casadi {
     virtual void propagateSparsity(double** input, double** output, bool fwd);
 
     /** \brief Free adjoint memory (MX) */
+    static void clearVector(const std::vector<MX*> v);
+
+    /** \brief Free adjoint memory (MX) */
     static void clearVector(const std::vector<std::vector<MX*> > v);
   };
 

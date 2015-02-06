@@ -812,13 +812,17 @@ namespace casadi {
     return ret;
   }
 
+  void MXNode::clearVector(const std::vector<MX*> v) {
+    for (int j=0; j<v.size(); ++j) {
+      if (v[j]!= 0) {
+        *v[j] = MX();
+      }
+    }
+  }
+
   void MXNode::clearVector(const std::vector<std::vector<MX*> > v) {
     for (int i=0; i<v.size(); ++i) {
-      for (int j=0; j<v[i].size(); ++j) {
-        if (v[i][j]!= 0) {
-          *v[i][j] = MX();
-        }
-      }
+      clearVector(v[i]);
     }
   }
 

@@ -1254,8 +1254,10 @@ namespace casadi {
       asens[d].resize(inputv_.size());
     }
 
-    MXPtrVV aseed_p(nadir), asens_p(nadir);
-    MXPtrVV aseed_purged(nadir), asens_purged(nadir);
+    // Pointers to the arguments of the current operation
+    MXPtrVV aseed_p, asens_p;
+    aseed_p.reserve(nadir);
+    asens_p.reserve(nadir);
 
     // Work vector, adjoint derivatives
     std::vector<std::vector<MX> > dwork(work_.size());
@@ -1289,38 +1291,55 @@ namespace casadi {
           dwork[it->res.front()][d] = MX();
         }
       } else {
-        // Sensitivity arguments
+        aseed_p.clear();
+        asens_p.clear();
+
         for (int d=0; d<nadir; ++d) {
-          aseed_p[d].resize(it->res.size());
+          // Pointers to seeds
+          MXPtrV seed(it->res.size());
+          bool can_skip = true;
           for (int oind=0; oind<it->res.size(); ++oind) {
             int el = it->res[oind];
-            aseed_p[d][oind] = el<0 ? 0 : &dwork[el][d];
-
-            // Provide a zero seed if no seed exists
-            if (el>=0 && dwork[el][d].isEmpty(true)) {
-              dwork[el][d] = MX(it->data->sparsity(oind).shape());
+            if (el>=0) {
+              if (dwork[el][d].isEmpty(true)) {
+                dwork[el][d] = MX(it->data->sparsity(oind).shape());
+              } else if (can_skip && !dwork[el][d].isZero()) {
+                can_skip = false;
+              }
+              seed[oind] = &dwork[el][d];
+            } else {
+              seed[oind] = 0;
             }
           }
 
-          asens_p[d].resize(it->arg.size());
+          // Pointers to sensitivities
+          MXPtrV sens(it->arg.size());
           for (int iind=0; iind<it->arg.size(); ++iind) {
             int el = it->arg[iind];
-            asens_p[d][iind] = el<0 ? 0 : &dwork[el][d];
-
-            // Set sensitivities to zero if not yet used
-            if (el>=0 && dwork[el][d].isEmpty(true)) {
-              dwork[el][d] = MX(it->data->dep(iind).shape());
+            if (el>=0) {
+              if (dwork[el][d].isEmpty(true)) {
+                dwork[el][d] = MX(it->data->dep(iind).shape());
+              }
+              sens[iind] = &dwork[el][d];
+            } else {
+              sens[iind] = 0;
             }
           }
-        }
-        if (it->data->getOp()==OP_CALL) {
-          purgeSeeds(aseed_p, asens_p, aseed_purged, asens_purged, false);
-          if (aseed_purged.size()!=0) {
-            it->data->evalAdj(aseed_p, asens_p);
+
+          // Add to list of directions being calculated
+          if (!can_skip) {
+            aseed_p.push_back(seed);
+            asens_p.push_back(sens);
+          } else {
+            MXNode::clearVector(seed);
           }
-        } else {
-          it->data->evalAdj(aseed_p, asens_p);
         }
+
+        // Skip if nothing to calculate
+        if (aseed_p.empty()) continue;
+
+        // Call the evaluation function
+        it->data->evalAdj(aseed_p, asens_p);
       }
     }
     log("MXFunctionInternal::evalAdj end");
