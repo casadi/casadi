@@ -647,6 +647,16 @@ namespace casadi {
       }
     }
 
+    // New implementation
+    if (output_given) {
+      if (fseed.size()>0 && aseed.size()==0) {
+        return evalFwd(fseed, fsens);
+      }
+      if (aseed.size()>0 && fseed.size()==0) {
+        return evalAdj(aseed, asens);
+      }
+    }
+
     // Use the function arguments if possible to avoid problems involving
     // equivalent but different expressions
     const vector<SX>& arg = output_given ? inputv_ : arg1;
@@ -787,6 +797,134 @@ namespace casadi {
       }
     }
     if (verbose()) cout << "SXFunctionInternal::evalSXsparse end" << endl;
+  }
+
+  void SXFunctionInternal::evalFwd(const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens) {
+    if (verbose()) cout << "SXFunctionInternal::evalFwd begin" << endl;
+
+    // Number of forward seeds
+    int nfdir = fsens.size();
+
+    // Iterator to the binary operations
+    vector<SXElement>::const_iterator b_it=operations_.begin();
+
+    // Tape
+    vector<TapeEl<SXElement> > s_pdwork(operations_.size());
+    vector<TapeEl<SXElement> >::iterator it1 = s_pdwork.begin();
+
+    // Evaluate algorithm
+    if (verbose()) cout << "SXFunctionInternal::evalFwd evaluating algorithm forward" << endl;
+    for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      switch (it->op) {
+      case OP_INPUT:
+      case OP_OUTPUT:
+      case OP_CONST:
+      case OP_PARAMETER:
+        break;
+      default:
+        {
+          const SXElement& f=*b_it++;
+          switch (it->op) {
+            CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, it1++->d)
+          }
+        }
+      }
+    }
+
+    // Calculate forward sensitivities
+    if (verbose())
+      cout << "SXFunctionInternal::evalFwd calculating forward derivatives" << endl;
+    for (int dir=0; dir<nfdir; ++dir) {
+      vector<TapeEl<SXElement> >::const_iterator it2 = s_pdwork.begin();
+      for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
+        switch (it->op) {
+        case OP_INPUT:
+          s_work_[it->i0] = fseed[dir][it->i1].data()[it->i2]; break;
+        case OP_OUTPUT:
+          fsens[dir][it->i0].data()[it->i2] = s_work_[it->i1]; break;
+        case OP_CONST:
+        case OP_PARAMETER:
+          s_work_[it->i0] = 0;
+          break;
+          CASADI_MATH_BINARY_BUILTIN // Binary operation
+            s_work_[it->i0] = it2->d[0] * s_work_[it->i1] + it2->d[1] * s_work_[it->i2];it2++;break;
+        default: // Unary operation
+          s_work_[it->i0] = it2->d[0] * s_work_[it->i1]; it2++;
+        }
+      }
+    }
+    if (verbose()) cout << "SXFunctionInternal::evalFwd end" << endl;
+  }
+
+  void SXFunctionInternal::evalAdj(const vector<vector<SX> >& aseed, vector<vector<SX> >& asens) {
+    if (verbose()) cout << "SXFunctionInternal::evalAdj begin" << endl;
+
+    // number of adjoint seeds
+    int nadir = aseed.size();
+
+    // Iterator to the binary operations
+    vector<SXElement>::const_iterator b_it=operations_.begin();
+
+    // Tape
+    vector<TapeEl<SXElement> > s_pdwork(operations_.size());
+    vector<TapeEl<SXElement> >::iterator it1 = s_pdwork.begin();
+
+    // Evaluate algorithm
+    if (verbose()) cout << "SXFunctionInternal::evalFwd evaluating algorithm forward" << endl;
+    for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      switch (it->op) {
+      case OP_INPUT:
+      case OP_OUTPUT:
+      case OP_CONST:
+      case OP_PARAMETER:
+        break;
+      default:
+        {
+          const SXElement& f=*b_it++;
+          switch (it->op) {
+            CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, it1++->d)
+          }
+        }
+      }
+    }
+
+    // Calculate adjoint sensitivities
+    if (verbose()) cout << "SXFunctionInternal::evalAdj calculating adjoint derivatives"
+                       << endl;
+    fill(s_work_.begin(), s_work_.end(), 0);
+    for (int dir=0; dir<nadir; ++dir) {
+      vector<TapeEl<SXElement> >::const_reverse_iterator it2 = s_pdwork.rbegin();
+      for (vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin();
+           it!=algorithm_.rend(); ++it) {
+        SXElement seed;
+        switch (it->op) {
+        case OP_INPUT:
+          asens[dir][it->i1].data()[it->i2] = s_work_[it->i0];
+          s_work_[it->i0] = 0;
+          break;
+        case OP_OUTPUT:
+          s_work_[it->i1] += aseed[dir][it->i0].data()[it->i2];
+          break;
+        case OP_CONST:
+        case OP_PARAMETER:
+          s_work_[it->i0] = 0;
+          break;
+          CASADI_MATH_BINARY_BUILTIN // Binary operation
+            seed = s_work_[it->i0];
+          s_work_[it->i0] = 0;
+          s_work_[it->i1] += it2->d[0] * seed;
+          s_work_[it->i2] += it2->d[1] * seed;
+          it2++;
+          break;
+        default: // Unary operation
+          seed = s_work_[it->i0];
+          s_work_[it->i0] = 0;
+          s_work_[it->i1] += it2->d[0] * seed;
+          it2++;
+        }
+      }
+    }
+    if (verbose()) cout << "SXFunctionInternal::evalAdj end" << endl;
   }
 
   SXFunctionInternal* SXFunctionInternal::clone() const {
