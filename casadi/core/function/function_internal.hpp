@@ -148,6 +148,22 @@ namespace casadi {
               const SXVectorVector& aseed, SXVectorVector& asens,
               bool always_inline, bool never_inline);
 
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwd(const std::vector<std::vector<SX> >& fseed,
+                         std::vector<std::vector<SX> >& fsens);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdj(const std::vector<std::vector<SX> >& aseed,
+                         std::vector<std::vector<SX> >& asens);
+
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fwdSeed,
+                        std::vector<std::vector<MX> >& fwdSens);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdj(const std::vector<std::vector<MX> >& adjSeed,
+                        std::vector<std::vector<MX> >& adjSens);
+
     ///@{
     /** \brief Return Hessian function */
     Function hessian(int iind, int oind);

@@ -2859,5 +2859,26 @@ namespace casadi {
       return name;
   }
 
+  void FunctionInternal::evalFwd(const std::vector<std::vector<SX> >& fseed,
+                                 std::vector<std::vector<SX> >& fsens) {
+
+    casadi_error("evalFwd(SX) not defined for class " << typeid(*this).name());
+  }
+
+  void FunctionInternal::evalAdj(const std::vector<std::vector<SX> >& aseed,
+                                 std::vector<std::vector<SX> >& asens) {
+    casadi_error("evalAdj(SX) not defined for class " << typeid(*this).name());
+  }
+
+  void FunctionInternal::evalFwd(const std::vector<std::vector<MX> >& fwdSeed,
+                                 std::vector<std::vector<MX> >& fwdSens) {
+    casadi_error("evalFwd(MX) not defined for class " << typeid(*this).name());
+  }
+
+  void FunctionInternal::evalAdj(const std::vector<std::vector<MX> >& adjSeed,
+                                 std::vector<std::vector<MX> >& adjSens) {
+    casadi_error("evalAdj(MX) not defined for class " << typeid(*this).name());
+  }
+
 
 } // namespace casadi
