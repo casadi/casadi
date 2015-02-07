@@ -91,6 +91,14 @@ namespace casadi {
         }
       }
     }
+    for (vector<WeakRef>::iterator j=derivative_fwd_.begin(); j!=derivative_fwd_.end(); ++j) {
+      if (!j->isNull()) *j = getcopy(j->shared(), already_copied);
+    }
+    for (vector<WeakRef>::iterator j=derivative_adj_.begin(); j!=derivative_adj_.end(); ++j) {
+      if (!j->isNull()) *j = getcopy(j->shared(), already_copied);
+    }
+
+
     full_jacobian_ = getcopy(full_jacobian_, already_copied);
   }
 
@@ -1726,6 +1734,200 @@ namespace casadi {
     return ret;
   }
 
+  Function FunctionInternal::derivativeFwd(int nfwd) {
+    casadi_assert(nfwd>=0);
+
+    // Check if there are enough forward directions allocated
+    if (nfwd>=derivative_fwd_.size()) {
+      derivative_fwd_.resize(nfwd+1);
+    }
+
+    // Quick return if already cached
+    if (derivative_fwd_[nfwd].alive()) {
+      return shared_cast<Function>(derivative_fwd_[nfwd].shared());
+    }
+
+    // Return value
+    Function ret = getDerivativeFwd(nfwd);
+
+    // Give it a suitable name
+    stringstream ss;
+    ss << "derivativeFwd_" << getOption("name") << "_" << nfwd;
+    ret.setOption("name", ss.str());
+
+    // Get the number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Names of inputs
+    std::vector<std::string> i_names;
+    i_names.reserve(num_in + num_out + num_in*nfwd);
+
+    // Nondifferentiated inputs
+    for (int i=0; i<num_in; ++i) {
+      i_names.push_back("der_" + input_.scheme.entryLabel(i));
+    }
+
+    // Nondifferentiated outputs (given)
+    for (int i=0; i<num_out; ++i) {
+      i_names.push_back("der_" + output_.scheme.entryLabel(i));
+    }
+
+    // Forward seeds
+    for (int d=0; d<nfwd; ++d) {
+      for (int i=0; i<num_in; ++i) {
+        ss.str(string());
+        ss << "fwd" << d << "_" << input_.scheme.entryLabel(i);
+        i_names.push_back(ss.str());
+      }
+    }
+
+    // Pass to return object
+    ret.setInputScheme(i_names);
+
+    // Names of outputs
+    std::vector<std::string> o_names;
+    o_names.reserve(num_out*nfwd);
+
+    // Forward sensitivities
+    for (int d=0; d<nfwd; ++d) {
+      for (int i=0; i<num_out; ++i) {
+        ss.str(string());
+        ss << "fwd" << d << "_" << output_.scheme.entryLabel(i);
+        o_names.push_back(ss.str());
+      }
+    }
+
+    // Pass to return object
+    ret.setOutputScheme(o_names);
+
+    // Initialize it
+    ret.init();
+
+    // Consistency check for inputs
+    for (int i=0; i<ret.getNumInputs(); ++i) {
+      const Sparsity& sp = i<num_in ? input(i).sparsity() :
+        i<num_in+num_out ? output(i-num_in).sparsity() :
+        input((i-num_in-num_out) % num_in).sparsity();
+      casadi_assert_message(ret.input(i).shape()==sp.shape(),
+                            "Incorrect shape for " << ret << " input " << i << " \""
+                            << i_names.at(i) << "\". Expected " << sp.shape()
+                            << " but got " << ret.input(i).shape());
+    }
+
+    // Consistency check for outputs
+    for (int i=0; i<ret.getNumOutputs(); ++i) {
+      const Sparsity& sp = output(i % num_out).sparsity();
+      casadi_assert_message(ret.output(i).shape()==sp.shape(),
+                            "Incorrect shape for " << ret << " output " << i << " \""
+                            << o_names.at(i) << "\". Expected " << sp.shape()
+                            << " but got " << ret.output(i).shape());
+    }
+
+    // Save to cache
+    derivative_fwd_[nfwd] = ret;
+
+    // Return generated function
+    return ret;
+  }
+
+  Function FunctionInternal::derivativeAdj(int nadj) {
+    casadi_assert(nadj>=0);
+
+    // Check if there are enough adjoint directions allocated
+    if (nadj>=derivative_adj_.size()) {
+      derivative_adj_.resize(nadj+1);
+    }
+
+    // Quick return if already cached
+    if (derivative_adj_[nadj].alive()) {
+      return shared_cast<Function>(derivative_adj_[nadj].shared());
+    }
+
+    // Return value
+    Function ret = getDerivativeAdj(nadj);
+
+    // Give it a suitable name
+    stringstream ss;
+    ss << "derivativeAdj_" << getOption("name") << "_" << nadj;
+    ret.setOption("name", ss.str());
+
+    // Get the number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Names of inputs
+    std::vector<std::string> i_names;
+    i_names.reserve(num_in + num_out + num_out*nadj);
+
+    // Nondifferentiated inputs
+    for (int i=0; i<num_in; ++i) {
+      i_names.push_back("der_" + input_.scheme.entryLabel(i));
+    }
+
+    // Nondifferentiated outputs (given)
+    for (int i=0; i<num_out; ++i) {
+      i_names.push_back("der_" + output_.scheme.entryLabel(i));
+    }
+
+    // Adjoint seeds
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<num_out; ++i) {
+        ss.str(string());
+        ss << "adj" << d << "_" << output_.scheme.entryLabel(i);
+        i_names.push_back(ss.str());
+      }
+    }
+
+    // Pass to return object
+    ret.setInputScheme(i_names);
+
+    // Names of outputs
+    std::vector<std::string> o_names;
+    o_names.reserve(num_in*nadj);
+
+    // Adjoint sensitivities
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<num_in; ++i) {
+        ss.str(string());
+        ss << "adj" << d << "_" << input_.scheme.entryLabel(i);
+        o_names.push_back(ss.str());
+      }
+    }
+
+    // Pass to return object
+    ret.setOutputScheme(o_names);
+
+    // Initialize it
+    ret.init();
+
+    // Consistency check for inputs
+    for (int i=0; i<ret.getNumInputs(); ++i) {
+      const Sparsity& sp = i<num_in ? input(i).sparsity() :
+        i<num_in+num_out ? output(i-num_in).sparsity() :
+        output((i-num_in-num_out) % num_out).sparsity();
+      casadi_assert_message(ret.input(i).shape()==sp.shape(),
+                            "Incorrect shape for " << ret << " input " << i << " \""
+                            << i_names.at(i) << "\". Expected " << sp.shape()
+                            << " but got " << ret.input(i).shape());
+    }
+
+    // Consistency check for outputs
+    for (int i=0; i<ret.getNumOutputs(); ++i) {
+      const Sparsity& sp = input(i % num_in).sparsity();
+      casadi_assert_message(ret.output(i).shape()==sp.shape(),
+                            "Incorrect shape for " << ret << " output " << i << " \""
+                            << o_names.at(i) << "\". Expected " << sp.shape()
+                            << " but got " << ret.output(i).shape());
+    }
+
+    // Save to cache
+    derivative_adj_[nadj] = ret;
+
+    // Return generated function
+    return ret;
+  }
+
   void FunctionInternal::setDerivative(const Function& fcn, int nfwd, int nadj) {
 
     // Check if there are enough forward directions allocated
@@ -1746,8 +1948,18 @@ namespace casadi {
     if (full_jacobian_.alive()) {
       return getDerivativeViaJac(nfwd, nadj);
     }
-
     casadi_error("FunctionInternal::getDerivative not defined for class " << typeid(*this).name());
+  }
+
+  Function FunctionInternal::getDerivativeFwd(int nfwd) {
+    // TODO(@jaeandersson): Fallback on finite differences
+    casadi_error("FunctionInternal::getDerivativeFwd not defined for class "
+                 << typeid(*this).name());
+  }
+
+  Function FunctionInternal::getDerivativeAdj(int nadj) {
+    casadi_error("FunctionInternal::getDerivativeAdj not defined for class "
+                 << typeid(*this).name());
   }
 
   Function FunctionInternal::getDerivativeViaJac(int nfwd, int nadj) {
@@ -2878,6 +3090,78 @@ namespace casadi {
   void FunctionInternal::evalAdj(const std::vector<std::vector<MX> >& adjSeed,
                                  std::vector<std::vector<MX> >& adjSens) {
     casadi_error("evalAdj(MX) not defined for class " << typeid(*this).name());
+  }
+
+  void FunctionInternal::callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+                                 const std::vector<std::vector<MX> >& fseed,
+                                 std::vector<std::vector<MX> >& fsens) {
+    // Number of directional derivatives
+    int nfwd = fseed.size();
+
+    // Number inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // All inputs and seeds
+    vector<MX> darg;
+    darg.reserve(num_in + num_out + num_in*nfwd);
+    darg.insert(darg.end(), arg.begin(), arg.end());
+    darg.insert(darg.end(), res.begin(), res.end());
+    for (int d=0; d<nfwd; ++d) {
+      darg.insert(darg.end(), fseed[d].begin(), fseed[d].end());
+    }
+
+    // Create derivative function
+    Function dfcn = derivativeFwd(nfwd);
+
+    // Create the evaluation node
+    vector<MX> x = MX::createMultipleOutput(new CallFunction(dfcn, darg));
+    vector<MX>::iterator x_it = x.begin();
+
+    // Retrieve sensitivities
+    fsens.resize(nfwd);
+    for (int d=0; d<nfwd; ++d) {
+      fsens[d].resize(num_out);
+      for (int i=0; i<num_out; ++i) {
+        fsens[d][i] = *x_it++;
+      }
+    }
+  }
+
+  void FunctionInternal::callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+                                 const std::vector<std::vector<MX> >& aseed,
+                                 std::vector<std::vector<MX> >& asens) {
+    // Number of directional derivatives
+    int nadj = aseed.size();
+
+    // Number inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // All inputs and seeds
+    vector<MX> darg;
+    darg.reserve(num_in + num_out + num_out*nadj);
+    darg.insert(darg.end(), arg.begin(), arg.end());
+    darg.insert(darg.end(), res.begin(), res.end());
+    for (int d=0; d<nadj; ++d) {
+      darg.insert(darg.end(), aseed[d].begin(), aseed[d].end());
+    }
+
+    // Create derivative function
+    Function dfcn = derivativeAdj(nadj);
+
+    // Create the evaluation node
+    vector<MX> x = MX::createMultipleOutput(new CallFunction(dfcn, darg));
+    vector<MX>::iterator x_it = x.begin();
+
+    // Retrieve sensitivities
+    asens.resize(nadj);
+    for (int d=0; d<nadj; ++d) {
+      asens[d].resize(num_in);
+      for (int i=0; i<num_in; ++i) {
+        asens[d][i] = *x_it++;
+      }
+    }
   }
 
 

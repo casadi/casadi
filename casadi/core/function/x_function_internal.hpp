@@ -99,9 +99,11 @@ namespace casadi {
      * derivatives and nadir adjoint derivatives */
     virtual Function getDerivative(int nfdir, int nadir);
 
-    /** \brief Constructs and returns a function that calculates forward derivatives by
-     * creating the Jacobian then multiplying */
-    //virtual Function getDerivativeViaJac(int nfdir, int nadir);
+    /** \brief Generate a function that calculates nfwd forward derivatives */
+    virtual Function getDerivativeFwd(int nfwd);
+
+    /** \brief Generate a function that calculates nadj adjoint derivatives */
+    virtual Function getDerivativeAdj(int nadj);
 
     /** \brief Symbolic expressions for the forward seeds */
     std::vector<std::vector<MatType> > symbolicFwdSeed(int nfdir);
@@ -791,6 +793,13 @@ namespace casadi {
 
       // Evaluate symbolically
       if (verbose()) std::cout << "XFunctionInternal::jac making function call" << std::endl;
+      if (fseed.size()>0) {
+        casadi_assert(aseed.size()==0);
+        //evalFwd(fseed, fsens);
+      } else if (aseed.size()>0) {
+        casadi_assert(fseed.size()==0);
+        //evalAdj(aseed, asens);
+      }
       call(inputv_, res, fseed, fsens, aseed, asens, always_inline, never_inline);
 
       // Carry out the forward sweeps
@@ -1071,6 +1080,82 @@ namespace casadi {
       }
       ret_out.insert(ret_out.end(), asens[dir].begin(), asens[dir].end());
     }
+    // Assemble function and return
+    PublicType ret(ret_in, ret_out);
+    ret.init();
+    return ret;
+  }
+
+  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+  Function XFunctionInternal<PublicType, DerivedType,
+                             MatType, NodeType>::getDerivativeFwd(int nfwd) {
+    // Seeds
+    std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd), fsens;
+
+    // Evaluate symbolically
+    evalFwd(fseed, fsens);
+
+    // Number inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // All inputs of the return function
+    std::vector<MatType> ret_in;
+    ret_in.reserve(num_in + num_out + nfwd*num_in);
+    ret_in.insert(ret_in.end(), inputv_.begin(), inputv_.end());
+    for (int i=0; i<num_out; ++i) {
+      std::stringstream ss;
+      ss << "dummy_output_" << i;
+      ret_in.push_back(MatType::sym(ss.str(), Sparsity(outputv_.at(i).shape())));
+    }
+    for (int d=0; d<nfwd; ++d)
+      ret_in.insert(ret_in.end(), fseed[d].begin(), fseed[d].end());
+
+    // All outputs of the return function
+    std::vector<MatType> ret_out;
+    ret_out.reserve(num_out*nfwd);
+    for (int d=0; d<nfwd; ++d) {
+      ret_out.insert(ret_out.end(), fsens[d].begin(), fsens[d].end());
+    }
+
+    // Assemble function and return
+    PublicType ret(ret_in, ret_out);
+    ret.init();
+    return ret;
+  }
+
+  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+  Function XFunctionInternal<PublicType, DerivedType,
+                             MatType, NodeType>::getDerivativeAdj(int nadj) {
+    // Seeds
+    std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj), asens;
+
+    // Evaluate symbolically
+    evalAdj(aseed, asens);
+
+    // Number inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // All inputs of the return function
+    std::vector<MatType> ret_in;
+    ret_in.reserve(num_in + num_out + nadj*num_out);
+    ret_in.insert(ret_in.end(), inputv_.begin(), inputv_.end());
+    for (int i=0; i<num_out; ++i) {
+      std::stringstream ss;
+      ss << "dummy_output_" << i;
+      ret_in.push_back(MatType::sym(ss.str(), Sparsity(outputv_.at(i).shape())));
+    }
+    for (int d=0; d<nadj; ++d)
+      ret_in.insert(ret_in.end(), aseed[d].begin(), aseed[d].end());
+
+    // All outputs of the return function
+    std::vector<MatType> ret_out;
+    ret_out.reserve(num_in*nadj);
+    for (int d=0; d<nadj; ++d) {
+      ret_out.insert(ret_out.end(), asens[d].begin(), asens[d].end());
+    }
+
     // Assemble function and return
     PublicType ret(ret_in, ret_out);
     ret.init();
