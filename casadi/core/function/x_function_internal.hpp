@@ -1094,6 +1094,7 @@ namespace casadi {
 
     // Evaluate symbolically
     evalFwd(fseed, fsens);
+    casadi_assert(fsens.size()==fseed.size());
 
     // Number inputs and outputs
     int num_in = getNumInputs();

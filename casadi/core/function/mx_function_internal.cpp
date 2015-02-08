@@ -749,8 +749,8 @@ namespace casadi {
     }
 
     // Get the number of directions
-    int nfdir = fseed.size();
-    int nadir = aseed.size();
+    int nfwd = fseed.size();
+    int nadj = aseed.size();
 
     // Allocate outputs
     if (!output_given) {
@@ -761,8 +761,8 @@ namespace casadi {
     vector<MX> output_tmp;
 
     // Allocate forward sensitivities
-    fsens.resize(nfdir);
-    for (int d=0; d<nfdir; ++d) {
+    fsens.resize(nfwd);
+    for (int d=0; d<nfwd; ++d) {
       fsens[d].resize(outputv_.size());
       if (skip_fwd) {
         for (int i=0; i<fsens[d].size(); ++i) {
@@ -772,11 +772,11 @@ namespace casadi {
     }
 
     // Skip if trivial
-    if (skip_fwd) nfdir = 0;
+    if (skip_fwd) nfwd = 0;
 
     // Allocate adjoint sensitivities
-    asens.resize(nadir);
-    for (int d=0; d<nadir; ++d) {
+    asens.resize(nadj);
+    for (int d=0; d<nadj; ++d) {
       asens[d].resize(inputv_.size());
       if (skip_adj) {
         for (int i=0; i<asens[d].size(); ++i) {
@@ -786,10 +786,10 @@ namespace casadi {
     }
 
     // Skip if trivial
-    if (skip_adj) nadir = 0;
+    if (skip_adj) nadj = 0;
 
     // Quick return if nothing to calculate
-    if (output_given && nfdir==0 && nadir==0) {
+    if (output_given && nfwd==0 && nadj==0) {
       log("MXFunctionInternal::evalMX quick return");
       return;
     }
@@ -806,15 +806,15 @@ namespace casadi {
     int tt = 0;
 
     MXPtrV input_p, output_p;
-    MXPtrVV fseed_p(nfdir), fsens_p(nfdir);
-    MXPtrVV aseed_p(nadir), asens_p(nadir);
-    MXPtrVV fseed_purged(nfdir), fsens_purged(nfdir);
-    MXPtrVV aseed_purged(nadir), asens_purged(nadir);
+    MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
+    MXPtrVV aseed_p(nadj), asens_p(nadj);
+    MXPtrVV fseed_purged(nfwd), fsens_purged(nfwd);
+    MXPtrVV aseed_purged(nadj), asens_purged(nadj);
     MXPtrVV dummy_p;
 
     // Work vector, forward derivatives
     std::vector<std::vector<MX> > dwork(work_.size());
-    fill(dwork.begin(), dwork.end(), std::vector<MX>(nfdir));
+    fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
     log("MXFunctionInternal::evalMX allocated derivative work vector (forward mode)");
 
     // Loop over computational nodes in forward order
@@ -822,7 +822,7 @@ namespace casadi {
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
 
       // Spill existing work elements if needed
-      if (nadir>0 && it->op!=OP_OUTPUT) {
+      if (nadj>0 && it->op!=OP_OUTPUT) {
         for (vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c) {
           if (*c >=0 && tt<tape.size() && tape[tt].first == make_pair(alg_counter, *c)) {
             tape[tt++].second = swork[*c];
@@ -834,7 +834,7 @@ namespace casadi {
         // Fetch input
         const Sparsity& sp_input = input(it->arg.front()).sparsity();
         swork[it->res.front()] = arg[it->arg.front()].setSparse(sp_input, true);
-        for (int d=0; d<nfdir; ++d) {
+        for (int d=0; d<nfwd; ++d) {
           dwork[it->res.front()][d] = fseed[d][it->arg.front()].setSparse(sp_input, true);
         }
       } else if (it->op==OP_OUTPUT) {
@@ -844,13 +844,13 @@ namespace casadi {
         }
 
         // Collect the forward sensitivities
-        for (int d=0; d<nfdir; ++d) {
+        for (int d=0; d<nfwd; ++d) {
           fsens[d][it->res.front()] = dwork[it->arg.front()][d];
         }
       } else if (it->op==OP_PARAMETER) {
         // Fetch parameter
         swork[it->res.front()] = it->data;
-        for (int d=0; d<nfdir; ++d) {
+        for (int d=0; d<nfwd; ++d) {
           dwork[it->res.front()][d] = MX();
         }
       } else {
@@ -880,7 +880,7 @@ namespace casadi {
         }
 
         // Forward seeds and sensitivities
-        for (int d=0; d<nfdir; ++d) {
+        for (int d=0; d<nfwd; ++d) {
           fseed_p[d].resize(it->arg.size());
           for (int iind=0; iind<it->arg.size(); ++iind) {
             int el = it->arg[iind];
@@ -907,7 +907,7 @@ namespace casadi {
         }
 
         // Call the evaluation function
-        if (!output_given || nfdir>0) {
+        if (!output_given || nfwd>0) {
           if (it->data->getOp()==OP_CALL) {
             // Purge the directions that have all-zero seeds #905
             // We do this only for OP_CALL since some operations might have
@@ -947,9 +947,9 @@ namespace casadi {
     }
 
     // Loop over computational nodes in reverse order
-    if (nadir>0) {
+    if (nadj>0) {
       // Work vector, adjoint derivatives
-      fill(dwork.begin(), dwork.end(), std::vector<MX>(nadir));
+      fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
       log("MXFunctionInternal::evalMX allocated derivative work vector (adjoint mode)");
 
       int alg_counter = algorithm_.size()-1;
@@ -970,7 +970,7 @@ namespace casadi {
 
         if (it->op == OP_INPUT) {
           // Collect the symbolic adjoint sensitivities
-          for (int d=0; d<nadir; ++d) {
+          for (int d=0; d<nadj; ++d) {
             if (dwork[it->res.front()][d].isEmpty(true)) {
               asens[d][it->arg.front()] = MX(input(it->arg.front()).shape());
             } else {
@@ -980,13 +980,13 @@ namespace casadi {
           }
         } else if (it->op==OP_OUTPUT) {
           // Pass the adjoint seeds
-          for (int d=0; d<nadir; ++d) {
+          for (int d=0; d<nadj; ++d) {
             dwork[it->arg.front()][d].addToSum(
               aseed[d][it->res.front()].setSparse(output(it->res.front()).sparsity(), true));
           }
         } else if (it->op==OP_PARAMETER) {
           // Clear adjoint seeds
-          for (int d=0; d<nadir; ++d) {
+          for (int d=0; d<nadj; ++d) {
             dwork[it->res.front()][d] = MX();
           }
         } else {
@@ -1011,7 +1011,7 @@ namespace casadi {
           }
 
           // Sensitivity arguments
-          for (int d=0; d<nadir; ++d) {
+          for (int d=0; d<nadj; ++d) {
             aseed_p[d].resize(it->res.size());
             for (int oind=0; oind<it->res.size(); ++oind) {
               int el = it->res[oind];
@@ -1082,11 +1082,14 @@ namespace casadi {
     assertInit();
 
     // Allocate results
-    int nfdir = fseed.size();
-    fsens.resize(nfdir);
+    int nfwd = fseed.size();
+    fsens.resize(nfwd);
+    for (int d=0; d<nfwd; ++d) {
+      fsens[d].resize(getNumOutputs());
+    }
 
     // Quick return if no directions
-    if (nfdir==0) return;
+    if (nfwd==0) return;
 
     // Check if there are any zero seeds
     for (vector<vector<MX> >::const_iterator i=fseed.begin(); i!=fseed.end(); ++i) {
@@ -1094,9 +1097,9 @@ namespace casadi {
       if (purgable(*i)) {
         // New argument without all-zero directions
         std::vector<std::vector<MX> > fseed_purged, fsens_purged;
-        fseed_purged.reserve(nfdir);
+        fseed_purged.reserve(nfwd);
         vector<int> index_purged;
-        for (int d=0; d<nfdir; ++d) {
+        for (int d=0; d<nfwd; ++d) {
           if (purgable(fseed[d])) {
             for (int i=0; i<fsens[d].size(); ++i) {
               fsens[d][i] = MX(output(i).shape());
@@ -1119,20 +1122,20 @@ namespace casadi {
     }
 
     // Allocate forward sensitivities
-    for (int d=0; d<nfdir; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       fsens[d].resize(outputv_.size());
     }
 
 
     // Work vector, forward derivatives
     std::vector<std::vector<MX> > dwork(work_.size());
-    fill(dwork.begin(), dwork.end(), std::vector<MX>(nfdir));
+    fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
     log("MXFunctionInternal::evalFwd allocated derivative work vector (forward mode)");
 
     // Pointers to the arguments of the current operation
     MXPtrVV fseed_p, fsens_p;
-    fseed_p.reserve(nfdir);
-    fsens_p.reserve(nfdir);
+    fseed_p.reserve(nfwd);
+    fsens_p.reserve(nfwd);
 
     // Loop over computational nodes in forward order
     int alg_counter = 0;
@@ -1140,17 +1143,17 @@ namespace casadi {
       if (it->op == OP_INPUT) {
         // Fetch input
         const Sparsity& sp_input = input(it->arg.front()).sparsity();
-        for (int d=0; d<nfdir; ++d) {
+        for (int d=0; d<nfwd; ++d) {
           dwork[it->res.front()][d] = fseed[d][it->arg.front()].setSparse(sp_input, true);
         }
       } else if (it->op==OP_OUTPUT) {
         // Collect the forward sensitivities
-        for (int d=0; d<nfdir; ++d) {
+        for (int d=0; d<nfwd; ++d) {
           fsens[d][it->res.front()] = dwork[it->arg.front()][d];
         }
       } else if (it->op==OP_PARAMETER) {
         // Fetch parameter
-        for (int d=0; d<nfdir; ++d) {
+        for (int d=0; d<nfwd; ++d) {
           dwork[it->res.front()][d] = MX();
         }
       } else {
@@ -1158,7 +1161,7 @@ namespace casadi {
         // Forward seeds and sensitivities
         fseed_p.clear();
         fsens_p.clear();
-        for (int d=0; d<nfdir; ++d) {
+        for (int d=0; d<nfwd; ++d) {
           // Pointers to seeds
           MXPtrV seed(it->arg.size());
           bool can_skip = true;
@@ -1213,11 +1216,14 @@ namespace casadi {
     assertInit();
 
     // Allocate results
-    int nadir = aseed.size();
-    asens.resize(nadir);
+    int nadj = aseed.size();
+    asens.resize(nadj);
+    for (int d=0; d<nadj; ++d) {
+      asens[d].resize(getNumInputs());
+    }
 
     // Quick return if no directions
-    if (nadir==0) return;
+    if (nadj==0) return;
 
     // Check if there are any zero seeds
     for (vector<vector<MX> >::const_iterator i=aseed.begin(); i!=aseed.end(); ++i) {
@@ -1225,9 +1231,9 @@ namespace casadi {
       if (purgable(*i)) {
         // New argument without all-zero directions
         std::vector<std::vector<MX> > aseed_purged, asens_purged;
-        aseed_purged.reserve(nadir);
+        aseed_purged.reserve(nadj);
         vector<int> index_purged;
-        for (int d=0; d<nadir; ++d) {
+        for (int d=0; d<nadj; ++d) {
           if (purgable(aseed[d])) {
             for (int i=0; i<asens[d].size(); ++i) {
               asens[d][i] = MX(input(i).shape());
@@ -1250,18 +1256,18 @@ namespace casadi {
     }
 
     // Allocate adjoint sensitivities
-    for (int d=0; d<nadir; ++d) {
+    for (int d=0; d<nadj; ++d) {
       asens[d].resize(inputv_.size());
     }
 
     // Pointers to the arguments of the current operation
     MXPtrVV aseed_p, asens_p;
-    aseed_p.reserve(nadir);
-    asens_p.reserve(nadir);
+    aseed_p.reserve(nadj);
+    asens_p.reserve(nadj);
 
     // Work vector, adjoint derivatives
     std::vector<std::vector<MX> > dwork(work_.size());
-    fill(dwork.begin(), dwork.end(), std::vector<MX>(nadir));
+    fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
     log("MXFunctionInternal::evalAdj allocated derivative work vector (adjoint mode)");
 
     // Loop over computational nodes in reverse order
@@ -1271,7 +1277,7 @@ namespace casadi {
          ++it, --alg_counter) {
       if (it->op == OP_INPUT) {
         // Collect the symbolic adjoint sensitivities
-        for (int d=0; d<nadir; ++d) {
+        for (int d=0; d<nadj; ++d) {
           if (dwork[it->res.front()][d].isEmpty(true)) {
             asens[d][it->arg.front()] = MX(input(it->arg.front()).shape());
           } else {
@@ -1281,20 +1287,20 @@ namespace casadi {
         }
       } else if (it->op==OP_OUTPUT) {
         // Pass the adjoint seeds
-        for (int d=0; d<nadir; ++d) {
+        for (int d=0; d<nadj; ++d) {
           dwork[it->arg.front()][d].addToSum(aseed[d][it->res.front()]
                                              .setSparse(output(it->res.front()).sparsity(), true));
         }
       } else if (it->op==OP_PARAMETER) {
         // Clear adjoint seeds
-        for (int d=0; d<nadir; ++d) {
+        for (int d=0; d<nadj; ++d) {
           dwork[it->res.front()][d] = MX();
         }
       } else {
         aseed_p.clear();
         asens_p.clear();
 
-        for (int d=0; d<nadir; ++d) {
+        for (int d=0; d<nadj; ++d) {
           // Pointers to seeds
           MXPtrV seed(it->res.size());
           bool can_skip = true;

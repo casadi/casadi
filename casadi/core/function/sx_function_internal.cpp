@@ -803,7 +803,16 @@ namespace casadi {
     if (verbose()) cout << "SXFunctionInternal::evalFwd begin" << endl;
 
     // Number of forward seeds
-    int nfdir = fsens.size();
+    int nfwd = fseed.size();
+
+    // Allocate results if needed
+    fsens.resize(nfwd);
+    for (int d=0; d<nfwd; ++d) {
+      fsens[d].resize(getNumOutputs());
+      for (int i=0; i<fsens[d].size(); ++i)
+        if (fsens[d][i].sparsity()!=output(i).sparsity())
+          fsens[d][i] = SX::zeros(output(i).sparsity());
+    }
 
     // Iterator to the binary operations
     vector<SXElement>::const_iterator b_it=operations_.begin();
@@ -834,7 +843,7 @@ namespace casadi {
     // Calculate forward sensitivities
     if (verbose())
       cout << "SXFunctionInternal::evalFwd calculating forward derivatives" << endl;
-    for (int dir=0; dir<nfdir; ++dir) {
+    for (int dir=0; dir<nfwd; ++dir) {
       vector<TapeEl<SXElement> >::const_iterator it2 = s_pdwork.begin();
       for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
         switch (it->op) {
@@ -860,7 +869,16 @@ namespace casadi {
     if (verbose()) cout << "SXFunctionInternal::evalAdj begin" << endl;
 
     // number of adjoint seeds
-    int nadir = aseed.size();
+    int nadj = aseed.size();
+
+    // Allocate results if needed
+    asens.resize(nadj);
+    for (int d=0; d<nadj; ++d) {
+      asens[d].resize(getNumInputs());
+      for (int i=0; i<asens[d].size(); ++i)
+        if (asens[d][i].sparsity()!=input(i).sparsity())
+          asens[d][i] = SX::zeros(input(i).sparsity());
+    }
 
     // Iterator to the binary operations
     vector<SXElement>::const_iterator b_it=operations_.begin();
@@ -892,7 +910,7 @@ namespace casadi {
     if (verbose()) cout << "SXFunctionInternal::evalAdj calculating adjoint derivatives"
                        << endl;
     fill(s_work_.begin(), s_work_.end(), 0);
-    for (int dir=0; dir<nadir; ++dir) {
+    for (int dir=0; dir<nadj; ++dir) {
       vector<TapeEl<SXElement> >::const_reverse_iterator it2 = s_pdwork.rbegin();
       for (vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin();
            it!=algorithm_.rend(); ++it) {

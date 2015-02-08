@@ -376,6 +376,12 @@ namespace casadi {
      */
     Function derivative(int nfwd, int nadj);
 
+    /** \brief Return function that calculates forward mode derivatives */
+    Function derivativeFwd(int nfwd);
+
+    /** \brief Return function that calculates reverse mode derivatives */
+    Function derivativeAdj(int nadj);
+
     /** \brief Set a function that calculates \a nfwd forward derivatives
         and \a nadj adjoint derivatives
 

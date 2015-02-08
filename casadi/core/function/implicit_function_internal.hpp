@@ -88,6 +88,12 @@ namespace casadi {
     /** \brief Calculate reverse mode directional derivatives */
     virtual void evalAdjNode(const MX& f, MXPtrVV& aseed, MXPtrVV& asens);
 
+    /// Generate forward derivative function
+    virtual Function getDerivativeFwd(int nfwd);
+
+    /// Generate adjoint derivative function
+    virtual Function getDerivativeAdj(int nadj);
+
     /// Number of equations
     int n_;
 

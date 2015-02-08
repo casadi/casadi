@@ -106,11 +106,60 @@ namespace casadi {
   }
 
   void CallFunction::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+#if 0
+    // Nondifferentiated inputs and outputs
+    vector<MX> arg(ndep());
+    for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
+    vector<MX> res(getNumOutputs());
+    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+
+    // Collect seeds
+    vector<vector<MX> > fseed(getVector(fwdSeed)), fsens;
+
+    // Call the cached functions
+    fcn_->callFwd(arg, res, fseed, fsens);
+
+    // Store the forward sensitivities
+    for (int d=0; d<fwdSens.size(); ++d) {
+      for (int i=0; i<fwdSens[d].size(); ++i) {
+        if (fwdSens[d][i]!=0) {
+          *fwdSens[d][i] = fsens[d][i];
+        }
+      }
+    }
+#else
     fcn_->evalFwdNode(shared_from_this<MX>(), fwdSeed, fwdSens);
+#endif
   }
 
   void CallFunction::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+#if 0
+    // Nondifferentiated inputs and outputs
+    vector<MX> arg(ndep());
+    for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
+    vector<MX> res(getNumOutputs());
+    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+
+    // Collect seeds
+    vector<vector<MX> > aseed(getVector(adjSeed)), asens;
+
+    // Call the cached functions
+    fcn_->callAdj(arg, res, aseed, asens);
+
+    // Free adjoint seeds
+    clearVector(adjSeed);
+
+    // Store the adjoint sensitivities
+    for (int d=0; d<adjSens.size(); ++d) {
+      for (int i=0; i<adjSens[d].size(); ++i) {
+        if (adjSens[d][i]!=0) {
+          adjSens[d][i]->addToSum(asens[d][i]);
+        }
+      }
+    }
+#else
     fcn_->evalAdjNode(shared_from_this<MX>(), adjSeed, adjSens);
+#endif
   }
 
   void CallFunction::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {

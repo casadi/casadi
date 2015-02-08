@@ -3126,6 +3126,7 @@ namespace casadi {
         fsens[d][i] = *x_it++;
       }
     }
+    casadi_assert(x_it==x.end());
   }
 
   void FunctionInternal::callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
@@ -3162,6 +3163,7 @@ namespace casadi {
         asens[d][i] = *x_it++;
       }
     }
+    casadi_assert(x_it==x.end());
   }
 
 
