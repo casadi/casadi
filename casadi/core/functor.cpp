@@ -33,9 +33,9 @@ using namespace std;
 
 namespace casadi {
 
-  Function DerivativeGenerator::operator()(Function& fcn, int nfwd, int nadj, void* user_data) {
+  Function DerivativeGenerator::operator()(Function& fcn, int ndir, void* user_data) {
     return static_cast<DerivativeGeneratorInternal*>(
-      SharedObject::operator->())->call(fcn, nfwd, nadj, user_data);
+      SharedObject::operator->())->call(fcn, ndir, user_data);
   }
 
 void CustomEvaluate::operator()(CustomFunction& fcn, void* user_data) {

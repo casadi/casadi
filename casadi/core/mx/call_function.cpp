@@ -106,7 +106,7 @@ namespace casadi {
   }
 
   void CallFunction::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
-#if 0
+#if 1
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -133,7 +133,7 @@ namespace casadi {
   }
 
   void CallFunction::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
-#if 0
+#if 1
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);

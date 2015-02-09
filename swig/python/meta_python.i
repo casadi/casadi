@@ -87,7 +87,7 @@
       friend class DerivativeGeneratorPython;
     
     DerivativeGeneratorPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-      virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data);
+      virtual Function call(Function& fcn, int ndir, void* user_data);
       virtual DerivativeGeneratorPythonInternal* clone() const { return new DerivativeGeneratorPythonInternal(p_); }
     };
    

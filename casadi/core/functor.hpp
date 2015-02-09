@@ -33,7 +33,7 @@
 namespace casadi {
 
   /// Function pointer to a derivative generator function
-  typedef Function (*DerivativeGeneratorCPtr)(Function& fcn, int nfwd, int nadj, void* user_data);
+  typedef Function (*DerivativeGeneratorCPtr)(Function& fcn, int ndir, void* user_data);
 
   /// Wrapper around functions
   typedef void (*CustomEvaluateCPtr)(CustomFunction &f, void* user_data);
@@ -72,7 +72,7 @@ namespace casadi {
       DerivativeGenerator(DerivativeGeneratorCPtr ptr);
 
       /// Call
-      Function operator() (Function& fcn, int nfwd, int nadj, void* user_data);
+      Function operator() (Function& fcn, int ndir, void* user_data);
   };
 
   /** \brief CustomEvaluate
@@ -83,7 +83,7 @@ namespace casadi {
   * \code
   *
   *   @pyevaluate
-  *   def c(f, nfdir, nadir):
+  *   def c(f, ndir):
   *     print f
   *
   *   f = CustomFunction(c, ...)

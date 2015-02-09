@@ -65,10 +65,6 @@ namespace casadi {
               "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,
               "Flag to indicate whether statistics must be gathered");
-    addOption("derivative_generator",     OT_DERIVATIVEGENERATOR,   GenericType(),
-              "Function that returns a derivative function given a number of forward "
-              "and reverse directional derivative, overrides internal routines. "
-              "Check documentation of DerivativeGenerator.");
     addOption("derivative_generator_forward",  OT_DERIVATIVEGENERATOR,   GenericType(),
               "Function that returns a derivative function given a number of forward "
               "mode directional derivatives. Overrides default routines.");
@@ -299,8 +295,6 @@ namespace casadi {
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
     f.setOption("ad_mode", getOption("ad_mode")); // Why?
-    if (hasSetOption("derivative_generator"))
-        f.setOption("derivative_generator", getOption("derivative_generator"));
     if (hasSetOption("derivative_generator_forward"))
         f.setOption("derivative_generator_forward", getOption("derivative_generator_forward"));
     if (hasSetOption("derivative_generator_reverse"))
@@ -1611,11 +1605,6 @@ namespace casadi {
     if ((getOption("ad_mode")=="forward" && nadj>0) ||
         (getOption("ad_mode")=="reverse" && nfwd>0)) {
       ret = getDerivativeViaJac(nfwd, nadj);
-    } else if (hasSetOption("derivative_generator")) {
-      /// User-provided derivative generator function
-      DerivativeGenerator dergen = getOption("derivative_generator");
-      Function this_ = shared_from_this<Function>();
-      ret = dergen(this_, nfwd, nadj, user_data_);
     } else if (2*full_jac_cost < der_dir_cost) {
       // Generate the Jacobian and then multiply to get the derivative
       //ret = getDerivativeViaJac(nfwd, nadj); // NOTE: Uncomment this line
@@ -1763,7 +1752,7 @@ namespace casadi {
       /// User-provided derivative generator function
       DerivativeGenerator dergen = getOption("derivative_generator_forward");
       Function this_ = shared_from_this<Function>();
-      ret = dergen(this_, nfwd, 0, user_data_);
+      ret = dergen(this_, nfwd, user_data_);
     } else {
       ret = getDerivativeFwd(nfwd);
     }
@@ -1868,7 +1857,7 @@ namespace casadi {
       /// User-provided derivative generator function
       DerivativeGenerator dergen = getOption("derivative_generator_reverse");
       Function this_ = shared_from_this<Function>();
-      ret = dergen(this_, 0, nadj, user_data_);
+      ret = dergen(this_, nadj, user_data_);
     } else {
       ret = getDerivativeAdj(nadj);
     }

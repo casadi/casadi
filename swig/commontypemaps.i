@@ -404,20 +404,17 @@
 #ifdef SWIGPYTHON
 %fragment("to"{DerivativeGenerator}, "header", fragment="fwd", fragment="to"{Function}) {
   namespace casadi {
-    Function DerivativeGeneratorPythonInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
+    Function DerivativeGeneratorPythonInternal::call(Function& fcn, int ndir, void* user_data) {
       casadi_assert(p_!=0);
-      PyObject * nfwd_py = PyInt_FromLong(nfwd);
-      PyObject * nadj_py = PyInt_FromLong(nadj);
+      PyObject * ndir_py = PyInt_FromLong(ndir);
       PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))),
                                              $descriptor(casadi::Function *), SWIG_POINTER_OWN |  0 );
       if(!fcn_py) {
-        Py_DECREF(nfwd_py);
-        Py_DECREF(nadj_py);
+        Py_DECREF(ndir_py);
         throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert Function to python");
       }
-      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, nfwd_py, nadj_py, NULL);
-      Py_DECREF(nfwd_py);
-      Py_DECREF(nadj_py);
+      PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, ndir_py, NULL);
+      Py_DECREF(ndir_py);
       Py_DECREF(fcn_py);
       if (r) {
         Function ret;  

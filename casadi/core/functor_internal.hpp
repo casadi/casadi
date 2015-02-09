@@ -51,7 +51,7 @@ namespace casadi {
 
   class CASADI_EXPORT DerivativeGeneratorInternal : public FunctorInternal {
     friend class DerivativeGenerator;
-    virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data)=0;
+    virtual Function call(Function& fcn, int ndir, void* user_data)=0;
   };
 
   class CASADI_EXPORT DerivativeGeneratorCInternal :
@@ -59,7 +59,7 @@ namespace casadi {
     friend class DerivativeGenerator;
 
     DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr);
-    virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data);
+    virtual Function call(Function& fcn, int ndir, void* user_data);
     virtual DerivativeGeneratorCInternal* clone() const;
   };
 

@@ -39,9 +39,9 @@ namespace casadi {
       FunctorCInternal<DerivativeGeneratorCPtr>(ptr) {
   }
 
-  Function DerivativeGeneratorCInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
+  Function DerivativeGeneratorCInternal::call(Function& fcn, int ndir, void* user_data) {
     casadi_assert(ptr_!=0);
-    return ptr_(fcn, nfwd, nadj, user_data);
+    return ptr_(fcn, ndir, user_data);
   }
 
   DerivativeGeneratorCInternal* DerivativeGeneratorCInternal::clone() const {
