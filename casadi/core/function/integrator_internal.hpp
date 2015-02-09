@@ -92,6 +92,12 @@ namespace casadi {
     */
     virtual Function getDerivative(int nfwd, int nadj);
 
+    /** Generate a function that calculates \a nfwd forward derivatives */
+    virtual Function getDerivativeFwd(int nfwd);
+
+    /** Generate a function that calculates \a nadj adjoint derivatives */
+    virtual Function getDerivativeAdj(int nadj);
+
     /** \brief Calculate the jacobian of output \a oind with respect to input \a iind */
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
 
