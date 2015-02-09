@@ -79,7 +79,32 @@ namespace casadi {
 
   void CallFunction::evaluateD(const double* const* input, double** output,
                                int* itmp, double* rtmp) {
-    fcn_->evaluateD(this, input, output, itmp, rtmp);
+    // Set up timers for profiling
+    double time_zero=0;
+    double time_start=0;
+    double time_stop=0;
+    double time_offset=0;
+
+    // Number of inputs and outputs
+    int num_in = fcn_.getNumInputs();
+    int num_out = fcn_.getNumOutputs();
+
+    // Pass the inputs to the function
+    for (int i = 0; i < num_in; ++i) {
+      if (input[i] != 0) {
+        fcn_.setInput(input[i], i);
+      } else {
+        fcn_.setInput(0., i);
+      }
+    }
+
+    // Evaluate
+    fcn_.evaluate();
+
+    // Get the outputs
+    for (int i=0; i<num_out; ++i) {
+      if (output[i] != 0) fcn_.getOutput(output[i], i);
+    }
   }
 
   int CallFunction::getNumOutputs() const {
@@ -96,7 +121,26 @@ namespace casadi {
 
   void CallFunction::evaluateSX(const SXElement* const* input, SXElement** output,
                                 int* itmp, SXElement* rtmp) {
-    fcn_->evaluateSX(this, input, output, itmp, rtmp);
+    // Number of inputs and outputs
+    int num_in = fcn_.getNumInputs();
+    int num_out = fcn_.getNumOutputs();
+
+    // Create input arguments
+    vector<SX> argv(num_in);
+    for (int i=0; i<num_in; ++i) {
+      argv[i] = SX::zeros(fcn_.input(i).sparsity());
+      if (input[i] != 0) argv[i].set(input[i]);
+    }
+
+    // Evaluate symbolically
+    vector<SX> resv;
+    vector<vector<SX> > dummy;
+    fcn_->evalSX(argv, resv, dummy, dummy, dummy, dummy);
+
+    // Collect the result
+    for (int i = 0; i < num_out; ++i) {
+      if (output[i] != 0) resv[i].get(output[i]);
+    }
   }
 
   void CallFunction::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -106,7 +150,6 @@ namespace casadi {
   }
 
   void CallFunction::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
-#if 1
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -127,13 +170,9 @@ namespace casadi {
         }
       }
     }
-#else
-    fcn_->evalFwdNode(shared_from_this<MX>(), fwdSeed, fwdSens);
-#endif
   }
 
   void CallFunction::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
-#if 1
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -157,9 +196,6 @@ namespace casadi {
         }
       }
     }
-#else
-    fcn_->evalAdjNode(shared_from_this<MX>(), adjSeed, adjSens);
-#endif
   }
 
   void CallFunction::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
