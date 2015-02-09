@@ -97,9 +97,15 @@ namespace casadi {
 
   Function DleToLrDle::getDerivative(int nfwd, int nadj) {
     return f_.derivative(nfwd, nadj);
-
   }
 
+  Function DleToLrDle::getDerivativeFwd(int nfwd) {
+    return f_.derivativeFwd(nfwd);
+  }
+
+  Function DleToLrDle::getDerivativeAdj(int nadj) {
+    return f_.derivativeAdj(nadj);
+  }
 
   void DleToLrDle::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {

@@ -64,11 +64,6 @@ casadi_plugin(DleSolver simple
   simple_indef_dle_internal.hpp
   simple_indef_dle_internal.cpp
   simple_indef_dle_internal_meta.cpp)
-  
-casadi_plugin(LrDleSolver smith
-  smith_lr_dle_internal.hpp
-  smith_lr_dle_internal.cpp
-  smith_lr_dle_internal_meta.cpp)
 
 casadi_plugin(LrDpleSolver lifting
   lifting_lr_dple_internal.hpp

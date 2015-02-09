@@ -86,6 +86,12 @@ namespace casadi {
     */
     virtual Function getDerivative(int nfwd, int nadj);
 
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    virtual Function getDerivativeFwd(int nfwd);
+
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    virtual Function getDerivativeAdj(int nadj);
+
     /// A documentation string
     static const std::string meta_doc;
 

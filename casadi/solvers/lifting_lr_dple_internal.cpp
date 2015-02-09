@@ -191,6 +191,13 @@ namespace casadi {
     return f_.derivative(nfwd, nadj);
   }
 
+  Function LiftingLrDpleInternal::getDerivativeFwd(int nfwd) {
+    return f_.derivativeFwd(nfwd);
+  }
+
+  Function LiftingLrDpleInternal::getDerivativeAdj(int nadj) {
+    return f_.derivativeAdj(nadj);
+  }
 
   void LiftingLrDpleInternal::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {

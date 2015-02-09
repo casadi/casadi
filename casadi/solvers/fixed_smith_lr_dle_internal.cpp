@@ -125,6 +125,14 @@ namespace casadi {
     return f_.derivative(nfwd, nadj);
   }
 
+  Function FixedSmithLrDleInternal::getDerivativeFwd(int nfwd) {
+    return f_.derivativeFwd(nfwd);
+  }
+
+  Function FixedSmithLrDleInternal::getDerivativeAdj(int nadj) {
+    return f_.derivativeAdj(nadj);
+  }
+
   void FixedSmithLrDleInternal::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     LrDleInternal::deepCopyMembers(already_copied);
