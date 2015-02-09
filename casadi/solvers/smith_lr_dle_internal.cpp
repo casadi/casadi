@@ -511,10 +511,11 @@ namespace casadi {
     casadi_assert_message((nfwd_==0 && nadj_==0) || (nfwd==0 && nadj==0),
       "SmithLrDleInternal::second order derivatives are not supported");
     // Return a deep copy
-    SmithLrDleInternal* node = new SmithLrDleInternal(st_, nfwd, nadj);
-    node->setOption(dictionary());
-    node->init();
-    return node->shared_from_this<Function>();
+    Function ret;
+    ret.assignNode(new SmithLrDleInternal(st_, nfwd, nadj));
+    ret.setOption(dictionary());
+    ret.init();
+    return ret;
   }
 
   void SmithLrDleInternal::deepCopyMembers(

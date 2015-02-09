@@ -129,6 +129,13 @@ namespace casadi {
     return f_.derivative(nfwd, nadj);
   }
 
+  Function SimpleIndefDleInternal::getDerivativeFwd(int nfwd) {
+    return f_.derivativeFwd(nfwd);
+  }
+
+  Function SimpleIndefDleInternal::getDerivativeAdj(int nadj) {
+    return f_.derivativeAdj(nadj);
+  }
 
   void SimpleIndefDleInternal::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {

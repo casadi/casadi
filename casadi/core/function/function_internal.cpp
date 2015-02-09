@@ -69,6 +69,12 @@ namespace casadi {
               "Function that returns a derivative function given a number of forward "
               "and reverse directional derivative, overrides internal routines. "
               "Check documentation of DerivativeGenerator.");
+    addOption("derivative_generator_forward",  OT_DERIVATIVEGENERATOR,   GenericType(),
+              "Function that returns a derivative function given a number of forward "
+              "mode directional derivatives. Overrides default routines.");
+    addOption("derivative_generator_reverse",  OT_DERIVATIVEGENERATOR,   GenericType(),
+              "Function that returns a derivative function given a number of reverse "
+              "mode directional derivatives. Overrides default routines.");
 
     verbose_ = false;
     user_data_ = 0;
@@ -295,6 +301,10 @@ namespace casadi {
     f.setOption("ad_mode", getOption("ad_mode")); // Why?
     if (hasSetOption("derivative_generator"))
         f.setOption("derivative_generator", getOption("derivative_generator"));
+    if (hasSetOption("derivative_generator_forward"))
+        f.setOption("derivative_generator_forward", getOption("derivative_generator_forward"));
+    if (hasSetOption("derivative_generator_reverse"))
+        f.setOption("derivative_generator_reverse", getOption("derivative_generator_reverse"));
 
     return f;
   }
@@ -1748,7 +1758,15 @@ namespace casadi {
     }
 
     // Return value
-    Function ret = getDerivativeFwd(nfwd);
+    Function ret;
+    if (hasSetOption("derivative_generator_forward")) {
+      /// User-provided derivative generator function
+      DerivativeGenerator dergen = getOption("derivative_generator_forward");
+      Function this_ = shared_from_this<Function>();
+      ret = dergen(this_, nfwd, 0, user_data_);
+    } else {
+      ret = getDerivativeFwd(nfwd);
+    }
 
     // Give it a suitable name
     stringstream ss;
@@ -1845,7 +1863,15 @@ namespace casadi {
     }
 
     // Return value
-    Function ret = getDerivativeAdj(nadj);
+    Function ret;
+    if (hasSetOption("derivative_generator_reverse")) {
+      /// User-provided derivative generator function
+      DerivativeGenerator dergen = getOption("derivative_generator_reverse");
+      Function this_ = shared_from_this<Function>();
+      ret = dergen(this_, 0, nadj, user_data_);
+    } else {
+      ret = getDerivativeAdj(nadj);
+    }
 
     // Give it a suitable name
     stringstream ss;
