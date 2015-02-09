@@ -358,5 +358,18 @@ namespace casadi {
   std::string Function::getSanitizedName() const {
     return (*this)->getSanitizedName();
   }
+
+  void Function::callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+                         const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens) {
+    (*this)->callFwd(arg, res, fseed, fsens);
+  }
+
+  void Function::callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+                         const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens) {
+    (*this)->callAdj(arg, res, aseed, asens);
+  }
+
 } // namespace casadi
 
