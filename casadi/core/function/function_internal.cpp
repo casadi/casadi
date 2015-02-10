@@ -2737,55 +2737,6 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::evalFwdNode(const MX& f, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
-    // Collect inputs and seeds
-    vector<MX> arg(f->ndep());
-    for (int i=0; i<arg.size(); ++i) arg[i] = f->dep(i);
-    vector<MX> res;
-
-    // Collect seeds
-    vector<vector<MX> > fseed = MXNode::getVector(fwdSeed);
-
-    // Evaluate symbolically
-    vector<vector<MX> > fsens, dummy;
-    createCallDerivative(arg, res, fseed, fsens, dummy, dummy);
-
-    // Store the forward sensitivities
-    for (int d=0; d<fwdSens.size(); ++d) {
-      for (int i=0; i<fwdSens[d].size(); ++i) {
-        if (fwdSens[d][i]!=0) {
-          *fwdSens[d][i] = fsens[d][i];
-        }
-      }
-    }
-  }
-
-  void FunctionInternal::evalAdjNode(const MX& f, MXPtrVV& adjSeed, MXPtrVV& adjSens) {
-    // Collect inputs and seeds
-    vector<MX> arg(f->ndep());
-    for (int i=0; i<arg.size(); ++i) arg[i] = f->dep(i);
-    vector<MX> res;
-
-    // Collect seeds
-    vector<vector<MX> > aseed = MXNode::getVector(adjSeed);
-
-    // Free adjoint seeds
-    MXNode::clearVector(adjSeed);
-
-    // Evaluate symbolically
-    vector<vector<MX> > asens, dummy;
-    createCallDerivative(arg, res, dummy, dummy, aseed, asens);
-
-    // Store the adjoint sensitivities
-    for (int d=0; d<adjSens.size(); ++d) {
-      for (int i=0; i<adjSens[d].size(); ++i) {
-        if (adjSens[d][i]!=0 && !asens[d][i].isEmpty(true) && !(*adjSens[d][i]).isEmpty(true)) {
-          adjSens[d][i]->addToSum(asens[d][i]);
-        }
-      }
-    }
-  }
-
   void FunctionInternal::propagateSparsity(MXNode* node, double** arg, double** res,
                                            int* itmp, bvec_t* rtmp, bool use_fwd) {
     // Pass/clear forward seeds/adjoint sensitivities
@@ -3007,30 +2958,14 @@ namespace casadi {
       return name;
   }
 
-  void FunctionInternal::evalFwd(const std::vector<std::vector<SX> >& fseed,
-                                 std::vector<std::vector<SX> >& fsens) {
-
-    casadi_error("evalFwd(SX) not defined for class " << typeid(*this).name());
-  }
-
-  void FunctionInternal::evalAdj(const std::vector<std::vector<SX> >& aseed,
-                                 std::vector<std::vector<SX> >& asens) {
-    casadi_error("evalAdj(SX) not defined for class " << typeid(*this).name());
-  }
-
-  void FunctionInternal::evalFwd(const std::vector<std::vector<MX> >& fwdSeed,
-                                 std::vector<std::vector<MX> >& fwdSens) {
-    casadi_error("evalFwd(MX) not defined for class " << typeid(*this).name());
-  }
-
-  void FunctionInternal::evalAdj(const std::vector<std::vector<MX> >& adjSeed,
-                                 std::vector<std::vector<MX> >& adjSens) {
-    casadi_error("evalAdj(MX) not defined for class " << typeid(*this).name());
-  }
-
   void FunctionInternal::callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
                                  const std::vector<std::vector<MX> >& fseed,
-                                 std::vector<std::vector<MX> >& fsens) {
+                                 std::vector<std::vector<MX> >& fsens,
+                                 bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert_message(!always_inline, "Class " << typeid(*this).name() <<
+                          " cannot be inlined in an MX expression");
+
     // Number of directional derivatives
     int nfwd = fseed.size();
 
@@ -3067,7 +3002,12 @@ namespace casadi {
 
   void FunctionInternal::callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
                                  const std::vector<std::vector<MX> >& aseed,
-                                 std::vector<std::vector<MX> >& asens) {
+                                 std::vector<std::vector<MX> >& asens,
+                                 bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert_message(!always_inline, "Class " << typeid(*this).name() <<
+                          " cannot be inlined in an MX expression");
+
     // Number of directional derivatives
     int nadj = aseed.size();
 
@@ -3102,5 +3042,20 @@ namespace casadi {
     casadi_assert(x_it==x.end());
   }
 
+  void FunctionInternal::callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+                                 const std::vector<std::vector<SX> >& fseed,
+                                 std::vector<std::vector<SX> >& fsens,
+                                 bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_error("SX expressions do not support call-nodes");
+  }
+
+  void FunctionInternal::callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+                                 const std::vector<std::vector<SX> >& aseed,
+                                 std::vector<std::vector<SX> >& asens,
+                                 bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_error("SX expressions do not support call-nodes");
+  }
 
 } // namespace casadi

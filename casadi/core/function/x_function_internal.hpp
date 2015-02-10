@@ -119,6 +119,21 @@ namespace casadi {
     virtual void generateBody(std::ostream &stream, const std::string& type,
                               CodeGenerator& gen) const = 0;
 
+    /** \brief Helper function: Check if a vector equals inputv */
+    virtual bool isInput(const std::vector<MatType>& arg) const;
+
+    /** \brief Create call to (cached) derivative function, forward mode  */
+    virtual void callFwd(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+                         const std::vector<std::vector<MatType> >& fseed,
+                         std::vector<std::vector<MatType> >& fsens,
+                         bool always_inline, bool never_inline);
+
+    /** \brief Create call to (cached) derivative function, reverse mode  */
+    virtual void callAdj(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+                         const std::vector<std::vector<MatType> >& aseed,
+                         std::vector<std::vector<MatType> >& asens,
+                         bool always_inline, bool never_inline);
+
     // Data members (all public)
 
     /** \brief  Inputs of the function (needed for symbolic calculations) */
@@ -795,10 +810,12 @@ namespace casadi {
       if (verbose()) std::cout << "XFunctionInternal::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
-        //evalFwd(fseed, fsens);
+        //static_cast<DerivedType*>(this)->callFwd(inputv_, outputv_,
+        //                                         fseed, fsens, always_inline, never_inline);
       } else if (aseed.size()>0) {
         casadi_assert(fseed.size()==0);
-        //evalAdj(aseed, asens);
+        //static_cast<DerivedType*>(this)->callAdj(inputv_, outputv_,
+        //                                         aseed, asens, always_inline, never_inline);
       }
       call(inputv_, res, fseed, fsens, aseed, asens, always_inline, never_inline);
 
@@ -1093,7 +1110,7 @@ namespace casadi {
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd), fsens;
 
     // Evaluate symbolically
-    evalFwd(fseed, fsens);
+    static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
     casadi_assert(fsens.size()==fseed.size());
 
     // Number inputs and outputs
@@ -1126,13 +1143,13 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType,
-                             MatType, NodeType>::getDerivativeAdj(int nadj) {
+  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::getDerivativeAdj(int nadj) {
     // Seeds
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj), asens;
 
     // Evaluate symbolically
-    evalAdj(aseed, asens);
+    static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
 
     // Number inputs and outputs
     int num_in = getNumInputs();
@@ -1203,7 +1220,57 @@ namespace casadi {
         sens_purged.push_back(sens[d]);
       }
     }
+  }
 
+  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+  bool XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::isInput(const std::vector<MatType>& arg) const {
+    // Check if arguments matches the input expressions, in which case
+    // the output is known to be the output expressions
+    const int checking_depth = 2;
+    for (int i=0; i<arg.size(); ++i) {
+      if (!isEqual(arg[i], inputv_[i], checking_depth)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+  void XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::callFwd(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+          const std::vector<std::vector<MatType> >& fseed,
+          std::vector<std::vector<MatType> >& fsens,
+          bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    bool inline_function = always_inline;     // TODO(@jaeandersson): Add logic for inlining
+
+    // The non-inlining version is implemented in the base class
+    if (!inline_function) {
+      return FunctionInternal::callFwd(arg, res, fseed, fsens, always_inline, never_inline);
+    }
+
+    casadi_assert_message(isInput(arg), "Not implemented");
+    static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
+  }
+
+  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+  void XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
+  ::callAdj(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+          const std::vector<std::vector<MatType> >& aseed,
+          std::vector<std::vector<MatType> >& asens,
+          bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    bool inline_function = always_inline;     // TODO(@jaeandersson): Add logic for inlining
+
+    // The non-inlining version is implemented in the base class
+    if (!inline_function) {
+      return FunctionInternal::callAdj(arg, res, aseed, asens, always_inline, never_inline);
+    }
+
+    // TODO(@jaeandersson): Add substitution if !isInput(arg)
+    casadi_assert_message(isInput(arg), "Not implemented");
+    static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
   }
 
 #endif

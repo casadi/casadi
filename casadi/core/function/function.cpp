@@ -361,14 +361,30 @@ namespace casadi {
 
   void Function::callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens) {
-    (*this)->callFwd(arg, res, fseed, fsens);
+                         std::vector<std::vector<MX> >& fsens,
+                         bool always_inline, bool never_inline) {
+    (*this)->callFwd(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
   void Function::callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens) {
-    (*this)->callAdj(arg, res, aseed, asens);
+                         std::vector<std::vector<MX> >& asens,
+                         bool always_inline, bool never_inline) {
+    (*this)->callAdj(arg, res, aseed, asens, always_inline, never_inline);
+  }
+
+  void Function::callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+                         const std::vector<std::vector<SX> >& fseed,
+                         std::vector<std::vector<SX> >& fsens,
+                         bool always_inline, bool never_inline) {
+    (*this)->callFwd(arg, res, fseed, fsens, always_inline, never_inline);
+  }
+
+  void Function::callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+                         const std::vector<std::vector<SX> >& aseed,
+                         std::vector<std::vector<SX> >& asens,
+                         bool always_inline, bool never_inline) {
+    (*this)->callAdj(arg, res, aseed, asens, always_inline, never_inline);
   }
 
 } // namespace casadi

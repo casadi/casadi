@@ -148,31 +148,29 @@ namespace casadi {
               const SXVectorVector& aseed, SXVectorVector& asens,
               bool always_inline, bool never_inline);
 
-    /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<std::vector<SX> >& fseed,
-                         std::vector<std::vector<SX> >& fsens);
-
-    /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<std::vector<SX> >& aseed,
-                         std::vector<std::vector<SX> >& asens);
-
-    /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<std::vector<MX> >& fwdSeed,
-                        std::vector<std::vector<MX> >& fwdSens);
-
-    /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<std::vector<MX> >& adjSeed,
-                        std::vector<std::vector<MX> >& adjSens);
-
     /** \brief Create call to (cached) derivative function, forward mode  */
     virtual void callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens);
+                         std::vector<std::vector<MX> >& fsens,
+                         bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
     virtual void callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens);
+                         std::vector<std::vector<MX> >& asens,
+                         bool always_inline, bool never_inline);
+
+    /** \brief Create call to (cached) derivative function, forward mode  */
+    virtual void callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+                         const std::vector<std::vector<SX> >& fseed,
+                         std::vector<std::vector<SX> >& fsens,
+                         bool always_inline, bool never_inline);
+
+    /** \brief Create call to (cached) derivative function, reverse mode  */
+    virtual void callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+                         const std::vector<std::vector<SX> >& aseed,
+                         std::vector<std::vector<SX> >& asens,
+                         bool always_inline, bool never_inline);
 
     ///@{
     /** \brief Return Hessian function */
@@ -375,12 +373,6 @@ namespace casadi {
     virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res,
                             const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed,
                             MXPtrVV& asens, bool output_given);
-
-    /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwdNode(const MX& f, const MXPtrVV& fseed, MXPtrVV& fsens);
-
-    /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdjNode(const MX& f, MXPtrVV& aseed, MXPtrVV& asens);
 
     virtual void propagateSparsity(MXNode* node, double** arg, double** res,
                                    int* itmp, bvec_t* rtmp, bool fwd);

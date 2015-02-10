@@ -326,12 +326,26 @@ namespace casadi {
     /** \brief Create call to (cached) derivative function, forward mode  */
     void callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& fseed,
-                 std::vector<std::vector<MX> >& SWIG_OUTPUT(fsens));
+                 std::vector<std::vector<MX> >& SWIG_OUTPUT(fsens),
+                 bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
     void callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& aseed,
-                 std::vector<std::vector<MX> >& SWIG_OUTPUT(asens));
+                 std::vector<std::vector<MX> >& SWIG_OUTPUT(asens),
+                 bool always_inline=false, bool never_inline=false);
+
+    /** \brief Create call to (cached) derivative function, forward mode  */
+    void callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+                 const std::vector<std::vector<SX> >& fseed,
+                 std::vector<std::vector<SX> >& SWIG_OUTPUT(fsens),
+                 bool always_inline=false, bool never_inline=false);
+
+    /** \brief Create call to (cached) derivative function, reverse mode  */
+    void callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+                 const std::vector<std::vector<SX> >& aseed,
+                 std::vector<std::vector<SX> >& SWIG_OUTPUT(asens),
+                 bool always_inline=false, bool never_inline=false);
 
     /// \cond INTERNAL
     ///@{
