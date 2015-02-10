@@ -1250,8 +1250,15 @@ namespace casadi {
       return FunctionInternal::callFwd(arg, res, fseed, fsens, always_inline, never_inline);
     }
 
-    casadi_assert_message(isInput(arg), "Not implemented");
-    static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
+    if (isInput(arg)) {
+      // Argument agrees with inputv_, call evalFwd directly
+      static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
+    } else {
+      // Need to create a temporary function
+      PublicType f(arg, res);
+      f.init();
+      f->evalFwd(fseed, fsens);
+    }
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
@@ -1268,9 +1275,15 @@ namespace casadi {
       return FunctionInternal::callAdj(arg, res, aseed, asens, always_inline, never_inline);
     }
 
-    // TODO(@jaeandersson): Add substitution if !isInput(arg)
-    casadi_assert_message(isInput(arg), "Not implemented");
-    static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
+    if (isInput(arg)) {
+      // Argument agrees with inputv_, call evalAdj directly
+      static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
+    } else {
+      // Need to create a temporary function
+      PublicType f(arg, res);
+      f.init();
+      f->evalAdj(aseed, asens);
+    }
   }
 
 #endif

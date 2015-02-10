@@ -457,7 +457,9 @@ class casadiTestCase(unittest.TestCase):
           aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.getNumOutputs())] for d in range(ndir)]
           inputss = [sym("i",f.getInput(i).sparsity()) for i in range(f.getNumInputs())]
           with internalAPI():
-            res,fwdsens,adjsens = f.callDerivative(inputss,fseeds,aseeds,True)
+            res = f.call(inputss)
+            fwdsens = f.callFwd(inputss, res, fseeds)
+            adjsens = f.callAdj(inputss, res, aseeds)
           
           vf = Function(inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
           
@@ -489,7 +491,9 @@ class casadiTestCase(unittest.TestCase):
               inputss2 = [sym("i",vf_reference.getInput(i).sparsity()) for i in range(vf.getNumInputs())]
               
               with internalAPI():
-                res2,fwdsens2,adjsens2 = vf.callDerivative(inputss2,fseeds2,aseeds2,True)
+                res2 = vf.call(inputss2)
+                fwdsens2 = vf.callFwd(inputss2, res2, fseeds2)
+                adjsens2 = vf.callAdj(inputss2, res2, aseeds2)
 
               vf2 = Function(inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
               vf2.init()
