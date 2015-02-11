@@ -109,11 +109,7 @@ class CASADI_EXPORT SXFunctionInternal :
   };
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res,
-                      const std::vector<std::vector<SX> >& fseed,
-                            std::vector<std::vector<SX> >& fsens,
-                      const std::vector<std::vector<SX> >& aseed,
-                            std::vector<std::vector<SX> >& asens);
+  virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
 
   /** \brief Calculate forward mode directional derivatives */
   virtual void evalFwd(const std::vector<std::vector<SX> >& fseed,

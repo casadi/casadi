@@ -60,7 +60,6 @@ namespace casadi {
     casadi_assert_message(arg.size()==getNumInputs(), "Function::call: dimension "
                           "mismatch. You supplied " << arg.size()
                           << " arguments instead of expected " << getNumInputs() << ".");
-    DMatrixVectorVector dummy;
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
@@ -69,7 +68,6 @@ namespace casadi {
     casadi_assert_message(arg.size()==getNumInputs(), "Function::call: dimension "
                           "mismatch. You supplied " << arg.size()
                           << " arguments instead of expected " << getNumInputs() << ".");
-    SXVectorVector dummy;
     (*this)->call(arg, res, always_inline, never_inline);
   }
 

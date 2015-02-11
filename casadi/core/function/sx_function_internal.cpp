@@ -623,53 +623,42 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::evalSXsparse(const vector<SX>& arg1, vector<SX>& res1,
-                                  const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens,
-                                  const vector<vector<SX> >& aseed, vector<vector<SX> >& asens) {
+  void SXFunctionInternal::evalSX(const vector<SX>& arg, vector<SX>& res) {
     if (verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
-    // Check if arguments matches the input expressions, in which case the output is known
-    // to be the output expressions
-    const int checking_depth = 2;
-    bool output_given = true;
-    for (int i=0; i<arg1.size() && output_given; ++i) {
-      for (int j=0; j<arg1[i].nnz() && output_given; ++j) {
-        if (!isEqual(arg1[i].at(j), inputv_[i].at(j), checking_depth)) {
-          output_given = false;
-        }
-      }
+    // Get the number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Make sure matching sparsity of fseed
+    bool matching_sparsity = true;
+    casadi_assert(arg.size()==num_in);
+    for (int i=0; matching_sparsity && i<num_in; ++i)
+      matching_sparsity = arg[i].sparsity()==input(i).sparsity();
+
+    // Correct sparsity if needed
+    if (!matching_sparsity) {
+      vector<SX> arg2(arg);
+      for (int i=0; i<num_in; ++i)
+        if (arg2[i].sparsity()!=input(i).sparsity())
+          arg2[i] = arg2[i].setSparse(input(i).sparsity());
+      return evalSX(arg2, res);
     }
+
+    // Allocate results
+    res.resize(num_out);
+    for (int i=0; i<num_out; ++i)
+      if (res[i].sparsity()!=output(i).sparsity())
+        res[i] = SX::zeros(output(i).sparsity());
 
     // Copy output if known
+    bool output_given = isInput(arg);
     if (output_given) {
-      for (int i=0; i<res1.size(); ++i) {
-        copy(outputv_[i].begin(), outputv_[i].end(), res1[i].begin());
+      for (int i=0; i<res.size(); ++i) {
+        copy(outputv_[i].begin(), outputv_[i].end(), res[i].begin());
       }
+      return;
     }
-
-    // New implementation
-    if (output_given) {
-      if (fseed.size()>0 && aseed.size()==0) {
-        return evalFwd(fseed, fsens);
-      }
-      if (aseed.size()>0 && fseed.size()==0) {
-        return evalAdj(aseed, asens);
-      }
-    }
-
-    // Use the function arguments if possible to avoid problems involving
-    // equivalent but different expressions
-    const vector<SX>& arg = output_given ? inputv_ : arg1;
-    vector<SX>& res = output_given ? outputv_ : res1;
-
-    // Number of forward seeds
-    int nfdir = fsens.size();
-
-    // number of adjoint seeds
-    int nadir = aseed.size();
-
-    // Do we need taping?
-    bool taping = nfdir>0 || nadir>0;
 
     // Iterator to the binary operations
     vector<SXElement>::const_iterator b_it=operations_.begin();
@@ -679,14 +668,6 @@ namespace casadi {
 
     // Iterator to free variables
     vector<SXElement>::const_iterator p_it = free_vars_.begin();
-
-    // Tape
-    vector<TapeEl<SXElement> > s_pdwork;
-    vector<TapeEl<SXElement> >::iterator it1;
-    if (taping) {
-      s_pdwork.resize(operations_.size());
-      it1 = s_pdwork.begin();
-    }
 
     // Evaluate algorithm
     if (verbose()) cout << "SXFunctionInternal::evalSXsparse evaluating algorithm forward" << endl;
@@ -712,7 +693,7 @@ namespace casadi {
           } else {
             switch (it->op) {
               CASADI_MATH_FUN_BUILTIN(s_work_[it->i1], s_work_[it->i2], f)
-                }
+            }
 
             // If this new expression is identical to the expression used
             // to define the algorithm, then reuse
@@ -720,83 +701,12 @@ namespace casadi {
             f.assignIfDuplicate(*b_it++, depth);
           }
 
-          // Get the partial derivatives, if requested
-          if (taping) {
-            switch (it->op) {
-              CASADI_MATH_DER_BUILTIN(s_work_[it->i1], s_work_[it->i2], f, it1++->d)
-                }
-          }
-
           // Finally save the function value
           s_work_[it->i0] = f;
         }
       }
     }
-
-    // Quick return if no sensitivities
-    if (!taping) return;
-
-    // Calculate forward sensitivities
-    if (verbose())
-      cout << "SXFunctionInternal::evalSXsparse calculating forward derivatives" << endl;
-    for (int dir=0; dir<nfdir; ++dir) {
-      vector<TapeEl<SXElement> >::const_iterator it2 = s_pdwork.begin();
-      for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
-        switch (it->op) {
-        case OP_INPUT:
-          s_work_[it->i0] = fseed[dir][it->i1].data()[it->i2]; break;
-        case OP_OUTPUT:
-          fsens[dir][it->i0].data()[it->i2] = s_work_[it->i1]; break;
-        case OP_CONST:
-        case OP_PARAMETER:
-          s_work_[it->i0] = 0;
-          break;
-          CASADI_MATH_BINARY_BUILTIN // Binary operation
-            s_work_[it->i0] = it2->d[0] * s_work_[it->i1] + it2->d[1] * s_work_[it->i2];it2++;break;
-        default: // Unary operation
-          s_work_[it->i0] = it2->d[0] * s_work_[it->i1]; it2++;
-        }
-      }
-    }
-
-    // Calculate adjoint sensitivities
-    if (verbose()) cout << "SXFunctionInternal::evalSXsparse calculating adjoint derivatives"
-                       << endl;
-    if (nadir>0) fill(s_work_.begin(), s_work_.end(), 0);
-    for (int dir=0; dir<nadir; ++dir) {
-      vector<TapeEl<SXElement> >::const_reverse_iterator it2 = s_pdwork.rbegin();
-      for (vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin();
-          it!=algorithm_.rend();
-          ++it) {
-        SXElement seed;
-        switch (it->op) {
-        case OP_INPUT:
-          asens[dir][it->i1].data()[it->i2] = s_work_[it->i0];
-          s_work_[it->i0] = 0;
-          break;
-        case OP_OUTPUT:
-          s_work_[it->i1] += aseed[dir][it->i0].data()[it->i2];
-          break;
-        case OP_CONST:
-        case OP_PARAMETER:
-          s_work_[it->i0] = 0;
-          break;
-          CASADI_MATH_BINARY_BUILTIN // Binary operation
-            seed = s_work_[it->i0];
-          s_work_[it->i0] = 0;
-          s_work_[it->i1] += it2->d[0] * seed;
-          s_work_[it->i2] += it2->d[1] * seed;
-          it2++;
-          break;
-        default: // Unary operation
-          seed = s_work_[it->i0];
-          s_work_[it->i0] = 0;
-          s_work_[it->i1] += it2->d[0] * seed;
-          it2++;
-        }
-      }
-    }
-    if (verbose()) cout << "SXFunctionInternal::evalSXsparse end" << endl;
+    if (verbose()) cout << "SXFunctionInternal::evalSX end" << endl;
   }
 
   void SXFunctionInternal::evalFwd(const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens) {

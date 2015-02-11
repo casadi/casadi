@@ -1239,162 +1239,14 @@ namespace casadi {
     log("FunctionInternal::getPartition end");
   }
 
-  void FunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res,
-                                const std::vector<std::vector<SX> >& fseed,
-                                std::vector<std::vector<SX> >& fsens,
-                                const std::vector<std::vector<SX> >& aseed,
-                                std::vector<std::vector<SX> >& asens) {
-    // Make sure initialized
-    assertInit();
-
-    // Assert number of inputs
-    casadi_assert_message(getNumInputs() == arg.size(),
-                          "Wrong number of inputs. Expecting "
-                          << getNumInputs() << ", got " << arg.size());
-
-    // Assert number of forward seeds
-    int nfdir = fseed.size();
-    for (int dir=0; dir<nfdir; ++dir) {
-      casadi_assert_message(getNumInputs() == fseed[dir].size(),
-                            "Wrong number of forward seeds in direction " << dir
-                            << ". Expecting " << getNumInputs() << ", got " << fseed[dir].size());
-    }
-
-    // Assert number of adjoint seeds
-    int nadir = aseed.size();
-    for (int dir=0; dir<nadir; ++dir) {
-      casadi_assert_message(getNumOutputs() == aseed[dir].size(),
-                            "Wrong number of adjoint seeds in direction " << dir
-                            << ". Expecting " << getNumOutputs() << ", got " << aseed[dir].size());
-    }
-
-    // Check if input sparsity pattern match (quick if sparsity matches)
-    bool sparsity_matches = true;
-    for (int i=0; i<getNumInputs() && sparsity_matches; ++i) {
-      sparsity_matches = arg[i].sparsity()==input(i).sparsity();
-    }
-    if (!sparsity_matches) {
-      vector<SX> arg_new(arg.size());
-      for (int i=0; i<arg.size(); ++i) {
-        try {
-          arg_new[i] = SX(input(i).sparsity());
-          arg_new[i].set(arg[i]);
-        } catch(exception& ex) {
-          stringstream ss;
-          ss << "SXFunctionInternal::evalSX: Failed to set " << input_.scheme.describeInput(i)
-             << ": " << ex.what();
-          throw CasadiException(ss.str());
-        }
-      }
-      evalSX(arg_new, res, fseed, fsens, aseed, asens);
-      return;
-    }
-
-    // Check if forward seed sparsity pattern match (quick if sparsity matches)
-    for (int dir=0; dir<nfdir && sparsity_matches; ++dir) {
-      for (int i=0; i<getNumInputs() && sparsity_matches; ++i) {
-        sparsity_matches = fseed[dir][i].sparsity()==input(i).sparsity();
-      }
-    }
-    if (!sparsity_matches) {
-      vector<vector<SX> > fseed_new(nfdir);
-      for (int dir=0; dir<nfdir; ++dir) {
-        fseed_new[dir].resize(getNumInputs());
-        for (int i=0; i<getNumInputs(); ++i) {
-          try {
-            fseed_new[dir][i] = SX(input(i).sparsity());
-            fseed_new[dir][i].set(fseed[dir][i]);
-          } catch(exception& ex) {
-            stringstream ss;
-            ss << "SXFunctionInternal::evalSX: Failed to set forward seed of "
-               << input_.scheme.describeInput(i) << ", direction " << dir << ": " << ex.what();
-            throw CasadiException(ss.str());
-          }
-        }
-      }
-      evalSX(arg, res, fseed_new, fsens, aseed, asens);
-      return;
-    }
-
-    // Check if adjoint seed sparsity pattern match (quick if sparsity matches)
-    for (int dir=0; dir<nadir && sparsity_matches; ++dir) {
-      for (int i=0; i<getNumOutputs() && sparsity_matches; ++i) {
-        sparsity_matches = aseed[dir][i].sparsity()==output(i).sparsity();
-      }
-    }
-    if (!sparsity_matches) {
-      vector<vector<SX> > aseed_new(nadir);
-      for (int dir=0; dir<nadir; ++dir) {
-        aseed_new[dir].resize(getNumOutputs());
-        for (int i=0; i<getNumOutputs(); ++i) {
-          try {
-            aseed_new[dir][i] = SX(output(i).sparsity());
-            aseed_new[dir][i].set(aseed[dir][i]);
-          } catch(exception& ex) {
-            stringstream ss;
-            ss << "SXFunctionInternal::evalSX: Failed to set adjoint seed of "
-               << output_.scheme.describeOutput(i) << ", direction " << dir << ": " << ex.what();
-            throw CasadiException(ss.str());
-          }
-        }
-      }
-      evalSX(arg, res, fseed, fsens, aseed_new, asens);
-      return;
-    }
-
-    // Resize (if needed) the number of outputs and make sure that the sparsity
-    // pattern is correct (cheap if already ok)
-    res.resize(getNumOutputs());
-    for (int i=0; i<getNumOutputs(); ++i) {
-      if (res[i].sparsity()!=output(i).sparsity()) {
-        res[i] = SX(output(i).sparsity());
-      }
-    }
-
-    // Resize (if needed) the number of forward sensitivities and make sure that
-    // the sparsity pattern is correct (cheap if already ok)
-    fsens.resize(nfdir);
-    for (int dir=0; dir<nfdir; ++dir) {
-      fsens[dir].resize(getNumOutputs());
-      for (int i=0; i<getNumOutputs(); ++i) {
-        if (fsens[dir][i].sparsity()!=output(i).sparsity()) {
-          fsens[dir][i] = SX(output(i).sparsity());
-        }
-      }
-    }
-
-    // Resize (if needed) the number of adjoint sensitivities and make sure that
-    // the sparsity pattern is correct (cheap if already ok)
-    asens.resize(nadir);
-    for (int dir=0; dir<nadir; ++dir) {
-      asens[dir].resize(getNumInputs());
-      for (int i=0; i<getNumInputs(); ++i) {
-        if (asens[dir][i].sparsity()!=input(i).sparsity()) {
-          asens[dir][i] = SX(input(i).sparsity());
-        }
-      }
-    }
-
-    // Call the sparse version
-    evalSXsparse(arg, res, fseed, fsens, aseed, asens);
+  void FunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res) {
+    casadi_error("FunctionInternal::evalSX not defined for class " << typeid(*this).name());
   }
 
-  void FunctionInternal::evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res,
-                                      const std::vector<std::vector<SX> >& fseed,
-                                      std::vector<std::vector<SX> >& fsens,
-                                      const std::vector<std::vector<SX> >& aseed,
-                                      std::vector<std::vector<SX> >& asens) {
-    casadi_error("FunctionInternal::evalSXsparse not defined for class " << typeid(*this).name());
-  }
-
-  void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res,
-                                const std::vector<std::vector<MX> >& fseed,
-                                std::vector<std::vector<MX> >& fsens,
-                                const std::vector<std::vector<MX> >& aseed,
-                                std::vector<std::vector<MX> >& asens) {
+  void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     MXFunction f = wrapMXFunction();
     f.init();
-    f.callDerivative(arg, res, fseed, fsens, aseed, asens, true);
+    f.call(arg, res, true);
   }
 
   void FunctionInternal::spEvaluate(bool fwd) {
@@ -1940,8 +1792,7 @@ namespace casadi {
 
     if (inline_function) {
       // Evaluate the function symbolically
-      MXVectorVector dummy;
-      evalMX(arg, res, dummy, dummy, dummy, dummy);
+      evalMX(arg, res);
 
     } else {
       // Create a call-node
@@ -1971,8 +1822,7 @@ namespace casadi {
                         bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
-    SXVectorVector dummy;
-    evalSX(arg, res, dummy, dummy, dummy, dummy);
+    evalSX(arg, res);
   }
 
   void FunctionInternal::call(const DMatrixVector& arg, DMatrixVector& res,

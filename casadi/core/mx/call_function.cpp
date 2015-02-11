@@ -134,8 +134,7 @@ namespace casadi {
 
     // Evaluate symbolically
     vector<SX> resv;
-    vector<vector<SX> > dummy;
-    fcn_->evalSX(argv, resv, dummy, dummy, dummy, dummy);
+    fcn_->evalSX(argv, resv);
 
     // Collect the result
     for (int i = 0; i < num_out; ++i) {

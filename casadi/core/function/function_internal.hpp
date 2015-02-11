@@ -93,25 +93,10 @@ namespace casadi {
     virtual void spInit(bool fwd) {}
 
     /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res,
-                        const std::vector<std::vector<SX> >& fseed,
-                        std::vector<std::vector<SX> >& fsens,
-                        const std::vector<std::vector<SX> >& aseed,
-                        std::vector<std::vector<SX> >& asens);
+    virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
 
     /** \brief  Evaluate symbolically, MX type */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res,
-                        const std::vector<std::vector<MX> >& fseed,
-                        std::vector<std::vector<MX> >& fsens,
-                        const std::vector<std::vector<MX> >& aseed,
-                        std::vector<std::vector<MX> >& asens);
-
-    /** \brief  Evaluate symbolically, SXElement type, matching sparsity patterns */
-    virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res,
-                              const std::vector<std::vector<SX> >& fseed,
-                              std::vector<std::vector<SX> >& fsens,
-                              const std::vector<std::vector<SX> >& aseed,
-                              std::vector<std::vector<SX> >& asens);
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief  Create function call node */
     virtual std::vector<MX> createCall(const std::vector<MX>& arg);

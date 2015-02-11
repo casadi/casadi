@@ -110,19 +110,11 @@ namespace casadi {
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
     virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
 
-    /** \brief Evaluate symbolically, SXElement type*/
-    virtual void evalSXsparse(const std::vector<SX>& input, std::vector<SX>& output,
-                              const std::vector<std::vector<SX> >& fwdSeed,
-                              std::vector<std::vector<SX> >& fwdSens,
-                              const std::vector<std::vector<SX> >& adjSeed,
-                              std::vector<std::vector<SX> >& adjSens);
+    /** \brief Evaluate symbolically, SX type*/
+    virtual void evalSX(const std::vector<SX>& input, std::vector<SX>& output);
 
     /** \brief Evaluate symbolically, MX type */
-    virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output,
-                        const std::vector<std::vector<MX> >& fwdSeed,
-                        std::vector<std::vector<MX> >& fwdSens,
-                        const std::vector<std::vector<MX> >& adjSeed,
-                        std::vector<std::vector<MX> >& adjSens);
+    virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fwdSeed,

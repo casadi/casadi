@@ -686,11 +686,7 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res,
-                                  const std::vector<std::vector<MX> >& fseed,
-                                  std::vector<std::vector<MX> >& fsens,
-                                  const std::vector<std::vector<MX> >& aseed,
-                                  std::vector<std::vector<MX> >& asens) {
+  void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     log("MXFunctionInternal::evalMX begin");
     assertInit();
     casadi_assert_message(arg.size()==getNumInputs(), "Wrong number of input arguments");
@@ -711,20 +707,6 @@ namespace casadi {
     // Copy output if known
     if (output_given) {
       copy(outputv_.begin(), outputv_.end(), res.begin());
-    }
-
-    // New implementation
-    if (fseed.size()>0) {
-      casadi_assert(output_given);
-      casadi_assert(aseed.empty());
-      asens.clear();
-      return evalFwd(fseed, fsens);
-    } else if (aseed.size()>0) {
-      casadi_assert(output_given);
-      casadi_assert(fseed.empty());
-      fsens.clear();
-      return evalAdj(aseed, asens);
-    } else if (output_given) {
       return;
     }
 
@@ -1048,13 +1030,31 @@ namespace casadi {
     log("MXFunctionInternal::evalAdj end");
   }
 
-  void MXFunctionInternal::evalSXsparse(const std::vector<SX>& input_s, std::vector<SX>& output_s,
-                                        const std::vector<std::vector<SX> >& fwdSeed,
-                                        std::vector<std::vector<SX> >& fwdSens,
-                                        const std::vector<std::vector<SX> >& adjSeed,
-                                        std::vector<std::vector<SX> >& adjSens) {
-    casadi_assert_message(fwdSens.empty(), "Not implemented");
-    casadi_assert_message(adjSeed.empty(), "Not implemented");
+  void MXFunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res) {
+    // Get the number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Make sure matching sparsity of fseed
+    bool matching_sparsity = true;
+    casadi_assert(arg.size()==num_in);
+    for (int i=0; matching_sparsity && i<num_in; ++i)
+      matching_sparsity = arg[i].sparsity()==input(i).sparsity();
+
+    // Correct sparsity if needed
+    if (!matching_sparsity) {
+      vector<SX> arg2(arg);
+      for (int i=0; i<num_in; ++i)
+        if (arg2[i].sparsity()!=input(i).sparsity())
+          arg2[i] = arg2[i].setSparse(input(i).sparsity());
+      return evalSX(arg2, res);
+    }
+
+    // Allocate results
+    res.resize(num_out);
+    for (int i=0; i<num_out; ++i)
+      if (res[i].sparsity()!=output(i).sparsity())
+        res[i] = SX::zeros(output(i).sparsity());
 
     // Create a work array
     vector<vector<SXElement> > swork(work_.size());
@@ -1077,10 +1077,10 @@ namespace casadi {
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op==OP_INPUT) {
         // Pass the input
-        input_s[it->arg.front()].get(getPtr(swork[it->res.front()]));
+        arg[it->arg.front()].get(getPtr(swork[it->res.front()]));
       } else if (it->op==OP_OUTPUT) {
         // Get the outputs
-        output_s[it->res.front()].set(getPtr(swork[it->arg.front()]));
+        res[it->res.front()].set(getPtr(swork[it->arg.front()]));
       } else if (it->op==OP_PARAMETER) {
         continue; // FIXME
       } else {
@@ -1127,11 +1127,8 @@ namespace casadi {
       res[i] = SX(outputv_[i].sparsity());
     }
 
-    // No sensitivities
-    vector<vector<SX> > dummy;
-
     // Evaluate symbolically
-    evalSX(arg, res, dummy, dummy, dummy, dummy);
+    evalSX(arg, res);
 
     // Create function
     SXFunction f(arg, res);
