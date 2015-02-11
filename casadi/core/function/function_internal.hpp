@@ -189,7 +189,6 @@ namespace casadi {
     Function derivativeFwd(int nfwd);
     virtual Function getDerivativeFwd(int nfwd);
     void setDerivativeFwd(const Function& fcn, int nfwd);
-    Function getDerivativeFwdViaJac(int nfwd);
     ///@}
 
     ///@{
@@ -201,7 +200,6 @@ namespace casadi {
     Function derivativeAdj(int nadj);
     virtual Function getDerivativeAdj(int nadj);
     void setDerivativeAdj(const Function& fcn, int nadj);
-    Function getDerivativeAdjViaJac(int nadj);
     ///@}
 
     /** \brief Create a helper MXFunction with some properties copied

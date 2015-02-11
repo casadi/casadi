@@ -1429,14 +1429,6 @@ namespace casadi {
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nfwd, user_data_);
       // Fails for ImplicitFunction
-#ifdef WITH_DERIVATIVE_VIA_JAC
-    } else if (getNumInputNonzeros()<nfwd) {
-      // Full Jacobian (calculated via forward mode) likely cheaper
-      ret = getDerivativeFwdViaJac(nfwd);
-    } else if (getOption("ad_mode")!="forward" && getNumOutputNonzeros()*adj_penalty<nfwd) {
-      // Full Jacobian (calculated via reverse mode) likely cheaper
-      ret = getDerivativeFwdViaJac(nfwd);
-#endif
     } else {
       ret = getDerivativeFwd(nfwd);
     }
@@ -1543,14 +1535,6 @@ namespace casadi {
       DerivativeGenerator dergen = getOption("derivative_generator_reverse");
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nadj, user_data_);
-#ifdef WITH_DERIVATIVE_VIA_JAC
-    } else if (getOption("ad_mode")!="reverse" && getNumInputNonzeros()<nadj*adj_penalty) {
-      // Full Jacobian (calculated via forward mode) likely cheaper
-      ret = getDerivativeAdjViaJac(nadj);
-    } else if (getNumOutputNonzeros()<nadj) {
-      // Full Jacobian (calculated via reverse mode) likely cheaper
-      ret = getDerivativeAdjViaJac(nadj);
-#endif
     } else {
       ret = getDerivativeAdj(nadj);
     }
@@ -1662,112 +1646,6 @@ namespace casadi {
     // TODO(@jaeandersson): Fallback on finite differences
     casadi_error("FunctionInternal::getDerivativeFwd not defined for class "
                  << typeid(*this).name());
-  }
-
-  Function FunctionInternal::getDerivativeFwdViaJac(int nfwd) {
-    // Number of inputs and outputs
-    const int n_in = getNumInputs();
-    const int n_out = getNumOutputs();
-
-    // Inputs and outputs of function created
-    vector<MX> res_in = symbolicInput(), res_out;
-    res_in.reserve(n_in + n_out + nfwd*n_in);
-    res_out.reserve(nfwd*n_out);
-
-    // Full Jacobian
-    MX J = fullJacobian()(res_in).at(0);
-
-    // Dummy outputs
-    stringstream ss;
-    for (int i=0; i<n_out; ++i) {
-      ss.str(string());
-      ss << "dummy_out_" << i;
-      res_in.push_back(MX::sym(ss.str(), output(i).shape()));
-    }
-
-    // Forward seeds
-    vector<MX> v(nfwd);
-    vector<MX> tmp(n_in);
-    for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<n_in; ++i) {
-        ss.str(string());
-        ss << "fwd_" << d << "_" << i;
-        tmp[i] = MX::sym(ss.str(), input(i).sparsity());
-        res_in.push_back(tmp[i]);
-      }
-      v[d] = veccat(tmp);
-    }
-
-    // Multiply the Jacobian from the right
-    v = horzsplit(mul(J, horzcat(v)));
-
-    // Vertical offsets
-    vector<int> offset(n_out+1, 0);
-    for (int i=0; i<n_out; ++i) {
-      offset[i+1] = offset[i]+output(i).numel();
-    }
-
-    // Collect forward sensitivities
-    for (int d=0; d<nfwd; ++d) {
-      tmp = vertsplit(v[d], offset);
-      for (int i=0; i<n_out; ++i) {
-        res_out.push_back(reshape(tmp[i], output(i).shape()));
-      }
-    }
-    return MXFunction(res_in, res_out);
-  }
-
-  Function FunctionInternal::getDerivativeAdjViaJac(int nadj) {
-    // Number of inputs and outputs
-    const int n_in = getNumInputs();
-    const int n_out = getNumOutputs();
-
-    // Inputs and outputs of function created
-    vector<MX> res_in = symbolicInput(), res_out;
-    res_in.reserve(n_in + n_out + nadj*n_out);
-    res_out.reserve(nadj*n_in);
-
-    // Full Jacobian
-    MX J = fullJacobian()(res_in).at(0);
-
-    // Dummy outputs
-    stringstream ss;
-    for (int i=0; i<n_out; ++i) {
-      ss.str(string());
-      ss << "dummy_out_" << i;
-      res_in.push_back(MX::sym(ss.str(), output(i).shape()));
-    }
-
-    // Adjoint seeds
-    vector<MX> v(nadj);
-    vector<MX> tmp(n_out);
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_out; ++i) {
-        ss.str(string());
-        ss << "adj_" << d << "_" << i;
-        tmp[i] = MX::sym(ss.str(), output(i).sparsity());
-        res_in.push_back(tmp[i]);
-      }
-      v[d] = veccat(tmp);
-    }
-
-    // Multiply the transpose of the Jacobian from the right
-    v = horzsplit(mul(J.T(), horzcat(v)));
-
-    // Vertical offsets
-    vector<int> offset(n_in+1, 0);
-    for (int i=0; i<n_in; ++i) {
-      offset[i+1] = offset[i]+input(i).numel();
-    }
-
-    // Collect forward sensitivities
-    for (int d=0; d<nadj; ++d) {
-      tmp = vertsplit(v[d], offset);
-      for (int i=0; i<n_in; ++i) {
-        res_out.push_back(reshape(tmp[i], input(i).shape()));
-      }
-    }
-    return MXFunction(res_in, res_out);
   }
 
   Function FunctionInternal::getDerivativeAdj(int nadj) {
@@ -2491,6 +2369,46 @@ namespace casadi {
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
 
+    // Should we calculate directional derivatives by first calculating the full
+    // Jacobian and then multiply from the right?
+    const int adj_penalty = 2; // Adjoint mode penalty factor
+    const int jac_penalty = 2; // Jacobian calculation penalty factor
+    // Heuristic 1: Jac calculated via forward mode likely cheaper
+    bool via_jac = jac_penalty*getNumInputNonzeros()<nfwd;
+    // Heuristic 2: Jac calculated via reverse mode likely cheaper
+    if (!via_jac) {
+      via_jac = getOption("ad_mode")!="forward"
+        && jac_penalty*getNumOutputNonzeros()*adj_penalty<nfwd;
+    }
+#ifndef ENABLE_DERIVATIVES_VIA_JAC
+    via_jac = false; // disabled (testing needed)
+#endif
+
+    // Calculating full Jacobian and then multiplying likely cheaper
+    if (via_jac) {
+      // Join forward seeds
+      vector<MX> v(nfwd);
+      for (int d=0; d<nfwd; ++d) {
+        v[d] = veccat(fseed[d]);
+      }
+
+      // Multiply the Jacobian from the right
+      MX J = fullJacobian()(arg).at(0);
+      v = horzsplit(mul(J, horzcat(v)));
+
+      // Vertical offsets
+      vector<int> offset(n_out+1, 0);
+      for (int i=0; i<n_out; ++i) {
+        offset[i+1] = offset[i]+output(i).numel();
+      }
+
+      // Collect forward sensitivities
+      for (int d=0; d<nfwd; ++d) {
+        fsens[d] = vertsplit(v[d], offset);
+      }
+      return;
+    }
+
     // All inputs and seeds
     vector<MX> darg;
     darg.reserve(n_in + n_out + n_in*nfwd);
@@ -2535,6 +2453,46 @@ namespace casadi {
     // Number inputs and outputs
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
+
+    // Should we calculate directional derivatives by first calculating the full
+    // Jacobian and then multiply from the right?
+    const int adj_penalty = 1; // Adjoint mode penalty factor (conservative)
+    const int jac_penalty = 2; // Jacobian calculation penalty factor
+    // Heuristic 1: Jac calculated via reverse mode likely cheaper
+    bool via_jac = jac_penalty*getNumOutputNonzeros()<nadj;
+    // Heuristic 2: Jac calculated via forward mode likely cheaper
+    if (!via_jac) {
+      via_jac = getOption("ad_mode")!="reverse"
+        && jac_penalty*getNumInputNonzeros()<nadj*adj_penalty;
+    }
+#ifndef ENABLE_DERIVATIVES_VIA_JAC
+    via_jac = false; // disabled (testing needed)
+#endif
+
+    // Calculating full Jacobian and then multiplying likely cheaper
+    if (via_jac) {
+      // Join adjoint seeds
+      vector<MX> v(nadj);
+      for (int d=0; d<nadj; ++d) {
+        v[d] = veccat(aseed[d]);
+      }
+
+      // Multiply the transposed Jacobian from the right
+      MX J = fullJacobian()(arg).at(0);
+      v = horzsplit(mul(J.T(), horzcat(v)));
+
+      // Vertical offsets
+      vector<int> offset(n_in+1, 0);
+      for (int i=0; i<n_in; ++i) {
+        offset[i+1] = offset[i]+input(i).numel();
+      }
+
+      // Collect adjoint sensitivities
+      for (int d=0; d<nadj; ++d) {
+        asens[d] = vertsplit(v[d], offset);
+      }
+      return;
+    }
 
     // All inputs and seeds
     vector<MX> darg;
