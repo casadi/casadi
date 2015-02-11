@@ -89,10 +89,6 @@ namespace casadi {
     }
   }
 
-  Function DleToDple::getDerivative(int nfwd, int nadj) {
-    return solver_.derivative(nfwd, nadj);
-  }
-
   Function DleToDple::getDerivativeFwd(int nfwd) {
     return solver_.derivativeFwd(nfwd);
   }

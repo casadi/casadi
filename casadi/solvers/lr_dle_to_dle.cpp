@@ -110,10 +110,6 @@ namespace casadi {
     Wrapper::evaluate();
   }
 
-  Function LrDleToDle::getDerivative(int nfwd, int nadj) {
-    return f_.derivative(nfwd, nadj);
-  }
-
   Function LrDleToDle::getDerivativeFwd(int nfwd) {
     return f_.derivativeFwd(nfwd);
   }

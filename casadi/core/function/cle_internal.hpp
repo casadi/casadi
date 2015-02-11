@@ -72,11 +72,6 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief Generate a function that calculates \a nfwd forward derivatives
-     and \a nadj adjoint derivatives
-     */
-    virtual Function getDerivative(int nfwd, int nadj)=0;
-
     /// Structure of Cle
     CleStructure st_;
 

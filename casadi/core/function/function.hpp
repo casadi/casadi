@@ -384,6 +384,7 @@ namespace casadi {
                                                const Dictionary& paropt=Dictionary());
 
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+     *         Legacy function: Use derivativeFwd and derivativeAdj instead.
      *
      *         Returns a function with <tt>(1+nfwd)*n_in+nadj*n_out</tt> inputs
      *         and <tt>(1+nfwd)*n_out + nadj*n_in</tt> outputs.
@@ -399,8 +400,6 @@ namespace casadi {
      *
      *         <tt>(n_in = getNumInputs(), n_out = getNumOutputs())</tt>
      *
-     *        The functions returned are cached, meaning that if called multiple timed
-     *        with the same value, then multiple references to the same function will be returned.
      */
     Function derivative(int nfwd, int nadj);
 
@@ -441,10 +440,12 @@ namespace casadi {
     Function derivativeAdj(int nadj);
 
     /** \brief Set a function that calculates \a nfwd forward derivatives
-        and \a nadj adjoint derivatives
+        NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
+    void setDerivativeFwd(const Function& fcn, int nfwd);
 
-NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
-    void setDerivative(const Function& fcn, int nfwd, int nadj);
+    /** \brief Set a function that calculates \a nadj adjoint derivatives
+        NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
+    void setDerivativeAdj(const Function& fcn, int nadj);
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block

@@ -846,6 +846,14 @@ namespace casadi {
 
   }
 
+  Function PsdIndefDpleInternal::getDerivativeFwd(int nfwd) {
+    casadi_error("Not implemened, cf. #1336");
+  }
+
+  Function PsdIndefDpleInternal::getDerivativeAdj(int nadj) {
+    casadi_error("Not implemened, cf. #1336");
+  }
+
   Function PsdIndefDpleInternal::getDerivative(int nfwd, int nadj) {
 
     // Base:

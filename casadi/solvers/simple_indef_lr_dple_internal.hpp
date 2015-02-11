@@ -81,11 +81,6 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief Generate a function that calculates \a nfwd forward derivatives
-     and \a nadj adjoint derivatives
-    */
-    virtual Function getDerivative(int nfwd, int nadj);
-
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     virtual Function getDerivativeFwd(int nfwd);
 

@@ -301,57 +301,6 @@ namespace casadi {
     }
   }
 
-  Function ParallelizerInternal::getDerivative(int nfwd, int nadj) {
-    // Generate derivative expressions
-    vector<Function> der_funcs(funcs_.size());
-    for (int i=0; i<funcs_.size(); ++i) {
-      if (copy_of_[i]>=0) {
-        der_funcs[i] = der_funcs[copy_of_[i]];
-      } else {
-        der_funcs[i] = funcs_[i].derivative(nfwd, nadj);
-      }
-    }
-
-    // Create a new parallelizer for the derivatives
-    Parallelizer par(der_funcs);
-
-    // Set options and initialize
-    par.setOption(dictionary());
-    par.init();
-
-    // Create a function call to the parallelizer
-    vector<MX> par_arg = par.symbolicInput();
-    vector<MX> par_res = par(par_arg);
-
-    // Get the offsets: copy to allow being used as a counter
-    std::vector<int> par_inind = par->inind_;
-    std::vector<int> par_outind = par->outind_;
-
-    // Arguments and results of the return function
-    vector<MX> ret_arg, ret_res;
-    ret_arg.reserve(par_arg.size());
-    ret_res.reserve(par_res.size());
-
-    // Loop over all nondifferentiated inputs/outputs and forward seeds/sensitivities
-    for (int dir=-1; dir<nfwd; ++dir) {
-      for (int i=0; i<funcs_.size(); ++i) {
-        for (int j=inind_[i]; j<inind_[i+1]; ++j) ret_arg.push_back(par_arg[par_inind[i]++]);
-        for (int j=outind_[i]; j<outind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
-      }
-    }
-
-    // Loop over adjoint seeds/sensitivities
-    for (int dir=0; dir<nadj; ++dir) {
-      for (int i=0; i<funcs_.size(); ++i) {
-        for (int j=outind_[i]; j<outind_[i+1]; ++j) ret_arg.push_back(par_arg[par_inind[i]++]);
-        for (int j=inind_[i]; j<inind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
-      }
-    }
-
-    // Assemble the return function
-    return MXFunction(ret_arg, ret_res);
-  }
-
   Function ParallelizerInternal::getDerivativeFwd(int nfwd) {
     // Generate derivative expressions
     vector<Function> der_funcs(funcs_.size());

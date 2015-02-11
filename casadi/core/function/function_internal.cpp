@@ -85,14 +85,6 @@ namespace casadi {
   void FunctionInternal::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     OptionsFunctionalityNode::deepCopyMembers(already_copied);
-    for (vector<vector<WeakRef> >::iterator i=derivative_fcn_.begin();
-        i!=derivative_fcn_.end(); ++i) {
-      for (vector<WeakRef>::iterator j=i->begin(); j!=i->end(); ++j) {
-        if (!j->isNull()) {
-          *j = getcopy(j->shared(), already_copied);
-        }
-      }
-    }
     for (vector<WeakRef>::iterator j=derivative_fwd_.begin(); j!=derivative_fwd_.end(); ++j) {
       if (!j->isNull()) *j = getcopy(j->shared(), already_copied);
     }
@@ -1564,175 +1556,6 @@ namespace casadi {
     return getNumericJacobian(iind, oind, compact, symmetric);
   }
 
-  Function FunctionInternal::derivative(int nfwd, int nadj) {
-    // Quick return if 0x0
-    if (nfwd==0 && nadj==0) return shared_from_this<Function>();
-
-    // Check if there are enough forward directions allocated
-    if (nfwd>=derivative_fcn_.size()) {
-      derivative_fcn_.resize(nfwd+1);
-    }
-
-    // Check if there are enough adjoint directions allocated
-    if (nadj>=derivative_fcn_[nfwd].size()) {
-      derivative_fcn_[nfwd].resize(nadj+1);
-    }
-
-    // Quick return if already cached
-    if (derivative_fcn_[nfwd][nadj].alive()) {
-      return shared_cast<Function>(derivative_fcn_[nfwd][nadj].shared());
-    }
-
-    // Return value
-    Function ret;
-
-    // Generate if not already cached
-
-    // Get the number of scalar inputs and outputs
-    int num_in_scalar = getNumInputNonzeros();
-    int num_out_scalar = getNumOutputNonzeros();
-
-    // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
-    int adj_penalty = 2;
-
-    // Crude estimate of the cost of calculating the full Jacobian
-    int full_jac_cost = std::min(num_in_scalar, adj_penalty*num_out_scalar);
-
-    // Crude estimate of the cost of calculating the directional derivatives
-    int der_dir_cost = nfwd + adj_penalty*nadj;
-
-    // Check if it is cheaper to calculate the full Jacobian and then multiply
-    if ((getOption("ad_mode")=="forward" && nadj>0) ||
-        (getOption("ad_mode")=="reverse" && nfwd>0)) {
-      ret = getDerivativeViaJac(nfwd, nadj);
-    } else if (2*full_jac_cost < der_dir_cost) {
-      // Generate the Jacobian and then multiply to get the derivative
-      //ret = getDerivativeViaJac(nfwd, nadj); // NOTE: Uncomment this line
-                                              // (and remove the next line)
-                                              // to enable this feature
-      ret = getDerivative(nfwd, nadj);
-    } else {
-      // Generate a new function
-      ret = getDerivative(nfwd, nadj);
-    }
-
-    // Give it a suitable name
-    stringstream ss;
-    ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
-    ret.setOption("name", ss.str());
-
-    // Names of inputs
-    std::vector<std::string> i_names;
-    i_names.reserve(getNumInputs()*(1+nfwd)+getNumOutputs()*nadj);
-
-    // Nondifferentiated inputs
-    for (int i=0; i<getNumInputs(); ++i) {
-      i_names.push_back("der_" + input_.scheme.entryLabel(i));
-    }
-
-    // Forward seeds
-    for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<getNumInputs(); ++i) {
-        ss.str(string());
-        ss << "fwd" << d << "_" << input_.scheme.entryLabel(i);
-        i_names.push_back(ss.str());
-      }
-    }
-
-    // Adjoint seeds
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<getNumOutputs(); ++i) {
-        ss.str(string());
-        ss << "adj" << d << "_" << output_.scheme.entryLabel(i);
-        i_names.push_back(ss.str());
-      }
-    }
-
-    // Pass to return object
-    ret.setInputScheme(i_names);
-
-    // Names of outputs
-    std::vector<std::string> o_names;
-    o_names.reserve(getNumOutputs()*(1+nfwd)+getNumInputs()*nadj);
-
-    // Nondifferentiated inputs
-    for (int i=0; i<getNumOutputs(); ++i) {
-      o_names.push_back("der_" + output_.scheme.entryLabel(i));
-    }
-
-    // Forward sensitivities
-    for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<getNumOutputs(); ++i) {
-        ss.str(string());
-        ss << "fwd" << d << "_" << output_.scheme.entryLabel(i);
-        o_names.push_back(ss.str());
-      }
-    }
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<getNumInputs(); ++i) {
-        ss.str(string());
-        ss << "adj" << d << "_" << input_.scheme.entryLabel(i);
-        o_names.push_back(ss.str());
-      }
-    }
-
-    // Pass to return object
-    ret.setOutputScheme(o_names);
-
-    // Initialize it
-    ret.init();
-
-    // Consistency check for inputs
-    int ind=0;
-    for (int d=-1; d<nfwd; ++d) {
-      for (int i=0; i<getNumInputs(); ++i, ++ind) {
-        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=input(i).sparsity()) {
-          casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \""
-                       << i_names.at(ind) << "\". Expected " << input(i).dimString()
-                       << " but got " << ret.input(ind).dimString());
-        }
-      }
-    }
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<getNumOutputs(); ++i, ++ind) {
-        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=output(i).sparsity()) {
-          casadi_error("Incorrect sparsity for " << ret << " input " << ind <<
-                       " \"" << i_names.at(ind) << "\". Expected " << output(i).dimString()
-                       << " but got " << ret.input(ind).dimString());
-        }
-      }
-    }
-
-    // Consistency check for outputs
-    ind=0;
-    for (int d=-1; d<nfwd; ++d) {
-      for (int i=0; i<getNumOutputs(); ++i, ++ind) {
-        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=output(i).sparsity()) {
-          casadi_error("Incorrect sparsity for " << ret << " output " << ind <<
-                       " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dimString()
-                       << " but got " << ret.output(ind).dimString());
-        }
-      }
-    }
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<getNumInputs(); ++i, ++ind) {
-        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=input(i).sparsity()) {
-          casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \""
-                       << o_names.at(ind) << "\". Expected " << input(i).dimString()
-                       << " but got " << ret.output(ind).dimString());
-        }
-      }
-    }
-
-    // Save to cache
-    derivative_fcn_[nfwd][nadj] = ret;
-
-    // Return generated function
-    return ret;
-  }
-
   Function FunctionInternal::derivativeFwd(int nfwd) {
     casadi_assert(nfwd>=0);
 
@@ -1943,27 +1766,26 @@ namespace casadi {
     return ret;
   }
 
-  void FunctionInternal::setDerivative(const Function& fcn, int nfwd, int nadj) {
+  void FunctionInternal::setDerivativeFwd(const Function& fcn, int nfwd) {
 
     // Check if there are enough forward directions allocated
-    if (nfwd>=derivative_fcn_.size()) {
-      derivative_fcn_.resize(nfwd+1);
-    }
-
-    // Check if there are enough adjoint directions allocated
-    if (nadj>=derivative_fcn_[nfwd].size()) {
-      derivative_fcn_[nfwd].resize(nadj+1);
+    if (nfwd>=derivative_fwd_.size()) {
+      derivative_fwd_.resize(nfwd+1);
     }
 
     // Save to cache
-    derivative_fcn_[nfwd][nadj] = fcn;
+    derivative_fwd_[nfwd] = fcn;
   }
 
-  Function FunctionInternal::getDerivative(int nfwd, int nadj) {
-    if (full_jacobian_.alive()) {
-      return getDerivativeViaJac(nfwd, nadj);
+  void FunctionInternal::setDerivativeAdj(const Function& fcn, int nadj) {
+
+    // Check if there are enough adjoint directions allocated
+    if (nadj>=derivative_adj_.size()) {
+      derivative_adj_.resize(nadj+1);
     }
-    casadi_error("FunctionInternal::getDerivative not defined for class " << typeid(*this).name());
+
+    // Save to cache
+    derivative_adj_[nadj] = fcn;
   }
 
   Function FunctionInternal::getDerivativeFwd(int nfwd) {

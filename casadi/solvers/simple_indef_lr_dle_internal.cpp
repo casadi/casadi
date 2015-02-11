@@ -151,10 +151,6 @@ namespace casadi {
     }
   }
 
-  Function SimpleIndefDleInternal::getDerivative(int nfwd, int nadj) {
-    return f_.derivative(nfwd, nadj);
-  }
-
   Function SimpleIndefDleInternal::getDerivativeFwd(int nfwd) {
     return f_.derivativeFwd(nfwd);
   }

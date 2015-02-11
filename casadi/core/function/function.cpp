@@ -402,7 +402,6 @@ namespace casadi {
       }
     }
     return ret;
-    //return (*this)->derivative(nfwd, nadj);
   }
 
   Function Function::derivativeFwd(int nfwd) {
@@ -413,8 +412,12 @@ namespace casadi {
     return (*this)->derivativeAdj(nadj);
   }
 
-  void Function::setDerivative(const Function& fcn, int nfwd, int nadj) {
-    (*this)->setDerivative(fcn, nfwd, nadj);
+  void Function::setDerivativeFwd(const Function& fcn, int nfwd) {
+    (*this)->setDerivativeFwd(fcn, nfwd);
+  }
+
+  void Function::setDerivativeAdj(const Function& fcn, int nadj) {
+    (*this)->setDerivativeAdj(fcn, nadj);
   }
 
   void Function::generateCode(const string& filename, bool generate_main) {

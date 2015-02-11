@@ -195,18 +195,8 @@ namespace casadi {
     virtual Function getFullJacobian();
     ///@}
 
-    ///@{
-    /** \brief Return function that calculates directional derivatives
-     *
-     *    derivative(nfwd,nadj) returns a cached instance if available,
-     *    and calls <tt>Function getDerivative(int nfwd, int nadj)</tt>
-     *    if no cached version is available.
-     */
-    Function derivative(int nfwd, int nadj);
-    void setDerivative(const Function& fcn, int nfwd, int nadj);
-    virtual Function getDerivative(int nfwd, int nadj);
+    /// Get derivative by calculating Jacobian (legacy, needs updating)
     virtual Function getDerivativeViaJac(int nfwd, int nadj);
-    ///@}
 
     ///@{
     /** \brief Return function that calculates forward derivatives
@@ -216,6 +206,7 @@ namespace casadi {
      */
     Function derivativeFwd(int nfwd);
     virtual Function getDerivativeFwd(int nfwd);
+    void setDerivativeFwd(const Function& fcn, int nfwd);
     ///@}
 
     ///@{
@@ -226,6 +217,7 @@ namespace casadi {
      */
     Function derivativeAdj(int nadj);
     virtual Function getDerivativeAdj(int nadj);
+    void setDerivativeAdj(const Function& fcn, int nadj);
     ///@}
 
     /** \brief Create a helper MXFunction with some properties copied
@@ -406,9 +398,6 @@ namespace casadi {
 
     /** \brief  Flag to indicate whether statistics must be gathered */
     bool gather_stats_;
-
-    /// Cache for functions to evaluate directional derivatives
-    std::vector<std::vector<WeakRef> > derivative_fcn_;
 
     /// Cache for functions to evaluate directional derivatives (new)
     std::vector<WeakRef> derivative_fwd_, derivative_adj_;

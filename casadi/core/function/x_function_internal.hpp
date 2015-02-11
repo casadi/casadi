@@ -95,10 +95,6 @@ namespace casadi {
     /** \brief Return Jacobian function  */
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
 
-    /** \brief Generate a function that calculates nfdir forward
-     * derivatives and nadir adjoint derivatives */
-    virtual Function getDerivative(int nfdir, int nadir);
-
     /** \brief Generate a function that calculates nfwd forward derivatives */
     virtual Function getDerivativeFwd(int nfwd);
 
@@ -1044,54 +1040,6 @@ namespace casadi {
       }
     }
     return aseed;
-  }
-
-
-  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::getDerivative(int nfdir,
-                                                                                     int nadir) {
-    // Seeds
-    std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfdir);
-    std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadir);
-
-    // Evaluate symbolically
-    std::vector<std::vector<MatType> > fsens(nfdir, outputv_), asens(nadir, inputv_);
-    callFwd(inputv_, outputv_, fseed, fsens, true, false);
-    callAdj(inputv_, outputv_, aseed, asens, true, false);
-
-    // All inputs of the return function
-    std::vector<MatType> ret_in;
-    ret_in.reserve(inputv_.size()*(1+nfdir) + outputv_.size()*nadir);
-    ret_in.insert(ret_in.end(), inputv_.begin(), inputv_.end());
-    for (int dir=0; dir<nfdir; ++dir)
-      ret_in.insert(ret_in.end(), fseed[dir].begin(), fseed[dir].end());
-    for (int dir=0; dir<nadir; ++dir)
-      ret_in.insert(ret_in.end(), aseed[dir].begin(), aseed[dir].end());
-
-    // All outputs of the return function
-    std::vector<MatType> ret_out;
-    ret_out.reserve(outputv_.size()*(1+nfdir) + inputv_.size()*nadir);
-    ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
-    for (int dir=0; dir<nfdir; ++dir) {
-      for (int i=0; i<getNumOutputs(); ++i) { // Correct sparsities #1025
-        if (fsens[dir][i].sparsity()!=outputv_[i].sparsity()) {
-          fsens[dir][i] = fsens[dir][i].setSparse(outputv_[i].sparsity());
-        }
-      }
-      ret_out.insert(ret_out.end(), fsens[dir].begin(), fsens[dir].end());
-    }
-    for (int dir=0; dir<nadir; ++dir) {
-      for (int i=0; i<getNumInputs(); ++i) { // Correct sparsities #1025
-        if (asens[dir][i].sparsity()!=inputv_[i].sparsity()) {
-          asens[dir][i] = asens[dir][i].setSparse(inputv_[i].sparsity());
-        }
-      }
-      ret_out.insert(ret_out.end(), asens[dir].begin(), asens[dir].end());
-    }
-    // Assemble function and return
-    PublicType ret(ret_in, ret_out);
-    ret.init();
-    return ret;
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>

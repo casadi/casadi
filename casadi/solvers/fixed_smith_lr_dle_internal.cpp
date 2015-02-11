@@ -121,10 +121,6 @@ namespace casadi {
     Wrapper::evaluate();
   }
 
-  Function FixedSmithLrDleInternal::getDerivative(int nfwd, int nadj) {
-    return f_.derivative(nfwd, nadj);
-  }
-
   Function FixedSmithLrDleInternal::getDerivativeFwd(int nfwd) {
     return f_.derivativeFwd(nfwd);
   }

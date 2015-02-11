@@ -154,10 +154,6 @@ namespace casadi {
     Wrapper::evaluate();
   }
 
-  Function LiftingIndefDpleInternal::getDerivative(int nfwd, int nadj) {
-    return f_.derivative(nfwd, nadj);
-  }
-
   Function LiftingIndefDpleInternal::getDerivativeFwd(int nfwd) {
     return f_.derivativeFwd(nfwd);
   }

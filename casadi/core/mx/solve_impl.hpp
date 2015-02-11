@@ -72,7 +72,15 @@ namespace casadi {
   template<bool Tr>
   void Solve<Tr>::evaluateD(const double* const* input, double** output,
                             int* itmp, double* rtmp) {
-    linear_solver_->evaluateDGen(input, output, itmp, rtmp, Tr, dep(0).size2());
+    // Factorize the matrix
+    linear_solver_.setInput(input[1], LINSOL_A);
+    linear_solver_.prepare();
+
+    // Solve for nondifferentiated output
+    if (input[0]!=input[0]) {
+      copy(input[0], input[0]+dep(1).size2(), output[0]);
+    }
+    linear_solver_.solve(output[0], dep(0).size2(), Tr);
   }
 
   template<bool Tr>
@@ -83,9 +91,11 @@ namespace casadi {
 
   template<bool Tr>
   void Solve<Tr>::eval(const MXPtrV& input, MXPtrV& output) {
-    MXPtrVV dummy;
-    linear_solver_->evaluateMXGen(input, output, dummy, dummy, dummy, dummy,
-                                  false, Tr);
+    if (input[0]->isZero()) {
+      *output[0] = MX(input[0]->shape());
+    } else {
+      *output[0] = linear_solver_->solve(*input[1], *input[0], Tr);
+    }
   }
 
   template<bool Tr>
