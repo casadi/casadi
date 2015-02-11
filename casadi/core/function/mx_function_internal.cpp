@@ -22,28 +22,6 @@
  *
  */
 
-/*
-*    This file is part of CasADi.
-*
-*    CasADi -- A symbolic framework for dynamic optimization.
-*    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-*
-*    CasADi is free software; you can redistribute it and/or
-*    modify it under the terms of the GNU Lesser General Public
-*    License as published by the Free Software Foundation; either
-*    version 3 of the License, or (at your option) any later version.
-*
-*    CasADi is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-*    Lesser General Public License for more details.
-*
-*    You should have received a copy of the GNU Lesser General Public
-*    License along with CasADi; if not, write to the Free Software
-*    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-*
-*/
-
 #include "mx_function_internal.hpp"
 #include "../mx/call_function.hpp"
 #include "../mx/mx_tools.hpp"
@@ -321,11 +299,10 @@ namespace casadi {
     }
 
     // Allocate work vectors (numeric)
-    work_.resize(0);
-    work_.resize(worksize, vector<double>());
-    tapeloc_.resize(worksize);
-    fill(tapeloc_.begin(), tapeloc_.end(), 0);
+    workloc_.resize(worksize+1);
+    fill(workloc_.begin(), workloc_.end(), -1);
     size_t nitmp=0, nrtmp=0;
+    size_t wind=0;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (it->op!=OP_OUTPUT) {
         for (int c=0; c<it->res.size(); ++c) {
@@ -334,11 +311,19 @@ namespace casadi {
             it->data->nTmp(ni, nr);
             nitmp = std::max(nitmp, ni);
             nrtmp = std::max(nrtmp, nr);
-            if (work_[it->res[c]].empty()) {
-              work_[it->res[c]] = vector<double>(it->data->sparsity(c).nnz(), 0);
+            if (workloc_[it->res[c]] < 0) {
+              workloc_[it->res[c]] = wind;
+              wind += it->data->sparsity(c).nnz();
             }
           }
         }
+      }
+    }
+    workloc_.back()=wind;
+    work2_.resize(wind);
+    for (int i=0; i<workloc_.size(); ++i) {
+      if (workloc_[i]<0) {
+        workloc_[i] = i==0 ? 0 : workloc_[i-1];
       }
     }
     itmp_.resize(nitmp);
@@ -414,7 +399,7 @@ namespace casadi {
       for (int i=0; i<mx_input_.size(); ++i) {
         if (el.arg[i]>=0) {
           int k = el.arg[i];
-          mx_input_[i] = getPtr(work_[k]);
+          mx_input_[i] = getPtr(work2_) + workloc_[k];
         } else {
           mx_input_[i] = 0;
         }
@@ -424,7 +409,7 @@ namespace casadi {
     if (el.op!=OP_OUTPUT) {
       for (int i=0; i<mx_output_.size(); ++i) {
         if (el.res[i]>=0) {
-          mx_output_[i] = getPtr(work_[el.res[i]]);
+          mx_output_[i] = getPtr(work2_) + workloc_[el.res[i]];
         } else {
           mx_output_[i] = 0;
         }
@@ -465,10 +450,10 @@ namespace casadi {
 
       if (it->op==OP_INPUT) {
         // Pass an input
-        input(it->arg.front()).get(getPtr(work_[it->res.front()]));
+        input(it->arg.front()).get(getPtr(work2_)+workloc_[it->res.front()]);
       } else if (it->op==OP_OUTPUT) {
         // Get an output
-        output(it->res.front()).set(getPtr(work_[it->arg.front()]));
+        output(it->res.front()).set(getPtr(work2_)+workloc_[it->arg.front()]);
       } else {
 
         // Point pointers to the data corresponding to the element
@@ -586,12 +571,8 @@ namespace casadi {
   }
 
   void MXFunctionInternal::spInit(bool fwd) {
-    // Start by setting all elements of the work vector to zero
-    for (vector<vector<double> >::iterator it=work_.begin(); it!=work_.end(); ++it) {
-      //Get a pointer to the int array
-      bvec_t *iwork = get_bvec_t(*it);
-      fill_n(iwork, it->size(), bvec_t(0));
-    }
+    bvec_t *iwork = get_bvec_t(work2_);
+    fill_n(iwork, work2_.size(), bvec_t(0));
   }
 
   void MXFunctionInternal::spEvaluate(bool fwd) {
@@ -601,16 +582,16 @@ namespace casadi {
       for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
         if (it->op==OP_INPUT) {
           // Pass input seeds
-          vector<double> &w = work_[it->res.front()];
-          bvec_t* iwork = get_bvec_t(w);
-          bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
-          copy(swork, swork+w.size(), iwork);
+          vector<double> &z = input(it->arg.front()).data();
+          bvec_t* iwork = get_bvec_t(work2_) + workloc_[it->res.front()];
+          bvec_t* swork = get_bvec_t(z);
+          copy(swork, swork+z.size(), iwork);
         } else if (it->op==OP_OUTPUT) {
           // Get the output sensitivities
-          vector<double> &w = work_[it->arg.front()];
-          bvec_t* iwork = get_bvec_t(w);
-          bvec_t* swork = get_bvec_t(output(it->res.front()).data());
-          copy(iwork, iwork+w.size(), swork);
+          vector<double> &z = output(it->res.front()).data();
+          bvec_t* iwork = get_bvec_t(work2_) + workloc_[it->arg.front()];
+          bvec_t* swork = get_bvec_t(z);
+          copy(iwork, iwork+z.size(), swork);
         } else {
           // Point pointers to the data corresponding to the element
           updatePointers(*it);
@@ -627,19 +608,19 @@ namespace casadi {
       for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
         if (it->op==OP_INPUT) {
           // Get the input sensitivities and clear it from the work vector
-          vector<double> &w = work_[it->res.front()];
-          bvec_t* iwork = get_bvec_t(w);
-          bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
-          for (int k=0; k<w.size(); ++k) {
+          vector<double> &z = input(it->arg.front()).data();
+          bvec_t* iwork = get_bvec_t(work2_) + workloc_[it->res.front()];
+          bvec_t* swork = get_bvec_t(z);
+          for (int k=0; k<z.size(); ++k) {
             swork[k] = iwork[k];
             iwork[k] = 0;
           }
         } else if (it->op==OP_OUTPUT) {
           // Pass output seeds
-          vector<double> &w = work_[it->arg.front()];
-          bvec_t* iwork = get_bvec_t(w);
-          bvec_t* swork = get_bvec_t(output(it->res.front()).data());
-          for (int k=0; k<w.size(); ++k) {
+          vector<double> &z = output(it->res.front()).data();
+          bvec_t* iwork = get_bvec_t(work2_) + workloc_[it->arg.front()];
+          bvec_t* swork = get_bvec_t(z);
+          for (int k=0; k<z.size(); ++k) {
             iwork[k] |= swork[k];
           }
         } else {
@@ -714,7 +695,7 @@ namespace casadi {
     vector<MX> output_tmp;
 
     // Symbolic work, non-differentiated
-    vector<MX> swork(work_.size());
+    vector<MX> swork(workloc_.size()-1);
     log("MXFunctionInternal::evalMX allocated work vector");
 
     MXPtrV input_p, output_p;
@@ -807,7 +788,7 @@ namespace casadi {
 
 
     // Work vector, forward derivatives
-    std::vector<std::vector<MX> > dwork(work_.size());
+    std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
     log("MXFunctionInternal::evalFwd allocated derivative work vector (forward mode)");
 
@@ -945,7 +926,7 @@ namespace casadi {
     asens_p.reserve(nadj);
 
     // Work vector, adjoint derivatives
-    std::vector<std::vector<MX> > dwork(work_.size());
+    std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
     log("MXFunctionInternal::evalAdj allocated derivative work vector (adjoint mode)");
 
@@ -1057,7 +1038,7 @@ namespace casadi {
         res[i] = SX::zeros(output(i).sparsity());
 
     // Create a work array
-    vector<vector<SXElement> > swork(work_.size());
+    vector<vector<SXElement> > swork(workloc_.size()-1);
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op!=OP_OUTPUT) {
         for (int i=0; i<it->res.size(); ++i) {
@@ -1140,14 +1121,16 @@ namespace casadi {
   }
 
   void MXFunctionInternal::printWork(ostream &stream) {
-    for (int k=0; k<work_.size(); ++k) {
-      stream << "work[" << k << "] = " << work_[k] << endl;
+    for (int k=0; k<workloc_.size()-1; ++k) {
+      vector<double>::const_iterator start=work2_.begin() + workloc_[k];
+      vector<double>::const_iterator stop=work2_.begin() + workloc_[k+1];
+      stream << "work[" << k << "] = " << vector<double>(start, stop) << endl;
     }
   }
 
   void MXFunctionInternal::allocTape(std::vector<std::pair<std::pair<int, int>, MX> >& tape) {
     // Marker of elements in the work vector still in use when being overwritten
-    vector<bool> in_use(work_.size(), false);
+    vector<bool> in_use(workloc_.size()-1, false);
 
     // Remove existing entries in the tape
     tape.clear();
@@ -1202,8 +1185,8 @@ namespace casadi {
     stream << "  static struct wstruct {" << endl;
 
     // Declare all work variables
-    for (int i=0; i<work_.size(); ++i) {
-      stream << "    d a" << i << "[" << work_[i].size() << "];" << endl;
+    for (int i=0; i<workloc_.size()-1; ++i) {
+      stream << "    d a" << i << "[" << (workloc_[i+1]-workloc_[i]) << "];" << endl;
     }
 
     // Finalize work structure
@@ -1284,7 +1267,7 @@ namespace casadi {
   void MXFunctionInternal::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn) {
     assertInit();
 
-    vector<MX> swork(work_.size());
+    vector<MX> swork(workloc_.size()-1);
 
     MXPtrV input_p, output_p;
     MXPtrVV dummy_p;

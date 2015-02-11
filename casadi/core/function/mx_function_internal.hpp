@@ -55,16 +55,15 @@ namespace casadi {
     std::vector<AlgEl> algorithm_;
 
     /** \brief  Working vector for numeric calculation */
-    std::vector<std::vector<double> > work_;
+    //std::vector<std::vector<double> > work_;
+    std::vector<int> workloc_;
+    std::vector<double> work2_;
 
     /** \brief  Temporary vectors needed for the evaluation (integer) */
     std::vector<int> itmp_;
 
     /** \brief  Temporary vectors needed for the evaluation (real) */
     std::vector<double> rtmp_;
-
-    /** \brief  Location in the tape vector for each variable */
-    std::vector<int> tapeloc_;
 
     /// Free variables
     std::vector<MX> free_vars_;

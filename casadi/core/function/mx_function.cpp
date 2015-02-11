@@ -143,7 +143,7 @@ std::vector<MX> MXFunction::getFree() const {
 }
 
 int MXFunction::getWorkSize() const {
-  return (*this)->work_.size();
+  return (*this)->workloc_.size()-1;
 }
 
 void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn) {
