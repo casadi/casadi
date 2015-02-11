@@ -655,8 +655,10 @@ class ADtests(casadiTestCase):
               
       for f in [fun,fun.expand()]:
         f.init()
-        d = f.derivative(ndir,ndir)
-        d.init()
+        d1 = f.derivativeFwd(ndir)
+        d1.init()
+        d2 = f.derivativeAdj(ndir)
+        d2.init()
         
         num_in = f.getNumInputs()
         num_out = f.getNumOutputs()

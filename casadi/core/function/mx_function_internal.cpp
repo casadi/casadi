@@ -686,185 +686,72 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::evalMX(const std::vector<MX>& arg1, std::vector<MX>& res1,
+  void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res,
                                   const std::vector<std::vector<MX> >& fseed,
                                   std::vector<std::vector<MX> >& fsens,
                                   const std::vector<std::vector<MX> >& aseed,
                                   std::vector<std::vector<MX> >& asens) {
     log("MXFunctionInternal::evalMX begin");
     assertInit();
-    casadi_assert_message(arg1.size()==getNumInputs(), "Wrong number of input arguments");
+    casadi_assert_message(arg.size()==getNumInputs(), "Wrong number of input arguments");
 
     // Resize the number of outputs
-    res1.resize(outputv_.size());
+    res.resize(outputv_.size());
 
     // Check if arguments matches the input expressions, in which case
     // the output is known to be the output expressions
     const int checking_depth = 2;
     bool output_given = true;
-    for (int i=0; i<arg1.size() && output_given; ++i) {
-      if (!isEqual(arg1[i], inputv_[i], checking_depth)) {
+    for (int i=0; i<arg.size() && output_given; ++i) {
+      if (!isEqual(arg[i], inputv_[i], checking_depth)) {
         output_given = false;
       }
     }
 
     // Copy output if known
     if (output_given) {
-      copy(outputv_.begin(), outputv_.end(), res1.begin());
+      copy(outputv_.begin(), outputv_.end(), res.begin());
     }
 
     // New implementation
-    if (output_given && !CasadiOptions::purgeSeeds) {
-      if (fseed.size()>0 && aseed.size()==0) {
-        return evalFwd(fseed, fsens);
-      }
-      if (aseed.size()>0 && fseed.size()==0) {
-        return evalAdj(aseed, asens);
-      }
-    }
-
-    // Use the function arguments if possible to avoid problems involving
-    // equivalent but different expressions
-    const vector<MX>& arg = output_given ? inputv_ : arg1;
-    vector<MX>& res = output_given ? outputv_ : res1;
-
-    // Skip forward sensitivities if no nonempty seeds
-    bool skip_fwd = true;
-    for (vector<vector<MX> >::const_iterator i=fseed.begin(); i!=fseed.end() && skip_fwd; ++i) {
-      for (vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_fwd; ++j) {
-        if (j->nnz()>0) {
-          skip_fwd = false;
-        }
-      }
-    }
-
-    // Skip forward sensitivities if no nonempty seeds
-    bool skip_adj = true;
-    for (vector<vector<MX> >::const_iterator i=aseed.begin(); i!=aseed.end() && skip_adj; ++i) {
-      for (vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_adj; ++j) {
-        if (j->nnz()>0) {
-          skip_adj = false;
-        }
-      }
-    }
-
-    // Get the number of directions
-    int nfwd = fseed.size();
-    int nadj = aseed.size();
-
-    // Allocate outputs
-    if (!output_given) {
-      res.resize(outputv_.size());
+    if (fseed.size()>0) {
+      casadi_assert(output_given);
+      casadi_assert(aseed.empty());
+      asens.clear();
+      return evalFwd(fseed, fsens);
+    } else if (aseed.size()>0) {
+      casadi_assert(output_given);
+      casadi_assert(fseed.empty());
+      fsens.clear();
+      return evalAdj(aseed, asens);
+    } else if (output_given) {
+      return;
     }
 
     // Temporary vector to hold function outputs
     vector<MX> output_tmp;
 
-    // Allocate forward sensitivities
-    fsens.resize(nfwd);
-    for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(outputv_.size());
-      if (skip_fwd) {
-        for (int i=0; i<fsens[d].size(); ++i) {
-          fsens[d][i] = MX(output(i).shape());
-        }
-      }
-    }
-
-    // Skip if trivial
-    if (skip_fwd) nfwd = 0;
-
-    // Allocate adjoint sensitivities
-    asens.resize(nadj);
-    for (int d=0; d<nadj; ++d) {
-      asens[d].resize(inputv_.size());
-      if (skip_adj) {
-        for (int i=0; i<asens[d].size(); ++i) {
-          asens[d][i] = MX(input(i).shape());
-        }
-      }
-    }
-
-    // Skip if trivial
-    if (skip_adj) nadj = 0;
-
-    // Quick return if nothing to calculate
-    if (output_given && nfwd==0 && nadj==0) {
-      log("MXFunctionInternal::evalMX quick return");
-      return;
-    }
-
     // Symbolic work, non-differentiated
     vector<MX> swork(work_.size());
     log("MXFunctionInternal::evalMX allocated work vector");
 
-    // "Tape" with spilled variables
-    vector<pair<pair<int, int>, MX> > tape;
-    allocTape(tape);
-
-    // Tape counter
-    int tt = 0;
-
     MXPtrV input_p, output_p;
-    MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
-    MXPtrVV aseed_p(nadj), asens_p(nadj);
-    MXPtrVV fseed_purged(nfwd), fsens_purged(nfwd);
-    MXPtrVV aseed_purged(nadj), asens_purged(nadj);
     MXPtrVV dummy_p;
-
-    // Work vector, forward derivatives
-    std::vector<std::vector<MX> > dwork(work_.size());
-    fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
-    log("MXFunctionInternal::evalMX allocated derivative work vector (forward mode)");
 
     // Loop over computational nodes in forward order
     int alg_counter = 0;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
-
-      // Spill existing work elements if needed
-      if (nadj>0 && it->op!=OP_OUTPUT) {
-        for (vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c) {
-          if (*c >=0 && tt<tape.size() && tape[tt].first == make_pair(alg_counter, *c)) {
-            tape[tt++].second = swork[*c];
-          }
-        }
-      }
-
       if (it->op == OP_INPUT) {
         // Fetch input
         const Sparsity& sp_input = input(it->arg.front()).sparsity();
         swork[it->res.front()] = arg[it->arg.front()].setSparse(sp_input, true);
-        for (int d=0; d<nfwd; ++d) {
-          dwork[it->res.front()][d] = fseed[d][it->arg.front()].setSparse(sp_input, true);
-        }
       } else if (it->op==OP_OUTPUT) {
         // Collect the results
-        if (!output_given) {
-          res[it->res.front()] = swork[it->arg.front()];
-        }
-
-        // Collect the forward sensitivities
-        for (int d=0; d<nfwd; ++d) {
-          fsens[d][it->res.front()] = dwork[it->arg.front()][d];
-        }
+        res[it->res.front()] = swork[it->arg.front()];
       } else if (it->op==OP_PARAMETER) {
         // Fetch parameter
         swork[it->res.front()] = it->data;
-        for (int d=0; d<nfwd; ++d) {
-          dwork[it->res.front()][d] = MX();
-        }
       } else {
-
-        // Get expressions for the result of the operation, if known
-        if (output_given) {
-          output_tmp.resize(it->res.size());
-          for (int i=0; i<it->res.size(); ++i) {
-            if (it->res[i]>=0) {
-              output_tmp[i] = it->data.getOutput(i);
-            }
-          }
-        }
-
         // Pointers to the arguments of the evaluation
         input_p.resize(it->arg.size());
         for (int i=0; i<input_p.size(); ++i) {
@@ -879,198 +766,9 @@ namespace casadi {
           output_p[i] = el<0 ? 0 : output_given ? &output_tmp[i] : &swork[el];
         }
 
-        // Forward seeds and sensitivities
-        for (int d=0; d<nfwd; ++d) {
-          fseed_p[d].resize(it->arg.size());
-          for (int iind=0; iind<it->arg.size(); ++iind) {
-            int el = it->arg[iind];
-            fseed_p[d][iind] = el<0 ? 0 : &dwork[el][d];
-
-            // Give zero seed if null
-            if (el>=0 && dwork[el][d].isEmpty(true)) {
-              if (d==0) {
-                dwork[el][d] = MX(input_p[iind]->shape());
-              } else {
-                dwork[el][d] = dwork[el][0];
-              }
-            }
-          }
-
-          fsens_p[d].resize(it->res.size());
-          for (int oind=0; oind<it->res.size(); ++oind) {
-            int el = it->res[oind];
-            fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
-            if (el>=0 && dwork[el][d].isEmpty(true)) {
-              dwork[el][d] = MX(output_p[oind]->shape());
-            }
-          }
-        }
-
         // Call the evaluation function
-        if (!output_given || nfwd>0) {
-          if (it->data->getOp()==OP_CALL) {
-            // Purge the directions that have all-zero seeds #905
-            // We do this only for OP_CALL since some operations might have
-            // a substancial effect on the sensitivities even though all seeds are zero:
-            // the sparsity might be changed e.g. in OP_SETSPARSE
-            purgeSeeds(fseed_p, fsens_p, fseed_purged, fsens_purged, true);
-            if (fsens_purged.size()==0 && fsens_purged.size()==0) {
-              it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p,
-                                   dummy_p, dummy_p, output_given);
-            } else {
-              if (CasadiOptions::purgeSeeds) {
-                // Call the evaluation function
-                it->data->evaluateMX(input_p, output_p, fseed_purged, fsens_purged,
-                                     dummy_p, dummy_p, output_given);
-              } else {
-                // Do nothing special
-                it->data->evaluateMX(input_p, output_p, fseed_p, fsens_p,
-                                     dummy_p, dummy_p, output_given);
-              }
-            }
-          } else {
-            // Call the evaluation function
-            it->data->evaluateMX(input_p, output_p, fseed_p, fsens_p,
-                                 dummy_p, dummy_p, output_given);
-          }
-        }
-
-        // Save results of the operation to work vector,
-        // if known (not earlier to allow inplace operations)
-        if (output_given) {
-          for (int i=0; i<it->res.size(); ++i) {
-            int el = it->res[i]; // index of the output
-            if (el>=0) swork[el] = output_tmp[i];
-          }
-        }
-      }
-    }
-
-    // Loop over computational nodes in reverse order
-    if (nadj>0) {
-      // Work vector, adjoint derivatives
-      fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
-      log("MXFunctionInternal::evalMX allocated derivative work vector (adjoint mode)");
-
-      int alg_counter = algorithm_.size()-1;
-      tt--;
-      for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin();
-          it!=algorithm_.rend();
-          ++it, --alg_counter) {
-        // Mark spilled work vector elements to be recovered to allow the
-        // operator input to be updated but not the operator output
-        // (important for inplace operations)
-        if (it->op!=OP_OUTPUT) {
-          for (vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c) {
-            if (*c >=0 && tt>=0 && tape[tt].first==make_pair(alg_counter, *c)) {
-              tapeloc_[*c] = 1 + tt--;
-            }
-          }
-        }
-
-        if (it->op == OP_INPUT) {
-          // Collect the symbolic adjoint sensitivities
-          for (int d=0; d<nadj; ++d) {
-            if (dwork[it->res.front()][d].isEmpty(true)) {
-              asens[d][it->arg.front()] = MX(input(it->arg.front()).shape());
-            } else {
-              asens[d][it->arg.front()] = dwork[it->res.front()][d];
-            }
-            dwork[it->res.front()][d] = MX();
-          }
-        } else if (it->op==OP_OUTPUT) {
-          // Pass the adjoint seeds
-          for (int d=0; d<nadj; ++d) {
-            dwork[it->arg.front()][d].addToSum(
-              aseed[d][it->res.front()].setSparse(output(it->res.front()).sparsity(), true));
-          }
-        } else if (it->op==OP_PARAMETER) {
-          // Clear adjoint seeds
-          for (int d=0; d<nadj; ++d) {
-            dwork[it->res.front()][d] = MX();
-          }
-        } else {
-          // Get the arguments of the evaluation
-          input_p.resize(it->arg.size());
-          for (int i=0; i<input_p.size(); ++i) {
-            int el = it->arg[i]; // index of the argument
-            if (el<0) {
-              input_p[i] = 0;
-            } else {
-              int tmp = tapeloc_[el]; // Positive if the data should be retrieved from the
-                                      // tape instead of the work vector
-              input_p[i] = tmp==0 ? &swork[el] : &tape[tmp-1].second;
-            }
-          }
-
-          // Result of the evaluation
-          output_p.resize(it->res.size());
-          for (int i=0; i<output_p.size(); ++i) {
-            int el = it->res[i]; // index of the output
-            output_p[i] = el<0 ? 0 : &swork[el];
-          }
-
-          // Sensitivity arguments
-          for (int d=0; d<nadj; ++d) {
-            aseed_p[d].resize(it->res.size());
-            for (int oind=0; oind<it->res.size(); ++oind) {
-              int el = it->res[oind];
-              aseed_p[d][oind] = el<0 ? 0 : &dwork[el][d];
-
-              // Provide a zero seed if no seed exists
-              if (el>=0 && dwork[el][d].isEmpty(true)) {
-                dwork[el][d] = MX(swork[el].shape());
-              }
-            }
-
-            asens_p[d].resize(it->arg.size());
-            for (int iind=0; iind<it->arg.size(); ++iind) {
-              int el = it->arg[iind];
-              asens_p[d][iind] = el<0 ? 0 : &dwork[el][d];
-
-              // Set sensitivities to zero if not yet used
-              if (el>=0 && dwork[el][d].isEmpty(true)) {
-                dwork[el][d] = MX(swork[el].shape());
-              }
-            }
-          }
-
-
-          if (it->data->getOp()==OP_CALL) {
-            // Purge the directions that have all-zero seeds #905
-            // We do this only for OP_CALL since some operations might have a substancial effect
-            // on the sensitivities even though all seeds are zero: the sparisty might be
-            // changed e.g. in OP_SETSPARSE
-            purgeSeeds(aseed_p, asens_p, aseed_purged, asens_purged, false);
-            if (aseed_purged.size()==0 && asens_purged.size()==0) {
-              // Call the evaluation function
-              it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p, dummy_p, dummy_p, true);
-            } else {
-              if (CasadiOptions::purgeSeeds) {
-                // Call the evaluation function
-                it->data->evaluateMX(input_p, output_p, dummy_p,
-                                     dummy_p, aseed_purged, asens_purged, true);
-              } else {
-                // Do nothing special
-                it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p, aseed_p, asens_p, true);
-              }
-            }
-          } else {
-            // Call the evaluation function
-            it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p, aseed_p, asens_p, true);
-          }
-        }
-
-        // Recover the spilled elements to the work vector for later access
-        // (delayed for inplace operations)
-        if (it->op!=OP_OUTPUT) {
-          for (vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c) {
-            if (*c >=0 && tapeloc_[*c] > 0) {
-              swork[*c] = tape[tapeloc_[*c]-1].second;
-              tapeloc_[*c] = 0;
-            }
-          }
-        }
+        it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p,
+                             dummy_p, dummy_p, output_given);
       }
     }
     log("MXFunctionInternal::evalMX end");

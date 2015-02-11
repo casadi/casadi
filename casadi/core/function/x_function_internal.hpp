@@ -546,9 +546,6 @@ namespace casadi {
       return MatType(input(iind).shape());
     }
 
-    // Dummy forward seeds and sensitivities
-    typename std::vector<std::vector<MatType> > fseed, fsens;
-
     // Adjoint seeds
     typename std::vector<std::vector<MatType> > aseed(1, std::vector<MatType>(outputv_.size()));
     for (int i=0; i<outputv_.size(); ++i) {
@@ -566,8 +563,7 @@ namespace casadi {
     }
 
     // Calculate with adjoint mode AD
-    std::vector<MatType> res(outputv_);
-    call(inputv_, res, fseed, fsens, aseed, asens, true, false);
+    static_cast<DerivedType*>(this)->callAdj(inputv_, outputv_, aseed, asens, true, false);
 
     int dir = 0;
     for (int i=0; i<getNumInputs(); ++i) { // Correct sparsities #1025
@@ -595,18 +591,14 @@ namespace casadi {
       }
     }
 
-    // Dummy adjoint seeds and sensitivities
-    typename std::vector<std::vector<MatType> > aseed, asens;
-
     // Forward sensitivities
     std::vector<std::vector<MatType> > fsens(1, std::vector<MatType>(outputv_.size()));
     for (int i=0; i<outputv_.size(); ++i) {
       fsens[0][i] = MatType::zeros(outputv_[i].sparsity());
     }
 
-    // Calculate with adjoint mode AD
-    std::vector<MatType> res(outputv_);
-    call(inputv_, res, fseed, fsens, aseed, asens, true, false);
+    // Calculate with forward mode AD
+    static_cast<DerivedType*>(this)->callFwd(inputv_, outputv_, fseed, fsens, true, false);
 
     // Return adjoint directional derivative
     return fsens[0].at(oind);
@@ -810,14 +802,13 @@ namespace casadi {
       if (verbose()) std::cout << "XFunctionInternal::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
-        //static_cast<DerivedType*>(this)->callFwd(inputv_, outputv_,
-        //                                         fseed, fsens, always_inline, never_inline);
+        static_cast<DerivedType*>(this)->callFwd(inputv_, outputv_,
+                                                 fseed, fsens, always_inline, never_inline);
       } else if (aseed.size()>0) {
         casadi_assert(fseed.size()==0);
-        //static_cast<DerivedType*>(this)->callAdj(inputv_, outputv_,
-        //                                         aseed, asens, always_inline, never_inline);
+        static_cast<DerivedType*>(this)->callAdj(inputv_, outputv_,
+                                                 aseed, asens, always_inline, never_inline);
       }
-      call(inputv_, res, fseed, fsens, aseed, asens, always_inline, never_inline);
 
       // Carry out the forward sweeps
       for (int d=0; d<nfdir_batch; ++d) {
