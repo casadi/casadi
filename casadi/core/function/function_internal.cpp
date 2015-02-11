@@ -3058,4 +3058,110 @@ namespace casadi {
     casadi_error("SX expressions do not support call-nodes");
   }
 
+  void FunctionInternal::
+  callFwd(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+          const std::vector<std::vector<DMatrix> >& fseed,
+          std::vector<std::vector<DMatrix> >& fsens,
+          bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_error("DMatrix does not support call-nodes");
+
+    // TODO(@jaeandersson): Evaluate in "batches"
+
+    // Retrieve derivative function
+    int nfwd = fseed.size();
+    Function dfcn = derivativeFwd(nfwd);
+
+    // Pass inputs
+    int num_in = getNumInputs();
+    int di=0;
+    casadi_assert(arg.size()==num_in);
+    for (int i=0; i<num_in; ++i) {
+      dfcn.setInput(arg[i], di++);
+    }
+
+    // Pass outputs
+    int num_out = getNumOutputs();
+    casadi_assert(res.size()==num_out);
+    for (int i=0; i<num_out; ++i) {
+      dfcn.setInput(res[i], di++);
+    }
+
+    // Pass seeds
+    for (int d=0; d<nfwd; ++d) {
+      casadi_assert(fseed[d].size()==num_in);
+      for (int i=0; i<num_in; ++i) {
+        dfcn.setInput(fseed[d][i], di++);
+      }
+    }
+    casadi_assert(di==dfcn.getNumInputs()); // Consistency check
+
+    // Calculate derivatives
+    dfcn.evaluate();
+
+    // Get sensitivities
+    fsens.resize(nfwd);
+    di = 0;
+    for (int d=0; d<nfwd; ++d) {
+      fsens[d].resize(num_out);
+      for (int i=0; i<num_out; ++i) {
+        fsens[d][i] = dfcn.output(di++);
+      }
+    }
+    casadi_assert(di==dfcn.getNumOutputs()); // Consistency check
+  }
+
+  void FunctionInternal::
+  callAdj(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+          const std::vector<std::vector<DMatrix> >& aseed,
+          std::vector<std::vector<DMatrix> >& asens,
+          bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_error("DMatrix does not support call-nodes");
+
+    // TODO(@jaeandersson): Evaluate in "batches"
+
+    // Retrieve derivative function
+    int nadj = aseed.size();
+    Function dfcn = derivativeAdj(nadj);
+
+    // Pass inputs
+    int num_in = getNumInputs();
+    int di=0;
+    casadi_assert(arg.size()==num_in);
+    for (int i=0; i<num_in; ++i) {
+      dfcn.setInput(arg[i], di++);
+    }
+
+    // Pass outputs
+    int num_out = getNumOutputs();
+    casadi_assert(res.size()==num_out);
+    for (int i=0; i<num_out; ++i) {
+      dfcn.setInput(res[i], di++);
+    }
+
+    // Pass seeds
+    for (int d=0; d<nadj; ++d) {
+      casadi_assert(aseed[d].size()==num_out);
+      for (int i=0; i<num_out; ++i) {
+        dfcn.setInput(aseed[d][i], di++);
+      }
+    }
+    casadi_assert(di==dfcn.getNumInputs()); // Consistency check
+
+    // Calculate derivatives
+    dfcn.evaluate();
+
+    // Get sensitivities
+    asens.resize(nadj);
+    di = 0;
+    for (int d=0; d<nadj; ++d) {
+      asens[d].resize(num_in);
+      for (int i=0; i<num_in; ++i) {
+        asens[d][i] = dfcn.output(di++);
+      }
+    }
+    casadi_assert(di==dfcn.getNumOutputs()); // Consistency check
+  }
+
 } // namespace casadi

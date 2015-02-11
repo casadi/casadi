@@ -387,5 +387,19 @@ namespace casadi {
     (*this)->callAdj(arg, res, aseed, asens, always_inline, never_inline);
   }
 
+  void Function::callFwd(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+                         const std::vector<std::vector<DMatrix> >& fseed,
+                         std::vector<std::vector<DMatrix> >& fsens,
+                         bool always_inline, bool never_inline) {
+    (*this)->callFwd(arg, res, fseed, fsens, always_inline, never_inline);
+  }
+
+  void Function::callAdj(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+                         const std::vector<std::vector<DMatrix> >& aseed,
+                         std::vector<std::vector<DMatrix> >& asens,
+                         bool always_inline, bool never_inline) {
+    (*this)->callAdj(arg, res, aseed, asens, always_inline, never_inline);
+  }
+
 } // namespace casadi
 

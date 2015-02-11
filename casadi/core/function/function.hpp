@@ -347,6 +347,18 @@ namespace casadi {
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
+    /** \brief Create call to (cached) derivative function, forward mode  */
+    void callFwd(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+                 const std::vector<std::vector<DMatrix> >& fseed,
+                 std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(fsens),
+                 bool always_inline=false, bool never_inline=false);
+
+    /** \brief Create call to (cached) derivative function, reverse mode  */
+    void callAdj(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+                 const std::vector<std::vector<DMatrix> >& aseed,
+                 std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(asens),
+                 bool always_inline=false, bool never_inline=false);
+
     /// \cond INTERNAL
     ///@{
    /** \brief Evaluate the function symbolically or numerically with directional derivatives

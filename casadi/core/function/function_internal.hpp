@@ -172,6 +172,17 @@ namespace casadi {
                          std::vector<std::vector<SX> >& asens,
                          bool always_inline, bool never_inline);
 
+    /** \brief Create call to (cached) derivative function, forward mode  */
+    virtual void callFwd(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+                         const std::vector<std::vector<DMatrix> >& fseed,
+                         std::vector<std::vector<DMatrix> >& fsens,
+                         bool always_inline, bool never_inline);
+
+    /** \brief Create call to (cached) derivative function, reverse mode  */
+    virtual void callAdj(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+                         const std::vector<std::vector<DMatrix> >& aseed,
+                         std::vector<std::vector<DMatrix> >& asens,
+                         bool always_inline, bool never_inline);
     ///@{
     /** \brief Return Hessian function */
     Function hessian(int iind, int oind);
