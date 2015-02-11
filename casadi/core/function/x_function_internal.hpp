@@ -137,22 +137,6 @@ namespace casadi {
 
     /** \brief  Outputs of the function (needed for symbolic calculations) */
     std::vector<MatType> outputv_;
-
-    /** \brief purge seeds from all-zeros
-    *
-    * If all seeds in one direction are zero, the corresponding sensitivities are set to zero
-    * and the direction is removed
-    * \param[in] seed -- original seeds
-    * \param[in] sens -- original sens
-    * \param[in] forward -- boolean indicating if we are using forward mode
-    * \param[out] seed_purged -- filled up with non-zero seed directions
-    * \param[out] sens_purged -- filled up with corresponding sens directions
-    *
-    */
-    void purgeSeeds(const std::vector<std::vector<MatType*> >& seed,
-                    const std::vector<std::vector<MatType*> >& sens,
-                    std::vector<std::vector<MatType*> >& seed_purged,
-                    std::vector<std::vector<MatType*> >& sens_purged, bool forward);
   };
 
 #ifdef casadi_implementation
@@ -1117,48 +1101,6 @@ namespace casadi {
     PublicType ret(ret_in, ret_out);
     ret.init();
     return ret;
-  }
-
-  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::purgeSeeds(
-    const std::vector<std::vector<MatType*> >& seed,
-    const std::vector<std::vector<MatType*> >& sens,
-    std::vector<std::vector<MatType*> >& seed_purged,
-    std::vector<std::vector<MatType*> >& sens_purged, bool forward) {
-
-    // This check out to be superfluous
-    casadi_assert(seed.size()==sens.size());
-
-    // Clear the outputs, leaving capacity intact
-    seed_purged.clear();
-    sens_purged.clear();
-
-    // Loop over all seed directions
-    for (int d=0;d<seed.size();++d) {
-
-      // Determine if this direction is empty
-      bool empty = true;
-      for (int i=0;i<seed[d].size();++i) {
-        if (!(seed[d][i]==0 || seed[d][i]->isEmpty(true) || (*seed[d][i])->isZero())) {
-          empty = false; break;
-        }
-      }
-
-      if (empty) {
-        // Empty directions are discarded, with forward sensitivities put to zero
-        if (forward) {
-          for (int i=0;i<sens[d].size();++i) {
-            if (sens[d][i]!=0 && !sens[d][i]->isEmpty(true)) {
-              *sens[d][i]=MatType::zeros(sens[d][i]->sparsity());
-            }
-          }
-        }
-      } else {
-        // Non-empty directions are added to the purged list
-        seed_purged.push_back(seed[d]);
-        sens_purged.push_back(sens[d]);
-      }
-    }
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
