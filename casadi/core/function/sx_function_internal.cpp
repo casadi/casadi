@@ -991,26 +991,8 @@ namespace casadi {
   }
 
   Function SXFunctionInternal::getFullJacobian() {
-    // Get all the inputs
-    SX arg(1, 0);
-    for (vector<SX>::const_iterator i=inputv_.begin(); i!=inputv_.end(); ++i) {
-      arg.appendColumns(vec(*i).T());
-    }
-
-    // Get all the outputs
-    SX res(1, 0);
-    for (vector<SX>::const_iterator i=outputv_.begin(); i!=outputv_.end(); ++i) {
-      res.appendColumns(vec(*i).T());
-    }
-
-    // Generate an expression for the Jacobian
-    SX J = casadi::jacobian(res, arg);
-
-    // Generate a function for the full Jacobian
-    vector<SX> ret_res(1, J);
-    ret_res.insert(ret_res.end(), outputv_.begin(), outputv_.end());
-    SXFunction ret(inputv_, ret_res);
-    return ret;
+    SX J = casadi::jacobian(veccat(outputv_), veccat(inputv_));
+    return SXFunction(inputv_, J);
   }
 
 

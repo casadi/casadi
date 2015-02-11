@@ -247,7 +247,7 @@ namespace casadi {
   Function Function::derivative(int nfwd, int nadj) {
     // Quick return
     if (nfwd==0 && nadj==0) return *this;
-    
+
     // Call self
     vector<MX> arg = symbolicInput();
     vector<MX> res = (*this)(arg);

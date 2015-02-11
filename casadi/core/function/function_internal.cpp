@@ -45,7 +45,6 @@
 using namespace std;
 
 namespace casadi {
-
   FunctionInternal::FunctionInternal() {
     setOption("name", "unnamed_function"); // name of the function
     addOption("verbose",                  OT_BOOLEAN,             false,
@@ -1422,12 +1421,22 @@ namespace casadi {
     }
 
     // Return value
+    const int adj_penalty = 2; // Adjoint mode penalty factor
     Function ret;
     if (hasSetOption("derivative_generator_forward")) {
       /// User-provided derivative generator function
       DerivativeGenerator dergen = getOption("derivative_generator_forward");
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nfwd, user_data_);
+      // Fails for ImplicitFunction
+#ifdef WITH_DERIVATIVE_VIA_JAC
+    } else if (getNumInputNonzeros()<nfwd) {
+      // Full Jacobian (calculated via forward mode) likely cheaper
+      ret = getDerivativeFwdViaJac(nfwd);
+    } else if (getOption("ad_mode")!="forward" && getNumOutputNonzeros()*adj_penalty<nfwd) {
+      // Full Jacobian (calculated via reverse mode) likely cheaper
+      ret = getDerivativeFwdViaJac(nfwd);
+#endif
     } else {
       ret = getDerivativeFwd(nfwd);
     }
@@ -1438,26 +1447,26 @@ namespace casadi {
     ret.setOption("name", ss.str());
 
     // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
 
     // Names of inputs
     std::vector<std::string> i_names;
-    i_names.reserve(num_in + num_out + num_in*nfwd);
+    i_names.reserve(n_in + n_out + n_in*nfwd);
 
     // Nondifferentiated inputs
-    for (int i=0; i<num_in; ++i) {
+    for (int i=0; i<n_in; ++i) {
       i_names.push_back("der_" + input_.scheme.entryLabel(i));
     }
 
     // Nondifferentiated outputs (given)
-    for (int i=0; i<num_out; ++i) {
+    for (int i=0; i<n_out; ++i) {
       i_names.push_back("der_" + output_.scheme.entryLabel(i));
     }
 
     // Forward seeds
     for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<num_in; ++i) {
+      for (int i=0; i<n_in; ++i) {
         ss.str(string());
         ss << "fwd" << d << "_" << input_.scheme.entryLabel(i);
         i_names.push_back(ss.str());
@@ -1469,11 +1478,11 @@ namespace casadi {
 
     // Names of outputs
     std::vector<std::string> o_names;
-    o_names.reserve(num_out*nfwd);
+    o_names.reserve(n_out*nfwd);
 
     // Forward sensitivities
     for (int d=0; d<nfwd; ++d) {
-      for (int i=0; i<num_out; ++i) {
+      for (int i=0; i<n_out; ++i) {
         ss.str(string());
         ss << "fwd" << d << "_" << output_.scheme.entryLabel(i);
         o_names.push_back(ss.str());
@@ -1488,9 +1497,9 @@ namespace casadi {
 
     // Consistency check for inputs
     for (int i=0; i<ret.getNumInputs(); ++i) {
-      const Sparsity& sp = i<num_in ? input(i).sparsity() :
-        i<num_in+num_out ? output(i-num_in).sparsity() :
-        input((i-num_in-num_out) % num_in).sparsity();
+      const Sparsity& sp = i<n_in ? input(i).sparsity() :
+        i<n_in+n_out ? output(i-n_in).sparsity() :
+        input((i-n_in-n_out) % n_in).sparsity();
       casadi_assert_message(ret.input(i).shape()==sp.shape(),
                             "Incorrect shape for " << ret << " input " << i << " \""
                             << i_names.at(i) << "\". Expected " << sp.shape()
@@ -1499,7 +1508,7 @@ namespace casadi {
 
     // Consistency check for outputs
     for (int i=0; i<ret.getNumOutputs(); ++i) {
-      const Sparsity& sp = output(i % num_out).sparsity();
+      const Sparsity& sp = output(i % n_out).sparsity();
       casadi_assert_message(ret.output(i).shape()==sp.shape(),
                             "Incorrect shape for " << ret << " output " << i << " \""
                             << o_names.at(i) << "\". Expected " << sp.shape()
@@ -1527,12 +1536,21 @@ namespace casadi {
     }
 
     // Return value
+    const int adj_penalty = 2; // Adjoint mode penalty factor
     Function ret;
     if (hasSetOption("derivative_generator_reverse")) {
       /// User-provided derivative generator function
       DerivativeGenerator dergen = getOption("derivative_generator_reverse");
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nadj, user_data_);
+#ifdef WITH_DERIVATIVE_VIA_JAC
+    } else if (getOption("ad_mode")!="reverse" && getNumInputNonzeros()<nadj*adj_penalty) {
+      // Full Jacobian (calculated via forward mode) likely cheaper
+      ret = getDerivativeAdjViaJac(nadj);
+    } else if (getNumOutputNonzeros()<nadj) {
+      // Full Jacobian (calculated via reverse mode) likely cheaper
+      ret = getDerivativeAdjViaJac(nadj);
+#endif
     } else {
       ret = getDerivativeAdj(nadj);
     }
@@ -1543,26 +1561,26 @@ namespace casadi {
     ret.setOption("name", ss.str());
 
     // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
 
     // Names of inputs
     std::vector<std::string> i_names;
-    i_names.reserve(num_in + num_out + num_out*nadj);
+    i_names.reserve(n_in + n_out + n_out*nadj);
 
     // Nondifferentiated inputs
-    for (int i=0; i<num_in; ++i) {
+    for (int i=0; i<n_in; ++i) {
       i_names.push_back("der_" + input_.scheme.entryLabel(i));
     }
 
     // Nondifferentiated outputs (given)
-    for (int i=0; i<num_out; ++i) {
+    for (int i=0; i<n_out; ++i) {
       i_names.push_back("der_" + output_.scheme.entryLabel(i));
     }
 
     // Adjoint seeds
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<num_out; ++i) {
+      for (int i=0; i<n_out; ++i) {
         ss.str(string());
         ss << "adj" << d << "_" << output_.scheme.entryLabel(i);
         i_names.push_back(ss.str());
@@ -1574,11 +1592,11 @@ namespace casadi {
 
     // Names of outputs
     std::vector<std::string> o_names;
-    o_names.reserve(num_in*nadj);
+    o_names.reserve(n_in*nadj);
 
     // Adjoint sensitivities
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<num_in; ++i) {
+      for (int i=0; i<n_in; ++i) {
         ss.str(string());
         ss << "adj" << d << "_" << input_.scheme.entryLabel(i);
         o_names.push_back(ss.str());
@@ -1593,9 +1611,9 @@ namespace casadi {
 
     // Consistency check for inputs
     for (int i=0; i<ret.getNumInputs(); ++i) {
-      const Sparsity& sp = i<num_in ? input(i).sparsity() :
-        i<num_in+num_out ? output(i-num_in).sparsity() :
-        output((i-num_in-num_out) % num_out).sparsity();
+      const Sparsity& sp = i<n_in ? input(i).sparsity() :
+        i<n_in+n_out ? output(i-n_in).sparsity() :
+        output((i-n_in-n_out) % n_out).sparsity();
       casadi_assert_message(ret.input(i).shape()==sp.shape(),
                             "Incorrect shape for " << ret << " input " << i << " \""
                             << i_names.at(i) << "\". Expected " << sp.shape()
@@ -1604,7 +1622,7 @@ namespace casadi {
 
     // Consistency check for outputs
     for (int i=0; i<ret.getNumOutputs(); ++i) {
-      const Sparsity& sp = input(i % num_in).sparsity();
+      const Sparsity& sp = input(i % n_in).sparsity();
       casadi_assert_message(ret.output(i).shape()==sp.shape(),
                             "Incorrect shape for " << ret << " output " << i << " \""
                             << o_names.at(i) << "\". Expected " << sp.shape()
@@ -1646,109 +1664,115 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  Function FunctionInternal::getDerivativeAdj(int nadj) {
-    casadi_error("FunctionInternal::getDerivativeAdj not defined for class "
-                 << typeid(*this).name());
-  }
-
-  Function FunctionInternal::getDerivativeViaJac(int nfwd, int nadj) {
-    // Get, possibly generate, a full Jacobian function
-    Function jfcn = fullJacobian();
-
+  Function FunctionInternal::getDerivativeFwdViaJac(int nfwd) {
     // Number of inputs and outputs
     const int n_in = getNumInputs();
     const int n_out = getNumOutputs();
 
-    // Get an expression for the full Jacobian
-    vector<MX> arg = symbolicInput();
-    vector<MX> res = jfcn(arg);
-    MX J = res.front().T();
-    res.erase(res.begin());
+    // Inputs and outputs of function created
+    vector<MX> res_in = symbolicInput(), res_out;
+    res_in.reserve(n_in + n_out + nfwd*n_in);
+    res_out.reserve(nfwd*n_out);
 
-    // Make room for the derivatives
-    arg.reserve(n_in*(1+nfwd)+n_out*nadj);
-    res.reserve(n_out*(1+nfwd)+n_in*nadj);
+    // Full Jacobian
+    MX J = fullJacobian()(res_in).at(0);
 
-    // Temporary string
+    // Dummy outputs
     stringstream ss;
-    vector<MX> d;
-
-    // Forward derivatives
-    if (nfwd>0) {
-      // Get col offsets for the horzsplit
-      vector<int> offset(1, 0);
-      for (int i=0; i<n_out; ++i) {
-        offset.push_back(offset.back()+res[i].numel());
-      }
-
-      // Calculate one derivative at a time (alternative: all at once using horzcat/horzsplit)
-      for (int dir=0; dir<nfwd; ++dir) {
-        // Assemble the right hand side
-        d.clear();
-        for (int i=0; i<n_in; ++i) {
-          // Create a forward seed with a suitable name and add to list of inputs
-          ss.str("fwd");
-          ss << dir << "_" << arg[i];
-          arg.push_back(MX::sym(ss.str(), arg[i].sparsity()));
-
-          // Add to the right-hand-side under construction
-          d.push_back(transpose(vec(arg.back())));
-        }
-        MX d_all = horzcat(d);
-
-        // Calculate the derivatives using a matrix multiplication with the Jacobian
-        d_all = mul(d_all, J);
-
-        // Split up the left hand sides
-        d = horzsplit(d_all, offset);
-        for (int i=0; i<n_out; ++i) {
-          res.push_back(reshape(d[i], res[i].shape()));
-          res.back() = res.back().setSparse(res[i].sparsity()+res.back().sparsity());
-        }
-      }
+    for (int i=0; i<n_out; ++i) {
+      ss.str(string());
+      ss << "dummy_out_" << i;
+      res_in.push_back(MX::sym(ss.str(), output(i).shape()));
     }
 
-    // Adjoint derivatives
-    if (nadj>0) {
-      // Transpose of J
-      MX JT = J.T();
-
-      // Get col offsets for the horzsplit
-      vector<int> offset(1, 0);
+    // Forward seeds
+    vector<MX> v(nfwd);
+    vector<MX> tmp(n_in);
+    for (int d=0; d<nfwd; ++d) {
       for (int i=0; i<n_in; ++i) {
-        offset.push_back(offset.back()+arg[i].numel());
+        ss.str(string());
+        ss << "fwd_" << d << "_" << i;
+        tmp[i] = MX::sym(ss.str(), input(i).sparsity());
+        res_in.push_back(tmp[i]);
       }
-
-      // Calculate one derivative at a time (alternative: all at once using horzcat/horzsplit)
-      for (int dir=0; dir<nadj; ++dir) {
-        // Assemble the right hand side
-        d.clear();
-        for (int i=0; i<n_out; ++i) {
-          // Create a forward seed with a suitable name and add to list of inputs
-          ss.str("adj");
-          ss << dir << "_" << res[i];
-          arg.push_back(MX::sym(ss.str(), res[i].sparsity()));
-
-          // Add to the right-hand-side under construction
-          d.push_back(transpose(vec(arg.back())));
-        }
-        MX d_all = horzcat(d);
-
-        // Calculate the derivatives using a matrix multiplication with the Jacobian
-        d_all = mul(d_all, JT);
-
-        // Split up the left hand sides
-        d = horzsplit(d_all, offset);
-        for (int i=0; i<n_in; ++i) {
-          res.push_back(reshape(d[i], arg[i].shape()));
-          res.back() = res.back().setSparse(arg[i].sparsity()+res.back().sparsity());
-        }
-      }
+      v[d] = veccat(tmp);
     }
 
-    // Assemble the derivative function
-    MXFunction ret(arg, res);
-    return ret;
+    // Multiply the Jacobian from the right
+    v = horzsplit(mul(J, horzcat(v)));
+
+    // Vertical offsets
+    vector<int> offset(n_out+1, 0);
+    for (int i=0; i<n_out; ++i) {
+      offset[i+1] = offset[i]+output(i).numel();
+    }
+
+    // Collect forward sensitivities
+    for (int d=0; d<nfwd; ++d) {
+      tmp = vertsplit(v[d], offset);
+      for (int i=0; i<n_out; ++i) {
+        res_out.push_back(reshape(tmp[i], output(i).shape()));
+      }
+    }
+    return MXFunction(res_in, res_out);
+  }
+
+  Function FunctionInternal::getDerivativeAdjViaJac(int nadj) {
+    // Number of inputs and outputs
+    const int n_in = getNumInputs();
+    const int n_out = getNumOutputs();
+
+    // Inputs and outputs of function created
+    vector<MX> res_in = symbolicInput(), res_out;
+    res_in.reserve(n_in + n_out + nadj*n_out);
+    res_out.reserve(nadj*n_in);
+
+    // Full Jacobian
+    MX J = fullJacobian()(res_in).at(0);
+
+    // Dummy outputs
+    stringstream ss;
+    for (int i=0; i<n_out; ++i) {
+      ss.str(string());
+      ss << "dummy_out_" << i;
+      res_in.push_back(MX::sym(ss.str(), output(i).shape()));
+    }
+
+    // Adjoint seeds
+    vector<MX> v(nadj);
+    vector<MX> tmp(n_out);
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<n_out; ++i) {
+        ss.str(string());
+        ss << "adj_" << d << "_" << i;
+        tmp[i] = MX::sym(ss.str(), output(i).sparsity());
+        res_in.push_back(tmp[i]);
+      }
+      v[d] = veccat(tmp);
+    }
+
+    // Multiply the transpose of the Jacobian from the right
+    v = horzsplit(mul(J.T(), horzcat(v)));
+
+    // Vertical offsets
+    vector<int> offset(n_in+1, 0);
+    for (int i=0; i<n_in; ++i) {
+      offset[i+1] = offset[i]+input(i).numel();
+    }
+
+    // Collect forward sensitivities
+    for (int d=0; d<nadj; ++d) {
+      tmp = vertsplit(v[d], offset);
+      for (int i=0; i<n_in; ++i) {
+        res_out.push_back(reshape(tmp[i], input(i).shape()));
+      }
+    }
+    return MXFunction(res_in, res_out);
+  }
+
+  Function FunctionInternal::getDerivativeAdj(int nadj) {
+    casadi_error("FunctionInternal::getDerivativeAdj not defined for class "
+                 << typeid(*this).name());
   }
 
   int FunctionInternal::getNumInputNonzeros() const {
@@ -1849,76 +1873,64 @@ namespace casadi {
       return shared_cast<Function>(full_jacobian_.shared());
     } else {
       // Generate a new Jacobian
-      Function ret;
-      if (getNumInputs()==1 && getNumOutputs()==1) {
-        ret = jacobian(0, 0, true, false);
-      } else {
-        ret = getFullJacobian();
+      Function ret = getFullJacobian();
 
-        // Give it a suitable name
-        stringstream ss;
-        ss << "jacobian_" << getOption("name");
-        ret.setOption("name", ss.str());
-        ret.setOption("verbose", getOption("verbose"));
+      // Give it a suitable name
+      stringstream ss;
+      ss << "jacobian_" << getOption("name");
+      ret.setOption("name", ss.str());
+      ret.setOption("verbose", getOption("verbose"));
 
-        // Same input scheme
-        ret.setInputScheme(input_.scheme);
-
-        // Construct output scheme
-        std::vector<std::string> oscheme;
-        oscheme.reserve(ret.getNumOutputs());
-        oscheme.push_back("jac");
-        for (int i=0; i<getNumOutputs(); ++i) {
-          oscheme.push_back(output_.scheme.entryLabel(i));
-        }
-        ret.setOutputScheme(oscheme);
-      }
-
+      // Set input and output schemes
+      ret.setInputScheme(input_.scheme);
+      std::vector<std::string> oscheme(1, "jac");
+      ret.setOutputScheme(oscheme);
 
       // Initialize
       ret.init();
 
-      // Return and cache it for reuse
+      // Consistency check
+      casadi_assert(ret.getNumInputs()==getNumInputs());
+      casadi_assert(ret.getNumOutputs()==1);
+
+      // Cache it for reuse and return
       full_jacobian_ = ret;
       return ret;
     }
   }
 
   Function FunctionInternal::getFullJacobian() {
-    // Symbolic inputs and outputs of the full Jacobian function under construction
-    vector<MX> jac_argv = symbolicInput(), jac_resv;
+    // Number inputs and outputs
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
 
-    // Symbolic inputs and outputs of the SISO function formed for generating the Jacobian
-    MX arg, res;
+    // Symbolic inputs of the full Jacobian function under construction
+    vector<MX> ret_argv = symbolicInput(), argv, resv;
 
-    // Arguments and results when calling "this" with the SISO inputs
-    vector<MX> argv, resv;
+    // Symbolic input of the SISO function formed for generating the Jacobian
+    MX arg;
 
-    // Check if the function is already single input
-    if (getNumInputs()==1) {
-      // Reuse the same symbolic primitives
-      argv = jac_argv;
+    // Reuse the same symbolic primitives, if single input
+    if (n_in==1) {
+      argv = ret_argv;
       arg = argv.front();
       resv = symbolicOutput(argv);
     } else {
-      // Need to create a new symbolic primitive
-
-      // Sparsity pattern for the symbolic input
-      Sparsity sp_arg(1, 0);
-
-      // Append the sparsity patterns, keep track of col offsets
-      vector<int> col_offset(1, 0);
-      for (int i=0; i<getNumInputs(); ++i) {
-        sp_arg.appendColumns(reshape(input(i).sparsity(), 1, input(i).numel()));
-        col_offset.push_back(sp_arg.numel());
+      // Collect Sparsity patterns of inputs
+      vector<Sparsity> sp_argv(n_in);
+      vector<int> row_offset(n_in+1, 0);
+      for (int i=0; i<n_in; ++i) {
+        sp_argv[i] = vec(input(i).sparsity());
+        row_offset[i+1] = row_offset[i]+sp_argv[i].numel();
       }
+      Sparsity sp_arg = vertcat(sp_argv);
 
       // Create symbolic primitive
       arg = MX::sym("x", sp_arg);
 
-      // Split up and fix shape
-      argv = horzsplit(arg, col_offset);
-      for (int i=0; i<getNumInputs(); ++i) {
+      // Split up and reshape to correct shape
+      argv = vertsplit(arg, row_offset);
+      for (int i=0; i<n_in; ++i) {
         argv[i] = reshape(argv[i], input(i).sparsity());
       }
 
@@ -1926,55 +1938,19 @@ namespace casadi {
       resv = shared_from_this<Function>()(argv);
     }
 
-    // Check if the function is already single output
-    if (getNumOutputs()==1) {
-      // Reuse the same output
-      res = resv.front();
-    } else {
-      // Concatenate the outputs
-      vector<MX> tmp = resv;
-      for (vector<MX>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
-        *i = reshape(*i, 1, i->numel());
-      }
-      res = horzcat(tmp);
-    }
+    // Reuse the same output, if possible
+    MX res = n_out==1 ? resv.front() : veccat(resv);
 
-    // Create a SISO function
-    MXFunction f(arg, res);
-    f.setOption("ad_mode", getOption("ad_mode"));
-    f.init();
+    // Form Jacobian
+    MX J = casadi::jacobian(res, arg);
+
+    // Make sure argv is the input of J
+    if (n_in!=1) {
+      J = substitute(J, arg, veccat(ret_argv));
+    }
 
     // Form an expression for the full Jacobian
-    MX J = f.jac();
-
-    // Append to list of outputs
-    resv.insert(resv.begin(), J);
-
-    // Wrap in an MXFunction to get the correct input, if necessary
-    if (getNumInputs()==1) {
-      // No need to wrap
-      jac_resv = resv;
-    } else {
-      // Form a SIMO function
-      MXFunction J_simo(arg, resv);
-      J_simo.setOption("name", "J_simo");
-      J_simo.init();
-
-      // The inputs of J_simo in terms of jac_argv
-      vector<MX> tmp = jac_argv;
-      for (vector<MX>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
-        *i = reshape(*i, 1, i->numel());
-      }
-      MX J_simo_arg = horzcat(tmp);
-
-      // Evaluate symbolically
-      jac_resv = J_simo(J_simo_arg);
-    }
-
-    // We are now ready to form the full Jacobian
-    MXFunction ret(jac_argv, jac_resv);
-    return ret;
-
+    return MXFunction(ret_argv, J);
   }
 
   void FunctionInternal::generateCode(std::ostream &cfile, bool generate_main) {
@@ -2512,12 +2488,12 @@ namespace casadi {
     if (nfwd==0) return;
 
     // Number inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
 
     // All inputs and seeds
     vector<MX> darg;
-    darg.reserve(num_in + num_out + num_in*nfwd);
+    darg.reserve(n_in + n_out + n_in*nfwd);
     darg.insert(darg.end(), arg.begin(), arg.end());
     darg.insert(darg.end(), res.begin(), res.end());
     for (int d=0; d<nfwd; ++d) {
@@ -2533,8 +2509,8 @@ namespace casadi {
 
     // Retrieve sensitivities
     for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(num_out);
-      for (int i=0; i<num_out; ++i) {
+      fsens[d].resize(n_out);
+      for (int i=0; i<n_out; ++i) {
         fsens[d][i] = *x_it++;
       }
     }
@@ -2557,12 +2533,12 @@ namespace casadi {
     if (nadj==0) return;
 
     // Number inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
 
     // All inputs and seeds
     vector<MX> darg;
-    darg.reserve(num_in + num_out + num_out*nadj);
+    darg.reserve(n_in + n_out + n_out*nadj);
     darg.insert(darg.end(), arg.begin(), arg.end());
     darg.insert(darg.end(), res.begin(), res.end());
     for (int d=0; d<nadj; ++d) {
@@ -2578,8 +2554,8 @@ namespace casadi {
 
     // Retrieve sensitivities
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(num_in);
-      for (int i=0; i<num_in; ++i) {
+      asens[d].resize(n_in);
+      for (int i=0; i<n_in; ++i) {
         asens[d][i] = *x_it++;
       }
     }
@@ -2627,24 +2603,24 @@ namespace casadi {
     Function dfcn = derivativeFwd(nfwd);
 
     // Pass inputs
-    int num_in = getNumInputs();
+    int n_in = getNumInputs();
     int di=0;
-    casadi_assert(arg.size()==num_in);
-    for (int i=0; i<num_in; ++i) {
+    casadi_assert(arg.size()==n_in);
+    for (int i=0; i<n_in; ++i) {
       dfcn.setInput(arg[i], di++);
     }
 
     // Pass outputs
-    int num_out = getNumOutputs();
-    casadi_assert(res.size()==num_out);
-    for (int i=0; i<num_out; ++i) {
+    int n_out = getNumOutputs();
+    casadi_assert(res.size()==n_out);
+    for (int i=0; i<n_out; ++i) {
       dfcn.setInput(res[i], di++);
     }
 
     // Pass seeds
     for (int d=0; d<nfwd; ++d) {
-      casadi_assert(fseed[d].size()==num_in);
-      for (int i=0; i<num_in; ++i) {
+      casadi_assert(fseed[d].size()==n_in);
+      for (int i=0; i<n_in; ++i) {
         dfcn.setInput(fseed[d][i], di++);
       }
     }
@@ -2657,8 +2633,8 @@ namespace casadi {
     fsens.resize(nfwd);
     di = 0;
     for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(num_out);
-      for (int i=0; i<num_out; ++i) {
+      fsens[d].resize(n_out);
+      for (int i=0; i<n_out; ++i) {
         fsens[d][i] = dfcn.output(di++);
       }
     }
@@ -2680,24 +2656,24 @@ namespace casadi {
     Function dfcn = derivativeAdj(nadj);
 
     // Pass inputs
-    int num_in = getNumInputs();
+    int n_in = getNumInputs();
     int di=0;
-    casadi_assert(arg.size()==num_in);
-    for (int i=0; i<num_in; ++i) {
+    casadi_assert(arg.size()==n_in);
+    for (int i=0; i<n_in; ++i) {
       dfcn.setInput(arg[i], di++);
     }
 
     // Pass outputs
-    int num_out = getNumOutputs();
-    casadi_assert(res.size()==num_out);
-    for (int i=0; i<num_out; ++i) {
+    int n_out = getNumOutputs();
+    casadi_assert(res.size()==n_out);
+    for (int i=0; i<n_out; ++i) {
       dfcn.setInput(res[i], di++);
     }
 
     // Pass seeds
     for (int d=0; d<nadj; ++d) {
-      casadi_assert(aseed[d].size()==num_out);
-      for (int i=0; i<num_out; ++i) {
+      casadi_assert(aseed[d].size()==n_out);
+      for (int i=0; i<n_out; ++i) {
         dfcn.setInput(aseed[d][i], di++);
       }
     }
@@ -2710,8 +2686,8 @@ namespace casadi {
     asens.resize(nadj);
     di = 0;
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(num_in);
-      for (int i=0; i<num_in; ++i) {
+      asens[d].resize(n_in);
+      for (int i=0; i<n_in; ++i) {
         asens[d][i] = dfcn.output(di++);
       }
     }

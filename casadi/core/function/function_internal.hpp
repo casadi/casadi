@@ -180,9 +180,6 @@ namespace casadi {
     virtual Function getFullJacobian();
     ///@}
 
-    /// Get derivative by calculating Jacobian (legacy, needs updating)
-    virtual Function getDerivativeViaJac(int nfwd, int nadj);
-
     ///@{
     /** \brief Return function that calculates forward derivatives
      *    derivativeFwd(nfwd) returns a cached instance if available,
@@ -192,6 +189,7 @@ namespace casadi {
     Function derivativeFwd(int nfwd);
     virtual Function getDerivativeFwd(int nfwd);
     void setDerivativeFwd(const Function& fcn, int nfwd);
+    Function getDerivativeFwdViaJac(int nfwd);
     ///@}
 
     ///@{
@@ -203,6 +201,7 @@ namespace casadi {
     Function derivativeAdj(int nadj);
     virtual Function getDerivativeAdj(int nadj);
     void setDerivativeAdj(const Function& fcn, int nadj);
+    Function getDerivativeAdjViaJac(int nadj);
     ///@}
 
     /** \brief Create a helper MXFunction with some properties copied
