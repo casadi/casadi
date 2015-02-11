@@ -68,15 +68,9 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                                    MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                                    bool output_given) {
+  void SetNonzeros<Add>::eval(const MXPtrV& input, MXPtrV& output) {
     // Get all the nonzeros
     vector<int> nz = getAll();
-
-    // Number of derivative directions
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
 
     // Output sparsity
     const Sparsity &osp = sparsity();
@@ -129,146 +123,76 @@ namespace casadi {
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
 
-    // Nondifferentiated function and forward sensitivities
-    int first_d = output_given ? 0 : -1;
-    for (int d=first_d; d<nfwd; ++d) {
-
-      // Get references to arguments and results
-      const MX& arg = d<0 ? *input[1] : *fwdSeed[d][1];
-      const MX& arg0 = d<0 ? *input[0] : *fwdSeed[d][0];
-      MX& res = d<0 ? *output[0] : *fwdSens[d][0];
-      if (&arg0 != &res) {
-        res = arg0;
-      }
-
-      // Entries in res with elements zero'ed out
-      if (!Add) {
-
-        // Get the nz locations in res corresponding to the output sparsity pattern
-        r_nz.resize(with_duplicates.size());
-        copy(with_duplicates.begin(), with_duplicates.end(), r_nz.begin());
-        res.sparsity().getNZ(r_nz);
-
-        // Zero out the corresponding entries
-        res = MX::zeros(isp)->getSetNonzeros(res, r_nz);
-      }
-
-      // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
-      arg.sparsity().find(r_nz);
-      isp.getNZ(r_nz);
-
-      // Filter out ignored entries and check if there is anything to add at all
-      bool elements_to_add = false;
-      for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-        if (*k>=0) {
-          if (nz[*k]>=0) {
-            elements_to_add = true;
-          } else {
-            *k = -1;
-          }
-        }
-      }
-
-      // Quick continue of no elements to set/add
-      if (!elements_to_add) continue;
-
-      // Get the nz locations in the argument corresponding to the inputs
-      r_ind.resize(el_output.size());
-      copy(el_output.begin(), el_output.end(), r_ind.begin());
-      res.sparsity().getNZ(r_ind);
-
-      // Enlarge the sparsity pattern of the arguments if not all assignments fit
-      for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-        if (*k>=0 && nz[*k]>=0 && r_ind[nz[*k]]<0) {
-
-          // Create a new pattern which includes both the the previous seed
-          // and the addition/assignment
-          Sparsity sp = res.sparsity().patternUnion(osp);
-          res = res->getSetSparse(sp);
-
-          // Recalculate the nz locations in the arguments corresponding to the inputs
-          copy(el_output.begin(), el_output.end(), r_ind.begin());
-          res.sparsity().getNZ(r_ind);
-
-          break;
-        }
-      }
-
-      // Have r_nz point to locations in the result instead of the output
-      for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-        if (*k>=0) {
-          *k = r_ind[nz[*k]];
-        }
-      }
-
-      // Add to the element to the sensitivity, if any
-      res = arg->getAddNonzeros(res, r_nz);
+    // Get references to arguments and results
+    const MX& arg = *input[1];
+    const MX& arg0 = *input[0];
+    MX& res = *output[0];
+    if (&arg0 != &res) {
+      res = arg0;
     }
 
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
+    // Entries in res with elements zero'ed out
+    if (!Add) {
 
-      // Get an owning references to the seeds and sensitivities
-      // and clear the seeds for the next run
-      MX& aseed = *adjSeed[d][0];
-      MX& asens0 = *adjSens[d][0];
-      MX& asens = *adjSens[d][1];
+      // Get the nz locations in res corresponding to the output sparsity pattern
+      r_nz.resize(with_duplicates.size());
+      copy(with_duplicates.begin(), with_duplicates.end(), r_nz.begin());
+      res.sparsity().getNZ(r_nz);
 
-      // Get the matching nonzeros
-      r_ind.resize(el_output.size());
-      copy(el_output.begin(), el_output.end(), r_ind.begin());
-      aseed.sparsity().getNZ(r_ind);
+      // Zero out the corresponding entries
+      res = MX::zeros(isp)->getSetNonzeros(res, r_nz);
+    }
 
-      // Sparsity pattern for the result
-      r_colind.resize(isp.size2()+1); // Col count
-      fill(r_colind.begin(), r_colind.end(), 0);
-      r_row.clear();
+    // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
+    arg.sparsity().find(r_nz);
+    isp.getNZ(r_nz);
 
-      // Perform the assignments
-      r_nz.clear();
-      for (int k=0; k<nz.size(); ++k) {
-
-        // Get the corresponding nonzero for the input
-        int el = nz[k];
-
-        // Skip if zero assignment
-        if (el==-1) continue;
-
-        // Get the corresponding nonzero in the argument
-        int el_arg = r_ind[el];
-
-        // Skip if no argument
-        if (el_arg==-1) continue;
-
-        // Save the assignment
-        r_nz.push_back(el_arg);
-
-        // Get the corresponding element
-        int i=icol[k], j=irow[k];
-
-        // Add to sparsity pattern
-        r_row.push_back(j);
-        r_colind[1+i]++;
-      }
-
-      // col count -> col offset
-      for (int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
-
-      // If anything to set/add
-      if (!r_nz.empty()) {
-        // Create a sparsity pattern from vectors
-        Sparsity f_sp(isp.size1(), isp.size2(), r_colind, r_row);
-        asens.addToSum(aseed->getGetNonzeros(f_sp, r_nz));
-        if (!Add) {
-          aseed = MX::zeros(f_sp)->getSetNonzeros(aseed, r_nz);
+    // Filter out ignored entries and check if there is anything to add at all
+    bool elements_to_add = false;
+    for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+      if (*k>=0) {
+        if (nz[*k]>=0) {
+          elements_to_add = true;
+        } else {
+          *k = -1;
         }
       }
+    }
 
-      if (&aseed != &asens0) {
-        asens0.addToSum(aseed);
-        aseed = MX();
+    // Quick continue of no elements to set/add
+    if (!elements_to_add) return;
+
+    // Get the nz locations in the argument corresponding to the inputs
+    r_ind.resize(el_output.size());
+    copy(el_output.begin(), el_output.end(), r_ind.begin());
+    res.sparsity().getNZ(r_ind);
+
+    // Enlarge the sparsity pattern of the arguments if not all assignments fit
+    for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+      if (*k>=0 && nz[*k]>=0 && r_ind[nz[*k]]<0) {
+
+        // Create a new pattern which includes both the the previous seed
+        // and the addition/assignment
+        Sparsity sp = res.sparsity().patternUnion(osp);
+        res = res->getSetSparse(sp);
+
+        // Recalculate the nz locations in the arguments corresponding to the inputs
+        copy(el_output.begin(), el_output.end(), r_ind.begin());
+        res.sparsity().getNZ(r_ind);
+
+        break;
       }
     }
+
+    // Have r_nz point to locations in the result instead of the output
+    for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+      if (*k>=0) {
+        *k = r_ind[nz[*k]];
+      }
+    }
+
+    // Add to the element to the sensitivity, if any
+    res = arg->getAddNonzeros(res, r_nz);
   }
 
   template<bool Add>

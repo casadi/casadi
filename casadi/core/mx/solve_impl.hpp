@@ -82,11 +82,10 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                             bool output_given) {
-    linear_solver_->evaluateMXGen(input, output, fwdSeed, fwdSens, adjSeed, adjSens,
-                                  output_given, Tr);
+  void Solve<Tr>::eval(const MXPtrV& input, MXPtrV& output) {
+    MXPtrVV dummy;
+    linear_solver_->evaluateMXGen(input, output, dummy, dummy, dummy, dummy,
+                                  false, Tr);
   }
 
   template<bool Tr>

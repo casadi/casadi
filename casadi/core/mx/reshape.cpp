@@ -89,30 +89,9 @@ namespace casadi {
     }
   }
 
-  void Reshape::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                           bool output_given) {
-    // Quick return if inplace
-    if (input[0]==output[0]) return;
-
-    if (!output_given) {
+  void Reshape::eval(const MXPtrV& input, MXPtrV& output) {
+    if (input[0]!=output[0])
       *output[0] = reshape(*input[0], shape());
-    }
-
-    // Forward sensitivities
-    int nfwd = fwdSens.size();
-    for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = reshape(*fwdSeed[d][0], shape());
-    }
-
-    // Adjoint sensitivities
-    int nadj = adjSeed.size();
-    for (int d=0; d<nadj; ++d) {
-      MX& aseed = *adjSeed[d][0];
-      MX& asens = *adjSens[d][0];
-      asens.addToSum(reshape(aseed, dep().shape()));
-      aseed = MX();
-    }
   }
 
   void Reshape::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {

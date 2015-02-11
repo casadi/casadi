@@ -155,44 +155,8 @@ namespace casadi {
     }
   }
 
-  void Diagcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                           bool output_given) {
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Non-differentiated output
-    if (!output_given) {
-      *output[0] = diagcat(getVector(input));
-    }
-
-    // Forward sensitivities
-    for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = diagcat(getVector(fwdSeed[d]));
-    }
-
-    // Quick return?
-    if (nadj==0) return;
-
-    // Get offsets for each row and column
-    vector<int> offset1(ndep()+1, 0);
-    vector<int> offset2(ndep()+1, 0);
-    for (int i=0; i<ndep(); ++i) {
-      int ncol = dep(i).sparsity().size2();
-      int nrow = dep(i).sparsity().size1();
-      offset2[i+1] = offset2[i] + ncol;
-      offset1[i+1] = offset1[i] + nrow;
-    }
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      MX& aseed = *adjSeed[d][0];
-      vector<MX> s = diagsplit(aseed, offset1, offset2);
-      aseed = MX();
-      for (int i=0; i<ndep(); ++i) {
-        adjSens[d][i]->addToSum(s[i]);
-      }
-    }
+  void Diagcat::eval(const MXPtrV& input, MXPtrV& output) {
+    *output[0] = diagcat(getVector(input));
   }
 
   void Diagcat::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
@@ -246,41 +210,8 @@ namespace casadi {
     }
   }
 
-  void Horzcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                           bool output_given) {
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Non-differentiated output
-    if (!output_given) {
-      *output[0] = horzcat(getVector(input));
-    }
-
-    // Forward sensitivities
-    for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = horzcat(getVector(fwdSeed[d]));
-    }
-
-    // Quick return?
-    if (nadj==0) return;
-
-    // Get offsets for each column
-    vector<int> col_offset(ndep()+1, 0);
-    for (int i=0; i<ndep(); ++i) {
-      int ncol = dep(i).sparsity().size2();
-      col_offset[i+1] = col_offset[i] + ncol;
-    }
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      MX& aseed = *adjSeed[d][0];
-      vector<MX> s = horzsplit(aseed, col_offset);
-      aseed = MX();
-      for (int i=0; i<ndep(); ++i) {
-        adjSens[d][i]->addToSum(s[i]);
-      }
-    }
+  void Horzcat::eval(const MXPtrV& input, MXPtrV& output) {
+    *output[0] = horzcat(getVector(input));
   }
 
   void Horzcat::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
@@ -331,41 +262,8 @@ namespace casadi {
     }
   }
 
-  void Vertcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                           bool output_given) {
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Non-differentiated output
-    if (!output_given) {
-      *output[0] = vertcat(getVector(input));
-    }
-
-    // Forward sensitivities
-    for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = vertcat(getVector(fwdSeed[d]));
-    }
-
-    // Quick return?
-    if (nadj==0) return;
-
-    // Get offsets for each row
-    vector<int> row_offset(ndep()+1, 0);
-    for (int i=0; i<ndep(); ++i) {
-      int nrow = dep(i).sparsity().size1();
-      row_offset[i+1] = row_offset[i] + nrow;
-    }
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      MX& aseed = *adjSeed[d][0];
-      vector<MX> s = vertsplit(aseed, row_offset);
-      aseed = MX();
-      for (int i=0; i<ndep(); ++i) {
-        adjSens[d][i]->addToSum(s[i]);
-      }
-    }
+  void Vertcat::eval(const MXPtrV& input, MXPtrV& output) {
+    *output[0] = vertcat(getVector(input));
   }
 
   void Vertcat::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {

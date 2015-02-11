@@ -1495,7 +1495,7 @@ namespace casadi {
             output_p[i] = el<0 ? 0 : &work.at(el);
           }
 
-          it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p, dummy_p, dummy_p, false);
+          it->data->eval(input_p, output_p);
         }
       }
     }
@@ -1616,8 +1616,7 @@ namespace casadi {
             int el = it->res[0];
             swork[el] = it->data;
           } else {
-            const_cast<MX&>(it->data)->evaluateMX(input_p, output_p,
-                                                  dummy_p, dummy_p, dummy_p, dummy_p, false);
+            const_cast<MX&>(it->data)->eval(input_p, output_p);
           }
         }
       }
@@ -1741,8 +1740,7 @@ namespace casadi {
           }
 
           // Evaluate atomic operation
-          const_cast<MX&>(it->data)->evaluateMX(input_p, output_p,
-                                                dummy_p, dummy_p, dummy_p, dummy_p, false);
+          const_cast<MX&>(it->data)->eval(input_p, output_p);
 
           // Possibly replace results with new variables
           for (int c=0; c<it->res.size(); ++c) {

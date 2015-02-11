@@ -48,32 +48,8 @@ namespace casadi {
                               int* itmp, SXElement* rtmp) {
   }
 
-  void ConstantMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                              MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                              bool output_given) {
-    // Evaluate nondifferentiated
-    if (!output_given) {
-      if (output[0]) {
-        *output[0] = shared_from_this<MX>();
-      }
-    }
-
-    // Forward sensitivities
-    if (!fwdSens.empty()) {
-      MX zero_sens(size1(), size2());
-      for (int d=0; d<fwdSens.size(); ++d) {
-        if (fwdSens[d][0]!=0) {
-          *fwdSens[d][0] = zero_sens;
-        }
-      }
-    }
-
-    // Clear adjoint seeds
-    for (int d=0; d<adjSeed.size(); ++d) {
-      if (adjSeed[d][0]!=0) {
-        *adjSeed[d][0] = MX();
-      }
-    }
+  void ConstantMX::eval(const MXPtrV& input, MXPtrV& output) {
+    *output[0] = shared_from_this<MX>();
   }
 
  void ConstantMX::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {

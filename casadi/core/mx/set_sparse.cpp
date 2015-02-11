@@ -69,26 +69,8 @@ namespace casadi {
     evaluateGen<SXElement>(input, output, itmp, rtmp);
   }
 
-  void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                             bool output_given) {
-    // Evaluate function
-    if (!output_given) {
-      *output[0] = input[0]->setSparse(sparsity());
-    }
-
-    // Propagate forward seeds
-    int nfwd = fwdSens.size();
-    for (int d=0; d<nfwd; ++d) {
-      *fwdSens[d][0] = fwdSeed[d][0]->setSparse(sparsity(), true);
-    }
-
-    // Propagate adjoint seeds
-    int nadj = adjSeed.size();
-    for (int d=0; d<nadj; ++d) {
-      adjSens[d][0]->addToSum(adjSeed[d][0]->setSparse(dep().sparsity(), true));
-      *adjSeed[d][0] = MX();
-    }
+  void SetSparse::eval(const MXPtrV& input, MXPtrV& output) {
+    *output[0] = input[0]->setSparse(sparsity());
   }
 
   void SetSparse::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {

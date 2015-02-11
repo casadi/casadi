@@ -63,25 +63,8 @@ namespace casadi {
     *res = sqrt(casadi_dot(dep().nnz(), arg, 1, arg, 1));
   }
 
-  void NormF::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                         MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                         bool output_given) {
-    if (!output_given) {
-      *output[0] = (*input[0])->getNormF();
-    }
-
-    // Forward sensitivities
-    int nfwd = fwdSens.size();
-    for (int d=0; d<nfwd; ++d) {
-      *fwdSens[d][0] = (*input[0])->getInnerProd(*fwdSeed[d][0]) / (*output[0]);
-    }
-
-    // Adjoint sensitivities
-    int nadj = adjSeed.size();
-    for (int d=0; d<nadj; ++d) {
-      adjSens[d][0]->addToSum(((*adjSeed[d][0])/(*output[0])) * *input[0]);
-      *adjSeed[d][0] = MX();
-    }
+  void NormF::eval(const MXPtrV& input, MXPtrV& output) {
+    *output[0] = (*input[0])->getNormF();
   }
 
   void NormF::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {

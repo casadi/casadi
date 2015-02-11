@@ -2110,8 +2110,6 @@ namespace casadi {
   }
 
   void FunctionInternal::call(const MXVector& arg, MXVector& res,
-                              const MXVectorVector& fseed, MXVectorVector& fsens,
-                              const MXVectorVector& aseed, MXVectorVector& asens,
                               bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
 
@@ -2120,7 +2118,8 @@ namespace casadi {
 
     if (inline_function) {
       // Evaluate the function symbolically
-      evalMX(arg, res, fseed, fsens, aseed, asens);
+      MXVectorVector dummy;
+      evalMX(arg, res, dummy, dummy, dummy, dummy);
 
     } else {
       // Create a call-node
@@ -2142,34 +2141,27 @@ namespace casadi {
           << ", " << input(i).size1() << ") while a shape (" << arg[i].size2() << ", "
           << arg[i].size1() << ") was supplied.");
       }
-      createCall(arg, res, fseed, fsens, aseed, asens);
+      res = createCall(arg);
     }
   }
 
   void FunctionInternal::call(const SXVector& arg, SXVector& res,
-                        const SXVectorVector& fseed, SXVectorVector& fsens,
-                        const SXVectorVector& aseed, SXVectorVector& asens,
                         bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
-    evalSX(arg, res, fseed, fsens, aseed, asens);
+    SXVectorVector dummy;
+    evalSX(arg, res, dummy, dummy, dummy, dummy);
   }
 
   void FunctionInternal::call(const DMatrixVector& arg, DMatrixVector& res,
-                        const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens,
-                        const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
                         bool always_inline, bool never_inline) {
-    if (fseed.size()==0 || aseed.size()==0) {
-      for (int i=0;i<arg.size();++i) {
-        setInput(arg[i], i);
-      }
-      evaluate();
-      res.resize(getNumOutputs());
-      for (int i=0;i<res.size();++i) {
-        res[i]=output(i);
-      }
-    } else {
-      casadi_error("Not implemented");
+    for (int i=0;i<arg.size();++i) {
+      setInput(arg[i], i);
+    }
+    evaluate();
+    res.resize(getNumOutputs());
+    for (int i=0;i<res.size();++i) {
+      res[i]=output(i);
     }
   }
 
@@ -2607,134 +2599,8 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  void FunctionInternal::createCall(const std::vector<MX> &arg,
-                          std::vector<MX> &res, const std::vector<std::vector<MX> > &fseed,
-                          std::vector<std::vector<MX> > &fsens,
-                          const std::vector<std::vector<MX> > &aseed,
-                          std::vector<std::vector<MX> > &asens) {
-
-    if (fseed.empty() && aseed.empty()) {
-      // Create the evaluation node
-      res = callSelf(arg);
-    } else {
-      // Create derivative node
-      createCallDerivative(arg, res, fseed, fsens, aseed, asens);
-    }
-  }
-
-  std::vector<MX> FunctionInternal::callSelf(const std::vector<MX> &arg) {
+  std::vector<MX> FunctionInternal::createCall(const std::vector<MX> &arg) {
     return MX::createMultipleOutput(new CallFunction(shared_from_this<Function>(), arg));
-  }
-
-  void FunctionInternal::createCallDerivative(
-      const std::vector<MX>& arg, std::vector<MX>& res,
-      const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens,
-      const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens) {
-
-
-    // Number of directional derivatives
-    int nfdir = fseed.size();
-    int nadir = aseed.size();
-
-    // Number inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
-
-    // Create derivative function
-    Function dfcn = derivative(nfdir, nadir);
-
-    // All inputs
-    vector<MX> darg;
-    darg.reserve(num_in*(1+nfdir) + num_out*nadir);
-    darg.insert(darg.end(), arg.begin(), arg.end());
-
-    // Forward seeds
-    for (int dir=0; dir<nfdir; ++dir) {
-      darg.insert(darg.end(), fseed[dir].begin(), fseed[dir].end());
-    }
-
-    // Adjoint seeds
-    for (int dir=0; dir<nadir; ++dir) {
-      darg.insert(darg.end(), aseed[dir].begin(), aseed[dir].end());
-    }
-
-    // Create the evaluation node
-    vector<MX> x = MX::createMultipleOutput(new CallFunction(dfcn, darg));
-    vector<MX>::iterator x_it = x.begin();
-
-    // Create the output nodes corresponding to the nondifferented function
-    res.resize(num_out);
-    for (int i = 0; i < num_out; ++i) {
-      res[i] = *x_it++;
-    }
-
-    // Forward sensitivities
-    fsens.resize(nfdir);
-    for (int dir = 0; dir < nfdir; ++dir) {
-      fsens[dir].resize(num_out);
-      for (int i = 0; i < num_out; ++i) {
-        fsens[dir][i] = *x_it++;
-      }
-    }
-
-    // Adjoint sensitivities
-    asens.resize(nadir);
-    for (int dir = 0; dir < nadir; ++dir) {
-      asens[dir].resize(num_in);
-      for (int i = 0; i < num_in; ++i) {
-        asens[dir][i] = *x_it++;
-      }
-    }
-
-  }
-
-  void FunctionInternal::evaluateMX(
-      MXNode* node, const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
-      const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {
-    // Collect inputs and seeds
-    vector<MX> arg = MXNode::getVector(input);
-    vector<vector<MX> > fseed = MXNode::getVector(fwdSeed);
-    vector<vector<MX> > aseed = MXNode::getVector(adjSeed);
-
-    // Free adjoint seeds
-    MXNode::clearVector(adjSeed);
-
-    // Evaluate symbolically
-    vector<MX> res;
-    vector<vector<MX> > fsens, asens;
-
-    if (fwdSens.size()==0 && adjSens.size()==0) {
-      res = callSelf(arg);
-    } else {
-      createCallDerivative(arg, res, fseed, fsens, aseed, asens);
-    }
-
-    // Store the non-differentiated results
-    if (!output_given) {
-      for (int i=0; i<res.size(); ++i) {
-        if (output[i]!=0) {
-          *output[i] = res[i];
-        }
-      }
-    }
-
-    // Store the forward sensitivities
-    for (int d=0; d<fwdSens.size(); ++d) {
-      for (int i=0; i<fwdSens[d].size(); ++i) {
-        if (fwdSens[d][i]!=0) {
-          *fwdSens[d][i] = fsens[d][i];
-        }
-      }
-    }
-
-    // Store the adjoint sensitivities
-    for (int d=0; d<adjSens.size(); ++d) {
-      for (int i=0; i<adjSens[d].size(); ++i) {
-        if (adjSens[d][i]!=0 && !asens[d][i].isEmpty(true) && !(*adjSens[d][i]).isEmpty(true)) {
-          adjSens[d][i]->addToSum(asens[d][i]);
-        }
-      }
-    }
   }
 
   void FunctionInternal::propagateSparsity(MXNode* node, double** arg, double** res,

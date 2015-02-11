@@ -64,9 +64,7 @@ namespace casadi {
     }
   }
 
-  void SubRef::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                          MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                          bool output_given) {
+  void SubRef::eval(const MXPtrV& input, MXPtrV& output) {
     casadi_error("not ready");
   }
 

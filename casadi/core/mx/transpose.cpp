@@ -158,24 +158,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                             bool output_given) {
-    if (!output_given)
-      *output[0] = input[0]->T();
-
-    // Forward sensitivities
-    int nfwd = fwdSens.size();
-    for (int d=0; d<nfwd; ++d) {
-      *fwdSens[d][0] = fwdSeed[d][0]->T();
-    }
-
-    // Adjoint sensitivities
-    int nadj = adjSeed.size();
-    for (int d=0; d<nadj; ++d) {
-      adjSens[d][0]->addToSum(adjSeed[d][0]->T());
-      *adjSeed[d][0] = MX();
-    }
+  void Transpose::eval(const MXPtrV& input, MXPtrV& output) {
+    *output[0] = input[0]->T();
   }
 
   void Transpose::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {

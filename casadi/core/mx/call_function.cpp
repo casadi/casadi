@@ -143,10 +143,14 @@ namespace casadi {
     }
   }
 
-  void CallFunction::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                                MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                                bool output_given) {
-    fcn_->evaluateMX(this, input, output, fwdSeed, fwdSens, adjSeed, adjSens, output_given);
+  void CallFunction::eval(const MXPtrV& input, MXPtrV& output) {
+    vector<MX> arg = getVector(input);
+    vector<MX> res = fcn_->createCall(arg);
+    for (int i=0; i<res.size(); ++i) {
+      if (output[i]!=0) {
+        *output[i] = res[i];
+      }
+    }
   }
 
   void CallFunction::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {

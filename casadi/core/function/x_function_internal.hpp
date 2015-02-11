@@ -1055,9 +1055,9 @@ namespace casadi {
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadir);
 
     // Evaluate symbolically
-    std::vector<MatType> res(outputv_);
     std::vector<std::vector<MatType> > fsens(nfdir, outputv_), asens(nadir, inputv_);
-    call(inputv_, res, fseed, fsens, aseed, asens, true, false);
+    callFwd(inputv_, outputv_, fseed, fsens, true, false);
+    callAdj(inputv_, outputv_, aseed, asens, true, false);
 
     // All inputs of the return function
     std::vector<MatType> ret_in;

@@ -243,15 +243,8 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output) {
-    MXPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
-    evaluateMX(input, output, fwdSeed, fwdSens, adjSeed, adjSens, false);
-  }
-
-  void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output,
-                          const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
-                          const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {
-    throw CasadiException(string("MXNode::evaluateMX not defined for class ")
+  void MXNode::eval(const MXPtrV& input, MXPtrV& output) {
+    throw CasadiException(string("MXNode::eval not defined for class ")
                           + typeid(*this).name());
   }
 

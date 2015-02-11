@@ -767,8 +767,7 @@ namespace casadi {
         }
 
         // Call the evaluation function
-        it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p,
-                             dummy_p, dummy_p, output_given);
+        it->data->eval(input_p, output_p);
       }
     }
     log("MXFunctionInternal::evalMX end");
@@ -1349,8 +1348,7 @@ namespace casadi {
               int el = it->res[i];
               output_p[i] = el<0 ? 0 : &swork[el];
             }
-
-            it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p, dummy_p, dummy_p, false);
+            it->data->eval(input_p, output_p);
           }
         }
       }

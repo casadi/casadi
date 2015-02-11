@@ -51,27 +51,8 @@ namespace casadi {
     }
   }
 
-  void Assertion::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                             bool output_given) {
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Non-differentiated output
-    if (!output_given) {
-      *output[0] = (*input[0]).attachAssert(*input[1], fail_message_);
-    }
-
-    // Forward sensitivities
-    for (int d=0; d<nfwd; ++d) {
-      *fwdSens[d][0] = *fwdSeed[d][0];
-    }
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      adjSens[d][0]->addToSum(*adjSeed[d][0]);
-      *adjSeed[d][0] = MX();
-    }
+  void Assertion::eval(const MXPtrV& input, MXPtrV& output) {
+    *output[0] = (*input[0]).attachAssert(*input[1], fail_message_);
   }
 
   void Assertion::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {

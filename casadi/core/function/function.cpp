@@ -61,7 +61,7 @@ namespace casadi {
                           "mismatch. You supplied " << arg.size()
                           << " arguments instead of expected " << getNumInputs() << ".");
     DMatrixVectorVector dummy;
-    (*this)->call(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
+    (*this)->call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const vector<SX> &arg, vector<SX>& res,
@@ -70,7 +70,7 @@ namespace casadi {
                           "mismatch. You supplied " << arg.size()
                           << " arguments instead of expected " << getNumInputs() << ".");
     SXVectorVector dummy;
-    (*this)->call(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
+    (*this)->call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const vector<MX> &arg, vector<MX>& res,
@@ -78,8 +78,7 @@ namespace casadi {
     casadi_assert_message(arg.size()==getNumInputs(), "Function::call: dimension "
                           "mismatch. You supplied " << arg.size()
                           << " arguments instead of expected " << getNumInputs() << ".");
-    MXVectorVector dummy;
-    (*this)->call(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
+    (*this)->call(arg, res, always_inline, never_inline);
   }
 
   vector<vector<MX> > Function::callParallel(const vector<vector<MX> > &x,

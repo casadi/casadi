@@ -98,31 +98,8 @@ namespace casadi {
     }
   }
 
-  void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output,
-                                  const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
-                                  const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                                  bool output_given) {
-    if (!output_given)
-      *output[0] = mul(*input[1], *input[2], *input[0]);
-
-    // Forward sensitivities
-    int nfwd = fwdSens.size();
-    for (int d=0; d<nfwd; ++d) {
-      *fwdSens[d][0] = *fwdSeed[d][0]
-        + mul(*input[1], *fwdSeed[d][2], MX::zeros(dep(0).sparsity()))
-        + mul(*fwdSeed[d][1], *input[2], MX::zeros(dep(0).sparsity()));
-    }
-
-    // Adjoint sensitivities
-    int nadj = adjSeed.size();
-    for (int d=0; d<nadj; ++d) {
-      adjSens[d][1]->addToSum(mul(*adjSeed[d][0], input[2]->T(), MX::zeros(dep(1).sparsity())));
-      adjSens[d][2]->addToSum(mul(input[1]->T(), *adjSeed[d][0], MX::zeros(dep(2).sparsity())));
-      if (adjSeed[d][0]!=adjSens[d][0]) {
-        adjSens[d][0]->addToSum(*adjSeed[d][0]);
-        *adjSeed[d][0] = MX();
-      }
-    }
+  void Multiplication::eval(const MXPtrV& input, MXPtrV& output) {
+    *output[0] = mul(*input[1], *input[2], *input[0]);
   }
 
   void Multiplication::propagateSparsity(double** input, double** output,

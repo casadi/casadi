@@ -122,11 +122,7 @@ namespace casadi {
     }
   }
 
-  void Horzsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                             bool output_given) {
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
+  void Horzsplit::eval(const MXPtrV& input, MXPtrV& output) {
     int nx = offset_.size()-1;
 
     // Get column offsets
@@ -139,34 +135,11 @@ namespace casadi {
       col_offset.push_back(col_offset.back() + it->size2());
     }
 
-    // Non-differentiated output and forward sensitivities
-    int first_d = output_given ? 0 : -1;
-    for (int d=first_d; d<nfwd; ++d) {
-      const MXPtrV& arg = d<0 ? input : fwdSeed[d];
-      MXPtrV& res = d<0 ? output : fwdSens[d];
-      MX& x = *arg[0];
-      vector<MX> y = horzsplit(x, col_offset);
-      for (int i=0; i<nx; ++i) {
-        if (res[i]!=0) {
-          *res[i] = y[i];
-        }
-      }
-    }
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      if (adjSens[d][0]!=0) {
-        vector<MX> v;
-        for (int i=0; i<nx; ++i) {
-          MX* x_i = adjSeed[d][i];
-          if (x_i!=0) {
-            v.push_back(*x_i);
-            *x_i = MX();
-          } else {
-            v.push_back(MX(output_sparsity_[i].shape()));
-          }
-        }
-        adjSens[d][0]->addToSum(horzcat(v));
+    MX& x = *input[0];
+    vector<MX> y = horzsplit(x, col_offset);
+    for (int i=0; i<nx; ++i) {
+      if (output[i]!=0) {
+        *output[i] = y[i];
       }
     }
   }
@@ -257,11 +230,7 @@ namespace casadi {
     }
   }
 
-  void Diagsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                             bool output_given) {
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
+  void Diagsplit::eval(const MXPtrV& input, MXPtrV& output) {
     int nx = offset_.size()-1;
 
     // Get offsets
@@ -278,34 +247,11 @@ namespace casadi {
       offset2.push_back(offset2.back() + it->size2());
     }
 
-    // Non-differentiated output and forward sensitivities
-    int first_d = output_given ? 0 : -1;
-    for (int d=first_d; d<nfwd; ++d) {
-      const MXPtrV& arg = d<0 ? input : fwdSeed[d];
-      MXPtrV& res = d<0 ? output : fwdSens[d];
-      MX& x = *arg[0];
-      vector<MX> y = diagsplit(x, offset1, offset2);
-      for (int i=0; i<nx; ++i) {
-        if (res[i]!=0) {
-          *res[i] = y[i];
-        }
-      }
-    }
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      if (adjSens[d][0]!=0) {
-        vector<MX> v;
-        for (int i=0; i<nx; ++i) {
-          MX* x_i = adjSeed[d][i];
-          if (x_i!=0) {
-            v.push_back(*x_i);
-            *x_i = MX();
-          } else {
-            v.push_back(MX(output_sparsity_[i].shape()));
-          }
-        }
-        adjSens[d][0]->addToSum(diagcat(v));
+    MX& x = *input[0];
+    vector<MX> y = diagsplit(x, offset1, offset2);
+    for (int i=0; i<nx; ++i) {
+      if (output[i]!=0) {
+        *output[i] = y[i];
       }
     }
   }
@@ -399,11 +345,7 @@ namespace casadi {
     }
   }
 
-  void Vertsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                             bool output_given) {
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
+  void Vertsplit::eval(const MXPtrV& input, MXPtrV& output) {
     int nx = offset_.size()-1;
 
     // Get row offsets
@@ -416,34 +358,11 @@ namespace casadi {
       row_offset.push_back(row_offset.back() + it->size1());
     }
 
-    // Non-differentiated output and forward sensitivities
-    int first_d = output_given ? 0 : -1;
-    for (int d=first_d; d<nfwd; ++d) {
-      const MXPtrV& arg = d<0 ? input : fwdSeed[d];
-      MXPtrV& res = d<0 ? output : fwdSens[d];
-      MX& x = *arg[0];
-      vector<MX> y = vertsplit(x, row_offset);
-      for (int i=0; i<nx; ++i) {
-        if (res[i]!=0) {
-          *res[i] = y[i];
-        }
-      }
-    }
-
-    // Adjoint sensitivities
-    for (int d=0; d<nadj; ++d) {
-      if (adjSens[d][0]!=0) {
-        vector<MX> v;
-        for (int i=0; i<nx; ++i) {
-          MX* x_i = adjSeed[d][i];
-          if (x_i!=0) {
-            v.push_back(*x_i);
-            *x_i = MX();
-          } else {
-            v.push_back(MX(output_sparsity_[i].shape()));
-          }
-        }
-        adjSens[d][0]->addToSum(vertcat(v));
+    MX& x = *input[0];
+    vector<MX> y = vertsplit(x, row_offset);
+    for (int i=0; i<nx; ++i) {
+      if (output[i]!=0) {
+        *output[i] = y[i];
       }
     }
   }

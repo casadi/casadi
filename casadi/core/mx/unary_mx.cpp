@@ -72,42 +72,9 @@ namespace casadi {
     casadi_math<SXElement>::fun(op_, inputd, dummy, outputd, nnz());
   }
 
-  void UnaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
-                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                           bool output_given) {
-    // Evaluate function
-    MX f, dummy; // Function value, dummy second argument
-    if (output_given) {
-      f = *output[0];
-    } else {
-      casadi_math<MX>::fun(op_, *input[0], dummy, f);
-    }
-
-    // Number of forward directions
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-    if (nfwd>0 || nadj>0) {
-      // Get partial derivatives
-      MX pd[2];
-      casadi_math<MX>::der(op_, *input[0], dummy, f, pd);
-
-      // Propagate forward seeds
-      for (int d=0; d<nfwd; ++d) {
-        *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]);
-      }
-
-      // Propagate adjoint seeds
-      for (int d=0; d<nadj; ++d) {
-        MX s = *adjSeed[d][0];
-        *adjSeed[d][0] = MX();
-        adjSens[d][0]->addToSum(pd[0]*s);
-      }
-    }
-
-    // Perform the assignment (which may be inplace, hence delayed)
-    if (!output_given) {
-      *output[0] = f;
-    }
+  void UnaryMX::eval(const MXPtrV& input, MXPtrV& output) {
+    MX dummy;
+    casadi_math<MX>::fun(op_, *input[0], dummy, *output[0]);
   }
 
   void UnaryMX::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {

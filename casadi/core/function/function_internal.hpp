@@ -114,38 +114,18 @@ namespace casadi {
                               std::vector<std::vector<SX> >& asens);
 
     /** \brief  Create function call node */
-    virtual void createCall(const std::vector<MX> &arg, std::vector<MX> &res,
-                            const std::vector<std::vector<MX> > &fseed,
-                            std::vector<std::vector<MX> > &fsens,
-                            const std::vector<std::vector<MX> > &aseed,
-                            std::vector<std::vector<MX> > &asens);
-
-    /** \brief  Create derivative node */
-    virtual void createCallDerivative(const std::vector<MX> &arg, std::vector<MX> &res,
-                                      const std::vector<std::vector<MX> > &fseed,
-                                      std::vector<std::vector<MX> > &fsens,
-                                      const std::vector<std::vector<MX> > &aseed,
-                                      std::vector<std::vector<MX> > &asens);
-
-    /** \brief  Create a call to this */
-    std::vector<MX> callSelf(const std::vector<MX> &arg);
+    virtual std::vector<MX> createCall(const std::vector<MX>& arg);
 
     /** \brief Call a function, DMatrix type (overloaded) */
     void call(const DMatrixVector& arg, DMatrixVector& res,
-              const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens,
-              const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
               bool always_inline, bool never_inline);
 
     /** \brief Call a function, MX type (overloaded) */
     void call(const MXVector& arg, MXVector& res,
-              const MXVectorVector& fseed, MXVectorVector& fsens,
-              const MXVectorVector& aseed, MXVectorVector& asens,
               bool always_inline, bool never_inline);
 
     /** \brief Call a function, SX type (overloaded) */
     void call(const SXVector& arg, SXVector& res,
-              const SXVectorVector& fseed, SXVectorVector& fsens,
-              const SXVectorVector& aseed, SXVectorVector& asens,
               bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
@@ -381,10 +361,6 @@ namespace casadi {
     /// The following functions are called internally from EvaluateMX.
     /// For documentation, see the MXNode class
     ///@{
-    virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res,
-                            const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed,
-                            MXPtrVV& asens, bool output_given);
-
     virtual void propagateSparsity(MXNode* node, double** arg, double** res,
                                    int* itmp, bvec_t* rtmp, bool fwd);
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);

@@ -55,10 +55,7 @@ namespace casadi {
     virtual SetNonzeros* clone() const = 0;
 
     /// Evaluate the function symbolically (MX)
-    void evaluateMX(const MXPtrV& input, MXPtrV& output,
-                    const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
-                    const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                    bool output_given);
+    void eval(const MXPtrV& input, MXPtrV& output);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
