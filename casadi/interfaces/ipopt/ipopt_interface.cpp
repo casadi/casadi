@@ -27,6 +27,9 @@
 #include "ipopt_interface.hpp"
 #include "ipopt_nlp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
+#include "../../core/profiling.hpp"
+#include "../../core/casadi_options.hpp"
+
 #include <ctime>
 #include <stdlib.h>
 
@@ -283,9 +286,32 @@ namespace casadi {
       (*app_sens)->Initialize();
     }
 #endif // WITH_SIPOPT
+
+
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      profileWriteName(CasadiOptions::profilingLog, this, getOption("name"),
+                       ProfilingData_FunctionType_Other, 5);
+
+      profileWriteSourceLineDep(CasadiOptions::profilingLog, this,
+        0, "f", nlp_.operator->());
+      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 1,
+        "grad_f", gradF_.operator->());
+      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 2,
+        "g", nlp_.operator->());
+      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 3,
+        "jac_g", this->jacG().operator->());
+      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 4,
+        "h", hessLag_.isNull() ? 0 : hessLag_.operator->());
+    }
+
   }
 
   void IpoptInterface::evaluate() {
+
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      profileWriteEntry(CasadiOptions::profilingLog, this);
+    }
+
     if (inputs_check_) checkInputs();
 
     checkInitialBounds();
@@ -322,8 +348,8 @@ namespace casadi {
     double time1 = clock();
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
-    double time2 = clock();
-    t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
+    double delta = (clock()-time1)/CLOCKS_PER_SEC;
+    t_mainloop_ = delta;
 
 #ifdef WITH_SIPOPT
     if (run_sens_ || compute_red_hessian_) {
@@ -350,6 +376,11 @@ namespace casadi {
 #endif // WITH_CASADI_PATCH
     }
 #endif // WITH_SIPOPT
+
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      profileWriteExit(CasadiOptions::profilingLog, this,
+        delta - (t_callback_fun_-t_callback_prepare_));
+    }
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
@@ -577,8 +608,11 @@ namespace casadi {
             casadi_error("IpoptInterface::h: NaN or Inf detected.");
 
       }
-      double time2 = clock();
-      t_eval_h_ += (time2-time1)/CLOCKS_PER_SEC;
+      double delta = (clock()-time1)/CLOCKS_PER_SEC;
+      t_eval_h_ += delta;
+      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+        profileWriteTime(CasadiOptions::profilingLog, this, 4, delta);
+      }
       n_eval_h_ += 1;
       log("eval_h ok");
       return true;
@@ -636,8 +670,11 @@ namespace casadi {
             casadi_error("IpoptInterface::jac_g: NaN or Inf detected.");
       }
 
-      double time2 = clock();
-      t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
+      double delta = (clock()-time1)/CLOCKS_PER_SEC;
+      t_eval_jac_g_ += delta;
+      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+        profileWriteTime(CasadiOptions::profilingLog, this, 3, delta);
+      }
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
@@ -675,9 +712,12 @@ namespace casadi {
       if (regularity_check_ && !isRegular(nlp_.output(NL_F).data()))
           casadi_error("IpoptInterface::f: NaN or Inf detected.");
 
-      double time2 = clock();
-      t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
+      double delta = (clock()-time1)/CLOCKS_PER_SEC;
+      t_eval_f_ += delta;
       n_eval_f_ += 1;
+      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+        profileWriteTime(CasadiOptions::profilingLog, this, 0, delta);
+      }
       log("eval_f ok");
       return true;
     } catch(exception& ex) {
@@ -714,8 +754,11 @@ namespace casadi {
       if (regularity_check_ && !isRegular(nlp_.output(NL_G).data()))
           casadi_error("IpoptInterface::g: NaN or Inf detected.");
 
-      double time2 = clock();
-      t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
+      double delta = (clock()-time1)/CLOCKS_PER_SEC;
+      t_eval_g_ += delta;
+      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+        profileWriteTime(CasadiOptions::profilingLog, this, 2, delta);
+      }
       n_eval_g_ += 1;
       log("eval_g ok");
       return true;
@@ -751,8 +794,11 @@ namespace casadi {
       if (regularity_check_ && !isRegular(gradF_.output().data()))
           casadi_error("IpoptInterface::grad_f: NaN or Inf detected.");
 
-      double time2 = clock();
-      t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
+      double delta = (clock()-time1)/CLOCKS_PER_SEC;
+      t_eval_grad_f_ += delta;
+      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+        profileWriteTime(CasadiOptions::profilingLog, this, 1, delta);
+      }
       n_eval_grad_f_ += 1;
       log("eval_grad_f ok");
       return true;

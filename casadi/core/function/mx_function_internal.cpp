@@ -394,8 +394,12 @@ namespace casadi {
            ++it, ++alg_counter) {
         std::stringstream ss;
         print(ss, *it);
-        profileWriteSourceLine(CasadiOptions::profilingLog, this, alg_counter, ss.str(), it->op,
-                               (it->op == OP_CALL)? it->data->getFunction().operator->() : 0);
+        if (it->op == OP_CALL) {
+          profileWriteSourceLineDep(CasadiOptions::profilingLog, this, alg_counter,
+                            ss.str(), it->op, it->data->getFunction().operator->());
+        } else {
+          profileWriteSourceLine(CasadiOptions::profilingLog, this, alg_counter, ss.str(), it->op);
+        }
       }
     }
 

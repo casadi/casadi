@@ -201,10 +201,20 @@ void profileWriteTime(std::ofstream &f, T *a, int line_number, double local, dou
   profileWrite(f, s);
 }
 
+template<typename T>
+void profileWriteTime(std::ofstream &f, T *a, int line_number, double local) {
+  ProfilingData_TIMELINE s;
+  s.local = local;
+  s.total = 0;
+  s.thisp = ptrToLong(a);
+  s.line_number = line_number;
+  profileWrite(f, s);
+}
+
 
 template<typename T, typename T2>
-void profileWriteSourceLine(std::ofstream &f, T *a, int line_number, const std::string &sourceline,
-                            int opcode, T2 *dependency) {
+void profileWriteSourceLineDep(std::ofstream &f, T *a, int line_number,
+        const std::string &sourceline, int opcode, T2 *dependency) {
   ProfilingData_SOURCE s;
   s.thisp = ptrToLong(a);
   s.line_number = line_number;
@@ -215,14 +225,40 @@ void profileWriteSourceLine(std::ofstream &f, T *a, int line_number, const std::
   f << sourceline;
 }
 
+template<typename T, typename T2>
+void profileWriteSourceLineDep(std::ofstream &f, T *a, int line_number,
+        const std::string &sourceline, T2 *dependency) {
+  ProfilingData_SOURCE s;
+  s.thisp = ptrToLong(a);
+  s.line_number = line_number;
+  s.length = sourceline.size();
+  s.opcode = -1;
+  s.dependency = ptrToLong(dependency);
+  profileWrite(f, s);
+  f << sourceline;
+}
+
 template<typename T>
 void profileWriteSourceLine(std::ofstream &f, T *a, int line_number,
-                            const std::string &sourceline, int opcode) {
+        const std::string &sourceline, int opcode) {
   ProfilingData_SOURCE s;
   s.thisp = ptrToLong(a);
   s.line_number = line_number;
   s.length = sourceline.size();
   s.opcode = opcode;
+  s.dependency = 0;
+  profileWrite(f, s);
+  f << sourceline;
+}
+
+template<typename T>
+void profileWriteSourceLine(std::ofstream &f, T *a, int line_number,
+        const std::string &sourceline) {
+  ProfilingData_SOURCE s;
+  s.thisp = ptrToLong(a);
+  s.line_number = line_number;
+  s.length = sourceline.size();
+  s.opcode = -1;
   s.dependency = 0;
   profileWrite(f, s);
   f << sourceline;

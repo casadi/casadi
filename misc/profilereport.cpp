@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
   // Calculate external_time and overhead_time
   for (Stats::iterator it = data.begin();it!=data.end();++it) {
     functionstat & f = it->second;
-    if (f.type==ProfilingData_FunctionType_MXFunction) {
+    if (f.type==ProfilingData_FunctionType_MXFunction || f.type==ProfilingData_FunctionType_Other) {
       f.overhead_time = f.total_time;
       for (std::vector<linestat>::const_iterator it2 = f.lines.begin();it2!=f.lines.end();++it2) {
         const linestat & l = *it2;
@@ -266,16 +266,85 @@ int main(int argc, char* argv[])
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
     
-    if (f.type== ProfilingData_FunctionType_Other ) continue;
+    //if (f.type== ProfilingData_FunctionType_Other ) continue;
+    
+    std::string type;
+    std::stringstream stats;
+    stats << "total_time: " << f.total_time;
+    stats << ", external_time: " << f.external_time;
+    stats << ", overhead_time: " <<  f.overhead_time;
+    stats << ", count: " <<  f.count;
+    
+    if (f.type==ProfilingData_FunctionType_Other) {
+      type="'other'";
+        
+        std::stringstream ops;
+                
+        for (int i=0;i<f.lines.size();++i) {
+          ops << "{ name: '";
+          ops << f.lines[i].code;
+          ops << "', n : " << f.lines[i].count << ", time: " << f.lines[i].total_time;
+          if (f.lines[i].dependency!=0) {
+            ops << ", dependency: " << f.lines[i].dependency;
+          }
+          ops << "}, ";
+        }
+        
+        stats << ", ops : [" << ops.str() << "]";
+      
+    } else if (f.type==ProfilingData_FunctionType_SXFunction) {
+      type="'SXFunction'";
+    } else if (f.type==ProfilingData_FunctionType_MXFunction) {
+      type="'MXFunction'";
+        //Binning
+        std::vector<int> type_binning_ncalls(casadi::NUM_BUILT_IN_OPS);
+        std::vector<double> type_binning_time(casadi::NUM_BUILT_IN_OPS);
+        
+        std::map<long,int> callmap;
+        if (f.type==ProfilingData_FunctionType_MXFunction) {
+          for (int i=0;i<f.lines.size();++i) {
+            const linestat &L = f.lines[i];
+            type_binning_ncalls[L.opcode]+=1;
+            type_binning_time[L.opcode]+=L.total_time;
+            if (f.lines[i].dependency!=0) {
+  
+              Stats::iterator itd = data.find(f.lines[i].dependency);
+              
+              if (itd->second.type== ProfilingData_FunctionType_Other ) continue;
+              
+              std::map<long,int>::iterator it = callmap.find(f.lines[i].dependency);
+              if (it==callmap.end()) {
+                callmap[f.lines[i].dependency] = f.lines[i].count;
+              } else {
+                it->second += f.lines[i].count;
+              }
+            }
+          }
+        }
+        
+        std::stringstream ops;
+                
+        for (int i=0;i<casadi::NUM_BUILT_IN_OPS;++i) {
+          ops << "{ name: '";
+          casadi::casadi_math<double>::printName(i,ops);
+          ops << "', n : " << type_binning_ncalls[i] << ", time: " << type_binning_time[i];
+          if (i==OP_CALL) {
+            ops << ", dependency: true";
+          }
+          ops << "}, ";
+        }
+        
+        stats << ", ops : [" << ops.str() << "]";
+    }
 
-    report << it->first  << ": {name:" << '"' << f.name << '"' << "}," << std::endl;
+    report << it->first  << ": {name:" << '"' << f.name << '"' << ", type:" << type << ", stats: {" << stats.str() << "}}," << std::endl;
   }
   report << "};" << std::endl;
   
   report << "var functioncalls=[";
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
-    if (f.type== ProfilingData_FunctionType_Other ) continue;
+    //if (f.type== ProfilingData_FunctionType_Other ) continue;
     
     std::map<long,int> callmap;
     for (int i=0;i<f.lines.size();++i) {
@@ -283,7 +352,7 @@ int main(int argc, char* argv[])
       
         Stats::iterator itd = data.find(f.lines[i].dependency);
         
-        if (itd->second.type== ProfilingData_FunctionType_Other ) continue;
+        //if (itd->second.type== ProfilingData_FunctionType_Other ) continue;
         
         std::map<long,int>::iterator it = callmap.find(f.lines[i].dependency);
         if (it==callmap.end()) {

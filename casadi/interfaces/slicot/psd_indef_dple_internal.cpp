@@ -197,13 +197,11 @@ namespace casadi {
     }
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, "PsdIndefSolver",
-                       ProfilingData_FunctionType_Other, 4);
+      profileWriteName(CasadiOptions::profilingLog, this, getOption("name"),
+                       ProfilingData_FunctionType_Other, 2);
 
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "periodic schur form", -1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "nominal", -1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 2, "forward", -1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 3, "adjoint", -1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "schur", -1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve", -1);
     }
 
     psd_num_zero_ = getOption("psd_num_zero");
@@ -265,17 +263,8 @@ namespace casadi {
 
     double time_total_start = clock();
 
-    // Set up timers for profiling
-    double time_zero=0;
-    double time_start=0;
-    double time_stop=0;
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      time_zero = getRealTime();
       profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
-
-    if (CasadiOptions::profiling) {
-      time_start = getRealTime(); // Start timer
     }
 
     // Transpose operation (after #554)
@@ -289,16 +278,11 @@ namespace casadi {
 
     double time_psd_start = clock();
     slicot_periodic_schur(n_, K_, X_, T_, Z_, dwork_, eig_real_, eig_imag_, psd_num_zero_);
-    t_psd_+=(clock()-time_psd_start)/CLOCKS_PER_SEC;
+    double time_psd_delta = (clock()-time_psd_start)/CLOCKS_PER_SEC;
+    t_psd_+=time_psd_delta;
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 0, time_stop-time_start,
-                       time_stop-time_zero);
-    }
-
-    if (CasadiOptions::profiling) {
-      time_start = getRealTime(); // Start timer
+      profileWriteTime(CasadiOptions::profilingLog, this, 0, time_psd_delta , t_psd_);
     }
 
     if (error_unstable_) {
@@ -380,23 +364,20 @@ namespace casadi {
 
         double time_linear_solve_start = clock();
         solver.prepare();
-        t_linear_solve_ += (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
+        double time_linear_solve_delta = (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
+        t_linear_solve_ += time_linear_solve_delta;
+
+        if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+          profileWriteTime(CasadiOptions::profilingLog, this, 1,
+            time_linear_solve_delta, t_linear_solve_);
+        }
 
       }
     }
 
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 1, time_stop-time_start,
-                       time_stop-time_zero);
-    }
 
     if (!transp_) {
       for (int d=0;d<nrhs_;++d) {
-
-        if (CasadiOptions::profiling) {
-          time_start = getRealTime(); // Start timer
-        }
 
         // ********** START ***************
         // V = blocks([mul([sZ[k].T, V[k], sZ[k]]) for k in range(p)])
@@ -561,7 +542,13 @@ namespace casadi {
             double time_linear_solve_start = clock();
             // n^2 K
             solver.solve(true);
-            t_linear_solve_ += (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
+            double time_linear_solve_delta = (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
+            t_linear_solve_ += time_linear_solve_delta;
+
+            if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+              profileWriteTime(CasadiOptions::profilingLog, this, 1,
+                time_linear_solve_delta, t_linear_solve_);
+            }
 
             // Extract solution and store it in X
             std::vector<double> & sol = solver.output().data();
@@ -601,20 +588,11 @@ namespace casadi {
                        &outputD(d).data()[k*n_*n_]);
         }
 
-        if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-          time_stop = getRealTime(); // Stop timer
-          profileWriteTime(CasadiOptions::profilingLog, this, 2, time_stop-time_start,
-                           time_stop-time_zero);
-        }
-
       }
     } else { // Transposed
 
       for (int d=0;d<nrhs_;++d) {
 
-        if (CasadiOptions::profiling) {
-          time_start = getRealTime(); // Start timer
-        }
 
         DMatrix &P_bar = inputD(1+d);
         std::vector<double> &Vbar = outputD(d).data();
@@ -676,7 +654,13 @@ namespace casadi {
             double time_linear_solve_start = clock();
             // n^2 K
             solver.solve(false);
-            t_linear_solve_ += (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
+            double time_linear_solve_delta = (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
+            t_linear_solve_ += time_linear_solve_delta;
+
+            if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+              profileWriteTime(CasadiOptions::profilingLog, this, 1,
+                time_linear_solve_delta, t_linear_solve_);
+            }
 
             // for k in range(p): V_bar[r][l][k]+=M_bar[k]
             std::vector<double> &Mbar = solver.output().data();
@@ -843,22 +827,14 @@ namespace casadi {
         }
 
         //std::fill(P_bar.data().begin(), P_bar.data().end(), 0);
-
-       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-          time_stop = getRealTime(); // Stop timer
-          profileWriteTime(CasadiOptions::profilingLog, this, 3, time_stop-time_start,
-                           time_stop-time_zero);
-       }
-
       }
     }
 
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      time_stop = getRealTime();
-      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_zero);
-    }
-
     t_total_ += (clock()-time_total_start)/CLOCKS_PER_SEC;
+
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      profileWriteExit(CasadiOptions::profilingLog, this, t_total_);
+    }
 
     if (gather_stats_) {
       stats_["t_psd"] = t_psd_;
