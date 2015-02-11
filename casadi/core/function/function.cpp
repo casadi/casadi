@@ -57,20 +57,29 @@ namespace casadi {
 
   void Function::call(const vector<DMatrix> &arg, vector<DMatrix> &res,
                       bool always_inline, bool never_inline) {
+    casadi_assert_message(arg.size()==getNumInputs(), "Function::call: dimension "
+                          "mismatch. You supplied " << arg.size()
+                          << " arguments instead of expected " << getNumInputs() << ".");
     DMatrixVectorVector dummy;
-    callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
+    (*this)->call(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
   }
 
   void Function::call(const vector<SX> &arg, vector<SX>& res,
                       bool always_inline, bool never_inline) {
+    casadi_assert_message(arg.size()==getNumInputs(), "Function::call: dimension "
+                          "mismatch. You supplied " << arg.size()
+                          << " arguments instead of expected " << getNumInputs() << ".");
     SXVectorVector dummy;
-    callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
+    (*this)->call(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
   }
 
   void Function::call(const vector<MX> &arg, vector<MX>& res,
                       bool always_inline, bool never_inline) {
+    casadi_assert_message(arg.size()==getNumInputs(), "Function::call: dimension "
+                          "mismatch. You supplied " << arg.size()
+                          << " arguments instead of expected " << getNumInputs() << ".");
     MXVectorVector dummy;
-    callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
+    (*this)->call(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
   }
 
   vector<vector<MX> > Function::callParallel(const vector<vector<MX> > &x,
@@ -327,28 +336,27 @@ namespace casadi {
                           const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens,
                           const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
                           bool always_inline, bool never_inline) {
-    (*this)->call(arg, res, fseed, fsens, aseed, asens, always_inline, never_inline);
+    call(arg, res, always_inline, never_inline);
+    callFwd(arg, res, fseed, fsens, always_inline, never_inline);
+    callAdj(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   void Function::callDerivative(const SXVector& arg, SXVector& res,
                           const SXVectorVector& fseed, SXVectorVector& fsens,
                           const SXVectorVector& aseed, SXVectorVector& asens,
                           bool always_inline, bool never_inline) {
-    casadi_assert_message(arg.size()==getNumInputs(), "Function::callDerivative: dimension "
-                          "mismatch. You supplied " << arg.size()
-                          << " arguments instead of expected " << getNumInputs() << ".");
-    (*this)->call(arg, res, fseed, fsens, aseed, asens, always_inline, never_inline);
+    call(arg, res, always_inline, never_inline);
+    callFwd(arg, res, fseed, fsens, always_inline, never_inline);
+    callAdj(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   void Function::callDerivative(const MXVector& arg, MXVector& res,
                           const MXVectorVector& fseed, MXVectorVector& fsens,
                           const MXVectorVector& aseed, MXVectorVector& asens,
                           bool always_inline, bool never_inline) {
-    casadi_assert_message(arg.size()==getNumInputs(), "Function::callDerivative: "
-                          "dimension mismatch. You supplied "
-                          << arg.size() << " arguments instead of expected "
-                          << getNumInputs() << ".");
-    (*this)->call(arg, res, fseed, fsens, aseed, asens, always_inline, never_inline);
+    call(arg, res, always_inline, never_inline);
+    callFwd(arg, res, fseed, fsens, always_inline, never_inline);
+    callAdj(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   std::string Function::getSanitizedName() const {

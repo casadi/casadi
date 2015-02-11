@@ -1237,13 +1237,19 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
-  ::callFwd(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+  void XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::
+  callFwd(const std::vector<MatType>& arg, const std::vector<MatType>& res,
           const std::vector<std::vector<MatType> >& fseed,
           std::vector<std::vector<MatType> >& fsens,
           bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     bool inline_function = always_inline;     // TODO(@jaeandersson): Add logic for inlining
+
+    // Quick return if no seeds
+    if (fseed.empty()) {
+      fsens.clear();
+      return;
+    }
 
     // The non-inlining version is implemented in the base class
     if (!inline_function) {
@@ -1262,13 +1268,19 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
-  ::callAdj(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+  void XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::
+  callAdj(const std::vector<MatType>& arg, const std::vector<MatType>& res,
           const std::vector<std::vector<MatType> >& aseed,
           std::vector<std::vector<MatType> >& asens,
           bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     bool inline_function = always_inline;     // TODO(@jaeandersson): Add logic for inlining
+
+    // Quick return if no seeds
+    if (aseed.empty()) {
+      asens.clear();
+      return;
+    }
 
     // The non-inlining version is implemented in the base class
     if (!inline_function) {

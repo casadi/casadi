@@ -804,11 +804,36 @@ namespace casadi {
 
     // Number of forward seeds
     int nfwd = fseed.size();
-
-    // Allocate results if needed
     fsens.resize(nfwd);
+
+    // Quick return if possible
+    if (nfwd==0) return;
+
+    // Get the number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Make sure matching sparsity of fseed
+    bool matching_sparsity = true;
     for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(getNumOutputs());
+      casadi_assert(fseed[d].size()==num_in);
+      for (int i=0; matching_sparsity && i<num_in; ++i)
+        matching_sparsity = fseed[d][i].sparsity()==input(i).sparsity();
+    }
+
+    // Correct sparsity if needed
+    if (!matching_sparsity) {
+      vector<vector<SX> > fseed2(fseed);
+      for (int d=0; d<nfwd; ++d)
+        for (int i=0; i<num_in; ++i)
+          if (fseed2[d][i].sparsity()!=input(i).sparsity())
+            fseed2[d][i] = fseed2[d][i].setSparse(input(i).sparsity());
+      return evalFwd(fseed2, fsens);
+    }
+
+    // Allocate results
+    for (int d=0; d<nfwd; ++d) {
+      fsens[d].resize(num_out);
       for (int i=0; i<fsens[d].size(); ++i)
         if (fsens[d][i].sparsity()!=output(i).sparsity())
           fsens[d][i] = SX::zeros(output(i).sparsity());
@@ -870,11 +895,36 @@ namespace casadi {
 
     // number of adjoint seeds
     int nadj = aseed.size();
+    asens.resize(nadj);
+
+    // Quick return if possible
+    if (nadj==0) return;
+
+    // Get the number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Make sure matching sparsity of fseed
+    bool matching_sparsity = true;
+    for (int d=0; d<nadj; ++d) {
+      casadi_assert(aseed[d].size()==num_out);
+      for (int i=0; matching_sparsity && i<num_out; ++i)
+        matching_sparsity = aseed[d][i].sparsity()==output(i).sparsity();
+    }
+
+    // Correct sparsity if needed
+    if (!matching_sparsity) {
+      vector<vector<SX> > aseed2(aseed);
+      for (int d=0; d<nadj; ++d)
+        for (int i=0; i<num_out; ++i)
+          if (aseed2[d][i].sparsity()!=output(i).sparsity())
+            aseed2[d][i] = aseed2[d][i].setSparse(output(i).sparsity());
+      return evalAdj(aseed2, asens);
+    }
 
     // Allocate results if needed
-    asens.resize(nadj);
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(getNumInputs());
+      asens[d].resize(num_in);
       for (int i=0; i<asens[d].size(); ++i)
         if (asens[d][i].sparsity()!=input(i).sparsity())
           asens[d][i] = SX::zeros(input(i).sparsity());
@@ -1580,5 +1630,23 @@ namespace casadi {
   }
 
 #endif // WITH_OPENCL
+
+  void SXFunctionInternal::callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+                                   const std::vector<std::vector<SX> >& fseed,
+                                   std::vector<std::vector<SX> >& fsens,
+                                   bool always_inline, bool never_inline) {
+    casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
+    XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>
+      ::callFwd(arg, res, fseed, fsens, true, false);
+  }
+
+  void SXFunctionInternal::callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+                                 const std::vector<std::vector<SX> >& aseed,
+                                 std::vector<std::vector<SX> >& asens,
+                                 bool always_inline, bool never_inline) {
+    casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
+    XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>
+      ::callAdj(arg, res, aseed, asens, true, false);
+  }
 
 } // namespace casadi

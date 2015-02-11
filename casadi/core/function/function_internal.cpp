@@ -2968,6 +2968,10 @@ namespace casadi {
 
     // Number of directional derivatives
     int nfwd = fseed.size();
+    fsens.resize(nfwd);
+
+    // Quick return if no seeds
+    if (nfwd==0) return;
 
     // Number inputs and outputs
     int num_in = getNumInputs();
@@ -2990,7 +2994,6 @@ namespace casadi {
     vector<MX>::iterator x_it = x.begin();
 
     // Retrieve sensitivities
-    fsens.resize(nfwd);
     for (int d=0; d<nfwd; ++d) {
       fsens[d].resize(num_out);
       for (int i=0; i<num_out; ++i) {
@@ -3010,6 +3013,10 @@ namespace casadi {
 
     // Number of directional derivatives
     int nadj = aseed.size();
+    asens.resize(nadj);
+
+    // Quick return if no seeds
+    if (nadj==0) return;
 
     // Number inputs and outputs
     int num_in = getNumInputs();
@@ -3032,7 +3039,6 @@ namespace casadi {
     vector<MX>::iterator x_it = x.begin();
 
     // Retrieve sensitivities
-    asens.resize(nadj);
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(num_in);
       for (int i=0; i<num_in; ++i) {
@@ -3047,7 +3053,12 @@ namespace casadi {
                                  std::vector<std::vector<SX> >& fsens,
                                  bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_error("SX expressions do not support call-nodes");
+    if (fseed.empty()) { // Quick return if no seeds
+      fsens.clear();
+      return;
+    }
+    casadi_error("FunctionInternal::callFwd(SX) not defined for class "
+                 << typeid(*this).name());
   }
 
   void FunctionInternal::callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
@@ -3055,7 +3066,12 @@ namespace casadi {
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_error("SX expressions do not support call-nodes");
+    if (aseed.empty()) { // Quick return if no seeds
+      asens.clear();
+      return;
+    }
+    casadi_error("FunctionInternal::callAdj(SX) not defined for class "
+                 << typeid(*this).name());
   }
 
   void FunctionInternal::
