@@ -247,7 +247,162 @@ namespace casadi {
   }
 
   Function Function::derivative(int nfwd, int nadj) {
-    return (*this)->derivative(nfwd, nadj);
+    // Quick return
+    if (nfwd==0 && nadj==0) return *this;
+    
+    // Call self
+    vector<MX> arg = symbolicInput();
+    vector<MX> res = (*this)(arg);
+    vector<MX> ret_in(arg), ret_out(res);
+
+    // Number inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Forward sensitivities
+    if (nfwd>0) {
+      Function dfcn = derivativeFwd(nfwd);
+      arg = dfcn.symbolicInput();
+      copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
+      copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
+      ret_in.insert(ret_in.end(), arg.begin()+num_in+num_out, arg.end());
+      res = dfcn(arg);
+      vector<MX>::iterator it=res.begin();
+      for (int d=0; d<nfwd; ++d)
+        for (int i=0; i<num_out; ++i, ++it)
+          *it = it->setSparse(output(i).sparsity());
+      ret_out.insert(ret_out.end(), res.begin(), res.end());
+    }
+
+    // Adjoint sensitivities
+    if (nadj>0) {
+      Function dfcn = derivativeAdj(nadj);
+      arg = dfcn.symbolicInput();
+      copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
+      copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
+      ret_in.insert(ret_in.end(), arg.begin()+num_in+num_out, arg.end());
+      res = dfcn(arg);
+      vector<MX>::iterator it=res.begin();
+      for (int d=0; d<nadj; ++d)
+        for (int i=0; i<num_in; ++i, ++it)
+          *it = it->setSparse(input(i).sparsity());
+      ret_out.insert(ret_out.end(), res.begin(), res.end());
+    }
+
+    // Construct return function
+    MXFunction ret(ret_in, ret_out);
+
+    // Give it a suitable name
+    stringstream ss;
+    ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
+    ret.setOption("name", ss.str());
+
+    // Names of inputs
+    std::vector<std::string> i_names;
+    i_names.reserve(getNumInputs()*(1+nfwd)+getNumOutputs()*nadj);
+
+    // Nondifferentiated inputs
+    for (int i=0; i<getNumInputs(); ++i) {
+      i_names.push_back("der_" + inputScheme().entryLabel(i));
+    }
+
+    // Forward seeds
+    for (int d=0; d<nfwd; ++d) {
+      for (int i=0; i<getNumInputs(); ++i) {
+        ss.str(string());
+        ss << "fwd" << d << "_" << inputScheme().entryLabel(i);
+        i_names.push_back(ss.str());
+      }
+    }
+
+    // Adjoint seeds
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<getNumOutputs(); ++i) {
+        ss.str(string());
+        ss << "adj" << d << "_" << outputScheme().entryLabel(i);
+        i_names.push_back(ss.str());
+      }
+    }
+
+    // Pass to return object
+    ret.setInputScheme(i_names);
+
+    // Names of outputs
+    std::vector<std::string> o_names;
+    o_names.reserve(getNumOutputs()*(1+nfwd)+getNumInputs()*nadj);
+
+    // Nondifferentiated inputs
+    for (int i=0; i<getNumOutputs(); ++i) {
+      o_names.push_back("der_" + outputScheme().entryLabel(i));
+    }
+
+    // Forward sensitivities
+    for (int d=0; d<nfwd; ++d) {
+      for (int i=0; i<getNumOutputs(); ++i) {
+        ss.str(string());
+        ss << "fwd" << d << "_" << outputScheme().entryLabel(i);
+        o_names.push_back(ss.str());
+      }
+    }
+
+    // Adjoint sensitivities
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<getNumInputs(); ++i) {
+        ss.str(string());
+        ss << "adj" << d << "_" << inputScheme().entryLabel(i);
+        o_names.push_back(ss.str());
+      }
+    }
+
+    // Pass to return object
+    ret.setOutputScheme(o_names);
+
+    // Initialize it
+    ret.init();
+
+    // Consistency check for inputs
+    int ind=0;
+    for (int d=-1; d<nfwd; ++d) {
+      for (int i=0; i<getNumInputs(); ++i, ++ind) {
+        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=input(i).sparsity()) {
+          casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \""
+                       << i_names.at(ind) << "\". Expected " << input(i).dimString()
+                       << " but got " << ret.input(ind).dimString());
+        }
+      }
+    }
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<getNumOutputs(); ++i, ++ind) {
+        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=output(i).sparsity()) {
+          casadi_error("Incorrect sparsity for " << ret << " input " << ind <<
+                       " \"" << i_names.at(ind) << "\". Expected " << output(i).dimString()
+                       << " but got " << ret.input(ind).dimString());
+        }
+      }
+    }
+
+    // Consistency check for outputs
+    ind=0;
+    for (int d=-1; d<nfwd; ++d) {
+      for (int i=0; i<getNumOutputs(); ++i, ++ind) {
+        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=output(i).sparsity()) {
+          casadi_error("Incorrect sparsity for " << ret << " output " << ind <<
+                       " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dimString()
+                       << " but got " << ret.output(ind).dimString());
+        }
+      }
+    }
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<getNumInputs(); ++i, ++ind) {
+        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=input(i).sparsity()) {
+          casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \""
+                       << o_names.at(ind) << "\". Expected " << input(i).dimString()
+                       << " but got " << ret.output(ind).dimString());
+        }
+      }
+    }
+    return ret;
+    //return (*this)->derivative(nfwd, nadj);
   }
 
   Function Function::derivativeFwd(int nfwd) {
