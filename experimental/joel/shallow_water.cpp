@@ -196,7 +196,7 @@ void Tester::model(){
   vector<MX> f_out;
   for(int j=0; j<n_euler_; ++j){
     // Create a call node
-    f_out = f_step.call(f_inter);
+    f_out = f_step(f_inter);
     
     // Save intermediate state
     f_inter[1] = f_out[0];
@@ -218,7 +218,7 @@ void Tester::model(){
     f_inter = f_in;
     for(int j=0; j<n_finite_elements_; ++j){
       // Create a call node
-      f_out = f_mx.call(f_inter);
+      f_out = f_mx(f_inter);
       
       // Save intermediate state
       f_inter[1] = f_out[0];
@@ -298,7 +298,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   for(int k=0; k<n_meas_; ++k){
     // Take a step
     MX f_arg[4] = {P,U,V,H};
-    vector<MX> f_res = f_.call(vector<MX>(f_arg,f_arg+4));
+    vector<MX> f_res = f_(vector<MX>(f_arg,f_arg+4));
     U = f_res[0];    V = f_res[1];    H = f_res[2];
     
     // Lift the height
@@ -424,7 +424,7 @@ int main(){
 
   // Codegen the Lifted Newton functions
   bool codegen = true;
-  
+
   // Regularize the QP
   bool regularize = true;
 
