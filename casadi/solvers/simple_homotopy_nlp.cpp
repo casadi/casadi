@@ -88,7 +88,7 @@ namespace casadi {
     std::vector<MX> nlp_in = nlpIn("x", x, "p", P);
 
     MXFunction nlp(nlpIn("x", x, "p", P),
-                   hnlp_.call(hnlpIn("x", x, "p", p_tau[0], "tau", p_tau[1])));
+                   hnlp_(hnlpIn("x", x, "p", p_tau[0], "tau", p_tau[1])));
 
     // Create an nlpsolver instance
     std::string nlpsolver_name = getOption("nlp_solver");

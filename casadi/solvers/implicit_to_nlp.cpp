@@ -129,7 +129,7 @@ namespace casadi {
     args_call[iin_] = u;
     for (int i=0, i2=0; i<getNumInputs(); ++i)
       if (i!=iin_) args_call[i] = inputs[i2++];
-    MX nlp_g = f_.call(args_call).at(iout_);
+    MX nlp_g = f_(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
     MXFunction nlp(nlpIn("x", u, "p", p), nlpOut("f", nlp_f, "g", nlp_g));

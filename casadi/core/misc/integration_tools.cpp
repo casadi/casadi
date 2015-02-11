@@ -169,7 +169,7 @@ namespace casadi {
           XL+=k.at(jj)*A.at(j-1).at(jj);
         }
         //std::cout << "help: " << A.at(j-1) << ", " << c.at(j) << std::endl;
-        k[j] = dt*f.call(daeIn("x", X+XL, "p", P, "t", t+dt*c.at(j)))[DAE_ODE];
+        k[j] = dt*f(daeIn("x", X+XL, "p", P, "t", t+dt*c.at(j)))[DAE_ODE];
       }
 
       for (int j=0;j<order;++j) {
@@ -307,9 +307,9 @@ namespace casadi {
       std::vector<MX> f_out;
       MX t_l = t0_l+tau_root[j]*h;
       if (nz>0) {
-        f_out = f.call(daeIn("t", t_l, "x", Xc[j], "p", P, "z", Zc[j-1]));
+        f_out = f(daeIn("t", t_l, "x", Xc[j], "p", P, "z", Zc[j-1]));
       } else {
-        f_out = f.call(daeIn("t", t_l, "x", Xc[j], "p", P));
+        f_out = f(daeIn("t", t_l, "x", Xc[j], "p", P));
       }
       V_eq.push_back(h*f_out[DAE_ODE]-xp_j);
       V_eq.push_back(f_out[DAE_ALG]);
@@ -344,7 +344,7 @@ namespace casadi {
     std::vector<MX> ifcn_call_in(5);
     ifcn_call_in[0] = MX::zeros(V.sparsity());
     std::copy(vfcn_inputs.begin()+1, vfcn_inputs.end(), ifcn_call_in.begin()+1);
-    std::vector<MX> ifcn_call_out = ifcn.call(ifcn_call_in, true);
+    std::vector<MX> ifcn_call_out = ifcn(ifcn_call_in, true);
     Vs = vertsplit(ifcn_call_out[0], splitPositions);
 
     MX XF = 0;
@@ -369,7 +369,7 @@ namespace casadi {
       F_in.push_back(t0_);
       F_in.push_back(h_);
       t0_+= h_;
-      std::vector<MX> F_out = F.call(F_in);
+      std::vector<MX> F_out = F(F_in);
       X = F_out[0];
     }
 

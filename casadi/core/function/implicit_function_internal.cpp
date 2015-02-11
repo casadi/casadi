@@ -210,7 +210,7 @@ namespace casadi {
     v[iin_] = z;
 
     // Get an expression for the Jacobian
-    MX J = jac_.call(v).front();
+    MX J = jac_(v).front();
 
     // Directional derivatives of f
     Function f_der = f_.derivative(nfwd, nadj);
@@ -250,7 +250,7 @@ namespace casadi {
     }
 
     // Propagate through the implicit function
-    v = f_der.call(v);
+    v = f_der(v);
     vector<MX>::const_iterator v_it = v.begin();
 
     // Discard non-differentiated evaluation (change?)
@@ -307,7 +307,7 @@ namespace casadi {
 
     // Get expression of Jacobian
     vector<MX> arg(darg.begin(), darg.begin()+num_in);
-    MX J = jac_.call(arg).front();
+    MX J = jac_(arg).front();
 
     // Use known value of implicit variable when calling f_der
     darg[num_in + iout_] = darg[iin_];
@@ -320,7 +320,7 @@ namespace casadi {
     }
 
     // Expressions for directional derivatives of f_
-    vector<MX> dres = f_der.call(darg);
+    vector<MX> dres = f_der(darg);
 
     // Solve for all the forward derivatives at once
     vector<MX> rhs(nfwd);
@@ -347,7 +347,7 @@ namespace casadi {
 
     // Get expression of Jacobian
     vector<MX> arg(darg.begin(), darg.begin()+num_in);
-    MX J = jac_.call(arg).front();
+    MX J = jac_(arg).front();
 
     // Use known value of implicit variable when calling f_der
     darg[num_in + iout_] = darg[iin_];
@@ -364,7 +364,7 @@ namespace casadi {
     }
 
     // Propagate through the implicit function
-    dres = f_der.call(dres);
+    dres = f_der(dres);
 
     // Collect sensitivities
     for (int d=0; d<nadj; ++d) {
@@ -406,7 +406,7 @@ namespace casadi {
     v[iin_] = z;
 
     // Get an expression for the Jacobian
-    MX J = jac_.call(v).front();
+    MX J = jac_(v).front();
 
     // Directional derivatives of f
     Function f_der = f_.derivative(nfwd, 0);
@@ -419,7 +419,7 @@ namespace casadi {
     }
 
     // Propagate through the implicit function
-    v = f_der.call(v);
+    v = f_der(v);
     vector<MX>::const_iterator v_it = v.begin();
 
     // Discard non-differentiated evaluation (change?)
@@ -475,7 +475,7 @@ namespace casadi {
     v[iin_] = z;
 
     // Get an expression for the Jacobian
-    MX J = jac_.call(v).front();
+    MX J = jac_(v).front();
 
     // Directional derivatives of f
     Function f_der = f_.derivative(0, nadj);
@@ -506,7 +506,7 @@ namespace casadi {
     rhs.clear();
 
     // Propagate through the implicit function
-    v = f_der.call(v);
+    v = f_der(v);
     vector<MX>::const_iterator v_it = v.begin();
 
     // Discard non-differentiated evaluation (change?)

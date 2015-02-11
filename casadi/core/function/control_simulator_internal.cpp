@@ -86,7 +86,7 @@ namespace casadi {
       control_dae_in_[CONTROL_DAE_X]    = dae_in_[DAE_X];
       control_dae_in_[CONTROL_DAE_Z]    = dae_in_[DAE_Z];
       control_dae_in_[CONTROL_DAE_P]    = dae_in_[DAE_P];
-      control_dae_ = MXFunction(control_dae_in_, control_dae_.call(dae_in_));
+      control_dae_ = MXFunction(control_dae_in_, control_dae_(dae_in_));
       control_dae_.init();
     }
     casadi_assert_message(control_dae_.getNumInputs()==CONTROL_DAE_NUM_IN,
@@ -163,7 +163,7 @@ namespace casadi {
     if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty())
       control_dae_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
-    std::vector<MX> control_dae_call = control_dae_.call(control_dae_in_);
+    std::vector<MX> control_dae_call = control_dae_(control_dae_in_);
 
 
     std::vector<MX> dae_out(
@@ -273,7 +273,7 @@ namespace casadi {
     vector<MX> output_fcn_out_(2 + output_fcn_.getNumOutputs());
     output_fcn_out_[0] = output_fcn_in_[CONTROL_DAE_X];
 
-    vector<MX> output_fcn_call_ = output_fcn_.call(output_fcn_in_);
+    vector<MX> output_fcn_call_ = output_fcn_(output_fcn_in_);
 
     copy(output_fcn_call_.begin(), output_fcn_call_.end(), output_fcn_out_.begin()+2);
 
@@ -321,7 +321,7 @@ namespace casadi {
       output_fcn_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
     // Transform the output_fcn_ with CONTROL_DAE input scheme to a DAE input scheme
-    output_fcn_ = MXFunction(dae_in_, output_fcn_.call(output_fcn_in_));
+    output_fcn_ = MXFunction(dae_in_, output_fcn_(output_fcn_in_));
 
     // Initialize the output function again
     output_fcn_.init();
@@ -390,7 +390,7 @@ namespace casadi {
 
       simulator_in[INTEGRATOR_P] = vertcat(P_eval);
 
-      simulator_out = simulator_.call(simulator_in);
+      simulator_out = simulator_(simulator_in);
 
       // Remember the end state and dstate for next iteration in this loop
       Xk = simulator_out[0](ALL, simulator_out[0].size2()-1);

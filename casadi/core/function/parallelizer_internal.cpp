@@ -321,7 +321,7 @@ namespace casadi {
 
     // Create a function call to the parallelizer
     vector<MX> par_arg = par.symbolicInput();
-    vector<MX> par_res = par.call(par_arg);
+    vector<MX> par_res = par(par_arg);
 
     // Get the offsets: copy to allow being used as a counter
     std::vector<int> par_inind = par->inind_;
@@ -372,7 +372,7 @@ namespace casadi {
 
     // Create a function call to the parallelizer
     vector<MX> par_arg = par.symbolicInput();
-    vector<MX> par_res = par.call(par_arg);
+    vector<MX> par_res = par(par_arg);
 
     // Get the offsets: copy to allow being used as a counter
     std::vector<int> par_inind = par->inind_;
@@ -421,7 +421,7 @@ namespace casadi {
 
     // Create a function call to the parallelizer
     vector<MX> par_arg = par.symbolicInput();
-    vector<MX> par_res = par.call(par_arg);
+    vector<MX> par_res = par(par_arg);
 
     // Get the offsets: copy to allow being used as a counter
     std::vector<int> par_inind = par->inind_;

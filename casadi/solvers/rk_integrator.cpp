@@ -93,28 +93,28 @@ namespace casadi {
       // k1
       f_arg[DAE_T] = t;
       f_arg[DAE_X] = x0;
-      f_res = f_.call(f_arg);
+      f_res = f_(f_arg);
       MX k1 = f_res[DAE_ODE];
       MX k1q = f_res[DAE_QUAD];
 
       // k2
       tt[0] = f_arg[DAE_T] = t + h_/2;
       x_def[0] = f_arg[DAE_X] = x0 + (h_/2) * k1;
-      f_res = f_.call(f_arg);
+      f_res = f_(f_arg);
       MX k2 = f_res[DAE_ODE];
       MX k2q = f_res[DAE_QUAD];
 
       // k3
       tt[1] = tt[0];
       x_def[1] = f_arg[DAE_X] = x0 + (h_/2) * k2;
-      f_res = f_.call(f_arg);
+      f_res = f_(f_arg);
       MX k3 = f_res[DAE_ODE];
       MX k3q = f_res[DAE_QUAD];
 
       // k4
       tt[2] = f_arg[DAE_T] = t + h_;
       x_def[2] = f_arg[DAE_X] = x0 + h_ * k3;
-      f_res = f_.call(f_arg);
+      f_res = f_(f_arg);
       MX k4 = f_res[DAE_ODE];
       MX k4q = f_res[DAE_QUAD];
 
@@ -155,7 +155,7 @@ namespace casadi {
       g_arg[RDAE_T] = tt[2];
       g_arg[RDAE_X] = x[2];
       g_arg[RDAE_RX] = rx0;
-      g_res = g_.call(g_arg);
+      g_res = g_(g_arg);
       MX k1 = g_res[RDAE_ODE];
       MX k1q = g_res[RDAE_QUAD];
 
@@ -163,7 +163,7 @@ namespace casadi {
       g_arg[RDAE_T] = tt[1];
       g_arg[RDAE_X] = x[1];
       g_arg[RDAE_RX] = rx_def[2] = rx0 + (h_/2) * k1;
-      g_res = g_.call(g_arg);
+      g_res = g_(g_arg);
       MX  k2 = g_res[RDAE_ODE];
       MX  k2q = g_res[RDAE_QUAD];
 
@@ -171,7 +171,7 @@ namespace casadi {
       g_arg[RDAE_T] = tt[0];
       g_arg[RDAE_X] = x[0];
       g_arg[RDAE_RX] = rx_def[1] = rx0 + (h_/2) * k2;
-      g_res = g_.call(g_arg);
+      g_res = g_(g_arg);
       MX k3 = g_res[RDAE_ODE];
       MX k3q = g_res[RDAE_QUAD];
 
@@ -179,7 +179,7 @@ namespace casadi {
       g_arg[RDAE_T] = t;
       g_arg[RDAE_X] = x0;
       g_arg[RDAE_RX] = rx_def[0] = rx0 + h_ * k3;
-      g_res = g_.call(g_arg);
+      g_res = g_(g_arg);
       MX k4 = g_res[RDAE_ODE];
       MX  k4q = g_res[RDAE_QUAD];
 

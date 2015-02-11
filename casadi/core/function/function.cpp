@@ -55,26 +55,22 @@ namespace casadi {
     return static_cast<FunctionInternal*>(OptionsFunctionality::operator->());
   }
 
-  vector<DMatrix> Function::call(const vector<DMatrix> &arg,
-                                 bool always_inline, bool never_inline) {
+  void Function::call(const vector<DMatrix> &arg, vector<DMatrix> &res,
+                      bool always_inline, bool never_inline) {
     DMatrixVectorVector dummy;
-    DMatrixVector res;
     callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
-    return res;
   }
 
-  vector<SX> Function::call(const vector<SX> &arg, bool always_inline, bool never_inline) {
+  void Function::call(const vector<SX> &arg, vector<SX>& res,
+                      bool always_inline, bool never_inline) {
     SXVectorVector dummy;
-    SXVector res;
     callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
-    return res;
   }
 
-  vector<MX> Function::call(const vector<MX> &arg, bool always_inline, bool never_inline) {
+  void Function::call(const vector<MX> &arg, vector<MX>& res,
+                      bool always_inline, bool never_inline) {
     MXVectorVector dummy;
-    MXVector res;
     callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
-    return res;
   }
 
   vector<vector<MX> > Function::callParallel(const vector<vector<MX> > &x,
@@ -93,7 +89,7 @@ namespace casadi {
     Dictionary::const_iterator ii=paropt.find("parallelization");
     if (ii!=paropt.end() && ii->second=="expand") {
       for (int i=0; i<x.size(); ++i) {
-        ret[i] = call(x[i]);
+        call(x[i], ret[i]);
       }
       return ret;
     }
@@ -112,7 +108,7 @@ namespace casadi {
     }
 
     // Call the parallelizer
-    vector<MX> p_out = p.call(p_in);
+    vector<MX> p_out = p(p_in);
     casadi_assert(p_out.size() == x.size() * getNumOutputs());
 
     // Collect the outputs
@@ -399,6 +395,42 @@ namespace casadi {
                          std::vector<std::vector<DMatrix> >& asens,
                          bool always_inline, bool never_inline) {
     (*this)->callAdj(arg, res, aseed, asens, always_inline, never_inline);
+  }
+
+  std::vector<DMatrix> Function::operator()(const std::vector<DMatrix>& arg,
+                                            bool always_inline, bool never_inline) {
+    std::vector<DMatrix> res;
+    call(arg, res, always_inline, never_inline);
+    return res;
+  }
+
+  std::vector<SX> Function::operator()(const std::vector<SX>& arg,
+                                       bool always_inline, bool never_inline) {
+    std::vector<SX> res;
+    call(arg, res, always_inline, never_inline);
+    return res;
+  }
+
+  std::vector<MX> Function::operator()(const std::vector<MX>& arg,
+                                       bool always_inline, bool never_inline) {
+    std::vector<MX> res;
+    call(arg, res, always_inline, never_inline);
+    return res;
+  }
+
+  IOSchemeVector<DMatrix> Function::
+  operator()(const IOSchemeVector<DMatrix>& arg, bool always_inline, bool never_inline) {
+    return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
+  }
+
+  IOSchemeVector<SX> Function::
+  operator()(const IOSchemeVector<SX>& arg, bool always_inline, bool never_inline) {
+    return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
+  }
+
+  IOSchemeVector<MX> Function::
+  operator()(const IOSchemeVector<MX>& arg, bool always_inline, bool never_inline) {
+    return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
   }
 
 } // namespace casadi

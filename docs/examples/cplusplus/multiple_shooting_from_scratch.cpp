@@ -151,7 +151,7 @@ int main(){
     int_in[INTEGRATOR_X0] = X[k];
 
     // Create an evaluation node
-    vector<MX> I_out = integrator.call(int_in);
+    vector<MX> I_out = integrator(int_in);
 
     // Save continuity constraints
     g.push_back( I_out[INTEGRATOR_XF] - X[k+1] );

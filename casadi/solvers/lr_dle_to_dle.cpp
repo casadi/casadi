@@ -87,7 +87,7 @@ namespace casadi {
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    std::vector<MX> Pr = solver_.call(dleIn("a", A, "v", CVC));
+    std::vector<MX> Pr = solver_(dleIn("a", A, "v", CVC));
     MX P = Pr[DLE_P];
 
     std::vector<MX> HPH(Hs_.size(), 0);

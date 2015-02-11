@@ -1523,7 +1523,7 @@ namespace casadi {
     // Otherwise, evaluate symbolically
     MXFunction F(v, ex);
     F.init();
-    return F.call(vdef, true);
+    return F(vdef, true);
   }
 
   MX MX::zz_graph_substitute(const std::vector<MX> &v, const std::vector<MX> &vdef) const {
@@ -1879,7 +1879,7 @@ namespace casadi {
     SXFunction s = f.expand();
     s.init();
 
-    return s.call(graph_substitute(v, syms, boundary), true);
+    return s(graph_substitute(v, syms, boundary), true);
   }
 
   MX MX::zz_kron(const MX& b) const {

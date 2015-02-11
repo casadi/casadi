@@ -282,36 +282,36 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
-    std::vector<DMatrix> call(const std::vector<DMatrix> &arg, bool always_inline=false,
-                              bool never_inline=false);
-    std::vector<SX> call(const std::vector<SX> &arg, bool always_inline=false,
-                         bool never_inline=false);
-    std::vector<MX> call(const std::vector<MX> &arg, bool always_inline=false,
-                         bool never_inline=false);
+    void call(const std::vector<DMatrix> &arg, std::vector<DMatrix>& SWIG_OUTPUT(res),
+              bool always_inline=false, bool never_inline=false);
+    void call(const std::vector<SX> &arg, std::vector<SX>& SWIG_OUTPUT(res),
+              bool always_inline=false, bool never_inline=false);
+    void call(const std::vector<MX> &arg, std::vector<MX>& SWIG_OUTPUT(res),
+              bool always_inline=false, bool never_inline=false);
     ///@}
 
     ///@{
     /// Functor shorthand for evaluation
-    std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg) { return call(arg);}
-    std::vector<SX> operator()(const std::vector<SX>& arg) { return call(arg);}
-    std::vector<MX> operator()(const std::vector<MX>& arg) { return call(arg);}
-    IOSchemeVector<DMatrix> operator()(const IOSchemeVector<DMatrix>& arg) {
-      return outputScheme().fromVector(call(arg));
-    }
-    IOSchemeVector<SX> operator()(const IOSchemeVector<SX>& arg) {
-      return outputScheme().fromVector(call(arg));
-    }
-    IOSchemeVector<MX> operator()(const IOSchemeVector<MX>& arg) {
-      return outputScheme().fromVector(call(arg));
-    }
+    std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg,
+                                    bool always_inline=false, bool never_inline=false);
+    std::vector<SX> operator()(const std::vector<SX>& arg,
+                               bool always_inline=false, bool never_inline=false);
+    std::vector<MX> operator()(const std::vector<MX>& arg,
+                               bool always_inline=false, bool never_inline=false);
+    IOSchemeVector<DMatrix> operator()(const IOSchemeVector<DMatrix>& arg,
+                                       bool always_inline=false, bool never_inline=false);
+    IOSchemeVector<SX> operator()(const IOSchemeVector<SX>& arg,
+                                  bool always_inline=false, bool never_inline=false);
+    IOSchemeVector<MX> operator()(const IOSchemeVector<MX>& arg,
+                                  bool always_inline=false, bool never_inline=false);
     ///@}
 
 #ifndef SWIG
     ///@{
     /// Functor shorthand for evaluation, single argument (only C++)
-    std::vector<DMatrix> operator()(const DMatrix& arg0) { return call(toVector(arg0));}
-    std::vector<SX> operator()(const SX& arg0) { return call(toVector(arg0));}
-    std::vector<MX> operator()(const MX& arg0) { return call(toVector(arg0));}
+    std::vector<DMatrix> operator()(const DMatrix& arg0) { return operator()(toVector(arg0));}
+    std::vector<SX> operator()(const SX& arg0) { return operator()(toVector(arg0));}
+    std::vector<MX> operator()(const MX& arg0) { return operator()(toVector(arg0));}
     ///@}
 #endif // SWIG
 

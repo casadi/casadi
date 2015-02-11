@@ -116,7 +116,7 @@ int main(){
     }
     
     // Append collocation equations
-    MX f_j = daeOut(f.call(daeIn("x",X[j],"p",P)),"ode").front();
+    MX f_j = f(daeIn("x",X[j],"p",P))["ode"];
     V_eq.append(h*f_j - xp_j);
   }
 
@@ -139,7 +139,7 @@ int main(){
   ifcn_arg.push_back(MX());
   ifcn_arg.push_back(X0);
   ifcn_arg.push_back(P);
-  V = ifcn.call(ifcn_arg).front();
+  V = ifcn(ifcn_arg).front();
   X.resize(1);
   for(int r=0; r<d; ++r){
     X.push_back(V[Slice(r*nx,(r+1)*nx)]);
@@ -160,7 +160,7 @@ int main(){
 
   // Do this iteratively for all finite elements
   for(int i=0; i<n; ++i){
-    F_arg[0] = F.call(F_arg).front();
+    F_arg[0] = F(F_arg).front();
   }
 
   // Fixed-step integrator

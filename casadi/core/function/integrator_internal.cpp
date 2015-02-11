@@ -256,7 +256,7 @@ namespace casadi {
     }
 
     // Call d
-    vector<MX> res = d.call(f_arg);
+    vector<MX> res = d(f_arg);
     vector<MX>::const_iterator res_it = res.begin();
 
     // Collect right-hand-sides
@@ -300,7 +300,7 @@ namespace casadi {
       }
 
       // Call d
-      res = d.call(g_arg);
+      res = d(g_arg);
       res_it = res.begin();
 
       // Collect right-hand-sides
@@ -336,7 +336,7 @@ namespace casadi {
       }
 
       // Call der
-      res = d.call(f_arg);
+      res = d(f_arg);
       res_it = res.begin() + DAE_NUM_OUT;
 
       // Record locations in augg for later
@@ -375,7 +375,7 @@ namespace casadi {
         }
 
         // Call der
-        res = d.call(g_arg);
+        res = d(g_arg);
         res_it = res.begin() + RDAE_NUM_OUT;
 
         // Collect right-hand-sides
@@ -399,7 +399,7 @@ namespace casadi {
         if (nrp_>0) g_arg[RDAE_RP] = MX::zeros(g_arg[RDAE_RP].sparsity());
 
         // Call der again
-        res = d.call(g_arg);
+        res = d(g_arg);
         res_it = res.begin() + RDAE_NUM_OUT;
 
         // Collect right-hand-sides and add contribution to the forward integration
@@ -821,7 +821,7 @@ namespace casadi {
     integrator_in[INTEGRATOR_RX0] = rx0_aug;
     integrator_in[INTEGRATOR_RP] = rp_aug;
     integrator_in[INTEGRATOR_RZ0] = rz0_aug;
-    vector<MX> integrator_out = integrator.call(integrator_in);
+    vector<MX> integrator_out = integrator(integrator_in);
 
     // Augmented results
     vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
@@ -967,7 +967,7 @@ namespace casadi {
     integrator_in[INTEGRATOR_RX0] = rx0_aug;
     integrator_in[INTEGRATOR_RP] = rp_aug;
     integrator_in[INTEGRATOR_RZ0] = rz0_aug;
-    vector<MX> integrator_out = integrator.call(integrator_in);
+    vector<MX> integrator_out = integrator(integrator_in);
 
     // Augmented results
     vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
@@ -1143,7 +1143,7 @@ namespace casadi {
     integrator_in[INTEGRATOR_RX0] = rx0_aug;
     integrator_in[INTEGRATOR_RP] = rp_aug;
     integrator_in[INTEGRATOR_RZ0] = rz0_aug;
-    vector<MX> integrator_out = integrator.call(integrator_in);
+    vector<MX> integrator_out = integrator(integrator_in);
 
     // Augmented results
     vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
@@ -1196,7 +1196,7 @@ namespace casadi {
 
   Function IntegratorInternal::getJacobian(int iind, int oind, bool compact, bool symmetric) {
     vector<MX> arg = symbolicInput();
-    vector<MX> res = shared_from_this<Function>().call(arg);
+    vector<MX> res = shared_from_this<Function>()(arg);
     MXFunction f(arg, res);
     f.setOption("ad_mode", "forward");
     f.init();

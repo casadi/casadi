@@ -162,7 +162,7 @@ namespace casadi {
       v_in[LR_DLE_H] = Hs;
     }
 
-    std::vector<MX> Pr = solver_.call(lrdpleIn("a", A, "v", V, "c", C, "h", H));
+    std::vector<MX> Pr = solver_(lrdpleIn("a", A, "v", V, "c", C, "h", H));
 
     MX Pf = Pr[0];
 

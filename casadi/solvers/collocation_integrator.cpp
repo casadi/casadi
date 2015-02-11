@@ -166,7 +166,7 @@ namespace casadi {
       f_arg[DAE_P] = p;
       f_arg[DAE_X] = x[j];
       f_arg[DAE_Z] = z[j];
-      vector<MX> f_res = f_.call(f_arg);
+      vector<MX> f_res = f_(f_arg);
 
       // Get an expression for the state derivative at the collocation point
       MX xp_j = C[0][j] * x0;
@@ -248,7 +248,7 @@ namespace casadi {
         g_arg[RDAE_RX] = rx[j];
         g_arg[RDAE_RZ] = rz[j];
         g_arg[RDAE_RP] = rp;
-        vector<MX> g_res = g_.call(g_arg);
+        vector<MX> g_res = g_(g_arg);
 
         // Get an expression for the state derivative at the collocation point
         MX rxp_j = -D[j]*rx0;

@@ -104,7 +104,7 @@ namespace casadi {
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    std::vector<MX> Pr = solver_.call(dpleIn("a", horzcat(As_), "v", horzcat(V_)));
+    std::vector<MX> Pr = solver_(dpleIn("a", horzcat(As_), "v", horzcat(V_)));
     std::vector<MX> Ps_ = horzsplit(Pr[DPLE_P], n_);
 
     std::vector<MX> HPH(K_);

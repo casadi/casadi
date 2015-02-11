@@ -904,7 +904,7 @@ namespace casadi {
     // P_0 .. P_{nrhs-1} = f( A Q_0 .. Q_{nrhs-1})
     std::vector<MX> ins_P;
     ins_P.insert(ins_P.begin(), ins_new.begin(), ins_new.begin()+(nrhs_+1));
-    std::vector<MX> Ps = shared_from_this<Function>().call(ins_P);
+    std::vector<MX> Ps = shared_from_this<Function>()(ins_P);
 
     for (int i=0;i<nrhs_;++i) {
       outs_new[i] = Ps[i];
@@ -962,7 +962,7 @@ namespace casadi {
         ins_f.push_back(horzcat(sum));
       }
 
-      std::vector<MX> outs = f.call(ins_f);
+      std::vector<MX> outs = f(ins_f);
       for (int i=0;i<nfwd;++i) {
         outs_new.at(nrhs_+q+nrhs_*i) = outs[i];
       }
@@ -989,7 +989,7 @@ namespace casadi {
         ins_b.push_back(horzcat(Pbs)/2);
       }
 
-      outs = b.call(ins_b);
+      outs = b(ins_b);
       for (int i=0;i<nadj;++i) {
         MX& Qb = outs_new.at(nrhs_*(nfwd+1)+(nrhs_+1)*i+q+1);
 

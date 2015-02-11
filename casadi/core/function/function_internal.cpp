@@ -288,7 +288,7 @@ namespace casadi {
 
   MXFunction FunctionInternal::wrapMXFunction() {
     vector<MX> arg = symbolicInput();
-    vector<MX> res = shared_from_this<Function>().call(arg);
+    vector<MX> res = shared_from_this<Function>()(arg);
 
     MXFunction f = MXFunction(arg, res);
     f.setOption("name", "wrap_" + string(getOption("name")));
@@ -367,7 +367,7 @@ namespace casadi {
   }
 
   std::vector<MX> FunctionInternal::symbolicOutput(const std::vector<MX>& arg) {
-    return shared_from_this<Function>().call(arg);
+    return shared_from_this<Function>()(arg);
   }
 
   std::vector<SX> FunctionInternal::symbolicInputSX() const {
@@ -1987,7 +1987,7 @@ namespace casadi {
 
     // Get an expression for the full Jacobian
     vector<MX> arg = symbolicInput();
-    vector<MX> res = jfcn.call(arg);
+    vector<MX> res = jfcn(arg);
     MX J = res.front().T();
     res.erase(res.begin());
 
@@ -2259,7 +2259,7 @@ namespace casadi {
       }
 
       // Evaluate symbolically
-      resv = shared_from_this<Function>().call(argv);
+      resv = shared_from_this<Function>()(argv);
     }
 
     // Check if the function is already single output

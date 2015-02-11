@@ -141,7 +141,7 @@ int main(){
     input[INTEGRATOR_P] = U[k];
 
     // Integrate
-    X = integrator.call(input).at(0);
+    X = integrator(input).at(0);
 
     // Lift X
     if(lifted_newton){

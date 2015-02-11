@@ -81,7 +81,7 @@ namespace casadi {
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    std::vector<MX> Pr = solver_.call(lrdleIn("a", A, "v", V));
+    std::vector<MX> Pr = solver_(lrdleIn("a", A, "v", V));
 
     f_ = MXFunction(dleIn("a", A, "v", V),
                     dleOut("p", Pr[DLE_P]));

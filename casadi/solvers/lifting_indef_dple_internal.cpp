@@ -131,7 +131,7 @@ namespace casadi {
     // Initialize the NLP solver
     solver_.init();
 
-    std::vector<MX> Pr = solver_.call(dleIn("a", A, "v" , V));
+    std::vector<MX> Pr = solver_(dleIn("a", A, "v" , V));
 
     MX Pf = Pr[0];
 

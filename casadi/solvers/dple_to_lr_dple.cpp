@@ -93,7 +93,7 @@ namespace casadi {
     solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    std::vector<MX> Pr = solver_.call(
+    std::vector<MX> Pr = solver_(
       lrdpleIn("a", A, "v", V, "c", MX(repmat(C, 1, K)), "h", MX(repmat(H, 1, K))));
 
     f_ = MXFunction(dpleIn("a", A, "v", V),

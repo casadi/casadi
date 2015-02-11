@@ -99,7 +99,7 @@ namespace casadi {
         nlp_in[NL_X] = F_in.at(0);
         if (F_in.size()>1) nlp_in[NL_P] = F_in.at(1);
         vector<MX> nlp_out(NL_NUM_OUT);
-        nlp_out[NL_F] = F.call(F_in).front();
+        nlp_out[NL_F] = F(F_in).front();
         return MXFunction(nlp_in, nlp_out);
       }
     } else if (F.isNull()) {
@@ -125,7 +125,7 @@ namespace casadi {
         nlp_in[NL_X] = G_in.at(0);
         if (G_in.size()>1) nlp_in[NL_P] = G_in.at(1);
         vector<MX> nlp_out(NL_NUM_OUT);
-        nlp_out[NL_G] = G.call(G_in).at(0);
+        nlp_out[NL_G] = G(G_in).at(0);
         return MXFunction(nlp_in, nlp_out);
       }
     } else {
@@ -169,7 +169,7 @@ namespace casadi {
             nlp_out[NL_F] = substitute(F_mx.outputExpr(), F_mx.inputExpr(),
                                        G_mx.inputExpr()).front();
           } else { // G_ but not F_ MXFunction
-            nlp_out[NL_F] = F.call(G_mx.inputExpr()).front();
+            nlp_out[NL_F] = F(G_mx.inputExpr()).front();
           }
         } else {
           if (!F_mx.isNull()) { // F but not G MXFunction
@@ -180,13 +180,13 @@ namespace casadi {
               nlp_in[NL_P] = MX::sym("p", 1, 0);
             }
             nlp_out[NL_F] = F_mx.outputExpr(0);
-            nlp_out[NL_G] = G.call(F_mx.inputExpr()).front();
+            nlp_out[NL_G] = G(F_mx.inputExpr()).front();
           } else { // None of them MXFunction
             vector<MX> FG_in = G.symbolicInput();
             nlp_in[NL_X] = FG_in.at(0);
             if (FG_in.size()>1) nlp_in[NL_P] = FG_in.at(1);
-            nlp_out[NL_G] = G.call(FG_in).front();
-            nlp_out[NL_F] = F.call(FG_in).front();
+            nlp_out[NL_G] = G(FG_in).front();
+            nlp_out[NL_F] = F(FG_in).front();
           }
         }
         return MXFunction(nlp_in, nlp_out);

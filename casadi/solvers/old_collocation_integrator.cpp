@@ -265,7 +265,7 @@ namespace casadi {
         f_in[DAE_Z] = Z[k][j-1];
 
         vector<MX> f_out;
-        f_out = f_.call(f_in);
+        f_out = f_(f_in);
         g.push_back(vec(h_mx*f_out[DAE_ODE] - xp_jk));
 
         // Add the algebraic conditions
@@ -298,7 +298,7 @@ namespace casadi {
           g_in[RDAE_RZ] = RZ[k][j-1];
 
           vector<MX> g_out;
-          g_out = g_.call(g_in);
+          g_out = g_(g_in);
           g.push_back(vec(h_mx*g_out[RDAE_ODE] + rxp_jk));
 
           // Add the algebraic conditions
