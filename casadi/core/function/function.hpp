@@ -313,14 +313,6 @@ namespace casadi {
     std::vector<SX> operator()(const SX& arg0) { return call(toVector(arg0));}
     std::vector<MX> operator()(const MX& arg0) { return call(toVector(arg0));}
     ///@}
-
-    ///@{
-    /// Functor shorthand for evaluation, two arguments (only C++)
-    std::vector<DMatrix> operator()(const DMatrix& arg0, const DMatrix& arg1)
-    { return call(toVector(arg0, arg1));}
-    std::vector<SX> operator()(const SX& arg0, const SX& arg1) { return call(toVector(arg0, arg1));}
-    std::vector<MX> operator()(const MX& arg0, const MX& arg1) { return call(toVector(arg0, arg1));}
-    ///@}
 #endif // SWIG
 
     /** \brief Create call to (cached) derivative function, forward mode  */
