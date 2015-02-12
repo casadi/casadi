@@ -90,8 +90,7 @@ namespace casadi {
   }
 
   void Reshape::eval(const MXPtrV& input, MXPtrV& output) {
-    if (input[0]!=output[0])
-      *output[0] = reshape(*input[0], shape());
+    *output[0] = reshape(*input[0], shape());
   }
 
   void Reshape::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
@@ -102,8 +101,9 @@ namespace casadi {
 
   void Reshape::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
     for (int d=0; d<adjSeed.size(); ++d) {
-      adjSens[d][0]->addToSum(reshape(*adjSeed[d][0], dep().shape()));
+      MX tmp = reshape(*adjSeed[d][0], dep().shape());
       *adjSeed[d][0] = MX();
+      adjSens[d][0]->addToSum(tmp);
     }
   }
 

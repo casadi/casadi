@@ -212,7 +212,7 @@ namespace casadi {
     place.resize(nodes.size());
 
     // Stack with unused elements in the work vector, sorted by sparsity pattern
-    SPARSITY_MAP<const void*, stack<int> > unused_all;
+    SPARSITY_MAP<int, stack<int> > unused_all;
 
     // Work vector size
     int worksize = 0;
@@ -243,10 +243,10 @@ namespace casadi {
             if (live_variables && remaining==0) {
 
               // Get a pointer to the sparsity pattern of the argument that can be freed
-              const void* sp = nodes[ch_ind]->sparsity().get();
+              int nnz = nodes[ch_ind]->sparsity().nnz();
 
               // Add to the stack of unused work vector elements for the current sparsity
-              unused_all[sp].push(place[ch_ind]);
+              unused_all[nnz].push(place[ch_ind]);
             }
 
             // Point to the place in the work vector instead of to the place in the list of nodes
@@ -268,10 +268,10 @@ namespace casadi {
             // Are reuse of variables (live variables) enabled?
             if (live_variables) {
               // Get a pointer to the sparsity pattern node
-              const void* sp = it->data->sparsity(c).get();
+              int nnz = it->data->sparsity(c).nnz();
 
               // Get a reference to the stack for the current sparsity
-              stack<int>& unused = unused_all[sp];
+              stack<int>& unused = unused_all[nnz];
 
               // Try to reuse a variable from the stack if possible (last in, first out)
               if (!unused.empty()) {
