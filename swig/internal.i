@@ -4366,6 +4366,63 @@
 %exception  casadi::vector_slice(const std::vector< T > &v, const std::vector< int > &i) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  snoptProblem::setLog(isnLog snLog, isnLog2 snLog2, isqLog sqLog) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblem::setSTOP(isnSTOP snSTOP) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblem::solve(int starttype) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemA::computeJac() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemA::setNeA(int neA) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemA::setNeG(int neG) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemA::setObjective(int ObjRow, double ObjAdd) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemA::setProblemSize(int n, int neF) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemA::setUserFun(snFunA usrfun) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemA::setWorkspace() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemA::solve(int starttype) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemB::setFuncon(snConB funcon) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemB::setFunobj(snObjB funobj) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemB::solve(int starttype) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemC::setObjective(int iObj, double ObjAdd) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemC::setProblemSize(int m, int n, int nnCon, int nnJac, int nnObj) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemC::setUserFun(snFunC usrfun) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemC::setWorkspace() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  snoptProblemC::solve(int starttype) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  sqicDestroy() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4988,5 +5045,14 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::sortCompare< T >::sortCompare(const std::vector< T > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception snoptProblemA::snoptProblemA() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception snoptProblemB::snoptProblemB() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception snoptProblemC::snoptProblemC() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
