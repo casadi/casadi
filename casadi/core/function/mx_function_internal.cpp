@@ -320,14 +320,12 @@ namespace casadi {
       }
     }
     workloc_.back()=wind;
-    work2_.resize(wind);
     for (int i=0; i<workloc_.size(); ++i) {
-      if (workloc_[i]<0) {
-        workloc_[i] = i==0 ? 0 : workloc_[i-1];
-      }
+      if (workloc_[i]<0) workloc_[i] = i==0 ? 0 : workloc_[i-1];
+      workloc_[i] += nrtmp;
     }
     itmp_.resize(nitmp);
-    rtmp_.resize(nrtmp);
+    rtmp_.resize(nrtmp+wind);
 
     // Reset the temporary variables
     for (int i=0; i<nodes.size(); ++i) {
@@ -394,12 +392,13 @@ namespace casadi {
   void MXFunctionInternal::updatePointers(const AlgEl& el) {
     mx_input_.resize(el.arg.size());
     mx_output_.resize(el.res.size());
+    double* w = getPtr(rtmp_);
 
     if (el.op!=OP_INPUT) {
       for (int i=0; i<mx_input_.size(); ++i) {
         if (el.arg[i]>=0) {
           int k = el.arg[i];
-          mx_input_[i] = getPtr(work2_) + workloc_[k];
+          mx_input_[i] = w + workloc_[k];
         } else {
           mx_input_[i] = 0;
         }
@@ -409,7 +408,7 @@ namespace casadi {
     if (el.op!=OP_OUTPUT) {
       for (int i=0; i<mx_output_.size(); ++i) {
         if (el.res[i]>=0) {
-          mx_output_[i] = getPtr(work2_) + workloc_[el.res[i]];
+          mx_output_[i] = w + workloc_[el.res[i]];
         } else {
           mx_output_[i] = 0;
         }
@@ -443,6 +442,7 @@ namespace casadi {
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
     int alg_counter = 0;
+    double* w = getPtr(rtmp_);
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
@@ -450,10 +450,10 @@ namespace casadi {
 
       if (it->op==OP_INPUT) {
         // Pass an input
-        input(it->arg.front()).get(getPtr(work2_)+workloc_[it->res.front()]);
+        input(it->arg.front()).get(w+workloc_[it->res.front()]);
       } else if (it->op==OP_OUTPUT) {
         // Get an output
-        output(it->res.front()).set(getPtr(work2_)+workloc_[it->arg.front()]);
+        output(it->res.front()).set(w+workloc_[it->arg.front()]);
       } else {
 
         // Point pointers to the data corresponding to the element
@@ -571,11 +571,12 @@ namespace casadi {
   }
 
   void MXFunctionInternal::spInit(bool fwd) {
-    bvec_t *iwork = get_bvec_t(work2_);
-    fill_n(iwork, work2_.size(), bvec_t(0));
+    bvec_t *iwork = get_bvec_t(rtmp_);
+    fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
 
   void MXFunctionInternal::spEvaluate(bool fwd) {
+    bvec_t* w = get_bvec_t(rtmp_);
     if (fwd) { // Forward propagation
 
       // Propagate sparsity forward
@@ -583,13 +584,13 @@ namespace casadi {
         if (it->op==OP_INPUT) {
           // Pass input seeds
           vector<double> &z = input(it->arg.front()).data();
-          bvec_t* iwork = get_bvec_t(work2_) + workloc_[it->res.front()];
+          bvec_t* iwork = w + workloc_[it->res.front()];
           bvec_t* swork = get_bvec_t(z);
           copy(swork, swork+z.size(), iwork);
         } else if (it->op==OP_OUTPUT) {
           // Get the output sensitivities
           vector<double> &z = output(it->res.front()).data();
-          bvec_t* iwork = get_bvec_t(work2_) + workloc_[it->arg.front()];
+          bvec_t* iwork = w + workloc_[it->arg.front()];
           bvec_t* swork = get_bvec_t(z);
           copy(iwork, iwork+z.size(), swork);
         } else {
@@ -609,7 +610,7 @@ namespace casadi {
         if (it->op==OP_INPUT) {
           // Get the input sensitivities and clear it from the work vector
           vector<double> &z = input(it->arg.front()).data();
-          bvec_t* iwork = get_bvec_t(work2_) + workloc_[it->res.front()];
+          bvec_t* iwork = w + workloc_[it->res.front()];
           bvec_t* swork = get_bvec_t(z);
           for (int k=0; k<z.size(); ++k) {
             swork[k] = iwork[k];
@@ -618,7 +619,7 @@ namespace casadi {
         } else if (it->op==OP_OUTPUT) {
           // Pass output seeds
           vector<double> &z = output(it->res.front()).data();
-          bvec_t* iwork = get_bvec_t(work2_) + workloc_[it->arg.front()];
+          bvec_t* iwork = w + workloc_[it->arg.front()];
           bvec_t* swork = get_bvec_t(z);
           for (int k=0; k<z.size(); ++k) {
             iwork[k] |= swork[k];
@@ -1037,19 +1038,9 @@ namespace casadi {
       if (res[i].sparsity()!=output(i).sparsity())
         res[i] = SX::zeros(output(i).sparsity());
 
-    // Create a work array
-    vector<vector<SXElement> > swork(workloc_.size()-1);
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
-      if (it->op!=OP_OUTPUT) {
-        for (int i=0; i<it->res.size(); ++i) {
-          if (it->res[i]>=0)
-            swork[it->res[i]].resize(it->data->sparsity(i).nnz(), 0);
-        }
-      }
-    }
-
     // Create a temporary vector
     vector<SXElement> rtmp(rtmp_.size());
+    SXElement* w=getPtr(rtmp);
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
@@ -1058,24 +1049,24 @@ namespace casadi {
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op==OP_INPUT) {
         // Pass the input
-        arg[it->arg.front()].get(getPtr(swork[it->res.front()]));
+        arg[it->arg.front()].get(w + workloc_[it->res.front()]);
       } else if (it->op==OP_OUTPUT) {
         // Get the outputs
-        res[it->res.front()].set(getPtr(swork[it->arg.front()]));
+        res[it->res.front()].set(w + workloc_[it->arg.front()]);
       } else if (it->op==OP_PARAMETER) {
         continue; // FIXME
       } else {
         sxarg.resize(it->arg.size());
         for (int c=0; c<sxarg.size(); ++c) {
           int ind = it->arg[c];
-          sxarg[c] = ind<0 ? 0 : getPtr(swork[ind]);
+          sxarg[c] = ind<0 ? 0 : w + workloc_[ind];
         }
         sxres.resize(it->res.size());
         for (int c=0; c<sxres.size(); ++c) {
           int ind = it->res[c];
-          sxres[c] = ind<0 ? 0 : getPtr(swork[ind]);
+          sxres[c] = ind<0 ? 0 : w + workloc_[ind];
         }
-        it->data->evaluateSX(getPtr(sxarg), getPtr(sxres), getPtr(itmp_), getPtr(rtmp));
+        it->data->evaluateSX(getPtr(sxarg), getPtr(sxres), getPtr(itmp_), w);
       }
     }
   }
@@ -1122,8 +1113,8 @@ namespace casadi {
 
   void MXFunctionInternal::printWork(ostream &stream) {
     for (int k=0; k<workloc_.size()-1; ++k) {
-      vector<double>::const_iterator start=work2_.begin() + workloc_[k];
-      vector<double>::const_iterator stop=work2_.begin() + workloc_[k+1];
+      vector<double>::const_iterator start=rtmp_.begin() + workloc_[k];
+      vector<double>::const_iterator stop=rtmp_.begin() + workloc_[k+1];
       stream << "work[" << k << "] = " << vector<double>(start, stop) << endl;
     }
   }
@@ -1180,19 +1171,6 @@ namespace casadi {
 
   void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type,
                                         CodeGenerator& gen) const {
-
-    // Data structure to hold intermediate variables
-    stream << "  static struct wstruct {" << endl;
-
-    // Declare all work variables
-    for (int i=0; i<workloc_.size()-1; ++i) {
-      stream << "    d a" << i << "[" << (workloc_[i+1]-workloc_[i]) << "];" << endl;
-    }
-
-    // Finalize work structure
-    stream << "  } w;" << endl;
-    stream << endl;
-
     // Temporary variables and vectors
     stream << "  int i, j, k, *ii, *jj, *kk;" << endl;
     stream << "  d r, s, t, *rr, *ss, *tt;" << endl;
@@ -1232,7 +1210,7 @@ namespace casadi {
       } else {
         for (int i=0; i<it->arg.size(); ++i) {
           if (it->arg.at(i)>=0) {
-            arg.at(i) = "w.a" + CodeGenerator::numToString(it->arg.at(i));
+            arg.at(i) = "(rrr+" + CodeGenerator::numToString(workloc_[it->arg.at(i)]) + ")";
           } else {
             arg.at(i) = "0";
           }
@@ -1246,7 +1224,7 @@ namespace casadi {
       } else {
         for (int i=0; i<it->res.size(); ++i) {
           if (it->res.at(i)>=0) {
-            res.at(i) = "w.a" + CodeGenerator::numToString(it->res.at(i));
+            res.at(i) = "(rrr+" + CodeGenerator::numToString(workloc_[it->res.at(i)]) + ")";
           } else {
             res.at(i) = "0";
           }

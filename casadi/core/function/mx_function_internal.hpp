@@ -54,23 +54,20 @@ namespace casadi {
     /** \brief  All the runtime elements in the order of evaluation */
     std::vector<AlgEl> algorithm_;
 
-    /** \brief  Working vector for numeric calculation */
-    //std::vector<std::vector<double> > work_;
-    std::vector<int> workloc_;
-    std::vector<double> work2_;
-
-    /** \brief  Temporary vectors needed for the evaluation (integer) */
+    /** \brief  Temporary vector needed for the evaluation (integer) */
     std::vector<int> itmp_;
 
-    /** \brief  Temporary vectors needed for the evaluation (real) */
+    /** \brief  Temporary vector needed for the evaluation (real) */
     std::vector<double> rtmp_;
+
+    /** \brief Offsets for elements in the rtmp_ vector */
+    std::vector<int> workloc_;
+
+    // Vectors to hold pointers during evaluation
+    std::vector<double*> mx_input_, mx_output_;
 
     /// Free variables
     std::vector<MX> free_vars_;
-
-    // Vectors to hold pointers during evaluation
-    std::vector<double*> mx_input_;
-    std::vector<double*> mx_output_;
 
     /** \brief  Multiple input, multiple output constructor, only to be accessed from MXFunction,
         therefore protected */
