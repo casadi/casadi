@@ -152,8 +152,7 @@ namespace casadi {
   }
 
   void Transpose::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-    } else {
+    if (part!=0) {
       stream << "'";
     }
   }

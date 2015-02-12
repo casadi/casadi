@@ -993,12 +993,7 @@ namespace casadi {
   }
 
   MX MX::T() const {
-    // Quick return if scalar
-    if (isScalar()) {
-      return *this;
-    } else {
-      return (*this)->getTranspose();
-    }
+    return (*this)->getTranspose();
   }
 
   void MX::addToSum(const MX& x) {
@@ -1239,13 +1234,6 @@ namespace casadi {
   }
 
   MX MX::zz_reshape(const Sparsity& sp) const {
-    // quick return if already the right shape
-    if (sp==sparsity()) return *this;
-
-    // make sure that the patterns match
-    casadi_assert(sp.isReshape(sparsity()));
-
-    // Create a reshape node
     return (*this)->getReshape(sp);
   }
 

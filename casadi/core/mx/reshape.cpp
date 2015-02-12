@@ -82,10 +82,23 @@ namespace casadi {
   }
 
   void Reshape::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "reshape(";
+    // For vectors, reshape is also a transpose
+    if (dep().isVector(true) && sparsity().isVector(true)) {
+      // Print as transpose: X'
+      if (part!=0) {
+        stream << "'";
+      }
     } else {
-      stream << ")";
+      // Print as reshape(X) or vec(X)
+      if (part==0) {
+        if (sparsity().isVector()) {
+          stream << "vec(";
+        } else {
+          stream << "reshape(";
+        }
+      } else {
+        stream << ")";
+      }
     }
   }
 
@@ -115,6 +128,15 @@ namespace casadi {
 
   MX Reshape::getReshape(const Sparsity& sp) const {
     return reshape(dep(0), sp);
+  }
+
+  MX Reshape::getTranspose() const {
+    // For vectors, reshape is also a transpose
+    if (dep().isVector(true) && sparsity().isVector(true)) {
+      return dep();
+    } else {
+      return MXNode::getTranspose();
+    }
   }
 
 } // namespace casadi

@@ -91,6 +91,9 @@ namespace casadi {
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool zz_isEqual(const MXNode* node, int depth) const
     { return sameOpAndDeps(node, depth) && sparsity()==node->sparsity();}
+
+    /// Transpose (if a dimension is one)
+    virtual MX getTranspose() const;
   };
 
 } // namespace casadi

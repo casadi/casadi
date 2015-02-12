@@ -345,7 +345,11 @@ namespace casadi {
   }
 
   MX MXNode::getTranspose() const {
-    if (sparsity().isDense()) {
+    if (sparsity().isScalar()) {
+      return shared_from_this<MX>();
+    } else if (sparsity().isVector(true)) {
+      return getReshape(sparsity().T());
+    } else if (sparsity().isDense()) {
       return MX::create(new DenseTranspose(shared_from_this<MX>()));
     } else {
       return MX::create(new Transpose(shared_from_this<MX>()));
@@ -353,7 +357,12 @@ namespace casadi {
   }
 
   MX MXNode::getReshape(const Sparsity& sp) const {
-    return MX::create(new Reshape(shared_from_this<MX>(), sp));
+    casadi_assert(sp.isReshape(sparsity()));
+    if (sp==sparsity()) {
+      return shared_from_this<MX>();
+    } else {
+      return MX::create(new Reshape(shared_from_this<MX>(), sp));
+    }
   }
 
 
