@@ -130,6 +130,8 @@ namespace casadi {
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                   const std::vector<int>& res, CodeGenerator& gen) const;
 
     /** \brief  Evaluate numerically */
     virtual void evaluateD(const double* const* input, double** output, int* itmp, double* rtmp);

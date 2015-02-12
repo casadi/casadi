@@ -75,8 +75,8 @@ namespace casadi {
     virtual int getOp() const { return op_;}
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                   const std::vector<int>& res, CodeGenerator& gen) const;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 1;}

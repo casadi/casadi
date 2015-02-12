@@ -121,12 +121,12 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                  const std::vector<std::string>& res, CodeGenerator& gen) const {
-    stream << "  for (i=0; i<" << sparsity().nnz() << "; ++i) ";
-    stream << res.at(0) << "[i]=";
+  void UnaryMX::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                  const std::vector<int>& res, CodeGenerator& gen) const {
+    stream << "  for (i=0, rr=" << gen.work(res.at(0)) << ", cs=" << gen.work(arg.at(0))
+           << "; i<" << sparsity().nnz() << "; ++i) *rr++=";
     casadi_math<double>::printPre(op_, stream);
-    stream << arg.at(0) << "[i]";
+    stream << " *cs++ ";
     casadi_math<double>::printPost(op_, stream);
     stream << ";" << endl;
   }

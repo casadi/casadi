@@ -310,6 +310,26 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
+  void MXNode::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                 const std::vector<int>& res, CodeGenerator& gen) const {
+    vector<string> sarg(arg.size()), sres(res.size());
+    for (int i=0; i<arg.size(); ++i) {
+      if (arg[i]>=0) {
+        sarg[i] = "(" + CodeGenerator::work(arg[i]) + ")";
+      } else {
+        sarg[i] = "0";
+      }
+    }
+    for (int i=0; i<res.size(); ++i) {
+      if (res[i]>=0) {
+        sres[i] = "(" + CodeGenerator::work(res[i]) + ")";
+      } else {
+        sres[i] = "0";
+      }
+    }
+    generateOperation(stream, sarg, sres, gen);
+  }
+
   void MXNode::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                  const std::vector<std::string>& res, CodeGenerator& gen) const {
     stream << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;

@@ -211,8 +211,8 @@ namespace casadi {
     fcn_->propagateSparsity(this, input, output, itmp, rtmp, use_fwd);
   }
 
-  void CallFunction::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                       const std::vector<std::string>& res,
+  void CallFunction::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                       const std::vector<int>& res,
                                        CodeGenerator& gen) const {
     fcn_->generateOperation(this, stream, arg, res, gen);
   }

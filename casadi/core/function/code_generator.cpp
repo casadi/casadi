@@ -68,7 +68,9 @@ namespace casadi {
   }
 
   std::string CodeGenerator::work(int n) {
-    if (n==0) {
+    if (n<0) {
+      return "0";
+    } else if (n==0) {
       return "w";
     } else {
       return "w+" + numToString(n);
@@ -327,8 +329,8 @@ namespace casadi {
       s << "*(" << res << ")=*(" << arg << ");" << endl;
     } else {
       // For loop
-      s << "for (" << it << "=0, rr=" << res << ", cs=" << arg << "; " << it << "<" << n << "; ++" << it
-        << ") *rr++=*cs++;" << endl;
+      s << "for (" << it << "=0, rr=" << res << ", cs=" << arg << "; " << it
+        << "<" << n << "; ++" << it << ") *rr++=*cs++;" << endl;
     }
   }
 

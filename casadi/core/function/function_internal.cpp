@@ -2197,8 +2197,8 @@ namespace casadi {
   }
 
   void FunctionInternal::generateOperation(const MXNode* node, std::ostream &stream,
-                                           const std::vector<std::string>& arg,
-                                           const std::vector<std::string>& res,
+                                           const std::vector<int>& arg,
+                                           const std::vector<int>& res,
                                            CodeGenerator& gen) const {
 
     // Get the index of the function
@@ -2207,16 +2207,13 @@ namespace casadi {
 
     // Pass inputs to the function input buffers
     for (int i=0; i<arg.size(); ++i) {
-      stream << arg.at(i);
+      stream << gen.work(arg.at(i));
       if (i+1<arg.size()+res.size()) stream << ", ";
     }
 
-    // Separate arguments and results with an extra space
-    stream << " ";
-
     // Pass results to the function input buffers
     for (int i=0; i<res.size(); ++i) {
-      stream << res.at(i);
+      stream << gen.work(res.at(i));
       if (i+1<res.size()) stream << ", ";
     }
 

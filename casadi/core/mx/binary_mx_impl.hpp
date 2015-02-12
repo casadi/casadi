@@ -109,13 +109,9 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::generateOperation(std::ostream &stream,
-                                            const std::vector<std::string>& arg,
-                                            const std::vector<std::string>& res,
+                                            const std::vector<int>& arg,
+                                            const std::vector<int>& res,
                                             CodeGenerator& gen) const {
-
-    // Print loop and right hand side
-    stream << "  for (i=0; i<" << sparsity().nnz() << "; ++i) ";
-    stream << res.at(0) << "[i]";
 
     // Check if inplace
     bool inplace;
@@ -124,21 +120,28 @@ namespace casadi {
     case OP_SUB:
     case OP_MUL:
     case OP_DIV:
-      inplace = res[0].compare(arg[0]) == 0;
+      inplace = res[0]==arg[0];
     default:
       inplace = false;
     }
 
+    // Print loop and right hand side
+    stream << "  for (i=0, "
+           << "rr=" << gen.work(res.at(0)) << ", ";
+    if (!inplace) stream << "cr=" << gen.work(arg.at(0)) << ", ";
+    stream << "cs=" << gen.work(arg.at(1)) << "; i<" << sparsity().nnz() << "; ++i) "
+           << "*rr++";
+
     if (inplace) {
       casadi_math<double>::printSep(op_, stream);
       stream << "=";
-      stream << arg.at(1) << (ScY ? "[0]" : "[i]");
+      stream << (ScY ? " *cs " : " *cs++ ");
     } else {
       stream << "=";
       casadi_math<double>::printPre(op_, stream);
-      stream << arg.at(0) << (ScX ? "[0]" : "[i]");
+      stream << (ScX ? " *cr " : " *cr++ ");
       casadi_math<double>::printSep(op_, stream);
-      stream << arg.at(1) << (ScY ? "[0]" : "[i]");
+      stream << (ScY ? " *cs " : " *cs++ ");
       casadi_math<double>::printPost(op_, stream);
     }
 

@@ -133,8 +133,8 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                   const std::vector<int>& res, CodeGenerator& gen) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const;
@@ -190,8 +190,8 @@ namespace casadi {
                             int* itmp, SXElement* rtmp) {}
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const {}
+    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                   const std::vector<int>& res, CodeGenerator& gen) const {}
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const { return 0;}
@@ -261,8 +261,8 @@ namespace casadi {
                             int* itmp, SXElement* rtmp);
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                   const std::vector<int>& res, CodeGenerator& gen) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const { return v_.value==0;}
@@ -459,12 +459,12 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                          const std::vector<std::string>& res,
+  void Constant<Value>::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                          const std::vector<int>& res,
                                           CodeGenerator& gen) const {
     // Copy the constant to the work vector
-    stream << "  for (i=0; i<" << sparsity().nnz() << "; ++i) ";
-    stream << res.at(0) << "[i]=";
+    stream << "  for (i=0, rr=" << gen.work(res.at(0)) << "; i<" << sparsity().nnz()
+           << "; ++i) *rr++=";
     std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
     // full precision NOTE: hex better?
     stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);

@@ -76,8 +76,8 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                   const std::vector<int>& res, CodeGenerator& gen) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_RESHAPE;}

@@ -107,13 +107,10 @@ namespace casadi {
     }
   }
 
-  void Reshape::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                  const std::vector<std::string>& res, CodeGenerator& gen) const {
-    // Quick return if inplace
-    if (arg[0].compare(res[0])==0) return;
-
-    stream << "  for (i=0; i<" << nnz() << "; ++i) " << res.front()
-           << "[i] = " << arg.front() << "[i];" << endl;
+  void Reshape::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                  const std::vector<int>& res, CodeGenerator& gen) const {
+    if (arg[0]==res[0]) return;
+    gen.copyVector(stream, gen.work(arg[0]), nnz(), gen.work(res[0]), "i", false);
   }
 
   MX Reshape::getReshape(const Sparsity& sp) const {

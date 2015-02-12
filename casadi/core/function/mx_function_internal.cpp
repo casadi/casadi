@@ -1182,7 +1182,7 @@ namespace casadi {
     int k=0;
 
     // Names of operation argument and results
-    vector<string> arg, res;
+    vector<int> arg, res;
 
     // Print class (for debugging)
     bool codegen_class = true;
@@ -1218,9 +1218,9 @@ namespace casadi {
         arg.resize(it->arg.size());
         for (int i=0; i<it->arg.size(); ++i) {
           if (it->arg.at(i)>=0) {
-            arg.at(i) = "(" + CodeGenerator::work(workloc_[it->arg.at(i)]) + ")";
+            arg.at(i) = workloc_.at(it->arg.at(i));
           } else {
-            arg.at(i) = "0";
+            arg.at(i) = -1;
           }
         }
 
@@ -1228,9 +1228,9 @@ namespace casadi {
         res.resize(it->res.size());
         for (int i=0; i<it->res.size(); ++i) {
           if (it->res.at(i)>=0) {
-            res.at(i) = "(w+" + CodeGenerator::numToString(workloc_[it->res.at(i)]) + ")";
+            res.at(i) = workloc_.at(it->res.at(i));
           } else {
-            res.at(i) = "0";
+            res.at(i) = -1;
           }
         }
 
