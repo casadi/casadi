@@ -144,9 +144,6 @@ namespace casadi {
     /// Print work vector
     void printWork(std::ostream &stream=std::cout);
 
-    /// Allocate tape
-    void allocTape(std::vector<std::pair<std::pair<int, int>, MX> >& tape);
-
     // print an element of an algorithm
     void print(std::ostream &stream, const AlgEl& el) const;
 

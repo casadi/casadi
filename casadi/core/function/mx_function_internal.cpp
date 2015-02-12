@@ -1119,34 +1119,6 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::allocTape(std::vector<std::pair<std::pair<int, int>, MX> >& tape) {
-    // Marker of elements in the work vector still in use when being overwritten
-    vector<bool> in_use(workloc_.size()-1, false);
-
-    // Remove existing entries in the tape
-    tape.clear();
-
-    // Evaluate the algorithm, keeping track of variables that are in use
-    int alg_counter = 0;
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
-      if (it->op!=OP_OUTPUT) {
-        // Loop over operation outputs, spill if necessary
-        for (int c=0; c<it->res.size(); ++c) {
-          int ind = it->res[c];
-          if (ind>=0) {
-            if (in_use[ind]) {
-              // Spill
-              tape.push_back(make_pair(make_pair(alg_counter, ind), MX()));
-            } else {
-              // Mark in use
-              in_use[ind] = true;
-            }
-          }
-        }
-      }
-    }
-  }
-
   void MXFunctionInternal::generateDeclarations(std::ostream &stream, const std::string& type,
                                                 CodeGenerator& gen) const {
 
