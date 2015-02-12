@@ -95,6 +95,9 @@ namespace casadi {
     /** Convert in integer to a string */
     static std::string numToString(int n);
 
+    /** Get work vector name from index */
+    static std::string work(int n);
+
     /** \brief  Print int vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
 

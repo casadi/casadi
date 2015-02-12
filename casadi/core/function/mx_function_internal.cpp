@@ -1174,8 +1174,9 @@ namespace casadi {
     // Temporary variables and vectors
     stream << "  int i, j, k, *ii, *jj, *kk;" << endl;
     stream << "  d r, s, t, *rr, *ss, *tt;" << endl;
+    stream << "  const d *cr, *cs, *ct;" << endl;
     stream << "  static int iii[" << itmp_.size() << "];" << endl;
-    stream << "  static d rrr[" << rtmp_.size() << "];" << endl;
+    stream << "  static d w[" << rtmp_.size() << "];" << endl;
 
     // Operation number (for printing)
     int k=0;
@@ -1203,40 +1204,37 @@ namespace casadi {
       }
       stream << " */" << endl;
 
-      // Get the names of the operation arguments
-      arg.resize(it->arg.size());
-      if (it->op == OP_INPUT) {
-        arg.front() = "x" + CodeGenerator::numToString(it->arg.front());
+      // Print the operation
+      if (it->op==OP_OUTPUT) {
+        gen.copyVector(stream, CodeGenerator::work(workloc_[it->arg.front()]),
+                       output(it->res.front()).nnz(),
+                       "r" + CodeGenerator::numToString(it->res.front()), "i", true);
+      } else if (it->op==OP_INPUT) {
+        gen.copyVector(stream, "x" + CodeGenerator::numToString(it->arg.front()),
+                       input(it->arg.front()).nnz(),
+                       CodeGenerator::work(workloc_[it->res.front()]), "i", false);
       } else {
+        // Get the names of the operation arguments
+        arg.resize(it->arg.size());
         for (int i=0; i<it->arg.size(); ++i) {
           if (it->arg.at(i)>=0) {
-            arg.at(i) = "(rrr+" + CodeGenerator::numToString(workloc_[it->arg.at(i)]) + ")";
+            arg.at(i) = "(" + CodeGenerator::work(workloc_[it->arg.at(i)]) + ")";
           } else {
             arg.at(i) = "0";
           }
         }
-      }
 
-      // Get the names of the operation results
-      res.resize(it->res.size());
-      if (it->op == OP_OUTPUT) {
-        res.front() = "r" + CodeGenerator::numToString(it->res.front());
-      } else {
+        // Get the names of the operation results
+        res.resize(it->res.size());
         for (int i=0; i<it->res.size(); ++i) {
           if (it->res.at(i)>=0) {
-            res.at(i) = "(rrr+" + CodeGenerator::numToString(workloc_[it->res.at(i)]) + ")";
+            res.at(i) = "(w+" + CodeGenerator::numToString(workloc_[it->res.at(i)]) + ")";
           } else {
             res.at(i) = "0";
           }
         }
-      }
 
-      // Print the operation
-      if (it->op==OP_OUTPUT) {
-        gen.copyVector(stream, arg.front(), output(it->res.front()).nnz(), res.front(), "i", true);
-      } else if (it->op==OP_INPUT) {
-        gen.copyVector(stream, arg.front(), input(it->arg.front()).nnz(), res.front(), "i", false);
-      } else {
+        // Generate operation
         it->data->generateOperation(stream, arg, res, gen);
       }
     }

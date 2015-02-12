@@ -67,6 +67,14 @@ namespace casadi {
     return ss.str();
   }
 
+  std::string CodeGenerator::work(int n) {
+    if (n==0) {
+      return "w";
+    } else {
+      return "w+" + numToString(n);
+    }
+  }
+
   int CodeGenerator::addDependency(const Function& f) {
     // Get the current number of functions before looking for it
     size_t num_f_before = added_dependencies_.size();
@@ -316,11 +324,11 @@ namespace casadi {
 
     if (n==1) {
       // Simplify if scalar assignment
-      s << "*" << res << "=*" << arg << ";" << endl;
+      s << "*(" << res << ")=*(" << arg << ");" << endl;
     } else {
       // For loop
-      s << "for (" << it << "=0; " << it << "<" << n << "; ++" << it << ") " << res
-        << "[" << it << "]=" << arg << "[" << it << "];" << endl;
+      s << "for (" << it << "=0, rr=" << res << ", cs=" << arg << "; " << it << "<" << n << "; ++" << it
+        << ") *rr++=*cs++;" << endl;
     }
   }
 

@@ -108,7 +108,7 @@ namespace casadi {
     int sp_arg = gen.addSparsity(dep(0).sparsity());
     int sp_res = gen.addSparsity(sparsity());
     stream << "  casadi_project(" << arg.front() << ", s" << sp_arg << ", " << res.front()
-           << ", s" << sp_res << ", rrr);" << std::endl;
+           << ", s" << sp_res << ", w);" << std::endl;
   }
 
 
