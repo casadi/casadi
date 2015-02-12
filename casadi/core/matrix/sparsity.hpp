@@ -573,8 +573,10 @@ namespace casadi {
     /// Is dense?
     bool isDense() const;
 
-    /// Is vector (i.e. size2()==1)
-    bool isVector() const { return size2()==1; }
+    /** \brief Check if the pattern is a column vector (i.e. size2()==1)
+        Optionally, checks if either row or column vector.
+     */
+    bool isVector(bool row_or_col=false) const;
 
     /// Is diagonal?
     bool isDiagonal() const;

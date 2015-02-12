@@ -120,8 +120,13 @@ namespace casadi {
     /** \brief  Check if the matrix expression is square */
     bool isSquare() const { return sparsity().isSquare();}
 
-    /** \brief  Check if the matrix is a vector (i.e. size2()==1) */
-    bool isVector() const { return sparsity().isVector();}
+    /** \brief  Check if the matrix is a column vector (i.e. size2()==1)
+        Optionally, checks if either row or column vector.
+     */
+    bool isVector(bool row_or_col=false) const { return sparsity().isVector(row_or_col);}
+
+    /** \brief  Check if the matrix is a row vector (i.e. size1()==1) */
+    bool isRowVector() const { return sparsity().isVector();}
 
     /** \brief Check if the matrix is upper triangular */
     bool isTriu() const { return sparsity().isTriu();}

@@ -255,6 +255,10 @@ namespace casadi {
     return (*this)->isDiagonal();
   }
 
+  bool Sparsity::isVector(bool row_or_col) const {
+    return (*this)->isVector(row_or_col);
+  }
+
   bool Sparsity::isSquare() const {
     return (*this)->isSquare();
   }
