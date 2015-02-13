@@ -61,33 +61,38 @@ namespace casadi {
     }
   }
 
-  void Concat::propagateSparsity(double** input, double** output, bool fwd) {
-    bvec_t *res_ptr = reinterpret_cast<bvec_t*>(output[0]);
+  void Concat::spFwd(const std::vector<const bvec_t*>& arg,
+                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();
-      bvec_t *arg_i_ptr = reinterpret_cast<bvec_t*>(input[i]);
-      if (fwd) {
-        copy(arg_i_ptr, arg_i_ptr+n_i, res_ptr);
-        res_ptr += n_i;
-      } else {
-        for (int k=0; k<n_i; ++k) {
-          *arg_i_ptr++ |= *res_ptr;
-          *res_ptr++ = 0;
-        }
+      const bvec_t *arg_i_ptr = arg[i];
+      copy(arg_i_ptr, arg_i_ptr+n_i, res_ptr);
+      res_ptr += n_i;
+    }
+  }
+
+  void Concat::spAdj(const std::vector<bvec_t*>& arg,
+                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    bvec_t *res_ptr = res[0];
+    for (int i=0; i<ndep(); ++i) {
+      int n_i = dep(i).nnz();
+      bvec_t *arg_i_ptr = arg[i];
+      for (int k=0; k<n_i; ++k) {
+        *arg_i_ptr++ |= *res_ptr;
+        *res_ptr++ = 0;
       }
     }
   }
 
-  void Concat::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                 const std::vector<std::string>& res, CodeGenerator& gen) const {
-    int nz_offset = 0;
+  void Concat::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                 const std::vector<int>& res, CodeGenerator& gen) const {
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
-      stream << "  for (i=0; i<" << nz << "; ++i) " << res.front() << "[i+" << nz_offset
-             << "] = " << arg.at(i) << "[i];" << endl;
-      nz_offset += nz;
+      stream << "  for (i=0, ";
+      if (i==0) stream << "rr=" << gen.work(res[0]) << ", ";
+      stream << "cs=" << gen.work(arg[i]) << "; i<" << nz << "; ++i) *rr++ = *cs++;" << endl;
     }
-    casadi_assert(nz_offset == nnz());
   }
 
   MX Concat::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
