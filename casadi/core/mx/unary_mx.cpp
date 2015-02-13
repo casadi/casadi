@@ -103,21 +103,20 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::propagateSparsity(double** input, double** output, bool fwd) {
-    // Quick return if inplace
-    if (input[0]==output[0]) return;
+  void UnaryMX::spFwd(const std::vector<const bvec_t*>& arg,
+                      const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    if (arg[0]==res[0]) return;
+    copy(arg[0], arg[0]+nnz(), res[0]);
+  }
 
-    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[0]);
-    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
-    if (fwd) {
-      copy(inputd, inputd+nnz(), outputd);
-    } else {
-      int nz = dep(0).nnz();
-      for (int el=0; el<nz; ++el) {
-        bvec_t s = outputd[el];
-        outputd[el] = bvec_t(0);
-        inputd[el] |= s;
-      }
+  void UnaryMX::spAdj(const std::vector<bvec_t*>& arg,
+                      const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    if (arg[0]==res[0]) return;
+    int nz = nnz();
+    for (int el=0; el<nz; ++el) {
+      bvec_t s = res[0][el];
+      res[0][el] = 0;
+      arg[0][el] |= s;
     }
   }
 
