@@ -477,8 +477,8 @@ namespace casadi {
      * no memory allocation: <tt>z = mul(x, y)</tt> with work vector
      * Forward mode.
      */
-    static void mul_sparsityF(bvec_t* x, const Sparsity& x_sp,
-                              bvec_t* y, const Sparsity& y_sp,
+    static void mul_sparsityF(const bvec_t* x, const Sparsity& x_sp,
+                              const bvec_t* y, const Sparsity& y_sp,
                               bvec_t* z, const Sparsity& z_sp,
                               bvec_t* w);
 

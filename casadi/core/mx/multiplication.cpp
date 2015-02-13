@@ -102,76 +102,59 @@ namespace casadi {
     *output[0] = mul(*input[1], *input[2], *input[0]);
   }
 
-  void Multiplication::propagateSparsity(double** input, double** output,
-                                         int* itmp, bvec_t* rtmp, bool fwd) {
-    bvec_t *zd = reinterpret_cast<bvec_t*>(input[0]);
-    bvec_t *rd = reinterpret_cast<bvec_t*>(output[0]);
-    const size_t n = this->nnz();
-    if (fwd) {
-      if (zd!=rd) copy(zd, zd+n, rd);
-      Sparsity::mul_sparsityF(reinterpret_cast<bvec_t*>(input[1]),
-                              dep(1).sparsity(),
-                              reinterpret_cast<bvec_t*>(input[2]),
-                              dep(2).sparsity(),
-                              reinterpret_cast<bvec_t*>(input[0]),
-                              dep(0).sparsity(), rtmp);
-    } else {
-      Sparsity::mul_sparsityR(reinterpret_cast<bvec_t*>(input[1]),
-                              dep(1).sparsity(),
-                              reinterpret_cast<bvec_t*>(input[2]),
-                              dep(2).sparsity(),
-                              reinterpret_cast<bvec_t*>(output[0]),
-                              sparsity(), rtmp);
-      if (zd!=rd) {
-        for (int i=0; i<n; ++i) {
-          zd[i] |= rd[i];
-          rd[i] = bvec_t(0);
-        }
+  void Multiplication::propagateSparsityFwd(const bvec_t* const* arg, bvec_t** res,
+                                            int* itmp, bvec_t* rtmp) {
+    if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
+    Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
+                            arg[2], dep(2).sparsity(),
+                            res[0], sparsity(), rtmp);
+  }
+
+  void Multiplication::propagateSparsityAdj(bvec_t** arg, bvec_t** res,
+                                            int* itmp, bvec_t* rtmp) {
+    Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
+                            arg[2], dep(2).sparsity(),
+                            res[0], sparsity(), rtmp);
+    if (arg[0]!=res[0]) {
+      const size_t n = nnz();
+      for (int i=0; i<n; ++i) {
+        arg[0][i] |= res[0][i];
+        res[0][i] = 0;
       }
     }
   }
 
   void Multiplication::generateOperation(std::ostream &stream,
-                                         const std::vector<std::string>& arg,
-                                         const std::vector<std::string>& res,
+                                         const std::vector<int>& arg,
+                                         const std::vector<int>& res,
                                          CodeGenerator& gen) const {
-    // Check if inplace
-    bool inplace = arg.at(0).compare(res.front())==0;
-
     // Copy first argument if not inplace
-    if (!inplace) {
-      stream << "  for (i=0; i<" << this->nnz() << "; ++i) " << res.front()
-             << "[i]=" << arg.at(0) << "[i];" << endl;
+    if (arg[0]!=res[0]) {
+      gen.copyVector(stream, gen.work(arg[0]), nnz(), gen.work(res[0]));
     }
 
     // Perform sparse matrix multiplication
     gen.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
     stream << "  casadi_mm_sparse(";
-    stream << arg.at(1) << ", s" << gen.addSparsity(dep(1).sparsity()) << ", ";
-    stream << arg.at(2) << ", s" << gen.addSparsity(dep(2).sparsity()) << ", ";
-    stream << res.front() << ", s" << gen.addSparsity(sparsity()) << ", w);" << endl;
+    stream << gen.work(arg[1]) << ", s" << gen.addSparsity(dep(1).sparsity()) << ", ";
+    stream << gen.work(arg[2]) << ", s" << gen.addSparsity(dep(2).sparsity()) << ", ";
+    stream << gen.work(res[0]) << ", s" << gen.addSparsity(sparsity()) << ", w);" << endl;
   }
 
   void DenseMultiplication::generateOperation(std::ostream &stream,
-                                              const std::vector<std::string>& arg,
-                                              const std::vector<std::string>& res,
+                                              const std::vector<int>& arg,
+                                              const std::vector<int>& res,
                                               CodeGenerator& gen) const {
-    // Check if inplace
-    bool inplace = arg.at(0).compare(res.front())==0;
-
     // Copy first argument if not inplace
-    if (!inplace) {
-      stream << "  for (i=0; i<" << this->nnz() << "; ++i) " << res.front()
-             << "[i]=" << arg.at(0) << "[i];" << endl;
+    if (arg[0]!=res[0]) {
+      gen.copyVector(stream, gen.work(arg[0]), nnz(), gen.work(res[0]));
     }
 
-    int nrow_x = this->dep(1).size1();
-    int nrow_y = this->dep(2).size1();
-    int ncol_y = this->dep(2).size2();
-    stream << "  for (i=0, rr=" << res.front() <<"; i<" << ncol_y << "; ++i)";
+    int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
+    stream << "  for (i=0, rr=" << gen.work(res[0]) <<"; i<" << ncol_y << "; ++i)";
     stream << " for (j=0; j<" << nrow_x << "; ++j, ++rr)";
-    stream << " for (k=0, ss=" << arg.at(1) << "+j, tt="
-           << arg.at(2) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)";
+    stream << " for (k=0, ss=" << gen.work(arg[1]) << "+j, tt="
+           << gen.work(arg[2]) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)";
     stream << " *rr += ss[k*" << nrow_x << "]**tt++;" << endl;
   }
 

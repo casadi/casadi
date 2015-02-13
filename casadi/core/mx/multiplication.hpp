@@ -52,8 +52,8 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                   const std::vector<int>& res, CodeGenerator& gen) const;
 
     /// Evaluate the function (template)
     template<typename T>
@@ -75,9 +75,13 @@ namespace casadi {
     /** \brief Calculate reverse mode directional derivatives */
     virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
-    /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(double** input, double** output,
-                                   int* itmp, bvec_t* rtmp, bool fwd);
+    /** \brief  Propagate sparsity forward */
+    virtual void propagateSparsityFwd(const bvec_t* const* arg, bvec_t** res,
+                                      int* itmp, bvec_t* rtmp);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void propagateSparsityAdj(bvec_t** arg, bvec_t** res,
+                                      int* itmp, bvec_t* rtmp);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_MATMUL;}
@@ -113,8 +117,8 @@ namespace casadi {
     virtual DenseMultiplication* clone() const { return new DenseMultiplication(*this);}
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                   const std::vector<int>& res, CodeGenerator& gen) const;
   };
 
 

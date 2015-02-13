@@ -153,6 +153,16 @@ namespace casadi {
     virtual void propagateSparsity(double** input, double** output,
                                    int* itmp, bvec_t* rtmp, bool fwd)
     { propagateSparsity(input, output, fwd);}
+    virtual void propagateSparsityFwd(const bvec_t* const* arg, bvec_t** res,
+                                      int* itmp, bvec_t* rtmp) {
+      propagateSparsity(reinterpret_cast<double**>(const_cast<bvec_t**>(arg)),
+                        reinterpret_cast<double**>(res), itmp, rtmp, true);
+    }
+    virtual void propagateSparsityAdj(bvec_t** arg, bvec_t** res,
+                                      int* itmp, bvec_t* rtmp) {
+      propagateSparsity(reinterpret_cast<double**>(arg),
+                        reinterpret_cast<double**>(res), itmp, rtmp, false);
+    }
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;

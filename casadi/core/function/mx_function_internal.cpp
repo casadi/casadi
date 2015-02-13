@@ -588,8 +588,7 @@ namespace casadi {
           for (int i=0; i<it->res.size(); ++i) res[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
           // Propagate sparsity forwards
-          it->data->propagateSparsity(reinterpret_cast<double**>(getPtr(arg)),
-                                      reinterpret_cast<double**>(getPtr(res)), iw, w, true);
+          it->data->propagateSparsityFwd(getPtr(arg), getPtr(res), iw, w);
         }
       }
 
@@ -620,8 +619,7 @@ namespace casadi {
           for (int i=0; i<it->res.size(); ++i) res[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
           // Propagate sparsity backwards
-          it->data->propagateSparsity(reinterpret_cast<double**>(getPtr(arg)),
-                                      reinterpret_cast<double**>(getPtr(res)), iw, w, false);
+          it->data->propagateSparsityAdj(getPtr(arg), getPtr(res), iw, w);
         }
       }
     }
