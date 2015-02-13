@@ -564,9 +564,10 @@ namespace casadi {
     // Work vector and tmporaries to hold pointers to operation input and outputs
     bvec_t* w = get_bvec_t(rtmp_);
     int* iw = getPtr(itmp_);
-    vector<bvec_t*> arg(max_arg_), res(max_res_);
+    vector<bvec_t*> res(max_res_);
 
     if (fwd) { // Forward propagation
+      vector<const bvec_t*> arg(max_arg_);
 
       // Propagate sparsity forward
       for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
@@ -588,11 +589,12 @@ namespace casadi {
           for (int i=0; i<it->res.size(); ++i) res[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
           // Propagate sparsity forwards
-          it->data->propagateSparsityFwd(getPtr(arg), getPtr(res), iw, w);
+          it->data->spFwd(arg, res, iw, w);
         }
       }
 
     } else { // Backward propagation
+      vector<bvec_t*> arg(max_arg_); // Non-const since seeds are cleared
 
       // Propagate sparsity backwards
       for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
@@ -619,7 +621,7 @@ namespace casadi {
           for (int i=0; i<it->res.size(); ++i) res[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
           // Propagate sparsity backwards
-          it->data->propagateSparsityAdj(getPtr(arg), getPtr(res), iw, w);
+          it->data->spAdj(arg, res, iw, w);
         }
       }
     }

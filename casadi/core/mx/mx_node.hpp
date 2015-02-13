@@ -149,19 +149,26 @@ namespace casadi {
     /** \brief Calculate reverse mode directional derivatives */
     virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
-    /** \brief  Propagate sparsity */
+    /** \brief  Propagate sparsity (legacy) */
     virtual void propagateSparsity(double** input, double** output,
-                                   int* itmp, bvec_t* rtmp, bool fwd)
-    { propagateSparsity(input, output, fwd);}
-    virtual void propagateSparsityFwd(const bvec_t* const* arg, bvec_t** res,
-                                      int* itmp, bvec_t* rtmp) {
-      propagateSparsity(reinterpret_cast<double**>(const_cast<bvec_t**>(arg)),
-                        reinterpret_cast<double**>(res), itmp, rtmp, true);
+                                   int* itmp, bvec_t* rtmp, bool fwd) {
+      propagateSparsity(input, output, fwd);
     }
-    virtual void propagateSparsityAdj(bvec_t** arg, bvec_t** res,
-                                      int* itmp, bvec_t* rtmp) {
-      propagateSparsity(reinterpret_cast<double**>(arg),
-                        reinterpret_cast<double**>(res), itmp, rtmp, false);
+
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const std::vector<const bvec_t*>& arg,
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+      propagateSparsity(reinterpret_cast<double**>(const_cast<bvec_t**>(getPtr(arg))),
+                        reinterpret_cast<double**>(const_cast<bvec_t**>(getPtr(res))),
+                        itmp, rtmp, true);
+    }
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(const std::vector<bvec_t*>& arg,
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+      propagateSparsity(reinterpret_cast<double**>(const_cast<bvec_t**>(getPtr(arg))),
+                        reinterpret_cast<double**>(const_cast<bvec_t**>(getPtr(res))),
+                        itmp, rtmp, false);
     }
 
     /** \brief  Get the name */

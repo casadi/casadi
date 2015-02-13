@@ -102,16 +102,18 @@ namespace casadi {
     *output[0] = mul(*input[1], *input[2], *input[0]);
   }
 
-  void Multiplication::propagateSparsityFwd(const bvec_t* const* arg, bvec_t** res,
-                                            int* itmp, bvec_t* rtmp) {
+  void Multiplication::spFwd(const std::vector<const bvec_t*>& arg,
+                             const std::vector<bvec_t*>& res, int* itmp,
+                             bvec_t* rtmp) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), rtmp);
   }
 
-  void Multiplication::propagateSparsityAdj(bvec_t** arg, bvec_t** res,
-                                            int* itmp, bvec_t* rtmp) {
+  void Multiplication::spAdj(const std::vector<bvec_t*>& arg,
+                             const std::vector<bvec_t*>& res,
+                             int* itmp, bvec_t* rtmp) {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), rtmp);
