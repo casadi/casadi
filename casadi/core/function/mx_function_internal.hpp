@@ -63,8 +63,8 @@ namespace casadi {
     /** \brief Offsets for elements in the rtmp_ vector */
     std::vector<int> workloc_;
 
-    // Vectors to hold pointers during evaluation
-    std::vector<double*> mx_input_, mx_output_;
+    // Length of pointer arrays needed during evaluation
+    std::size_t max_arg_, max_res_;
 
     /// Free variables
     std::vector<MX> free_vars_;
@@ -122,9 +122,6 @@ namespace casadi {
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SX>& inputv);
-
-    // Update pointers to a particular element
-    void updatePointers(const AlgEl& el);
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const { return inputv_;}

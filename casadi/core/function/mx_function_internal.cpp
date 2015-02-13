@@ -136,6 +136,10 @@ namespace casadi {
     // Count the number of times each node is used
     vector<int> refcount(nodes.size(), 0);
 
+    // Maximum number of input and output arguments
+    max_arg_ = 0;
+    max_res_ = 0;
+
     // Get the sequence of instructions for the virtual machine
     algorithm_.resize(0);
     algorithm_.reserve(nodes.size());
@@ -175,6 +179,10 @@ namespace casadi {
             ae.res[0] = n->temp;
           }
         }
+
+        // Update maximum size of arg and res
+        max_arg_ = std::max(max_arg_, ae.arg.size());
+        max_res_ = std::max(max_res_, ae.res.size());
 
         // Increase the reference count of the dependencies
         for (int c=0; c<ae.arg.size(); ++c) {
@@ -389,33 +397,6 @@ namespace casadi {
     log("MXFunctionInternal::init end");
   }
 
-  void MXFunctionInternal::updatePointers(const AlgEl& el) {
-    mx_input_.resize(el.arg.size());
-    mx_output_.resize(el.res.size());
-    double* w = getPtr(rtmp_);
-
-    if (el.op!=OP_INPUT) {
-      for (int i=0; i<mx_input_.size(); ++i) {
-        if (el.arg[i]>=0) {
-          int k = el.arg[i];
-          mx_input_[i] = w + workloc_[k];
-        } else {
-          mx_input_[i] = 0;
-        }
-      }
-    }
-
-    if (el.op!=OP_OUTPUT) {
-      for (int i=0; i<mx_output_.size(); ++i) {
-        if (el.res[i]>=0) {
-          mx_output_[i] = w + workloc_[el.res[i]];
-        } else {
-          mx_output_[i] = 0;
-        }
-      }
-    }
-  }
-
   void MXFunctionInternal::evaluate() {
     casadi_log("MXFunctionInternal::evaluate():begin "  << getOption("name"));
     // Set up timers for profiling
@@ -431,6 +412,12 @@ namespace casadi {
       }
     }
 
+    // Work vector and temporaries to hold pointers to operation input and outputs
+    double* w = getPtr(rtmp_);
+    int* iw = getPtr(itmp_);
+    vector<const double*> arg(max_arg_);
+    vector<double*> res(max_res_);
+
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
       std::stringstream ss;
@@ -442,7 +429,6 @@ namespace casadi {
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
     int alg_counter = 0;
-    double* w = getPtr(rtmp_);
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
@@ -455,13 +441,12 @@ namespace casadi {
         // Get an output
         output(it->res.front()).set(w+workloc_[it->arg.front()]);
       } else {
-
         // Point pointers to the data corresponding to the element
-        updatePointers(*it);
+        for (int i=0; i<it->arg.size(); ++i) arg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
+        for (int i=0; i<it->res.size(); ++i) res[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evaluateD(getPtr(mx_input_), getPtr(mx_output_),
-                            getPtr(itmp_), getPtr(rtmp_));
+        it->data->evaluateD(getPtr(arg), getPtr(res), iw, w);
       }
 
       // Write out profiling information
@@ -576,7 +561,11 @@ namespace casadi {
   }
 
   void MXFunctionInternal::spEvaluate(bool fwd) {
+    // Work vector and tmporaries to hold pointers to operation input and outputs
     bvec_t* w = get_bvec_t(rtmp_);
+    int* iw = getPtr(itmp_);
+    vector<bvec_t*> arg(max_arg_), res(max_res_);
+
     if (fwd) { // Forward propagation
 
       // Propagate sparsity forward
@@ -595,11 +584,12 @@ namespace casadi {
           copy(iwork, iwork+z.size(), swork);
         } else {
           // Point pointers to the data corresponding to the element
-          updatePointers(*it);
+          for (int i=0; i<it->arg.size(); ++i) arg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
+          for (int i=0; i<it->res.size(); ++i) res[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
           // Propagate sparsity forwards
-          it->data->propagateSparsity(getPtr(mx_input_), getPtr(mx_output_), getPtr(itmp_),
-                                      reinterpret_cast<bvec_t*>(getPtr(rtmp_)), true);
+          it->data->propagateSparsity(reinterpret_cast<double**>(getPtr(arg)),
+                                      reinterpret_cast<double**>(getPtr(res)), iw, w, true);
         }
       }
 
@@ -626,11 +616,12 @@ namespace casadi {
           }
         } else {
           // Point pointers to the data corresponding to the element
-          updatePointers(*it);
+          for (int i=0; i<it->arg.size(); ++i) arg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
+          for (int i=0; i<it->res.size(); ++i) res[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
           // Propagate sparsity backwards
-          it->data->propagateSparsity(getPtr(mx_input_), getPtr(mx_output_), getPtr(itmp_),
-                                      reinterpret_cast<bvec_t*>(getPtr(rtmp_)), false);
+          it->data->propagateSparsity(reinterpret_cast<double**>(getPtr(arg)),
+                                      reinterpret_cast<double**>(getPtr(res)), iw, w, false);
         }
       }
     }
@@ -1038,14 +1029,15 @@ namespace casadi {
       if (res[i].sparsity()!=output(i).sparsity())
         res[i] = SX::zeros(output(i).sparsity());
 
-    // Create a temporary vector
+    // Work vector and temporaries to hold pointers to operation input and outputs
     vector<SXElement> rtmp(rtmp_.size());
     SXElement* w=getPtr(rtmp);
+    int* iw = getPtr(itmp_);
+    vector<const SXElement*> argp(max_arg_);
+    vector<SXElement*> resp(max_res_);
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
-    vector<const SXElement*> sxarg;
-    vector<SXElement*> sxres;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op==OP_INPUT) {
         // Pass the input
@@ -1056,17 +1048,12 @@ namespace casadi {
       } else if (it->op==OP_PARAMETER) {
         continue; // FIXME
       } else {
-        sxarg.resize(it->arg.size());
-        for (int c=0; c<sxarg.size(); ++c) {
-          int ind = it->arg[c];
-          sxarg[c] = ind<0 ? 0 : w + workloc_[ind];
-        }
-        sxres.resize(it->res.size());
-        for (int c=0; c<sxres.size(); ++c) {
-          int ind = it->res[c];
-          sxres[c] = ind<0 ? 0 : w + workloc_[ind];
-        }
-        it->data->evaluateSX(getPtr(sxarg), getPtr(sxres), getPtr(itmp_), w);
+        // Point pointers to the data corresponding to the element
+        for (int i=0; i<it->arg.size(); ++i) argp[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
+        for (int i=0; i<it->res.size(); ++i) resp[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+
+        // Evaluate
+        it->data->evaluateSX(getPtr(argp), getPtr(resp), getPtr(itmp_), w);
       }
     }
   }
