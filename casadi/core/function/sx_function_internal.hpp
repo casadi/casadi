@@ -94,20 +94,6 @@ class CASADI_EXPORT SXFunctionInternal :
   /** \brief  Evaluate the function numerically */
   virtual void evaluate();
 
-  /** \brief  Helper class to be plugged into evaluateGen when working
-   * with a value known only at runtime */
-  struct int_runtime {
-    const int value;
-    int_runtime(int v) : value(v) {}
-  };
-
-  /** \brief  Helper class to be plugged into evaluateGen when working
-   * with a value known already at compiletime */
-  template<int v>
-  struct int_compiletime {
-    static const int value = v;
-  };
-
   /** \brief  evaluate symbolically while also propagating directional derivatives */
   virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
 
