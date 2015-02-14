@@ -552,117 +552,139 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::propagateSparsity(double** input, double** output,
-                                                 bool fwd) {
-    // Get references to the assignment operations and data
-    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
-    bvec_t *inputd0 = reinterpret_cast<bvec_t*>(input[0]);
-    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[1]);
+  void SetNonzerosVector<Add>::
+  spFwd(const std::vector<const bvec_t*>& arg,
+        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    const bvec_t *a0 = arg[0];
+    const bvec_t *a = arg[1];
+    bvec_t *r = res[0];
+    int n = this->nnz();
 
     // Propagate sparsity
-    if (fwd) {
-      if (outputd != inputd0) {
-        copy(inputd0, inputd0+this->dep(0).nnz(), outputd);
-      }
-      for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++inputd) {
-        if (Add) {
-          if (*k>=0) outputd[*k] |= *inputd;
-        } else {
-          if (*k>=0) outputd[*k] = *inputd;
-        }
-      }
-    } else {
-      for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++inputd) {
-        if (*k>=0) {
-          *inputd |= outputd[*k];
-          if (!Add) {
-            outputd[*k] = 0;
-          }
-        }
-      }
-      if (outputd != inputd0) {
-        int n = this->dep(0).nnz();
-        for (int k=0; k<n; ++k) {
-          inputd0[k] |= outputd[k];
-          outputd[k] = 0;
-        }
+    if (r != a0) copy(a0, a0+n, r);
+    for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
+      if (Add) {
+        if (*k>=0) r[*k] |= *a;
+      } else {
+        if (*k>=0) r[*k] = *a;
       }
     }
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::propagateSparsity(double** input, double** output, bool fwd) {
-    // Get references to the assignment operations and data
-    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
-    bvec_t *inputd0 = reinterpret_cast<bvec_t*>(input[0]);
-    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[1]);
+  void SetNonzerosVector<Add>::
+  spAdj(const std::vector<bvec_t*>& arg,
+        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    bvec_t *a0 = arg[0];
+    bvec_t *a = arg[1];
+    bvec_t *r = res[0];
+    int n = this->nnz();
 
     // Propagate sparsity
-    if (fwd) {
-      if (outputd != inputd0) {
-        copy(inputd0, inputd0+this->dep(0).nnz(), outputd);
-      }
-      for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
-        if (Add) {
-          outputd[k] |= *inputd++;
-        } else {
-          outputd[k] = *inputd++;
-        }
-      }
-    } else {
-      for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
-        *inputd++ |= outputd[k];
+    for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
+      if (*k>=0) {
+        *a |= r[*k];
         if (!Add) {
-          outputd[k] = 0;
+          r[*k] = 0;
         }
       }
-      if (outputd != inputd0) {
-        int n = this->dep(0).nnz();
-        for (int k=0; k<n; ++k) {
-          inputd0[k] |= outputd[k];
-          outputd[k] = 0;
+    }
+    if (r != a0) {
+      for (int k=0; k<n; ++k) {
+        *a0++ |= *r;
+        *r++ = 0;
+      }
+    }
+  }
+
+  template<bool Add>
+  void SetNonzerosSlice<Add>::
+  spFwd(const std::vector<const bvec_t*>& arg,
+        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    const bvec_t *a0 = arg[0];
+    const bvec_t *a = arg[1];
+    bvec_t *r = res[0];
+    int n = this->nnz();
+
+    // Propagate sparsity
+    if (r != a0) copy(a0, a0+n, r);
+    for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
+      if (Add) {
+        r[k] |= *a++;
+      } else {
+        r[k] = *a++;
+      }
+    }
+  }
+
+  template<bool Add>
+  void SetNonzerosSlice<Add>::
+  spAdj(const std::vector<bvec_t*>& arg,
+        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    bvec_t *a0 = arg[0];
+    bvec_t *a = arg[1];
+    bvec_t *r = res[0];
+    int n = this->nnz();
+
+    // Propagate sparsity
+    for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
+      *a++ |= r[k];
+      if (!Add) {
+        r[k] = 0;
+      }
+    }
+    if (r != a0) {
+      for (int k=0; k<n; ++k) {
+        *a0++ |= *r;
+        *r++ = 0;
+      }
+    }
+  }
+
+  template<bool Add>
+  void SetNonzerosSlice2<Add>::
+  spFwd(const std::vector<const bvec_t*>& arg,
+        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    const bvec_t *a0 = arg[0];
+    const bvec_t *a = arg[1];
+    bvec_t *r = res[0];
+    int n = this->nnz();
+
+    // Propagate sparsity
+    if (r != a0) copy(a0, a0+n, r);
+    for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
+      for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
+        if (Add) {
+          r[k2] |= *a++;
+        } else {
+          r[k2] = *a++;
         }
       }
     }
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::propagateSparsity(double** input, double** output,
-                                                 bool fwd) {
-    // Get references to the assignment operations and data
-    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
-    bvec_t *inputd0 = reinterpret_cast<bvec_t*>(input[0]);
-    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[1]);
+  void SetNonzerosSlice2<Add>::
+  spAdj(const std::vector<bvec_t*>& arg,
+        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    bvec_t *a0 = arg[0];
+    bvec_t *a = arg[1];
+    bvec_t *r = res[0];
+    int n = this->nnz();
 
     // Propagate sparsity
-    if (fwd) {
-      if (outputd != inputd0) {
-        copy(inputd0, inputd0+this->dep(0).nnz(), outputd);
-      }
-      for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
-        for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
-          if (Add) {
-            outputd[k2] |= *inputd++;
-          } else {
-            outputd[k2] = *inputd++;
-          }
+    for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
+      for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
+        *a++ |= r[k2];
+        if (!Add) {
+          r[k2] = 0;
         }
       }
-    } else {
-      for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
-        for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
-          *inputd++ |= outputd[k2];
-          if (!Add) {
-            outputd[k2] = 0;
-          }
-        }
-      }
-      if (outputd != inputd0) {
-        int n = this->dep(0).nnz();
-        for (int k=0; k<n; ++k) {
-          inputd0[k] |= outputd[k];
-          outputd[k] = 0;
-        }
+    }
+    if (r != a0) {
+      for (int k=0; k<n; ++k) {
+        *a0++ |= *r;
+        *r++ = 0;
       }
     }
   }
@@ -772,66 +794,55 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::generateOperation(std::ostream &stream,
-                                                 const std::vector<std::string>& arg,
-                                                 const std::vector<std::string>& res,
+                                                 const std::vector<int>& arg,
+                                                 const std::vector<int>& res,
                                                  CodeGenerator& gen) const {
-    // Check if inplace
-    bool inplace = arg.at(0).compare(res.front())==0;
-
     // Copy first argument if not inplace
-    if (!inplace) {
-      stream << "  for (i=0; i<" << this->nnz() << "; ++i) " << res.front() << "[i]="
-             << arg.at(0) << "[i];" << endl;
+    if (arg[0]!=res[0]) {
+      gen.copyVector(stream, gen.work(arg[0]), this->nnz(), gen.work(res[0]));
     }
 
     // Condegen the indices
     int ind = gen.getConstant(this->nz_, true);
 
     // Perform the operation inplace
-    stream << "  for (ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.at(1) << "; ii!=s"
-           << ind << "+" << this->nz_.size() << "; ++ii, ++ss)";
+    stream << "  for (ii=s" << ind << ", rr=" << gen.work(res[0]) << ", "
+           << "ss=" << gen.work(arg[1]) << "; ii!=s" << ind
+           << "+" << this->nz_.size() << "; ++ii, ++ss)";
     stream << " if (*ii>=0) rr[*ii] " << (Add?"+=":"=") << " *ss;" << endl;
   }
 
   template<bool Add>
   void SetNonzerosSlice<Add>::generateOperation(std::ostream &stream,
-                                                const std::vector<std::string>& arg,
-                                                const std::vector<std::string>& res,
+                                                const std::vector<int>& arg,
+                                                const std::vector<int>& res,
                                                 CodeGenerator& gen) const {
-    // Check if inplace
-    bool inplace = arg.at(0).compare(res.front())==0;
-
     // Copy first argument if not inplace
-    if (!inplace) {
-      stream << "  for (i=0; i<" << this->nnz() << "; ++i) " << res.front()
-             << "[i]=" << arg.at(0) << "[i];" << endl;
+    if (arg[0]!=res[0]) {
+      gen.copyVector(stream, gen.work(arg[0]), this->nnz(), gen.work(res[0]));
     }
 
     // Perform the operation inplace
-    stream << "  for (rr=" << res.front() << "+" << s_.start_ << ", ss="
-           << arg.at(1) << "; rr!=" << res.front() << "+" << s_.stop_
+    stream << "  for (rr=" << gen.work(res[0]+s_.start_) << ", ss="
+           << gen.work(arg[1]) << "; rr!=" << gen.work(res[0]+s_.stop_)
            << "; rr+=" << s_.step_ << ")";
     stream << " *rr " << (Add?"+=":"=") << " *ss++;" << endl;
   }
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::generateOperation(std::ostream &stream,
-                                                 const std::vector<std::string>& arg,
-                                                 const std::vector<std::string>& res,
+                                                 const std::vector<int>& arg,
+                                                 const std::vector<int>& res,
                                                  CodeGenerator& gen) const {
-    // Check if inplace
-    bool inplace = arg.at(0).compare(res.front())==0;
-
     // Copy first argument if not inplace
-    if (!inplace) {
-      stream << "  for (i=0; i<" << this->nnz() << "; ++i) "
-             << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
+    if (arg[0]!=res[0]) {
+      gen.copyVector(stream, gen.work(arg[0]), this->nnz(), gen.work(res[0]));
     }
 
     // Perform the operation inplace
-    stream << "  for (rr=" << res.front() << "+" << outer_.start_
-           << ", ss=" << arg.at(1) << "; rr!=" << res.front()
-           << "+" << outer_.stop_ << "; rr+=" << outer_.step_ << ")";
+    stream << "  for (rr=" << gen.work(res[0]+outer_.start_)
+           << ", ss=" << gen.work(arg[1]) << "; rr!=" << gen.work(res[0]+outer_.stop_)
+           << "; rr+=" << outer_.step_ << ")";
     stream << " for (tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_
            << "; tt+=" << inner_.step_ << ")";
     stream << " *tt " << (Add?"+=":"=") << " *ss++;" << endl;
