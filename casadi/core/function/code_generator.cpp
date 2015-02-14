@@ -77,6 +77,19 @@ namespace casadi {
     }
   }
 
+  std::string CodeGenerator::workelement(int n) {
+    casadi_assert(n>=0);
+    if (n==0) {
+      return "*w";
+    } else {
+      return "w[+" + numToString(n) + "]";
+    }
+  }
+
+  void CodeGenerator::assign(std::ostream &s, const std::string& lhs, const std::string& rhs) {
+    s << "  " << lhs << " = " << rhs << ";" << endl;
+  }
+
   int CodeGenerator::addDependency(const Function& f) {
     // Get the current number of functions before looking for it
     size_t num_f_before = added_dependencies_.size();

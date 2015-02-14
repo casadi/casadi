@@ -67,35 +67,48 @@ namespace casadi {
     }
   }
 
-  void Split::propagateSparsity(double** input, double** output, bool fwd) {
+  void Split::spFwd(const std::vector<const bvec_t*>& arg,
+                    const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
-      if (output[i]!=0) {
-        bvec_t *arg_ptr = reinterpret_cast<bvec_t*>(input[0]) + offset_[i];
+      if (res[i]!=0) {
+        const bvec_t *arg_ptr = arg[0] + offset_[i];
         int n_i = sparsity(i).nnz();
-        bvec_t *res_i_ptr = reinterpret_cast<bvec_t*>(output[i]);
+        bvec_t *res_i_ptr = res[i];
         for (int k=0; k<n_i; ++k) {
-          if (fwd) {
-            *res_i_ptr++ = *arg_ptr++;
-          } else {
-            *arg_ptr++ |= *res_i_ptr;
-            *res_i_ptr++ = 0;
-          }
+          *res_i_ptr++ = *arg_ptr++;
         }
       }
     }
   }
 
-  void Split::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                const std::vector<std::string>& res, CodeGenerator& gen) const {
-    int nx = res.size();
+  void Split::spAdj(const std::vector<bvec_t*>& arg,
+                    const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    int nx = offset_.size()-1;
+    for (int i=0; i<nx; ++i) {
+      if (res[i]!=0) {
+        bvec_t *arg_ptr = arg[0] + offset_[i];
+        int n_i = sparsity(i).nnz();
+        bvec_t *res_i_ptr = res[i];
+        for (int k=0; k<n_i; ++k) {
+          *arg_ptr++ |= *res_i_ptr;
+          *res_i_ptr++ = 0;
+        }
+      }
+    }
+  }
+
+  void Split::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                const std::vector<int>& res, CodeGenerator& gen) const {
+    int nx = getNumOutputs();
     for (int i=0; i<nx; ++i) {
       int nz_first = offset_[i];
       int nz_last = offset_[i+1];
       int nz = nz_last-nz_first;
-      if (res.at(i).compare("0")!=0) {
-        stream << "  for (i=0; i<" << nz << "; ++i) " << res.at(i) << "[i] = " << arg.at(0)
-               << "[i+" << nz_first << "];" << endl;
+      if (res[i]>=0) {
+        stream << "  for (i=0, rr=" <<  gen.work(res[i]) << ", "
+               << "cr=" << gen.work(arg[0]+nz_first) << "; i<" << nz << "; ++i) "
+               << "*rr++ = *cr++;" << endl;
       }
     }
   }

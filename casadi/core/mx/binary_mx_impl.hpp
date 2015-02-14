@@ -178,19 +178,41 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::propagateSparsity(double** input, double** output, bool fwd) {
-    bvec_t *input0 = reinterpret_cast<bvec_t*>(input[0]);
-    bvec_t *input1 = reinterpret_cast<bvec_t*>(input[1]);
-    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
-    for (int el=0; el<nnz(); ++el) {
-      if (fwd) {
-        outputd[el] = input0[ScX ? 0 : el] | input1[ScY ? 0 : el];
-      } else {
-        bvec_t s = outputd[el];
-        outputd[el] = bvec_t(0);
-        input0[ScX ? 0 : el] |= s;
-        input1[ScY ? 0 : el] |= s;
-      }
+  void BinaryMX<ScX, ScY>::spFwd(const std::vector<const bvec_t*>& arg,
+                                 const std::vector<bvec_t*>& res,
+                                 int* itmp, bvec_t* rtmp) {
+    const bvec_t *a0=arg[0], *a1=arg[1];
+    bvec_t *r=res[0];
+    int n=nnz();
+    for (int i=0; i<n; ++i) {
+      if (ScX && ScY)
+        *r++ = *a0 | *a1;
+      else if (ScX && !ScY)
+        *r++ = *a0 | *a1++;
+      else if (!ScX && ScY)
+        *r++ = *a0++ | *a1;
+      else
+        *r++ = *a0++ | *a1++;
+    }
+  }
+
+  template<bool ScX, bool ScY>
+  void BinaryMX<ScX, ScY>::spAdj(const std::vector<bvec_t*>& arg,
+                                 const std::vector<bvec_t*>& res,
+                                 int* itmp, bvec_t* rtmp) {
+    bvec_t *a0=arg[0], *a1=arg[1], *r = res[0];
+    int n=nnz();
+    for (int i=0; i<n; ++i) {
+      bvec_t s = *r;
+      *r++ = 0;
+      if (ScX)
+        *a0 |= s;
+      else
+        *a0++ |= s;
+      if (ScY)
+        *a1 |= s;
+      else
+        *a1++ |= s;
     }
   }
 

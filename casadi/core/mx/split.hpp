@@ -63,12 +63,17 @@ namespace casadi {
     virtual void evaluateSX(const SXElement* const* input, SXElement** output,
                             int* itmp, SXElement* rtmp);
 
-    /// Propagate sparsity
-    virtual void propagateSparsity(double** input, double** output, bool fwd);
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const std::vector<const bvec_t*>& arg,
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(const std::vector<bvec_t*>& arg,
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                   const std::vector<int>& res, CodeGenerator& gen) const;
 
     // Sparsity pattern of the outputs
     std::vector<int> offset_;

@@ -98,6 +98,9 @@ namespace casadi {
     /** Get work vector name from index */
     static std::string work(int n);
 
+    /** Get work vector element from index */
+    static std::string workelement(int n);
+
     /** \brief  Print int vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
 
@@ -107,6 +110,9 @@ namespace casadi {
     /** \brief Copy a vector to another */
     void copyVector(std::ostream &s, const std::string& arg, std::size_t n, const std::string& res,
                     const std::string& it="i", bool only_if_exists=false) const;
+
+    /** \brief Assignment */
+    static void assign(std::ostream &s, const std::string& lhs, const std::string& rhs);
 
   private:
 

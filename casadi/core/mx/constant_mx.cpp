@@ -69,9 +69,14 @@ namespace casadi {
     }
   }
 
-  void ConstantMX::propagateSparsity(double** input, double** output, bool fwd) {
-    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
-    fill_n(outputd, nnz(), 0);
+  void ConstantMX::spFwd(const std::vector<const bvec_t*>& arg,
+                         const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    fill_n(res[0], nnz(), 0);
+  }
+
+  void ConstantMX::spAdj(const std::vector<bvec_t*>& arg,
+                         const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    fill_n(res[0], nnz(), 0);
   }
 
   void ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector<int>& arg,

@@ -83,29 +83,32 @@ namespace casadi {
     *output[0] = casadi_dot(dep(0).nnz(), input[0], 1, input[1], 1);
   }
 
-  void InnerProd::propagateSparsity(double** input, double** output, bool fwd) {
-    bvec_t* res = reinterpret_cast<bvec_t*>(output[0]);
-    bvec_t* arg0 = reinterpret_cast<bvec_t*>(input[0]);
-    bvec_t* arg1 = reinterpret_cast<bvec_t*>(input[1]);
+  void InnerProd::spFwd(const std::vector<const bvec_t*>& arg,
+                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    const bvec_t *a0=arg[0], *a1=arg[1];
+    bvec_t* r = res[0];
     const int n = dep(0).nnz();
-    if (fwd) {
-      *res = 0;
-      for (int i=0; i<n; ++i) {
-        *res |= *arg0++ | *arg1++;
-      }
-    } else {
-      for (int i=0; i<n; ++i) {
-        *arg0++ |= *res;
-        *arg1++ |= *res;
-      }
-      *res = 0;
+    *r = 0;
+    for (int i=0; i<n; ++i) {
+      *r |= *a0++ | *a1++;
     }
   }
 
-  void InnerProd::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                    const std::vector<std::string>& res, CodeGenerator& gen) const {
-    stream << "  *" << res.front() << " = "
-           << gen.casadi_dot(dep().nnz(), arg.at(0), 1, arg.at(1), 1) << ";" << endl;
+  void InnerProd::spAdj(const std::vector<bvec_t*>& arg,
+                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    bvec_t *a0=arg[0], *a1=arg[1], *r=res[0];
+    const int n = dep(0).nnz();
+    for (int i=0; i<n; ++i) {
+      *a0++ |= *r;
+      *a1++ |= *r;
+    }
+    *r = 0;
+  }
+
+  void InnerProd::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                    const std::vector<int>& res, CodeGenerator& gen) const {
+    gen.assign(stream, gen.workelement(res[0]),
+               gen.casadi_dot(dep().nnz(), gen.work(arg[0]), 1, gen.work(arg[1]), 1));
   }
 
 } // namespace casadi

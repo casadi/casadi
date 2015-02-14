@@ -64,19 +64,20 @@ namespace casadi {
     copy(arg, arg+nnz(), res);
   }
 
-  void Reshape::propagateSparsity(double** input, double** output, bool fwd) {
-    // Quick return if inplace
-    if (input[0]==output[0]) return;
+  void Reshape::spFwd(const std::vector<const bvec_t*>& arg,
+                      const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    if (res[0]!=arg[0]) copy(arg[0], arg[0]+nnz(), res[0]);
+  }
 
-    bvec_t *res_ptr = reinterpret_cast<bvec_t*>(output[0]);
-    int n = dep().nnz();
-    bvec_t *arg_ptr = reinterpret_cast<bvec_t*>(input[0]);
-    if (fwd) {
-      copy(arg_ptr, arg_ptr+n, res_ptr);
-    } else {
+  void Reshape::spAdj(const std::vector<bvec_t*>& arg,
+                      const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    bvec_t *a = arg[0];
+    bvec_t *r = res[0];
+    if (r!=a) {
+      int n = nnz();
       for (int k=0; k<n; ++k) {
-        *arg_ptr++ |= *res_ptr;
-        *res_ptr++ = 0;
+        *a++ |= *r;
+        *r++ = 0;
       }
     }
   }

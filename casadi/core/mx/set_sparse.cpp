@@ -88,15 +88,15 @@ namespace casadi {
     }
   }
 
-  void SetSparse::propagateSparsity(double** input, double** output, bool fwd) {
-    bvec_t *inputd = reinterpret_cast<bvec_t*>(input[0]);
-    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
-    if (fwd) {
-      sparsity().set(outputd, inputd, dep().sparsity());
-    } else {
-      dep().sparsity().bor(inputd, outputd, sparsity());
-      fill(outputd, outputd + nnz(), bvec_t(0));
-    }
+  void SetSparse::spFwd(const std::vector<const bvec_t*>& arg,
+                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    sparsity().set(res[0], arg[0], dep().sparsity());
+  }
+
+  void SetSparse::spAdj(const std::vector<bvec_t*>& arg,
+                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    dep().sparsity().bor(arg[0], res[0], sparsity());
+    fill(res[0], res[0]+nnz(), 0);
   }
 
   void SetSparse::generateOperation(std::ostream &stream, const std::vector<int>& arg,

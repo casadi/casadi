@@ -52,7 +52,13 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubRef::propagateSparsity(double** input, double** output, bool fwd) {
+  void SubRef::spFwd(const std::vector<const bvec_t*>& arg,
+                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    casadi_error("not ready");
+  }
+
+  void SubRef::spAdj(const std::vector<bvec_t*>& arg,
+                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
     casadi_error("not ready");
   }
 
@@ -76,8 +82,8 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubRef::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                 const std::vector<std::string>& res, CodeGenerator& gen) const {
+  void SubRef::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                 const std::vector<int>& res, CodeGenerator& gen) const {
     casadi_error("not ready");
   }
 

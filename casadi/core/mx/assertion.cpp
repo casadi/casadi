@@ -56,15 +56,13 @@ namespace casadi {
   }
 
   void Assertion::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
-    int nfwd = fwdSens.size();
-    for (int d=0; d<nfwd; ++d) {
+    for (int d=0; d<fwdSens.size(); ++d) {
       *fwdSens[d][0] = *fwdSeed[d][0];
     }
   }
 
   void Assertion::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
-    int nadj = adjSeed.size();
-    for (int d=0; d<nadj; ++d) {
+    for (int d=0; d<adjSeed.size(); ++d) {
       adjSens[d][0]->addToSum(*adjSeed[d][0]);
       *adjSeed[d][0] = MX();
     }
@@ -72,7 +70,7 @@ namespace casadi {
 
   void Assertion::evaluateSX(const SXElement* const* input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
-    copy(input[0], input[0]+dep().nnz(), output[0]);
+    copy(input[0], input[0]+nnz(), output[0]);
   }
 
   void Assertion::evaluateD(const double* const* input, double** output,
@@ -81,20 +79,22 @@ namespace casadi {
       casadi_error("Assertion error: " << fail_message_);
     }
 
-    copy(input[0], input[0]+dep().nnz(), output[0]);
+    copy(input[0], input[0]+nnz(), output[0]);
   }
 
-  void Assertion::propagateSparsity(double** input, double** output, bool fwd) {
-    bvec_t *input0 = reinterpret_cast<bvec_t*>(input[0]);
-    bvec_t *outputd = reinterpret_cast<bvec_t*>(output[0]);
-    for (int el=0; el<nnz(); ++el) {
-      if (fwd) {
-        outputd[el] = input0[el];
-      } else {
-        bvec_t s = outputd[el];
-        outputd[el] = bvec_t(0);
-        input0[el] |= s;
-      }
+  void Assertion::spFwd(const std::vector<const bvec_t*>& arg,
+                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    copy(arg[0], arg[0]+nnz(), res[0]);
+  }
+
+  void Assertion::spAdj(const std::vector<bvec_t*>& arg,
+                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    bvec_t *a = arg[0];
+    bvec_t *r = res[0];
+    int n = nnz();
+    for (int i=0; i<n; ++i) {
+      *a++ |= *r;
+      *r++ = 0;
     }
   }
 
