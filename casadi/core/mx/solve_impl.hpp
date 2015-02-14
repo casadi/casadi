@@ -109,9 +109,15 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::propagateSparsity(double** input, double** output,
-                                    int* itmp, bvec_t* rtmp, bool fwd) {
-    linear_solver_->propagateSparsityGen(input, output, itmp, rtmp, fwd, Tr, dep(0).size2());
+  void Solve<Tr>::spFwd(const std::vector<const bvec_t*>& arg,
+                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    linear_solver_->spFwdLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
+  }
+
+  template<bool Tr>
+  void Solve<Tr>::spAdj(const std::vector<bvec_t*>& arg,
+                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    linear_solver_->spAdjLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }
 
   template<bool Tr>

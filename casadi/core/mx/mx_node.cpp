@@ -258,44 +258,47 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::propagateSparsity(double** input, double** output, bool fwd) {
+  void MXNode::spFwd(const std::vector<const bvec_t*>& arg,
+                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
-    if (fwd) {
-
-      // Get dependencies of all inputs
-      for (int k=0; k<ndep(); ++k) {
-        const bvec_t* v = reinterpret_cast<const bvec_t*>(input[k]);
-        for (int i=0; i<dep(k).nnz(); ++i) {
-          all_depend |= v[i];
-        }
+    // Get dependencies of all inputs
+    for (int k=0; k<ndep(); ++k) {
+      const bvec_t* v = arg[k];
+      for (int i=0; i<dep(k).nnz(); ++i) {
+        all_depend |= v[i];
       }
+    }
 
-      // Propagate to all outputs
-      for (int k=0; k<getNumOutputs(); ++k) {
-        bvec_t* v = reinterpret_cast<bvec_t*>(output[k]);
-        for (int i=0; i<sparsity(k).nnz(); ++i) {
-          v[i] = all_depend;
-        }
+    // Propagate to all outputs
+    for (int k=0; k<getNumOutputs(); ++k) {
+      bvec_t* v = res[k];
+      for (int i=0; i<sparsity(k).nnz(); ++i) {
+        v[i] = all_depend;
       }
-    } else {
+    }
+  }
 
-      // Get dependencies of all outputs
-      for (int k=0; k<getNumOutputs(); ++k) {
-        bvec_t* v = reinterpret_cast<bvec_t*>(output[k]);
-        for (int i=0; i<sparsity(k).nnz(); ++i) {
-          all_depend |= v[i];
-          v[i] = 0;
-        }
+  void MXNode::spAdj(const std::vector<bvec_t*>& arg,
+                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    // By default, everything depends on everything
+    bvec_t all_depend(0);
+
+    // Get dependencies of all outputs
+    for (int k=0; k<getNumOutputs(); ++k) {
+      bvec_t* v = res[k];
+      for (int i=0; i<sparsity(k).nnz(); ++i) {
+        all_depend |= v[i];
+        v[i] = 0;
       }
+    }
 
-      // Propagate to all inputs
-      for (int k=0; k<ndep(); ++k) {
-        bvec_t* v = reinterpret_cast<bvec_t*>(input[k]);
-        for (int i=0; i<dep(k).nnz(); ++i) {
-          v[i] |= all_depend;
-        }
+    // Propagate to all inputs
+    for (int k=0; k<ndep(); ++k) {
+      bvec_t* v = arg[k];
+      for (int i=0; i<dep(k).nnz(); ++i) {
+        v[i] |= all_depend;
       }
     }
   }
@@ -312,26 +315,6 @@ namespace casadi {
 
   void MXNode::generateOperation(std::ostream &stream, const std::vector<int>& arg,
                                  const std::vector<int>& res, CodeGenerator& gen) const {
-    vector<string> sarg(arg.size()), sres(res.size());
-    for (int i=0; i<arg.size(); ++i) {
-      if (arg[i]>=0) {
-        sarg[i] = "(" + CodeGenerator::work(arg[i]) + ")";
-      } else {
-        sarg[i] = "0";
-      }
-    }
-    for (int i=0; i<res.size(); ++i) {
-      if (res[i]>=0) {
-        sres[i] = "(" + CodeGenerator::work(res[i]) + ")";
-      } else {
-        sres[i] = "0";
-      }
-    }
-    generateOperation(stream, sarg, sres, gen);
-  }
-
-  void MXNode::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                 const std::vector<std::string>& res, CodeGenerator& gen) const {
     stream << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
   }
 

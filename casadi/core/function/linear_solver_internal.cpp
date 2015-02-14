@@ -207,9 +207,10 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::propagateSparsityGen(double** arg, double** res,
-                                                  int* itmp, bvec_t* rtmp,
-                                                  bool fwd, bool tr, int nrhs) {
+  void LinearSolverInternal::
+  spFwdLinsol(const std::vector<const bvec_t*>& arg,
+              const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp,
+              bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -217,57 +218,70 @@ namespace casadi {
     int n = A_sp.size1();
 
     // Get pointers to data
-    bvec_t* B_ptr = reinterpret_cast<bvec_t*>(arg[0]);
-    bvec_t* A_ptr = reinterpret_cast<bvec_t*>(arg[1]);
-    bvec_t* X_ptr = reinterpret_cast<bvec_t*>(res[0]);
-    bvec_t* tmp_ptr = rtmp;
+    const bvec_t *B=arg[0], *A = arg[1];
+    bvec_t* X = res[0];
+    bvec_t* tmp = rtmp;
 
     // For all right-hand-sides
     for (int r=0; r<nrhs; ++r) {
+      // Copy B to a temporary vector
+      copy(B, B+n, tmp);
 
-      if (fwd) {
-
-        // Copy B_ptr to a temporary vector
-        copy(B_ptr, B_ptr+n, tmp_ptr);
-
-        // Add A_hat contribution to tmp
-        for (int cc=0; cc<n; ++cc) {
-          for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
-            int rr = A_row[k];
-            tmp_ptr[tr ? cc : rr] |= A_ptr[k];
-          }
+      // Add A_hat contribution to tmp
+      for (int cc=0; cc<n; ++cc) {
+        for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
+          int rr = A_row[k];
+          tmp[tr ? cc : rr] |= A[k];
         }
+      }
 
-        // Propagate to X_ptr
-        std::fill(X_ptr, X_ptr+n, 0);
-        spSolve(X_ptr, tmp_ptr, tr);
+      // Propagate to X
+      std::fill(X, X+n, 0);
+      spSolve(X, tmp, tr);
 
-      } else { // adjoint
+      // Continue to the next right-hand-side
+      B += n;
+      X += n;
+    }
+  }
 
-        // Solve transposed
-        std::fill(tmp_ptr, tmp_ptr+n, 0);
-        spSolve(tmp_ptr, B_ptr, !tr);
+  void LinearSolverInternal::
+  spAdjLinsol(const std::vector<bvec_t*>& arg,
+              const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp,
+              bool tr, int nrhs) {
+    // Sparsities
+    const Sparsity& A_sp = input(LINSOL_A).sparsity();
+    const int* A_colind = A_sp.colind();
+    const int* A_row = A_sp.row();
+    int n = A_sp.size1();
 
-        // Clear seeds
-        std::fill(B_ptr, B_ptr+n, 0);
+    // Get pointers to data
+    bvec_t *B=arg[0], *A=arg[1], *X=res[0];
+    bvec_t* tmp = rtmp;
 
-        // Propagate to X_ptr
-        for (int i=0; i<n; ++i) {
-          X_ptr[i] |= tmp_ptr[i];
-        }
+    // For all right-hand-sides
+    for (int r=0; r<nrhs; ++r) {
+      // Solve transposed
+      std::fill(tmp, tmp+n, 0);
+      spSolve(tmp, B, !tr);
 
-        // Propagate to A_ptr
-        for (int cc=0; cc<n; ++cc) {
-          for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
-            int rr = A_row[k];
-            A_ptr[k] |= tmp_ptr[tr ? cc : rr];
-          }
+      // Clear seeds
+      std::fill(B, B+n, 0);
+
+      // Propagate to X
+      for (int i=0; i<n; ++i) X[i] |= tmp[i];
+
+      // Propagate to A
+      for (int cc=0; cc<n; ++cc) {
+        for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
+          int rr = A_row[k];
+          A[k] |= tmp[tr ? cc : rr];
         }
       }
 
       // Continue to the next right-hand-side
-      B_ptr += n;
-      X_ptr += n;
+      B += n;
+      X += n;
     }
   }
 

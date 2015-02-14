@@ -72,9 +72,13 @@ namespace casadi {
     /** \brief Calculate reverse mode directional derivatives */
     virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
-    /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(double** input, double** output,
-                                   int* itmp, bvec_t* rtmp, bool fwd);
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const std::vector<const bvec_t*>& arg,
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(const std::vector<bvec_t*>& arg,
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Get function reference */
     virtual Function& getFunction();

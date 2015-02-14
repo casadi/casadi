@@ -128,8 +128,6 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const = 0;
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
     virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
                                    const std::vector<int>& res, CodeGenerator& gen) const;
 
@@ -149,27 +147,13 @@ namespace casadi {
     /** \brief Calculate reverse mode directional derivatives */
     virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
-    /** \brief  Propagate sparsity (legacy) */
-    virtual void propagateSparsity(double** input, double** output,
-                                   int* itmp, bvec_t* rtmp, bool fwd) {
-      propagateSparsity(input, output, fwd);
-    }
-
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const std::vector<const bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
-      propagateSparsity(reinterpret_cast<double**>(const_cast<bvec_t**>(getPtr(arg))),
-                        reinterpret_cast<double**>(const_cast<bvec_t**>(getPtr(res))),
-                        itmp, rtmp, true);
-    }
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(const std::vector<bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
-      propagateSparsity(reinterpret_cast<double**>(const_cast<bvec_t**>(getPtr(arg))),
-                        reinterpret_cast<double**>(const_cast<bvec_t**>(getPtr(res))),
-                        itmp, rtmp, false);
-    }
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;
@@ -396,9 +380,6 @@ namespace casadi {
 
     /** \brief  The sparsity pattern */
     Sparsity sparsity_;
-
-    /** \brief  Propagate sparsity, no work */
-    virtual void propagateSparsity(double** input, double** output, bool fwd);
 
     /** \brief Free adjoint memory (MX) */
     static void clearVector(const std::vector<MX*> v);

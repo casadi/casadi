@@ -2129,71 +2129,108 @@ namespace casadi {
     return MX::createMultipleOutput(new CallFunction(shared_from_this<Function>(), arg));
   }
 
-  void FunctionInternal::propagateSparsity(MXNode* node, double** arg, double** res,
-                                           int* itmp, bvec_t* rtmp, bool use_fwd) {
+  void FunctionInternal::spFwd(const std::vector<const bvec_t*>& arg,
+                               const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    // Number inputs and outputs
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
+
     // Pass/clear forward seeds/adjoint sensitivities
-    for (int i=0; i<getNumInputs(); ++i) {
+    for (int i=0; i<n_in; ++i) {
       // Input vector
       bvec_t* input_i = reinterpret_cast<bvec_t*>(input(i).ptr());
-      if (arg[i] == 0) {
+      if (arg[i]==0) {
         // Set to zero if not used
-        fill_n(input_i, input(i).nnz(), bvec_t(0));
+        fill_n(input_i, input(i).nnz(), 0);
       } else {
-        const bvec_t* arg_i = reinterpret_cast<const bvec_t*>(arg[i]);
-        copy(arg_i, arg_i+input(i).nnz(), input_i);
+        copy(arg[i], arg[i]+input(i).nnz(), input_i);
       }
     }
 
     // Pass/clear adjoint seeds/forward sensitivities
-    for (int i=0; i<getNumOutputs(); ++i) {
+    for (int i=0; i<n_out; ++i) {
       // Output vector
       bvec_t* output_i = reinterpret_cast<bvec_t*>(output(i).ptr());
-      if (res[i] == 0) {
+      if (res[i]==0) {
         // Set to zero if not used
-        fill_n(output_i, output(i).nnz(), bvec_t(0));
+        fill_n(output_i, output(i).nnz(), 0);
       } else {
-        const bvec_t* res_i = reinterpret_cast<const bvec_t*>(res[i]);
-        copy(res_i, res_i+output(i).nnz(), output_i);
+        copy(res[i], res[i]+output(i).nnz(), output_i);
       }
     }
 
     // Propagate seeds
-    spInit(use_fwd); // NOTE: should only be done once
-    if (spCanEvaluate(use_fwd)) {
-      spEvaluate(use_fwd);
+    spInit(true); // NOTE: should only be done once
+    if (spCanEvaluate(true)) {
+      spEvaluate(true);
     } else {
-      spEvaluateViaJacSparsity(use_fwd);
+      spEvaluateViaJacSparsity(true);
     }
 
     // Get the sensitivities
-    if (use_fwd) {
-      for (int i=0; i<getNumOutputs(); ++i) {
-        if (res[i] != 0) {
-          bvec_t* res_i = reinterpret_cast<bvec_t*>(res[i]);
-          const bvec_t* output_i = reinterpret_cast<const bvec_t*>(output(i).ptr());
-          copy(output_i, output_i+output(i).nnz(), res_i);
-        }
-      }
-    } else {
-      for (int i=0; i<getNumInputs(); ++i) {
-        if (arg[i] != 0) {
-          int n = input(i).nnz();
-          bvec_t* arg_i = reinterpret_cast<bvec_t*>(arg[i]);
-          const bvec_t* input_i = reinterpret_cast<const bvec_t*>(input(i).ptr());
-          for (int k=0; k<n; ++k) *arg_i++ |= *input_i++;
-        }
+    for (int i=0; i<n_out; ++i) {
+      if (res[i]!=0) {
+        const bvec_t* output_i = reinterpret_cast<const bvec_t*>(output(i).ptr());
+        copy(output_i, output_i+output(i).nnz(), res[i]);
       }
     }
 
     // Clear seeds and sensitivities
-    for (int iind=0; iind<getNumInputs(); ++iind) {
-      vector<double> &v = input(iind).data();
-      fill(v.begin(), v.end(), 0);
+    for (int i=0; i<n_in; ++i) input(i).set(0.);
+    for (int i=0; i<n_out; ++i) output(i).set(0.);
+  }
+
+  void FunctionInternal::spAdj(const std::vector<bvec_t*>& arg,
+                               const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    // Number inputs and outputs
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
+
+    // Pass/clear forward seeds/adjoint sensitivities
+    for (int i=0; i<n_in; ++i) {
+      // Input vector
+      bvec_t* input_i = reinterpret_cast<bvec_t*>(input(i).ptr());
+      if (arg[i]==0) {
+        // Set to zero if not used
+        fill_n(input_i, input(i).nnz(), 0);
+      } else {
+        copy(arg[i], arg[i]+input(i).nnz(), input_i);
+      }
     }
-    for (int oind=0; oind<getNumOutputs(); ++oind) {
-      vector<double> &v = output(oind).data();
-      fill(v.begin(), v.end(), 0);
+
+    // Pass/clear adjoint seeds/forward sensitivities
+    for (int i=0; i<n_out; ++i) {
+      // Output vector
+      bvec_t* output_i = reinterpret_cast<bvec_t*>(output(i).ptr());
+      if (res[i]==0) {
+        // Set to zero if not used
+        fill_n(output_i, output(i).nnz(), 0);
+      } else {
+        copy(res[i], res[i]+output(i).nnz(), output_i);
+      }
     }
+
+    // Propagate seeds
+    spInit(false); // NOTE: should only be done once
+    if (spCanEvaluate(false)) {
+      spEvaluate(false);
+    } else {
+      spEvaluateViaJacSparsity(false);
+    }
+
+    // Get the sensitivities
+    for (int i=0; i<n_in; ++i) {
+      if (arg[i]!=0) {
+        int n = input(i).nnz();
+        bvec_t* arg_i = arg[i];
+        const bvec_t* input_i = reinterpret_cast<const bvec_t*>(input(i).ptr());
+        for (int k=0; k<n; ++k) *arg_i++ |= *input_i++;
+      }
+    }
+
+    // Clear seeds and sensitivities
+    for (int i=0; i<n_in; ++i) input(i).set(0.);
+    for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
   void FunctionInternal::generateOperation(const MXNode* node, std::ostream &stream,

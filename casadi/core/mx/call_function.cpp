@@ -206,9 +206,14 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void CallFunction::propagateSparsity(double** input, double** output,
-                                       int* itmp, bvec_t* rtmp, bool use_fwd) {
-    fcn_->propagateSparsity(this, input, output, itmp, rtmp, use_fwd);
+  void CallFunction::spFwd(const std::vector<const bvec_t*>& arg,
+                           const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    fcn_->spFwd(arg, res, itmp, rtmp);
+  }
+
+  void CallFunction::spAdj(const std::vector<bvec_t*>& arg,
+                           const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    fcn_->spAdj(arg, res, itmp, rtmp);
   }
 
   void CallFunction::generateOperation(std::ostream &stream, const std::vector<int>& arg,

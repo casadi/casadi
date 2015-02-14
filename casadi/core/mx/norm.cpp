@@ -82,11 +82,11 @@ namespace casadi {
     }
   }
 
-  void NormF::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                const std::vector<std::string>& res, CodeGenerator& gen) const {
-    stream << "  *" << res.front() << " = sqrt(" << gen.casadi_dot(dep().nnz(),
-                                                                   arg.front(), 1,
-                                                                   arg.front(), 1) << ");" << endl;
+  void NormF::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+                                const std::vector<int>& res, CodeGenerator& gen) const {
+    gen.assign(stream, gen.workelement(res[0]),
+               "sqrt(" + gen.casadi_dot(dep().nnz(), gen.work(arg[0]), 1,
+                                        gen.work(arg[0]), 1) + ")");
   }
 
   void Norm2::printPart(std::ostream &stream, int part) const {

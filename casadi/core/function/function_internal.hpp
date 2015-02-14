@@ -335,8 +335,14 @@ namespace casadi {
     /// The following functions are called internally from EvaluateMX.
     /// For documentation, see the MXNode class
     ///@{
-    virtual void propagateSparsity(MXNode* node, double** arg, double** res,
-                                   int* itmp, bvec_t* rtmp, bool fwd);
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const std::vector<const bvec_t*>& arg,
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(const std::vector<bvec_t*>& arg,
+                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);
     virtual void generateOperation(const MXNode* node, std::ostream &stream,
                                    const std::vector<int>& arg,
