@@ -68,23 +68,24 @@ namespace casadi {
     }
   }
 
-  void InnerProd::evaluateD(const double* const* input, double** output,
+  void InnerProd::evalD(const cpv_double& input, const pv_double& output,
                             int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void InnerProd::evaluateSX(const SXElement* const* input, SXElement** output,
-                             int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+  void InnerProd::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+                         int* itmp, SXElement* rtmp) {
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void InnerProd::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void InnerProd::evalGen(const std::vector<const T*>& input,
+                          const std::vector<T*>& output, int* itmp, T* rtmp) {
     *output[0] = casadi_dot(dep(0).nnz(), input[0], 1, input[1], 1);
   }
 
-  void InnerProd::spFwd(const std::vector<const bvec_t*>& arg,
-                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spFwd(const cpv_bvec_t& arg,
+                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t* r = res[0];
     const int n = dep(0).nnz();
@@ -94,8 +95,8 @@ namespace casadi {
     }
   }
 
-  void InnerProd::spAdj(const std::vector<bvec_t*>& arg,
-                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spAdj(const pv_bvec_t& arg,
+                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     bvec_t *a0=arg[0], *a1=arg[1], *r=res[0];
     const int n = dep(0).nnz();
     for (int i=0; i<n; ++i) {
@@ -105,7 +106,7 @@ namespace casadi {
     *r = 0;
   }
 
-  void InnerProd::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void InnerProd::generate(std::ostream &stream, const std::vector<int>& arg,
                                     const std::vector<int>& res, CodeGenerator& gen) const {
     gen.assign(stream, gen.workelement(res[0]),
                gen.casadi_dot(dep().nnz(), gen.work(arg[0]), 1, gen.work(arg[1]), 1));

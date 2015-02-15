@@ -43,18 +43,19 @@ namespace casadi {
     }
   }
 
-  void NormF::evaluateD(const double* const* input, double** output,
-                        int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+  void NormF::evalD(const cpv_double& input, const pv_double& output,
+                    int* itmp, double* rtmp) {
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void NormF::evaluateSX(const SXElement* const* input, SXElement** output,
+  void NormF::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                          int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void NormF::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void NormF::evalGen(const std::vector<const T*>& input,
+                      const std::vector<T*>& output, int* itmp, T* rtmp) {
     // Get data
     T* res = output[0];
     const T* arg = input[0];
@@ -82,7 +83,7 @@ namespace casadi {
     }
   }
 
-  void NormF::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void NormF::generate(std::ostream &stream, const std::vector<int>& arg,
                                 const std::vector<int>& res, CodeGenerator& gen) const {
     gen.assign(stream, gen.workelement(res[0]),
                "sqrt(" + gen.casadi_dot(dep().nnz(), gen.work(arg[0]), 1,

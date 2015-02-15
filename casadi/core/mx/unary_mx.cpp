@@ -56,7 +56,7 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::evaluateD(const double* const* input, double** output,
+  void UnaryMX::evalD(const cpv_double& input, const pv_double& output,
                           int* itmp, double* rtmp) {
     double dummy = numeric_limits<double>::quiet_NaN();
     double* outputd = output[0];
@@ -64,7 +64,7 @@ namespace casadi {
     casadi_math<double>::fun(op_, inputd, dummy, outputd, nnz());
   }
 
-  void UnaryMX::evaluateSX(const SXElement* const* input, SXElement** output,
+  void UnaryMX::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                            int* itmp, SXElement* rtmp) {
     SXElement dummy = 0;
     SXElement* outputd = output[0];
@@ -103,14 +103,14 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::spFwd(const std::vector<const bvec_t*>& arg,
-                      const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void UnaryMX::spFwd(const cpv_bvec_t& arg,
+                      const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     if (arg[0]==res[0]) return;
     copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
-  void UnaryMX::spAdj(const std::vector<bvec_t*>& arg,
-                      const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void UnaryMX::spAdj(const pv_bvec_t& arg,
+                      const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     if (arg[0]==res[0]) return;
     int nz = nnz();
     for (int el=0; el<nz; ++el) {
@@ -120,7 +120,7 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void UnaryMX::generate(std::ostream &stream, const std::vector<int>& arg,
                                   const std::vector<int>& res, CodeGenerator& gen) const {
     stream << "  for (i=0, rr=" << gen.work(res.at(0)) << ", cs=" << gen.work(arg.at(0))
            << "; i<" << sparsity().nnz() << "; ++i) *rr++=";

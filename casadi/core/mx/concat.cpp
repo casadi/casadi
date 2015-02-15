@@ -41,18 +41,19 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::evaluateD(const double* const* input, double** output,
+  void Concat::evalD(const cpv_double& input, const pv_double& output,
                          int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Concat::evaluateSX(const SXElement* const* input, SXElement** output,
+  void Concat::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                           int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Concat::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void Concat::evalGen(const std::vector<const T*>& input,
+                       const std::vector<T*>& output, int* itmp, T* rtmp) {
     T* res = output[0];
     for (int i=0; i<ndep(); ++i) {
       const T* arg_i = input[i];
@@ -61,8 +62,8 @@ namespace casadi {
     }
   }
 
-  void Concat::spFwd(const std::vector<const bvec_t*>& arg,
-                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Concat::spFwd(const cpv_bvec_t& arg,
+                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();
@@ -72,8 +73,8 @@ namespace casadi {
     }
   }
 
-  void Concat::spAdj(const std::vector<bvec_t*>& arg,
-                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Concat::spAdj(const pv_bvec_t& arg,
+                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();
@@ -85,7 +86,7 @@ namespace casadi {
     }
   }
 
-  void Concat::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void Concat::generate(std::ostream &stream, const std::vector<int>& arg,
                                  const std::vector<int>& res, CodeGenerator& gen) const {
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();

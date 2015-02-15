@@ -232,14 +232,14 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::evaluateD(const double* const* input, double** output, int* itmp, double* rtmp) {
-    throw CasadiException(string("MXNode::evaluateD not defined for class ")
+  void MXNode::evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp) {
+    throw CasadiException(string("MXNode::evalD not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evaluateSX(const SXElement* const* input, SXElement** output,
+  void MXNode::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                           int* itmp, SXElement* rtmp) {
-    throw CasadiException(string("MXNode::evaluateSX not defined for class ")
+    throw CasadiException(string("MXNode::evalSX not defined for class ")
                           + typeid(*this).name());
   }
 
@@ -258,8 +258,8 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::spFwd(const std::vector<const bvec_t*>& arg,
-                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void MXNode::spFwd(const cpv_bvec_t& arg,
+                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -272,7 +272,7 @@ namespace casadi {
     }
 
     // Propagate to all outputs
-    for (int k=0; k<getNumOutputs(); ++k) {
+    for (int k=0; k<nout(); ++k) {
       bvec_t* v = res[k];
       for (int i=0; i<sparsity(k).nnz(); ++i) {
         v[i] = all_depend;
@@ -280,13 +280,13 @@ namespace casadi {
     }
   }
 
-  void MXNode::spAdj(const std::vector<bvec_t*>& arg,
-                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void MXNode::spAdj(const pv_bvec_t& arg,
+                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
     // Get dependencies of all outputs
-    for (int k=0; k<getNumOutputs(); ++k) {
+    for (int k=0; k<nout(); ++k) {
       bvec_t* v = res[k];
       for (int i=0; i<sparsity(k).nnz(); ++i) {
         all_depend |= v[i];
@@ -313,7 +313,7 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  void MXNode::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void MXNode::generate(std::ostream &stream, const std::vector<int>& arg,
                                  const std::vector<int>& res, CodeGenerator& gen) const {
     stream << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
   }

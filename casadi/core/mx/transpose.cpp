@@ -37,28 +37,29 @@ namespace casadi {
     setSparsity(x.sparsity().T());
   }
 
-  void Transpose::evaluateD(const double* const* input, double** output,
+  void Transpose::evalD(const cpv_double& input, const pv_double& output,
                             int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
- void DenseTranspose::evaluateD(const double* const* input, double** output,
+ void DenseTranspose::evalD(const cpv_double& input, const pv_double& output,
                                 int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Transpose::evaluateSX(const SXElement* const* input, SXElement** output,
+  void Transpose::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                              int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
-  void DenseTranspose::evaluateSX(const SXElement* const* input, SXElement** output,
+  void DenseTranspose::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                                   int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Transpose::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void Transpose::evalGen(const std::vector<const T*>& input,
+                          const std::vector<T*>& output, int* itmp, T* rtmp) {
 
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
@@ -78,8 +79,8 @@ namespace casadi {
   }
 
   template<typename T>
-  void DenseTranspose::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
-
+  void DenseTranspose::evalGen(const std::vector<const T*>& input,
+                               const std::vector<T*>& output, int* itmp, T* rtmp) {
     // Get sparsity patterns
     int x_nrow = dep().size1();
     int x_ncol = dep().size2();
@@ -93,8 +94,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::spFwd(const std::vector<const bvec_t*>& arg,
-                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Transpose::spFwd(const cpv_bvec_t& arg,
+                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     // Shortands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -112,8 +113,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::spAdj(const std::vector<bvec_t*>& arg,
-                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Transpose::spAdj(const pv_bvec_t& arg,
+                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     // Shortands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -133,8 +134,8 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::spFwd(const std::vector<const bvec_t*>& arg,
-                             const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void DenseTranspose::spFwd(const cpv_bvec_t& arg,
+                             const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     // Shorthands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -149,8 +150,8 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::spAdj(const std::vector<bvec_t*>& arg,
-                             const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void DenseTranspose::spAdj(const pv_bvec_t& arg,
+                             const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     // Shorthands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -189,7 +190,7 @@ namespace casadi {
     }
   }
 
-  void Transpose::generateOperation(std::ostream &stream,
+  void Transpose::generate(std::ostream &stream,
                                     const std::vector<int>& arg,
                                     const std::vector<int>& res,
                                     CodeGenerator& gen) const {
@@ -200,7 +201,7 @@ namespace casadi {
            << gen.work(res[0]) << ", s" << gen.addSparsity(sparsity()) << ", iii);" << endl;
   }
 
-  void DenseTranspose::generateOperation(std::ostream &stream,
+  void DenseTranspose::generate(std::ostream &stream,
                                          const std::vector<int>& arg,
                                          const std::vector<int>& res,
                                          CodeGenerator& gen) const {

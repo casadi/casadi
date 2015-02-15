@@ -71,7 +71,6 @@ namespace casadi {
   }
   ///@}
 
-
   /** \brief Node class for MX objects
       \author Joel Andersson
       \date 2010
@@ -128,14 +127,14 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const = 0;
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
+                          const std::vector<int>& res, CodeGenerator& gen) const;
 
     /** \brief  Evaluate numerically */
-    virtual void evaluateD(const double* const* input, double** output, int* itmp, double* rtmp);
+    virtual void evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const SXElement* const* input, SXElement** output,
+    virtual void evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
                             int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
@@ -148,12 +147,12 @@ namespace casadi {
     virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const std::vector<const bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const cpv_bvec_t& arg,
+                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const std::vector<bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(const pv_bvec_t& arg,
+                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;
@@ -200,7 +199,7 @@ namespace casadi {
     virtual bool hasDep() const {return ndep()>0; }
 
     /** \brief  Number of outputs */
-    virtual int getNumOutputs() const { return 1;}
+    virtual int nout() const { return 1;}
 
     /** \brief  Get an output */
     virtual MX getOutput(int oind) const;

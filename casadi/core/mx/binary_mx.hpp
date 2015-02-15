@@ -66,30 +66,31 @@ namespace casadi {
     virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const std::vector<const bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const cpv_bvec_t& arg,
+                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const std::vector<bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(const pv_bvec_t& arg,
+                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /// Evaluate the function (template)
     template<typename T>
-    void evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp);
+    void evalGen(const std::vector<const T*>& input,
+                 const std::vector<T*>& output, int* itmp, T* rtmp);
 
     /// Evaluate the function numerically
-    virtual void evaluateD(const double* const* input, double** output,
-                           int* itmp, double* rtmp);
+    virtual void evalD(const cpv_double& input, const pv_double& output,
+                       int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXElement* const* input, SXElement** output,
-                            int* itmp, SXElement* rtmp);
+    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+                        int* itmp, SXElement* rtmp);
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 2;}
 
     /** \brief Generate code for the operation */
-    void generateOperation(std::ostream &stream, const std::vector<int>& arg,
+    void generate(std::ostream &stream, const std::vector<int>& arg,
                            const std::vector<int>& res, CodeGenerator& gen) const;
 
     /// Get a unary operation

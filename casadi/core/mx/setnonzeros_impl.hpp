@@ -455,20 +455,21 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateD(const double* const* input, double** output,
+  void SetNonzerosVector<Add>::evalD(const cpv_double& input, const pv_double& output,
                                          int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateSX(const SXElement* const* input, SXElement** output,
+  void SetNonzerosVector<Add>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                                           int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosVector<Add>::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void SetNonzerosVector<Add>::evalGen(const std::vector<const T*>& input,
+                                       const std::vector<T*>& output, int* itmp, T* rtmp) {
     const T* idata0 = input[0];
     const T* idata = input[1];
     T* odata = output[0];
@@ -485,20 +486,21 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateD(const double* const* input, double** output,
+  void SetNonzerosSlice<Add>::evalD(const cpv_double& input, const pv_double& output,
                                     int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateSX(const SXElement* const* input, SXElement** output,
+  void SetNonzerosSlice<Add>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                                          int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice<Add>::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void SetNonzerosSlice<Add>::evalGen(const std::vector<const T*>& input,
+                                      const std::vector<T*>& output, int* itmp, T* rtmp) {
     const T* idata0 = input[0];
     const T* idata = input[1];
     T* odata = output[0];
@@ -516,20 +518,21 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateD(const double* const* input, double** output,
+  void SetNonzerosSlice2<Add>::evalD(const cpv_double& input, const pv_double& output,
                                          int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateSX(const SXElement* const* input, SXElement** output,
+  void SetNonzerosSlice2<Add>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                                           int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice2<Add>::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void SetNonzerosSlice2<Add>::evalGen(const std::vector<const T*>& input,
+                                       const std::vector<T*>& output, int* itmp, T* rtmp) {
     const T* idata0 = input[0];
     const T* idata = input[1];
     T* odata = output[0];
@@ -553,8 +556,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spFwd(const std::vector<const bvec_t*>& arg,
-        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  spFwd(const cpv_bvec_t& arg,
+        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -573,8 +576,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spAdj(const std::vector<bvec_t*>& arg,
-        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  spAdj(const pv_bvec_t& arg,
+        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     bvec_t *a0 = arg[0];
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -599,8 +602,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spFwd(const std::vector<const bvec_t*>& arg,
-        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  spFwd(const cpv_bvec_t& arg,
+        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -619,8 +622,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spAdj(const std::vector<bvec_t*>& arg,
-        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  spAdj(const pv_bvec_t& arg,
+        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     bvec_t *a0 = arg[0];
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -643,8 +646,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spFwd(const std::vector<const bvec_t*>& arg,
-        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  spFwd(const cpv_bvec_t& arg,
+        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -665,8 +668,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spAdj(const std::vector<bvec_t*>& arg,
-        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  spAdj(const pv_bvec_t& arg,
+        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     bvec_t *a0 = arg[0];
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -793,7 +796,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::generateOperation(std::ostream &stream,
+  void SetNonzerosVector<Add>::generate(std::ostream &stream,
                                                  const std::vector<int>& arg,
                                                  const std::vector<int>& res,
                                                  CodeGenerator& gen) const {
@@ -813,7 +816,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::generateOperation(std::ostream &stream,
+  void SetNonzerosSlice<Add>::generate(std::ostream &stream,
                                                 const std::vector<int>& arg,
                                                 const std::vector<int>& res,
                                                 CodeGenerator& gen) const {
@@ -830,7 +833,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::generateOperation(std::ostream &stream,
+  void SetNonzerosSlice2<Add>::generate(std::ostream &stream,
                                                  const std::vector<int>& arg,
                                                  const std::vector<int>& res,
                                                  CodeGenerator& gen) const {

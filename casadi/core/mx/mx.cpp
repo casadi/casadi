@@ -112,7 +112,7 @@ namespace casadi {
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {
     casadi_assert(dynamic_cast<MultipleOutput*>(node)!=0);
     MX x =  MX::create(node);
-    std::vector<MX> ret(x->getNumOutputs());
+    std::vector<MX> ret(x->nout());
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = MX::create(new OutputNode(x, i));
       if (ret[i].isEmpty(true)) {
@@ -899,7 +899,7 @@ namespace casadi {
   }
 
   int MX::getNumOutputs() const {
-    return (*this)->getNumOutputs();
+    return (*this)->nout();
   }
 
   MX MX::getOutput(int oind) const {

@@ -59,18 +59,19 @@ namespace casadi {
     }
   }
 
-  void Multiplication::evaluateD(const double* const* input, double** output,
+  void Multiplication::evalD(const cpv_double& input, const pv_double& output,
                                  int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Multiplication::evaluateSX(const SXElement* const* input, SXElement** output,
+  void Multiplication::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                                   int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Multiplication::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void Multiplication::evalGen(const std::vector<const T*>& input,
+                               const std::vector<T*>& output, int* itmp, T* rtmp) {
     if (input[0]!=output[0]) {
       copy(input[0], input[0]+dep(0).nnz(), output[0]);
     }
@@ -102,8 +103,8 @@ namespace casadi {
     *output[0] = mul(*input[1], *input[2], *input[0]);
   }
 
-  void Multiplication::spFwd(const std::vector<const bvec_t*>& arg,
-                             const std::vector<bvec_t*>& res, int* itmp,
+  void Multiplication::spFwd(const cpv_bvec_t& arg,
+                             const pv_bvec_t& res, int* itmp,
                              bvec_t* rtmp) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
@@ -111,8 +112,8 @@ namespace casadi {
                             res[0], sparsity(), rtmp);
   }
 
-  void Multiplication::spAdj(const std::vector<bvec_t*>& arg,
-                             const std::vector<bvec_t*>& res,
+  void Multiplication::spAdj(const pv_bvec_t& arg,
+                             const pv_bvec_t& res,
                              int* itmp, bvec_t* rtmp) {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
@@ -126,7 +127,7 @@ namespace casadi {
     }
   }
 
-  void Multiplication::generateOperation(std::ostream &stream,
+  void Multiplication::generate(std::ostream &stream,
                                          const std::vector<int>& arg,
                                          const std::vector<int>& res,
                                          CodeGenerator& gen) const {
@@ -143,7 +144,7 @@ namespace casadi {
     stream << gen.work(res[0]) << ", s" << gen.addSparsity(sparsity()) << ", w);" << endl;
   }
 
-  void DenseMultiplication::generateOperation(std::ostream &stream,
+  void DenseMultiplication::generate(std::ostream &stream,
                                               const std::vector<int>& arg,
                                               const std::vector<int>& res,
                                               CodeGenerator& gen) const {

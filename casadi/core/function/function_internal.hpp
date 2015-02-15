@@ -344,9 +344,8 @@ namespace casadi {
                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
 
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);
-    virtual void generateOperation(const MXNode* node, std::ostream &stream,
-                                   const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
+                          const std::vector<int>& res, CodeGenerator& gen) const;
     virtual void printPart(const MXNode* node, std::ostream &stream, int part) const;
     ///@}
 

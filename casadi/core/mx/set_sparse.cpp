@@ -55,18 +55,19 @@ namespace casadi {
   }
 
   template<typename T>
-  void SetSparse::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void SetSparse::evalGen(const std::vector<const T*>& input,
+                          const std::vector<T*>& output, int* itmp, T* rtmp) {
     casadi_project(input[0], dep().sparsity(), output[0], sparsity(), rtmp);
   }
 
-  void SetSparse::evaluateD(const double* const* input, double** output,
+  void SetSparse::evalD(const cpv_double& input, const pv_double& output,
                             int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void SetSparse::evaluateSX(const SXElement* const* input, SXElement** output,
+  void SetSparse::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                              int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   void SetSparse::eval(const MXPtrV& input, MXPtrV& output) {
@@ -88,18 +89,18 @@ namespace casadi {
     }
   }
 
-  void SetSparse::spFwd(const std::vector<const bvec_t*>& arg,
-                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void SetSparse::spFwd(const cpv_bvec_t& arg,
+                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     sparsity().set(res[0], arg[0], dep().sparsity());
   }
 
-  void SetSparse::spAdj(const std::vector<bvec_t*>& arg,
-                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void SetSparse::spAdj(const pv_bvec_t& arg,
+                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
   }
 
-  void SetSparse::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void SetSparse::generate(std::ostream &stream, const std::vector<int>& arg,
                                     const std::vector<int>& res, CodeGenerator& gen) const {
     // Codegen "copy sparse"
     gen.addAuxiliary(CodeGenerator::AUX_PROJECT);

@@ -38,28 +38,29 @@ namespace casadi {
     return new SubAssign(*this);
   }
 
-  void SubAssign::evaluateD(const double* const* input, double** output,
-                            int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+  void SubAssign::evalD(const cpv_double& input, const pv_double& output,
+                        int* itmp, double* rtmp) {
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void SubAssign::evaluateSX(const SXElement* const* input, SXElement** output,
-                             int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+  void SubAssign::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+                         int* itmp, SXElement* rtmp) {
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void SubAssign::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void SubAssign::evalGen(const std::vector<const T*>& input,
+                          const std::vector<T*>& output, int* itmp, T* rtmp) {
     casadi_error("not ready");
   }
 
-  void SubAssign::spFwd(const std::vector<const bvec_t*>& arg,
-                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void SubAssign::spFwd(const cpv_bvec_t& arg,
+                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     casadi_error("not ready");
   }
 
-  void SubAssign::spAdj(const std::vector<bvec_t*>& arg,
-                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void SubAssign::spAdj(const pv_bvec_t& arg,
+                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     casadi_error("not ready");
   }
 
@@ -85,7 +86,7 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void SubAssign::generate(std::ostream &stream, const std::vector<int>& arg,
                                     const std::vector<int>& res, CodeGenerator& gen) const {
     casadi_error("not ready");
   }

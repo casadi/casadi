@@ -313,7 +313,6 @@ namespace casadi {
 
 #endif // SWIG
 /// \endcond
-
   typedef std::vector<SXElement> SXElementVector;
   typedef std::vector<std::vector<SXElement> > SXElementVectorVector;
   typedef std::vector< std::vector<std::vector<SXElement> > > SXElementVectorVectorVector;

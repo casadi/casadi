@@ -58,10 +58,10 @@ namespace casadi {
     virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
     /// Evaluate the function numerically
-    virtual void evaluateD(const double* const* input, double** output, int* itmp, double* rtmp);
+    virtual void evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXElement* const* input, SXElement** output,
+    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                             int* itmp, SXElement* rtmp);
 
     /// Print a part of the expression */
@@ -71,12 +71,12 @@ namespace casadi {
     virtual int getOp() const { return OP_ASSERTION;}
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const std::vector<const bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const cpv_bvec_t& arg,
+                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const std::vector<bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(const pv_bvec_t& arg,
+                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
 
   private:

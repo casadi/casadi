@@ -63,10 +63,10 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const;
 
     /// Evaluate the function numerically
-    virtual void evaluateD(const double* const* input, double** output, int* itmp, double* rtmp);
+    virtual void evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXElement* const* input, SXElement** output,
+    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                             int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
@@ -79,12 +79,12 @@ namespace casadi {
     virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const std::vector<const bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const cpv_bvec_t& arg,
+                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const std::vector<bvec_t*>& arg,
-                       const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(const pv_bvec_t& arg,
+                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_SOLVE;}

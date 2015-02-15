@@ -2233,10 +2233,8 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::generateOperation(const MXNode* node, std::ostream &stream,
-                                           const std::vector<int>& arg,
-                                           const std::vector<int>& res,
-                                           CodeGenerator& gen) const {
+  void FunctionInternal::generate(std::ostream &stream, const std::vector<int>& arg,
+                                  const std::vector<int>& res, CodeGenerator& gen) const {
 
     // Get the index of the function
     int f = gen.getDependency(shared_from_this<Function>());

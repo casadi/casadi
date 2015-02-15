@@ -40,11 +40,11 @@ namespace casadi {
   ConstantMX::~ConstantMX() {
   }
 
-  void ConstantMX::evaluateD(const double* const* input, double** output,
+  void ConstantMX::evalD(const cpv_double& input, const pv_double& output,
                              int* itmp, double* rtmp) {
   }
 
-  void ConstantMX::evaluateSX(const SXElement* const* input, SXElement** output,
+  void ConstantMX::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                               int* itmp, SXElement* rtmp) {
   }
 
@@ -69,17 +69,17 @@ namespace casadi {
     }
   }
 
-  void ConstantMX::spFwd(const std::vector<const bvec_t*>& arg,
-                         const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void ConstantMX::spFwd(const cpv_bvec_t& arg,
+                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantMX::spAdj(const std::vector<bvec_t*>& arg,
-                         const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void ConstantMX::spAdj(const pv_bvec_t& arg,
+                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void ConstantDMatrix::generate(std::ostream &stream, const std::vector<int>& arg,
                                           const std::vector<int>& res,
                                           CodeGenerator& gen) const {
     // Print the constant

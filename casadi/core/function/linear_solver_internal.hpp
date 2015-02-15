@@ -69,8 +69,8 @@ namespace casadi {
     MX solve(const MX& A, const MX& B, bool transpose);
 
     /// Evaluate MX, possibly transposed
-    virtual void evaluateSXGen(const SXElement* const* arg, SXElement** res,
-                               int* itmp, SXElement* rtmp, bool tr, int nrhs);
+    virtual void evalSXLinsol(const cpv_SXElement& arg, const pv_SXElement& res,
+                              int* itmp, SXElement* rtmp, bool tr, int nrhs);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwdLinsol(const MX& X, const MXPtrVV& fseed, MXPtrVV& fsens, bool tr);

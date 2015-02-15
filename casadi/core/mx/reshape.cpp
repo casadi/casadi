@@ -44,18 +44,19 @@ namespace casadi {
     return new Reshape(*this);
   }
 
-  void Reshape::evaluateD(const double* const* input, double** output,
+  void Reshape::evalD(const cpv_double& input, const pv_double& output,
                           int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Reshape::evaluateSX(const SXElement* const* input, SXElement** output,
+  void Reshape::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                            int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Reshape::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void Reshape::evalGen(const std::vector<const T*>& input,
+                        const std::vector<T*>& output, int* itmp, T* rtmp) {
     // Quick return if inplace
     if (input[0]==output[0]) return;
 
@@ -64,13 +65,13 @@ namespace casadi {
     copy(arg, arg+nnz(), res);
   }
 
-  void Reshape::spFwd(const std::vector<const bvec_t*>& arg,
-                      const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Reshape::spFwd(const cpv_bvec_t& arg,
+                      const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     if (res[0]!=arg[0]) copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
-  void Reshape::spAdj(const std::vector<bvec_t*>& arg,
-                      const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Reshape::spAdj(const pv_bvec_t& arg,
+                      const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     if (r!=a) {
@@ -121,7 +122,7 @@ namespace casadi {
     }
   }
 
-  void Reshape::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void Reshape::generate(std::ostream &stream, const std::vector<int>& arg,
                                   const std::vector<int>& res, CodeGenerator& gen) const {
     if (arg[0]==res[0]) return;
     gen.copyVector(stream, gen.work(arg[0]), nnz(), gen.work(res[0]), "i", false);

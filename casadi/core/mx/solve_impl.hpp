@@ -70,7 +70,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateD(const double* const* input, double** output,
+  void Solve<Tr>::evalD(const cpv_double& input, const pv_double& output,
                             int* itmp, double* rtmp) {
     // Factorize the matrix
     linear_solver_.setInput(input[1], LINSOL_A);
@@ -84,9 +84,9 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateSX(const SXElement* const* input, SXElement** output,
+  void Solve<Tr>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                              int* itmp, SXElement* rtmp) {
-    linear_solver_->evaluateSXGen(input, output, itmp, rtmp, Tr, dep(0).size2());
+    linear_solver_->evalSXLinsol(input, output, itmp, rtmp, Tr, dep(0).size2());
   }
 
   template<bool Tr>
@@ -109,14 +109,14 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::spFwd(const std::vector<const bvec_t*>& arg,
-                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Solve<Tr>::spFwd(const cpv_bvec_t& arg,
+                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     linear_solver_->spFwdLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::spAdj(const std::vector<bvec_t*>& arg,
-                        const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Solve<Tr>::spAdj(const pv_bvec_t& arg,
+                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     linear_solver_->spAdjLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }
 

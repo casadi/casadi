@@ -52,7 +52,7 @@ namespace casadi {
     virtual ~MultipleOutput();
 
     /** \brief  Number of outputs */
-    virtual int getNumOutputs() const=0;
+    virtual int nout() const=0;
 
     /** \brief  Get an output */
     virtual MX getOutput(int oind) const;

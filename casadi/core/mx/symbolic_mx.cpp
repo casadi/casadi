@@ -46,11 +46,11 @@ namespace casadi {
     stream << name_;
   }
 
-  void SymbolicMX::evaluateD(const double* const* input, double** output,
+  void SymbolicMX::evalD(const cpv_double& input, const pv_double& output,
                              int* itmp, double* rtmp) {
   }
 
-  void SymbolicMX::evaluateSX(const SXElement* const* input, SXElement** output,
+  void SymbolicMX::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                               int* itmp, SXElement* rtmp) {
   }
 
@@ -67,13 +67,13 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::spFwd(const std::vector<const bvec_t*>& arg,
-                         const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void SymbolicMX::spFwd(const cpv_bvec_t& arg,
+                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void SymbolicMX::spAdj(const std::vector<bvec_t*>& arg,
-                         const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void SymbolicMX::spAdj(const pv_bvec_t& arg,
+                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     fill_n(res[0], nnz(), 0);
   }
 

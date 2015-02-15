@@ -77,8 +77,8 @@ namespace casadi {
     fcn_->printPart(this, stream, part);
   }
 
-  void CallFunction::evaluateD(const double* const* input, double** output,
-                               int* itmp, double* rtmp) {
+  void CallFunction::evalD(const cpv_double& input, const pv_double& output,
+                           int* itmp, double* rtmp) {
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
@@ -107,7 +107,7 @@ namespace casadi {
     }
   }
 
-  int CallFunction::getNumOutputs() const {
+  int CallFunction::nout() const {
     return fcn_.getNumOutputs();
   }
 
@@ -119,7 +119,7 @@ namespace casadi {
     return fcn_;
   }
 
-  void CallFunction::evaluateSX(const SXElement* const* input, SXElement** output,
+  void CallFunction::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                                 int* itmp, SXElement* rtmp) {
     // Number of inputs and outputs
     int num_in = fcn_.getNumInputs();
@@ -156,7 +156,7 @@ namespace casadi {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(getNumOutputs());
+    vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Collect seeds
@@ -179,7 +179,7 @@ namespace casadi {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(getNumOutputs());
+    vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Collect seeds
@@ -206,20 +206,19 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void CallFunction::spFwd(const std::vector<const bvec_t*>& arg,
-                           const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void CallFunction::spFwd(const cpv_bvec_t& arg,
+                           const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     fcn_->spFwd(arg, res, itmp, rtmp);
   }
 
-  void CallFunction::spAdj(const std::vector<bvec_t*>& arg,
-                           const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void CallFunction::spAdj(const pv_bvec_t& arg,
+                           const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     fcn_->spAdj(arg, res, itmp, rtmp);
   }
 
-  void CallFunction::generateOperation(std::ostream &stream, const std::vector<int>& arg,
-                                       const std::vector<int>& res,
-                                       CodeGenerator& gen) const {
-    fcn_->generateOperation(this, stream, arg, res, gen);
+  void CallFunction::generate(std::ostream &stream, const std::vector<int>& arg,
+                              const std::vector<int>& res, CodeGenerator& gen) const {
+    fcn_->generate(stream, arg, res, gen);
   }
 
   void CallFunction::nTmp(size_t& ni, size_t& nr) {

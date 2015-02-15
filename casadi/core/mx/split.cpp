@@ -43,18 +43,19 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::evaluateD(const double* const* input, double** output,
+  void Split::evalD(const cpv_double& input, const pv_double& output,
                         int* itmp, double* rtmp) {
-    evaluateGen<double>(input, output, itmp, rtmp);
+    evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Split::evaluateSX(const SXElement* const* input, SXElement** output,
+  void Split::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
                          int* itmp, SXElement* rtmp) {
-    evaluateGen<SXElement>(input, output, itmp, rtmp);
+    evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Split::evaluateGen(const T* const* input, T** output, int* itmp, T* rtmp) {
+  void Split::evalGen(const std::vector<const T*>& input,
+                      const std::vector<T*>& output, int* itmp, T* rtmp) {
     // Number of derivatives
     int nx = offset_.size()-1;
 
@@ -67,8 +68,8 @@ namespace casadi {
     }
   }
 
-  void Split::spFwd(const std::vector<const bvec_t*>& arg,
-                    const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Split::spFwd(const cpv_bvec_t& arg,
+                    const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {
@@ -82,8 +83,8 @@ namespace casadi {
     }
   }
 
-  void Split::spAdj(const std::vector<bvec_t*>& arg,
-                    const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void Split::spAdj(const pv_bvec_t& arg,
+                    const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {
@@ -98,9 +99,9 @@ namespace casadi {
     }
   }
 
-  void Split::generateOperation(std::ostream &stream, const std::vector<int>& arg,
+  void Split::generate(std::ostream &stream, const std::vector<int>& arg,
                                 const std::vector<int>& res, CodeGenerator& gen) const {
-    int nx = getNumOutputs();
+    int nx = nout();
     for (int i=0; i<nx; ++i) {
       int nz_first = offset_[i];
       int nz_last = offset_[i+1];
@@ -440,7 +441,7 @@ namespace casadi {
 
   MX Horzsplit::getHorzcat(const std::vector<MX>& x) const {
     // Check x length
-    if (x.size()!=getNumOutputs()) {
+    if (x.size()!=nout()) {
       return MXNode::getHorzcat(x);
     }
 
@@ -457,7 +458,7 @@ namespace casadi {
 
   MX Vertsplit::getVertcat(const std::vector<MX>& x) const {
     // Check x length
-    if (x.size()!=getNumOutputs()) {
+    if (x.size()!=nout()) {
       return MXNode::getVertcat(x);
     }
 
@@ -474,7 +475,7 @@ namespace casadi {
 
   MX Diagsplit::getDiagcat(const std::vector<MX>& x) const {
     // Check x length
-    if (x.size()!=getNumOutputs()) {
+    if (x.size()!=nout()) {
       return MXNode::getDiagcat(x);
     }
 

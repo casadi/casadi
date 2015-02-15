@@ -172,7 +172,7 @@ namespace casadi {
           for (int i=0; i<n->ndep(); ++i) {
             ae.arg[i] = n->dep(i)->temp;
           }
-          ae.res.resize(n->getNumOutputs());
+          ae.res.resize(n->nout());
           if (n->isMultipleOutput()) {
             fill(ae.res.begin(), ae.res.end(), -1);
           } else {
@@ -446,7 +446,7 @@ namespace casadi {
         for (int i=0; i<it->res.size(); ++i) res[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evaluateD(getPtr(arg), getPtr(res), iw, w);
+        it->data->evalD(arg, res, iw, w);
       }
 
       // Write out profiling information
@@ -1053,7 +1053,7 @@ namespace casadi {
         for (int i=0; i<it->res.size(); ++i) resp[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evaluateSX(getPtr(argp), getPtr(resp), getPtr(itmp_), w);
+        it->data->evalSX(argp, resp, getPtr(itmp_), w);
       }
     }
   }
@@ -1194,7 +1194,7 @@ namespace casadi {
         }
 
         // Generate operation
-        it->data->generateOperation(stream, arg, res, gen);
+        it->data->generate(stream, arg, res, gen);
       }
     }
   }
