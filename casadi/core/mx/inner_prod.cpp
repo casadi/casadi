@@ -49,18 +49,18 @@ namespace casadi {
     }
   }
 
-  void InnerProd::eval(const MXPtrV& input, MXPtrV& output) {
+  void InnerProd::eval(const cpv_MX& input, const pv_MX& output) {
     *output[0] = (*input[0])->getInnerProd(*input[1]);
   }
 
-  void InnerProd::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void InnerProd::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     for (int d=0; d<fwdSens.size(); ++d) {
       *fwdSens[d][0] = dep(0)->getInnerProd(*fwdSeed[d][1])
         + (*fwdSeed[d][0])->getInnerProd(dep(1));
     }
   }
 
-  void InnerProd::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void InnerProd::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     for (int d=0; d<adjSeed.size(); ++d) {
       adjSens[d][0]->addToSum(*adjSeed[d][0] * dep(1));
       adjSens[d][1]->addToSum(*adjSeed[d][0] * dep(0));

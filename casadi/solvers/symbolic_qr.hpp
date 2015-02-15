@@ -40,6 +40,8 @@
 /// \cond INTERNAL
 
 namespace casadi {
+  typedef SX* SXPtr;
+  typedef std::vector<SXPtr> SXPtrV;
 
   /** \brief \pluginbrief{LinearSolver,symbolicqr}
 

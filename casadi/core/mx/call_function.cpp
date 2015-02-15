@@ -142,8 +142,8 @@ namespace casadi {
     }
   }
 
-  void CallFunction::eval(const MXPtrV& input, MXPtrV& output) {
-    vector<MX> arg = getVector(input);
+  void CallFunction::eval(const cpv_MX& input, const pv_MX& output) {
+    vector<MX> arg = getVector(input, ndep());
     vector<MX> res = fcn_->createCall(arg);
     for (int i=0; i<res.size(); ++i) {
       if (output[i]!=0) {
@@ -152,7 +152,8 @@ namespace casadi {
     }
   }
 
-  void CallFunction::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void CallFunction::evalFwd(const std::vector<cpv_MX>& fwdSeed,
+                             const std::vector<pv_MX>& fwdSens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -160,7 +161,7 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Collect seeds
-    vector<vector<MX> > fseed(getVector(fwdSeed)), fsens;
+    vector<vector<MX> > fseed(getVector(fwdSeed, ndep())), fsens;
 
     // Call the cached functions
     fcn_.callFwd(arg, res, fseed, fsens);
@@ -175,7 +176,7 @@ namespace casadi {
     }
   }
 
-  void CallFunction::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void CallFunction::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -183,13 +184,13 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Collect seeds
-    vector<vector<MX> > aseed(getVector(adjSeed)), asens;
+    vector<vector<MX> > aseed(getVector(adjSeed, nout())), asens;
 
     // Call the cached functions
     fcn_.callAdj(arg, res, aseed, asens);
 
     // Free adjoint seeds
-    clearVector(adjSeed);
+    clearVector(adjSeed, nout());
 
     // Store the adjoint sensitivities
     for (int d=0; d<adjSens.size(); ++d) {

@@ -70,18 +70,18 @@ namespace casadi {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
-  void SetSparse::eval(const MXPtrV& input, MXPtrV& output) {
+  void SetSparse::eval(const cpv_MX& input, const pv_MX& output) {
     *output[0] = input[0]->setSparse(sparsity());
   }
 
-  void SetSparse::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void SetSparse::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     int nfwd = fwdSens.size();
     for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = fwdSeed[d][0]->setSparse(sparsity(), true);
     }
   }
 
-  void SetSparse::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void SetSparse::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     int nadj = adjSeed.size();
     for (int d=0; d<nadj; ++d) {
       adjSens[d][0]->addToSum(adjSeed[d][0]->setSparse(dep().sparsity(), true));

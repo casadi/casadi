@@ -173,17 +173,17 @@ namespace casadi {
     }
   }
 
-  void Transpose::eval(const MXPtrV& input, MXPtrV& output) {
+  void Transpose::eval(const cpv_MX& input, const pv_MX& output) {
     *output[0] = input[0]->T();
   }
 
-  void Transpose::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void Transpose::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     for (int d=0; d<fwdSens.size(); ++d) {
       *fwdSens[d][0] = fwdSeed[d][0]->T();
     }
   }
 
-  void Transpose::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void Transpose::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     for (int d=0; d<adjSeed.size(); ++d) {
       adjSens[d][0]->addToSum(adjSeed[d][0]->T());
       *adjSeed[d][0] = MX();

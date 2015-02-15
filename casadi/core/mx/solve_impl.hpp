@@ -90,7 +90,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval(const MXPtrV& input, MXPtrV& output) {
+  void Solve<Tr>::eval(const cpv_MX& input, const pv_MX& output) {
     if (input[0]->isZero()) {
       *output[0] = MX(input[0]->shape());
     } else {
@@ -99,12 +99,12 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void Solve<Tr>::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     linear_solver_->evalFwdLinsol(shared_from_this<MX>(), fwdSeed, fwdSens, Tr);
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void Solve<Tr>::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     linear_solver_->evalAdjLinsol(shared_from_this<MX>(), adjSeed, adjSens, Tr);
   }
 

@@ -74,15 +74,15 @@ namespace casadi {
     }
   }
 
-  void SubAssign::eval(const MXPtrV& input, MXPtrV& output) {
+  void SubAssign::eval(const cpv_MX& input, const pv_MX& output) {
     casadi_error("not ready");
   }
 
-  void SubAssign::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void SubAssign::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     casadi_error("not ready");
   }
 
-  void SubAssign::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void SubAssign::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     casadi_error("not ready");
   }
 

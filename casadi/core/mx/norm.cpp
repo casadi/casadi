@@ -64,18 +64,18 @@ namespace casadi {
     *res = sqrt(casadi_dot(dep().nnz(), arg, 1, arg, 1));
   }
 
-  void NormF::eval(const MXPtrV& input, MXPtrV& output) {
+  void NormF::eval(const cpv_MX& input, const pv_MX& output) {
     *output[0] = (*input[0])->getNormF();
   }
 
-  void NormF::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void NormF::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     MX self = shared_from_this<MX>();
     for (int d=0; d<fwdSens.size(); ++d) {
       *fwdSens[d][0] = dep(0)->getInnerProd(*fwdSeed[d][0]) / self;
     }
   }
 
-  void NormF::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void NormF::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     MX self = shared_from_this<MX>();
     for (int d=0; d<adjSeed.size(); ++d) {
       adjSens[d][0]->addToSum(((*adjSeed[d][0])/self) * dep(0));

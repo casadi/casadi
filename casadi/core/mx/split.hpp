@@ -99,13 +99,13 @@ namespace casadi {
     virtual Horzsplit* clone() const { return new Horzsplit(*this);}
 
     /// Evaluate the function symbolically (MX)
-    virtual void eval(const MXPtrV& input, MXPtrV& output);
+    virtual void eval(const cpv_MX& input, const pv_MX& output);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+    virtual void evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+    virtual void evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -134,13 +134,13 @@ namespace casadi {
     virtual Diagsplit* clone() const { return new Diagsplit(*this);}
 
     /// Evaluate the function symbolically (MX)
-    virtual void eval(const MXPtrV& input, MXPtrV& output);
+    virtual void eval(const cpv_MX& input, const pv_MX& output);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+    virtual void evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+    virtual void evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -169,13 +169,13 @@ namespace casadi {
     virtual Vertsplit* clone() const { return new Vertsplit(*this);}
 
     /// Evaluate the function symbolically (MX)
-    virtual void eval(const MXPtrV& input, MXPtrV& output);
+    virtual void eval(const cpv_MX& input, const pv_MX& output);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+    virtual void evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+    virtual void evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;

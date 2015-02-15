@@ -55,13 +55,13 @@ namespace casadi {
     virtual SetNonzeros* clone() const = 0;
 
     /// Evaluate the function symbolically (MX)
-    void eval(const MXPtrV& input, MXPtrV& output);
+    void eval(const cpv_MX& input, const pv_MX& output);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+    virtual void evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+    virtual void evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens);
 
     /** \brief Get the operation */
     virtual int getOp() const { return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}

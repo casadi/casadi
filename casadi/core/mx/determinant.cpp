@@ -45,11 +45,11 @@ namespace casadi {
     }
   }
 
-  void Determinant::eval(const MXPtrV& input, MXPtrV& output) {
+  void Determinant::eval(const cpv_MX& input, const pv_MX& output) {
     *output[0] = det(*input[0]);
   }
 
-  void Determinant::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void Determinant::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
@@ -58,7 +58,7 @@ namespace casadi {
     }
   }
 
-  void Determinant::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void Determinant::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();

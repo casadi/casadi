@@ -69,13 +69,13 @@ namespace casadi {
                             int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
-    virtual void eval(const MXPtrV& input, MXPtrV& output);
+    virtual void eval(const cpv_MX& arg, const pv_MX& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens);
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const cpv_bvec_t& arg,

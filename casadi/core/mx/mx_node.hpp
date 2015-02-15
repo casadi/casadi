@@ -131,28 +131,26 @@ namespace casadi {
                           const std::vector<int>& res, CodeGenerator& gen) const;
 
     /** \brief  Evaluate numerically */
-    virtual void evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp);
+    virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
     virtual void evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
-                            int* itmp, SXElement* rtmp);
+                        int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void eval(const MXPtrV& input, MXPtrV& output);
+    virtual void eval(const cpv_MX& arg, const pv_MX& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& fsens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;
@@ -266,14 +264,6 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 0;}
 
-    /// Convert vector of pointers to vector of objects
-    template<typename T>
-    static std::vector<T> getVector(const std::vector<T*> v);
-
-    /// Convert vector of vectors of pointers to vector of vectors of objects
-    template<typename T>
-    static std::vector<std::vector<T> > getVector(const std::vector<std::vector<T*> > v);
-
     /// Simplify the expression (ex is a reference to the node)
     virtual void simplifyMe(MX& ex) {}
 
@@ -380,38 +370,26 @@ namespace casadi {
     /** \brief  The sparsity pattern */
     Sparsity sparsity_;
 
-    /** \brief Free adjoint memory (MX) */
-    static void clearVector(const std::vector<MX*> v);
+    /// Convert vector of const MX pointers to vector of MX
+    static std::vector<MX> getVector(const cpv_MX& v, int len);
+
+    /// Convert vector of const MX pointers to vector of MX
+    static std::vector<MX> getVector(const pv_MX& v, int len);
+
+    /// Convert vector of vectors of pointers to vector of vectors of objects
+    static std::vector<std::vector<MX> > getVector(const std::vector<pv_MX>& v, int len);
+
+    /// Convert vector of vectors of pointers to vector of vectors of objects
+    static std::vector<std::vector<MX> > getVector(const std::vector<cpv_MX>& v, int len);
 
     /** \brief Free adjoint memory (MX) */
-    static void clearVector(const std::vector<std::vector<MX*> > v);
+    static void clearVector(const pv_MX& v, int len);
+
+    /** \brief Free adjoint memory (MX) */
+    static void clearVector(const std::vector<pv_MX>& v, int len);
   };
 
-
-  // Implementations
-
-  template<typename T>
-  std::vector<T> MXNode::getVector(const std::vector<T*> v) {
-    std::vector<T> ret(v.size());
-    for (int i=0; i<v.size(); i++) {
-      if (v[i]!=0) {
-        ret[i] = *v[i];
-      }
-    }
-    return ret;
-  }
-
-  template<typename T>
-  std::vector<std::vector<T> > MXNode::getVector(const std::vector<std::vector<T*> > v) {
-    std::vector<std::vector<T> > ret(v.size());
-    for (int i=0; i<v.size(); i++) {
-      ret[i] = getVector(v[i]);
-    }
-    return ret;
-  }
   /// \endcond
-
 } // namespace casadi
-/// \endcond
 
 #endif // CASADI_MX_NODE_HPP

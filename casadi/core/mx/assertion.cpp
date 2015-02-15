@@ -51,17 +51,17 @@ namespace casadi {
     }
   }
 
-  void Assertion::eval(const MXPtrV& input, MXPtrV& output) {
+  void Assertion::eval(const cpv_MX& input, const pv_MX& output) {
     *output[0] = (*input[0]).attachAssert(*input[1], fail_message_);
   }
 
-  void Assertion::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void Assertion::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     for (int d=0; d<fwdSens.size(); ++d) {
       *fwdSens[d][0] = *fwdSeed[d][0];
     }
   }
 
-  void Assertion::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void Assertion::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     for (int d=0; d<adjSeed.size(); ++d) {
       adjSens[d][0]->addToSum(*adjSeed[d][0]);
       *adjSeed[d][0] = MX();

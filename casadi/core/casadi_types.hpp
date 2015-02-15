@@ -115,6 +115,8 @@ namespace casadi {
   typedef std::vector<const double*> cpv_double;
   typedef std::vector<bvec_t*> pv_bvec_t;
   typedef std::vector<const bvec_t*> cpv_bvec_t;
+  typedef std::vector<MX*> pv_MX;
+  typedef std::vector<const MX*> cpv_MX;
 #endif // SWIG
 
   /* Standard stream used for printing

@@ -74,12 +74,6 @@ namespace casadi {
     /// Solve the nonlinear system of equations
     virtual void solveNonLinear() = 0;
 
-    /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwdNode(const MX& f, const MXPtrVV& fseed, MXPtrVV& fsens);
-
-    /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdjNode(const MX& f, MXPtrVV& aseed, MXPtrVV& asens);
-
     /// Generate forward derivative function
     virtual Function getDerivativeFwd(int nfwd);
 

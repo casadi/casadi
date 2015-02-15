@@ -48,11 +48,11 @@ namespace casadi {
                               int* itmp, SXElement* rtmp) {
   }
 
-  void ConstantMX::eval(const MXPtrV& input, MXPtrV& output) {
+  void ConstantMX::eval(const cpv_MX& input, const pv_MX& output) {
     *output[0] = shared_from_this<MX>();
   }
 
- void ConstantMX::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+ void ConstantMX::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
    MX zero_sens(size1(), size2());
    for (int d=0; d<fwdSens.size(); ++d) {
      if (fwdSens[d][0]!=0) {
@@ -61,7 +61,7 @@ namespace casadi {
    }
  }
 
-  void ConstantMX::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void ConstantMX::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     for (int d=0; d<adjSeed.size(); ++d) {
       if (adjSeed[d][0]!=0) {
         *adjSeed[d][0] = MX();

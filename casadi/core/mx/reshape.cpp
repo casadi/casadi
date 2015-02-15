@@ -104,17 +104,17 @@ namespace casadi {
     }
   }
 
-  void Reshape::eval(const MXPtrV& input, MXPtrV& output) {
+  void Reshape::eval(const cpv_MX& input, const pv_MX& output) {
     *output[0] = reshape(*input[0], shape());
   }
 
-  void Reshape::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void Reshape::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     for (int d = 0; d<fwdSens.size(); ++d) {
       *fwdSens[d][0] = reshape(*fwdSeed[d][0], shape());
     }
   }
 
-  void Reshape::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void Reshape::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     for (int d=0; d<adjSeed.size(); ++d) {
       MX tmp = reshape(*adjSeed[d][0], dep().shape());
       *adjSeed[d][0] = MX();

@@ -71,13 +71,13 @@ namespace casadi {
                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /// Evaluate the function symbolically (MX)
-    virtual void eval(const MXPtrV& input, MXPtrV& output);
+    virtual void eval(const cpv_MX& input, const pv_MX& output);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens);
+    virtual void evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens);
+    virtual void evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens);
 
     /** \brief Generate code for the operation */
     void generate(std::ostream &stream, const std::vector<int>& arg,

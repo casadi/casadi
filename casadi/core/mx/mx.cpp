@@ -1450,8 +1450,8 @@ namespace casadi {
     // Get references to the internal data structures
     std::vector<MXAlgEl>& algorithm = f->algorithm_;
     vector<MX> work(f.getWorkSize());
-    MXPtrV input_p, output_p;
-    MXPtrVV dummy_p;
+    vector<const MX*> input_p;
+    vector<MX*> output_p;
 
     for (vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it) {
       switch (it->op) {
@@ -1551,8 +1551,8 @@ namespace casadi {
     // Allocate output vector
     vector<MX> f_out(f.getNumOutputs());
 
-    MXPtrV input_p, output_p;
-    MXPtrVV dummy_p;
+    vector<const MX*> input_p;
+    vector<MX*> output_p;
 
     // expr_lookup iterator
     std::map<const MXNode*, int>::const_iterator it_lookup;
@@ -1701,8 +1701,8 @@ namespace casadi {
     stringstream v_name;
 
     // Arguments for calling the atomic operations
-    MXPtrV input_p, output_p;
-    MXPtrVV dummy_p;
+    vector<const MX*> input_p;
+    vector<MX*> output_p;
 
     // Evaluate the algorithm
     k=0;

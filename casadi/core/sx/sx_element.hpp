@@ -320,12 +320,6 @@ namespace casadi {
   typedef std::vector<Matrix<SXElement> > SXVector;
   typedef std::vector< std::vector<Matrix<SXElement> > > SXVectorVector;
 
-  /// \cond INTERNAL
-  typedef SX* SXPtr;
-  typedef std::vector<SXPtr> SXPtrV;
-  typedef std::vector<SXPtrV> SXPtrVV;
-  /// \endcond
-
   // Specialize functions in GenericMatrix<SX> and SX
   template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
   template<> bool SX::isRegular() const;

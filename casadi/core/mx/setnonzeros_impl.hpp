@@ -68,7 +68,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::eval(const MXPtrV& input, MXPtrV& output) {
+  void SetNonzeros<Add>::eval(const cpv_MX& input, const pv_MX& output) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 
@@ -196,7 +196,8 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void SetNonzeros<Add>::evalFwd(const std::vector<cpv_MX>& fwdSeed,
+                                 const std::vector<pv_MX>& fwdSens) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 
@@ -331,7 +332,8 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void SetNonzeros<Add>::evalAdj(const std::vector<pv_MX>& adjSeed,
+                                 const std::vector<pv_MX>& adjSens) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 

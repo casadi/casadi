@@ -54,13 +54,13 @@ namespace casadi {
                               int* itmp, SXElement* rtmp) {
   }
 
-  void SymbolicMX::eval(const MXPtrV& input, MXPtrV& output) {
+  void SymbolicMX::eval(const cpv_MX& input, const pv_MX& output) {
   }
 
-  void SymbolicMX::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void SymbolicMX::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
   }
 
-  void SymbolicMX::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void SymbolicMX::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
   }
 
   const std::string& SymbolicMX::getName() const {

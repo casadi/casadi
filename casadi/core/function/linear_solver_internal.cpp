@@ -120,8 +120,8 @@ namespace casadi {
     solve(getPtr(x), nrhs, transpose);
   }
 
-  void LinearSolverInternal::evalFwdLinsol(const MX& X, const MXPtrVV& fseed, MXPtrVV& fsens,
-                                           bool tr) {
+  void LinearSolverInternal::evalFwdLinsol(const MX& X, const std::vector<cpv_MX>& fseed,
+                                           const std::vector<pv_MX>& fsens, bool tr) {
     const MX& A = X->dep(1);
     std::vector<int> rhs_ind;
     std::vector<MX> rhs;
@@ -159,7 +159,8 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evalAdjLinsol(const MX& X, MXPtrVV& aseed, MXPtrVV& asens, bool tr) {
+  void LinearSolverInternal::evalAdjLinsol(const MX& X, const std::vector<pv_MX>& aseed,
+                                           const std::vector<pv_MX>& asens, bool tr) {
     const MX& A = X->dep(1);
     std::vector<int> rhs_ind;
     std::vector<MX> rhs;

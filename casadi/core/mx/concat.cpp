@@ -87,7 +87,7 @@ namespace casadi {
   }
 
   void Concat::generate(std::ostream &stream, const std::vector<int>& arg,
-                                 const std::vector<int>& res, CodeGenerator& gen) const {
+                        const std::vector<int>& res, CodeGenerator& gen) const {
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
       stream << "  for (i=0, ";
@@ -161,18 +161,18 @@ namespace casadi {
     }
   }
 
-  void Diagcat::eval(const MXPtrV& input, MXPtrV& output) {
-    *output[0] = diagcat(getVector(input));
+  void Diagcat::eval(const cpv_MX& arg, const pv_MX& res) {
+    *res[0] = diagcat(getVector(arg, ndep()));
   }
 
-  void Diagcat::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void Diagcat::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     int nfwd = fwdSens.size();
     for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = diagcat(getVector(fwdSeed[d]));
+      *fwdSens[d][0] = diagcat(getVector(fwdSeed[d], ndep()));
     }
   }
 
-  void Diagcat::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void Diagcat::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     // Get offsets for each row and column
     vector<int> offset1(ndep()+1, 0);
     vector<int> offset2(ndep()+1, 0);
@@ -216,18 +216,18 @@ namespace casadi {
     }
   }
 
-  void Horzcat::eval(const MXPtrV& input, MXPtrV& output) {
-    *output[0] = horzcat(getVector(input));
+  void Horzcat::eval(const cpv_MX& arg, const pv_MX& res) {
+    *res[0] = horzcat(getVector(arg, ndep()));
   }
 
-  void Horzcat::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void Horzcat::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     int nfwd = fwdSens.size();
     for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = horzcat(getVector(fwdSeed[d]));
+      *fwdSens[d][0] = horzcat(getVector(fwdSeed[d], ndep()));
     }
   }
 
-  void Horzcat::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void Horzcat::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     // Get offsets for each column
     vector<int> col_offset(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {
@@ -268,18 +268,18 @@ namespace casadi {
     }
   }
 
-  void Vertcat::eval(const MXPtrV& input, MXPtrV& output) {
-    *output[0] = vertcat(getVector(input));
+  void Vertcat::eval(const cpv_MX& arg, const pv_MX& res) {
+    *res[0] = vertcat(getVector(arg, ndep()));
   }
 
-  void Vertcat::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void Vertcat::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
     int nfwd = fwdSens.size();
     for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = vertcat(getVector(fwdSeed[d]));
+      *fwdSens[d][0] = vertcat(getVector(fwdSeed[d], ndep()));
     }
   }
 
-  void Vertcat::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void Vertcat::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     // Get offsets for each row
     vector<int> row_offset(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {

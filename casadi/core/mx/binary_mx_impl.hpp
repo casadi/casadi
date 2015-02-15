@@ -65,32 +65,34 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::eval(const MXPtrV& input, MXPtrV& output) {
-    casadi_math<MX>::fun(op_, *input[0], *input[1], *output[0]);
+  void BinaryMX<ScX, ScY>::eval(const cpv_MX& arg, const pv_MX& res) {
+    casadi_math<MX>::fun(op_, *arg[0], *arg[1], *res[0]);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalFwd(const MXPtrVV& fwdSeed, MXPtrVV& fwdSens) {
+  void BinaryMX<ScX, ScY>::evalFwd(const std::vector<cpv_MX>& fseed,
+                                   const std::vector<pv_MX>& fsens) {
     // Get partial derivatives
     MX pd[2];
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
 
     // Propagate forward seeds
-    for (int d=0; d<fwdSens.size(); ++d) {
-      *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
+    for (int d=0; d<fsens.size(); ++d) {
+      *fsens[d][0] = pd[0]*(*fseed[d][0]) + pd[1]*(*fseed[d][1]);
     }
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalAdj(MXPtrVV& adjSeed, MXPtrVV& adjSens) {
+  void BinaryMX<ScX, ScY>::evalAdj(const std::vector<pv_MX>& aseed,
+                                   const std::vector<pv_MX>& asens) {
     // Get partial derivatives
     MX pd[2];
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
 
     // Propagate adjoint seeds
-    for (int d=0; d<adjSeed.size(); ++d) {
-      MX s = *adjSeed[d][0];
-      *adjSeed[d][0] = MX();
+    for (int d=0; d<aseed.size(); ++d) {
+      MX s = *aseed[d][0];
+      *aseed[d][0] = MX();
       for (int c=0; c<2; ++c) {
         // Get increment of sensitivity c
         MX t = pd[c]*s;
@@ -102,16 +104,16 @@ namespace casadi {
         }
 
         // Propagate the seeds
-        adjSens[d][c]->addToSum(t);
+        asens[d][c]->addToSum(t);
       }
     }
   }
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::generate(std::ostream &stream,
-                                            const std::vector<int>& arg,
-                                            const std::vector<int>& res,
-                                            CodeGenerator& gen) const {
+                                    const std::vector<int>& arg,
+                                    const std::vector<int>& res,
+                                    CodeGenerator& gen) const {
 
     // Check if inplace
     bool inplace;
