@@ -33,6 +33,8 @@ import time
 import __builtin__
 import scipy.linalg
 
+CasadiOptions.setCatchErrorsSwig(False)
+
 clesolvers = []
 if LinearSolver.hasPlugin("csparse") and CleSolver.hasPlugin("simple"):
   clesolvers.append(("simple",{"linear_solver": "csparse"}))
@@ -46,8 +48,10 @@ if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("simple"):
 if LinearSolver.hasPlugin("csparse") and DleSolver.hasPlugin("dple.slicot"):
   dlesolvers.append(("dple.slicot",{"dple_solver_options": {"linear_solver": "csparse"}}))
 
+"""
 if DleSolver.hasPlugin("lrdle.smith"):
   dlesolvers.append(("lrdle.smith",{"lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
+"""
 
 if DleSolver.hasPlugin("lrdle.fixed_smith"):
   dlesolvers.append(("lrdle.fixed_smith",{"lrdle_solver_options": {"iter":100}}))
@@ -69,8 +73,10 @@ if LrDleSolver.hasPlugin("fixed_smith"):
 if LrDleSolver.hasPlugin("dle.simple") and LinearSolver.hasPlugin("csparse"):
   lrdlesolvers.append(("dle.simple",{"dle_solver_options": {"linear_solver": "csparse"}}))
 
+"""
 if LrDleSolver.hasPlugin("dle.lrdle.smith"):
   lrdlesolvers.append(("dle.lrdle.smith",{"dle_solver_options.lrdle_solver_options": {"max_iter":100,"tol": 1e-13}}))
+"""
 
 lrdplesolvers = []
 
