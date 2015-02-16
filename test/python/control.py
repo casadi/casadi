@@ -33,8 +33,6 @@ import time
 import __builtin__
 import scipy.linalg
 
-CasadiOptions.setCatchErrorsSwig(False)
-
 clesolvers = []
 if LinearSolver.hasPlugin("csparse") and CleSolver.hasPlugin("simple"):
   clesolvers.append(("simple",{"linear_solver": "csparse"}))
