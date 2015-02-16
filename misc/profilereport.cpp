@@ -32,6 +32,8 @@
 #include "casadi/core/casadi_math.hpp"
 #include "casadi/core/casadi_calculus.hpp"
 
+#include "misc/resource_boilerplate.hpp"
+
 /**float(m.group(1))*1e-6, float(m.group(2))*1e-3, m.group(3), int(m.group(4)), m.group(5) , m.group(6)
 linereg = re.compile("^([\d\.]+) ns \| ([\d\.]+) ms \| (0x[\w\d]+:[\w_]+):(\d+)\|(0x[\w\d]+:[\w_]+)?\|(.*)$")
 
@@ -196,49 +198,15 @@ int main(int argc, char* argv[])
   }
   
   std::ofstream report ("prof.html");
-  
-  report << "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>\n<html xmlns='http://www.w3.org/1999/xhtml'>\n<head><script src='http://d3js.org/d3.v3.min.js'></script><script src='http://cpettitt.github.io/project/dagre-d3/v0.1.5/dagre-d3.min.js'></script>";
-  
-  report << "<style>"
-"svg {"
-"    overflow: hidden;"
-"}"
-""
-".node rect {"
-"    stroke: #333;"
-"    stroke-width: 1.5px;"
-"    fill: #fff;"
-"}"
-""
-".edgeLabel rect {"
-"    fill: #fff;"
-"}"
-""
-".edgePath {"
-"    stroke: #333;"
-"    stroke-width: 1.5px;"
-"    fill: none;"
-"}"
-".outer {"
-"    width: 1024px;"
-"    height: 960px;"
-"    overflow: auto;"
-"}"
-".inner {"
-"    width: 8000px;"
-"    height: 6000px;"
-"}"
-"svg {"
-"    display: block;"
-"    width: 100%;"
-"    height: 100%;"
-"}"
-  "</style>";
-  
-  report << "</head><body>\n";
-  report << "<div id='chart3'></div>" << std::endl;
-  
 
+  std::istringstream boilerplate_stream(resource_boilerplate);
+  std::string line;
+  while (std::getline(boilerplate_stream, line)) {
+    if (line == "<!--CONTENTS-->") {
+      break;
+    }
+    report << line << std::endl;
+  }
 
   report << "<table><thead><tr><th>Id</th><th>#calls</th><th>Internal (s)</th><th>External (s)</th><th>Overhead (s)</th><th>Algorithm size</th><th>#inputs</th><th>#input nz</th><th>#outputs</th><th>#output nz</th></tr></thead>" << std::endl;
   
@@ -461,6 +429,8 @@ int main(int argc, char* argv[])
 
   }
   
-  report << "</body></html>";
+  while (std::getline(boilerplate_stream, line)) {
+    report << line << std::endl;
+  }
   
 }

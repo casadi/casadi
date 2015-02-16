@@ -1,0 +1,371 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head><script src='http://d3js.org/d3.v3.min.js'></script><script src='http://cpettitt.github.io/project/dagre-d3/v0.1.5/dagre-d3.min.js'></script><style>svg {    overflow: hidden;}.node rect {    stroke: #333;    stroke-width: 1.5px;    fill: #fff;}.edgeLabel rect {    fill: #fff;}.edgePath {    stroke: #333;    stroke-width: 1.5px;    fill: none;}.outer {    width: 1024px;    height: 960px;    overflow: auto;}.inner {    width: 8000px;    height: 6000px;}svg {    display: block;    width: 100%;    height: 100%;}
+
+
+.link {
+  stroke: #999;
+  stroke-width: 2px;
+}
+
+marker {
+  fill: #999;
+}
+
+.MXFunction circle {
+  stroke: black;
+}
+
+.SXFunction circle {
+  stroke: black;
+  stroke-width: 2px;
+  stroke-dasharray: 5,5;
+}
+
+.cell rect {
+  fill: red;
+}
+
+.cell rect.call {
+  fill: white;
+}
+
+.cell rect.overhead {
+  fill: #ffcccc;
+}
+
+.node circle {
+  fill: #eee;
+}
+
+
+</style></head><body>
+<div id="treemap"></div>
+<div id='chart3'></div>
+
+<!--CONTENTS-->
+
+<script>
+    
+  // From associative array to flat array
+  var functions_array = [];
+  
+  var f_lookup = d3.map();
+  
+  var i = 0;
+  d3.entries(functions).forEach(function (e) {
+    if (e.value.name==='CSparse' || e.value.name==='LapackLUDense') return;
+    
+    ret = e.value;
+    ret.originalid = e.key;
+    functions_array.push(ret);
+    f_lookup.set(e.key,i);
+    i = i +1;
+  });
+  
+
+  var functioncalls_new = [];
+  
+  functioncalls.forEach(function(e) {
+    if (f_lookup.has(e.source) && f_lookup.has(e.target)) {
+      e.target = f_lookup.get(e.target);
+      e.source = f_lookup.get(e.source);
+      functioncalls_new.push(e);
+    }
+  });
+  
+  functions = functions_array;
+  functionscalls = functioncalls_new;
+  
+  
+  
+  // aggregation
+  
+  function compact(s) {
+    
+    for (i = 0; i < 2; i++) {
+      s = s.replace(/^((\w+\()*)derivative_(.*)_0_\d+(\)*)$/g,"$1adj($3)$4");
+      s = s.replace(/^((\w+\()*)derivative_(.*)_\d+_0(\)*)$/g,"$1fwd($3)$4");
+      s = s.replace(/^((\w+\()*)jacobian_(.*)_0_0(\)*)$/g,"$1jac($3)$4");
+      s = s.replace(/^((\w+\()*)derivativeAdj_(.*)_\d+(\)*)$/g,"$1adj($3)$4");
+      s = s.replace(/^((\w+\()*)derivativeFwd_(.*)_\d+(\)*)$/g,"$1fwd($3)$4");
+    }
+
+    return s;
+  }
+  
+  // aggregation
+  compact_dic = d3.map();
+  functions.forEach(function(e,i) {
+    cname = compact(e.name);
+    e.name = cname;
+    if (compact_dic.has(cname)) {
+      var temp = compact_dic.get(cname)
+      temp.push(i);
+      compact_dic.set(cname , temp);
+    } else {
+      compact_dic.set(cname , [i]);
+    }
+  });
+  
+
+  function function_join(a,b) {
+    if ("stats" in b) {
+	a.stats.total_time+=b.stats.total_time;
+	a.stats.overhead_time+=b.stats.overhead_time;
+	a.stats.external_time+=b.stats.external_time;
+	a.stats.count+=b.stats.count;
+	if ("ops" in b.stats) {
+	  b.stats.ops.forEach(function (e,i) {
+	    if (a.stats.ops[i].name!=b.stats.ops[i].name) {
+	      throw "mismatch";
+	    } else {
+	      a.stats.ops[i].time+=b.stats.ops[i].time;
+	      a.stats.ops[i].n+=b.stats.ops[i].n;
+	    }
+	  });
+	}
+    }
+  }
+  
+  f_lookup = d3.map();
+  
+  functions_array = [];
+  compact_dic.entries().forEach(function(e,i) {
+    var obj = null
+    e.value.forEach(function (orig) {
+       if (obj==null) {
+          obj = functions[orig];
+       } else {
+          function_join(obj,functions[orig]);
+       }
+       f_lookup.set(orig, i);
+    });
+    obj.index = i;
+    functions_array.push(obj);
+  });
+
+  functioncalls.forEach(function(e) {
+    if (f_lookup.has(e.source) && f_lookup.has(e.target)) {
+      e.target = f_lookup.get(e.target);
+      e.source = f_lookup.get(e.source);
+      functioncalls_new.push(e);
+    }
+  });
+  
+  functions = functions_array;
+  functionscalls = functioncalls_new;
+  
+  scale = 30;  // 1 second == scale*scale
+
+  var width = 960,
+    height = 500
+
+  var zoom = d3.behavior.zoom()
+    .on("zoom", zoomed);
+    
+  var svg = d3.select("#treemap").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+    
+
+    
+  // build the arrow.
+  svg.append("defs").selectAll("marker")
+    .data(["end"])      // Different link/path types can be defined here
+  .enter().append("marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 10)
+    .attr("refY", 0)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+
+  svg.append('rect')
+    .attr('width', width)
+    .attr('height', height)
+    .attr('fill', 'white');
+    
+  var svg = svg.append("g")
+    .call(zoom)
+    .append("g");
+    
+  functions.forEach(function (d) {
+     d.radius = Math.max(scaled(d.stats.total_time)/Math.sqrt(2),50);
+  });
+  
+  var force = d3.layout.force()
+    .linkDistance(function (d) { return (d.source.radius+d.target.radius) * 1.2; })
+    //.linkDistance(500)
+    .charge(function (d) { return -d.radius*d.radius*2; }) //-d.radius*d.radius;
+    //charge(-200)
+    .size([width, height]);
+
+
+  function zoomed() {
+    svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  }
+
+  force
+      .nodes(functions)
+      .links(functioncalls)
+      .start();
+
+  var link = svg.selectAll(".link")
+      .data(functioncalls)
+    .enter().append("path")
+    .attr("class", "link")
+    .attr("marker-end", "url(#end)");
+
+  var node = svg.selectAll(".node")
+      .data(functions)
+    .enter().append("g")
+      .attr("class", "node")
+      .classed("MXFunction",function (d) { return d.type==="MXFunction"})
+      .classed("SXFunction",function (d) { return d.type==="SXFunction"})
+      .classed("other",function (d) { return d.type==="other"})
+      .call(force.drag);
+      
+
+
+
+  node.append("circle")
+      .attr("class", "node")
+      .attr("r", function (d) {return d.radius })
+      
+  node.append("text")
+      .attr("dy", "-0.35em")
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.name })
+      .attr('y', function(d) { return -scaled(d.stats.total_time)/2});
+      
+      
+  //node.append("rect")
+  //    .attr()
+
+  force.on("tick", function() {
+    //var q = d3.geom.quadtree(functions),
+    //i = 0,
+    //n = functions.length;
+
+    //while (++i < n) {
+    //  q.visit(collide(functions[i]));
+    //}
+    
+    link.attr("d", function(d) {
+
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy+1e-6);
+	dx = dx/dr;
+	dy = dy/dr;
+
+        return "M" + 
+            (d.source.x + dx* (d.source.radius+10)) + "," + 
+            (d.source.y + dy* (d.source.radius+10)) + "L" + 
+            (d.target.x - dx* (d.target.radius+10)) + "," + 
+            (d.target.y - dy* (d.target.radius+10)) ;
+    });
+  
+    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  });
+  
+  
+function collide(node) {
+  var r = node.radius + 16,
+      nx1 = node.x - r,
+      nx2 = node.x + r,
+      ny1 = node.y - r,
+      ny2 = node.y + r;
+  return function(quad, x1, y1, x2, y2) {
+    if (quad.point && (quad.point !== node)) {
+      var x = node.x - quad.point.x,
+          y = node.y - quad.point.y,
+          l = Math.sqrt(x * x + y * y),
+          r = node.radius + quad.point.radius;
+      if (l < r) {
+        l = (l - r) / l * .5;
+        node.x -= x *= l;
+        node.y -= y *= l;
+        quad.point.x += x;
+        quad.point.y += y;
+      }
+    }
+    return x1 > nx2
+        || x2 < nx1
+        || y1 > ny2
+        || y2 < ny1;
+  };
+}
+
+  
+  function scaled(t) {
+    return scale*Math.sqrt(t);
+  }
+  // https://gist.github.com/paulirish/1579816 
+  
+  
+  treemaps = {}
+
+  node.each(function (d) {
+    treemaps[d.originalid] = d3.layout.treemap()
+        .size([scaled(d.stats.total_time), scaled(d.stats.total_time)])
+        .sticky(true)
+        .value(function(d) { return d.time; });
+  });
+  
+  function treemap_lookup(d) {
+        if ('parent' in d) {
+	   return treemaps[d.parent.originalid](d);
+	} else {
+	   return treemaps[d.originalid](d);
+	}
+    }
+  
+  var cell = node.filter(function(d) { return d.type==="MXFunction"|| d.type==="other";} )
+    .append("g")
+    .attr('transform', function(d) { return 'translate(' + (- scaled(d.stats.total_time)/2) + ',' + (- scaled(d.stats.total_time)/2) + ')'; })
+    .datum(function (d,i) { return { "name": 'all', "children": d.stats.ops.concat([ {name: "overhead", time: d.stats.overhead_time, n: 1, overhead: true} ]), "originalid": d.originalid,"index": d.index}; })
+    .selectAll(".cell")
+    .data(treemap_lookup)
+    .enter().append('g')
+    .attr('class', 'cell')
+    .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+    
+    // add a rectangle to each cell
+    cell.append('rect')
+    .attr('width', function(d) { return d.dx; })
+    .attr('height', function(d) { return d.dy; })
+    .classed("call",function (d) { return "dependency" in d;})
+    .classed("overhead",function (d) { return "overhead" in d;})
+    .append("title")
+    .text(function(d) { return "parent" in d? "Inside: " + functions[d.parent.index].name + "  -- total " + functions[d.parent.index].stats.total_time + "s, " + functions[d.parent.index].stats.count + " calls" + "\n" + d.name + ": " + d.time + "s, " + d.n + " calls" : ""; });
+    
+    
+    // label the cells
+    cell.append('text')
+    .attr('x', function(d) { return d.dx/2; d})
+    .attr('y', function(d) { return d.dy/2; d})
+    .attr('dy', '.35em')
+    .attr('text-anchor', 'middle')
+    .text(function(d) { return d.area>100.0 ?  d.name : "" });
+
+    cell = node.filter(function(d) { return d.type==="SXFunction";} )
+    .append("g")
+    .attr('transform', function(d) { return 'translate(' + (- scaled(d.stats.total_time)/2) + ',' + (- scaled(d.stats.total_time)/2) + ')'; })
+    .attr('class', 'cell')
+    .append('rect')
+    .attr('width', function(d) { return scaled(d.stats.total_time); })
+    .attr('height', function(d) { return scaled(d.stats.total_time);})
+    .style('fill', function(d) { return d.name==="call" ? "white" : (d.name==="overhead" ? "#ff8080": "red"); })
+    .append("title")
+    .text(function(d) { return d.name + ": " + d.stats.total_time + "s, " + d.stats.count + " calls"; });
+    
+</script>
+
+
+</body></html>
+
