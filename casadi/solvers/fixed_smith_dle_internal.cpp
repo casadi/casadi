@@ -108,6 +108,14 @@ namespace casadi {
     Wrapper::evaluate();
   }
 
+  Function FixedSmithDleInternal::getDerivativeFwd(int nfwd) {
+    return f_.derivativeFwd(nfwd);
+  }
+
+  Function FixedSmithDleInternal::getDerivativeAdj(int nadj) {
+    return f_.derivativeAdj(nadj);
+  }
+
   void FixedSmithDleInternal::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     DleInternal::deepCopyMembers(already_copied);

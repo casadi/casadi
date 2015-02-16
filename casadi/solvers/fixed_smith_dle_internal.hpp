@@ -126,6 +126,12 @@ namespace casadi {
     /** \brief  evaluate */
     virtual void evaluate();
 
+    /** Generate a function that calculates \a nfwd forward derivatives */
+    virtual Function getDerivativeFwd(int nfwd);
+
+    /** Generate a function that calculates \a nadj adjoint derivatives */
+    virtual Function getDerivativeAdj(int nadj);
+
     /** \brief  Initialize */
     virtual void init();
 
