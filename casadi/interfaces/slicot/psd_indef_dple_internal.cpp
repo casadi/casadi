@@ -847,40 +847,28 @@ namespace casadi {
   }
 
   Function PsdIndefDpleInternal::getDerivativeFwd(int nfwd) {
-    casadi_error("Not implemened, cf. #1336");
-  }
-
-  Function PsdIndefDpleInternal::getDerivativeAdj(int nadj) {
-    casadi_error("Not implemened, cf. #1336");
-  }
-
-  Function PsdIndefDpleInternal::getDerivative(int nfwd, int nadj) {
 
     // Base:
     // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
 
     /* Allocate output list for derivative
     *
-    * Three parts:
-    *
-    * 1)  [P_0 .. P_{nrhs-1}]
-    * 2)  [P_0^f0 .. P_{nrhs-1}^f0] ...
+    * Structute:
+    *    [P_0^f0 .. P_{nrhs-1}^f0] ...
     *       [P_0^f{nfwd-1} .. P_{nrhs-1}^f{nfwd-1}]
-    * 3)  [A^b0 Q_0^b0 .. Q_{nrhs-1}^b0] ...
-    *       [A^b{nadj-1} Q_0^b{nadj-1} .. Q_{nrhs-1}^b{nadj-1}]
     */
-    std::vector<MX> outs_new((nrhs_+1)*nadj+nrhs_*(nfwd+1), 0);
+
+    std::vector<MX> outs_new(nrhs_*nfwd, 0);
 
     /* Allocate input list for derivative and populate with symbolics
     * Three parts:
     *
     * 1)  [A Q_0 .. Q_{nrhs-1}]
-    * 2)  [A^f0 Q_0^f0 .. Q_{nrhs-1}^f0] ...
+    * 2)  [P P_0 .. P_{nrhs-1}]
+    * 3)  [A^f0 Q_0^f0 .. Q_{nrhs-1}^f0] ...
     *       [A^f{nfwd-1} Q_0^f{nfwd-1} .. Q_{nrhs-1}^f{nfwd-1}]
-    * 3)  [P_0^b0 .. P_{nrhs-1}^b0] ...
-    *       [P_0^b{nadj-1} .. P_{nrhs-1}^b{nadj-1}]
     */
-    std::vector<MX> ins_new((nrhs_+1)*(nfwd+1)+nrhs_*nadj);
+    std::vector<MX> ins_new(2*nrhs_+1 + (nrhs_+1)*nfwd, 0);
 
     // Part 1
     ins_new[0] = MX::sym("A", input(DPLE_A).sparsity());
@@ -889,33 +877,19 @@ namespace casadi {
     }
 
     // Part 2
-    for (int q=0; q<nrhs_; ++q) {
-      for (int k=0;k<nfwd;++k) {
-        MX& Qf  = ins_new.at((nrhs_+1)*(k+1)+q+1);
-        MX& Af  = ins_new.at((nrhs_+1)*(k+1));
-
-        Qf = MX::sym("Qf", input(DPLE_V).sparsity());
-        Af = MX::sym("Af", input(DPLE_A).sparsity());
-      }
+    for (int i=0; i<nrhs_; ++i) {
+      ins_new[nrhs_+i+1] = MX::sym("P", output(DPLE_P).sparsity());
     }
 
     // Part 3
     for (int q=0; q<nrhs_; ++q) {
-      for (int k=0;k<nadj;++k) {
-          MX& Pb  = ins_new.at((nrhs_+1)*(nfwd+1)+nrhs_*k+q);
+      for (int k=0;k<nfwd;++k) {
+        MX& Qf  = ins_new.at(2*nrhs_+1 + (nrhs_+1)*k+q+1);
+        MX& Af  = ins_new.at(2*nrhs_+1 + (nrhs_+1)*k);
 
-          Pb = MX::sym("Pb", output(DPLE_P).sparsity());
+        Qf = MX::sym("Qf", input(DPLE_V).sparsity());
+        Af = MX::sym("Af", input(DPLE_A).sparsity());
       }
-    }
-    // Create a call to yourself
-    //
-    // P_0 .. P_{nrhs-1} = f( A Q_0 .. Q_{nrhs-1})
-    std::vector<MX> ins_P;
-    ins_P.insert(ins_P.begin(), ins_new.begin(), ins_new.begin()+(nrhs_+1));
-    std::vector<MX> Ps = shared_from_this<Function>()(ins_P);
-
-    for (int i=0;i<nrhs_;++i) {
-      outs_new[i] = Ps[i];
     }
 
     // Prepare a solver for forward seeds
@@ -925,14 +899,6 @@ namespace casadi {
     DpleSolver f;
     f.assignNode(node);
     f.init();
-
-    // Prepare a solver for adjoint seeds
-    PsdIndefDpleInternal* node2 = new PsdIndefDpleInternal(st_, nadj, !transp_);
-    node2->setOption(dictionary());
-
-    DpleSolver b;
-    b.assignNode(node2);
-    b.init();
 
     for (int q=0; q<nrhs_; ++q) {
 
@@ -945,13 +911,13 @@ namespace casadi {
       std::vector<MX> ins_f;
       const MX& A  = ins_new[0];
       std::vector<MX> As = horzsplit(A, n_);
-      const MX& P  = Ps[q];
+      const MX& P  = ins_new[nrhs_+1+q];
       std::vector<MX> Ps_ = horzsplit(P, n_);
 
       ins_f.push_back(A);
       for (int k=0;k<nfwd;++k) {
-        const MX& Qf  = ins_new.at((nrhs_+1)*(k+1)+q+1);
-        const MX& Af  = ins_new.at((nrhs_+1)*(k+1));
+        const MX& Qf  = ins_new.at(2*nrhs_+1+(nrhs_+1)*k+q+1);
+        const MX& Af  = ins_new.at(2*nrhs_+1+(nrhs_+1)*k);
 
         std::vector<MX> Qfs = horzsplit(Qf, n_);
         std::vector<MX> Afs = horzsplit(Af, n_);
@@ -972,8 +938,79 @@ namespace casadi {
 
       std::vector<MX> outs = f(ins_f);
       for (int i=0;i<nfwd;++i) {
-        outs_new.at(nrhs_+q+nrhs_*i) = outs[i];
+        outs_new.at(q+nrhs_*i) = outs[i];
       }
+
+
+    }
+
+    MXFunction ret(ins_new, outs_new);
+    ret.init();
+
+    return ret;
+
+  }
+
+  Function PsdIndefDpleInternal::getDerivativeAdj(int nadj) {
+
+    // Base:
+    // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
+
+    /* Allocate output list for derivative
+    *
+    * Structure:
+    *
+    * [A^b0 Q_0^b0 .. Q_{nrhs-1}^b0] ...
+    *       [A^b{nadj-1} Q_0^b{nadj-1} .. Q_{nrhs-1}^b{nadj-1}]
+    */
+
+    std::vector<MX> outs_new((nrhs_+1)*nadj, 0);
+
+    /* Allocate input list for derivative and populate with symbolics
+    * Three parts:
+    *
+    * 1)  [A Q_0 .. Q_{nrhs-1}]
+    * 2)  [P P_0 .. P_{nrhs-1}]
+    * 3)  [P_0^b0 .. P_{nrhs-1}^b0] ...
+    *       [P_0^b{nadj-1} .. P_{nrhs-1}^b{nadj-1}]
+    */
+    std::vector<MX> ins_new(2*nrhs_+1 + nrhs_*nadj, 0);
+
+    // Part 1
+    ins_new[0] = MX::sym("A", input(DPLE_A).sparsity());
+    for (int i=0; i<nrhs_; ++i) {
+      ins_new[i+1] = MX::sym("Q", input(DPLE_V).sparsity());
+    }
+
+    // Part 2
+    for (int i=0; i<nrhs_; ++i) {
+      ins_new[nrhs_+i+1] = MX::sym("P", output(DPLE_P).sparsity());
+    }
+
+    // Part 3
+    for (int q=0; q<nrhs_; ++q) {
+      for (int k=0;k<nadj;++k) {
+          MX& Pb  = ins_new.at(2*nrhs_+1+nrhs_*k+q);
+
+          Pb = MX::sym("Pb", output(DPLE_P).sparsity());
+      }
+    }
+
+    // Prepare a solver for adjoint seeds
+    PsdIndefDpleInternal* node2 = new PsdIndefDpleInternal(st_, nadj, !transp_);
+    node2->setOption(dictionary());
+
+    DpleSolver b;
+    b.assignNode(node2);
+    b.init();
+
+    for (int q=0; q<nrhs_; ++q) {
+
+      std::vector<MX> ins_f;
+      const MX& A  = ins_new[0];
+      std::vector<MX> As = horzsplit(A, n_);
+      const MX& P  = ins_new[nrhs_+1+q];
+      std::vector<MX> Ps_ = horzsplit(P, n_);
 
       // Adjoint
       /* rev(Q_b^b0) .. rev(Q_b^b{nadj-1}) += f(rev(A),
@@ -987,7 +1024,7 @@ namespace casadi {
       std::vector<MX> ins_b;
       ins_b.push_back(A);
       for (int k=0;k<nadj;++k) {
-        const MX& Pb  = ins_new.at((nrhs_+1)*(nfwd+1)+nrhs_*k+q);
+        const MX& Pb  = ins_new.at(2*nrhs_+1+nrhs_*k+q);
         // Symmetrise P_q^bk
         std::vector<MX> Pbs = horzsplit(Pb, n_);
         for (int i=0;i<K_;++i) {
@@ -997,13 +1034,13 @@ namespace casadi {
         ins_b.push_back(horzcat(Pbs)/2);
       }
 
-      outs = b(ins_b);
+      std::vector<MX> outs = b(ins_b);
       for (int i=0;i<nadj;++i) {
-        MX& Qb = outs_new.at(nrhs_*(nfwd+1)+(nrhs_+1)*i+q+1);
+        MX& Qb = outs_new.at((nrhs_+1)*i+q+1);
 
         Qb += outs[i];
         std::vector<MX> Qbs = horzsplit(Qb, n_);
-        MX& Ab = outs_new.at(nrhs_*(nfwd+1)+(nrhs_+1)*i);
+        MX& Ab = outs_new.at((nrhs_+1)*i);
 
         std::vector<MX> sum(K_, 0);
         for (int j=0;j<K_;++j) {
@@ -1022,7 +1059,6 @@ namespace casadi {
     ret.init();
 
     return ret;
-
   }
 
   void PsdIndefDpleInternal::deepCopyMembers(
