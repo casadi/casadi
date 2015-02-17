@@ -863,4 +863,19 @@ namespace casadi {
     return ret;
   }
 
+  void MXNode::copyFwd(const bvec_t* arg, bvec_t* res, int len) {
+    if (arg!=res) {
+      copy(arg, arg+len, res);
+    }
+  }
+
+  void MXNode::copyAdj(bvec_t* arg, bvec_t* res, int len) {
+    if (arg!=res) {
+      for (int k=0; k<len; ++k) {
+        *arg++ |= *res;
+        *res++ = 0;
+      }
+    }
+  }
+
 } // namespace casadi

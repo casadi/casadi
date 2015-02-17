@@ -387,6 +387,12 @@ namespace casadi {
 
     /** \brief Free adjoint memory (MX) */
     static void clearVector(const std::vector<pv_MX>& v, int len);
+
+    /** \brief Propagate sparsities forward through a copy operation */
+    static void copyFwd(const bvec_t* arg, bvec_t* res, int len);
+
+    /** \brief Propagate sparsities backwards through a copy operation */
+    static void copyAdj(bvec_t* arg, bvec_t* res, int len);
   };
 
   /// \endcond

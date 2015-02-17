@@ -67,20 +67,12 @@ namespace casadi {
 
   void Reshape::spFwd(const cpv_bvec_t& arg,
                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    if (res[0]!=arg[0]) copy(arg[0], arg[0]+nnz(), res[0]);
+    copyFwd(arg[0], res[0], nnz());
   }
 
   void Reshape::spAdj(const pv_bvec_t& arg,
                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    bvec_t *a = arg[0];
-    bvec_t *r = res[0];
-    if (r!=a) {
-      int n = nnz();
-      for (int k=0; k<n; ++k) {
-        *a++ |= *r;
-        *r++ = 0;
-      }
-    }
+    copyAdj(arg[0], res[0], nnz());
   }
 
   void Reshape::printPart(std::ostream &stream, int part) const {

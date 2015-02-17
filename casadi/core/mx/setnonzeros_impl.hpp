@@ -580,12 +580,8 @@ namespace casadi {
   void SetNonzerosVector<Add>::
   spAdj(const pv_bvec_t& arg,
         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    bvec_t *a0 = arg[0];
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
-    int n = this->nnz();
-
-    // Propagate sparsity
     for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
       if (*k>=0) {
         *a |= r[*k];
@@ -594,12 +590,7 @@ namespace casadi {
         }
       }
     }
-    if (r != a0) {
-      for (int k=0; k<n; ++k) {
-        *a0++ |= *r;
-        *r++ = 0;
-      }
-    }
+    MXNode::copyAdj(arg[0], r, this->nnz());
   }
 
   template<bool Add>
@@ -626,24 +617,15 @@ namespace casadi {
   void SetNonzerosSlice<Add>::
   spAdj(const pv_bvec_t& arg,
         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    bvec_t *a0 = arg[0];
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
-    int n = this->nnz();
-
-    // Propagate sparsity
     for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
       *a++ |= r[k];
       if (!Add) {
         r[k] = 0;
       }
     }
-    if (r != a0) {
-      for (int k=0; k<n; ++k) {
-        *a0++ |= *r;
-        *r++ = 0;
-      }
-    }
+    MXNode::copyAdj(arg[0], r, this->nnz());
   }
 
   template<bool Add>
@@ -672,12 +654,8 @@ namespace casadi {
   void SetNonzerosSlice2<Add>::
   spAdj(const pv_bvec_t& arg,
         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    bvec_t *a0 = arg[0];
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
-    int n = this->nnz();
-
-    // Propagate sparsity
     for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
       for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
         *a++ |= r[k2];
@@ -686,12 +664,7 @@ namespace casadi {
         }
       }
     }
-    if (r != a0) {
-      for (int k=0; k<n; ++k) {
-        *a0++ |= *r;
-        *r++ = 0;
-      }
-    }
+    MXNode::copyAdj(arg[0], r, this->nnz());
   }
 
   template<bool Add>

@@ -107,7 +107,7 @@ namespace casadi {
 
   void Multiplication::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp,
                              bvec_t* rtmp) {
-    if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
+    copyFwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), rtmp);
@@ -118,13 +118,7 @@ namespace casadi {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), rtmp);
-    if (arg[0]!=res[0]) {
-      const size_t n = nnz();
-      for (int i=0; i<n; ++i) {
-        arg[0][i] |= res[0][i];
-        res[0][i] = 0;
-      }
-    }
+    copyAdj(arg[0], res[0], nnz());
   }
 
   void Multiplication::generate(std::ostream &stream,

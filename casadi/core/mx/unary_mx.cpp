@@ -105,19 +105,12 @@ namespace casadi {
 
   void UnaryMX::spFwd(const cpv_bvec_t& arg,
                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    if (arg[0]==res[0]) return;
-    copy(arg[0], arg[0]+nnz(), res[0]);
+    copyFwd(arg[0], res[0], nnz());
   }
 
   void UnaryMX::spAdj(const pv_bvec_t& arg,
                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    if (arg[0]==res[0]) return;
-    int nz = nnz();
-    for (int el=0; el<nz; ++el) {
-      bvec_t s = res[0][el];
-      res[0][el] = 0;
-      arg[0][el] |= s;
-    }
+    copyAdj(arg[0], res[0], nnz());
   }
 
   void UnaryMX::generate(std::ostream &stream, const std::vector<int>& arg,
