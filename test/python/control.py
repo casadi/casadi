@@ -61,8 +61,10 @@ if DleSolver.hasPlugin("fixed_smith"):
 
 lrdlesolvers = []
 
+"""
 if LrDleSolver.hasPlugin("smith"):
   lrdlesolvers.append(("smith",{"max_iter":100,"tol": 1e-13}))
+"""
 
 if LrDleSolver.hasPlugin("fixed_smith"):
   lrdlesolvers.append(("fixed_smith",{"iter":100}))
