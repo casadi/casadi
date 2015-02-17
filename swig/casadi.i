@@ -1119,15 +1119,21 @@ def PyFunction(obj,inputs,outputs):
       
     Fun = CustomFunction(fcustom,inputs,outputs)
     Fun.setOption("name","CustomFunction")
-    if hasattr(obj,'getDerivative'):
+    if hasattr(obj,'getDerivativeFwd'):
       @pyderivativegenerator
-      def derivativewrap(f,nfwd,nadj):
-        return obj.getDerivative(f,nfwd,nadj)
-      Fun.setOption("derivative_generator",derivativewrap)
+      def derivativewrap(f,nfwd):
+        return obj.getDerivativeFwd(f,nfwd)
+      Fun.setOption("derivative_generator_forward",derivativewrap)
       
-    elif hasattr(obj,'fwd') or hasattr(obj,'adj'):
+    if hasattr(obj,'getDerivativeAdj'):
       @pyderivativegenerator
-      def derivativewrap(f,nfwd,nadj):
+      def derivativewrap(f,adj):
+        return obj.getDerivativeAdj(f,adj)
+      Fun.setOption("derivative_generator_reverse",derivativewrap)
+      
+    if hasattr(obj,'fwd'):
+      @pyderivativegenerator
+      def derivativewrapFwd(f,nfwd):
         num_in = f.getNumInputs()
         num_out = f.getNumOutputs()
         
@@ -1136,26 +1142,44 @@ def PyFunction(obj,inputs,outputs):
           all_inputs = [f2.input(i) for i in range(f2.getNumInputs())]
           all_outputs = [f2.output(i) for i in range(f2.getNumOutputs())]
           inputs=all_inputs[:num_in]
-          outputs=all_outputs[:num_out]
-          fwd_seeds=zip(*[iter(all_inputs[num_in:num_in*(nfwd+1)])]*num_in)
-          fwd_sens=zip(*[iter(all_outputs[num_out:num_out*(nfwd+1)])]*num_out)
-          adj_seeds=zip(*[iter(all_inputs[num_in*(nfwd+1):])]*num_out)
-          adj_sens=zip(*[iter(all_outputs[num_out*(nfwd+1):])]*num_in)
-          if hasattr(obj,'fwd') and nfwd>0:
-            obj.fwd(inputs,outputs,fwd_seeds,fwd_sens)
-          if hasattr(obj,'adj') and nadj>0:
-            obj.adj(inputs,outputs,adj_seeds,adj_sens)
+          outputs=all_inputs[num_in:num_in+num_out]
+          fwd_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_in)
+          fwd_sens=zip(*[iter(all_outputs)]*num_out)
+          obj.fwd(inputs,outputs,fwd_seeds,fwd_sens)
           
-        DerFun = CustomFunction(der,inputs+nfwd*inputs+nadj*outputs,outputs+nfwd*outputs+nadj*inputs)
+        DerFun = CustomFunction(der,inputs+outputs+nfwd*inputs,nfwd*outputs)
         DerFun.setOption("name","CustomFunction_derivative")
         DerFun.init()
         return DerFun
  
-      Fun.setOption("derivative_generator",derivativewrap)
+      Fun.setOption("derivative_generator_forward",derivativewrapFwd)
     
-    if not(hasattr(obj,'getDerivative')) and hasattr(obj,'fwd') and not hasattr(obj,'adj'):
+    if hasattr(obj,'adj'):
+      @pyderivativegenerator
+      def derivativewrapAdj(f,nadj):
+        num_in = f.getNumInputs()
+        num_out = f.getNumOutputs()
+        
+        @pyevaluate
+        def der(f2):
+          all_inputs = [f2.input(i) for i in range(f2.getNumInputs())]
+          all_outputs = [f2.output(i) for i in range(f2.getNumOutputs())]
+          inputs=all_inputs[:num_in]
+          outputs=all_inputs[num_in:num_in+num_out]
+          adj_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_out)
+          adj_sens=zip(*[iter(all_outputs)]*num_in)
+          obj.adj(inputs,outputs,adj_seeds,adj_sens)
+          
+        DerFun = CustomFunction(der,inputs+outputs+nadj*outputs,nadj*inputs)
+        DerFun.setOption("name","CustomFunction_derivative")
+        DerFun.init()
+        return DerFun
+ 
+      Fun.setOption("derivative_generator_reverse",derivativewrapAdj)
+      
+    if not(hasattr(obj,'getDerivativeFwd')) and hasattr(obj,'fwd') and not hasattr(obj,'adj'):
       Fun.setOption("ad_mode","forward")
-    if not(hasattr(obj,'getDerivative')) and not hasattr(obj,'fwd') and hasattr(obj,'adj'):
+    if not(hasattr(obj,'getDerivativeAdj')) and not hasattr(obj,'fwd') and hasattr(obj,'adj'):
       Fun.setOption("ad_mode","reverse")
     return Fun
   
