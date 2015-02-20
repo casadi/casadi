@@ -136,24 +136,6 @@ class SXtests(casadiTestCase):
       
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
 
-      def fmod(f,x):
-        #f.setOption("ad_mode","forward")
-        f.init();
-        J=f.jacobian()
-        J.init()
-        return J
-        
-      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
-      
-      def fmod(f,x):
-        #f.setOption("ad_mode","reverse")
-        f.init();
-        J=f.jacobian()
-        J.init()
-        return J
-        
-      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
-      
   def test_SXJac(self):
       self.message("SX(1,1) unary operation, jac")
       x=SX.sym("x")

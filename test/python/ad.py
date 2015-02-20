@@ -324,7 +324,8 @@ class ADtests(casadiTestCase):
             for mode in ["forward","reverse"]:
               self.message(" %s Jacobian on SX. Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
-              f.setOption("ad_mode",mode)
+              f.setOption("ad_weight", 0 if mode=='forward' else 1)
+              f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
               f.init()
               Jf=f.jacobian(0,0)
               Jf.init()
@@ -376,7 +377,8 @@ class ADtests(casadiTestCase):
             for mode in ["forward","reverse"]:
               self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-              f.setOption("ad_mode",mode)
+              f.setOption("ad_weight", 0 if mode=='forward' else 1)
+              f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
               f.init()
               Jf=f.jacobian(0,0)
               Jf.init()
@@ -394,7 +396,8 @@ class ADtests(casadiTestCase):
             for mode in ["forward","reverse"]:
               self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-              f.setOption("ad_mode",mode)
+              f.setOption("ad_weight", 0 if mode=='forward' else 1)
+              f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
               f.init()
               Jf=f.jacobian(0,0)
               Jf.init()
@@ -440,7 +443,6 @@ class ADtests(casadiTestCase):
     inp[3,0]=y
 
     f=SXFunction([inp],[vertcat([x+y,x,y])])
-    #f.setOption("ad_mode","forward")
     f.init()
     J=f.jacobian(0,0)
     J.init()
@@ -461,7 +463,6 @@ class ADtests(casadiTestCase):
     inp[3,0]=y
 
     f=SXFunction([inp],[vertcat([x+y,x,y])])
-    #f.setOption("ad_mode","forward")
     f.init()
     J=f.jacobian(0,0)
     J.init()
@@ -801,7 +802,8 @@ class ADtests(casadiTestCase):
       for f in [fun.expand(),fun]:
         #  jacobian()
         for mode in ["forward","reverse"]:
-          f.setOption("ad_mode",mode)
+          f.setOption("ad_weight", 0 if mode=='forward' else 1)
+          f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
           f.init()
           Jf=f.jacobian(0,0)
           Jf.init()
@@ -830,7 +832,8 @@ class ADtests(casadiTestCase):
       for f in [fun,fun.expand()]:
         #  gradient()
         for mode in ["forward","reverse"]:
-          f.setOption("ad_mode",mode)
+          f.setOption("ad_weight", 0 if mode=='forward' else 1)
+          f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
           f.init()
           Gf=f.gradient(0,0)
           Gf.init()
@@ -845,7 +848,8 @@ class ADtests(casadiTestCase):
       for f in [fun,fun.expand()]:
         #  hessian()
         for mode in ["forward","reverse"]:
-          f.setOption("ad_mode",mode)
+          f.setOption("ad_weight", 0 if mode=='forward' else 1)
+          f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
           f.init()
           Hf=f.hessian(0,0)
           Hf.init()

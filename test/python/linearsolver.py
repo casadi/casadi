@@ -89,13 +89,15 @@ class LinearSolverTests(casadiTestCase):
         self.checkarray(mul(A.T,solver.getOutput()),DMatrix.zeros(m,n-m))
         self.checkarray(mul(solver.getOutput().T,solver.getOutput()),DMatrix.eye(n-m))
         
-        solver.setOption("ad_mode","forward")
+        solver.setOption("ad_weight",0)
+        solver.setOption("ad_weight_sp",0)
         solver.init()
         
         Jf = solver.jacobian()
         Jf.init()
 
-        solver.setOption("ad_mode","reverse")
+        solver.setOption("ad_weight",1)
+        solver.setOption("ad_weight_sp",1)
         solver.init()
         
         Jb = solver.jacobian()

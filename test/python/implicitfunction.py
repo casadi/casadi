@@ -268,7 +268,8 @@ class NLPtests(casadiTestCase):
     # Convert to SXFunction to decrease overhead
     vfcn_sx = SXFunction(vfcn)
     vfcn_sx.setOption("name","S")
-    vfcn_sx.setOption("ad_mode","forward")
+    vfcn_sx.setOption("ad_weight",0)
+    vfcn_sx.setOption("ad_weight_sp",0)
 
     # Create a implicit function instance to solve the system of equations
     ifcn = ImplicitFunction("newton",vfcn_sx)
@@ -284,7 +285,8 @@ class NLPtests(casadiTestCase):
 
     F = MXFunction([X0],[f*X0+V])
     F.setOption("name","F")
-    F.setOption("ad_mode","forward")
+    F.setOption("ad_weight",0)
+    F.setOption("ad_weight_sp",0)
     F.init()
 
     # Test values

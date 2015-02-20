@@ -202,6 +202,13 @@ namespace casadi {
     void setDerivativeAdj(const Function& fcn, int nadj);
     ///@}
 
+    /** \brief  Weighting factor for chosing forward/reverse mode */
+    virtual double adWeight();
+
+    /** \brief  Weighting factor for chosing forward/reverse mode,
+        sparsity propagation */
+    virtual double adWeightSp();
+
     /** \brief Create a helper MXFunction with some properties copied
     *
     * Copied properties:

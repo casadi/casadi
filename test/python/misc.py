@@ -80,7 +80,7 @@ class Misctests(casadiTestCase):
     self.assertRaises(RuntimeError,lambda : f.setOption("foobar",123))
     self.assertRaises(RuntimeError,lambda : f.setOption("name",123))
     
-    self.assertRaises(RuntimeError,lambda : f.setOption("ad_mode","foo"))
+    self.assertRaises(RuntimeError,lambda : f.setOption("ad_weight","foo"))
     
     x = SX.sym("x")
     nlp = SXFunction(nlpIn(x=x),nlpOut(f=x))

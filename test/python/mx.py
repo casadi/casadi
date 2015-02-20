@@ -567,18 +567,8 @@ class MXtests(casadiTestCase):
     self.message("SX(1,1) unary operation, jacobian")
     x=MX.sym("x")
     x0=array([[0.738]])
-
-    def fmod(f,x):
-      #f.setOption("ad_mode","forward")
-      f.init()
-      J=f.jacobian()
-      J.init()
-      return J
-      
-    self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
     
     def fmod(f,x):
-      #f.setOption("ad_mode","reverse")
       f.init()
       J=f.jacobian()
       J.init()
@@ -591,18 +581,8 @@ class MXtests(casadiTestCase):
       x=MX.sym("x",3,1)
       
       x0=array([0.738,0.9,0.3])
-
-      def fmod(f,x):
-        #f.setOption("ad_mode","forward")
-        f.init()
-        J=f.jacobian()
-        J.init()
-        return J
-        
-      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
       
       def fmod(f,x):
-        #f.setOption("ad_mode","reverse")
         f.init()
         J=f.jacobian()
         J.init()
@@ -831,7 +811,8 @@ class MXtests(casadiTestCase):
     J_ = dot(dot((dot(D_,x_)+e_).T,C_.T),A_) + dot(dot((dot(A_,x_)+b_).T,C_),D_)
     
     for mode in ["forward", "reverse"]:
-      #f.setOption("ad_mode",mode)
+      f.setOption("ad_weight", 0 if mode=='forward' else 1)
+      f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
       f.init()
       J = f.jacobian()
       J.init()
@@ -903,7 +884,8 @@ class MXtests(casadiTestCase):
     J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
     
     for mode in ["forward", "reverse"]:
-      #f.setOption("ad_mode","forward")
+      f.setOption("ad_weight", 0 if mode=='forward' else 1)
+      f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
       f.init()
       J = f.jacobian()
       J.init()
@@ -979,7 +961,8 @@ class MXtests(casadiTestCase):
     J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
     
     for mode in ["forward", "reverse"]:
-      #f.setOption("ad_mode","forward")
+      f.setOption("ad_weight", 0 if mode=='forward' else 1)
+      f.setOption("ad_weight_sp", 0 if mode=='forward' else 1)
       f.init()
       J = f.jacobian()
       J.init()
@@ -1180,7 +1163,7 @@ class MXtests(casadiTestCase):
     #self.checkarray(J.getOutput(),nums.T/linalg.norm(nums),"Norm_2")
 
     #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","reverse")
+    #J.setOption("ad_weight",1)
     #J.init()
 
     #J.setInput(nums)
@@ -1207,7 +1190,7 @@ class MXtests(casadiTestCase):
     #F =MXFunction([X],[norm_1(X)])
 
     #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","forward")
+    #J.setOption("ad_weight",0)
     #J.init()
 
     #J.setInput(nums)
@@ -1215,7 +1198,7 @@ class MXtests(casadiTestCase):
     #self.checkarray(J.getOutput(),matrix([1,-1,nan]),"Norm_1")
 
     #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","reverse")
+    #J.setOption("ad_weight",1)
     #J.init()
 
     #J.setInput(nums)
@@ -1446,7 +1429,7 @@ class MXtests(casadiTestCase):
         gfcn = tmp.expand()
       else:
         gfcn = MXFunction([U],[G])
-      gfcn.setOption("ad_mode","reverse")
+      gfcn.setOption("ad_weight",1)
       gfcn.init()
       J = gfcn.jacobian()
       J.init()
@@ -1511,7 +1494,8 @@ class MXtests(casadiTestCase):
     self.checkarray(i,J.getOutput())
     
     f = MXFunction([X],[vecNZ(T.T)**2])
-    f.setOption("ad_mode","reverse")
+    f.setOption("ad_weight",1)
+    f.setOption("ad_weight_sp",1)
     f.init()
     
     J = MXFunction([X],[f.jac()])
@@ -1558,7 +1542,8 @@ class MXtests(casadiTestCase):
     self.checkarray(i,J.getOutput())
     
     f = MXFunction([X],[T**2])
-    f.setOption("ad_mode","reverse")
+    f.setOption("ad_weight",1)
+    f.setOption("ad_weight_sp",1)
     f.init()
     
     J = MXFunction([X],[f.jac()])

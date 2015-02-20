@@ -605,12 +605,10 @@ class Functiontests(casadiTestCase):
           
 
       Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
-      if max_fwd and max_adj:
-        Fun.setOption("ad_mode","automatic")
-      elif max_adj:
-        Fun.setOption("ad_mode","reverse")
-      elif max_fwd:
-        Fun.setOption("ad_mode","forward")
+      if max_adj and not max_fwd:
+        Fun.setOption("ad_weight", 1)
+      elif max_fwd and not max_adj:
+        Fun.setOption("ad_weight", 0)
       Fun.init()
       
       if not indirect: 
@@ -737,12 +735,10 @@ class Functiontests(casadiTestCase):
             y_bar.set(by)
 
       Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
-      if max_fwd and max_adj:
-        Fun.setOption("ad_mode","automatic")
-      elif max_adj:
-        Fun.setOption("ad_mode","reverse")
-      elif max_fwd:
-        Fun.setOption("ad_mode","forward")
+      if max_adj and not max_fwd:
+        Fun.setOption("ad_weight", 1)
+      elif max_fwd and not max_adj:
+        Fun.setOption("ad_weight", 0)
       Fun.init()
       
       if not indirect: 
@@ -927,12 +923,10 @@ class Functiontests(casadiTestCase):
             y_bar.set(by)
 
       Fun = PyFunction(Fun(),[Sparsity.dense(2,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
-      if max_fwd and max_adj:
-        Fun.setOption("ad_mode","automatic")
-      elif max_adj:
-        Fun.setOption("ad_mode","reverse")
-      elif max_fwd:
-        Fun.setOption("ad_mode","forward")
+      if max_adj and not max_fwd:
+        Fun.setOption("ad_weight", 1)
+      elif max_fwd and not max_adj:
+        Fun.setOption("ad_weight", 0)
       Fun.init()
 
       if not indirect: 
@@ -1002,12 +996,10 @@ class Functiontests(casadiTestCase):
               X_bar.set([2*x*xb+y*yb,xb+x*yb])
           
       c = PyFunction(Squares(),[Sparsity.dense(2,1)], [Sparsity.dense(2,1)])
-      if max_fwd and max_adj:
-        c.setOption("ad_mode","automatic")
-      elif max_adj:
-        c.setOption("ad_mode","reverse")
-      elif max_fwd:
-        c.setOption("ad_mode","forward")
+      if max_adj and not max_fwd:
+        c.setOption("ad_weight", 1)
+      elif max_fwd and not max_adj:
+        c.setOption("ad_weight", 0)
       c.init()
 
       if not indirect: 

@@ -1011,7 +1011,6 @@ namespace casadi {
     vector<MX> arg = symbolicInput();
     vector<MX> res = shared_from_this<Function>()(arg);
     MXFunction f(arg, res);
-    f.setOption("ad_mode", "forward");
     f.init();
     return f.jacobian(iind, oind, compact, symmetric);
   }
