@@ -81,6 +81,8 @@ namespace casadi {
     addOption("derivative_generator_reverse",  OT_DERIVATIVEGENERATOR,   GenericType(),
               "Function that returns a derivative function given a number of reverse "
               "mode directional derivatives. Overrides default routines.");
+    addOption("full_jacobian",                 OT_FUNCTION,              GenericType(),
+              "The Jacobian of all outputs with respect to all inputs.");
 
     verbose_ = false;
     user_data_ = 0;
@@ -298,11 +300,12 @@ namespace casadi {
     f.setOutputScheme(getOutputScheme());
     f.setOption("ad_weight", adWeight());
     f.setOption("ad_weight_sp", adWeightSp());
-    for (int i=0; i<2; ++i) {
+    for (int i=0; i<3; ++i) {
       string n;
       switch (i) {
       case 0: n="derivative_generator_forward"; break;
       case 1: n="derivative_generator_reverse"; break;
+      case 2: n="full_jacobian"; break;
       }
       if (hasSetOption(n)) f.setOption(n, getOption(n));
     }
@@ -1750,8 +1753,14 @@ namespace casadi {
       // Return cached Jacobian
       return shared_cast<Function>(full_jacobian_.shared());
     } else {
-      // Generate a new Jacobian
-      Function ret = getFullJacobian();
+      Function ret;
+      if (hasSetOption("full_jacobian")) {
+        /// User-provided Jacobian function
+        ret = getOption("full_jacobian");
+      } else {
+        // Generate full Jacobian
+        ret = getFullJacobian();
+      }
 
       // Give it a suitable name
       stringstream ss;
