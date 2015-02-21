@@ -3633,24 +3633,23 @@ namespace casadi {
   }
 
   bool SparsityInternal::isReshape(const SparsityInternal& y) const {
-    // Quick true if the objects are the same or are empty
-    if (this==&y || isEmpty()) return true;
+    // Quick return if the objects are the same
+    if (this==&y) return true;
 
+    // Check if same number of entries and nonzeros
+    if (numel()!=y.numel() || nnz()!=y.nnz()) return false;
+
+    // Quick return if empty interior or dense
+    if (nnz()==0 || isDense()) return true;
+
+    // Get Pattern
     const int* colind = this->colind();
     const int* row = this->row();
     const int* y_colind = y.colind();
     const int* y_row = y.row();
 
-    // If same number of rows, check if patterns are equal
-    if (size1()==y.size1())
-      return isEqual(y.size1(), y.size2(), y_colind, y_row);
-
-    // Assert dimensions and number of nonzeros
-    if (size2()*size1()!=y.size1()*y.size2() || nnz()!=y.nnz())
-      return false;
-
-    // Quick return if empty interior or dense
-    if (nnz()==0 || isDense()) return true;
+    // If same number of rows, check if patterns are identical
+    if (size1()==y.size1()) return isEqual(y.size1(), y.size2(), y_colind, y_row);
 
     // Loop over the elements
     for (int cc=0; cc<size2(); ++cc) {
