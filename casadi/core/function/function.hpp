@@ -538,6 +538,57 @@ namespace casadi {
     /// \cond INTERNAL
     /** \brief Check if the numerical values of the supplied bounds make sense */
     void checkInputs() const;
+#ifndef SWIG
+    /** \brief Check if input arguments have correct length and dimensions */
+    template<typename M>
+    void checkArg(const std::vector<M>& arg) const;
+
+    /** \brief Check if output arguments have correct length and dimensions */
+    template<typename M>
+    void checkRes(const std::vector<M>& res) const;
+
+    /** \brief Check forward mode seeds dimensions */
+    template<typename M>
+    void checkFwdSeed(const std::vector<std::vector<M> >& fseed) const;
+
+    /** \brief Check reverse mode seeds dimensions */
+    template<typename M>
+    void checkAdjSeed(const std::vector<std::vector<M> >& aseed) const;
+
+    /** \brief Check if input arguments that needs to be replaced */
+    template<typename M>
+    bool matchingArg(const std::vector<M>& arg) const;
+
+    /** \brief Check if output arguments that needs to be replaced */
+    template<typename M>
+    bool matchingRes(const std::vector<M>& arg) const;
+
+    /** \brief Check if there are 0-by-0 forward seeds that needs to be replaced */
+    template<typename M>
+    bool matchingFwdSeed(const std::vector<std::vector<M> >& fseed) const;
+
+    /** \brief Check if there are 0-by-0 reverse seeds that needs to be replaced */
+    template<typename M>
+    bool matchingAdjSeed(const std::vector<std::vector<M> >& aseed) const;
+
+    /** \brief Replace 0-by-0 inputs */
+    template<typename M>
+    std::vector<M> replaceArg(const std::vector<M>& arg) const;
+
+    /** \brief Replace 0-by-0 outputs */
+    template<typename M>
+    std::vector<M> replaceRes(const std::vector<M>& res) const;
+
+    /** \brief Replace 0-by-0 forward seeds */
+    template<typename M>
+    std::vector<std::vector<M> >
+      replaceFwdSeed(const std::vector<std::vector<M> >& fseed) const;
+
+    /** \brief Replace 0-by-0 reverse seeds */
+    template<typename M>
+    std::vector<std::vector<M> >
+      replaceAdjSeed(const std::vector<std::vector<M> >& aseed) const;
+#endif // SWIG
     /// \endcond
 
     /** \brief get function name with all non alphanumeric characters converted to '_' */

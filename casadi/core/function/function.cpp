@@ -57,25 +57,22 @@ namespace casadi {
 
   void Function::call(const vector<DMatrix> &arg, vector<DMatrix> &res,
                       bool always_inline, bool never_inline) {
-    casadi_assert_message(arg.size()==getNumInputs(), "Function::call: dimension "
-                          "mismatch. You supplied " << arg.size()
-                          << " arguments instead of expected " << getNumInputs() << ".");
+    if (!matchingArg(arg))
+      return call(replaceArg(arg), res, always_inline, never_inline);
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const vector<SX> &arg, vector<SX>& res,
                       bool always_inline, bool never_inline) {
-    casadi_assert_message(arg.size()==getNumInputs(), "Function::call: dimension "
-                          "mismatch. You supplied " << arg.size()
-                          << " arguments instead of expected " << getNumInputs() << ".");
+    if (!matchingArg(arg))
+      return call(replaceArg(arg), res, always_inline, never_inline);
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const vector<MX> &arg, vector<MX>& res,
                       bool always_inline, bool never_inline) {
-    casadi_assert_message(arg.size()==getNumInputs(), "Function::call: dimension "
-                          "mismatch. You supplied " << arg.size()
-                          << " arguments instead of expected " << getNumInputs() << ".");
+    if (!matchingArg(arg))
+      return call(replaceArg(arg), res, always_inline, never_inline);
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
@@ -522,6 +519,12 @@ namespace casadi {
                          const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens,
                          bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingFwdSeed(fseed)) {
+      return callFwd(arg, res, replaceFwdSeed(fseed), fsens,
+                     always_inline, never_inline);
+    }
     (*this)->callFwd(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
@@ -529,6 +532,12 @@ namespace casadi {
                          const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens,
                          bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingAdjSeed(aseed)) {
+      return callAdj(arg, res, replaceAdjSeed(aseed), asens,
+                     always_inline, never_inline);
+    }
     (*this)->callAdj(arg, res, aseed, asens, always_inline, never_inline);
   }
 
@@ -536,6 +545,12 @@ namespace casadi {
                          const std::vector<std::vector<SX> >& fseed,
                          std::vector<std::vector<SX> >& fsens,
                          bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingFwdSeed(fseed)) {
+      return callFwd(arg, res, replaceFwdSeed(fseed), fsens,
+                     always_inline, never_inline);
+    }
     (*this)->callFwd(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
@@ -543,6 +558,12 @@ namespace casadi {
                          const std::vector<std::vector<SX> >& aseed,
                          std::vector<std::vector<SX> >& asens,
                          bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingAdjSeed(aseed)) {
+      return callAdj(arg, res, replaceAdjSeed(aseed), asens,
+                     always_inline, never_inline);
+    }
     (*this)->callAdj(arg, res, aseed, asens, always_inline, never_inline);
   }
 
@@ -550,6 +571,12 @@ namespace casadi {
                          const std::vector<std::vector<DMatrix> >& fseed,
                          std::vector<std::vector<DMatrix> >& fsens,
                          bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingFwdSeed(fseed)) {
+      return callFwd(arg, res, replaceFwdSeed(fseed), fsens,
+                     always_inline, never_inline);
+    }
     (*this)->callFwd(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
@@ -557,6 +584,12 @@ namespace casadi {
                          const std::vector<std::vector<DMatrix> >& aseed,
                          std::vector<std::vector<DMatrix> >& asens,
                          bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingAdjSeed(aseed)) {
+      return callAdj(arg, res, replaceAdjSeed(aseed), asens,
+                     always_inline, never_inline);
+    }
     (*this)->callAdj(arg, res, aseed, asens, always_inline, never_inline);
   }
 
@@ -594,6 +627,138 @@ namespace casadi {
   IOSchemeVector<MX> Function::
   operator()(const IOSchemeVector<MX>& arg, bool always_inline, bool never_inline) {
     return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
+  }
+
+  template<typename M>
+  void Function::checkArg(const std::vector<M>& arg) const {
+    int n_in = getNumInputs();
+    casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
+                          << n_in << ", got " << arg.size());
+    for (int i=0; i<n_in; ++i) {
+      casadi_assert_message(arg[i].isEmpty(true) || arg[i].shape()==input(i).shape(),
+                            "Input " << i << " has mismatching shape. Expected "
+                            << input(i).shape() << ", got " << arg[i].shape());
+    }
+  }
+
+  template<typename M>
+  void Function::checkRes(const std::vector<M>& res) const {
+    int n_out = getNumOutputs();
+    casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
+                          << n_out << ", got " << res.size());
+    for (int i=0; i<n_out; ++i) {
+      casadi_assert_message(res[i].isEmpty(true) || res[i].shape()==output(i).shape(),
+                            "Output " << i << " has mismatching shape. Expected "
+                            << output(i).shape() << ", got " << res[i].shape());
+    }
+  }
+
+  template<typename M>
+  void Function::checkFwdSeed(const std::vector<std::vector<M> >& fseed) const {
+    int n_in = getNumInputs();
+    for (int d=0; d<fseed.size(); ++d) {
+      casadi_assert_message(fseed[d].size()==n_in,
+                            "Incorrect number of forward seeds for direction " << d
+                            << ": Expected " << n_in << ", got " << fseed[d].size());
+      for (int i=0; i<n_in; ++i) {
+        casadi_assert_message(fseed[d][i].isEmpty(true) || fseed[d][i].shape()==input(i).shape(),
+                              "Forward seed " << i << " for direction " << d
+                              << " has mismatching shape. Expected " << input(i).shape()
+                              << ", got " << fseed[d][i].shape());
+      }
+    }
+  }
+
+  template<typename M>
+  void Function::checkAdjSeed(const std::vector<std::vector<M> >& aseed) const {
+    int n_out = getNumOutputs();
+    for (int d=0; d<aseed.size(); ++d) {
+      casadi_assert_message(aseed[d].size()==n_out,
+                            "Incorrect number of adjoint seeds for direction " << d
+                            << ": Expected " << n_out << ", got " << aseed[d].size());
+      for (int i=0; i<n_out; ++i) {
+        casadi_assert_message(aseed[d][i].isEmpty(true) || aseed[d][i].shape()==output(i).shape(),
+                              "Adjoint seed " << i << " for direction " << d
+                              << " has mismatching shape. Expected " << output(i).shape()
+                              << ", got " << aseed[d][i].shape());
+      }
+    }
+  }
+
+  template<typename M>
+  bool Function::matchingArg(const std::vector<M>& arg) const {
+    checkArg(arg);
+    int n_in = getNumInputs();
+    for (int i=0; i<n_in; ++i) {
+      if (arg.at(i).shape()!=input(i).shape()) return false;
+    }
+    return true;
+  }
+
+  template<typename M>
+  bool Function::matchingRes(const std::vector<M>& res) const {
+    checkRes(res);
+    int n_out = getNumOutputs();
+    for (int i=0; i<n_out; ++i) {
+      if (res.at(i).shape()!=output(i).shape()) return false;
+    }
+    return true;
+  }
+
+  template<typename M>
+  bool Function::matchingFwdSeed(const std::vector<std::vector<M> >& fseed) const {
+    checkFwdSeed(fseed);
+    for (int d=0; d<fseed.size(); ++d) {
+      if (!matchingArg(fseed[d])) return false;
+    }
+    return true;
+  }
+
+  template<typename M>
+  bool Function::matchingAdjSeed(const std::vector<std::vector<M> >& aseed) const {
+    checkAdjSeed(aseed);
+    for (int d=0; d<aseed.size(); ++d) {
+      if (!matchingRes(aseed[d])) return false;
+    }
+    return true;
+  }
+
+  template<typename M>
+  std::vector<M> Function::replaceArg(const std::vector<M>& arg) const {
+    std::vector<M> r(arg);
+    int n_in = getNumInputs();
+    for (int i=0; i<n_in; ++i) {
+      if (r.at(i).shape()!=input(i).shape())
+        r.at(i) = M(input(i).shape());
+    }
+    return r;
+  }
+
+  template<typename M>
+  std::vector<M> Function::replaceRes(const std::vector<M>& res) const {
+    std::vector<M> r(res);
+    int n_out = getNumOutputs();
+    for (int i=0; i<n_out; ++i) {
+      if (r.at(i).shape()!=output(i).shape())
+        r.at(i) = M(output(i).shape());
+    }
+    return r;
+  }
+
+  template<typename M>
+  std::vector<std::vector<M> >
+  Function::replaceFwdSeed(const std::vector<std::vector<M> >& fseed) const {
+    std::vector<std::vector<M> > r(fseed.size());
+    for (int d=0; d<r.size(); ++d) r[d] = replaceArg(fseed[d]);
+    return r;
+  }
+
+  template<typename M>
+  std::vector<std::vector<M> >
+  Function::replaceAdjSeed(const std::vector<std::vector<M> >& aseed) const {
+    std::vector<std::vector<M> > r(aseed.size());
+    for (int d=0; d<r.size(); ++d) r[d] = replaceRes(aseed[d]);
+    return r;
   }
 
 } // namespace casadi
