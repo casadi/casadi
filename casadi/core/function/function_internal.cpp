@@ -2399,6 +2399,45 @@ namespace casadi {
       return name;
   }
 
+  bool FunctionInternal::hasDerivative() const {
+    return hasDerivativeFwd() || hasDerivativeAdj() ||
+      full_jacobian_.alive() || hasSetOption("full_jacobian");
+  }
+
+  bool FunctionInternal::fwdViaJac(int nfwd) {
+    if (!hasDerivativeFwd()) return true;
+
+    // Jacobian calculation penalty factor
+    const int jac_penalty = 2;
+
+    // Heuristic 1: Jac calculated via forward mode likely cheaper
+    if (jac_penalty*getNumInputNonzeros()<nfwd) return true;
+
+    // Heuristic 2: Jac calculated via reverse mode likely cheaper
+    double w = adWeight();
+    if (hasDerivativeAdj() && jac_penalty*(1-w)*getNumOutputNonzeros()<w*nfwd)
+      return true;
+
+    return false;
+  }
+
+  bool FunctionInternal::adjViaJac(int nadj) {
+    if (!hasDerivativeAdj()) return true;
+
+    // Jacobian calculation penalty factor
+    const int jac_penalty = 2;
+
+    // Heuristic 1: Jac calculated via reverse mode likely cheaper
+    if (jac_penalty*getNumOutputNonzeros()<nadj) return true;
+
+    // Heuristic 2: Jac calculated via forward mode likely cheaper
+    double w = adWeight();
+    if (hasDerivativeFwd() && jac_penalty*w*getNumInputNonzeros()<(1-w)*nadj)
+      return true;
+
+    return false;
+  }
+
   void FunctionInternal::callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
                                  const std::vector<std::vector<MX> >& fseed,
                                  std::vector<std::vector<MX> >& fsens,
@@ -2407,8 +2446,8 @@ namespace casadi {
     casadi_assert_message(!always_inline, "Class " << typeid(*this).name() <<
                           " cannot be inlined in an MX expression");
 
-    // Either forward or reverse mode must be supported
-    casadi_assert(hasDerivativeFwd() || hasDerivativeAdj());
+    // Derivative information must be available
+    casadi_assert(hasDerivative());
 
     // Number of directional derivatives
     int nfwd = fseed.size();
@@ -2421,21 +2460,8 @@ namespace casadi {
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
 
-    // Get weighting factor
-    double w = adWeight();
-
-    // Should we calculate directional derivatives by first calculating the full
-    // Jacobian and then multiply from the right?
-    const int jac_penalty = 2; // Jacobian calculation penalty factor
-    // Heuristic 1: Jac calculated via forward mode likely cheaper
-    bool via_jac = jac_penalty*getNumInputNonzeros()<nfwd;
-    // Heuristic 2: Jac calculated via reverse mode likely cheaper
-    if (!via_jac && hasDerivativeAdj()) {
-      via_jac = jac_penalty*(1-w)*getNumOutputNonzeros()<w*nfwd;
-    }
-
-    // Calculating full Jacobian and then multiplying likely cheaper
-    if (via_jac) {
+    // Calculating full Jacobian and then multiplying
+    if (fwdViaJac(nfwd)) {
       // Join forward seeds
       vector<MX> v(nfwd);
       for (int d=0; d<nfwd; ++d) {
@@ -2499,8 +2525,8 @@ namespace casadi {
     casadi_assert_message(!always_inline, "Class " << typeid(*this).name() <<
                           " cannot be inlined in an MX expression");
 
-    // Either forward or reverse mode must be supported
-    casadi_assert(hasDerivativeFwd() || hasDerivativeAdj());
+    // Derivative information must be available
+    casadi_assert(hasDerivative());
 
     // Number of directional derivatives
     int nadj = aseed.size();
@@ -2513,21 +2539,8 @@ namespace casadi {
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
 
-    // Get weighting factor
-    double w = adWeight();
-
-    // Should we calculate directional derivatives by first calculating the full
-    // Jacobian and then multiply from the right?
-    const int jac_penalty = 2; // Jacobian calculation penalty factor
-    // Heuristic 1: Jac calculated via reverse mode likely cheaper
-    bool via_jac = jac_penalty*getNumOutputNonzeros()<nadj;
-    // Heuristic 2: Jac calculated via forward mode likely cheaper
-    if (!via_jac && hasDerivativeFwd()) {
-      via_jac = jac_penalty*w*getNumInputNonzeros()<(1-w)*nadj;
-    }
-
     // Calculating full Jacobian and then multiplying likely cheaper
-    if (via_jac) {
+    if (adjViaJac(nadj)) {
       // Join adjoint seeds
       vector<MX> v(nadj);
       for (int d=0; d<nadj; ++d) {

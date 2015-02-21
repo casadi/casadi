@@ -204,6 +204,9 @@ namespace casadi {
     void setDerivativeAdj(const Function& fcn, int nadj);
     ///@}
 
+    /** \brief Can derivatives be calculated in any way? */
+    bool hasDerivative() const;
+
     /** \brief  Weighting factor for chosing forward/reverse mode */
     virtual double adWeight();
 
@@ -376,6 +379,12 @@ namespace casadi {
     static void reportConstraints(std::ostream &stream, const Matrix<double> &v,
                                   const Matrix<double> &lb, const Matrix<double> &ub,
                                   const std::string &name, double tol=1e-8);
+
+    ///@{
+    /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
+    virtual bool fwdViaJac(int nfwd);
+    virtual bool adjViaJac(int nadj);
+    ///@}
 
     /** \brief  Inputs of the function */
     IOSchemeVector<DMatrix> input_;
