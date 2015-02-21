@@ -629,13 +629,19 @@ namespace casadi {
     return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
   }
 
+  inline bool checkMat(const Sparsity& arg, const Sparsity& inp) {
+    return arg.shape()==inp.shape() || arg.isEmpty() || arg.isScalar() ||
+      (inp.size2()==arg.size1() && inp.size1()==arg.size2()
+       && (arg.isVector() || inp.isVector()));
+  }
+
   template<typename M>
   void Function::checkArg(const std::vector<M>& arg) const {
     int n_in = getNumInputs();
     casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
                           << n_in << ", got " << arg.size());
     for (int i=0; i<n_in; ++i) {
-      casadi_assert_message(arg[i].isEmpty(true) || arg[i].shape()==input(i).shape(),
+      casadi_assert_message(checkMat(arg[i].sparsity(), input(i).sparsity()),
                             "Input " << i << " has mismatching shape. Expected "
                             << input(i).shape() << ", got " << arg[i].shape());
     }
@@ -647,7 +653,7 @@ namespace casadi {
     casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
                           << n_out << ", got " << res.size());
     for (int i=0; i<n_out; ++i) {
-      casadi_assert_message(res[i].isEmpty(true) || res[i].shape()==output(i).shape(),
+      casadi_assert_message(checkMat(res[i].sparsity(), output(i).sparsity()),
                             "Output " << i << " has mismatching shape. Expected "
                             << output(i).shape() << ", got " << res[i].shape());
     }
@@ -661,7 +667,7 @@ namespace casadi {
                             "Incorrect number of forward seeds for direction " << d
                             << ": Expected " << n_in << ", got " << fseed[d].size());
       for (int i=0; i<n_in; ++i) {
-        casadi_assert_message(fseed[d][i].isEmpty(true) || fseed[d][i].shape()==input(i).shape(),
+        casadi_assert_message(checkMat(fseed[d][i].sparsity(), input(i).sparsity()),
                               "Forward seed " << i << " for direction " << d
                               << " has mismatching shape. Expected " << input(i).shape()
                               << ", got " << fseed[d][i].shape());
@@ -677,7 +683,7 @@ namespace casadi {
                             "Incorrect number of adjoint seeds for direction " << d
                             << ": Expected " << n_out << ", got " << aseed[d].size());
       for (int i=0; i<n_out; ++i) {
-        casadi_assert_message(aseed[d][i].isEmpty(true) || aseed[d][i].shape()==output(i).shape(),
+        casadi_assert_message(checkMat(aseed[d][i].sparsity(), output(i).sparsity()),
                               "Adjoint seed " << i << " for direction " << d
                               << " has mismatching shape. Expected " << output(i).shape()
                               << ", got " << aseed[d][i].shape());
@@ -724,24 +730,35 @@ namespace casadi {
   }
 
   template<typename M>
-  std::vector<M> Function::replaceArg(const std::vector<M>& arg) const {
-    std::vector<M> r(arg);
-    int n_in = getNumInputs();
-    for (int i=0; i<n_in; ++i) {
-      if (r.at(i).shape()!=input(i).shape())
-        r.at(i) = M(input(i).shape());
+  M replaceMat(const M& arg, const Sparsity& inp) {
+    if (arg.shape()==inp.shape()) {
+      // Matching dimensions already
+      return arg;
+    } else if (arg.isEmpty()) {
+      // Empty matrix means set zero
+      return M(inp.shape());
+    } else if (arg.isScalar()) {
+      // Scalar assign means set all
+      return M(inp, arg);
+    } else {
+      // Assign vector with transposing
+      casadi_assert(arg.size1()==inp.size2() && arg.size2()==inp.size1()
+                    && (arg.isVector() || inp.isVector()));
+      return arg.T();
     }
+  }
+
+  template<typename M>
+  std::vector<M> Function::replaceArg(const std::vector<M>& arg) const {
+    std::vector<M> r(arg.size());
+    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(arg[i], input(i).sparsity());
     return r;
   }
 
   template<typename M>
   std::vector<M> Function::replaceRes(const std::vector<M>& res) const {
-    std::vector<M> r(res);
-    int n_out = getNumOutputs();
-    for (int i=0; i<n_out; ++i) {
-      if (r.at(i).shape()!=output(i).shape())
-        r.at(i) = M(output(i).shape());
-    }
+    std::vector<M> r(res.size());
+    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(res[i], output(i).sparsity());
     return r;
   }
 
