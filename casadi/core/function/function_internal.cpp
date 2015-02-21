@@ -296,11 +296,16 @@ namespace casadi {
     f.setOption("name", "wrap_" + string(getOption("name")));
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
-    const char* op[4] = {"ad_weight", "ad_weight_sp",
-                             "derivative_generator_forward",
-                             "derivative_generator_reverse"};
-    for (int i=0; i<4; ++i)
-      if (hasSetOption(op[i])) f.setOption(op[i], getOption(op[i]));
+    f.setOption("ad_weight", adWeight());
+    f.setOption("ad_weight_sp", adWeightSp());
+    for (int i=0; i<2; ++i) {
+      string n;
+      switch (i) {
+      case 0: n="derivative_generator_forward"; break;
+      case 1: n="derivative_generator_reverse"; break;
+      }
+      if (hasSetOption(n)) f.setOption(n, getOption(n));
+    }
     return f;
   }
 
@@ -418,8 +423,7 @@ namespace casadi {
     if (nz_out%bvec_size>0) nsweep_adj++;
 
     // Get weighting factor
-    double w = hasSetOption("ad_weight_sp") ? double(getOption("ad_weight_sp")) :
-      adWeightSp();
+    double w = adWeightSp();
 
     // Use forward mode?
     bool use_fwd = w*nsweep_fwd <= (1-w)*nsweep_adj;
@@ -818,8 +822,7 @@ namespace casadi {
     bool hasrun = false;
 
     // Get weighting factor
-    double w = hasSetOption("ad_weight_sp") ? double(getOption("ad_weight_sp")) :
-      adWeightSp();
+    double w = adWeightSp();
 
     // Lookup table for bvec_t
     std::vector<bvec_t> bvec_lookup;
@@ -1162,15 +1165,9 @@ namespace casadi {
     Sparsity &AT = jacSparsity(iind, oind, compact, symmetric);
     Sparsity A = symmetric ? AT : AT.T();
 
-    // Get weighting factor
-    double w = hasSetOption("ad_weight") ? double(getOption("ad_weight")) :
-      adWeight();
-
-    // Which AD mode?
-    bool test_ad_fwd = w<1, test_ad_adj = w>0;
-
     // Get seed matrices by graph coloring
     if (symmetric) {
+      casadi_assert(hasDerivativeFwd());
 
       // Star coloring if symmetric
       log("FunctionInternal::getPartition starColoring");
@@ -1179,11 +1176,18 @@ namespace casadi {
                  << A.size1() << " without coloring).");
 
     } else {
-      // Best coloring encountered so far
-      double best_coloring = min(w*A.size1(), (1-w)*A.size2());
+      casadi_assert(hasDerivativeFwd() || hasDerivativeAdj());
+      // Get weighting factor
+      double w = adWeight();
+
+      // Which AD mode?
+      bool test_ad_fwd=w<1, test_ad_adj=w>0;
+
+      // Best coloring encountered so far (relatively tight upper bound)
+      double best_coloring = numeric_limits<double>::infinity();
 
       // Test forward mode first?
-      bool test_fwd_first = w*A.size1() <= (1-w)*A.size2();
+      bool test_fwd_first = test_ad_fwd && w*A.size1() <= (1-w)*A.size2();
       int mode_fwd = test_fwd_first ? 0 : 1;
 
       // Test both coloring modes
@@ -1199,7 +1203,7 @@ namespace casadi {
         if (fwd) {
           log("FunctionInternal::getPartition unidirectional coloring (forward mode)");
           int max_colorings_to_test = best_coloring>=w*A.size1() ? A.size1() :
-            ceil(best_coloring/w);
+            floor(best_coloring/w);
           D1 = AT.unidirectionalColoring(A, max_colorings_to_test);
           if (D1.isNull()) {
             if (verbose()) cout << "Forward mode coloring interrupted (more than "
@@ -1209,12 +1213,13 @@ namespace casadi {
                                << D1.size2() << " directional derivatives needed ("
                                << A.size1() << " without coloring)." << endl;
             D2 = Sparsity();
-            best_coloring = D1.size2();
+            best_coloring = w*D1.size2();
           }
         } else {
           log("FunctionInternal::getPartition unidirectional coloring (adjoint mode)");
           int max_colorings_to_test = best_coloring>=(1-w)*A.size2() ? A.size2() :
-            ceil(best_coloring/(1-w));
+            floor(best_coloring/(1-w));
+
           D2 = A.unidirectionalColoring(AT, max_colorings_to_test);
           if (D2.isNull()) {
             if (verbose()) cout << "Adjoint mode coloring interrupted (more than "
@@ -1224,7 +1229,7 @@ namespace casadi {
                                << D2.size2() << " directional derivatives needed ("
                                << A.size2() << " without coloring)." << endl;
             D1 = Sparsity();
-            best_coloring = D2.size2();
+            best_coloring = (1-w)*D2.size2();
           }
         }
       }
@@ -1416,7 +1421,6 @@ namespace casadi {
     }
 
     // Return value
-    const int adj_penalty = 2; // Adjoint mode penalty factor
     Function ret;
     if (hasSetOption("derivative_generator_forward")) {
       /// User-provided derivative generator function
@@ -1425,6 +1429,7 @@ namespace casadi {
       ret = dergen(this_, nfwd, user_data_);
       // Fails for ImplicitFunction
     } else {
+      casadi_assert(hasDerivativeFwd());
       ret = getDerivativeFwd(nfwd);
     }
 
@@ -1523,7 +1528,6 @@ namespace casadi {
     }
 
     // Return value
-    const int adj_penalty = 2; // Adjoint mode penalty factor
     Function ret;
     if (hasSetOption("derivative_generator_reverse")) {
       /// User-provided derivative generator function
@@ -1531,6 +1535,7 @@ namespace casadi {
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nadj, user_data_);
     } else {
+      casadi_assert(hasDerivativeAdj());
       ret = getDerivativeAdj(nadj);
     }
 
@@ -1773,6 +1778,8 @@ namespace casadi {
   }
 
   Function FunctionInternal::getFullJacobian() {
+    casadi_assert(hasDerivativeFwd() || hasDerivativeAdj());
+
     // Number inputs and outputs
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
@@ -1815,7 +1822,13 @@ namespace casadi {
     MX res = n_out==1 ? resv.front() : veccat(resv);
 
     // Form Jacobian
-    MX J = casadi::jacobian(res, arg);
+    MX J;
+    {
+      MXFunction tmp(arg, res);
+      tmp.setOption("ad_weight", adWeight());
+      tmp.init();
+      J = tmp.jac();
+    }
 
     // Make sure argv is the input of J
     if (n_in!=1) {
@@ -2385,6 +2398,9 @@ namespace casadi {
     casadi_assert_message(!always_inline, "Class " << typeid(*this).name() <<
                           " cannot be inlined in an MX expression");
 
+    // Either forward or reverse mode must be supported
+    casadi_assert(hasDerivativeFwd() || hasDerivativeAdj());
+
     // Number of directional derivatives
     int nfwd = fseed.size();
     fsens.resize(nfwd);
@@ -2397,8 +2413,7 @@ namespace casadi {
     int n_out = getNumOutputs();
 
     // Get weighting factor
-    double w = hasSetOption("ad_weight") ? double(getOption("ad_weight")) :
-      adWeight();
+    double w = adWeight();
 
     // Should we calculate directional derivatives by first calculating the full
     // Jacobian and then multiply from the right?
@@ -2406,12 +2421,9 @@ namespace casadi {
     // Heuristic 1: Jac calculated via forward mode likely cheaper
     bool via_jac = jac_penalty*getNumInputNonzeros()<nfwd;
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
-    if (!via_jac) {
-      via_jac = w>0 && jac_penalty*(1-w)*getNumOutputNonzeros()<w*nfwd;
+    if (!via_jac && hasDerivativeAdj()) {
+      via_jac = jac_penalty*(1-w)*getNumOutputNonzeros()<w*nfwd;
     }
-#ifndef ENABLE_DERIVATIVES_VIA_JAC
-    via_jac = false; // disabled (testing needed)
-#endif
 
     // Calculating full Jacobian and then multiplying likely cheaper
     if (via_jac) {
@@ -2423,7 +2435,13 @@ namespace casadi {
 
       // Multiply the Jacobian from the right
       MX J = fullJacobian()(arg).at(0);
-      v = horzsplit(mul(J, horzcat(v)));
+      bool ok = true;
+      try {
+        v = horzsplit(mul(J, horzcat(v)));
+      } catch(...) {
+        ok = false;
+      }
+      casadi_assert(ok);
 
       // Vertical offsets
       vector<int> offset(n_out+1, 0);
@@ -2472,6 +2490,9 @@ namespace casadi {
     casadi_assert_message(!always_inline, "Class " << typeid(*this).name() <<
                           " cannot be inlined in an MX expression");
 
+    // Either forward or reverse mode must be supported
+    casadi_assert(hasDerivativeFwd() || hasDerivativeAdj());
+
     // Number of directional derivatives
     int nadj = aseed.size();
     asens.resize(nadj);
@@ -2484,22 +2505,17 @@ namespace casadi {
     int n_out = getNumOutputs();
 
     // Get weighting factor
-    double w = hasSetOption("ad_weight") ? double(getOption("ad_weight")) :
-      adWeight();
+    double w = adWeight();
 
     // Should we calculate directional derivatives by first calculating the full
     // Jacobian and then multiply from the right?
-    const int adj_penalty = 1; // Adjoint mode penalty factor (conservative)
     const int jac_penalty = 2; // Jacobian calculation penalty factor
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
     bool via_jac = jac_penalty*getNumOutputNonzeros()<nadj;
     // Heuristic 2: Jac calculated via forward mode likely cheaper
-    if (!via_jac) {
-      via_jac = w<1 && jac_penalty*w*getNumInputNonzeros()<(1-w)*nadj;
+    if (!via_jac && hasDerivativeFwd()) {
+      via_jac = jac_penalty*w*getNumInputNonzeros()<(1-w)*nadj;
     }
-#ifndef ENABLE_DERIVATIVES_VIA_JAC
-    via_jac = false; // disabled (testing needed)
-#endif
 
     // Calculating full Jacobian and then multiplying likely cheaper
     if (via_jac) {
@@ -2511,7 +2527,16 @@ namespace casadi {
 
       // Multiply the transposed Jacobian from the right
       MX J = fullJacobian()(arg).at(0);
-      v = horzsplit(mul(J.T(), horzcat(v)));
+      MX vv = horzcat(v);
+      casadi_assert(vv.size1()==J.size1());
+
+      bool ok = true;
+      try {
+        v = horzsplit(mul(J.T(), horzcat(v)));
+      } catch(...) {
+        ok = false;
+      }
+      casadi_assert(ok);
 
       // Vertical offsets
       vector<int> offset(n_in+1, 0);
@@ -2685,24 +2710,31 @@ namespace casadi {
   }
 
   double FunctionInternal::adWeight() {
-    // By default, reverse mode is twice as expensive as forward mode
-    return 1./3;  // i.e. nf <= 2*na <=> 1/3*nf <= (1-1/3)*na
+    // If reverse mode derivatives unavailable, use forward
+    if (!hasDerivativeAdj()) return 0;
+
+    // If forward mode derivatives unavailable, use reverse
+    if (!hasDerivativeFwd()) return 1;
+
+    // A user-provided option overrides default value
+    if (hasSetOption("ad_weight")) return getOption("ad_weight");
+
+    // By default, reverse mode is about twice as expensive as forward mode
+    return 0.33;  // i.e. nf <= 2*na <=> 1/3*nf <= (1-1/3)*na, forward when tie
   }
 
   double FunctionInternal::adWeightSp() {
-    bool fwd_ok = spCanEvaluate(true);
-    bool adj_ok = spCanEvaluate(false);
-    if (fwd_ok) {
-      if (adj_ok) {
-        // Both modes equally expensive by default (no "taping" needed)
-        return 1./2;
-      } else {
-        return 0; // Always forward mode
-      }
-    } else {
-      casadi_assert(adj_ok);
-      return 1; // Always reverse mode
-    }
+    // If reverse mode propagation unavailable, use forward
+    if (!spCanEvaluate(false)) return 0;
+
+    // If forward mode propagation unavailable, use reverse
+    if (!spCanEvaluate(true)) return 1;
+
+    // A user-provided option overrides default value
+    if (hasSetOption("ad_weight_sp")) return getOption("ad_weight_sp");
+
+    // Both modes equally expensive by default (no "taping" needed)
+    return 0.49; // Forward when tie
   }
 
 } // namespace casadi

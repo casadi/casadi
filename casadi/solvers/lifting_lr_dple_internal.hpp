@@ -117,11 +117,17 @@ namespace casadi {
     /** \brief  Obtain solver name from Adaptor */
     virtual std::string getAdaptorSolverName() const { return solvername(); }
 
-    /** Generate a function that calculates \a nfwd forward derivatives */
+    ///@{
+    /** \brief Generate a function that calculates nfwd forward derivatives */
     virtual Function getDerivativeFwd(int nfwd);
+    virtual bool hasDerivativeFwd() const { return true;}
+    ///@}
 
-    /** Generate a function that calculates \a nadj adjoint derivatives */
+    ///@{
+    /** \brief Generate a function that calculates nadj adjoint derivatives */
     virtual Function getDerivativeAdj(int nadj);
+    virtual bool hasDerivativeAdj() const { return true;}
+    ///@}
 
     /// A documentation string
     static const std::string meta_doc;

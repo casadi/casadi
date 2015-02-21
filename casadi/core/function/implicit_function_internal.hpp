@@ -74,11 +74,17 @@ namespace casadi {
     /// Solve the nonlinear system of equations
     virtual void solveNonLinear() = 0;
 
-    /// Generate forward derivative function
+    ///@{
+    /** \brief Generate a function that calculates nfwd forward derivatives */
     virtual Function getDerivativeFwd(int nfwd);
+    virtual bool hasDerivativeFwd() const { return true;}
+    ///@}
 
-    /// Generate adjoint derivative function
+    ///@{
+    /** \brief Generate a function that calculates nadj adjoint derivatives */
     virtual Function getDerivativeAdj(int nadj);
+    virtual bool hasDerivativeAdj() const { return true;}
+    ///@}
 
     /// Number of equations
     int n_;

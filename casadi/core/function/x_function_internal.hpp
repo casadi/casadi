@@ -95,11 +95,17 @@ namespace casadi {
     /** \brief Return Jacobian function  */
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
 
+    ///@{
     /** \brief Generate a function that calculates nfwd forward derivatives */
     virtual Function getDerivativeFwd(int nfwd);
+    virtual bool hasDerivativeFwd() const { return true;}
+    ///@}
 
+    ///@{
     /** \brief Generate a function that calculates nadj adjoint derivatives */
     virtual Function getDerivativeAdj(int nadj);
+    virtual bool hasDerivativeAdj() const { return true;}
+    ///@}
 
     /** \brief Symbolic expressions for the forward seeds */
     std::vector<std::vector<MatType> > symbolicFwdSeed(int nfdir);

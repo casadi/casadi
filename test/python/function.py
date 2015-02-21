@@ -42,7 +42,7 @@ class Functiontests(casadiTestCase):
       f.evaluate()
 
       X = MX.sym("X",2)
-      F = f.call([X,X])[0]
+      F = f.call([X,MX()])[0]
       g = MXFunction([X],[F])
       g.init()
 
@@ -505,7 +505,7 @@ class Functiontests(casadiTestCase):
     self.assertTrue(f.getOption("name")=="def")
     
   def test_CustomFunctionHard(self):
-  
+
     x = MX.sym("x")
     y = MX.sym("y")
     
@@ -645,8 +645,6 @@ class Functiontests(casadiTestCase):
         
     g = MXFunction([x,y],[sin(x+3*y)])
     g.init()
-    
-
     g.setInput(0.2,0)
     g.setInput(0.7,1)
     
@@ -680,7 +678,7 @@ class Functiontests(casadiTestCase):
     for indirect in [True,False]:
       f = getP(indirect=indirect)
       self.checkfunction(f,g,sens_der=False,jacobian=False,gradient=False,hessian=False,evals=False)
-    
+
       with self.assertRaises(Exception):          
         f.gradient()
 

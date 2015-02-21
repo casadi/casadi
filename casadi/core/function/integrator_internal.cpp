@@ -1007,14 +1007,6 @@ namespace casadi {
     return MXFunction(ret_in, ret_out);
   }
 
-  Function IntegratorInternal::getJacobian(int iind, int oind, bool compact, bool symmetric) {
-    vector<MX> arg = symbolicInput();
-    vector<MX> res = shared_from_this<Function>()(arg);
-    MXFunction f(arg, res);
-    f.init();
-    return f.jacobian(iind, oind, compact, symmetric);
-  }
-
   void IntegratorInternal::reset() {
     log("IntegratorInternal::reset", "begin");
 

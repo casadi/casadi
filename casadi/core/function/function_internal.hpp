@@ -188,6 +188,7 @@ namespace casadi {
      */
     Function derivativeFwd(int nfwd);
     virtual Function getDerivativeFwd(int nfwd);
+    virtual bool hasDerivativeFwd() const { return hasSetOption("derivative_generator_forward");}
     void setDerivativeFwd(const Function& fcn, int nfwd);
     ///@}
 
@@ -199,6 +200,7 @@ namespace casadi {
      */
     Function derivativeAdj(int nadj);
     virtual Function getDerivativeAdj(int nadj);
+    virtual bool hasDerivativeAdj() const { return hasSetOption("derivative_generator_reverse");}
     void setDerivativeAdj(const Function& fcn, int nadj);
     ///@}
 
