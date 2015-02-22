@@ -107,12 +107,6 @@ namespace casadi {
     virtual bool hasDerivativeAdj() const { return true;}
     ///@}
 
-    /** \brief Symbolic expressions for the forward seeds */
-    std::vector<std::vector<MatType> > symbolicFwdSeed(int nfdir);
-
-    /** \brief Symbolic expressions for the adjoint seeds */
-    std::vector<std::vector<MatType> > symbolicAdjSeed(int nadir);
-
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(std::ostream &stream, const std::string& type,
                                       CodeGenerator& gen) const = 0;
@@ -984,59 +978,10 @@ namespace casadi {
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  std::vector<std::vector<MatType> >
-    XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::symbolicFwdSeed(int nfdir) {
-    std::vector<std::vector<MatType> > fseed(nfdir, inputv_);
-    for (int dir=0; dir<nfdir; ++dir) {
-      // Replace symbolic inputs
-      int iind=0;
-      for (typename std::vector<MatType>::iterator i=fseed[dir].begin();
-          i!=fseed[dir].end();
-          ++i, ++iind) {
-        // Name of the forward seed
-        std::stringstream ss;
-        ss << "f";
-        if (nfdir>1) ss << dir;
-        ss << "_";
-        ss << iind;
-
-        // Save to matrix
-        *i = MatType::sym(ss.str(), i->sparsity());
-
-      }
-    }
-    return fseed;
-  }
-
-  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  std::vector<std::vector<MatType> >
-      XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::symbolicAdjSeed(int nadir) {
-    std::vector<std::vector<MatType> > aseed(nadir, outputv_);
-    for (int dir=0; dir<nadir; ++dir) {
-      // Replace symbolic inputs
-      int oind=0;
-      for (typename std::vector<MatType>::iterator i=aseed[dir].begin();
-          i!=aseed[dir].end();
-          ++i, ++oind) {
-        // Name of the adjoint seed
-        std::stringstream ss;
-        ss << "a";
-        if (nadir>1) ss << dir << "_";
-        ss << oind;
-
-        // Save to matrix
-        *i = MatType::sym(ss.str(), i->sparsity());
-
-      }
-    }
-    return aseed;
-  }
-
-  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   Function XFunctionInternal<PublicType, DerivedType,
                              MatType, NodeType>::getDerivativeFwd(int nfwd) {
     // Seeds
-    std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd), fsens;
+    std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, inputv_), fsens;
 
     // Evaluate symbolically
     static_cast<DerivedType*>(this)->evalFwd(fseed, fsens);
@@ -1075,7 +1020,7 @@ namespace casadi {
   Function XFunctionInternal<PublicType, DerivedType, MatType, NodeType>
   ::getDerivativeAdj(int nadj) {
     // Seeds
-    std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj), asens;
+    std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, outputv_), asens;
 
     // Evaluate symbolically
     static_cast<DerivedType*>(this)->evalAdj(aseed, asens);

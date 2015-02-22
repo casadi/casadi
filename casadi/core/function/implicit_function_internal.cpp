@@ -177,43 +177,20 @@ namespace casadi {
   }
 
   Function ImplicitFunctionInternal::getDerivativeFwd(int nfwd) {
-    // Number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
-
-    // Get function for calculating directional derivatives
-    Function f_der = f_->derivativeFwd(nfwd);
-    vector<MX> darg = f_der.symbolicInput();
-
-    // Get expression of Jacobian
-    vector<MX> arg(darg.begin(), darg.begin()+num_in);
-    MX J = jac_(arg).front();
-
-    // Use known value of implicit variable when calling f_der
-    darg[num_in + iout_] = darg[iin_];
-
-    // Ignore seeds for guess
-    for (int d=0; d<nfwd; ++d) {
-      int ind = num_in + num_out + d*num_in + iin_;
-      darg[ind] = MX::sym(darg[ind].getName() + "_guess_ignored",
-                          Sparsity(darg[ind].shape()));
-    }
-
-    // Expressions for directional derivatives of f_
-    vector<MX> dres = f_der(darg);
-
-    // Solve for all the forward derivatives at once
-    vector<MX> rhs(nfwd);
-    for (int d=0; d<nfwd; ++d) rhs[d] = dres[num_out*d + iout_];
-    rhs = horzsplit(J->getSolve(horzcat(rhs), false, linsol_));
-    for (int d=0; d<nfwd; ++d) dres[num_out*d + iout_] = -rhs[d];
-
-    // Ignore initial guess (we use known value above)
-    darg[iin_] = MX::sym(darg[iin_].getName() + "_guess_ignored",
-                         Sparsity(darg[iin_].shape()));
+    // Symbolic expression for the input
+    vector<MX> arg = symbolicInput();
+    arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
+                        Sparsity(arg[iin_].shape()));
+    vector<MX> res = symbolicOutput();
+    vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
+    callFwd(arg, res, fseed, fsens, false, false);
 
     // Construct return function
-    return MXFunction(darg, dres);
+    arg.insert(arg.end(), res.begin(), res.end());
+    for (int d=0; d<nfwd; ++d) arg.insert(arg.end(), fseed[d].begin(), fseed[d].end());
+    res.clear();
+    for (int d=0; d<nfwd; ++d) res.insert(res.end(), fsens[d].begin(), fsens[d].end());
+    return MXFunction(arg, res);
   }
 
   Function ImplicitFunctionInternal::getDerivativeAdj(int nadj) {
@@ -335,5 +312,46 @@ namespace casadi {
   std::map<std::string, ImplicitFunctionInternal::Plugin> ImplicitFunctionInternal::solvers_;
 
   const std::string ImplicitFunctionInternal::infix_ = "implicitfunction";
+
+  void ImplicitFunctionInternal::
+  callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+          const std::vector<std::vector<MX> >& fseed,
+          std::vector<std::vector<MX> >& fsens,
+          bool always_inline, bool never_inline) {
+    // Number of directional derivatives
+    int nfwd = fseed.size();
+    fsens.resize(nfwd);
+
+    // Quick return if no seeds
+    if (nfwd==0) return;
+
+    // Propagate through f_
+    vector<MX> f_arg(arg);
+    f_arg.at(iin_) = res.at(iout_);
+    vector<MX> f_res(res);
+    f_res.at(iout_) = MX(input(iin_).shape()); // zero residual
+    std::vector<std::vector<MX> > f_fseed(fseed);
+    for (int d=0; d<nfwd; ++d) {
+      f_fseed[d].at(iin_) = MX(input(iin_).shape()); // ignore seeds for guess
+    }
+    f_.callFwd(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+
+    // Get expression of Jacobian
+    MX J = jac_(f_arg).front();
+
+    // Solve for all the forward derivatives at once
+    vector<MX> rhs(nfwd);
+    for (int d=0; d<nfwd; ++d) rhs[d] = fsens[d][iout_];
+    rhs = horzsplit(J->getSolve(horzcat(rhs), false, linsol_));
+    for (int d=0; d<nfwd; ++d) fsens[d][iout_] = -rhs[d];
+  }
+
+  void ImplicitFunctionInternal::
+  callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+          const std::vector<std::vector<MX> >& aseed,
+          std::vector<std::vector<MX> >& asens,
+          bool always_inline, bool never_inline) {
+    FunctionInternal::callAdj(arg, res, aseed, asens, always_inline, never_inline);
+  }
 
 } // namespace casadi

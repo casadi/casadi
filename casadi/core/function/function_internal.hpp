@@ -303,6 +303,9 @@ namespace casadi {
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const;
 
+    /// Get a vector of symbolic variables with the same dimensions as the outputs
+    virtual std::vector<MX> symbolicOutput() const;
+
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
 
@@ -433,6 +436,14 @@ namespace casadi {
     /** \brief Can a derivative direction be skipped */
     template<typename MatType>
     static bool purgable(const std::vector<MatType>& seed);
+
+    /** \brief Symbolic expressions for the forward seeds */
+    template<typename MatType>
+    std::vector<std::vector<MatType> > symbolicFwdSeed(int nfwd, const std::vector<MatType>& v);
+
+    /** \brief Symbolic expressions for the adjoint seeds */
+    template<typename MatType>
+    std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
   };
 
   // Template implementations
@@ -442,6 +453,55 @@ namespace casadi {
       if (!i->isZero()) return false;
     }
     return true;
+  }
+
+  template<typename MatType>
+  std::vector<std::vector<MatType> >
+  FunctionInternal::symbolicFwdSeed(int nfwd, const std::vector<MatType>& v) {
+    std::vector<std::vector<MatType> > fseed(nfwd, v);
+    for (int dir=0; dir<nfwd; ++dir) {
+      // Replace symbolic inputs
+      int iind=0;
+      for (typename std::vector<MatType>::iterator i=fseed[dir].begin();
+          i!=fseed[dir].end();
+          ++i, ++iind) {
+        // Name of the forward seed
+        std::stringstream ss;
+        ss << "f";
+        if (nfwd>1) ss << dir;
+        ss << "_";
+        ss << iind;
+
+        // Save to matrix
+        *i = MatType::sym(ss.str(), i->sparsity());
+
+      }
+    }
+    return fseed;
+  }
+
+  template<typename MatType>
+  std::vector<std::vector<MatType> >
+  FunctionInternal::symbolicAdjSeed(int nadj, const std::vector<MatType>& v) {
+    std::vector<std::vector<MatType> > aseed(nadj, v);
+    for (int dir=0; dir<nadj; ++dir) {
+      // Replace symbolic inputs
+      int oind=0;
+      for (typename std::vector<MatType>::iterator i=aseed[dir].begin();
+          i!=aseed[dir].end();
+          ++i, ++oind) {
+        // Name of the adjoint seed
+        std::stringstream ss;
+        ss << "a";
+        if (nadj>1) ss << dir << "_";
+        ss << oind;
+
+        // Save to matrix
+        *i = MatType::sym(ss.str(), i->sparsity());
+
+      }
+    }
+    return aseed;
   }
 
 } // namespace casadi

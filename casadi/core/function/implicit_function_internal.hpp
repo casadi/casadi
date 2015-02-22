@@ -86,6 +86,18 @@ namespace casadi {
     virtual bool hasDerivativeAdj() const { return true;}
     ///@}
 
+    /** \brief Create call to (cached) derivative function, forward mode  */
+    virtual void callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+                         const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens,
+                         bool always_inline, bool never_inline);
+
+    /** \brief Create call to (cached) derivative function, reverse mode  */
+    virtual void callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+                         const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens,
+                         bool always_inline, bool never_inline);
+
     /// Number of equations
     int n_;
 

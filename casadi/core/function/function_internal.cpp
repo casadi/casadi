@@ -365,12 +365,23 @@ namespace casadi {
   }
 
   std::vector<MX> FunctionInternal::symbolicInput() const {
-    vector<MX> ret(getNumInputs());
     assertInit();
+    vector<MX> ret(getNumInputs());
     for (int i=0; i<ret.size(); ++i) {
       stringstream name;
       name << "x_" << i;
       ret[i] = MX::sym(name.str(), input(i).sparsity());
+    }
+    return ret;
+  }
+
+  std::vector<MX> FunctionInternal::symbolicOutput() const {
+    assertInit();
+    vector<MX> ret(getNumOutputs());
+    for (int i=0; i<ret.size(); ++i) {
+      stringstream name;
+      name << "r_" << i;
+      ret[i] = MX::sym(name.str(), output(i).sparsity());
     }
     return ret;
   }
