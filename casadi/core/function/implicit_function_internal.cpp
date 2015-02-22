@@ -194,52 +194,20 @@ namespace casadi {
   }
 
   Function ImplicitFunctionInternal::getDerivativeAdj(int nadj) {
-    // Number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
-
-    // Get function for calculating directional derivatives
-    Function f_der = f_->derivativeAdj(nadj);
-    vector<MX> darg = f_der.symbolicInput();
-
-    // Get expression of Jacobian
-    vector<MX> arg(darg.begin(), darg.begin()+num_in);
-    MX J = jac_(arg).front();
-
-    // Use known value of implicit variable when calling f_der
-    darg[num_in + iout_] = darg[iin_];
-
-    // Solve for all the adjoint seeds at once
-    vector<MX> dres(darg);
-    vector<MX> rhs(nadj);
-    for (int d=0; d<nadj; ++d) {
-      rhs[d] = dres[num_in + num_out + num_out*d + iout_];
-    }
-    rhs = horzsplit(J->getSolve(horzcat(rhs), true, linsol_));
-    for (int d=0; d<nadj; ++d) {
-      dres[num_in + num_out + num_out*d + iout_] = rhs[d];
-    }
-
-    // Propagate through the implicit function
-    dres = f_der(dres);
-
-    // Collect sensitivities
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<num_in; ++i) {
-        if (i!=iin_) {
-          dres[num_in*d + i] = -dres[num_in*d + i];
-        } else {
-          dres[num_in*d + i] = MX(dres[num_in*d + i].shape());
-        }
-      }
-    }
-
-    // Ignore initial guess (we use known value above)
-    darg[iin_] = MX::sym(darg[iin_].getName() + "_guess_ignored",
-                         Sparsity(darg[iin_].shape()));
+    // Symbolic expression for the input
+    vector<MX> arg = symbolicInput();
+    arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
+                        Sparsity(arg[iin_].shape()));
+    vector<MX> res = symbolicOutput();
+    vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
+    callAdj(arg, res, aseed, asens, false, false);
 
     // Construct return function
-    return MXFunction(darg, dres);
+    arg.insert(arg.end(), res.begin(), res.end());
+    for (int d=0; d<nadj; ++d) arg.insert(arg.end(), aseed[d].begin(), aseed[d].end());
+    res.clear();
+    for (int d=0; d<nadj; ++d) res.insert(res.end(), asens[d].begin(), asens[d].end());
+    return MXFunction(arg, res);
   }
 
   void ImplicitFunctionInternal::spEvaluate(bool fwd) {
@@ -351,7 +319,40 @@ namespace casadi {
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
           bool always_inline, bool never_inline) {
-    FunctionInternal::callAdj(arg, res, aseed, asens, always_inline, never_inline);
+
+    // Number of directional derivatives
+    int nadj = aseed.size();
+    asens.resize(nadj);
+
+    // Quick return if no seeds
+    if (nadj==0) return;
+
+    // Get expression of Jacobian
+    vector<MX> f_arg(arg);
+    f_arg.at(iin_) = res.at(iout_);
+    MX J = jac_(f_arg).front();
+
+    // Solve for all the adjoint seeds at once
+    vector<MX> rhs(nadj);
+    for (int d=0; d<nadj; ++d) rhs[d] = aseed[d][iout_];
+    rhs = horzsplit(J->getSolve(horzcat(rhs), true, linsol_));
+    int num_out = getNumOutputs();
+    vector<vector<MX> > f_aseed(nadj);
+    for (int d=0; d<nadj; ++d) {
+      f_aseed[d].resize(num_out);
+      for (int i=0; i<num_out; ++i)
+        f_aseed[d][i] = i==iout_ ? -rhs[d] : -aseed[d][i];
+    }
+
+    // Propagate through f_
+    vector<MX> f_res(res);
+    f_res.at(iout_) = MX(input(iin_).shape()); // zero residual
+    f_.callAdj(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
+
+    // No dependency on guess
+    for (int d=0; d<nadj; ++d) {
+      asens[d][iin_] = MX(input(iin_).shape());
+    }
   }
 
 } // namespace casadi
