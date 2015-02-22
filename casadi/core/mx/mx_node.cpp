@@ -465,8 +465,7 @@ namespace casadi {
 
   MX MXNode::getBinarySwitch(int op, const MX& y) const {
     // Make sure that dimensions match
-    casadi_assert_message((sparsity().isScalar(false) || y.isScalar() ||
-                           (sparsity().size2()==y.size2() && size1()==y.size1())),
+    casadi_assert_message(sparsity().isScalar() || y.isScalar() || sparsity().shape()==y.shape(),
                           "Dimension mismatch." << "lhs is " << sparsity().dimString()
                           << ", while rhs is " << y.dimString());
 
