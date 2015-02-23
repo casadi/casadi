@@ -440,6 +440,8 @@ namespace casadi {
   MX MXNode::getSetSparse(const Sparsity& sp) const {
     if (sp==sparsity()) {
       return shared_from_this<MX>();
+    } else if (sp.nnz()==0) {
+      return MX::zeros(sp);
     } else {
       return MX::create(new SetSparse(shared_from_this<MX>(), sp));
     }
