@@ -100,7 +100,26 @@ namespace casadi {
 
   template<bool Tr>
   void Solve<Tr>::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
-    linear_solver_->evalFwdLinsol(shared_from_this<MX>(), fwdSeed, fwdSens, Tr);
+    // Nondifferentiated inputs and outputs
+    vector<MX> arg(ndep());
+    for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
+    vector<MX> res(nout());
+    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+
+    // Collect seeds
+    vector<vector<MX> > fseed(getVector(fwdSeed, ndep())), fsens;
+
+    // Call the cached functions
+    linear_solver_->callFwdLinsol(arg, res, fseed, fsens, Tr);
+
+    // Store the forward sensitivities
+    for (int d=0; d<fwdSens.size(); ++d) {
+      for (int i=0; i<fwdSens[d].size(); ++i) {
+        if (fwdSens[d][i]!=0) {
+          *fwdSens[d][i] = fsens[d][i];
+        }
+      }
+    }
   }
 
   template<bool Tr>
@@ -113,13 +132,11 @@ namespace casadi {
 
     // Collect seeds
     vector<vector<MX> > aseed(getVector(adjSeed, nout())), asens;
+    clearVector(adjSeed, nout());
 
     // Call the cached functions
     linear_solver_->callAdjLinsol(arg, res, aseed, asens, Tr);
 
-    // Free adjoint seeds
-    clearVector(adjSeed, nout());
-    
     // Store the adjoint sensitivities
     for (int d=0; d<adjSens.size(); ++d) {
       for (int i=0; i<adjSens[d].size(); ++i) {

@@ -73,8 +73,9 @@ namespace casadi {
                               int* itmp, SXElement* rtmp, bool tr, int nrhs);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwdLinsol(const MX& X, const std::vector<cpv_MX>& fseed,
-                               const std::vector<pv_MX>& fsens, bool tr);
+    virtual void callFwdLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
+                               const std::vector<std::vector<MX> >& fseed,
+                               std::vector<std::vector<MX> >& fsens, bool tr);
 
     /** \brief Calculate reverse mode directional derivatives */
     virtual void callAdjLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,

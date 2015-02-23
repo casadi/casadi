@@ -120,49 +120,39 @@ namespace casadi {
     solve(getPtr(x), nrhs, transpose);
   }
 
-  void LinearSolverInternal::evalFwdLinsol(const MX& X, const std::vector<cpv_MX>& fseed,
-                                           const std::vector<pv_MX>& fsens, bool tr) {
-    const MX& A = X->dep(1);
-    std::vector<int> rhs_ind;
-    std::vector<MX> rhs;
-    std::vector<int> col_offset(1, 0);
-    for (int d=0; d<fsens.size(); ++d) {
-      const MX& B_hat = *fseed[d][0];
-      const MX& A_hat = *fseed[d][1];
+  void LinearSolverInternal::
+  callFwdLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
+                const std::vector<std::vector<MX> >& fseed,
+                std::vector<std::vector<MX> >& fsens, bool tr) {
+    // Number of derivatives
+    int nfwd = fseed.size();
+    const MX& B = arg[0];
+    const MX& A = arg[1];
+    const MX& X = res[0];
 
-      // Get right hand side
-      MX rhs_d;
-      if (tr) {
-        rhs_d = B_hat - mul(A_hat.T(), X);
-      } else {
-        rhs_d = B_hat - mul(A_hat, X);
-      }
-
-      // Simplifiy if zero
-      if (rhs_d.isZero()) {
-        *fsens[d][0] = MX(rhs_d.shape());
-      } else {
-        rhs.push_back(rhs_d);
-        rhs_ind.push_back(d);
-        col_offset.push_back(col_offset.back()+rhs_d.size2());
-      }
+    // Solve for all directions at once
+    std::vector<MX> rhs(nfwd);
+    std::vector<int> col_offset(nfwd+1, 0);
+    for (int d=0; d<nfwd; ++d) {
+      const MX& B_hat = fseed[d][0];
+      const MX& A_hat = fseed[d][1];
+      rhs[d] = tr ? B_hat - mul(A_hat.T(), X) : B_hat - mul(A_hat, X);
+      col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
+    rhs = horzsplit(solve(A, horzcat(rhs), tr), col_offset);
 
-    if (!rhs.empty()) {
-      // Solve for all directions at once
-      rhs = horzsplit(solve(A, horzcat(rhs), tr), col_offset);
-
-      // Save result
-      for (int i=0; i<rhs.size(); ++i) {
-        *fsens[rhs_ind[i]][0] = rhs[i];
-      }
+    // Fetch result
+    fsens.resize(nfwd);
+    for (int d=0; d<nfwd; ++d) {
+      fsens[d].resize(1);
+      fsens[d][0] = rhs[d];
     }
   }
 
   void LinearSolverInternal::
   callAdjLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
                 const std::vector<std::vector<MX> >& aseed,
-                std::vector<std::vector<MX> >& asens, bool tr) {              
+                std::vector<std::vector<MX> >& asens, bool tr) {
     // Number of derivatives
     int nadj = aseed.size();
     const MX& B = arg[0];
