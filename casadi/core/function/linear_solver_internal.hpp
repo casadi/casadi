@@ -77,8 +77,9 @@ namespace casadi {
                                const std::vector<pv_MX>& fsens, bool tr);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdjLinsol(const MX& X, const std::vector<pv_MX>& aseed,
-                               const std::vector<pv_MX>& asens, bool tr);
+    virtual void callAdjLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
+                               const std::vector<std::vector<MX> >& aseed,
+                               std::vector<std::vector<MX> >& asens, bool tr);
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwdLinsol(const std::vector<const bvec_t*>& arg,

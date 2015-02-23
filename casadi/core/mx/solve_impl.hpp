@@ -105,7 +105,29 @@ namespace casadi {
 
   template<bool Tr>
   void Solve<Tr>::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
-    linear_solver_->evalAdjLinsol(shared_from_this<MX>(), adjSeed, adjSens, Tr);
+    // Nondifferentiated inputs and outputs
+    vector<MX> arg(ndep());
+    for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
+    vector<MX> res(nout());
+    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+
+    // Collect seeds
+    vector<vector<MX> > aseed(getVector(adjSeed, nout())), asens;
+
+    // Call the cached functions
+    linear_solver_->callAdjLinsol(arg, res, aseed, asens, Tr);
+
+    // Free adjoint seeds
+    clearVector(adjSeed, nout());
+    
+    // Store the adjoint sensitivities
+    for (int d=0; d<adjSens.size(); ++d) {
+      for (int i=0; i<adjSens[d].size(); ++i) {
+        if (adjSens[d][i]!=0) {
+          adjSens[d][i]->addToSum(asens[d][i]);
+        }
+      }
+    }
   }
 
   template<bool Tr>

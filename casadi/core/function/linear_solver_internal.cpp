@@ -159,52 +159,39 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evalAdjLinsol(const MX& X, const std::vector<pv_MX>& aseed,
-                                           const std::vector<pv_MX>& asens, bool tr) {
-    const MX& A = X->dep(1);
-    std::vector<int> rhs_ind;
-    std::vector<MX> rhs;
-    std::vector<int> col_offset(1, 0);
-    for (int d=0; d<aseed.size(); ++d) {
-      MX& X_bar = *aseed[d][0];
+  void LinearSolverInternal::
+  callAdjLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
+                const std::vector<std::vector<MX> >& aseed,
+                std::vector<std::vector<MX> >& asens, bool tr) {              
+    // Number of derivatives
+    int nadj = aseed.size();
+    const MX& B = arg[0];
+    const MX& A = arg[1];
+    const MX& X = res[0];
 
-      // Simplifiy if zero
-      if (X_bar.isZero()) {
-        if (aseed[d][0]!=asens[d][0]) {
-          *asens[d][0] = X_bar;
-          X_bar = MX();
-        }
-      } else {
-        rhs.push_back(X_bar);
-        rhs_ind.push_back(d);
-        col_offset.push_back(col_offset.back()+X_bar.size2());
-
-        // Delete seed
-        X_bar = MX();
-      }
+    // Solve for all directions at once
+    std::vector<MX> rhs(nadj);
+    std::vector<int> col_offset(nadj+1, 0);
+    for (int d=0; d<nadj; ++d) {
+      rhs[d] = aseed[d][0];
+      col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
+    rhs = horzsplit(solve(A, horzcat(rhs), !tr), col_offset);
 
-    if (!rhs.empty()) {
-      // Solve for all directions at once
-      rhs = horzsplit(solve(A, horzcat(rhs), !tr), col_offset);
+    // Collect sensitivities
+    asens.resize(nadj);
+    for (int d=0; d<nadj; ++d) {
+      asens[d].resize(2);
 
-      for (int i=0; i<rhs.size(); ++i) {
-        int d = rhs_ind[i];
-
-        // Propagate to A
-        if (!tr) {
-          asens[d][1]->addToSum(-mul(rhs[i], X.T(), MX::zeros(A.sparsity())));
-        } else {
-          asens[d][1]->addToSum(-mul(X, rhs[i].T(), MX::zeros(A.sparsity())));
-        }
-
-        // Propagate to B
-        if (aseed[d][0]==asens[d][0]) {
-          *asens[d][0] = rhs[i];
-        } else {
-          asens[d][0]->addToSum(rhs[i]);
-        }
+      // Propagate to A
+      if (!tr) {
+        asens[d][1] = -mul(rhs[d], X.T(), MX::zeros(A.sparsity()));
+      } else {
+        asens[d][1] = -mul(X, rhs[d].T(), MX::zeros(A.sparsity()));
       }
+
+      // Propagate to B
+      asens[d][0] = rhs[d];
     }
   }
 
