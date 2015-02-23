@@ -2481,13 +2481,7 @@ namespace casadi {
 
       // Multiply the Jacobian from the right
       MX J = fullJacobian()(arg).at(0);
-      bool ok = true;
-      try {
-        v = horzsplit(mul(J, horzcat(v)));
-      } catch(...) {
-        ok = false;
-      }
-      casadi_assert(ok);
+      v = horzsplit(mul(J, horzcat(v)));
 
       // Vertical offsets
       vector<int> offset(n_out+1, 0);
