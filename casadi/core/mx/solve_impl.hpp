@@ -70,31 +70,26 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalD(const cpv_double& input, const pv_double& output,
-                            int* itmp, double* rtmp) {
-    // Factorize the matrix
-    linear_solver_.setInput(input[1], LINSOL_A);
+  void Solve<Tr>::evalD(const cpv_double& arg, const pv_double& res,
+                        int* itmp, double* rtmp) {
+    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(1).size2(), res[0]);
+    linear_solver_.setInput(arg[1], LINSOL_A);
     linear_solver_.prepare();
-
-    // Solve for nondifferentiated output
-    if (input[0]!=input[0]) {
-      copy(input[0], input[0]+dep(1).size2(), output[0]);
-    }
-    linear_solver_.solve(output[0], dep(0).size2(), Tr);
+    linear_solver_.solve(res[0], dep(0).size2(), Tr);
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
-                             int* itmp, SXElement* rtmp) {
-    linear_solver_->evalSXLinsol(input, output, itmp, rtmp, Tr, dep(0).size2());
+  void Solve<Tr>::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+                         int* itmp, SXElement* rtmp) {
+    linear_solver_->evalSXLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval(const cpv_MX& input, const pv_MX& output) {
-    if (input[0]->isZero()) {
-      *output[0] = MX(input[0]->shape());
+  void Solve<Tr>::eval(const cpv_MX& arg, const pv_MX& res) {
+    if (arg[0]->isZero()) {
+      *res[0] = MX(arg[0]->shape());
     } else {
-      *output[0] = linear_solver_->solve(*input[1], *input[0], Tr);
+      *res[0] = linear_solver_->solve(*arg[1], *arg[0], Tr);
     }
   }
 
