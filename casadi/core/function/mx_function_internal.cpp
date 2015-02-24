@@ -1054,7 +1054,7 @@ namespace casadi {
         for (int i=0; i<it->res.size(); ++i) resp[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalSX(argp, resp, getPtr(itmp_), w);
+        it->data->evalSX(argp, resp, iw, w);
       }
     }
   }

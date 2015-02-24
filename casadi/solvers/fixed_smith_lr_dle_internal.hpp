@@ -99,10 +99,6 @@ namespace casadi {
     static const std::string meta_doc;
 
   private:
-
-    /// State space dimension
-    int n_;
-
     /// Number of Smith iterations
     int iter_;
 

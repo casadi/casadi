@@ -126,7 +126,6 @@ namespace casadi {
                 std::vector<std::vector<MX> >& fsens, bool tr) {
     // Number of derivatives
     int nfwd = fseed.size();
-    const MX& B = arg[0];
     const MX& A = arg[1];
     const MX& X = res[0];
 
@@ -155,7 +154,6 @@ namespace casadi {
                 std::vector<std::vector<MX> >& asens, bool tr) {
     // Number of derivatives
     int nadj = aseed.size();
-    const MX& B = arg[0];
     const MX& A = arg[1];
     const MX& X = res[0];
 
