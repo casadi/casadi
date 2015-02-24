@@ -75,10 +75,10 @@ namespace casadi {
               "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,
               "Flag to indicate whether statistics must be gathered");
-    addOption("derivative_generator_forward",  OT_DERIVATIVEGENERATOR,   GenericType(),
+    addOption("custom_forward",  OT_DERIVATIVEGENERATOR,   GenericType(),
               "Function that returns a derivative function given a number of forward "
               "mode directional derivatives. Overrides default routines.");
-    addOption("derivative_generator_reverse",  OT_DERIVATIVEGENERATOR,   GenericType(),
+    addOption("custom_reverse",  OT_DERIVATIVEGENERATOR,   GenericType(),
               "Function that returns a derivative function given a number of reverse "
               "mode directional derivatives. Overrides default routines.");
     addOption("full_jacobian",                 OT_FUNCTION,              GenericType(),
@@ -303,8 +303,8 @@ namespace casadi {
     for (int i=0; i<3; ++i) {
       string n;
       switch (i) {
-      case 0: n="derivative_generator_forward"; break;
-      case 1: n="derivative_generator_reverse"; break;
+      case 0: n="custom_forward"; break;
+      case 1: n="custom_reverse"; break;
       case 2: n="full_jacobian"; break;
       }
       if (hasSetOption(n)) f.setOption(n, getOption(n));
@@ -1436,9 +1436,9 @@ namespace casadi {
 
     // Return value
     Function ret;
-    if (hasSetOption("derivative_generator_forward")) {
+    if (hasSetOption("custom_forward")) {
       /// User-provided derivative generator function
-      DerivativeGenerator dergen = getOption("derivative_generator_forward");
+      DerivativeGenerator dergen = getOption("custom_forward");
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nfwd, user_data_);
       // Fails for ImplicitFunction
@@ -1543,9 +1543,9 @@ namespace casadi {
 
     // Return value
     Function ret;
-    if (hasSetOption("derivative_generator_reverse")) {
+    if (hasSetOption("custom_reverse")) {
       /// User-provided derivative generator function
-      DerivativeGenerator dergen = getOption("derivative_generator_reverse");
+      DerivativeGenerator dergen = getOption("custom_reverse");
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nadj, user_data_);
     } else {

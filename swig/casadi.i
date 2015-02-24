@@ -1123,13 +1123,13 @@ def PyFunction(obj,inputs,outputs):
       @pyderivativegenerator
       def derivativewrap(f,nfwd):
         return obj.getDerivativeFwd(f,nfwd)
-      Fun.setOption("derivative_generator_forward",derivativewrap)
+      Fun.setOption("custom_forward",derivativewrap)
       
     if hasattr(obj,'getDerivativeAdj'):
       @pyderivativegenerator
       def derivativewrap(f,adj):
         return obj.getDerivativeAdj(f,adj)
-      Fun.setOption("derivative_generator_reverse",derivativewrap)
+      Fun.setOption("custom_reverse",derivativewrap)
       
     if hasattr(obj,'fwd'):
       @pyderivativegenerator
@@ -1152,7 +1152,7 @@ def PyFunction(obj,inputs,outputs):
         DerFun.init()
         return DerFun
  
-      Fun.setOption("derivative_generator_forward",derivativewrapFwd)
+      Fun.setOption("custom_forward",derivativewrapFwd)
     
     if hasattr(obj,'adj'):
       @pyderivativegenerator
@@ -1175,7 +1175,7 @@ def PyFunction(obj,inputs,outputs):
         DerFun.init()
         return DerFun
  
-      Fun.setOption("derivative_generator_reverse",derivativewrapAdj)
+      Fun.setOption("custom_reverse",derivativewrapAdj)
     return Fun
   
 %}
