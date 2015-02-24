@@ -1176,11 +1176,6 @@ def PyFunction(obj,inputs,outputs):
         return DerFun
  
       Fun.setOption("derivative_generator_reverse",derivativewrapAdj)
-      
-    if not(hasattr(obj,'getDerivativeFwd')) and hasattr(obj,'fwd') and not hasattr(obj,'adj'):
-      Fun.setOption("ad_mode","forward")
-    if not(hasattr(obj,'getDerivativeAdj')) and not hasattr(obj,'fwd') and hasattr(obj,'adj'):
-      Fun.setOption("ad_mode","reverse")
     return Fun
   
 %}

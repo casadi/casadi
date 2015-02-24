@@ -1004,7 +1004,7 @@ class Integrationtests(casadiTestCase):
     
     return # this should return identical zero
     H=qeJ.jacobian(0,0)
-    H.setOption("ad_mode","reverse")
+    #H.setOption("ad_mode","reverse")
     H.init()
     H.setInput(A,0)
     H.setInput(vec(B),1)
