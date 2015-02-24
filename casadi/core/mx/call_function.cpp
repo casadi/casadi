@@ -79,12 +79,6 @@ namespace casadi {
 
   void CallFunction::evalD(const cpv_double& input, const pv_double& output,
                            int* itmp, double* rtmp) {
-    // Set up timers for profiling
-    double time_zero=0;
-    double time_start=0;
-    double time_stop=0;
-    double time_offset=0;
-
     // Number of inputs and outputs
     int num_in = fcn_.getNumInputs();
     int num_out = fcn_.getNumOutputs();
