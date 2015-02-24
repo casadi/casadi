@@ -79,7 +79,6 @@ namespace casadi {
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
-    const int* irow = isp.row();
     vector<int> icol = isp.getCol();
 
     // We next need to resort the assignment vector by outputs instead of inputs
@@ -211,7 +210,6 @@ namespace casadi {
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
-    const int* irow = isp.row();
     vector<int> icol = isp.getCol();
 
     // We next need to resort the assignment vector by outputs instead of inputs
