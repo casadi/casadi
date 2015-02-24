@@ -1523,22 +1523,22 @@ namespace casadi {
 
 #endif // WITH_OPENCL
 
-  void SXFunctionInternal::callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void SXFunctionInternal::callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
                                    const std::vector<std::vector<SX> >& fseed,
                                    std::vector<std::vector<SX> >& fsens,
                                    bool always_inline, bool never_inline) {
     casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
     XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>
-      ::callFwd(arg, res, fseed, fsens, true, false);
+      ::callForward(arg, res, fseed, fsens, true, false);
   }
 
-  void SXFunctionInternal::callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void SXFunctionInternal::callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                                  const std::vector<std::vector<SX> >& aseed,
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {
     casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
     XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>
-      ::callAdj(arg, res, aseed, asens, true, false);
+      ::callReverse(arg, res, aseed, asens, true, false);
   }
 
 } // namespace casadi

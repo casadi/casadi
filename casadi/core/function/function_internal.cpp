@@ -1181,7 +1181,7 @@ namespace casadi {
 
     // Get seed matrices by graph coloring
     if (symmetric) {
-      casadi_assert(hasDerivativeFwd());
+      casadi_assert(hasDerForward());
 
       // Star coloring if symmetric
       log("FunctionInternal::getPartition starColoring");
@@ -1190,7 +1190,7 @@ namespace casadi {
                  << A.size1() << " without coloring).");
 
     } else {
-      casadi_assert(hasDerivativeFwd() || hasDerivativeAdj());
+      casadi_assert(hasDerForward() || hasDerReverse());
       // Get weighting factor
       double w = adWeight();
 
@@ -1421,7 +1421,7 @@ namespace casadi {
     return getNumericJacobian(iind, oind, compact, symmetric);
   }
 
-  Function FunctionInternal::derivativeFwd(int nfwd) {
+  Function FunctionInternal::derForward(int nfwd) {
     casadi_assert(nfwd>=0);
 
     // Check if there are enough forward directions allocated
@@ -1443,13 +1443,13 @@ namespace casadi {
       ret = dergen(this_, nfwd, user_data_);
       // Fails for ImplicitFunction
     } else {
-      casadi_assert(hasDerivativeFwd());
-      ret = getDerivativeFwd(nfwd);
+      casadi_assert(hasDerForward());
+      ret = getDerForward(nfwd);
     }
 
     // Give it a suitable name
     stringstream ss;
-    ss << "derivativeFwd_" << getOption("name") << "_" << nfwd;
+    ss << "derForward_" << getOption("name") << "_" << nfwd;
     ret.setOption("name", ss.str());
 
     // Get the number of inputs and outputs
@@ -1528,7 +1528,7 @@ namespace casadi {
     return ret;
   }
 
-  Function FunctionInternal::derivativeAdj(int nadj) {
+  Function FunctionInternal::derReverse(int nadj) {
     casadi_assert(nadj>=0);
 
     // Check if there are enough adjoint directions allocated
@@ -1549,13 +1549,13 @@ namespace casadi {
       Function this_ = shared_from_this<Function>();
       ret = dergen(this_, nadj, user_data_);
     } else {
-      casadi_assert(hasDerivativeAdj());
-      ret = getDerivativeAdj(nadj);
+      casadi_assert(hasDerReverse());
+      ret = getDerReverse(nadj);
     }
 
     // Give it a suitable name
     stringstream ss;
-    ss << "derivativeAdj_" << getOption("name") << "_" << nadj;
+    ss << "derReverse_" << getOption("name") << "_" << nadj;
     ret.setOption("name", ss.str());
 
     // Get the number of inputs and outputs
@@ -1634,7 +1634,7 @@ namespace casadi {
     return ret;
   }
 
-  void FunctionInternal::setDerivativeFwd(const Function& fcn, int nfwd) {
+  void FunctionInternal::setDerForward(const Function& fcn, int nfwd) {
 
     // Check if there are enough forward directions allocated
     if (nfwd>=derivative_fwd_.size()) {
@@ -1645,7 +1645,7 @@ namespace casadi {
     derivative_fwd_[nfwd] = fcn;
   }
 
-  void FunctionInternal::setDerivativeAdj(const Function& fcn, int nadj) {
+  void FunctionInternal::setDerReverse(const Function& fcn, int nadj) {
 
     // Check if there are enough adjoint directions allocated
     if (nadj>=derivative_adj_.size()) {
@@ -1656,14 +1656,14 @@ namespace casadi {
     derivative_adj_[nadj] = fcn;
   }
 
-  Function FunctionInternal::getDerivativeFwd(int nfwd) {
+  Function FunctionInternal::getDerForward(int nfwd) {
     // TODO(@jaeandersson): Fallback on finite differences
-    casadi_error("FunctionInternal::getDerivativeFwd not defined for class "
+    casadi_error("FunctionInternal::getDerForward not defined for class "
                  << typeid(*this).name());
   }
 
-  Function FunctionInternal::getDerivativeAdj(int nadj) {
-    casadi_error("FunctionInternal::getDerivativeAdj not defined for class "
+  Function FunctionInternal::getDerReverse(int nadj) {
+    casadi_error("FunctionInternal::getDerReverse not defined for class "
                  << typeid(*this).name());
   }
 
@@ -1798,7 +1798,7 @@ namespace casadi {
   }
 
   Function FunctionInternal::getFullJacobian() {
-    casadi_assert(hasDerivativeFwd() || hasDerivativeAdj());
+    casadi_assert(hasDerForward() || hasDerReverse());
 
     // Number inputs and outputs
     int n_in = getNumInputs();
@@ -2411,12 +2411,12 @@ namespace casadi {
   }
 
   bool FunctionInternal::hasDerivative() const {
-    return hasDerivativeFwd() || hasDerivativeAdj() ||
+    return hasDerForward() || hasDerReverse() ||
       full_jacobian_.alive() || hasSetOption("full_jacobian");
   }
 
   bool FunctionInternal::fwdViaJac(int nfwd) {
-    if (!hasDerivativeFwd()) return true;
+    if (!hasDerForward()) return true;
 
     // Jacobian calculation penalty factor
     const int jac_penalty = 2;
@@ -2426,14 +2426,14 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = adWeight();
-    if (hasDerivativeAdj() && jac_penalty*(1-w)*getNumOutputNonzeros()<w*nfwd)
+    if (hasDerReverse() && jac_penalty*(1-w)*getNumOutputNonzeros()<w*nfwd)
       return true;
 
     return false;
   }
 
   bool FunctionInternal::adjViaJac(int nadj) {
-    if (!hasDerivativeAdj()) return true;
+    if (!hasDerReverse()) return true;
 
     // Jacobian calculation penalty factor
     const int jac_penalty = 2;
@@ -2443,13 +2443,13 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = adWeight();
-    if (hasDerivativeFwd() && jac_penalty*w*getNumInputNonzeros()<(1-w)*nadj)
+    if (hasDerForward() && jac_penalty*w*getNumInputNonzeros()<(1-w)*nadj)
       return true;
 
     return false;
   }
 
-  void FunctionInternal::callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+  void FunctionInternal::callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
                                  const std::vector<std::vector<MX> >& fseed,
                                  std::vector<std::vector<MX> >& fsens,
                                  bool always_inline, bool never_inline) {
@@ -2506,7 +2506,7 @@ namespace casadi {
     }
 
     // Create derivative function
-    Function dfcn = derivativeFwd(nfwd);
+    Function dfcn = derForward(nfwd);
 
     // Create the evaluation node
     vector<MX> x = MX::createMultipleOutput(new CallFunction(dfcn, darg));
@@ -2522,7 +2522,7 @@ namespace casadi {
     casadi_assert(x_it==x.end());
   }
 
-  void FunctionInternal::callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+  void FunctionInternal::callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                                  const std::vector<std::vector<MX> >& aseed,
                                  std::vector<std::vector<MX> >& asens,
                                  bool always_inline, bool never_inline) {
@@ -2579,7 +2579,7 @@ namespace casadi {
     }
 
     // Create derivative function
-    Function dfcn = derivativeAdj(nadj);
+    Function dfcn = derReverse(nadj);
 
     // Create the evaluation node
     vector<MX> x = MX::createMultipleOutput(new CallFunction(dfcn, darg));
@@ -2595,7 +2595,7 @@ namespace casadi {
     casadi_assert(x_it==x.end());
   }
 
-  void FunctionInternal::callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void FunctionInternal::callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
                                  const std::vector<std::vector<SX> >& fseed,
                                  std::vector<std::vector<SX> >& fsens,
                                  bool always_inline, bool never_inline) {
@@ -2604,11 +2604,11 @@ namespace casadi {
       fsens.clear();
       return;
     }
-    casadi_error("FunctionInternal::callFwd(SX) not defined for class "
+    casadi_error("FunctionInternal::callForward(SX) not defined for class "
                  << typeid(*this).name());
   }
 
-  void FunctionInternal::callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void FunctionInternal::callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                                  const std::vector<std::vector<SX> >& aseed,
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {
@@ -2617,12 +2617,12 @@ namespace casadi {
       asens.clear();
       return;
     }
-    casadi_error("FunctionInternal::callAdj(SX) not defined for class "
+    casadi_error("FunctionInternal::callReverse(SX) not defined for class "
                  << typeid(*this).name());
   }
 
   void FunctionInternal::
-  callFwd(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+  callForward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
           const std::vector<std::vector<DMatrix> >& fseed,
           std::vector<std::vector<DMatrix> >& fsens,
           bool always_inline, bool never_inline) {
@@ -2633,7 +2633,7 @@ namespace casadi {
 
     // Retrieve derivative function
     int nfwd = fseed.size();
-    Function dfcn = derivativeFwd(nfwd);
+    Function dfcn = derForward(nfwd);
 
     // Pass inputs
     int n_in = getNumInputs();
@@ -2675,7 +2675,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  callAdj(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+  callReverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
           const std::vector<std::vector<DMatrix> >& aseed,
           std::vector<std::vector<DMatrix> >& asens,
           bool always_inline, bool never_inline) {
@@ -2686,7 +2686,7 @@ namespace casadi {
 
     // Retrieve derivative function
     int nadj = aseed.size();
-    Function dfcn = derivativeAdj(nadj);
+    Function dfcn = derReverse(nadj);
 
     // Pass inputs
     int n_in = getNumInputs();
@@ -2729,10 +2729,10 @@ namespace casadi {
 
   double FunctionInternal::adWeight() {
     // If reverse mode derivatives unavailable, use forward
-    if (!hasDerivativeAdj()) return 0;
+    if (!hasDerReverse()) return 0;
 
     // If forward mode derivatives unavailable, use reverse
-    if (!hasDerivativeFwd()) return 1;
+    if (!hasDerForward()) return 1;
 
     // A user-provided option overrides default value
     if (hasSetOption("ad_weight")) return getOption("ad_weight");

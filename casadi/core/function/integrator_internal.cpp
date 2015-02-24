@@ -685,8 +685,8 @@ namespace casadi {
     return ret;
   }
 
-  Function IntegratorInternal::getDerivativeFwd(int nfwd) {
-    log("IntegratorInternal::getDerivativeFwd", "begin");
+  Function IntegratorInternal::getDerForward(int nfwd) {
+    log("IntegratorInternal::getDerForward", "begin");
 
     // Form the augmented DAE
     AugOffset offset;
@@ -822,14 +822,14 @@ namespace casadi {
       if (dir>=0) // Nondifferentiated output ignored
         ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
-    log("IntegratorInternal::getDerivativeFwd", "end");
+    log("IntegratorInternal::getDerForward", "end");
 
     // Create derivative function and return
     return MXFunction(ret_in, ret_out);
   }
 
-  Function IntegratorInternal::getDerivativeAdj(int nadj) {
-    log("IntegratorInternal::getDerivativeAdj", "begin");
+  Function IntegratorInternal::getDerReverse(int nadj) {
+    log("IntegratorInternal::getDerReverse", "begin");
 
     // Form the augmented DAE
     AugOffset offset;

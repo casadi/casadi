@@ -301,14 +301,14 @@ namespace casadi {
     }
   }
 
-  Function ParallelizerInternal::getDerivativeFwd(int nfwd) {
+  Function ParallelizerInternal::getDerForward(int nfwd) {
     // Generate derivative expressions
     vector<Function> der_funcs(funcs_.size());
     for (int i=0; i<funcs_.size(); ++i) {
       if (copy_of_[i]>=0) {
         der_funcs[i] = der_funcs[copy_of_[i]];
       } else {
-        der_funcs[i] = funcs_[i].derivativeFwd(nfwd);
+        der_funcs[i] = funcs_[i].derForward(nfwd);
       }
     }
 
@@ -350,14 +350,14 @@ namespace casadi {
     return MXFunction(ret_arg, ret_res);
   }
 
-  Function ParallelizerInternal::getDerivativeAdj(int nadj) {
+  Function ParallelizerInternal::getDerReverse(int nadj) {
     // Generate derivative expressions
     vector<Function> der_funcs(funcs_.size());
     for (int i=0; i<funcs_.size(); ++i) {
       if (copy_of_[i]>=0) {
         der_funcs[i] = der_funcs[copy_of_[i]];
       } else {
-        der_funcs[i] = funcs_[i].derivativeAdj(nadj);
+        der_funcs[i] = funcs_[i].derReverse(nadj);
       }
     }
 

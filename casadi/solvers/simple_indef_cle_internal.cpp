@@ -112,12 +112,12 @@ namespace casadi {
     }
   }
 
-  Function SimpleIndefCleInternal::getDerivativeFwd(int nfwd) {
-    return f_.derivativeFwd(nfwd);
+  Function SimpleIndefCleInternal::getDerForward(int nfwd) {
+    return f_.derForward(nfwd);
   }
 
-  Function SimpleIndefCleInternal::getDerivativeAdj(int nadj) {
-    return f_.derivativeAdj(nadj);
+  Function SimpleIndefCleInternal::getDerReverse(int nadj) {
+    return f_.derReverse(nadj);
   }
 
   void SimpleIndefCleInternal::deepCopyMembers(

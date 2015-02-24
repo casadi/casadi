@@ -528,7 +528,7 @@ class Functiontests(casadiTestCase):
           z2 = sin(z1)
           z.set(z2)
           
-        def getDerivativeFwd(self,f,nfwd):
+        def getDerForward(self,f,nfwd):
           inputs = [f.input(i).sparsity() for i in range(f.getNumInputs())]
           outputs = [f.output(i).sparsity() for i in range(f.getNumOutputs())]
           
@@ -540,7 +540,7 @@ class Functiontests(casadiTestCase):
           FunDer = PyFunction(Der(),inputs+outputs+inputs*nfwd,outputs*nfwd)
           return FunDer
 
-        def getDerivativeAdj(self,f,nadj):
+        def getDerReverse(self,f,nadj):
           inputs = [f.input(i).sparsity() for i in range(f.getNumInputs())]
           outputs = [f.output(i).sparsity() for i in range(f.getNumOutputs())]
           

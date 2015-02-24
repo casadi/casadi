@@ -846,7 +846,7 @@ namespace casadi {
 
   }
 
-  Function PsdIndefDpleInternal::getDerivativeFwd(int nfwd) {
+  Function PsdIndefDpleInternal::getDerForward(int nfwd) {
 
     // Base:
     // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})
@@ -951,7 +951,7 @@ namespace casadi {
 
   }
 
-  Function PsdIndefDpleInternal::getDerivativeAdj(int nadj) {
+  Function PsdIndefDpleInternal::getDerReverse(int nadj) {
 
     // Base:
     // P_0 P_1 P_2 .. P_{nrhs-1} = f( A Q_0 Q_1 Q_2 .. Q_{nrhs-1})

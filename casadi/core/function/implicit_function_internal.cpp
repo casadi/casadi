@@ -176,14 +176,14 @@ namespace casadi {
     solveNonLinear();
   }
 
-  Function ImplicitFunctionInternal::getDerivativeFwd(int nfwd) {
+  Function ImplicitFunctionInternal::getDerForward(int nfwd) {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
                         Sparsity(arg[iin_].shape()));
     vector<MX> res = symbolicOutput();
     vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
-    callFwd(arg, res, fseed, fsens, false, false);
+    callForward(arg, res, fseed, fsens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -193,14 +193,14 @@ namespace casadi {
     return MXFunction(arg, res);
   }
 
-  Function ImplicitFunctionInternal::getDerivativeAdj(int nadj) {
+  Function ImplicitFunctionInternal::getDerReverse(int nadj) {
     // Symbolic expression for the input
     vector<MX> arg = symbolicInput();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
                         Sparsity(arg[iin_].shape()));
     vector<MX> res = symbolicOutput();
     vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
-    callAdj(arg, res, aseed, asens, false, false);
+    callReverse(arg, res, aseed, asens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -282,7 +282,7 @@ namespace casadi {
   const std::string ImplicitFunctionInternal::infix_ = "implicitfunction";
 
   void ImplicitFunctionInternal::
-  callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+  callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& fseed,
           std::vector<std::vector<MX> >& fsens,
           bool always_inline, bool never_inline) {
@@ -302,7 +302,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       f_fseed[d].at(iin_) = MX(input(iin_).shape()); // ignore seeds for guess
     }
-    f_.callFwd(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+    f_.callForward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
 
     // Get expression of Jacobian
     MX J = jac_(f_arg).front();
@@ -315,7 +315,7 @@ namespace casadi {
   }
 
   void ImplicitFunctionInternal::
-  callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+  callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
           bool always_inline, bool never_inline) {
@@ -347,7 +347,7 @@ namespace casadi {
     // Propagate through f_
     vector<MX> f_res(res);
     f_res.at(iout_) = MX(input(iin_).shape()); // zero residual
-    f_.callAdj(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
+    f_.callReverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
 
     // No dependency on guess
     for (int d=0; d<nadj; ++d) {

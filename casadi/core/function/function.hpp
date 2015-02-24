@@ -76,12 +76,6 @@ namespace casadi {
       Write the Jacobian as \f$J_ {i, j} = \nabla f_{i, j} =
       \frac {\partial f_{i, j}(\vec{x})}{\partial \vec{x}}\f$.
 
-      Using \f$\vec {v} \in \mathbf{R}^n\f$ as a forward seed:  <tt>setFwdSeed(v, i)</tt>\n
-      Retrieving \f$\vec {s}_f \in \mathbf{R}^p\f$ from:        <tt>getFwdSens(sf, j)</tt>\n
-
-      Using \f$\vec {w} \in \mathbf{R}^p\f$ as a forward seed:  <tt>setAdjSeed(w, j)</tt>\n
-      Retrieving \f$\vec {s}_a \in \mathbf{R}^n \f$ from:        <tt>getAdjSens(sa, i)</tt>\n
-
       We have the following relationships for function mapping from a row vector to a row vector:
 
       \f$ \vec {s}_f = \nabla f_{i, j} . \vec{v}\f$ \n
@@ -316,37 +310,37 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+    void callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& fseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+    void callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& aseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+    void callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& fseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+    void callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& aseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void callFwd(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+    void callForward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
                  const std::vector<std::vector<DMatrix> >& fseed,
                  std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void callAdj(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+    void callReverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
                  const std::vector<std::vector<DMatrix> >& aseed,
                  std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
@@ -384,7 +378,7 @@ namespace casadi {
                                                const Dictionary& paropt=Dictionary());
 
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-     *         Legacy function: Use derivativeFwd and derivativeAdj instead.
+     *         Legacy function: Use derForward and derReverse instead.
      *
      *         Returns a function with <tt>(1+nfwd)*n_in+nadj*n_out</tt> inputs
      *         and <tt>(1+nfwd)*n_out + nadj*n_in</tt> outputs.
@@ -418,7 +412,7 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function derivativeFwd(int nfwd);
+    Function derForward(int nfwd);
 
     /** \brief Get a function that calculates nadj adjoint derivatives
      *
@@ -437,15 +431,15 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function derivativeAdj(int nadj);
+    Function derReverse(int nadj);
 
     /** \brief Set a function that calculates \a nfwd forward derivatives
         NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
-    void setDerivativeFwd(const Function& fcn, int nfwd);
+    void setDerForward(const Function& fcn, int nfwd);
 
     /** \brief Set a function that calculates \a nadj adjoint derivatives
         NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
-    void setDerivativeAdj(const Function& fcn, int nadj);
+    void setDerReverse(const Function& fcn, int nadj);
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block

@@ -164,7 +164,7 @@ namespace casadi {
     vector<vector<MX> > fseed(getVector(fwdSeed, ndep())), fsens;
 
     // Call the cached functions
-    fcn_.callFwd(arg, res, fseed, fsens);
+    fcn_.callForward(arg, res, fseed, fsens);
 
     // Store the forward sensitivities
     for (int d=0; d<fwdSens.size(); ++d) {
@@ -187,7 +187,7 @@ namespace casadi {
     vector<vector<MX> > aseed(getVector(adjSeed, nout())), asens;
 
     // Call the cached functions
-    fcn_.callAdj(arg, res, aseed, asens);
+    fcn_.callReverse(arg, res, aseed, asens);
 
     // Free adjoint seeds
     clearVector(adjSeed, nout());

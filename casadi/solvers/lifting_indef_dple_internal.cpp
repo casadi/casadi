@@ -154,12 +154,12 @@ namespace casadi {
     Wrapper::evaluate();
   }
 
-  Function LiftingIndefDpleInternal::getDerivativeFwd(int nfwd) {
-    return f_.derivativeFwd(nfwd);
+  Function LiftingIndefDpleInternal::getDerForward(int nfwd) {
+    return f_.derForward(nfwd);
   }
 
-  Function LiftingIndefDpleInternal::getDerivativeAdj(int nadj) {
-    return f_.derivativeAdj(nadj);
+  Function LiftingIndefDpleInternal::getDerReverse(int nadj) {
+    return f_.derReverse(nadj);
   }
 
   void LiftingIndefDpleInternal::deepCopyMembers(

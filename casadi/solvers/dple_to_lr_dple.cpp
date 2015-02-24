@@ -109,12 +109,12 @@ namespace casadi {
     Wrapper::evaluate();
   }
 
-  Function DpleToLrDple::getDerivativeFwd(int nfwd) {
-    return f_.derivativeFwd(nfwd);
+  Function DpleToLrDple::getDerForward(int nfwd) {
+    return f_.derForward(nfwd);
   }
 
-  Function DpleToLrDple::getDerivativeAdj(int nadj) {
-    return f_.derivativeAdj(nadj);
+  Function DpleToLrDple::getDerReverse(int nadj) {
+    return f_.derReverse(nadj);
   }
 
   void DpleToLrDple::deepCopyMembers(

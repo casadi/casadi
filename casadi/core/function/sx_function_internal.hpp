@@ -106,13 +106,13 @@ class CASADI_EXPORT SXFunctionInternal :
                        std::vector<std::vector<SX> >& asens);
 
   /** \brief Create call to (cached) derivative function, forward mode  */
-  virtual void callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+  virtual void callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
                        const std::vector<std::vector<SX> >& fseed,
                        std::vector<std::vector<SX> >& fsens,
                        bool always_inline, bool never_inline);
 
   /** \brief Create call to (cached) derivative function, reverse mode  */
-  virtual void callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+  virtual void callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                        const std::vector<std::vector<SX> >& aseed,
                        std::vector<std::vector<SX> >& asens,
                        bool always_inline, bool never_inline);

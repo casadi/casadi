@@ -121,7 +121,7 @@ namespace casadi {
   }
 
   void LinearSolverInternal::
-  callFwdLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
+  callForwardLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
                 const std::vector<std::vector<MX> >& fseed,
                 std::vector<std::vector<MX> >& fsens, bool tr) {
     // Number of derivatives
@@ -150,7 +150,7 @@ namespace casadi {
   }
 
   void LinearSolverInternal::
-  callAdjLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
+  callReverseLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
                 const std::vector<std::vector<MX> >& aseed,
                 std::vector<std::vector<MX> >& asens, bool tr) {
     // Number of derivatives

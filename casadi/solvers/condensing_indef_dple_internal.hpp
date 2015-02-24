@@ -123,14 +123,14 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates nfwd forward derivatives */
-    virtual Function getDerivativeFwd(int nfwd);
-    virtual bool hasDerivativeFwd() const { return true;}
+    virtual Function getDerForward(int nfwd);
+    virtual bool hasDerForward() const { return true;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates nadj adjoint derivatives */
-    virtual Function getDerivativeAdj(int nadj);
-    virtual bool hasDerivativeAdj() const { return true;}
+    virtual Function getDerReverse(int nadj);
+    virtual bool hasDerReverse() const { return true;}
     ///@}
 
     /// A documentation string

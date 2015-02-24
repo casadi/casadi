@@ -76,24 +76,24 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates nfwd forward derivatives */
-    virtual Function getDerivativeFwd(int nfwd);
-    virtual bool hasDerivativeFwd() const { return true;}
+    virtual Function getDerForward(int nfwd);
+    virtual bool hasDerForward() const { return true;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates nadj adjoint derivatives */
-    virtual Function getDerivativeAdj(int nadj);
-    virtual bool hasDerivativeAdj() const { return true;}
+    virtual Function getDerReverse(int nadj);
+    virtual bool hasDerReverse() const { return true;}
     ///@}
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens,
                          bool always_inline, bool never_inline);

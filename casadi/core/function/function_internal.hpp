@@ -114,37 +114,37 @@ namespace casadi {
               bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void callFwd(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void callAdj(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void callFwd(const std::vector<SX>& arg, const std::vector<SX>& res,
+    virtual void callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
                          const std::vector<std::vector<SX> >& fseed,
                          std::vector<std::vector<SX> >& fsens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void callAdj(const std::vector<SX>& arg, const std::vector<SX>& res,
+    virtual void callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                          const std::vector<std::vector<SX> >& aseed,
                          std::vector<std::vector<SX> >& asens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void callFwd(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+    virtual void callForward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
                          const std::vector<std::vector<DMatrix> >& fseed,
                          std::vector<std::vector<DMatrix> >& fsens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void callAdj(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+    virtual void callReverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
                          const std::vector<std::vector<DMatrix> >& aseed,
                          std::vector<std::vector<DMatrix> >& asens,
                          bool always_inline, bool never_inline);
@@ -182,26 +182,26 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates forward derivatives
-     *    derivativeFwd(nfwd) returns a cached instance if available,
-     *    and calls <tt>Function getDerivativeFwd(int nfwd)</tt>
+     *    derForward(nfwd) returns a cached instance if available,
+     *    and calls <tt>Function getDerForward(int nfwd)</tt>
      *    if no cached version is available.
      */
-    Function derivativeFwd(int nfwd);
-    virtual Function getDerivativeFwd(int nfwd);
-    virtual bool hasDerivativeFwd() const { return hasSetOption("custom_forward");}
-    void setDerivativeFwd(const Function& fcn, int nfwd);
+    Function derForward(int nfwd);
+    virtual Function getDerForward(int nfwd);
+    virtual bool hasDerForward() const { return hasSetOption("custom_forward");}
+    void setDerForward(const Function& fcn, int nfwd);
     ///@}
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives
-     *    derivativeAdj(nadj) returns a cached instance if available,
-     *    and calls <tt>Function getDerivativeAdj(int nadj)</tt>
+     *    derReverse(nadj) returns a cached instance if available,
+     *    and calls <tt>Function getDerReverse(int nadj)</tt>
      *    if no cached version is available.
      */
-    Function derivativeAdj(int nadj);
-    virtual Function getDerivativeAdj(int nadj);
-    virtual bool hasDerivativeAdj() const { return hasSetOption("custom_reverse");}
-    void setDerivativeAdj(const Function& fcn, int nadj);
+    Function derReverse(int nadj);
+    virtual Function getDerReverse(int nadj);
+    virtual bool hasDerReverse() const { return hasSetOption("custom_reverse");}
+    void setDerReverse(const Function& fcn, int nadj);
     ///@}
 
     /** \brief Can derivatives be calculated in any way? */

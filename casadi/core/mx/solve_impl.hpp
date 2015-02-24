@@ -105,7 +105,7 @@ namespace casadi {
     vector<vector<MX> > fseed(getVector(fwdSeed, ndep())), fsens;
 
     // Call the cached functions
-    linear_solver_->callFwdLinsol(arg, res, fseed, fsens, Tr);
+    linear_solver_->callForwardLinsol(arg, res, fseed, fsens, Tr);
 
     // Store the forward sensitivities
     for (int d=0; d<fwdSens.size(); ++d) {
@@ -130,7 +130,7 @@ namespace casadi {
     clearVector(adjSeed, nout());
 
     // Call the cached functions
-    linear_solver_->callAdjLinsol(arg, res, aseed, asens, Tr);
+    linear_solver_->callReverseLinsol(arg, res, aseed, asens, Tr);
 
     // Store the adjoint sensitivities
     for (int d=0; d<adjSens.size(); ++d) {
