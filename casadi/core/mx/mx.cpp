@@ -997,10 +997,12 @@ namespace casadi {
   }
 
   void MX::addToSum(const MX& x) {
-    if (isEmpty(true)) {
-      *this = x;
-    } else {
-      *this += x;
+    if (!x.isEmpty()) {
+      if (isEmpty()) {
+        *this = x;
+      } else {
+        *this += x;
+      }
     }
   }
 

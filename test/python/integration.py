@@ -115,7 +115,7 @@ class Integrationtests(casadiTestCase):
     
     for integrator in [
          explicitRK(f,tf,4,10),
-         implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",10)
+#         implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",10)
        ]:
       integrator.init()
       

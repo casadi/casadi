@@ -931,7 +931,7 @@ namespace casadi {
       if (it->op == OP_INPUT) {
         // Collect the symbolic adjoint sensitivities
         for (int d=0; d<nadj; ++d) {
-          if (dwork[it->res.front()][d].isEmpty(true)) {
+          if (dwork[it->res.front()][d].isEmpty()) {
             asens[d][it->arg.front()] = MX(input(it->arg.front()).shape());
           } else {
             asens[d][it->arg.front()] = dwork[it->res.front()][d];
