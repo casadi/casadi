@@ -72,7 +72,7 @@ namespace casadi {
   template<bool Tr>
   void Solve<Tr>::evalD(const cpv_double& arg, const pv_double& res,
                         int* itmp, double* rtmp) {
-    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(1).size2(), res[0]);
+    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     linear_solver_.setInput(arg[1], LINSOL_A);
     linear_solver_.prepare();
     linear_solver_.solve(res[0], dep(0).size2(), Tr);
