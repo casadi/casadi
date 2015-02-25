@@ -377,7 +377,7 @@ namespace casadi {
     std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg,
                                                const Dictionary& paropt=Dictionary());
 
-    /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+    /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
      *         Legacy function: Use derForward and derReverse instead.
      *
      *         Returns a function with <tt>(1+nfwd)*n_in+nadj*n_out</tt> inputs
@@ -397,7 +397,7 @@ namespace casadi {
      */
     Function derivative(int nfwd, int nadj);
 
-    /** \brief Get a function that calculates nfwd forward derivatives
+    /** \brief Get a function that calculates \a nfwd forward derivatives
      *
      *         Returns a function with <tt>n_in + n_out +nfwd*n_in</tt> inputs
      *         and <tt>nfwd*n_out</tt> outputs.
@@ -414,7 +414,7 @@ namespace casadi {
      */
     Function derForward(int nfwd);
 
-    /** \brief Get a function that calculates nadj adjoint derivatives
+    /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
      *         Returns a function with <tt>n_in + n_out +nadj*n_out</tt> inputs
      *         and <tt>nadj*n_in</tt> outputs.

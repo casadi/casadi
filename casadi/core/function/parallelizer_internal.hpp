@@ -79,13 +79,13 @@ namespace casadi {
     virtual bool spCanEvaluate(bool fwd) { return true;}
 
     ///@{
-    /** \brief Generate a function that calculates nfwd forward derivatives */
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
     virtual Function getDerForward(int nfwd);
     virtual bool hasDerForward() const { return true;}
     ///@}
 
     ///@{
-    /** \brief Generate a function that calculates nadj adjoint derivatives */
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
     virtual Function getDerReverse(int nadj);
     virtual bool hasDerReverse() const { return true;}
     ///@}
