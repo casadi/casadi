@@ -239,13 +239,13 @@ namespace casadi {
     for (int r=0; r<nrhs; ++r) {
       // Solve transposed
       std::fill(tmp, tmp+n, 0);
-      spSolve(tmp, B, !tr);
+      spSolve(tmp, X, !tr);
 
       // Clear seeds
-      std::fill(B, B+n, 0);
+      std::fill(X, X+n, 0);
 
-      // Propagate to X
-      for (int i=0; i<n; ++i) X[i] |= tmp[i];
+      // Propagate to B
+      for (int i=0; i<n; ++i) B[i] |= tmp[i];
 
       // Propagate to A
       for (int cc=0; cc<n; ++cc) {
