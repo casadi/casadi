@@ -30,41 +30,40 @@ tf = 10.0  # End time
 
 # Declare variables (use scalar graph)
 u  = SX.sym("u")    # control
-x  = SX.sym("x",3)  # states
+x  = SX.sym("x",2)  # states
 
-# ODE right hand side
-xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, \
-                x[0], \
-                x[0]*x[0] + x[1]*x[1] + u*u] )
+# ODE right hand side and quadratures
+xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]] )
+qdot = x[0]*x[0] + x[1]*x[1] + u*u
 
 # DAE residual function
-dae = SXFunction(daeIn(x=x,p=u),daeOut(ode=xdot))
+dae = SXFunction(daeIn(x=x,p=u),daeOut(ode=xdot, quad=qdot))
 
 # Create an integrator
 integrator = Integrator("cvodes", dae)
-integrator.setOption("abstol",1e-8) # tolerance
-integrator.setOption("reltol",1e-8) # tolerance
 integrator.setOption("tf",tf/nk) # final time
 integrator.init()
 
 # All controls (use matrix graph)
-U = MX.sym("U",nk) # nk-by-1 symbolic variable
+x = MX.sym("x",nk) # nk-by-1 symbolic variable
+U = vertsplit(x) # cheaper than x[0], x[1], ...
 
-# The initial state (x_0=0, x_1=1, x_2=0)
-X  = MX([0,1,0])
+# The initial state (x_0=0, x_1=1)
+X  = MX([0,1])
+
+# Objective function
+f = 0
 
 # Build a graph of integrator calls
 for k in range(nk):
-  X, = integratorOut(integrator(integratorIn(x0=X,p=U[k])),"xf")
-  
-# Objective function: x_2(T)
-f=X[2]
+  X,QF = integratorOut(integrator(integratorIn(x0=X,p=U[k])),"xf","qf")
+  f += QF
 
 # Terminal constraints: x_0(T)=x_1(T)=0
-g = X[:2]
+g = X
 
 # Allocate an NLP solver
-nlp = MXFunction(nlpIn(x=U),nlpOut(f=f,g=g))
+nlp = MXFunction(nlpIn(x=x),nlpOut(f=f,g=g))
 solver = NlpSolver("ipopt", nlp)
 solver.init()
 
