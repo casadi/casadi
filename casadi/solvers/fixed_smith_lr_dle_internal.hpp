@@ -31,8 +31,6 @@
 
 /** \defgroup plugin_LrDleSolver_fixed_smith
  Solving the Discrete Lyapunov Equations with a regular LinearSolver
-   @copydoc DleSolversmith
-   @copydoc LrDleSolversmith
       
 */
 /** \pluginsection{LrDleSolver,fixed_smith} */
