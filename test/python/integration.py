@@ -112,8 +112,8 @@ class Integrationtests(casadiTestCase):
     f.init()
     
     for integrator in [
-         simpleRK(f,20,4),
-         simpleIRK(f,10,4,"radau","newton",{"linear_solver": "csparse"})
+         simpleRK(f, 20),
+         simpleIRK(f, 20)
        ]:
       integrator.init()
 

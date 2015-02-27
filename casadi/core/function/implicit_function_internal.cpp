@@ -37,7 +37,7 @@ using namespace std;
 namespace casadi {
 
   ImplicitFunctionInternal::ImplicitFunctionInternal(const Function& f) : f_(f) {
-    addOption("linear_solver",            OT_STRING, GenericType(),
+    addOption("linear_solver",            OT_STRING, "csparse",
               "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
