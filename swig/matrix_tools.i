@@ -80,6 +80,8 @@ MatType triu(const MatType& a, bool includeDiagonal=true);
 MatType tril(const MatType& a, bool includeDiagonal=true);
 int norm_0_mul(const MatType &x, const MatType &y);
 MatType kron(const MatType& a, const MatType& b);
+MatType repmat(const MatType &A, int n, int m=1);
+MatType repmat(const MatType &A, const std::pair<int, int>& rc);
 %enddef
 
 %define GENERIC_MATRIX_DECL(MatType...)
@@ -108,8 +110,6 @@ MatType polyval(const MatType& p, const MatType& x);
 MatType diag(const MatType &A);
 MatType unite(const MatType& A, const MatType& B);
 MatType densify(const MatType& x);
-MatType repmat(const MatType &A, int n, int m=1);
-MatType repmat(const MatType &A, const std::pair<int, int>& rc);
 MatType simplify(const MatType &x);
 MatType if_else(const MatType &cond, const MatType &if_true, const MatType &if_false);
 %enddef

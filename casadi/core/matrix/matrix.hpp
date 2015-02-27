@@ -545,7 +545,6 @@ namespace casadi {
     Matrix<DataType> zz_solve(const Matrix<DataType>& b) const;
     Matrix<DataType> zz_pinv() const;
     Matrix<DataType> zz_kron(const Matrix<DataType>& b) const;
-    Matrix<DataType> zz_repmat(int n, int m=1) const;
     Matrix<DataType> zz_diag() const;
     static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);
     Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;

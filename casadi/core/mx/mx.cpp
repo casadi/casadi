@@ -1286,23 +1286,6 @@ namespace casadi {
     return res;
   }
 
-  MX MX::zz_repmat(int n, int m) const {
-    if (n==1 &&  m==1) {
-      // Quick return if possible
-      return *this;
-    } else if (isScalar()) {
-      if (isDense()) {
-        return MX(Sparsity::dense(n, m), *this);
-      } else {
-        return MX(n, m);
-      }
-    } else {
-      std::vector<MX> v_hor(m, *this);
-      std::vector<MX> v_ver(n, horzcat(v_hor));
-      return vertcat(v_ver);
-    }
-  }
-
   MX MX::zz_createParent(std::vector<MX> &deps) {
     // First check if arguments are symbolic
     for (int k=0;k<deps.size();k++) {

@@ -2649,24 +2649,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_repmat(int n, int m) const {
-    if (n==1 &&  m==1) {
-      // Quick return if possible
-      return *this;
-    } else if (isScalar()) {
-      if (isDense()) {
-        return Matrix<DataType>(Sparsity::dense(n, m), toScalar(), false);
-      } else {
-        return Matrix<DataType>(n, m);
-      }
-    } else {
-      std::vector< Matrix<DataType> > v_hor(m, *this);
-      std::vector< Matrix<DataType> > v_ver(n, horzcat(v_hor));
-      return vertcat(v_ver);
-    }
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_diag() const {
     // Nonzero mapping
     std::vector<int> mapping;

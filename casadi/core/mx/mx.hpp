@@ -403,7 +403,6 @@ namespace casadi {
     MX zz_if_else(const MX &if_true, const MX &if_false) const;
     MX zz_unite(const MX& B) const;
     MX zz_trace() const;
-    MX zz_repmat(int n, int m=1) const;
     static MX zz_createParent(std::vector<MX> &deps);
     static MX zz_createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children);
     static MX zz_createParent(const std::vector<MX> &deps, std::vector<MX>& children);

@@ -339,16 +339,6 @@ namespace casadi {
     /** \brief  Make the matrix dense if not already */
     inline friend MatType densify(const MatType& x) { return x.zz_densify();}
 
-    /** \brief Repeat matrix A n times vertically and m times horizontally */
-    inline friend MatType repmat(const MatType &A, int n, int m=1) {
-      return A.zz_repmat(n, m);
-    }
-
-    /** \brief Repeat matrix A n times vertically and m times horizontally */
-    inline friend MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
-      return A.zz_repmat(rc.first, rc.second);
-    }
-
     /** \brief Check if expression depends on the argument
         The argument must be symbolic
     */

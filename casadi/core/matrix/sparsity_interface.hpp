@@ -54,6 +54,7 @@ namespace casadi {
     static MatType zz_veccat(const std::vector< MatType >& x);
     static MatType zz_vecNZcat(const std::vector< MatType >& x);
     MatType zz_vec() const;
+    MatType zz_repmat(int n, int m=1) const;
     /// \endcond
 
 /**
@@ -387,6 +388,15 @@ namespace casadi {
       return a.zz_kron(b);
     }
 
+    /** \brief Repeat matrix A n times vertically and m times horizontally */
+    inline friend MatType repmat(const MatType &A, int n, int m=1) {
+      return A.zz_repmat(n, m);
+    }
+
+    /** \brief Repeat matrix A n times vertically and m times horizontally */
+    inline friend MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
+      return A.zz_repmat(rc.first, rc.second);
+    }
 #endif // !SWIG || DOXYGEN
 /** @} */
   };
@@ -395,6 +405,12 @@ namespace casadi {
   template<typename MatType>
   MatType SparsityInterface<MatType>::zz_vec() const {
     return reshape(self(), self().numel(), 1);
+  }
+
+  template<typename MatType>
+  MatType SparsityInterface<MatType>::zz_repmat(int n, int m) const {
+    MatType allrows = vertcat(std::vector<MatType>(n, self()));
+    return horzcat(std::vector<MatType>(m, allrows));
   }
 
   template<typename MatType>
