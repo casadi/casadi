@@ -112,8 +112,9 @@ class Integrationtests(casadiTestCase):
     f.init()
     
     for integrator in [
-         simpleRK(f, 20),
-         simpleIRK(f, 20)
+         simpleRK(f),
+         simpleIRK(f),
+         simpleIntegrator(f)
        ]:
       integrator.init()
 
@@ -126,7 +127,7 @@ class Integrationtests(casadiTestCase):
         f.setInput(1,"x0")
         f.setInput(1,"tf")
       integrator.evaluate()
-      self.checkfunction(integrator,solution,digits=5)
+      self.checkfunction(integrator,solution,digits=3)
 
   @slow()
   def test_tools(self):

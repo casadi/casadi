@@ -343,4 +343,60 @@ namespace casadi {
     return ret;
   }
 
+  MXFunction simpleIntegrator(Function f, const std::string& integrator,
+                              const Dictionary& integrator_options) {
+    // Initialize f, if needed
+    f.init(false);
+
+    // Consistency check
+    casadi_assert_message(f.getNumInputs()==2, "Function must have two inputs: x and p");
+    casadi_assert_message(f.getNumOutputs()==1, "Function must have one outputs: dot(x)");
+
+    // Sparsities
+    Sparsity x_sp = f.input(0).sparsity();
+    Sparsity p_sp = f.input(1).sparsity();
+
+    // Wrapper function inputs
+    MX x = MX::sym("x", x_sp);
+    MX u = MX::sym("u", vertcat(Sparsity::scalar(), vec(p_sp))); // augment p with t
+
+    // Normalized xdot
+    int u_offset[] = {0, 1, 1+p_sp.size1()};
+    vector<MX> pp = vertsplit(u, vector<int>(u_offset, u_offset+3));
+    MX tf = pp[0];
+    MX p = reshape(pp[1], p_sp.shape());
+    MX f_in[] = {x, p};
+    MX xdot = f(vector<MX>(f_in, f_in+2)).at(0);
+    xdot *= tf;
+
+    // Form DAE function
+    MXFunction dae(daeIn("x", x, "p", u), daeOut("ode", xdot));
+
+    // Create integrator function
+    Integrator ifcn(integrator, dae);
+    ifcn.setOption("name", "integrator");
+    ifcn.setOption(integrator_options);
+    ifcn.setOption("tf", 1); // Normalized time
+    ifcn.init();
+
+    // Inputs of constructed function
+    MX x0 = MX::sym("x0", x_sp);
+    p = MX::sym("p", p_sp);
+    tf = MX::sym("tf");
+
+    // State at end
+    MX xf = ifcn(integratorIn("x0", x0, "p", vertcat(tf, vec(p))))[INTEGRATOR_XF];
+
+    // Form discrete-time dynamics
+    vector<MX> ret_in(3);
+    ret_in[0] = x0;
+    ret_in[1] = p;
+    ret_in[2] = tf;
+    MXFunction ret(ret_in, xf);
+    ret.setOption("name", "F");
+    ret.setInputScheme(IOScheme("x0", "p", "tf"));
+    ret.setOutputScheme(IOScheme("xf"));
+    return ret;
+  }
+
 } // namespace casadi

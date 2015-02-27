@@ -94,6 +94,21 @@ namespace casadi {
   MXFunction simpleIRK(Function f, int N=10, int order=4, const std::string& scheme="radau",
                        const std::string& solver="newton",
                        const Dictionary& solver_options = Dictionary());
+
+  /** \brief Simplified wrapper for the Integrator class
+   * Constructs an integrator using the same syntax as simpleRK and simpleIRK.
+   * The constructed function (which is of type MXFunction), has three inputs,
+   * corresponding to initial state (x0), parameter (p) and integration time (tf)
+   * and one output, corresponding to final state (xf).
+   *
+   * \param f      ODE function with two inputs (x and p) and one output (xdot)
+   * \param N      Number of integrator steps
+   * \param order  Order of interpolating polynomials
+   * \param scheme Collocation scheme, as excepted by collocationPoints function.
+  */
+  CASADI_EXPORT
+  MXFunction simpleIntegrator(Function f, const std::string& integrator="cvodes",
+                              const Dictionary& integrator_options = Dictionary());
 } // namespace casadi
 
 #endif // CASADI_INTEGRATION_TOOLS_HPP
