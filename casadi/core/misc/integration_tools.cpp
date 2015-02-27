@@ -132,55 +132,75 @@ namespace casadi {
     return collocationPointsGen<long double>(order, scheme);
   }
 
-  Function explicitRK(Function& f, const MX& tf, int order, int ne) {
-    casadi_assert_message(ne>=1, "Parameter ne (number of elements must be at least 1), but got "
-                          << ne << ".");
-    casadi_assert_message(order==4, "Only RK order 4 is supported now.");
-    casadi_assert_message(f.getNumInputs()==DAE_NUM_IN && f.getNumOutputs()==DAE_NUM_OUT,
-                          "Supplied function must adhere to dae scheme.");
-    casadi_assert_message(f.output(DAE_ALG).isEmpty() && f.input(DAE_Z).isEmpty(),
-                          "Supplied function cannot have algebraic states.");
-    casadi_assert_message(f.output(DAE_QUAD).isEmpty(),
-                          "Supplied function cannot have quadrature states.");
+  MXFunction simpleRK(Function f, int N, int order) {
+    // Initialize f, if needed
+    f.init(false);
 
-    MX X = MX::sym("X", f.input(DAE_X).sparsity());
-    MX P = MX::sym("P", f.input(DAE_P).sparsity());
-    MX X0 = X;
-    MX t = 0;
-    MX dt = tf/ne;
+    // Consistency check
+    casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
+                          << N << ".");
+    casadi_assert_message(order==4, "Only RK order 4 is supported now.");
+    casadi_assert_message(f.getNumInputs()==2, "Function must have two inputs: x and p");
+    casadi_assert_message(f.getNumOutputs()==1, "Function must have one outputs: dot(x)");
+
+    MX x0 = MX::sym("x0", f.input(0).sparsity());
+    MX p = MX::sym("p", f.input(1).sparsity());
+    MX tf = MX::sym("tf");
 
     std::vector<double> b(order);
-    b[0]=1.0/6;b[1]=1.0/3;b[2]=1.0/3;b[3]=1.0/6;
+    b[0]=1.0/6;
+    b[1]=1.0/3;
+    b[2]=1.0/3;
+    b[3]=1.0/6;
 
     std::vector<double> c(order);
-    c[0]=0;c[1]=1.0/2;c[2]=1.0/2;c[3]=1;
+    c[0]=0;
+    c[1]=1.0/2;
+    c[2]=1.0/2;
+    c[3]=1;
 
     std::vector< std::vector<double> > A(order-1);
-    A[0].resize(1);A[0][0]=1.0/2;
-    A[1].resize(2);A[1][0]=0;A[1][1]=1.0/2;
-    A[2].resize(3);A[2][0]=0;A[2][1]=0;A[2][2]=1;
+    A[0].resize(1);
+    A[0][0]=1.0/2;
+    A[1].resize(2);
+    A[1][0]=0;A[1][1]=1.0/2;
+    A[2].resize(3);
+    A[2][0]=0;
+    A[2][1]=0;A[2][2]=1;
+
+    // Time step
+    MX dt = tf/N;
 
     std::vector<MX> k(order);
+    vector<MX> f_arg(2);
 
-    for (int i=0;i<ne;++i) {
-      for (int j=0;j<order;++j) {
-        MX XL = 0;
-        for (int jj=0;jj<j;++jj) {
-          XL+=k.at(jj)*A.at(j-1).at(jj);
+    // Integrate
+    MX xf = x0;
+    for (int i=0; i<N; ++i) {
+      for (int j=0; j<order; ++j) {
+        MX xL = 0;
+        for (int jj=0; jj<j; ++jj) {
+          xL += k.at(jj)*A.at(j-1).at(jj);
         }
-        //std::cout << "help: " << A.at(j-1) << ", " << c.at(j) << std::endl;
-        k[j] = dt*f(daeIn("x", X+XL, "p", P, "t", t+dt*c.at(j)))[DAE_ODE];
+        f_arg[0] = xf+xL;
+        f_arg[1] = p;
+        k[j] = dt*f(f_arg).at(0);
       }
 
-      for (int j=0;j<order;++j) {
-        X += b.at(j)*k.at(j);
-
+      for (int j=0; j<order; ++j) {
+        xf += b.at(j)*k.at(j);
       }
-      t+= dt;
     }
 
-    MXFunction ret(integratorIn("x0", X0, "p", P), integratorOut("xf", X));
-
+    // Form discrete-time dynamics
+    vector<MX> ret_in(3);
+    ret_in[0] = x0;
+    ret_in[1] = p;
+    ret_in[2] = tf;
+    MXFunction ret(ret_in, xf);
+    ret.setOption("name", "F");
+    ret.setInputScheme(IOScheme("x0", "p", "tf"));
+    ret.setOutputScheme(IOScheme("xf"));
     return ret;
   }
 
@@ -230,11 +250,10 @@ namespace casadi {
         C[j2][j] = tfcn.output().at(0);
       }
     }
-
   }
 
-  Function implicitRK(Function& f, const std::string& impl, const Dictionary& impl_options,
-                      const MX& tf, int order, const std::string& scheme, int ne) {
+  Function implicitRK(Function f, const std::string& impl, const Dictionary& impl_options,
+                     const MX& tf, int order, const std::string& scheme, int ne) {
     casadi_assert_message(ne>=1, "Parameter ne (number of elements must be at least 1), "
                           "but got " << ne << ".");
     casadi_assert_message(order==4, "Only RK order 4 is supported now.");

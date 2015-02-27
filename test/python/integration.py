@@ -105,16 +105,35 @@ class Integrationtests(casadiTestCase):
   def test_tools_trivial(self):
     num = self.num
 
-    t=SX.sym("t")
-    q=SX.sym("q")
-    p=SX.sym("p")
-    
-    f=SXFunction(daeIn(x=q),daeOut(ode=q))
+    x = SX.sym("x")
+    p = SX.sym("p",0)
+    tf = SX.sym("tf")
+    f=SXFunction([x,p],[x])
     f.init()
-    tf = 1
     
     for integrator in [
-         explicitRK(f,tf,4,10),
+         simpleRK(f,20,4),
+         #implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",10)
+       ]:
+      integrator.init()
+
+      solution = SXFunction([x,p,tf],[x*exp(tf)])
+      solution.setInputScheme(IOScheme(["x0","p","tf"]))
+      solution.setOutputScheme(IOScheme(["xf"]))
+      solution.init()
+
+      for f in [solution,integrator]:
+        f.setInput(1,"x0")
+        f.setInput(1,"tf")
+      integrator.evaluate()
+      self.checkfunction(integrator,solution,digits=5)
+
+    tf = 1
+    q=SX.sym("q")
+    f=SXFunction(daeIn(x=q),daeOut(ode=q))
+    f.init()
+
+    for integrator in [
          implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",10)
        ]:
       integrator.init()

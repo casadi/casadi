@@ -26,11 +26,7 @@
 #ifndef CASADI_INTEGRATION_TOOLS_HPP
 #define CASADI_INTEGRATION_TOOLS_HPP
 
-#include <vector>
-#include <algorithm>
-#include "casadi/core/casadi_exception.hpp"
-#include "casadi/core/options_functionality.hpp"
-#include "casadi/core/mx/mx.hpp"
+#include "casadi/core/function/mx_function.hpp"
 
 namespace casadi {
 
@@ -74,15 +70,15 @@ namespace casadi {
   enum CollocationPoints {LEGENDRE, RADAU};
 
   /** \brief Construct an explicit Runge-Kutta integrator
-  * \param f dynamical system
-  * \copydoc scheme_DAEInput
-  * \copydoc scheme_DAEOutput
-  * \param tf    Integration end time
-  * \param order Order of integration
-  * \param ne    Number of times the \e RK primitive is repeated over the integration interval
-  */
-  CASADI_EXPORT Function explicitRK(Function& f, const MX &tf=1,
-                                                int order=4, int ne = 1);
+   * The constructed function (which is of type MXFunction), has three inputs,
+   * corresponding to initial state (x0), parameter (p) and integration time (tf)
+   * and one output, corresponding to final state (xf).
+   *
+   * \param f     ODE function with two inputs (x and p) and one output (xdot)
+   * \param N     Number of integrator steps
+   * \param order Order of interpolating polynomials
+   */
+  CASADI_EXPORT MXFunction simpleRK(Function f, int N=10, int order=4);
 
   /** \brief Construct an implicit Runge-Kutta integrator
   * \param f dynamical system
@@ -94,7 +90,7 @@ namespace casadi {
   * \param ne    Number of times the \e RK primitive is repeated over the integration interval
   */
   CASADI_EXPORT
-  Function implicitRK(Function& f, const std::string& impl,
+  Function implicitRK(Function f, const std::string& impl,
                       const Dictionary& dict = Dictionary(), const MX &tf=1, int order=4,
                       const std::string& scheme="radau", int ne = 1);
 
