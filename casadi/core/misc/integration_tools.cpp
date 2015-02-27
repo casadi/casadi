@@ -261,7 +261,6 @@ namespace casadi {
     // Consistency check
     casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
                           << N << ".");
-    casadi_assert_message(order==4, "Only RK order 4 is supported now.");
     casadi_assert_message(f.getNumInputs()==2, "Function must have two inputs: x and p");
     casadi_assert_message(f.getNumOutputs()==1, "Function must have one outputs: dot(x)");
 
@@ -314,34 +313,22 @@ namespace casadi {
     ifcn.setOption(solver_options);
     ifcn.init();
 
-    // Get an expression for the state at the end of the finite element
-    std::vector<MX> ifcn_in(4);
-    ifcn_in[0] = repmat(x0, order);
-    ifcn_in[1] = x0;
-    ifcn_in[2] = p;
-    ifcn_in[3] = tf;
-
-    std::vector<MX> ifcn_out = ifcn(ifcn_in);
-    x = vertsplit(ifcn_out[0], x0.size1());
-
-    MX XF = 0;
-    for (int i=0; i<=order; ++i) {
-      XF += D[i]*(i==0 ? x0 : x[i-1]);
-    }
-
-    // Get the discrete time dynamics
-    ifcn_in.erase(ifcn_in.begin());
-    MXFunction F = MXFunction(ifcn_in, XF);
-    F.init();
-
     // Get state at end time
-    std::vector<MX> F_in(3);
+    std::vector<MX> ifcn_in(4), ifcn_out;
     MX xf = x0;
     for (int k=0; k<N; ++k) {
-      F_in[0] = xf;
-      F_in[1] = p;
-      F_in[2] = tf;
-      xf = F(F_in).at(0);
+      ifcn_in[0] = repmat(xf, order);
+      ifcn_in[1] = xf;
+      ifcn_in[2] = p;
+      ifcn_in[3] = tf;
+      ifcn_out = ifcn(ifcn_in);
+      x = vertsplit(ifcn_out[0], x0.size1());
+
+      // State at end of step
+      xf = D[0]*x0;
+      for (int i=1; i<=order; ++i) {
+        xf += D[i]*x[i-1];
+      }
     }
 
     // Form discrete-time dynamics
