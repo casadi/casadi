@@ -349,11 +349,6 @@ namespace casadi {
       return A.zz_repmat(rc.first, rc.second);
     }
 
-    /** \brief Repeat a scalar to a new sparsity pattern */
-    inline friend MatType repmat(const MatType &A, const Sparsity& sp) {
-      return A.zz_repmat(sp);
-    }
-
     /** \brief Check if expression depends on the argument
         The argument must be symbolic
     */

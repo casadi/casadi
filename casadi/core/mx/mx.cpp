@@ -299,7 +299,7 @@ namespace casadi {
       } else if (m.isScalar()) {
         // m scalar means "set all"
         if (m.isDense()) {
-          return setSub(repmat(m, rr.sparsity()), ind1, rr);
+          return setSub(MX(rr.sparsity(), m), ind1, rr);
         } else {
           return setSub(MX(rr.shape()), ind1, rr);
         }
@@ -417,7 +417,7 @@ namespace casadi {
       if (m.isScalar()) {
         // m scalar means "set all"
         if (!m.isDense()) return; // Nothing to set
-        return setNZ(repmat(m, kk.sparsity()), ind1, kk);
+        return setNZ(MX(kk.sparsity(), m), ind1, kk);
       } else if (kk.shape() == m.shape()) {
         // Project sparsity if needed
         return setNZ(m.setSparse(kk.sparsity()), ind1, kk);
@@ -1284,11 +1284,6 @@ namespace casadi {
       res+=(*this)(i, i);
     }
     return res;
-  }
-
-  MX MX::zz_repmat(const Sparsity& sp) const {
-    casadi_assert_message(isScalar(), "repmat(MX x, Sparsity sp) only defined for scalar x");
-    return MX(sp, *this);
   }
 
   MX MX::zz_repmat(int n, int m) const {
