@@ -273,64 +273,48 @@ namespace casadi {
     std::vector < double > D;
     collocationInterpolators(tau_root, C, D);
 
+    // Inputs of constructed function
     MX x0 = MX::sym("x0", f.input(0).sparsity());
     MX p = MX::sym("p", f.input(1).sparsity());
     MX tf = MX::sym("tf");
 
-    // Retrieve problem dimensions
-    int nx = x0.nnz();
+    // Time step
+    MX dt = tf/N;
 
     // Implicitly defined variables
-    MX V = MX::sym("V", order*nx);
+    MX v = MX::sym("v", repmat(x0.sparsity(), order));
+    std::vector<MX> Vs = vertsplit(v, x0.size1());
 
-    MX X = x0;
 
     // Components of the unknowns that correspond to states at collocation points
     std::vector<MX> Xc;
-    Xc.reserve(order);
     Xc.push_back(x0);
-
-    // Components of the unknowns that correspond to algebraic states at collocation points
-    std::vector<MX> Zc;
-    Zc.reserve(order);
-
-    // Splitting the unknowns
-    std::vector<int> splitPositions = range(0, order*nx, nx);
-    splitPositions.push_back(order*nx);
-    std::vector<MX> Vs = vertsplit(V, splitPositions);
 
     // Extracting unknowns from Z
     for (int i=0; i<order; ++i) {
       Xc.push_back(x0+Vs[i]);
     }
 
-    // Get the collocation Equations (that define V)
-    std::vector<MX> V_eq;
-
-    // Time step
-    MX dt = tf/N;
-
-    std::vector<MX> f_in(2), f_out;
+    // Collect the equations that implicitly define v
+    std::vector<MX> V_eq, f_in(2), f_out;
     for (int j=1; j<order+1; ++j) {
       // Expression for the state derivative at the collocation point
       MX xp_j = 0;
-      for (int r=0; r<order+1; ++r) {
-        xp_j+= C[j][r]*Xc[r];
-      }
-      // Append collocation equations & algebraic constraints
+      for (int r=0; r<order+1; ++r) xp_j+= C[j][r]*Xc[r];
+
+      // Collocation equations
       f_in[0] = Xc[j];
       f_in[1] = p;
       f_out = f(f_in);
       V_eq.push_back(dt*f_out.at(0)-xp_j);
     }
 
-    // Root-finding function, implicitly defines V as a function of X0 and P
-    std::vector<MX> rfp_in;
-    rfp_in.push_back(V);
-    rfp_in.push_back(X);
-    rfp_in.push_back(p);
-    rfp_in.push_back(tf);
-
+    // Root-finding function
+    std::vector<MX> rfp_in(4);
+    rfp_in[0] = v;
+    rfp_in[1] = x0;
+    rfp_in[2] = p;
+    rfp_in[3] = tf;
     Function rfp = MXFunction(rfp_in, vertcat(V_eq));
     rfp.init();
 
@@ -341,31 +325,32 @@ namespace casadi {
 
     // Get an expression for the state at the end of the finite element
     std::vector<MX> ifcn_in(4);
-    ifcn_in[0] = MX::zeros(V.sparsity());
-    ifcn_in[1] = X;
+    ifcn_in[0] = MX::zeros(v.sparsity());
+    ifcn_in[1] = x0;
     ifcn_in[2] = p;
     ifcn_in[3] = tf;
 
     std::vector<MX> ifcn_out = ifcn(ifcn_in);
-    Vs = vertsplit(ifcn_out[0], splitPositions);
+    Vs = vertsplit(ifcn_out[0], x0.size1());
 
     MX XF = 0;
     for (int i=0; i<order+1; ++i) {
-      XF += D[i]*(i==0 ? X : X + Vs[i-1]);
+      XF += D[i]*(i==0 ? x0 : x0 + Vs[i-1]);
     }
 
     // Get the discrete time dynamics
     ifcn_in.erase(ifcn_in.begin());
     MXFunction F = MXFunction(ifcn_in, XF);
     F.init();
-    std::vector<MX> F_in(3);
 
-    // Loop over all finite elements
-    for (int i=0; i<N; ++i) {
-      F_in[0] = X;
+    // Get state at end time
+    std::vector<MX> F_in(3);
+    MX xf = x0;
+    for (int k=0; k<N; ++k) {
+      F_in[0] = xf;
       F_in[1] = p;
       F_in[2] = tf;
-      X = F(F_in).at(0);
+      xf = F(F_in).at(0);
     }
 
     // Form discrete-time dynamics
@@ -373,7 +358,7 @@ namespace casadi {
     ret_in[0] = x0;
     ret_in[1] = p;
     ret_in[2] = tf;
-    MXFunction ret(ret_in, X);
+    MXFunction ret(ret_in, xf);
     ret.setOption("name", "F");
     ret.setInputScheme(IOScheme("x0", "p", "tf"));
     ret.setOutputScheme(IOScheme("xf"));
