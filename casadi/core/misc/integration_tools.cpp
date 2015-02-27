@@ -201,6 +201,7 @@ namespace casadi {
     ret.setOption("name", "F");
     ret.setInputScheme(IOScheme("x0", "p", "tf"));
     ret.setOutputScheme(IOScheme("xf"));
+    ret.init();
     return ret;
   }
 
@@ -340,6 +341,7 @@ namespace casadi {
     ret.setOption("name", "F");
     ret.setInputScheme(IOScheme("x0", "p", "tf"));
     ret.setOutputScheme(IOScheme("xf"));
+    ret.init();
     return ret;
   }
 
@@ -396,6 +398,7 @@ namespace casadi {
     ret.setOption("name", "F");
     ret.setInputScheme(IOScheme("x0", "p", "tf"));
     ret.setOutputScheme(IOScheme("xf"));
+    ret.init();
     return ret;
   }
 
