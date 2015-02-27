@@ -113,7 +113,7 @@ class Integrationtests(casadiTestCase):
     
     for integrator in [
          simpleRK(f,20,4),
-         #implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",10)
+         simpleIRK(f,10,4,"radau","newton",{"linear_solver": "csparse"})
        ]:
       integrator.init()
 
@@ -126,27 +126,6 @@ class Integrationtests(casadiTestCase):
         f.setInput(1,"x0")
         f.setInput(1,"tf")
       integrator.evaluate()
-      self.checkfunction(integrator,solution,digits=5)
-
-    tf = 1
-    q=SX.sym("q")
-    f=SXFunction(daeIn(x=q),daeOut(ode=q))
-    f.init()
-
-    for integrator in [
-         implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",10)
-       ]:
-      integrator.init()
-      
-      solution = SXFunction(integratorIn(x0=q),integratorOut(xf=q*exp(tf)))
-      solution.init()
-      
-      for f in [solution,integrator]:
-        f.setInput(1,"x0")
-        
-      integrator.evaluate()
-      
-
       self.checkfunction(integrator,solution,digits=5)
 
   @slow()

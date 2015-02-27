@@ -252,152 +252,132 @@ namespace casadi {
     }
   }
 
-  Function implicitRK(Function f, const std::string& impl, const Dictionary& impl_options,
-                     const MX& tf, int order, const std::string& scheme, int ne) {
-    casadi_assert_message(ne>=1, "Parameter ne (number of elements must be at least 1), "
-                          "but got " << ne << ".");
+  MXFunction simpleIRK(Function f, int N, int order, const std::string& scheme,
+                       const std::string& solver,
+                       const Dictionary& solver_options) {
+    // Initialize f, if needed
+    f.init(false);
+
+    // Consistency check
+    casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
+                          << N << ".");
     casadi_assert_message(order==4, "Only RK order 4 is supported now.");
-    casadi_assert_message(f.getNumInputs()==DAE_NUM_IN && f.getNumOutputs()==DAE_NUM_OUT,
-                          "Supplied function must adhere to dae scheme.");
-    casadi_assert_message(f.output(DAE_QUAD).isEmpty(),
-                          "Supplied function cannot have quadrature states.");
+    casadi_assert_message(f.getNumInputs()==2, "Function must have two inputs: x and p");
+    casadi_assert_message(f.getNumOutputs()==1, "Function must have one outputs: dot(x)");
 
     // Obtain collocation points
-    std::vector<double> tau_root = collocationPoints(order, "legendre");
+    std::vector<double> tau_root = collocationPoints(order, scheme);
 
     // Retrieve collocation interpolating matrices
     std::vector < std::vector <double> > C;
     std::vector < double > D;
     collocationInterpolators(tau_root, C, D);
 
+    MX x0 = MX::sym("x0", f.input(0).sparsity());
+    MX p = MX::sym("p", f.input(1).sparsity());
+    MX tf = MX::sym("tf");
+
     // Retrieve problem dimensions
-    int nx = f.input(DAE_X).nnz();
-    int nz = f.input(DAE_Z).nnz();
-    int np = f.input(DAE_P).nnz();
+    int nx = x0.nnz();
 
-    //Variables for one finite element
-    MX X = MX::sym("X", nx);
-    MX P = MX::sym("P", np);
-    MX V = MX::sym("V", order*(nx+nz)); // Unknowns
+    // Implicitly defined variables
+    MX V = MX::sym("V", order*nx);
 
-    MX X0 = X;
+    MX X = x0;
 
     // Components of the unknowns that correspond to states at collocation points
-    std::vector<MX> Xc;Xc.reserve(order);
-    Xc.push_back(X0);
+    std::vector<MX> Xc;
+    Xc.reserve(order);
+    Xc.push_back(x0);
 
     // Components of the unknowns that correspond to algebraic states at collocation points
-    std::vector<MX> Zc;Zc.reserve(order);
+    std::vector<MX> Zc;
+    Zc.reserve(order);
 
     // Splitting the unknowns
     std::vector<int> splitPositions = range(0, order*nx, nx);
-    if (nz>0) {
-      std::vector<int> Zc_pos = range(order*nx, order*nx+(order+1)*nz, nz);
-      splitPositions.insert(splitPositions.end(), Zc_pos.begin(), Zc_pos.end());
-    } else {
-      splitPositions.push_back(order*nx);
-    }
+    splitPositions.push_back(order*nx);
     std::vector<MX> Vs = vertsplit(V, splitPositions);
 
     // Extracting unknowns from Z
-    for (int i=0;i<order;++i) {
-      Xc.push_back(X0+Vs[i]);
-    }
-    if (nz>0) {
-      for (int i=0;i<order;++i) {
-        Zc.push_back(Vs[order+i]);
-      }
+    for (int i=0; i<order; ++i) {
+      Xc.push_back(x0+Vs[i]);
     }
 
     // Get the collocation Equations (that define V)
     std::vector<MX> V_eq;
 
-    // Local start time
-    MX t0_l=MX::sym("t0");
-    MX h = MX::sym("h");
+    // Time step
+    MX dt = tf/N;
 
-    for (int j=1;j<order+1;++j) {
+    std::vector<MX> f_in(2), f_out;
+    for (int j=1; j<order+1; ++j) {
       // Expression for the state derivative at the collocation point
       MX xp_j = 0;
-      for (int r=0;r<order+1;++r) {
+      for (int r=0; r<order+1; ++r) {
         xp_j+= C[j][r]*Xc[r];
       }
       // Append collocation equations & algebraic constraints
-      std::vector<MX> f_out;
-      MX t_l = t0_l+tau_root[j]*h;
-      if (nz>0) {
-        f_out = f(daeIn("t", t_l, "x", Xc[j], "p", P, "z", Zc[j-1]));
-      } else {
-        f_out = f(daeIn("t", t_l, "x", Xc[j], "p", P));
-      }
-      V_eq.push_back(h*f_out[DAE_ODE]-xp_j);
-      V_eq.push_back(f_out[DAE_ALG]);
-
+      f_in[0] = Xc[j];
+      f_in[1] = p;
+      f_out = f(f_in);
+      V_eq.push_back(dt*f_out.at(0)-xp_j);
     }
 
     // Root-finding function, implicitly defines V as a function of X0 and P
-    std::vector<MX> vfcn_inputs;
-    vfcn_inputs.push_back(V);
-    vfcn_inputs.push_back(X);
-    vfcn_inputs.push_back(P);
-    vfcn_inputs.push_back(t0_l);
-    vfcn_inputs.push_back(h);
+    std::vector<MX> rfp_in;
+    rfp_in.push_back(V);
+    rfp_in.push_back(X);
+    rfp_in.push_back(p);
+    rfp_in.push_back(tf);
 
-    Function vfcn = MXFunction(vfcn_inputs, vertcat(V_eq));
-    vfcn.init();
-
-    try {
-      // Attempt to convert to SXFunction to decrease overhead
-      vfcn = SXFunction(vfcn);
-      vfcn.init();
-    } catch(CasadiException & e) {
-      //
-    }
+    Function rfp = MXFunction(rfp_in, vertcat(V_eq));
+    rfp.init();
 
     // Create a implicit function instance to solve the system of equations
-    ImplicitFunction ifcn(impl, vfcn, Function(), LinearSolver());
-    ifcn.setOption(impl_options);
+    ImplicitFunction ifcn(solver, rfp);
+    ifcn.setOption(solver_options);
     ifcn.init();
 
     // Get an expression for the state at the end of the finite element
-    std::vector<MX> ifcn_call_in(5);
-    ifcn_call_in[0] = MX::zeros(V.sparsity());
-    std::copy(vfcn_inputs.begin()+1, vfcn_inputs.end(), ifcn_call_in.begin()+1);
-    std::vector<MX> ifcn_call_out = ifcn(ifcn_call_in, true);
-    Vs = vertsplit(ifcn_call_out[0], splitPositions);
+    std::vector<MX> ifcn_in(4);
+    ifcn_in[0] = MX::zeros(V.sparsity());
+    ifcn_in[1] = X;
+    ifcn_in[2] = p;
+    ifcn_in[3] = tf;
+
+    std::vector<MX> ifcn_out = ifcn(ifcn_in);
+    Vs = vertsplit(ifcn_out[0], splitPositions);
 
     MX XF = 0;
-    for (int i=0;i<order+1;++i) {
-      XF += D[i]*(i==0? X : X + Vs[i-1]);
+    for (int i=0; i<order+1; ++i) {
+      XF += D[i]*(i==0 ? X : X + Vs[i-1]);
     }
-
 
     // Get the discrete time dynamics
-    ifcn_call_in.erase(ifcn_call_in.begin());
-    MXFunction F = MXFunction(ifcn_call_in, XF);
+    ifcn_in.erase(ifcn_in.begin());
+    MXFunction F = MXFunction(ifcn_in, XF);
     F.init();
+    std::vector<MX> F_in(3);
 
     // Loop over all finite elements
-    MX h_ = tf/ne;
-    MX t0_ = 0;
-
-    for (int i=0;i<ne;++i) {
-      std::vector<MX> F_in;
-      F_in.push_back(X);
-      F_in.push_back(P);
-      F_in.push_back(t0_);
-      F_in.push_back(h_);
-      t0_+= h_;
-      std::vector<MX> F_out = F(F_in);
-      X = F_out[0];
+    for (int i=0; i<N; ++i) {
+      F_in[0] = X;
+      F_in[1] = p;
+      F_in[2] = tf;
+      X = F(F_in).at(0);
     }
 
-    // Create a ruturn function with Integrator signature
-    MXFunction ret = MXFunction(integratorIn("x0", X0, "p", P), integratorOut("xf", X));
-    ret.init();
-
+    // Form discrete-time dynamics
+    vector<MX> ret_in(3);
+    ret_in[0] = x0;
+    ret_in[1] = p;
+    ret_in[2] = tf;
+    MXFunction ret(ret_in, X);
+    ret.setOption("name", "F");
+    ret.setInputScheme(IOScheme("x0", "p", "tf"));
+    ret.setOutputScheme(IOScheme("xf"));
     return ret;
-
   }
 
 } // namespace casadi
