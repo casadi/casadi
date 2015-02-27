@@ -283,27 +283,18 @@ namespace casadi {
 
     // Implicitly defined variables
     MX v = MX::sym("v", repmat(x0.sparsity(), order));
-    std::vector<MX> Vs = vertsplit(v, x0.size1());
-
-
-    // Components of the unknowns that correspond to states at collocation points
-    std::vector<MX> Xc;
-    Xc.push_back(x0);
-
-    // Extracting unknowns from Z
-    for (int i=0; i<order; ++i) {
-      Xc.push_back(x0+Vs[i]);
-    }
+    std::vector<MX> x = vertsplit(v, x0.size1());
+    x.insert(x.begin(), x0);
 
     // Collect the equations that implicitly define v
     std::vector<MX> V_eq, f_in(2), f_out;
     for (int j=1; j<order+1; ++j) {
       // Expression for the state derivative at the collocation point
       MX xp_j = 0;
-      for (int r=0; r<order+1; ++r) xp_j+= C[j][r]*Xc[r];
+      for (int r=0; r<=order; ++r) xp_j+= C[j][r]*x[r];
 
       // Collocation equations
-      f_in[0] = Xc[j];
+      f_in[0] = x[j];
       f_in[1] = p;
       f_out = f(f_in);
       V_eq.push_back(dt*f_out.at(0)-xp_j);
@@ -325,17 +316,17 @@ namespace casadi {
 
     // Get an expression for the state at the end of the finite element
     std::vector<MX> ifcn_in(4);
-    ifcn_in[0] = MX::zeros(v.sparsity());
+    ifcn_in[0] = repmat(x0, order);
     ifcn_in[1] = x0;
     ifcn_in[2] = p;
     ifcn_in[3] = tf;
 
     std::vector<MX> ifcn_out = ifcn(ifcn_in);
-    Vs = vertsplit(ifcn_out[0], x0.size1());
+    x = vertsplit(ifcn_out[0], x0.size1());
 
     MX XF = 0;
-    for (int i=0; i<order+1; ++i) {
-      XF += D[i]*(i==0 ? x0 : x0 + Vs[i-1]);
+    for (int i=0; i<=order; ++i) {
+      XF += D[i]*(i==0 ? x0 : x[i-1]);
     }
 
     // Get the discrete time dynamics
