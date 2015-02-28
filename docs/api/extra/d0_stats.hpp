@@ -385,15 +385,6 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_LrDleSolver_smith
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>iter_count</td></tr>
-</table>
-*/
 /// \cond INTERNAL
 /** \class casadi::SnoptInterface
 \n
