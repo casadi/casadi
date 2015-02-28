@@ -3395,17 +3395,6 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_LrDleSolver_smith
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>max_iter</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of iterations for the algorithm</td></tr>
-<tr><td>print_iteration</td><td>OT_BOOLEAN</td><td>false</td><td>Print information about each iteration</td></tr>
-<tr><td>tol</td><td>OT_REAL</td><td>1e-12</td><td>Tolerance for satisfying the Lyapunov equation.</td></tr>
-</table>
-*/
 /// \cond INTERNAL
 /** \class casadi::SnoptInterface
 \n
