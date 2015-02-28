@@ -71,7 +71,7 @@ namespace casadi {
 
   /** \brief Construct an explicit Runge-Kutta integrator
    * The constructed function (which is of type MXFunction), has three inputs,
-   * corresponding to initial state (x0), parameter (p) and integration time (tf)
+   * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
    *
    * \param f     ODE function with two inputs (x and p) and one output (xdot)
@@ -82,7 +82,7 @@ namespace casadi {
 
   /** \brief Construct an implicit Runge-Kutta integrator using a collocation scheme
    * The constructed function (which is of type MXFunction), has three inputs,
-   * corresponding to initial state (x0), parameter (p) and integration time (tf)
+   * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
    *
    * \param f      ODE function with two inputs (x and p) and one output (xdot)
@@ -98,7 +98,7 @@ namespace casadi {
   /** \brief Simplified wrapper for the Integrator class
    * Constructs an integrator using the same syntax as simpleRK and simpleIRK.
    * The constructed function (which is of type MXFunction), has three inputs,
-   * corresponding to initial state (x0), parameter (p) and integration time (tf)
+   * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
    *
    * \param f      ODE function with two inputs (x and p) and one output (xdot)

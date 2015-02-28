@@ -145,7 +145,7 @@ namespace casadi {
 
     MX x0 = MX::sym("x0", f.input(0).sparsity());
     MX p = MX::sym("p", f.input(1).sparsity());
-    MX tf = MX::sym("tf");
+    MX h = MX::sym("h");
 
     std::vector<double> b(order);
     b[0]=1.0/6;
@@ -169,7 +169,7 @@ namespace casadi {
     A[2][1]=0;A[2][2]=1;
 
     // Time step
-    MX dt = tf/N;
+    MX dt = h/N;
 
     std::vector<MX> k(order);
     vector<MX> f_arg(2);
@@ -196,10 +196,10 @@ namespace casadi {
     vector<MX> ret_in(3);
     ret_in[0] = x0;
     ret_in[1] = p;
-    ret_in[2] = tf;
+    ret_in[2] = h;
     MXFunction ret(ret_in, xf);
     ret.setOption("name", "F");
-    ret.setInputScheme(IOScheme("x0", "p", "tf"));
+    ret.setInputScheme(IOScheme("x0", "p", "h"));
     ret.setOutputScheme(IOScheme("xf"));
     ret.init();
     return ret;
@@ -276,10 +276,10 @@ namespace casadi {
     // Inputs of constructed function
     MX x0 = MX::sym("x0", f.input(0).sparsity());
     MX p = MX::sym("p", f.input(1).sparsity());
-    MX tf = MX::sym("tf");
+    MX h = MX::sym("h");
 
     // Time step
-    MX dt = tf/N;
+    MX dt = h/N;
 
     // Implicitly defined variables
     MX v = MX::sym("v", repmat(x0.sparsity(), order));
@@ -305,7 +305,7 @@ namespace casadi {
     rfp_in[0] = v;
     rfp_in[1] = x0;
     rfp_in[2] = p;
-    rfp_in[3] = tf;
+    rfp_in[3] = h;
     Function rfp = MXFunction(rfp_in, vertcat(V_eq));
     rfp.init();
 
@@ -321,7 +321,7 @@ namespace casadi {
       ifcn_in[0] = repmat(xf, order);
       ifcn_in[1] = xf;
       ifcn_in[2] = p;
-      ifcn_in[3] = tf;
+      ifcn_in[3] = h;
       ifcn_out = ifcn(ifcn_in);
       x = vertsplit(ifcn_out[0], x0.size1());
 
@@ -336,10 +336,10 @@ namespace casadi {
     vector<MX> ret_in(3);
     ret_in[0] = x0;
     ret_in[1] = p;
-    ret_in[2] = tf;
+    ret_in[2] = h;
     MXFunction ret(ret_in, xf);
     ret.setOption("name", "F");
-    ret.setInputScheme(IOScheme("x0", "p", "tf"));
+    ret.setInputScheme(IOScheme("x0", "p", "h"));
     ret.setOutputScheme(IOScheme("xf"));
     ret.init();
     return ret;
@@ -365,11 +365,11 @@ namespace casadi {
     // Normalized xdot
     int u_offset[] = {0, 1, 1+p_sp.size1()};
     vector<MX> pp = vertsplit(u, vector<int>(u_offset, u_offset+3));
-    MX tf = pp[0];
+    MX h = pp[0];
     MX p = reshape(pp[1], p_sp.shape());
     MX f_in[] = {x, p};
     MX xdot = f(vector<MX>(f_in, f_in+2)).at(0);
-    xdot *= tf;
+    xdot *= h;
 
     // Form DAE function
     MXFunction dae(daeIn("x", x, "p", u), daeOut("ode", xdot));
@@ -378,25 +378,26 @@ namespace casadi {
     Integrator ifcn(integrator, dae);
     ifcn.setOption("name", "integrator");
     ifcn.setOption(integrator_options);
+    ifcn.setOption("t0", 0); // Normalized time
     ifcn.setOption("tf", 1); // Normalized time
     ifcn.init();
 
     // Inputs of constructed function
     MX x0 = MX::sym("x0", x_sp);
     p = MX::sym("p", p_sp);
-    tf = MX::sym("tf");
+    h = MX::sym("h");
 
     // State at end
-    MX xf = ifcn(integratorIn("x0", x0, "p", vertcat(tf, vec(p))))[INTEGRATOR_XF];
+    MX xf = ifcn(integratorIn("x0", x0, "p", vertcat(h, vec(p))))[INTEGRATOR_XF];
 
     // Form discrete-time dynamics
     vector<MX> ret_in(3);
     ret_in[0] = x0;
     ret_in[1] = p;
-    ret_in[2] = tf;
+    ret_in[2] = h;
     MXFunction ret(ret_in, xf);
     ret.setOption("name", "F");
-    ret.setInputScheme(IOScheme("x0", "p", "tf"));
+    ret.setInputScheme(IOScheme("x0", "p", "h"));
     ret.setOutputScheme(IOScheme("xf"));
     ret.init();
     return ret;

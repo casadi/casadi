@@ -119,13 +119,13 @@ class Integrationtests(casadiTestCase):
       integrator.init()
 
       solution = SXFunction([x,p,tf],[x*exp(tf)])
-      solution.setInputScheme(IOScheme(["x0","p","tf"]))
+      solution.setInputScheme(IOScheme(["x0","p","h"]))
       solution.setOutputScheme(IOScheme(["xf"]))
       solution.init()
 
       for f in [solution,integrator]:
         f.setInput(1,"x0")
-        f.setInput(1,"tf")
+        f.setInput(1,"h")
       integrator.evaluate()
       self.checkfunction(integrator,solution,digits=3)
 
@@ -148,14 +148,14 @@ class Integrationtests(casadiTestCase):
       integrator.init()
 
       solution = SXFunction([vertcat((q0,t0)),p,t],[vertcat([q0*exp(((t0+t)**3-t0**3)/(3*p)),t0+t])])
-      solution.setInputScheme(IOScheme(["x0","p","tf"]))
+      solution.setInputScheme(IOScheme(["x0","p","h"]))
       solution.setOutputScheme(IOScheme(["xf"]))
       solution.init()
       
       for f in [solution,integrator]:
         f.setInput([0.3,0],"x0")
         f.setInput(0.7,"p")
-        f.setInput(1, "tf")
+        f.setInput(1, "h")
       
       self.checkfunction(integrator,solution,digits=3)
     
