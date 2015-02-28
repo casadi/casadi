@@ -1169,15 +1169,6 @@
 @copydoc scheme_IntegratorInput
 */
 /// \cond INTERNAL
-/** \class casadi::SmithLrDleInternal
-\n
-\par
-@copydoc scheme_LR_DLEInput
-<br/>
-@copydoc scheme_LR_DLEOutput
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::SnoptInterface
 \n
 \par

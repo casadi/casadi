@@ -375,17 +375,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::SmithLrDleInternal
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>iter_count</td><td>casadi::SmithLrDleInternal</td></tr>
-</table>
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::SnoptInterface
 \n
 \par
