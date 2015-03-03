@@ -312,6 +312,14 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) rhs[d] = fsens[d][iout_];
     rhs = horzsplit(J->getSolve(horzcat(rhs), false, linsol_));
     for (int d=0; d<nfwd; ++d) fsens[d][iout_] = -rhs[d];
+
+    // Propagate to auxiliary outputs
+    int num_out = getNumOutputs();
+    if (num_out>1) {
+      for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
+      f_.callForward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+      for (int d=0; d<nfwd; ++d) fsens[d][iout_] = f_fseed[d][iin_]; // Otherwise overwritten
+    }
   }
 
   void ImplicitFunctionInternal::
