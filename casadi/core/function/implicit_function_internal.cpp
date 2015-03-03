@@ -309,9 +309,9 @@ namespace casadi {
 
     // Solve for all the forward derivatives at once
     vector<MX> rhs(nfwd);
-    for (int d=0; d<nfwd; ++d) rhs[d] = fsens[d][iout_];
-    rhs = horzsplit(J->getSolve(horzcat(rhs), false, linsol_));
-    for (int d=0; d<nfwd; ++d) fsens[d][iout_] = -rhs[d];
+    for (int d=0; d<nfwd; ++d) rhs[d] = vec(fsens[d][iout_]);
+    rhs = horzsplit(J->getSolve(-horzcat(rhs), false, linsol_));
+    for (int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], input(iin_).shape());
 
     // Propagate to auxiliary outputs
     int num_out = getNumOutputs();
@@ -340,26 +340,44 @@ namespace casadi {
     f_arg.at(iin_) = res.at(iout_);
     MX J = jac_(f_arg).front();
 
-    // Solve for all the adjoint seeds at once
-    vector<MX> rhs(nadj);
-    for (int d=0; d<nadj; ++d) rhs[d] = aseed[d][iout_];
-    rhs = horzsplit(J->getSolve(horzcat(rhs), true, linsol_));
+    // Get adjoint seeds for calling f
     int num_out = getNumOutputs();
+    int num_in = getNumInputs();
+    vector<MX> f_res(res);
+    f_res[iout_] = MX(input(iin_).shape()); // zero residual
     vector<vector<MX> > f_aseed(nadj);
     for (int d=0; d<nadj; ++d) {
       f_aseed[d].resize(num_out);
-      for (int i=0; i<num_out; ++i)
-        f_aseed[d][i] = i==iout_ ? -rhs[d] : -aseed[d][i];
+      for (int i=0; i<num_out; ++i) f_aseed[d][i] = i==iout_ ? f_res[iout_] : aseed[d][i];
     }
 
+    // Propagate dependencies from auxiliary outputs
+    vector<MX> rhs(nadj);
+    vector<vector<MX> > asens_aux;
+    if (num_out>1) {
+      f_.callReverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
+      for (int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
+    } else {
+      for (int d=0; d<nadj; ++d) rhs[d] = vec(aseed[d][iout_]);
+    }
+
+    // Solve for all the adjoint seeds at once
+    rhs = horzsplit(J->getSolve(-horzcat(rhs), true, linsol_));
+    for (int d=0; d<nadj; ++d) f_aseed[d][iout_] = reshape(rhs[d], input(iin_).shape());
+
     // Propagate through f_
-    vector<MX> f_res(res);
-    f_res.at(iout_) = MX(input(iin_).shape()); // zero residual
     f_.callReverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
 
     // No dependency on guess
     for (int d=0; d<nadj; ++d) {
       asens[d][iin_] = MX(input(iin_).shape());
+    }
+
+    // Add contribution from auxiliary outputs
+    if (num_out>1) {
+      for (int d=0; d<nadj; ++d) {
+        for (int i=0; i<num_in; ++i) if (i!=iin_) asens[d][i] += asens_aux[d][i];
+      }
     }
   }
 
