@@ -232,7 +232,7 @@ namespace casadi {
 
       // Propagate to auxiliary outputs
       if (getNumOutputs()>1) {
-        f_.output(iout_).setBV(output(iout_));
+        f_.input(iin_).setBV(output(iout_));
         f_.spEvaluate(true);
         for (int i=0; i<getNumOutputs(); ++i) {
           if (i!=iout_) output(i).setBV(f_.output(i));
