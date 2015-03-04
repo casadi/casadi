@@ -366,10 +366,10 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<num_out; ++i) {
         if (i==iout_) {
-          f_aseed[d][i] = reshape(rhs[d], input(iin_).shape());
+          f_aseed[d][i] = reshape(rhs[d], output(i).shape());
         } else {
           // Avoid counting the auxiliary seeds twice
-          f_aseed[d][i] = MX(input(i).shape());
+          f_aseed[d][i] = MX(output(i).shape());
         }
       }
     }
