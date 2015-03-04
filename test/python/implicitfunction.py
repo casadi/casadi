@@ -81,8 +81,31 @@ class NLPtests(casadiTestCase):
       refsol.init()
       refsol.setInput(A_,1)
       refsol.setInput(b_,2)      
-      self.checkfunction(solver,refsol,digits=10)         
-   
+      self.checkfunction(solver,refsol,digits=10)
+      
+      
+      A = SX.sym("A",2,2)
+      b = SX.sym("b",2)
+      f=SXFunction([x,A,b],[mul(A,x)-b,mul(C_,x)])
+      f.init()
+      for ad_weight_sp in [0,1]:
+        for ad_weight in [0,1]:
+          print ad_weight, ad_weight_sp
+          solver=ImplicitFunction(Solver,f)
+          solver.setOption("ad_weight_sp",ad_weight_sp)
+          solver.setOption("ad_weight",ad_weight)
+          solver.setOption(options)
+          solver.init()
+          solver.setInput(0,0)
+          solver.setInput(A_,1)
+          solver.setInput(b_,2)
+      
+          refsol = SXFunction([x,A,b],[solve(A,b),mul(C_,solve(A,b))])      
+          refsol.init()
+          refsol.setInput(0,0)
+          refsol.setInput(A_,1)
+          refsol.setInput(b_,2)      
+          self.checkfunction(solver,refsol,digits=10)         
 
   def test_scalar1(self):
     self.message("Scalar implicit problem, n=0")
@@ -100,7 +123,7 @@ class NLPtests(casadiTestCase):
       refsol = SXFunction([x],[ceil(x/pi-0.5)*pi])
       refsol.init()
       refsol.setInput(6)
-      self.checkfunction(solver,refsol,digits=5)         
+      self.checkfunction(solver,refsol,digits=10)         
       
   def test_scalar2(self):
     self.message("Scalar implicit problem, n=1")
@@ -309,6 +332,31 @@ class NLPtests(casadiTestCase):
     self.checkarray(G.getOutput(),DMatrix([2]))
     self.checkarray(J.getOutput(),DMatrix([2]))
     
+  def test_extra_outputs(self):
+    x = SX.sym("x")
+    a = SX.sym("a")
+    f = SXFunction([x,a],[tan(x)-a,sqrt(a)*x**2 ])
+
+    f.init()
+    for Solver, options in solvers:
+      solver=ImplicitFunction(Solver,f)
+      solver.setOption("ad_weight_sp",1)
+      solver.setOption(options)
+      solver.init()
+      solver.setInput(0.3,1)
+      solver.setInput(0.1,0)
+      solver.evaluate()
+      
+      refsol = SXFunction([x,a],[arctan(a),sqrt(a)*arctan(a)**2]) 
+      refsol.init()
+      refsol.setInput(0.3,1)
+      refsol.setInput(0.1,0)
+      self.checkfunction(solver,refsol,digits=5)
+
+    x = SX.sym("x",2)
+    a = SX.sym("a",2)
+    f = SXFunction([x,a],[tan(x)-a,sqrt(a)*x**2 ])
+
 if __name__ == '__main__':
     unittest.main()
 
