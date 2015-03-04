@@ -337,7 +337,7 @@ namespace casadi {
 
     // Get expression of Jacobian
     vector<MX> f_arg(arg);
-    f_arg.at(iin_) = res.at(iout_);
+    f_arg[iin_] = res.at(iout_);
     MX J = jac_(f_arg).front();
 
     // Get adjoint seeds for calling f
@@ -363,7 +363,16 @@ namespace casadi {
 
     // Solve for all the adjoint seeds at once
     rhs = horzsplit(J->getSolve(-horzcat(rhs), true, linsol_));
-    for (int d=0; d<nadj; ++d) f_aseed[d][iout_] = reshape(rhs[d], input(iin_).shape());
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<num_out; ++i) {
+        if (i==iout_) {
+          f_aseed[d][i] = reshape(rhs[d], input(iin_).shape());
+        } else {
+          // Avoid counting the auxiliary seeds twice
+          f_aseed[d][i] = MX(input(i).shape());
+        }
+      }
+    }
 
     // Propagate through f_
     f_.callReverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
