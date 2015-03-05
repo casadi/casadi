@@ -62,7 +62,7 @@ int main(){
    */
 
   // Optimization variables
-  MX x = MX.sym("x",2);
+  MX x = MX::sym("x",2);
 
   // Objective
   MX f = x[0]*x[0] + x[1]*x[1];
