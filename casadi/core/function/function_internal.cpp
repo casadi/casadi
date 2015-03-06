@@ -1923,7 +1923,7 @@ namespace casadi {
     generateIO(gen);
 
     // Generate the actual function
-    generateFunction(gen.function_, "evaluate", "const d*", "d*", "d", gen);
+    generateFunction(gen.function_, "eval", "const d*", "d*", "d", gen);
 
     // Flush the code generator
     gen.flush(cfile);
@@ -1936,7 +1936,7 @@ namespace casadi {
     nTmp(ni, nr);
     cfile << "  static int iii[" << ni << "];" << endl;
     cfile << "  static d w[" << nr << "];" << endl;
-    cfile << "  evaluate(";
+    cfile << "  eval(";
 
     // Number of inputs/outputs
     int n_i = input_.data.size();
@@ -1956,6 +1956,42 @@ namespace casadi {
 
     cfile << ", iii, w); " << std::endl;
     cfile << "  return 0;" << std::endl;
+    cfile << "}" << std::endl << std::endl;
+
+    // Legacy syntax
+    cfile << "void evaluate(";
+
+    // Declare inputs
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
+    for (int i=0; i<n_in; ++i) {
+      cfile << "const d* x" << i;
+      if (i+1<n_in+n_out) cfile << ", ";
+    }
+
+    // Declare outputs
+    for (int i=0; i<n_out; ++i) {
+      cfile << "d* r" << i;
+      if (i+1<n_out) cfile << ", ";
+    }
+    cfile << ") { " << std::endl;
+
+    // Collect input arguments
+    cfile << "  const d* x[] = {";
+    for (int i=0; i<n_i; ++i) {
+      if (i!=0) cfile << ", ";
+      cfile << "x" << i;
+    }
+    cfile << "};" << std::endl;
+
+    // Collect output arguments
+    cfile << "  d* r[] = {";
+    for (int i=0; i<n_o; ++i) {
+      if (i!=0) cfile << ", ";
+      cfile << "r" << i;
+    }
+    cfile << "};" << std::endl;
+    cfile << "  evaluateWrap(x, r);" << std::endl;
     cfile << "}" << std::endl << std::endl;
 
     // Create a main for debugging and profiling: TODO: Cleanup and expose to user, see #617
