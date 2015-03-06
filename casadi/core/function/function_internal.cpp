@@ -2077,6 +2077,7 @@ namespace casadi {
     stringstream &s = gen.function_;
 
     // Function that returns the number of inputs and outputs
+    s << endl;
     s << "int init(int *n_in, int *n_out) {" << endl;
     s << "  *n_in = " << n_i << ";" << endl;
     s << "  *n_out = " << n_o << ";" << endl;
@@ -2137,6 +2138,15 @@ namespace casadi {
     s << "  *row = sp + 2 + (*ncol + 1);" << endl;
     s << "  return 0;" << endl;
     s << "}" << endl << endl;
+
+    // Function that returns work vector lengths
+    size_t ni, nr;
+    nTmp(ni, nr);
+    s << "void nwork(int *ni, int *nr) {" << endl;
+    s << "  if (ni) *ni = " << ni << ";" << endl;
+    s << "  if (nr) *nr = " << nr << ";" << endl;
+    s << "}" << endl;
+    s << endl;
   }
 
   Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,
