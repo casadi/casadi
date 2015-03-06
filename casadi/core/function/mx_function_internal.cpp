@@ -397,8 +397,9 @@ namespace casadi {
     log("MXFunctionInternal::init end");
   }
 
-  void MXFunctionInternal::evaluate() {
-    casadi_log("MXFunctionInternal::evaluate():begin "  << getOption("name"));
+  void MXFunctionInternal::evalD(const cpv_double& arg,
+                                 const pv_double& res, int* itmp, double* rtmp) {
+    casadi_log("MXFunctionInternal::evalD():begin "  << getOption("name"));
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
@@ -413,10 +414,8 @@ namespace casadi {
     }
 
     // Work vector and temporaries to hold pointers to operation input and outputs
-    double* w = getPtr(rtmp_);
-    int* iw = getPtr(itmp_);
-    vector<const double*> arg(max_arg_);
-    vector<double*> res(max_res_);
+    vector<const double*> oarg(max_arg_);
+    vector<double*> ores(max_res_);
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -436,17 +435,28 @@ namespace casadi {
 
       if (it->op==OP_INPUT) {
         // Pass an input
-        input(it->arg.front()).get(w+workloc_[it->res.front()]);
+        double *w = rtmp+workloc_[it->res.front()];
+        int i=it->arg.front();
+        int nnz=input(i).nnz();
+        if (arg[i]==0) {
+          fill(w, w+nnz, 0);
+        } else {
+          copy(arg[i], arg[i]+nnz, w);
+        }
       } else if (it->op==OP_OUTPUT) {
         // Get an output
-        output(it->res.front()).set(w+workloc_[it->arg.front()]);
+        double *w = rtmp+workloc_[it->arg.front()];
+        int i=it->res.front();
+        if (res[i]!=0) copy(w, w+output(i).nnz(), res[i]);
       } else {
         // Point pointers to the data corresponding to the element
-        for (int i=0; i<it->arg.size(); ++i) arg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
-        for (int i=0; i<it->res.size(); ++i) res[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+        for (int i=0; i<it->arg.size(); ++i)
+          oarg[i] = it->arg[i]>=0 ? rtmp+workloc_[it->arg[i]] : 0;
+        for (int i=0; i<it->res.size(); ++i)
+          ores[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalD(arg, res, iw, w);
+        it->data->evalD(oarg, ores, itmp, rtmp);
       }
 
       // Write out profiling information
@@ -483,7 +493,7 @@ namespace casadi {
       }
     }
 
-    casadi_log("MXFunctionInternal::evaluate():end "  << getOption("name"));
+    casadi_log("MXFunctionInternal::evalD():end "  << getOption("name"));
   }
 
   void MXFunctionInternal::print(ostream &stream, const AlgEl& el) const {

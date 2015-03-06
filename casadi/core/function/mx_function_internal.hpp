@@ -76,8 +76,8 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~MXFunctionInternal();
 
-    /** \brief  Evaluate the algorithm */
-    virtual void evaluate();
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
 
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
