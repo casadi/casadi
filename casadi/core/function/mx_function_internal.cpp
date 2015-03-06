@@ -1145,8 +1145,6 @@ namespace casadi {
     stream << "  int i, j, k, *ii, *jj, *kk;" << endl;
     stream << "  d r, s, t, *rr, *ss, *tt;" << endl;
     stream << "  const d *cr, *cs, *ct;" << endl;
-    stream << "  static int iii[" << itmp_.size() << "];" << endl;
-    stream << "  static d w[" << rtmp_.size() << "];" << endl;
 
     // Operation number (for printing)
     int k=0;

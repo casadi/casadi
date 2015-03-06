@@ -1930,6 +1930,12 @@ namespace casadi {
 
     // Define wrapper function
     cfile << "int evaluateWrap(const d** x, d** r) {" << std::endl;
+
+    // Temporary memory
+    size_t ni, nr;
+    nTmp(ni, nr);
+    cfile << "  static int iii[" << ni << "];" << endl;
+    cfile << "  static d w[" << nr << "];" << endl;
     cfile << "  evaluate(";
 
     // Number of inputs/outputs
@@ -1948,7 +1954,7 @@ namespace casadi {
       cfile << "r[" << i << "]";
     }
 
-    cfile << "); " << std::endl;
+    cfile << ", iii, w); " << std::endl;
     cfile << "  return 0;" << std::endl;
     cfile << "}" << std::endl << std::endl;
 
@@ -2042,7 +2048,7 @@ namespace casadi {
       if (i+1<n_out)
         stream << ", ";
     }
-    stream << ") { " << std::endl;
+    stream << ", int* iii, d* w) { " << std::endl;
 
     // Insert the function body
     generateBody(stream, type, gen);
@@ -2313,18 +2319,16 @@ namespace casadi {
 
     // Pass inputs to the function input buffers
     for (int i=0; i<arg.size(); ++i) {
-      stream << gen.work(arg.at(i));
-      if (i+1<arg.size()+res.size()) stream << ", ";
+      stream << gen.work(arg.at(i)) << ", ";
     }
 
     // Pass results to the function input buffers
     for (int i=0; i<res.size(); ++i) {
-      stream << gen.work(res.at(i));
-      if (i+1<res.size()) stream << ", ";
+      stream << gen.work(res.at(i)) << ", ";
     }
 
     // Finalize the function call
-    stream << ");" << endl;
+    stream << "iii, w);" << endl;
   }
 
   void FunctionInternal::nTmp(size_t& ni, size_t& nr) {
