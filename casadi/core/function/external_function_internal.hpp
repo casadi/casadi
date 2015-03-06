@@ -42,8 +42,8 @@
 
 namespace casadi {
 
-class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
-  friend class ExternalFunction;
+  class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
+    friend class ExternalFunction;
   public:
 
     /** \brief  constructor */
@@ -55,43 +55,43 @@ class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
     /** \brief  Destructor */
     virtual ~ExternalFunctionInternal();
 
-    /** \brief  Evaluate */
-    virtual void evaluate();
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
+
+    /** \brief  Work vector sizes */
+    virtual void nTmp(size_t& ni, size_t& nr);
 
     /** \brief  Initialize */
     virtual void init();
 
   protected:
 
-///@{
-/** \brief  Function pointer types */
-  typedef int (*evaluatePtr)(const double** x, double** r);
-  typedef int (*initPtr)(int *n_in_, int *n_out_);
-  typedef int (*getSparsityPtr)(int n_in, int *n_row, int *n_col, int **colind, int **row);
-///@}
+    ///@{
+    /** \brief  Function pointer types */
+    typedef int (*evalPtr)(const double* const* arg, double* const* res, int* iw, double* w);
+    typedef int (*initPtr)(int *n_in, int *n_out);
+    typedef int (*getSparsityPtr)(int n_in, int *n_row, int *n_col, int **colind, int **row);
+    typedef int (*nworkPtr)(int *ni, int *nr);
+    ///@}
 
-  /** \brief  Name of binary */
-  std::string bin_name_;
+    /** \brief  Name of binary */
+    std::string bin_name_;
 
-  /** \brief  Function pointers */
-  evaluatePtr evaluate_;
+    /** \brief  Function pointers */
+    evalPtr eval_;
 
 #if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
-  typedef HINSTANCE handle_t;
+    typedef HINSTANCE handle_t;
 #else
-  typedef void* handle_t;
+    typedef void* handle_t;
 #endif
 
-  /** \brief  handle to the dll */
-  handle_t handle_;
+    /** \brief  handle to the dll */
+    handle_t handle_;
 
-  /** \brief  Array of pointers to the input */
-  std::vector<const double*> input_array_;
-
-  /** \brief  Array of pointers to the output */
-  std::vector<double*> output_array_;
-
-};
+    /** \brief Work vector sizes */
+    size_t ni_, nr_;
+  };
 
 } // namespace casadi
 /// \endcond

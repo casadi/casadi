@@ -2141,9 +2141,10 @@ namespace casadi {
     // Function that returns work vector lengths
     size_t ni, nr;
     nTmp(ni, nr);
-    s << "void nwork(int *ni, int *nr) {" << endl;
+    s << "int nwork(int *ni, int *nr) {" << endl;
     s << "  if (ni) *ni = " << ni << ";" << endl;
     s << "  if (nr) *nr = " << nr << ";" << endl;
+    s << "  return 0;" << endl;
     s << "}" << endl;
     s << endl;
   }
