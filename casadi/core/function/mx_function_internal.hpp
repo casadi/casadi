@@ -54,12 +54,6 @@ namespace casadi {
     /** \brief  All the runtime elements in the order of evaluation */
     std::vector<AlgEl> algorithm_;
 
-    /** \brief  Temporary vector needed for the evaluation (integer) */
-    std::vector<int> itmp_;
-
-    /** \brief  Temporary vector needed for the evaluation (real) */
-    std::vector<double> rtmp_;
-
     /** \brief Offsets for elements in the rtmp_ vector */
     std::vector<int> workloc_;
 
@@ -143,7 +137,6 @@ namespace casadi {
 
     // print an element of an algorithm
     void print(std::ostream &stream, const AlgEl& el) const;
-
   };
 
 } // namespace casadi

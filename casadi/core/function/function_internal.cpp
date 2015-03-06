@@ -1252,6 +1252,49 @@ namespace casadi {
     log("FunctionInternal::getPartition end");
   }
 
+  void FunctionInternal::evaluate() {
+    // Allocate temporary memory if needed
+    size_t ni, nr;
+    nTmp(ni, nr);
+    itmp_.resize(ni);
+    rtmp_.resize(nr);
+
+    // Get pointers to input arguments
+    cpv_double arg(getNumInputs());
+    for (int i=0; i<arg.size(); ++i) arg[i]=input(i).ptr();
+
+    // Get pointers to output arguments
+    pv_double res(getNumOutputs());
+    for (int i=0; i<res.size(); ++i) res[i]=output(i).ptr();
+
+    // Call memory-less
+    evalD(arg, res, getPtr(itmp_), getPtr(rtmp_));
+  }
+
+  void FunctionInternal::evalD(const cpv_double& arg,
+                               const pv_double& res, int* itmp, double* rtmp) {
+    // Number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Pass the inputs to the function
+    for (int i=0; i<num_in; ++i) {
+      if (arg[i] != 0) {
+        setInput(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
+    // Evaluate
+    evaluate();
+
+    // Get the outputs
+    for (int i=0; i<num_out; ++i) {
+      if (res[i] != 0) getOutput(res[i], i);
+    }
+  }
+
   void FunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res) {
     casadi_error("FunctionInternal::evalSX not defined for class " << typeid(*this).name());
   }
@@ -2284,10 +2327,9 @@ namespace casadi {
     stream << ");" << endl;
   }
 
-  void FunctionInternal::nTmp(MXNode* node, size_t& ni, size_t& nr) {
-    // Start with no extra memory
-    ni=0;
-    nr=0;
+  void FunctionInternal::nTmp(size_t& ni, size_t& nr) {
+    ni=itmp_.size();
+    nr=rtmp_.size();
   }
 
   void FunctionInternal::printPart(const MXNode* node, std::ostream &stream, int part) const {

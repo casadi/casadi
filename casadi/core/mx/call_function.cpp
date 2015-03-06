@@ -77,28 +77,9 @@ namespace casadi {
     fcn_->printPart(this, stream, part);
   }
 
-  void CallFunction::evalD(const cpv_double& input, const pv_double& output,
+  void CallFunction::evalD(const cpv_double& arg, const pv_double& res,
                            int* itmp, double* rtmp) {
-    // Number of inputs and outputs
-    int num_in = fcn_.getNumInputs();
-    int num_out = fcn_.getNumOutputs();
-
-    // Pass the inputs to the function
-    for (int i = 0; i < num_in; ++i) {
-      if (input[i] != 0) {
-        fcn_.setInput(input[i], i);
-      } else {
-        fcn_.setInput(0., i);
-      }
-    }
-
-    // Evaluate
-    fcn_.evaluate();
-
-    // Get the outputs
-    for (int i=0; i<num_out; ++i) {
-      if (output[i] != 0) fcn_.getOutput(output[i], i);
-    }
+    fcn_->evalD(arg, res, itmp, rtmp);
   }
 
   int CallFunction::nout() const {
@@ -201,13 +182,11 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void CallFunction::spFwd(const cpv_bvec_t& arg,
-                           const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void CallFunction::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     fcn_->spFwd(arg, res, itmp, rtmp);
   }
 
-  void CallFunction::spAdj(const pv_bvec_t& arg,
-                           const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void CallFunction::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     fcn_->spAdj(arg, res, itmp, rtmp);
   }
 
@@ -217,7 +196,7 @@ namespace casadi {
   }
 
   void CallFunction::nTmp(size_t& ni, size_t& nr) {
-    fcn_->nTmp(this, ni, nr);
+    fcn_->nTmp(ni, nr);
   }
 
 } // namespace casadi
