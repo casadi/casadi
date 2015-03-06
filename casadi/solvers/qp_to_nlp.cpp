@@ -56,7 +56,7 @@ namespace casadi {
   }
 
   QpToNlp::QpToNlp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
-    Adaptor::addOptions();
+    Adaptor<QpToNlp, NlpSolverInternal>::addOptions();
   }
 
   QpToNlp::~QpToNlp() {

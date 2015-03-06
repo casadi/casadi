@@ -61,7 +61,7 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_lr_dle_to_dle"); // name of the function
 
-    Adaptor::addOptions();
+    Adaptor<DleToLrDle, LrDleInternal>::addOptions();
   }
 
   DleToLrDle::~DleToLrDle() {

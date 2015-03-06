@@ -60,7 +60,7 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_dle_to_dple"); // name of the function
 
-    Adaptor::addOptions();
+    Adaptor<DleToDple, DpleInternal>::addOptions();
   }
 
   DleToDple::~DleToDple() {

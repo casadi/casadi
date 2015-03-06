@@ -56,7 +56,7 @@ namespace casadi {
   }
 
   QpToQcqp::QpToQcqp(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
-    Adaptor::addOptions();
+    Adaptor<QpToQcqp, QcqpSolverInternal>::addOptions();
   }
 
   QpToQcqp::~QpToQcqp() {

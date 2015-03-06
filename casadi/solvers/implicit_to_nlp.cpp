@@ -48,7 +48,7 @@ namespace casadi {
   }
 
   QpToImplicit::QpToImplicit(const Function& f) : ImplicitFunctionInternal(f) {
-    Adaptor::addOptions();
+    Adaptor<QpToImplicit, NlpSolverInternal>::addOptions();
   }
 
   QpToImplicit::~QpToImplicit() {

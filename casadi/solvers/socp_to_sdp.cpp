@@ -58,7 +58,7 @@ namespace casadi {
   }
 
   SocpToSdp::SocpToSdp(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
-    Adaptor::addOptions();
+    Adaptor<SocpToSdp, SdpSolverInternal>::addOptions();
   }
 
   SocpToSdp::~SocpToSdp() {

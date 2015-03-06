@@ -62,7 +62,7 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_condensing_indef_dple_solver"); // name of the function
 
-    Adaptor::addOptions();
+    Adaptor<CondensingIndefDpleInternal, DleInternal>::addOptions();
 
   }
 

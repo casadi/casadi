@@ -62,7 +62,7 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_lifting_indef_dple_solver"); // name of the function
 
-    Adaptor::addOptions();
+    Adaptor<LiftingIndefDpleInternal, DleInternal>::addOptions();
 
     addOption("form",    OT_STRING,    "A",
               "The form of the lifting", "A:0|B:1");

@@ -51,7 +51,7 @@ namespace casadi {
   }
 
   SdqpToSdp::SdqpToSdp(const std::vector<Sparsity> &st) : SdqpSolverInternal(st) {
-    Adaptor::addOptions();
+    Adaptor<SdqpToSdp, SdpSolverInternal>::addOptions();
   }
 
   SdqpToSdp::~SdqpToSdp() {

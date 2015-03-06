@@ -61,7 +61,7 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_dple_to_lr_dple"); // name of the function
 
-    Adaptor::addOptions();
+    Adaptor<DpleToLrDple, LrDpleInternal>::addOptions();
 
   }
 
