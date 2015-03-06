@@ -102,12 +102,12 @@ namespace casadi {
                     lrdleOut("y", diagcat(HPH)));
     f_.init();
 
-    Wrapper::checkDimensions();
+    Wrapper<LrDleToDle>::checkDimensions();
 
   }
 
   void LrDleToDle::evaluate() {
-    Wrapper::evaluate();
+    Wrapper<LrDleToDle>::evaluate();
   }
 
   Function LrDleToDle::getDerForward(int nfwd) {

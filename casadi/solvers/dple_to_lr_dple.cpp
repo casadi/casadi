@@ -100,13 +100,13 @@ namespace casadi {
                     dpleOut("p", Pr[DPLE_P]));
     f_.init();
 
-    Wrapper::checkDimensions();
+    Wrapper<DpleToLrDple>::checkDimensions();
   }
 
 
 
   void DpleToLrDple::evaluate() {
-    Wrapper::evaluate();
+    Wrapper<DpleToLrDple>::evaluate();
   }
 
   Function DpleToLrDple::getDerForward(int nfwd) {

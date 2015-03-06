@@ -113,12 +113,12 @@ namespace casadi {
     f_ = MXFunction(dle_in, lrdleOut("y", with_H_? diagcat(HPH): out));
     f_.init();
 
-    Wrapper::checkDimensions();
+    Wrapper<FixedSmithLrDleInternal>::checkDimensions();
 
   }
 
   void FixedSmithLrDleInternal::evaluate() {
-    Wrapper::evaluate();
+    Wrapper<FixedSmithLrDleInternal>::evaluate();
   }
 
   Function FixedSmithLrDleInternal::getDerForward(int nfwd) {

@@ -122,14 +122,14 @@ namespace casadi {
     f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", horzcat(Ps)));
     f_.init();
 
-    Wrapper::checkDimensions();
+    Wrapper<CondensingIndefDpleInternal>::checkDimensions();
 
   }
 
 
 
   void CondensingIndefDpleInternal::evaluate() {
-    Wrapper::evaluate();
+    Wrapper<CondensingIndefDpleInternal>::evaluate();
   }
 
   Function CondensingIndefDpleInternal::getDerForward(int nfwd) {

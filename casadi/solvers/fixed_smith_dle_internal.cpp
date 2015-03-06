@@ -100,12 +100,12 @@ namespace casadi {
     f_ = MXFunction(dleIn("a", As, "v", Vs), dleOut("p", P));
     f_.init();
 
-    Wrapper::checkDimensions();
+    Wrapper<FixedSmithDleInternal>::checkDimensions();
 
   }
 
   void FixedSmithDleInternal::evaluate() {
-    Wrapper::evaluate();
+    Wrapper<FixedSmithDleInternal>::evaluate();
   }
 
   Function FixedSmithDleInternal::getDerForward(int nfwd) {

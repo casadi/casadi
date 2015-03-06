@@ -87,12 +87,12 @@ namespace casadi {
                     dleOut("p", Pr[DLE_P]));
     f_.init();
 
-    Wrapper::checkDimensions();
+    Wrapper<DleToLrDle>::checkDimensions();
 
   }
 
   void DleToLrDle::evaluate() {
-    Wrapper::evaluate();
+    Wrapper<DleToLrDle>::evaluate();
   }
 
   Function DleToLrDle::getDerForward(int nfwd) {

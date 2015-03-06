@@ -177,14 +177,14 @@ namespace casadi {
     f_.setOutputScheme(SCHEME_LR_DPLEOutput);
     f_.init();
 
-    Wrapper::checkDimensions();
+    Wrapper<LiftingLrDpleInternal>::checkDimensions();
 
   }
 
 
 
   void LiftingLrDpleInternal::evaluate() {
-    Wrapper::evaluate();
+    Wrapper<LiftingLrDpleInternal>::evaluate();
   }
 
   Function LiftingLrDpleInternal::getDerForward(int nfwd) {

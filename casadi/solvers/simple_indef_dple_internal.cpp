@@ -117,13 +117,13 @@ namespace casadi {
     f_ = MXFunction(dpleIn("a", As, "v", Vs), dpleOut("p", P));
     f_.init();
 
-    Wrapper::checkDimensions();
+    Wrapper<SimpleIndefDpleInternal>::checkDimensions();
   }
 
 
 
   void SimpleIndefDpleInternal::evaluate() {
-    Wrapper::evaluate();
+    Wrapper<SimpleIndefDpleInternal>::evaluate();
   }
 
   Function SimpleIndefDpleInternal::getDerForward(int nfwd) {
