@@ -274,7 +274,8 @@ namespace casadi {
       stream << "  ";
 
       if (it->op==OP_OUTPUT) {
-        stream << "if (r" << it->i0 << "!=0) r" << it->i0 << "[" << it->i2 << "]=" << "a" << it->i1;
+        stream << "if (res[" << it->i0 << "]!=0) "
+               << "res["<< it->i0 << "][" << it->i2 << "]=" << "a" << it->i1;
       } else {
         // Declare result if not already declared
         if (!declared[it->i0]) {
@@ -289,7 +290,7 @@ namespace casadi {
         if (it->op==OP_CONST) {
           gen.printConstant(stream, it->d);
         } else if (it->op==OP_INPUT) {
-          stream << "x" << it->i1 << "[" << it->i2 << "]";
+          stream << "arg[" << it->i1 << "][" << it->i2 << "]";
         } else {
           int ndep = casadi_math<double>::ndeps(it->op);
           casadi_math<double>::printPre(it->op, stream);

@@ -1176,9 +1176,9 @@ namespace casadi {
       if (it->op==OP_OUTPUT) {
         gen.copyVector(stream, CodeGenerator::work(workloc_[it->arg.front()]),
                        output(it->res.front()).nnz(),
-                       "r" + CodeGenerator::numToString(it->res.front()), "i", true);
+                       "res[" + CodeGenerator::numToString(it->res.front()) + "]", "i", true);
       } else if (it->op==OP_INPUT) {
-        gen.copyVector(stream, "x" + CodeGenerator::numToString(it->arg.front()),
+        gen.copyVector(stream, "arg[" + CodeGenerator::numToString(it->arg.front()) + "]",
                        input(it->arg.front()).nnz(),
                        CodeGenerator::work(workloc_[it->res.front()]), "i", false);
       } else {

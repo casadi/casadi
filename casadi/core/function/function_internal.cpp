@@ -1929,32 +1929,14 @@ namespace casadi {
     gen.flush(cfile);
 
     // Define wrapper function
-    cfile << "int evaluateWrap(const d** x, d** r) {" << std::endl;
+    cfile << "int evaluateWrap(const d** arg, d** res) {" << std::endl;
 
     // Temporary memory
     size_t ni, nr;
     nTmp(ni, nr);
-    cfile << "  static int iii[" << ni << "];" << endl;
+    cfile << "  static int iw[" << ni << "];" << endl;
     cfile << "  static d w[" << nr << "];" << endl;
-    cfile << "  eval(";
-
-    // Number of inputs/outputs
-    int n_i = input_.data.size();
-    int n_o = output_.data.size();
-
-    // Pass inputs
-    for (int i=0; i<n_i; ++i) {
-      if (i!=0) cfile << ", ";
-      cfile << "x[" << i << "]";
-    }
-
-    // Pass outputs
-    for (int i=0; i<n_o; ++i) {
-      if (i+n_i!= 0) cfile << ", ";
-      cfile << "r[" << i << "]";
-    }
-
-    cfile << ", iii, w); " << std::endl;
+    cfile << "  eval(arg, res, iw, w);" << endl;
     cfile << "  return 0;" << std::endl;
     cfile << "}" << std::endl << std::endl;
 
@@ -1977,21 +1959,21 @@ namespace casadi {
     cfile << ") { " << std::endl;
 
     // Collect input arguments
-    cfile << "  const d* x[] = {";
-    for (int i=0; i<n_i; ++i) {
+    cfile << "  const d* arg[] = {";
+    for (int i=0; i<n_in; ++i) {
       if (i!=0) cfile << ", ";
       cfile << "x" << i;
     }
     cfile << "};" << std::endl;
 
     // Collect output arguments
-    cfile << "  d* r[] = {";
-    for (int i=0; i<n_o; ++i) {
+    cfile << "  d* res[] = {";
+    for (int i=0; i<n_out; ++i) {
       if (i!=0) cfile << ", ";
       cfile << "r" << i;
     }
     cfile << "};" << std::endl;
-    cfile << "  evaluateWrap(x, r);" << std::endl;
+    cfile << "  evaluateWrap(arg, res);" << std::endl;
     cfile << "}" << std::endl << std::endl;
 
     // Create a main for debugging and profiling: TODO: Cleanup and expose to user, see #617
@@ -2063,28 +2045,9 @@ namespace casadi {
     // Generate declarations
     generateDeclarations(stream, type, gen);
 
-    // Number of inpus and outputs
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
-
     // Define function
     stream << "/* " << getSanitizedName() << " */" << std::endl;
-    stream << "void " << fname << "(";
-
-    // Declare inputs
-    for (int i=0; i<n_in; ++i) {
-      stream << input_type << " x" << i;
-      if (i+1<n_in+n_out)
-        stream << ", ";
-    }
-
-    // Declare outputs
-    for (int i=0; i<n_out; ++i) {
-      stream << output_type << " r" << i;
-      if (i+1<n_out)
-        stream << ", ";
-    }
-    stream << ", int* iii, d* w) { " << std::endl;
+    stream << "void " << fname << "(const d* const* arg, d* const* res, int* iii, d* w) {" << endl;
 
     // Insert the function body
     generateBody(stream, type, gen);
@@ -2358,23 +2321,37 @@ namespace casadi {
 
   void FunctionInternal::generate(std::ostream &stream, const std::vector<int>& arg,
                                   const std::vector<int>& res, CodeGenerator& gen) const {
+    // Number inputs and outputs
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
+
+    // Put in a separate scope to avoid name collisions
+    stream << "  {" << endl;
+
+    // Collect input arguments
+    stream << "    const d* arg1[] = {";
+    for (int i=0; i<n_in; ++i) {
+      if (i!=0) stream << ", ";
+      stream << gen.work(arg.at(i));
+    }
+    stream << "};" << endl;
+
+    // Collect output arguments
+    stream << "    d* res1[] = {";
+    for (int i=0; i<n_out; ++i) {
+      if (i!=0) stream << ", ";
+      stream << gen.work(res.at(i));
+    }
+    stream << "};" << endl;
 
     // Get the index of the function
     int f = gen.getDependency(shared_from_this<Function>());
-    stream << "  f" << f << "(";
 
-    // Pass inputs to the function input buffers
-    for (int i=0; i<arg.size(); ++i) {
-      stream << gen.work(arg.at(i)) << ", ";
-    }
-
-    // Pass results to the function input buffers
-    for (int i=0; i<res.size(); ++i) {
-      stream << gen.work(res.at(i)) << ", ";
-    }
+    // Call function
+    stream << "    f" << f << "(arg1, res1, iii, w);" << endl;
 
     // Finalize the function call
-    stream << "iii, w);" << endl;
+    stream << "  }" << endl;
   }
 
   void FunctionInternal::nTmp(size_t& ni, size_t& nr) {
