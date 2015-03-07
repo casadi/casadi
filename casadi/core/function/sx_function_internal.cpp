@@ -100,7 +100,8 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunctionInternal::evaluate() {
+  void SXFunctionInternal::evalD(const cpv_double& arg, const pv_double& res,
+                                 int* itmp, double* rtmp) {
     double time_start=0;
     double time_stop=0;
     if (CasadiOptions::profiling) {
@@ -127,8 +128,7 @@ namespace casadi {
 #ifdef WITH_OPENCL
     if (just_in_time_opencl_) {
       // Evaluate with OpenCL
-      evaluateOpenCL();
-      return; // Quick return
+      return evaluateOpenCL();
     }
 #endif // WITH_OPENCL
 
@@ -136,20 +136,20 @@ namespace casadi {
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
         // Start by adding all of the built operations
-        CASADI_MATH_FUN_BUILTIN(work_[it->i1], work_[it->i2], work_[it->i0])
+        CASADI_MATH_FUN_BUILTIN(rtmp[it->i1], rtmp[it->i2], rtmp[it->i0])
 
         // Constant
-        case OP_CONST: work_[it->i0] = it->d; break;
+        case OP_CONST: rtmp[it->i0] = it->d; break;
 
         // Load function input to work vector
-        case OP_INPUT: work_[it->i0] = inputNoCheck(it->i1).data()[it->i2]; break;
+        case OP_INPUT: rtmp[it->i0] = arg[it->i1][it->i2]; break;
 
         // Get function output from work vector
-        case OP_OUTPUT: outputNoCheck(it->i0).data()[it->i2] = work_[it->i1]; break;
+        case OP_OUTPUT: if (res[it->i0]) res[it->i0][it->i2] = rtmp[it->i1]; break;
       }
     }
 
-    casadi_log("SXFunctionInternal::evaluate():end " << getOption("name"));
+    casadi_log("SXFunctionInternal::evalD():end " << getOption("name"));
 
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
@@ -266,7 +266,7 @@ namespace casadi {
                                         CodeGenerator& gen) const {
 
     // Which variables have been declared
-    vector<bool> declared(work_.size(), false);
+    vector<bool> declared(rtmp_.size(), false);
 
     // Run the algorithm
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -498,7 +498,7 @@ namespace casadi {
     }
 
     // Allocate work vectors (symbolic/numeric)
-    work_.resize(worksize, numeric_limits<double>::quiet_NaN());
+    rtmp_.resize(worksize, numeric_limits<double>::quiet_NaN());
     s_work_.resize(worksize);
 
     // Reset the temporary variables
@@ -929,8 +929,8 @@ namespace casadi {
     // We need a work array containing unsigned long rather than doubles.
     // Since the two datatypes have the same size (64 bits)
     // we can save overhead by reusing the double array
-    bvec_t *iwork = get_bvec_t(work_);
-    if (!fwd) fill_n(iwork, work_.size(), bvec_t(0));
+    bvec_t *iwork = get_bvec_t(rtmp_);
+    if (!fwd) fill_n(iwork, rtmp_.size(), bvec_t(0));
   }
 
   void SXFunctionInternal::spEvaluate(bool fwd) {
@@ -943,7 +943,7 @@ namespace casadi {
 #endif // WITH_OPENCL
 
     // Get work array
-    bvec_t *iwork = get_bvec_t(work_);
+    bvec_t *iwork = get_bvec_t(rtmp_);
 
     if (fwd) {
       // Propagate sparsity forward
@@ -1059,7 +1059,7 @@ namespace casadi {
 
       if (use_fwd) {
         // Which variables have been declared
-        vector<bool> declared(work_.size(), false);
+        vector<bool> declared(rtmp_.size(), false);
 
         // Propagate sparsity forward
         for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -1100,7 +1100,7 @@ namespace casadi {
         ss << "ulong t;" << endl;
 
         // Declare and initialize work vector
-        for (int i=0; i<work_.size(); ++i) {
+        for (int i=0; i<rtmp_.size(); ++i) {
           ss << "ulong a" << i << "=0;"<< endl;
         }
 

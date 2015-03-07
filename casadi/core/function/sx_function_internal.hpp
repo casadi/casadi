@@ -91,8 +91,8 @@ class CASADI_EXPORT SXFunctionInternal :
   /** \brief  Destructor */
   virtual ~SXFunctionInternal();
 
-  /** \brief  Evaluate the function numerically */
-  virtual void evaluate();
+  /** \brief  Evaluate numerically, work vectors given */
+  virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
   virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
@@ -140,9 +140,6 @@ class CASADI_EXPORT SXFunctionInternal :
 
   /** \brief  all binary nodes of the tree in the order of execution */
   std::vector<AlgEl> algorithm_;
-
-  /** \brief  Working vector for numeric calculation */
-  std::vector<double> work_;
 
   /// work vector for symbolic calculations (allocated first time)
   std::vector<SXElement> s_work_;

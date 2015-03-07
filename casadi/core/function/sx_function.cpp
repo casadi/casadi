@@ -174,7 +174,7 @@ SX SXFunction::getFree() const {
 }
 
 int SXFunction::getWorkSize() const {
-  return (*this)->work_.size();
+  return (*this)->rtmp_.size();
 }
 
 } // namespace casadi

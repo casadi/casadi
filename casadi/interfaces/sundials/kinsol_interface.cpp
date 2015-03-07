@@ -357,7 +357,6 @@ namespace casadi {
           SXFunction f_sx = shared_cast<SXFunction>(f_);
           if (!f_sx.isNull()) {
             f_sx.print(ss);
-            ss << f_sx->work_ << endl;
             ss << "Equation " << k << " = " << f_sx.outputExpr(0).at(k) << endl;
           }
         }
