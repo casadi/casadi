@@ -100,13 +100,13 @@ namespace casadi {
     double start;
 
     /// Lower bound
-    SXElement min;
+    double min2;
 
     /// Upper bound
-    SXElement max;
+    double max2;
 
     /// Initial guess
-    SXElement initialGuess;
+    double initialGuess2;
 
     /// Derivative at time 0
     double derivativeStart;

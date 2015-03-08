@@ -67,12 +67,12 @@ print hessian(L,x)
 #$ We can also retrieve other information from the model such as the end time,
 #$ variable bounds and initial guess:
 tf = ocp.tf
-ubx = evalf(ocp.max(x))
-lbx = evalf(ocp.min(x))
-ubu = evalf(ocp.max(u))
-lbu = evalf(ocp.min(u))
-x0 = evalf(ocp.initialGuess(x))
-u0 = evalf(ocp.initialGuess(u))
+ubx = ocp.max2(x)
+lbx = ocp.min2(x)
+ubu = ocp.max2(u)
+lbu = ocp.min2(u)
+x0 = ocp.initialGuess2(x)
+u0 = ocp.initialGuess2(u)
 #$ We now proceeed to solve the optimal control problem, which can be written more compactly as:
 #$  $$ \begin{array}{cl}   \textbf{minimize}    &  \displaystyle\int_{t=0}^{\texttt{tf}}{\texttt{L} \, dt} \\ \\
 #$                         \textbf{subject to}  &  \texttt{I}(t) = 0, \quad \text{for} \quad t=0 \\

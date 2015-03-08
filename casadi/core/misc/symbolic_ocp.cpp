@@ -138,15 +138,9 @@ namespace casadi {
             const XmlNode& props = vnode["Real"];
             props.readAttribute("unit", var.unit, false);
             props.readAttribute("displayUnit", var.displayUnit, false);
-            double dmin = -numeric_limits<double>::infinity();
-            props.readAttribute("min", dmin, false);
-            var.min = dmin;
-            double dmax =  numeric_limits<double>::infinity();
-            props.readAttribute("max", dmax, false);
-            var.max = dmax;
-            double dinitialGuess = 0;
-            props.readAttribute("initialGuess", dinitialGuess, false);
-            var.initialGuess = dinitialGuess;
+            props.readAttribute("min", var.min2, false);
+            props.readAttribute("max", var.max2, false);
+            props.readAttribute("initialGuess", var.initialGuess2, false);
             props.readAttribute("start", var.start, false);
             props.readAttribute("nominal", var.nominal, false);
             props.readAttribute("free", var.free, false);
@@ -362,15 +356,32 @@ namespace casadi {
             v.setName(ss.str());
 
             // Get the definition and bounds
+            SXElement ex = readExpr(constr_i[0]).toScalar();
+            SXElement val = readExpr(constr_i[1]).toScalar();
             if (constr_i.checkName("opt:ConstraintLeq")) {
-              v.beq = readExpr(constr_i[0]).toScalar();
-              v.max = readExpr(constr_i[1]).toScalar();
+              if (val.isConstant()) {
+                v.beq = ex;
+                v.max2 = val.getValue();
+              } else {
+                v.beq = ex - val;
+                v.max2 = 0;
+              }
             } else if (constr_i.checkName("opt:ConstraintGeq")) {
-              v.beq = readExpr(constr_i[0]).toScalar();
-              v.min = readExpr(constr_i[1]).toScalar();
+              if (val.isConstant()) {
+                v.beq = ex;
+                v.min2 = val.getValue();
+              } else {
+                v.beq = ex - val;
+                v.min2 = 0;
+              }
             } else if (constr_i.checkName("opt:ConstraintEq")) {
-              v.beq = readExpr(constr_i[0]).toScalar();
-              v.max = v.min = readExpr(constr_i[1]).toScalar();
+              if (val.isConstant()) {
+                v.beq = ex;
+                v.max2 = v.min2 = val.getValue();
+              } else {
+                v.beq = ex - val;
+                v.max2 = v.min2 = 0;
+              }
             } else {
               cerr << "unknown constraint type" << constr_i.getName() << endl;
               throw CasadiException("SymbolicOCP::addConstraints");
@@ -390,15 +401,32 @@ namespace casadi {
             v.setName(ss.str());
 
             // Get the definition and bounds
+            SXElement ex = readExpr(constr_i[0]).toScalar();
+            SXElement val = readExpr(constr_i[1]).toScalar();
             if (constr_i.checkName("opt:ConstraintLeq")) {
-              v.beq = readExpr(constr_i[0]).toScalar();
-              v.max = readExpr(constr_i[1]).toScalar();
+              if (val.isConstant()) {
+                v.beq = ex;
+                v.max2 = val.getValue();
+              } else {
+                v.beq = ex - val;
+                v.max2 = 0;
+              }
             } else if (constr_i.checkName("opt:ConstraintGeq")) {
-              v.beq = readExpr(constr_i[0]).toScalar();
-              v.min = readExpr(constr_i[1]).toScalar();
+              if (val.isConstant()) {
+                v.beq = ex;
+                v.min2 = val.getValue();
+              } else {
+                v.beq = ex - val;
+                v.min2 = 0;
+              }
             } else if (constr_i.checkName("opt:ConstraintEq")) {
-              v.beq = readExpr(constr_i[0]).toScalar();
-              v.max = v.min = readExpr(constr_i[1]).toScalar();
+              if (val.isConstant()) {
+                v.beq = ex;
+                v.max2 = v.min2 = val.getValue();
+              } else {
+                v.beq = ex - val;
+                v.max2 = v.min2 = 0;
+              }
             } else {
               cerr << "unknown constraint type" << constr_i.getName() << endl;
               throw CasadiException("SymbolicOCP::addConstraints");
@@ -653,16 +681,16 @@ namespace casadi {
     if (!this->path.isEmpty()) {
       stream << "Path constraints" << endl;
       for (int i=0; i<this->path.nnz(); ++i)
-        stream << str(max(this->path.at(i))) << " <= "
-               << this->path.at(i) << " <= " << str(max(this->path.at(i))) << endl;
+        stream << max2(this->path.at(i)) << " <= "
+               << this->path.at(i) << " <= " << max2(this->path.at(i)) << endl;
       stream << endl;
     }
 
     if (!this->point.isEmpty()) {
       stream << "Point constraints" << endl;
       for (int i=0; i<this->point.nnz(); ++i)
-        stream << str(max(this->point.at(i))) << " <= "
-               << this->point.at(i) << " <= " << str(max(this->point.at(i))) << endl;
+        stream << max2(this->point.at(i)) << " <= "
+               << this->point.at(i) << " <= " << max2(this->point.at(i)) << endl;
       stream << endl;
     }
 
@@ -726,11 +754,11 @@ namespace casadi {
         casadi_assert(v.nominal!=0);
         v.beq *= v.nominal;
         v.ode /= v.nominal;
-        v.min /= v.nominal;
-        v.max /= v.nominal;
+        v.min2 /= v.nominal;
+        v.max2 /= v.nominal;
         v.start /= v.nominal;
         v.derivativeStart /= v.nominal;
-        v.initialGuess /= v.nominal;
+        v.initialGuess2 /= v.nominal;
         v_id.push_back(v.v);
         v_rep.push_back(v.beq);
         v_id.push_back(v.d);
@@ -1403,19 +1431,19 @@ namespace casadi {
 
       datfile << "p_min" << endl;
       for (int k=0; k<p.nnz(); ++k) {
-        datfile << k << ": " << min(p[k]) << endl;
+        datfile << k << ": " << min2(p[k]) << endl;
       }
       datfile << endl;
 
       datfile << "p_max" << endl;
       for (int k=0; k<p.nnz(); ++k) {
-        datfile << k << ": " << max(p[k]) << endl;
+        datfile << k << ": " << max2(p[k]) << endl;
       }
       datfile << endl;
 
       datfile << "p_fix" << endl;
       for (int k=0; k<p.nnz(); ++k) {
-        datfile << k << ": " << (min(p[k])==max(p[k])) << endl;
+        datfile << k << ": " << (min2(p[k])==max2(p[k])) << endl;
       }
       datfile << endl;
 
@@ -1449,19 +1477,19 @@ namespace casadi {
 
       datfile << "sd_min(*,*)" << endl;
       for (int k=0; k<this->x.nnz(); ++k) {
-        datfile << k << ": " << min(this->x[k]) << endl;
+        datfile << k << ": " << min2(this->x[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sd_max(*,*)" << endl;
       for (int k=0; k<this->x.nnz(); ++k) {
-        datfile << k << ": " << max(this->x[k]) << endl;
+        datfile << k << ": " << max2(this->x[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sd_fix(*,*)" << endl;
       for (int k=0; k<this->x.nnz(); ++k) {
-        datfile << k << ": " << (min(this->x[k])==max(this->x[k])) << endl;
+        datfile << k << ": " << (min2(this->x[k])==max2(this->x[k])) << endl;
       }
       datfile << endl;
 
@@ -1495,19 +1523,19 @@ namespace casadi {
 
       datfile << "sa_min(*,*)" << endl;
       for (int k=0; k<this->z.nnz(); ++k) {
-        datfile << k << ": " << min(this->z[k]) << endl;
+        datfile << k << ": " << min2(this->z[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sa_max(*,*)" << endl;
       for (int k=0; k<this->z.nnz(); ++k) {
-        datfile << k << ": " << max(this->z[k]) << endl;
+        datfile << k << ": " << max2(this->z[k]) << endl;
       }
       datfile << endl;
 
       datfile << "sa_fix(*,*)" << endl;
       for (int k=0; k<this->z.nnz(); ++k) {
-        datfile << k << ": " << (min(this->z[k])==max(this->z[k])) << endl;
+        datfile << k << ": " << (min2(this->z[k])==max2(this->z[k])) << endl;
       }
       datfile << endl;
 
@@ -1541,19 +1569,19 @@ namespace casadi {
 
       datfile << "u_min(*,*)" << endl;
       for (int k=0; k<this->u.nnz(); ++k) {
-        datfile << k << ": " << min(this->u[k]) << endl;
+        datfile << k << ": " << min2(this->u[k]) << endl;
       }
       datfile << endl;
 
       datfile << "u_max(*,*)" << endl;
       for (int k=0; k<this->u.nnz(); ++k) {
-        datfile << k << ": " << max(this->u[k]) << endl;
+        datfile << k << ": " << max2(this->u[k]) << endl;
       }
       datfile << endl;
 
       datfile << "u_fix(*,*)" << endl;
       for (int k=0; k<this->u.nnz(); ++k) {
-        datfile << k << ": " << (min(this->u[k])==max(this->u[k])) << endl;
+        datfile << k << ": " << (min2(this->u[k])==max2(this->u[k])) << endl;
       }
       datfile << endl;
 
@@ -1792,52 +1820,58 @@ namespace casadi {
     }
   }
 
-  SX SymbolicOCP::min(const std::string& name) const {
-    return variable(name).min;
+  double SymbolicOCP::min2(const std::string& name, bool normalized) const {
+    const Variable& v = variable(name);
+    return normalized ? v.min2 / v.nominal : v.min2;
   }
 
-  SX SymbolicOCP::min(const SX& var) const {
-    return attribute(&SymbolicOCP::min, var);
+  std::vector<double> SymbolicOCP::min2(const SX& var, bool normalized) const {
+    return attribute(&SymbolicOCP::min2, var, normalized);
   }
 
-  void SymbolicOCP::setMin(const std::string& name, const SX& val) {
-    variable(name).min = val.toScalar();
+  void SymbolicOCP::setMin2(const std::string& name, double val, bool normalized) {
+    Variable& v = variable(name);
+    v.min2 = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicOCP::setMin(const SX& var, const SX& val) {
-    setAttribute(&SymbolicOCP::setMin, var, val);
+  void SymbolicOCP::setMin2(const SX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&SymbolicOCP::setMin2, var, val, normalized);
   }
 
-  SX SymbolicOCP::max(const std::string& name) const {
-    return variable(name).max;
+  double SymbolicOCP::max2(const std::string& name, bool normalized) const {
+    const Variable& v = variable(name);
+    return normalized ? v.max2 / v.nominal : v.max2;
   }
 
-  SX SymbolicOCP::max(const SX& var) const {
-    return attribute(&SymbolicOCP::max, var);
+  std::vector<double> SymbolicOCP::max2(const SX& var, bool normalized) const {
+    return attribute(&SymbolicOCP::max2, var, normalized);
   }
 
-  void SymbolicOCP::setMax(const std::string& name, const SX& val) {
-    variable(name).max = val.toScalar();
+  void SymbolicOCP::setMax2(const std::string& name, double val, bool normalized) {
+    Variable& v = variable(name);
+    v.max2 = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicOCP::setMax(const SX& var, const SX& val) {
-    setAttribute(&SymbolicOCP::setMax, var, val);
+  void SymbolicOCP::setMax2(const SX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&SymbolicOCP::setMax2, var, val, normalized);
   }
 
-  SX SymbolicOCP::initialGuess(const std::string& name) const {
-    return variable(name).initialGuess;
+  double SymbolicOCP::initialGuess2(const std::string& name, bool normalized) const {
+    const Variable& v = variable(name);
+    return normalized ? v.initialGuess2 / v.nominal : v.initialGuess2;
   }
 
-  SX SymbolicOCP::initialGuess(const SX& var) const {
-    return attribute(&SymbolicOCP::initialGuess, var);
+  std::vector<double> SymbolicOCP::initialGuess2(const SX& var, bool normalized) const {
+    return attribute(&SymbolicOCP::initialGuess2, var, normalized);
   }
 
-  void SymbolicOCP::setInitialGuess(const std::string& name, const SX& val) {
-    variable(name).initialGuess = val.toScalar();
+  void SymbolicOCP::setInitialGuess2(const std::string& name, double val, bool normalized) {
+    Variable& v = variable(name);
+    v.initialGuess2 = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicOCP::setInitialGuess(const SX& var, const SX& val) {
-    setAttribute(&SymbolicOCP::setInitialGuess, var, val);
+  void SymbolicOCP::setInitialGuess2(const SX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&SymbolicOCP::setInitialGuess2, var, val, normalized);
   }
 
   double SymbolicOCP::start(const std::string& name, bool normalized) const {
