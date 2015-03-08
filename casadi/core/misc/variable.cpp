@@ -57,38 +57,6 @@ namespace casadi {
     this->d = this->ode = SXElement::sym("der_" + name);
   }
 
-  SXElement Variable::atTime(double t, bool allocate) const {
-    casadi_assert(!allocate);
-    return const_cast<Variable*>(this)->atTime(t, false);
-  }
-
-  SXElement Variable::atTime(double t, bool allocate) {
-    // Find an existing element
-    map<double, SXElement>::const_iterator it = timed_.find(t);
-
-    // If not found
-    if (it==timed_.end()) {
-      if (allocate) {
-        // Create a timed variable
-        stringstream ss;
-        ss << name() << ".atTime(" << t << ")";
-        SXElement tvar = SXElement::sym(ss.str());
-
-        // Save to map
-        timed_[t] = tvar;
-
-        // Return the expression
-        return tvar;
-      } else {
-        casadi_error(" has no timed variable with t = " << t << ".");
-      }
-
-    } else {
-      // Return the expression
-      return it->second;
-    }
-  }
-
   void Variable::repr(ostream &stream, bool trailing_newline) const {
     stream << "Variable(";
     print(stream, false);

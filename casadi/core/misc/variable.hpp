@@ -141,24 +141,11 @@ namespace casadi {
     /// Free attribute
     bool free;
 
-    /// Timed variable (never allocate)
-    SXElement atTime(double t, bool allocate=false) const;
-
-    /// Timed variable (allocate if necessary)
-    SXElement atTime(double t, bool allocate=false);
-
     /// Print a description of the object
     void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
     /// Print a representation of the object
     void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
-
-#ifndef SWIG
-  private:
-    // Timed variables
-    std::map<double, SXElement> timed_;
-#endif // SWIG
-
   };
 } // namespace casadi
 

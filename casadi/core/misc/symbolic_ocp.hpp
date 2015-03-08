@@ -88,7 +88,7 @@ namespace casadi {
   public:
 
     /// Default constructor
-    SymbolicOCP(bool ignore_timed_variables=true);
+    SymbolicOCP();
 
     /** @name Variables and equations
      *  Public data members
@@ -413,12 +413,6 @@ namespace casadi {
     /// Set the unit for a component
     void setUnit(const std::string& name, const std::string& val);
 
-    /// Timed variable (never allocate)
-    SX atTime(const std::string& name, double t, bool allocate=false) const;
-
-    /// Timed variable (allocate if necessary)
-    SX atTime(const std::string& name, double t, bool allocate=false);
-
     ///  Print representation
     void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
@@ -435,9 +429,6 @@ namespace casadi {
     /// Find of variable by name
     typedef std::map<std::string, Variable> VarMap;
     VarMap varmap_;
-
-    /// Allow timed variables?
-    bool ignore_timed_variables_;
 
     /// Read an equation
     SX readExpr(const XmlNode& odenode);
