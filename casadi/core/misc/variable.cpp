@@ -36,9 +36,9 @@ namespace casadi {
     this->alias = NO_ALIAS;
     this->description = "";
     this->valueReference = -1; //?
-    this->min2 = -numeric_limits<double>::infinity();
-    this->max2 = numeric_limits<double>::infinity();
-    this->initialGuess2 = 0;
+    this->min = -numeric_limits<double>::infinity();
+    this->max = numeric_limits<double>::infinity();
+    this->initialGuess = 0;
     this->nominal = 1.0;
     this->start = 0.0;
     this->derivativeStart = 0.0;

@@ -100,13 +100,13 @@ namespace casadi {
     double start;
 
     /// Lower bound
-    double min2;
+    double min;
 
     /// Upper bound
-    double max2;
+    double max;
 
     /// Initial guess
-    double initialGuess2;
+    double initialGuess;
 
     /// Derivative at time 0
     double derivativeStart;

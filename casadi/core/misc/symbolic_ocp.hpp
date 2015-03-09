@@ -345,42 +345,40 @@ namespace casadi {
     void setNominal(const SX& var, const std::vector<double>& val);
 
     /// Get the lower bound by name
-    double min2(const std::string& name, bool normalized=false) const;
+    double min(const std::string& name, bool normalized=false) const;
 
     /// Get the lower bound(s) by expression
-    std::vector<double> min2(const SX& var, bool normalized=false) const;
+    std::vector<double> min(const SX& var, bool normalized=false) const;
 
     /// Set the lower bound by name
-    void setMin2(const std::string& name, double val, bool normalized=false);
+    void setMin(const std::string& name, double val, bool normalized=false);
 
     /// Set the lower bound(s) by expression
-    void setMin2(const SX& var, const std::vector<double>& val, bool normalized=false);
+    void setMin(const SX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the upper bound by name
-    double max2(const std::string& name, bool normalized=false) const;
+    double max(const std::string& name, bool normalized=false) const;
 
     /// Get the upper bound(s) by expression
-    std::vector<double> max2(const SX& var, bool normalized=false) const;
+    std::vector<double> max(const SX& var, bool normalized=false) const;
 
     /// Set the upper bound by name
-    void setMax2(const std::string& name, double val, bool normalized=false);
+    void setMax(const std::string& name, double val, bool normalized=false);
 
     /// Set the upper bound(s) by expression
-    void setMax2(const SX& var, const std::vector<double>& val, bool normalized=false);
-
-
+    void setMax(const SX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the initial guess by name
-    double initialGuess2(const std::string& name, bool normalized=false) const;
+    double initialGuess(const std::string& name, bool normalized=false) const;
 
     /// Get the initial guess(es) by expression
-    std::vector<double> initialGuess2(const SX& var, bool normalized=false) const;
+    std::vector<double> initialGuess(const SX& var, bool normalized=false) const;
 
     /// Set the initial guess by name
-    void setInitialGuess2(const std::string& name, double val, bool normalized=false);
+    void setInitialGuess(const std::string& name, double val, bool normalized=false);
 
     /// Set the initial guess(es) by expression
-    void setInitialGuess2(const SX& var, const std::vector<double>& val, bool normalized=false);
+    void setInitialGuess(const SX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the (optionally normalized) value at time 0 by name
     double start(const std::string& name, bool normalized=false) const;
