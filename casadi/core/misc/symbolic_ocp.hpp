@@ -272,10 +272,12 @@ namespace casadi {
     /// Generate code for a particular function
     static void generateFunction(std::ostream &stream, const std::string& fname,
                                  const std::vector<SX>& f_in, const std::vector<SX>& f_out,
-                                 CodeGenerator& gen);
+                                 CodeGenerator& gen,
+                                 bool fwd=false, bool adj=false, bool foa=false);
 
     /// Corresponding header
-    static void generateFunctionHeader(std::ostream &stream, const std::string& fname);
+    static void generateFunctionHeader(std::ostream &stream, const std::string& fname,
+                                       bool fwd=false, bool adj=false, bool foa=false);
     ///@}
 
     /// Get variable expression by name

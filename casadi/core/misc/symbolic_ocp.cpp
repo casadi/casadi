@@ -1741,10 +1741,16 @@ namespace casadi {
     setAttribute(&SymbolicOCP::setDerivativeStart, var, val, normalized);
   }
 
-  void SymbolicOCP::generateFunctionHeader(std::ostream &stream, const std::string& fname) {
+  void SymbolicOCP::generateFunctionHeader(std::ostream &stream, const std::string& fname,
+                                           bool fwd, bool adj, bool foa) {
     stream << "void " << fname << "_nwork(int *ni, int *nr);" << endl;
     stream << "int " << fname
-           << "(const double* const* arg, double* const* res, int* iii, double* w);" << endl;
+           << "(const double* const* arg, double* const* res, int* iw, double* w);" << endl;
+
+    // Codegen derivative information
+    if (fwd) generateFunctionHeader(stream, fname+"_fwd");
+    if (adj) generateFunctionHeader(stream, fname+"_adj");
+    if (foa) generateFunctionHeader(stream, fname+"_foa");
   }
 
   void SymbolicOCP::generateHeader(const std::string& filename, const std::string& prefix) {
@@ -1777,11 +1783,20 @@ namespace casadi {
     generateFunctionHeader(s, prefix+"eval_dae");
     generateFunctionHeader(s, prefix+"eval_alg");
     generateFunctionHeader(s, prefix+"eval_quad");
+    generateFunctionHeader(s, prefix+"eval", true, true, true);
+    s << endl;
 
     s << "/* Jacobian of all outputs w.r.t. all inputs */" << endl;
     generateFunctionHeader(s, prefix+"eval_jac");
     s << "void " << prefix <<
       "jac_sparsity(int *nrow, int *ncol, const int **colind, const int **row);" << endl;
+    s << endl;
+
+    s << "/* Hessian of all outputs w.r.t. all inputs */" << endl;
+    generateFunctionHeader(s, prefix+"eval_hes");
+    s << "void " << prefix <<
+      "hes_sparsity(int *nrow, int *ncol, const int **colind, const int **row);" << endl;
+    s << endl;
 
     // C linkage
     s << "#ifdef __cplusplus" << endl;
@@ -1794,7 +1809,8 @@ namespace casadi {
   void SymbolicOCP::generateFunction(std::ostream &stream, const std::string& fname,
                                      const std::vector<SX>& f_in,
                                      const std::vector<SX>& f_out,
-                                     CodeGenerator& gen) {
+                                     CodeGenerator& gen,
+                                     bool fwd, bool adj, bool foa) {
     SXFunction f(f_in, f_out);
     f.setOption("name", fname);
     f.init();
@@ -1805,6 +1821,28 @@ namespace casadi {
     stream << "  if (ni) *ni = 0;" << endl;
     stream << "  if (nr) *nr = 0;" << endl;
     stream << "}" << endl << endl;
+
+    // Forward mode directional derivative
+    if (fwd) {
+      SXFunction f_fwd = shared_cast<SXFunction>(f.derForward(1));
+      generateFunction(stream, fname+"_fwd",
+                       f_fwd.inputExpr(), f_fwd.outputExpr(), gen);
+    }
+
+    // Reverse mode mode directional derivative
+    if (adj || foa) {
+      SXFunction f_adj = shared_cast<SXFunction>(f.derReverse(1));
+      if (adj) {
+        generateFunction(stream, fname+"_adj",
+                         f_adj.inputExpr(), f_adj.outputExpr(), gen);
+      }
+      // Forward-over-reverse mode directional derivative
+      if (foa) {
+        SXFunction f_foa = shared_cast<SXFunction>(f_adj.derForward(1));
+        generateFunction(stream, fname+"_foa",
+                         f_foa.inputExpr(), f_foa.outputExpr(), gen);
+      }
+    }
   }
 
   void SymbolicOCP::generateCode(const std::string& filename,
@@ -1842,7 +1880,7 @@ namespace casadi {
     // Create a code generator object
     CodeGenerator gen;
     if (!include.empty()) {
-      gen.addInclude(include);
+      gen.addInclude(include, true);
     }
 
     // Function that returns the dimensions
@@ -1881,8 +1919,15 @@ namespace casadi {
     v_out.push_back(this->quad);
     v_out.push_back(this->ydef);
 
+    // All functions at once
+    generateFunction(gen.function_, prefix+"eval", v_in, v_out, gen, true, true, true);
+
     // Jacobian of all input w.r.t. all outputs
-    SX J = jacobian(vertcat(v_out), vertcat(v_in));
+    SX v_in_all = vertcat(v_in);
+    SX v_out_all = vertcat(v_out);
+    SX J = jacobian(v_out_all, v_in_all);
+
+    // Codegen it
     generateFunction(gen.function_, prefix+"eval_jac", v_in, vector<SX>(1, J), gen);
     int Jsp_ind = gen.addSparsity(J.sparsity());
     gen.function_
@@ -1893,7 +1938,35 @@ namespace casadi {
       << "  if (ncol) *ncol = s[1];" << endl
       << "  if (colind) *colind = s+2;" << endl
       << "  if (row) *row = s+2+s[1]+1;" << endl
-      << "}" << endl;
+      << "}" << endl << endl;
+
+    // Introduce lagrange multipliers
+    vector<SX> lam;
+    lam.push_back(SX::sym("lam_ode", this->ode.sparsity()));
+    lam.push_back(SX::sym("lam_dae", this->dae.sparsity()));
+    lam.push_back(SX::sym("lam_alg", this->alg.sparsity()));
+    lam.push_back(SX::sym("lam_quad", this->quad.sparsity()));
+    lam.push_back(SX::sym("lam_ydef", this->ydef.sparsity()));
+
+    // Jacobian of all input w.r.t. all outputs
+    SX lam_all = vertcat(lam);
+    SX gamma = inner_prod(v_out_all, lam_all);
+    SX H = hessian(gamma, v_in_all);
+    H = triu(H); // Upper triangular half
+    v_in.insert(v_in.begin(), lam.begin(), lam.end());
+
+    // Codegen it
+    generateFunction(gen.function_, prefix+"eval_hes", v_in, vector<SX>(1, H), gen);
+    int Hsp_ind = gen.addSparsity(H.sparsity());
+    gen.function_
+      << "void " << prefix
+      << "hes_sparsity(int *nrow, int *ncol, const int **colind, const int **row) {" << endl
+      << "  const int *s = s" << Hsp_ind << ";" << endl
+      << "  if (nrow) *nrow = s[0];" << endl
+      << "  if (ncol) *ncol = s[1];" << endl
+      << "  if (colind) *colind = s+2;" << endl
+      << "  if (row) *row = s+2+s[1]+1;" << endl
+      << "}" << endl << endl;
 
     // Flush the code generator
     gen.flush(s);
