@@ -121,11 +121,14 @@ namespace casadi {
      */
     SX q, quad;
 
-    /** \brief Output variables
+    /** \brief Intermediate variables and definitions definitions
      * Interdependencies are allowed but must be non-cyclic.
-     * The definitions can be retrieved by calling the method #beq with y as argument.
      */
-    SX y;
+    SX i, idef;
+
+    /** \brief Output variables and corresponding definitions
+     */
+    SX y, ydef;
 
     /** \brief Free controls
      * The trajectories of the free controls are decision variables of the optimal control problem.
@@ -138,38 +141,6 @@ namespace casadi {
      * optimization algorithm in order to minimize the cost functional.
      */
     SX p;
-
-    /** \brief Independent parameters
-     * An independent parameter is a parameter whose value is determined by an expression that
-     * contains only literals.
-     * An independent parameter is fixed after the DAE has been initialized.
-     * The definitions can be retrieved by calling the method #beq with pi as argument.
-     */
-    SX pi;
-
-    /** \brief Dependent parameters and corresponding definitions
-     * A dependent parameter is a parameter whose value is determined by an expression which
-     * contains references to other parameters.
-     * A dependent parameter is fixed after the DAE has been initialized.
-     * Interdependencies are allowed but must be non-cyclic.
-     * The definitions can be retrieved by calling the method #beq with pd as argument.
-    */
-    SX pd;
-
-    /** \brief Independent constant
-     * An independent constant is a constant whose value is determined by an expression that
-     * contains only literals.
-     * The definitions can be retrieved by calling the method #beq with ci as argument.
-     */
-    SX ci;
-
-    /** \brief Dependent constants and corresponding definitions
-     * A dependent constant is a constant whose value is determined by an expression which
-     * contains references to other constants.
-     * Interdependencies are allowed but must be non-cyclic.
-     * The definitions can be retrieved by calling the method #beq with cd as argument.
-    */
-    SX cd;
     ///@}
 
     /// Interval start time
@@ -207,14 +178,6 @@ namespace casadi {
     SX lterm;
     ///@}
 
-    /** \brief Path constraints of the optimal control problem
-     */
-    SX path;
-
-    /** \brief Point constraints of the optimal control problem
-     */
-    SX point;
-
     /// Parse from XML to C++ format
     void parseFMI(const std::string& filename);
 
@@ -244,26 +207,14 @@ namespace casadi {
     /// Transform the implicit DAE or semi-explicit DAE into an explicit ODE
     void makeExplicit();
 
-    /// Eliminate independent parameters
-    void eliminateIndependentParameters();
+    /// Sort intermediate variables
+    void sort_i();
 
-    /// Sort the dependent parameters
-    void sortDependentParameters();
+    /// Eliminate interdependencies amongst intermediate variables
+    void separate_i();
 
-    /// Eliminate interdependencies amongst the dependent parameters
-    void eliminateDependentParameterInterdependencies();
-
-    /// Eliminate dependent parameters
-    void eliminateDependentParameters();
-
-    /// Sort the outputs
-    void sortOutputs();
-
-    /// Eliminate interdependencies amongst the outputs
-    void eliminateOutputInterdependencies();
-
-    /// Eliminate outputs
-    void eliminateOutputs();
+    /// Eliminate intermediate variables
+    void eliminate_i();
 
     /// Eliminate Lagrange terms from the objective function and make them quadrature states
     void eliminateLagrangeTerms();
@@ -297,18 +248,6 @@ namespace casadi {
 
     /// Get a derivative expression by non-differentiated expression
     SX der(const SX& var) const;
-
-    /// Get a binding equation by name
-    SX beq(const std::string& name) const;
-
-    /// Get a binding equation by non-differentiated expression
-    SX beq(const SX& var) const;
-
-    /// Set a binding equation by name
-    void setBeq(const std::string& name, const SX& val);
-
-    /// Set an binding expression by non-differentiated expression
-    void setBeq(const SX& var, const SX& val);
 
     /// Get the nominal value by name
     double nominal(const std::string& name) const;

@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   void Variable::setName(const std::string& name) {
-    this->v = this->beq = SXElement::sym(name);
+    this->v = SXElement::sym(name);
     this->d = SXElement::sym("der_" + name);
   }
 

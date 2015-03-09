@@ -85,9 +85,6 @@ namespace casadi {
     /// Derivative expression
     SXElement d;
 
-    /// Binding equation. Equal to "v" if unknown
-    SXElement beq;
-
     /// Nominal value
     double nominal;
 

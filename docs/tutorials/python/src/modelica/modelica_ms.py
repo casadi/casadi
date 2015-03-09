@@ -44,7 +44,6 @@ print ocp
 #$ By insprecting the equations, we see that it is relatively both straightforward to eliminate 
 #$ the algebraic variables from the problem and to rewrite the DAE as an explicit ODE.
 #$ Indeed, for cases like this one, CasADi can do this reformulation automatically:
-ocp.eliminateIndependentParameters()
 ocp.makeExplicit()
 #! Let us extract variables for the states, the control and equations
 x = ocp.x
