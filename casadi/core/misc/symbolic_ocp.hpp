@@ -37,23 +37,26 @@ namespace casadi {
 
       <H3>Variables:  </H3>
       \verbatim
-      x:      differential states
-      z:      algebraic states
-      p :     independent parameters
       t :     time
+      x:      states defined by ODE
+      s:      implicitly defined states
+      z:      algebraic variables
+      p :     free parameters
       u :     control signals
       q :     quadrature states
-      y :     dependent variables
+      i :     intermediate variables
+      y :     outputs
       \endverbatim
 
       <H3>Equations:  </H3>
       \verbatim
-      explicit or implicit ODE: \dot {x} = ode(t, x, z, u, p_free, pi, pd)
-      or                           0 = ode(t, x, z,\dot {x}, u, p_free, pi, pd)
-      algebraic equations:            0 = alg(t, x, z, u, p_free, pi, pd)
-      quadratures:              \dot {q} = quad(t, x, z, u, p_free, pi, pd)
-      dependent equations:            y = dep(t, x, z, u, p_free, pi, pd)
-      initial equations:              0 = initial(t, x, z, u, p_free, pi, pd)
+      ODE:                   \dot{x} ==  ode(t, x, s, z, u, p, i)
+      DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, i, sdot)
+      Initial equations:           0 == init(t, x, s, z, u, p, i, sdot)
+      algebraic equations:         0 ==  alg(t, x, s, z, u, p, i)
+      quadrature equations:  \dot{q} == quad(t, x, s, z, u, p, i)
+      intermediate equations:      i == idef(t, x, s, z, u, p, i)
+      output equations:            y == ydef(t, x, s, z, u, p, i)
       \endverbatim
 
       <H3>Objective function terms:  </H3>
@@ -62,26 +65,7 @@ namespace casadi {
       Lagrange terms:       \sum {\integral{mterm}}
       \endverbatim
 
-      Note that when parsed, all dynamic equations end up in the implicit category "dae".
-      At a later state, the DAE can be reformulated, for example in semi-explicit form,
-      possibly in addition to a set of quadrature states.
-
-      <H3>Usage skeleton:</H3>
-
-      1. Call default constructor
-      > SymbolicOCP ocp;
-
-      2. Parse an FMI conformant XML file <BR>
-      > ocp.parseFMI(xml_file_name)
-
-      3. Modify/add variables, equations, optimization <BR>
-      > ...
-
-      When the optimal control problem is in a suitable form, it is possible to either
-      generate functions for numeric/symbolic evaluation or exporting the OCP formulation
-      into a new FMI conformant XML file. The latter functionality is not yet available.
-
-      \date 2012
+      \date 2012-2015
       \author Joel Andersson
   */
   class CASADI_EXPORT SymbolicOCP : public PrintableObject<SymbolicOCP> {
@@ -97,18 +81,15 @@ namespace casadi {
     /** \brief Independent variable (usually time) */
     SX t;
 
-    /** \brief Differential-algebraic equation (DAE) with corresponding state vector and initial
-     * conditions
-     * DAE in fully-implicit form and corresponding states and algebraic variables.
-     * dae and s have matching dimensions and <tt>0 == dae(der(s), s, ...)</tt>
-     * implicitly defines <tt>der(s)</tt>.
-     * At <tt>t==0</tt>, <tt>0 == initial(der(s), s, ...)</tt> holds in addition to the dae.
-     */
-    SX s, dae, initial;
-
     /** \brief Differential states defined by ordinary differential equations (ODE)
      */
     SX x, ode;
+
+    /** \brief Differential-algebraic equation (DAE) with corresponding state vector,
+     * state derivatives and and initial conditions.
+     * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to the dae.
+     */
+    SX s, sdot, dae, init;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * \a alg and \a z have matching dimensions and

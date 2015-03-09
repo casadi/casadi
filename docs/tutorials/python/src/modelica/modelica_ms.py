@@ -50,7 +50,7 @@ x = ocp.x
 u = ocp.u
 f = ocp.ode
 L = ocp.lterm
-I = ocp.initial
+I = ocp.init
 #$ These are expressions that can be visualized or manipulated using CasADi's 
 #$ symbolic framework:
 print 5*sin(f[0])

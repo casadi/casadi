@@ -49,7 +49,7 @@ namespace casadi {
     tf_free = false;
 
     // Start with vectors of zero length
-    this->s=this->dae=this->initial=
+    this->s=this->sdot=this->dae=this->init=
       this->x=this->ode=
       this->z=this->alg=
       this->q=this->quad=
@@ -182,6 +182,7 @@ namespace casadi {
             break;
           case CAT_STATE:
             this->s.append(var.v);
+            this->sdot.append(var.d);
             break;
           case CAT_DEPENDENT_CONSTANT:
             // Skip
@@ -202,6 +203,7 @@ namespace casadi {
           case CAT_ALGEBRAIC:
             if (var.causality == INTERNAL) {
               this->s.append(var.v);
+              this->sdot.append(var.d);
             } else if (var.causality == INPUT) {
               this->u.append(var.v);
             }
@@ -261,7 +263,7 @@ namespace casadi {
 
         // Add the differential equations
         for (int i=0; i<inode.size(); ++i) {
-          initial.append(readExpr(inode[i]));
+          init.append(readExpr(inode[i]));
         }
       }
     }
@@ -534,9 +536,9 @@ namespace casadi {
       stream << endl;
     }
 
-    if (!this->initial.isEmpty()) {
+    if (!this->init.isEmpty()) {
       stream << "Initial equations" << endl;
-      for (SX::const_iterator it=this->initial.begin(); it!=this->initial.end(); it++) {
+      for (SX::const_iterator it=this->init.begin(); it!=this->init.end(); it++) {
         stream << "0 == " << *it << endl;
       }
       stream << endl;
@@ -651,7 +653,7 @@ namespace casadi {
     ex.push_back(this->quad);
     ex.push_back(this->idef);
     ex.push_back(this->ydef);
-    ex.push_back(this->initial);
+    ex.push_back(this->init);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
 
@@ -666,7 +668,7 @@ namespace casadi {
     this->quad = *it++ / nominal(this->q);
     this->idef = *it++ / nominal(this->i);
     this->ydef = *it++ / nominal(this->y);
-    this->initial = *it++;
+    this->init = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
     casadi_assert(it==ex.end());
@@ -725,7 +727,7 @@ namespace casadi {
     ex.push_back(this->alg);
     ex.push_back(this->quad);
     ex.push_back(this->ydef);
-    ex.push_back(this->initial);
+    ex.push_back(this->init);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
 
@@ -739,7 +741,7 @@ namespace casadi {
     this->alg = *it++;
     this->quad = *it++;
     this->ydef = *it++;
-    this->initial = *it++;
+    this->init = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
     casadi_assert(it==ex.end());
@@ -817,7 +819,7 @@ namespace casadi {
     if (this->x.isEmpty()) return;
 
     // Find out which differential equation depends on which differential state
-    SXFunction f(der(this->s), this->dae);
+    SXFunction f(this->sdot, this->dae);
     f.init();
     Sparsity sp = f.jacSparsity();
 
@@ -830,6 +832,7 @@ namespace casadi {
 
     // Permute variables
     this->s = this->s(colperm);
+    this->sdot = this->sdot(colperm);
   }
 
   void SymbolicOCP::sortALG() {
@@ -863,7 +866,7 @@ namespace casadi {
     if (this->s.isEmpty()) return;
 
     // Write the ODE as a function of the state derivatives
-    SXFunction f(der(this->s), this->dae);
+    SXFunction f(this->sdot, this->dae);
     f.init();
 
     // Get the sparsity of the Jacobian which can be used to determine which
@@ -880,9 +883,10 @@ namespace casadi {
 
     // Permute variables
     this->s = this->s(colperm);
+    this->sdot = this->sdot(colperm);
 
     // Now write the sorted ODE as a function of the state derivatives
-    f = SXFunction(der(this->s), this->dae);
+    f = SXFunction(this->sdot, this->dae);
     f.init();
 
     // Get the Jacobian
@@ -930,12 +934,12 @@ namespace casadi {
     }
 
     // Eliminate inter-dependencies
-    substituteInPlace(der(this->s), new_ode, false);
+    substituteInPlace(this->sdot, new_ode, false);
 
     // Add to explicit differential states and ODE
     this->x.append(this->s);
     this->ode.append(new_ode);
-    this->dae = this->s = SX::zeros(0, 1);
+    this->dae = this->s = this->sdot = SX::zeros(0, 1);
   }
 
   void SymbolicOCP::eliminateAlgebraic() {
@@ -1404,7 +1408,7 @@ namespace casadi {
 
     // We investigate the interdependencies in sdot -> dae
     vector<SX> f_in;
-    f_in.push_back(der(this->s));
+    f_in.push_back(this->sdot);
     SXFunction f(f_in, this->dae);
     f.init();
 
@@ -1448,10 +1452,11 @@ namespace casadi {
     f.spEvaluate(false);
 
     // Get the new algebraic variables and new states
-    SX new_s, new_z;
+    SX new_s, new_sdot, new_z;
     for (int i=0; i<ns; ++i) {
       if (f_sdot[i]==bvec_t(1)) {
         new_s.append(this->s[i]);
+        new_sdot.append(this->sdot[i]);
       } else {
         casadi_assert(f_sdot[i]==bvec_t(0));
         new_z.append(this->s[i]);
@@ -1464,6 +1469,7 @@ namespace casadi {
     // Divide up the s and dae
     this->dae = new_dae;
     this->s = new_s;
+    this->sdot = new_sdot;
     this->alg.append(new_alg);
     this->z.append(new_z);
   }
