@@ -69,15 +69,14 @@ namespace casadi {
       \author Joel Andersson
    */
   struct CASADI_EXPORT Variable : public PrintableObject<Variable> {
-
     /// Default constructor
-    Variable();
+    Variable() {}
+
+    /// Constructor
+    explicit Variable(const std::string& name);
 
     /// Variable name
     std::string name() const;
-
-    /// Set the variable name (and corresponding expressions)
-    void setName(const std::string& name);
 
     /// Variable expression
     SXElement v;
@@ -126,9 +125,6 @@ namespace casadi {
 
     /// Display unit
     std::string displayUnit;
-
-    /// Variable index
-    int index;
 
     /// Free attribute
     bool free;

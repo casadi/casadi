@@ -33,33 +33,44 @@ namespace casadi {
   // Forward declarations
   class XmlNode;
 
-  /** \brief A flat OCP representation coupled to an XML file
-
-      <H3>Variables:  </H3>
+  /** \brief A flat OCP representation
+      <H3>Independent variables:  </H3>
       \verbatim
-      t :     time
+      t:      time
+      \endverbatim
+
+      <H3>Time-continuous variables:  </H3>
+      \verbatim
       x:      states defined by ODE
       s:      implicitly defined states
       z:      algebraic variables
-      p :     free parameters
-      u :     control signals
-      q :     quadrature states
-      i :     intermediate variables
-      y :     outputs
+      u:      control signals
+      q:      quadrature states
+      i:      intermediate variables
+      y:      outputs
       \endverbatim
 
-      <H3>Equations:  </H3>
+      <H3>Time-constant variables:  </H3>
       \verbatim
-      ODE:                   \dot{x} ==  ode(t, x, s, z, u, p, i)
+      p:      free parameters
+      \endverbatim
+
+      <H3>Dynamic constraints (imposed everywhere):  </H3>
+      \verbatim
+      ODE                    \dot{x} ==  ode(t, x, s, z, u, p, i)
       DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, i, sdot)
-      Initial equations:           0 == init(t, x, s, z, u, p, i, sdot)
       algebraic equations:         0 ==  alg(t, x, s, z, u, p, i)
       quadrature equations:  \dot{q} == quad(t, x, s, z, u, p, i)
       intermediate equations:      i == idef(t, x, s, z, u, p, i)
       output equations:            y == ydef(t, x, s, z, u, p, i)
       \endverbatim
 
-      <H3>Objective function terms:  </H3>
+      <H3>Point constraints (imposed pointwise):  </H3>
+      \verbatim
+      Initial equations:           0 == init(t, x, s, z, u, p, i, sdot)
+      \endverbatim
+
+      <H3>Contributions to the objective function:  </H3>
       \verbatim
       Mayer terms:          \sum {mterm_k}
       Lagrange terms:       \sum {\integral{mterm}}
@@ -86,10 +97,9 @@ namespace casadi {
     SX x, ode;
 
     /** \brief Differential-algebraic equation (DAE) with corresponding state vector,
-     * state derivatives and and initial conditions.
-     * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to the dae.
+     * state derivatives.
      */
-    SX s, sdot, dae, init;
+    SX s, sdot, dae;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * \a alg and \a z have matching dimensions and
@@ -123,6 +133,12 @@ namespace casadi {
      */
     SX p;
     ///@}
+
+    /** \brief Initial conditions
+     * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to
+     * the ode and/or dae.
+     */
+    SX init;
 
     /// Interval start time
     double t0;
@@ -159,16 +175,39 @@ namespace casadi {
     SX lterm;
     ///@}
 
-    /// Parse from XML to C++ format
+    /** @name Symbolic modeling
+     *  Formulate an optimal control problem
+     */
+    ///@{
+    /// Import existing problem from FMI/XML
     void parseFMI(const std::string& filename);
 
-    /// Add a variable
-    void addVariable(const std::string& name, const Variable& var);
+    /// Add a new differential state
+    SX add_x(const std::string& name);
 
-    ///@{
-    /// Access a variable by name
-    Variable& variable(const std::string& name);
-    const Variable& variable(const std::string& name) const;
+    /// Add a implicit state
+    std::pair<SX, SX> add_s(const std::string& name);
+
+    /// Add a new algebraic variable
+    SX add_z(const std::string& name);
+
+    /// Add a new parameter
+    SX add_p(const std::string& name);
+
+    /// Add a new control
+    SX add_u(const std::string& name);
+
+    /// Add an ordinary differential equation
+    void add_ode(const SX& new_ode);
+
+    /// Add a differential-algebraic equation
+    void add_dae(const SX& new_dae);
+
+    /// Add an algebraic equation
+    void add_alg(const SX& new_alg);
+
+    /// Check if dimensions match
+    void sanityCheck() const;
     ///@}
 
     /** @name Manipulation
@@ -316,6 +355,18 @@ namespace casadi {
 
     /// Print description
     void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
+
+    /// Add a variable
+    void addVariable(const std::string& name, const Variable& var);
+
+    /// Add a new variable: returns corresponding symbolic expression
+    SX addVariable(const std::string& name);
+
+    ///@{
+    /// Access a variable by name
+    Variable& variable(const std::string& name);
+    const Variable& variable(const std::string& name) const;
+    ///@}
 
 #ifndef SWIG
     // Internal methods

@@ -99,8 +99,7 @@ namespace casadi {
         if (varmap_.find(qn)==varmap_.end()) {
 
           // Create variable
-          Variable var;
-          var.setName(name);
+          Variable var(name);
 
           // Value reference
           var.valueReference = valueReference;
@@ -591,8 +590,7 @@ namespace casadi {
       q_name << "q_" << ind++;
 
       // Create a new quadrature state
-      Variable qv;
-      qv.setName(q_name.str());
+      Variable qv(q_name.str());
 
       // Set attributes
       qv.variability = CONTINUOUS;
@@ -1076,12 +1074,98 @@ namespace casadi {
     // Try to find the component
     if (varmap_.find(name)!=varmap_.end()) {
       stringstream ss;
-      ss << "Variable \"" << name << "\" has already been added.";
-      throw CasadiException(ss.str());
+      casadi_error("Variable \"" << name << "\" has already been added.");
     }
 
     // Add to the map of all variables
     varmap_[name] = var;
+  }
+
+  SX SymbolicOCP::addVariable(const std::string& name) {
+    Variable v(name);
+    addVariable(name, v);
+    return v.v;
+  }
+
+  SX SymbolicOCP::add_x(const std::string& name) {
+    SX new_x = addVariable(name);
+    this->x.append(new_x);
+    return new_x;
+  }
+
+  std::pair<SX, SX> SymbolicOCP::add_s(const std::string& name) {
+    Variable v(name);
+    addVariable(name, v);
+    this->s.append(v.v);
+    this->sdot.append(v.d);
+    return std::pair<SX, SX>(v.v, v.d);
+  }
+
+  SX SymbolicOCP::add_z(const std::string& name) {
+    SX new_z = addVariable(name);
+    this->z.append(new_z);
+    return new_z;
+  }
+
+  SX SymbolicOCP::add_p(const std::string& name) {
+    SX new_p = addVariable(name);
+    this->p.append(new_p);
+    return new_p;
+  }
+
+  SX SymbolicOCP::add_u(const std::string& name) {
+    SX new_u = addVariable(name);
+    this->u.append(new_u);
+    return new_u;
+  }
+
+  void SymbolicOCP::add_ode(const SX& new_ode) {
+    this->ode.append(new_ode);
+  }
+
+  void SymbolicOCP::add_dae(const SX& new_dae) {
+    this->dae.append(new_dae);
+  }
+
+  void SymbolicOCP::add_alg(const SX& new_alg) {
+    this->alg.append(new_alg);
+  }
+
+  void SymbolicOCP::sanityCheck() const {
+    // Time
+    casadi_assert_message(this->t.isSymbolic(), "Non-symbolic time t");
+    casadi_assert_message(this->t.isScalar(), "Non-scalar time t");
+
+    // Differential states
+    casadi_assert_message(this->x.isSymbolic(), "Non-symbolic state x");
+    casadi_assert_message(this->x.shape()==this->ode.shape(), "ode has wrong dimensions");
+
+    // DAE
+    casadi_assert_message(this->s.isSymbolic(), "Non-symbolic state x");
+    casadi_assert_message(this->s.shape()==this->sdot.shape(), "sdot has wrong dimensions");
+    casadi_assert_message(this->s.shape()==this->dae.shape(), "dae has wrong dimensions");
+
+    // Algebraic variables/equations
+    casadi_assert_message(this->z.isSymbolic(), "Non-symbolic algebraic variable z");
+    casadi_assert_message(this->z.shape()==this->alg.shape(), "alg has wrong dimensions");
+
+    // Quadrature states/equations
+    casadi_assert_message(this->q.isSymbolic(), "Non-symbolic quadrature state q");
+    casadi_assert_message(this->q.shape()==this->quad.shape(), "quad has wrong dimensions");
+
+    // Intermediate variables
+    casadi_assert_message(this->i.isSymbolic(), "Non-symbolic intermediate variable i");
+    casadi_assert_message(this->i.shape()==this->idef.shape(), "idef has wrong dimensions");
+
+    // Output equations
+    casadi_assert_message(this->y.isSymbolic(), "Non-symbolic output y");
+    casadi_assert_message(this->y.shape()==this->ydef.shape(), "ydef has wrong dimensions");
+
+    // Control
+    casadi_assert_message(this->u.isSymbolic(), "Non-symbolic control u");
+
+    // Parameter
+    casadi_assert_message(this->p.isSymbolic(), "Non-symbolic parameter p");
   }
 
   std::string SymbolicOCP::qualifiedName(const XmlNode& nn) {

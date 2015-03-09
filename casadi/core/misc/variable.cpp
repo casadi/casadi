@@ -29,13 +29,15 @@
 using namespace std;
 namespace casadi {
 
-  Variable::Variable() {
+  Variable::Variable(const std::string& name) {
+    this->v = SXElement::sym(name);
+    this->d = SXElement::sym("der_" + name);
     this->variability = CONTINUOUS;
     this->causality = INTERNAL;
     this->category = CAT_UNKNOWN;
     this->alias = NO_ALIAS;
     this->description = "";
-    this->valueReference = -1; //?
+    this->valueReference = -1;
     this->min = -numeric_limits<double>::infinity();
     this->max = numeric_limits<double>::infinity();
     this->initialGuess = 0;
@@ -45,16 +47,10 @@ namespace casadi {
     this->unit = "";
     this->displayUnit = "";
     this->free = false;
-    this->index = -1;
   }
 
   string Variable::name() const {
     return this->v.getName();
-  }
-
-  void Variable::setName(const std::string& name) {
-    this->v = SXElement::sym(name);
-    this->d = SXElement::sym("der_" + name);
   }
 
   void Variable::repr(ostream &stream, bool trailing_newline) const {
