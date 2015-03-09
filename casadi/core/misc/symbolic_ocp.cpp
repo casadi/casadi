@@ -110,9 +110,6 @@ namespace casadi {
           else
             throw CasadiException("Unknown variability");
 
-          // ODE is zero for non-continuous variables
-          if (var.variability!=CONTINUOUS) var.ode = 0;
-
           // Causality
           if (causality.compare("input")==0)
             var.causality = INPUT;
@@ -600,7 +597,7 @@ namespace casadi {
     if (!this->x.isEmpty()) {
       stream << "Differential equations" << endl;
       for (int k=0; k<this->x.nnz(); ++k) {
-        stream << str(der(this->x[k])) << " == " << str(ode(this->x[k])) << endl;
+        stream << str(der(this->x[k])) << " == " << str(this->ode2[k]) << endl;
       }
       stream << endl;
     }
@@ -616,7 +613,7 @@ namespace casadi {
     if (!this->q.isEmpty()) {
       stream << "Quadrature equations" << endl;
       for (int k=0; k<this->q.nnz(); ++k) {
-        stream << str(der(this->q[k])) << " == " << str(ode(this->q[k])) << endl;
+        stream << str(der(this->q[k])) << " == " << str(this->quad2[k]) << endl;
       }
       stream << endl;
     }
@@ -729,7 +726,7 @@ namespace casadi {
       this->q.append(qv.v);
 
       // Add the Lagrange term to the list of quadratures
-      setOde(qv.v, *it);
+      this->quad2.append(qv.v);
 
       // Add to the list of Mayer terms
       this->mterm.append(qv.v);
@@ -753,7 +750,6 @@ namespace casadi {
         Variable& v=it->second;
         casadi_assert(v.nominal!=0);
         v.beq *= v.nominal;
-        v.ode /= v.nominal;
         v.min /= v.nominal;
         v.max /= v.nominal;
         v.start /= v.nominal;
@@ -763,7 +759,6 @@ namespace casadi {
         v_rep.push_back(v.beq);
         v_id.push_back(v.d);
         v_rep.push_back(v.d * v.nominal);
-        ex_rep.push_back(v.ode);
         ex_rep.push_back(v.beq);
       }
     }
@@ -774,8 +769,10 @@ namespace casadi {
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(ex_rep);
+    ex.push_back(this->ode2);
     ex.push_back(this->dae);
     ex.push_back(this->alg);
+    ex.push_back(this->quad2);
     ex.push_back(this->initial);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
@@ -786,8 +783,10 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     ex_rep = (*it++).data();
+    this->ode2 = *it++ / nominal(this->x);
     this->dae = *it++;
     this->alg = *it++;
+    this->quad2 = *it++ / nominal(this->q);
     this->initial = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
@@ -798,7 +797,6 @@ namespace casadi {
     for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
       Variable& v=it->second;
       if (v.nominal!=1) {
-        v.ode = *ex_rep_it++;
         v.beq = *ex_rep_it++;
         v.nominal=1;
       }
@@ -810,9 +808,9 @@ namespace casadi {
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(ode(this->x));
+    ex.push_back(this->ode2);
     ex.push_back(this->alg);
-    ex.push_back(ode(this->q));
+    ex.push_back(this->quad2);
     ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->mterm);
@@ -825,9 +823,9 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    setOde(this->x, *it++);
+    this->ode2 = *it++;
     this->alg = *it++;
-    setOde(this->q, *it++);
+    this->quad2 = *it++;
     setBeq(this->y, *it++);
     this->initial = *it++;
     this->mterm = *it++;
@@ -881,9 +879,9 @@ namespace casadi {
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(ode(this->x));
+    ex.push_back(this->ode2);
     ex.push_back(this->alg);
-    ex.push_back(ode(this->q));
+    ex.push_back(this->quad2);
     ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->mterm);
@@ -895,9 +893,9 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    setOde(this->x, *it++);
+    this->ode2 = *it++;
     this->alg = *it++;
-    setOde(this->q, *it++);
+    this->quad2 = *it++;
     setBeq(this->y, *it++);
     this->initial = *it++;
     this->mterm = *it++;
@@ -950,9 +948,9 @@ namespace casadi {
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(ode(this->x));
+    ex.push_back(this->ode2);
     ex.push_back(this->alg);
-    ex.push_back(ode(this->q));
+    ex.push_back(this->quad2);
     ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->mterm);
@@ -964,9 +962,9 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    setOde(this->x, *it++);
+    this->ode2 = *it++;
     this->alg = *it++;
-    setOde(this->q, *it++);
+    this->quad2 = *it++;
     setBeq(this->y, *it++);
     this->initial = *it++;
     this->mterm = *it++;
@@ -998,7 +996,7 @@ namespace casadi {
     xz.append(v[PI]);
     xz.append(v[PF]);
     xz.append(v[U]);
-    SXFunction fcn = SXFunction(xz, ode(this->x));
+    SXFunction fcn = SXFunction(xz, this->ode2);
     SXFunction J(v, fcn.jac());
 
     // Evaluate the Jacobian in the starting point
@@ -1037,7 +1035,7 @@ namespace casadi {
     }
 
     // Scale the equations
-    setOde(this->x, ode(this->x)/scale);
+    this->ode2 /= scale;
 
     double time2 = clock();
     double dt = (time2-time1)/CLOCKS_PER_SEC;
@@ -1162,8 +1160,8 @@ namespace casadi {
     substituteInPlace(der(this->s), new_ode, false);
 
     // Add to explicit differential states and ODE
-    setOde(this->s, new_ode);
     this->x.append(this->s);
+    this->ode2.append(new_ode);
     this->dae = this->s = SX::zeros(0, 1);
   }
 
@@ -1635,31 +1633,6 @@ namespace casadi {
     setAttribute(&SymbolicOCP::setBeq, var, val);
   }
 
-  SX SymbolicOCP::ode(const std::string& name) const {
-    return variable(name).ode;
-  }
-
-  SX SymbolicOCP::ode(const SX& var) const {
-    casadi_assert(var.isVector() && var.isSymbolic());
-    SX ret = SX::zeros(var.sparsity());
-    for (int i=0; i<ret.nnz(); ++i) {
-      ret[i] = ode(var.at(i).getName());
-    }
-    return ret;
-  }
-
-  void SymbolicOCP::setOde(const std::string& name, const SX& val) {
-    variable(name).ode = val.toScalar();
-  }
-
-  void SymbolicOCP::setOde(const SX& var, const SX& val) {
-    casadi_assert(var.isVector() && var.isSymbolic());
-    casadi_assert(var.sparsity()==val.sparsity());
-    for (int i=0; i<var.nnz(); ++i) {
-      setOde(var.at(i).getName(), val.at(i));
-    }
-  }
-
   void SymbolicOCP::separateAlgebraic() {
     // Quick return if no s
     if (this->s.isEmpty()) return;
@@ -1870,7 +1843,8 @@ namespace casadi {
     v.initialGuess = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicOCP::setInitialGuess(const SX& var, const std::vector<double>& val, bool normalized) {
+  void SymbolicOCP::setInitialGuess(const SX& var, const std::vector<double>& val,
+                                    bool normalized) {
     setAttribute(&SymbolicOCP::setInitialGuess, var, val, normalized);
   }
 

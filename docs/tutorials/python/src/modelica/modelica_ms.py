@@ -49,7 +49,7 @@ ocp.makeExplicit()
 #! Let us extract variables for the states, the control and equations
 x = ocp.x
 u = ocp.u
-f = ocp.ode(ocp.x)
+f = ocp.ode2
 L = ocp.lterm
 I = ocp.initial
 #$ These are expressions that can be visualized or manipulated using CasADi's 

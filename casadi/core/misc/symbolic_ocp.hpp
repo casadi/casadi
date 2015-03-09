@@ -107,9 +107,8 @@ namespace casadi {
     SX s, dae, initial;
 
     /** \brief Differential states defined by ordinary differential equations (ODE)
-     * The ODE can be retrieved by calling the method #ode with x as argument.
      */
-    SX x;
+    SX x, ode2;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * \a alg and \a z have matching dimensions and
@@ -119,9 +118,8 @@ namespace casadi {
 
     /** \brief Quadrature states
      * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
-     * The ODE can be retrieved by calling the method #ode with q as argument.
      */
-    SX q;
+    SX q, quad2;
 
     /** \brief Output variables
      * Interdependencies are allowed but must be non-cyclic.
@@ -311,26 +309,6 @@ namespace casadi {
 
     /// Set an binding expression by non-differentiated expression
     void setBeq(const SX& var, const SX& val);
-
-    /** \brief Get a derivative binding equation (i.e. ordinary differential equation, ODE)
-     * by name.
-     *
-     * Returns variable expression if unknown.
-     */
-    SX ode(const std::string& name) const;
-
-    /** \brief Get a derivative binding expression (i.e. ordinary differential equation, ODE)
-     * by non-differentiated expression.
-     *
-     * Returns derivative expression if unknown.
-     */
-    SX ode(const SX& var) const;
-
-    /// Set a derivative binding equation by name
-    void setOde(const std::string& name, const SX& val);
-
-    /// Set an derivative binding expression by non-differentiated expression
-    void setOde(const SX& var, const SX& val);
 
     /// Get the nominal value by name
     double nominal(const std::string& name) const;

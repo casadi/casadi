@@ -54,7 +54,7 @@ namespace casadi {
 
   void Variable::setName(const std::string& name) {
     this->v = this->beq = SXElement::sym(name);
-    this->d = this->ode = SXElement::sym("der_" + name);
+    this->d = SXElement::sym("der_" + name);
   }
 
   void Variable::repr(ostream &stream, bool trailing_newline) const {
