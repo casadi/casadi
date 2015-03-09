@@ -579,7 +579,7 @@ namespace casadi {
     if (trailing_newline) stream << endl;
   }
 
-  void SymbolicOCP::eliminateLagrangeTerms() {
+  void SymbolicOCP::eliminate_lterm() {
     // Index for the names
     int ind = 0;
     // For every integral term in the objective function
@@ -615,7 +615,7 @@ namespace casadi {
     this->lterm.clear();
   }
 
-  void SymbolicOCP::eliminateQuadratureStates() {
+  void SymbolicOCP::eliminate_quad() {
     // Move all the quadratures to the list of differential states
     this->x.append(this->q);
     this->q = SX::zeros(0, 1);
@@ -697,7 +697,7 @@ namespace casadi {
     this->idef = this->idef(colperm);
   }
 
-  void SymbolicOCP::separate_i() {
+  void SymbolicOCP::split_i() {
     // Quick return if no intermediates
     if (this->i.isEmpty()) return;
 
@@ -812,7 +812,7 @@ namespace casadi {
     cout << "... equation scaling complete after " << dt << " seconds." << endl;
   }
 
-  void SymbolicOCP::sortDAE() {
+  void SymbolicOCP::sort_dae() {
     // Quick return if no differential states
     if (this->x.isEmpty()) return;
 
@@ -833,7 +833,7 @@ namespace casadi {
     this->sdot = this->sdot(colperm);
   }
 
-  void SymbolicOCP::sortALG() {
+  void SymbolicOCP::sort_alg() {
     // Quick return if no algebraic states
     if (this->z.isEmpty()) return;
 
@@ -858,7 +858,7 @@ namespace casadi {
     eliminate_i();
 
     // Separate the algebraic variables and equations
-    separateAlgebraic();
+    split_dae();
 
     // Quick return if there are no implicitly defined states
     if (this->s.isEmpty()) return;
@@ -940,7 +940,7 @@ namespace casadi {
     this->dae = this->s = this->sdot = SX::zeros(0, 1);
   }
 
-  void SymbolicOCP::eliminateAlgebraic() {
+  void SymbolicOCP::eliminate_alg() {
     // Only works if there are no i
     eliminate_i();
 
@@ -1049,7 +1049,7 @@ namespace casadi {
     makeSemiExplicit();
 
     // Then eliminate the algebraic variables
-    eliminateAlgebraic();
+    eliminate_alg();
 
     // Error if still algebraic variables
     casadi_assert_message(this->z.isEmpty(), "Failed to eliminate algebraic variables");
@@ -1483,7 +1483,7 @@ namespace casadi {
     return ret;
   }
 
-  void SymbolicOCP::separateAlgebraic() {
+  void SymbolicOCP::split_dae() {
     // Only works if there are no i
     eliminate_i();
 

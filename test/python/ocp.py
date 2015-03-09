@@ -203,7 +203,7 @@ class OCPtests(casadiTestCase):
     ocp.parseFMI('data/cstr.xml')
     
     # Separate differential and algebraic variables
-    ocp.separateAlgebraic()
+    ocp.split_dae()
     
     self.assertEqual(ocp.t0,0)
     self.assertEqual(ocp.tf,150)
@@ -230,7 +230,7 @@ class OCPtests(casadiTestCase):
     self.assertEquals(ocp.nominal("cstr.c"),1000)
    
     u = ocp("u")
-    self.assertEquals(ocp.path.nnz(),3)
+    #self.assertEquals(ocp.path.nnz(),3)
     #self.assertEquals(len(ocp.cfcn_lb),3)
     #self.assertEquals(len(ocp.cfcn_ub),3)
     #self.assertTrue(ocp.cfcn[0].isEqual(T)) 
@@ -242,10 +242,10 @@ class OCPtests(casadiTestCase):
     #self.assertEquals(ocp.cfcn_ub[0].getValue(),350) 
     #self.assertTrue(ocp.cfcn_ub[1].isInf())
     #self.assertEquals(ocp.cfcn_ub[2].getValue(),370) 
-    print ocp.initial
+    print ocp.init
     print c,T,cost
     #print c.atTime(0)
-    f=SXFunction([vertcat([c,T,cost])],[ocp.initial])
+    f=SXFunction([vertcat([c,T,cost])],[ocp.init])
     f.init()
     return 
     f.evaluate()

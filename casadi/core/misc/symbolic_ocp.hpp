@@ -216,10 +216,10 @@ namespace casadi {
     ///@{
 
     /// Identify and separate the algebraic variables and equations in the DAE
-    void separateAlgebraic();
+    void split_dae();
 
-    /// Eliminate algebraic variables, transforming them into outputs
-    void eliminateAlgebraic();
+    /// Eliminate algebraic variables and equations transforming them into outputs
+    void eliminate_alg();
 
     /// Transform the implicit DAE to a semi-explicit DAE
     void makeSemiExplicit();
@@ -231,22 +231,22 @@ namespace casadi {
     void sort_i();
 
     /// Eliminate interdependencies amongst intermediate variables
-    void separate_i();
+    void split_i();
 
     /// Eliminate intermediate variables
     void eliminate_i();
 
     /// Eliminate Lagrange terms from the objective function and make them quadrature states
-    void eliminateLagrangeTerms();
+    void eliminate_lterm();
 
     /// Eliminate quadrature states and turn them into ODE states
-    void eliminateQuadratureStates();
+    void eliminate_quad();
 
     /// Sort the DAE and implicitly defined states
-    void sortDAE();
+    void sort_dae();
 
     /// Sort the algebraic equations and algebraic states
-    void sortALG();
+    void sort_alg();
 
     /// Generate a <tt>MUSCOD-II</tt> compatible DAT file
     void generateMuscodDatFile(const std::string& filename,
