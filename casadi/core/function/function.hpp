@@ -476,6 +476,10 @@ namespace casadi {
     /** \brief Generate C code for the function */
     std::string generateCodeStr(bool generate_main=false);
 
+    /** \brief Generate code without meta information */
+    void generateFunction(std::ostream &stream, const std::string& fname,
+                          const std::string& type, CodeGenerator& gen) const;
+
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
     FunctionInternal* operator->();

@@ -108,7 +108,7 @@ namespace casadi {
       name << "f" << ind;
 
       // Print to file
-      f->generateFunction(dependencies_, name.str(), "const d*", "d*", "d", *this);
+      f->generateFunction(dependencies_, name.str(), "d", *this);
     }
 
     return ind;

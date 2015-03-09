@@ -40,6 +40,8 @@ namespace casadi {
   template<class T> class Matrix;
   class Function;
   class Sparsity;
+  class CodeGenerator;
+
   /// \cond INTERNAL
   template<class T> class LPStructIOSchemeVector;
   template<class T> class QPStructIOSchemeVector;

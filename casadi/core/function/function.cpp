@@ -438,6 +438,11 @@ namespace casadi {
     cfile.close();
   }
 
+  void Function::generateFunction(std::ostream &stream, const std::string& fname,
+                                  const std::string& type, CodeGenerator& gen) const {
+    (*this)->generateFunction(stream, fname, type, gen);
+  }
+
   std::string Function::generateCodeStr(bool generate_main) {
     std::ostringstream cfile;
     generateCode(cfile, generate_main);

@@ -179,9 +179,6 @@ namespace casadi {
      *  Formulate an optimal control problem
      */
     ///@{
-    /// Import existing problem from FMI/XML
-    void parseFMI(const std::string& filename);
-
     /// Add a new differential state
     SX add_x(const std::string& name);
 
@@ -248,17 +245,38 @@ namespace casadi {
     /// Sort the algebraic equations and algebraic states
     void sort_alg();
 
-    /// Generate a <tt>MUSCOD-II</tt> compatible DAT file
-    void generateMuscodDatFile(const std::string& filename,
-                               const Dictionary& mc2_ops=Dictionary()) const;
-
-    ///@}
-
     /// Scale the variables
     void scaleVariables();
 
     /// Scale the implicit equations
     void scaleEquations();
+    ///@}
+
+    /** @name Import and export
+     */
+    ///@{
+    /// Import existing problem from FMI/XML
+    void parseFMI(const std::string& filename);
+
+    /// Generate a <tt>MUSCOD-II</tt> compatible DAT file
+    void generateMuscodDatFile(const std::string& filename,
+                               const Dictionary& mc2_ops=Dictionary()) const;
+
+    /// Generate a file for numerical evaluation
+    void generateCode(const std::string& filename,
+                      const Dictionary& options=Dictionary());
+
+    /// Generate a header file for generateCode
+    static void generateHeader(const std::string& filename, const std::string& prefix="");
+
+    /// Generate code for a particular function
+    static void generateFunction(std::ostream &stream, const std::string& fname,
+                                 const std::vector<SX>& f_in, const std::vector<SX>& f_out,
+                                 CodeGenerator& gen);
+
+    /// Corresponding header
+    static void generateFunctionHeader(std::ostream &stream, const std::string& fname);
+    ///@}
 
     /// Get variable expression by name
     SX operator()(const std::string& name) const;

@@ -236,7 +236,6 @@ namespace casadi {
 
     /** \brief Generate code the function */
     virtual void generateFunction(std::ostream &stream, const std::string& fname,
-                                  const std::string& input_type, const std::string& output_type,
                                   const std::string& type, CodeGenerator& gen) const;
 
     /** \brief Generate code for the declarations of the C function */

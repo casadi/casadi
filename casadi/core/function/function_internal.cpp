@@ -1916,14 +1916,11 @@ namespace casadi {
     // Create a code generator object
     CodeGenerator gen;
 
-    // Add standard math
-    gen.addInclude("math.h");
-
     // Generate function inputs and outputs information
     generateIO(gen);
 
     // Generate the actual function
-    generateFunction(gen.function_, "eval", "const d*", "d*", "d", gen);
+    generateFunction(gen.function_, "eval", "d", gen);
 
     // Flush the code generator
     gen.flush(cfile);
@@ -2038,15 +2035,19 @@ namespace casadi {
   }
 
   void FunctionInternal::generateFunction(
-      std::ostream &stream, const std::string& fname, const std::string& input_type,
-      const std::string& output_type, const std::string& type, CodeGenerator& gen) const {
+      std::ostream &stream, const std::string& fname, const std::string& type,
+      CodeGenerator& gen) const {
+
+    // Add standard math
+    gen.addInclude("math.h");
 
     // Generate declarations
     generateDeclarations(stream, type, gen);
 
     // Define function
     stream << "/* " << getSanitizedName() << " */" << endl;
-    stream << "int " << fname << "(const d* const* arg, d* const* res, int* iii, d* w) {" << endl;
+    stream << "int " << fname << "(const " << type << "* const* arg, " << type
+           << "* const* res, int* iii, " << type << "* w) {" << endl;
 
     // Insert the function body
     generateBody(stream, type, gen);
