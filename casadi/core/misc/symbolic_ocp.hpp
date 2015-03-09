@@ -108,7 +108,7 @@ namespace casadi {
 
     /** \brief Differential states defined by ordinary differential equations (ODE)
      */
-    SX x, ode2;
+    SX x, ode;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * \a alg and \a z have matching dimensions and
@@ -119,7 +119,7 @@ namespace casadi {
     /** \brief Quadrature states
      * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
      */
-    SX q, quad2;
+    SX q, quad;
 
     /** \brief Output variables
      * Interdependencies are allowed but must be non-cyclic.

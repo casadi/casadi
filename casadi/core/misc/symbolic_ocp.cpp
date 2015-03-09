@@ -597,7 +597,7 @@ namespace casadi {
     if (!this->x.isEmpty()) {
       stream << "Differential equations" << endl;
       for (int k=0; k<this->x.nnz(); ++k) {
-        stream << str(der(this->x[k])) << " == " << str(this->ode2[k]) << endl;
+        stream << str(der(this->x[k])) << " == " << str(this->ode[k]) << endl;
       }
       stream << endl;
     }
@@ -613,7 +613,7 @@ namespace casadi {
     if (!this->q.isEmpty()) {
       stream << "Quadrature equations" << endl;
       for (int k=0; k<this->q.nnz(); ++k) {
-        stream << str(der(this->q[k])) << " == " << str(this->quad2[k]) << endl;
+        stream << str(der(this->q[k])) << " == " << str(this->quad[k]) << endl;
       }
       stream << endl;
     }
@@ -726,7 +726,7 @@ namespace casadi {
       this->q.append(qv.v);
 
       // Add the Lagrange term to the list of quadratures
-      this->quad2.append(qv.v);
+      this->quad.append(qv.v);
 
       // Add to the list of Mayer terms
       this->mterm.append(qv.v);
@@ -769,10 +769,10 @@ namespace casadi {
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(ex_rep);
-    ex.push_back(this->ode2);
+    ex.push_back(this->ode);
     ex.push_back(this->dae);
     ex.push_back(this->alg);
-    ex.push_back(this->quad2);
+    ex.push_back(this->quad);
     ex.push_back(this->initial);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
@@ -783,10 +783,10 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     ex_rep = (*it++).data();
-    this->ode2 = *it++ / nominal(this->x);
+    this->ode = *it++ / nominal(this->x);
     this->dae = *it++;
     this->alg = *it++;
-    this->quad2 = *it++ / nominal(this->q);
+    this->quad = *it++ / nominal(this->q);
     this->initial = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
@@ -808,9 +808,9 @@ namespace casadi {
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode2);
+    ex.push_back(this->ode);
     ex.push_back(this->alg);
-    ex.push_back(this->quad2);
+    ex.push_back(this->quad);
     ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->mterm);
@@ -823,9 +823,9 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode2 = *it++;
+    this->ode = *it++;
     this->alg = *it++;
-    this->quad2 = *it++;
+    this->quad = *it++;
     setBeq(this->y, *it++);
     this->initial = *it++;
     this->mterm = *it++;
@@ -879,9 +879,9 @@ namespace casadi {
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode2);
+    ex.push_back(this->ode);
     ex.push_back(this->alg);
-    ex.push_back(this->quad2);
+    ex.push_back(this->quad);
     ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->mterm);
@@ -893,9 +893,9 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode2 = *it++;
+    this->ode = *it++;
     this->alg = *it++;
-    this->quad2 = *it++;
+    this->quad = *it++;
     setBeq(this->y, *it++);
     this->initial = *it++;
     this->mterm = *it++;
@@ -948,9 +948,9 @@ namespace casadi {
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode2);
+    ex.push_back(this->ode);
     ex.push_back(this->alg);
-    ex.push_back(this->quad2);
+    ex.push_back(this->quad);
     ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->mterm);
@@ -962,9 +962,9 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode2 = *it++;
+    this->ode = *it++;
     this->alg = *it++;
-    this->quad2 = *it++;
+    this->quad = *it++;
     setBeq(this->y, *it++);
     this->initial = *it++;
     this->mterm = *it++;
@@ -996,7 +996,7 @@ namespace casadi {
     xz.append(v[PI]);
     xz.append(v[PF]);
     xz.append(v[U]);
-    SXFunction fcn = SXFunction(xz, this->ode2);
+    SXFunction fcn = SXFunction(xz, this->ode);
     SXFunction J(v, fcn.jac());
 
     // Evaluate the Jacobian in the starting point
@@ -1035,7 +1035,7 @@ namespace casadi {
     }
 
     // Scale the equations
-    this->ode2 /= scale;
+    this->ode /= scale;
 
     double time2 = clock();
     double dt = (time2-time1)/CLOCKS_PER_SEC;
@@ -1161,7 +1161,7 @@ namespace casadi {
 
     // Add to explicit differential states and ODE
     this->x.append(this->s);
-    this->ode2.append(new_ode);
+    this->ode.append(new_ode);
     this->dae = this->s = SX::zeros(0, 1);
   }
 
