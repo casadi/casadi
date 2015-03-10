@@ -2022,6 +2022,7 @@ namespace casadi {
     lam.push_back(SX::sym("lam_dae", this->dae.sparsity()));
     lam.push_back(SX::sym("lam_alg", this->alg.sparsity()));
     lam.push_back(SX::sym("lam_quad", this->quad.sparsity()));
+    lam.push_back(SX::sym("lam_idef", this->idef.sparsity()));
     lam.push_back(SX::sym("lam_ydef", this->ydef.sparsity()));
 
     // Jacobian of all input w.r.t. all outputs
