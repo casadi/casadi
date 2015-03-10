@@ -1774,10 +1774,14 @@ namespace casadi {
     s << "/* Input convension */" << endl;
     s << "typedef enum {"
       << "OCP_T, "
+      << "OCP_X, "
       << "OCP_S, "
       << "OCP_SDOT, "
       << "OCP_Z, "
       << "OCP_U, "
+      << "OCP_Q, "
+      << "OCP_I, "
+      << "OCP_Y, "
       << "OCP_P, "
       << "OCP_NUM_IN} " << prefix << "ocp_input_t;" << endl << endl;
 
@@ -1788,25 +1792,29 @@ namespace casadi {
       << "OCP_DAE, "
       << "OCP_ALG, "
       << "OCP_QUAD, "
+      << "OCP_IDEF, "
       << "OCP_YDEF, "
       << "OCP_NUM_OUT} " << prefix << "ocp_output_t;" << endl << endl;
 
-    s << "/* Problem dimensions */" << endl;
-    s << "int " << prefix << "get_nx();" << endl;
-    s << "int " << prefix << "get_ns();" << endl;
-    s << "int " << prefix << "get_nz();" << endl;
-    s << "int " << prefix << "get_nu();" << endl;
-    s << "int " << prefix << "get_nq();" << endl;
-    s << "int " << prefix << "get_ni();" << endl;
-    s << "int " << prefix << "get_ny();" << endl;
-    s << "int " << prefix << "get_np();" << endl;
-    s << endl;
+    // Input dimensions and offset
+    s << "/* Input dimensions and offsets */" << endl
+      << "void " << prefix
+      << "input_dims(const int **dims, const int **offset, const int **inv_offset);" << endl
+      << endl;
+
+    // Output dimensions and offset
+    s << "/* Output dimensions and offsets */" << endl
+      << "void " << prefix
+      << "output_dims(const int **dims, const int **offset, const int **inv_offset);" << endl
+      << endl;
 
     s << "/* Function declarations */" << endl;
     generateFunctionHeader(s, prefix+"eval_ode");
     generateFunctionHeader(s, prefix+"eval_dae");
     generateFunctionHeader(s, prefix+"eval_alg");
     generateFunctionHeader(s, prefix+"eval_quad");
+    generateFunctionHeader(s, prefix+"eval_idef");
+    generateFunctionHeader(s, prefix+"eval_ydef");
     generateFunctionHeader(s, prefix+"eval", true, true, true);
     s << endl;
 
@@ -1909,18 +1917,6 @@ namespace casadi {
       gen.addInclude(include, true);
     }
 
-    // Function that returns the dimensions
-    gen.function_
-      << "int " << prefix << "get_nx() { return " << this->x.nnz() << ";}" << endl
-      << "int " << prefix << "get_ns() { return " << this->s.nnz() << ";}" << endl
-      << "int " << prefix << "get_nz() { return " << this->z.nnz() << ";}" << endl
-      << "int " << prefix << "get_nu() { return " << this->u.nnz() << ";}" << endl
-      << "int " << prefix << "get_nq() { return " << this->q.nnz() << ";}" << endl
-      << "int " << prefix << "get_ni() { return " << this->i.nnz() << ";}" << endl
-      << "int " << prefix << "get_ny() { return " << this->y.nnz() << ";}" << endl
-      << "int " << prefix << "get_np() { return " << this->p.nnz() << ";}" << endl
-      << endl;
-
     // All inputs
     vector<SX> v_in;
     v_in.push_back(this->t);
@@ -1929,23 +1925,77 @@ namespace casadi {
     v_in.push_back(this->sdot);
     v_in.push_back(this->z);
     v_in.push_back(this->u);
+    v_in.push_back(this->q);
+    v_in.push_back(this->i);
+    v_in.push_back(this->y);
     v_in.push_back(this->p);
+
+    // Input dimensions
+    vector<int> dims(v_in.size());
+    for (int i=0; i<v_in.size(); ++i) {
+      dims[i] = v_in[i].nnz();
+    }
+    int dims_ind = gen.getConstant(dims, true);
+
+    // Corresponding offsets
+    dims.insert(dims.begin(), 0);
+    vector<int> inv_offset;
+    for (int i=0; i<v_in.size(); ++i) {
+      dims[i+1] += dims[i]; // cumsum
+      inv_offset.resize(dims[i+1], i);
+    }
+    int offset_ind = gen.getConstant(dims, true);
+    int inv_offset_ind = gen.getConstant(inv_offset, true);
+    gen.function_
+      << "void " << prefix
+      << "input_dims(const int **dims, const int **offset, const int **inv_offset) {" << endl
+      << "  if (dims) *dims = s" << dims_ind << ";" << endl
+      << "  if (offset) *offset = s" << offset_ind << ";" << endl
+      << "  if (inv_offset) *inv_offset = s" << inv_offset_ind << ";" << endl
+      << "}" << endl << endl;
+
+    // All outputs
+    vector<SX> v_out;
+    v_out.push_back(this->ode);
+    v_out.push_back(this->dae);
+    v_out.push_back(this->alg);
+    v_out.push_back(this->quad);
+    v_out.push_back(this->idef);
+    v_out.push_back(this->ydef);
+
+    // Output dimensions
+    dims.resize(v_out.size());
+    for (int i=0; i<v_out.size(); ++i) {
+      dims[i] = v_out[i].nnz();
+    }
+    dims_ind = gen.getConstant(dims, true);
+
+    // Corresponding offsets
+    dims.insert(dims.begin(), 0);
+    inv_offset.clear();
+    for (int i=0; i<v_out.size(); ++i) {
+      dims[i+1] += dims[i]; // cumsum
+      inv_offset.resize(dims[i+1], i);
+    }
+    offset_ind = gen.getConstant(dims, true);
+    inv_offset_ind = gen.getConstant(inv_offset, true);
+    gen.function_
+      << "void " << prefix
+      << "output_dims(const int **dims, const int **offset, const int **inv_offset) {" << endl
+      << "  if (dims) *dims = s" << dims_ind << ";" << endl
+      << "  if (offset) *offset = s" << offset_ind << ";" << endl
+      << "  if (inv_offset) *inv_offset = s" << inv_offset_ind << ";" << endl
+      << "}" << endl << endl;
 
     // Basic functions individually
     generateFunction(gen.function_, prefix+"eval_ode", v_in, vector<SX>(1, this->ode), gen);
     generateFunction(gen.function_, prefix+"eval_dae", v_in, vector<SX>(1, this->dae), gen);
     generateFunction(gen.function_, prefix+"eval_alg", v_in, vector<SX>(1, this->alg), gen);
     generateFunction(gen.function_, prefix+"eval_quad", v_in, vector<SX>(1, this->quad), gen);
+    generateFunction(gen.function_, prefix+"eval_idef", v_in, vector<SX>(1, this->quad), gen);
+    generateFunction(gen.function_, prefix+"eval_ydef", v_in, vector<SX>(1, this->quad), gen);
 
-    // All inputs
-    vector<SX> v_out;
-    v_out.push_back(this->ode);
-    v_out.push_back(this->dae);
-    v_out.push_back(this->alg);
-    v_out.push_back(this->quad);
-    v_out.push_back(this->ydef);
-
-    // All functions at once
+    // All functions at once, with derivatives
     generateFunction(gen.function_, prefix+"eval", v_in, v_out, gen, true, true, true);
 
     // Jacobian of all input w.r.t. all outputs

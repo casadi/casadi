@@ -50,7 +50,7 @@ namespace casadi {
     /** \brief Get or add a constant */
     int getConstant(const std::vector<double>& v, bool allow_adding=false);
 
-    /** \brief Get or add am integer constant */
+    /** \brief Get or add an integer constant */
     int getConstant(const std::vector<int>& v, bool allow_adding=false);
 
     /** \brief Add a dependent function */
