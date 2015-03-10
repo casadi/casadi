@@ -1767,6 +1767,27 @@ namespace casadi {
     s << "extern \"C\" {" << endl;
     s << "#endif" << endl << endl;
 
+    // Typedef input enum corresponding to generated format
+    s << "/* Input convension */" << endl;
+    s << "typedef enum {"
+      << "OCP_T, "
+      << "OCP_S, "
+      << "OCP_SDOT, "
+      << "OCP_Z, "
+      << "OCP_U, "
+      << "OCP_P, "
+      << "OCP_NUM_IN} " << prefix << "ocp_input_t;" << endl << endl;
+
+    // Typedef input enum corresponding to generated format
+    s << "/* Output convension */" << endl;
+    s << "typedef enum {"
+      << "OCP_ODE, "
+      << "OCP_DAE, "
+      << "OCP_ALG, "
+      << "OCP_QUAD, "
+      << "OCP_YDEF, "
+      << "OCP_NUM_OUT} " << prefix << "ocp_output_t;" << endl << endl;
+
     s << "/* Problem dimensions */" << endl;
     s << "int " << prefix << "get_nx();" << endl;
     s << "int " << prefix << "get_ns();" << endl;
