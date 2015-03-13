@@ -326,18 +326,14 @@ PyObject* arrayView() {
   def __float__(self):
     if self.numel()!=1:
       raise Exception("Only a scalar can be cast to a float")
-    if self.nnz()==0:
-      return 0.0
-    return self.toScalar()
+    return self.getValue()
 %}
 
 %pythoncode %{
   def __int__(self):
     if self.numel()!=1:
       raise Exception("Only a scalar can be cast to an int")
-    if self.nnz()==0:
-      return 0
-    return int(self.toScalar())
+    return self.getIntValue()
 %}
 
 %pythoncode %{
@@ -346,7 +342,7 @@ PyObject* arrayView() {
       raise Exception("Only a scalar can be cast to a float")
     if self.nnz()==0:
       return 0
-    return self.toScalar()!=0
+    return self.getValue()!=0
 %}
 
 %pythoncode %{
@@ -370,10 +366,11 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
     def toArray(self):
       import numpy as n
       r = n.zeros((self.size1(),self.size2()))
+      d = self.data()
       for j in range(self.size2()):
         for k in range(self.colind(j),self.colind(j+1)):
           i = self.row(k)
-          r[i,j] = self.at(k)
+          r[i,j] = d[k]
       return r
   %}
   
@@ -381,9 +378,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
     def __float__(self):
       if self.numel()!=1:
         raise Exception("Only a scalar can be cast to a float")
-      if self.nnz()==0:
-        return 0.0
-      return float(self.toScalar())
+      return self.getValue()
   %}
 
   %pythoncode %{
@@ -392,7 +387,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
         raise Exception("Only a scalar can be cast to an int")
       if self.nnz()==0:
         return 0
-      return self.toScalar()
+      return self.getIntValue()
   %}
 
 #ifdef SWIGPYTHON

@@ -811,7 +811,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType>::Matrix(const std::vector< std::vector<DataType> >& d) {
+  Matrix<DataType>::Matrix(const std::vector< std::vector<double> >& d) {
     // Get dimensions
     int nrow=d.size();
     int ncol=d.empty() ? 1 : d.front().size();
@@ -2057,6 +2057,11 @@ namespace casadi {
   template<typename DataType>
   double Matrix<DataType>::getValue() const {
     return static_cast<double>(toScalar());
+  }
+
+  template<typename DataType>
+  int Matrix<DataType>::getIntValue() const {
+    return static_cast<int>(toScalar());
   }
 
   template<typename DataType>

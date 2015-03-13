@@ -690,15 +690,12 @@ using namespace casadi;
 
 %{
 namespace std {
-void dummy(casadi::SXElement foo,
-           std::vector< std::vector<double> > foo1,
+void dummy(std::vector< std::vector<double> > foo1,
            std::vector<double> &foo2,
            std::vector<casadi::MX> &foo3,
            casadi::MX foo4,
            casadi::Matrix<double> foo5,
            casadi::Sparsity foo6,
-           std::vector<casadi::SXElement> foo7,
-           std::vector< std::vector<casadi::SXElement> > foo8,
            casadi::SX foo9,
            casadi::GenericType foo10,
            std::vector < casadi::Matrix<double> > foo11,
@@ -735,15 +732,12 @@ import _casadi
 #endif // SWIGPYTHON
 
 namespace std {
-  void dummy(casadi::SXElement foo,
-             std::vector< std::vector<double> > foo1,
+  void dummy(std::vector< std::vector<double> > foo1,
              std::vector<double> &foo2,
              std::vector<casadi::MX> &foo3,
              casadi::MX foo4,
              casadi::Matrix<double> foo5,
              casadi::Sparsity foo6,
-             std::vector<casadi::SXElement> foo7,
-             std::vector< std::vector<casadi::SXElement> > foo8,
              casadi::SX foo9,
              casadi::GenericType foo10,
              std::vector < casadi::Matrix<double> > foo11,

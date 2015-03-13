@@ -329,6 +329,7 @@ namespace casadi {
   template<> bool SX::isSymbolic() const;
   template<> bool SX::isSymbolicSparse() const;
   template<> double SX::getValue() const;
+  template<> int SX::getIntValue() const;
   template<> SX SX::getDep(int ch) const;
   template<> int SX::getNdeps() const;
   template<> std::string SX::getName() const;

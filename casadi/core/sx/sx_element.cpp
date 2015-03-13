@@ -934,6 +934,11 @@ namespace casadi {
   }
 
   template<>
+  int SX::getIntValue() const {
+    return toScalar().getIntValue();
+  }
+
+  template<>
   std::string SX::getName() const {
     return toScalar().getName();
   }

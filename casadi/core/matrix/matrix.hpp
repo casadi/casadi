@@ -122,9 +122,6 @@ namespace casadi {
     Matrix<DataType>& operator=(const Matrix<DataType>& m);
 #endif // SWIG
 
-    /// Dense matrix constructor with data given as vector of vectors
-    explicit Matrix(const std::vector< std::vector<DataType> >& m);
-
     /** \brief Create a sparse matrix with all structural zeros */
     Matrix(int nrow, int ncol);
 
@@ -150,6 +147,10 @@ namespace casadi {
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);
 
+    /// Dense matrix constructor with data given as vector of vectors
+    explicit Matrix(const std::vector< std::vector<double> >& m);
+
+#ifndef SWIG
     /// Construct from a vector
     /**
      * Thanks to implicit conversion, you can pretend that Matrix(const SXElement& x); exists.
@@ -166,7 +167,6 @@ namespace casadi {
     /// Scalar type
     typedef DataType ScalarType;
 
-#ifndef SWIG
     /// Base class
     typedef GenericMatrix<Matrix<DataType> > B;
 
@@ -247,7 +247,6 @@ namespace casadi {
       copy(x.begin(), x.end(), begin());
     }
 
-
 #ifndef SWIG
     /// Get a non-zero element
     inline const DataType& at(int k) const {
@@ -265,33 +264,16 @@ namespace casadi {
         throw CasadiException(ss.str());
       }
     }
-#else // SWIG
-    /// Access a non-zero element
-    DataType at(int k) {
-      try {
-        if (k<0) k+=nnz();
-        return data().at(k);
-      } catch(std::out_of_range& /* unnamed */) {
-        std::stringstream ss;
-        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0, " << nnz() << ")";
-        throw CasadiException(ss.str());
-      }
-    }
-#endif // SWIG
 
-#ifndef SWIG
     /// get an element
     const DataType& elem(int rr, int cc=0) const;
 
     /// get a reference to an element
     DataType& elem(int rr, int cc=0);
-#else // SWIG
-    /// Access a non-zero element
-    DataType elem(int rr, int cc=0) { return elem(rr, cc);}
-#endif // SWIG
 
     /// get an element, do not allocate
     const DataType getElement(int rr, int cc=0) const { return elem(rr, cc);}
+#endif // SWIG
 
     /// Returns true if the matrix has a non-zero at location rr, cc
     bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr, cc); }
@@ -364,14 +346,18 @@ namespace casadi {
     /// Set all elements to zero
     void setZero();
 
+#ifndef SWIG
     /// Set all elements to a value
     void setAll(const DataType& val);
+#endif // SWIG
 
     /** \brief Set sparse */
     Matrix<DataType> setSparse(const Sparsity& sp, bool intersect=false) const;
 
+#ifndef SWIG
     /// Make the matrix dense
     void makeDense(const DataType& val = 0);
+#endif // SWIG
 
     /** \brief  Make a matrix sparse by removing numerical zeros smaller
      * in absolute value than a specified tolerance */
@@ -868,6 +854,9 @@ namespace casadi {
 
     /** \brief Get double value (only if constant) */
     double getValue() const;
+
+    /** \brief Get double value (only if integer constant) */
+    int getIntValue() const;
 
     /** \brief Get name (only if symbolic scalar) */
     std::string getName() const;

@@ -685,8 +685,8 @@ class typemaptests(casadiTestCase):
   def test_setAll_365(self):
     self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
     m = DMatrix.ones(5,5)
-    m.setAll(DMatrix(4))
-    m.setAll(IMatrix(4))
+    m.set(DMatrix(4))
+    m.set(IMatrix(4))
         
   def test_issue570(self):
     self.message("Issue #570: long int")

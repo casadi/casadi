@@ -80,7 +80,7 @@
       casadi::Matrix<int> *temp;
       SWIG_ConvertPtr(p, (void **) &temp, type_IMatrix(), 0 );
       if (temp->isScalar(true)) {
-        if (m) *m = temp->toScalar();
+        if (m) *m = temp->getIntValue();
         return true;
       }
       return false;
@@ -138,7 +138,7 @@
       casadi::Matrix<double> *ptr;
       SWIG_ConvertPtr(p, (void **) &ptr, type_DMatrix(), 0 );
       if (ptr->isScalar(true)) {
-        if (m) *m = ptr->toScalar();
+        if (m) *m = ptr->getValue();
         return true;
       }
       return false;
@@ -149,7 +149,7 @@
       casadi::Matrix<int> *ptr;
       SWIG_ConvertPtr(p, (void **) &ptr, type_IMatrix(), 0 );
       if (ptr->isScalar(true)) {
-        if (m) *m = ptr->toScalar();
+        if (m) *m = ptr->getIntValue();
         return true;
       }
       return false;
