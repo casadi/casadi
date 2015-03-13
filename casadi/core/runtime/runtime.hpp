@@ -99,6 +99,10 @@ namespace casadi {
   template<typename real_t>
   real_t casadi_norm_inf_mul(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y,
                              real_t *dwork, int *iwork);
+
+  /// Calculates inner_prod(x, mul(A, x))
+  template<typename real_t>
+  real_t casadi_quad_form(const real_t* A, const int* sp_A, const real_t* x);
 }
 
 // Helper functions
@@ -418,7 +422,35 @@ namespace casadi {
     }
     return res;
   }
-}
+
+    /// Calculates inner_prod(x, mul(A, x)) without memory allocation
+  template<typename real_t>
+  real_t casadi_quad_form(const real_t* A, const int* sp_A, const real_t* x) {
+    /* Get sparsities */
+    int ncol_A = sp_A[1];
+    const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;
+
+    // Return value
+    real_t ret=0;
+
+    // Loop over the columns of A
+    for (int cc=0; cc<ncol_A; ++cc) {
+      // Loop over the nonzeros of A
+      for (int el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
+        // Get row
+        int rr = row_A[el];
+
+        // Add contribution
+        ret += x[rr]*A[el]*x[cc];
+      }
+    }
+
+    return ret;
+  }
+
+} // namespace casadi
+
+
 
 /// \endcond
 

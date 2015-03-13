@@ -165,8 +165,14 @@ namespace casadi {
     MatType zz_triu(bool includeDiagonal=true) const {
       return self().setSparse(triu(sparsity(), includeDiagonal));
     }
-    MatType zz_quad_form(const MatType &A) const { return mul(self().T(), mul(A, self())); }
-    MatType zz_quad_form() const { return mul(self().T(), self()); }
+    MatType zz_quad_form(const MatType &A) const {
+      casadi_assert(isVector());
+      return inner_prod(self(), mul(A, self()));
+    }
+    MatType zz_quad_form() const {
+      casadi_assert(isVector());
+      return inner_prod(self(), self());
+    }
     MatType zz_sum_square() const { return sumAll(self()*self()); }
     MatType zz_linspace(const MatType &b, int nsteps) const;
     MatType zz_cross(const MatType &b, int dim=-1) const;

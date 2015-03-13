@@ -1553,32 +1553,20 @@ namespace casadi {
   }
 
   template<typename DataType>
-  DataType Matrix<DataType>::quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A) {
+  Matrix<DataType> Matrix<DataType>::zz_quad_form(const Matrix<DataType>& A) const {
+    casadi_assert(isVector());
+
+    // Call recursively if vector not dense
+    if (!isDense()) return densify(*this).zz_quad_form(A);
+
     // Assert dimensions
-    casadi_assert_message(x.size()==A.size2() && x.size()==A.size1(),
-                          "Dimension mismatch. Got x=" << x.size() << " and A=" << A.dimString());
+    casadi_assert_message(size1()==A.size2() && size1()==A.size1(),
+                          "Dimension mismatch. Got x.size1 = " << size1()
+                          << " and A.shape = " << A.shape());
 
-    // Access the internal data of A
-    const int* A_colind = A.colind();
-    const int* A_row = A.row();
-    const std::vector<DataType> &A_data = A.data();
-
-    // Return value
-    DataType ret=0;
-
-    // Loop over the cols of A
-    for (int i=0; i<x.size(); ++i) {
-      // Loop over the nonzeros of A
-      for (int el=A_colind[i]; el<A_colind[i+1]; ++el) {
-        // Get row
-        int j = A_row[el];
-
-        // Add contribution
-        ret += x[i]*A_data[el]*x[j];
-      }
-    }
-
-    return ret;
+    
+    // Calculate using runtime function
+    return casadi_quad_form(A.ptr(), A.sparsity(), ptr());
   }
 
   template<typename DataType>

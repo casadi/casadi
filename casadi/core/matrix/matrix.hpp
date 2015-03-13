@@ -433,10 +433,9 @@ namespace casadi {
     Matrix<DataType> zz_poly_roots() const;
     Matrix<DataType> zz_eig_symbolic() const;
     Matrix<DataType> zz_sparsify(double tol=0) const;
+    Matrix<DataType> zz_quad_form() const { return B::zz_quad_form();}
+    Matrix<DataType> zz_quad_form(const Matrix<DataType>& A) const;
     ///@}
-
-    /// Calculates inner_prod(x, mul(A, x)) without memory allocation
-    static DataType quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A);
     /// \endcond
 
     /// Transpose the matrix

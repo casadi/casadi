@@ -399,7 +399,7 @@ namespace casadi {
       log("QP solved");
 
       // Detecting indefiniteness
-      double gain = quad_form(dx_, Bk_);
+      double gain = casadi_quad_form(Bk_.ptr(), Bk_.sparsity(), getPtr(dx_));
       if (gain < 0) {
         casadi_warning("Indefinite Hessian detected...");
       }
@@ -647,33 +647,6 @@ namespace casadi {
     stream << setw(3) << ls_trials;
     stream << (ls_success ? ' ' : 'F');
     stream << endl;
-  }
-
-  double Sqpmethod::quad_form(const std::vector<double>& x, const DMatrix& A) {
-    // Assert dimensions
-    casadi_assert(x.size()==A.size1() && x.size()==A.size2());
-
-    // Access the internal data of A
-    const int* A_colind = A.colind();
-    const int* A_row = A.row();
-    const std::vector<double> &A_data = A.data();
-
-    // Return value
-    double ret=0;
-
-    // Loop over the columns of A
-    for (int cc=0; cc<x.size(); ++cc) {
-      // Loop over the nonzeros of A
-      for (int el=A_colind[cc]; el<A_colind[cc+1]; ++el) {
-        // Get row
-        int rr = A_row[el];
-
-        // Add contribution
-        ret += x[cc]*A_data[el]*x[rr];
-      }
-    }
-
-    return ret;
   }
 
   void Sqpmethod::reset_h() {
