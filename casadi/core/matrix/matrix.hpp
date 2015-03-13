@@ -158,7 +158,7 @@ namespace casadi {
       copy(x.begin(), x.end(), begin());
     }
 
-    /** \brief  Create an expression from an vector  */
+    /** \brief  Create an expression from a vector  */
     template<typename A>
     Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
         data_(std::vector<DataType>(x.size())) {

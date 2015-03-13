@@ -856,6 +856,9 @@ except:
 %rename(logic_all) zz_all;
 %rename(logic_any) zz_any;
 %rename(__pow__) zz_power;
+%rename(__float__) getValue;
+%rename(__int__) getIntValue;
+
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB

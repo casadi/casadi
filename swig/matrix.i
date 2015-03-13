@@ -323,31 +323,17 @@ PyObject* arrayView() {
 %}
 
 %pythoncode %{
-  def __float__(self):
-    if self.numel()!=1:
-      raise Exception("Only a scalar can be cast to a float")
-    return self.getValue()
-%}
-
-%pythoncode %{
-  def __int__(self):
-    if self.numel()!=1:
-      raise Exception("Only a scalar can be cast to an int")
-    return self.getIntValue()
-%}
-
-%pythoncode %{
   def __nonzero__(self):
     if self.numel()!=1:
       raise Exception("Only a scalar can be cast to a float")
     if self.nnz()==0:
       return 0
-    return self.getValue()!=0
+    return float(self)!=0
 %}
 
 %pythoncode %{
   def __abs__(self):
-    return abs(self.__float__())
+    return abs(float(self))
 %}
 
 #ifdef SWIGPYTHON
@@ -374,22 +360,6 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
       return r
   %}
   
-  %pythoncode %{
-    def __float__(self):
-      if self.numel()!=1:
-        raise Exception("Only a scalar can be cast to a float")
-      return self.getValue()
-  %}
-
-  %pythoncode %{
-    def __int__(self):
-      if self.numel()!=1:
-        raise Exception("Only a scalar can be cast to an int")
-      if self.nnz()==0:
-        return 0
-      return self.getIntValue()
-  %}
-
 #ifdef SWIGPYTHON
   binopsrFull(casadi::Matrix<int>)
   binopsFull(const casadi::SX & b,,casadi::SX,casadi::SX)
@@ -398,7 +368,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 #endif // SWIGPYTHON
   %pythoncode %{
     def __abs__(self):
-      return int(self.__int__())
+      return abs(int(self))
   %}
 } // extend Matrix<int>
 

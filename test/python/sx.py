@@ -503,12 +503,12 @@ class SXtests(casadiTestCase):
     r=w-y
     self.assertFalse(r.isSymbolic())     
     self.assertTrue(r.isZero())
-    self.assertEqual(r.getValue(),0)
-    self.assertEqual(r.getValue(),0)
+    self.assertEqual(float(r),0)
+    self.assertEqual(float(r),0)
     y = SX.sym("y",2)
     y = substitute(y+6,y,0)
-    self.assertEqual(int(y[0].getValue()),6)
-    self.assertEqual(int(y[1].getValue()),6)
+    self.assertEqual(int(y[0]),6)
+    self.assertEqual(int(y[1]),6)
    
   def test_primitivefunctions(self):
     self.message("Primitive functions")
