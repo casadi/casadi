@@ -589,14 +589,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType>::Matrix(const std::vector<DataType>& x, int nrow, int ncol) :
-      sparsity_(Sparsity::dense(nrow, ncol)), data_(x) {
-    casadi_assert_message(x.size() == nrow*ncol, "Dimension mismatch." << std::endl
-                          << "You supplied a vector of length " << x.size() << ", but " << nrow
-                          << " x " << ncol << " = " << nrow*ncol);
-  }
-
-  template<typename DataType>
   Matrix<DataType>& Matrix<DataType>::operator=(const Matrix<DataType>& m) {
     sparsity_ = m.sparsity_;
     data_ = m.data_;

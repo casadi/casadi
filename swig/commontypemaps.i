@@ -890,9 +890,9 @@
       std::vector <double> t;
       int res = make_vector(p, &t, to_double);
       if (t.size()>0) {
-        if (m) *m = casadi::Matrix<double>(t,t.size(),1);
+        if (m) *m = casadi::Matrix<double>(t);
       } else {
-        if (m) *m = casadi::Matrix<double>(t,t.size(),0);
+        if (m) *m = casadi::Matrix<double>(0,0);
       }
       return res;
     }
@@ -989,7 +989,7 @@
     {
       std::vector <int> t;
       int res = make_vector(p, &t, to_int);
-      if (m) *m = casadi::Matrix<int>(t,t.size(),1);
+      if (m) *m = casadi::Matrix<int>(t);
       return res;
     }
     return true;

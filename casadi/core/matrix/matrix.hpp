@@ -150,16 +150,24 @@ namespace casadi {
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<double> >& m);
 
+    /** \brief Create a matrix from another matrix with a different entry type
+     *  Assumes that the scalar conversion is valid.
+     */
+    template<typename A>
+    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.nnz())) {
+      copy(x.begin(), x.end(), begin());
+    }
+
+    /** \brief  Create an expression from an vector  */
+    template<typename A>
+    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
+        data_(std::vector<DataType>(x.size())) {
+      copy(x.begin(), x.end(), begin());
+    }
+
 #ifndef SWIG
     /// Construct from a vector
-    /**
-     * Thanks to implicit conversion, you can pretend that Matrix(const SXElement& x); exists.
-     * Note: above remark applies only to C++, not Python or MATLAB interfaces
-     */
     Matrix(const std::vector<DataType>& x);
-
-    /// Construct dense matrix from a vector with the elements in column major ordering
-    Matrix(const std::vector<DataType>& x, int nrow, int ncol);
 
     /// Convert to scalar type
     const DataType toScalar() const;
@@ -221,33 +229,7 @@ namespace casadi {
     reference back() { return data().back();}
     const_reference back() const { return data().back();}
     /// \endcond
-#endif // SWIG
 
-    /** \brief  Create a matrix from a matrix with a different type of matrix entries
-     * (assuming that the scalar conversion is valid) */
-    template<typename A>
-    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.nnz())) {
-      copy(x.begin(), x.end(), begin());
-    }
-
-    /** \brief  Create an expression from an stl vector  */
-    template<typename A>
-    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
-        data_(std::vector<DataType>(x.size())) {
-      copy(x.begin(), x.end(), begin());
-    }
-
-    /** \brief  Create a non-vector expression from an stl vector */
-    template<typename A>
-    Matrix(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity::dense(nrow, ncol)),
-        data_(std::vector<DataType>(x.size())) {
-      if (x.size() != nrow*ncol)
-          throw CasadiException("Matrix::Matrix(const std::vector<DataType>& x, "
-                                " int n, int m): dimension mismatch");
-      copy(x.begin(), x.end(), begin());
-    }
-
-#ifndef SWIG
     /// Get a non-zero element
     inline const DataType& at(int k) const {
       return const_cast<Matrix<DataType>*>(this)->at(k);
