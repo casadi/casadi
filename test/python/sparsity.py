@@ -294,9 +294,9 @@ class Sparsitytests(casadiTestCase):
     f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
-    self.checkarray(DMatrix(f.getOutput().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    self.checkarray(DMatrix(f.getOutput().nonzeros()),DMatrix([1,0,0,7,0]),"sparsity index")
     
-    self.assertTrue(f.getOutput().data()[1]==0)
+    self.assertTrue(f.getOutput().nonzeros()[1]==0)
     
   def test_sparsityindex(self):
     self.message("sparsity indexing")
@@ -327,7 +327,7 @@ class Sparsitytests(casadiTestCase):
     f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
-    self.checkarray(DMatrix(f.getOutput().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    self.checkarray(DMatrix(f.getOutput().nonzeros()),DMatrix([1,0,0,7,0]),"sparsity index")
     
   def test_getCCS(self):
     self.message("CCS format")

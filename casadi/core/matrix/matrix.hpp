@@ -610,13 +610,13 @@ namespace casadi {
     void enlarge(int nrow, int ncol,
                  const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
+#ifndef SWIG
     /// Access the non-zero elements
     std::vector<DataType>& data();
 
     /// Const access the non-zero elements
     const std::vector<DataType>& data() const;
 
-#ifndef SWIG
     /// \cond INTERNAL
     /// Get a pointer to the data
     DataType* ptr() { return isEmpty() ? static_cast<DataType*>(0) : &front();}

@@ -315,7 +315,7 @@ PyObject* arrayView() {
     with warnings.catch_warnings():
       warnings.simplefilter("ignore")
       from scipy.sparse import csc_matrix
-    return csc_matrix( (list(self.data()),self.row(),self.colind()), shape = self.shape, dtype=n.double )
+    return csc_matrix( (self.nonzeros(),self.row(),self.colind()), shape = self.shape, dtype=n.double )
 
   def tocsc(self):
     return self.toCsc_matrix()
@@ -352,7 +352,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
     def toArray(self):
       import numpy as n
       r = n.zeros((self.size1(),self.size2()))
-      d = self.data()
+      d = self.nonzeros_int()
       for j in range(self.size2()):
         for k in range(self.colind(j),self.colind(j+1)):
           i = self.row(k)
@@ -384,7 +384,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
         self.__init__(sp,state["data"])
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data(),dtype=int)}
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros_int(),dtype=int)}
   %} 
 }
 
@@ -397,7 +397,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
         self.__init__(sp,state["data"])
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data(),dtype=float)}
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros(),dtype=float)}
   %}
   
 }

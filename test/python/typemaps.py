@@ -146,8 +146,8 @@ class typemaptests(casadiTestCase):
     w = DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
     
-    list(w.data())
-    tuple(w.data())
+    list(w.nonzeros())
+    tuple(w.nonzeros())
     w.toArray()
     array(w)
     w.toMatrix()

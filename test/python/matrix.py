@@ -131,7 +131,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(C.shape,(9,1),"veccat shape")
     self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"veccat size")
     
-    self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
+    self.checkarray(tuple(C.nonzeros()),tuple(arange(1,7)),"numbers shape")
 
   def test_slicestepnegative(self):
     self.message("Slice step negative")
@@ -229,7 +229,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(C.shape,(6,1),"vecNZcat shape")
     self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"vecNZcat size")
     
-    self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
+    self.checkarray(tuple(C.nonzeros()),tuple(arange(1,7)),"numbers shape")
     
   def test_IMatrix_indexing(self):
     self.message("IMatrix")

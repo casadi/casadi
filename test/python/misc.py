@@ -38,14 +38,6 @@ except:
 
 class Misctests(casadiTestCase):
     
-  def test_issue179A(self):
-    self.message('Regression test #179 (A)')
-    x = SX.sym("x")
-    f = SXFunction([x], [2 * x])
-    f.init()
-    y = f.call([x])[0].data()
-    print y
-    
   def test_issue179B(self):
     self.message('Regression test #179 (B)')
     def calc_sparsity():
