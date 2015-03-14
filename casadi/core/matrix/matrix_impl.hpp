@@ -1736,7 +1736,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::triplet(const std::vector<int>& row,
                                              const std::vector<int>& col,
-                                             const std::vector<DataType>& d) {
+                                             const Matrix<DataType>& d) {
     return triplet(row, col, d, *std::max_element(row.begin(), row.end()),
                    *std::max_element(col.begin(), col.end()));
   }
@@ -1744,7 +1744,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::triplet(const std::vector<int>& row,
                                              const std::vector<int>& col,
-                                             const std::vector<DataType>& d,
+                                             const Matrix<DataType>& d,
                                              const std::pair<int, int>& rc) {
     return triplet(row, col, d, rc.first, rc.second);
   }
@@ -1752,7 +1752,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::triplet(const std::vector<int>& row,
                                              const std::vector<int>& col,
-                                             const std::vector<DataType>& d,
+                                             const Matrix<DataType>& d,
                                              int nrow, int ncol) {
     casadi_assert_message(col.size()==row.size() && col.size()==d.size(),
                           "Argument error in Matrix<DataType>::triplet(row, col, d): "
@@ -1760,9 +1760,7 @@ namespace casadi {
                           << row.size() << ", " << col.size()  << " and " << d.size());
     std::vector<int> mapping;
     Sparsity sp = Sparsity::triplet(nrow, ncol, row, col, mapping);
-    std::vector<DataType> v(mapping.size());
-    for (int k=0; k<v.size(); ++k) v[k] = d[mapping[k]];
-    return Matrix<DataType>(sp, v, false);
+    return Matrix<DataType>(sp, d[mapping]);
   }
 
   template<typename DataType>

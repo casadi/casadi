@@ -710,11 +710,11 @@ namespace casadi {
      */
     ///@{
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
-                                    const std::vector<DataType>& d);
+                                    const Matrix<DataType>& d);
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
-                                    const std::vector<DataType>& d, int nrow, int ncol);
+                                    const Matrix<DataType>& d, int nrow, int ncol);
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
-                                    const std::vector<DataType>& d, const std::pair<int, int>& rc);
+                                    const Matrix<DataType>& d, const std::pair<int, int>& rc);
     ///@}
 
     ///@{
