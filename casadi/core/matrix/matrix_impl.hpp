@@ -2671,38 +2671,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::zz_addMultiple(const std::vector<DataType>& v,
-                                     std::vector<DataType>& res, bool trans_A) const {
-    // Get dimension and sparsity
-    int d1=size2(), d2=size1();
-    const int* colind=this->colind();
-    const int* row=this->row();
-    const std::vector<DataType>& data = this->data();
-
-    // Assert consistent dimensions
-    if (trans_A) {
-      casadi_assert(v.size()==d1);
-      casadi_assert(res.size()==d2);
-    } else {
-      casadi_assert(v.size()==d2);
-      casadi_assert(res.size()==d1);
-    }
-
-    // Carry out multiplication
-    for (int i=0; i<d1; ++i) { // loop over cols
-      for (int el=colind[i]; el<colind[i+1]; ++el) { // loop over the non-zero elements
-        int j=row[el];  // row
-        // Add scalar product
-        if (trans_A) {
-          res[j] += v[i]*data[el];
-        } else {
-          res[i] += v[j]*data[el];
-        }
-      }
-    }
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_project(const Sparsity& sp) const {
     // Check dimensions
     if (!(isEmpty() && sp.numel()==0)) {

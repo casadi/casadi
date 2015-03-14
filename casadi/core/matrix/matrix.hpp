@@ -484,8 +484,6 @@ namespace casadi {
     static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);
     Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;
     Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
-    void zz_addMultiple(const std::vector<DataType>& v,
-                        std::vector<DataType>& res, bool trans_A=false) const;
     Matrix<DataType> zz_project(const Sparsity& sparsity) const;
     Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
     ///@}
@@ -535,14 +533,6 @@ namespace casadi {
     inline friend Matrix<DataType>
       norm_inf_mul(const Matrix<DataType> &x, const Matrix<DataType> &y) {
       return x.zz_norm_inf_mul(y);
-    }
-
-    /// same as: res += mul(A, v)
-    inline friend void addMultiple(const Matrix<DataType>& A,
-                                   const std::vector<DataType>& v,
-                                   std::vector<DataType>& res,
-                                   bool trans_A=false) {
-      return A.zz_addMultiple(v, res, trans_A);
     }
 
     /** \brief  Make a matrix sparse by removing numerical zeros*/
