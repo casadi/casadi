@@ -1849,48 +1849,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  NonZeroIterator<DataType>::NonZeroIterator(const Matrix<DataType> & m)
-    : m_(m) {
-    nz.i  = 0;
-    nz.j  = 0;
-    nz.k  = 0;
-  }
-
-  template<typename DataType>
-  bool NonZeroIterator<DataType>::operator==(const NonZeroIterator<DataType>& rhs)
-  { return (m_ == rhs.m_) && (nz.k==rhs.nz.k); }
-
-  template<typename DataType>
-  NonZero<DataType>& NonZeroIterator<DataType>::operator*() {
-    return nz;
-  }
-
-  template<typename DataType>
-  NonZeroIterator<DataType>& NonZeroIterator<DataType>::operator++() {
-    nz.k ++;
-
-    if (nz.k < m_.size()) {
-      nz.j = m_.row()[nz.k];
-      nz.el = m_.data()[nz.k];
-      while (nz.k>=m_.colind(nz.i)) {nz.i++; }
-    }
-    return *this;
-  }
-
-  template<typename DataType>
-  NonZeroIterator<DataType> NonZeroIterator<DataType>::begin() {
-    NonZeroIterator<DataType> it = NonZeroIterator<DataType>(m_);
-    return it;
-
-  }
-  template<typename DataType>
-  NonZeroIterator<DataType> NonZeroIterator<DataType>::end() {
-    NonZeroIterator<DataType> it = NonZeroIterator<DataType>(m_);
-    it.nz.k = m_.size()-1;
-    return it;
-  }
-
-  template<typename DataType>
   bool Matrix<DataType>::isRegular() const {
     return casadi::isRegular(data_);
   }

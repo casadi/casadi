@@ -38,38 +38,6 @@
 
 namespace casadi {
 
-/// \cond INTERNAL
-  template<typename DataType>
-  struct NonZero {
-    int k; // Non-zero index into matrix
-    int i; // Row into matrix
-    int j; // Col into matrix
-    DataType el;  // Element
-  };
-
-
-  template<typename DataType>
-  class CASADI_EXPORT NonZeroIterator :
-        public std::iterator< std::forward_iterator_tag, NonZero<DataType> > {
-  public:
-    NonZeroIterator(const Matrix<DataType> & m);
-
-#ifndef SWIG
-    NonZeroIterator<DataType>& operator++();
-#endif // SWIG
-
-    NonZero<DataType>& operator*();
-
-    NonZeroIterator<DataType> begin();
-    NonZeroIterator<DataType> end();
-    bool operator==(const NonZeroIterator<DataType>& rhs);
-
-  private:
-    Matrix<DataType> m_;
-    NonZero<DataType> nz;
-  };
-/// \endcond
-
 /// \cond CLUTTER
   ///@{
   /** \brief Get typename */
