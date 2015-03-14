@@ -1008,12 +1008,12 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::set(DataType val, SparsityType sp) {
+  void Matrix<DataType>::set(DataType val) {
     std::fill(data().begin(), data().end(), val);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::get(DataType& val, SparsityType sp) const {
+  void Matrix<DataType>::get(DataType& val) const {
     getArray(&val, 1, SP_DENSE);
   }
 

@@ -639,10 +639,10 @@ namespace casadi {
 
     /// \cond INTERNAL
     /** \brief  Set the non-zero elements, scalar */
-    void set(DataType val, SparsityType sp=SP_SPARSE);
+    void set(DataType val);
 
     /** \brief  Get the non-zero elements, scalar */
-    void get(DataType& val, SparsityType sp=SP_SPARSE) const;
+    void get(DataType& val) const;
 
     /** \brief  Set the non-zero elements, vector */
     void set(const std::vector<DataType>& val, SparsityType sp=SP_SPARSE);
