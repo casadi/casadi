@@ -142,9 +142,6 @@ namespace casadi {
 
     MX operator-() const;
 
-    /// Get the non-zero elements
-    MX nonzeros() const;
-
 #ifndef SWIG
     /// \cond INTERNAL
     ///@{

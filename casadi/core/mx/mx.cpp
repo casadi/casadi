@@ -1886,8 +1886,4 @@ namespace casadi {
     return f(*this).at(0);
   }
 
-  MX MX::nonzeros() const {
-    return getNZ(false, Slice());
-  }
-
 } // namespace casadi
