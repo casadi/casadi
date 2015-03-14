@@ -839,6 +839,12 @@ namespace casadi {
     /** \brief Get double value (only if integer constant) */
     int getIntValue() const;
 
+    /** \brief Get all nonzeros */
+    std::vector<double> nonzeros() const;
+
+    /** \brief Get all nonzeros */
+    std::vector<int> nonzeros_int() const;
+
     /** \brief Get name (only if symbolic scalar) */
     std::string getName() const;
 

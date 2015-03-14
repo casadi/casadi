@@ -2045,6 +2045,20 @@ namespace casadi {
   }
 
   template<typename DataType>
+  std::vector<double> Matrix<DataType>::nonzeros() const {
+    std::vector<double> ret(nnz());
+    std::copy(begin(), end(), ret.begin());
+    return ret;
+  }
+
+  template<typename DataType>
+  std::vector<int> Matrix<DataType>::nonzeros_int() const {
+    std::vector<int> ret(nnz());
+    std::copy(begin(), end(), ret.begin());
+    return ret;
+  }
+
+  template<typename DataType>
   std::string Matrix<DataType>::getName() const {
     throw CasadiException("\"getName\" not defined for instantiation");
   }

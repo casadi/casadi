@@ -939,6 +939,24 @@ namespace casadi {
   }
 
   template<>
+  std::vector<double> SX::nonzeros() const {
+    std::vector<double> ret(nnz());
+    for (size_t i=0; i<ret.size(); ++i) {
+      ret[i] = at(i).getValue();
+    }
+    return ret;
+  }
+
+  template<>
+  std::vector<int> SX::nonzeros_int() const {
+    std::vector<int> ret(nnz());
+    for (size_t i=0; i<ret.size(); ++i) {
+      ret[i] = at(i).getIntValue();
+    }
+    return ret;
+  }
+
+  template<>
   std::string SX::getName() const {
     return toScalar().getName();
   }
