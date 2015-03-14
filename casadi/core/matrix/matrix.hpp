@@ -651,10 +651,10 @@ namespace casadi {
     void get(std::vector<DataType>& val, SparsityType sp=SP_SPARSE) const;
 
     /** \brief  Set the non-zero elements, Matrix */
-    void set(const Matrix<DataType>& val, SparsityType sp=SP_SPARSE);
+    void set(const Matrix<DataType>& val);
 
     /** \brief  Get the non-zero elements, Matrix */
-    void get(Matrix<DataType>& val, SparsityType sp=SP_SPARSE) const;
+    void get(Matrix<DataType>& val) const;
 
 #ifdef SWIG
     %rename(get) getStridedArray;

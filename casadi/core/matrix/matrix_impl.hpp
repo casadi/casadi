@@ -1028,7 +1028,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::set(const Matrix<DataType>& val, SparsityType sp) {
+  void Matrix<DataType>::set(const Matrix<DataType>& val) {
     sparsity().set(getPtr(data()), getPtr(val.data()), val.sparsity());
   }
 
@@ -1074,8 +1074,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::get(Matrix<DataType>& val, SparsityType sp) const {
-    val.set(*this, sp);
+  void Matrix<DataType>::get(Matrix<DataType>& val) const {
+    val.set(*this);
   }
 
   template<typename DataType>
