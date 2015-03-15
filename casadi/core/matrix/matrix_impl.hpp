@@ -1564,7 +1564,6 @@ namespace casadi {
                           "Dimension mismatch. Got x.size1 = " << size1()
                           << " and A.shape = " << A.shape());
 
-    
     // Calculate using runtime function
     return casadi_quad_form(A.ptr(), A.sparsity(), ptr());
   }
