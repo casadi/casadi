@@ -74,20 +74,20 @@ ocp.makeExplicit()
 dae_fcn_in = daeIn(
   t = ocp.t,
   x = ocp.x,
-  p = vertcat((ocp.pi,ocp.p))
+  p = ocp.p
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode(ocp.x)))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = Integrator("cvodes", dae)
 
 # Output function
-output_fcn_out = [ocp.beq("m"),ocp.beq("P")]
+output_fcn_out = substitute([ocp("m"),ocp("P")], [ocp.i], [ocp.idef])
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
   z = ocp.z,
-  p = vertcat((ocp.pi,ocp.p,ocp.u))
+  p = vertcat((ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -129,27 +129,24 @@ ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 # Transform into an explicit ODE
 ocp.makeExplicit()
 
-# Eliminate the independent variables
-ocp.eliminateIndependentParameters()
-
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
   x = ocp.x,
-  p = vertcat((ocp.pi,ocp.p))
+  p = ocp.p
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode(ocp.x)))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = Integrator("cvodes", dae)
 
 # Output function
-output_fcn_out = [ocp.beq("T")]
+output_fcn_out = substitute([ocp("T")], [ocp.i], [ocp.idef])
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
   z = ocp.z,
-  p = vertcat((ocp.pi,ocp.p,ocp.u))
+  p = vertcat((ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -181,9 +178,6 @@ comp("BasicVolumeTest")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeTest.xml')
 
-# Eliminate the dependent variables
-ocp.eliminateIndependentParameters()
-
 # Transform into an explicit ODE
 ocp.makeExplicit()
 
@@ -191,20 +185,20 @@ ocp.makeExplicit()
 dae_fcn_in = daeIn(
   t = ocp.t,
   x = ocp.x,
-  p = vertcat((ocp.pi,ocp.p))
+  p = ocp.p
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode(ocp.x)))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = Integrator("cvodes", dae)
 
 # Output function
-output_fcn_out = [ocp.beq("T"),ocp.beq("U"),ocp.beq("V")]
+output_fcn_out = substitute([ocp("T"),ocp("U"),ocp("V")], [ocp.i], [ocp.idef])
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
   z = ocp.z,
-  p = vertcat((ocp.pi,ocp.p,ocp.u))
+  p = vertcat((ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
