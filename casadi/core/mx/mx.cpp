@@ -128,30 +128,30 @@ namespace casadi {
     return (*this)->__nonzero__();
   }
 
-  const MX MX::getSub(bool ind1, const Slice& rr, const Slice& cc) const {
+  void MX::getSub(MX& m, bool ind1, const Slice& rr, const Slice& cc) const {
     // Fall back on (IMatrix, IMatrix)
-    return getSub(ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    return getSub(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
-  const MX MX::getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const {
+  void MX::getSub(MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) const {
     // Fall back on (IMatrix, IMatrix)
-    return getSub(ind1, rr.getAll(size1(), ind1), cc);
+    getSub(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
-  const MX MX::getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const {
+  void MX::getSub(MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) const {
     // Fall back on (IMatrix, IMatrix)
-    return getSub(ind1, rr, cc.getAll(size2(), ind1));
+    getSub(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
-  const MX MX::getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
+  void MX::getSub(MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
-      return getSub(ind1, rr.T(), cc);
+      return getSub(m, ind1, rr.T(), cc);
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return getSub(ind1, rr, cc.T());
+      return getSub(m, ind1, rr, cc.T());
     }
 
     casadi_assert_message(rr.isDense() && rr.isVector(),
@@ -164,20 +164,18 @@ namespace casadi {
     Sparsity sp = sparsity().sub(rr.data(), cc.data(), mapping, ind1);
 
     // Create return MX
-    return (*this)->getGetNonzeros(sp, mapping);
+    m = (*this)->getGetNonzeros(sp, mapping);
   }
 
-  const MX MX::getSub(bool ind1, const Slice& rr) const {
+  void MX::getSub(MX& m, bool ind1, const Slice& rr) const {
     // Fall back on IMatrix
-    return getSub(ind1, rr.getAll(numel(), ind1));
+    getSub(m, ind1, rr.getAll(numel(), ind1));
   }
 
-  const MX MX::getSub(bool ind1, const Matrix<int>& rr) const {
+  void MX::getSub(MX& m, bool ind1, const Matrix<int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense()) {
-      MX m;
-      getNZ(m, ind1, rr);
-      return m;
+      return getNZ(m, ind1, rr);
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -185,15 +183,15 @@ namespace casadi {
     Sparsity sp = sparsity().sub(rr.data(), rr.sparsity(), mapping, ind1);
 
     // Create return MX
-    return (*this)->getGetNonzeros(sp, mapping);
+    m = (*this)->getGetNonzeros(sp, mapping);
   }
 
-  const MX MX::getSub(bool ind1, const Sparsity& sp) const {
+  void MX::getSub(MX& m, bool ind1, const Sparsity& sp) const {
     casadi_assert_message(shape()==sp.shape(),
                           "getSub(Sparsity sp): shape mismatch. This matrix has shape "
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
-    return setSparse(sp);
+    m = setSparse(sp);
   }
 
   void MX::setSub(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {

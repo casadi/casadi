@@ -213,13 +213,18 @@ namespace casadi {
     /** \brief  Get vector element or slice */
     template<typename RR>
     const MatType operator()(const RR& rr) const {
-      return self().getSub(false, rr);
+      MatType ret;
+      self().getSub(ret, false, rr);
+      return ret;
     }
 
     /** \brief  Get Matrix element or slice */
     template<typename RR, typename CC>
-    const MatType operator()(const RR& rr, const CC& cc) const
-    { return self().getSub(false, rr, cc); }
+    const MatType operator()(const RR& rr, const CC& cc) const {
+      MatType ret;
+      self().getSub(ret, false, rr, cc);
+      return ret;
+    }
 
     /** \brief Access Matrix elements (one argument) */
     template<typename RR>

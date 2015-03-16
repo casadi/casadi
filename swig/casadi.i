@@ -1014,13 +1014,13 @@ class NZproxy:
 #ifdef SWIGMATLAB
 %define %matrix_helpers(Type)
     // Get a submatrix (index-1)
-    const Type getitem(const Slice& rr) const { return $self->getSub(true, rr);}
-    const Type getitem(const Matrix<int>& rr) const { return $self->getSub(true, rr);}
-    const Type getitem(const Sparsity& sp) const { return $self->getSub(true, sp);}
-    const Type getitem(const Slice& rr, const Slice& cc) const { return $self->getSub(true, rr, cc);}
-    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { return $self->getSub(true, rr, cc);}
-    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { return $self->getSub(true, rr, cc);}
-    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { return $self->getSub(true, rr, cc);}
+    const Type getitem(const Slice& rr) const { Type m; $self->getSub(m, true, rr); return m;}
+    const Type getitem(const Matrix<int>& rr) const { Type m; $self->getSub(m, true, rr); return m;}
+    const Type getitem(const Sparsity& sp) const { Type m; $self->getSub(m, true, sp); return m;}
+    const Type getitem(const Slice& rr, const Slice& cc) const { Type m; $self->getSub(m, true, rr, cc); return m;}
+    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { Type m; $self->getSub(m, true, rr, cc); return m;}
+    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { Type m; $self->getSub(m, true, rr, cc); return m;}
+    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { Type m; $self->getSub(m, true, rr, cc); return m;}
 
     // Set a submatrix (index-1)
     void setitem(const Type& m, const Slice& rr) { $self->setSub(m, true, rr);}

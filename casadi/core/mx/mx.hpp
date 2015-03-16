@@ -277,17 +277,17 @@ namespace casadi {
 
     ///@{
     /// Get a submatrix, single argument
-    const MX getSub(bool ind1, const Slice& rr) const;
-    const MX getSub(bool ind1, const Matrix<int>& rr) const;
-    const MX getSub(bool ind1, const Sparsity& sp) const;
+    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
+    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr) const;
+    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
     ///@}
 
     /// Get a submatrix, two arguments
     ///@{
-    const MX getSub(bool ind1, const Slice& rr, const Slice& cc) const;
-    const MX getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
-    const MX getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
-    const MX getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
+    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Slice& cc) const;
+    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Matrix<int>& cc) const;
+    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr, const Slice& cc) const;
+    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
     ///@}
 
     ///@{

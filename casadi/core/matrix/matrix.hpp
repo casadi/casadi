@@ -239,17 +239,21 @@ namespace casadi {
 
     ///@{
     /// Get a submatrix, single argument
-    const Matrix<DataType> getSub(bool ind1, const Slice& rr) const;
-    const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr) const;
-    const Matrix<DataType> getSub(bool ind1, const Sparsity& sp) const;
+    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
+    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr) const;
+    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
     ///@}
 
     /// Get a submatrix, two arguments
     ///@{
-    const Matrix<DataType> getSub(bool ind1, const Slice& rr, const Slice& cc) const;
-    const Matrix<DataType> getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
-    const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
-    const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
+    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+                const Slice& rr, const Slice& cc) const;
+    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+                const Slice& rr, const Matrix<int>& cc) const;
+    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+                const Matrix<int>& rr, const Slice& cc) const;
+    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+                const Matrix<int>& rr, const Matrix<int>& cc) const;
     ///@}
 
     ///@{

@@ -45,8 +45,9 @@ namespace casadi {
     J j_;
   public:
     /// Constructor
-    SubMatrix(M& mat, const I& i, const J& j)
-      : M(mat.getSub(false, i, j)), mat_(mat), i_(i), j_(j) {}
+    SubMatrix(M& mat, const I& i, const J& j) : mat_(mat), i_(i), j_(j) {
+      mat.getSub(*this, false, i, j);
+    }
 
     ///@{
     /// Methods that modify a part of the parent object (A(i, j) = ?, A(i, j) += ?, etc.)
@@ -101,8 +102,9 @@ namespace casadi {
     I i_;
   public:
     /// Constructor
-    SubIndex(M& mat, const I& i)
-      : M(mat.getSub(false, i)), mat_(mat), i_(i) {}
+    SubIndex(M& mat, const I& i) : mat_(mat), i_(i) {
+      mat.getSub(*this, false, i);
+    }
 
     ///@{
     /// Methods that modify a part of the parent object (A(i) = ?, A(i) += ?, etc.)
