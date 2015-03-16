@@ -114,7 +114,7 @@ print "Minimal cost " , solver.getOutput("f")
 print "----"
 
 print "Nominal solution"
-print "x = " , solver.output("x").data()
+print "x = " , solver.output("x").nonzeros()
 print "----"
   
 print "perturbed solution"
