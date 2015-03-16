@@ -1024,7 +1024,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::set(const Matrix<DataType>& val) {
+  void Matrix<DataType>::setSub(const Matrix<DataType>& val) {
     sparsity().set(getPtr(data()), getPtr(val.data()), val.sparsity());
   }
 
@@ -1070,8 +1070,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::get(Matrix<DataType>& val) const {
-    val.set(*this);
+  void Matrix<DataType>::getSub(Matrix<DataType>& val) const {
+    val.setSub(*this);
   }
 
   template<typename DataType>
@@ -2053,7 +2053,7 @@ namespace casadi {
       return setSparse(sp.patternIntersection(sparsity()), false);
     } else {
       Matrix<DataType> ret(sp);
-      ret.set(*this);
+      ret.setSub(*this);
       return ret;
     }
   }

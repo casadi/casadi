@@ -436,7 +436,7 @@ namespace casadi {
 
     // Pass the inputs
     for (int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
-      implicit_solver_.input(1+iind).set(input(iind));
+      implicit_solver_.input(1+iind).setSub(input(iind));
     }
 
     // Pass solution guess (if this is the first integration or if hotstart is disabled)
@@ -449,7 +449,7 @@ namespace casadi {
       // Use supplied integrator, if any
       if (has_startup_integrator) {
         for (int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
-          startup_integrator_.input(iind).set(input(iind));
+          startup_integrator_.input(iind).setSub(input(iind));
         }
 
         // Reset the integrator
@@ -514,7 +514,7 @@ namespace casadi {
     implicit_solver_.evaluate();
 
     // Save the result
-    implicit_solver_.output().set(implicit_solver_.input());
+    implicit_solver_.output().setSub(implicit_solver_.input());
 
     // Write out profiling information
     if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
@@ -534,7 +534,7 @@ namespace casadi {
 
   void OldCollocationIntegrator::integrate(double t_out) {
     for (int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind) {
-      output(oind).set(implicit_solver_.output(1+oind));
+      output(oind).setSub(implicit_solver_.output(1+oind));
     }
   }
 

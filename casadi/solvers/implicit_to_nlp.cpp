@@ -75,7 +75,7 @@ namespace casadi {
     }
 
     // Pass initial guess
-    solver_.input(NLP_SOLVER_X0).set(output(iout_));
+    solver_.input(NLP_SOLVER_X0).setSub(output(iout_));
 
     // Add auxiliary inputs
     vector<double>::iterator nlp_p = solver_.input(NLP_SOLVER_P).begin();
@@ -91,7 +91,7 @@ namespace casadi {
     stats_["solver_stats"] = solver_.getStats();
 
     // Get the implicit variable
-    output(iout_).set(solver_.output(NLP_SOLVER_X));
+    output(iout_).setSub(solver_.output(NLP_SOLVER_X));
 
     // Evaluate auxilary outputs, if necessary
     if (getNumOutputs()>0) {

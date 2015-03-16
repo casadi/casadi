@@ -237,6 +237,12 @@ namespace casadi {
     ///  Convert to Slice (only for IMatrix)
     Slice toSlice(bool ind1=false) const;
 
+    /** \brief Set all the entries without changing sparsity pattern */
+    void setSub(const Matrix<DataType>& val);
+
+    /** \brief Get all the entries without changing sparsity pattern */
+    void getSub(Matrix<DataType>& val) const;
+
     ///@{
     /** \brief Get the elements numerically */
     void setSub(double val);
@@ -671,12 +677,6 @@ namespace casadi {
 
     /** \brief  Get the non-zero elements, vector */
     void get(std::vector<DataType>& val, SparsityType sp=SP_SPARSE) const;
-
-    /** \brief  Set the non-zero elements, Matrix */
-    void set(const Matrix<DataType>& val);
-
-    /** \brief  Get the non-zero elements, Matrix */
-    void get(Matrix<DataType>& val) const;
 
 #ifdef SWIG
     %rename(get) getStridedArray;

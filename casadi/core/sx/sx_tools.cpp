@@ -36,7 +36,7 @@ namespace casadi {
   Matrix<double> evalf(const SX &ex, const SX &v, const Matrix<double> &vdef) {
     SXFunction fcn(v, ex);
     fcn.init();
-    fcn.input(0).set(vdef);
+    fcn.setInput(vdef, 0);
     fcn.evaluate();
     return fcn.output();
   }

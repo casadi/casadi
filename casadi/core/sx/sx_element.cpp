@@ -1455,9 +1455,9 @@ namespace casadi {
 
     for (int dir=0; dir<vv.size(); ++dir) {
       if (transpose_jacobian) {
-        aseed[dir][0].set(vv[dir]);
+        aseed[dir][0].setSub(vv[dir]);
       } else {
-        fseed[dir][0].set(vv[dir]);
+        fseed[dir][0].setSub(vv[dir]);
       }
     }
 

@@ -422,14 +422,14 @@ namespace casadi {
 
     // Copy all inputs
     for (int i=0;i<getNumInputs();++i) {
-      all_output_.input(i).set(input(i));
+      all_output_.input(i).setSub(input(i));
     }
 
     all_output_.evaluate();
 
     // Copy all outputs
     for (int i=0;i<getNumOutputs();++i) {
-      output(i).set(all_output_.output(i));
+      output(i).setSub(all_output_.output(i));
     }
 
   }

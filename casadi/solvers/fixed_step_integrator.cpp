@@ -87,12 +87,12 @@ namespace casadi {
     while (k_<k_out) {
       // Take step
       F.input(DAE_T).set(t_);
-      F.input(DAE_X).set(output(INTEGRATOR_XF));
-      F.input(DAE_Z).set(Z_);
-      F.input(DAE_P).set(input(INTEGRATOR_P));
+      F.input(DAE_X).setSub(output(INTEGRATOR_XF));
+      F.input(DAE_Z).setSub(Z_);
+      F.input(DAE_P).setSub(input(INTEGRATOR_P));
       F.evaluate();
-      F.output(DAE_ODE).get(output(INTEGRATOR_XF));
-      F.output(DAE_ALG).get(Z_);
+      F.output(DAE_ODE).getSub(output(INTEGRATOR_XF));
+      F.output(DAE_ALG).getSub(Z_);
       transform(F.output(DAE_QUAD).begin(),
                 F.output(DAE_QUAD).end(),
                 output(INTEGRATOR_QF).begin(),
@@ -130,13 +130,13 @@ namespace casadi {
       G.input(RDAE_T).set(t_);
       G.input(RDAE_X).set(x_tape_.at(k_));
       G.input(RDAE_Z).set(Z_tape_.at(k_));
-      G.input(RDAE_P).set(input(INTEGRATOR_P));
-      G.input(RDAE_RX).set(output(INTEGRATOR_RXF));
-      G.input(RDAE_RZ).set(RZ_);
-      G.input(RDAE_RP).set(input(INTEGRATOR_RP));
+      G.input(RDAE_P).setSub(input(INTEGRATOR_P));
+      G.input(RDAE_RX).setSub(output(INTEGRATOR_RXF));
+      G.input(RDAE_RZ).setSub(RZ_);
+      G.input(RDAE_RP).setSub(input(INTEGRATOR_RP));
       G.evaluate();
-      G.output(RDAE_ODE).get(output(INTEGRATOR_RXF));
-      G.output(RDAE_ALG).get(RZ_);
+      G.output(RDAE_ODE).getSub(output(INTEGRATOR_RXF));
+      G.output(RDAE_ALG).getSub(RZ_);
       transform(G.output(RDAE_QUAD).begin(),
                 G.output(RDAE_QUAD).end(),
                 output(INTEGRATOR_RQF).begin(),

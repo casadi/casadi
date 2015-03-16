@@ -1014,8 +1014,8 @@ namespace casadi {
     t_ = t0_;
 
     // Initialize output
-    xf().set(x0());
-    zf().set(z0());
+    xf().setSub(x0());
+    zf().setSub(z0());
 
     // Reset summation states
     qf().set(0.0);
@@ -1030,8 +1030,8 @@ namespace casadi {
     t_ = tf_;
 
     // Initialize output
-    rxf().set(rx0());
-    rzf().set(rz0());
+    rxf().setSub(rx0());
+    rzf().setSub(rz0());
 
     // Reset summation states
     rqf().set(0.0);

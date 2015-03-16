@@ -888,7 +888,7 @@ namespace casadi {
   void StabilizedSqp::reset_h() {
     // Initial Hessian approximation of BFGS
     if (!exact_hessian_) {
-      Bk_.set(B_init_);
+      Bk_.setSub(B_init_);
     }
 
     if (monitored("eval_h")) {
@@ -1020,7 +1020,7 @@ namespace casadi {
 
       // Get the output
       jacG.output(1+NL_G).get(g, SP_DENSE);
-      jacG.output().get(J);
+      jacG.output().getSub(J);
 
       if (monitored("eval_jac_g")) {
         cout << "x = " << x << endl;

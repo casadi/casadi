@@ -314,7 +314,7 @@ namespace casadi {
     stats_["return_status"] = status;
 
     // Copy constraints
-    nlp_.output(NL_G).get(output(NLP_SOLVER_G));
+    nlp_.output(NL_G).getSub(output(NLP_SOLVER_G));
 
     // Copy lagrange multipliers
     output(NLP_SOLVER_LAM_G).set(getPtr(lambda));

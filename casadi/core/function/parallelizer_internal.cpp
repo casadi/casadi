@@ -176,7 +176,7 @@ namespace casadi {
 
     // Copy inputs to functions
     for (int j=inind_[task]; j<inind_[task+1]; ++j) {
-      fcn.input(j-inind_[task]).set(input(j));
+      fcn.input(j-inind_[task]).setSub(input(j));
     }
 
     // Evaluate
@@ -184,7 +184,7 @@ namespace casadi {
 
     // Get the results
     for (int j=outind_[task]; j<outind_[task+1]; ++j) {
-      fcn.output(j-outind_[task]).get(output(j));
+      fcn.output(j-outind_[task]).getSub(output(j));
     }
   }
 
