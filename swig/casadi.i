@@ -1032,8 +1032,8 @@ class NZproxy:
     void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
-    const Type getitemcurl(const Slice& rr) const { return $self->getNZ(true, rr);}
-    const Type getitemcurl(const Matrix<int>& rr) const { return $self->getNZ(true, rr);}
+    const Type getitemcurl(const Slice& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
+    const Type getitemcurl(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
 
     // Set nonzeros (index-1)
     void setitemcurl(const Type& m, const Slice& rr) { $self->setNZ(m, true, rr);}

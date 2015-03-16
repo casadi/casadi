@@ -199,7 +199,9 @@ namespace casadi {
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
     const MatType operator[](const K& k) const {
-      return self().getNZ(false, k);
+      MatType ret;
+      self().getNZ(ret, false, k);
+      return ret;
     }
 
     /** \brief  Access vector nonzero or slice of nonzeros */

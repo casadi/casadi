@@ -277,8 +277,8 @@ namespace casadi {
 
     ///@{
     /// Get a set of nonzeros
-    const Matrix<DataType> getNZ(bool ind1, const Slice& k) const;
-    const Matrix<DataType> getNZ(bool ind1, const Matrix<int>& k) const;
+    void getNZ(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Slice& k) const;
+    void getNZ(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& k) const;
     ///@}
 
     ///@{

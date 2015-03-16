@@ -308,8 +308,8 @@ namespace casadi {
 
     ///@{
     /// Get a set of nonzeros
-    MX getNZ(bool ind1, const Slice& kk) const;
-    MX getNZ(bool ind1, const Matrix<int>& kk) const;
+    void getNZ(MX& SWIG_OUTPUT(m), bool ind1, const Slice& kk) const;
+    void getNZ(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& kk) const;
     ///@}
 
     ///@{

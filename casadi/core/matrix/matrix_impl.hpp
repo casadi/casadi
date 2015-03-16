@@ -171,7 +171,9 @@ namespace casadi {
 
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense()) {
-      return getNZ(ind1, rr);
+      Matrix<DataType> ret;
+      getNZ(ret, ind1, rr);
+      return ret;
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -408,21 +410,22 @@ namespace casadi {
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getNZ(bool ind1, const Slice& kk) const {
+  void Matrix<DataType>::getNZ(Matrix<DataType>& m, bool ind1, const Slice& kk) const {
     // Scalar
     if (kk.isScalar(nnz())) {
-      return at(kk.toScalar(nnz()));
+      m = at(kk.toScalar(nnz()));
+      return;
     }
 
     // Fall back on IMatrix
-    return getNZ(ind1, kk.getAll(nnz(), ind1));
+    getNZ(m, ind1, kk.getAll(nnz(), ind1));
   }
 
   template<typename DataType>
-  const Matrix<DataType> Matrix<DataType>::getNZ(bool ind1, const Matrix<int>& kk) const {
+  void Matrix<DataType>::getNZ(Matrix<DataType>& m, bool ind1, const Matrix<int>& kk) const {
     // Scalar
     if (kk.isScalar(true)) {
-      return getNZ(ind1, kk.toSlice(ind1));
+      return getNZ(m, ind1, kk.toSlice(ind1));
     }
 
     // Get nonzeros of kk
@@ -438,12 +441,11 @@ namespace casadi {
     }
 
     // Copy nonzeros
-    Matrix<DataType> ret = zeros(kk.sparsity());
+    m = zeros(kk.sparsity());
     for (int el=0; el<k.size(); ++el) {
       int k_el = k[el]-ind1;
-      ret.at(el) = at(k_el>=0 ? k_el : k_el+sz);
+      m.at(el) = at(k_el>=0 ? k_el : k_el+sz);
     }
-    return ret;
   }
 
   template<typename DataType>

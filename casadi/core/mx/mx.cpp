@@ -175,7 +175,9 @@ namespace casadi {
   const MX MX::getSub(bool ind1, const Matrix<int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense()) {
-      return getNZ(ind1, rr);
+      MX m;
+      getNZ(m, ind1, rr);
+      return m;
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -370,14 +372,17 @@ namespace casadi {
     }
   }
 
-  MX MX::getNZ(bool ind1, const Slice& kk) const {
+  void MX::getNZ(MX& m, bool ind1, const Slice& kk) const {
     // Fallback on IMatrix
-    return getNZ(ind1, kk.getAll(nnz(), ind1));
+    getNZ(m, ind1, kk.getAll(nnz(), ind1));
   }
 
-  MX MX::getNZ(bool ind1, const Matrix<int>& kk) const {
+  void MX::getNZ(MX& m, bool ind1, const Matrix<int>& kk) const {
     // Quick return if no entries
-    if (kk.nnz()==0) return MX::zeros(kk.sparsity());
+    if (kk.nnz()==0) {
+      m = MX::zeros(kk.sparsity());
+      return;
+    }
 
     // Check bounds
     int sz = nnz();
@@ -395,11 +400,11 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += sz;
       }
-      return getNZ(false, kk_mod); // Call recursively
+      getNZ(m, false, kk_mod); // Call recursively
     }
 
     // Return reference to the nonzeros
-    return (*this)->getGetNonzeros(kk.sparsity(), kk.data());
+    m = (*this)->getGetNonzeros(kk.sparsity(), kk.data());
   }
 
   void MX::setNZ(const MX& m, bool ind1, const Slice& kk) {
@@ -465,7 +470,9 @@ namespace casadi {
   }
 
   const MX MX::at(int k) const {
-    return getNZ(false, k);
+    MX m;
+    getNZ(m, false, k);
+    return m;
   }
 
   /// Access a non-zero element
