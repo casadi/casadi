@@ -111,6 +111,12 @@ namespace casadi {
     /// Access a non-zero element, with bounds checking
     NonZeros<MX, int> at(int k);
 
+    /** \brief Get the sparsity pattern */
+    const Sparsity& sparsity() const;
+
+    /// Access the sparsity, make a copy if there are multiple references to it
+    Sparsity& sparsityRef();
+
 #endif // SWIG
 
     /// Returns the truth value of an MX expression
@@ -121,11 +127,8 @@ namespace casadi {
     typedef MX ScalarType;
     /// \endcond
 
-    /** \brief Get the sparsity pattern */
-    const Sparsity& sparsity() const;
-
-    /// Access the sparsity, make a copy if there are multiple references to it
-    Sparsity& sparsityRef();
+    /** \brief Get an owning reference to the sparsity pattern */
+    Sparsity getSparsity() const { return sparsity();}
 
     /** \brief Erase a submatrix (leaving structural zeros in its place)
         Erase rows and/or columns of a matrix */

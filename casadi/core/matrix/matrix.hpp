@@ -616,16 +616,16 @@ namespace casadi {
     const DataType* ptr() const { return isEmpty() ? static_cast<const DataType*>(0) : &front();}
     friend inline const DataType* getPtr(const Matrix<DataType>& v) { return v.ptr();}
     /// \endcond
-#endif // SWIG
-
-    /// Get the non-zero elements
-    //Matrix<DataType> nonzeros() const { return data();}
 
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const { return sparsity_; }
 
     /// Access the sparsity, make a copy if there are multiple references to it
     Sparsity& sparsityRef();
+#endif // SWIG
+
+    /** \brief Get an owning reference to the sparsity pattern */
+    Sparsity getSparsity() const { return sparsity();}
 
     /// \cond INTERNAL
     /** \brief  Set the non-zero elements, scalar */
@@ -650,7 +650,6 @@ namespace casadi {
     %rename(get) getStridedArray;
     %rename(set) setArray;
 #endif
-
     /** \brief  Get the non-zero elements, array */
     void getArray(DataType* val, int len, SparsityType sp=SP_SPARSE) const;
 

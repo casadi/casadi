@@ -824,6 +824,7 @@ except:
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
 %rename(row) getRow;
 %rename(colind) getColind;
+%rename(sparsity) getSparsity;
 
 #ifdef SWIGPYTHON
 %rename(__add__) zz_plus;
