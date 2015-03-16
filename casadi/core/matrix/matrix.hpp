@@ -666,12 +666,6 @@ namespace casadi {
     Sparsity getSparsity() const { return sparsity();}
 
     /// \cond INTERNAL
-    /** \brief  Set the non-zero elements, scalar */
-    void set(DataType val);
-
-    /** \brief  Get the non-zero elements, scalar */
-    void get(DataType& val) const;
-
     /** \brief  Set the non-zero elements, vector */
     void set(const std::vector<DataType>& val, SparsityType sp=SP_SPARSE);
 

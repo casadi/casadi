@@ -360,7 +360,7 @@ namespace casadi {
     nlp_.evaluate();
 
     // Get the result
-    nlp_.output(NL_F).get(obj);
+    nlp_.output(NL_F).getSub(obj);
     nlp_.output(NL_G).get(c, SP_DENSE);
 
     // Printing

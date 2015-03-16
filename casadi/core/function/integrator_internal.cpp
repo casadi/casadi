@@ -1018,7 +1018,7 @@ namespace casadi {
     zf().setSub(z0());
 
     // Reset summation states
-    qf().set(0.0);
+    qf().setSub(0.0);
 
     log("IntegratorInternal::reset", "end");
   }
@@ -1034,7 +1034,7 @@ namespace casadi {
     rzf().setSub(rz0());
 
     // Reset summation states
-    rqf().set(0.0);
+    rqf().setSub(0.0);
 
     log("IntegratorInternal::resetB", "end");
   }

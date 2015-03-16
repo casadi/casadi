@@ -63,8 +63,8 @@ namespace casadi {
   void QpToImplicit::solveNonLinear() {
 
     // Equality nonlinear constraints
-    solver_.input(NLP_SOLVER_LBG).set(0.);
-    solver_.input(NLP_SOLVER_UBG).set(0.);
+    solver_.input(NLP_SOLVER_LBG).setSub(0.);
+    solver_.input(NLP_SOLVER_UBG).setSub(0.);
 
     // Simple constraints
     vector<double>& lbx = solver_.input(NLP_SOLVER_LBX).data();

@@ -332,7 +332,7 @@ namespace casadi {
       if (!callback_.isNull()) {
         double time1 = clock();
 
-        if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).set(fk_);
+        if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).setSub(fk_);
         if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).set(x_);
         if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).set(mu_);
         if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
@@ -564,7 +564,7 @@ namespace casadi {
     t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
     // Save results to outputs
-    output(NLP_SOLVER_F).set(fk_);
+    output(NLP_SOLVER_F).setSub(fk_);
     output(NLP_SOLVER_X).set(x_);
     output(NLP_SOLVER_LAM_G).set(mu_);
     output(NLP_SOLVER_LAM_X).set(mu_x_);
@@ -826,7 +826,7 @@ namespace casadi {
 
       // Get the result
       gradF.output().get(grad_f, SP_DENSE);
-      gradF.output(1+NL_X).get(f);
+      gradF.output(1+NL_X).getSub(f);
 
       // Printing
       if (monitored("eval_f")) {

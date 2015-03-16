@@ -371,7 +371,7 @@ namespace casadi {
     { setOutput(val, outputSchemeEntry(oname)); }                                \
 
 #ifndef DOXYGENPROC
-    SETTERS_NZ(double) // NOLINT(readability/casting) - false positive
+    SETTERS_SUB(double) // NOLINT(readability/casting) - false positive
 #ifndef SWIG
     SETTERS_NZ(const double*)
 #endif // SWIG
@@ -404,7 +404,7 @@ namespace casadi {
 
 #ifndef DOXYGENPROC
 #ifndef SWIG
-GETTERS_NZ(double&)
+GETTERS_SUB(double&)
 GETTERS_NZ(double*) // NOLINT(readability/casting) - false positive
 GETTERS_NZ(std::vector<double>&)
 GETTERS_SUB(Matrix<double>&)
