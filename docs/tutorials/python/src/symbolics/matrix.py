@@ -42,11 +42,11 @@ print "column offsets: ", w.colind()
 #! ... the row for each nonzero ...
 print "row: ", w.row()
 #! ... and the nonzero data entries:
-print "nonzeros: ", w.data()
+print "nonzeros: ", w.nonzeros()
 #! Conversion
 #! --------------
 #! DMatrix can easily be converted into other data formats
-print w.data()
+print w.nonzeros()
 print w.toArray()
 print array(w)
 print w.toMatrix()
