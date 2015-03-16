@@ -1987,7 +1987,30 @@ namespace casadi {
 
   template<typename DataType>
   double Matrix<DataType>::getValue() const {
-    return static_cast<double>(toScalar());
+    casadi_assert(isScalar());
+    if (nnz()==0) {
+      return 0;
+    } else {
+      return getValue(0);
+    }
+  }
+
+  template<typename DataType>
+  double Matrix<DataType>::getValue(int k) const {
+    return static_cast<double>(at(k));
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setValue(double m) {
+    casadi_assert(isScalar());
+    if (nnz()!=0) {
+      setValue(m, 0);
+    }
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setValue(double m, int k) {
+    at(k) = m;
   }
 
   template<typename DataType>
@@ -2929,6 +2952,101 @@ namespace casadi {
     Matrix<DataType> ret = *this;
     ret.makeSparse(tol);
     return ret;
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(double val) {
+    std::fill(this->begin(), this->end(), val);
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const double* val) {
+    int size1 = this->size1();
+    int size2 = this->size2();
+    const int* colind = this->colind();
+    const int* row = this->row();
+    for (int cc=0; cc<size2; ++cc) {
+      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+        int rr=row[el];
+        setValue(val[cc + size1*rr], el);
+      }
+    }
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setSub(const std::vector<double>& val) {
+    casadi_assert(val.size()==this->numel());
+    setSub(getPtr(val));
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::getSub(double& val) const {
+    casadi_assert(isScalar());
+    getSub(&val);
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::getSub(double* val) const {
+    int size1 = this->size1();
+    int size2 = this->size2();
+    const int* colind = this->colind();
+    const int* row = this->row();
+    int k = 0;
+    for (int cc=0; cc<size2; ++cc) {
+      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+        int rr=row[el];
+        int k_sought=cc + size1*rr;
+        while (k<k_sought) val[k++] = 0;
+        val[k++] = getValue(el);
+      }
+    }
+    int k_sought=size1*size2;
+    while (k<k_sought) val[k++] = 0;
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::getSub(std::vector<double>& val) const {
+    casadi_assert(val.size()==this->numel());
+    getSub(getPtr(val));
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setNZ(double val) {
+    std::fill(this->begin(), this->end(), val);
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setNZ(const double* val) {
+    int nnz = this->nnz();
+    for (int el=0; el<nnz; ++el) {
+      setValue(*val++, el);
+    }
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setNZ(const std::vector<double>& val) {
+    casadi_assert(val.size()==this->nnz());
+    setNZ(getPtr(val));
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::getNZ(double& val) const {
+    casadi_assert(1==this->nnz());
+    getNZ(&val);
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::getNZ(double* val) const {
+    int nnz = this->nnz();
+    for (int el=0; el<nnz; ++el) {
+      *val++ = getValue(el);
+    }
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::getNZ(std::vector<double>& val) const {
+    casadi_assert(val.size()==this->nnz());
+    getNZ(getPtr(val));
   }
 
 } // namespace casadi

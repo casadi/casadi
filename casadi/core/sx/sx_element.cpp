@@ -929,8 +929,8 @@ namespace casadi {
   }
 
   template<>
-  double SX::getValue() const {
-    return toScalar().getValue();
+  double SX::getValue(int k) const {
+    return at(k).getValue();
   }
 
   template<>

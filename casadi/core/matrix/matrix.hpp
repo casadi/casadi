@@ -238,6 +238,20 @@ namespace casadi {
     Slice toSlice(bool ind1=false) const;
 
     ///@{
+    /** \brief Get the elements numerically */
+    void setSub(double val);
+    void setSub(const double* val);
+    void setSub(const std::vector<double>& val);
+    ///@}
+
+    ///@{
+    /** \brief Get the elements numerically */
+    void getSub(double& val) const;
+    void getSub(double* val) const;
+    void getSub(std::vector<double>& val) const;
+    ///@}
+
+    ///@{
     /// Get a submatrix, single argument
     void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
     void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr) const;
@@ -277,6 +291,20 @@ namespace casadi {
     void addSub(const Matrix<DataType>& m, RR rr, CC cc, bool ind1) {
       setSub(m+sub(rr, cc, ind1), rr, cc, ind1);
     }
+    ///@}
+
+    ///@{
+    /** \brief Get the elements numerically */
+    void setNZ(double val);
+    void setNZ(const double* val);
+    void setNZ(const std::vector<double>& val);
+    ///@}
+
+    ///@{
+    /** \brief Get the elements numerically */
+    void getNZ(double& val) const;
+    void getNZ(double* val) const;
+    void getNZ(std::vector<double>& val) const;
     ///@}
 
     ///@{
@@ -796,6 +824,15 @@ namespace casadi {
 
     /** \brief Get double value (only if constant) */
     double getValue() const;
+
+    /** \brief Get double value (particular nonzero) */
+    double getValue(int k) const;
+
+    /** \brief Set double value (only if constant) */
+    void setValue(double m);
+
+    /** \brief Set double value (particular nonzero) */
+    void setValue(double m, int k);
 
     /** \brief Get double value (only if integer constant) */
     int getIntValue() const;
