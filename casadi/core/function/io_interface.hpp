@@ -343,13 +343,13 @@ namespace casadi {
 #define SETTERS_NZ(T)                                                              \
     void setInput(T val, int iind=0)                                            \
     { static_cast<const Derived*>(this)->assertInit();                          \
-      try { input(iind).set(val); }                                             \
+      try { input(iind).setNZ(val); }                                             \
       catch(std::exception& e) {                                                \
         casadi_error(e.what() << "Occurred at iind = " << iind << ".");         \
       }                                                                         \
     }                                                                           \
     void setOutput(T val, int oind=0)                                           \
-    { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
+    { static_cast<const Derived*>(this)->assertInit(); output(oind).setNZ(val); } \
     void setInput(T val, const std::string &iname)                              \
     { setInput(val, inputSchemeEntry(iname));  }                                 \
     void setOutput(T val, const std::string &oname)                             \
@@ -384,9 +384,9 @@ namespace casadi {
 
 #define GETTERS_NZ(T)                                                             \
     void getInput(T val, int iind=0) const                                     \
-    { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);}  \
+    { static_cast<const Derived*>(this)->assertInit(); input(iind).getNZ(val);}  \
     void getOutput(T val, int oind=0) const                                    \
-    { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
+    { static_cast<const Derived*>(this)->assertInit(); output(oind).getNZ(val);} \
     void getInput(T val, const std::string &iname) const                       \
     { getInput(val, inputSchemeEntry(iname)); }                                 \
     void getOutput(T val, const std::string &oname) const                      \

@@ -246,15 +246,15 @@ namespace casadi {
     ///@{
     /** \brief Get the elements numerically */
     void setSub(double val);
-    void setSub(const double* val);
-    void setSub(const std::vector<double>& val);
+    void setSub(const double* val, bool tr=false);
+    void setSub(const std::vector<double>& val, bool tr=false);
     ///@}
 
     ///@{
     /** \brief Get the elements numerically */
     void getSub(double& val) const;
-    void getSub(double* val) const;
-    void getSub(std::vector<double>& val) const;
+    void getSub(double* val, bool tr=false) const;
+    void getSub(std::vector<double>& val, bool tr=false) const;
     ///@}
 
     ///@{
@@ -300,7 +300,7 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Get the elements numerically */
+    /** \brief Set the elements numerically */
     void setNZ(double val);
     void setNZ(const double* val);
     void setNZ(const std::vector<double>& val);
@@ -312,6 +312,12 @@ namespace casadi {
     void getNZ(double* val) const;
     void getNZ(std::vector<double>& val) const;
     ///@}
+
+    /** \brief Set upper triangular elements */
+    void setSym(const double* val);
+
+    /** \brief Set upper triangular elements */
+    void getSym(double* val) const;
 
     ///@{
     /// Get a set of nonzeros

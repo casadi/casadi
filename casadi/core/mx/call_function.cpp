@@ -104,7 +104,7 @@ namespace casadi {
     vector<SX> argv(num_in);
     for (int i=0; i<num_in; ++i) {
       argv[i] = SX::zeros(fcn_.input(i).sparsity());
-      if (input[i] != 0) argv[i].set(input[i]);
+      if (input[i] != 0) argv[i].setArray(input[i], argv[i].nnz());
     }
 
     // Evaluate symbolically
@@ -113,7 +113,7 @@ namespace casadi {
 
     // Collect the result
     for (int i = 0; i < num_out; ++i) {
-      if (output[i] != 0) resv[i].get(output[i]);
+      if (output[i] != 0) resv[i].getArray(output[i], resv[i].nnz());
     }
   }
 
