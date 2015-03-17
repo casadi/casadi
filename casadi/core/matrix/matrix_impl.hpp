@@ -1055,73 +1055,67 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getArray(double* val, int len, SparsityType sp) const {
-    // Get references to data for quick access
-    std::vector<double> data = this->nonzeros();
-    const int size1 = this->size1();
-    const int size2 = this->size2();
-    const int* colind = this->colind();
-    const int* row = this->row();
+  void Matrix<DataType>::get(double* val, int len, int stride1, int stride2,
+                             SparsityType sp) const {
+    if (stride1==0 || stride2==0 || (sp==SP_DENSE && stride2==1 && stride1==size1())) {
+      // Get references to data for quick access
+      std::vector<double> data = this->nonzeros();
+      const int size1 = this->size1();
+      const int size2 = this->size2();
+      const int* colind = this->colind();
+      const int* row = this->row();
 
-    if (sp==SP_SPARSE || (sp==SP_DENSE && isDense())) {
-      casadi_assert_message(len==nnz(),
-                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
-                            "Trying to fetch " << len << " elements from a " << dimString()
-                            << " matrix with " << nnz() << " non-zeros.");
-      copy(data.begin(), data.end(), val);
-    } else if (sp==SP_DENSE) {
-      casadi_assert_message(len==numel(),
-                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
-                            "Trying to fetch " << len << " elements from a " << dimString()
-                            << " matrix with " << numel() << " entries.");
-      // Begin with all zeros
-      std::fill(val, val+len, 0);
+      if (sp==SP_SPARSE || (sp==SP_DENSE && isDense())) {
+        casadi_assert_message(len==nnz(),
+                              "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
+                              "Trying to fetch " << len << " elements from a " << dimString()
+                              << " matrix with " << nnz() << " non-zeros.");
+        copy(data.begin(), data.end(), val);
+      } else if (sp==SP_DENSE) {
+        casadi_assert_message(len==numel(),
+                              "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
+                              "Trying to fetch " << len << " elements from a " << dimString()
+                              << " matrix with " << numel() << " entries.");
+        // Begin with all zeros
+        std::fill(val, val+len, 0);
 
-      // Add the nonzeros
-      for (int cc=0; cc<size2; ++cc) { // loop over columns
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
-          int rr=row[el];
-          val[rr+cc*size1] = data[el];
+        // Add the nonzeros
+        for (int cc=0; cc<size2; ++cc) { // loop over columns
+          for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
+            int rr=row[el];
+            val[rr+cc*size1] = data[el];
+          }
         }
-      }
-    } else if (sp==SP_DENSETRANS) {
-      casadi_assert_message(len==numel(),
-                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
-                            "Trying to fetch " << len << " elements from a " << dimString()
-                            << " matrix with " << numel() << " entries.");
-      // Begin with all zeros
-      std::fill(val, val+len, 0);
+      } else if (sp==SP_DENSETRANS) {
+        casadi_assert_message(len==numel(),
+                              "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
+                              "Trying to fetch " << len << " elements from a " << dimString()
+                              << " matrix with " << numel() << " entries.");
+        // Begin with all zeros
+        std::fill(val, val+len, 0);
 
-      // Add the nonzeros
-      for (int cc=0; cc<size2; ++cc) { // loop over columns
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
-          int rr=row[el];
-          val[cc+rr*size2] = data[el];
+        // Add the nonzeros
+        for (int cc=0; cc<size2; ++cc) { // loop over columns
+          for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
+            int rr=row[el];
+            val[cc+rr*size2] = data[el];
+          }
         }
-      }
-    } else if (sp==SP_SPARSESYM) {
-      // copy to the result vector
-      int nz = 0;
-      for (int cc=0; cc<size2; ++cc) {
-        // Loop over the elements in the col
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
-          if (row[el] > cc) break; // break inner loop (only upper triangular part is used)
-          val[nz++] = data[el];
+      } else if (sp==SP_SPARSESYM) {
+        // copy to the result vector
+        int nz = 0;
+        for (int cc=0; cc<size2; ++cc) {
+          // Loop over the elements in the col
+          for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
+            if (row[el] > cc) break; // break inner loop (only upper triangular part is used)
+            val[nz++] = data[el];
+          }
         }
+      } else {
+        casadi_error("Matrix<DataType>::getArray: not SPARSE, SP_SPARSESYM, DENSE or SP_DENSETRANS");
       }
-    } else {
-      casadi_error("Matrix<DataType>::getArray: not SPARSE, SP_SPARSESYM, DENSE or SP_DENSETRANS");
+      return;
     }
-  }
-
-  /**
-     Set stride to zero for unstrided acces
-  */
-  template<typename DataType>
-  void Matrix<DataType>::getStridedArray(double* val, int len, int stride1, int stride2,
-                                         SparsityType sp) const {
-    if (stride1==0 || stride2==0 || (sp==SP_DENSE && stride2==1 && stride1==size1()))
-        return getArray(val, len, sp);
 
     // Get references to data for quick access
     //const int size1 = this->size1();

@@ -678,15 +678,9 @@ namespace casadi {
     Sparsity getSparsity() const { return sparsity();}
 
     /// \cond INTERNAL
-#ifdef SWIG
-    %rename(get) getStridedArray;
-#endif
-    /** \brief  Get the non-zero elements, array */
-    void getArray(double* val, int len, SparsityType sp=SP_SPARSE) const;
-
     /** \brief  Get the non-zero elements, strided array */
-    void getStridedArray(double* val, int len, int stride1, int stride2,
-                         SparsityType sp=SP_SPARSE) const;
+    void get(double* val, int len, int stride1, int stride2,
+             SparsityType sp=SP_SPARSE) const;
 
 #ifndef SWIG
     /** Bitwise set, reinterpreting the data as a bvec_t array */
