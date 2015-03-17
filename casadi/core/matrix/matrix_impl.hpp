@@ -1112,7 +1112,8 @@ namespace casadi {
           }
         }
       } else {
-        casadi_error("Matrix<DataType>::getArray: not SPARSE, SP_SPARSESYM, DENSE or SP_DENSETRANS");
+        casadi_error("Matrix<DataType>::getArray: "
+                     "not SPARSE, SP_SPARSESYM, DENSE or SP_DENSETRANS");
       }
       return;
     }
