@@ -1014,11 +1014,11 @@ namespace casadi {
     t_ = t0_;
 
     // Initialize output
-    xf().setSub(x0());
-    zf().setSub(z0());
+    xf().set(x0());
+    zf().set(z0());
 
     // Reset summation states
-    qf().setSub(0.0);
+    qf().set(0.0);
 
     log("IntegratorInternal::reset", "end");
   }
@@ -1030,11 +1030,11 @@ namespace casadi {
     t_ = tf_;
 
     // Initialize output
-    rxf().setSub(rx0());
-    rzf().setSub(rz0());
+    rxf().set(rx0());
+    rzf().set(rz0());
 
     // Reset summation states
-    rqf().setSub(0.0);
+    rqf().set(0.0);
 
     log("IntegratorInternal::resetB", "end");
   }

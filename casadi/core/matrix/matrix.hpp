@@ -238,16 +238,16 @@ namespace casadi {
     Slice toSlice(bool ind1=false) const;
 
     /** \brief Set all the entries without changing sparsity pattern */
-    void setSub(const Matrix<DataType>& val);
+    void set(const Matrix<DataType>& val);
 
     /** \brief Get all the entries without changing sparsity pattern */
     void getSub(Matrix<DataType>& val) const;
 
     ///@{
     /** \brief Get the elements numerically */
-    void setSub(double val);
-    void setSub(const double* val, bool tr=false);
-    void setSub(const std::vector<double>& val, bool tr=false);
+    void set(double val);
+    void set(const double* val, bool tr=false);
+    void set(const std::vector<double>& val, bool tr=false);
     ///@}
 
     ///@{
@@ -278,24 +278,24 @@ namespace casadi {
 
     ///@{
     /// Set a submatrix, single argument
-    void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Sparsity& sp);
+    void set(const Matrix<DataType>& m, bool ind1, const Slice& rr);
+    void set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr);
+    void set(const Matrix<DataType>& m, bool ind1, const Sparsity& sp);
     ///@}
 
     ///@{
     /// Set a submatrix, two arguments
-    void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Slice& cc);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
+    void set(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Slice& cc);
+    void set(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
+    void set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
+    void set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
     ///@}
 
     ///@{
     /// Add a submatrix to an existing matrix (TODO: remove memory allocation)
     template<typename RR, typename CC>
     void addSub(const Matrix<DataType>& m, RR rr, CC cc, bool ind1) {
-      setSub(m+sub(rr, cc, ind1), rr, cc, ind1);
+      set(m+sub(rr, cc, ind1), rr, cc, ind1);
     }
     ///@}
 

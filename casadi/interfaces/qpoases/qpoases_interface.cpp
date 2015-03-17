@@ -286,7 +286,7 @@ namespace casadi {
     }
 
     // Get optimal cost
-    output(QP_SOLVER_COST).setSub(qp_->getObjVal());
+    output(QP_SOLVER_COST).set(qp_->getObjVal());
 
     // Get the primal solution
     qp_->getPrimalSolution(&output(QP_SOLVER_X).front());

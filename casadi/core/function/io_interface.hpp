@@ -358,13 +358,13 @@ namespace casadi {
 #define SETTERS_SUB(T)                                                              \
     void setInput(T val, int iind=0)                                            \
     { static_cast<const Derived*>(this)->assertInit();                          \
-      try { input(iind).setSub(val); }                                             \
+      try { input(iind).set(val); }                                             \
       catch(std::exception& e) {                                                \
         casadi_error(e.what() << "Occurred at iind = " << iind << ".");         \
       }                                                                         \
     }                                                                           \
     void setOutput(T val, int oind=0)                                           \
-    { static_cast<const Derived*>(this)->assertInit(); output(oind).setSub(val); } \
+    { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
     void setInput(T val, const std::string &iname)                              \
     { setInput(val, inputSchemeEntry(iname));  }                                 \
     void setOutput(T val, const std::string &oname)                             \

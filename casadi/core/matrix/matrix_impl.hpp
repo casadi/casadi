@@ -192,7 +192,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
+  void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Slice& cc) {
     // Both are scalar
     if (rr.isScalar(size1()) && cc.isScalar(size2()) && m.isDense()) {
@@ -201,56 +201,56 @@ namespace casadi {
     }
 
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    set(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
+  void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Matrix<int>& cc) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, ind1, rr.getAll(size1(), ind1), cc);
+    set(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
+  void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Slice& cc) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, ind1, rr, cc.getAll(size2(), ind1));
+    set(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1,
+  void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Matrix<int>& cc) {
     // Scalar
     if (rr.isScalar(true) && cc.isScalar(true) && m.isDense()) {
-      return setSub(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
+      return set(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
-      return setSub(m, ind1, rr.T(), cc);
+      return set(m, ind1, rr.T(), cc);
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return setSub(m, ind1, rr, cc.T());
+      return set(m, ind1, rr, cc.T());
     }
 
     // Make sure rr and cc are dense vectors
     casadi_assert_message(rr.isDense() && rr.isVector(),
-                          "Matrix::setSub: First index not dense vector");
+                          "Matrix::set: First index not dense vector");
     casadi_assert_message(cc.isDense() && cc.isVector(),
-                          "Matrix::setSub: Second index not dense vector");
+                          "Matrix::set: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
     if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
       if (m.isScalar()) {
         // m scalar means "set all"
-        return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
+        return set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
       } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return setSub(m.T(), ind1, rr, cc);
+        return set(m.T(), ind1, rr, cc);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
@@ -263,13 +263,13 @@ namespace casadi {
 
     // Report out-of-bounds
     if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
-      casadi_error("setSub[., r, c] out of bounds. Your rr contains "
+      casadi_error("set[., r, c] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
                    << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
     if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
-      casadi_error("setSub [., r, c] out of bounds. Your cc contains "
+      casadi_error("set [., r, c] out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
                    << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
@@ -292,11 +292,11 @@ namespace casadi {
         el.at(k) = this_i + this_j*sz1;
       }
     }
-    return setSub(m, false, el);
+    return set(m, false, el);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr) {
+  void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1, const Slice& rr) {
     // Scalar
     if (rr.isScalar(numel()) && m.isDense()) {
       int r = rr.toScalar(numel());
@@ -305,14 +305,14 @@ namespace casadi {
     }
 
     // Fall back on IMatrix
-    setSub(m, ind1, rr.getAll(numel(), ind1));
+    set(m, ind1, rr.getAll(numel(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) {
+  void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) {
     // Scalar
     if (rr.isScalar(true) && m.isDense()) {
-      return setSub(m, ind1, rr.toSlice(ind1));
+      return set(m, ind1, rr.toSlice(ind1));
     }
 
     // Assert dimensions of assigning matrix
@@ -325,18 +325,18 @@ namespace casadi {
         Sparsity sp = rr.sparsity() * m.sparsity();
 
         // Project both matrices to this sparsity
-        return setSub(m.setSparse(sp), ind1, rr.setSparse(sp));
+        return set(m.setSparse(sp), ind1, rr.setSparse(sp));
       } else if (m.isScalar()) {
         // m scalar means "set all"
         if (m.isDense()) {
-          return setSub(Matrix<DataType>(rr.sparsity(), m), ind1, rr);
+          return set(Matrix<DataType>(rr.sparsity(), m), ind1, rr);
         } else {
-          return setSub(Matrix<DataType>(rr.shape()), ind1, rr);
+          return set(Matrix<DataType>(rr.shape()), ind1, rr);
         }
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return setSub(m.T(), ind1, rr);
+        return set(m.T(), ind1, rr);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << rr.shape()
@@ -352,7 +352,7 @@ namespace casadi {
 
     // Check bounds
     if (!inBounds(rr.data(), -nel+ind1, nel+ind1)) {
-      casadi_error("setSub[rr] out of bounds. Your rr contains "
+      casadi_error("set[rr] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
                    << ", which is outside the range [" << -nel+ind1 << ","<< nel+ind1 <<  ").");
@@ -390,9 +390,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& m, bool ind1, const Sparsity& sp) {
+  void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1, const Sparsity& sp) {
     casadi_assert_message(shape()==sp.shape(),
-                          "setSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          "set(Sparsity sp): shape mismatch. This matrix has shape "
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
     std::vector<int> ii = sp.find();
@@ -1004,7 +1004,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const Matrix<DataType>& val) {
+  void Matrix<DataType>::set(const Matrix<DataType>& val) {
     sparsity().set(getPtr(data()), getPtr(val.data()), val.sparsity());
   }
 
@@ -1051,7 +1051,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::getSub(Matrix<DataType>& val) const {
-    val.setSub(*this);
+    val.set(*this);
   }
 
   template<typename DataType>
@@ -1954,7 +1954,7 @@ namespace casadi {
       return setSparse(sp.patternIntersection(sparsity()), false);
     } else {
       Matrix<DataType> ret(sp);
-      ret.setSub(*this);
+      ret.set(*this);
       return ret;
     }
   }
@@ -2856,12 +2856,12 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(double val) {
+  void Matrix<DataType>::set(double val) {
     std::fill(this->begin(), this->end(), val);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const double* val, bool tr) {
+  void Matrix<DataType>::set(const double* val, bool tr) {
     // Get sparsity pattern
     int size1 = this->size1();
     int size2 = this->size2();
@@ -2878,9 +2878,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setSub(const std::vector<double>& val, bool tr) {
+  void Matrix<DataType>::set(const std::vector<double>& val, bool tr) {
     casadi_assert(val.size()==this->numel());
-    setSub(getPtr(val), tr);
+    set(getPtr(val), tr);
   }
 
   template<typename DataType>

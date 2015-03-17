@@ -86,10 +86,10 @@ namespace casadi {
     // Take time steps until end time has been reached
     while (k_<k_out) {
       // Take step
-      F.input(DAE_T).setSub(t_);
-      F.input(DAE_X).setSub(output(INTEGRATOR_XF));
-      F.input(DAE_Z).setSub(Z_);
-      F.input(DAE_P).setSub(input(INTEGRATOR_P));
+      F.input(DAE_T).set(t_);
+      F.input(DAE_X).set(output(INTEGRATOR_XF));
+      F.input(DAE_Z).set(Z_);
+      F.input(DAE_P).set(input(INTEGRATOR_P));
       F.evaluate();
       F.output(DAE_ODE).getSub(output(INTEGRATOR_XF));
       F.output(DAE_ALG).getSub(Z_);
@@ -127,13 +127,13 @@ namespace casadi {
       t_ = t0_ + k_*h_;
 
       // Take step
-      G.input(RDAE_T).setSub(t_);
+      G.input(RDAE_T).set(t_);
       G.input(RDAE_X).setNZ(x_tape_.at(k_));
       G.input(RDAE_Z).setNZ(Z_tape_.at(k_));
-      G.input(RDAE_P).setSub(input(INTEGRATOR_P));
-      G.input(RDAE_RX).setSub(output(INTEGRATOR_RXF));
-      G.input(RDAE_RZ).setSub(RZ_);
-      G.input(RDAE_RP).setSub(input(INTEGRATOR_RP));
+      G.input(RDAE_P).set(input(INTEGRATOR_P));
+      G.input(RDAE_RX).set(output(INTEGRATOR_RXF));
+      G.input(RDAE_RZ).set(RZ_);
+      G.input(RDAE_RP).set(input(INTEGRATOR_RP));
       G.evaluate();
       G.output(RDAE_ODE).getSub(output(INTEGRATOR_RXF));
       G.output(RDAE_ALG).getSub(RZ_);
@@ -173,11 +173,11 @@ namespace casadi {
   }
 
   void FixedStepIntegrator::calculateInitialConditions() {
-    Z_.setSub(numeric_limits<double>::quiet_NaN());
+    Z_.set(numeric_limits<double>::quiet_NaN());
   }
 
   void FixedStepIntegrator::calculateInitialConditionsB() {
-    RZ_.setSub(numeric_limits<double>::quiet_NaN());
+    RZ_.set(numeric_limits<double>::quiet_NaN());
   }
 
 } // namespace casadi

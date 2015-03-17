@@ -157,8 +157,8 @@ namespace casadi {
     stats_["socp_solver_stats"] = solver_.getStats();
 
     // Read the outputs from SOCP Solver
-    output(SOCP_SOLVER_COST).setSub(solver_.output(QCQP_SOLVER_COST));
-    output(SOCP_SOLVER_LAM_A).setSub(solver_.output(QCQP_SOLVER_LAM_A));
+    output(SOCP_SOLVER_COST).set(solver_.output(QCQP_SOLVER_COST));
+    output(SOCP_SOLVER_LAM_A).set(solver_.output(QCQP_SOLVER_LAM_A));
     std::copy(solver_.output(QCQP_SOLVER_X).begin(),
               solver_.output(QCQP_SOLVER_X).begin()+n_,
               output(SOCP_SOLVER_X).begin());

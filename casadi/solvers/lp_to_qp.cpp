@@ -65,14 +65,14 @@ namespace casadi {
   void LpToQp::evaluate() {
 
     // Pass inputs of LP to QP form
-    solver_.input(QP_SOLVER_A).setSub(input(LP_SOLVER_A));
-    solver_.input(QP_SOLVER_G).setSub(input(LP_SOLVER_C));
+    solver_.input(QP_SOLVER_A).set(input(LP_SOLVER_A));
+    solver_.input(QP_SOLVER_G).set(input(LP_SOLVER_C));
 
-    solver_.input(QP_SOLVER_LBX).setSub(input(LP_SOLVER_LBX));
-    solver_.input(QP_SOLVER_UBX).setSub(input(LP_SOLVER_UBX));
+    solver_.input(QP_SOLVER_LBX).set(input(LP_SOLVER_LBX));
+    solver_.input(QP_SOLVER_UBX).set(input(LP_SOLVER_UBX));
 
-    solver_.input(QP_SOLVER_LBA).setSub(input(LP_SOLVER_LBA));
-    solver_.input(QP_SOLVER_UBA).setSub(input(LP_SOLVER_UBA));
+    solver_.input(QP_SOLVER_LBA).set(input(LP_SOLVER_LBA));
+    solver_.input(QP_SOLVER_UBA).set(input(LP_SOLVER_UBA));
 
     // Delegate computation to NLP Solver
     solver_.evaluate();
@@ -81,10 +81,10 @@ namespace casadi {
     stats_["qp_solver_stats"] = solver_.getStats();
 
     // Read the outputs from Ipopt
-    output(QP_SOLVER_X).setSub(solver_.output(LP_SOLVER_X));
-    output(QP_SOLVER_COST).setSub(solver_.output(LP_SOLVER_COST));
-    output(QP_SOLVER_LAM_A).setSub(solver_.output(LP_SOLVER_LAM_A));
-    output(QP_SOLVER_LAM_X).setSub(solver_.output(LP_SOLVER_LAM_X));
+    output(QP_SOLVER_X).set(solver_.output(LP_SOLVER_X));
+    output(QP_SOLVER_COST).set(solver_.output(LP_SOLVER_COST));
+    output(QP_SOLVER_LAM_A).set(solver_.output(LP_SOLVER_LAM_A));
+    output(QP_SOLVER_LAM_X).set(solver_.output(LP_SOLVER_LAM_X));
   }
 
   void LpToQp::init() {

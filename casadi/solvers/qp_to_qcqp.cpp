@@ -65,15 +65,15 @@ namespace casadi {
   void QpToQcqp::evaluate() {
 
     // Pass inputs of QP to QCQP form
-    solver_.input(QCQP_SOLVER_A).setSub(input(QP_SOLVER_A));
-    solver_.input(QCQP_SOLVER_G).setSub(input(QP_SOLVER_G));
-    solver_.input(QCQP_SOLVER_H).setSub(input(QP_SOLVER_H));
+    solver_.input(QCQP_SOLVER_A).set(input(QP_SOLVER_A));
+    solver_.input(QCQP_SOLVER_G).set(input(QP_SOLVER_G));
+    solver_.input(QCQP_SOLVER_H).set(input(QP_SOLVER_H));
 
-    solver_.input(QCQP_SOLVER_LBX).setSub(input(QP_SOLVER_LBX));
-    solver_.input(QCQP_SOLVER_UBX).setSub(input(QP_SOLVER_UBX));
+    solver_.input(QCQP_SOLVER_LBX).set(input(QP_SOLVER_LBX));
+    solver_.input(QCQP_SOLVER_UBX).set(input(QP_SOLVER_UBX));
 
-    solver_.input(QCQP_SOLVER_LBA).setSub(input(QP_SOLVER_LBA));
-    solver_.input(QCQP_SOLVER_UBA).setSub(input(QP_SOLVER_UBA));
+    solver_.input(QCQP_SOLVER_LBA).set(input(QP_SOLVER_LBA));
+    solver_.input(QCQP_SOLVER_UBA).set(input(QP_SOLVER_UBA));
 
     // Delegate computation to QCQP Solver
     solver_.evaluate();
@@ -82,10 +82,10 @@ namespace casadi {
     stats_["qcqp_solver_stats"] = solver_.getStats();
 
     // Read the outputs from Ipopt
-    output(QCQP_SOLVER_X).setSub(solver_.output(QP_SOLVER_X));
-    output(QCQP_SOLVER_COST).setSub(solver_.output(QP_SOLVER_COST));
-    output(QCQP_SOLVER_LAM_A).setSub(solver_.output(QP_SOLVER_LAM_A));
-    output(QCQP_SOLVER_LAM_X).setSub(solver_.output(QP_SOLVER_LAM_X));
+    output(QCQP_SOLVER_X).set(solver_.output(QP_SOLVER_X));
+    output(QCQP_SOLVER_COST).set(solver_.output(QP_SOLVER_COST));
+    output(QCQP_SOLVER_LAM_A).set(solver_.output(QP_SOLVER_LAM_A));
+    output(QCQP_SOLVER_LAM_X).set(solver_.output(QP_SOLVER_LAM_X));
   }
 
   void QpToQcqp::init() {

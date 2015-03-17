@@ -2264,8 +2264,8 @@ namespace casadi {
     }
 
     // Clear seeds and sensitivities
-    for (int i=0; i<n_in; ++i) input(i).setSub(0.);
-    for (int i=0; i<n_out; ++i) output(i).setSub(0.);
+    for (int i=0; i<n_in; ++i) input(i).set(0.);
+    for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
   void FunctionInternal::spAdj(const std::vector<bvec_t*>& arg,
@@ -2317,8 +2317,8 @@ namespace casadi {
     }
 
     // Clear seeds and sensitivities
-    for (int i=0; i<n_in; ++i) input(i).setSub(0.);
-    for (int i=0; i<n_out; ++i) output(i).setSub(0.);
+    for (int i=0; i<n_in; ++i) input(i).set(0.);
+    for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
   void FunctionInternal::generate(std::ostream &stream, const std::vector<int>& arg,

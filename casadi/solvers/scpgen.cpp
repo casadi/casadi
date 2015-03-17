@@ -799,7 +799,7 @@ namespace casadi {
     cout << "optimal cost = " << f_ << endl;
 
     // Save results to outputs
-    output(NLP_SOLVER_F).setSub(f_);
+    output(NLP_SOLVER_F).set(f_);
     output(NLP_SOLVER_X).setNZ(x_opt_);
     output(NLP_SOLVER_LAM_G).setNZ(g_lam_);
     output(NLP_SOLVER_LAM_X).setNZ(x_lam_);

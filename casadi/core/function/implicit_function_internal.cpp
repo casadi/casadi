@@ -170,7 +170,7 @@ namespace casadi {
     fact_up_to_date_ = false;
 
     // Get initial guess
-    output(iout_).setSub(input(iin_));
+    output(iout_).set(input(iin_));
 
     // Solve the nonlinear system of equations
     solveNonLinear();

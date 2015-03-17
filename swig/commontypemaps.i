@@ -796,7 +796,7 @@
     
       if (m) {
         *m = casadi::Matrix<double>::zeros(nrows,ncols);
-        m->setSub(d, true);
+        m->set(d, true);
       }
            
       // Free memory

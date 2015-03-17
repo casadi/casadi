@@ -332,7 +332,7 @@ namespace casadi {
       if (!callback_.isNull()) {
         double time1 = clock();
 
-        if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).setSub(fk_);
+        if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).set(fk_);
         if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).setNZ(x_);
         if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).setNZ(mu_);
         if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
@@ -564,7 +564,7 @@ namespace casadi {
     t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
     // Save results to outputs
-    output(NLP_SOLVER_F).setSub(fk_);
+    output(NLP_SOLVER_F).set(fk_);
     output(NLP_SOLVER_X).setNZ(x_);
     output(NLP_SOLVER_LAM_G).setNZ(mu_);
     output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
@@ -652,7 +652,7 @@ namespace casadi {
   void Sqpmethod::reset_h() {
     // Initial Hessian approximation of BFGS
     if (!exact_hessian_) {
-      Bk_.setSub(B_init_);
+      Bk_.set(B_init_);
     }
 
     if (monitored("eval_h")) {

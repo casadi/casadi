@@ -948,8 +948,8 @@ class NZproxy:
     def __setitem__(self,s,val):
         with internalAPI():
           if isinstance(s,tuple) and len(s)==2:
-            return self.setSub(val, False, s[0], s[1])  
-          return self.setSub(val, False, s)
+            return self.set(val, False, s[0], s[1])  
+          return self.set(val, False, s)
         
     @property
     def nz(self):
@@ -1023,13 +1023,13 @@ class NZproxy:
     const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { Type m; $self->getSub(m, true, rr, cc); return m;}
 
     // Set a submatrix (index-1)
-    void setitem(const Type& m, const Slice& rr) { $self->setSub(m, true, rr);}
-    void setitem(const Type& m, const Matrix<int>& rr) { $self->setSub(m, true, rr);}
-    void setitem(const Type& m, const Sparsity& sp) { $self->setSub(m, true, sp);}
-    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
-    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
+    void setitem(const Type& m, const Slice& rr) { $self->set(m, true, rr);}
+    void setitem(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
+    void setitem(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
+    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
+    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
     const Type getitemcurl(const Slice& rr) const { Type m; $self->getNZ(m, true, rr); return m;}

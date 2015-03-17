@@ -320,9 +320,9 @@ namespace casadi {
 
     double temp;
     DSDPGetDDObjective(dsdp_, &temp);
-    output(SDP_SOLVER_COST).setSub(-temp);
+    output(SDP_SOLVER_COST).set(-temp);
     DSDPGetPPObjective(dsdp_, &temp);
-    output(SDP_SOLVER_DUAL_COST).setSub(-temp);
+    output(SDP_SOLVER_DUAL_COST).set(-temp);
 
     if (calc_dual_) {
       for (int j=0;j<nb_;++j) {

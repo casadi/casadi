@@ -52,36 +52,36 @@ namespace casadi {
     ///@{
     /// Methods that modify a part of the parent object (A(i, j) = ?, A(i, j) += ?, etc.)
     inline const M& operator=(const SubMatrix<M, I, J> &y) {
-      mat_.setSub(y, false, i_, j_);
+      mat_.set(y, false, i_, j_);
       return y;
     }
 
     inline const M& operator=(const M &y) {
-      mat_.setSub(y, false, i_, j_);
+      mat_.set(y, false, i_, j_);
       return y;
     }
 
     inline M operator+=(const M &y) {
       M s = *this+y;
-      mat_.setSub(s, false, i_, j_);
+      mat_.set(s, false, i_, j_);
       return s;
     }
 
     inline M operator-=(const M &y) {
       M s = *this-y;
-      mat_.setSub(s, false, i_, j_);
+      mat_.set(s, false, i_, j_);
       return s;
     }
 
     inline M operator*=(const M &y) {
       M s = *this*y;
-      mat_.setSub(s, false, i_, j_);
+      mat_.set(s, false, i_, j_);
       return s;
     }
 
     inline M operator/=(const M &y) {
       M s = *this/y;
-      mat_.setSub(s, false, i_, j_);
+      mat_.set(s, false, i_, j_);
       return s;
     }
     ///@}
@@ -109,36 +109,36 @@ namespace casadi {
     ///@{
     /// Methods that modify a part of the parent object (A(i) = ?, A(i) += ?, etc.)
     inline const M& operator=(const SubIndex<M, I> &y) {
-      mat_.setSub(y, false, i_);
+      mat_.set(y, false, i_);
       return y;
     }
 
     inline const M& operator=(const M &y) {
-      mat_.setSub(y, false, i_);
+      mat_.set(y, false, i_);
       return y;
     }
 
     inline M operator+=(const M &y) {
       M s = *this+y;
-      mat_.setSub(s, false, i_);
+      mat_.set(s, false, i_);
       return s;
     }
 
     inline M operator-=(const M &y) {
       M s = *this-y;
-      mat_.setSub(s, false, i_);
+      mat_.set(s, false, i_);
       return s;
     }
 
     inline M operator*=(const M &y) {
       M s = *this*y;
-      mat_.setSub(s, false, i_);
+      mat_.set(s, false, i_);
       return s;
     }
 
     inline M operator/=(const M &y) {
       M s = *this/y;
-      mat_.setSub(s, false, i_);
+      mat_.set(s, false, i_);
       return s;
     }
     ///@}

@@ -111,15 +111,15 @@ class typemaptests(casadiTestCase):
     z=n.zeros((12,5))
     self.assertRaises(TypeError,lambda : dm.getSub(z),"get(wrong size ndarray)")
     z=ones((3,4))
-    dm.setSub(z)
+    dm.set(z)
     self.checkarray(dm.toArray() > 0,dm,"set(2Dndarray)")
     z=n.matrix(ones((3,4)))
-    dm.setSub(z)
+    dm.set(z)
     self.checkarray(dm.toArray() > 0,dm,"set(2Dmatrix)")
     z=n.zeros((12,5))
     
     if scipy_available:
-      dm.setSub(c)
+      dm.set(c)
       self.checkarray(c,dm,"set(csr_matrix)")
     
       z=n.zeros(3)
@@ -441,7 +441,7 @@ class typemaptests(casadiTestCase):
     self.checkarray(w,goal,"Constructor")
     
     for name, value in test.items():
-      w.setSub(value)
+      w.set(value)
       self.checkarray(w,goal,"name")
       
       
@@ -607,7 +607,7 @@ class typemaptests(casadiTestCase):
     A = matrix([[1.0,2],[3,4]])
     B = matrix([[4.0,5],[6,7]])
     
-    w.setSub(A)
+    w.set(A)
     w.getSub(B.T)
     
     self.checkarray(B.T,A,"get")
@@ -620,7 +620,7 @@ class typemaptests(casadiTestCase):
     A = matrix([[1.0,2],[3,4]])
     B = matrix([[4.0,5],[6,7]])
     
-    w.setSub(A[0,:])
+    w.set(A[0,:])
     self.checkarray(w,A[0,:],"set")
     w.getSub(B[0,:])
     self.checkarray(B[0,:],A[0,:],"get")
@@ -628,7 +628,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[0],[0]])
 
 
-    w.setSub(A[:,0])
+    w.set(A[:,0])
     self.checkarray(w,A[:,0],"set")
     w.getSub(B[:,0])
     self.checkarray(B[:,0],A[:,0],"get")
@@ -692,8 +692,8 @@ class typemaptests(casadiTestCase):
   def test_setAll_365(self):
     self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
     m = DMatrix.ones(5,5)
-    m.setSub(DMatrix(4))
-    m.setSub(IMatrix(4))
+    m.set(DMatrix(4))
+    m.set(IMatrix(4))
         
   def test_issue570(self):
     self.message("Issue #570: long int")
@@ -889,7 +889,7 @@ class typemaptests(casadiTestCase):
       f.setInput(D)
 
       self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))
-      d.setSub(D)
+      d.set(D)
       self.checkarray(d,DMatrix([[1,2],[3,4]]))
 
   def test_issue1217(self):
