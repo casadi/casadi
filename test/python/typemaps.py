@@ -111,22 +111,21 @@ class typemaptests(casadiTestCase):
     z=n.zeros((12,5))
     self.assertRaises(TypeError,lambda : dm.get(z),"get(wrong size ndarray)")
     z=ones((3,4))
-    dm.set(z)
+    dm.setSub(z)
     self.checkarray(dm.toArray() > 0,dm,"set(2Dndarray)")
     z=n.matrix(ones((3,4)))
-    dm.set(z)
+    dm.setSub(z)
     self.checkarray(dm.toArray() > 0,dm,"set(2Dmatrix)")
     z=n.zeros((12,5))
-    self.assertRaises(TypeError,lambda : dm.set(z))
     
     if scipy_available:
-      dm.set(c)
+      dm.setSub(c)
       self.checkarray(c,dm,"set(csr_matrix)")
     
       z=n.zeros(3)
       dm.get(z)
       self.checkarray(n.matrix(z),n.matrix(data),"get(1Dndarray)")
-      dm.set(z)
+      dm.setNZ(z)
 
       self.checkarray(c,dm,"set(1Dndarray)")
 
@@ -138,7 +137,6 @@ class typemaptests(casadiTestCase):
       with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         c[0,0]=1
-      self.assertRaises(TypeError,lambda :  dm.set(c))
       self.assertRaises(TypeError,lambda :  dm.get(c))
 
   def test_conversion(self):
@@ -443,7 +441,7 @@ class typemaptests(casadiTestCase):
     self.checkarray(w,goal,"Constructor")
     
     for name, value in test.items():
-      w.set(value)
+      w.setSub(value)
       self.checkarray(w,goal,"name")
       
       
@@ -609,7 +607,7 @@ class typemaptests(casadiTestCase):
     A = matrix([[1.0,2],[3,4]])
     B = matrix([[4.0,5],[6,7]])
     
-    w.set(A)
+    w.setSub(A)
     w.get(B.T)
     
     self.checkarray(B.T,A,"get")
@@ -622,7 +620,7 @@ class typemaptests(casadiTestCase):
     A = matrix([[1.0,2],[3,4]])
     B = matrix([[4.0,5],[6,7]])
     
-    w.set(A[0,:])
+    w.setSub(A[0,:])
     self.checkarray(w,A[0,:],"set")
     w.get(B[0,:])
     self.checkarray(B[0,:],A[0,:],"get")
@@ -630,7 +628,7 @@ class typemaptests(casadiTestCase):
     w = DMatrix([[0],[0]])
 
 
-    w.set(A[:,0])
+    w.setSub(A[:,0])
     self.checkarray(w,A[:,0],"set")
     w.get(B[:,0])
     self.checkarray(B[:,0],A[:,0],"get")
@@ -891,7 +889,7 @@ class typemaptests(casadiTestCase):
       f.setInput(D)
 
       self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))
-      d.set(D)
+      d.setSub(D)
       self.checkarray(d,DMatrix([[1,2],[3,4]]))
 
   def test_issue1217(self):

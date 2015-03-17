@@ -680,16 +680,12 @@ namespace casadi {
     /// \cond INTERNAL
 #ifdef SWIG
     %rename(get) getStridedArray;
-    %rename(set) setArray;
 #endif
     /** \brief  Get the non-zero elements, array */
-    void getArray(DataType* val, int len, SparsityType sp=SP_SPARSE) const;
-
-    /** \brief  Set the non-zero elements, array */
-    void setArray(const DataType* val, int len, SparsityType sp=SP_SPARSE);
+    void getArray(double* val, int len, SparsityType sp=SP_SPARSE) const;
 
     /** \brief  Get the non-zero elements, strided array */
-    void getStridedArray(DataType* val, int len, int stride1, int stride2,
+    void getStridedArray(double* val, int len, int stride1, int stride2,
                          SparsityType sp=SP_SPARSE) const;
 
 #ifndef SWIG

@@ -1055,9 +1055,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getArray(DataType* val, int len, SparsityType sp) const {
+  void Matrix<DataType>::getArray(double* val, int len, SparsityType sp) const {
     // Get references to data for quick access
-    const std::vector<DataType> &data = this->data();
+    std::vector<double> data = this->nonzeros();
     const int size1 = this->size1();
     const int size2 = this->size2();
     const int* colind = this->colind();
@@ -1118,13 +1118,12 @@ namespace casadi {
      Set stride to zero for unstrided acces
   */
   template<typename DataType>
-  void Matrix<DataType>::getStridedArray(DataType* val, int len, int stride1, int stride2,
+  void Matrix<DataType>::getStridedArray(double* val, int len, int stride1, int stride2,
                                          SparsityType sp) const {
     if (stride1==0 || stride2==0 || (sp==SP_DENSE && stride2==1 && stride1==size1()))
         return getArray(val, len, sp);
 
     // Get references to data for quick access
-    const std::vector<DataType> &data = this->data();
     //const int size1 = this->size1();
     const int size2 = this->size2();
     const int* colind = this->colind();
@@ -1136,14 +1135,14 @@ namespace casadi {
       for (int cc=0; cc<size2; ++cc) { // loop over columns
         for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
           int rr=row[el];
-          val[rr*stride2 + cc*stride1] = data[el];
+          val[rr*stride2 + cc*stride1] = getValue(el);
         }
       }
     } else if (sp==SP_DENSETRANS && isDense()) {
       for (int cc=0; cc<size2; ++cc) { // loop over columns
         for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
           int rr=row[el];
-          val[cc*stride2 + rr*stride1] = data[el];
+          val[cc*stride2 + rr*stride1] = getValue(el);
         }
       }
     } else if (sp==SP_DENSE) {
@@ -1153,67 +1152,6 @@ namespace casadi {
       casadi_error("Matrix<DataType>::getStridedArray: strided SP_SPARSESYM not implemented");
     } else {
       casadi_error("Matrix<DataType>::getStridedArray: not SPARSE or DENSE");
-    }
-
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setArray(const DataType* val, int len, SparsityType sp) {
-    // Get references to data for quick access
-    std::vector<DataType> &data = this->data();
-    const int size1 = this->size1();
-    const int size2 = this->size2();
-    const int* colind = this->colind();
-    const int* row = this->row();
-
-    if (sp==SP_SPARSE || (sp==SP_DENSE && numel()==nnz())) {
-      casadi_assert_message(len==nnz(),
-                            "Matrix<DataType>::setArray: Dimension mismatch." << std::endl <<
-                            "Trying to pass " << len << " elements to a " << dimString()
-                            << " matrix with " << nnz() << " non-zeros.");
-      copy(val, val+len, data.begin());
-    } else if (sp==SP_DENSE) {
-      casadi_assert_message(len==numel(),
-                            "Matrix<DataType>::setArray: Dimension mismatch." << std::endl <<
-                            "Trying to pass " << len << " elements to a " << dimString()
-                            << " matrix with " << numel() << " entries.");
-      // Get the nonzeros
-      for (int cc=0; cc<size2; ++cc) { // loop over columns
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
-          int rr=row[el];
-          data[el] = val[rr+cc*size1];
-        }
-      }
-    } else if (sp==SP_DENSETRANS) {
-      casadi_assert_message(len==numel(),
-                            "Matrix<DataType>::setArray: Dimension mismatch." << std::endl <<
-                            "Trying to pass " << len << " elements to a " << dimString()
-                            << " matrix with " << numel() << " entries.");
-      // Get the nonzeros
-      for (int cc=0; cc<size2; ++cc) { // loop over columns
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
-          int rr=row[el];
-          data[el] = val[cc+rr*size2];
-        }
-      }
-    } else if (sp==SP_SPARSESYM) {
-      // NOTE: Has to be rewritten! sparsity().transpose(...) involves memory allocation
-      // and is not threadsafe!!!
-      // These routines is supposed to be used inside threadsafe code.
-      std::vector<int> mapping;
-      sparsity().transpose(mapping, false);
-      // copy to the result vector
-      int nz = 0;
-      for (int cc=0; cc<size2; ++cc) {
-        // Loop over the elements in the col
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) { // loop over the non-zero elements
-          if (row[el] > cc) break; // break inner loop (only lower triangular part is used)
-          data[mapping[el]] = data[el] = val[nz++];
-        }
-      }
-    } else {
-      throw CasadiException("Matrix<DataType>::setArray: "
-                            "not SPARSE, SP_SPARSESYM, DENSE or SP_DENSETRANS");
     }
   }
 
