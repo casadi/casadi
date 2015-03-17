@@ -596,7 +596,7 @@ namespace casadi {
         hessLag_.evaluate();
 
         // Get results
-        hessLag_.output().get(values, SP_SPARSESYM);
+        hessLag_.output().getSym(values);
 
         if (monitored("eval_h")) {
           cout << "x = " << hessLag_.input(NL_X).data() << endl;

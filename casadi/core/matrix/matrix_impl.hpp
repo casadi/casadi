@@ -1065,19 +1065,13 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::set(const DataType* val, SparsityType sp) {
-    int len = sp==SP_SPARSE ? nnz() :
-        sp==SP_DENSE || sp==SP_DENSETRANS ? numel() :
-        sp==SP_SPARSESYM ? sizeU() : -1;
-    setArray(val, len, sp);
+  void Matrix<DataType>::set(const DataType* val) {
+    setArray(val, nnz());
   }
 
   template<typename DataType>
-  void Matrix<DataType>::get(DataType* val, SparsityType sp) const {
-    int len = sp==SP_SPARSE ? nnz() :
-        sp==SP_DENSE || sp==SP_DENSETRANS ? numel() :
-        sp==SP_SPARSESYM ? sizeU() : -1;
-    getArray(val, len, sp);
+  void Matrix<DataType>::get(DataType* val) const {
+    getArray(val, nnz());
   }
 
   template<typename DataType>
@@ -2961,7 +2955,7 @@ namespace casadi {
     for (int cc=0; cc<size2; ++cc) {
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         int rr=row[el];
-        setValue(val[tr ? rr + size2*cc : cc + size1*rr], el);
+        setValue(val[tr ? cc + size2*rr : rr + size1*cc], el);
       }
     }
   }
@@ -2995,7 +2989,7 @@ namespace casadi {
     for (int cc=0; cc<size2; ++cc) {
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         int rr=row[el];
-        val[tr ? rr + size2*cc : cc + size1*rr] = getValue(el);
+        val[tr ? cc + size2*rr : rr + size1*cc] = getValue(el);
       }
     }
   }

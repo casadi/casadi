@@ -693,7 +693,7 @@
       int ncols  = array_numdims(p)==2 ? array_size(p,1) : 1;
       if (m) {
         *m = casadi::SX::zeros(nrows, ncols);
-        m->set(v, casadi::SP_DENSETRANS);
+        m->setArray(casadi::getPtr(v), nrows*ncols, casadi::SP_DENSETRANS);
       }
       return true;
     }
@@ -799,7 +799,7 @@
     
       if (m) {
         *m = casadi::Matrix<double>::zeros(nrows,ncols);
-        m->set(d, casadi::SP_DENSETRANS);
+        m->setSub(d, true);
       }
            
       // Free memory
@@ -971,7 +971,7 @@
     
       if (m) {
         *m = casadi::Matrix<int>::zeros(nrows,ncols);
-        m->set(d,casadi::SP_DENSETRANS);
+        m->setArray(d, nrows*ncols, casadi::SP_DENSETRANS);
       }
            
       // Free memory

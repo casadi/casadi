@@ -316,7 +316,7 @@ namespace casadi {
     /** \brief Set upper triangular elements */
     void setSym(const double* val);
 
-    /** \brief Set upper triangular elements */
+    /** \brief Get upper triangular elements */
     void getSym(double* val) const;
 
     ///@{
@@ -700,10 +700,10 @@ namespace casadi {
 
 #ifndef SWIG
     /** \brief  Legacy - use getArray instead */
-    void get(DataType* val, SparsityType sp=SP_SPARSE) const;
+    void get(DataType* val) const;
 
     /** \brief  Legacy - use setArray instead */
-    void set(const DataType* val, SparsityType sp=SP_SPARSE);
+    void set(const DataType* val);
 
     /** Bitwise set, reinterpreting the data as a bvec_t array */
     void setZeroBV();

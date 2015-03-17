@@ -421,7 +421,7 @@ namespace casadi {
     hessLag_.evaluate();
 
     // Get results
-    hessLag_.output().get(hessian, SP_SPARSESYM);
+    hessLag_.output().getSym(hessian);
 
     // Printing
     if (monitored("eval_h")) {
