@@ -1004,13 +1004,13 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::set(const std::vector<DataType>& val, SparsityType sp) {
-    setArray(val.empty() ? 0 : &val.front(), val.size(), sp);
+  void Matrix<DataType>::set(const std::vector<DataType>& val) {
+    setArray(val.empty() ? 0 : &val.front(), val.size());
   }
 
   template<typename DataType>
-  void Matrix<DataType>::get(std::vector<DataType>& val, SparsityType sp) const {
-    getArray(val.empty() ? 0 : &val.front(), val.size(), sp);
+  void Matrix<DataType>::get(std::vector<DataType>& val) const {
+    getArray(val.empty() ? 0 : &val.front(), val.size());
   }
 
   template<typename DataType>
@@ -1062,16 +1062,6 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::getSub(Matrix<DataType>& val) const {
     val.setSub(*this);
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::set(const DataType* val) {
-    setArray(val, nnz());
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::get(DataType* val) const {
-    getArray(val, nnz());
   }
 
   template<typename DataType>
@@ -3020,6 +3010,12 @@ namespace casadi {
   }
 
   template<typename DataType>
+  void Matrix<DataType>::setSym(const std::vector<double>& val) {
+    casadi_assert(val.size()==this->sizeU());
+    setSym(getPtr(val));
+  }
+
+  template<typename DataType>
   void Matrix<DataType>::getNZ(double& val) const {
     casadi_assert(1==this->nnz());
     getNZ(&val);
@@ -3037,6 +3033,12 @@ namespace casadi {
   void Matrix<DataType>::getNZ(std::vector<double>& val) const {
     casadi_assert(val.size()==this->nnz());
     getNZ(getPtr(val));
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::getSym(std::vector<double>& val) const {
+    casadi_assert(val.size()==this->sizeU());
+    getSym(getPtr(val));
   }
 
   template<typename DataType>

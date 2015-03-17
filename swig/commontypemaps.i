@@ -903,7 +903,7 @@
       if (m) {
         *m = casadi::DMatrix(getSparsity(p));
         double* data = static_cast<double*>(mxGetData(p));
-        m->set(data);
+        m->setNZ(data);
       }
       return true;
     }

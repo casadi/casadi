@@ -989,7 +989,7 @@ namespace casadi {
       nlp_.evaluate();
 
       // Ge the result
-      nlp_.output(NL_G).get(g, SP_DENSE);
+      nlp_.output(NL_G).getSub(g);
 
       // Printing
       if (monitored("eval_g")) {
@@ -1019,7 +1019,7 @@ namespace casadi {
       jacG.evaluate();
 
       // Get the output
-      jacG.output(1+NL_G).get(g, SP_DENSE);
+      jacG.output(1+NL_G).getSub(g);
       jacG.output().getSub(J);
 
       if (monitored("eval_jac_g")) {
@@ -1048,7 +1048,7 @@ namespace casadi {
       gradF.evaluate();
 
       // Get the result
-      gradF.output().get(grad_f, SP_DENSE);
+      gradF.output().getSub(grad_f);
       gradF.output(1+NL_X).getSub(f);
 
       // Printing

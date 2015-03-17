@@ -313,11 +313,17 @@ namespace casadi {
     void getNZ(std::vector<double>& val) const;
     ///@}
 
+    ///@{
     /** \brief Set upper triangular elements */
     void setSym(const double* val);
+    void setSym(const std::vector<double>& val);
+    ///@}
 
+    ///@{
     /** \brief Get upper triangular elements */
     void getSym(double* val) const;
+    void getSym(std::vector<double>& val) const;
+    ///@}
 
     ///@{
     /// Get a set of nonzeros
@@ -673,10 +679,10 @@ namespace casadi {
 
     /// \cond INTERNAL
     /** \brief  Set the non-zero elements, vector */
-    void set(const std::vector<DataType>& val, SparsityType sp=SP_SPARSE);
+    void set(const std::vector<DataType>& val);
 
     /** \brief  Get the non-zero elements, vector */
-    void get(std::vector<DataType>& val, SparsityType sp=SP_SPARSE) const;
+    void get(std::vector<DataType>& val) const;
 
 #ifdef SWIG
     %rename(get) getStridedArray;
@@ -699,12 +705,6 @@ namespace casadi {
                          SparsityType sp=SP_SPARSE) const;
 
 #ifndef SWIG
-    /** \brief  Legacy - use getArray instead */
-    void get(DataType* val) const;
-
-    /** \brief  Legacy - use setArray instead */
-    void set(const DataType* val);
-
     /** Bitwise set, reinterpreting the data as a bvec_t array */
     void setZeroBV();
 
