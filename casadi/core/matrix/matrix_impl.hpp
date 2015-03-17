@@ -1150,6 +1150,21 @@ namespace casadi {
   }
 
   template<typename DataType>
+  void Matrix<DataType>::get(double* val, int len, int stride1, int stride2) const {
+    if (stride1==0 || stride2==0) {
+      // Get references to data for quick access
+      std::vector<double> data = this->nonzeros();
+      casadi_assert_message(len==nnz(),
+                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
+                            "Trying to fetch " << len << " elements from a " << dimString()
+                            << " matrix with " << nnz() << " non-zeros.");
+      copy(data.begin(), data.end(), val);
+    } else {
+      throw CasadiException("Matrix<DataType>::getArray: strided SPARSE not implemented");
+    }
+  }
+
+  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_power(const Matrix<DataType>& y) const {
     return binary(OP_POW, *this, y);
   }
