@@ -86,7 +86,7 @@ class Fun:
     z0 = 3*y
     z1 = x+z0
     z2 = sin(z1)
-    z.set(z2)
+    z.setSub(z2)
             
 c = PyFunction(Fun(12345), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
 c.init()
@@ -119,25 +119,25 @@ class Fun:
     z0 = 3*y
     z1 = x+z0
     z2 = sin(z1)
-    z.set(z2)
+    z.setSub(z2)
 
   def fwd(self,(x,y),(z,),seeds,sens):
     z0 = 3*y
     z1 = x+z0
     z2 = sin(z1)
-    z.set(z2)
+    z.setSub(z2)
     
     for ((dx,dy),(dz,)) in zip(seeds,sens):
       dz0 = 3*dy
       dz1 = dx+dz0
       dz2 = cos(z1)*dz1
-      dz.set(dz2)
+      dz.setSub(dz2)
   
   def adj(self,(x,y),(z,),seeds,sens):
     z0 = 3*y
     z1 = x+z0
     z2 = sin(z1)
-    z.set(z2)
+    z.setSub(z2)
     
     for ((z_bar,),(x_bar,y_bar)) in zip(seeds,sens):
       bx = 0
@@ -149,8 +149,8 @@ class Fun:
       bz1 += bz2*cos(z1)
       bx+= bz1;bz0+= bz1
       by+= 3*bz0
-      x_bar.set(bx)
-      y_bar.set(by)
+      x_bar.setSub(bx)
+      y_bar.setSub(by)
 
 c = PyFunction(Fun(), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
 c.init()
@@ -212,7 +212,7 @@ class Fun:
     z0 = 3*y
     z1 = x+z0
     z2 = sin(z1)
-    z.set(z2)
+    z.setSub(z2)
     
   def getDerForward(self,f,nfwd):
     inputs = [f.input(i).sparsity() for i in range(f.getNumInputs())]
@@ -259,7 +259,7 @@ class Fun:
       dz1 = dx+dz0
       dz2 = cos(z1)*dz1
       
-      outputs[i].set(dz2)
+      outputs[i].setSub(dz2)
     
   def evaluateDerAdj(self,inputs,outputs,nadj):
     # sin(x+3*y)
@@ -286,8 +286,8 @@ class Fun:
       bz1 += bz2*cos(z1)
       bx+= bz1;bz0+= bz1
       by+= 3*bz0
-      outputs[num_in*i+0].set(bx)
-      outputs[num_in*i+1].set(by)
+      outputs[num_in*i+0].setSub(bx)
+      outputs[num_in*i+1].setSub(by)
       
 Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
 Fun.init()
