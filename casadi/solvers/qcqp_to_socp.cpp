@@ -73,9 +73,9 @@ namespace casadi {
     // Transform QCQP_SOLVER_P to SOCP_SOLVER_G
     // G = chol(H/2)
     int qcqp_p_offset = 0;
-    cholesky_[0].input(0).setArray(&input(QCQP_SOLVER_H).data().front()+qcqp_p_offset);
+    cholesky_[0].input(0).setNZ(input(QCQP_SOLVER_H).ptr()+qcqp_p_offset);
     for (int i=0;i<nq_;++i) {
-      cholesky_[i+1].input(0).setArray(&input(QCQP_SOLVER_P).data().front()+qcqp_p_offset);
+      cholesky_[i+1].input(0).setNZ(input(QCQP_SOLVER_P).ptr()+qcqp_p_offset);
       qcqp_p_offset+= cholesky_[i+1].input(0).nnz();
     }
 

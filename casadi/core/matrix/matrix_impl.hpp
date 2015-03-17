@@ -1218,16 +1218,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getArray(DataType* val) const {
-    getArray(val, nnz(), SP_SPARSE);
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setArray(const DataType* val) {
-    setArray(val, nnz(), SP_SPARSE);
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_power(const Matrix<DataType>& y) const {
     return binary(OP_POW, *this, y);
   }

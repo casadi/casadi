@@ -688,12 +688,6 @@ namespace casadi {
     /** \brief  Set the non-zero elements, array */
     void setArray(const DataType* val, int len, SparsityType sp=SP_SPARSE);
 
-    /** \brief  Get the non-zero elements, array, sparse and correct length */
-    void getArray(DataType* val) const;
-
-    /** \brief  Set the non-zero elements, array, sparse and correct length */
-    void setArray(const DataType* val);
-
     /** \brief  Get the non-zero elements, strided array */
     void getStridedArray(DataType* val, int len, int stride1, int stride2,
                          SparsityType sp=SP_SPARSE) const;

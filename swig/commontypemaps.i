@@ -675,26 +675,23 @@
     if (is_array(p)) {
       if (array_type(p) != NPY_OBJECT) return false;
       if (array_numdims(p)>2 || array_numdims(p)<1) return false;
+      int nrows = array_size(p,0); // 1D array is cast into column vector
+      int ncols  = array_numdims(p)==2 ? array_size(p,1) : 1;
       PyArrayIterObject* it = (PyArrayIterObject*)PyArray_IterNew(p);
-      std::vector<casadi::SXElement> v;
-      if (m) v.resize(it->size);
-      std::vector<casadi::SXElement>::iterator v_it = v.begin();
+      casadi::SX mT;
+      if (m) mT = casadi::SX::zeros(ncols, nrows);
+      int k=0;
       casadi::SX tmp;
       PyObject *pe;
       while (it->index < it->size) { 
         pe = *((PyObject**) PyArray_ITER_DATA(it));
         if (!to_SX(pe, &tmp)) return false;
         if (!tmp.isScalar()) return false;
-        if (m) *v_it++ = tmp.toScalar();
+        if (m) mT(k) = tmp;
         PyArray_ITER_NEXT(it);
       }
       Py_DECREF(it);
-      int nrows = array_size(p,0); // 1D array is cast into column vector
-      int ncols  = array_numdims(p)==2 ? array_size(p,1) : 1;
-      if (m) {
-        *m = casadi::SX::zeros(nrows, ncols);
-        m->setArray(casadi::getPtr(v), nrows*ncols, casadi::SP_DENSETRANS);
-      }
+      if (m) *m = mT.T();
       return true;
     }
     // Object has __SX__ method
@@ -943,7 +940,6 @@
       int nrows = array_size(p,0); // 1D array is cast into column vector
       int ncols  = 1;
       if (array_numdims(p)==2) ncols=array_size(p,1); 
-      int size=nrows*ncols; // number of elements in the dense matrix
       if (!array_is_native(p)) return false;
       // Make sure we have a contigous array with int datatype
       int array_is_new_object=0;
@@ -966,12 +962,14 @@
         return true;
       }
     
-      int* d=(int*) array_data(array);
-      std::vector<int> v(d,d+size);
-    
       if (m) {
-        *m = casadi::Matrix<int>::zeros(nrows,ncols);
-        m->setArray(d, nrows*ncols, casadi::SP_DENSETRANS);
+        int* d= static_cast<int*>(array_data(array));
+        *m = casadi::Matrix<int>::zeros(nrows, ncols);
+        for (int rr=0; rr<nrows; ++rr) {
+          for (int cc=0; cc<ncols; ++cc) {
+            (*m)(rr, cc) = *d++;
+          }
+        }
       }
            
       // Free memory
