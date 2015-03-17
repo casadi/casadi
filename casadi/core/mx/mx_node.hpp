@@ -317,10 +317,10 @@ namespace casadi {
     virtual MX getAddNonzeros(const MX& y, const std::vector<int>& nz) const;
 
     /// Get submatrix reference
-    virtual MX getSubRef(const Slice& i, const Slice& j) const;
+    virtual MX getRef(const Slice& i, const Slice& j) const;
 
     /// Get submatrix assignment
-    virtual MX getSubAssign(const MX& y, const Slice& i, const Slice& j) const;
+    virtual MX getAssign(const MX& y, const Slice& i, const Slice& j) const;
 
     /// Create set sparse
     virtual MX getSetSparse(const Sparsity& sp) const;

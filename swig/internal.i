@@ -1939,10 +1939,10 @@
 %exception  casadi::MXNode::getSolve(const MX &r, bool tr, const LinearSolver &linear_solver) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MXNode::getSubAssign(const MX &y, const Slice &i, const Slice &j) const  {
+%exception  casadi::MXNode::getAssign(const MX &y, const Slice &i, const Slice &j) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MXNode::getSubRef(const Slice &i, const Slice &j) const  {
+%exception  casadi::MXNode::getRef(const Slice &i, const Slice &j) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getTranspose() const  {
@@ -2122,25 +2122,25 @@
 %exception  casadi::Matrix< DataType >::getNdeps() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Matrix< int > &rr) const  {
+%exception  casadi::Matrix< DataType >::get(bool ind1, const Matrix< int > &rr) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) const  {
+%exception  casadi::Matrix< DataType >::get(bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Matrix< int > &rr, const Slice &cc) const  {
+%exception  casadi::Matrix< DataType >::get(bool ind1, const Matrix< int > &rr, const Slice &cc) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Slice &rr) const  {
+%exception  casadi::Matrix< DataType >::get(bool ind1, const Slice &rr) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Slice &rr, const Matrix< int > &cc) const  {
+%exception  casadi::Matrix< DataType >::get(bool ind1, const Slice &rr, const Matrix< int > &cc) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Slice &rr, const Slice &cc) const  {
+%exception  casadi::Matrix< DataType >::get(bool ind1, const Slice &rr, const Slice &cc) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Sparsity &sp) const  {
+%exception  casadi::Matrix< DataType >::get(bool ind1, const Sparsity &sp) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::getValue() const  {

@@ -942,8 +942,8 @@ class NZproxy:
     def __getitem__(self, s):
         with internalAPI():
           if isinstance(s, tuple) and len(s)==2:
-            return self.getSub(False, s[0], s[1])
-          return self.getSub(False, s)
+            return self.get(False, s[0], s[1])
+          return self.get(False, s)
 
     def __setitem__(self,s,val):
         with internalAPI():
@@ -1014,13 +1014,13 @@ class NZproxy:
 #ifdef SWIGMATLAB
 %define %matrix_helpers(Type)
     // Get a submatrix (index-1)
-    const Type getitem(const Slice& rr) const { Type m; $self->getSub(m, true, rr); return m;}
-    const Type getitem(const Matrix<int>& rr) const { Type m; $self->getSub(m, true, rr); return m;}
-    const Type getitem(const Sparsity& sp) const { Type m; $self->getSub(m, true, sp); return m;}
-    const Type getitem(const Slice& rr, const Slice& cc) const { Type m; $self->getSub(m, true, rr, cc); return m;}
-    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { Type m; $self->getSub(m, true, rr, cc); return m;}
-    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { Type m; $self->getSub(m, true, rr, cc); return m;}
-    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { Type m; $self->getSub(m, true, rr, cc); return m;}
+    const Type getitem(const Slice& rr) const { Type m; $self->get(m, true, rr); return m;}
+    const Type getitem(const Matrix<int>& rr) const { Type m; $self->get(m, true, rr); return m;}
+    const Type getitem(const Sparsity& sp) const { Type m; $self->get(m, true, sp); return m;}
+    const Type getitem(const Slice& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
 
     // Set a submatrix (index-1)
     void setitem(const Type& m, const Slice& rr) { $self->set(m, true, rr);}

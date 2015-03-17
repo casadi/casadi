@@ -73,7 +73,7 @@ namespace casadi {
     prepared_ = false;
 
     // Get the elements of the matrix, dense format
-    input(0).getSub(mat_);
+    input(0).get(mat_);
 
     // Factorize the matrix
     int info = -100;

@@ -394,9 +394,9 @@ namespace casadi {
 
 #define GETTERS_SUB(T)                                                             \
     void getInput(T val, int iind=0) const                                     \
-    { static_cast<const Derived*>(this)->assertInit(); input(iind).getSub(val);}  \
+    { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);}  \
     void getOutput(T val, int oind=0) const                                    \
-    { static_cast<const Derived*>(this)->assertInit(); output(oind).getSub(val);} \
+    { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
     void getInput(T val, const std::string &iname) const                       \
     { getInput(val, inputSchemeEntry(iname)); }                                 \
     void getOutput(T val, const std::string &oname) const                      \

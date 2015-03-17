@@ -184,7 +184,7 @@ namespace casadi {
 
     // Get the results
     for (int j=outind_[task]; j<outind_[task+1]; ++j) {
-      fcn.output(j-outind_[task]).getSub(output(j));
+      fcn.output(j-outind_[task]).get(output(j));
     }
   }
 

@@ -241,7 +241,7 @@ namespace casadi {
     void set(const Matrix<DataType>& val);
 
     /** \brief Get all the entries without changing sparsity pattern */
-    void getSub(Matrix<DataType>& val) const;
+    void get(Matrix<DataType>& val) const;
 
     ///@{
     /** \brief Get the elements numerically */
@@ -252,27 +252,27 @@ namespace casadi {
 
     ///@{
     /** \brief Get the elements numerically */
-    void getSub(double& val) const;
-    void getSub(double* val, bool tr=false) const;
-    void getSub(std::vector<double>& val, bool tr=false) const;
+    void get(double& val) const;
+    void get(double* val, bool tr=false) const;
+    void get(std::vector<double>& val, bool tr=false) const;
     ///@}
 
     ///@{
     /// Get a submatrix, single argument
-    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
-    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr) const;
-    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
     ///@}
 
     /// Get a submatrix, two arguments
     ///@{
-    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
                 const Slice& rr, const Slice& cc) const;
-    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
                 const Slice& rr, const Matrix<int>& cc) const;
-    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
                 const Matrix<int>& rr, const Slice& cc) const;
-    void getSub(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
                 const Matrix<int>& rr, const Matrix<int>& cc) const;
     ///@}
 
@@ -679,7 +679,7 @@ namespace casadi {
 
     /// \cond INTERNAL
     /** \brief  Get the non-zero elements, strided array */
-    void getSub(double* val, int len, int stride1, int stride2, SparsityType sp) const;
+    void get(double* val, int len, int stride1, int stride2, SparsityType sp) const;
     void getNZ(double* val, int len, int stride1, int stride2) const;
 
 #ifndef SWIG

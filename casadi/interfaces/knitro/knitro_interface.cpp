@@ -314,7 +314,7 @@ namespace casadi {
     stats_["return_status"] = status;
 
     // Copy constraints
-    nlp_.output(NL_G).getSub(output(NLP_SOLVER_G));
+    nlp_.output(NL_G).get(output(NLP_SOLVER_G));
 
     // Copy lagrange multipliers
     output(NLP_SOLVER_LAM_G).setNZ(getPtr(lambda));
@@ -360,8 +360,8 @@ namespace casadi {
     nlp_.evaluate();
 
     // Get the result
-    nlp_.output(NL_F).getSub(obj);
-    nlp_.output(NL_G).getSub(c);
+    nlp_.output(NL_F).get(obj);
+    nlp_.output(NL_G).get(c);
 
     // Printing
     if (monitored("eval_f")) {
@@ -383,7 +383,7 @@ namespace casadi {
     gradF_.evaluate();
 
     // Get the result
-    gradF_.output().getSub(objGrad);
+    gradF_.output().get(objGrad);
 
     // Printing
     if (monitored("eval_grad_f")) {

@@ -599,7 +599,7 @@ class Matrixtests(casadiTestCase):
           self.checkarray(d[row,col],r,"%s[%s,%s]" % (repr(d),str(row),str(col)))
           
     
-    # getSub1
+    # get1
     check(IMatrix(Sparsity.dense(3,3),range(3*3)),[0,1,2],[0,1,2])
     check(IMatrix(Sparsity.dense(4,4),range(4*4)),[0,1,3],[0,2,3])
     check(IMatrix(Sparsity.dense(3,3),range(3*3)),[0,0,1],[0,0,1])
@@ -615,7 +615,7 @@ class Matrixtests(casadiTestCase):
     d = IMatrix(sp,range(sp.nnz()))
     check(d,[0,3],[0,2])
     
-    # getSub2
+    # get2
     check(IMatrix(Sparsity.dense(2,2),range(2*2)),[0,0,0],[0,0,0])
     check(IMatrix(Sparsity.dense(2,2),range(2*2)),[0,0,1],[0,0,1])
     check(IMatrix(Sparsity.dense(2,2),range(2*2)),[1,1,0],[1,1,0])

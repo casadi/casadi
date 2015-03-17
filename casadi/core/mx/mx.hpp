@@ -275,19 +275,22 @@ namespace casadi {
     /** \brief  Identity matrix */
     static MX eye(int ncol);
 
+    /** \brief Avoid shadowing SharedObject::get() */
+    using SharedObject::get;
+
     ///@{
     /// Get a submatrix, single argument
-    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
-    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr) const;
-    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
     ///@}
 
     /// Get a submatrix, two arguments
     ///@{
-    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Slice& cc) const;
-    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Matrix<int>& cc) const;
-    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr, const Slice& cc) const;
-    void getSub(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Slice& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Matrix<int>& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr, const Slice& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
     ///@}
 
     ///@{

@@ -80,7 +80,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(Matrix<DataType>& m, bool ind1,
+  void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Slice& cc) const {
     // Both are scalar
     if (rr.isScalar(size1()) && cc.isScalar(size2())) {
@@ -94,45 +94,45 @@ namespace casadi {
     }
 
     // Fall back on IMatrix-IMatrix
-    getSub(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    get(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(Matrix<DataType>& m, bool ind1,
+  void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Matrix<int>& cc) const {
     // Fall back on IMatrix-IMatrix
-    getSub(m, ind1, rr.getAll(size1(), ind1), cc);
+    get(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(Matrix<DataType>& m, bool ind1,
+  void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Slice& cc) const {
     // Fall back on IMatrix-IMatrix
-    getSub(m, ind1, rr, cc.getAll(size2(), ind1));
+    get(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(Matrix<DataType>& m, bool ind1,
+  void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Scalar
     if (rr.isScalar(true) && cc.isScalar(true)) {
-      return getSub(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
+      return get(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
     }
 
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
-      return getSub(m, ind1, rr.T(), cc);
+      return get(m, ind1, rr.T(), cc);
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return getSub(m, ind1, rr, cc.T());
+      return get(m, ind1, rr, cc.T());
     }
 
     casadi_assert_message(rr.isDense() && rr.isVector(),
-                          "Marix::getSub: First index must be a dense vector");
+                          "Marix::get: First index must be a dense vector");
     casadi_assert_message(cc.isDense() && cc.isVector(),
-                          "Marix::getSub: Second index must be a dense vector");
+                          "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
@@ -144,7 +144,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(Matrix<DataType>& m, bool ind1, const Slice& rr) const {
+  void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1, const Slice& rr) const {
     // Scalar
     if (rr.isScalar(numel())) {
       int r = rr.toScalar(numel());
@@ -158,14 +158,14 @@ namespace casadi {
     }
 
     // Fall back on IMatrix
-    getSub(m, ind1, rr.getAll(numel(), ind1));
+    get(m, ind1, rr.getAll(numel(), ind1));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) const {
+  void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1, const Matrix<int>& rr) const {
     // Scalar
     if (rr.isScalar(true)) {
-      return getSub(m, ind1, rr.toSlice(ind1));
+      return get(m, ind1, rr.toSlice(ind1));
     }
 
     // If the indexed matrix is dense, use nonzero indexing
@@ -183,9 +183,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(Matrix<DataType>& m, bool ind1, const Sparsity& sp) const {
+  void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1, const Sparsity& sp) const {
     casadi_assert_message(shape()==sp.shape(),
-                          "getSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          "get(Sparsity sp): shape mismatch. This matrix has shape "
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
     m = setSparse(sp);
@@ -1050,12 +1050,12 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(Matrix<DataType>& val) const {
+  void Matrix<DataType>::get(Matrix<DataType>& val) const {
     val.set(*this);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(double* val, int len, int stride1, int stride2,
+  void Matrix<DataType>::get(double* val, int len, int stride1, int stride2,
                                 SparsityType sp) const {
     if (stride1==0 || stride2==0 || (sp==SP_DENSE && stride2==1 && stride1==size1())) {
       // Get references to data for quick access
@@ -2884,13 +2884,13 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(double& val) const {
+  void Matrix<DataType>::get(double& val) const {
     casadi_assert(isScalar());
-    getSub(&val);
+    get(&val);
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(double* val, bool tr) const {
+  void Matrix<DataType>::get(double* val, bool tr) const {
     // Get sparsity pattern
     int size1 = this->size1();
     int size2 = this->size2();
@@ -2912,9 +2912,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::getSub(std::vector<double>& val, bool tr) const {
+  void Matrix<DataType>::get(std::vector<double>& val, bool tr) const {
     casadi_assert(val.size()==this->numel());
-    getSub(getPtr(val), tr);
+    get(getPtr(val), tr);
   }
 
   template<typename DataType>

@@ -182,12 +182,12 @@ namespace casadi{
       npy_intp dims[2] = {$self->size1(), $self->size2()};
       PyObject* ret = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
       double* d = static_cast<double*>(array_data(ret));
-      $self->getSub(d, true); // Row-major
+      $self->get(d, true); // Row-major
       return ret;
 #elif defined(SWIGMATLAB)
       mxArray *p  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
       double* d = static_cast<double*>(mxGetData(p));
-      $self->getSub(d); // Column-major
+      $self->get(d); // Column-major
       return p;
 #else
       return 0;
@@ -235,7 +235,7 @@ PyObject* arrayView() {
       return self.arrayView()
     else:
       r = n.zeros((self.size1(),self.size2()))
-      self.getSub(r)
+      self.get(r)
       return r
 %}
 

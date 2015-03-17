@@ -46,7 +46,7 @@ namespace casadi {
   public:
     /// Constructor
     SubMatrix(M& mat, const I& i, const J& j) : mat_(mat), i_(i), j_(j) {
-      mat.getSub(*this, false, i, j);
+      mat.get(*this, false, i, j);
     }
 
     ///@{
@@ -103,7 +103,7 @@ namespace casadi {
   public:
     /// Constructor
     SubIndex(M& mat, const I& i) : mat_(mat), i_(i) {
-      mat.getSub(*this, false, i);
+      mat.get(*this, false, i);
     }
 
     ///@{

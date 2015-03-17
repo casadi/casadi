@@ -447,11 +447,11 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getSubRef(const Slice& i, const Slice& j) const {
+  MX MXNode::getRef(const Slice& i, const Slice& j) const {
     return MX::create(new SubRef(shared_from_this<MX>(), i, j));
   }
 
-  MX MXNode::getSubAssign(const MX& y, const Slice& i, const Slice& j) const {
+  MX MXNode::getAssign(const MX& y, const Slice& i, const Slice& j) const {
     return MX::create(new SubAssign(shared_from_this<MX>(), y, i, j));
   }
 

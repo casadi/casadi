@@ -214,7 +214,7 @@ namespace casadi {
     template<typename RR>
     const MatType operator()(const RR& rr) const {
       MatType ret;
-      self().getSub(ret, false, rr);
+      self().get(ret, false, rr);
       return ret;
     }
 
@@ -222,7 +222,7 @@ namespace casadi {
     template<typename RR, typename CC>
     const MatType operator()(const RR& rr, const CC& cc) const {
       MatType ret;
-      self().getSub(ret, false, rr, cc);
+      self().get(ret, false, rr, cc);
       return ret;
     }
 

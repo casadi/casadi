@@ -128,36 +128,36 @@ namespace casadi {
     return (*this)->__nonzero__();
   }
 
-  void MX::getSub(MX& m, bool ind1, const Slice& rr, const Slice& cc) const {
+  void MX::get(MX& m, bool ind1, const Slice& rr, const Slice& cc) const {
     // Fall back on (IMatrix, IMatrix)
-    return getSub(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    return get(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
-  void MX::getSub(MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) const {
+  void MX::get(MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) const {
     // Fall back on (IMatrix, IMatrix)
-    getSub(m, ind1, rr.getAll(size1(), ind1), cc);
+    get(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
-  void MX::getSub(MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) const {
+  void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) const {
     // Fall back on (IMatrix, IMatrix)
-    getSub(m, ind1, rr, cc.getAll(size2(), ind1));
+    get(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
-  void MX::getSub(MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
+  void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
-      return getSub(m, ind1, rr.T(), cc);
+      return get(m, ind1, rr.T(), cc);
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return getSub(m, ind1, rr, cc.T());
+      return get(m, ind1, rr, cc.T());
     }
 
     casadi_assert_message(rr.isDense() && rr.isVector(),
-                          "Marix::getSub: First index must be a dense vector");
+                          "Marix::get: First index must be a dense vector");
     casadi_assert_message(cc.isDense() && cc.isVector(),
-                          "Marix::getSub: Second index must be a dense vector");
+                          "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
@@ -167,12 +167,12 @@ namespace casadi {
     m = (*this)->getGetNonzeros(sp, mapping);
   }
 
-  void MX::getSub(MX& m, bool ind1, const Slice& rr) const {
+  void MX::get(MX& m, bool ind1, const Slice& rr) const {
     // Fall back on IMatrix
-    getSub(m, ind1, rr.getAll(numel(), ind1));
+    get(m, ind1, rr.getAll(numel(), ind1));
   }
 
-  void MX::getSub(MX& m, bool ind1, const Matrix<int>& rr) const {
+  void MX::get(MX& m, bool ind1, const Matrix<int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense()) {
       return getNZ(m, ind1, rr);
@@ -186,9 +186,9 @@ namespace casadi {
     m = (*this)->getGetNonzeros(sp, mapping);
   }
 
-  void MX::getSub(MX& m, bool ind1, const Sparsity& sp) const {
+  void MX::get(MX& m, bool ind1, const Sparsity& sp) const {
     casadi_assert_message(shape()==sp.shape(),
-                          "getSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          "get(Sparsity sp): shape mismatch. This matrix has shape "
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
     m = setSparse(sp);

@@ -783,7 +783,7 @@ namespace casadi {
       gradF_.evaluate();
 
       // Get the result
-      gradF_.output().getSub(grad_f);
+      gradF_.output().get(grad_f);
 
       // Printing
       if (monitored("eval_grad_f")) {

@@ -989,7 +989,7 @@ namespace casadi {
       nlp_.evaluate();
 
       // Ge the result
-      nlp_.output(NL_G).getSub(g);
+      nlp_.output(NL_G).get(g);
 
       // Printing
       if (monitored("eval_g")) {
@@ -1019,8 +1019,8 @@ namespace casadi {
       jacG.evaluate();
 
       // Get the output
-      jacG.output(1+NL_G).getSub(g);
-      jacG.output().getSub(J);
+      jacG.output(1+NL_G).get(g);
+      jacG.output().get(J);
 
       if (monitored("eval_jac_g")) {
         cout << "x = " << x << endl;
@@ -1048,8 +1048,8 @@ namespace casadi {
       gradF.evaluate();
 
       // Get the result
-      gradF.output().getSub(grad_f);
-      gradF.output(1+NL_X).getSub(f);
+      gradF.output().get(grad_f);
+      gradF.output(1+NL_X).get(f);
 
       // Printing
       if (monitored("eval_f")) {
