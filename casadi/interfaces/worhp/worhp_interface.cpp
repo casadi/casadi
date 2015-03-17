@@ -503,7 +503,7 @@ namespace casadi {
       casadi_assert(lbg.nnz()==worhp_o_.m);
       lbg.getNZ(worhp_o_.GL);
       casadi_assert(ubg.nnz()==worhp_o_.m);
-      ubg.getNNZ(worhp_o_.GU);
+      ubg.getNZ(worhp_o_.GU);
     }
 
     // Replace infinite bounds with worhp_p_.Infty
