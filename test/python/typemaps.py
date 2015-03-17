@@ -425,10 +425,19 @@ class typemaptests(casadiTestCase):
       "list" : goallist,
       "tuple" : tuple(goallist),
       "array1ddouble" : array(goallist,dtype=double),
-      "array2ddouble" : array([goallist],dtype=double).T,
       "array1dint" : array(goallist),
-      "array2dint" : array([goallist]).T,
       "mixed" : [1,DMatrix(2),array(3)]
+    }
+    w=DMatrix(goal)
+    self.checkarray(w,goal,"Constructor")
+    
+    for name, value in test.items():
+      w.setNZ(value)
+      self.checkarray(w,goal,"name")
+
+    test={
+      "array2ddouble" : array([goallist],dtype=double).T,
+      "array2dint" : array([goallist]).T,
     }
     w=DMatrix(goal)
     self.checkarray(w,goal,"Constructor")

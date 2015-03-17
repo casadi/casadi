@@ -800,10 +800,10 @@ namespace casadi {
 
     // Save results to outputs
     output(NLP_SOLVER_F).setSub(f_);
-    output(NLP_SOLVER_X).set(x_opt_);
-    output(NLP_SOLVER_LAM_G).set(g_lam_);
-    output(NLP_SOLVER_LAM_X).set(x_lam_);
-    output(NLP_SOLVER_G).set(g_);
+    output(NLP_SOLVER_X).setNZ(x_opt_);
+    output(NLP_SOLVER_LAM_G).setNZ(g_lam_);
+    output(NLP_SOLVER_LAM_X).setNZ(x_lam_);
+    output(NLP_SOLVER_G).setNZ(g_);
 
     // Write timers
     if (print_time_) {

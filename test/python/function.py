@@ -917,7 +917,7 @@ class Functiontests(casadiTestCase):
             bz1 += bz2*cos(z1)
             bx0+= bz1;bz0+= bz1
             by+= 3*bz0
-            x_bar.set([bx0,bx1])
+            x_bar.setSub([bx0,bx1])
             y_bar.setSub(by)
 
       Fun = PyFunction(Fun(),[Sparsity.dense(2,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
@@ -971,27 +971,27 @@ class Functiontests(casadiTestCase):
          def evaluate(self,(X,),(Y,)):
             x = X[0]
             y = X[1]
-            Y.set([x**2+y,x*y])
+            Y.setSub([x**2+y,x*y])
           
          def fwd(self,(X,),(Y,),seeds,sens):
             assert(max_fwd)
             x = X[0]
             y = X[1]
-            Y.set([x**2+y,x*y])
+            Y.setSub([x**2+y,x*y])
             for ((Xdot,),(Zdot,)) in zip(seeds,sens):
               xdot = Xdot[0]
               ydot = Xdot[1]
-              Zdot.set([2*x*xdot+ydot,y*xdot+x*ydot])
+              Zdot.setSub([2*x*xdot+ydot,y*xdot+x*ydot])
             
          def adj(self,(X,),(Y,),seeds,sens):
             assert(max_adj)
             x = X[0]
             y = X[1]
-            Y.set([x**2+y,x*y])
+            Y.setSub([x**2+y,x*y])
             for ((Y_bar,),(X_bar,)) in zip(seeds,sens):
               xb = Y_bar[0]
               yb = Y_bar[1]
-              X_bar.set([2*x*xb+y*yb,xb+x*yb])
+              X_bar.setSub([2*x*xb+y*yb,xb+x*yb])
           
       c = PyFunction(Squares(),[Sparsity.dense(2,1)], [Sparsity.dense(2,1)])
       if max_adj and not max_fwd:

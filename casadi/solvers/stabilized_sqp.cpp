@@ -406,10 +406,10 @@ namespace casadi {
       // Call callback function if present
       if (!callback_.isNull()) {
         if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).setSub(fk_);
-        if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).set(x_);
-        if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).set(mu_);
-        if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
-        if (!output(NLP_SOLVER_G).isEmpty()) output(NLP_SOLVER_G).set(gk_);
+        if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).setNZ(x_);
+        if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).setNZ(mu_);
+        if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
+        if (!output(NLP_SOLVER_G).isEmpty()) output(NLP_SOLVER_G).setNZ(gk_);
         int ret = callback_(ref_, user_data_);
 
         if (!ret) {
@@ -812,10 +812,10 @@ namespace casadi {
 
     // Save results to outputs
     output(NLP_SOLVER_F).setSub(fk_);
-    output(NLP_SOLVER_X).set(x_);
-    output(NLP_SOLVER_LAM_G).set(mu_);
-    output(NLP_SOLVER_LAM_X).set(mu_x_);
-    output(NLP_SOLVER_G).set(gk_);
+    output(NLP_SOLVER_X).setNZ(x_);
+    output(NLP_SOLVER_LAM_G).setNZ(mu_);
+    output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
+    output(NLP_SOLVER_G).setNZ(gk_);
 
     // Save statistics
     stats_["iter_count"] = iter;

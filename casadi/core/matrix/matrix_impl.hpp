@@ -1004,16 +1004,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::set(const std::vector<DataType>& val) {
-    setArray(val.empty() ? 0 : &val.front(), val.size());
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::get(std::vector<DataType>& val) const {
-    getArray(val.empty() ? 0 : &val.front(), val.size());
-  }
-
-  template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& val) {
     sparsity().set(getPtr(data()), getPtr(val.data()), val.sparsity());
   }

@@ -678,12 +678,6 @@ namespace casadi {
     Sparsity getSparsity() const { return sparsity();}
 
     /// \cond INTERNAL
-    /** \brief  Set the non-zero elements, vector */
-    void set(const std::vector<DataType>& val);
-
-    /** \brief  Get the non-zero elements, vector */
-    void get(std::vector<DataType>& val) const;
-
 #ifdef SWIG
     %rename(get) getStridedArray;
     %rename(set) setArray;
