@@ -103,13 +103,13 @@ class typemaptests(casadiTestCase):
     if scipy_available:
       c=dm.toCsc_matrix()
     z=n.zeros((3,4))
-    dm.get(z)
+    dm.getSub(z)
     self.checkarray(z,dm,"get(2Dndarray)")
     z=n.matrix(n.zeros((3,4)))
-    dm.get(z)
+    dm.getSub(z)
     self.checkarray(z,dm,"get(2Dmatrix)")
     z=n.zeros((12,5))
-    self.assertRaises(TypeError,lambda : dm.get(z),"get(wrong size ndarray)")
+    self.assertRaises(TypeError,lambda : dm.getSub(z),"get(wrong size ndarray)")
     z=ones((3,4))
     dm.setSub(z)
     self.checkarray(dm.toArray() > 0,dm,"set(2Dndarray)")
@@ -123,21 +123,21 @@ class typemaptests(casadiTestCase):
       self.checkarray(c,dm,"set(csr_matrix)")
     
       z=n.zeros(3)
-      dm.get(z)
+      dm.getNZ(z)
       self.checkarray(n.matrix(z),n.matrix(data),"get(1Dndarray)")
       dm.setNZ(z)
 
       self.checkarray(c,dm,"set(1Dndarray)")
 
       dm = dm * 2
-      dm.get(c)
+      dm.getSub(c)
 
       self.checkarray(c,dm,"get(csr_matrix)")
       
       with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         c[0,0]=1
-      self.assertRaises(TypeError,lambda :  dm.get(c))
+      self.assertRaises(TypeError,lambda :  dm.getSub(c))
 
   def test_conversion(self):
     self.message("DMatrix conversions")
@@ -608,7 +608,7 @@ class typemaptests(casadiTestCase):
     B = matrix([[4.0,5],[6,7]])
     
     w.setSub(A)
-    w.get(B.T)
+    w.getSub(B.T)
     
     self.checkarray(B.T,A,"get")
     
@@ -622,7 +622,7 @@ class typemaptests(casadiTestCase):
     
     w.setSub(A[0,:])
     self.checkarray(w,A[0,:],"set")
-    w.get(B[0,:])
+    w.getSub(B[0,:])
     self.checkarray(B[0,:],A[0,:],"get")
     
     w = DMatrix([[0],[0]])
@@ -630,13 +630,13 @@ class typemaptests(casadiTestCase):
 
     w.setSub(A[:,0])
     self.checkarray(w,A[:,0],"set")
-    w.get(B[:,0])
+    w.getSub(B[:,0])
     self.checkarray(B[:,0],A[:,0],"get")
     
     w = DMatrix([[1,2],[3,4]])
     A = zeros((8,7))
     B = zeros((8,7))
-    w.get(A[2:7:3,:7:4])
+    w.getSub(A[2:7:3,:7:4])
     B[2:7:3,:7:4] = w
     self.checkarray(A,B,"get")
     

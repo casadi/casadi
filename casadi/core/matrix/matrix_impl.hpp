@@ -1055,8 +1055,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::get(double* val, int len, int stride1, int stride2,
-                             SparsityType sp) const {
+  void Matrix<DataType>::getSub(double* val, int len, int stride1, int stride2,
+                                SparsityType sp) const {
     if (stride1==0 || stride2==0 || (sp==SP_DENSE && stride2==1 && stride1==size1())) {
       // Get references to data for quick access
       std::vector<double> data = this->nonzeros();
@@ -1150,7 +1150,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::get(double* val, int len, int stride1, int stride2) const {
+  void Matrix<DataType>::getNZ(double* val, int len, int stride1, int stride2) const {
     if (stride1==0 || stride2==0) {
       // Get references to data for quick access
       std::vector<double> data = this->nonzeros();

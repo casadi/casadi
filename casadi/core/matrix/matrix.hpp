@@ -679,8 +679,8 @@ namespace casadi {
 
     /// \cond INTERNAL
     /** \brief  Get the non-zero elements, strided array */
-    void get(double* val, int len, int stride1, int stride2, SparsityType sp) const;
-    void get(double* val, int len, int stride1, int stride2) const;
+    void getSub(double* val, int len, int stride1, int stride2, SparsityType sp) const;
+    void getNZ(double* val, int len, int stride1, int stride2) const;
 
 #ifndef SWIG
     /** Bitwise set, reinterpreting the data as a bvec_t array */

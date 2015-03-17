@@ -235,7 +235,7 @@ PyObject* arrayView() {
       return self.arrayView()
     else:
       r = n.zeros((self.size1(),self.size2()))
-      self.get(r)
+      self.getSub(r)
       return r
 %}
 
