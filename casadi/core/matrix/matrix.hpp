@@ -704,15 +704,14 @@ namespace casadi {
     /** \brief Bitwise or the non-zero elements, array */
     void borArrayBV(const bvec_t* val, int len);
 
-#endif
-/// \endcond
-
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation
         kl:    The number of subdiagonals in res
         ku:    The number of superdiagonals in res
         ldres: The leading dimension in res
         res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, DataType *res) const;
+#endif
+/// \endcond
 
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
