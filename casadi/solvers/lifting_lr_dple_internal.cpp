@@ -46,7 +46,7 @@ namespace casadi {
     plugin->creator = LiftingLrDpleInternal::creator;
     plugin->name = "lifting";
     plugin->doc = LiftingLrDpleInternal::meta_doc.c_str();
-    plugin->version = 22;
+    plugin->version = 23;
     plugin->adaptorHasPlugin = LrDleSolver::hasPlugin;
     return 0;
   }

@@ -39,7 +39,7 @@ namespace casadi {
     plugin->creator = KnitroInterface::creator;
     plugin->name = "knitro";
     plugin->doc = KnitroInterface::meta_doc.c_str();
-    plugin->version = 22;
+    plugin->version = 23;
     return 0;
   }
 

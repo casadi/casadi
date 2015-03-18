@@ -46,7 +46,7 @@ namespace casadi {
     plugin->creator = FixedSmithDleInternal::creator;
     plugin->name = "fixed_smith";
     plugin->doc = FixedSmithDleInternal::meta_doc.c_str();
-    plugin->version = 22;
+    plugin->version = 23;
     return 0;
   }
 

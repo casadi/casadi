@@ -46,7 +46,7 @@ namespace casadi {
     plugin->creator = LiftingIndefDpleInternal::creator;
     plugin->name = "lifting";
     plugin->doc = LiftingIndefDpleInternal::meta_doc.c_str();
-    plugin->version = 22;
+    plugin->version = 23;
     plugin->adaptorHasPlugin = DleSolver::hasPlugin;
     return 0;
   }

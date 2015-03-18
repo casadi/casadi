@@ -46,7 +46,7 @@ namespace casadi {
     plugin->creator = SimpleIndefCleInternal::creator;
     plugin->name = "simple";
     plugin->doc = SimpleIndefCleInternal::meta_doc.c_str();
-    plugin->version = 22;
+    plugin->version = 23;
     return 0;
   }
 

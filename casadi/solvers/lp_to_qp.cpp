@@ -37,7 +37,7 @@ namespace casadi {
     plugin->creator = LpToQp::creator;
     plugin->name = "qp";
     plugin->doc = LpToQp::meta_doc.c_str();;
-    plugin->version = 22;
+    plugin->version = 23;
     plugin->adaptorHasPlugin = QpSolver::hasPlugin;
     return 0;
   }
