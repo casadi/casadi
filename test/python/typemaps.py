@@ -117,16 +117,15 @@ class typemaptests(casadiTestCase):
     dm.set(z)
     self.checkarray(dm.toArray() > 0,dm,"set(2Dmatrix)")
     z=n.zeros((12,5))
-    self.assertRaises(TypeError,lambda : dm.set(z))
     
     if scipy_available:
       dm.set(c)
       self.checkarray(c,dm,"set(csr_matrix)")
     
       z=n.zeros(3)
-      dm.get(z)
+      dm.getNZ(z)
       self.checkarray(n.matrix(z),n.matrix(data),"get(1Dndarray)")
-      dm.set(z)
+      dm.setNZ(z)
 
       self.checkarray(c,dm,"set(1Dndarray)")
 
@@ -138,7 +137,6 @@ class typemaptests(casadiTestCase):
       with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         c[0,0]=1
-      self.assertRaises(TypeError,lambda :  dm.set(c))
       self.assertRaises(TypeError,lambda :  dm.get(c))
 
   def test_conversion(self):
@@ -146,8 +144,8 @@ class typemaptests(casadiTestCase):
     w = DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
     
-    list(w.data())
-    tuple(w.data())
+    list(w.nonzeros())
+    tuple(w.nonzeros())
     w.toArray()
     array(w)
     w.toMatrix()
@@ -425,10 +423,19 @@ class typemaptests(casadiTestCase):
       "list" : goallist,
       "tuple" : tuple(goallist),
       "array1ddouble" : array(goallist,dtype=double),
-      "array2ddouble" : array([goallist],dtype=double).T,
       "array1dint" : array(goallist),
-      "array2dint" : array([goallist]).T,
       "mixed" : [1,DMatrix(2),array(3)]
+    }
+    w=DMatrix(goal)
+    self.checkarray(w,goal,"Constructor")
+    
+    for name, value in test.items():
+      w.setNZ(value)
+      self.checkarray(w,goal,"name")
+
+    test={
+      "array2ddouble" : array([goallist],dtype=double).T,
+      "array2dint" : array([goallist]).T,
     }
     w=DMatrix(goal)
     self.checkarray(w,goal,"Constructor")
@@ -685,8 +692,8 @@ class typemaptests(casadiTestCase):
   def test_setAll_365(self):
     self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
     m = DMatrix.ones(5,5)
-    m.setAll(DMatrix(4))
-    m.setAll(IMatrix(4))
+    m.set(DMatrix(4))
+    m.set(IMatrix(4))
         
   def test_issue570(self):
     self.message("Issue #570: long int")

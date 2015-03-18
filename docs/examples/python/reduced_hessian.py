@@ -84,7 +84,7 @@ print "Minimal cost " , solver.getOutput("f")
 print "----" 
 
 print "Solution" 
-print "x = " , solver.output("x").data() 
+print "x = " , solver.output("x").nonzeros() 
 print "----" 
 
 # Obtain the reduced Hessian

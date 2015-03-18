@@ -45,42 +45,43 @@ namespace casadi {
     J j_;
   public:
     /// Constructor
-    SubMatrix(M& mat, const I& i, const J& j)
-      : M(mat.getSub(false, i, j)), mat_(mat), i_(i), j_(j) {}
+    SubMatrix(M& mat, const I& i, const J& j) : mat_(mat), i_(i), j_(j) {
+      mat.get(*this, false, i, j);
+    }
 
     ///@{
     /// Methods that modify a part of the parent object (A(i, j) = ?, A(i, j) += ?, etc.)
     inline const M& operator=(const SubMatrix<M, I, J> &y) {
-      mat_.setSub(y, false, i_, j_);
+      mat_.set(y, false, i_, j_);
       return y;
     }
 
     inline const M& operator=(const M &y) {
-      mat_.setSub(y, false, i_, j_);
+      mat_.set(y, false, i_, j_);
       return y;
     }
 
     inline M operator+=(const M &y) {
       M s = *this+y;
-      mat_.setSub(s, false, i_, j_);
+      mat_.set(s, false, i_, j_);
       return s;
     }
 
     inline M operator-=(const M &y) {
       M s = *this-y;
-      mat_.setSub(s, false, i_, j_);
+      mat_.set(s, false, i_, j_);
       return s;
     }
 
     inline M operator*=(const M &y) {
       M s = *this*y;
-      mat_.setSub(s, false, i_, j_);
+      mat_.set(s, false, i_, j_);
       return s;
     }
 
     inline M operator/=(const M &y) {
       M s = *this/y;
-      mat_.setSub(s, false, i_, j_);
+      mat_.set(s, false, i_, j_);
       return s;
     }
     ///@}
@@ -101,42 +102,43 @@ namespace casadi {
     I i_;
   public:
     /// Constructor
-    SubIndex(M& mat, const I& i)
-      : M(mat.getSub(false, i)), mat_(mat), i_(i) {}
+    SubIndex(M& mat, const I& i) : mat_(mat), i_(i) {
+      mat.get(*this, false, i);
+    }
 
     ///@{
     /// Methods that modify a part of the parent object (A(i) = ?, A(i) += ?, etc.)
     inline const M& operator=(const SubIndex<M, I> &y) {
-      mat_.setSub(y, false, i_);
+      mat_.set(y, false, i_);
       return y;
     }
 
     inline const M& operator=(const M &y) {
-      mat_.setSub(y, false, i_);
+      mat_.set(y, false, i_);
       return y;
     }
 
     inline M operator+=(const M &y) {
       M s = *this+y;
-      mat_.setSub(s, false, i_);
+      mat_.set(s, false, i_);
       return s;
     }
 
     inline M operator-=(const M &y) {
       M s = *this-y;
-      mat_.setSub(s, false, i_);
+      mat_.set(s, false, i_);
       return s;
     }
 
     inline M operator*=(const M &y) {
       M s = *this*y;
-      mat_.setSub(s, false, i_);
+      mat_.set(s, false, i_);
       return s;
     }
 
     inline M operator/=(const M &y) {
       M s = *this/y;
-      mat_.setSub(s, false, i_);
+      mat_.set(s, false, i_);
       return s;
     }
     ///@}

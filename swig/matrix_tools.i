@@ -134,10 +134,6 @@ GENERIC_MATRIX_DECL(MatType)
 %define GENERIC_MATRIX_TOOLS_TEMPLATES_MATRIX(DataType...)
 GENERIC_MATRIX_TOOLS_TEMPLATES(casadi::Matrix<DataType>)
 MATRIX_DECL(casadi::Matrix<DataType>)
-void addMultiple(const casadi::Matrix<DataType>& A,
-                 const std::vector<DataType>& v,
-                 std::vector<DataType>& res,
-                 bool trans_A=false);
 %enddef
 
 #ifndef SWIGMATLAB

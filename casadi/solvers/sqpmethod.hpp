@@ -182,9 +182,6 @@ namespace casadi {
                                const std::vector<double>& g, const std::vector<double>& lbg,
                                const std::vector<double>& ubg);
 
-    /// Calculates <tt>inner_prod(x, mul(A, x))</tt>
-    static double quad_form(const std::vector<double>& x, const DMatrix& A);
-
     // Accumulated time since last reset:
     double t_eval_f_; // time spent in eval_f
     double t_eval_grad_f_; // time spent in eval_grad_f

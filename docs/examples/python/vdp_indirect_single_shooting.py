@@ -125,7 +125,7 @@ solver.init()
 solver.evaluate()
 
 # Retrieve the optimal solution
-l_init_opt = NP.array(solver.output().data())
+l_init_opt = NP.array(solver.output().nonzeros())
 
 # Time grid for visualization
 tgrid = NP.linspace(0,10,100)

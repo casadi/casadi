@@ -115,7 +115,7 @@
 %exception  casadi::CallFunction::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CallFunction::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::CallFunction::eval(const cpv_MX &arg, const pv_MX &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CallFunction::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
@@ -763,7 +763,7 @@
 %exception  casadi::FunctionInternal::generateDeclarations(std::ostream &stream, const std::string &type, CodeGenerator &gen) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::generateFunction(std::ostream &stream, const std::string &fname, const std::string &input_type, const std::string &output_type, const std::string &type, CodeGenerator &gen) const  {
+%exception  casadi::FunctionInternal::generateFunction(std::ostream &stream, const std::string &fname, const std::string &type, CodeGenerator &gen) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::generateIO(CodeGenerator &gen) {
@@ -878,6 +878,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::monitored(const std::string &mod) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::nTmp(size_t &ni, size_t &nr) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::outputNoCheck(int oind=0) const  {
@@ -1816,6 +1819,12 @@
 %exception  casadi::MX::setTemp(int t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::sparsity() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::sparsityRef() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MXFunction::algorithm() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1856,6 +1865,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getAssertion(const MX &y, const std::string &fail_message="") const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXNode::getAssign(const MX &y, const Slice &i, const Slice &j) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getBinary(int op, const MX &y, bool scX, bool scY) const  {
@@ -1927,6 +1939,9 @@
 %exception  casadi::MXNode::getOutput(int oind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MXNode::getRef(const Slice &i, const Slice &j) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MXNode::getReshape(const Sparsity &sp) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1937,12 +1952,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getSolve(const MX &r, bool tr, const LinearSolver &linear_solver) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXNode::getSubAssign(const MX &y, const Slice &i, const Slice &j) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::MXNode::getSubRef(const Slice &i, const Slice &j) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getTranspose() const  {
@@ -2095,13 +2104,34 @@
 %exception  casadi::Matrix< DataType >::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::get(DataType &val, SparsityType sp=SP_SPARSE) const  {
+%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &output_m, bool ind1, const Matrix< int > &rr) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &val, SparsityType sp=SP_SPARSE) const  {
+%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &output_m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::get(std::vector< DataType > &val, SparsityType sp=SP_SPARSE) const  {
+%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &output_m, bool ind1, const Matrix< int > &rr, const Slice &cc) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &output_m, bool ind1, const Slice &rr) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &output_m, bool ind1, const Slice &rr, const Matrix< int > &cc) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &output_m, bool ind1, const Slice &rr, const Slice &cc) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &output_m, bool ind1, const Sparsity &sp) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::get(Matrix< DataType > &val) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::get(double &val) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::get(std::vector< double > &val, bool tr=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::getDep(int ch=0) const  {
@@ -2110,10 +2140,19 @@
 %exception  casadi::Matrix< DataType >::getElementHash() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getNZ(bool ind1, const Matrix< int > &k) const  {
+%exception  casadi::Matrix< DataType >::getIntValue() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getNZ(bool ind1, const Slice &k) const  {
+%exception  casadi::Matrix< DataType >::getNZ(Matrix< DataType > &output_m, bool ind1, const Matrix< int > &k) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::getNZ(Matrix< DataType > &output_m, bool ind1, const Slice &k) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::getNZ(double &val) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::getNZ(std::vector< double > &val) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::getName() const  {
@@ -2122,28 +2161,13 @@
 %exception  casadi::Matrix< DataType >::getNdeps() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Matrix< int > &rr) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Matrix< int > &rr, const Slice &cc) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Slice &rr) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Slice &rr, const Matrix< int > &cc) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Slice &rr, const Slice &cc) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::getSub(bool ind1, const Sparsity &sp) const  {
+%exception  casadi::Matrix< DataType >::getSym(std::vector< double > &val) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::getValue() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::getValue(int k) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::hasNonStructuralZeros() const  {
@@ -2218,6 +2242,12 @@
 %exception  casadi::Matrix< DataType >::nan(int nrow=1, int ncol=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< DataType >::nonzeros() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::nonzeros_int() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< DataType >::print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2257,13 +2287,34 @@
 %exception  casadi::Matrix< DataType >::scalar_matrix(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::set(DataType val, SparsityType sp=SP_SPARSE) {
+%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &m, bool ind1, const Matrix< int > &rr) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &val, SparsityType sp=SP_SPARSE) {
+%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::set(const std::vector< DataType > &val, SparsityType sp=SP_SPARSE) {
+%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &m, bool ind1, const Matrix< int > &rr, const Slice &cc) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &m, bool ind1, const Slice &rr) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &m, bool ind1, const Slice &rr, const Matrix< int > &cc) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &m, bool ind1, const Slice &rr, const Slice &cc) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &m, bool ind1, const Sparsity &sp) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::set(const Matrix< DataType > &val) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::set(const std::vector< double > &val, bool tr=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::set(double val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::setAll(const DataType &val) {
@@ -2278,28 +2329,22 @@
 %exception  casadi::Matrix< DataType >::setNZ(const Matrix< DataType > &m, bool ind1, const Slice &k) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< DataType >::setNZ(const std::vector< double > &val) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::setNZ(double val) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< DataType >::setSparse(const Sparsity &sp, bool intersect=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, bool ind1, const Matrix< int > &rr) {
+%exception  casadi::Matrix< DataType >::setSym(const std::vector< double > &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) {
+%exception  casadi::Matrix< DataType >::setValue(double m) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, bool ind1, const Matrix< int > &rr, const Slice &cc) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, bool ind1, const Slice &rr) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, bool ind1, const Slice &rr, const Matrix< int > &cc) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, bool ind1, const Slice &rr, const Slice &cc) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::setSub(const Matrix< DataType > &m, bool ind1, const Sparsity &sp) {
+%exception  casadi::Matrix< DataType >::setValue(double m, int k) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::setZero() {
@@ -2317,13 +2362,13 @@
 %exception  casadi::Matrix< DataType >::toSlice(bool ind1=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const std::vector< DataType > &d) {
+%exception  casadi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const Matrix< DataType > &d) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const std::vector< DataType > &d, const std::pair< int, int > &rc) {
+%exception  casadi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const Matrix< DataType > &d, const std::pair< int, int > &rc) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const std::vector< DataType > &d, int nrow, int ncol) {
+%exception  casadi::Matrix< DataType >::triplet(const std::vector< int > &row, const std::vector< int > &col, const Matrix< DataType > &d, int nrow, int ncol) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::unary(int op, const Matrix< DataType > &x) {
@@ -2336,9 +2381,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::zz_acosh() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Matrix< DataType >::zz_addMultiple(const std::vector< DataType > &v, std::vector< DataType > &res, bool trans_A=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::zz_adj() const  {
@@ -2584,6 +2626,9 @@
 %exception  casadi::Matrix< DataType >::zz_qr(Matrix< DataType > &Q, Matrix< DataType > &R) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< DataType >::zz_quad_form(const Matrix< DataType > &A) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< DataType >::zz_ramp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2707,6 +2752,9 @@
 %exception  casadi::Matrix< T >::getBV(Matrix< DataType > &val) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< T >::getElement(int rr, int cc=0) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< T >::ptr() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2723,6 +2771,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< T >::rend() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< T >::sparsity() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MinusInfSX::getValue() const  {
@@ -2852,12 +2903,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::NlpSolverInternal::spHessLag() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::NonZeroIterator< DataType >::begin() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::NonZeroIterator< DataType >::end() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Norm1::clone() const  {
@@ -5026,10 +5071,7 @@
 %exception casadi::Matrix< DataType >::Matrix(const std::vector< DataType > &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::Matrix< DataType >::Matrix(const std::vector< DataType > &x, int nrow, int ncol) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::Matrix< DataType >::Matrix(const std::vector< std::vector< DataType > > &m) {
+%exception casadi::Matrix< DataType >::Matrix(const std::vector< std::vector< double > > &m) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Matrix< DataType >::Matrix(double val) {
@@ -5066,9 +5108,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::NlpSolverOutputIOSchemeVector< M >::NlpSolverOutputIOSchemeVector(const std::vector< M > &t) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::NonZeroIterator< DataType >::NonZeroIterator(const Matrix< DataType > &m) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Norm1::Norm1(const MX &x) {

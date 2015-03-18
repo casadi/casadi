@@ -340,7 +340,7 @@ class SXtests(casadiTestCase):
     fcn.evaluate()
 
     # Get the results
-    res = tuple(fcn.output().data())
+    res = tuple(fcn.output().nonzeros())
     self.assertAlmostEqual(res[0], fun(*L)[0],10,'SXfunction evaluation wrong')
     self.assertAlmostEqual(res[1], fun(*L)[1],10,'SXfunction evaluation wrong')
     
@@ -503,12 +503,12 @@ class SXtests(casadiTestCase):
     r=w-y
     self.assertFalse(r.isSymbolic())     
     self.assertTrue(r.isZero())
-    self.assertEqual(r.getValue(),0)
-    self.assertEqual(r.getValue(),0)
+    self.assertEqual(float(r),0)
+    self.assertEqual(float(r),0)
     y = SX.sym("y",2)
     y = substitute(y+6,y,0)
-    self.assertEqual(int(y[0].getValue()),6)
-    self.assertEqual(int(y[1].getValue()),6)
+    self.assertEqual(int(y[0]),6)
+    self.assertEqual(int(y[1]),6)
    
   def test_primitivefunctions(self):
     self.message("Primitive functions")
@@ -1116,7 +1116,7 @@ class SXtests(casadiTestCase):
     
     self.assertTrue(h.output().sparsity()==H.sparsity())
     
-    self.checkarray(h.output().data(),H.data())
+    self.checkarray(h.output().nonzeros(),H.nonzeros())
 
   def test_mxnulloutput(self):
      a = SX(5,0)

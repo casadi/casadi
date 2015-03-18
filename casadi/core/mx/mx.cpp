@@ -128,54 +128,54 @@ namespace casadi {
     return (*this)->__nonzero__();
   }
 
-  const MX MX::getSub(bool ind1, const Slice& rr, const Slice& cc) const {
+  void MX::get(MX& m, bool ind1, const Slice& rr, const Slice& cc) const {
     // Fall back on (IMatrix, IMatrix)
-    return getSub(ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    return get(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
-  const MX MX::getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const {
+  void MX::get(MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) const {
     // Fall back on (IMatrix, IMatrix)
-    return getSub(ind1, rr.getAll(size1(), ind1), cc);
+    get(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
-  const MX MX::getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const {
+  void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) const {
     // Fall back on (IMatrix, IMatrix)
-    return getSub(ind1, rr, cc.getAll(size2(), ind1));
+    get(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
-  const MX MX::getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
+  void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
-      return getSub(ind1, rr.T(), cc);
+      return get(m, ind1, rr.T(), cc);
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return getSub(ind1, rr, cc.T());
+      return get(m, ind1, rr, cc.T());
     }
 
     casadi_assert_message(rr.isDense() && rr.isVector(),
-                          "Marix::getSub: First index must be a dense vector");
+                          "Marix::get: First index must be a dense vector");
     casadi_assert_message(cc.isDense() && cc.isVector(),
-                          "Marix::getSub: Second index must be a dense vector");
+                          "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
     Sparsity sp = sparsity().sub(rr.data(), cc.data(), mapping, ind1);
 
     // Create return MX
-    return (*this)->getGetNonzeros(sp, mapping);
+    m = (*this)->getGetNonzeros(sp, mapping);
   }
 
-  const MX MX::getSub(bool ind1, const Slice& rr) const {
+  void MX::get(MX& m, bool ind1, const Slice& rr) const {
     // Fall back on IMatrix
-    return getSub(ind1, rr.getAll(numel(), ind1));
+    get(m, ind1, rr.getAll(numel(), ind1));
   }
 
-  const MX MX::getSub(bool ind1, const Matrix<int>& rr) const {
+  void MX::get(MX& m, bool ind1, const Matrix<int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
     if (isDense()) {
-      return getNZ(ind1, rr);
+      return getNZ(m, ind1, rr);
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -183,58 +183,58 @@ namespace casadi {
     Sparsity sp = sparsity().sub(rr.data(), rr.sparsity(), mapping, ind1);
 
     // Create return MX
-    return (*this)->getGetNonzeros(sp, mapping);
+    m = (*this)->getGetNonzeros(sp, mapping);
   }
 
-  const MX MX::getSub(bool ind1, const Sparsity& sp) const {
+  void MX::get(MX& m, bool ind1, const Sparsity& sp) const {
     casadi_assert_message(shape()==sp.shape(),
-                          "getSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          "get(Sparsity sp): shape mismatch. This matrix has shape "
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
-    return setSparse(sp);
+    m = setSparse(sp);
   }
 
-  void MX::setSub(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {
+  void MX::set(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    set(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
-  void MX::setSub(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) {
+  void MX::set(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, ind1, rr.getAll(size1(), ind1), cc);
+    set(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
-  void MX::setSub(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) {
+  void MX::set(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) {
     // Fall back on (IMatrix, IMatrix)
-    setSub(m, ind1, rr, cc.getAll(size2(), ind1));
+    set(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
-  void MX::setSub(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) {
+  void MX::set(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) {
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
-      return setSub(m, ind1, rr.T(), cc);
+      return set(m, ind1, rr.T(), cc);
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return setSub(m, ind1, rr, cc.T());
+      return set(m, ind1, rr, cc.T());
     }
 
     // Make sure rr and cc are dense vectors
     casadi_assert_message(rr.isDense() && rr.isVector(),
-                          "MX::setSub: First index not dense vector");
+                          "MX::set: First index not dense vector");
     casadi_assert_message(cc.isDense() && cc.isVector(),
-                          "MX::setSub: Second index not dense vector");
+                          "MX::set: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
     if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
       if (m.isScalar()) {
         // m scalar means "set all"
-        return setSub(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
+        return set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
       } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return setSub(m.T(), ind1, rr, cc);
+        return set(m.T(), ind1, rr, cc);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << rr.size1() << "-by-"
@@ -247,13 +247,13 @@ namespace casadi {
 
     // Report out-of-bounds
     if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
-      casadi_error("setSub[., rr, cc] out of bounds. Your rr contains "
+      casadi_error("set[., rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
                    << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
     if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
-      casadi_error("setSub [., rr, cc] out of bounds. Your cc contains "
+      casadi_error("set [., rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
                    << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
@@ -276,15 +276,15 @@ namespace casadi {
         el.at(k) = this_i + this_j*sz1;
       }
     }
-    return setSub(m, false, el);
+    return set(m, false, el);
   }
 
-  void MX::setSub(const MX& m, bool ind1, const Slice& rr) {
+  void MX::set(const MX& m, bool ind1, const Slice& rr) {
     // Fall back on IMatrix
-    setSub(m, ind1, rr.getAll(size1(), ind1));
+    set(m, ind1, rr.getAll(size1(), ind1));
   }
 
-  void MX::setSub(const MX& m, bool ind1, const Matrix<int>& rr) {
+  void MX::set(const MX& m, bool ind1, const Matrix<int>& rr) {
     // Assert dimensions of assigning matrix
     if (rr.sparsity() != m.sparsity()) {
       if (rr.shape() == m.shape()) {
@@ -295,18 +295,18 @@ namespace casadi {
         Sparsity sp = rr.sparsity() * m.sparsity();
 
         // Project both matrices to this sparsity
-        return setSub(m.setSparse(sp), ind1, rr.setSparse(sp));
+        return set(m.setSparse(sp), ind1, rr.setSparse(sp));
       } else if (m.isScalar()) {
         // m scalar means "set all"
         if (m.isDense()) {
-          return setSub(MX(rr.sparsity(), m), ind1, rr);
+          return set(MX(rr.sparsity(), m), ind1, rr);
         } else {
-          return setSub(MX(rr.shape()), ind1, rr);
+          return set(MX(rr.shape()), ind1, rr);
         }
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return setSub(m.T(), ind1, rr);
+        return set(m.T(), ind1, rr);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << rr.shape()
@@ -322,7 +322,7 @@ namespace casadi {
 
     // Check bounds
     if (!inBounds(rr.data(), -nel+ind1, nel+ind1)) {
-      casadi_error("setSub[rr] out of bounds. Your rr contains "
+      casadi_error("set[rr] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
                    << ", which is outside the range [" << -nel+ind1 << ","<< nel+ind1 <<  ").");
@@ -357,9 +357,9 @@ namespace casadi {
     *this = simplify(m->getSetNonzeros(*this, nz));
   }
 
-  void MX::setSub(const MX& m, bool ind1, const Sparsity& sp) {
+  void MX::set(const MX& m, bool ind1, const Sparsity& sp) {
     casadi_assert_message(shape()==sp.shape(),
-                          "setSub(Sparsity sp): shape mismatch. This matrix has shape "
+                          "set(Sparsity sp): shape mismatch. This matrix has shape "
                           << shape() << ", but supplied sparsity index has shape "
                           << sp.shape() << ".");
     std::vector<int> ii = sp.find();
@@ -370,14 +370,17 @@ namespace casadi {
     }
   }
 
-  MX MX::getNZ(bool ind1, const Slice& kk) const {
+  void MX::getNZ(MX& m, bool ind1, const Slice& kk) const {
     // Fallback on IMatrix
-    return getNZ(ind1, kk.getAll(nnz(), ind1));
+    getNZ(m, ind1, kk.getAll(nnz(), ind1));
   }
 
-  MX MX::getNZ(bool ind1, const Matrix<int>& kk) const {
+  void MX::getNZ(MX& m, bool ind1, const Matrix<int>& kk) const {
     // Quick return if no entries
-    if (kk.nnz()==0) return MX::zeros(kk.sparsity());
+    if (kk.nnz()==0) {
+      m = MX::zeros(kk.sparsity());
+      return;
+    }
 
     // Check bounds
     int sz = nnz();
@@ -395,11 +398,11 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += sz;
       }
-      return getNZ(false, kk_mod); // Call recursively
+      getNZ(m, false, kk_mod); // Call recursively
     }
 
     // Return reference to the nonzeros
-    return (*this)->getGetNonzeros(kk.sparsity(), kk.data());
+    m = (*this)->getGetNonzeros(kk.sparsity(), kk.data());
   }
 
   void MX::setNZ(const MX& m, bool ind1, const Slice& kk) {
@@ -465,7 +468,9 @@ namespace casadi {
   }
 
   const MX MX::at(int k) const {
-    return getNZ(false, k);
+    MX m;
+    getNZ(m, false, k);
+    return m;
   }
 
   /// Access a non-zero element
@@ -1884,10 +1889,6 @@ namespace casadi {
     f.setOption("name", "nullspace");
     f.init();
     return f(*this).at(0);
-  }
-
-  MX MX::nonzeros() const {
-    return getNZ(false, Slice());
   }
 
 } // namespace casadi

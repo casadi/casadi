@@ -690,15 +690,12 @@ using namespace casadi;
 
 %{
 namespace std {
-void dummy(casadi::SXElement foo,
-           std::vector< std::vector<double> > foo1,
+void dummy(std::vector< std::vector<double> > foo1,
            std::vector<double> &foo2,
            std::vector<casadi::MX> &foo3,
            casadi::MX foo4,
            casadi::Matrix<double> foo5,
            casadi::Sparsity foo6,
-           std::vector<casadi::SXElement> foo7,
-           std::vector< std::vector<casadi::SXElement> > foo8,
            casadi::SX foo9,
            casadi::GenericType foo10,
            std::vector < casadi::Matrix<double> > foo11,
@@ -735,15 +732,12 @@ import _casadi
 #endif // SWIGPYTHON
 
 namespace std {
-  void dummy(casadi::SXElement foo,
-             std::vector< std::vector<double> > foo1,
+  void dummy(std::vector< std::vector<double> > foo1,
              std::vector<double> &foo2,
              std::vector<casadi::MX> &foo3,
              casadi::MX foo4,
              casadi::Matrix<double> foo5,
              casadi::Sparsity foo6,
-             std::vector<casadi::SXElement> foo7,
-             std::vector< std::vector<casadi::SXElement> > foo8,
              casadi::SX foo9,
              casadi::GenericType foo10,
              std::vector < casadi::Matrix<double> > foo11,
@@ -830,6 +824,7 @@ except:
 %rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
 %rename(row) getRow;
 %rename(colind) getColind;
+%rename(sparsity) getSparsity;
 
 #ifdef SWIGPYTHON
 %rename(__add__) zz_plus;
@@ -862,6 +857,9 @@ except:
 %rename(logic_all) zz_all;
 %rename(logic_any) zz_any;
 %rename(__pow__) zz_power;
+%rename(__float__) getValue;
+%rename(__int__) getIntValue;
+
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
@@ -944,14 +942,14 @@ class NZproxy:
     def __getitem__(self, s):
         with internalAPI():
           if isinstance(s, tuple) and len(s)==2:
-            return self.getSub(False, s[0], s[1])
-          return self.getSub(False, s)
+            return self.get(False, s[0], s[1])
+          return self.get(False, s)
 
     def __setitem__(self,s,val):
         with internalAPI():
           if isinstance(s,tuple) and len(s)==2:
-            return self.setSub(val, False, s[0], s[1])  
-          return self.setSub(val, False, s)
+            return self.set(val, False, s[0], s[1])  
+          return self.set(val, False, s)
         
     @property
     def nz(self):
@@ -1016,26 +1014,26 @@ class NZproxy:
 #ifdef SWIGMATLAB
 %define %matrix_helpers(Type)
     // Get a submatrix (index-1)
-    const Type getitem(const Slice& rr) const { return $self->getSub(true, rr);}
-    const Type getitem(const Matrix<int>& rr) const { return $self->getSub(true, rr);}
-    const Type getitem(const Sparsity& sp) const { return $self->getSub(true, sp);}
-    const Type getitem(const Slice& rr, const Slice& cc) const { return $self->getSub(true, rr, cc);}
-    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { return $self->getSub(true, rr, cc);}
-    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { return $self->getSub(true, rr, cc);}
-    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { return $self->getSub(true, rr, cc);}
+    const Type getitem(const Slice& rr) const { Type m; $self->get(m, true, rr); return m;}
+    const Type getitem(const Matrix<int>& rr) const { Type m; $self->get(m, true, rr); return m;}
+    const Type getitem(const Sparsity& sp) const { Type m; $self->get(m, true, sp); return m;}
+    const Type getitem(const Slice& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type getitem(const Slice& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type getitem(const Matrix<int>& rr, const Slice& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
+    const Type getitem(const Matrix<int>& rr, const Matrix<int>& cc) const { Type m; $self->get(m, true, rr, cc); return m;}
 
     // Set a submatrix (index-1)
-    void setitem(const Type& m, const Slice& rr) { $self->setSub(m, true, rr);}
-    void setitem(const Type& m, const Matrix<int>& rr) { $self->setSub(m, true, rr);}
-    void setitem(const Type& m, const Sparsity& sp) { $self->setSub(m, true, sp);}
-    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
-    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->setSub(m, true, rr, cc);}
-    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->setSub(m, true, rr, cc);}
+    void setitem(const Type& m, const Slice& rr) { $self->set(m, true, rr);}
+    void setitem(const Type& m, const Matrix<int>& rr) { $self->set(m, true, rr);}
+    void setitem(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
+    void setitem(const Type& m, const Slice& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
+    void setitem(const Type& m, const Slice& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Slice& cc) { $self->set(m, true, rr, cc);}
+    void setitem(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
-    const Type getitemcurl(const Slice& rr) const { return $self->getNZ(true, rr);}
-    const Type getitemcurl(const Matrix<int>& rr) const { return $self->getNZ(true, rr);}
+    const Type getitemcurl(const Slice& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
+    const Type getitemcurl(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
 
     // Set nonzeros (index-1)
     void setitemcurl(const Type& m, const Slice& rr) { $self->setNZ(m, true, rr);}

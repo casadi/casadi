@@ -342,20 +342,20 @@ class Toolstests(casadiTestCase):
     
     init['X',0,-1,'p',0] = 2
     self.checkarray(init.cat[shooting.i['X',0,-1,'p',0]],DMatrix.ones(6)*2)
-    self.assertEqual(sum([i!=i for i in init.cat.data()]),1503-6)
+    self.assertEqual(sum([i!=i for i in init.cat.nonzeros()]),1503-6)
     
     init['X',0,-1,'p',0] = [3]*6
     self.checkarray(init.cat[shooting.i['X',0,-1,'p',0]],DMatrix.ones(6)*3)
-    self.assertEqual(sum([i!=i for i in init.cat.data()]),1503-6)
+    self.assertEqual(sum([i!=i for i in init.cat.nonzeros()]),1503-6)
  
     init['X',0,-1,'p',0] = DMatrix([4]*6)
     self.checkarray(init.cat[shooting.i['X',0,-1,'p',0]],DMatrix.ones(6)*4)
-    self.assertEqual(sum([i!=i for i in init.cat.data()]),1503-6)
+    self.assertEqual(sum([i!=i for i in init.cat.nonzeros()]),1503-6)
     
     init['X',0,-1,'p',:] = 7
     
     self.checkarray(init.cat[shooting.i['X',0,-1,'p',1]],DMatrix.ones(6)*7)
-    self.assertEqual(sum([i!=i for i in init.cat.data()]),1503-6*9)
+    self.assertEqual(sum([i!=i for i in init.cat.nonzeros()]),1503-6*9)
     
     self.checkarray(init['X',0,-1,'p',horzcat,:],DMatrix.ones(6,9)*7)
 
@@ -659,14 +659,14 @@ class Toolstests(casadiTestCase):
     
     X_sx = struct_SX(x_sx)
     X_sx["x"] = DMatrix(range(n))
-    X_sx["S"] = DMatrix(range(n,n+n*n),n,n)
+    X_sx["S"] = c.reshape(DMatrix(range(n,n+n*n)),n,n)
    
     X_mx = struct_MX(x_sx)
     X_mx["x"] = DMatrix(range(n))
-    X_mx["S"] = DMatrix(range(n,n+n*n),n,n)
+    X_mx["S"] = c.reshape(DMatrix(range(n,n+n*n)),n,n)
     
-    self.checkarray(x_sx.struct.map[("S",)],DMatrix(range(n,n+n*n),n,n))
-    self.checkarray(x_mx.struct.map[("S",)],DMatrix(range(n,n+n*n),n,n))
+    self.checkarray(x_sx.struct.map[("S",)],c.reshape(DMatrix(range(n,n+n*n)),n,n))
+    self.checkarray(x_mx.struct.map[("S",)],c.reshape(DMatrix(range(n,n+n*n)),n,n))
     self.checkarray(X_sx.cat,DMatrix(range(n+n*n)))
     self.checkarray(X_mx.cat,DMatrix(range(n+n*n)))
     
@@ -674,9 +674,9 @@ class Toolstests(casadiTestCase):
       h = S([entry("w",struct=s)])
       hX = struct_SX(h)
       hX["w","x"] = DMatrix(range(n))
-      hX["w","S"] = DMatrix(range(n,n+n*n),n,n) 
+      hX["w","S"] = c.reshape(DMatrix(range(n,n+n*n)),n,n) 
       
-      self.checkarray(h.struct.map[("w","S",)],DMatrix(range(n,n+n*n),n,n))
+      self.checkarray(h.struct.map[("w","S",)],c.reshape(DMatrix(range(n,n+n*n)),n,n))
       self.checkarray(hX.cat,DMatrix(range(n+n*n)))
       
       self.checkarray(h.struct.map[("w",)],DMatrix(range(n+n*n)))
@@ -699,14 +699,14 @@ class Toolstests(casadiTestCase):
     
     X_sx = struct_SX(x_sx)
     X_sx["x"] = DMatrix(range(n))
-    X_sx["S"] = DMatrix(range(n,n+n*m),n,m)
+    X_sx["S"] = c.reshape(DMatrix(range(n,n+n*m)),n,m)
    
     X_mx = struct_MX(x_sx)
     X_mx["x"] = DMatrix(range(n))
-    X_mx["S"] = DMatrix(range(n,n+n*m),n,m)
+    X_mx["S"] = c.reshape(DMatrix(range(n,n+n*m)),n,m)
     
-    self.checkarray(x_sx.struct.map[("S",)],DMatrix(range(n,n+n*m),n,m))
-    self.checkarray(x_mx.struct.map[("S",)],DMatrix(range(n,n+n*m),n,m))
+    self.checkarray(x_sx.struct.map[("S",)],c.reshape(DMatrix(range(n,n+n*m)),n,m))
+    self.checkarray(x_mx.struct.map[("S",)],c.reshape(DMatrix(range(n,n+n*m)),n,m))
     self.checkarray(X_sx.cat,DMatrix(range(n+n*m)))
     self.checkarray(X_mx.cat,DMatrix(range(n+n*m)))
     

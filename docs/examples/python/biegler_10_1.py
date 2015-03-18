@@ -171,7 +171,7 @@ for N in range(1,11):
   print "optimal cost: ", float(solver.getOutput("f"))
 
   # Print the optimal solution
-  xopt = solver.output("x").data()
+  xopt = solver.output("x").nonzeros()
   print "optimal solution: ", xopt
  
   # plot to screen

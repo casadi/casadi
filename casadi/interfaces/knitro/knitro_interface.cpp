@@ -317,8 +317,8 @@ namespace casadi {
     nlp_.output(NL_G).get(output(NLP_SOLVER_G));
 
     // Copy lagrange multipliers
-    output(NLP_SOLVER_LAM_G).set(getPtr(lambda));
-    output(NLP_SOLVER_LAM_X).set(getPtr(lambda)+ng_);
+    output(NLP_SOLVER_LAM_G).setNZ(getPtr(lambda));
+    output(NLP_SOLVER_LAM_X).setNZ(getPtr(lambda)+ng_);
 
     // Free memory (move to destructor!)
     KTR_free(&kc_handle_);
@@ -361,7 +361,7 @@ namespace casadi {
 
     // Get the result
     nlp_.output(NL_F).get(obj);
-    nlp_.output(NL_G).get(c, SP_DENSE);
+    nlp_.output(NL_G).get(c);
 
     // Printing
     if (monitored("eval_f")) {
@@ -383,7 +383,7 @@ namespace casadi {
     gradF_.evaluate();
 
     // Get the result
-    gradF_.output().get(objGrad, SP_DENSE);
+    gradF_.output().get(objGrad);
 
     // Printing
     if (monitored("eval_grad_f")) {
@@ -400,7 +400,7 @@ namespace casadi {
       jacG_.evaluate();
 
       // Get the result
-      jacG_.output().get(jac);
+      jacG_.output().getNZ(jac);
 
       // Printing
       if (monitored("eval_jac_g")) {
@@ -421,7 +421,7 @@ namespace casadi {
     hessLag_.evaluate();
 
     // Get results
-    hessLag_.output().get(hessian, SP_SPARSESYM);
+    hessLag_.output().getSym(hessian);
 
     // Printing
     if (monitored("eval_h")) {

@@ -101,8 +101,8 @@ namespace casadi {
 
       // Tape
       if (nrx_>0) {
-        output(INTEGRATOR_XF).get(x_tape_.at(k_+1));
-        Z_.get(Z_tape_.at(k_));
+        output(INTEGRATOR_XF).getNZ(x_tape_.at(k_+1));
+        Z_.getNZ(Z_tape_.at(k_));
       }
 
       // Advance time
@@ -128,8 +128,8 @@ namespace casadi {
 
       // Take step
       G.input(RDAE_T).set(t_);
-      G.input(RDAE_X).set(x_tape_.at(k_));
-      G.input(RDAE_Z).set(Z_tape_.at(k_));
+      G.input(RDAE_X).setNZ(x_tape_.at(k_));
+      G.input(RDAE_Z).setNZ(Z_tape_.at(k_));
       G.input(RDAE_P).set(input(INTEGRATOR_P));
       G.input(RDAE_RX).set(output(INTEGRATOR_RXF));
       G.input(RDAE_RZ).set(RZ_);
@@ -157,7 +157,7 @@ namespace casadi {
 
     // Add the first element in the tape
     if (nrx_>0) {
-      output(INTEGRATOR_XF).get(x_tape_.at(0));
+      output(INTEGRATOR_XF).getNZ(x_tape_.at(0));
     }
   }
 

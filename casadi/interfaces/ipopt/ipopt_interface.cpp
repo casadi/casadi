@@ -596,7 +596,7 @@ namespace casadi {
         hessLag_.evaluate();
 
         // Get results
-        hessLag_.output().get(values, SP_SPARSESYM);
+        hessLag_.output().getSym(values);
 
         if (monitored("eval_h")) {
           cout << "x = " << hessLag_.input(NL_X).data() << endl;
@@ -783,7 +783,7 @@ namespace casadi {
       gradF_.evaluate();
 
       // Get the result
-      gradF_.output().getArray(grad_f, n, SP_DENSE);
+      gradF_.output().get(grad_f);
 
       // Printing
       if (monitored("eval_grad_f")) {
@@ -814,10 +814,10 @@ namespace casadi {
     try {
       casadi_assert(n == nx_);
       casadi_assert(m == ng_);
-      input(NLP_SOLVER_LBX).getArray(x_l, n);
-      input(NLP_SOLVER_UBX).getArray(x_u, n);
-      input(NLP_SOLVER_LBG).getArray(g_l, m);
-      input(NLP_SOLVER_UBG).getArray(g_u, m);
+      input(NLP_SOLVER_LBX).getNZ(x_l);
+      input(NLP_SOLVER_UBX).getNZ(x_u);
+      input(NLP_SOLVER_LBG).getNZ(g_l);
+      input(NLP_SOLVER_UBG).getNZ(g_u);
       return true;
     } catch(exception& ex) {
       cerr << "get_bounds_info failed: " << ex.what() << endl;
@@ -839,7 +839,7 @@ namespace casadi {
       }
 
       if (init_x) {
-        input(NLP_SOLVER_X0).getArray(x, n);
+        input(NLP_SOLVER_X0).getNZ(x);
       }
 
       if (init_z) {
@@ -852,7 +852,7 @@ namespace casadi {
       }
 
       if (init_lambda) {
-        input(NLP_SOLVER_LAM_G0).getArray(lambda, m);
+        input(NLP_SOLVER_LAM_G0).getNZ(lambda);
       }
 
       return true;

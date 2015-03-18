@@ -1051,11 +1051,20 @@ namespace casadi {
     // should only evaluate nodes that have not yet been calculated!
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op==OP_INPUT) {
-        // Pass the input
-        arg[it->arg.front()].get(w + workloc_[it->res.front()]);
+        // Pass an input
+        SXElement *w1 = w+workloc_[it->res.front()];
+        int i=it->arg.front();
+        int nnz=input(i).nnz();
+        //if (arg[i]==0) {
+        //fill(w, w+nnz, 0);
+        //} else {
+        std::copy(arg[i].ptr(), arg[i].ptr()+nnz, w1);
+        //}
       } else if (it->op==OP_OUTPUT) {
         // Get the outputs
-        res[it->res.front()].set(w + workloc_[it->arg.front()]);
+        SXElement *w1 = w+workloc_[it->arg.front()];
+        int i=it->res.front();
+        /*if (res[i]!=0) */ std::copy(w1, w1+output(i).nnz(), res[i].ptr());
       } else if (it->op==OP_PARAMETER) {
         continue; // FIXME
       } else {

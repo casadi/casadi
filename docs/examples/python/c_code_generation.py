@@ -38,7 +38,7 @@ else:
 x = SX.sym("x",7,7)
 f = det(x)
 x = vec(x)
-x0 = [random.rand() for xi in x.data()]
+x0 = [random.rand() for xi in range(x.nnz())]
 
 fcn = SXFunction([x],[f])
 fcn.init()
@@ -103,7 +103,7 @@ for f in f_test:
   for r in range(nrep):
     f.evaluate()
   t2 = time.time()
-  print "result = ", f.output().data()
+  print "result = ", f.output().nonzeros()
   dt = (t2-t1)/nrep
   print "time = ", dt*1e3, " ms"
   

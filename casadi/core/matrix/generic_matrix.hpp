@@ -146,6 +146,15 @@ namespace casadi {
     int colind(int col) const { return sparsity().colind(col); }
     ///@}
 
+    /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix
+        A : DenseMatrix  4 x 3
+        B : SparseMatrix 4 x 3 , 5 structural non-zeros
+
+        k = A.find()
+        A[k] will contain the elements of A that are non-zero in B
+    */
+    std::vector<int> find(bool ind1=SWIG_IND1) const { return sparsity().find(ind1);}
+
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
 
@@ -165,8 +174,14 @@ namespace casadi {
     MatType zz_triu(bool includeDiagonal=true) const {
       return self().setSparse(triu(sparsity(), includeDiagonal));
     }
-    MatType zz_quad_form(const MatType &A) const { return mul(self().T(), mul(A, self())); }
-    MatType zz_quad_form() const { return mul(self().T(), self()); }
+    MatType zz_quad_form(const MatType &A) const {
+      casadi_assert(isVector());
+      return inner_prod(self(), mul(A, self()));
+    }
+    MatType zz_quad_form() const {
+      casadi_assert(isVector());
+      return inner_prod(self(), self());
+    }
     MatType zz_sum_square() const { return sumAll(self()*self()); }
     MatType zz_linspace(const MatType &b, int nsteps) const;
     MatType zz_cross(const MatType &b, int dim=-1) const;
@@ -184,7 +199,9 @@ namespace casadi {
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
     const MatType operator[](const K& k) const {
-      return self().getNZ(false, k);
+      MatType ret;
+      self().getNZ(ret, false, k);
+      return ret;
     }
 
     /** \brief  Access vector nonzero or slice of nonzeros */
@@ -196,13 +213,18 @@ namespace casadi {
     /** \brief  Get vector element or slice */
     template<typename RR>
     const MatType operator()(const RR& rr) const {
-      return self().getSub(false, rr);
+      MatType ret;
+      self().get(ret, false, rr);
+      return ret;
     }
 
     /** \brief  Get Matrix element or slice */
     template<typename RR, typename CC>
-    const MatType operator()(const RR& rr, const CC& cc) const
-    { return self().getSub(false, rr, cc); }
+    const MatType operator()(const RR& rr, const CC& cc) const {
+      MatType ret;
+      self().get(ret, false, rr, cc);
+      return ret;
+    }
 
     /** \brief Access Matrix elements (one argument) */
     template<typename RR>

@@ -143,7 +143,7 @@ class casadiTestCase(unittest.TestCase):
       else:
         return ret
     else:
-      ret = DMatrix([valuegenerator() for i in range(n*m)],n,m)
+      ret = casadi.reshape(DMatrix([valuegenerator() for i in range(n*m)]),n,m)
       if symm:
         return (ret + ret.T)/2
       else:

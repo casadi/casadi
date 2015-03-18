@@ -333,10 +333,10 @@ namespace casadi {
         double time1 = clock();
 
         if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).set(fk_);
-        if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).set(x_);
-        if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).set(mu_);
-        if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
-        if (!output(NLP_SOLVER_G).isEmpty()) output(NLP_SOLVER_G).set(gk_);
+        if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).setNZ(x_);
+        if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).setNZ(mu_);
+        if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
+        if (!output(NLP_SOLVER_G).isEmpty()) output(NLP_SOLVER_G).setNZ(gk_);
 
         Dictionary iteration;
         iteration["iter"] = iter;
@@ -399,7 +399,7 @@ namespace casadi {
       log("QP solved");
 
       // Detecting indefiniteness
-      double gain = quad_form(dx_, Bk_);
+      double gain = casadi_quad_form(Bk_.ptr(), Bk_.sparsity(), getPtr(dx_));
       if (gain < 0) {
         casadi_warning("Indefinite Hessian detected...");
       }
@@ -565,10 +565,10 @@ namespace casadi {
 
     // Save results to outputs
     output(NLP_SOLVER_F).set(fk_);
-    output(NLP_SOLVER_X).set(x_);
-    output(NLP_SOLVER_LAM_G).set(mu_);
-    output(NLP_SOLVER_LAM_X).set(mu_x_);
-    output(NLP_SOLVER_G).set(gk_);
+    output(NLP_SOLVER_X).setNZ(x_);
+    output(NLP_SOLVER_LAM_G).setNZ(mu_);
+    output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
+    output(NLP_SOLVER_G).setNZ(gk_);
 
     if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
@@ -647,33 +647,6 @@ namespace casadi {
     stream << setw(3) << ls_trials;
     stream << (ls_success ? ' ' : 'F');
     stream << endl;
-  }
-
-  double Sqpmethod::quad_form(const std::vector<double>& x, const DMatrix& A) {
-    // Assert dimensions
-    casadi_assert(x.size()==A.size1() && x.size()==A.size2());
-
-    // Access the internal data of A
-    const int* A_colind = A.colind();
-    const int* A_row = A.row();
-    const std::vector<double> &A_data = A.data();
-
-    // Return value
-    double ret=0;
-
-    // Loop over the columns of A
-    for (int cc=0; cc<x.size(); ++cc) {
-      // Loop over the nonzeros of A
-      for (int el=A_colind[cc]; el<A_colind[cc+1]; ++el) {
-        // Get row
-        int rr = A_row[el];
-
-        // Add contribution
-        ret += x[cc]*A_data[el]*x[rr];
-      }
-    }
-
-    return ret;
   }
 
   void Sqpmethod::reset_h() {
@@ -780,7 +753,7 @@ namespace casadi {
       nlp_.evaluate();
 
       // Ge the result
-      nlp_.output(NL_G).get(g, SP_DENSE);
+      nlp_.output(NL_G).get(g);
 
       // Printing
       if (monitored("eval_g")) {
@@ -816,7 +789,7 @@ namespace casadi {
       jacG.evaluate();
 
       // Get the output
-      jacG.output(1+NL_G).get(g, SP_DENSE);
+      jacG.output(1+NL_G).get(g);
       jacG.output().get(J);
 
       if (monitored("eval_jac_g")) {
@@ -852,7 +825,7 @@ namespace casadi {
       gradF.evaluate();
 
       // Get the result
-      gradF.output().get(grad_f, SP_DENSE);
+      gradF.output().get(grad_f);
       gradF.output(1+NL_X).get(f);
 
       // Printing

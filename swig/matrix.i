@@ -36,159 +36,106 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
          2D scipy.csc_matrix
 */
 
-%typemap(in,numinputs=1) (double * val,int len,int stride1, int stride2,SparsityType sp)  {
-	PyObject* p = $input;
-	$3 = 0;
-	$4 = 0;
-	if (is_array(p)) {
-			if (!(array_is_native(p) && array_type(p)==NPY_DOUBLE))
-			  SWIG_exception_fail(SWIG_TypeError, "Array should be native & of datatype double");
+  %typemap(in,numinputs=1) (double * val,int len,int stride1, int stride2,SparsityType sp)  {
+    PyObject* p = $input;
+    $3 = 0;
+    $4 = 0;
+    if (is_array(p)) {
+      if (!(array_is_native(p) && array_type(p)==NPY_DOUBLE))
+        SWIG_exception_fail(SWIG_TypeError, "Array should be native & of datatype double");
 			  
-	    if (!(array_is_contiguous(p))) {
-	      if (PyArray_CHKFLAGS((PyArrayObject *) p,NPY_ALIGNED)) {
-	        $3 = PyArray_STRIDE((PyArrayObject *) p,0)/sizeof(double);
-	        $4 = PyArray_STRIDE((PyArrayObject *) p,1)/sizeof(double);
-	      } else {
-			   SWIG_exception_fail(SWIG_TypeError, "Array should be contiguous or aligned");
-	      }
-	    }
+      if (!(array_is_contiguous(p))) {
+        if (PyArray_CHKFLAGS((PyArrayObject *) p,NPY_ALIGNED)) {
+          $3 = PyArray_STRIDE((PyArrayObject *) p,0)/sizeof(double);
+          $4 = PyArray_STRIDE((PyArrayObject *) p,1)/sizeof(double);
+        } else {
+          SWIG_exception_fail(SWIG_TypeError, "Array should be contiguous or aligned");
+        }
+      }
 	    
-			if (array_numdims(p)==2) {
-				if (!(array_size(p,0)==arg1->size1() && array_size(p,1)==arg1->size2()) ) {
-				  std::stringstream s;
-				  s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
-				  s << "Array is not of correct shape.";
-				  s << "Expecting shape (" << arg1->size1() << "," << arg1->size2() << ")" << ", but got shape (" << array_size(p,0) << "," << array_size(p,1) <<") instead.";
-          const std::string tmp(s.str());
-          const char* cstr = tmp.c_str();
-			    SWIG_exception_fail(SWIG_TypeError,  cstr);
-			  }
-			  $5 = casadi::SP_DENSETRANS;
-			  $2 = array_size(p,0)*array_size(p,1);
-			  $1 = (double*) array_data(p);
-			} else if (array_numdims(p)==1) {
-				if (!(array_size(p,0)==arg1->nnz()) ) {
-				  std::stringstream s;
-				  s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
-				  s << "Array is not of correct size. Should match number of non-zero elements.";
-				  s << "Expecting " << array_size(p,0) << " non-zeros, but got " << arg1->nnz() <<" instead.";
-          const std::string tmp(s.str());
-          const char* cstr = tmp.c_str();
-			    SWIG_exception_fail(SWIG_TypeError,  cstr);
-			  }
-			  $5 = casadi::SP_SPARSE;
-			  $2 = array_size(p,0);
-			  $1 = (double*) array_data(p);
-			} else {
-			  SWIG_exception_fail(SWIG_TypeError, "Expecting 1D or 2D numpy.ndarray");
-			}
-	} else if (PyObjectHasClassName(p,"csc_matrix")) {
-			$5 = casadi::SP_SPARSE;
-			PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
-			if (!(array_is_contiguous(narray) && array_is_native(narray) && array_type(narray)==NPY_DOUBLE))
-			  SWIG_exception_fail(SWIG_TypeError, "csc_matrix should be contiguous, native & of datatype double");
-			$2 = array_size(narray,0);
-			if (!(array_size(narray,0)==arg1->nnz() ) ) {
-					std::stringstream s;
-				  s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
-				  s << "csc_matrix does not have correct number of non-zero elements.";
-				  s << "Expecting " << arg1->nnz() << " non-zeros, but got " << array_size(narray,0) << " instead.";
-          const std::string tmp(s.str());
-          const char* cstr = tmp.c_str();
-		      Py_DECREF(narray);
-			    SWIG_exception_fail(SWIG_TypeError,  cstr);
-			}
-			$1 = (double*) array_data(narray);
-			Py_DECREF(narray);
-	} else {
-			SWIG_exception_fail(SWIG_TypeError, "Unrecognised object");
-	}
-	
-}
-
-/**
-Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte order, datatype)  - DENSE
-         1D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte order, datatype double) - SPARSE
-         2D scipy.csc_matrix (any setting of contiguous, native byte order, datatype double) 
-*/
-%typemap(in,numinputs=1) (const double *val,int len,SparsityType sp) (PyArrayObject* array=NULL, int array_is_new_object=0)  {
-	PyObject* p = $input;
-	if (is_array(p)) {
-			array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-			if (array_numdims(array)==2) {
-				if (!(array_size(array,0)==arg1->size1() && array_size(array,1)==arg1->size2()) ) {
-				  std::stringstream s;
-				  s << "SWIG::typemap(in) (const double *val,int len,SparsityType sp) " << std::endl;
-				  s << "Array is not of correct shape.";
-				  s << "Expecting shape (" << arg1->size1() << "," << arg1->size2() << ")" << ", but got shape (" << array_size(array,0) << "," << array_size(array,1) <<") instead.";
-          const std::string tmp(s.str());
-          const char* cstr = tmp.c_str();
-			    SWIG_exception_fail(SWIG_TypeError,  cstr);
-			  }
-			  $3 = casadi::SP_DENSETRANS;
-			  $2 = array_size(array,0)*array_size(array,1);
-			  $1 = (double*) array_data(array);
-			} else if (array_numdims(array)==1) {
-				if (!(array_size(array,0)==arg1->nnz()) ) {
-				  std::stringstream s;
-				  s << "SWIG::typemap(in) (const double *val,int len,SparsityType sp) " << std::endl;
-				  s << "Array is not of correct size. Should match number of non-zero elements.";
-				  s << "Expecting " << arg1->nnz() << " non-zeros, but got " << array_size(array,0) << " instead.";
-          const std::string tmp(s.str());
-          const char* cstr = tmp.c_str();
-			    SWIG_exception_fail(SWIG_TypeError,  cstr);
-			  }
-			  $3 = casadi::SP_SPARSE;
-			  $2 = array_size(array,0);
-			  $1 = (double*) array_data(array);
-			} else {
-			  SWIG_exception_fail(SWIG_TypeError, "Expecting 1D or 2D numpy.ndarray");
-			}
-	} else if (PyObjectHasClassName(p,"csc_matrix")) {
-			$3 = casadi::SP_SPARSE;
-			PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
-			$2 = array_size(narray,0);
-			if (!(array_size(narray,0)==arg1->nnz() ) ) {
-					std::stringstream s;
-				  s << "SWIG::typemap(in) (const double *val,int len,SparsityType sp) " << std::endl;
-				  s << "csc_matrix does not have correct number of non-zero elements.";
-				  s << "Expecting " << arg1->nnz() << " non-zeros, but got " << array_size(narray,0) << " instead.";
-          const std::string tmp(s.str());
-          const char* cstr = tmp.c_str();
-          Py_DECREF(narray);
-			    SWIG_exception_fail(SWIG_TypeError,  cstr);
-			}
-			array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
-			$1 = (double*) array_data(array);
-			Py_DECREF(narray);
-	} else {
-			SWIG_exception_fail(SWIG_TypeError, "Unrecognised object");
-	}
-	
-}
-
-%typemap(freearg) (const double *val,int len,SparsityType sp) {
-    if (array_is_new_object$argnum && array$argnum) { Py_DECREF(array$argnum); }
-}
-
+      if (!(array_size(p,0)==arg1->size1() && array_size(p,1)==arg1->size2()) ) {
+        std::stringstream s;
+        s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
+        s << "Array is not of correct shape.";
+        s << "Expecting shape (" << arg1->size1() << "," << arg1->size2() << ")" << ", but got shape ("
+          << array_size(p,0) << "," << array_size(p,1) <<") instead.";
+        const std::string tmp(s.str());
+        const char* cstr = tmp.c_str();
+        SWIG_exception_fail(SWIG_TypeError,  cstr);
+      }
+      $5 = casadi::SP_DENSETRANS;
+      $2 = array_size(p,0)*array_size(p,1);
+      $1 = (double*) array_data(p);
+    } else if (PyObjectHasClassName(p,"csc_matrix")) {
+      $5 = casadi::SP_SPARSE;
+      PyObject * narray=PyObject_GetAttrString( p, "data"); // narray needs to be decref'ed
+      if (!(array_is_contiguous(narray) && array_is_native(narray) && array_type(narray)==NPY_DOUBLE))
+        SWIG_exception_fail(SWIG_TypeError, "csc_matrix should be contiguous, native & of datatype double");
+      $2 = array_size(narray,0);
+      if (!(array_size(narray,0)==arg1->nnz() ) ) {
+        std::stringstream s;
+        s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
+        s << "csc_matrix does not have correct number of non-zero elements.";
+        s << "Expecting " << arg1->nnz() << " non-zeros, but got " << array_size(narray,0) << " instead.";
+        const std::string tmp(s.str());
+        const char* cstr = tmp.c_str();
+        Py_DECREF(narray);
+        SWIG_exception_fail(SWIG_TypeError,  cstr);
+      }
+      $1 = (double*) array_data(narray);
+      Py_DECREF(narray);
+    } else {
+      SWIG_exception_fail(SWIG_TypeError, "Unrecognised object");
+    }
+  }
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) (double * val,int len,int stride1, int stride2,SparsityType sp) {
   PyObject* p = $input;
-  if (((is_array(p) && array_numdims(p) < 3)  && array_type(p)!=NPY_OBJECT)|| PyObjectHasClassName(p,"csc_matrix")) {
+  if (((is_array(p) && array_numdims(p) == 2)  && array_type(p)!=NPY_OBJECT) || PyObjectHasClassName(p,"csc_matrix")) {
     $1=1;
   } else {
     $1=0;
   }
 }
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) (const double * val,int len,SparsityType sp) {
+%typemap(in,numinputs=1) (double * val,int len,int stride1, int stride2)  {
+    PyObject* p = $input;
+    $3 = 0;
+    $4 = 0;
+    if (!(array_is_native(p) && array_type(p)==NPY_DOUBLE))
+      SWIG_exception_fail(SWIG_TypeError, "Array should be native & of datatype double");
+			  
+    if (!(array_is_contiguous(p))) {
+      if (PyArray_CHKFLAGS((PyArrayObject *) p,NPY_ALIGNED)) {
+        $3 = PyArray_STRIDE((PyArrayObject *) p,0)/sizeof(double);
+        $4 = PyArray_STRIDE((PyArrayObject *) p,1)/sizeof(double);
+      } else {
+        SWIG_exception_fail(SWIG_TypeError, "Array should be contiguous or aligned");
+      }
+    }
+	    
+    if (!(array_size(p,0)==arg1->nnz()) ) {
+      std::stringstream s;
+      s << "SWIG::typemap(in) (double *val,int len,SparsityType sp) " << std::endl;
+      s << "Array is not of correct size. Should match number of non-zero elements.";
+      s << "Expecting " << array_size(p,0) << " non-zeros, but got " << arg1->nnz() <<" instead.";
+      const std::string tmp(s.str());
+      const char* cstr = tmp.c_str();
+      SWIG_exception_fail(SWIG_TypeError,  cstr);
+    }
+    $2 = array_size(p,0);
+    $1 = (double*) array_data(p);
+  }
+
+%typemap(typecheck,precedence=SWIG_TYPECHECK_INTEGER) (double * val,int len,int stride1, int stride2) {
   PyObject* p = $input;
-  if (((is_array(p) && array_numdims(p) < 3)  && array_type(p)!=NPY_OBJECT)|| PyObjectHasClassName(p,"csc_matrix")) {
+  if ((is_array(p) && array_numdims(p) == 1) && array_type(p)!=NPY_OBJECT) {
     $1=1;
   } else {
     $1=0;
   }
 }
+
 #endif // SWIGPYTHON
 
 } // namespace casadi
@@ -235,12 +182,12 @@ namespace casadi{
       npy_intp dims[2] = {$self->size1(), $self->size2()};
       PyObject* ret = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
       double* d = static_cast<double*>(array_data(ret));
-      $self->get(d, SP_DENSETRANS); // Row-major
+      $self->get(d, true); // Row-major
       return ret;
 #elif defined(SWIGMATLAB)
       mxArray *p  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
       double* d = static_cast<double*>(mxGetData(p));
-      $self->get(d, SP_DENSE); // Column-major
+      $self->get(d); // Column-major
       return p;
 #else
       return 0;
@@ -251,7 +198,7 @@ namespace casadi{
     // Convert to a sparse matrix
     GUESTOBJECT* zz_sparse() const {
       mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
-      $self->get(static_cast<double*>(mxGetData(p)));
+      $self->getNZ(static_cast<double*>(mxGetData(p)));
       std::copy($self->colind(), $self->colind()+$self->size2()+1, mxGetJc(p));
       std::copy($self->row(), $self->row()+$self->size2()+1, mxGetIr(p));
       return p;
@@ -315,29 +262,11 @@ PyObject* arrayView() {
     with warnings.catch_warnings():
       warnings.simplefilter("ignore")
       from scipy.sparse import csc_matrix
-    return csc_matrix( (list(self.data()),self.row(),self.colind()), shape = self.shape, dtype=n.double )
+    return csc_matrix( (self.nonzeros(),self.row(),self.colind()), shape = self.shape, dtype=n.double )
 
   def tocsc(self):
     return self.toCsc_matrix()
 
-%}
-
-%pythoncode %{
-  def __float__(self):
-    if self.numel()!=1:
-      raise Exception("Only a scalar can be cast to a float")
-    if self.nnz()==0:
-      return 0.0
-    return self.toScalar()
-%}
-
-%pythoncode %{
-  def __int__(self):
-    if self.numel()!=1:
-      raise Exception("Only a scalar can be cast to an int")
-    if self.nnz()==0:
-      return 0
-    return int(self.toScalar())
 %}
 
 %pythoncode %{
@@ -346,12 +275,12 @@ PyObject* arrayView() {
       raise Exception("Only a scalar can be cast to a float")
     if self.nnz()==0:
       return 0
-    return self.toScalar()!=0
+    return float(self)!=0
 %}
 
 %pythoncode %{
   def __abs__(self):
-    return abs(self.__float__())
+    return abs(float(self))
 %}
 
 #ifdef SWIGPYTHON
@@ -370,31 +299,14 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
     def toArray(self):
       import numpy as n
       r = n.zeros((self.size1(),self.size2()))
+      d = self.nonzeros_int()
       for j in range(self.size2()):
         for k in range(self.colind(j),self.colind(j+1)):
           i = self.row(k)
-          r[i,j] = self.at(k)
+          r[i,j] = d[k]
       return r
   %}
   
-  %pythoncode %{
-    def __float__(self):
-      if self.numel()!=1:
-        raise Exception("Only a scalar can be cast to a float")
-      if self.nnz()==0:
-        return 0.0
-      return float(self.toScalar())
-  %}
-
-  %pythoncode %{
-    def __int__(self):
-      if self.numel()!=1:
-        raise Exception("Only a scalar can be cast to an int")
-      if self.nnz()==0:
-        return 0
-      return self.toScalar()
-  %}
-
 #ifdef SWIGPYTHON
   binopsrFull(casadi::Matrix<int>)
   binopsFull(const casadi::SX & b,,casadi::SX,casadi::SX)
@@ -403,7 +315,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
 #endif // SWIGPYTHON
   %pythoncode %{
     def __abs__(self):
-      return int(self.__int__())
+      return abs(int(self))
   %}
 } // extend Matrix<int>
 
@@ -419,7 +331,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
         self.__init__(sp,state["data"])
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data(),dtype=int)}
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros_int(),dtype=int)}
   %} 
 }
 
@@ -432,7 +344,7 @@ binopsFull(const casadi::MX & b,,casadi::MX,casadi::MX)
         self.__init__(sp,state["data"])
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data(),dtype=float)}
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros(),dtype=float)}
   %}
   
 }

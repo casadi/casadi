@@ -800,10 +800,10 @@ namespace casadi {
 
     // Save results to outputs
     output(NLP_SOLVER_F).set(f_);
-    output(NLP_SOLVER_X).set(x_opt_);
-    output(NLP_SOLVER_LAM_G).set(g_lam_);
-    output(NLP_SOLVER_LAM_X).set(x_lam_);
-    output(NLP_SOLVER_G).set(g_);
+    output(NLP_SOLVER_X).setNZ(x_opt_);
+    output(NLP_SOLVER_LAM_G).setNZ(g_lam_);
+    output(NLP_SOLVER_LAM_X).setNZ(x_lam_);
+    output(NLP_SOLVER_G).setNZ(g_);
 
     // Write timers
     if (print_time_) {
@@ -1134,7 +1134,7 @@ namespace casadi {
     // Make sure that we have a decent direction
     if (!gauss_newton_) {
       // Get the curvature in the step direction
-      double gain = DMatrix::quad_form(x_step_, qpH_);
+      double gain = casadi_quad_form(qpH_.ptr(), qpH_.sparsity(), getPtr(x_step_));
       if (gain < 0) {
         iteration_note_ = "Hessian indefinite in the search direction";
       }

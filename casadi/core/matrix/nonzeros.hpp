@@ -40,7 +40,7 @@ template<typename M, typename K>
 class CASADI_EXPORT NonZeros : public M {
   public:
     /// Constructor
-    NonZeros(M& mat, const K& k) : M(mat.getNZ(false, k)), mat_(mat), k_(k) {}
+    NonZeros(M& mat, const K& k) : mat_(mat), k_(k) { mat.getNZ(*this, false, k); }
 
     ///@{
     /// Methods that modify a part of the parent object (A[k] = ?, A[k] += ?, etc.)

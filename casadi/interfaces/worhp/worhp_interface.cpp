@@ -489,14 +489,21 @@ namespace casadi {
     }
 
     // Pass inputs to WORHP data structures
-    x0.getArray(worhp_o_.X, worhp_o_.n);
-    lbx.getArray(worhp_o_.XL, worhp_o_.n);
-    ubx.getArray(worhp_o_.XU, worhp_o_.n);
-    lam_x0.getArray(worhp_o_.Lambda, worhp_o_.n);
+    casadi_assert(x0.nnz()==worhp_o_.n);
+    x0.getNZ(worhp_o_.X);
+    casadi_assert(lbx.nnz()==worhp_o_.n);
+    lbx.getNZ(worhp_o_.XL);
+    casadi_assert(ubx.nnz()==worhp_o_.n);
+    ubx.getNZ(worhp_o_.XU);
+    casadi_assert(lam_x0.nnz()==worhp_o_.n);
+    lam_x0.getNZ(worhp_o_.Lambda);
     if (worhp_o_.m>0) {
-      lam_g0.getArray(worhp_o_.Mu, worhp_o_.m);
-      lbg.getArray(worhp_o_.GL, worhp_o_.m);
-      ubg.getArray(worhp_o_.GU, worhp_o_.m);
+      casadi_assert(lam_g0.nnz()==worhp_o_.m);
+      lam_g0.getNZ(worhp_o_.Mu);
+      casadi_assert(lbg.nnz()==worhp_o_.m);
+      lbg.getNZ(worhp_o_.GL);
+      casadi_assert(ubg.nnz()==worhp_o_.m);
+      ubg.getNZ(worhp_o_.GU);
     }
 
     // Replace infinite bounds with worhp_p_.Infty
@@ -532,16 +539,17 @@ namespace casadi {
           if (!callback_.isNull()) {
             double time1 = clock();
             // Copy outputs
-            if (!output(NLP_SOLVER_X).isEmpty())
-              output(NLP_SOLVER_X).setArray(worhp_o_.X, worhp_o_.n);
+            if (!output(NLP_SOLVER_X).isEmpty()) {
+              output(NLP_SOLVER_X).setNZ(worhp_o_.X);
+            }
             if (!output(NLP_SOLVER_F).isEmpty())
               output(NLP_SOLVER_F).set(worhp_o_.F);
             if (!output(NLP_SOLVER_G).isEmpty())
-              output(NLP_SOLVER_G).setArray(worhp_o_.G, worhp_o_.m);
+              output(NLP_SOLVER_G).setNZ(worhp_o_.G);
             if (!output(NLP_SOLVER_LAM_X).isEmpty())
-              output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda, worhp_o_.n);
+              output(NLP_SOLVER_LAM_X).setNZ(worhp_o_.Lambda);
             if (!output(NLP_SOLVER_LAM_G).isEmpty())
-              output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu, worhp_o_.m);
+              output(NLP_SOLVER_LAM_G).setNZ(worhp_o_.Mu);
 
             Dictionary iteration;
             iteration["iter"] = worhp_w_.MajorIter;
@@ -603,11 +611,11 @@ namespace casadi {
     t_mainloop_ += (time2-time1)/CLOCKS_PER_SEC;
 
     // Copy outputs
-    output(NLP_SOLVER_X).setArray(worhp_o_.X, worhp_o_.n, SP_DENSE);
+    output(NLP_SOLVER_X).set(worhp_o_.X);
     output(NLP_SOLVER_F).set(worhp_o_.F);
-    output(NLP_SOLVER_G).setArray(worhp_o_.G, worhp_o_.m, SP_DENSE);
-    output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda, worhp_o_.n);
-    output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu, worhp_o_.m, SP_DENSE);
+    output(NLP_SOLVER_G).set(worhp_o_.G);
+    output(NLP_SOLVER_LAM_X).setNZ(worhp_o_.Lambda);
+    output(NLP_SOLVER_LAM_G).set(worhp_o_.Mu);
 
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
 
@@ -864,7 +872,7 @@ namespace casadi {
       gradF_.evaluate();
 
       // Get the result
-      gradF_.output().get(grad_f, SP_DENSE);
+      gradF_.output().get(grad_f);
 
       // Scale
       for (int i=0; i<nx_; ++i) {

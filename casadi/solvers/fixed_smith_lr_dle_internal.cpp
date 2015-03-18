@@ -96,7 +96,8 @@ namespace casadi {
     for (int i=0;i<iter_;++i) {
       if (with_H_) {
         for (int k=0;k<Hs.size();++k) {
-          HPH[k]+= quad_form(mul(D.T(), Hs[k]), Vs);
+          MX v = mul(D.T(), Hs[k]);
+          HPH[k]+= mul(v.T(), mul(Vs, v));
         }
       } else {
         out += mul(D, mul(Vs, D.T()));

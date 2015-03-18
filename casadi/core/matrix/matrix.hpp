@@ -38,38 +38,6 @@
 
 namespace casadi {
 
-/// \cond INTERNAL
-  template<typename DataType>
-  struct NonZero {
-    int k; // Non-zero index into matrix
-    int i; // Row into matrix
-    int j; // Col into matrix
-    DataType el;  // Element
-  };
-
-
-  template<typename DataType>
-  class CASADI_EXPORT NonZeroIterator :
-        public std::iterator< std::forward_iterator_tag, NonZero<DataType> > {
-  public:
-    NonZeroIterator(const Matrix<DataType> & m);
-
-#ifndef SWIG
-    NonZeroIterator<DataType>& operator++();
-#endif // SWIG
-
-    NonZero<DataType>& operator*();
-
-    NonZeroIterator<DataType> begin();
-    NonZeroIterator<DataType> end();
-    bool operator==(const NonZeroIterator<DataType>& rhs);
-
-  private:
-    Matrix<DataType> m_;
-    NonZero<DataType> nz;
-  };
-/// \endcond
-
 /// \cond CLUTTER
   ///@{
   /** \brief Get typename */
@@ -122,9 +90,6 @@ namespace casadi {
     Matrix<DataType>& operator=(const Matrix<DataType>& m);
 #endif // SWIG
 
-    /// Dense matrix constructor with data given as vector of vectors
-    explicit Matrix(const std::vector< std::vector<DataType> >& m);
-
     /** \brief Create a sparse matrix with all structural zeros */
     Matrix(int nrow, int ncol);
 
@@ -150,15 +115,27 @@ namespace casadi {
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);
 
-    /// Construct from a vector
-    /**
-     * Thanks to implicit conversion, you can pretend that Matrix(const SXElement& x); exists.
-     * Note: above remark applies only to C++, not Python or MATLAB interfaces
-     */
-    Matrix(const std::vector<DataType>& x);
+    /// Dense matrix constructor with data given as vector of vectors
+    explicit Matrix(const std::vector< std::vector<double> >& m);
 
-    /// Construct dense matrix from a vector with the elements in column major ordering
-    Matrix(const std::vector<DataType>& x, int nrow, int ncol);
+    /** \brief Create a matrix from another matrix with a different entry type
+     *  Assumes that the scalar conversion is valid.
+     */
+    template<typename A>
+    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.nnz())) {
+      copy(x.begin(), x.end(), begin());
+    }
+
+    /** \brief  Create an expression from a vector  */
+    template<typename A>
+    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
+        data_(std::vector<DataType>(x.size())) {
+      copy(x.begin(), x.end(), begin());
+    }
+
+#ifndef SWIG
+    /// Construct from a vector
+    Matrix(const std::vector<DataType>& x);
 
     /// Convert to scalar type
     const DataType toScalar() const;
@@ -166,7 +143,6 @@ namespace casadi {
     /// Scalar type
     typedef DataType ScalarType;
 
-#ifndef SWIG
     /// Base class
     typedef GenericMatrix<Matrix<DataType> > B;
 
@@ -221,34 +197,7 @@ namespace casadi {
     reference back() { return data().back();}
     const_reference back() const { return data().back();}
     /// \endcond
-#endif // SWIG
 
-    /** \brief  Create a matrix from a matrix with a different type of matrix entries
-     * (assuming that the scalar conversion is valid) */
-    template<typename A>
-    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.nnz())) {
-      copy(x.begin(), x.end(), begin());
-    }
-
-    /** \brief  Create an expression from an stl vector  */
-    template<typename A>
-    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
-        data_(std::vector<DataType>(x.size())) {
-      copy(x.begin(), x.end(), begin());
-    }
-
-    /** \brief  Create a non-vector expression from an stl vector */
-    template<typename A>
-    Matrix(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity::dense(nrow, ncol)),
-        data_(std::vector<DataType>(x.size())) {
-      if (x.size() != nrow*ncol)
-          throw CasadiException("Matrix::Matrix(const std::vector<DataType>& x, "
-                                " int n, int m): dimension mismatch");
-      copy(x.begin(), x.end(), begin());
-    }
-
-
-#ifndef SWIG
     /// Get a non-zero element
     inline const DataType& at(int k) const {
       return const_cast<Matrix<DataType>*>(this)->at(k);
@@ -265,33 +214,16 @@ namespace casadi {
         throw CasadiException(ss.str());
       }
     }
-#else // SWIG
-    /// Access a non-zero element
-    DataType at(int k) {
-      try {
-        if (k<0) k+=nnz();
-        return data().at(k);
-      } catch(std::out_of_range& /* unnamed */) {
-        std::stringstream ss;
-        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0, " << nnz() << ")";
-        throw CasadiException(ss.str());
-      }
-    }
-#endif // SWIG
 
-#ifndef SWIG
     /// get an element
     const DataType& elem(int rr, int cc=0) const;
 
     /// get a reference to an element
     DataType& elem(int rr, int cc=0);
-#else // SWIG
-    /// Access a non-zero element
-    DataType elem(int rr, int cc=0) { return elem(rr, cc);}
-#endif // SWIG
 
     /// get an element, do not allocate
     const DataType getElement(int rr, int cc=0) const { return elem(rr, cc);}
+#endif // SWIG
 
     /// Returns true if the matrix has a non-zero at location rr, cc
     bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr, cc); }
@@ -305,48 +237,98 @@ namespace casadi {
     ///  Convert to Slice (only for IMatrix)
     Slice toSlice(bool ind1=false) const;
 
+    /** \brief Set all the entries without changing sparsity pattern */
+    void set(const Matrix<DataType>& val);
+
+    /** \brief Get all the entries without changing sparsity pattern */
+    void get(Matrix<DataType>& val) const;
+
+    ///@{
+    /** \brief Get the elements numerically */
+    void set(double val);
+    void set(const double* val, bool tr=false);
+    void set(const std::vector<double>& val, bool tr=false);
+    ///@}
+
+    ///@{
+    /** \brief Get the elements numerically */
+    void get(double& val) const;
+    void get(double* val, bool tr=false) const;
+    void get(std::vector<double>& val, bool tr=false) const;
+    ///@}
+
     ///@{
     /// Get a submatrix, single argument
-    const Matrix<DataType> getSub(bool ind1, const Slice& rr) const;
-    const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr) const;
-    const Matrix<DataType> getSub(bool ind1, const Sparsity& sp) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
     ///@}
 
     /// Get a submatrix, two arguments
     ///@{
-    const Matrix<DataType> getSub(bool ind1, const Slice& rr, const Slice& cc) const;
-    const Matrix<DataType> getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
-    const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
-    const Matrix<DataType> getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+                const Slice& rr, const Slice& cc) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+                const Slice& rr, const Matrix<int>& cc) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+                const Matrix<int>& rr, const Slice& cc) const;
+    void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1,
+                const Matrix<int>& rr, const Matrix<int>& cc) const;
     ///@}
 
     ///@{
     /// Set a submatrix, single argument
-    void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Sparsity& sp);
+    void set(const Matrix<DataType>& m, bool ind1, const Slice& rr);
+    void set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr);
+    void set(const Matrix<DataType>& m, bool ind1, const Sparsity& sp);
     ///@}
 
     ///@{
     /// Set a submatrix, two arguments
-    void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Slice& cc);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
-    void setSub(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
+    void set(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Slice& cc);
+    void set(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
+    void set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
+    void set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
     ///@}
 
     ///@{
     /// Add a submatrix to an existing matrix (TODO: remove memory allocation)
     template<typename RR, typename CC>
     void addSub(const Matrix<DataType>& m, RR rr, CC cc, bool ind1) {
-      setSub(m+sub(rr, cc, ind1), rr, cc, ind1);
+      set(m+sub(rr, cc, ind1), rr, cc, ind1);
     }
     ///@}
 
     ///@{
+    /** \brief Set the elements numerically */
+    void setNZ(double val);
+    void setNZ(const double* val);
+    void setNZ(const std::vector<double>& val);
+    ///@}
+
+    ///@{
+    /** \brief Get the elements numerically */
+    void getNZ(double& val) const;
+    void getNZ(double* val) const;
+    void getNZ(std::vector<double>& val) const;
+    ///@}
+
+    ///@{
+    /** \brief Set upper triangular elements */
+    void setSym(const double* val);
+    void setSym(const std::vector<double>& val);
+    ///@}
+
+    ///@{
+    /** \brief Get upper triangular elements */
+    void getSym(double* val) const;
+    void getSym(std::vector<double>& val) const;
+    ///@}
+
+    ///@{
     /// Get a set of nonzeros
-    const Matrix<DataType> getNZ(bool ind1, const Slice& k) const;
-    const Matrix<DataType> getNZ(bool ind1, const Matrix<int>& k) const;
+    void getNZ(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Slice& k) const;
+    void getNZ(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& k) const;
     ///@}
 
     ///@{
@@ -364,14 +346,18 @@ namespace casadi {
     /// Set all elements to zero
     void setZero();
 
+#ifndef SWIG
     /// Set all elements to a value
     void setAll(const DataType& val);
+#endif // SWIG
 
     /** \brief Set sparse */
     Matrix<DataType> setSparse(const Sparsity& sp, bool intersect=false) const;
 
+#ifndef SWIG
     /// Make the matrix dense
     void makeDense(const DataType& val = 0);
+#endif // SWIG
 
     /** \brief  Make a matrix sparse by removing numerical zeros smaller
      * in absolute value than a specified tolerance */
@@ -465,10 +451,9 @@ namespace casadi {
     Matrix<DataType> zz_poly_roots() const;
     Matrix<DataType> zz_eig_symbolic() const;
     Matrix<DataType> zz_sparsify(double tol=0) const;
+    Matrix<DataType> zz_quad_form() const { return B::zz_quad_form();}
+    Matrix<DataType> zz_quad_form(const Matrix<DataType>& A) const;
     ///@}
-
-    /// Calculates inner_prod(x, mul(A, x)) without memory allocation
-    static DataType quad_form(const std::vector<DataType>& x, const Matrix<DataType>& A);
     /// \endcond
 
     /// Transpose the matrix
@@ -549,8 +534,6 @@ namespace casadi {
     static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);
     Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;
     Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
-    void zz_addMultiple(const std::vector<DataType>& v,
-                        std::vector<DataType>& res, bool trans_A=false) const;
     Matrix<DataType> zz_project(const Sparsity& sparsity) const;
     Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
     ///@}
@@ -600,14 +583,6 @@ namespace casadi {
     inline friend Matrix<DataType>
       norm_inf_mul(const Matrix<DataType> &x, const Matrix<DataType> &y) {
       return x.zz_norm_inf_mul(y);
-    }
-
-    /// same as: res += mul(A, v)
-    inline friend void addMultiple(const Matrix<DataType>& A,
-                                   const std::vector<DataType>& v,
-                                   std::vector<DataType>& res,
-                                   bool trans_A=false) {
-      return A.zz_addMultiple(v, res, trans_A);
     }
 
     /** \brief  Make a matrix sparse by removing numerical zeros*/
@@ -675,13 +650,13 @@ namespace casadi {
     void enlarge(int nrow, int ncol,
                  const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
+#ifndef SWIG
     /// Access the non-zero elements
     std::vector<DataType>& data();
 
     /// Const access the non-zero elements
     const std::vector<DataType>& data() const;
 
-#ifndef SWIG
     /// \cond INTERNAL
     /// Get a pointer to the data
     DataType* ptr() { return isEmpty() ? static_cast<DataType*>(0) : &front();}
@@ -691,64 +666,23 @@ namespace casadi {
     const DataType* ptr() const { return isEmpty() ? static_cast<const DataType*>(0) : &front();}
     friend inline const DataType* getPtr(const Matrix<DataType>& v) { return v.ptr();}
     /// \endcond
-#endif // SWIG
-
-    /// Get the non-zero elements
-    Matrix<DataType> nonzeros() const { return data();}
 
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const { return sparsity_; }
 
     /// Access the sparsity, make a copy if there are multiple references to it
     Sparsity& sparsityRef();
+#endif // SWIG
+
+    /** \brief Get an owning reference to the sparsity pattern */
+    Sparsity getSparsity() const { return sparsity();}
 
     /// \cond INTERNAL
-    /** \brief  Set the non-zero elements, scalar */
-    void set(DataType val, SparsityType sp=SP_SPARSE);
-
-    /** \brief  Get the non-zero elements, scalar */
-    void get(DataType& val, SparsityType sp=SP_SPARSE) const;
-
-    /** \brief  Set the non-zero elements, vector */
-    void set(const std::vector<DataType>& val, SparsityType sp=SP_SPARSE);
-
-    /** \brief  Get the non-zero elements, vector */
-    void get(std::vector<DataType>& val, SparsityType sp=SP_SPARSE) const;
-
-    /** \brief  Set the non-zero elements, Matrix */
-    void set(const Matrix<DataType>& val, SparsityType sp=SP_SPARSE);
-
-    /** \brief  Get the non-zero elements, Matrix */
-    void get(Matrix<DataType>& val, SparsityType sp=SP_SPARSE) const;
-
-#ifdef SWIG
-    %rename(get) getStridedArray;
-    %rename(set) setArray;
-#endif
-
-    /** \brief  Get the non-zero elements, array */
-    void getArray(DataType* val, int len, SparsityType sp=SP_SPARSE) const;
-
-    /** \brief  Set the non-zero elements, array */
-    void setArray(const DataType* val, int len, SparsityType sp=SP_SPARSE);
-
-    /** \brief  Get the non-zero elements, array, sparse and correct length */
-    void getArray(DataType* val) const;
-
-    /** \brief  Set the non-zero elements, array, sparse and correct length */
-    void setArray(const DataType* val);
-
     /** \brief  Get the non-zero elements, strided array */
-    void getStridedArray(DataType* val, int len, int stride1, int stride2,
-                         SparsityType sp=SP_SPARSE) const;
+    void get(double* val, int len, int stride1, int stride2, SparsityType sp) const;
+    void getNZ(double* val, int len, int stride1, int stride2) const;
 
 #ifndef SWIG
-    /** \brief  Legacy - use getArray instead */
-    void get(DataType* val, SparsityType sp=SP_SPARSE) const;
-
-    /** \brief  Legacy - use setArray instead */
-    void set(const DataType* val, SparsityType sp=SP_SPARSE);
-
     /** Bitwise set, reinterpreting the data as a bvec_t array */
     void setZeroBV();
 
@@ -770,26 +704,25 @@ namespace casadi {
     /** \brief Bitwise or the non-zero elements, array */
     void borArrayBV(const bvec_t* val, int len);
 
-#endif
-/// \endcond
-
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation
         kl:    The number of subdiagonals in res
         ku:    The number of superdiagonals in res
         ldres: The leading dimension in res
         res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, DataType *res) const;
+#endif
+/// \endcond
 
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
      */
     ///@{
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
-                                    const std::vector<DataType>& d);
+                                    const Matrix<DataType>& d);
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
-                                    const std::vector<DataType>& d, int nrow, int ncol);
+                                    const Matrix<DataType>& d, int nrow, int ncol);
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
-                                    const std::vector<DataType>& d, const std::pair<int, int>& rc);
+                                    const Matrix<DataType>& d, const std::pair<int, int>& rc);
     ///@}
 
     ///@{
@@ -868,6 +801,24 @@ namespace casadi {
 
     /** \brief Get double value (only if constant) */
     double getValue() const;
+
+    /** \brief Get double value (particular nonzero) */
+    double getValue(int k) const;
+
+    /** \brief Set double value (only if constant) */
+    void setValue(double m);
+
+    /** \brief Set double value (particular nonzero) */
+    void setValue(double m, int k);
+
+    /** \brief Get double value (only if integer constant) */
+    int getIntValue() const;
+
+    /** \brief Get all nonzeros */
+    std::vector<double> nonzeros() const;
+
+    /** \brief Get all nonzeros */
+    std::vector<int> nonzeros_int() const;
 
     /** \brief Get name (only if symbolic scalar) */
     std::string getName() const;

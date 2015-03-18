@@ -131,7 +131,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(C.shape,(9,1),"veccat shape")
     self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"veccat size")
     
-    self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
+    self.checkarray(tuple(C.nonzeros()),tuple(arange(1,7)),"numbers shape")
 
   def test_slicestepnegative(self):
     self.message("Slice step negative")
@@ -229,7 +229,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(C.shape,(6,1),"vecNZcat shape")
     self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"vecNZcat size")
     
-    self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
+    self.checkarray(tuple(C.nonzeros()),tuple(arange(1,7)),"numbers shape")
     
   def test_IMatrix_indexing(self):
     self.message("IMatrix")
@@ -599,7 +599,7 @@ class Matrixtests(casadiTestCase):
           self.checkarray(d[row,col],r,"%s[%s,%s]" % (repr(d),str(row),str(col)))
           
     
-    # getSub1
+    # get1
     check(IMatrix(Sparsity.dense(3,3),range(3*3)),[0,1,2],[0,1,2])
     check(IMatrix(Sparsity.dense(4,4),range(4*4)),[0,1,3],[0,2,3])
     check(IMatrix(Sparsity.dense(3,3),range(3*3)),[0,0,1],[0,0,1])
@@ -615,7 +615,7 @@ class Matrixtests(casadiTestCase):
     d = IMatrix(sp,range(sp.nnz()))
     check(d,[0,3],[0,2])
     
-    # getSub2
+    # get2
     check(IMatrix(Sparsity.dense(2,2),range(2*2)),[0,0,0],[0,0,0])
     check(IMatrix(Sparsity.dense(2,2),range(2*2)),[0,0,1],[0,0,1])
     check(IMatrix(Sparsity.dense(2,2),range(2*2)),[1,1,0],[1,1,0])
@@ -636,10 +636,10 @@ class Matrixtests(casadiTestCase):
     D = sparsify(D)
     i = DVector([0]*5)
     
-    D.get(i,SP_SPARSESYM)
+    D.getSym(i)
     #self.checkarray(list(i),[1,2,-1,-3,5])
     A = 2*D
-    A.set(i,SP_SPARSESYM)
+    A.setSym(i)
     self.checkarray(A,D)
     
   def test_diagcat(self):

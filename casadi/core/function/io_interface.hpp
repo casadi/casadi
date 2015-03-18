@@ -340,7 +340,22 @@ namespace casadi {
 /// \endcond
 
 
-#define SETTERS(T)                                                              \
+#define SETTERS_NZ(T)                                                              \
+    void setInput(T val, int iind=0)                                            \
+    { static_cast<const Derived*>(this)->assertInit();                          \
+      try { input(iind).setNZ(val); }                                             \
+      catch(std::exception& e) {                                                \
+        casadi_error(e.what() << "Occurred at iind = " << iind << ".");         \
+      }                                                                         \
+    }                                                                           \
+    void setOutput(T val, int oind=0)                                           \
+    { static_cast<const Derived*>(this)->assertInit(); output(oind).setNZ(val); } \
+    void setInput(T val, const std::string &iname)                              \
+    { setInput(val, inputSchemeEntry(iname));  }                                 \
+    void setOutput(T val, const std::string &oname)                             \
+    { setOutput(val, outputSchemeEntry(oname)); }                                \
+
+#define SETTERS_SUB(T)                                                              \
     void setInput(T val, int iind=0)                                            \
     { static_cast<const Derived*>(this)->assertInit();                          \
       try { input(iind).set(val); }                                             \
@@ -356,17 +371,28 @@ namespace casadi {
     { setOutput(val, outputSchemeEntry(oname)); }                                \
 
 #ifndef DOXYGENPROC
-    SETTERS(double) // NOLINT(readability/casting) - false positive
+    SETTERS_SUB(double) // NOLINT(readability/casting) - false positive
 #ifndef SWIG
-    SETTERS(const double*)
+    SETTERS_NZ(const double*)
 #endif // SWIG
-    SETTERS(const std::vector<double>&)
-    SETTERS(const Matrix<double>&)
+    SETTERS_NZ(const std::vector<double>&)
+    SETTERS_SUB(const Matrix<double>&)
 #endif // DOXYGENPROC
 
-#undef SETTERS
+#undef SETTERS_NZ
+#undef SETTERS_SUB
 
-#define GETTERS(T)                                                             \
+#define GETTERS_NZ(T)                                                             \
+    void getInput(T val, int iind=0) const                                     \
+    { static_cast<const Derived*>(this)->assertInit(); input(iind).getNZ(val);}  \
+    void getOutput(T val, int oind=0) const                                    \
+    { static_cast<const Derived*>(this)->assertInit(); output(oind).getNZ(val);} \
+    void getInput(T val, const std::string &iname) const                       \
+    { getInput(val, inputSchemeEntry(iname)); }                                 \
+    void getOutput(T val, const std::string &oname) const                      \
+    { getOutput(val, outputSchemeEntry(oname)); }                               \
+
+#define GETTERS_SUB(T)                                                             \
     void getInput(T val, int iind=0) const                                     \
     { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);}  \
     void getOutput(T val, int oind=0) const                                    \
@@ -378,13 +404,14 @@ namespace casadi {
 
 #ifndef DOXYGENPROC
 #ifndef SWIG
-GETTERS(double&)
-GETTERS(double*) // NOLINT(readability/casting) - false positive
-GETTERS(std::vector<double>&)
-GETTERS(Matrix<double>&)
+GETTERS_SUB(double&)
+GETTERS_NZ(double*) // NOLINT(readability/casting) - false positive
+GETTERS_NZ(std::vector<double>&)
+GETTERS_SUB(Matrix<double>&)
 #endif // SWIG
 #endif // DOXYGENPROC
-#undef GETTERS
+#undef GETTERS_NZ
+#undef GETTERS_SUB
 
   };
 

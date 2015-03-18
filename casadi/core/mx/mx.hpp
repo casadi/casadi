@@ -111,6 +111,12 @@ namespace casadi {
     /// Access a non-zero element, with bounds checking
     NonZeros<MX, int> at(int k);
 
+    /** \brief Get the sparsity pattern */
+    const Sparsity& sparsity() const;
+
+    /// Access the sparsity, make a copy if there are multiple references to it
+    Sparsity& sparsityRef();
+
 #endif // SWIG
 
     /// Returns the truth value of an MX expression
@@ -121,11 +127,8 @@ namespace casadi {
     typedef MX ScalarType;
     /// \endcond
 
-    /** \brief Get the sparsity pattern */
-    const Sparsity& sparsity() const;
-
-    /// Access the sparsity, make a copy if there are multiple references to it
-    Sparsity& sparsityRef();
+    /** \brief Get an owning reference to the sparsity pattern */
+    Sparsity getSparsity() const { return sparsity();}
 
     /** \brief Erase a submatrix (leaving structural zeros in its place)
         Erase rows and/or columns of a matrix */
@@ -141,9 +144,6 @@ namespace casadi {
                  const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
     MX operator-() const;
-
-    /// Get the non-zero elements
-    MX nonzeros() const;
 
 #ifndef SWIG
     /// \cond INTERNAL
@@ -275,41 +275,44 @@ namespace casadi {
     /** \brief  Identity matrix */
     static MX eye(int ncol);
 
+    /** \brief Avoid shadowing SharedObject::get() */
+    using SharedObject::get;
+
     ///@{
     /// Get a submatrix, single argument
-    const MX getSub(bool ind1, const Slice& rr) const;
-    const MX getSub(bool ind1, const Matrix<int>& rr) const;
-    const MX getSub(bool ind1, const Sparsity& sp) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Sparsity& sp) const;
     ///@}
 
     /// Get a submatrix, two arguments
     ///@{
-    const MX getSub(bool ind1, const Slice& rr, const Slice& cc) const;
-    const MX getSub(bool ind1, const Slice& rr, const Matrix<int>& cc) const;
-    const MX getSub(bool ind1, const Matrix<int>& rr, const Slice& cc) const;
-    const MX getSub(bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Slice& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Slice& rr, const Matrix<int>& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr, const Slice& cc) const;
+    void get(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const;
     ///@}
 
     ///@{
     /// Set a submatrix, single argument
-    void setSub(const MX& m, bool ind1, const Slice& rr);
-    void setSub(const MX& m, bool ind1, const Matrix<int>& rr);
-    void setSub(const MX& m, bool ind1, const Sparsity& sp);
+    void set(const MX& m, bool ind1, const Slice& rr);
+    void set(const MX& m, bool ind1, const Matrix<int>& rr);
+    void set(const MX& m, bool ind1, const Sparsity& sp);
     ///@}
 
     ///@{
     /// Set a submatrix, two arguments
     ///@}
-    void setSub(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
-    void setSub(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
-    void setSub(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
-    void setSub(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
+    void set(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
+    void set(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
+    void set(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
+    void set(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
     ///@}
 
     ///@{
     /// Get a set of nonzeros
-    MX getNZ(bool ind1, const Slice& kk) const;
-    MX getNZ(bool ind1, const Matrix<int>& kk) const;
+    void getNZ(MX& SWIG_OUTPUT(m), bool ind1, const Slice& kk) const;
+    void getNZ(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& kk) const;
     ///@}
 
     ///@{

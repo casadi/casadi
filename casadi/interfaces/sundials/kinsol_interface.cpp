@@ -289,7 +289,7 @@ namespace casadi {
     }
 
     // Get the initial guess
-    output(iout_).get(NV_DATA_S(u_));
+    output(iout_).getNZ(NV_DATA_S(u_));
 
     // Solve the nonlinear system of equations
     int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);

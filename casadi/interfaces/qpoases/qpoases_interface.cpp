@@ -239,14 +239,14 @@ namespace casadi {
       h = getPtr(input(QP_SOLVER_H));
     } else {
       // First copy to dense array
-      input(QP_SOLVER_H).get(h_data_, SP_DENSE);
+      input(QP_SOLVER_H).get(h_data_);
       h = getPtr(h_data_);
     }
 
     // Copy A to a row-major dense vector
     const double* a=0;
     if (nc_>0) {
-      input(QP_SOLVER_A).get(a_data_, SP_DENSETRANS);
+      input(QP_SOLVER_A).get(a_data_, true);
       a = getPtr(a_data_);
     }
 
