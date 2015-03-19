@@ -256,10 +256,6 @@ namespace casadi {
       casadi_error("Code generation is not possible since variables "
                    << free_vars_ << " are free.");
     }
-
-    // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
-    gen.addAuxiliary(CodeGenerator::AUX_SQ);
-    gen.addAuxiliary(CodeGenerator::AUX_SIGN);
   }
 
   void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type,
