@@ -275,8 +275,10 @@ namespace casadi {
     /** \brief  Identity matrix */
     static MX eye(int ncol);
 
+#ifndef SWIG
     /** \brief Avoid shadowing SharedObject::get() */
     using SharedObject::get;
+#endif // SWIG
 
     ///@{
     /// Get a submatrix, single argument
