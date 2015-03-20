@@ -2914,7 +2914,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::get(std::vector<double>& val, bool tr) const {
-    casadi_assert(val.size()==this->numel());
+    val.resize(this->numel());
     get(getPtr(val), tr);
   }
 
@@ -2959,13 +2959,13 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::getNZ(std::vector<double>& val) const {
-    casadi_assert(val.size()==this->nnz());
+    val.resize(this->nnz());
     getNZ(getPtr(val));
   }
 
   template<typename DataType>
   void Matrix<DataType>::getSym(std::vector<double>& val) const {
-    casadi_assert(val.size()==this->sizeU());
+    val.resize(this->sizeU());
     getSym(getPtr(val));
   }
 
