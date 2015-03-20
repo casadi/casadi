@@ -240,8 +240,10 @@ namespace casadi {
     /** \brief Set all the entries without changing sparsity pattern */
     void set(const Matrix<DataType>& val);
 
+#ifndef SWIG
     /** \brief Get all the entries without changing sparsity pattern */
     void get(Matrix<DataType>& val) const;
+#endif // SWIG
 
     ///@{
     /** \brief Get the elements numerically */
@@ -252,9 +254,11 @@ namespace casadi {
 
     ///@{
     /** \brief Get the elements numerically */
+#ifndef SWIG
     void get(double& val) const;
     void get(double* val, bool tr=false) const;
-    void get(std::vector<double>& val, bool tr=false) const;
+#endif // SWIG
+    void get(std::vector<double>& SWIG_OUTPUT(m), bool tr=false) const;
     ///@}
 
     ///@{
@@ -308,9 +312,11 @@ namespace casadi {
 
     ///@{
     /** \brief Get the elements numerically */
+#ifndef SWIG
     void getNZ(double& val) const;
     void getNZ(double* val) const;
-    void getNZ(std::vector<double>& val) const;
+#endif // SWIG
+    void getNZ(std::vector<double>& SWIG_OUTPUT(m)) const;
     ///@}
 
     ///@{
@@ -321,8 +327,10 @@ namespace casadi {
 
     ///@{
     /** \brief Get upper triangular elements */
+#ifndef SWIG
     void getSym(double* val) const;
-    void getSym(std::vector<double>& val) const;
+#endif // SWIG
+    void getSym(std::vector<double>& SWIG_OUTPUT(m)) const;
     ///@}
 
     ///@{
