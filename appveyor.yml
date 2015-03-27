@@ -1,6 +1,6 @@
 branches: 
   except:
-    - travis
+    - /.*travis.*/
 
 build_script:
   - cmake "-GVisual Studio 12 Win64" -H. -B_builds

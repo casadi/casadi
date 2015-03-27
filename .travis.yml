@@ -6,7 +6,7 @@ env:
 
 branches:
   except:
-    - appveyor
+    - /.*appveyor.*/
 
 compiler: 
 - gcc
