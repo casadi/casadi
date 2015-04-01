@@ -101,7 +101,8 @@ namespace casadi {
     virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
 
     /** \brief Evaluate symbolically, SX type*/
-    virtual void evalSX(const std::vector<SX>& input, std::vector<SX>& output);
+    virtual void evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+                        int* itmp, SXElement* rtmp);
 
     /** \brief Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output);

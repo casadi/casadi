@@ -1014,36 +1014,13 @@ namespace casadi {
     log("MXFunctionInternal::evalAdj end");
   }
 
-  void MXFunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res) {
+  void MXFunctionInternal::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+                                  int* itmp, SXElement* rtmp) {
     // Get the number of inputs and outputs
     int num_in = getNumInputs();
     int num_out = getNumOutputs();
 
-    // Make sure matching sparsity of fseed
-    bool matching_sparsity = true;
-    casadi_assert(arg.size()==num_in);
-    for (int i=0; matching_sparsity && i<num_in; ++i)
-      matching_sparsity = arg[i].sparsity()==input(i).sparsity();
-
-    // Correct sparsity if needed
-    if (!matching_sparsity) {
-      vector<SX> arg2(arg);
-      for (int i=0; i<num_in; ++i)
-        if (arg2[i].sparsity()!=input(i).sparsity())
-          arg2[i] = arg2[i].setSparse(input(i).sparsity());
-      return evalSX(arg2, res);
-    }
-
-    // Allocate results
-    res.resize(num_out);
-    for (int i=0; i<num_out; ++i)
-      if (res[i].sparsity()!=output(i).sparsity())
-        res[i] = SX::zeros(output(i).sparsity());
-
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<SXElement> rtmp(rtmp_.size());
-    SXElement* w=getPtr(rtmp);
-    int* iw = getPtr(itmp_);
     vector<const SXElement*> argp(max_arg_);
     vector<SXElement*> resp(max_res_);
 
@@ -1052,28 +1029,31 @@ namespace casadi {
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op==OP_INPUT) {
         // Pass an input
-        SXElement *w1 = w+workloc_[it->res.front()];
+        SXElement *w = rtmp+workloc_[it->res.front()];
         int i=it->arg.front();
         int nnz=input(i).nnz();
-        //if (arg[i]==0) {
-        //fill(w, w+nnz, 0);
-        //} else {
-        std::copy(arg[i].ptr(), arg[i].ptr()+nnz, w1);
-        //}
+        if (arg[i]==0) {
+          std::fill(w, w+nnz, 0);
+        } else {
+          std::copy(arg[i], arg[i]+nnz, w);
+        }
       } else if (it->op==OP_OUTPUT) {
         // Get the outputs
-        SXElement *w1 = w+workloc_[it->arg.front()];
+        SXElement *w = rtmp+workloc_[it->arg.front()];
         int i=it->res.front();
-        /*if (res[i]!=0) */ std::copy(w1, w1+output(i).nnz(), res[i].ptr());
+        if (res[i]!=0)
+          std::copy(w, w+output(i).nnz(), res[i]);
       } else if (it->op==OP_PARAMETER) {
         continue; // FIXME
       } else {
         // Point pointers to the data corresponding to the element
-        for (int i=0; i<it->arg.size(); ++i) argp[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
-        for (int i=0; i<it->res.size(); ++i) resp[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+        for (int i=0; i<it->arg.size(); ++i)
+          argp[i] = it->arg[i]>=0 ? rtmp+workloc_[it->arg[i]] : 0;
+        for (int i=0; i<it->res.size(); ++i)
+          resp[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalSX(argp, resp, iw, w);
+        it->data->evalSX(argp, resp, itmp, rtmp);
       }
     }
   }
@@ -1107,7 +1087,7 @@ namespace casadi {
     }
 
     // Evaluate symbolically
-    evalSX(arg, res);
+    FunctionInternal::evalSX(arg, res);
 
     // Create function
     SXFunction f(arg, res);
