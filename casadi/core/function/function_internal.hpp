@@ -96,6 +96,10 @@ namespace casadi {
     virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
 
     /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
+    virtual void evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+                        int* itmp, SXElement* rtmp);
+
+    /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
 
     /** \brief  Evaluate symbolically, MX type */

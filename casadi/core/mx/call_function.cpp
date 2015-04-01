@@ -94,31 +94,9 @@ namespace casadi {
     return fcn_;
   }
 
-  void CallFunction::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void CallFunction::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
                                 int* itmp, SXElement* rtmp) {
-    // Number of inputs and outputs
-    int num_in = fcn_.getNumInputs();
-    int num_out = fcn_.getNumOutputs();
-
-    // Create input arguments
-    vector<SX> argv(num_in);
-    for (int i=0; i<num_in; ++i) {
-      argv[i] = SX::zeros(fcn_.input(i).sparsity());
-      if (input[i] != 0) {
-        std::copy(input[i], input[i]+argv[i].nnz(), argv[i].begin());
-      }
-    }
-
-    // Evaluate symbolically
-    vector<SX> resv;
-    fcn_->evalSX(argv, resv);
-
-    // Collect the result
-    for (int i = 0; i < num_out; ++i) {
-      if (output[i] != 0) {
-        std::copy(resv[i].begin(), resv[i].end(), output[i]);
-      }
-    }
+    fcn_->evalSX(arg, res, itmp, rtmp);
   }
 
   void CallFunction::eval(const cpv_MX& input, const pv_MX& output) {

@@ -1295,6 +1295,33 @@ namespace casadi {
     }
   }
 
+  void FunctionInternal::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+                                int* itmp, SXElement* rtmp) {
+    // Number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Create input arguments
+    vector<SX> argv(num_in);
+    for (int i=0; i<num_in; ++i) {
+      argv[i] = SX::zeros(input(i).sparsity());
+      if (arg[i] != 0) {
+        std::copy(arg[i], arg[i]+argv[i].nnz(), argv[i].begin());
+      }
+    }
+
+    // Evaluate symbolically
+    vector<SX> resv;
+    evalSX(argv, resv);
+
+    // Collect the result
+    for (int i = 0; i < num_out; ++i) {
+      if (res[i] != 0) {
+        std::copy(resv[i].begin(), resv[i].end(), res[i]);
+      }
+    }
+  }
+
   void FunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res) {
     casadi_error("FunctionInternal::evalSX not defined for class " << typeid(*this).name());
   }
