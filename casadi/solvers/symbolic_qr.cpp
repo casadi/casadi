@@ -218,33 +218,30 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr) {
-    // Get arguments
-    casadi_assert(input.at(0)!=0);
-    SX r = *input.at(0);
-    casadi_assert(input.at(1)!=0);
-    SX A = *input.at(1);
+  void SymbolicQr::evalSXLinsol(const cpv_SXElement& arg, const pv_SXElement& res,
+                                int* itmp, SXElement* rtmp, bool tr, int nrhs) {
+    casadi_assert(arg.at(0)!=0);
+    casadi_assert(arg.at(1)!=0);
+    casadi_assert(res.at(0)!=0);
 
-    // Number of right hand sides
-    int nrhs = r.size2();
-
-    // Factorize A
+    // Get A and factorize it
+    SX A(input(LINSOL_A).sparsity());
+    copy(arg[1], arg[1]+A.nnz(), A.begin());
     vector<SX> v = fact_fcn_(A);
 
     // Select solve function
     Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
 
     // Solve for every right hand side
-    vector<SX> resv;
-    v.resize(3);
+    v.push_back(SX::zeros(A.size1()));
+    const SXElement* a=arg[0];
+    SXElement* r=res[0];
     for (int i=0; i<nrhs; ++i) {
-      v[2] = r(Slice(), i);
-      resv.push_back(solv(v).at(0));
+      copy(a, a+v[2].nnz(), v[2].begin());
+      SX rr = solv(v).at(0);
+      copy(rr.begin(), rr.end(), r);
+      r += rr.nnz();
     }
-
-    // Collect the right hand sides
-    casadi_assert(output[0]!=0);
-    *output.at(0) = horzcat(resv);
   }
 
   void SymbolicQr::generateDeclarations(std::ostream &stream, const std::string& type,
