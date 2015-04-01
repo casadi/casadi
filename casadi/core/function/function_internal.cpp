@@ -1323,7 +1323,47 @@ namespace casadi {
   }
 
   void FunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res) {
-    casadi_error("FunctionInternal::evalSX not defined for class " << typeid(*this).name());
+    // Get the number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Check if matching input sparsity
+    bool matching_sparsity = true;
+    casadi_assert(arg.size()==num_in);
+    for (int i=0; matching_sparsity && i<num_in; ++i)
+      matching_sparsity = arg[i].sparsity()==input(i).sparsity();
+
+    // Correct input sparsity if needed
+    if (!matching_sparsity) {
+      vector<SX> arg2(arg);
+      for (int i=0; i<num_in; ++i)
+        if (arg2[i].sparsity()!=input(i).sparsity())
+          arg2[i] = arg2[i].setSparse(input(i).sparsity());
+      return evalSX(arg2, res);
+    }
+
+    // Allocate results
+    res.resize(num_out);
+    for (int i=0; i<num_out; ++i)
+      if (res[i].sparsity()!=output(i).sparsity())
+        res[i] = SX::zeros(output(i).sparsity());
+
+    // Allocate temporary memory if needed
+    size_t ni, nr;
+    nTmp(ni, nr);
+    itmp_.resize(ni);
+    vector<SXElement> rtmp(nr);
+
+    // Get pointers to input arguments
+    cpv_SXElement argp(arg.size());
+    for (int i=0; i<argp.size(); ++i) argp[i]=getPtr(arg[i]);
+
+    // Get pointers to output arguments
+    pv_SXElement resp(getNumOutputs());
+    for (int i=0; i<resp.size(); ++i) resp[i]=getPtr(res[i]);
+
+    // Call memory-less
+    evalSX(argp, resp, getPtr(itmp_), getPtr(rtmp));
   }
 
   void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

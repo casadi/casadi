@@ -135,17 +135,13 @@ namespace casadi {
     // Evaluate the algorithm
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
-        // Start by adding all of the built operations
         CASADI_MATH_FUN_BUILTIN(rtmp[it->i1], rtmp[it->i2], rtmp[it->i0])
 
-        // Constant
-        case OP_CONST: rtmp[it->i0] = it->d; break;
-
-        // Load function input to work vector
-        case OP_INPUT: rtmp[it->i0] = arg[it->i1][it->i2]; break;
-
-        // Get function output from work vector
-        case OP_OUTPUT: if (res[it->i0]) res[it->i0][it->i2] = rtmp[it->i1]; break;
+      case OP_CONST: rtmp[it->i0] = it->d; break;
+      case OP_INPUT: rtmp[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
+      case OP_OUTPUT: if (res[it->i0]!=0) res[it->i0][it->i2] = rtmp[it->i1]; break;
+      default:
+        casadi_error("SXFunctionInternal::evalD: Unknown operation" << it->op);
       }
     }
 
@@ -620,42 +616,9 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::evalSX(const vector<SX>& arg, vector<SX>& res) {
+  void SXFunctionInternal::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+                                  int* itmp, SXElement* rtmp) {
     if (verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
-
-    // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
-
-    // Make sure matching sparsity of fseed
-    bool matching_sparsity = true;
-    casadi_assert(arg.size()==num_in);
-    for (int i=0; matching_sparsity && i<num_in; ++i)
-      matching_sparsity = arg[i].sparsity()==input(i).sparsity();
-
-    // Correct sparsity if needed
-    if (!matching_sparsity) {
-      vector<SX> arg2(arg);
-      for (int i=0; i<num_in; ++i)
-        if (arg2[i].sparsity()!=input(i).sparsity())
-          arg2[i] = arg2[i].setSparse(input(i).sparsity());
-      return evalSX(arg2, res);
-    }
-
-    // Allocate results
-    res.resize(num_out);
-    for (int i=0; i<num_out; ++i)
-      if (res[i].sparsity()!=output(i).sparsity())
-        res[i] = SX::zeros(output(i).sparsity());
-
-    // Copy output if known
-    bool output_given = isInput(arg);
-    if (output_given) {
-      for (int i=0; i<res.size(); ++i) {
-        copy(outputv_[i].begin(), outputv_[i].end(), res[i].begin());
-      }
-      return;
-    }
 
     // Iterator to the binary operations
     vector<SXElement>::const_iterator b_it=operations_.begin();
@@ -671,35 +634,32 @@ namespace casadi {
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
-        s_work_[it->i0] = arg[it->i1].data()[it->i2]; break;
+        rtmp[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2];
+        break;
       case OP_OUTPUT:
-        res[it->i0].data()[it->i2] = s_work_[it->i1];
+        if (res[it->i0]!=0) res[it->i0][it->i2] = rtmp[it->i1];
         break;
       case OP_CONST:
-        s_work_[it->i0] = *c_it++;
+        rtmp[it->i0] = *c_it++;
         break;
       case OP_PARAMETER:
-        s_work_[it->i0] = *p_it++; break;
+        rtmp[it->i0] = *p_it++; break;
       default:
         {
           // Evaluate the function to a temporary value
           // (as it might overwrite the children in the work vector)
           SXElement f;
-          if (output_given) {
-            f = *b_it++;
-          } else {
-            switch (it->op) {
-              CASADI_MATH_FUN_BUILTIN(s_work_[it->i1], s_work_[it->i2], f)
-            }
-
-            // If this new expression is identical to the expression used
-            // to define the algorithm, then reuse
-            const int depth = 2; // NOTE: a higher depth could possibly give more savings
-            f.assignIfDuplicate(*b_it++, depth);
+          switch (it->op) {
+            CASADI_MATH_FUN_BUILTIN(rtmp[it->i1], rtmp[it->i2], f)
           }
 
+          // If this new expression is identical to the expression used
+          // to define the algorithm, then reuse
+          const int depth = 2; // NOTE: a higher depth could possibly give more savings
+          f.assignIfDuplicate(*b_it++, depth);
+
           // Finally save the function value
-          s_work_[it->i0] = f;
+          rtmp[it->i0] = f;
         }
       }
     }
