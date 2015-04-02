@@ -167,6 +167,12 @@ class CASADI_EXPORT SXFunctionInternal :
    * no symbolic evaluations are possible after this */
   void clearSymbolic();
 
+  /** \brief  Propagate sparsity forward */
+  virtual void spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+
+  /** \brief  Propagate sparsity backwards */
+  virtual void spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+
   /// Propagate a sparsity pattern through the algorithm
   virtual void spEvaluate(bool fwd);
 

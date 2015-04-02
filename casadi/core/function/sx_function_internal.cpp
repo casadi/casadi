@@ -889,6 +889,61 @@ namespace casadi {
     if (!fwd) fill_n(iwork, rtmp_.size(), bvec_t(0));
   }
 
+  void SXFunctionInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res,
+                                 int* itmp, bvec_t* rtmp) {
+    // Propagate sparsity forward
+    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      switch (it->op) {
+      case OP_CONST:
+      case OP_PARAMETER:
+        rtmp[it->i0] = 0; break;
+      case OP_INPUT:
+        rtmp[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
+      case OP_OUTPUT:
+        if (res[it->i0]!=0) res[it->i0][it->i2] = rtmp[it->i1]; break;
+      default: // Unary or binary operation
+        rtmp[it->i0] = rtmp[it->i1] | rtmp[it->i2]; break;
+      }
+    }
+  }
+
+  void SXFunctionInternal::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
+                                 int* itmp, bvec_t* rtmp) {
+
+    size_t ni, nr;
+    nTmp(ni, nr);
+    fill_n(rtmp, nr, 0);
+
+    // Propagate sparsity backward
+    for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
+      // Temp seed
+      bvec_t seed;
+
+      // Propagate seeds
+      switch (it->op) {
+      case OP_CONST:
+      case OP_PARAMETER:
+        rtmp[it->i0] = 0;
+        break;
+      case OP_INPUT:
+        if (arg[it->i1]!=0) arg[it->i1][it->i2] |= rtmp[it->i0];
+        rtmp[it->i0] = 0;
+        break;
+      case OP_OUTPUT:
+        if (res[it->i0]!=0) {
+          rtmp[it->i1] |= res[it->i0][it->i2];
+          res[it->i0][it->i2] = 0;
+        }
+        break;
+      default: // Unary or binary operation
+        seed = rtmp[it->i0];
+        rtmp[it->i0] = 0;
+        rtmp[it->i1] |= seed;
+        rtmp[it->i2] |= seed;
+      }
+    }
+  }
+
   void SXFunctionInternal::spEvaluate(bool fwd) {
 #ifdef WITH_OPENCL
     if (just_in_time_sparsity_) {
