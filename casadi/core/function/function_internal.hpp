@@ -357,6 +357,12 @@ namespace casadi {
     /// For documentation, see the MXNode class
     ///@{
     /** \brief  Propagate sparsity forward */
+    virtual void spFwdSwitch(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdjSwitch(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+
+    /** \brief  Propagate sparsity forward */
     virtual void spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */

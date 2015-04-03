@@ -165,11 +165,11 @@ namespace casadi {
   }
 
   void CallFunction::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    fcn_->spFwd(arg, res, itmp, rtmp);
+    fcn_.spFwd(arg, res, itmp, rtmp);
   }
 
   void CallFunction::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
-    fcn_->spAdj(arg, res, itmp, rtmp);
+    fcn_.spAdj(arg, res, itmp, rtmp);
   }
 
   void CallFunction::generate(std::ostream &stream, const std::vector<int>& arg,
@@ -178,7 +178,7 @@ namespace casadi {
   }
 
   void CallFunction::nTmp(size_t& ni, size_t& nr) {
-    fcn_->nTmp(ni, nr);
+    fcn_.nTmp(ni, nr);
   }
 
 } // namespace casadi

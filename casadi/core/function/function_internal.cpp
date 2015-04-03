@@ -2288,6 +2288,12 @@ namespace casadi {
     return MX::createMultipleOutput(new CallFunction(shared_from_this<Function>(), arg));
   }
 
+  void FunctionInternal::spFwdSwitch(const std::vector<const bvec_t*>& arg,
+                                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
+    spFwd(arg, res, itmp, rtmp);
+  }
+
   void FunctionInternal::spFwd(const std::vector<const bvec_t*>& arg,
                                const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
@@ -2337,6 +2343,12 @@ namespace casadi {
     // Clear seeds and sensitivities
     for (int i=0; i<n_in; ++i) input(i).set(0.);
     for (int i=0; i<n_out; ++i) output(i).set(0.);
+  }
+
+  void FunctionInternal::spAdjSwitch(const std::vector<bvec_t*>& arg,
+                                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+    // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
+    spAdj(arg, res, itmp, rtmp);
   }
 
   void FunctionInternal::spAdj(const std::vector<bvec_t*>& arg,

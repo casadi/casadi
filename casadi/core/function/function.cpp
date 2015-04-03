@@ -233,6 +233,18 @@ namespace casadi {
     (*this)->spEvaluate(fwd);
   }
 
+  void Function::nTmp(size_t& ni, size_t& nr) {
+    (*this)->nTmp(ni, nr);
+  }
+
+  void Function::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+    (*this)->spFwdSwitch(arg, res, itmp, rtmp);
+  }
+
+  void Function::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+    (*this)->spAdjSwitch(arg, res, itmp, rtmp);
+  }
+
   bool Function::spCanEvaluate(bool fwd) {
     return (*this)->spCanEvaluate(fwd);
   }
