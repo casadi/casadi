@@ -502,77 +502,78 @@ namespace casadi {
                                  int* itmp, bvec_t* rtmp) {
     log("IntegratorInternal::spFwd", "begin");
 
-    // Temporary vectors
-    bvec_t *tmp_f1, *tmp_f2, *tmp_g1= NULL, *tmp_g2=NULL;
-    casadi_assert(!linsol_f_.isNull());
-    tmp_f1 = reinterpret_cast<bvec_t*>(linsol_f_.input(LINSOL_B).ptr());
-    tmp_f2 = reinterpret_cast<bvec_t*>(linsol_f_.output(LINSOL_X).ptr());
-    if (!g_.isNull()) {
-      casadi_assert(!linsol_g_.isNull());
-      tmp_g1 = reinterpret_cast<bvec_t*>(linsol_g_.input(LINSOL_B).ptr());
-      tmp_g2 = reinterpret_cast<bvec_t*>(linsol_g_.output(LINSOL_X).ptr());
-    }
+    // Work vectors
+    bvec_t *tmp_x = rtmp; rtmp += nx_;
+    bvec_t *tmp_z = rtmp; rtmp += nz_;
+    bvec_t *tmp_rx = rtmp; rtmp += nrx_;
+    bvec_t *tmp_rz = rtmp; rtmp += nrz_;
 
-    // Propagate through the DAE
+    // Propagate through f
     cpv_bvec_t dae_in(DAE_NUM_IN, 0);
     dae_in[DAE_X] = arg[INTEGRATOR_X0];
     dae_in[DAE_P] = arg[INTEGRATOR_P];
     pv_bvec_t dae_out(DAE_NUM_OUT, 0);
-    dae_out[DAE_ODE] = tmp_f1;
-    dae_out[DAE_ALG] = tmp_f1 + nx_;
+    dae_out[DAE_ODE] = tmp_x;
+    dae_out[DAE_ALG] = tmp_z;
     f_.spFwd(dae_in, dae_out, itmp, rtmp);
+    if (arg[INTEGRATOR_X0]) {
+      const bvec_t *tmp = arg[INTEGRATOR_X0];
+      for (int i=0; i<nx_; ++i) tmp_x[i] |= *tmp++;
+    }
 
-    // Propagate interdependencies
-    std::fill(tmp_f2, tmp_f2+nx_+nz_, 0);
-    if (arg[INTEGRATOR_X0]!=0)
-      copy(arg[INTEGRATOR_X0], arg[INTEGRATOR_X0]+nx_, tmp_f2);
-    linsol_f_.spSolve(tmp_f2, tmp_f1, true);
-    if (res[INTEGRATOR_XF]!=0)
-      copy(tmp_f2, tmp_f2+nx_, res[INTEGRATOR_XF]);
-    if (res[INTEGRATOR_ZF]!=0)
-      copy(tmp_f2+nx_, tmp_f2+nx_+nz_, res[INTEGRATOR_ZF]);
+    // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
+    copy(tmp_x, tmp_x+nx_+nz_, rtmp);
+    fill_n(tmp_x, nx_+nz_, 0);
+    linsol_f_.spSolve(tmp_x, rtmp, true);
 
-    // Get influence on the quadratures
-    if (nq_>0 && res[INTEGRATOR_QF]!=0) {
-      dae_in[DAE_X] = tmp_f2;
-      dae_in[DAE_Z] = tmp_f2+nx_;
+    // Get xf and zf
+    if (res[INTEGRATOR_XF])
+      copy(tmp_x, tmp_x+nx_, res[INTEGRATOR_XF]);
+    if (res[INTEGRATOR_ZF])
+      copy(tmp_z, tmp_z+nz_, res[INTEGRATOR_ZF]);
+
+    // Propagate to quadratures
+    if (nq_>0 && res[INTEGRATOR_QF]) {
+      dae_in[DAE_X] = tmp_x;
+      dae_in[DAE_Z] = tmp_z;
       dae_out[DAE_ODE] = dae_out[DAE_ALG] = 0;
       dae_out[DAE_QUAD] = res[INTEGRATOR_QF];
       f_.spFwd(dae_in, dae_out, itmp, rtmp);
     }
 
-    // Propagate through g
     if (!g_.isNull()) {
-      // Propagate through the backward DAE
+      // Propagate through g
       cpv_bvec_t rdae_in(RDAE_NUM_IN, 0);
-
-      rdae_in[RDAE_X] = tmp_f2;
+      rdae_in[RDAE_X] = tmp_x;
       rdae_in[RDAE_P] = arg[INTEGRATOR_P];
-      rdae_in[RDAE_Z] = tmp_f2+nx_;
+      rdae_in[RDAE_Z] = tmp_z;
       rdae_in[RDAE_RX] = arg[INTEGRATOR_X0];
       rdae_in[RDAE_RX] = arg[INTEGRATOR_RX0];
       rdae_in[RDAE_RP] = arg[INTEGRATOR_RP];
       pv_bvec_t rdae_out(RDAE_NUM_OUT, 0);
-      rdae_out[RDAE_ODE] = tmp_g1;
-      rdae_out[RDAE_ALG] = tmp_g1 + nrx_;
+      rdae_out[RDAE_ODE] = tmp_rx;
+      rdae_out[RDAE_ALG] = tmp_rz;
       g_.spFwd(rdae_in, rdae_out, itmp, rtmp);
+      if (arg[INTEGRATOR_RX0]) {
+        const bvec_t *tmp = arg[INTEGRATOR_RX0];
+        for (int i=0; i<nrx_; ++i) tmp_rx[i] |= *tmp++;
+      }
 
-      // Propagate interdependencies
-      std::fill(tmp_g2, tmp_g2+nrx_+nrz_, 0);
-      if (arg[INTEGRATOR_RX0]!=0)
-        copy(arg[INTEGRATOR_RX0], arg[INTEGRATOR_RX0]+nrx_, tmp_g2);
+      // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
+      copy(tmp_rx, tmp_rx+nrx_+nrz_, rtmp);
+      fill_n(tmp_rx, nrx_+nrz_, 0);
+      linsol_g_.spSolve(tmp_rx, rtmp, true);
 
-      std::fill(tmp_g2+nrx_, tmp_g2+nrx_+nrz_, 0);
-      linsol_g_.spSolve(tmp_g2, tmp_g1, true);
-      if (res[INTEGRATOR_RXF]!=0)
-        copy(tmp_g2, tmp_g2+nrx_, res[INTEGRATOR_RXF]);
-      if (res[INTEGRATOR_RZF]!=0)
-        copy(tmp_g2+nrx_, tmp_g2+nrx_+nrz_, res[INTEGRATOR_RZF]);
+      // Get rxf and rzf
+      if (res[INTEGRATOR_RXF])
+        copy(tmp_rx, tmp_rx+nrx_, res[INTEGRATOR_RXF]);
+      if (res[INTEGRATOR_RZF])
+        copy(tmp_rz, tmp_rz+nrz_, res[INTEGRATOR_RZF]);
 
-      // Get influence on the backward quadratures
-      if (nrq_>0 && res[INTEGRATOR_RQF]!=0) {
-        rdae_in[RDAE_RX] = tmp_g2;
-        rdae_in[RDAE_RZ] = tmp_g2 + nrx_;
+      // Propagate to quadratures
+      if (nrq_>0 && res[INTEGRATOR_RQF]) {
+        rdae_in[RDAE_RX] = tmp_rx;
+        rdae_in[RDAE_RZ] = tmp_rz;
         rdae_out[RDAE_ODE] = rdae_out[RDAE_ALG] = 0;
         rdae_out[RDAE_QUAD] = res[INTEGRATOR_RQF];
         g_.spFwd(rdae_in, rdae_out, itmp, rtmp);
