@@ -1031,10 +1031,6 @@ namespace casadi {
 
   void MXFunctionInternal::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
                                   int* itmp, SXElement* rtmp) {
-    // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
-
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElement*> argp(max_arg_);
     vector<SXElement*> resp(max_res_);
