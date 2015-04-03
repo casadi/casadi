@@ -525,7 +525,7 @@ namespace casadi {
     copy(tmp_x, tmp_x+nx_+nz_, rtmp);
     fill_n(tmp_x, nx_+nz_, 0);
     casadi_assert(!linsol_f_.isNull());
-    linsol_f_.spSolve(tmp_x, rtmp, true);
+    linsol_f_.spSolve(tmp_x, rtmp, false);
 
     // Get xf and zf
     if (res[INTEGRATOR_XF])
@@ -564,7 +564,7 @@ namespace casadi {
       copy(tmp_rx, tmp_rx+nrx_+nrz_, rtmp);
       fill_n(tmp_rx, nrx_+nrz_, 0);
       casadi_assert(!linsol_g_.isNull());
-      linsol_g_.spSolve(tmp_rx, rtmp, true);
+      linsol_g_.spSolve(tmp_rx, rtmp, false);
 
       // Get rxf and rzf
       if (res[INTEGRATOR_RXF])
@@ -641,7 +641,7 @@ namespace casadi {
       copy(tmp_rx, tmp_rx+nrx_+nrz_, rtmp);
       fill_n(tmp_rx, nrx_+nrz_, 0);
       casadi_assert(!linsol_g_.isNull());
-      linsol_g_.spSolve(tmp_rx, rtmp, false);
+      linsol_g_.spSolve(tmp_rx, rtmp, true);
 
       // Propagate through g
       rdae_out[RDAE_ODE] = tmp_rx;
@@ -667,7 +667,7 @@ namespace casadi {
     copy(tmp_x, tmp_x+nx_+nz_, rtmp);
     fill_n(tmp_x, nx_+nz_, 0);
     casadi_assert(!linsol_f_.isNull());
-    linsol_f_.spSolve(tmp_x, rtmp, false);
+    linsol_f_.spSolve(tmp_x, rtmp, true);
 
     // Propagate through f
     dae_out[DAE_ODE] = tmp_x;
@@ -1091,40 +1091,38 @@ namespace casadi {
 
   Sparsity IntegratorInternal::spJacF() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity ret = f_.jacSparsity(DAE_X, DAE_ODE).T();
+    Sparsity jac_ode_x = f_.jacSparsity(DAE_X, DAE_ODE);
 
     // Add diagonal to get interdependencies
-    ret = ret.patternUnion(Sparsity::diag(nx_));
+    jac_ode_x = jac_ode_x + Sparsity::diag(nx_);
 
     // Quick return if no algebraic variables
-    if (nz_==0) return ret;
+    if (nz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z, DAE_ODE).T();
-    Sparsity jac_alg_x = f_.jacSparsity(DAE_X, DAE_ALG).T();
-    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z, DAE_ALG).T();
-    ret = vertcat(ret, jac_ode_z);
-    ret.appendColumns(vertcat(jac_alg_x, jac_alg_z));
-    return ret;
+    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z, DAE_ODE);
+    Sparsity jac_alg_x = f_.jacSparsity(DAE_X, DAE_ALG);
+    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z, DAE_ALG);
+    return blockcat(jac_ode_x, jac_ode_z,
+                    jac_alg_x, jac_alg_z);
   }
 
   Sparsity IntegratorInternal::spJacG() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity ret = g_.jacSparsity(RDAE_RX, RDAE_ODE).T();
+    Sparsity jac_ode_x = g_.jacSparsity(RDAE_RX, RDAE_ODE);
 
     // Add diagonal to get interdependencies
-    ret = ret.patternUnion(Sparsity::diag(nrx_));
+    jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
 
     // Quick return if no algebraic variables
-    if (nrz_==0) return ret;
+    if (nrz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ, RDAE_ODE).T();
-    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX, RDAE_ALG).T();
-    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ, RDAE_ALG).T();
-    ret = vertcat(ret, jac_ode_z);
-    ret.appendColumns(vertcat(jac_alg_x, jac_alg_z));
-    return ret;
+    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ, RDAE_ODE);
+    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX, RDAE_ALG);
+    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ, RDAE_ALG);
+    return blockcat(jac_ode_x, jac_ode_z,
+                    jac_alg_x, jac_alg_z);
   }
 
   std::map<std::string, IntegratorInternal::Plugin> IntegratorInternal::solvers_;
