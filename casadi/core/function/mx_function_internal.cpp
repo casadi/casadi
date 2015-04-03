@@ -570,6 +570,88 @@ namespace casadi {
     fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
 
+  void MXFunctionInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res,
+                                 int* itmp, bvec_t* rtmp) {
+    // Tmporaries to hold pointers to operation input and outputs
+    vector<bvec_t*> ores(max_res_);
+    vector<const bvec_t*> oarg(max_arg_);
+
+    // Propagate sparsity forward
+    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
+      if (it->op==OP_INPUT) {
+        // Pass input seeds
+        int i=it->arg.front();
+        int nnz=input(i).nnz();
+        const bvec_t* iw = arg[i];
+        bvec_t* w = rtmp + workloc_[it->res.front()];
+        if (iw!=0) {
+          copy(iw, iw+nnz, w);
+        } else {
+          fill_n(w, nnz, 0);
+        }
+      } else if (it->op==OP_OUTPUT) {
+        // Get the output sensitivities
+        int i=it->res.front();
+        int nnz=output(i).nnz();
+        bvec_t* ow = res[i];
+        bvec_t* w = rtmp + workloc_[it->arg.front()];
+        if (ow!=0) copy(w, w+nnz, ow);
+      } else {
+        // Point pointers to the data corresponding to the element
+        for (int i=0; i<it->arg.size(); ++i)
+          oarg[i] = it->arg[i]>=0 ? rtmp+workloc_[it->arg[i]] : 0;
+        for (int i=0; i<it->res.size(); ++i)
+          ores[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
+
+        // Propagate sparsity forwards
+        it->data->spFwd(oarg, ores, itmp, rtmp);
+      }
+    }
+  }
+
+  void MXFunctionInternal::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
+                                 int* itmp, bvec_t* rtmp) {
+    // Tmporaries to hold pointers to operation input and outputs
+    vector<bvec_t*> ores(max_res_);
+    vector<bvec_t*> oarg(max_arg_); // Non-const since seeds are cleared
+
+    size_t ni, nr;
+    nTmp(ni, nr);
+    fill_n(rtmp, nr, 0);
+
+    // Propagate sparsity backwards
+    for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
+      if (it->op==OP_INPUT) {
+        // Get the input sensitivities and clear it from the work vector
+        int i=it->arg.front();
+        int nnz=input(i).nnz();
+        bvec_t* iw = arg[i];
+        bvec_t* w = rtmp + workloc_[it->res.front()];
+        if (iw!=0) for (int k=0; k<nnz; ++k) iw[k] |= w[k];
+        fill_n(w, nnz, 0);
+      } else if (it->op==OP_OUTPUT) {
+        // Pass output seeds
+        int i=it->res.front();
+        int nnz=output(i).nnz();
+        bvec_t* ow = res[i];
+        bvec_t* w = rtmp + workloc_[it->arg.front()];
+        if (ow!=0) {
+          for (int k=0; k<nnz; ++k) w[k] |= ow[k];
+          fill_n(ow, nnz, 0);
+        }
+      } else {
+        // Point pointers to the data corresponding to the element
+        for (int i=0; i<it->arg.size(); ++i)
+          oarg[i] = it->arg[i]>=0 ? rtmp+workloc_[it->arg[i]] : 0;
+        for (int i=0; i<it->res.size(); ++i)
+          ores[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
+
+        // Propagate sparsity backwards
+        it->data->spAdj(oarg, ores, itmp, rtmp);
+      }
+    }
+  }
+
   void MXFunctionInternal::spEvaluate(bool fwd) {
     // Work vector and tmporaries to hold pointers to operation input and outputs
     bvec_t* w = get_bvec_t(rtmp_);
