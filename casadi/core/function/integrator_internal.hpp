@@ -80,10 +80,6 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Propagate the sparsity pattern through a set of
-     * directional derivatives forward or backward */
-    virtual void spEvaluate(bool fwd);
-
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
