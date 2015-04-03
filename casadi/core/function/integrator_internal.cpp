@@ -493,6 +493,198 @@ namespace casadi {
     return ret;
   }
 
+  void IntegratorInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res,
+                                 int* itmp, bvec_t* rtmp) {
+    log("IntegratorInternal::spFwd", "begin");
+
+    // Temporary vectors
+    bvec_t *tmp_f1, *tmp_f2, *tmp_g1= NULL, *tmp_g2=NULL;
+    casadi_assert(!linsol_f_.isNull());
+    tmp_f1 = reinterpret_cast<bvec_t*>(linsol_f_.input(LINSOL_B).ptr());
+    tmp_f2 = reinterpret_cast<bvec_t*>(linsol_f_.output(LINSOL_X).ptr());
+    if (!g_.isNull()) {
+      casadi_assert(!linsol_g_.isNull());
+      tmp_g1 = reinterpret_cast<bvec_t*>(linsol_g_.input(LINSOL_B).ptr());
+      tmp_g2 = reinterpret_cast<bvec_t*>(linsol_g_.output(LINSOL_X).ptr());
+    }
+
+    // Propagate through the DAE
+    cpv_bvec_t dae_in(DAE_NUM_IN, 0);
+    dae_in[DAE_X] = arg[INTEGRATOR_X0];
+    dae_in[DAE_P] = arg[INTEGRATOR_P];
+    pv_bvec_t dae_out(DAE_NUM_OUT, 0);
+    dae_out[DAE_ODE] = tmp_f1;
+    dae_out[DAE_ALG] = tmp_f1 + nx_;
+    f_.spFwd(dae_in, dae_out, itmp, rtmp);
+
+    // Propagate interdependencies
+    std::fill(tmp_f2, tmp_f2+nx_+nz_, 0);
+    if (arg[INTEGRATOR_X0]!=0)
+      copy(arg[INTEGRATOR_X0], arg[INTEGRATOR_X0]+nx_, tmp_f2);
+    linsol_f_.spSolve(tmp_f2, tmp_f1, true);
+    if (res[INTEGRATOR_XF]!=0)
+      copy(tmp_f2, tmp_f2+nx_, res[INTEGRATOR_XF]);
+    if (res[INTEGRATOR_ZF]!=0)
+      copy(tmp_f2+nx_, tmp_f2+nx_+nz_, res[INTEGRATOR_ZF]);
+
+    // Get influence on the quadratures
+    if (nq_>0 && res[INTEGRATOR_QF]!=0) {
+      dae_in[DAE_X] = tmp_f2;
+      dae_in[DAE_Z] = tmp_f2+nx_;
+      dae_out[DAE_ODE] = dae_out[DAE_ALG] = 0;
+      dae_out[DAE_QUAD] = res[INTEGRATOR_QF];
+      f_.spFwd(dae_in, dae_out, itmp, rtmp);
+    }
+
+    // Propagate through g
+    if (!g_.isNull()) {
+      // Propagate through the backward DAE
+      cpv_bvec_t rdae_in(RDAE_NUM_IN, 0);
+
+      rdae_in[RDAE_X] = tmp_f2;
+      rdae_in[RDAE_P] = arg[INTEGRATOR_P];
+      rdae_in[RDAE_Z] = tmp_f2+nx_;
+      rdae_in[RDAE_RX] = arg[INTEGRATOR_X0];
+      rdae_in[RDAE_RX] = arg[INTEGRATOR_RX0];
+      rdae_in[RDAE_RP] = arg[INTEGRATOR_RP];
+      pv_bvec_t rdae_out(RDAE_NUM_OUT, 0);
+      rdae_out[RDAE_ODE] = tmp_g1;
+      rdae_out[RDAE_ALG] = tmp_g1 + nrx_;
+      g_.spFwd(rdae_in, rdae_out, itmp, rtmp);
+
+      // Propagate interdependencies
+      std::fill(tmp_g2, tmp_g2+nrx_+nrz_, 0);
+      if (arg[INTEGRATOR_RX0]!=0)
+        copy(arg[INTEGRATOR_RX0], arg[INTEGRATOR_RX0]+nrx_, tmp_g2);
+
+      std::fill(tmp_g2+nrx_, tmp_g2+nrx_+nrz_, 0);
+      linsol_g_.spSolve(tmp_g2, tmp_g1, true);
+      if (res[INTEGRATOR_RXF]!=0)
+        copy(tmp_g2, tmp_g2+nrx_, res[INTEGRATOR_RXF]);
+      if (res[INTEGRATOR_RZF]!=0)
+        copy(tmp_g2+nrx_, tmp_g2+nrx_+nrz_, res[INTEGRATOR_RZF]);
+
+      // Get influence on the backward quadratures
+      if (nrq_>0 && res[INTEGRATOR_RQF]!=0) {
+        rdae_in[RDAE_RX] = tmp_g2;
+        rdae_in[RDAE_RZ] = tmp_g2 + nrx_;
+        rdae_out[RDAE_ODE] = rdae_out[RDAE_ALG] = 0;
+        rdae_out[RDAE_QUAD] = res[INTEGRATOR_RQF];
+        g_.spFwd(rdae_in, rdae_out, itmp, rtmp);
+      }
+    }
+    log("IntegratorInternal::spFwd", "end");
+  }
+
+  void IntegratorInternal::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
+                                 int* itmp, bvec_t* rtmp) {
+    return FunctionInternal::spAdj(arg, res, itmp, rtmp);
+
+    log("IntegratorInternal::spAdj", "begin");
+
+    // Temporary vectors
+    bvec_t *tmp_f1, *tmp_f2, *tmp_g1= NULL, *tmp_g2=NULL;
+    casadi_assert(!linsol_f_.isNull());
+    tmp_f1 = reinterpret_cast<bvec_t*>(linsol_f_.input(LINSOL_B).ptr());
+    tmp_f2 = reinterpret_cast<bvec_t*>(linsol_f_.output(LINSOL_X).ptr());
+    if (!g_.isNull()) {
+      casadi_assert(!linsol_g_.isNull());
+      tmp_g1 = reinterpret_cast<bvec_t*>(linsol_g_.input(LINSOL_B).ptr());
+      tmp_g2 = reinterpret_cast<bvec_t*>(linsol_g_.output(LINSOL_X).ptr());
+    }
+
+    int *iw = getPtr(itmp_);
+    bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(rtmp_));
+
+    // Clear adjoint sensitivities
+    x0().setBV(xf());
+    p().setZeroBV();
+    z0().setBV(zf());
+    rx0().setBV(rxf());
+    rp().setZeroBV();
+    rz0().setBV(rzf());
+
+    // Propagate through g
+    if (!g_.isNull()) {
+      pv_bvec_t rdae_in(RDAE_NUM_IN, 0);
+      pv_bvec_t rdae_out(RDAE_NUM_OUT, 0);
+
+      // Propagate influence from the backward quadratures
+      if (nrq_>0) {
+        DMatrix rqf_copy(rqf());
+        rdae_out[RDAE_QUAD] = reinterpret_cast<bvec_t*>(rqf_copy.ptr());
+        rdae_in[RDAE_RX] = reinterpret_cast<bvec_t*>(rx0().ptr());
+        rdae_in[RDAE_RP] = reinterpret_cast<bvec_t*>(rz0().ptr());
+        g_.spAdj(rdae_in, rdae_out, iw, w);
+      }
+
+      // Propagate interdependencies
+      rx0().getArrayBV(tmp_g2, nrx_);
+      rz0().getArrayBV(tmp_g2+nrx_, nrz_);
+      std::fill(tmp_g1, tmp_g1+nrx_+nrz_, 0);
+      linsol_g_.spSolve(tmp_g1, tmp_g2, false);
+
+      // Propagate through the backward DAE
+      rdae_out[RDAE_ODE] = tmp_g1;
+      rdae_out[RDAE_ALG] = tmp_g1 + nrx_;
+      const bvec_t* tmp = reinterpret_cast<const bvec_t*>(rx0().ptr());
+      for (int i=0; i<nrx_; ++i) tmp_g1[i] |= tmp[i];
+      tmp = reinterpret_cast<const bvec_t*>(rz0().ptr());
+      for (int i=0; i<nrz_; ++i) tmp_g1[nrx_ + i] |= tmp[i];
+      DMatrix rqf_copy(rqf());
+      rdae_out[RDAE_QUAD] = reinterpret_cast<bvec_t*>(rqf_copy.ptr());
+
+
+      rdae_in[RDAE_X] = reinterpret_cast<bvec_t*>(x0().ptr());
+      rdae_in[RDAE_P] = reinterpret_cast<bvec_t*>(p().ptr());
+      rdae_in[RDAE_Z] = reinterpret_cast<bvec_t*>(z0().ptr());
+      rdae_in[RDAE_RX] = reinterpret_cast<bvec_t*>(rx0().ptr());
+      rdae_in[RDAE_RP] = reinterpret_cast<bvec_t*>(rp().ptr());
+      rdae_in[RDAE_RZ] = 0;
+      g_.spAdj(rdae_in, rdae_out, iw, w);
+
+      // No dependency on initial guess
+      rz0().setZeroBV();
+    }
+
+    pv_bvec_t dae_out(DAE_NUM_OUT, 0);
+    pv_bvec_t dae_in(DAE_NUM_IN, 0);
+
+    // Propagate influence from the quadratures
+    if (nq_>0) {
+      DMatrix qf_copy(qf());
+      dae_out[DAE_QUAD] = reinterpret_cast<bvec_t*>(qf_copy.ptr());
+      dae_in[DAE_X] = reinterpret_cast<bvec_t*>(x0().ptr());
+      dae_in[DAE_Z] = reinterpret_cast<bvec_t*>(z0().ptr());
+      f_.spAdj(dae_in, dae_out, iw, w);
+    }
+
+    // Propagate interdependencies
+    x0().getArrayBV(tmp_f2, nx_);
+    z0().getArrayBV(tmp_f2+nx_, nz_);
+    std::fill(tmp_f1, tmp_f1+nx_+nz_, 0);
+    linsol_f_.spSolve(tmp_f1, tmp_f2, false);
+
+    // Propagate through the DAE
+    dae_out[DAE_ODE] = tmp_f1;
+    dae_out[DAE_ALG] = tmp_f1 + nx_;
+    DMatrix qf_copy(qf());
+    dae_out[DAE_QUAD] = reinterpret_cast<bvec_t*>(qf_copy.ptr());
+    const bvec_t* tmp = reinterpret_cast<bvec_t*>(x0().ptr());
+    for (int i=0; i<nx_; ++i) tmp_f1[i] |= tmp[i];
+    tmp = reinterpret_cast<const bvec_t*>(z0().ptr());
+    for (int i=0; i<nz_; ++i) tmp_f1[nx_ + i] |= tmp[i];
+    dae_in[DAE_X] = reinterpret_cast<bvec_t*>(x0().ptr());
+    dae_in[DAE_P] = reinterpret_cast<bvec_t*>(p().ptr());
+    dae_in[DAE_Z] = 0;
+    f_.spAdj(dae_in, dae_out, iw, w);
+
+    // No dependency on initial guess
+    z0().setZeroBV();
+
+    log("IntegratorInternal::spAdj", "end");
+  }
+
   void IntegratorInternal::spEvaluate(bool fwd) {
     log("IntegratorInternal::spEvaluate", "begin");
 
