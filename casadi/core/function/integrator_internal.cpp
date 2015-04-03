@@ -524,6 +524,7 @@ namespace casadi {
     // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
     copy(tmp_x, tmp_x+nx_+nz_, rtmp);
     fill_n(tmp_x, nx_+nz_, 0);
+    casadi_assert(!linsol_f_.isNull());
     linsol_f_.spSolve(tmp_x, rtmp, true);
 
     // Get xf and zf
@@ -562,6 +563,7 @@ namespace casadi {
       // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
       copy(tmp_rx, tmp_rx+nrx_+nrz_, rtmp);
       fill_n(tmp_rx, nrx_+nrz_, 0);
+      casadi_assert(!linsol_g_.isNull());
       linsol_g_.spSolve(tmp_rx, rtmp, true);
 
       // Get rxf and rzf
@@ -587,17 +589,42 @@ namespace casadi {
     log("IntegratorInternal::spAdj", "begin");
 
     // Work vectors
-    fill_n(rtmp, nx_ + nz_ + nrx_ + nrz_, 0);
     bvec_t *tmp_x = rtmp; rtmp += nx_;
     bvec_t *tmp_z = rtmp; rtmp += nz_;
     bvec_t *tmp_rx = rtmp; rtmp += nrx_;
     bvec_t *tmp_rz = rtmp; rtmp += nrz_;
 
+    // Get & clear seeds (forward integration)
+    if (res[INTEGRATOR_XF]) {
+      copy(res[INTEGRATOR_XF], res[INTEGRATOR_XF]+nx_, tmp_x);
+      fill_n(res[INTEGRATOR_XF], nx_, 0);
+    } else {
+      fill_n(tmp_x, nx_, 0);
+    }
+    if (res[INTEGRATOR_ZF]) {
+      copy(res[INTEGRATOR_ZF], res[INTEGRATOR_ZF]+nz_, tmp_z);
+      fill_n(res[INTEGRATOR_ZF], nz_, 0);
+    } else {
+      fill_n(tmp_z, nz_, 0);
+    }
+
     if (!g_.isNull()) {
-      // Propagate through g
+      // Get & clear seeds (backward integration)
+      if (res[INTEGRATOR_RXF]) {
+        copy(res[INTEGRATOR_RXF], res[INTEGRATOR_RXF]+nrx_, tmp_rx);
+        fill_n(res[INTEGRATOR_RXF], nrx_, 0);
+      } else {
+        fill_n(tmp_rx, nrx_, 0);
+      }
+      if (res[INTEGRATOR_RZF]) {
+        copy(res[INTEGRATOR_RZF], res[INTEGRATOR_RZF]+nrz_, tmp_rz);
+        fill_n(res[INTEGRATOR_RZF], nrz_, 0);
+      } else {
+        fill_n(tmp_rz, nrz_, 0);
+      }
+
+      // Propagate dependencies from quadratures
       pv_bvec_t rdae_out(RDAE_NUM_OUT, 0);
-      rdae_out[RDAE_ODE] = res[INTEGRATOR_RXF];
-      rdae_out[RDAE_ALG] = res[INTEGRATOR_RZF];
       rdae_out[RDAE_QUAD] = res[INTEGRATOR_RQF];
       pv_bvec_t rdae_in(RDAE_NUM_IN, 0);
       rdae_in[RDAE_X] = tmp_x;
@@ -606,43 +633,49 @@ namespace casadi {
       rdae_in[RDAE_RX] = tmp_rx;
       rdae_in[RDAE_RZ] = tmp_rz;
       rdae_in[RDAE_RP] = arg[INTEGRATOR_RP];
-      g_.spAdj(rdae_in, rdae_out, itmp, rtmp);
+      if (nrq_>0 && res[INTEGRATOR_RQF]) {
+        g_.spAdj(rdae_in, rdae_out, itmp, rtmp);
+      }
 
-      // Propagate interdependencies rx <-> rz
-      fill_n(rtmp, nrx_+nrz_, 0);
+      // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
+      copy(tmp_rx, tmp_rx+nrx_+nrz_, rtmp);
+      fill_n(tmp_rx, nrx_+nrz_, 0);
       casadi_assert(!linsol_g_.isNull());
-      linsol_g_.spSolve(rtmp, tmp_rx, false);
-      copy(rtmp, rtmp+nrx_+nrz_, tmp_rx);
+      linsol_g_.spSolve(tmp_rx, rtmp, false);
+
+      // Propagate through g
+      rdae_out[RDAE_ODE] = tmp_rx;
+      rdae_out[RDAE_ALG] = tmp_rx + nrx_;
+      rdae_out[RDAE_QUAD] = 0;
+      rdae_in[RDAE_X] = arg[INTEGRATOR_RX0];
+      rdae_in[RDAE_Z] = 0;
+      g_.spAdj(rdae_in, rdae_out, itmp, rtmp);
     }
 
-    // Fetch rx0 (note: rz0 unchanged, just a guess)
-    if (arg[INTEGRATOR_RX0]) {
-      bvec_t *tmp = arg[INTEGRATOR_RX0];
-      for (int i=0; i<nrx_; ++i) *tmp++ |= *tmp_rx++;
-    }
-
-    // Propagate through f
+    // Propagate dependencies from quadratures
     pv_bvec_t dae_out(DAE_NUM_OUT, 0);
-    dae_out[DAE_ODE] = res[INTEGRATOR_XF];
-    dae_out[DAE_ALG] = res[INTEGRATOR_ZF];
     dae_out[DAE_QUAD] = res[INTEGRATOR_QF];
     pv_bvec_t dae_in(DAE_NUM_IN, 0);
     dae_in[DAE_X] = tmp_x;
     dae_in[DAE_Z] = tmp_z;
     dae_in[DAE_P] = arg[INTEGRATOR_P];
-    f_.spAdj(dae_in, dae_out, itmp, rtmp);
-
-    // Propagate interdependencies x <-> z
-    fill_n(rtmp, nx_+nz_, 0);
-    casadi_assert(!linsol_f_.isNull());
-    linsol_f_.spSolve(rtmp, tmp_x, false);
-    copy(rtmp, rtmp+nx_+nz_, tmp_x);
-
-    // Fetch x0 (note: z0 unchanged, just a guess)
-    if (arg[INTEGRATOR_X0]) {
-      bvec_t *tmp = arg[INTEGRATOR_X0];
-      for (int i=0; i<nx_; ++i) *tmp++ |= *tmp_x++;
+    if (nq_>0 && res[INTEGRATOR_QF]) {
+      f_.spAdj(dae_in, dae_out, itmp, rtmp);
     }
+
+    // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
+    copy(tmp_x, tmp_x+nx_+nz_, rtmp);
+    fill_n(tmp_x, nx_+nz_, 0);
+    casadi_assert(!linsol_f_.isNull());
+    linsol_f_.spSolve(tmp_x, rtmp, false);
+
+    // Propagate through f
+    dae_out[DAE_ODE] = tmp_x;
+    dae_out[DAE_ALG] = tmp_x + nx_;
+    dae_out[DAE_QUAD] = 0;
+    dae_in[DAE_X] = arg[INTEGRATOR_X0];
+    dae_in[DAE_Z] = 0; // Note: Ignored, just a guess
+    f_.spAdj(dae_in, dae_out, itmp, rtmp);
 
     log("IntegratorInternal::spAdj", "end");
   }
