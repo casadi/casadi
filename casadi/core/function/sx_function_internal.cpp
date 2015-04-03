@@ -944,64 +944,6 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::spEvaluate(bool fwd) {
-#ifdef WITH_OPENCL
-    if (just_in_time_sparsity_) {
-      // Evaluate with OpenCL
-      spEvaluateOpenCL(fwd);
-      return; // Quick return
-    }
-#endif // WITH_OPENCL
-
-    // Get work array
-    bvec_t *iwork = get_bvec_t(rtmp_);
-
-    if (fwd) {
-      // Propagate sparsity forward
-      for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-        switch (it->op) {
-        case OP_CONST:
-        case OP_PARAMETER:
-          iwork[it->i0] = bvec_t(0); break;
-        case OP_INPUT:
-          iwork[it->i0] = reinterpret_cast<bvec_t*>(&inputNoCheck(it->i1).front())[it->i2]; break;
-        case OP_OUTPUT:
-          reinterpret_cast<bvec_t*>(&outputNoCheck(it->i0).front())[it->i2] = iwork[it->i1]; break;
-        default: // Unary or binary operation
-          iwork[it->i0] = iwork[it->i1] | iwork[it->i2]; break;
-        }
-      }
-
-    } else { // Backward propagation
-
-      // Propagate sparsity backward
-      for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
-        // Temp seed
-        bvec_t seed;
-
-        // Propagate seeds
-        switch (it->op) {
-        case OP_CONST:
-        case OP_PARAMETER:
-          iwork[it->i0] = 0;
-          break;
-        case OP_INPUT:
-          reinterpret_cast<bvec_t*>(&inputNoCheck(it->i1).front())[it->i2] = iwork[it->i0];
-          iwork[it->i0] = 0;
-          break;
-        case OP_OUTPUT:
-          iwork[it->i1] |= reinterpret_cast<bvec_t*>(&outputNoCheck(it->i0).front())[it->i2];
-          break;
-        default: // Unary or binary operation
-          seed = iwork[it->i0];
-          iwork[it->i0] = 0;
-          iwork[it->i1] |= seed;
-          iwork[it->i2] |= seed;
-        }
-      }
-    }
-  }
-
   Function SXFunctionInternal::getFullJacobian() {
     SX J = casadi::jacobian(veccat(outputv_), veccat(inputv_));
     return SXFunction(inputv_, J);

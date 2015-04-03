@@ -1373,8 +1373,33 @@ namespace casadi {
   }
 
   void FunctionInternal::spEvaluate(bool fwd) {
-    casadi_error("FunctionInternal::spEvaluate not defined for class "
-                 << typeid(*this).name());
+    // Allocate temporary memory if needed
+    size_t ni, nr;
+    nTmp(ni, nr);
+    itmp_.resize(ni);
+    rtmp_.resize(nr);
+    int *iw = getPtr(itmp_);
+    bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(rtmp_));
+
+    // Get pointers to output arguments
+    pv_bvec_t res(getNumOutputs());
+    for (int i=0; i<res.size(); ++i) res[i]=reinterpret_cast<bvec_t*>(output(i).ptr());
+
+    if (fwd) {
+      // Get pointers to input arguments
+      cpv_bvec_t arg(getNumInputs());
+      for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
+
+      // Call memory-less
+      spFwd(arg, res, iw, w);
+    } else {
+      // Get pointers to input arguments
+      pv_bvec_t arg(getNumInputs());
+      for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
+
+      // Call memory-less
+      spAdj(arg, res, iw, w);
+    }
   }
 
   void FunctionInternal::spEvaluateViaJacSparsity(bool fwd) {
@@ -2247,14 +2272,13 @@ namespace casadi {
     return MX::createMultipleOutput(new CallFunction(shared_from_this<Function>(), arg));
   }
 
-  void FunctionInternal::spFwdSwitch(const std::vector<const bvec_t*>& arg,
-                                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void FunctionInternal::spFwdSwitch(const cpv_bvec_t& arg, const pv_bvec_t& res,
+                                     int* itmp, bvec_t* rtmp) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
     spFwd(arg, res, itmp, rtmp);
   }
 
-  void FunctionInternal::spFwd(const std::vector<const bvec_t*>& arg,
-                               const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void FunctionInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
@@ -2304,14 +2328,14 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::spAdjSwitch(const std::vector<bvec_t*>& arg,
-                                     const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void FunctionInternal::spAdjSwitch(const pv_bvec_t& arg, const pv_bvec_t& res,
+                                     int* itmp, bvec_t* rtmp) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
     spAdj(arg, res, itmp, rtmp);
   }
 
-  void FunctionInternal::spAdj(const std::vector<bvec_t*>& arg,
-                               const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp) {
+  void FunctionInternal::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
+                               int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
     int n_in = getNumInputs();
     int n_out = getNumOutputs();

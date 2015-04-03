@@ -173,9 +173,6 @@ class CASADI_EXPORT SXFunctionInternal :
   /** \brief  Propagate sparsity backwards */
   virtual void spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
-  /// Propagate a sparsity pattern through the algorithm
-  virtual void spEvaluate(bool fwd);
-
   /// Is the class able to propagate seeds through the algorithm?
   virtual bool spCanEvaluate(bool fwd) { return true;}
 
