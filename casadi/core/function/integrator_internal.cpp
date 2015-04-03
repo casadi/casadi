@@ -184,6 +184,17 @@ namespace casadi {
       linsol_g_ = LinearSolver(spJacG());
       linsol_g_.init();
     }
+
+    // Allocate sufficiently large work vectors
+    size_t ni, nr;
+    f_.nTmp(ni, nr);
+    itmp_.resize(max(itmp_.size(), ni));
+    rtmp_.resize(max(rtmp_.size(), nr));
+    if (!g_.isNull()) {
+      g_.nTmp(ni, nr);
+      itmp_.resize(max(itmp_.size(), ni));
+      rtmp_.resize(max(rtmp_.size(), nr));
+    }
   }
 
   void IntegratorInternal::deepCopyMembers(
@@ -503,15 +514,17 @@ namespace casadi {
     }
 
     if (fwd) {
+      int *iw = getPtr(itmp_);
+      bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(rtmp_));
 
       // Propagate through the DAE
-      f_.input(DAE_T).setZeroBV();
-      f_.input(DAE_X).setBV(x0());
-      f_.input(DAE_P).setBV(p());
-      f_.input(DAE_Z).setZeroBV();
-      f_.spEvaluate(true);
-      f_.output(DAE_ODE).getArrayBV(tmp_f1, nx_);
-      f_.output(DAE_ALG).getArrayBV(tmp_f1+nx_, nz_);
+      cpv_bvec_t dae_in(DAE_NUM_IN, 0);
+      dae_in[DAE_X] = reinterpret_cast<const bvec_t*>(x0().ptr());
+      dae_in[DAE_P] = reinterpret_cast<const bvec_t*>(p().ptr());
+      pv_bvec_t dae_out(DAE_NUM_OUT, 0);
+      dae_out[DAE_ODE] = tmp_f1;
+      dae_out[DAE_ALG] = tmp_f1 + nx_;
+      f_.spFwd(dae_in, dae_out, iw, w);
 
       // Propagate interdependencies
       x0().getArrayBV(tmp_f2, nx_);
@@ -522,26 +535,26 @@ namespace casadi {
 
       // Get influence on the quadratures
       if (nq_>0) {
-        f_.input(DAE_X).setArrayBV(tmp_f2, nx_);
-        f_.input(DAE_Z).setBV(zf());
-        f_.spEvaluate(true);
-        f_.output(DAE_QUAD).getBV(qf());
+        dae_in[DAE_X] = tmp_f2;
+        dae_in[DAE_Z] = reinterpret_cast<const bvec_t*>(zf().ptr());
+        dae_out[DAE_ODE] = dae_out[DAE_ALG] = 0;
+        dae_out[DAE_QUAD] = reinterpret_cast<bvec_t*>(qf().ptr());
+        f_.spFwd(dae_in, dae_out, iw, w);
       }
 
       // Propagate through g
       if (!g_.isNull()) {
-
         // Propagate through the backward DAE
-        g_.input(RDAE_T).setZeroBV();
-        g_.input(RDAE_X).setBV(xf());
-        g_.input(RDAE_P).setBV(p());
-        g_.input(RDAE_Z).setBV(zf());
-        g_.input(RDAE_RX).setBV(rx0());
-        g_.input(RDAE_RP).setBV(rp());
-        g_.input(RDAE_RZ).setZeroBV();
-        g_.spEvaluate(true);
-        g_.output(RDAE_ODE).getArrayBV(tmp_g1, nrx_);
-        g_.output(RDAE_ALG).getArrayBV(tmp_g1+nrx_, nrz_);
+        cpv_bvec_t rdae_in(RDAE_NUM_IN, 0);
+        rdae_in[RDAE_X] = reinterpret_cast<const bvec_t*>(x0().ptr());
+        rdae_in[RDAE_P] = reinterpret_cast<const bvec_t*>(p().ptr());
+        rdae_in[RDAE_Z] = reinterpret_cast<const bvec_t*>(zf().ptr());
+        rdae_in[RDAE_RX] = reinterpret_cast<const bvec_t*>(rx0().ptr());
+        rdae_in[RDAE_RP] = reinterpret_cast<const bvec_t*>(rp().ptr());
+        pv_bvec_t rdae_out(RDAE_NUM_OUT, 0);
+        rdae_out[RDAE_ODE] = tmp_g1;
+        rdae_out[RDAE_ALG] = tmp_g1 + nrx_;
+        g_.spFwd(rdae_in, rdae_out, iw, w);
 
         // Propagate interdependencies
         rx0().getArrayBV(tmp_g2, nrx_);
@@ -552,10 +565,11 @@ namespace casadi {
 
         // Get influence on the backward quadratures
         if (nrq_>0) {
-          g_.input(RDAE_RX).setBV(rxf());
-          g_.input(RDAE_RZ).setBV(rzf());
-          g_.spEvaluate(true);
-          g_.output(RDAE_QUAD).getBV(rqf());
+          rdae_in[RDAE_RX] = reinterpret_cast<const bvec_t*>(rxf().ptr());
+          rdae_in[RDAE_RZ] = reinterpret_cast<const bvec_t*>(rzf().ptr());
+          rdae_out[RDAE_ODE] = rdae_out[RDAE_ALG] = 0;
+          rdae_out[RDAE_QUAD] = reinterpret_cast<bvec_t*>(rqf().ptr());
+          g_.spFwd(rdae_in, rdae_out, iw, w);
         }
       }
     } else { // reverse mode
