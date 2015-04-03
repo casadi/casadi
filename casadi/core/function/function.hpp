@@ -527,13 +527,13 @@ namespace casadi {
 
 #ifndef SWIG
     /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr);
+    void nTmp(size_t& ni, size_t& nr);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    void spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    void spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
 #endif // SWIG
 
     /// \endcond
