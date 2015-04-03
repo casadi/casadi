@@ -2278,7 +2278,8 @@ namespace casadi {
     spFwd(arg, res, itmp, rtmp);
   }
 
-  void FunctionInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void FunctionInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res,
+                               int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
     int n_in = getNumInputs();
     int n_out = getNumOutputs();

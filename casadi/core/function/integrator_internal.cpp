@@ -507,15 +507,10 @@ namespace casadi {
       tmp_g2 = reinterpret_cast<bvec_t*>(linsol_g_.output(LINSOL_X).ptr());
     }
 
-    // Initialize the callback functions for sparsity propagation
-    f_.spInit(fwd);
-    if (!g_.isNull()) {
-      g_.spInit(fwd);
-    }
+    int *iw = getPtr(itmp_);
+    bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(rtmp_));
 
     if (fwd) {
-      int *iw = getPtr(itmp_);
-      bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(rtmp_));
 
       // Propagate through the DAE
       cpv_bvec_t dae_in(DAE_NUM_IN, 0);
@@ -584,15 +579,16 @@ namespace casadi {
 
       // Propagate through g
       if (!g_.isNull()) {
+        pv_bvec_t rdae_in(RDAE_NUM_IN, 0);
+        pv_bvec_t rdae_out(RDAE_NUM_OUT, 0);
 
         // Propagate influence from the backward quadratures
         if (nrq_>0) {
-          g_.output(RDAE_ODE).setZeroBV();
-          g_.output(RDAE_ALG).setZeroBV();
-          g_.output(RDAE_QUAD).setBV(rqf());
-          g_.spEvaluate(false);
-          rx0().borBV(g_.input(RDAE_RX));
-          rz0().borBV(g_.input(RDAE_RZ));
+          DMatrix rqf_copy(rqf());
+          rdae_out[RDAE_QUAD] = reinterpret_cast<bvec_t*>(rqf_copy.ptr());
+          rdae_in[RDAE_RX] = reinterpret_cast<bvec_t*>(rx0().ptr());
+          rdae_in[RDAE_RP] = reinterpret_cast<bvec_t*>(rz0().ptr());
+          g_.spAdj(rdae_in, rdae_out, iw, w);
         }
 
         // Propagate interdependencies
@@ -602,29 +598,38 @@ namespace casadi {
         linsol_g_.spSolve(tmp_g1, tmp_g2, false);
 
         // Propagate through the backward DAE
-        g_.output(RDAE_ODE).setArrayBV(tmp_g1, nrx_);
-        g_.output(RDAE_ODE).borBV(rx0());
-        g_.output(RDAE_ALG).setArrayBV(tmp_g1+nrx_, nrz_);
-        g_.output(RDAE_ALG).borBV(rz0());
-        g_.spEvaluate(false);
-        x0().borBV(g_.input(RDAE_X));
-        p().borBV(g_.input(RDAE_P));
-        z0().borBV(g_.input(RDAE_Z));
-        rx0().borBV(g_.input(RDAE_RX));
-        rp().borBV(g_.input(RDAE_RP));
+        rdae_out[RDAE_ODE] = tmp_g1;
+        rdae_out[RDAE_ALG] = tmp_g1 + nrx_;
+        const bvec_t* tmp = reinterpret_cast<const bvec_t*>(rx0().ptr());
+        for (int i=0; i<nrx_; ++i) tmp_g1[i] |= tmp[i];
+        tmp = reinterpret_cast<const bvec_t*>(rz0().ptr());
+        for (int i=0; i<nrz_; ++i) tmp_g1[nrx_ + i] |= tmp[i];
+        DMatrix rqf_copy(rqf());
+        rdae_out[RDAE_QUAD] = reinterpret_cast<bvec_t*>(rqf_copy.ptr());
+
+
+        rdae_in[RDAE_X] = reinterpret_cast<bvec_t*>(x0().ptr());
+        rdae_in[RDAE_P] = reinterpret_cast<bvec_t*>(p().ptr());
+        rdae_in[RDAE_Z] = reinterpret_cast<bvec_t*>(z0().ptr());
+        rdae_in[RDAE_RX] = reinterpret_cast<bvec_t*>(rx0().ptr());
+        rdae_in[RDAE_RP] = reinterpret_cast<bvec_t*>(rp().ptr());
+        rdae_in[RDAE_RZ] = 0;
+        g_.spAdj(rdae_in, rdae_out, iw, w);
 
         // No dependency on initial guess
         rz0().setZeroBV();
       }
 
+      pv_bvec_t dae_out(DAE_NUM_OUT, 0);
+      pv_bvec_t dae_in(DAE_NUM_IN, 0);
+
       // Propagate influence from the quadratures
       if (nq_>0) {
-        f_.output(DAE_ODE).setZeroBV();
-        f_.output(DAE_ALG).setZeroBV();
-        f_.output(DAE_QUAD).setBV(qf());
-        f_.spEvaluate(false);
-        x0().borBV(f_.input(DAE_X));
-        z0().borBV(f_.input(DAE_Z));
+        DMatrix qf_copy(qf());
+        dae_out[DAE_QUAD] = reinterpret_cast<bvec_t*>(qf_copy.ptr());
+        dae_in[DAE_X] = reinterpret_cast<bvec_t*>(x0().ptr());
+        dae_in[DAE_Z] = reinterpret_cast<bvec_t*>(z0().ptr());
+        f_.spAdj(dae_in, dae_out, iw, w);
       }
 
       // Propagate interdependencies
@@ -634,13 +639,18 @@ namespace casadi {
       linsol_f_.spSolve(tmp_f1, tmp_f2, false);
 
       // Propagate through the DAE
-      f_.output(DAE_ODE).setArrayBV(tmp_f1, nx_);
-      f_.output(DAE_ODE).borBV(x0());
-      f_.output(DAE_ALG).setArrayBV(tmp_f1+nx_, nz_);
-      f_.output(DAE_ALG).borBV(z0());
-      f_.spEvaluate(false);
-      x0().borBV(f_.input(DAE_X));
-      p().borBV(f_.input(DAE_P));
+      dae_out[DAE_ODE] = tmp_f1;
+      dae_out[DAE_ALG] = tmp_f1 + nx_;
+      DMatrix qf_copy(qf());
+      dae_out[DAE_QUAD] = reinterpret_cast<bvec_t*>(qf_copy.ptr());
+      const bvec_t* tmp = reinterpret_cast<bvec_t*>(x0().ptr());
+      for (int i=0; i<nx_; ++i) tmp_f1[i] |= tmp[i];
+      tmp = reinterpret_cast<const bvec_t*>(z0().ptr());
+      for (int i=0; i<nz_; ++i) tmp_f1[nx_ + i] |= tmp[i];
+      dae_in[DAE_X] = reinterpret_cast<bvec_t*>(x0().ptr());
+      dae_in[DAE_P] = reinterpret_cast<bvec_t*>(p().ptr());
+      dae_in[DAE_Z] = 0;
+      f_.spAdj(dae_in, dae_out, iw, w);
 
       // No dependency on initial guess
       z0().setZeroBV();
