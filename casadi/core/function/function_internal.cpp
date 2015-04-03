@@ -1373,49 +1373,8 @@ namespace casadi {
   }
 
   void FunctionInternal::spEvaluate(bool fwd) {
-    // By default, everything is assumed to depend on everything
-
-    // Variable which depends on all everything
-    bvec_t all_depend(0);
-    if (fwd) {
-      // Get dependency on all inputs
-      for (int iind=0; iind<getNumInputs(); ++iind) {
-        const DMatrix& m = inputNoCheck(iind);
-        const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
-        for (int i=0; i<m.nnz(); ++i) {
-          all_depend |= v[i];
-        }
-      }
-
-      // Propagate to all outputs
-      for (int oind=0; oind<getNumOutputs(); ++oind) {
-        DMatrix& m = outputNoCheck(oind);
-        bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-        for (int i=0; i<m.nnz(); ++i) {
-          v[i] = all_depend;
-        }
-      }
-
-    } else {
-
-      // Get dependency on all outputs
-      for (int oind=0; oind<getNumOutputs(); ++oind) {
-        const DMatrix& m = outputNoCheck(oind);
-        const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
-        for (int i=0; i<m.nnz(); ++i) {
-          all_depend |= v[i];
-        }
-      }
-
-      // Propagate to all inputs
-      for (int iind=0; iind<getNumInputs(); ++iind) {
-        DMatrix& m = inputNoCheck(iind);
-        bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-        for (int i=0; i<m.nnz(); ++i) {
-          v[i] |= all_depend;
-        }
-      }
-    }
+    casadi_error("FunctionInternal::spEvaluate not defined for class "
+                 << typeid(*this).name());
   }
 
   void FunctionInternal::spEvaluateViaJacSparsity(bool fwd) {
