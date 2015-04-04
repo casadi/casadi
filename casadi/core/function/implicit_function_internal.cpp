@@ -162,6 +162,18 @@ namespace casadi {
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
                           "Constraint vector if supplied, must be of length n, but got "
                           << u_c_.size() << " and n = " << n_);
+
+    // Allocate sufficiently large work vectors
+    size_t ni, nr;
+    f_.nTmp(ni, nr);
+    itmp_.resize(ni);
+    rtmp_.resize(nr);
+    if (!jac_.isNull()) {
+      jac_.nTmp(ni, nr);
+      itmp_.resize(max(itmp_.size(), ni));
+      rtmp_.resize(max(rtmp_.size(), nr));
+    }
+    rtmp_.resize(rtmp_.size() + 2*n_);
   }
 
   void ImplicitFunctionInternal::evaluate() {
@@ -210,35 +222,46 @@ namespace casadi {
     return MXFunction(arg, res);
   }
 
+  void ImplicitFunctionInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res,
+                                       int* itmp, bvec_t* rtmp) {
+    int num_out = getNumOutputs();
+    int num_in = getNumInputs();
+    bvec_t* tmp1 = rtmp; rtmp += n_;
+    bvec_t* tmp2 = rtmp; rtmp += n_;
+
+    // Propagate dependencies through the function
+    cpv_bvec_t argf(arg.begin(), arg.begin()+num_in);
+    argf[iin_] = 0;
+    pv_bvec_t resf(num_out, 0);
+    resf[iout_] = tmp1;
+    f_.spFwd(argf, resf, itmp, rtmp);
+
+    // "Solve" in order to propagate to z
+    fill_n(tmp2, n_, 0);
+    linsol_.spSolve(tmp2, tmp1, false);
+    if (res[iout_]) copy(tmp2, tmp2+n_, res[iout_]);
+
+    // Propagate to auxiliary outputs
+    if (num_out>1) {
+      argf[iin_] = tmp2;
+      copy(res.begin(), res.begin()+num_out, resf.begin());
+      resf[iout_] = 0;
+      f_.spFwd(argf, resf, itmp, rtmp);
+    }
+  }
+
+  void ImplicitFunctionInternal::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
+                                       int* itmp, bvec_t* rtmp) {
+    FunctionInternal::spAdj(arg, res, itmp, rtmp);
+  }
+
   void ImplicitFunctionInternal::spEvaluate(bool fwd) {
 
     // Initialize the callback for sparsity propagation
     f_.spInit(fwd);
 
     if (fwd) {
-
-      // Pass inputs to function
-      f_.input(iin_).setZeroBV();
-      for (int i=0; i<getNumInputs(); ++i) {
-        if (i!=iin_) f_.input(i).setBV(input(i));
-      }
-
-      // Propagate dependencies through the function
-      f_.spEvaluate(true);
-
-      // "Solve" in order to propagate to z
-      output(iout_).setZeroBV();
-      linsol_.spSolve(output(iout_), f_.output(iout_), false);
-
-      // Propagate to auxiliary outputs
-      if (getNumOutputs()>1) {
-        f_.input(iin_).setBV(output(iout_));
-        f_.spEvaluate(true);
-        for (int i=0; i<getNumOutputs(); ++i) {
-          if (i!=iout_) output(i).setBV(f_.output(i));
-        }
-      }
-
+      casadi_error("no");
     } else {
 
       // Propagate dependencies from auxiliary outputs
