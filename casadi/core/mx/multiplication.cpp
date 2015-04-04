@@ -59,25 +59,23 @@ namespace casadi {
     }
   }
 
-  void Multiplication::evalD(const cpv_double& input, const pv_double& output,
+  void Multiplication::evalD(cp_double* input, p_double* output,
                                  int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Multiplication::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void Multiplication::evalSX(cp_SXElement* input, p_SXElement* output,
                                   int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Multiplication::evalGen(const std::vector<const T*>& input,
-                               const std::vector<T*>& output, int* itmp, T* rtmp) {
-    if (input[0]!=output[0]) {
-      copy(input[0], input[0]+dep(0).nnz(), output[0]);
-    }
-    casadi_mm_sparse(input[1], dep(1).sparsity(),
-                     input[2], dep(2).sparsity(),
-                     output[0], sparsity(), rtmp);
+  void Multiplication::evalGen(const T* const* arg, T* const* res,
+                               int* itmp, T* rtmp) {
+    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+    casadi_mm_sparse(arg[1], dep(1).sparsity(),
+                     arg[2], dep(2).sparsity(),
+                     res[0], sparsity(), rtmp);
   }
 
   void Multiplication::evalFwd(const std::vector<cpv_MX>& fseed,

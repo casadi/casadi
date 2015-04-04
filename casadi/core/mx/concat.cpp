@@ -41,24 +41,24 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::evalD(const cpv_double& input, const pv_double& output,
+  void Concat::evalD(cp_double* input, p_double* output,
                          int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Concat::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void Concat::evalSX(cp_SXElement* input, p_SXElement* output,
                           int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Concat::evalGen(const std::vector<const T*>& input,
-                       const std::vector<T*>& output, int* itmp, T* rtmp) {
-    T* res = output[0];
+  void Concat::evalGen(const T* const* arg, T* const* res,
+                       int* itmp, T* rtmp) {
+    T* r = res[0];
     for (int i=0; i<ndep(); ++i) {
-      const T* arg_i = input[i];
-      copy(arg_i, arg_i+dep(i).nnz(), res);
-      res += dep(i).nnz();
+      int n = dep(i).nnz();
+      copy(arg[i], arg[i]+n, r);
+      r += n;
     }
   }
 

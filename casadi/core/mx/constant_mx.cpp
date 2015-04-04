@@ -40,11 +40,11 @@ namespace casadi {
   ConstantMX::~ConstantMX() {
   }
 
-  void ConstantMX::evalD(const cpv_double& input, const pv_double& output,
+  void ConstantMX::evalD(cp_double* input, p_double* output,
                              int* itmp, double* rtmp) {
   }
 
-  void ConstantMX::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void ConstantMX::evalSX(cp_SXElement* input, p_SXElement* output,
                               int* itmp, SXElement* rtmp) {
   }
 

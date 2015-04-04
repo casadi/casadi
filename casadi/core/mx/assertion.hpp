@@ -58,10 +58,10 @@ namespace casadi {
     virtual void evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens);
 
     /// Evaluate the function numerically
-    virtual void evalD(const cpv_double& input, const pv_double& output, int* itmp, double* rtmp);
+    virtual void evalD(cp_double* input, p_double* output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+    virtual void evalSX(cp_SXElement* input, p_SXElement* output,
                             int* itmp, SXElement* rtmp);
 
     /// Print a part of the expression */

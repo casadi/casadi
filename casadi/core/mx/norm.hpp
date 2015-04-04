@@ -61,15 +61,14 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const std::vector<const T*>& input,
-                 const std::vector<T*>& output, int* itmp, T* rtmp);
+    void evalGen(const T* const* arg, T* const* res, int* itmp, T* rtmp);
 
     /// Evaluate the function numerically
-    virtual void evalD(const cpv_double& input, const pv_double& output,
+    virtual void evalD(cp_double* input, p_double* output,
                        int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+    virtual void evalSX(cp_SXElement* input, p_SXElement* output,
                             int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */

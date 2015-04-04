@@ -397,8 +397,8 @@ namespace casadi {
     log("MXFunctionInternal::init end");
   }
 
-  void MXFunctionInternal::evalD(const cpv_double& arg,
-                                 const pv_double& res, int* itmp, double* rtmp) {
+  void MXFunctionInternal::evalD(cp_double* arg,
+                                 p_double* res, int* itmp, double* rtmp) {
     casadi_log("MXFunctionInternal::evalD():begin "  << getOption("name"));
     // Set up timers for profiling
     double time_zero=0;
@@ -414,8 +414,8 @@ namespace casadi {
     }
 
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<const double*> oarg(max_arg_);
-    vector<double*> ores(max_res_);
+    vector<cp_double> oarg(max_arg_);
+    vector<p_double> ores(max_res_);
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -456,7 +456,7 @@ namespace casadi {
           ores[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalD(oarg, ores, itmp, rtmp);
+        it->data->evalD(getPtr(oarg), getPtr(ores), itmp, rtmp);
       }
 
       // Write out profiling information
@@ -1029,11 +1029,11 @@ namespace casadi {
     log("MXFunctionInternal::evalAdj end");
   }
 
-  void MXFunctionInternal::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+  void MXFunctionInternal::evalSX(cp_SXElement* arg, p_SXElement* res,
                                   int* itmp, SXElement* rtmp) {
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<const SXElement*> argp(max_arg_);
-    vector<SXElement*> resp(max_res_);
+    vector<cp_SXElement> argp(max_arg_);
+    vector<p_SXElement> resp(max_res_);
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
@@ -1064,7 +1064,7 @@ namespace casadi {
           resp[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalSX(argp, resp, itmp, rtmp);
+        it->data->evalSX(getPtr(argp), getPtr(resp), itmp, rtmp);
       }
     }
   }

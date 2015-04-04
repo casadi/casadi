@@ -139,10 +139,10 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  void ExternalFunctionInternal::evalD(const cpv_double& arg, const pv_double& res,
+  void ExternalFunctionInternal::evalD(cp_double* arg, p_double* res,
                                        int* itmp, double* rtmp) {
 #ifdef WITH_DL
-    int flag = eval_(getPtr(arg), getPtr(res), itmp, rtmp);
+    int flag = eval_(arg, res, itmp, rtmp);
     if (flag) throw CasadiException("ExternalFunctionInternal: \"eval\" failed");
 #endif // WITH_DL
   }

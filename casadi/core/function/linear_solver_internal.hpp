@@ -69,11 +69,11 @@ namespace casadi {
     MX solve(const MX& A, const MX& B, bool transpose);
 
     /// Evaluate SX, possibly transposed
-    virtual void evalSXLinsol(const cpv_SXElement& arg, const pv_SXElement& res,
+    virtual void evalSXLinsol(cp_SXElement* arg, p_SXElement* res,
                               int* itmp, SXElement* rtmp, bool tr, int nrhs);
 
     /// Evaluate SX
-    virtual void evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+    virtual void evalSX(cp_SXElement* arg, p_SXElement* res,
                         int* itmp, SXElement* rtmp) {
       evalSXLinsol(arg, res, itmp, rtmp, false, output(LINSOL_X).size2());
     }

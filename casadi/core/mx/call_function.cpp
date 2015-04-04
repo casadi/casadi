@@ -77,7 +77,7 @@ namespace casadi {
     fcn_->printPart(this, stream, part);
   }
 
-  void CallFunction::evalD(const cpv_double& arg, const pv_double& res,
+  void CallFunction::evalD(cp_double* arg, p_double* res,
                            int* itmp, double* rtmp) {
     fcn_->evalD(arg, res, itmp, rtmp);
   }
@@ -94,7 +94,7 @@ namespace casadi {
     return fcn_;
   }
 
-  void CallFunction::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+  void CallFunction::evalSX(cp_SXElement* arg, p_SXElement* res,
                                 int* itmp, SXElement* rtmp) {
     fcn_->evalSX(arg, res, itmp, rtmp);
   }

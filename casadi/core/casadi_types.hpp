@@ -119,13 +119,8 @@ namespace casadi {
   typedef const bvec_t* cp_bvec_t;
   typedef MX* p_MX;
   typedef const MX* cp_MX;
-
-  typedef std::vector<SXElement*> pv_SXElement;
-  typedef std::vector<const SXElement*> cpv_SXElement;
-  typedef std::vector<double*> pv_double;
-  typedef std::vector<const double*> cpv_double;
-  typedef std::vector<MX*> pv_MX;
-  typedef std::vector<const MX*> cpv_MX;
+  typedef std::vector<p_MX> pv_MX;
+  typedef std::vector<cp_MX> cpv_MX;
 #endif // SWIG
 
   /* Standard stream used for printing

@@ -131,10 +131,10 @@ namespace casadi {
                           const std::vector<int>& res, CodeGenerator& gen) const;
 
     /** \brief  Evaluate numerically */
-    virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
+    virtual void evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+    virtual void evalSX(cp_SXElement* arg, p_SXElement* res,
                         int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate symbolically (MX) */

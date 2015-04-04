@@ -37,30 +37,29 @@ namespace casadi {
     setSparsity(x.sparsity().T());
   }
 
-  void Transpose::evalD(const cpv_double& input, const pv_double& output,
+  void Transpose::evalD(cp_double* input, p_double* output,
                             int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
- void DenseTranspose::evalD(const cpv_double& input, const pv_double& output,
+ void DenseTranspose::evalD(cp_double* input, p_double* output,
                                 int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Transpose::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void Transpose::evalSX(cp_SXElement* input, p_SXElement* output,
                              int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
-  void DenseTranspose::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void DenseTranspose::evalSX(cp_SXElement* input, p_SXElement* output,
                                   int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Transpose::evalGen(const std::vector<const T*>& input,
-                          const std::vector<T*>& output, int* itmp, T* rtmp) {
-
+  void Transpose::evalGen(const T* const* arg, T* const* res,
+                          int* itmp, T* rtmp) {
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
     const int* x_row = dep(0).row();
@@ -68,8 +67,8 @@ namespace casadi {
     const int* xT_colind = sparsity().colind();
     int xT_ncol = sparsity().size2();
 
-    const T* x = input[0];
-    T* xT = output[0];
+    const T* x = arg[0];
+    T* xT = res[0];
 
     // Transpose
     copy(xT_colind, xT_colind+xT_ncol+1, itmp);
@@ -79,14 +78,14 @@ namespace casadi {
   }
 
   template<typename T>
-  void DenseTranspose::evalGen(const std::vector<const T*>& input,
-                               const std::vector<T*>& output, int* itmp, T* rtmp) {
+  void DenseTranspose::evalGen(const T* const* arg, T* const* res,
+                               int* itmp, T* rtmp) {
     // Get sparsity patterns
     int x_nrow = dep().size1();
     int x_ncol = dep().size2();
 
-    const T* x = input[0];
-    T* xT = output[0];
+    const T* x = arg[0];
+    T* xT = res[0];
     for (int i=0; i<x_ncol; ++i) {
       for (int j=0; j<x_nrow; ++j) {
         xT[i+j*x_ncol] = x[j+i*x_nrow];
@@ -173,8 +172,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = input[0]->T();
+  void Transpose::eval(const cpv_MX& arg, const pv_MX& res) {
+    *res[0] = arg[0]->T();
   }
 
   void Transpose::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {

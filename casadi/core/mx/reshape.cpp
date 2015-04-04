@@ -44,25 +44,20 @@ namespace casadi {
     return new Reshape(*this);
   }
 
-  void Reshape::evalD(const cpv_double& input, const pv_double& output,
+  void Reshape::evalD(cp_double* input, p_double* output,
                           int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Reshape::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void Reshape::evalSX(cp_SXElement* input, p_SXElement* output,
                            int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Reshape::evalGen(const std::vector<const T*>& input,
-                        const std::vector<T*>& output, int* itmp, T* rtmp) {
-    // Quick return if inplace
-    if (input[0]==output[0]) return;
-
-    T* res = output[0];
-    const T* arg = input[0];
-    copy(arg, arg+nnz(), res);
+  void Reshape::evalGen(const T* const* arg, T* const* res,
+                        int* itmp, T* rtmp) {
+    if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
   void Reshape::spFwd(cp_bvec_t* arg,

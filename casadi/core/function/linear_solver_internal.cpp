@@ -330,7 +330,7 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evalSXLinsol(const cpv_SXElement& arg, const pv_SXElement& res,
+  void LinearSolverInternal::evalSXLinsol(cp_SXElement* arg, p_SXElement* res,
                                            int* itmp, SXElement* rtmp, bool tr, int nrhs) {
     casadi_error("LinearSolverInternal::evalSXLinsol not defined for class "
                  << typeid(*this).name());

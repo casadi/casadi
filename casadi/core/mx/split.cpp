@@ -43,27 +43,26 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::evalD(const cpv_double& input, const pv_double& output,
+  void Split::evalD(cp_double* input, p_double* output,
                         int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Split::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void Split::evalSX(cp_SXElement* input, p_SXElement* output,
                          int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void Split::evalGen(const std::vector<const T*>& input,
-                      const std::vector<T*>& output, int* itmp, T* rtmp) {
+  void Split::evalGen(const T* const* arg, T* const* res, int* itmp, T* rtmp) {
     // Number of derivatives
     int nx = offset_.size()-1;
 
     for (int i=0; i<nx; ++i) {
       int nz_first = offset_[i];
       int nz_last = offset_[i+1];
-      if (output[i]!=0) {
-        copy(input[0]+nz_first, input[0]+nz_last, output[i]);
+      if (res[i]!=0) {
+        copy(arg[0]+nz_first, arg[0]+nz_last, res[i]);
       }
     }
   }

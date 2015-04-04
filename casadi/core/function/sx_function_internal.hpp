@@ -92,10 +92,10 @@ class CASADI_EXPORT SXFunctionInternal :
   virtual ~SXFunctionInternal();
 
   /** \brief  Evaluate numerically, work vectors given */
-  virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
+  virtual void evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp);
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+  virtual void evalSX(cp_SXElement* arg, p_SXElement* res,
                       int* itmp, SXElement* rtmp);
 
   /** \brief Calculate forward mode directional derivatives */

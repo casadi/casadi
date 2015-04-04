@@ -455,24 +455,24 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalD(const cpv_double& input, const pv_double& output,
+  void SetNonzerosVector<Add>::evalD(cp_double* input, p_double* output,
                                          int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void SetNonzerosVector<Add>::evalSX(cp_SXElement* input, p_SXElement* output,
                                           int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosVector<Add>::evalGen(const std::vector<const T*>& input,
-                                       const std::vector<T*>& output, int* itmp, T* rtmp) {
-    const T* idata0 = input[0];
-    const T* idata = input[1];
-    T* odata = output[0];
+  void SetNonzerosVector<Add>::evalGen(const T* const* arg, T* const* res,
+                                       int* itmp, T* rtmp) {
+    const T* idata0 = arg[0];
+    const T* idata = arg[1];
+    T* odata = res[0];
     if (idata0 != odata) {
       copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
@@ -486,24 +486,24 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalD(const cpv_double& input, const pv_double& output,
+  void SetNonzerosSlice<Add>::evalD(cp_double* input, p_double* output,
                                     int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void SetNonzerosSlice<Add>::evalSX(cp_SXElement* input, p_SXElement* output,
                                          int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice<Add>::evalGen(const std::vector<const T*>& input,
-                                      const std::vector<T*>& output, int* itmp, T* rtmp) {
-    const T* idata0 = input[0];
-    const T* idata = input[1];
-    T* odata = output[0];
+  void SetNonzerosSlice<Add>::evalGen(const T* const* arg, T* const* res,
+                                      int* itmp, T* rtmp) {
+    const T* idata0 = arg[0];
+    const T* idata = arg[1];
+    T* odata = res[0];
     if (idata0 != odata) {
       copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
@@ -518,24 +518,24 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalD(const cpv_double& input, const pv_double& output,
+  void SetNonzerosSlice2<Add>::evalD(cp_double* input, p_double* output,
                                          int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void SetNonzerosSlice2<Add>::evalSX(cp_SXElement* input, p_SXElement* output,
                                           int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice2<Add>::evalGen(const std::vector<const T*>& input,
-                                       const std::vector<T*>& output, int* itmp, T* rtmp) {
-    const T* idata0 = input[0];
-    const T* idata = input[1];
-    T* odata = output[0];
+  void SetNonzerosSlice2<Add>::evalGen(const T* const* arg, T* const* res,
+                                       int* itmp, T* rtmp) {
+    const T* idata0 = arg[0];
+    const T* idata = arg[1];
+    T* odata = res[0];
     if (idata0 != odata) {
       copy(idata0, idata0 + this->dep(0).nnz(), odata);
     }

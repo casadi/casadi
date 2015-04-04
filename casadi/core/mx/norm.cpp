@@ -43,25 +43,20 @@ namespace casadi {
     }
   }
 
-  void NormF::evalD(const cpv_double& input, const pv_double& output,
+  void NormF::evalD(cp_double* input, p_double* output,
                     int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void NormF::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void NormF::evalSX(cp_SXElement* input, p_SXElement* output,
                          int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<typename T>
-  void NormF::evalGen(const std::vector<const T*>& input,
-                      const std::vector<T*>& output, int* itmp, T* rtmp) {
-    // Get data
-    T* res = output[0];
-    const T* arg = input[0];
-
-    // Perform the inner product
-    *res = sqrt(casadi_dot(dep().nnz(), arg, 1, arg, 1));
+  void NormF::evalGen(const T* const* arg, T* const* res,
+                      int* itmp, T* rtmp) {
+    *res[0] = sqrt(casadi_dot(dep().nnz(), arg[0], 1, arg[0], 1));
   }
 
   void NormF::eval(const cpv_MX& input, const pv_MX& output) {

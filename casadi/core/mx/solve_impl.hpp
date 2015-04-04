@@ -70,7 +70,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalD(const cpv_double& arg, const pv_double& res,
+  void Solve<Tr>::evalD(cp_double* arg, p_double* res,
                         int* itmp, double* rtmp) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     linear_solver_.setInput(arg[1], LINSOL_A);
@@ -79,7 +79,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+  void Solve<Tr>::evalSX(cp_SXElement* arg, p_SXElement* res,
                          int* itmp, SXElement* rtmp) {
     linear_solver_->evalSXLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }

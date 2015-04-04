@@ -1260,19 +1260,19 @@ namespace casadi {
     rtmp_.resize(nr);
 
     // Get pointers to input arguments
-    cpv_double arg(getNumInputs());
+    vector<cp_double> arg(getNumInputs());
     for (int i=0; i<arg.size(); ++i) arg[i]=input(i).ptr();
 
     // Get pointers to output arguments
-    pv_double res(getNumOutputs());
+    vector<p_double> res(getNumOutputs());
     for (int i=0; i<res.size(); ++i) res[i]=output(i).ptr();
 
     // Call memory-less
-    evalD(arg, res, getPtr(itmp_), getPtr(rtmp_));
+    evalD(getPtr(arg), getPtr(res), getPtr(itmp_), getPtr(rtmp_));
   }
 
-  void FunctionInternal::evalD(const cpv_double& arg,
-                               const pv_double& res, int* itmp, double* rtmp) {
+  void FunctionInternal::evalD(cp_double* arg,
+                               p_double* res, int* itmp, double* rtmp) {
     // Number of inputs and outputs
     int num_in = getNumInputs();
     int num_out = getNumOutputs();
@@ -1295,7 +1295,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+  void FunctionInternal::evalSX(cp_SXElement* arg, p_SXElement* res,
                                 int* itmp, SXElement* rtmp) {
     // Number of inputs and outputs
     int num_in = getNumInputs();
@@ -1355,15 +1355,15 @@ namespace casadi {
     vector<SXElement> rtmp(nr);
 
     // Get pointers to input arguments
-    cpv_SXElement argp(arg.size());
+    vector<cp_SXElement> argp(arg.size());
     for (int i=0; i<argp.size(); ++i) argp[i]=getPtr(arg[i]);
 
     // Get pointers to output arguments
-    pv_SXElement resp(getNumOutputs());
+    vector<p_SXElement> resp(getNumOutputs());
     for (int i=0; i<resp.size(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
-    evalSX(argp, resp, getPtr(itmp_), getPtr(rtmp));
+    evalSX(getPtr(argp), getPtr(resp), getPtr(itmp_), getPtr(rtmp));
   }
 
   void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

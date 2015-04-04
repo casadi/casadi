@@ -100,7 +100,7 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunctionInternal::evalD(const cpv_double& arg, const pv_double& res,
+  void SXFunctionInternal::evalD(cp_double* arg, p_double* res,
                                  int* itmp, double* rtmp) {
     double time_start=0;
     double time_stop=0;
@@ -616,7 +616,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+  void SXFunctionInternal::evalSX(cp_SXElement* arg, p_SXElement* res,
                                   int* itmp, SXElement* rtmp) {
     if (verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 

@@ -151,25 +151,25 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalD(const cpv_double& input, const pv_double& output,
+  void BinaryMX<ScX, ScY>::evalD(cp_double* input, p_double* output,
                                      int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalSX(const cpv_SXElement& input, const pv_SXElement& output,
+  void BinaryMX<ScX, ScY>::evalSX(cp_SXElement* input, p_SXElement* output,
                                       int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
   template<bool ScX, bool ScY>
   template<typename T>
-  void BinaryMX<ScX, ScY>::evalGen(const std::vector<const T*>& input,
-                                   const std::vector<T*>& output, int* itmp, T* rtmp) {
+  void BinaryMX<ScX, ScY>::evalGen(const T* const* arg, T* const* res,
+                                   int* itmp, T* rtmp) {
     // Get data
-    T* output0 = output[0];
-    const T* input0 = input[0];
-    const T* input1 = input[1];
+    T* output0 = res[0];
+    const T* input0 = arg[0];
+    const T* input1 = arg[1];
 
     if (!ScX && !ScY) {
       casadi_math<T>::fun(op_, input0, input1, output0, nnz());

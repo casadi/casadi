@@ -87,7 +87,7 @@ namespace casadi {
                               CodeGenerator& gen) const;
 
     /** \brief Evaluate symbolically (SX) */
-    virtual void evalSXLinsol(const cpv_SXElement& arg, const pv_SXElement& res,
+    virtual void evalSXLinsol(cp_SXElement* arg, p_SXElement* res,
                               int* itmp, SXElement* rtmp, bool tr, int nrhs);
 
     // Factorization function

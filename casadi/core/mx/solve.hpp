@@ -63,10 +63,10 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const cpv_double& arg, const pv_double& res, int* itmp, double* rtmp);
+    virtual void evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const cpv_SXElement& arg, const pv_SXElement& res,
+    virtual void evalSX(cp_SXElement* arg, p_SXElement* res,
                         int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */

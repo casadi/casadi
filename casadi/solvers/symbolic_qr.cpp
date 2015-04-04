@@ -218,11 +218,11 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::evalSXLinsol(const cpv_SXElement& arg, const pv_SXElement& res,
+  void SymbolicQr::evalSXLinsol(cp_SXElement* arg, p_SXElement* res,
                                 int* itmp, SXElement* rtmp, bool tr, int nrhs) {
-    casadi_assert(arg.at(0)!=0);
-    casadi_assert(arg.at(1)!=0);
-    casadi_assert(res.at(0)!=0);
+    casadi_assert(arg[0]!=0);
+    casadi_assert(arg[1]!=0);
+    casadi_assert(res[0]!=0);
 
     // Get A and factorize it
     SX A(input(LINSOL_A).sparsity());
