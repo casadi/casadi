@@ -111,7 +111,6 @@ namespace casadi {
   }
 
   void ParallelizerInternal::evaluate() {
-
     // Let the first call (which may contain memory allocations) be serial when using OpenMP
     if (mode_== SERIAL) {
       for (int task=0; task<funcs_.size(); ++task) {
@@ -119,46 +118,10 @@ namespace casadi {
       }
     } else if (mode_== OPENMP) {
 #ifdef WITH_OPENMP
-      // Allocate some lists to collect statistics
-      std::vector<int> task_allocation(funcs_.size());
-      std::vector<int> task_order(funcs_.size());
-      std::vector<double> task_cputime(funcs_.size());
-      std::vector<double> task_starttime(funcs_.size());
-      std::vector<double> task_endtime(funcs_.size());
-      // A private counter
-      int cnt=0;
-#pragma omp parallel for firstprivate(cnt)
+#pragma omp parallel for
       for (int task=0; task<funcs_.size(); ++task) {
-        if (gather_stats_ && task==0) {
-          stats_["max_threads"] = omp_get_max_threads();
-          stats_["num_threads"] = omp_get_num_threads();
-        }
-        task_allocation[task] = omp_get_thread_num();
-        task_starttime[task] = omp_get_wtime();
-
-        // Do the actual work
         evaluateTask(task);
-
-        task_endtime[task] = omp_get_wtime();
-        task_cputime[task] =  task_endtime[task] - task_starttime[task];
-        task_order[task] = cnt++;
       }
-      if (gather_stats_) {
-        stats_["task_allocation"] = task_allocation;
-        stats_["task_order"] = task_order;
-        stats_["task_cputime"] = task_cputime;
-      }
-      // Measure all times relative to the earliest start_time.
-      double start = *std::min_element(task_starttime.begin(), task_starttime.end());
-      for (int task=0; task<funcs_.size(); ++task) {
-        task_starttime[task] =  task_starttime[task] - start;
-        task_endtime[task] = task_endtime[task] - start;
-      }
-      if (gather_stats_) {
-        stats_["task_starttime"] = task_starttime;
-        stats_["task_endtime"] = task_endtime;
-      }
-
 #endif //WITH_OPENMP
 #ifndef WITH_OPENMP
       casadi_error("ParallelizerInternal::evaluate: OPENMP support was not available "
