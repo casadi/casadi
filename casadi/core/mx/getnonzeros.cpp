@@ -106,8 +106,8 @@ namespace casadi {
   }
 
   void GetNonzerosVector::
-  spFwd(const cpv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spFwd(cp_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k) {
@@ -116,8 +116,8 @@ namespace casadi {
   }
 
   void GetNonzerosVector::
-  spAdj(const pv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spAdj(p_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k) {
@@ -127,8 +127,8 @@ namespace casadi {
   }
 
   void GetNonzerosSlice::
-  spFwd(const cpv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spFwd(cp_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
@@ -137,8 +137,8 @@ namespace casadi {
   }
 
   void GetNonzerosSlice::
-  spAdj(const pv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spAdj(p_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
@@ -147,8 +147,8 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice2::spFwd(const cpv_bvec_t& arg,
-                                const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void GetNonzerosSlice2::spFwd(cp_bvec_t* arg,
+                                p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
@@ -158,8 +158,8 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice2::spAdj(const pv_bvec_t& arg,
-                                const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void GetNonzerosSlice2::spAdj(p_bvec_t* arg,
+                                p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {

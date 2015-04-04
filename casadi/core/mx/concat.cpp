@@ -62,8 +62,8 @@ namespace casadi {
     }
   }
 
-  void Concat::spFwd(const cpv_bvec_t& arg,
-                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Concat::spFwd(cp_bvec_t* arg,
+                     p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();
@@ -73,8 +73,8 @@ namespace casadi {
     }
   }
 
-  void Concat::spAdj(const pv_bvec_t& arg,
-                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Concat::spAdj(p_bvec_t* arg,
+                     p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();

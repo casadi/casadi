@@ -78,12 +78,12 @@ namespace casadi {
     virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(cp_bvec_t* arg,
+                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(p_bvec_t* arg,
+                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_MATMUL;}

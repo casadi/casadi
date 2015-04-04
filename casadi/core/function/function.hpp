@@ -530,10 +530,10 @@ namespace casadi {
     void nTmp(size_t& ni, size_t& nr);
 
     /** \brief  Propagate sparsity forward */
-    void spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    void spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 #endif // SWIG
 
     /// \endcond

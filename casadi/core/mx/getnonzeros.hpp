@@ -84,12 +84,12 @@ namespace casadi {
     virtual std::vector<int> getAll() const { return nz_;}
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(cp_bvec_t* arg,
+                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(p_bvec_t* arg,
+                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /// Evaluate the function (template)
     template<typename T>
@@ -141,12 +141,12 @@ namespace casadi {
     virtual void simplifyMe(MX& ex);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(cp_bvec_t* arg,
+                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(p_bvec_t* arg,
+                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /// Evaluate the function (template)
     template<typename T>
@@ -193,12 +193,12 @@ namespace casadi {
     virtual std::vector<int> getAll() const { return inner_.getAll(outer_, outer_.stop_);}
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const cpv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(cp_bvec_t* arg,
+                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(const pv_bvec_t& arg,
-                       const pv_bvec_t& res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(p_bvec_t* arg,
+                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /// Evaluate the function (template)
     template<typename T>

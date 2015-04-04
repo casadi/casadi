@@ -65,13 +65,13 @@ namespace casadi {
     copy(arg, arg+nnz(), res);
   }
 
-  void Reshape::spFwd(const cpv_bvec_t& arg,
-                      const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Reshape::spFwd(cp_bvec_t* arg,
+                      p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void Reshape::spAdj(const pv_bvec_t& arg,
-                      const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Reshape::spAdj(p_bvec_t* arg,
+                      p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     copyAdj(arg[0], res[0], nnz());
   }
 

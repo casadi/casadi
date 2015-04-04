@@ -570,11 +570,11 @@ namespace casadi {
     fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
 
-  void MXFunctionInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res,
+  void MXFunctionInternal::spFwd(cp_bvec_t* arg, p_bvec_t* res,
                                  int* itmp, bvec_t* rtmp) {
     // Tmporaries to hold pointers to operation input and outputs
-    vector<bvec_t*> ores(max_res_);
-    vector<const bvec_t*> oarg(max_arg_);
+    vector<cp_bvec_t> oarg(max_arg_);
+    vector<p_bvec_t> ores(max_res_);
 
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
@@ -604,12 +604,12 @@ namespace casadi {
           ores[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity forwards
-        it->data->spFwd(oarg, ores, itmp, rtmp);
+        it->data->spFwd(getPtr(oarg), getPtr(ores), itmp, rtmp);
       }
     }
   }
 
-  void MXFunctionInternal::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
+  void MXFunctionInternal::spAdj(p_bvec_t* arg, p_bvec_t* res,
                                  int* itmp, bvec_t* rtmp) {
     // Tmporaries to hold pointers to operation input and outputs
     vector<bvec_t*> ores(max_res_);
@@ -647,7 +647,7 @@ namespace casadi {
           ores[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        it->data->spAdj(oarg, ores, itmp, rtmp);
+        it->data->spAdj(getPtr(oarg), getPtr(ores), itmp, rtmp);
       }
     }
   }

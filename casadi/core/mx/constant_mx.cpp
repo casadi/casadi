@@ -69,13 +69,13 @@ namespace casadi {
     }
   }
 
-  void ConstantMX::spFwd(const cpv_bvec_t& arg,
-                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void ConstantMX::spFwd(cp_bvec_t* arg,
+                         p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantMX::spAdj(const pv_bvec_t& arg,
-                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void ConstantMX::spAdj(p_bvec_t* arg,
+                         p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     fill_n(res[0], nnz(), 0);
   }
 

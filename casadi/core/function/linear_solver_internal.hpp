@@ -89,14 +89,12 @@ namespace casadi {
                                std::vector<std::vector<MX> >& asens, bool tr);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwdLinsol(const std::vector<const bvec_t*>& arg,
-                             const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp,
-                             bool tr, int nrhs);
+    virtual void spFwdLinsol(cp_bvec_t* arg, p_bvec_t* res,
+                             int* itmp, bvec_t* rtmp, bool tr, int nrhs);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdjLinsol(const std::vector<bvec_t*>& arg,
-                             const std::vector<bvec_t*>& res, int* itmp, bvec_t* rtmp,
-                             bool tr, int nrhs);
+    virtual void spAdjLinsol(p_bvec_t* arg, p_bvec_t* res,
+                             int* itmp, bvec_t* rtmp, bool tr, int nrhs);
 
     ///@{
     /// Propagate sparsity through a linear solve

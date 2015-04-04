@@ -67,13 +67,13 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::spFwd(const cpv_bvec_t& arg,
-                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void SymbolicMX::spFwd(cp_bvec_t* arg,
+                         p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void SymbolicMX::spAdj(const pv_bvec_t& arg,
-                         const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void SymbolicMX::spAdj(p_bvec_t* arg,
+                         p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     fill_n(res[0], nnz(), 0);
   }
 

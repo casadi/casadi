@@ -54,13 +54,13 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::spFwd(const cpv_bvec_t& arg,
-                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void SubAssign::spFwd(cp_bvec_t* arg,
+                     p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     casadi_error("not ready");
   }
 
-  void SubAssign::spAdj(const pv_bvec_t& arg,
-                     const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void SubAssign::spAdj(p_bvec_t* arg,
+                     p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     casadi_error("not ready");
   }
 

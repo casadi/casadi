@@ -111,12 +111,19 @@ namespace casadi {
 
 
   /** Pointer shorthands */
+  typedef SXElement* p_SXElement;
+  typedef const SXElement* cp_SXElement;
+  typedef double* p_double;
+  typedef const double* cp_double;
+  typedef bvec_t* p_bvec_t;
+  typedef const bvec_t* cp_bvec_t;
+  typedef MX* p_MX;
+  typedef const MX* cp_MX;
+
   typedef std::vector<SXElement*> pv_SXElement;
   typedef std::vector<const SXElement*> cpv_SXElement;
   typedef std::vector<double*> pv_double;
   typedef std::vector<const double*> cpv_double;
-  typedef std::vector<bvec_t*> pv_bvec_t;
-  typedef std::vector<const bvec_t*> cpv_bvec_t;
   typedef std::vector<MX*> pv_MX;
   typedef std::vector<const MX*> cpv_MX;
 #endif // SWIG

@@ -237,11 +237,11 @@ namespace casadi {
     (*this)->nTmp(ni, nr);
   }
 
-  void Function::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Function::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     (*this)->spFwdSwitch(arg, res, itmp, rtmp);
   }
 
-  void Function::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Function::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     (*this)->spAdjSwitch(arg, res, itmp, rtmp);
   }
 

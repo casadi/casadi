@@ -181,8 +181,8 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::spFwd(const cpv_bvec_t& arg,
-                                 const pv_bvec_t& res,
+  void BinaryMX<ScX, ScY>::spFwd(cp_bvec_t* arg,
+                                 p_bvec_t* res,
                                  int* itmp, bvec_t* rtmp) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t *r=res[0];
@@ -200,8 +200,8 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::spAdj(const pv_bvec_t& arg,
-                                 const pv_bvec_t& res,
+  void BinaryMX<ScX, ScY>::spAdj(p_bvec_t* arg,
+                                 p_bvec_t* res,
                                  int* itmp, bvec_t* rtmp) {
     bvec_t *a0=arg[0], *a1=arg[1], *r = res[0];
     int n=nnz();

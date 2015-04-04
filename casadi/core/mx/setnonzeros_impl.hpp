@@ -556,8 +556,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spFwd(const cpv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spFwd(cp_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -576,8 +576,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spAdj(const pv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spAdj(p_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
@@ -593,8 +593,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spFwd(const cpv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spFwd(cp_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -613,8 +613,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spAdj(const pv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spAdj(p_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
@@ -628,8 +628,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spFwd(const cpv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spFwd(cp_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -650,8 +650,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spAdj(const pv_bvec_t& arg,
-        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  spAdj(p_bvec_t* arg,
+        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {

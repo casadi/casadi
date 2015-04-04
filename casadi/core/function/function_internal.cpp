@@ -1382,23 +1382,23 @@ namespace casadi {
     bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(rtmp_));
 
     // Get pointers to output arguments
-    pv_bvec_t res(getNumOutputs());
+    vector<p_bvec_t> res(getNumOutputs());
     for (int i=0; i<res.size(); ++i) res[i]=reinterpret_cast<bvec_t*>(output(i).ptr());
 
     if (fwd) {
       // Get pointers to input arguments
-      cpv_bvec_t arg(getNumInputs());
+      vector<cp_bvec_t> arg(getNumInputs());
       for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
 
       // Call memory-less
-      spFwd(arg, res, iw, w);
+      spFwd(getPtr(arg), getPtr(res), iw, w);
     } else {
       // Get pointers to input arguments
-      pv_bvec_t arg(getNumInputs());
+      vector<p_bvec_t> arg(getNumInputs());
       for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
 
       // Call memory-less
-      spAdj(arg, res, iw, w);
+      spAdj(getPtr(arg), getPtr(res), iw, w);
     }
   }
 
@@ -2272,13 +2272,13 @@ namespace casadi {
     return MX::createMultipleOutput(new CallFunction(shared_from_this<Function>(), arg));
   }
 
-  void FunctionInternal::spFwdSwitch(const cpv_bvec_t& arg, const pv_bvec_t& res,
+  void FunctionInternal::spFwdSwitch(cp_bvec_t* arg, p_bvec_t* res,
                                      int* itmp, bvec_t* rtmp) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
     spFwd(arg, res, itmp, rtmp);
   }
 
-  void FunctionInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res,
+  void FunctionInternal::spFwd(cp_bvec_t* arg, p_bvec_t* res,
                                int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
     int n_in = getNumInputs();
@@ -2329,13 +2329,13 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::spAdjSwitch(const pv_bvec_t& arg, const pv_bvec_t& res,
+  void FunctionInternal::spAdjSwitch(p_bvec_t* arg, p_bvec_t* res,
                                      int* itmp, bvec_t* rtmp) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
     spAdj(arg, res, itmp, rtmp);
   }
 
-  void FunctionInternal::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
+  void FunctionInternal::spAdj(p_bvec_t* arg, p_bvec_t* res,
                                int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
     int n_in = getNumInputs();

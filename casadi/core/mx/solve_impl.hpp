@@ -143,14 +143,14 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::spFwd(const cpv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Solve<Tr>::spFwd(cp_bvec_t* arg,
+                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     linear_solver_->spFwdLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::spAdj(const pv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Solve<Tr>::spAdj(p_bvec_t* arg,
+                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     linear_solver_->spAdjLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }
 

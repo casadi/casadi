@@ -84,8 +84,8 @@ namespace casadi {
     *output[0] = casadi_dot(dep(0).nnz(), input[0], 1, input[1], 1);
   }
 
-  void InnerProd::spFwd(const cpv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spFwd(cp_bvec_t* arg,
+                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t* r = res[0];
     const int n = dep(0).nnz();
@@ -95,8 +95,8 @@ namespace casadi {
     }
   }
 
-  void InnerProd::spAdj(const pv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spAdj(p_bvec_t* arg,
+                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *a0=arg[0], *a1=arg[1], *r=res[0];
     const int n = dep(0).nnz();
     for (int i=0; i<n; ++i) {

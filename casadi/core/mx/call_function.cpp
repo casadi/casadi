@@ -164,11 +164,11 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void CallFunction::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void CallFunction::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     fcn_.spFwd(arg, res, itmp, rtmp);
   }
 
-  void CallFunction::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void CallFunction::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     fcn_.spAdj(arg, res, itmp, rtmp);
   }
 

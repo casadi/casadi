@@ -82,13 +82,13 @@ namespace casadi {
     copy(input[0], input[0]+nnz(), output[0]);
   }
 
-  void Assertion::spFwd(const cpv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Assertion::spFwd(cp_bvec_t* arg,
+                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
-  void Assertion::spAdj(const pv_bvec_t& arg,
-                        const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void Assertion::spAdj(p_bvec_t* arg,
+                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();

@@ -103,13 +103,13 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::spFwd(const cpv_bvec_t& arg,
-                      const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void UnaryMX::spFwd(cp_bvec_t* arg,
+                      p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void UnaryMX::spAdj(const pv_bvec_t& arg,
-                      const pv_bvec_t& res, int* itmp, bvec_t* rtmp) {
+  void UnaryMX::spAdj(p_bvec_t* arg,
+                      p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     copyAdj(arg[0], res[0], nnz());
   }
 

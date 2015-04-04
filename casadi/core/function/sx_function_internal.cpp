@@ -889,7 +889,7 @@ namespace casadi {
     if (!fwd) fill_n(iwork, rtmp_.size(), bvec_t(0));
   }
 
-  void SXFunctionInternal::spFwd(const cpv_bvec_t& arg, const pv_bvec_t& res,
+  void SXFunctionInternal::spFwd(cp_bvec_t* arg, p_bvec_t* res,
                                  int* itmp, bvec_t* rtmp) {
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -907,7 +907,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
+  void SXFunctionInternal::spAdj(p_bvec_t* arg, p_bvec_t* res,
                                  int* itmp, bvec_t* rtmp) {
 
     size_t ni, nr;
