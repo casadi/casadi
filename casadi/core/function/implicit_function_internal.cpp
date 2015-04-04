@@ -252,52 +252,37 @@ namespace casadi {
 
   void ImplicitFunctionInternal::spAdj(const pv_bvec_t& arg, const pv_bvec_t& res,
                                        int* itmp, bvec_t* rtmp) {
-    FunctionInternal::spAdj(arg, res, itmp, rtmp);
-  }
+    int num_out = getNumOutputs();
+    int num_in = getNumInputs();
+    bvec_t* tmp1 = rtmp; rtmp += n_;
+    bvec_t* tmp2 = rtmp; rtmp += n_;
 
-  void ImplicitFunctionInternal::spEvaluate(bool fwd) {
-
-    // Initialize the callback for sparsity propagation
-    f_.spInit(fwd);
-
-    if (fwd) {
-      casadi_error("no");
+    // Get & clear seed corresponding to implicitly defined variable
+    if (res[iout_]) {
+      copy(res[iout_], res[iout_]+n_, tmp1);
+      fill_n(res[iout_], n_, 0);
     } else {
-
-      // Propagate dependencies from auxiliary outputs
-      if (getNumOutputs()>1) {
-        f_.output(iout_).setZeroBV();
-        for (int i=0; i<getNumOutputs(); ++i) {
-          if (i!=iout_) f_.output(i).setBV(output(i));
-        }
-        f_.spEvaluate(false);
-        for (int i=0; i<getNumInputs(); ++i) {
-          input(i).setBV(f_.input(i));
-        }
-      } else {
-        for (int i=0; i<getNumInputs(); ++i) {
-          input(i).setZeroBV();
-        }
-      }
-
-      // Add dependency on implicitly defined variable
-      input(iin_).borBV(output(iout_));
-
-      // "Solve" in order to get seed
-      f_.output(iout_).setZeroBV();
-      linsol_.spSolve(f_.output(iout_), input(iin_), true);
-
-      // Propagate dependencies through the function
-      f_.spEvaluate(false);
-
-      // Collect influence on inputs
-      for (int i=0; i<getNumInputs(); ++i) {
-        if (i!=iin_) input(i).borBV(f_.input(i));
-      }
-
-      // No dependency on the initial guess
-      input(iin_).setZeroBV();
+      fill_n(tmp1, n_, 0);
     }
+
+    // Propagate dependencies from auxiliary outputs to z
+    pv_bvec_t resf(res.begin(), res.begin()+num_out);
+    resf[iout_] = 0;
+    pv_bvec_t argf(arg.begin(), arg.begin()+num_in);
+    argf[iin_] = tmp1;
+    if (num_out>1) {
+      f_.spAdj(argf, resf, itmp, rtmp);
+    }
+
+    // "Solve" in order to get seed
+    fill_n(tmp2, n_, 0);
+    linsol_.spSolve(tmp2, tmp1, true);
+
+    // Propagate dependencies through the function
+    for (int i=0; i<num_out; ++i) resf[i] = 0;
+    resf[iout_] = tmp2;
+    argf[iin_] = 0; // just a guess
+    f_.spAdj(argf, resf, itmp, rtmp);
   }
 
   std::map<std::string, ImplicitFunctionInternal::Plugin> ImplicitFunctionInternal::solvers_;
