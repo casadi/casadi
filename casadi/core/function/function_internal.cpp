@@ -24,7 +24,7 @@
 
 
 #include "function_internal.hpp"
-#include "../mx/call_function.hpp"
+#include "../mx/casadi_call.hpp"
 #include <typeinfo>
 #include "../std_vector_tools.hpp"
 #include "mx_function.hpp"
@@ -2269,7 +2269,7 @@ namespace casadi {
   }
 
   std::vector<MX> FunctionInternal::createCall(const std::vector<MX> &arg) {
-    return MX::createMultipleOutput(new CallFunction(shared_from_this<Function>(), arg));
+    return MX::createMultipleOutput(new Call(shared_from_this<Function>(), arg));
   }
 
   void FunctionInternal::spFwdSwitch(cp_bvec_t* arg, p_bvec_t* res,
@@ -2648,7 +2648,7 @@ namespace casadi {
     Function dfcn = derForward(nfwd);
 
     // Create the evaluation node
-    vector<MX> x = MX::createMultipleOutput(new CallFunction(dfcn, darg));
+    vector<MX> x = MX::createMultipleOutput(new Call(dfcn, darg));
     vector<MX>::iterator x_it = x.begin();
 
     // Retrieve sensitivities
@@ -2721,7 +2721,7 @@ namespace casadi {
     Function dfcn = derReverse(nadj);
 
     // Create the evaluation node
-    vector<MX> x = MX::createMultipleOutput(new CallFunction(dfcn, darg));
+    vector<MX> x = MX::createMultipleOutput(new Call(dfcn, darg));
     vector<MX>::iterator x_it = x.begin();
 
     // Retrieve sensitivities

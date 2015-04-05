@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CALL_Function_HPP
-#define CALL_Function_HPP
+#ifndef CASADI_CALL_HPP
+#define CASADI_CALL_HPP
 
 #include "multiple_output.hpp"
 #include "../function/function.hpp"
@@ -37,17 +37,17 @@ namespace casadi {
       \author Joel Andersson
       \date 2010-2013
   */
-  class CASADI_EXPORT CallFunction : public MultipleOutput {
+  class CASADI_EXPORT Call : public MultipleOutput {
   public:
 
     /** \brief  Constructor */
-    explicit CallFunction(const Function& fcn, std::vector<MX> arg);
+    explicit Call(const Function& fcn, std::vector<MX> arg);
 
     /** \brief  Destructor */
-    virtual ~CallFunction() {}
+    virtual ~Call() {}
 
     /** \brief  Clone function */
-    virtual CallFunction* clone() const;
+    virtual Call* clone() const;
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -109,4 +109,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CALL_Function_HPP
+#endif // CASADI_CALL_HPP

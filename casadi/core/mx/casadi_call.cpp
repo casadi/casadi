@@ -23,7 +23,7 @@
  */
 
 
-#include "call_function.hpp"
+#include "casadi_call.hpp"
 #include "../function/function_internal.hpp"
 #include "../std_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
@@ -33,7 +33,7 @@ using namespace std;
 
 namespace casadi {
 
-  CallFunction::CallFunction(const Function& fcn, std::vector<MX> arg) : fcn_(fcn) {
+  Call::Call(const Function& fcn, std::vector<MX> arg) : fcn_(fcn) {
 
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
@@ -69,37 +69,37 @@ namespace casadi {
     setSparsity(Sparsity::scalar());
   }
 
-  CallFunction* CallFunction::clone() const {
-    return new CallFunction(*this);
+  Call* Call::clone() const {
+    return new Call(*this);
   }
 
-  void CallFunction::printPart(std::ostream &stream, int part) const {
+  void Call::printPart(std::ostream &stream, int part) const {
     fcn_->printPart(this, stream, part);
   }
 
-  void CallFunction::evalD(cp_double* arg, p_double* res,
+  void Call::evalD(cp_double* arg, p_double* res,
                            int* itmp, double* rtmp) {
     fcn_->evalD(arg, res, itmp, rtmp);
   }
 
-  int CallFunction::nout() const {
+  int Call::nout() const {
     return fcn_.getNumOutputs();
   }
 
-  const Sparsity& CallFunction::sparsity(int oind) const {
+  const Sparsity& Call::sparsity(int oind) const {
     return fcn_.output(oind).sparsity();
   }
 
-  Function& CallFunction::getFunction() {
+  Function& Call::getFunction() {
     return fcn_;
   }
 
-  void CallFunction::evalSX(cp_SXElement* arg, p_SXElement* res,
+  void Call::evalSX(cp_SXElement* arg, p_SXElement* res,
                                 int* itmp, SXElement* rtmp) {
     fcn_->evalSX(arg, res, itmp, rtmp);
   }
 
-  void CallFunction::eval(const cpv_MX& input, const pv_MX& output) {
+  void Call::eval(const cpv_MX& input, const pv_MX& output) {
     vector<MX> arg = getVector(input, ndep());
     vector<MX> res = fcn_->createCall(arg);
     for (int i=0; i<res.size(); ++i) {
@@ -109,7 +109,7 @@ namespace casadi {
     }
   }
 
-  void CallFunction::evalFwd(const std::vector<cpv_MX>& fwdSeed,
+  void Call::evalFwd(const std::vector<cpv_MX>& fwdSeed,
                              const std::vector<pv_MX>& fwdSens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
@@ -133,7 +133,7 @@ namespace casadi {
     }
   }
 
-  void CallFunction::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void Call::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -159,25 +159,25 @@ namespace casadi {
     }
   }
 
-  void CallFunction::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
+  void Call::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     MXNode::deepCopyMembers(already_copied);
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void CallFunction::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Call::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     fcn_.spFwd(arg, res, itmp, rtmp);
   }
 
-  void CallFunction::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Call::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     fcn_.spAdj(arg, res, itmp, rtmp);
   }
 
-  void CallFunction::generate(std::ostream &stream, const std::vector<int>& arg,
+  void Call::generate(std::ostream &stream, const std::vector<int>& arg,
                               const std::vector<int>& res, CodeGenerator& gen) const {
     fcn_->generate(stream, arg, res, gen);
   }
 
-  void CallFunction::nTmp(size_t& ni, size_t& nr) {
+  void Call::nTmp(size_t& ni, size_t& nr) {
     fcn_.nTmp(ni, nr);
   }
 

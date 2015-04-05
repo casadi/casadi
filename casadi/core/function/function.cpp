@@ -24,7 +24,6 @@
 
 
 #include "function_internal.hpp"
-#include "../mx/call_function.hpp"
 #include "../function/mx_function.hpp"
 #include <typeinfo>
 #include "../std_vector_tools.hpp"

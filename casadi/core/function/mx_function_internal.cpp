@@ -23,7 +23,6 @@
  */
 
 #include "mx_function_internal.hpp"
-#include "../mx/call_function.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 
