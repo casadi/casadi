@@ -98,7 +98,7 @@ namespace casadi {
     }
 
     // Create parallelizer object and initialize it
-    Parallelizer p(vector<Function>(x.size(), *this));
+    Parallelizer p(*this, x.size());
     p.setOption(paropt);
     p.init();
 

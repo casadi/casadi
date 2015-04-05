@@ -74,7 +74,7 @@ class Functiontests(casadiTestCase):
     f.init()
     
     #! Evaluate this function ten times in parallel
-    p = Parallelizer([f]*2)
+    p = Parallelizer(f, 2)
     
     for mode in ["openmp","serial"]:
       p.setOption("parallelization",mode)
@@ -128,7 +128,7 @@ class Functiontests(casadiTestCase):
     f.init()
     
     #! Evaluate this function ten times in parallel
-    pp = Parallelizer([f]*2)
+    pp = Parallelizer(f, 2)
     for mode in ["serial","openmp"]:
       pp.setOption("parallelization",mode)
       pp.init()

@@ -43,15 +43,12 @@ namespace casadi {
 
   protected:
     /// Constructor
-    explicit ParallelizerInternal(const std::vector<Function>& funcs);
+    explicit ParallelizerInternal(const Function& f, int n);
 
   public:
     /// clone
     virtual ParallelizerInternal* clone() const {
       ParallelizerInternal* ret = new ParallelizerInternal(*this);
-      for (std::vector<Function>::iterator it=ret->funcs_.begin(); it!=ret->funcs_.end(); ++it) {
-        it->makeUnique();
-      }
       return ret;
     }
 
@@ -102,17 +99,17 @@ namespace casadi {
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
-    /// Functions
-    std::vector<Function> funcs_;
+    /// Function
+    Function f_;
+
+    /// Number of times called
+    int n_;
 
     /// Input argument indices
     std::vector<int> inind_;
 
     /// Output argument indices
     std::vector<int> outind_;
-
-    /// Is a function a copy of another
-    std::vector<int> copy_of_;
 
     /// Parallelization modes
     enum Mode {SERIAL, OPENMP, MPI};

@@ -46,7 +46,7 @@ namespace casadi {
     Parallelizer();
 
     /// Create a Parallelizer
-    explicit Parallelizer(const std::vector<Function>& funcs);
+    explicit Parallelizer(const Function& f, int n);
 
     /// Access functions of the node
     ParallelizerInternal* operator->();
