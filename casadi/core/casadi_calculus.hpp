@@ -74,6 +74,9 @@ namespace casadi {
     // Embedded function call
     OP_CALL,
 
+    // Embedded function call in parallel
+    OP_MAP,
+
     // Matrix multiplication
     OP_MATMUL,
 
