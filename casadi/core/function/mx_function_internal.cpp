@@ -811,6 +811,10 @@ namespace casadi {
     vector<pv_MX> fsens_p;
     fseed_p.reserve(nfwd);
     fsens_p.reserve(nfwd);
+    vector<vector<MX> > oseed, osens;
+    oseed.reserve(nfwd);
+    osens.reserve(nfwd);
+    vector<bool> skip(nfwd, false);
 
     // Loop over computational nodes in forward order
     int alg_counter = 0;
@@ -832,54 +836,42 @@ namespace casadi {
           dwork[it->res.front()][d] = MX();
         }
       } else {
-
-        // Forward seeds and sensitivities
-        fseed_p.clear();
-        fsens_p.clear();
+        // Get seeds, ignoring all-zero directions
+        oseed.clear();
         for (int d=0; d<nfwd; ++d) {
-          // Pointers to seeds
-          cpv_MX seed(it->arg.size());
-          bool can_skip = true;
-          for (int iind=0; iind<it->arg.size(); ++iind) {
-            int el = it->arg[iind];
-            if (el>=0) {
-              if (dwork[el][d].isEmpty(true)) {
-                dwork[el][d] = MX(it->data->dep(iind).shape());
-              } else if (can_skip && !dwork[el][d].isZero()) {
-                can_skip = false;
-              }
-              seed[iind] = &dwork[el][d];
+          // Collect seeds, skipping directions with only zeros
+          vector<MX> seed(it->arg.size());
+          skip[d] = true; // All seeds are zero?
+          for (int i=0; i<it->arg.size(); ++i) {
+            int el = it->arg[i];
+            if (el<0 || dwork[el][d].isEmpty(true)) {
+              seed[i] = MX(it->data->dep(i).shape());
             } else {
-              seed[iind] = 0;
+              seed[i] = dwork[el][d];
             }
+            if (!seed[i].isZero()) skip[d] = false;
           }
-          // Pointers to sensitivities
-          pv_MX sens(it->res.size());
-          for (int oind=0; oind<it->res.size(); ++oind) {
-            int el = it->res[oind];
-            if (el>=0) {
-              if (can_skip || dwork[el][d].isEmpty(true)) {
-                dwork[el][d] = MX(it->data->sparsity(oind).shape());
-              }
-              sens[oind] = &dwork[el][d];
-            } else {
-              sens[oind] = 0;
-            }
-          }
-
-          // Add to list of directions being calculated
-          if (!can_skip) {
-            fseed_p.push_back(seed);
-            fsens_p.push_back(sens);
-          }
+          if (!skip[d]) oseed.push_back(seed);
         }
 
-        // Skip if nothing to calculate
-        if (fseed_p.empty()) continue;
+        // Perform the operation
+        osens.resize(oseed.size());
+        if (!osens.empty()) {
+          fill(osens.begin(), osens.end(), vector<MX>(it->res.size()));
+          it->data->evalFwd(oseed, osens);
+        }
 
-
-        // Call the evaluation function
-        it->data->evalFwd(fseed_p, fsens_p);
+        // Store sensitivities
+        int d1=0;
+        for (int d=0; d<nfwd; ++d) {
+          for (int i=0; i<it->res.size(); ++i) {
+            int el = it->res[i];
+            if (el>=0) {
+              dwork[el][d] = skip[d] ? MX(it->data->sparsity(i).shape()) : osens[d1][i];
+            }
+          }
+          if (!skip[d]) d1++;
+        }
       }
     }
     log("MXFunctionInternal::evalFwd end");

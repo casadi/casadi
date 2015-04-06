@@ -251,6 +251,45 @@ namespace casadi {
     eval(parg, pres);
   }
 
+  void MXNode::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                       std::vector<std::vector<MX> >& fsens) {
+    std::vector<cpv_MX> fseed2(fseed.size());
+    for (int d=0; d<fseed.size(); ++d) {
+      fseed2[d].resize(fseed[d].size());
+      for (int i=0; i<fseed[d].size(); ++i) {
+        fseed2[d][i] = &fseed[d][i];
+      }
+    }
+    std::vector<pv_MX> fsens2(fsens.size());
+    for (int d=0; d<fsens.size(); ++d) {
+      fsens2[d].resize(fsens[d].size());
+      for (int i=0; i<fsens[d].size(); ++i) {
+        fsens2[d][i] = &fsens[d][i];
+      }
+    }
+    evalFwd(fseed2, fsens2);
+  }
+
+  void MXNode::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                       std::vector<std::vector<MX> >& asens) {
+    std::vector<std::vector<MX> > aseed_copy(aseed);
+    std::vector<pv_MX> aseed2(aseed.size());
+    for (int d=0; d<aseed.size(); ++d) {
+      aseed2[d].resize(aseed[d].size());
+      for (int i=0; i<aseed[d].size(); ++i) {
+        aseed2[d][i] = &aseed_copy[d][i];
+      }
+    }
+    std::vector<pv_MX> asens2(asens.size());
+    for (int d=0; d<asens.size(); ++d) {
+      asens2[d].resize(asens[d].size());
+      for (int i=0; i<asens[d].size(); ++i) {
+        asens2[d][i] = &asens[d][i];
+      }
+    }
+    evalAdj(aseed2, asens2);
+  }
+
   void MXNode::eval(const cpv_MX& input, const pv_MX& output) {
     throw CasadiException(string("MXNode::eval not defined for class ")
                           + typeid(*this).name());
