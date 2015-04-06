@@ -232,7 +232,7 @@ namespace casadi {
     // Propagate dependencies through the function
     vector<cp_bvec_t> argf(arg, arg+num_in);
     argf[iin_] = 0;
-    vector<p_bvec_t> resf(num_out, 0);
+    vector<p_bvec_t> resf(num_out, static_cast<p_bvec_t>(0));
     resf[iout_] = tmp1;
     f_.spFwd(getPtr(argf), getPtr(resf), itmp, rtmp);
 
