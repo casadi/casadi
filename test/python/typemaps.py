@@ -96,6 +96,7 @@ class typemaptests(casadiTestCase):
       
       
   def test_setget(self):
+    return # get/set with return-by-reference has been dropped
     self.message("DMatrix set/get")
     data = n.array([3,2.3,8])
     dm=DMatrix(Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8])
@@ -608,10 +609,15 @@ class typemaptests(casadiTestCase):
     B = matrix([[4.0,5],[6,7]])
     
     w.set(A)
-    w.get(B.T)
+    B = np.array(w.get(True)).reshape(B.shape)
+    
+    self.checkarray(B,A,"get")
+    
+    B = np.array(w.get(False)).reshape(B.shape)
     
     self.checkarray(B.T,A,"get")
     
+
   def test_setgetslice(self):
     self.message("set/get on DMatrix using slices")
     
@@ -910,6 +916,10 @@ class typemaptests(casadiTestCase):
     self.assertTrue(isinstance(a,list))
     for i in a:
       self.assertTrue(isinstance(i,str))
+
+  def test_issue1373(self):
+    print np.array(casadi.DMatrix([2]))
+    print np.array(casadi.DMatrix([1,2,3.0]))
       
 if __name__ == '__main__':
     unittest.main()
