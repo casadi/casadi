@@ -40,13 +40,14 @@ f = MXFunction([x,y],[z])
 f.init()
 
 #! Evaluate this function ten times in parallel
-p = Parallelizer([f]*n)
+p = Parallelizer(f,n)
 p.setOption("gather_stats",True)
 p.setOption("parallelization","openmp")
 p.init()
 
 #! Note that the parallelizer MX input/output interface is a repitition of our function's I/O interface
 assert(p.getNumInputs() == n*f.getNumInputs())
+assert(p.getNumOutputs() == n*f.getNumOutputs())
 
 p.evaluate()
 
