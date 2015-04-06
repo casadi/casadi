@@ -707,15 +707,13 @@ namespace casadi {
       return;
     }
 
-    // Temporary vector to hold function outputs
-    vector<MX> output_tmp;
-
     // Symbolic work, non-differentiated
     vector<MX> swork(workloc_.size()-1);
     log("MXFunctionInternal::evalMX allocated work vector");
 
-    vector<const MX*> input_p;
-    vector<MX*> output_p;
+    vector<MX> oarg, ores;
+    oarg.reserve(max_arg_);
+    ores.reserve(max_res_);
 
     // Loop over computational nodes in forward order
     int alg_counter = 0;
@@ -731,22 +729,22 @@ namespace casadi {
         // Fetch parameter
         swork[it->res.front()] = it->data;
       } else {
-        // Pointers to the arguments of the evaluation
-        input_p.resize(it->arg.size());
-        for (int i=0; i<input_p.size(); ++i) {
+        // Arguments of the operation
+        oarg.resize(it->arg.size());
+        for (int i=0; i<oarg.size(); ++i) {
           int el = it->arg[i]; // index of the argument
-          input_p[i] = el<0 ? 0 : &swork[el];
+          oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : swork[el];
         }
 
-        // Pointers to the result of the evaluation
-        output_p.resize(it->res.size());
-        for (int i=0; i<output_p.size(); ++i) {
+        // Perform the operation
+        ores.resize(it->res.size());
+        it->data->evalMX(oarg, ores);
+
+        // Get the result
+        for (int i=0; i<ores.size(); ++i) {
           int el = it->res[i]; // index of the output
-          output_p[i] = el<0 ? 0 : output_given ? &output_tmp[i] : &swork[el];
+          if (el>=0) swork[el] = ores[i];
         }
-
-        // Call the evaluation function
-        it->data->eval(input_p, output_p);
       }
     }
     log("MXFunctionInternal::evalMX end");
@@ -1212,8 +1210,9 @@ namespace casadi {
 
     vector<MX> swork(workloc_.size()-1);
 
-    vector<const MX*> input_p;
-    vector<MX*> output_p;
+    vector<MX> oarg, ores;
+    oarg.reserve(max_arg_);
+    ores.reserve(max_res_);
 
     // Definition of intermediate variables
     vector<MX> y;
@@ -1260,18 +1259,22 @@ namespace casadi {
           break;
         default:
           {
-            input_p.resize(it->arg.size());
-            for (int i=0; i<input_p.size(); ++i) {
-              int el = it->arg[i];
-              input_p[i] = el<0 ? 0 : &swork[el];
+            // Arguments of the operation
+            oarg.resize(it->arg.size());
+            for (int i=0; i<oarg.size(); ++i) {
+              int el = it->arg[i]; // index of the argument
+              oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : swork[el];
             }
 
-            output_p.resize(it->res.size());
-            for (int i=0; i<output_p.size(); ++i) {
-              int el = it->res[i];
-              output_p[i] = el<0 ? 0 : &swork[el];
+            // Perform the operation
+            ores.resize(it->res.size());
+            it->data->evalMX(oarg, ores);
+
+            // Get the result
+            for (int i=0; i<ores.size(); ++i) {
+              int el = it->res[i]; // index of the output
+              if (el>=0) swork[el] = ores[i];
             }
-            it->data->eval(input_p, output_p);
           }
         }
       }

@@ -243,6 +243,14 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
+  void MXNode::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    cpv_MX parg(arg.size());
+    for (int i=0; i<arg.size(); ++i) parg[i] = &arg[i];
+    pv_MX pres(res.size());
+    for (int i=0; i<res.size(); ++i) pres[i] = &res[i];
+    eval(parg, pres);
+  }
+
   void MXNode::eval(const cpv_MX& input, const pv_MX& output) {
     throw CasadiException(string("MXNode::eval not defined for class ")
                           + typeid(*this).name());

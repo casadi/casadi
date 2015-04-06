@@ -1435,8 +1435,7 @@ namespace casadi {
     // Get references to the internal data structures
     std::vector<MXAlgEl>& algorithm = f->algorithm_;
     vector<MX> work(f.getWorkSize());
-    vector<const MX*> input_p;
-    vector<MX*> output_p;
+    vector<MX> oarg, ores;
 
     for (vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it) {
       switch (it->op) {
@@ -1456,19 +1455,22 @@ namespace casadi {
         break;
       default:
         {
-          input_p.resize(it->arg.size());
-          for (int i=0; i<input_p.size(); ++i) {
+          // Arguments of the operation
+          oarg.resize(it->arg.size());
+          for (int i=0; i<oarg.size(); ++i) {
             int el = it->arg[i];
-            input_p[i] = el<0 ? 0 : &work.at(el);
+            oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : work.at(el);
           }
 
-          output_p.resize(it->res.size());
-          for (int i=0; i<output_p.size(); ++i) {
+          // Perform the operation
+          ores.resize(it->res.size());
+          it->data->evalMX(oarg, ores);
+
+          // Get the result
+          for (int i=0; i<ores.size(); ++i) {
             int el = it->res[i];
-            output_p[i] = el<0 ? 0 : &work.at(el);
+            if (el>=0) work.at(el) = ores[i];
           }
-
-          it->data->eval(input_p, output_p);
         }
       }
     }
@@ -1535,9 +1537,7 @@ namespace casadi {
 
     // Allocate output vector
     vector<MX> f_out(f.getNumOutputs());
-
-    vector<const MX*> input_p;
-    vector<MX*> output_p;
+    vector<MX> oarg, ores;
 
     // expr_lookup iterator
     std::map<const MXNode*, int>::const_iterator it_lookup;
@@ -1571,25 +1571,27 @@ namespace casadi {
         {
           bool node_tainted = false;
 
-          input_p.resize(it->arg.size());
-          for (int i=0; i<input_p.size(); ++i) {
+          // Arguments of the operation
+          oarg.resize(it->arg.size());
+          for (int i=0; i<oarg.size(); ++i) {
             int el = it->arg[i];
             if (el>=0) node_tainted =  node_tainted || tainted[el];
-            input_p[i] = el<0 ? 0 : &swork[el];
+            oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : swork.at(el);
           }
 
-          output_p.resize(it->res.size());
-          for (int i=0; i<output_p.size(); ++i) {
-            int el = it->res[i];
-            output_p[i] = el<0 ? 0 : &swork[el];
-            if (el>=0) tainted[el] = node_tainted;
-          }
-
+          // Perform the operation
+          ores.resize(it->res.size());
           if (it->res.size()==1 && it->res[0]>=0 && !node_tainted) {
-            int el = it->res[0];
-            swork[el] = it->data;
+            ores.at(0) = it->data;
           } else {
-            const_cast<MX&>(it->data)->eval(input_p, output_p);
+            const_cast<MX&>(it->data)->evalMX(oarg, ores);
+          }
+
+          // Get the result
+          for (int i=0; i<ores.size(); ++i) {
+            int el = it->res[i];
+            if (el>=0) swork.at(el) = ores[i];
+            if (el>=0) tainted[el] = node_tainted;
           }
         }
       }
@@ -1686,8 +1688,7 @@ namespace casadi {
     stringstream v_name;
 
     // Arguments for calling the atomic operations
-    vector<const MX*> input_p;
-    vector<MX*> output_p;
+    vector<MX> oarg, ores;
 
     // Evaluate the algorithm
     k=0;
@@ -1698,22 +1699,22 @@ namespace casadi {
       case OP_PARAMETER:  work[it->res.front()] = it->data; break;
       default:
         {
-          // Pointers to the arguments of the evaluation
-          input_p.resize(it->arg.size());
-          for (int i=0; i<input_p.size(); ++i) {
-            int el = it->arg[i]; // index of the argument
-            input_p[i] = el<0 ? 0 : &work[el];
+          // Arguments of the operation
+          oarg.resize(it->arg.size());
+          for (int i=0; i<oarg.size(); ++i) {
+            int el = it->arg[i];
+            oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : work.at(el);
           }
 
-          // Pointers to the result of the evaluation
-          output_p.resize(it->res.size());
-          for (int i=0; i<output_p.size(); ++i) {
-            int el = it->res[i]; // index of the output
-            output_p[i] = el<0 ? 0 : &work[el];
-          }
+          // Perform the operation
+          ores.resize(it->res.size());
+          const_cast<MX&>(it->data)->evalMX(oarg, ores);
 
-          // Evaluate atomic operation
-          const_cast<MX&>(it->data)->eval(input_p, output_p);
+          // Get the result
+          for (int i=0; i<ores.size(); ++i) {
+            int el = it->res[i];
+            if (el>=0) work.at(el) = ores[i];
+          }
 
           // Possibly replace results with new variables
           for (int c=0; c<it->res.size(); ++c) {
