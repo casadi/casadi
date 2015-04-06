@@ -199,38 +199,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::ParallelizerInternal
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>max_threads</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>num_threads</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_allocation</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_cputime</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_endtime</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_order</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_starttime</td><td>casadi::ParallelizerInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class casadi::Parallelizer
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>max_threads</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>num_threads</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_allocation</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_cputime</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_endtime</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_order</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>task_starttime</td><td>casadi::ParallelizerInternal</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::PsdIndefDpleInternal
 \n
 \par
