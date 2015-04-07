@@ -807,10 +807,6 @@ namespace casadi {
     log("MXFunctionInternal::evalFwd allocated derivative work vector (forward mode)");
 
     // Pointers to the arguments of the current operation
-    vector<cpv_MX> fseed_p;
-    vector<pv_MX> fsens_p;
-    fseed_p.reserve(nfwd);
-    fsens_p.reserve(nfwd);
     vector<vector<MX> > oseed, osens;
     oseed.reserve(nfwd);
     osens.reserve(nfwd);
@@ -849,7 +845,7 @@ namespace casadi {
             } else {
               seed[i] = dwork[el][d];
             }
-            if (!seed[i].isZero()) skip[d] = false;
+            if (skip[d] && !seed[i].isZero()) skip[d] = false;
           }
           if (!skip[d]) oseed.push_back(seed);
         }
@@ -928,9 +924,10 @@ namespace casadi {
     }
 
     // Pointers to the arguments of the current operation
-    vector<pv_MX> aseed_p, asens_p;
-    aseed_p.reserve(nadj);
-    asens_p.reserve(nadj);
+    vector<vector<MX> > oseed, osens;
+    oseed.reserve(nadj);
+    osens.reserve(nadj);
+    vector<bool> skip(nadj, false);
 
     // Work vector, adjoint derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
@@ -938,10 +935,7 @@ namespace casadi {
     log("MXFunctionInternal::evalAdj allocated derivative work vector (adjoint mode)");
 
     // Loop over computational nodes in reverse order
-    int alg_counter = algorithm_.size()-1;
-    for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin();
-         it!=algorithm_.rend();
-         ++it, --alg_counter) {
+    for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
       if (it->op == OP_INPUT) {
         // Collect the symbolic adjoint sensitivities
         for (int d=0; d<nadj; ++d) {
@@ -955,8 +949,12 @@ namespace casadi {
       } else if (it->op==OP_OUTPUT) {
         // Pass the adjoint seeds
         for (int d=0; d<nadj; ++d) {
-          dwork[it->arg.front()][d].addToSum(aseed[d][it->res.front()]
-                                             .setSparse(output(it->res.front()).sparsity(), true));
+          MX a = aseed[d][it->res.front()].setSparse(output(it->res.front()).sparsity(), true);
+          if (dwork[it->arg.front()][d].isEmpty(true)) {
+            dwork[it->arg.front()][d] = a;
+          } else {
+            dwork[it->arg.front()][d] += a;
+          }
         }
       } else if (it->op==OP_PARAMETER) {
         // Clear adjoint seeds
@@ -964,55 +962,77 @@ namespace casadi {
           dwork[it->res.front()][d] = MX();
         }
       } else {
-        aseed_p.clear();
-        asens_p.clear();
-
+        // Collect and reset seeds
+        oseed.clear();
         for (int d=0; d<nadj; ++d) {
-          // Pointers to seeds
-          pv_MX seed(it->res.size());
-          bool can_skip = true;
-          for (int oind=0; oind<it->res.size(); ++oind) {
-            int el = it->res[oind];
-            if (el>=0) {
-              if (dwork[el][d].isEmpty(true)) {
-                dwork[el][d] = MX(it->data->sparsity(oind).shape());
-              } else if (can_skip && !dwork[el][d].isZero()) {
-                can_skip = false;
-              }
-              seed[oind] = &dwork[el][d];
-            } else {
-              seed[oind] = 0;
-            }
-          }
+          // Can the direction be skipped completely?
+          skip[d] = true;
 
-          // Pointers to sensitivities
-          pv_MX sens(it->arg.size());
-          for (int iind=0; iind<it->arg.size(); ++iind) {
-            int el = it->arg[iind];
+          // Seeds for direction d
+          vector<MX> seed(it->res.size());
+          for (int i=0; i<it->res.size(); ++i) {
+            // Get and clear seed
+            int el = it->res[i];
             if (el>=0) {
-              if (dwork[el][d].isEmpty(true)) {
-                dwork[el][d] = MX(it->data->dep(iind).shape());
-              }
-              sens[iind] = &dwork[el][d];
+              seed[i] = dwork[el][d];
+              dwork[el][d] = MX();
             } else {
-              sens[iind] = 0;
+              seed[i] = MX();
             }
-          }
 
-          // Add to list of directions being calculated
-          if (!can_skip) {
-            aseed_p.push_back(seed);
-            asens_p.push_back(sens);
-          } else {
-            MXNode::clearVector(seed, seed.size());
+            // If first time encountered, reset to zero of right dimension
+            if (seed[i].isEmpty(true)) seed[i] = MX(it->data->sparsity(i).shape());
+
+            // If nonzero seeds, keep direction
+            if (skip[d] && !seed[i].isZero()) skip[d] = false;
           }
+          // Add to list of derivatives
+          if (!skip[d]) oseed.push_back(seed);
         }
 
-        // Skip if nothing to calculate
-        if (aseed_p.empty()) continue;
+        // Get values of sensitivities before addition
+        osens.resize(oseed.size());
+        int d1=0;
+        for (int d=0; d<nadj; ++d) {
+          if (skip[d]) continue;
+          osens[d1].resize(it->arg.size());
+          for (int i=0; i<it->arg.size(); ++i) {
+            // Pass seed and reset to avoid counting twice
+            int el = it->arg[i];
+            if (el>=0) {
+              osens[d1][i] = dwork[el][d];
+              dwork[el][d] = MX();
+            } else {
+              osens[d1][i] = MX();
+            }
 
-        // Call the evaluation function
-        it->data->evalAdj(aseed_p, asens_p);
+            // If first time encountered, reset to zero of right dimension
+            if (osens[d1][i].isEmpty(true)) osens[d1][i] = MX(it->data->dep(i).shape());
+          }
+          d1++;
+        }
+
+        // Perform the operation
+        if (!osens.empty()) {
+          it->data->evalAdj(oseed, osens);
+        }
+
+        // Store sensitivities
+        d1=0;
+        for (int d=0; d<nadj; ++d) {
+          if (skip[d]) continue;
+          for (int i=0; i<it->arg.size(); ++i) {
+            int el = it->arg[i];
+            if (el>=0) {
+              if (dwork[el][d].isEmpty(true)) {
+                dwork[el][d] = osens[d1][i];
+              } else {
+                dwork[el][d] += osens[d1][i];
+              }
+            }
+          }
+          d1++;
+        }
       }
     }
     log("MXFunctionInternal::evalAdj end");
