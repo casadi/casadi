@@ -179,7 +179,12 @@
 %fragment("conv_constref", "header") {
   template<typename T>
   bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
-    if (SWIG_ConvertPtr(p, (void **)&ptr, type, 0) == -1 || ptr == 0) {
+    if (p == Py_None) {
+      m = T();
+      ptr = &m;
+      return true;
+    }
+    if (SWIG_ConvertPtr(p, (void **)&ptr, type, 0) == -1) {
       if (!f(p, &m, 0)) return false;
       ptr = &m;
     }
