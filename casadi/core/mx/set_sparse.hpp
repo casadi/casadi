@@ -76,12 +76,10 @@ namespace casadi {
                            const std::vector<int>& res, CodeGenerator& gen) const;
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(cp_bvec_t* arg,
-                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(p_bvec_t* arg,
-                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_SET_SPARSE;}

@@ -59,6 +59,15 @@ namespace casadi {
     virtual void evalSX(cp_SXElement* arg, p_SXElement* res,
                         int* itmp, SXElement* rtmp);
 
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
+
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+
     /** \brief  Get function reference */
     virtual Function& getFunction();
 

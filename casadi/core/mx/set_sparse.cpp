@@ -90,13 +90,11 @@ namespace casadi {
     }
   }
 
-  void SetSparse::spFwd(cp_bvec_t* arg,
-                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void SetSparse::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     sparsity().set(res[0], arg[0], dep().sparsity());
   }
 
-  void SetSparse::spAdj(p_bvec_t* arg,
-                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void SetSparse::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
   }

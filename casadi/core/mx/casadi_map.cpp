@@ -120,6 +120,26 @@ namespace casadi {
 #endif // WITH_OPENMP
   }
 
+  void Map::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+    int f_num_in = fcn_.getNumInputs();
+    int f_num_out = fcn_.getNumOutputs();
+    for (int i=0; i<n_; ++i) {
+      fcn_->spFwd(arg, res, itmp, rtmp);
+      arg += f_num_in;
+      res += f_num_out;
+    }
+  }
+
+  void Map::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+    int f_num_in = fcn_.getNumInputs();
+    int f_num_out = fcn_.getNumOutputs();
+    for (int i=0; i<n_; ++i) {
+      fcn_->spAdj(arg, res, itmp, rtmp);
+      arg += f_num_in;
+      res += f_num_out;
+    }
+  }
+
   int Map::nout() const {
     int f_num_out = fcn_.getNumOutputs();
     return n_ * f_num_out;
@@ -141,6 +161,28 @@ namespace casadi {
       fcn_->evalSX(arg, res, itmp, rtmp);
       arg += f_num_in;
       res += f_num_out;
+    }
+  }
+
+  void Map::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    // Collect arguments
+    int f_num_in = fcn_.getNumInputs();
+    vector<vector<MX> > v(n_);
+    vector<MX>::const_iterator arg_it = arg.begin();
+    for (int i=0; i<n_; ++i) {
+      v[i] = vector<MX>(arg_it, arg_it+f_num_in);
+      arg_it += f_num_in;
+    }
+
+    // Call in parallel
+    v = fcn_.callParallel(v);
+
+    // Get results
+    int f_num_out = fcn_.getNumOutputs();
+    vector<MX>::iterator res_it = res.begin();
+    for (int i=0; i<n_; ++i) {
+      copy(v[i].begin(), v[i].end(), res_it);
+      res_it += f_num_out;
     }
   }
 
