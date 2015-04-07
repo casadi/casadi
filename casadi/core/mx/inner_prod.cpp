@@ -53,18 +53,18 @@ namespace casadi {
     *output[0] = (*input[0])->getInnerProd(*input[1]);
   }
 
-  void InnerProd::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
-    for (int d=0; d<fwdSens.size(); ++d) {
-      *fwdSens[d][0] = dep(0)->getInnerProd(*fwdSeed[d][1])
-        + (*fwdSeed[d][0])->getInnerProd(dep(1));
+  void InnerProd::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+    for (int d=0; d<fsens.size(); ++d) {
+      *fsens[d][0] = dep(0)->getInnerProd(*fseed[d][1])
+        + (*fseed[d][0])->getInnerProd(dep(1));
     }
   }
 
-  void InnerProd::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
-    for (int d=0; d<adjSeed.size(); ++d) {
-      adjSens[d][0]->addToSum(*adjSeed[d][0] * dep(1));
-      adjSens[d][1]->addToSum(*adjSeed[d][0] * dep(0));
-      *adjSeed[d][0] = MX();
+  void InnerProd::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+    for (int d=0; d<aseed.size(); ++d) {
+      asens[d][0]->addToSum(*aseed[d][0] * dep(1));
+      asens[d][1]->addToSum(*aseed[d][0] * dep(0));
+      *aseed[d][0] = MX();
     }
   }
 

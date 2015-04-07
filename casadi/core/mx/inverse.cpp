@@ -51,19 +51,19 @@ namespace casadi {
     *output[0] = inv(*input[0]);
   }
 
-  void Inverse::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+  void Inverse::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
     MX inv_X = shared_from_this<MX>();
-    for (int d=0; d<fwdSens.size(); ++d) {
-      *fwdSens[d][0] = -mul(inv_X, mul(*fwdSeed[d][0], inv_X));
+    for (int d=0; d<fsens.size(); ++d) {
+      *fsens[d][0] = -mul(inv_X, mul(*fseed[d][0], inv_X));
     }
   }
 
-  void Inverse::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void Inverse::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
     MX inv_X = shared_from_this<MX>();
     MX trans_inv_X = inv_X.T();
-    for (int d=0; d<adjSeed.size(); ++d) {
-      adjSens[d][0]->addToSum(-mul(trans_inv_X, mul(*adjSeed[d][0], trans_inv_X)));
-      *adjSeed[d][0] = MX();
+    for (int d=0; d<aseed.size(); ++d) {
+      asens[d][0]->addToSum(-mul(trans_inv_X, mul(*aseed[d][0], trans_inv_X)));
+      *aseed[d][0] = MX();
     }
   }
 

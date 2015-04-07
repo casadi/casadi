@@ -262,12 +262,12 @@ namespace casadi {
     }
   }
 
-  void GetNonzeros::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+  void GetNonzeros::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 
     // Number of derivative directions
-    int nfwd = fwdSens.size();
+    int nfwd = fsens.size();
 
     // Output sparsity
     const Sparsity& osp = sparsity();
@@ -290,8 +290,8 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
 
       // Get references to arguments and results
-      const MX& arg = *fwdSeed[d][0];
-      MX& res = *fwdSens[d][0];
+      const MX& arg = *fseed[d][0];
+      MX& res = *fsens[d][0];
 
       // Get the matching nonzeros
       r_ind.resize(el_input.size());
@@ -344,12 +344,12 @@ namespace casadi {
 
   }
 
-  void GetNonzeros::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void GetNonzeros::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 
     // Number of derivative directions
-    int nadj = adjSeed.size();
+    int nadj = aseed.size();
 
     // Output sparsity
     const Sparsity& osp = sparsity();
@@ -372,13 +372,12 @@ namespace casadi {
 
       // Get an owning references to the seeds and sensitivities
       // and clear the seeds for the next run
-      MX aseed = *adjSeed[d][0];
-      *adjSeed[d][0] = MX();
-      MX& asens = *adjSens[d][0]; // Sensitivity after addition
-      MX asens0 = asens; // Sensitivity before addition
+      MX aseed0 = *aseed[d][0];
+      *aseed[d][0] = MX();
+      MX asens0 = *asens[d][0]; // Sensitivity before addition
 
       // Get the corresponding nz locations in the output sparsity pattern
-      aseed.sparsity().find(r_nz);
+      aseed0.sparsity().find(r_nz);
       osp.getNZ(r_nz);
 
       // Filter out ignored entries and check if there is anything to add at all
@@ -425,7 +424,7 @@ namespace casadi {
       }
 
       // Add to the element to the sensitivity
-      asens = aseed->getAddNonzeros(asens0, r_nz);
+      *asens[d][0] = aseed0->getAddNonzeros(asens0, r_nz);
     }
   }
 

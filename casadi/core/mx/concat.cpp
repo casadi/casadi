@@ -165,14 +165,14 @@ namespace casadi {
     *res[0] = diagcat(getVector(arg, ndep()));
   }
 
-  void Diagcat::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
-    int nfwd = fwdSens.size();
+  void Diagcat::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+    int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = diagcat(getVector(fwdSeed[d], ndep()));
+      *fsens[d][0] = diagcat(getVector(fseed[d], ndep()));
     }
   }
 
-  void Diagcat::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void Diagcat::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
     // Get offsets for each row and column
     vector<int> offset1(ndep()+1, 0);
     vector<int> offset2(ndep()+1, 0);
@@ -184,13 +184,13 @@ namespace casadi {
     }
 
     // Adjoint sensitivities
-    int nadj = adjSeed.size();
+    int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
-      MX& aseed = *adjSeed[d][0];
-      vector<MX> s = diagsplit(aseed, offset1, offset2);
-      aseed = MX();
+      MX& aseed0 = *aseed[d][0];
+      vector<MX> s = diagsplit(aseed0, offset1, offset2);
+      aseed0 = MX();
       for (int i=0; i<ndep(); ++i) {
-        adjSens[d][i]->addToSum(s[i]);
+        asens[d][i]->addToSum(s[i]);
       }
     }
   }
@@ -220,14 +220,14 @@ namespace casadi {
     *res[0] = horzcat(getVector(arg, ndep()));
   }
 
-  void Horzcat::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
-    int nfwd = fwdSens.size();
+  void Horzcat::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+    int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = horzcat(getVector(fwdSeed[d], ndep()));
+      *fsens[d][0] = horzcat(getVector(fseed[d], ndep()));
     }
   }
 
-  void Horzcat::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void Horzcat::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
     // Get offsets for each column
     vector<int> col_offset(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {
@@ -236,13 +236,13 @@ namespace casadi {
     }
 
     // Adjoint sensitivities
-    int nadj = adjSeed.size();
+    int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
-      MX& aseed = *adjSeed[d][0];
-      vector<MX> s = horzsplit(aseed, col_offset);
-      aseed = MX();
+      MX& aseed0 = *aseed[d][0];
+      vector<MX> s = horzsplit(aseed0, col_offset);
+      aseed0 = MX();
       for (int i=0; i<ndep(); ++i) {
-        adjSens[d][i]->addToSum(s[i]);
+        asens[d][i]->addToSum(s[i]);
       }
     }
   }
@@ -272,14 +272,14 @@ namespace casadi {
     *res[0] = vertcat(getVector(arg, ndep()));
   }
 
-  void Vertcat::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
-    int nfwd = fwdSens.size();
+  void Vertcat::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+    int nfwd = fsens.size();
     for (int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = vertcat(getVector(fwdSeed[d], ndep()));
+      *fsens[d][0] = vertcat(getVector(fseed[d], ndep()));
     }
   }
 
-  void Vertcat::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void Vertcat::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
     // Get offsets for each row
     vector<int> row_offset(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {
@@ -288,13 +288,13 @@ namespace casadi {
     }
 
     // Adjoint sensitivities
-    int nadj = adjSeed.size();
+    int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
-      MX& aseed = *adjSeed[d][0];
-      vector<MX> s = vertsplit(aseed, row_offset);
-      aseed = MX();
+      MX& aseed0 = *aseed[d][0];
+      vector<MX> s = vertsplit(aseed0, row_offset);
+      aseed0 = MX();
       for (int i=0; i<ndep(); ++i) {
-        adjSens[d][i]->addToSum(s[i]);
+        asens[d][i]->addToSum(s[i]);
       }
     }
   }

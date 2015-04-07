@@ -295,12 +295,12 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+  void MXNode::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
     throw CasadiException(string("MXNode::evalFwd not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void MXNode::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
     throw CasadiException(string("MXNode::evalAdj not defined for class ")
                           + typeid(*this).name());
   }

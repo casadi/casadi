@@ -95,17 +95,17 @@ namespace casadi {
     *output[0] = reshape(*input[0], shape());
   }
 
-  void Reshape::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
-    for (int d = 0; d<fwdSens.size(); ++d) {
-      *fwdSens[d][0] = reshape(*fwdSeed[d][0], shape());
+  void Reshape::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+    for (int d = 0; d<fsens.size(); ++d) {
+      *fsens[d][0] = reshape(*fseed[d][0], shape());
     }
   }
 
-  void Reshape::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
-    for (int d=0; d<adjSeed.size(); ++d) {
-      MX tmp = reshape(*adjSeed[d][0], dep().shape());
-      *adjSeed[d][0] = MX();
-      adjSens[d][0]->addToSum(tmp);
+  void Reshape::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+    for (int d=0; d<aseed.size(); ++d) {
+      MX tmp = reshape(*aseed[d][0], dep().shape());
+      *aseed[d][0] = MX();
+      asens[d][0]->addToSum(tmp);
     }
   }
 
