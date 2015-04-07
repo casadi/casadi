@@ -262,7 +262,8 @@ namespace casadi {
     }
   }
 
-  void GetNonzeros::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+  void GetNonzeros::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                            std::vector<std::vector<MX> >& fsens) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 
@@ -290,8 +291,8 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
 
       // Get references to arguments and results
-      const MX& arg = *fseed[d][0];
-      MX& res = *fsens[d][0];
+      const MX& arg = fseed[d][0];
+      MX& res = fsens[d][0];
 
       // Get the matching nonzeros
       r_ind.resize(el_input.size());
@@ -341,10 +342,10 @@ namespace casadi {
         res = arg->getGetNonzeros(f_sp, r_nz);
       }
     }
-
   }
 
-  void GetNonzeros::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+  void GetNonzeros::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                            std::vector<std::vector<MX> >& asens) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 
@@ -372,9 +373,8 @@ namespace casadi {
 
       // Get an owning references to the seeds and sensitivities
       // and clear the seeds for the next run
-      MX aseed0 = *aseed[d][0];
-      *aseed[d][0] = MX();
-      MX asens0 = *asens[d][0]; // Sensitivity before addition
+      MX aseed0 = aseed[d][0];
+      MX asens0 = asens[d][0]; // Sensitivity before addition
 
       // Get the corresponding nz locations in the output sparsity pattern
       aseed0.sparsity().find(r_nz);
@@ -424,7 +424,7 @@ namespace casadi {
       }
 
       // Add to the element to the sensitivity
-      *asens[d][0] = aseed0->getAddNonzeros(asens0, r_nz);
+      asens[d][0] = aseed0->getAddNonzeros(asens0, r_nz);
     }
   }
 
