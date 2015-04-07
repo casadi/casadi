@@ -172,8 +172,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::eval(const cpv_MX& arg, const pv_MX& res) {
-    *res[0] = arg[0]->T();
+  void Transpose::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = arg[0].T();
   }
 
   void Transpose::evalFwd(const std::vector<std::vector<MX> >& fseed,

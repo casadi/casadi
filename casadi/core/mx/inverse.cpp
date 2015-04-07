@@ -47,8 +47,8 @@ namespace casadi {
     }
   }
 
-  void Inverse::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = inv(*input[0]);
+  void Inverse::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = inv(arg[0]);
   }
 
   void Inverse::evalFwd(const std::vector<std::vector<MX> >& fseed,

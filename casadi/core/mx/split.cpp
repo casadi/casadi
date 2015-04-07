@@ -135,7 +135,7 @@ namespace casadi {
     }
   }
 
-  void Horzsplit::eval(const cpv_MX& arg, const pv_MX& res) {
+  void Horzsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     int nx = offset_.size()-1;
 
     // Get column offsets
@@ -148,13 +148,7 @@ namespace casadi {
       col_offset.push_back(col_offset.back() + it->size2());
     }
 
-    const MX& x = *arg[0];
-    vector<MX> y = horzsplit(x, col_offset);
-    for (int i=0; i<nx; ++i) {
-      if (res[i]!=0) {
-        *res[i] = y[i];
-      }
-    }
+    res = horzsplit(arg[0], col_offset);
   }
 
   void Horzsplit::evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -224,7 +218,7 @@ namespace casadi {
     }
   }
 
-  void Diagsplit::eval(const cpv_MX& arg, const pv_MX& res) {
+  void Diagsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     int nx = offset_.size()-1;
 
     // Get offsets
@@ -241,13 +235,7 @@ namespace casadi {
       offset2.push_back(offset2.back() + it->size2());
     }
 
-    const MX& x = *arg[0];
-    vector<MX> y = diagsplit(x, offset1, offset2);
-    for (int i=0; i<nx; ++i) {
-      if (res[i]!=0) {
-        *res[i] = y[i];
-      }
-    }
+    res = diagsplit(arg[0], offset1, offset2);
   }
 
   void Diagsplit::evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -321,7 +309,7 @@ namespace casadi {
     }
   }
 
-  void Vertsplit::eval(const cpv_MX& arg, const pv_MX& res) {
+  void Vertsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     int nx = offset_.size()-1;
 
     // Get row offsets
@@ -329,18 +317,11 @@ namespace casadi {
     row_offset.reserve(offset_.size());
     row_offset.push_back(0);
     for (std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
-        it!=output_sparsity_.end();
-        ++it) {
+        it!=output_sparsity_.end(); ++it) {
       row_offset.push_back(row_offset.back() + it->size1());
     }
 
-    const MX& x = *arg[0];
-    vector<MX> y = vertsplit(x, row_offset);
-    for (int i=0; i<nx; ++i) {
-      if (res[i]!=0) {
-        *res[i] = y[i];
-      }
-    }
+    res = vertsplit(arg[0], row_offset);
   }
 
   void Vertsplit::evalFwd(const std::vector<std::vector<MX> >& fseed,

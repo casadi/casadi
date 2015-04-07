@@ -48,8 +48,8 @@ namespace casadi {
                               int* itmp, SXElement* rtmp) {
   }
 
-  void ConstantMX::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = shared_from_this<MX>();
+  void ConstantMX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = shared_from_this<MX>();
   }
 
  void ConstantMX::evalFwd(const std::vector<std::vector<MX> >& fseed,

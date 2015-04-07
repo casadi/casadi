@@ -95,8 +95,8 @@ namespace casadi {
     /// Clone function
     virtual Horzsplit* clone() const { return new Horzsplit(*this);}
 
-    /// Evaluate the function symbolically (MX)
-    virtual void eval(const cpv_MX& input, const pv_MX& output);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -132,8 +132,8 @@ namespace casadi {
     /// Clone function
     virtual Diagsplit* clone() const { return new Diagsplit(*this);}
 
-    /// Evaluate the function symbolically (MX)
-    virtual void eval(const cpv_MX& input, const pv_MX& output);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -169,8 +169,8 @@ namespace casadi {
     /// Clone function
     virtual Vertsplit* clone() const { return new Vertsplit(*this);}
 
-    /// Evaluate the function symbolically (MX)
-    virtual void eval(const cpv_MX& input, const pv_MX& output);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,

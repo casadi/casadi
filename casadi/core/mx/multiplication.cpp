@@ -96,8 +96,8 @@ namespace casadi {
     }
   }
 
-  void Multiplication::eval(const cpv_MX& arg, const pv_MX& res) {
-    *res[0] = mul(*arg[1], *arg[2], *arg[0]);
+  void Multiplication::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = mul(arg[1], arg[2], arg[0]);
   }
 
   void Multiplication::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp,

@@ -137,17 +137,6 @@ namespace casadi {
     virtual void evalSX(cp_SXElement* arg, p_SXElement* res,
                         int* itmp, SXElement* rtmp);
 
-  private:
-    /** \brief  Evaluate symbolically (MX) */
-    virtual void eval(const cpv_MX& arg, const pv_MX& res);
-
-    /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
-
-    /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens);
-
-  public:
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
@@ -382,24 +371,6 @@ namespace casadi {
 
     /** \brief  The sparsity pattern */
     Sparsity sparsity_;
-
-    /// Convert vector of const MX pointers to vector of MX
-    static std::vector<MX> getVector(const cpv_MX& v, int len);
-
-    /// Convert vector of const MX pointers to vector of MX
-    static std::vector<MX> getVector(const pv_MX& v, int len);
-
-    /// Convert vector of vectors of pointers to vector of vectors of objects
-    static std::vector<std::vector<MX> > getVector(const std::vector<pv_MX>& v, int len);
-
-    /// Convert vector of vectors of pointers to vector of vectors of objects
-    static std::vector<std::vector<MX> > getVector(const std::vector<cpv_MX>& v, int len);
-
-    /** \brief Free adjoint memory (MX) */
-    static void clearVector(const pv_MX& v, int len);
-
-    /** \brief Free adjoint memory (MX) */
-    static void clearVector(const std::vector<pv_MX>& v, int len);
 
     /** \brief Propagate sparsities forward through a copy operation */
     static void copyFwd(const bvec_t* arg, bvec_t* res, int len);

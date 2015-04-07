@@ -45,8 +45,8 @@ namespace casadi {
     }
   }
 
-  void Determinant::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = det(*input[0]);
+  void Determinant::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = det(arg[0]);
   }
 
   void Determinant::evalFwd(const std::vector<std::vector<MX> >& fseed,

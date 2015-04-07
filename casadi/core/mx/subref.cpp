@@ -71,7 +71,7 @@ namespace casadi {
     }
   }
 
-  void SubRef::eval(const cpv_MX& input, const pv_MX& output) {
+  void SubRef::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     casadi_error("not ready");
   }
 

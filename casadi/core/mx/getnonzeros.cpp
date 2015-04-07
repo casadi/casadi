@@ -188,7 +188,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzeros::eval(const cpv_MX& input, const pv_MX& output) {
+  void GetNonzeros::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 
@@ -209,14 +209,10 @@ namespace casadi {
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
 
-    // Get references to arguments and results
-    const MX& arg = *input[0];
-    MX& res = *output[0];
-
     // Get the matching nonzeros
     r_ind.resize(el_input.size());
     copy(el_input.begin(), el_input.end(), r_ind.begin());
-    arg.sparsity().getNZ(r_ind);
+    arg[0].sparsity().getNZ(r_ind);
 
     // Sparsity pattern for the result
     r_colind.resize(osp.size2()+1); // Col count
@@ -255,10 +251,10 @@ namespace casadi {
 
     // Create a sparsity pattern from vectors
     if (r_nz.size()==0) {
-      res = MX(osp.shape());
+      res[0] = MX(osp.shape());
     } else {
       Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
-      res = arg->getGetNonzeros(f_sp, r_nz);
+      res[0] = arg[0]->getGetNonzeros(f_sp, r_nz);
     }
   }
 

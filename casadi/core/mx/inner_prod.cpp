@@ -49,8 +49,8 @@ namespace casadi {
     }
   }
 
-  void InnerProd::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = (*input[0])->getInnerProd(*input[1]);
+  void InnerProd::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = arg[0]->getInnerProd(arg[1]);
   }
 
   void InnerProd::evalFwd(const std::vector<std::vector<MX> >& fseed,

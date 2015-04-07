@@ -67,8 +67,8 @@ namespace casadi {
     virtual void evalSX(cp_SXElement* input, p_SXElement* output,
                             int* itmp, SXElement* rtmp);
 
-    /** \brief  Evaluate the function symbolically (MX) */
-    virtual void eval(const cpv_MX& arg, const pv_MX& res);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,

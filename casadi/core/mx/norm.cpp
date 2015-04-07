@@ -59,8 +59,8 @@ namespace casadi {
     *res[0] = sqrt(casadi_dot(dep().nnz(), arg[0], 1, arg[0], 1));
   }
 
-  void NormF::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = (*input[0])->getNormF();
+  void NormF::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = arg[0]->getNormF();
   }
 
   void NormF::evalFwd(const std::vector<std::vector<MX> >& fseed,

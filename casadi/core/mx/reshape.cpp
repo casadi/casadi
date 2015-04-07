@@ -90,8 +90,8 @@ namespace casadi {
     }
   }
 
-  void Reshape::eval(const cpv_MX& input, const pv_MX& output) {
-    *output[0] = reshape(*input[0], shape());
+  void Reshape::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = reshape(arg[0], shape());
   }
 
   void Reshape::evalFwd(const std::vector<std::vector<MX> >& fseed,
