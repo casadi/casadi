@@ -72,34 +72,34 @@ namespace casadi {
     casadi_math<SXElement>::fun(op_, inputd, dummy, outputd, nnz());
   }
 
-  void UnaryMX::eval(const cpv_MX& input, const pv_MX& output) {
+  void UnaryMX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     MX dummy;
-    casadi_math<MX>::fun(op_, *input[0], dummy, *output[0]);
+    casadi_math<MX>::fun(op_, arg[0], dummy, res[0]);
   }
 
-  void UnaryMX::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+  void UnaryMX::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                     std::vector<std::vector<MX> >& fsens) {
     // Get partial derivatives
     MX pd[2];
     MX dummy; // Function value, dummy second argument
     casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
 
     // Propagate forward seeds
-    for (int d=0; d<fwdSens.size(); ++d) {
-      *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]);
+    for (int d=0; d<fsens.size(); ++d) {
+      fsens[d][0] = pd[0]*fseed[d][0];
     }
   }
 
-  void UnaryMX::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void UnaryMX::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                     std::vector<std::vector<MX> >& asens) {
     // Get partial derivatives
     MX pd[2];
     MX dummy; // Function value, dummy second argument
     casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
 
     // Propagate adjoint seeds
-    for (int d=0; d<adjSeed.size(); ++d) {
-      MX s = *adjSeed[d][0];
-      *adjSeed[d][0] = MX();
-      adjSens[d][0]->addToSum(pd[0]*s);
+    for (int d=0; d<aseed.size(); ++d) {
+      asens[d][0] += pd[0]*aseed[d][0];
     }
   }
 

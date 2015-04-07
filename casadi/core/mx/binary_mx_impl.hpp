@@ -64,35 +64,35 @@ namespace casadi {
     }
   }
 
+
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::eval(const cpv_MX& arg, const pv_MX& res) {
-    casadi_math<MX>::fun(op_, *arg[0], *arg[1], *res[0]);
+  void BinaryMX<ScX, ScY>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    casadi_math<MX>::fun(op_, arg[0], arg[1], res[0]);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalFwd(const std::vector<cpv_MX>& fseed,
-                                   const std::vector<pv_MX>& fsens) {
+  void BinaryMX<ScX, ScY>::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                                   std::vector<std::vector<MX> >& fsens) {
     // Get partial derivatives
     MX pd[2];
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
 
     // Propagate forward seeds
     for (int d=0; d<fsens.size(); ++d) {
-      *fsens[d][0] = pd[0]*(*fseed[d][0]) + pd[1]*(*fseed[d][1]);
+      fsens[d][0] = pd[0]*fseed[d][0] + pd[1]*fseed[d][1];
     }
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalAdj(const std::vector<pv_MX>& aseed,
-                                   const std::vector<pv_MX>& asens) {
+  void BinaryMX<ScX, ScY>::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                                   std::vector<std::vector<MX> >& asens) {
     // Get partial derivatives
     MX pd[2];
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
 
     // Propagate adjoint seeds
     for (int d=0; d<aseed.size(); ++d) {
-      MX s = *aseed[d][0];
-      *aseed[d][0] = MX();
+      MX s = aseed[d][0];
       for (int c=0; c<2; ++c) {
         // Get increment of sensitivity c
         MX t = pd[c]*s;
@@ -104,7 +104,7 @@ namespace casadi {
         }
 
         // Propagate the seeds
-        asens[d][c]->addToSum(t);
+        asens[d][c] += t;
       }
     }
   }

@@ -56,34 +56,32 @@ namespace casadi {
     /** \brief Check if binary operation */
     virtual bool isBinaryOp() const { return true;}
 
-    /** \brief  Evaluate the function symbolically (MX) */
-    virtual void eval(const cpv_MX& arg, const pv_MX& res);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(cp_bvec_t* arg,
-                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(p_bvec_t* arg,
-                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /// Evaluate the function (template)
     template<typename T>
     void evalGen(const T* const* arg, T* const* res, int* itmp, T* rtmp);
 
     /// Evaluate the function numerically
-    virtual void evalD(cp_double* input, p_double* output,
-                       int* itmp, double* rtmp);
+    virtual void evalD(cp_double* input, p_double* output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(cp_SXElement* input, p_SXElement* output,
-                        int* itmp, SXElement* rtmp);
+    virtual void evalSX(cp_SXElement* input, p_SXElement* output, int* itmp, SXElement* rtmp);
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 2;}
