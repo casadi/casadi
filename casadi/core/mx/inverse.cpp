@@ -51,19 +51,20 @@ namespace casadi {
     *output[0] = inv(*input[0]);
   }
 
-  void Inverse::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+  void Inverse::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                        std::vector<std::vector<MX> >& fsens) {
     MX inv_X = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
-      *fsens[d][0] = -mul(inv_X, mul(*fseed[d][0], inv_X));
+      fsens[d][0] = -mul(inv_X, mul(fseed[d][0], inv_X));
     }
   }
 
-  void Inverse::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+  void Inverse::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                        std::vector<std::vector<MX> >& asens) {
     MX inv_X = shared_from_this<MX>();
     MX trans_inv_X = inv_X.T();
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0]->addToSum(-mul(trans_inv_X, mul(*aseed[d][0], trans_inv_X)));
-      *aseed[d][0] = MX();
+      asens[d][0] -= mul(trans_inv_X, mul(aseed[d][0], trans_inv_X));
     }
   }
 

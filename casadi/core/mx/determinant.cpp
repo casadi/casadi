@@ -49,22 +49,23 @@ namespace casadi {
     *output[0] = det(*input[0]);
   }
 
-  void Determinant::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+  void Determinant::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                            std::vector<std::vector<MX> >& fsens) {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
     for (int d=0; d<fsens.size(); ++d) {
-      *fsens[d][0] = det_X * inner_prod(trans_inv_X, *fseed[d][0]);
+      fsens[d][0] = det_X * inner_prod(trans_inv_X, fseed[d][0]);
     }
   }
 
-  void Determinant::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+  void Determinant::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                            std::vector<std::vector<MX> >& asens) {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0]->addToSum((*aseed[d][0]*det_X) * trans_inv_X);
-      *aseed[d][0] = MX();
+      asens[d][0] += aseed[d][0]*det_X * trans_inv_X;
     }
   }
 

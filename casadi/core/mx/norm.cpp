@@ -63,23 +63,24 @@ namespace casadi {
     *output[0] = (*input[0])->getNormF();
   }
 
-  void NormF::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+  void NormF::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                      std::vector<std::vector<MX> >& fsens) {
     MX self = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
-      *fsens[d][0] = dep(0)->getInnerProd(*fseed[d][0]) / self;
+      fsens[d][0] = dep(0)->getInnerProd(fseed[d][0]) / self;
     }
   }
 
-  void NormF::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+  void NormF::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                      std::vector<std::vector<MX> >& asens) {
     MX self = shared_from_this<MX>();
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0]->addToSum(((*aseed[d][0])/self) * dep(0));
-      *aseed[d][0] = MX();
+      asens[d][0] += (aseed[d][0]/self) * dep(0);
     }
   }
 
   void NormF::generate(std::ostream &stream, const std::vector<int>& arg,
-                                const std::vector<int>& res, CodeGenerator& gen) const {
+                       const std::vector<int>& res, CodeGenerator& gen) const {
     gen.assign(stream, gen.workelement(res[0]),
                "sqrt(" + gen.casadi_dot(dep().nnz(), gen.work(arg[0]), 1,
                                         gen.work(arg[0]), 1) + ")");

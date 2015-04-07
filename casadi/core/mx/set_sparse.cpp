@@ -74,18 +74,19 @@ namespace casadi {
     *output[0] = input[0]->setSparse(sparsity());
   }
 
-  void SetSparse::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+  void SetSparse::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                          std::vector<std::vector<MX> >& fsens) {
     int nfwd = fsens.size();
     for (int d=0; d<nfwd; ++d) {
-      *fsens[d][0] = fseed[d][0]->setSparse(sparsity(), true);
+      fsens[d][0] = fseed[d][0].setSparse(sparsity(), true);
     }
   }
 
-  void SetSparse::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+  void SetSparse::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                          std::vector<std::vector<MX> >& asens) {
     int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
-      asens[d][0]->addToSum(aseed[d][0]->setSparse(dep().sparsity(), true));
-      *aseed[d][0] = MX();
+      asens[d][0] += aseed[d][0].setSparse(dep().sparsity(), true);
     }
   }
 

@@ -99,14 +99,16 @@ namespace casadi {
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
-    /// Evaluate the function symbolically (MX)
-    virtual void eval(const cpv_MX& arg, const pv_MX& res);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_HORZCAT;}
@@ -131,14 +133,16 @@ namespace casadi {
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
-    /// Evaluate the function symbolically (MX)
-    virtual void eval(const cpv_MX& arg, const pv_MX& res);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_VERTCAT;}
@@ -163,14 +167,16 @@ namespace casadi {
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
-    /// Evaluate the function symbolically (MX)
-    virtual void eval(const cpv_MX& arg, const pv_MX& res);
+    /** \brief  Evaluate symbolically (MX) */
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_DIAGCAT;}

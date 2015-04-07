@@ -54,33 +54,31 @@ namespace casadi {
     void evalGen(const T* const* arg, T* const* res, int* itmp, T* rtmp);
 
     /// Evaluate the function numerically
-    virtual void evalD(cp_double* input, p_double* output,
-                       int* itmp, double* rtmp);
+    virtual void evalD(cp_double* input, p_double* output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(cp_SXElement* input, p_SXElement* output,
-                            int* itmp, SXElement* rtmp);
+    virtual void evalSX(cp_SXElement* input, p_SXElement* output, int* itmp, SXElement* rtmp);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(cp_bvec_t* arg,
-                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(p_bvec_t* arg,
-                       p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /// Evaluate the function symbolically (MX)
     virtual void eval(const cpv_MX& input, const pv_MX& output);
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens);
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens);
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
     void generate(std::ostream &stream, const std::vector<int>& arg,
-                           const std::vector<int>& res, CodeGenerator& gen) const;
+                  const std::vector<int>& res, CodeGenerator& gen) const;
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;

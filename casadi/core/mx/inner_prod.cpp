@@ -53,18 +53,19 @@ namespace casadi {
     *output[0] = (*input[0])->getInnerProd(*input[1]);
   }
 
-  void InnerProd::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+  void InnerProd::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                          std::vector<std::vector<MX> >& fsens) {
     for (int d=0; d<fsens.size(); ++d) {
-      *fsens[d][0] = dep(0)->getInnerProd(*fseed[d][1])
-        + (*fseed[d][0])->getInnerProd(dep(1));
+      fsens[d][0] = dep(0)->getInnerProd(fseed[d][1])
+        + fseed[d][0]->getInnerProd(dep(1));
     }
   }
 
-  void InnerProd::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+  void InnerProd::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                          std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0]->addToSum(*aseed[d][0] * dep(1));
-      asens[d][1]->addToSum(*aseed[d][0] * dep(0));
-      *aseed[d][0] = MX();
+      asens[d][0] += aseed[d][0] * dep(1);
+      asens[d][1] += aseed[d][0] * dep(0);
     }
   }
 
@@ -84,8 +85,7 @@ namespace casadi {
     *res[0] = casadi_dot(dep(0).nnz(), arg[0], 1, arg[1], 1);
   }
 
-  void InnerProd::spFwd(cp_bvec_t* arg,
-                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t* r = res[0];
     const int n = dep(0).nnz();
@@ -95,8 +95,7 @@ namespace casadi {
     }
   }
 
-  void InnerProd::spAdj(p_bvec_t* arg,
-                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     bvec_t *a0=arg[0], *a1=arg[1], *r=res[0];
     const int n = dep(0).nnz();
     for (int i=0; i<n; ++i) {
