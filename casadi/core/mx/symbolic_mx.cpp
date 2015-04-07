@@ -57,10 +57,12 @@ namespace casadi {
   void SymbolicMX::eval(const cpv_MX& input, const pv_MX& output) {
   }
 
-  void SymbolicMX::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+  void SymbolicMX::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                           std::vector<std::vector<MX> >& fsens) {
   }
 
-  void SymbolicMX::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+  void SymbolicMX::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                           std::vector<std::vector<MX> >& asens) {
   }
 
   const std::string& SymbolicMX::getName() const {

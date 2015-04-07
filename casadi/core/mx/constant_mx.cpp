@@ -52,21 +52,16 @@ namespace casadi {
     *output[0] = shared_from_this<MX>();
   }
 
- void ConstantMX::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+ void ConstantMX::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                          std::vector<std::vector<MX> >& fsens) {
    MX zero_sens(size1(), size2());
    for (int d=0; d<fsens.size(); ++d) {
-     if (fsens[d][0]!=0) {
-       *fsens[d][0] = zero_sens;
-     }
+     fsens[d][0] = zero_sens;
    }
  }
 
-  void ConstantMX::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
-    for (int d=0; d<aseed.size(); ++d) {
-      if (aseed[d][0]!=0) {
-        *aseed[d][0] = MX();
-      }
-    }
+  void ConstantMX::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                           std::vector<std::vector<MX> >& asens) {
   }
 
   void ConstantMX::spFwd(cp_bvec_t* arg,

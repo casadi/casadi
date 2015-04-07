@@ -44,13 +44,12 @@ namespace casadi {
     return new Reshape(*this);
   }
 
-  void Reshape::evalD(cp_double* input, p_double* output,
-                          int* itmp, double* rtmp) {
+  void Reshape::evalD(cp_double* input, p_double* output, int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
   void Reshape::evalSX(cp_SXElement* input, p_SXElement* output,
-                           int* itmp, SXElement* rtmp) {
+                       int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
 
@@ -95,17 +94,17 @@ namespace casadi {
     *output[0] = reshape(*input[0], shape());
   }
 
-  void Reshape::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+  void Reshape::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                        std::vector<std::vector<MX> >& fsens) {
     for (int d = 0; d<fsens.size(); ++d) {
-      *fsens[d][0] = reshape(*fseed[d][0], shape());
+      fsens[d][0] = reshape(fseed[d][0], shape());
     }
   }
 
-  void Reshape::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+  void Reshape::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                        std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
-      MX tmp = reshape(*aseed[d][0], dep().shape());
-      *aseed[d][0] = MX();
-      asens[d][0]->addToSum(tmp);
+      asens[d][0] += reshape(aseed[d][0], dep().shape());
     }
   }
 

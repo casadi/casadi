@@ -75,11 +75,13 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubRef::evalFwd(const std::vector<cpv_MX>& fseed, const std::vector<pv_MX>& fsens) {
+  void SubRef::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                       std::vector<std::vector<MX> >& fsens) {
     casadi_error("not ready");
   }
 
-  void SubRef::evalAdj(const std::vector<pv_MX>& aseed, const std::vector<pv_MX>& asens) {
+  void SubRef::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                       std::vector<std::vector<MX> >& asens) {
     casadi_error("not ready");
   }
 
