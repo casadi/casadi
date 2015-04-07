@@ -48,22 +48,30 @@ VECTOR_REPR(casadi::Matrix<casadi::SXElement>)
 
 #ifdef SWIGPYTHON
 %pythoncode %{
+
 try:
   import numpy
+
   def constpow(x,y):
     pass
 
   constpow=numpy.frompyfunc(constpow,2,1)
-  
+
+  fmin_backup = fmin
+  fmax_backup = fmax
+
   def fmin(x,y):
     pass
     
   def fmax(x,y):
     pass
-  
+
   _min_ufunc = numpy.frompyfunc(fmin,2,1)
   _max_ufunc = numpy.frompyfunc(fmax,2,1)
-  
+
+  fmin = fmin_backup
+  fmax = fmax_backup
+
   _defaultmin = min
   def min(*args,**kwargs):
     if len(args)==2 and len(kwargs)==0 and (hasattr(args[0],'fmin') or hasattr(args[1],'fmin')):
