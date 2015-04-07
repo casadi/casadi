@@ -2703,7 +2703,15 @@ namespace casadi {
 
       // Collect adjoint sensitivities
       for (int d=0; d<nadj; ++d) {
-        asens[d] = vertsplit(v[d], offset);
+        asens[d].resize(n_in);
+        vector<MX> a = vertsplit(v[d], offset);
+        for (int i=0; i<n_in; ++i) {
+          if (asens[d][i].isEmpty(true)) {
+            asens[d][i] = a[i];
+          } else {
+            asens[d][i] += a[i];
+          }
+        }
       }
       return;
     }
@@ -2728,7 +2736,11 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(n_in);
       for (int i=0; i<n_in; ++i) {
-        asens[d][i] = *x_it++;
+        if (asens[d][i].isEmpty(true)) {
+          asens[d][i] = *x_it++;
+        } else {
+          asens[d][i] += *x_it++;
+        }
       }
     }
     casadi_assert(x_it==x.end());

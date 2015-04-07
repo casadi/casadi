@@ -79,78 +79,52 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalSX(cp_SXElement* arg, p_SXElement* res,
-                         int* itmp, SXElement* rtmp) {
+  void Solve<Tr>::evalSX(cp_SXElement* arg, p_SXElement* res, int* itmp, SXElement* rtmp) {
     linear_solver_->evalSXLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::eval(const cpv_MX& arg, const pv_MX& res) {
-    if (arg[0]->isZero()) {
-      *res[0] = MX(arg[0]->shape());
+  void Solve<Tr>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+    if (arg[0].isZero()) {
+      res[0] = MX(arg[0].shape());
     } else {
-      *res[0] = linear_solver_->solve(*arg[1], *arg[0], Tr);
+      res[0] = linear_solver_->solve(arg[1], arg[0], Tr);
     }
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalFwd(const std::vector<cpv_MX>& fwdSeed, const std::vector<pv_MX>& fwdSens) {
+  void Solve<Tr>::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                          std::vector<std::vector<MX> >& fsens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
-
-    // Collect seeds
-    vector<vector<MX> > fseed(getVector(fwdSeed, ndep())), fsens;
 
     // Call the cached functions
     linear_solver_->callForwardLinsol(arg, res, fseed, fsens, Tr);
-
-    // Store the forward sensitivities
-    for (int d=0; d<fwdSens.size(); ++d) {
-      for (int i=0; i<fwdSens[d].size(); ++i) {
-        if (fwdSens[d][i]!=0) {
-          *fwdSens[d][i] = fsens[d][i];
-        }
-      }
-    }
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalAdj(const std::vector<pv_MX>& adjSeed, const std::vector<pv_MX>& adjSens) {
+  void Solve<Tr>::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                          std::vector<std::vector<MX> >& asens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
     vector<MX> res(nout());
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
-    // Collect seeds
-    vector<vector<MX> > aseed(getVector(adjSeed, nout())), asens;
-    clearVector(adjSeed, nout());
-
     // Call the cached functions
     linear_solver_->callReverseLinsol(arg, res, aseed, asens, Tr);
-
-    // Store the adjoint sensitivities
-    for (int d=0; d<adjSens.size(); ++d) {
-      for (int i=0; i<adjSens[d].size(); ++i) {
-        if (adjSens[d][i]!=0) {
-          adjSens[d][i]->addToSum(asens[d][i]);
-        }
-      }
-    }
   }
 
   template<bool Tr>
-  void Solve<Tr>::spFwd(cp_bvec_t* arg,
-                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Solve<Tr>::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     linear_solver_->spFwdLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::spAdj(p_bvec_t* arg,
-                        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Solve<Tr>::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
     linear_solver_->spAdjLinsol(arg, res, itmp, rtmp, Tr, dep(0).size2());
   }
 

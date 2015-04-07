@@ -382,12 +382,19 @@ namespace casadi {
       }
     }
 
+    // No dependency on guess (1)
+    vector<MX> tmp(nadj);
+    for (int d=0; d<nadj; ++d) {
+      asens[d].resize(num_in);
+      tmp[d] = asens[d][iin_].isEmpty(true) ? MX(input(iin_).shape()) : asens[d][iin_];
+    }
+
     // Propagate through f_
     f_.callReverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
 
-    // No dependency on guess
+    // No dependency on guess (2)
     for (int d=0; d<nadj; ++d) {
-      asens[d][iin_] = MX(input(iin_).shape());
+      asens[d][iin_] = tmp[d];
     }
 
     // Add contribution from auxiliary outputs
