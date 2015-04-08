@@ -105,13 +105,6 @@ namespace casadi {
       nodes.push_back(static_cast<MXNode*>(0));
     }
 
-    // Make sure that all inputs have been added also // TODO REMOVE THIS
-    for (vector<MX>::iterator it = inputv_.begin(); it != inputv_.end(); ++it) {
-      if (!it->getTemp()) {
-        nodes.push_back(static_cast<MXNode*>(it->get()));
-      }
-    }
-
     // Set the temporary variables to be the corresponding place in the sorted graph
     for (int i=0; i<nodes.size(); ++i) {
       if (nodes[i]) {
@@ -921,6 +914,9 @@ namespace casadi {
     // Allocate adjoint sensitivities
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(inputv_.size());
+      for (int i=0; i<asens[d].size(); ++i) {
+        asens[d][i] = MX(input(i).shape());
+      }
     }
 
     // Pointers to the arguments of the current operation
@@ -939,9 +935,7 @@ namespace casadi {
       if (it->op == OP_INPUT) {
         // Collect the symbolic adjoint sensitivities
         for (int d=0; d<nadj; ++d) {
-          if (dwork[it->res.front()][d].isEmpty()) {
-            asens[d][it->arg.front()] = MX(input(it->arg.front()).shape());
-          } else {
+          if (!dwork[it->res.front()][d].isEmpty()) {
             asens[d][it->arg.front()] = dwork[it->res.front()][d];
           }
           dwork[it->res.front()][d] = MX();
