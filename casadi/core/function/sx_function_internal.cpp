@@ -326,15 +326,6 @@ namespace casadi {
       }
     }
 
-    // Make sure that all inputs have been added also // TODO REMOVE THIS
-    for (vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it) {
-      for (vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc) {
-        if (!itc->getTemp()) {
-          nodes.push_back(itc->get());
-        }
-      }
-    }
-
     // Set the temporary variables to be the corresponding place in the sorted graph
     for (int i=0; i<nodes.size(); ++i) {
       if (nodes[i]) {
@@ -792,9 +783,13 @@ namespace casadi {
     // Allocate results if needed
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(num_in);
-      for (int i=0; i<asens[d].size(); ++i)
-        if (asens[d][i].sparsity()!=input(i).sparsity())
+      for (int i=0; i<asens[d].size(); ++i) {
+        if (asens[d][i].sparsity()!=input(i).sparsity()) {
           asens[d][i] = SX::zeros(input(i).sparsity());
+        } else {
+          fill(asens[d][i].begin(), asens[d][i].end(), 0);
+        }
+      }
     }
 
     // Iterator to the binary operations
