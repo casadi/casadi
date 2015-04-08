@@ -205,9 +205,10 @@ namespace casadi {
     /// Check if norm
     bool isNorm() const;
 
-    /** \brief  check if all nonzeros are symbolic
-     * (this function is currently identical to isSymbolic) */
-    bool isSymbolicSparse() const;
+    /** \brief Check if matrix can be used to define function inputs.
+        Valid inputs for MXFunctions are combinations of Reshape, concatenations and SymbolicMX
+    */
+    bool isValidInput() const;
 
     /** \brief  check if identity */
     bool isIdentity() const;

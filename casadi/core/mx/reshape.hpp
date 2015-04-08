@@ -98,6 +98,9 @@ namespace casadi {
 
     /// Transpose (if a dimension is one)
     virtual MX getTranspose() const;
+
+    /** \brief  Check if valid function input */
+    virtual bool isValidInput() const;
   };
 
 } // namespace casadi

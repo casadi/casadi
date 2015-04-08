@@ -779,10 +779,10 @@ namespace casadi {
     */
     bool isSymbolic() const;
 
-    /** \brief Check if symbolic
+    /** \brief Check if matrix can be used to define function inputs.
         Sparse matrices can return true if all non-zero elements are symbolic
     */
-    bool isSymbolicSparse() const;
+    bool isValidInput() const;
 
     /** \brief Check if the matrix is constant (note that false negative answers are possible)*/
     bool isConstant() const;

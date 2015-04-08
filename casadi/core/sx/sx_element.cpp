@@ -913,14 +913,14 @@ namespace casadi {
   template<>
   bool SX::isSymbolic() const {
     if (isDense()) {
-      return isSymbolicSparse();
+      return isValidInput();
     } else {
       return false;
     }
   }
 
   template<>
-  bool SX::isSymbolicSparse() const {
+  bool SX::isValidInput() const {
     for (int k=0; k<nnz(); ++k) // loop over non-zero elements
       if (!at(k)->isSymbolic()) // if an element is not symbolic
         return false;

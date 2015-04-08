@@ -951,18 +951,8 @@ namespace casadi {
     return MX::create(new SymbolicMX(name, sp));
   }
 
-  bool MX::isSymbolicSparse() const {
-    if (getOp()==OP_HORZCAT) {
-      // Check if the expression is a horzcat where all components are symbolic primitives
-      for (int d=0; d<getNdeps(); ++d) {
-        if (!getDep(d).isSymbolic()) {
-          return false;
-        }
-      }
-      return true;
-    } else {
-      return isSymbolic();
-    }
+  bool MX::isValidInput() const {
+    return (*this)->isValidInput();
   }
 
   bool MX::isIdentity() const {

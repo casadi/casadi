@@ -154,7 +154,7 @@ namespace casadi {
     for (int i=0; i<inputv.size(); ++i) {
       if (inputv[i].isEmpty()) {
         // That's okay
-      } else if (!inputv[i].isSymbolicSparse()) {
+      } else if (!inputv[i].isValidInput()) {
         casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be"
                      " purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
       }

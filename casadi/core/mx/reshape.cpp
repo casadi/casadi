@@ -127,4 +127,11 @@ namespace casadi {
     }
   }
 
+  bool Reshape::isValidInput() const {
+    if (!dep()->isValidInput()) return false;
+    casadi_warning("Experimental feature: MXFunction with Reshape as function input");
+    return true;
+  }
+
+
 } // namespace casadi

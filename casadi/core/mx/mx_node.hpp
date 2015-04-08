@@ -157,6 +157,9 @@ namespace casadi {
     /** \brief  Get the name */
     virtual const std::string& getName() const;
 
+    /** \brief  Check if valid function input */
+    virtual bool isValidInput() const {return getOp()==OP_PARAMETER;}
+
     /** \brief  Check if evaluation output */
     virtual bool isOutputNode() const {return false;}
 

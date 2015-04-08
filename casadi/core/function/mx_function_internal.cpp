@@ -348,7 +348,10 @@ namespace casadi {
         algorithm_[i].op = OP_INPUT;
 
         // Location of the input
-        algorithm_[i].arg = vector<int>(1, ind);
+        algorithm_[i].arg.resize(3);
+        algorithm_[i].arg[0] = ind; // Input?
+        algorithm_[i].arg[1] = 0; // Segment?
+        algorithm_[i].arg[2] = 0; // Nonzero offet?
 
         // Mark input as read
         inputv_[ind].setTemp(0);

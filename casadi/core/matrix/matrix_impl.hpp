@@ -1774,7 +1774,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isSymbolicSparse() const {
+  bool Matrix<DataType>::isValidInput() const {
     return false;
   }
 

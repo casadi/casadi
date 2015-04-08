@@ -77,6 +77,9 @@ namespace casadi {
     virtual bool zz_isEqual(const MXNode* node, int depth) const {
       return sameOpAndDeps(node, depth);
     }
+
+    /** \brief  Check if valid function input */
+    virtual bool isValidInput() const;
   };
 
 
