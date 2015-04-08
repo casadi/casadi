@@ -68,6 +68,14 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
+                         std::vector<std::vector<MX> >& fsens);
+
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
+                         std::vector<std::vector<MX> >& asens);
+
     /** \brief  Get function reference */
     virtual Function& getFunction();
 

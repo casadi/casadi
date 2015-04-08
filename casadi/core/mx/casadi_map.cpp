@@ -186,6 +186,54 @@ namespace casadi {
     }
   }
 
+  void Map::evalFwd(const std::vector<std::vector<MX> >& fseed,
+                     std::vector<std::vector<MX> >& fsens) {
+    // Derivative function
+    int nfwd = fsens.size();
+    Function dfcn = fcn_.derForward(nfwd);
+
+    // Nondifferentiated inputs and outputs
+    vector<MX> arg(ndep());
+    for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
+    vector<MX> res(nout());
+    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+
+    // Collect arguments
+    vector<vector<MX> > v(n_);
+    for (int i=0; i<n_; ++i) {
+      v[i].insert(v[i].end(), arg.begin(), arg.end());
+      v[i].insert(v[i].end(), res.begin(), res.end());
+      v[i].insert(v[i].end(), fseed[i].begin(), fseed[i].end());
+    }
+
+    // Call the cached function
+    fsens = dfcn.callParallel(v);
+  }
+
+  void Map::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                     std::vector<std::vector<MX> >& asens) {
+    // Derivative function
+    int nadj = asens.size();
+    Function dfcn = fcn_.derReverse(nadj);
+
+    // Nondifferentiated inputs and outputs
+    vector<MX> arg(ndep());
+    for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
+    vector<MX> res(nout());
+    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
+
+    // Collect arguments
+    vector<vector<MX> > v(n_);
+    for (int i=0; i<n_; ++i) {
+      v[i].insert(v[i].end(), arg.begin(), arg.end());
+      v[i].insert(v[i].end(), res.begin(), res.end());
+      v[i].insert(v[i].end(), aseed[i].begin(), aseed[i].end());
+    }
+
+    // Call the cached function
+    asens = dfcn.callParallel(v);
+  }
+
   void Map::deepCopyMembers(map<SharedObjectNode*, SharedObject>& already_copied) {
     MXNode::deepCopyMembers(already_copied);
     fcn_ = deepcopy(fcn_, already_copied);
