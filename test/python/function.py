@@ -65,19 +65,23 @@ class Functiontests(casadiTestCase):
 
       g.evaluate()
   
-  def test_Parallelizer(self):
-    self.message("Parallelizer")
+  def test_Map(self):
+    self.message("Map")
     x = MX.sym("x",2)
     y = MX.sym("y")
 
     f = MXFunction([x,y],[sin(x) + y])
     f.init()
-    
-    #! Evaluate this function ten times in parallel
-    p = Parallelizer(f, 2)
-    
-    for mode in ["openmp","serial"]:
-      p.setOption("parallelization",mode)
+        
+    for mode in ["expand", "serial", "openmp"]:
+      x0 = MX.sym("x0",2)
+      y0 = MX.sym("y0")
+      x1 = MX.sym("x1",2)
+      y1 = MX.sym("y1")
+
+      [[z0],[z1]] = f.callParallel([[x0,y0],[x1,y1]],mode)
+      
+      p = MXFunction([x0,y0,x1,y1],[z0,z1])
       p.init()
       
       n1 = DMatrix([4,5])
@@ -118,44 +122,8 @@ class Functiontests(casadiTestCase):
 
     self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
     self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
-        
-  def test_Parallelizer2(self):
-    self.message("Parallelizer")
-    x = MX.sym("x",2)
-    y = MX.sym("y")
-
-    f = MXFunction([x,y],[sin(x) + y])
-    f.init()
-    
-    #! Evaluate this function ten times in parallel
-    pp = Parallelizer(f, 2)
-    for mode in ["serial","openmp"]:
-      pp.setOption("parallelization",mode)
-      pp.init()
-      
-      x1 = MX.sym("x",2)
-      y1 = MX.sym("y")
-      x2 = MX.sym("x",2)
-      y2 = MX.sym("y")
-      p = MXFunction([x1,y1,x2,y2], pp.call([x1,y1,x2,y2]) )
-      p.init()
-      
-      n1 = DMatrix([4,5])
-      N1 = 3
-      n2 = DMatrix([5,7])
-      N2 = 8
-      
-      p.setInput(n1,0)
-      p.setInput(N1,1)
-      p.setInput(n2,2)
-      p.setInput(N2,3)
-      
-      p.evaluate()
-
-      self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
-      self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
-          
-  def test_ParallelizerMXCall(self):
+                  
+  def test_callParallel(self):
     self.message("MX parallel call")
     x = MX.sym("x",2)
     y = MX.sym("y")
