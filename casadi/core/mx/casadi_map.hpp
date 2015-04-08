@@ -100,6 +100,9 @@ namespace casadi {
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr);
 
+    /// Get parallelization
+    virtual std::string parallelization() const { return "serial";}
+
     // Function to be evaluated
     Function fcn_;
 
@@ -128,6 +131,9 @@ namespace casadi {
 
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr);
+
+    /// Get parallelization
+    virtual std::string parallelization() const { return "openmp";}
   };
 
 } // namespace casadi

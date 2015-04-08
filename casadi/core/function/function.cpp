@@ -76,50 +76,26 @@ namespace casadi {
   }
 
   vector<vector<MX> > Function::callParallel(const vector<vector<MX> > &x,
-                                             const Dictionary& paropt) {
+                                             const std::string& parallelization) {
     assertInit();
+    if (x.empty()) return x;
 
-    // Make sure not empty
-    casadi_assert_message(x.size()>1, "Function: callParallel(vector<vector<MX> >): "
-                          "argument must be of length > 1. You supplied length "
-                          << x.size() << ".");
-
-    // Return object
-    vector<vector<MX> > ret(x.size());
-
-    // Check if we are bypassing the parallelizer
-    Dictionary::const_iterator ii=paropt.find("parallelization");
-    if (ii!=paropt.end() && ii->second=="expand") {
-      for (int i=0; i<x.size(); ++i) {
-        call(x[i], ret[i]);
-      }
-      return ret;
+    // Check if arguments match
+    int n = x.size();
+    bool matching=true;
+    for (int i=0; i<n; ++i) {
+      matching = matchingArg(x[i]) && matching; // non-short circuiting
     }
 
-    // Create parallelizer object and initialize it
-    Parallelizer p(*this, x.size());
-    p.setOption(paropt);
-    p.init();
-
-    // Concatenate the arguments
-    vector<MX> p_in;
-    p_in.reserve(x.size() * getNumInputs());
-    for (int i=0; i<x.size(); ++i) {
-      p_in.insert(p_in.end(), x[i].begin(), x[i].end());
-      p_in.resize(p_in.size()+getNumInputs()-x[i].size());
+    // Replace arguments if needed
+    if (!matching) {
+      vector<vector<MX> > x_new(n);
+      for (int i=0; i<n; ++i) x_new[i] = replaceArg(x[i]);
+      return callParallel(x_new, parallelization);
     }
 
-    // Call the parallelizer
-    vector<MX> p_out = p(p_in);
-    casadi_assert(p_out.size() == x.size() * getNumOutputs());
-
-    // Collect the outputs
-    vector<MX>::const_iterator it=p_out.begin();
-    for (int i=0; i<x.size(); ++i) {
-      ret[i].insert(ret[i].end(), it, it+getNumOutputs());
-      it += getNumOutputs();
-    }
-    return ret;
+    // Call the internal function
+    return (*this)->createMap(x, parallelization);
   }
 
   void Function::evaluate() {

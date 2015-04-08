@@ -47,24 +47,9 @@ namespace casadi {
     for (vector<vector<MX> >::const_iterator j=arg.begin(); j!=arg.end(); ++j) {
       casadi_assert(j->size()==n_);
       for (int i=0; i<n_; ++i) {
-        if (j->at(i).shape()==fcn_.input(i).shape()) {
-          // Insert sparsity projection nodes if needed
-          all_arg.push_back(j->at(i).setSparse(fcn_.input(i).sparsity()));
-        } else {
-          // Different dimensions
-          if (j->at(i).isEmpty() || fcn_.input(i).isEmpty()) { // NOTE: To permissive?
-            // Replace nulls with zeros of the right dimension
-            all_arg.push_back(MX::zeros(fcn_.input(i).sparsity()));
-          } else if (j->at(i).isScalar()) {
-            // Scalar argument means set all
-            all_arg.push_back(MX(fcn_.input(i).sparsity(), j->at(i)));
-          } else {
-            // Mismatching dimensions
-            casadi_error("Cannot create map node: Dimension mismatch for argument "
-                         << i << ". Argument has shape " << j->at(i).shape()
-                         << " but function input is " << fcn_.input(i).shape());
-          }
-        }
+        casadi_assert(j->at(i).shape()==fcn_.input(i).shape());
+        // Insert sparsity projection nodes if needed
+        all_arg.push_back(j->at(i).setSparse(fcn_.input(i).sparsity()));
       }
     }
     casadi_assert(all_arg.size() == n_ * f_num_in);
@@ -175,7 +160,7 @@ namespace casadi {
     }
 
     // Call in parallel
-    v = fcn_.callParallel(v);
+    v = fcn_.callParallel(v, parallelization());
 
     // Get results
     int f_num_out = fcn_.getNumOutputs();
@@ -207,7 +192,7 @@ namespace casadi {
     }
 
     // Call the cached function
-    fsens = dfcn.callParallel(v);
+    fsens = dfcn.callParallel(v, parallelization());
   }
 
   void Map::evalAdj(const std::vector<std::vector<MX> >& aseed,
@@ -231,7 +216,7 @@ namespace casadi {
     }
 
     // Call the cached function
-    asens = dfcn.callParallel(v);
+    asens = dfcn.callParallel(v, parallelization());
   }
 
   void Map::deepCopyMembers(map<SharedObjectNode*, SharedObject>& already_copied) {

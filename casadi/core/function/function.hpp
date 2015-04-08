@@ -353,7 +353,7 @@ namespace casadi {
         \param paropt Set of options to be passed to the Parallelizer
     */
     std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg,
-                                               const Dictionary& paropt=Dictionary());
+                                               const std::string& parallelization="serial");
 
     /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
      *         Legacy function: Use derForward and derReverse instead.
