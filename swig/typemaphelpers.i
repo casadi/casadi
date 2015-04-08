@@ -176,7 +176,7 @@
 }
 %enddef
 
-%fragment("conv_constref", "header", fragment="is_null") {
+%fragment("conv_constref", "header", fragment="is_a") {
   template<typename T>
   bool conv_constref(GUESTOBJECT *p, T* &ptr, T &m, swig_type_info *type, int (*f)(GUESTOBJECT *p, void *mv, int offs)) {
     if (is_null(p)) {
