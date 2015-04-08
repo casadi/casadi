@@ -2131,7 +2131,7 @@
 %exception  casadi::Matrix< DataType >::get(double &val) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::get(std::vector< double > &val, bool tr=false) const  {
+%exception  casadi::Matrix< DataType >::get(std::vector< double > &output_m, bool tr=false) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::getDep(int ch=0) const  {
@@ -2152,7 +2152,7 @@
 %exception  casadi::Matrix< DataType >::getNZ(double &val) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getNZ(std::vector< double > &val) const  {
+%exception  casadi::Matrix< DataType >::getNZ(std::vector< double > &output_m) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::getName() const  {
@@ -2161,7 +2161,7 @@
 %exception  casadi::Matrix< DataType >::getNdeps() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::getSym(std::vector< double > &val) const  {
+%exception  casadi::Matrix< DataType >::getSym(std::vector< double > &output_m) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::getValue() const  {
