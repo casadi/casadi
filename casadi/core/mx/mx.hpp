@@ -474,9 +474,6 @@ namespace casadi {
     /// Lift an expression
     void lift(const MX& x_guess);
 
-    /// Add an expression to the expression if the expression is non-empty, otherwise assign
-    void addToSum(const MX& x);
-
     /// Transpose the matrix
     MX T() const;
 

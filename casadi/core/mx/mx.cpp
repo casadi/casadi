@@ -1001,16 +1001,6 @@ namespace casadi {
     return (*this)->getTranspose();
   }
 
-  void MX::addToSum(const MX& x) {
-    if (!x.isEmpty()) {
-      if (isEmpty()) {
-        *this = x;
-      } else {
-        *this += x;
-      }
-    }
-  }
-
   bool MX::testCast(const SharedObjectNode* ptr) {
     return dynamic_cast<const MXNode*>(ptr)!=0;
   }
