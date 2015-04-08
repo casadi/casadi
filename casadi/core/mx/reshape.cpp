@@ -141,5 +141,8 @@ namespace casadi {
     dep()->resetInput();
   }
 
+  void Reshape::getPrimitives(std::vector<MXNode*>& v) {
+    dep()->getPrimitives(v);
+  }
 
 } // namespace casadi

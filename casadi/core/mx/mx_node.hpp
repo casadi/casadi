@@ -166,6 +166,9 @@ namespace casadi {
     /** \brief Reset the marker for an input expression */
     virtual void resetInput();
 
+    /** \brief Get symbolic primitives */
+    virtual void getPrimitives(std::vector<MXNode*>& v);
+
     /** \brief  Check if evaluation output */
     virtual bool isOutputNode() const {return false;}
 

@@ -321,5 +321,10 @@ namespace casadi {
     }
   }
 
+  void Concat::getPrimitives(std::vector<MXNode*>& v) {
+    for (int i=0; i<ndep(); ++i) {
+      dep(i)->getPrimitives(v);
+    }
+  }
 
 } // namespace casadi

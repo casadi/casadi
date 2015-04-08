@@ -129,6 +129,11 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
+  void MXNode::getPrimitives(std::vector<MXNode*>& v) {
+    throw CasadiException(string("MXNode::getPrimitives() not defined for class ")
+                          + typeid(*this).name());
+  }
+
   const string& MXNode::getName() const {
     throw CasadiException(string("MXNode::getName() not defined for class ")
                           + typeid(*this).name());

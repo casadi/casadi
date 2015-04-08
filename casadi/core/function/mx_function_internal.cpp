@@ -308,21 +308,29 @@ namespace casadi {
       it->second->temp = it->first+1;
     }
 
-    // Add input instructions
+    // Add input instructions, loop over inputs
+    vector<MXNode*> prim;
     for (int ind=0; ind<inputv_.size(); ++ind) {
-      int i = inputv_[ind].getTemp()-1;
-      if (i>=0) {
-        // Mark as input
-        algorithm_[i].op = OP_INPUT;
+      // Loop over symbolic primitives of each input
+      prim.clear();
+      inputv_[ind]->getPrimitives(prim);
+      int nz_offset=0;
+      for (int p=0; p<prim.size(); ++p) {
+        int i = prim[p]->temp-1;
+        if (i>=0) {
+          // Mark as input
+          algorithm_[i].op = OP_INPUT;
 
-        // Location of the input
-        algorithm_[i].arg.resize(3);
-        algorithm_[i].arg[0] = ind; // Input?
-        algorithm_[i].arg[1] = 0; // Segment?
-        algorithm_[i].arg[2] = 0; // Nonzero offet?
+          // Location of the input
+          algorithm_[i].arg.resize(3);
+          algorithm_[i].arg[0] = ind;
+          algorithm_[i].arg[1] = p;
+          algorithm_[i].arg[2] = nz_offset;
+          nz_offset += prim[p]->nnz();
 
-        // Mark input as read
-        inputv_[ind].setTemp(0);
+          // Mark input as read
+          prim[p]->temp = 0;
+        }
       }
     }
 
@@ -399,12 +407,13 @@ namespace casadi {
       if (it->op==OP_INPUT) {
         // Pass an input
         double *w = rtmp+workloc_[it->res.front()];
-        int i=it->arg.front();
-        int nnz=input(i).nnz();
+        int nnz=it->data.nnz();
+        int i=it->arg.at(0);
+        int nz_offset=it->arg.at(2);
         if (arg[i]==0) {
           fill(w, w+nnz, 0);
         } else {
-          copy(arg[i], arg[i]+nnz, w);
+          copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w);
         }
       } else if (it->op==OP_OUTPUT) {
         // Get an output
@@ -485,7 +494,7 @@ namespace casadi {
         stream << "} = ";
       }
       if (el.op==OP_INPUT) {
-        stream << "input[" << el.arg.front() << "]";
+        stream << "input[" << el.arg.at(0) << "][" << el.arg.at(1) << "]";
       } else {
         el.data->printPart(stream, 0);
         for (int i=0; i<el.arg.size(); ++i) {
@@ -543,12 +552,13 @@ namespace casadi {
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op==OP_INPUT) {
         // Pass input seeds
-        int i=it->arg.front();
-        int nnz=input(i).nnz();
+        int nnz=it->data.nnz();
+        int i=it->arg.at(0);
+        int nz_offset=it->arg.at(2);
         const bvec_t* iw = arg[i];
         bvec_t* w = rtmp + workloc_[it->res.front()];
         if (iw!=0) {
-          copy(iw, iw+nnz, w);
+          copy(iw+nz_offset, iw+nz_offset+nnz, w);
         } else {
           fill_n(w, nnz, 0);
         }
@@ -586,11 +596,12 @@ namespace casadi {
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
       if (it->op==OP_INPUT) {
         // Get the input sensitivities and clear it from the work vector
-        int i=it->arg.front();
-        int nnz=input(i).nnz();
+        int nnz=it->data.nnz();
+        int i=it->arg.at(0);
+        int nz_offset=it->arg.at(2);
         bvec_t* iw = arg[i];
         bvec_t* w = rtmp + workloc_[it->res.front()];
-        if (iw!=0) for (int k=0; k<nnz; ++k) iw[k] |= w[k];
+        if (iw!=0) for (int k=0; k<nnz; ++k) iw[nz_offset+k] |= w[k];
         fill_n(w, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
@@ -1015,12 +1026,13 @@ namespace casadi {
       if (it->op==OP_INPUT) {
         // Pass an input
         SXElement *w = rtmp+workloc_[it->res.front()];
-        int i=it->arg.front();
-        int nnz=input(i).nnz();
+        int nnz=it->data.nnz();
+        int i=it->arg.at(0);
+        int nz_offset=it->arg.at(2);
         if (arg[i]==0) {
           std::fill(w, w+nnz, 0);
         } else {
-          std::copy(arg[i], arg[i]+nnz, w);
+          std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w);
         }
       } else if (it->op==OP_OUTPUT) {
         // Get the outputs
@@ -1152,8 +1164,9 @@ namespace casadi {
                        output(it->res.front()).nnz(),
                        "res[" + CodeGenerator::numToString(it->res.front()) + "]", "i", true);
       } else if (it->op==OP_INPUT) {
-        gen.copyVector(stream, "arg[" + CodeGenerator::numToString(it->arg.front()) + "]",
-                       input(it->arg.front()).nnz(),
+        std::string arg = "arg[" + CodeGenerator::numToString(it->arg.at(0)) + "]";
+        if (it->arg.at(2)!=0) arg += "+" + CodeGenerator::numToString(it->arg.at(2));
+        gen.copyVector(stream, arg, it->data.nnz(),
                        CodeGenerator::work(workloc_[it->res.front()]), "i", false);
       } else {
         // Get the names of the operation arguments

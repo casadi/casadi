@@ -93,4 +93,8 @@ namespace casadi {
     this->temp = 0;
   }
 
+  void SymbolicMX::getPrimitives(std::vector<MXNode*>& v) {
+    v.push_back(this);
+  }
+
 } // namespace casadi
