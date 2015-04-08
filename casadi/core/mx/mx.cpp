@@ -1778,6 +1778,20 @@ namespace casadi {
     return temp.tang();
   }
 
+  MX MX::zz_hessian(const MX &arg) const {
+    MX H, g;
+    hessian(*this, arg, H, g);
+    return H;
+  }
+
+  void MX::zz_hessian(const MX &arg, MX &H, MX &g) const {
+    g = gradient(*this, arg);
+
+    MXFunction temp(arg, g); // make a runtime
+    temp.init();
+    H = temp.jac(0, 0, false, true);
+  }
+
   MX MX::zz_det() const {
     return (*this)->getDeterminant();
   }

@@ -2691,5 +2691,23 @@ class MXtests(casadiTestCase):
 
     h = g.jacobian(0,0,False,True)
 
+  def test_exprjac(self):
+
+
+    for fun in [lambda x: x[0]*x[1],lambda x: x[0]*sin(x[1])]:
+      for op in [c.gradient, jacobian, hessian]:
+        print fun, op
+        x = MX.sym("x",2)
+        print fun(x)
+        print op(fun(x),x)
+        f = MXFunction([x],[op(fun(x),x)])        
+        f.init()
+
+        x = SX.sym("x",2)
+        fr = SXFunction([x],[op(fun(x),x)])        
+        fr.init()
+
+        self.checkfunction(f,fr)
+
 if __name__ == '__main__':
     unittest.main()
