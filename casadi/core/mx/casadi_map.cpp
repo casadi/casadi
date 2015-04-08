@@ -216,7 +216,12 @@ namespace casadi {
     }
 
     // Call the cached function
-    asens = dfcn.callParallel(v, parallelization());
+    v = dfcn.callParallel(v, parallelization());
+    for (int i=0; i<v.size(); ++i) {
+      for (int j=0; j<v[i].size(); ++j) {
+        asens[i][j] += v[i][j];
+      }
+    }
   }
 
   void Map::deepCopyMembers(map<SharedObjectNode*, SharedObject>& already_copied) {
