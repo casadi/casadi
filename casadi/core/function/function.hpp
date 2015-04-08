@@ -350,7 +350,7 @@ namespace casadi {
     /// \endcond
 
     /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param paropt Set of options to be passed to the Parallelizer
+        \param parallelization Type of parallelization used: expand|serial|openmp
     */
     std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg,
                                                const std::string& parallelization="serial");

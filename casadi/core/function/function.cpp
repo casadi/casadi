@@ -28,7 +28,6 @@
 #include <typeinfo>
 #include "../std_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "parallelizer.hpp"
 
 using namespace std;
 

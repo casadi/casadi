@@ -70,7 +70,7 @@ set(CASADI_SRCS
   mx/multiplication.hpp      mx/multiplication.cpp      # Matrix multiplication
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
   mx/casadi_call.hpp         mx/casadi_call.cpp         # Function call
-  mx/casadi_map.hpp          mx/casadi_map.cpp           # Function call in parallel
+  mx/casadi_map.hpp          mx/casadi_map.cpp          # Multiple function calls at once
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose
   mx/concat.hpp              mx/concat.cpp              # Concatenation
@@ -105,7 +105,6 @@ set(CASADI_SRCS
   function/homotopy_nlp_solver.hpp function/homotopy_nlp_solver.cpp function/homotopy_nlp_internal.hpp function/homotopy_nlp_internal.cpp
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
   function/control_simulator.hpp   function/control_simulator.cpp   function/control_simulator_internal.hpp   function/control_simulator_internal.cpp
-  function/parallelizer.hpp        function/parallelizer.cpp        function/parallelizer_internal.hpp        function/parallelizer_internal.cpp
   function/qp_solver.hpp           function/qp_solver.cpp           function/qp_solver_internal.hpp           function/qp_solver_internal.cpp
   function/stabilized_qp_solver.hpp    function/stabilized_qp_solver.cpp    function/stabilized_qp_solver_internal.hpp function/stabilized_qp_solver_internal.cpp
   function/sdp_solver.hpp          function/sdp_solver.cpp          function/sdp_solver_internal.hpp          function/sdp_solver_internal.cpp

@@ -58,7 +58,6 @@
 #include "function/implicit_function.hpp"
 #include "function/custom_function.hpp"
 #include "function/simulator.hpp"
-#include "function/parallelizer.hpp"
 #include "function/control_simulator.hpp"
 #include "function/qp_solver.hpp"
 #include "function/homotopy_nlp_solver.hpp"

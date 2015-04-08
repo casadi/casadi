@@ -1203,7 +1203,6 @@ def PyFunction(obj,inputs,outputs):
 %include <casadi/core/function/qcqp_solver.hpp>
 %include <casadi/core/function/sdqp_solver.hpp>
 %include <casadi/core/function/external_function.hpp>
-%include <casadi/core/function/parallelizer.hpp>
 %include <casadi/core/function/custom_function.hpp>
 %include <casadi/core/functor.hpp>
 %include <casadi/core/function/nullspace.hpp>
