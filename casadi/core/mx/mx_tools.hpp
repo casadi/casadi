@@ -134,6 +134,12 @@ namespace casadi {
   inline MX jacobian(const MX &ex, const MX &arg) { return ex.zz_jacobian(arg);}
   inline MX gradient(const MX &ex, const MX &arg) { return ex.zz_gradient(arg);}
   inline MX tangent(const MX &ex, const MX &arg) { return ex.zz_tangent(arg);}
+  inline MX hessian(const MX &ex, const MX &arg) { return ex.zz_hessian(arg);}
+
+  // Hessian and gradient:
+  inline void hessian(const MX &ex, const MX &arg, MX &H, MX &g) {
+    return ex.zz_hessian(arg, H, g);
+  }
   ///@}
 
   /** \brief Get all symbols contained in the supplied expression

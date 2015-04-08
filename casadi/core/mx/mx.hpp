@@ -436,6 +436,8 @@ namespace casadi {
     MX zz_jacobian(const MX &arg) const;
     MX zz_gradient(const MX &arg) const;
     MX zz_tangent(const MX &arg) const;
+    MX zz_hessian(const MX &arg) const;
+    void zz_hessian(const MX &arg, MX &H, MX &g) const;
     MX zz_det() const;
     MX zz_inv() const;
     std::vector<MX> zz_getSymbols() const;
