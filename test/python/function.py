@@ -79,7 +79,7 @@ class Functiontests(casadiTestCase):
       x1 = MX.sym("x1",2)
       y1 = MX.sym("y1")
 
-      [[z0],[z1]] = f.callParallel([[x0,y0],[x1,y1]],mode)
+      [[z0],[z1]] = f.map([[x0,y0],[x1,y1]],mode)
       
       p = MXFunction([x0,y0,x1,y1],[z0,z1])
       p.init()
@@ -123,7 +123,7 @@ class Functiontests(casadiTestCase):
     self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
     self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
                   
-  def test_callParallel(self):
+  def test_map(self):
     self.message("MX parallel call")
     x = MX.sym("x",2)
     y = MX.sym("y")
@@ -136,7 +136,7 @@ class Functiontests(casadiTestCase):
     y1 = MX.sym("y")
     x2 = MX.sym("x",2)
     y2 = MX.sym("y")
-    [[F1],[F2]] = f.callParallel([[x1,y1],[x2,y2]])
+    [[F1],[F2]] = f.map([[x1,y1],[x2,y2]])
     p = MXFunction([x1,y1,x2,y2],[F1,F2])
     p.init()
     

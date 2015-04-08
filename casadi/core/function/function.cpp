@@ -74,8 +74,8 @@ namespace casadi {
     (*this)->call(arg, res, always_inline, never_inline);
   }
 
-  vector<vector<MX> > Function::callParallel(const vector<vector<MX> > &x,
-                                             const std::string& parallelization) {
+  vector<vector<MX> > Function::map(const vector<vector<MX> > &x,
+                                    const std::string& parallelization) {
     assertInit();
     if (x.empty()) return x;
 
@@ -90,7 +90,7 @@ namespace casadi {
     if (!matching) {
       vector<vector<MX> > x_new(n);
       for (int i=0; i<n; ++i) x_new[i] = replaceArg(x[i]);
-      return callParallel(x_new, parallelization);
+      return map(x_new, parallelization);
     }
 
     // Call the internal function

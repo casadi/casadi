@@ -160,7 +160,7 @@ namespace casadi {
     }
 
     // Call in parallel
-    v = fcn_.callParallel(v, parallelization());
+    v = fcn_.map(v, parallelization());
 
     // Get results
     int f_num_out = fcn_.getNumOutputs();
@@ -192,7 +192,7 @@ namespace casadi {
     }
 
     // Call the cached function
-    fsens = dfcn.callParallel(v, parallelization());
+    fsens = dfcn.map(v, parallelization());
   }
 
   void Map::evalAdj(const std::vector<std::vector<MX> >& aseed,
@@ -216,7 +216,7 @@ namespace casadi {
     }
 
     // Call the cached function
-    v = dfcn.callParallel(v, parallelization());
+    v = dfcn.map(v, parallelization());
     for (int i=0; i<v.size(); ++i) {
       for (int j=0; j<v[i].size(); ++j) {
         asens[i][j] += v[i][j];
