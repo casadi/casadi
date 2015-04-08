@@ -136,8 +136,6 @@ namespace casadi {
   }
 
   void Horzsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    int nx = offset_.size()-1;
-
     // Get column offsets
     vector<int> col_offset;
     col_offset.reserve(offset_.size());
@@ -154,7 +152,6 @@ namespace casadi {
   void Horzsplit::evalFwd(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) {
     int nfwd = fsens.size();
-    int nx = offset_.size()-1;
 
     // Get column offsets
     vector<int> col_offset;
@@ -175,7 +172,6 @@ namespace casadi {
   void Horzsplit::evalAdj(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) {
     int nadj = aseed.size();
-    int nx = offset_.size()-1;
 
     // Get column offsets
     vector<int> col_offset;
@@ -219,8 +215,6 @@ namespace casadi {
   }
 
   void Diagsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    int nx = offset_.size()-1;
-
     // Get offsets
     vector<int> offset1;
     offset1.reserve(offset_.size());
@@ -241,8 +235,6 @@ namespace casadi {
   void Diagsplit::evalFwd(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) {
     int nfwd = fsens.size();
-    int nx = offset_.size()-1;
-
     // Get offsets
     vector<int> offset1;
     offset1.reserve(offset_.size());
@@ -266,7 +258,6 @@ namespace casadi {
   void Diagsplit::evalAdj(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) {
     int nadj = asens.size();
-    int nx = offset_.size()-1;
 
     // Get offsets
     vector<int> offset1;
@@ -310,8 +301,6 @@ namespace casadi {
   }
 
   void Vertsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    int nx = offset_.size()-1;
-
     // Get row offsets
     vector<int> row_offset;
     row_offset.reserve(offset_.size());
@@ -327,7 +316,6 @@ namespace casadi {
   void Vertsplit::evalFwd(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) {
     int nfwd = fsens.size();
-    int nx = offset_.size()-1;
 
     // Get row offsets
     vector<int> row_offset;
@@ -346,7 +334,6 @@ namespace casadi {
   void Vertsplit::evalAdj(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) {
     int nadj = aseed.size();
-    int nx = offset_.size()-1;
 
     // Get row offsets
     vector<int> row_offset;
