@@ -158,7 +158,13 @@ namespace casadi {
     virtual const std::string& getName() const;
 
     /** \brief  Check if valid function input */
-    virtual bool isValidInput() const {return getOp()==OP_PARAMETER;}
+    virtual bool isValidInput() const { return false;}
+
+    /** \brief Detect duplicate symbolic expressions */
+    virtual bool hasDuplicates();
+
+    /** \brief Reset the marker for an input expression */
+    virtual void resetInput();
 
     /** \brief  Check if evaluation output */
     virtual bool isOutputNode() const {return false;}

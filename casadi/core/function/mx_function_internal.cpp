@@ -43,38 +43,6 @@ namespace casadi {
     XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>(inputv, outputv) {
 
     setOption("name", "unnamed_mx_function");
-
-    // Check for inputs that are not symbolic primitives
-    int ind=0;
-    for (vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it, ++ind) {
-      if (!it->isSymbolic()) {
-        if (it->isEmpty()) {
-          stringstream ss;
-          ss << "r" << ind;
-          *it = MX::sym(ss.str(), it->sparsity());
-        } else {
-          casadi_error(
-            "Failed to create an MXFunction instance since not all input "
-            "arguments are symbolic primitives. Support for non-symbolic "
-            "inputs has been dropped. We refer users to the approach "
-            "demonstrated in "
-            "http://docs.casadi.org/tutorials/tools/structure.pdf");
-        }
-      }
-    }
-
-    // Check for duplicate entries among the input expressions
-    bool has_duplicates = false;
-    for (vector<MX>::iterator it = inputv_.begin(); it != inputv_.end(); ++it) {
-      has_duplicates = has_duplicates || it->getTemp()!=0;
-      it->setTemp(1);
-    }
-
-    // Reset temporaries
-    for (vector<MX>::iterator it = inputv_.begin(); it != inputv_.end(); ++it) {
-      it->setTemp(0);
-    }
-    casadi_assert_message(!has_duplicates, "The input expressions are not independent.");
   }
 
 

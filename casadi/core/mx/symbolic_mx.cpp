@@ -79,4 +79,18 @@ namespace casadi {
     fill_n(res[0], nnz(), 0);
   }
 
+  bool SymbolicMX::hasDuplicates() {
+    if (this->temp!=0) {
+      cerr << "Duplicate expression: " << getName() << endl;
+      return true;
+    } else {
+      this->temp = 1;
+      return false;
+    }
+  }
+
+  void SymbolicMX::resetInput() {
+    this->temp = 0;
+  }
+
 } // namespace casadi

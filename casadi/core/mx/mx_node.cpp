@@ -119,6 +119,16 @@ namespace casadi {
     }
   }
 
+  bool MXNode::hasDuplicates() {
+    throw CasadiException(string("MXNode::hasDuplicates() not defined for class ")
+                          + typeid(*this).name());
+  }
+
+  void MXNode::resetInput() {
+    throw CasadiException(string("MXNode::resetInput() not defined for class ")
+                          + typeid(*this).name());
+  }
+
   const string& MXNode::getName() const {
     throw CasadiException(string("MXNode::getName() not defined for class ")
                           + typeid(*this).name());

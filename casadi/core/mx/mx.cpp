@@ -955,6 +955,14 @@ namespace casadi {
     return (*this)->isValidInput();
   }
 
+  bool MX::hasDuplicates() {
+    return (*this)->hasDuplicates();
+  }
+
+  void MX::resetInput() {
+    (*this)->resetInput();
+  }
+
   bool MX::isIdentity() const {
     return (*this)->isIdentity();
   }

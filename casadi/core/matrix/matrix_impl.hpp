@@ -1779,6 +1779,16 @@ namespace casadi {
   }
 
   template<typename DataType>
+  bool Matrix<DataType>::hasDuplicates() {
+    throw CasadiException("\"hasDuplicates\" not defined for instantiation");
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::resetInput() {
+    throw CasadiException("\"resetInput\" not defined for instantiation");
+  }
+
+  template<typename DataType>
   bool Matrix<DataType>::isInteger() const {
     // loop over non-zero elements
     for (int k=0; k<nnz(); ++k)

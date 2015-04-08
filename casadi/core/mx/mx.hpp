@@ -210,6 +210,19 @@ namespace casadi {
     */
     bool isValidInput() const;
 
+    /// \cond INTERNAL
+    /** \brief Detect duplicate symbolic expressions
+        If there are symbolic primitives appearing more than once, the function will return
+        true and the names of the duplicate expressions will be printed to std::cerr.
+        Note: Will mark the node using MX::setTemp.
+        Make sure to call resetInput() after usage.
+    */
+    bool hasDuplicates();
+
+    /** \brief Reset the marker for an input expression */
+    void resetInput();
+  /// \endcond
+
     /** \brief  check if identity */
     bool isIdentity() const;
 

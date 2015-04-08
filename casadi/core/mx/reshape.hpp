@@ -101,6 +101,12 @@ namespace casadi {
 
     /** \brief  Check if valid function input */
     virtual bool isValidInput() const;
+
+    /** \brief Detect duplicate symbolic expressions */
+    virtual bool hasDuplicates();
+
+    /** \brief Reset the marker for an input expression */
+    virtual void resetInput();
   };
 
 } // namespace casadi

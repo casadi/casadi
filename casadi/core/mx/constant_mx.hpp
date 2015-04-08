@@ -224,6 +224,15 @@ namespace casadi {
 
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;
+
+    /** \brief  Check if valid function input */
+    virtual bool isValidInput() const { return true;}
+
+    /** \brief Detect duplicate symbolic expressions */
+    virtual bool hasDuplicates() { return false;}
+
+    /** \brief Reset the marker for an input expression */
+    virtual void resetInput() {}
   };
 
   /** \brief Constant known at runtime */

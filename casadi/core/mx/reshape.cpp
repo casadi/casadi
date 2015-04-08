@@ -133,5 +133,13 @@ namespace casadi {
     return true;
   }
 
+  bool Reshape::hasDuplicates() {
+    return dep()->hasDuplicates();
+  }
+
+  void Reshape::resetInput() {
+    dep()->resetInput();
+  }
+
 
 } // namespace casadi

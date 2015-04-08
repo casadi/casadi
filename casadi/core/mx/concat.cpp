@@ -307,4 +307,19 @@ namespace casadi {
     return true;
   }
 
+  bool Concat::hasDuplicates() {
+    bool has_duplicates = false;
+    for (int i=0; i<ndep(); ++i) {
+      has_duplicates = dep(i)->hasDuplicates() || has_duplicates;
+    }
+    return has_duplicates;
+  }
+
+  void Concat::resetInput() {
+    for (int i=0; i<ndep(); ++i) {
+      dep(i)->resetInput();
+    }
+  }
+
+
 } // namespace casadi

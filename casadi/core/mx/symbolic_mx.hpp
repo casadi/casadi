@@ -87,6 +87,15 @@ namespace casadi {
     /** \brief Get the operation */
     virtual int getOp() const { return OP_PARAMETER;}
 
+    /** \brief  Check if valid function input */
+    virtual bool isValidInput() const { return true;}
+
+    /** \brief Detect duplicate symbolic expressions */
+    virtual bool hasDuplicates();
+
+    /** \brief Reset the marker for an input expression */
+    virtual void resetInput();
+
   protected:
     // Name of the variable
     std::string name_;

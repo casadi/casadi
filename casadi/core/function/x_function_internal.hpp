@@ -169,6 +169,27 @@ namespace casadi {
     setNumOutputs(outputv_.size());
     for (int i=0; i<outputv_.size(); ++i)
       output(i) = DMatrix(outputv_[i].sparsity());
+
+    // Check for duplicate entries among the input expressions
+    bool has_duplicates = false;
+    for (typename std::vector<MatType>::iterator it = inputv_.begin();
+         it != inputv_.end(); ++it) {
+      has_duplicates = it->hasDuplicates() || has_duplicates;
+    }
+
+    // Reset temporaries
+    for (typename std::vector<MatType>::iterator it = inputv_.begin();
+         it != inputv_.end(); ++it) {
+      it->resetInput();
+    }
+
+    if (has_duplicates) {
+      std::cerr << "Input expressions:" << std::endl;
+      for (int iind=0; iind<inputv_.size(); ++iind) {
+        std::cerr << iind << ": " << inputv_[iind] << std::endl;
+      }
+      casadi_error("The input expressions are not independent (or were not reset properly).");
+    }
   }
 
 
