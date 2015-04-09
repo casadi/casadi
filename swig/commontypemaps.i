@@ -685,8 +685,7 @@
       PyObject *pe;
       while (it->index < it->size) { 
         pe = *((PyObject**) PyArray_ITER_DATA(it));
-        if (!to_SX(pe, &tmp)) return false;
-        if (!tmp.isScalar()) return false;
+        if (!to_SX(pe, &tmp) || !tmp.isScalar()) { Py_DECREF(it); return false; }
         if (m) mT(k) = tmp;
         PyArray_ITER_NEXT(it);
       }
