@@ -81,6 +81,9 @@ namespace casadi {
     /** \brief  Check if valid function input */
     virtual bool isValidInput() const;
 
+    /** \brief Get the number of symbolic primitives */
+    virtual int numPrimitives() const;
+
     /** \brief Detect duplicate symbolic expressions */
     virtual bool hasDuplicates();
 
@@ -124,6 +127,15 @@ namespace casadi {
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_HORZCAT;}
+
+    /** \brief Split up an expression along symbolic primitives */
+    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+
+    /** \brief Join an expression along symbolic primitives */
+    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+
+    /** \brief Get offsets for split */
+    std::vector<int> offset() const;
   };
 
   /** \brief Vertical concatenation of vectors
@@ -158,6 +170,15 @@ namespace casadi {
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_VERTCAT;}
+
+    /** \brief Split up an expression along symbolic primitives */
+    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+
+    /** \brief Join an expression along symbolic primitives */
+    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+
+    /** \brief Get offsets for split */
+    std::vector<int> offset() const;
   };
 
   /** \brief Diagonal concatenation of matrices
@@ -192,6 +213,15 @@ namespace casadi {
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_DIAGCAT;}
+
+    /** \brief Split up an expression along symbolic primitives */
+    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+
+    /** \brief Join an expression along symbolic primitives */
+    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+
+    /** \brief Get offsets for split */
+    std::pair<std::vector<int>, std::vector<int> > offset() const;
   };
 
 } // namespace casadi

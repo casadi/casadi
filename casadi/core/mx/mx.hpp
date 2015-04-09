@@ -210,6 +210,17 @@ namespace casadi {
     */
     bool isValidInput() const;
 
+    /** \brief Get the number of symbolic primitive
+        Assumes isValidInput() returns true.
+    */
+    int numPrimitives() const;
+
+    /** \brief Split up an expression along symbolic primitives */
+    std::vector<MX> splitPrimitives(const MX& x) const;
+
+    /** \brief Join an expression along symbolic primitives */
+    MX joinPrimitives(std::vector<MX>& v) const;
+
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return

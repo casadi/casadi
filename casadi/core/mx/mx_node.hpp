@@ -160,6 +160,15 @@ namespace casadi {
     /** \brief  Check if valid function input */
     virtual bool isValidInput() const { return false;}
 
+    /** \brief Get the number of symbolic primitives */
+    virtual int numPrimitives() const;
+
+    /** \brief Split up an expression along symbolic primitives */
+    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+
+    /** \brief Join an expression along symbolic primitives */
+    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+
     /** \brief Detect duplicate symbolic expressions */
     virtual bool hasDuplicates();
 

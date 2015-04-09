@@ -119,6 +119,11 @@ namespace casadi {
     }
   }
 
+  int MXNode::numPrimitives() const {
+    throw CasadiException(string("MXNode::numPrimitives() not defined for class ")
+                          + typeid(*this).name());
+  }
+
   bool MXNode::hasDuplicates() {
     throw CasadiException(string("MXNode::hasDuplicates() not defined for class ")
                           + typeid(*this).name());
@@ -131,6 +136,16 @@ namespace casadi {
 
   void MXNode::getPrimitives(std::vector<MXNode*>& v) {
     throw CasadiException(string("MXNode::getPrimitives() not defined for class ")
+                          + typeid(*this).name());
+  }
+
+  void MXNode::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+    throw CasadiException(string("MXNode::splitPrimitives() not defined for class ")
+                          + typeid(*this).name());
+  }
+
+  MX MXNode::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+    throw CasadiException(string("MXNode::joinPrimitives() not defined for class ")
                           + typeid(*this).name());
   }
 

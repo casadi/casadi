@@ -133,6 +133,18 @@ namespace casadi {
     return true;
   }
 
+  int Reshape::numPrimitives() const {
+    return dep()->numPrimitives();
+  }
+
+  void Reshape::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+    dep()->splitPrimitives(reshape(x, dep().shape()), it);
+  }
+
+  MX Reshape::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+    return reshape(dep()->joinPrimitives(it), shape());
+  }
+
   bool Reshape::hasDuplicates() {
     return dep()->hasDuplicates();
   }

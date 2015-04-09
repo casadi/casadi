@@ -173,9 +173,7 @@ namespace casadi {
     }
   }
 
-  void Diagcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
-                        std::vector<std::vector<MX> >& asens) {
-    // Get offsets for each row and column
+  std::pair<std::vector<int>, std::vector<int> > Diagcat::offset() const {
     vector<int> offset1(ndep()+1, 0);
     vector<int> offset2(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {
@@ -184,11 +182,18 @@ namespace casadi {
       offset2[i+1] = offset2[i] + ncol;
       offset1[i+1] = offset1[i] + nrow;
     }
+    return make_pair(offset1, offset2);
+  }
+
+  void Diagcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                        std::vector<std::vector<MX> >& asens) {
+    // Get offsets for each row and column
+    std::pair<std::vector<int>, std::vector<int> > off = offset();
 
     // Adjoint sensitivities
     int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
-      vector<MX> s = diagsplit(aseed[d][0], offset1, offset2);
+      vector<MX> s = diagsplit(aseed[d][0], off.first, off.second);
       for (int i=0; i<ndep(); ++i) {
         asens[d][i] += s[i];
       }
@@ -228,14 +233,19 @@ namespace casadi {
     }
   }
 
-  void Horzcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
-                        std::vector<std::vector<MX> >& asens) {
-    // Get offsets for each column
+  std::vector<int> Horzcat::offset() const {
     vector<int> col_offset(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {
       int ncol = dep(i).sparsity().size2();
       col_offset[i+1] = col_offset[i] + ncol;
     }
+    return col_offset;
+  }
+
+  void Horzcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                        std::vector<std::vector<MX> >& asens) {
+    // Get offsets for each column
+    vector<int> col_offset = offset();
 
     // Adjoint sensitivities
     int nadj = aseed.size();
@@ -280,14 +290,19 @@ namespace casadi {
     }
   }
 
-  void Vertcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
-                        std::vector<std::vector<MX> >& asens) {
-    // Get offsets for each row
+  std::vector<int> Vertcat::offset() const {
     vector<int> row_offset(ndep()+1, 0);
     for (int i=0; i<ndep(); ++i) {
       int nrow = dep(i).sparsity().size1();
       row_offset[i+1] = row_offset[i] + nrow;
     }
+    return row_offset;
+  }
+
+  void Vertcat::evalAdj(const std::vector<std::vector<MX> >& aseed,
+                        std::vector<std::vector<MX> >& asens) {
+    // Get offsets for each row
+    vector<int> row_offset = offset();
 
     // Adjoint sensitivities
     int nadj = aseed.size();
@@ -305,6 +320,60 @@ namespace casadi {
     }
     casadi_warning("Experimental feature: MXFunction with concatenation as function input");
     return true;
+  }
+
+  int Concat::numPrimitives() const {
+    int nprim = 0;
+    for (int i=0; i<ndep(); ++i) {
+      nprim +=  dep(i)->numPrimitives();
+    }
+    return nprim;
+  }
+
+  void Horzcat::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+    vector<MX> s = horzsplit(x, offset());
+    for (int i=0; i<s.size(); ++i) {
+      dep(i)->splitPrimitives(s[i], it);
+    }
+  }
+
+  MX Horzcat::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+    vector<MX> s(ndep());
+    for (int i=0; i<s.size(); ++i) {
+      s[i] = dep(i)->joinPrimitives(it);
+    }
+    return horzcat(s);
+  }
+
+  void Vertcat::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+    vector<MX> s = vertsplit(x, offset());
+    for (int i=0; i<s.size(); ++i) {
+      dep(i)->splitPrimitives(s[i], it);
+    }
+  }
+
+  MX Vertcat::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+    vector<MX> s(ndep());
+    for (int i=0; i<s.size(); ++i) {
+      s[i] = dep(i)->joinPrimitives(it);
+    }
+    return vertcat(s);
+  }
+
+  void Diagcat::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+    std::pair<std::vector<int>, std::vector<int> > off = offset();
+    vector<MX> s = diagsplit(x, off.first, off.second);
+    for (int i=0; i<s.size(); ++i) {
+      dep(i)->splitPrimitives(s[i], it);
+    }
+  }
+
+  MX Diagcat::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+    vector<MX> s(ndep());
+    for (int i=0; i<s.size(); ++i) {
+      s[i] = dep(i)->joinPrimitives(it);
+    }
+    return diagcat(s);
   }
 
   bool Concat::hasDuplicates() {
