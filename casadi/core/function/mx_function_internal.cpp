@@ -904,11 +904,12 @@ namespace casadi {
       }
     }
 
-    // Allocate adjoint sensitivities
+    // Allocate splited adjoint sensitivities
+    vector<vector<vector<MX> > > asens_split(nadj);
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(inputv_.size());
-      for (int i=0; i<asens[d].size(); ++i) {
-        asens[d][i] = MX(input(i).shape());
+      asens_split[d].resize(inputv_.size());
+      for (int i=0; i<inputv_.size(); ++i) {
+        asens_split[d][i].resize(inputv_[i].numPrimitives());
       }
     }
 
@@ -926,11 +927,9 @@ namespace casadi {
     // Loop over computational nodes in reverse order
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
       if (it->op == OP_INPUT) {
-        // Collect the symbolic adjoint sensitivities
+        // Get the adjoint sensitivities
         for (int d=0; d<nadj; ++d) {
-          if (!dwork[it->res.front()][d].isEmpty()) {
-            asens[d][it->arg.front()] = dwork[it->res.front()][d];
-          }
+          asens_split[d].at(it->arg.at(0)).at(it->arg.at(1)) = dwork[it->res.front()][d];
           dwork[it->res.front()][d] = MX();
         }
       } else if (it->op==OP_OUTPUT) {
@@ -1022,6 +1021,15 @@ namespace casadi {
         }
       }
     }
+
+    // Get adjoint sensitivities
+    for (int d=0; d<nadj; ++d) {
+      asens[d].resize(inputv_.size());
+      for (int i=0; i<inputv_.size(); ++i) {
+        asens[d][i] = inputv_[i].joinPrimitives(asens_split[d][i]);
+      }
+    }
+
     log("MXFunctionInternal::evalAdj end");
   }
 
