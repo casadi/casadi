@@ -922,10 +922,14 @@ class typemaptests(casadiTestCase):
     print np.array(casadi.DMatrix([1,2,3.0]))
 
   def test_None(self):
-    print None==DMatrix(3)
+    self.assertFalse(None==DMatrix(3))
     x = SX.sym('x')
     f = SXFunction([x],[x])
     f.setOption('verbose', None)
+
+    b = atleast_2d(None)
+    with self.assertRaises(NotImplementedError):
+      c = repmat(b, 1, 1)
       
 if __name__ == '__main__':
     unittest.main()
