@@ -779,11 +779,19 @@ namespace casadi {
       fsens[d].resize(outputv_.size());
     }
 
-
     // Work vector, forward derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
     log("MXFunctionInternal::evalFwd allocated derivative work vector (forward mode)");
+
+    // Split up fseed analogous to symbolic primitives
+    vector<vector<vector<MX> > > fseed_split(nfwd);
+    for (int d=0; d<nfwd; ++d) {
+      fseed_split[d].resize(fseed[d].size());
+      for (int i=0; i<fseed[d].size(); ++i) {
+        fseed_split[d][i] = inputv_[i].splitPrimitives(fseed[d][i]);
+      }
+    }
 
     // Pointers to the arguments of the current operation
     vector<vector<MX> > oseed, osens;
@@ -792,16 +800,15 @@ namespace casadi {
     vector<bool> skip(nfwd, false);
 
     // Loop over computational nodes in forward order
-    int alg_counter = 0;
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
+    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (it->op == OP_INPUT) {
-        // Fetch input
-        const Sparsity& sp_input = input(it->arg.front()).sparsity();
+        // Fetch forward seed
         for (int d=0; d<nfwd; ++d) {
-          dwork[it->res.front()][d] = fseed[d][it->arg.front()].setSparse(sp_input, true);
+          dwork[it->res.front()][d] = fseed_split[d].at(it->arg.at(0)).at(it->arg.at(1))
+            .setSparse(it->data.sparsity(), true);
         }
       } else if (it->op==OP_OUTPUT) {
-        // Collect the forward sensitivities
+        // Collect forward sensitivity
         for (int d=0; d<nfwd; ++d) {
           fsens[d][it->res.front()] = dwork[it->arg.front()][d];
         }
