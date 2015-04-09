@@ -686,6 +686,11 @@ namespace casadi {
     vector<MX> swork(workloc_.size()-1);
     log("MXFunctionInternal::evalMX allocated work vector");
 
+    // Split up inputs analogous to symbolic primitives
+    vector<vector<MX> > arg_split(arg.size());
+    for (int i=0; i<arg.size(); ++i)
+      arg_split[i] = inputv_[i].splitPrimitives(arg[i]);
+
     vector<MX> oarg, ores;
     oarg.reserve(max_arg_);
     ores.reserve(max_res_);
@@ -694,9 +699,8 @@ namespace casadi {
     int alg_counter = 0;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
       if (it->op == OP_INPUT) {
-        // Fetch input
-        const Sparsity& sp_input = input(it->arg.front()).sparsity();
-        swork[it->res.front()] = arg[it->arg.front()].setSparse(sp_input, true);
+        swork[it->res.front()] = arg_split.at(it->arg.at(0)).at(it->arg.at(1))
+          .setSparse(it->data.sparsity(), true);
       } else if (it->op==OP_OUTPUT) {
         // Collect the results
         res[it->res.front()] = swork[it->arg.front()];

@@ -964,7 +964,7 @@ namespace casadi {
     std::vector<MX> ret(numPrimitives());
     std::vector<MX>::iterator it=ret.begin();
     (*this)->splitPrimitives(x, it);
-    casadi_assert(it==ret.begin());
+    casadi_assert(it==ret.end());
     return ret;
   }
 
@@ -972,7 +972,7 @@ namespace casadi {
     casadi_assert_message(v.size()==numPrimitives(), "Wrong number of primitives supplied");
     std::vector<MX>::const_iterator it=v.begin();
     MX ret = (*this)->joinPrimitives(it);
-    casadi_assert(it==v.begin());
+    casadi_assert(it==v.end());
     return ret;
   }
 
