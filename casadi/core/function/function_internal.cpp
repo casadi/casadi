@@ -2674,6 +2674,9 @@ namespace casadi {
       // Collect forward sensitivities
       for (int d=0; d<nfwd; ++d) {
         fsens[d] = vertsplit(v[d], offset);
+        for (int i=0; i<n_out; ++i) {
+          fsens[d][i] = reshape(fsens[d][i], output(i).shape());
+        }
       }
       return;
     }
@@ -2750,9 +2753,9 @@ namespace casadi {
         vector<MX> a = vertsplit(v[d], offset);
         for (int i=0; i<n_in; ++i) {
           if (asens[d][i].isEmpty(true)) {
-            asens[d][i] = a[i];
+            asens[d][i] = reshape(a[i], input(i).shape());
           } else {
-            asens[d][i] += a[i];
+            asens[d][i] += reshape(a[i], input(i).shape());
           }
         }
       }
