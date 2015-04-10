@@ -245,6 +245,12 @@ namespace casadi {
 
     /** \brief Get symbolic primitives */
     virtual void getPrimitives(std::vector<MXNode*>& v) {}
+
+    /** \brief  Get the name */
+    virtual const std::string& getName() const {
+      static std::string dummyname;
+      return dummyname;
+    }
   };
 
   /** \brief Constant known at runtime */
