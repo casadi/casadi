@@ -134,7 +134,7 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::getPrimitives(std::vector<MXNode*>& v) {
+  void MXNode::getPrimitives(std::vector<MX>::iterator& it) const {
     throw CasadiException(string("MXNode::getPrimitives() not defined for class ")
                           + typeid(*this).name());
   }

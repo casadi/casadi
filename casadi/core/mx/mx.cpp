@@ -960,6 +960,14 @@ namespace casadi {
     return (*this)->numPrimitives();
   }
 
+  std::vector<MX> MX::getPrimitives() const {
+    std::vector<MX> ret(numPrimitives());
+    std::vector<MX>::iterator it=ret.begin();
+    (*this)->getPrimitives(it);
+    casadi_assert(it==ret.end());
+    return ret;
+  }
+
   std::vector<MX> MX::splitPrimitives(const MX& x) const {
     std::vector<MX> ret(numPrimitives());
     std::vector<MX>::iterator it=ret.begin();

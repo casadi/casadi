@@ -231,6 +231,9 @@ namespace casadi {
     /** \brief Get the number of symbolic primitives */
     virtual int numPrimitives() const { return 0;}
 
+    /** \brief Get symbolic primitives */
+    virtual void getPrimitives(std::vector<MX>::iterator& it) const {}
+
     /** \brief Split up an expression along symbolic primitives */
     virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {}
 
@@ -242,9 +245,6 @@ namespace casadi {
 
     /** \brief Reset the marker for an input expression */
     virtual void resetInput() {}
-
-    /** \brief Get symbolic primitives */
-    virtual void getPrimitives(std::vector<MXNode*>& v) {}
 
     /** \brief  Get the name */
     virtual const std::string& getName() const {

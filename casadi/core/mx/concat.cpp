@@ -390,9 +390,9 @@ namespace casadi {
     }
   }
 
-  void Concat::getPrimitives(std::vector<MXNode*>& v) {
+  void Concat::getPrimitives(std::vector<MX>::iterator& it) const {
     for (int i=0; i<ndep(); ++i) {
-      dep(i)->getPrimitives(v);
+      dep(i)->getPrimitives(it);
     }
   }
 

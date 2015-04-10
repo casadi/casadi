@@ -84,14 +84,14 @@ namespace casadi {
     /** \brief Get the number of symbolic primitives */
     virtual int numPrimitives() const;
 
+    /** \brief Get symbolic primitives */
+    virtual void getPrimitives(std::vector<MX>::iterator& it) const;
+
     /** \brief Detect duplicate symbolic expressions */
     virtual bool hasDuplicates();
 
     /** \brief Reset the marker for an input expression */
     virtual void resetInput();
-
-    /** \brief Get symbolic primitives */
-    virtual void getPrimitives(std::vector<MXNode*>& v);
   };
 
 

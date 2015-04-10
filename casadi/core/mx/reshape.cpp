@@ -137,6 +137,10 @@ namespace casadi {
     return dep()->numPrimitives();
   }
 
+  void Reshape::getPrimitives(std::vector<MX>::iterator& it) const {
+    dep()->getPrimitives(it);
+  }
+
   void Reshape::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
     dep()->splitPrimitives(reshape(x, dep().shape()), it);
   }
@@ -151,10 +155,6 @@ namespace casadi {
 
   void Reshape::resetInput() {
     dep()->resetInput();
-  }
-
-  void Reshape::getPrimitives(std::vector<MXNode*>& v) {
-    dep()->getPrimitives(v);
   }
 
 } // namespace casadi

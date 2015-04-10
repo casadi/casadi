@@ -79,6 +79,10 @@ namespace casadi {
     fill_n(res[0], nnz(), 0);
   }
 
+  void SymbolicMX::getPrimitives(std::vector<MX>::iterator& it) const {
+    *it++ = shared_from_this<MX>();
+  }
+
   void SymbolicMX::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
     *it++ = x;
   }
@@ -105,10 +109,6 @@ namespace casadi {
 
   void SymbolicMX::resetInput() {
     this->temp = 0;
-  }
-
-  void SymbolicMX::getPrimitives(std::vector<MXNode*>& v) {
-    v.push_back(this);
   }
 
 } // namespace casadi

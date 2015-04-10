@@ -215,6 +215,9 @@ namespace casadi {
     */
     int numPrimitives() const;
 
+    /** \brief Get symbolic primitives */
+    std::vector<MX> getPrimitives() const;
+
     /** \brief Split up an expression along symbolic primitives */
     std::vector<MX> splitPrimitives(const MX& x) const;
 

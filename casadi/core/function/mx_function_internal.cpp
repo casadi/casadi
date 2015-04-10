@@ -309,14 +309,12 @@ namespace casadi {
     }
 
     // Add input instructions, loop over inputs
-    vector<MXNode*> prim;
     for (int ind=0; ind<inputv_.size(); ++ind) {
       // Loop over symbolic primitives of each input
-      prim.clear();
-      inputv_[ind]->getPrimitives(prim);
+      vector<MX> prim = inputv_[ind].getPrimitives();
       int nz_offset=0;
       for (int p=0; p<prim.size(); ++p) {
-        int i = prim[p]->temp-1;
+        int i = prim[p].getTemp()-1;
         if (i>=0) {
           // Mark as input
           algorithm_[i].op = OP_INPUT;
@@ -329,7 +327,7 @@ namespace casadi {
           nz_offset += prim[p]->nnz();
 
           // Mark input as read
-          prim[p]->temp = 0;
+          prim[p].setTemp(0);
         }
       }
     }
@@ -1081,7 +1079,18 @@ namespace casadi {
     vector<SX> arg(inputv_.size());
     if (inputvsx.empty()) { // No symbolic input provided
       for (int i=0; i<arg.size(); ++i) {
-        arg[i] = SX::sym(inputv_[i]->getName(), inputv_[i].sparsity());
+        // Start with matrix with the correct sparsity
+        arg[i] = SX(inputv_[i].sparsity());
+
+        // Divide input into primitives and create corresponding SX
+        vector<SXElement>::iterator ait = arg[i].begin();
+        vector<MX> prim = inputv_[i].getPrimitives();
+        for (vector<MX>::const_iterator pit=prim.begin(); pit!=prim.end(); ++pit) {
+          SX t = SX::sym(pit->getName(), pit->sparsity());
+          copy(t.begin(), t.end(), ait);
+          ait += t.nnz();
+        }
+        casadi_assert(ait==arg[i].end());
       }
     } else { // Use provided symbolic input
       // Make sure number of inputs matches
