@@ -33,7 +33,7 @@ using namespace std;
 
 namespace casadi {
 
-  Call::Call(const Function& fcn, std::vector<MX> arg) : fcn_(fcn) {
+  Call::Call(const Function& fcn, vector<MX> arg) : fcn_(fcn) {
 
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
@@ -98,12 +98,12 @@ namespace casadi {
     fcn_->evalSX(arg, res, itmp, rtmp);
   }
 
-  void Call::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Call::evalMX(const vector<MX>& arg, vector<MX>& res) {
     res = fcn_->createCall(arg);
   }
 
-  void Call::evalFwd(const std::vector<std::vector<MX> >& fseed,
-                     std::vector<std::vector<MX> >& fsens) {
+  void Call::evalFwd(const vector<vector<MX> >& fseed,
+                     vector<vector<MX> >& fsens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -114,8 +114,8 @@ namespace casadi {
     fcn_.callForward(arg, res, fseed, fsens);
   }
 
-  void Call::evalAdj(const std::vector<std::vector<MX> >& aseed,
-                     std::vector<std::vector<MX> >& asens) {
+  void Call::evalAdj(const vector<vector<MX> >& aseed,
+                     vector<vector<MX> >& asens) {
     // Nondifferentiated inputs and outputs
     vector<MX> arg(ndep());
     for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
@@ -123,7 +123,15 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Call the cached functions
-    fcn_.callReverse(arg, res, aseed, asens);
+    vector<vector<MX> > v;
+    fcn_.callReverse(arg, res, aseed, v);
+    for (int i=0; i<v.size(); ++i) {
+      for (int j=0; j<v[i].size(); ++j) {
+        if (!v[i][j].isEmpty()) { // TODO(@jaeandersson): Hack
+          asens[i][j] += v[i][j];
+        }
+      }
+    }
   }
 
   void Call::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
@@ -139,8 +147,8 @@ namespace casadi {
     fcn_.spAdj(arg, res, itmp, rtmp);
   }
 
-  void Call::generate(std::ostream &stream, const std::vector<int>& arg,
-                              const std::vector<int>& res, CodeGenerator& gen) const {
+  void Call::generate(std::ostream &stream, const vector<int>& arg,
+                      const vector<int>& res, CodeGenerator& gen) const {
     fcn_->generate(stream, arg, res, gen);
   }
 
