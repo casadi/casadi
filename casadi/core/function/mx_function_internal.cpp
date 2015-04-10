@@ -324,11 +324,11 @@ namespace casadi {
           algorithm_[i].arg[0] = ind;
           algorithm_[i].arg[1] = p;
           algorithm_[i].arg[2] = nz_offset;
-          nz_offset += prim[p]->nnz();
 
           // Mark input as read
           prim[p].setTemp(0);
         }
+        nz_offset += prim[p]->nnz();
       }
     }
 

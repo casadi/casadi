@@ -318,7 +318,6 @@ namespace casadi {
     for (int i=0; i<ndep(); ++i) {
       if (!dep(i)->isValidInput()) return false;
     }
-    casadi_warning("Experimental feature: MXFunction with concatenation as function input");
     return true;
   }
 
