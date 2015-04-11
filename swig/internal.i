@@ -43,13 +43,13 @@
 %exception  casadi::Assertion::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Assertion::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::Assertion::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Assertion::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Assertion::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Assertion::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Assertion::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Assertion::getOp() const  {
@@ -61,13 +61,13 @@
 %exception  casadi::BinaryMX< ScX, ScY >::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::BinaryMX< ScX, ScY >::eval(const cpv_MX &arg, const pv_MX &res) {
+%exception  casadi::BinaryMX< ScX, ScY >::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::BinaryMX< ScX, ScY >::evalAdj(const std::vector< pv_MX > &aseed, const std::vector< pv_MX > &asens) {
+%exception  casadi::BinaryMX< ScX, ScY >::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::BinaryMX< ScX, ScY >::evalFwd(const std::vector< cpv_MX > &fseed, const std::vector< pv_MX > &fsens) {
+%exception  casadi::BinaryMX< ScX, ScY >::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::BinaryMX< ScX, ScY >::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -115,13 +115,13 @@
 %exception  casadi::Call::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Call::eval(const cpv_MX &arg, const pv_MX &res) {
+%exception  casadi::Call::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Call::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Call::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Call::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Call::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Call::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -208,6 +208,21 @@
 %exception  casadi::Concat::getGetNonzeros(const Sparsity &sp, const std::vector< int > &nz) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Concat::getPrimitives(std::vector< MX >::iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Concat::hasDuplicates() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Concat::isValidInput() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Concat::numPrimitives() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Concat::resetInput() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Constant< Value >::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -292,13 +307,13 @@
 %exception  casadi::ConstantMX::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ConstantMX::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::ConstantMX::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ConstantMX::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::ConstantMX::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ConstantMX::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::ConstantMX::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ConstantMX::getInnerProd(const MX &y) const  {
@@ -427,13 +442,13 @@
 %exception  casadi::Determinant::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Determinant::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::Determinant::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Determinant::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Determinant::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Determinant::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Determinant::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Determinant::getOp() const  {
@@ -445,31 +460,40 @@
 %exception  casadi::Diagcat::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Diagcat::eval(const cpv_MX &arg, const pv_MX &res) {
+%exception  casadi::Diagcat::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Diagcat::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Diagcat::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Diagcat::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Diagcat::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Diagcat::getOp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Diagcat::joinPrimitives(std::vector< MX >::const_iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagcat::offset() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Diagcat::printPart(std::ostream &stream, int part) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Diagcat::splitPrimitives(const MX &x, std::vector< MX >::iterator &it) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Diagsplit::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Diagsplit::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::Diagsplit::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Diagsplit::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Diagsplit::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Diagsplit::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Diagsplit::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Diagsplit::getDiagcat(const std::vector< MX > &x) const  {
@@ -731,6 +755,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::createCall(const std::vector< MX > &arg) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::createMap(const std::vector< std::vector< MX > > &arg, const std::string &parallelization) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::derForward(int nfwd) {
@@ -1015,13 +1042,13 @@
 %exception  casadi::GenericType::toIntVectorVector() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GetNonzeros::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::GetNonzeros::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GetNonzeros::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::GetNonzeros::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GetNonzeros::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::GetNonzeros::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GetNonzeros::getAll() const  {
@@ -1081,31 +1108,40 @@
 %exception  casadi::Horzcat::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Horzcat::eval(const cpv_MX &arg, const pv_MX &res) {
+%exception  casadi::Horzcat::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Horzcat::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Horzcat::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Horzcat::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Horzcat::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Horzcat::getOp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Horzcat::joinPrimitives(std::vector< MX >::const_iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Horzcat::offset() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Horzcat::printPart(std::ostream &stream, int part) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Horzcat::splitPrimitives(const MX &x, std::vector< MX >::iterator &it) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Horzsplit::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Horzsplit::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::Horzsplit::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Horzsplit::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Horzsplit::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Horzsplit::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Horzsplit::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Horzsplit::getHorzcat(const std::vector< MX > &x) const  {
@@ -1426,13 +1462,13 @@
 %exception  casadi::InnerProd::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::InnerProd::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::InnerProd::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::InnerProd::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::InnerProd::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::InnerProd::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::InnerProd::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::InnerProd::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -1546,13 +1582,13 @@
 %exception  casadi::Inverse::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Inverse::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::Inverse::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Inverse::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Inverse::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Inverse::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Inverse::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Inverse::getOp() const  {
@@ -1813,6 +1849,12 @@
 %exception  casadi::MX::getTemp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::hasDuplicates() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::resetInput() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::setTemp(int t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1846,13 +1888,13 @@
 %exception  casadi::MXNode::dep(int ind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MXNode::eval(const cpv_MX &arg, const pv_MX &res) {
+%exception  casadi::MXNode::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MXNode::evalAdj(const std::vector< pv_MX > &aseed, const std::vector< pv_MX > &fsens) {
+%exception  casadi::MXNode::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MXNode::evalFwd(const std::vector< cpv_MX > &fseed, const std::vector< pv_MX > &fsens) {
+%exception  casadi::MXNode::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -1936,6 +1978,9 @@
 %exception  casadi::MXNode::getOutput(int oind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MXNode::getPrimitives(std::vector< MX >::iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MXNode::getRef(const Slice &i, const Slice &j) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1969,6 +2014,9 @@
 %exception  casadi::MXNode::hasDep() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MXNode::hasDuplicates() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MXNode::isBinaryOp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1990,10 +2038,16 @@
 %exception  casadi::MXNode::isUnaryOp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MXNode::isValidInput() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MXNode::isValue(double val) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::isZero() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXNode::joinPrimitives(std::vector< MX >::const_iterator &it) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::mapping() const  {
@@ -2014,6 +2068,9 @@
 %exception  casadi::MXNode::numInplace() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MXNode::numPrimitives() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MXNode::numel() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2027,6 +2084,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::repr(std::ostream &stream) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXNode::resetInput() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::setDependencies(const MX &dep) {
@@ -2062,7 +2122,19 @@
 %exception  casadi::MXNode::sparsity(int oind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MXNode::splitPrimitives(const MX &x, std::vector< MX >::iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Map::clone() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Map::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Map::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Map::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::getFunction() {
@@ -2081,6 +2153,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::nout() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Map::parallelization() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::printPart(std::ostream &stream, int part) const  {
@@ -2194,6 +2269,9 @@
 %exception  casadi::Matrix< DataType >::getValue(int k) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< DataType >::hasDuplicates() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< DataType >::hasNonStructuralZeros() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2239,7 +2317,7 @@
 %exception  casadi::Matrix< DataType >::isSymbolic() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::isSymbolicSparse() const  {
+%exception  casadi::Matrix< DataType >::isValidInput() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::isZero() const  {
@@ -2300,6 +2378,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::reserve(int nnz, int ncol) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< DataType >::resetInput() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::resize(int nrow, int ncol) {
@@ -2833,13 +2914,13 @@
 %exception  casadi::Multiplication::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Multiplication::eval(const cpv_MX &arg, const pv_MX &res) {
+%exception  casadi::Multiplication::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Multiplication::evalAdj(const std::vector< pv_MX > &aseed, const std::vector< pv_MX > &asens) {
+%exception  casadi::Multiplication::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Multiplication::evalFwd(const std::vector< cpv_MX > &fseed, const std::vector< pv_MX > &fsens) {
+%exception  casadi::Multiplication::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Multiplication::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -2950,13 +3031,13 @@
 %exception  casadi::NormF::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::NormF::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::NormF::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::NormF::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::NormF::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::NormF::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::NormF::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::NormF::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -3002,6 +3083,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OmpMap::nTmp(size_t &ni, size_t &nr) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::OmpMap::parallelization() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OneSX::getIntValue() const  {
@@ -3244,13 +3328,13 @@
 %exception  casadi::Reshape::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Reshape::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::Reshape::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Reshape::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Reshape::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Reshape::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Reshape::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Reshape::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -3259,16 +3343,37 @@
 %exception  casadi::Reshape::getOp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Reshape::getPrimitives(std::vector< MX >::iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Reshape::getReshape(const Sparsity &sp) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Reshape::getTranspose() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Reshape::hasDuplicates() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Reshape::isValidInput() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Reshape::joinPrimitives(std::vector< MX >::const_iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Reshape::numInplace() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Reshape::numPrimitives() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Reshape::printPart(std::ostream &stream, int part) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Reshape::resetInput() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Reshape::splitPrimitives(const MX &x, std::vector< MX >::iterator &it) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::RkIntegrator::clone() const  {
@@ -3691,13 +3796,13 @@
 %exception  casadi::SetNonzeros< Add >::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SetNonzeros< Add >::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::SetNonzeros< Add >::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SetNonzeros< Add >::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::SetNonzeros< Add >::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SetNonzeros< Add >::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::SetNonzeros< Add >::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SetNonzeros< Add >::getAll() const  {
@@ -3757,13 +3862,13 @@
 %exception  casadi::SetSparse::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SetSparse::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::SetSparse::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SetSparse::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::SetSparse::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SetSparse::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::SetSparse::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SetSparse::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -3874,13 +3979,13 @@
 %exception  casadi::Solve< Tr >::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Solve< Tr >::eval(const cpv_MX &arg, const pv_MX &res) {
+%exception  casadi::Solve< Tr >::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Solve< Tr >::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Solve< Tr >::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Solve< Tr >::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Solve< Tr >::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Solve< Tr >::getFunction() {
@@ -4165,13 +4270,13 @@
 %exception  casadi::SubAssign::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SubAssign::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::SubAssign::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SubAssign::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::SubAssign::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SubAssign::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::SubAssign::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SubAssign::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -4186,13 +4291,13 @@
 %exception  casadi::SubRef::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SubRef::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::SubRef::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SubRef::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::SubRef::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SubRef::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::SubRef::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SubRef::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -4228,13 +4333,13 @@
 %exception  casadi::SymbolicMX::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SymbolicMX::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::SymbolicMX::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SymbolicMX::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::SymbolicMX::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SymbolicMX::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::SymbolicMX::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SymbolicMX::getName() const  {
@@ -4243,7 +4348,28 @@
 %exception  casadi::SymbolicMX::getOp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SymbolicMX::getPrimitives(std::vector< MX >::iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SymbolicMX::hasDuplicates() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SymbolicMX::isValidInput() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SymbolicMX::joinPrimitives(std::vector< MX >::const_iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SymbolicMX::numPrimitives() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SymbolicMX::printPart(std::ostream &stream, int part) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SymbolicMX::resetInput() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SymbolicMX::splitPrimitives(const MX &x, std::vector< MX >::iterator &it) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SymbolicQr::clone() const  {
@@ -4279,13 +4405,13 @@
 %exception  casadi::Transpose::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Transpose::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::Transpose::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Transpose::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Transpose::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Transpose::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Transpose::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Transpose::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -4306,13 +4432,13 @@
 %exception  casadi::UnaryMX::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::UnaryMX::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::UnaryMX::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::UnaryMX::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::UnaryMX::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::UnaryMX::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::UnaryMX::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::UnaryMX::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
@@ -4360,31 +4486,40 @@
 %exception  casadi::Vertcat::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Vertcat::eval(const cpv_MX &arg, const pv_MX &res) {
+%exception  casadi::Vertcat::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Vertcat::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Vertcat::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Vertcat::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Vertcat::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Vertcat::getOp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Vertcat::joinPrimitives(std::vector< MX >::const_iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Vertcat::offset() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Vertcat::printPart(std::ostream &stream, int part) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Vertcat::splitPrimitives(const MX &x, std::vector< MX >::iterator &it) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Vertsplit::clone() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Vertsplit::eval(const cpv_MX &input, const pv_MX &output) {
+%exception  casadi::Vertsplit::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Vertsplit::evalAdj(const std::vector< pv_MX > &adjSeed, const std::vector< pv_MX > &adjSens) {
+%exception  casadi::Vertsplit::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Vertsplit::evalFwd(const std::vector< cpv_MX > &fwdSeed, const std::vector< pv_MX > &fwdSens) {
+%exception  casadi::Vertsplit::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Vertsplit::getOp() const  {
@@ -4501,6 +4636,12 @@
 %exception  casadi::ZeroByZero::getMatrixValue() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ZeroByZero::getName() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ZeroByZero::getPrimitives(std::vector< MX >::iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::ZeroByZero::getReshape(const Sparsity &sp) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4519,7 +4660,25 @@
 %exception  casadi::ZeroByZero::getValue() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ZeroByZero::hasDuplicates() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ZeroByZero::isValidInput() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ZeroByZero::joinPrimitives(std::vector< MX >::const_iterator &it) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ZeroByZero::numPrimitives() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::ZeroByZero::printPart(std::ostream &stream, int part) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ZeroByZero::resetInput() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ZeroByZero::splitPrimitives(const MX &x, std::vector< MX >::iterator &it) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ZeroSX::getIntValue() const  {
