@@ -920,9 +920,6 @@ namespace casadi {
     // Loop over blocks
     for (int b=0; b<nb; ++b) {
 
-      // Block size
-      int bs = rowblock[b+1] - rowblock[b];
-
       // Get variables in the block
       vector<MX> xb(this->s.begin()+colblock[b], this->s.begin()+colblock[b+1]);
       vector<MX> xdotb(this->sdot.begin()+colblock[b], this->sdot.begin()+colblock[b+1]);
@@ -1006,9 +1003,6 @@ namespace casadi {
 
     // Loop over blocks
     for (int b=0; b<nb; ++b) {
-
-      // Block size
-      int bs = rowblock[b+1] - rowblock[b];
 
       // Get local variables
       vector<MX> zb(this->z.begin()+colblock[b], this->z.begin()+colblock[b+1]);
