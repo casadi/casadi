@@ -611,7 +611,7 @@ namespace casadi {
 
   void SymbolicOCP::scaleVariables() {
     // Gather variables and expressions to replace
-    vector<SXElement> v_id, v_rep, ex_rep;
+    vector<SX> v_id, v_rep;
     for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
       if (it->second.nominal!=1) {
         Variable& v=it->second;
@@ -644,7 +644,7 @@ namespace casadi {
     ex.push_back(vertcat(this->lterm));
 
     // Substitute all at once (more efficient since they may have common subexpressions)
-    ex = substitute(ex, vector<SX>(1, v_id), vector<SX>(1, v_rep));
+    ex = substitute(ex, v_id, v_rep);
 
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
@@ -660,11 +660,9 @@ namespace casadi {
     casadi_assert(it==ex.end());
 
     // Save the substituted expressions
-    vector<SXElement>::iterator ex_rep_it = ex_rep.begin();
     for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
       it->second.nominal=1;
     }
-    casadi_assert(ex_rep_it==ex_rep.end());
   }
 
   void SymbolicOCP::sort_i() {
