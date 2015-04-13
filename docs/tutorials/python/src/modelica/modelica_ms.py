@@ -46,11 +46,11 @@ print ocp
 #$ Indeed, for cases like this one, CasADi can do this reformulation automatically:
 ocp.makeExplicit()
 #! Let us extract variables for the states, the control and equations
-x = ocp.x
-u = ocp.u
-f = ocp.ode
-L = ocp.lterm
-I = ocp.init
+x = vertcat(ocp.x)
+u = vertcat(ocp.u)
+f = vertcat(ocp.ode)
+L = vertcat(ocp.lterm)
+I = vertcat(ocp.init)
 #$ These are expressions that can be visualized or manipulated using CasADi's 
 #$ symbolic framework:
 print 5*sin(f[0])

@@ -94,51 +94,51 @@ namespace casadi {
 
     /** \brief Differential states defined by ordinary differential equations (ODE)
      */
-    SX x, ode;
+    std::vector<SX> x, ode;
 
     /** \brief Differential-algebraic equation (DAE) with corresponding state vector,
      * state derivatives.
      */
-    SX s, sdot, dae;
+    std::vector<SX> s, sdot, dae;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * \a alg and \a z have matching dimensions and
      * <tt>0 == alg(z, ...)</tt> implicitly defines \a z.
      */
-    SX z, alg;
+    std::vector<SX> z, alg;
 
     /** \brief Quadrature states
      * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
      */
-    SX q, quad;
+    std::vector<SX> q, quad;
 
     /** \brief Intermediate variables and definitions definitions
      * Interdependencies are allowed but must be non-cyclic.
      */
-    SX i, idef;
+    std::vector<SX> i, idef;
 
     /** \brief Output variables and corresponding definitions
      */
-    SX y, ydef;
+    std::vector<SX> y, ydef;
 
     /** \brief Free controls
      * The trajectories of the free controls are decision variables of the optimal control problem.
      * They are chosen by the optimization algorithm in order to minimize the cost functional.
      */
-    SX u;
+    std::vector<SX> u;
 
     /** \brief Free parameters
      * A free parameter is variables which is constant over time, but whose value is chosen by the
      * optimization algorithm in order to minimize the cost functional.
      */
-    SX p;
+    std::vector<SX> p;
     ///@}
 
     /** \brief Initial conditions
      * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to
      * the ode and/or dae.
      */
-    SX init;
+    std::vector<SX> init;
 
     /// Interval start time
     double t0;
@@ -169,10 +169,10 @@ namespace casadi {
     ///@{
 
     /// Mayer terms in the objective (point terms)
-    SX mterm;
+    std::vector<SX> mterm;
 
     /// Lagrange terms in the objective (integral terms)
-    SX lterm;
+    std::vector<SX> lterm;
     ///@}
 
     /** @name Symbolic modeling

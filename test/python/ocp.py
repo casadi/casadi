@@ -209,16 +209,16 @@ class OCPtests(casadiTestCase):
     self.assertEqual(ocp.tf,150)
     #self.assertFalse(ocp.t0_free)
     #self.assertFalse(ocp.tf_free)
-    self.assertTrue(ocp.lterm.nnz()==0)
-    self.assertTrue(ocp.mterm.nnz()==1)
+    self.assertTrue(len(ocp.lterm)==0)
+    self.assertTrue(len(ocp.mterm)==1)
     m = ocp.mterm
     self.assertTrue(isinstance(m,SX))
     self.assertTrue(isinstance(ocp.t,SX))
     self.assertEquals(str(m),'cost')
     print dir(ocp)
-    self.assertEquals(ocp.dae.nnz(),3)
+    self.assertEquals(len(ocp.dae),3)
     print type(ocp.s)
-    self.assertEquals(ocp.s.nnz(),3) # there are three states
+    self.assertEquals(len(ocp.s),3) # there are three states
     c = ocp("cstr.c")
     T = ocp("cstr.T")
     cost = ocp("cost")
@@ -245,7 +245,7 @@ class OCPtests(casadiTestCase):
     print ocp.init
     print c,T,cost
     #print c.atTime(0)
-    f=SXFunction([vertcat([c,T,cost])],[ocp.init])
+    f=SXFunction([vertcat([c,T,cost])],[vertcat(ocp.init)])
     f.init()
     return 
     f.evaluate()
