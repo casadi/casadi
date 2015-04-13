@@ -78,7 +78,7 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=vertcat(ocp.ode)))
+dae = MXFunction(dae_fcn_in,daeOut(ode=vertcat(ocp.ode)))
 integrator = Integrator("cvodes", dae)
 
 # Output function
@@ -89,7 +89,7 @@ output_fcn_in = daeIn(
   z = vertcat(ocp.z),
   p = vertcat(ocp.p + ocp.u)
 )
-output_fcn = SXFunction(output_fcn_in,output_fcn_out)
+output_fcn = MXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,1,100)
@@ -137,7 +137,7 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=vertcat(ocp.ode)))
+dae = MXFunction(dae_fcn_in,daeOut(ode=vertcat(ocp.ode)))
 integrator = Integrator("cvodes", dae)
 
 # Output function
@@ -148,7 +148,7 @@ output_fcn_in = daeIn(
   z = vertcat(ocp.z),
   p = vertcat(ocp.p + ocp.u)
 )
-output_fcn = SXFunction(output_fcn_in,output_fcn_out)
+output_fcn = MXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,10,100)
@@ -189,7 +189,7 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=vertcat(ocp.ode)))
+dae = MXFunction(dae_fcn_in,daeOut(ode=densify(vertcat(ocp.ode))))
 integrator = Integrator("cvodes", dae)
 
 # Output function
@@ -200,7 +200,7 @@ output_fcn_in = daeIn(
   z = vertcat(ocp.z),
   p = vertcat(ocp.p + ocp.u)
 )
-output_fcn = SXFunction(output_fcn_in,output_fcn_out)
+output_fcn = MXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
 grid = NP.linspace(0,2,100)

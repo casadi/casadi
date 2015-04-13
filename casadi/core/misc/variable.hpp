@@ -79,10 +79,10 @@ namespace casadi {
     std::string name() const;
 
     /// Variable expression
-    SX v;
+    MX v;
 
     /// Derivative expression
-    SX d;
+    MX d;
 
     /// Nominal value
     double nominal;

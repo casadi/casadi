@@ -87,12 +87,18 @@ print "lbx = ", lbx, "ubx = ", ubx, "lbu = ", lbu, "ubu = ", ubu
 #$ From the symbolic expressions, we can create functions (functors) for evaluating the 
 #$ ODE right hand side numerically or symbolically. The following code creates a function
 #$ with two inputs (x and u) and two outputs (f and L):
-ode_fcn = SXFunction([x,u],[f,L])
+ode_fcn = MXFunction([x,u],[f,L])
 ode_fcn.setOption("name","ode_fcn")
 ode_fcn.init()
 #$ We also create a function for evaluating the initial conditions:
-init_fcn = SXFunction([x],[I])
+init_fcn = MXFunction([x],[I])
 init_fcn.setOption("name","init_fcn")
+init_fcn.init()
+#$ Increased speed is often possible by converting the MXFunction instances to SXFunction instances.
+#$ This is possible when the symbolic expressions do not contain any exotic operators:
+ode_fcn = SXFunction(ode_fcn)
+ode_fcn.init()
+init_fcn = SXFunction(init_fcn)
 init_fcn.init()
 #$ We shall use the "direct multiple shooting" method with 20 shooting intervals of equal length
 #$ to solve the OCP. 

@@ -90,55 +90,55 @@ namespace casadi {
      */
     ///@{
     /** \brief Independent variable (usually time) */
-    SX t;
+    MX t;
 
     /** \brief Differential states defined by ordinary differential equations (ODE)
      */
-    std::vector<SX> x, ode;
+    std::vector<MX> x, ode;
 
     /** \brief Differential-algebraic equation (DAE) with corresponding state vector,
      * state derivatives.
      */
-    std::vector<SX> s, sdot, dae;
+    std::vector<MX> s, sdot, dae;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * \a alg and \a z have matching dimensions and
      * <tt>0 == alg(z, ...)</tt> implicitly defines \a z.
      */
-    std::vector<SX> z, alg;
+    std::vector<MX> z, alg;
 
     /** \brief Quadrature states
      * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
      */
-    std::vector<SX> q, quad;
+    std::vector<MX> q, quad;
 
     /** \brief Intermediate variables and definitions definitions
      * Interdependencies are allowed but must be non-cyclic.
      */
-    std::vector<SX> i, idef;
+    std::vector<MX> i, idef;
 
     /** \brief Output variables and corresponding definitions
      */
-    std::vector<SX> y, ydef;
+    std::vector<MX> y, ydef;
 
     /** \brief Free controls
      * The trajectories of the free controls are decision variables of the optimal control problem.
      * They are chosen by the optimization algorithm in order to minimize the cost functional.
      */
-    std::vector<SX> u;
+    std::vector<MX> u;
 
     /** \brief Free parameters
      * A free parameter is variables which is constant over time, but whose value is chosen by the
      * optimization algorithm in order to minimize the cost functional.
      */
-    std::vector<SX> p;
+    std::vector<MX> p;
     ///@}
 
     /** \brief Initial conditions
      * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to
      * the ode and/or dae.
      */
-    std::vector<SX> init;
+    std::vector<MX> init;
 
     /// Interval start time
     double t0;
@@ -169,10 +169,10 @@ namespace casadi {
     ///@{
 
     /// Mayer terms in the objective (point terms)
-    std::vector<SX> mterm;
+    std::vector<MX> mterm;
 
     /// Lagrange terms in the objective (integral terms)
-    std::vector<SX> lterm;
+    std::vector<MX> lterm;
     ///@}
 
     /** @name Symbolic modeling
@@ -180,28 +180,28 @@ namespace casadi {
      */
     ///@{
     /// Add a new differential state
-    SX add_x(const std::string& name);
+    MX add_x(const std::string& name);
 
     /// Add a implicit state
-    std::pair<SX, SX> add_s(const std::string& name);
+    std::pair<MX, MX> add_s(const std::string& name);
 
     /// Add a new algebraic variable
-    SX add_z(const std::string& name);
+    MX add_z(const std::string& name);
 
     /// Add a new parameter
-    SX add_p(const std::string& name);
+    MX add_p(const std::string& name);
 
     /// Add a new control
-    SX add_u(const std::string& name);
+    MX add_u(const std::string& name);
 
     /// Add an ordinary differential equation
-    void add_ode(const SX& new_ode);
+    void add_ode(const MX& new_ode);
 
     /// Add a differential-algebraic equation
-    void add_dae(const SX& new_dae);
+    void add_dae(const MX& new_dae);
 
     /// Add an algebraic equation
-    void add_alg(const SX& new_alg);
+    void add_alg(const MX& new_alg);
 
     /// Check if dimensions match
     void sanityCheck() const;
@@ -271,7 +271,7 @@ namespace casadi {
 
     /// Generate code for a particular function
     static void generateFunction(std::ostream &stream, const std::string& fname,
-                                 const std::vector<SX>& f_in, const std::vector<SX>& f_out,
+                                 const std::vector<MX>& f_in, const std::vector<MX>& f_out,
                                  CodeGenerator& gen,
                                  bool fwd=false, bool adj=false, bool foa=false);
 
@@ -281,91 +281,91 @@ namespace casadi {
     ///@}
 
     /// Get variable expression by name
-    SX operator()(const std::string& name) const;
+    MX operator()(const std::string& name) const;
 
     /// Get a derivative expression by name
-    SX der(const std::string& name) const;
+    MX der(const std::string& name) const;
 
     /// Get a derivative expression by non-differentiated expression
-    SX der(const SX& var) const;
+    MX der(const MX& var) const;
 
     /// Get the nominal value by name
     double nominal(const std::string& name) const;
 
     /// Get the nominal value(s) by expression
-    std::vector<double> nominal(const SX& var) const;
+    std::vector<double> nominal(const MX& var) const;
 
     /// Set the nominal value by name
     void setNominal(const std::string& name, double val);
 
     /// Set the nominal value(s) by expression
-    void setNominal(const SX& var, const std::vector<double>& val);
+    void setNominal(const MX& var, const std::vector<double>& val);
 
     /// Get the lower bound by name
     double min(const std::string& name, bool normalized=false) const;
 
     /// Get the lower bound(s) by expression
-    std::vector<double> min(const SX& var, bool normalized=false) const;
+    std::vector<double> min(const MX& var, bool normalized=false) const;
 
     /// Set the lower bound by name
     void setMin(const std::string& name, double val, bool normalized=false);
 
     /// Set the lower bound(s) by expression
-    void setMin(const SX& var, const std::vector<double>& val, bool normalized=false);
+    void setMin(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the upper bound by name
     double max(const std::string& name, bool normalized=false) const;
 
     /// Get the upper bound(s) by expression
-    std::vector<double> max(const SX& var, bool normalized=false) const;
+    std::vector<double> max(const MX& var, bool normalized=false) const;
 
     /// Set the upper bound by name
     void setMax(const std::string& name, double val, bool normalized=false);
 
     /// Set the upper bound(s) by expression
-    void setMax(const SX& var, const std::vector<double>& val, bool normalized=false);
+    void setMax(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the initial guess by name
     double initialGuess(const std::string& name, bool normalized=false) const;
 
     /// Get the initial guess(es) by expression
-    std::vector<double> initialGuess(const SX& var, bool normalized=false) const;
+    std::vector<double> initialGuess(const MX& var, bool normalized=false) const;
 
     /// Set the initial guess by name
     void setInitialGuess(const std::string& name, double val, bool normalized=false);
 
     /// Set the initial guess(es) by expression
-    void setInitialGuess(const SX& var, const std::vector<double>& val, bool normalized=false);
+    void setInitialGuess(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the (optionally normalized) value at time 0 by name
     double start(const std::string& name, bool normalized=false) const;
 
     /// Get the (optionally normalized) value(s) at time 0 by expression
-    std::vector<double> start(const SX& var, bool normalized=false) const;
+    std::vector<double> start(const MX& var, bool normalized=false) const;
 
     /// Set the (optionally normalized) value at time 0 by name
     void setStart(const std::string& name, double val, bool normalized=false);
 
     /// Set the (optionally normalized) value(s) at time 0 by expression
-    void setStart(const SX& var, const std::vector<double>& val, bool normalized=false);
+    void setStart(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the (optionally normalized) derivative value at time 0 by name
     double derivativeStart(const std::string& name, bool normalized=false) const;
 
     /// Get the (optionally normalized) derivative value(s) at time 0 by expression
-    std::vector<double> derivativeStart(const SX& var, bool normalized=false) const;
+    std::vector<double> derivativeStart(const MX& var, bool normalized=false) const;
 
     /// Set the (optionally normalized) derivative value at time 0 by name
     void setDerivativeStart(const std::string& name, double val, bool normalized=false);
 
     /// Set the (optionally normalized) derivative value(s) at time 0 by expression
-    void setDerivativeStart(const SX& var, const std::vector<double>& val, bool normalized=false);
+    void setDerivativeStart(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the unit for a component
     std::string unit(const std::string& name) const;
 
     /// Get the unit given a vector of symbolic variables (all units must be identical)
-    std::string unit(const SX& var) const;
+    std::string unit(const MX& var) const;
 
     /// Set the unit for a component
     void setUnit(const std::string& name, const std::string& val);
@@ -380,7 +380,7 @@ namespace casadi {
     void addVariable(const std::string& name, const Variable& var);
 
     /// Add a new variable: returns corresponding symbolic expression
-    SX addVariable(const std::string& name);
+    MX addVariable(const std::string& name);
 
     ///@{
     /// Access a variable by name
@@ -400,26 +400,26 @@ namespace casadi {
     VarMap varmap_;
 
     /// Read an equation
-    SX readExpr(const XmlNode& odenode);
+    MX readExpr(const XmlNode& odenode);
 
     /// Read a variable
     Variable& readVariable(const XmlNode& node);
 
     /// Get an attribute by expression
     typedef double (SymbolicOCP::*getAtt)(const std::string& name, bool normalized) const;
-    std::vector<double> attribute(getAtt f, const SX& var, bool normalized) const;
+    std::vector<double> attribute(getAtt f, const MX& var, bool normalized) const;
 
     /// Get a symbolic attribute by expression
-    typedef SX (SymbolicOCP::*getAttS)(const std::string& name) const;
-    SX attribute(getAttS f, const SX& var) const;
+    typedef MX (SymbolicOCP::*getAttS)(const std::string& name) const;
+    MX attribute(getAttS f, const MX& var) const;
 
     /// Set an attribute by expression
     typedef void (SymbolicOCP::*setAtt)(const std::string& name, double val, bool normalized);
-    void setAttribute(setAtt f, const SX& var, const std::vector<double>& val, bool normalized);
+    void setAttribute(setAtt f, const MX& var, const std::vector<double>& val, bool normalized);
 
     /// Set a symbolic attribute by expression
-    typedef void (SymbolicOCP::*setAttS)(const std::string& name, const SX& val);
-    void setAttribute(setAttS f, const SX& var, const SX& val);
+    typedef void (SymbolicOCP::*setAttS)(const std::string& name, const MX& val);
+    void setAttribute(setAttS f, const MX& var, const MX& val);
 
 #endif // SWIG
 

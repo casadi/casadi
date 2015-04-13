@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   Variable::Variable(const std::string& name) {
-    this->v = SX::sym(name);
-    this->d = SX::sym("der_" + name);
+    this->v = MX::sym(name);
+    this->d = MX::sym("der_" + name);
     this->variability = CONTINUOUS;
     this->causality = INTERNAL;
     this->category = CAT_UNKNOWN;

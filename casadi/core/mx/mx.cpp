@@ -1430,8 +1430,8 @@ namespace casadi {
                           "Mismatch in the number of expression to substitute.");
     for (int k=0; k<v.size(); ++k) {
       casadi_assert_message(v[k].isSymbolic(), "Variable " << k << " is not symbolic");
-      casadi_assert_message(v[k].sparsity() == vdef[k].sparsity(),
-                            "Inconsistent sparsity for variable " << k << ".");
+      casadi_assert_message(v[k].shape() == vdef[k].shape(),
+                            "Inconsistent shape for variable " << k << ".");
     }
     casadi_assert_message(reverse==false, "Not implemented");
 

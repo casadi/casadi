@@ -212,8 +212,8 @@ class OCPtests(casadiTestCase):
     self.assertTrue(len(ocp.lterm)==0)
     self.assertTrue(len(ocp.mterm)==1)
     m = vertcat(ocp.mterm)
-    self.assertTrue(isinstance(m,SX))
-    self.assertTrue(isinstance(ocp.t,SX))
+    self.assertTrue(isinstance(m,MX))
+    self.assertTrue(isinstance(ocp.t,MX))
     self.assertEquals(str(m),'cost')
     print dir(ocp)
     self.assertEquals(len(ocp.dae),3)
@@ -222,7 +222,7 @@ class OCPtests(casadiTestCase):
     c = ocp("cstr.c")
     T = ocp("cstr.T")
     cost = ocp("cost")
-    self.assertTrue(isinstance(c,SX))
+    self.assertTrue(isinstance(c,MX))
     
     self.assertEquals(c.getName(),"cstr.c")
     self.assertEquals(T.getName(),"cstr.T")
@@ -245,7 +245,7 @@ class OCPtests(casadiTestCase):
     print ocp.init
     print c,T,cost
     #print c.atTime(0)
-    f=SXFunction([vertcat([c,T,cost])],[vertcat(ocp.init)])
+    f=MXFunction([vertcat([c,T,cost])],[vertcat(ocp.init)])
     f.init()
     return 
     f.evaluate()
