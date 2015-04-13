@@ -610,6 +610,9 @@ namespace casadi {
   }
 
   void SymbolicOCP::scaleVariables() {
+    // Assert correctness
+    sanityCheck();
+
     // Gather variables and expressions to replace
     vector<SX> v_id, v_rep;
     for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
@@ -633,33 +636,32 @@ namespace casadi {
 
     // Collect all expressions to be replaced
     vector<SX> ex;
-    ex.push_back(vertcat(this->ode));
-    ex.push_back(vertcat(this->dae));
-    ex.push_back(vertcat(this->alg));
-    ex.push_back(vertcat(this->quad));
-    ex.push_back(vertcat(this->idef));
-    ex.push_back(vertcat(this->ydef));
-    ex.push_back(vertcat(this->init));
-    ex.push_back(vertcat(this->mterm));
-    ex.push_back(vertcat(this->lterm));
-
+    ex.insert(ex.end(), this->ode.begin(), this->ode.end());
+    ex.insert(ex.end(), this->dae.begin(), this->dae.end());
+    ex.insert(ex.end(), this->alg.begin(), this->alg.end());
+    ex.insert(ex.end(), this->quad.begin(), this->quad.end());
+    ex.insert(ex.end(), this->idef.begin(), this->idef.end());
+    ex.insert(ex.end(), this->ydef.begin(), this->ydef.end());
+    ex.insert(ex.end(), this->init.begin(), this->init.end());
+    ex.insert(ex.end(), this->mterm.begin(), this->mterm.end());
+    ex.insert(ex.end(), this->lterm.begin(), this->lterm.end());
     // Substitute all at once (more efficient since they may have common subexpressions)
     ex = substitute(ex, v_id, v_rep);
 
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
-    this->ode = vertsplit(*it++ / nominal(vertcat(this->x)));
-    this->dae = vertsplit(*it++);
-    this->alg = vertsplit(*it++);
-    this->quad = vertsplit(*it++ / nominal(vertcat(this->q)));
-    this->idef = vertsplit(*it++ / nominal(vertcat(this->i)));
-    this->ydef = vertsplit(*it++ / nominal(vertcat(this->y)));
-    this->init = vertsplit(*it++);
-    this->mterm = vertsplit(*it++);
-    this->lterm = vertsplit(*it++);
+    for (int i=0; i<this->x.size(); ++i) this->ode[i] = *it++ / nominal(this->x[i]);
+    for (int i=0; i<this->s.size(); ++i) this->dae[i] = *it++;
+    for (int i=0; i<this->z.size(); ++i) this->alg[i] = *it++;
+    for (int i=0; i<this->q.size(); ++i) this->quad[i] = *it++ / nominal(this->q[i]);
+    for (int i=0; i<this->i.size(); ++i) this->idef[i] = *it++ / nominal(this->i[i]);
+    for (int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++ / nominal(this->y[i]);
+    for (int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
+    for (int i=0; i<this->mterm.size(); ++i) this->mterm[i] = *it++;
+    for (int i=0; i<this->lterm.size(); ++i) this->lterm[i] = *it++;
     casadi_assert(it==ex.end());
 
-    // Save the substituted expressions
+    // Nominal value is 1 after scaling
     for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
       it->second.nominal=1;
     }
@@ -1183,7 +1185,7 @@ namespace casadi {
                           "s and sdot have different lengths");
     casadi_assert_message(this->s.size()==this->dae.size(),
                           "s and dae have different lengths");
-    for (int i=0; i<this->x.size(); ++i) {
+    for (int i=0; i<this->s.size(); ++i) {
       casadi_assert_message(this->s[i].isSymbolic(), "Non-symbolic state s");
       casadi_assert_message(this->s[i].shape()==this->sdot[i].shape(),
                             "sdot has wrong dimensions");
@@ -1221,7 +1223,7 @@ namespace casadi {
     // Output equations
     casadi_assert_message(this->y.size()==this->ydef.size(),
                           "y and ydef have different lengths");
-    for (int i=0; i<this->i.size(); ++i) {
+    for (int i=0; i<this->y.size(); ++i) {
       casadi_assert_message(this->y[i].isSymbolic(), "Non-symbolic output y");
       casadi_assert_message(this->y[i].shape()==this->ydef[i].shape(),
                             "ydef has wrong dimensions");

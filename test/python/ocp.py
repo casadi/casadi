@@ -211,7 +211,7 @@ class OCPtests(casadiTestCase):
     #self.assertFalse(ocp.tf_free)
     self.assertTrue(len(ocp.lterm)==0)
     self.assertTrue(len(ocp.mterm)==1)
-    m = ocp.mterm
+    m = vertcat(ocp.mterm)
     self.assertTrue(isinstance(m,SX))
     self.assertTrue(isinstance(ocp.t,SX))
     self.assertEquals(str(m),'cost')
