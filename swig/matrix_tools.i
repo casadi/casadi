@@ -112,6 +112,7 @@ MatType unite(const MatType& A, const MatType& B);
 MatType densify(const MatType& x);
 MatType simplify(const MatType &x);
 MatType if_else(const MatType &cond, const MatType &if_true, const MatType &if_false);
+bool dependsOn(const MatType& f, const MatType &arg);
 %enddef
 
 %define MATRIX_DECL(MatType...)

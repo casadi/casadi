@@ -180,11 +180,6 @@ namespace casadi {
   /** \brief  Get the sparsity pattern of a matrix */
   inline SX spy(const SX& A) { return A.zz_spy();}
 
-  /** \brief Check if expression depends on the argument
-    The argument must be symbolic
-  */
-  inline bool dependsOn(const SX& f, const SX &arg) { return f.zz_dependsOn(arg); }
-
   /** \brief Get all symbols contained in the supplied expression
    * Get all symbols on which the supplied expression depends
    * \see SXFunction::getFree()

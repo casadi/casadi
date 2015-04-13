@@ -468,9 +468,9 @@ namespace casadi {
     void zz_hessian(const MX &arg, MX &H, MX &g) const;
     MX zz_det() const;
     MX zz_inv() const;
+    bool zz_dependsOn(const MX &arg) const;
     std::vector<MX> zz_getSymbols() const;
     static std::vector<MX> zz_getSymbols(const std::vector<MX>& e);
-    bool zz_dependsOn(const std::vector<MX> &arg) const;
     static MX zz_matrix_expand(const MX& e,
                                const std::vector<MX> &boundary = std::vector<MX>());
     static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,

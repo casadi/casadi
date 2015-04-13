@@ -1384,11 +1384,10 @@ namespace casadi {
 
   template<>
   bool SX::zz_dependsOn(const SX &arg) const {
-    const SX& ex = *this;
-    if (ex.nnz()==0) return false;
+    if (nnz()==0) return false;
 
     // Construct a temporary algorithm
-    SXFunction temp(arg, ex);
+    SXFunction temp(arg, *this);
     temp.init();
     temp.spInit(true);
 

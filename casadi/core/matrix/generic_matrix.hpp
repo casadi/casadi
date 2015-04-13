@@ -376,6 +376,13 @@ namespace casadi {
                                   const MatType &if_false) {
       return cond.zz_if_else(if_true, if_false);
     }
+
+    /** \brief Check if expression depends on the argument
+        The argument must be symbolic
+    */
+    inline friend bool dependsOn(const MatType& f, const MatType &arg) {
+      return f.zz_dependsOn(arg);
+    }
     /** @} */
 
 #endif // !SWIG || DOXYGEN

@@ -156,11 +156,6 @@ namespace casadi {
     return MX::zz_getSymbols(e);
   }
 
-  /** \brief Check if expression depends on any of the arguments
-    The arguments must be symbolic
-  */
-  inline bool dependsOn(const MX& ex, const std::vector<MX> &arg) { return ex.zz_dependsOn(arg);}
-
   /** \brief Expand MX graph to SXFunction call
   *
   *  Expand the given expression e, optionally
