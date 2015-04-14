@@ -94,32 +94,32 @@ namespace casadi {
 
     /** \brief Differential states defined by ordinary differential equations (ODE)
      */
-    std::vector<MX> x, ode;
+    std::vector<MX> x, ode, lam_ode;
 
     /** \brief Differential-algebraic equation (DAE) with corresponding state vector,
      * state derivatives.
      */
-    std::vector<MX> s, sdot, dae;
+    std::vector<MX> s, sdot, dae, lam_dae;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * \a alg and \a z have matching dimensions and
      * <tt>0 == alg(z, ...)</tt> implicitly defines \a z.
      */
-    std::vector<MX> z, alg;
+    std::vector<MX> z, alg, lam_alg;
 
     /** \brief Quadrature states
      * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
      */
-    std::vector<MX> q, quad;
+    std::vector<MX> q, quad, lam_quad;
 
     /** \brief Intermediate variables and definitions definitions
      * Interdependencies are allowed but must be non-cyclic.
      */
-    std::vector<MX> i, idef;
+    std::vector<MX> i, idef, lam_idef;
 
     /** \brief Output variables and corresponding definitions
      */
-    std::vector<MX> y, ydef;
+    std::vector<MX> y, ydef, lam_ydef;
 
     /** \brief Free controls
      * The trajectories of the free controls are decision variables of the optimal control problem.
@@ -195,13 +195,22 @@ namespace casadi {
     MX add_u(const std::string& name);
 
     /// Add an ordinary differential equation
-    void add_ode(const MX& new_ode);
+    void add_ode(const MX& new_ode, const std::string& name=std::string());
 
     /// Add a differential-algebraic equation
-    void add_dae(const MX& new_dae);
+    void add_dae(const MX& new_dae, const std::string& name=std::string());
 
     /// Add an algebraic equation
-    void add_alg(const MX& new_alg);
+    void add_alg(const MX& new_alg, const std::string& name=std::string());
+
+    /// Add a quadrature equation
+    void add_quad(const MX& new_quad, const std::string& name=std::string());
+
+    /// Add an intermediate variable equation
+    void add_idef(const MX& new_idef, const std::string& name=std::string());
+
+    /// Add an output equation
+    void add_ydef(const MX& new_ydef, const std::string& name=std::string());
 
     /// Check if dimensions match
     void sanityCheck() const;

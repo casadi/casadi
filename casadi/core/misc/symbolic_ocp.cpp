@@ -1132,16 +1132,46 @@ namespace casadi {
     return new_u;
   }
 
-  void SymbolicOCP::add_ode(const MX& new_ode) {
+  void SymbolicOCP::add_ode(const MX& new_ode, const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_ode(new_ode, "ode" + CodeGenerator::numToString(this->ode.size()));
     this->ode.push_back(new_ode);
+    this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
   }
 
-  void SymbolicOCP::add_dae(const MX& new_dae) {
+  void SymbolicOCP::add_dae(const MX& new_dae, const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_dae(new_dae, "dae" + CodeGenerator::numToString(this->dae.size()));
     this->dae.push_back(new_dae);
+    this->lam_dae.push_back(MX::sym("lam_" + name, new_dae.sparsity()));
   }
 
-  void SymbolicOCP::add_alg(const MX& new_alg) {
+  void SymbolicOCP::add_alg(const MX& new_alg, const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_alg(new_alg, "alg" + CodeGenerator::numToString(this->alg.size()));
     this->alg.push_back(new_alg);
+    this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
+  }
+
+  void SymbolicOCP::add_quad(const MX& new_quad, const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_quad(new_quad, "quad" + CodeGenerator::numToString(this->quad.size()));
+    this->quad.push_back(new_quad);
+    this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
+  }
+
+  void SymbolicOCP::add_idef(const MX& new_idef, const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_idef(new_idef, "idef" + CodeGenerator::numToString(this->idef.size()));
+    this->idef.push_back(new_idef);
+    this->lam_idef.push_back(MX::sym("lam_" + name, new_idef.sparsity()));
+  }
+
+  void SymbolicOCP::add_ydef(const MX& new_ydef, const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_ydef(new_ydef, "ydef" + CodeGenerator::numToString(this->ydef.size()));
+    this->ydef.push_back(new_ydef);
+    this->lam_ydef.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
   }
 
   void SymbolicOCP::sanityCheck() const {
@@ -2086,12 +2116,12 @@ namespace casadi {
 
     // Introduce lagrange multipliers
     vector<MX> lam;
-    lam.push_back(MX::sym("lam_ode", vertcat(this->ode).sparsity()));
-    lam.push_back(MX::sym("lam_dae", vertcat(this->dae).sparsity()));
-    lam.push_back(MX::sym("lam_alg", vertcat(this->alg).sparsity()));
-    lam.push_back(MX::sym("lam_quad", vertcat(this->quad).sparsity()));
-    lam.push_back(MX::sym("lam_idef", vertcat(this->idef).sparsity()));
-    lam.push_back(MX::sym("lam_ydef", vertcat(this->ydef).sparsity()));
+    lam.insert(lam.end(), this->lam_ode.begin(), this->lam_ode.end());
+    lam.insert(lam.end(), this->lam_dae.begin(), this->lam_dae.end());
+    lam.insert(lam.end(), this->lam_alg.begin(), this->lam_alg.end());
+    lam.insert(lam.end(), this->lam_quad.begin(), this->lam_quad.end());
+    lam.insert(lam.end(), this->lam_idef.begin(), this->lam_idef.end());
+    lam.insert(lam.end(), this->lam_ydef.begin(), this->lam_ydef.end());
 
     // Jacobian of all input w.r.t. all outputs
     MX lam_all = vertcat(lam);
