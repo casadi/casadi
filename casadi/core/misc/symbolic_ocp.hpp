@@ -180,19 +180,19 @@ namespace casadi {
      */
     ///@{
     /// Add a new differential state
-    MX add_x(const std::string& name);
+    MX add_x(const std::string& name=std::string());
 
     /// Add a implicit state
-    std::pair<MX, MX> add_s(const std::string& name);
+    std::pair<MX, MX> add_s(const std::string& name=std::string());
 
     /// Add a new algebraic variable
-    MX add_z(const std::string& name);
+    MX add_z(const std::string& name=std::string());
 
     /// Add a new parameter
-    MX add_p(const std::string& name);
+    MX add_p(const std::string& name=std::string());
 
     /// Add a new control
-    MX add_u(const std::string& name);
+    MX add_u(const std::string& name=std::string());
 
     /// Add an ordinary differential equation
     void add_ode(const MX& new_ode, const std::string& name=std::string());

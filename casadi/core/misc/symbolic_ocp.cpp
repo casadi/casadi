@@ -1101,12 +1101,16 @@ namespace casadi {
   }
 
   MX SymbolicOCP::add_x(const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_x("x" + CodeGenerator::numToString(this->x.size()));
     MX new_x = addVariable(name);
     this->x.push_back(new_x);
     return new_x;
   }
 
   std::pair<MX, MX> SymbolicOCP::add_s(const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_s("s" + CodeGenerator::numToString(this->s.size()));
     Variable v(name);
     addVariable(name, v);
     this->s.push_back(v.v);
@@ -1115,18 +1119,24 @@ namespace casadi {
   }
 
   MX SymbolicOCP::add_z(const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_z("z" + CodeGenerator::numToString(this->z.size()));
     MX new_z = addVariable(name);
     this->z.push_back(new_z);
     return new_z;
   }
 
   MX SymbolicOCP::add_p(const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_p("p" + CodeGenerator::numToString(this->p.size()));
     MX new_p = addVariable(name);
     this->p.push_back(new_p);
     return new_p;
   }
 
   MX SymbolicOCP::add_u(const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_u("u" + CodeGenerator::numToString(this->u.size()));
     MX new_u = addVariable(name);
     this->u.push_back(new_u);
     return new_u;
