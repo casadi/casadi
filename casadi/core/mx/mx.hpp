@@ -491,7 +491,12 @@ namespace casadi {
     *
     *  If y does not evaluate to 1, a runtime error is raised
     */
-    MX attachAssert(const MX& y, const std::string &fail_message="") const;
+    MX attachAssert(const MX& y, const std::string& fail_message="") const;
+
+    /** \brief Monitor an expression
+    * Returns itself, but with the side effect of printing the nonzeros along with a comment
+    */
+    MX monitor(const std::string& comment) const;
 
     /** \brief Set sparse */
     MX setSparse(const Sparsity& sp, bool intersect=false) const;

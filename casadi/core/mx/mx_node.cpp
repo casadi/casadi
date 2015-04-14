@@ -46,6 +46,7 @@
 #include "concat.hpp"
 #include "split.hpp"
 #include "assertion.hpp"
+#include "monitor.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -669,8 +670,16 @@ namespace casadi {
     return true;
   }
 
-  MX MXNode::getAssertion(const MX& y, const std::string &fail_message) const {
+  MX MXNode::getAssertion(const MX& y, const std::string& fail_message) const {
     return MX::create(new Assertion(shared_from_this<MX>(), y, fail_message));
+  }
+
+  MX MXNode::getMonitor(const std::string& comment) const {
+    if (nnz()==0) {
+      return shared_from_this<MX>();
+    } else {
+      return MX::create(new Monitor(shared_from_this<MX>(), comment));
+    }
   }
 
   MX MXNode::getDeterminant() const {

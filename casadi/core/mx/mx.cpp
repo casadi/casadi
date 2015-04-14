@@ -659,6 +659,10 @@ namespace casadi {
     return(*this)->getAssertion(y, fail_message);
   }
 
+  MX MX::monitor(const std::string& comment) const {
+    return(*this)->getMonitor(comment);
+  }
+
   MX MX::zz_exp() const {
     return (*this)->getUnary(OP_EXP);
   }

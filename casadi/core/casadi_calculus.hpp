@@ -137,6 +137,9 @@ namespace casadi {
     // Assertion
     OP_ASSERTION,
 
+    // Monitor
+    OP_MONITOR,
+
     // Norms
     OP_NORM2, OP_NORM1, OP_NORMINF, OP_NORMF,
 

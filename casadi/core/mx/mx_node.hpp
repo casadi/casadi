@@ -379,7 +379,10 @@ namespace casadi {
     virtual MX getNorm1() const;
 
     /// Assertion
-    MX getAssertion(const MX& y, const std::string & fail_message="") const;
+    MX getAssertion(const MX& y, const std::string& fail_message) const;
+
+    /// Monitor
+    MX getMonitor(const std::string& comment) const;
 
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe
