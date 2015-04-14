@@ -165,13 +165,19 @@ xk = [MX.sym("x" + str(k), 2) for k in range(nk+1)]
 uk = [MX.sym("u" + str(k), 1) for k in range(nk)]
 #$ We gather all degrees of freedom of the NLP as well as bounds and initial guess for the decision variable:
 v = []; lbv = []; ubv = []; v0 = []
+#$ Indices corresponding to the different parts of the the variable vector:
+vind = {'x':[], 'u':[]}
+off = 0
 for k in range(nk):
    #$ States
    v.append(xk[k]); lbv.append(lbx); ubv.append(ubx); v0.append(x0)
+   vind['x'].append(range(off, off+2)); off += 2
    #$ Control
    v.append(uk[k]); lbv.append(lbu); ubv.append(ubu); v0.append(u0)
+   vind['u'].append(range(off, off+1)); off += 1
 #$ State at end
 v.append(xk[-1]); lbv.append(lbx); ubv.append(ubx); v0.append(x0)
+vind['x'].append(range(off, off+2)); off += 2
 #$ Concatenate lists
 v = vertcat(v); lbv = vertcat(lbv); ubv = vertcat(ubv); v0 = vertcat(v0)
 #$ Next, let us build up expressions for the objective (cost) function and the nonlinear constraints,
@@ -204,9 +210,9 @@ solver.setInput(0,"ubg")
 solver.evaluate()
 #$ After making sure that the solution was successful, we retrieve the solution:
 v_opt  = solver.getOutput("x")
-x0_opt = v_opt[0::3]
-x1_opt = v_opt[1::3]
-u_opt  = v_opt[2::3]
+x0_opt = v_opt[[vind['x'][k][0] for k in range(nk+1)]]
+x1_opt = v_opt[[vind['x'][k][1] for k in range(nk+1)]]
+u_opt = v_opt[[vind['u'][k][0] for k in range(nk)]]
 #$ Finally, we use the python package \emph{matplotlib} to visualize the solution. matplotlib uses a syntax
 #$ which should look famliar to MATLAB users:
 from pylab import *
