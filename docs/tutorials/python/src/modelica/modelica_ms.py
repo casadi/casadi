@@ -137,10 +137,10 @@ xk = MX.sym("xk",2)
 uk = MX.sym("uk")
 xkj = xk; xkj_L = 0
 for j in range(nj):
-   [k1,k1_L] = ode_fcn.call([xkj,uk])
-   [k2,k2_L] = ode_fcn.call([xkj + h/2*k1,uk]) 
-   [k3,k3_L] = ode_fcn.call([xkj + h/2*k2,uk])
-   [k4,k4_L] = ode_fcn.call([xkj + h*k3,uk])
+   [k1,k1_L] = ode_fcn([xkj,uk])
+   [k2,k2_L] = ode_fcn([xkj + h/2*k1,uk])
+   [k3,k3_L] = ode_fcn([xkj + h/2*k2,uk])
+   [k4,k4_L] = ode_fcn([xkj + h*k3,uk])
    xkj   += h/6 * (k1   + 2*k2   + 2*k3   + k4)
    xkj_L += h/6 * (k1_L + 2*k2_L + 2*k3_L + k4_L)
 integrator = MXFunction([xk,uk],[xkj,xkj_L])
@@ -158,33 +158,33 @@ integrator.init()
 #$ $\pm \infty$ if absent and equality constraints are imposed by having upper and lower bounds equal to each other.
 #$ 
 #$ For the direct multiple shooting method, the degrees of freedom of the NLP are the parametrized controls and 
-#$ the state at the beginning of each interval.  Since we have one control and two states and we have nk intervals, 
-#$ there are in total 3*nk intervals.
+#$ the state at the beginning of each interval. We also include the state at the end time.
 #$
-#$ Let us declare a vector-valued CasADi symbolic primitive corresponding to these degrees of freedom:
-v = MX.sym("v",3*nk)
-#$ Next, we split up this $3 \, \texttt{nk}$-by-1 matrix vertically into \texttt{nk} vectors of length 3 and 
-#$ then get expressions for the state and control for each interval:
-vk = vertsplit(v,3)
-xk = [i[:2] for i in vk]
-uk = [i[2]  for i in vk]
-#$ We are now ready to construct the NLP. We begin by getting numerical values for the initial guess as well as
-#$ upper and lower bounds on the decision variable. For simplicity, we shall only impose the state bounds
-#$ at the beginning of each interval:
-lbv = repmat(vertcat((lbx,lbu)),nk,1)
-ubv = repmat(vertcat((ubx,ubu)),nk,1)
-v0 = repmat(vertcat((x0,u0)),nk,1)
+#$ Let us declare symbolic primitives corresponding to these degrees of freedom:
+xk = [MX.sym("x" + str(k), 2) for k in range(nk+1)]
+uk = [MX.sym("u" + str(k), 1) for k in range(nk)]
+#$ We gather all degrees of freedom of the NLP as well as bounds and initial guess for the decision variable:
+v = []; lbv = []; ubv = []; v0 = []
+for k in range(nk):
+   #$ States
+   v.append(xk[k]); lbv.append(lbx); ubv.append(ubx); v0.append(x0)
+   #$ Control
+   v.append(uk[k]); lbv.append(lbu); ubv.append(ubu); v0.append(u0)
+#$ State at end
+v.append(xk[-1]); lbv.append(lbx); ubv.append(ubx); v0.append(x0)
+#$ Concatenate lists
+v = vertcat(v); lbv = vertcat(lbv); ubv = vertcat(ubv); v0 = vertcat(v0)
 #$ Next, let us build up expressions for the objective (cost) function and the nonlinear constraints,
 #$ starting with zero cost and and empty list of constraints:
 J = 0;  eq = []
 #$ We begin by adding to the NLP, the equations corresponding to the initial conditions. For this we
 #$ "call" the above created \verb|init_fcn| with the expression for the state at the first interval:
-[eq0] = init_fcn.call([xk[0]])
+[eq0] = init_fcn([xk[0]])
 eq.append(eq0)
 #$ Next, we loop over the shooting intervals, imposing continuity of the trajectory and summing up the
 #$ the cost contributions:
 for k in range(nk):
-    [xk_end,Jk] = integrator.call([xk[k],uk[k]])
+    [xk_end,Jk] = integrator([xk[k],uk[k]])
     J += Jk
     if k+1<nk: eq.append(xk_end - xk[k+1])
 #$ Now form the NLP callback function and create an NLP solver. We shall use the open-source solver IPOPT
@@ -211,7 +211,7 @@ u_opt  = v_opt[2::3]
 #$ which should look famliar to MATLAB users:
 from pylab import *
 from numpy import *
-tgrid = linspace(0,tf,nk)
+tgrid = linspace(0,tf,nk+1)
 figure(1)
 plot(tgrid,x0_opt)
 title(str(x[0]))
@@ -223,8 +223,7 @@ title(str(x[1]))
 grid()
 show()
 figure(3)
-#step(tgrid,u_opt)
-plot(tgrid,u_opt)
+step(tgrid,vertcat((u_opt[0],u_opt)))
 title(str(u))
 grid()
 show()
