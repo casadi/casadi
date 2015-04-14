@@ -174,17 +174,14 @@ vind = {'x':[], 'u':[]}
 def valloc(n, nv): return range(nv, nv+n), nv+n
 for k in range(nk):
    #$ States
-   v.append(xk[k]); lbv.append(lbx); ubv.append(ubx); v0.append(x0)
    ind, nv = valloc(nx, nv)
-   vind['x'].append(ind)
+   v.append(xk[k]); lbv.append(lbx); ubv.append(ubx); v0.append(x0); vind['x'].append(ind)
    #$ Control
-   v.append(uk[k]); lbv.append(lbu); ubv.append(ubu); v0.append(u0)
    ind, nv = valloc(nu, nv)
-   vind['u'].append(ind)
+   v.append(uk[k]); lbv.append(lbu); ubv.append(ubu); v0.append(u0); vind['u'].append(ind)
 #$ State at end
-v.append(xk[-1]); lbv.append(lbx); ubv.append(ubx); v0.append(x0)
 ind, nv = valloc(nx, nv)
-vind['x'].append(ind)
+v.append(xk[-1]); lbv.append(lbx); ubv.append(ubx); v0.append(x0); vind['x'].append(ind)
 #$ Concatenate lists
 v = vertcat(v); lbv = vertcat(lbv); ubv = vertcat(ubv); v0 = vertcat(v0)
 #$ Next, let us build up expressions for the objective (cost) function and the nonlinear constraints,
