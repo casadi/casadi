@@ -124,7 +124,7 @@ namespace casadi {
 
     // Copy if not inplace
     if (arg[0]!=res[0]) {
-      gen.copyVector(stream, gen.work(arg[0]), nnz(), gen.work(res[0]));
+      stream << "  " << gen.copy_n("w", arg[0], nnz(), "w", res[0]) << endl;
     }
   }
 

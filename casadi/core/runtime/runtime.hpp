@@ -32,7 +32,7 @@
 namespace casadi {
   /// COPY: y <-x
   template<typename real_t>
-  void casadi_copy(int n, const real_t* x, int inc_x, real_t* y, int inc_y);
+  void casadi_copy_n(const real_t* x, int n, real_t* y);
 
   /// SWAP: x <-> y
   template<typename real_t>
@@ -64,7 +64,7 @@ namespace casadi {
 
   /// FILL: x <- alpha
   template<typename real_t>
-  void casadi_fill(int n, real_t alpha, real_t* x, int inc_x);
+  void casadi_fill_n(real_t* x, int n, real_t alpha);
 
   /// Sparse matrix-matrix multiplication: z <- z + x*y
   template<typename real_t>
@@ -126,13 +126,9 @@ namespace casadi {
 namespace casadi {
 
   template<typename real_t>
-  void casadi_copy(int n, const real_t* x, int inc_x, real_t* y, int inc_y) {
+  void casadi_copy_n(const real_t* x, int n, real_t* y) {
     int i;
-    for (i=0; i<n; ++i) {
-      *y = *x;
-      x += inc_x;
-      y += inc_y;
-    }
+    for (i=0; i<n; ++i) *y++ = *x++;
   }
 
   template<typename real_t>
@@ -226,12 +222,9 @@ namespace casadi {
   }
 
   template<typename real_t>
-  void casadi_fill(int n, real_t alpha, real_t* x, int inc_x) {
+  void casadi_fill_n(real_t* x, int n, real_t alpha) {
     int i;
-    for (i=0; i<n; ++i) {
-      *x = alpha;
-      x += inc_x;
-    }
+    for (i=0; i<n; ++i) *x++ = alpha;
   }
 
   template<typename real_t>

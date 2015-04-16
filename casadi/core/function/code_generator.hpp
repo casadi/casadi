@@ -60,7 +60,7 @@ namespace casadi {
     int getDependency(const Function& f) const;
 
     /** \brief Print a constant in a lossless but compact manner */
-    static void printConstant(std::ostream& s, double v);
+    static std::string constant(double v);
 
     /** \brief Codegen casadi_dot */
     std::string casadi_dot(int n, const std::string& x, int inc_x, const std::string& y, int inc_y);
@@ -68,14 +68,14 @@ namespace casadi {
     /** \brief Auxiliary functions */
     enum Auxiliary {
       // BLAS Level 1
-      AUX_COPY,
+      AUX_COPY_N,
       AUX_SWAP,
       AUX_SCAL,
       AUX_AXPY,
       AUX_DOT,
       AUX_NRM2,
       AUX_IAMAX,
-      AUX_FILL,
+      AUX_FILL_N,
       AUX_ASUM,
 
       // Misc
@@ -107,9 +107,13 @@ namespace casadi {
     /** \brief  Print real vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
 
-    /** \brief Copy a vector to another */
-    void copyVector(std::ostream &s, const std::string& arg, std::size_t n, const std::string& res,
-                    const std::string& it="i", bool only_if_exists=false) const;
+    /** \brief Create a copy_n operation */
+    std::string copy_n(const std::string& arg, std::size_t arg_off, std::size_t n,
+                       const std::string& res, std::size_t res_off);
+
+    /** \brief Create a fill_n operation */
+    std::string fill_n(const std::string& res, std::size_t res_off, std::size_t n,
+                       const std::string& v);
 
     /** \brief Assignment */
     static void assign(std::ostream &s, const std::string& lhs, const std::string& rhs);

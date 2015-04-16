@@ -252,9 +252,9 @@ namespace casadi {
 
         // What to store
         if (it->op==OP_CONST) {
-          gen.printConstant(stream, it->d);
+          stream << gen.constant(it->d);
         } else if (it->op==OP_INPUT) {
-          stream << "arg[" << it->i1 << "][" << it->i2 << "]";
+          stream << "arg[" << it->i1 << "] ? arg[" << it->i1 << "][" << it->i2 << "] : 0";
         } else {
           int ndep = casadi_math<double>::ndeps(it->op);
           casadi_math<double>::printPre(it->op, stream);

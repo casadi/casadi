@@ -760,7 +760,7 @@ namespace casadi {
                                                  CodeGenerator& gen) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      gen.copyVector(stream, gen.work(arg[0]), this->nnz(), gen.work(res[0]));
+      stream << "  " << gen.copy_n("w", arg[0], this->nnz(), "w", res[0]) << endl;
     }
 
     // Condegen the indices
@@ -775,12 +775,12 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::generate(std::ostream &stream,
-                                                const std::vector<int>& arg,
-                                                const std::vector<int>& res,
-                                                CodeGenerator& gen) const {
+                                       const std::vector<int>& arg,
+                                       const std::vector<int>& res,
+                                       CodeGenerator& gen) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      gen.copyVector(stream, gen.work(arg[0]), this->nnz(), gen.work(res[0]));
+      stream << "  " << gen.copy_n("w", arg[0], this->nnz(), "w", res[0]) << endl;
     }
 
     // Perform the operation inplace
@@ -792,12 +792,12 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::generate(std::ostream &stream,
-                                                 const std::vector<int>& arg,
-                                                 const std::vector<int>& res,
-                                                 CodeGenerator& gen) const {
+                                        const std::vector<int>& arg,
+                                        const std::vector<int>& res,
+                                        CodeGenerator& gen) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      gen.copyVector(stream, gen.work(arg[0]), this->nnz(), gen.work(res[0]));
+      stream << "  " << gen.copy_n("w", arg[0], this->nnz(), "w", res[0]) << endl;
     }
 
     // Perform the operation inplace

@@ -1188,14 +1188,20 @@ namespace casadi {
 
       // Print the operation
       if (it->op==OP_OUTPUT) {
-        gen.copyVector(stream, CodeGenerator::work(workloc_[it->arg.front()]),
-                       output(it->res.front()).nnz(),
-                       "res[" + CodeGenerator::numToString(it->res.front()) + "]", "i", true);
+        int n = output(it->res.front()).nnz();
+        if (n!=0) {
+          string r = "res[" + CodeGenerator::numToString(it->res.front()) + "]";
+          stream << "  if (" << r << ") "
+                 << gen.copy_n("w", workloc_[it->arg.front()], n, r, 0) << endl;
+        }
       } else if (it->op==OP_INPUT) {
-        std::string arg = "arg[" + CodeGenerator::numToString(it->arg.at(0)) + "]";
-        if (it->arg.at(2)!=0) arg += "+" + CodeGenerator::numToString(it->arg.at(2));
-        gen.copyVector(stream, arg, it->data.nnz(),
-                       CodeGenerator::work(workloc_[it->res.front()]), "i", false);
+        int n = it->data.nnz();
+        if (n!=0) {
+          std::string arg = "arg[" + CodeGenerator::numToString(it->arg.at(0)) + "]";
+          int i = workloc_[it->res.front()];
+          stream << "  if (" << arg << ") " << gen.copy_n(arg, it->arg.at(2), n, "w", i)
+                 << " else " << gen.fill_n("w", i, n, "0") << endl;
+        }
       } else {
         // Get the names of the operation arguments
         arg.resize(it->arg.size());

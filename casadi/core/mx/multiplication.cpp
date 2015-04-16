@@ -122,7 +122,7 @@ namespace casadi {
                                 CodeGenerator& gen) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      gen.copyVector(stream, gen.work(arg[0]), nnz(), gen.work(res[0]));
+      stream << "  " << gen.copy_n("w", arg[0], nnz(), "w", res[0]) << endl;
     }
 
     // Perform sparse matrix multiplication
@@ -139,7 +139,7 @@ namespace casadi {
                                               CodeGenerator& gen) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      gen.copyVector(stream, gen.work(arg[0]), nnz(), gen.work(res[0]));
+      stream << "  " << gen.copy_n("w", arg[0], nnz(), "w", res[0]) << endl;
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();

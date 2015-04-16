@@ -128,7 +128,7 @@ namespace casadi {
     s << "d " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
-      printConstant(s, v[i]);
+      s << constant(v[i]);
     }
     s << "};" << endl;
   }
@@ -258,8 +258,8 @@ namespace casadi {
 
     // Add the appropriate function
     switch (f) {
-    case AUX_COPY:
-      auxiliaries_ << codegen_str_copy << endl;
+    case AUX_COPY_N:
+      auxiliaries_ << codegen_str_copy_n << endl;
       break;
     case AUX_SWAP:
       auxiliaries_ << codegen_str_swap << endl;
@@ -282,8 +282,8 @@ namespace casadi {
     case AUX_NRM2:
       auxiliaries_ << codegen_str_nrm2 << endl;
       break;
-    case AUX_FILL:
-      auxiliaries_ << codegen_str_fill << endl;
+    case AUX_FILL_N:
+      auxiliaries_ << codegen_str_fill_n << endl;
       break;
     case AUX_MM_SPARSE:
       auxiliaries_ << codegen_str_mm_sparse << endl;
@@ -295,7 +295,6 @@ namespace casadi {
       auxSign();
       break;
     case AUX_PROJECT:
-      addAuxiliary(AUX_COPY);
       auxiliaries_ << codegen_str_project << endl;
       break;
     case AUX_TRANS:
@@ -314,7 +313,8 @@ namespace casadi {
     auxiliaries_ << "#define sign(x) casadi_sign(x)" << endl << endl;
   }
 
-  void CodeGenerator::printConstant(std::ostream& s, double v) {
+  std::string CodeGenerator::constant(double v) {
+    stringstream s;
     if (isnan(v)) {
       s << "NAN";
     } else if (isinf(v)) {
@@ -324,44 +324,58 @@ namespace casadi {
       int v_int(v);
       if (v_int==v) {
         // Print integer
-        s << v_int << ".0";
+        s << v_int << ".";
       } else {
         // Print real
+        std::ios_base::fmtflags fmtfl = s.flags(); // get current format flags
         s << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) << v;
+        s.flags(fmtfl); // reset current format flags
       }
     }
+    return s.str();
   }
 
-  void CodeGenerator::copyVector(std::ostream &s, const std::string& arg, std::size_t n,
-                                 const std::string& res, const std::string& it,
-                                 bool only_if_exists) const {
-    // Quick return if nothing to do
-    if (n==0) return;
-
-    // Indent
-    s << "  ";
-
-    // Print condition
-    if (only_if_exists) {
-      s << "if (" << res << "!=0) ";
-    }
-
+  std::string CodeGenerator::copy_n(const std::string& arg, std::size_t arg_off,
+                                    std::size_t n, const std::string& res, std::size_t res_off) {
+    stringstream s;
+    // inline if scalar
     if (n==1) {
-      // Simplify if scalar assignment
-      s << "*(" << res << ")=*(" << arg << ");" << endl;
+      s << res << "[" << res_off << "] = " << arg << "[" << arg_off << "];";
     } else {
-      // For loop
-      s << "for (" << it << "=0, rr=" << res << ", cs=" << arg << "; " << it
-        << "<" << n << "; ++" << it << ") *rr++=*cs++;" << endl;
+      // Handle offsets with recursion
+      if (arg_off!=0) return copy_n(arg+"+"+numToString(arg_off), 0, n, res, res_off);
+      if (res_off!=0) return copy_n(arg, arg_off, n, res+"+"+numToString(res_off), 0);
+
+      // Perform operation
+      addAuxiliary(AUX_COPY_N);
+      s << "casadi_copy_n(" << arg << ", " << n << ", " << res << ");";
     }
+    return s.str();
+  }
+
+  std::string CodeGenerator::fill_n(const std::string& res, std::size_t res_off,
+                                    std::size_t n, const std::string& v) {
+    stringstream s;
+    // Inline if scalar
+    if (n==1) {
+      s << res << "[" << res_off << "] = " << v << ";";
+    } else {
+      // Handle offset with recursion
+      if (res_off!=0) return fill_n(res+"+"+numToString(res_off), 0, n, v);
+
+      // Perform operation
+      addAuxiliary(AUX_FILL_N);
+      s << "casadi_fill_n(" << res << ", " << n << ", " << v << ");";
+    }
+    return s.str();
   }
 
   std::string CodeGenerator::casadi_dot(int n, const std::string& x, int inc_x,
                                         const std::string& y, int inc_y) {
     addAuxiliary(AUX_DOT);
-    stringstream ss;
-    ss << "casadi_dot(" << n << ", " << x << ", " << inc_x << ", " << y << ", " << inc_y << ")";
-    return ss.str();
+    stringstream s;
+    s << "casadi_dot(" << n << ", " << x << ", " << inc_x << ", " << y << ", " << inc_y << ")";
+    return s.str();
   }
 
 } // namespace casadi

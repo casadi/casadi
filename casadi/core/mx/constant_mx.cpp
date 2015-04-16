@@ -81,7 +81,7 @@ namespace casadi {
     int ind = gen.getConstant(x_.data(), true);
 
     // Copy the constant to the work vector
-    gen.copyVector(stream, "c"+gen.numToString(ind), nnz(), gen.work(res.at(0)), "i", false);
+    stream << "  " << gen.copy_n("c"+gen.numToString(ind), 0, nnz(), "w", res[0]) << endl;
   }
 
   bool ConstantMX::__nonzero__() const {

@@ -494,14 +494,7 @@ namespace casadi {
   void Constant<Value>::generate(std::ostream &stream, const std::vector<int>& arg,
                                           const std::vector<int>& res,
                                           CodeGenerator& gen) const {
-    // Copy the constant to the work vector
-    stream << "  for (i=0, rr=" << gen.work(res.at(0)) << "; i<" << sparsity().nnz()
-           << "; ++i) *rr++=";
-    std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
-    // full precision NOTE: hex better?
-    stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
-    stream << v_.value << ";" << std::endl;
-    stream.flags(fmtfl); // reset current format flags
+    stream << "  " << gen.fill_n("w", res[0], nnz(), gen.constant(v_.value)) << std::endl;
   }
 
   template<typename Value>
