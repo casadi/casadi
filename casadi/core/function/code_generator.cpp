@@ -315,13 +315,20 @@ namespace casadi {
   }
 
   void CodeGenerator::printConstant(std::ostream& s, double v) {
-    int v_int(v);
-    if (v_int==v) {
-      // Print integer
-      s << v_int << ".0";
+    if (isnan(v)) {
+      s << "NAN";
+    } else if (isinf(v)) {
+      if (v<0) s << "-";
+      s << "INFINITY";
     } else {
-      // Print real
-      s << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) << v;
+      int v_int(v);
+      if (v_int==v) {
+        // Print integer
+        s << v_int << ".0";
+      } else {
+        // Print real
+        s << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) << v;
+      }
     }
   }
 
