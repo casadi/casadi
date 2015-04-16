@@ -1952,11 +1952,13 @@ namespace casadi {
     f.setOption("name", fname);
     f.init();
     f.generateFunction(stream, fname, "double", gen);
+    size_t ni, nr;
+    f.nTmp(ni, nr);
 
-    // No work vector needed for now (MXFunction)
+    // Size of work vectors needed
     stream << "void " << fname << "_nwork(int *ni, int *nr) {" << endl;
-    stream << "  if (ni) *ni = 0;" << endl;
-    stream << "  if (nr) *nr = 0;" << endl;
+    stream << "  if (ni) *ni = " << ni << ";" << endl;
+    stream << "  if (nr) *nr = " << nr << ";" << endl;
     stream << "}" << endl << endl;
 
     // Forward mode directional derivative
