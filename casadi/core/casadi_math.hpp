@@ -459,8 +459,8 @@ inline void casadi_math<T>::printName(unsigned char op, std::ostream &stream) {
     case OP_NEG:                 stream << "neg";                 break;
     case OP_EXP:                 stream << "exp";                 break;
     case OP_LOG:                 stream << "log";                 break;
+    case OP_CONSTPOW:
     case OP_POW:                 stream << "pow";                 break;
-    case OP_CONSTPOW:            stream << "constpow";            break;
     case OP_SQRT:                stream << "sqrt";                break;
     case OP_SQ:                  stream << "sq";                  break;
     case OP_TWICE:               stream << "twice";               break;
