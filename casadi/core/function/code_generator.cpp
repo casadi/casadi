@@ -360,7 +360,7 @@ namespace casadi {
         << "    } else {" << endl
         << "      for (c=0; c<ncol; ++c) {" << endl
         << "        for (k=colind[c]; k<colind[c+1]; ++k) {" << endl
-        << "          y[k] = tr ? p_data[c+row[k]*ncol] : p_data[row[k]+c*nrow];" << endl
+        << "          y[k] = p_data[row[k]+c*nrow];" << endl
         << "        }" << endl
         << "      }" << endl
         << "    }" << endl
