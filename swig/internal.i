@@ -1903,7 +1903,7 @@
 %exception  casadi::MXNode::getAddNonzeros(const MX &y, const std::vector< int > &nz) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MXNode::getAssertion(const MX &y, const std::string &fail_message="") const  {
+%exception  casadi::MXNode::getAssertion(const MX &y, const std::string &fail_message) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getAssign(const MX &y, const Slice &i, const Slice &j) const  {
@@ -1952,6 +1952,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getMatrixValue() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MXNode::getMonitor(const std::string &comment) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MXNode::getMultiplication(const MX &y, const MX &z) const  {
@@ -2897,6 +2900,30 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MinusOneSX::isMinusOne() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Monitor::clone() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Monitor::evalAdj(const std::vector< std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Monitor::evalFwd(const std::vector< std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Monitor::evalMX(const std::vector< MX > &arg, std::vector< MX > &res) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Monitor::generate(std::ostream &stream, const std::vector< int > &arg, const std::vector< int > &res, CodeGenerator &gen) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Monitor::getOp() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Monitor::numInplace() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Monitor::printPart(std::ostream &stream, int part) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MultipleOutput::getOutput(int oind) const  {
@@ -5273,6 +5300,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::MinusOneSX::MinusOneSX() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::Monitor::Monitor(const MX &x, const std::string &comment) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::MultipleOutput::MultipleOutput() {
