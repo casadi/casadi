@@ -113,14 +113,14 @@ namespace casadi {
                          const std::vector<int>& res, CodeGenerator& gen) const {
     // Print comment
     gen.addInclude("stdio.h");
-    stream << "#ifndef NDEBUG" << endl;
+    //    stream << "#ifndef NDEBUG" << endl;
     stream << "  printf(\"" << comment_ << "\\n[\");" << endl;
     stream << "  for (i=0, rr=" << gen.work(arg[0]) << "; i!=" << nnz() << "; ++i) {" << endl;
     stream << "    if (i!=0) printf(\", \");" << endl;
     stream << "    printf(\"%g\", *rr++);" << endl;
     stream << "  }" << endl;
     stream << "  printf(\"]\\n\");" << endl;
-    stream << "#endif // NDEBUG" << endl;
+    //    stream << "#endif // NDEBUG" << endl;
 
     // Copy if not inplace
     if (arg[0]!=res[0]) {
