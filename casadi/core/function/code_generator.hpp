@@ -37,6 +37,8 @@ namespace casadi {
 
   class CASADI_EXPORT CodeGenerator {
   public:
+    /// Constructor
+    CodeGenerator(bool mex=false) : mex_(mex) {}
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path = false);
@@ -133,6 +135,13 @@ namespace casadi {
     /** \brief Assignment */
     static void assign(std::ostream &s, const std::string& lhs, const std::string& rhs);
 
+    /** \brief Printf */
+    std::string printf(const std::string& str,
+                       const std::vector<std::string>& arg=std::vector<std::string>());
+    std::string printf(const std::string& str, const std::string& arg1);
+    std::string printf(const std::string& str, const std::string& arg1, const std::string& arg2);
+    std::string printf(const std::string& str, const std::string& arg1, const std::string& arg2,
+                       const std::string& arg3);
   private:
 
     /// SQUARE
@@ -143,6 +152,8 @@ namespace casadi {
 
     //  private:
   public:
+    // Are we creating a MEX file?
+    bool mex_;
 
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes_;

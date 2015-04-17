@@ -477,5 +477,43 @@ namespace casadi {
     return s.str();
   }
 
+  std::string CodeGenerator::printf(const std::string& str, const std::vector<std::string>& arg) {
+    stringstream s;
+    if (mex_) {
+      addInclude("mex.h");
+      s << "mexPrintf";
+    } else {
+      addInclude("stdio.h");
+      s << "printf";
+    }
+    s << "(\"" << str << "\"";
+    for (int i=0; i<arg.size(); ++i) s << ", " << arg[i];
+    s << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::printf(const std::string& str, const std::string& arg1) {
+    std::vector<std::string> arg;
+    arg.push_back(arg1);
+    return printf(str, arg);
+  }
+
+  std::string CodeGenerator::printf(const std::string& str, const std::string& arg1,
+                                    const std::string& arg2) {
+    std::vector<std::string> arg;
+    arg.push_back(arg1);
+    arg.push_back(arg2);
+    return printf(str, arg);
+  }
+
+  std::string CodeGenerator::printf(const std::string& str, const std::string& arg1,
+                                    const std::string& arg2, const std::string& arg3) {
+    std::vector<std::string> arg;
+    arg.push_back(arg1);
+    arg.push_back(arg2);
+    arg.push_back(arg3);
+    return printf(str, arg);
+  }
+
 } // namespace casadi
 
