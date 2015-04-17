@@ -2145,7 +2145,13 @@ namespace casadi {
       // Work vectors, including input buffers
       size_t ni, nr;
       nTmp(ni, nr);
-      int i_nnz = getNumInputNonzeros();
+      int i_nnz = 0;
+      for (int i=0; i<n_in; ++i) {
+        const Sparsity& s = input(i).sparsity();
+        i_nnz += s.nnz();
+        nr = max(nr, static_cast<size_t>(s.size1())); // To be able to copy a column
+        nr = max(nr, static_cast<size_t>(s.size2())); // To be able to copy a row
+      }
       nr += i_nnz;
       stream << "  int iw[" << ni << "];" << endl;
       stream << "  d w[" << nr << "];" << endl;

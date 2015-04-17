@@ -341,15 +341,26 @@ namespace casadi {
         << "      if (!tr) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\\"casadi_from_mex\\\""
         << " failed: Dimension mismatch.\");" << endl
         << "    }" << endl
+        << "    int r,c,k;" << endl
         << "    if (is_sparse) {" << endl
-        << "      mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\\"casadi_from_mex\\\" failed: "
-        << "Sparse assign not implemented.\");" << endl
+        << "      if (tr) {" << endl
+        << "        for (c=0; c<ncol; ++c)" << endl
+        << "          for (k=colind[c]; k<colind[c+1]; ++k) w[row[k]+c*nrow]=0;" << endl
+        << "        for (c=0; c<p_ncol; ++c)" << endl
+        << "          for (k=Jc[c]; k<Jc[c+1]; ++k) w[c+Ir[k]*p_ncol] = p_data[k];" << endl
+        << "        for (c=0; c<ncol; ++c)" << endl
+        << "          for (k=colind[c]; k<colind[c+1]; ++k) y[k] = w[row[k]+c*nrow];" << endl
+        << "      } else {" << endl
+        << "        for (c=0; c<ncol; ++c) {" << endl
+        << "          for (k=colind[c]; k<colind[c+1]; ++k) w[row[k]]=0;" << endl
+        << "          for (k=Jc[c]; k<Jc[c+1]; ++k) w[Ir[k]]=p_data[k];" << endl
+        << "          for (k=colind[c]; k<colind[c+1]; ++k) y[k]=w[row[k]];" << endl
+        << "        }" << endl
+        << "      }" << endl
         << "    } else {" << endl
-        << "      int r,c,k;" << endl
         << "      for (c=0; c<ncol; ++c) {" << endl
         << "        for (k=colind[c]; k<colind[c+1]; ++k) {" << endl
-        << "          r=row[k];" << endl
-        << "          y[k] = tr ? p_data[c+r*ncol] : p_data[r+c*nrow];" << endl
+        << "          y[k] = tr ? p_data[c+row[k]*ncol] : p_data[row[k]+c*nrow];" << endl
         << "        }" << endl
         << "      }" << endl
         << "    }" << endl

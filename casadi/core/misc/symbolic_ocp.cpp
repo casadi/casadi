@@ -1951,7 +1951,7 @@ namespace casadi {
     MXFunction f(f_in, f_out);
     f.setOption("name", fname);
     f.init();
-    f.generateFunction(stream, fname, "double", gen);
+    f.generateFunction(stream, fname, "double", gen, gen.mex_);
     size_t ni, nr;
     f.nTmp(ni, nr);
 
@@ -1965,7 +1965,7 @@ namespace casadi {
     if (fwd) {
       MXFunction f_fwd = shared_cast<MXFunction>(f.derForward(1));
       generateFunction(stream, fname+"_fwd",
-                       f_fwd.inputExpr(), f_fwd.outputExpr(), gen);
+                       f_fwd.inputExpr(), f_fwd.outputExpr(), gen, gen.mex_);
     }
 
     // Reverse mode mode directional derivative
@@ -1973,13 +1973,13 @@ namespace casadi {
       MXFunction f_adj = shared_cast<MXFunction>(f.derReverse(1));
       if (adj) {
         generateFunction(stream, fname+"_adj",
-                         f_adj.inputExpr(), f_adj.outputExpr(), gen);
+                         f_adj.inputExpr(), f_adj.outputExpr(), gen, gen.mex_);
       }
       // Forward-over-reverse mode directional derivative
       if (foa) {
         MXFunction f_foa = shared_cast<MXFunction>(f_adj.derForward(1));
         generateFunction(stream, fname+"_foa",
-                         f_foa.inputExpr(), f_foa.outputExpr(), gen);
+                         f_foa.inputExpr(), f_foa.outputExpr(), gen, gen.mex_);
       }
     }
   }
@@ -1989,6 +1989,7 @@ namespace casadi {
     // Default options
     string prefix = "";
     string include = "";
+    bool mex = false;
 
     // Read options
     for (Dictionary::const_iterator it=options.begin(); it!=options.end(); ++it) {
@@ -1996,6 +1997,8 @@ namespace casadi {
         prefix = it->second.toString();
       } else if (it->first=="include") {
         include = it->second.toString();
+      } else if (it->first=="mex") {
+        mex = it->second;
       } else {
         casadi_error("Unrecongnized option: " << it->first);
       }
@@ -2016,7 +2019,7 @@ namespace casadi {
     s << "#endif" << endl << endl;
 
     // Create a code generator object
-    CodeGenerator gen;
+    CodeGenerator gen(mex);
     if (!include.empty()) {
       gen.addInclude(include, true);
     }
