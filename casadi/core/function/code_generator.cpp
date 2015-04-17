@@ -304,7 +304,32 @@ namespace casadi {
     case AUX_TRANS:
       auxiliaries_ << codegen_str_trans << endl;
       break;
+    case AUX_TO_MEX:
+      auxiliaries_
+        << "mxArray* casadi_to_mex(const int* sp, d** x) {" << endl
+        << "  int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];" << endl
+        << "  mxArray* p = mxCreateSparse(nrow, ncol, nnz, mxREAL);" << endl
+        << "  int i;" << endl
+        << "  mwIndex* j;" << endl
+        << "  for (i=0, j=mxGetJc(p); i<=ncol; ++i) *j++ = *sp++;" << endl
+        << "  for (i=0, j=mxGetIr(p); i<nnz; ++i) *j++ = *sp++;" << endl
+        << "  if (x) *x = (d*)mxGetData(p);" << endl
+        << "  return p;" << endl
+        << "}" << endl << endl;
+      break;
+    case AUX_FROM_MEX:
+      auxiliaries_
+        << endl;
+      break;
     }
+  }
+
+  std::string CodeGenerator::to_mex(const Sparsity& sp, const std::string& data) {
+    addInclude("mex.h");
+    addAuxiliary(AUX_TO_MEX);
+    stringstream s;
+    s << "casadi_to_mex(" << sparsity(sp) << ", " << data << ");";
+    return s.str();
   }
 
   void CodeGenerator::auxSq() {

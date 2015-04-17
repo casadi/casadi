@@ -70,7 +70,6 @@ namespace casadi {
 
     /** \brief Auxiliary functions */
     enum Auxiliary {
-      // BLAS Level 1
       AUX_COPY_N,
       AUX_SWAP,
       AUX_SCAL,
@@ -80,13 +79,13 @@ namespace casadi {
       AUX_IAMAX,
       AUX_FILL_N,
       AUX_ASUM,
-
-      // Misc
       AUX_SQ,
       AUX_SIGN,
       AUX_MM_SPARSE,
       AUX_PROJECT,
-      AUX_TRANS
+      AUX_TRANS,
+      AUX_TO_MEX,
+      AUX_FROM_MEX
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -122,6 +121,9 @@ namespace casadi {
     std::string project(const std::string& arg, std::size_t arg_off, const Sparsity& sp_arg,
                         const std::string& res, std::size_t res_off, const Sparsity& sp_res,
                         const std::string& w);
+
+    /** \brief Create matrix in MATLAB's MEX format */
+    std::string to_mex(const Sparsity& sp, const std::string& data="0");
 
     /** \brief Assignment */
     static void assign(std::ostream &s, const std::string& lhs, const std::string& rhs);

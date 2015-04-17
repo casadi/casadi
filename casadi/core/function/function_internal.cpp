@@ -2176,28 +2176,11 @@ namespace casadi {
       stream << "  }" << endl;
 
       // Output sparsities
-      stream << "  const int* s_out[] = {";
+      stream << "  d* res[" << n_out << "] = {0};" << endl;
       for (int i=0; i<n_out; ++i) {
-        if (i!=0) stream << ", ";
-        stream << gen.sparsity(output(i).sparsity());
+        stream << "  if (--resc>=0) resv[" << i << "] = "
+               << gen.to_mex(output(i).sparsity(), "&res["+gen.numToString(i)+"]") << endl;
       }
-      stream << "};" << endl;
-
-      // Allocate outputs
-      stream << "  d* res[" << n_out << "];" << endl;
-      stream << "  for (i=0; i<" << n_out << "; ++i) {" << endl;
-      stream << "    if (i<resc) {" << endl;
-      stream << "      const int *s=s_out[i];" << endl;
-      stream << "      int nrow=*s++, ncol=*s++, nnz=s[ncol];" << endl;
-      stream << "      resv[i] = mxCreateSparse(nrow, ncol, nnz, mxREAL);" << endl;
-      stream << "      mwIndex *Jc=mxGetJc(resv[i]), *Ir=mxGetIr(resv[i]);" << endl;
-      stream << "      for (j=0; j<=ncol; ++j) *Jc++ = *s++;" << endl;
-      stream << "      for (j=0; j<nnz; ++j) *Ir++ = *s++;" << endl;
-      stream << "      res[i] = (double*)mxGetData(resv[i]);" << endl;
-      stream << "    } else {" << endl;
-      stream << "      res[i] = 0;" << endl;
-      stream << "    }" << endl;
-      stream << "  }" << endl;
 
       // Call the function
       stream << "  i = " << fname << "(arg, res, iw, w);" << endl;
