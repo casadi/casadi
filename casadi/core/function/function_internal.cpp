@@ -2134,46 +2134,24 @@ namespace casadi {
              << "\"Evaluation of \\\"" << fname << "\\\" failed. "
              << "Too many output arguments (%d, max " << n_out << ")\", resc);" << endl;
 
-      // Input sparsities
-      stream << "  const int* s_in[] = {";
-      int nnz=0;
-      for (int i=0; i<n_in; ++i) {
-        if (i!=0) stream << ", ";
-        stream << gen.sparsity(input(i).sparsity());
-        nnz += input(i).nnz();
-      }
-      stream << "};" << endl;
-
       // Work vectors, including input buffers
       size_t ni, nr;
       nTmp(ni, nr);
-      nr += nnz;
+      int i_nnz = getNumInputNonzeros();
+      nr += i_nnz;
       stream << "  int iw[" << ni << "];" << endl;
-      stream << "  d rw[" << nr << "];" << endl;
-      stream << "  d* w = rw;" << endl;
-      stream << "  " << gen.fill_n("w", 0, nnz, "0") << endl;
+      stream << "  d w[" << nr << "];" << endl;
+      string fw = "w+" + gen.numToString(i_nnz);
 
       // Copy inputs to buffers
-      stream << "  const d* arg[" << n_in << "];" << endl;
-      stream << "  for (i=0; i<" << n_in << "; ++i) {" << endl;
-      stream << "    if (i<argc) {" << endl;
-      stream << "      const int *colind=s_in[i];" << endl;
-      stream << "      int nrow=*colind++, ncol=*colind++, nnz=colind[ncol];" << endl;
-      stream << "      const int *row=colind+ncol+1;" << endl;
-      stream << "      const double* data = (const double*)mxGetData(argv[i]);" << endl;
-      stream << "      int r,c,k;" << endl;
-      stream << "      for (c=0; c<ncol; ++c) {" << endl;
-      stream << "        for (k=colind[c]; k<colind[c+1]; ++k) {" << endl;
-      stream << "          r=row[k];" << endl;
-      stream << "          w[k] = data[r+c*nrow];" << endl;
-      stream << "        }" << endl;
-      stream << "      }" << endl;
-      stream << "      arg[i] = w;" << endl;
-      stream << "      w += nnz;" << endl;
-      stream << "    } else {" << endl;
-      stream << "      arg[i] = 0;" << endl;
-      stream << "    }" << endl;
-      stream << "  }" << endl;
+      int offset=0;
+      stream << "  const d* arg[" << n_in << "] = {0};" << endl;
+      for (int i=0; i<n_in; ++i) {
+        std::string p = "argv[" + gen.numToString(i) + "]";
+        stream << "  if (--argc>=0) arg[" << i << "] = "
+               << gen.from_mex(p, "w", offset, input(i).sparsity(), fw) << endl;
+        offset += input(i).nnz();
+      }
 
       // Output sparsities
       stream << "  d* res[" << n_out << "] = {0};" << endl;
@@ -2183,7 +2161,7 @@ namespace casadi {
       }
 
       // Call the function
-      stream << "  i = " << fname << "(arg, res, iw, w);" << endl;
+      stream << "  i = " << fname << "(arg, res, iw, " << fw << ");" << endl;
       stream << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
              << "\\\" failed.\");" << endl;
 

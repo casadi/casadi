@@ -318,8 +318,44 @@ namespace casadi {
         << "}" << endl << endl;
       break;
     case AUX_FROM_MEX:
+      addAuxiliary(AUX_FILL_N);
       auxiliaries_
-        << endl;
+        << "d* casadi_from_mex(const mxArray *p, d* y, const int* sp, d* w) {" << endl
+        << "  if (!mxIsDouble(p) || mxGetNumberOfDimensions(p)!=2)" << endl
+        << "    mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\\"casadi_from_mex\\\" failed: "
+        << "Not a two-dimensional matrix of double precision.\");" << endl
+        << "  int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];" << endl
+        << "  const int *colind=sp, *row=sp+ncol+1;" << endl
+        << "  size_t p_nrow = mxGetM(p), p_ncol = mxGetN(p);" << endl
+        << "  const double* p_data = (const double*)mxGetData(p);" << endl
+        << "  bool is_sparse = mxIsSparse(p);" << endl
+        << "  mwIndex *Jc = is_sparse ? mxGetJc(p) : 0;" << endl
+        << "  mwIndex *Ir = is_sparse ? mxGetIr(p) : 0;" << endl
+        << "  if (p_nrow==1 && p_ncol==1) {" << endl
+        << "    double v = is_sparse && Jc[1]==0 ? 0 : *p_data;" << endl
+        << "    casadi_fill_n(y, nnz, v);" << endl
+        << "  } else {" << endl
+        << "    bool tr = false;" << endl
+        << "    if (nrow!=p_nrow || ncol!=p_ncol) {" << endl
+        << "      tr = nrow==p_ncol && ncol==p_nrow && (nrow==1 || ncol==1);" << endl
+        << "      if (!tr) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\\"casadi_from_mex\\\""
+        << " failed: Dimension mismatch.\");" << endl
+        << "    }" << endl
+        << "    if (is_sparse) {" << endl
+        << "      mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\\"casadi_from_mex\\\" failed: "
+        << "Sparse assign not implemented.\");" << endl
+        << "    } else {" << endl
+        << "      int r,c,k;" << endl
+        << "      for (c=0; c<ncol; ++c) {" << endl
+        << "        for (k=colind[c]; k<colind[c+1]; ++k) {" << endl
+        << "          r=row[k];" << endl
+        << "          y[k] = tr ? p_data[c+r*ncol] : p_data[r+c*nrow];" << endl
+        << "        }" << endl
+        << "      }" << endl
+        << "    }" << endl
+        << "  }" << endl
+        << "  return y;" << endl
+        << "}" << endl << endl;
       break;
     }
   }
@@ -329,6 +365,20 @@ namespace casadi {
     addAuxiliary(AUX_TO_MEX);
     stringstream s;
     s << "casadi_to_mex(" << sparsity(sp) << ", " << data << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::from_mex(std::string& arg,
+                                      const std::string& res, std::size_t res_off,
+                                      const Sparsity& sp_res, const std::string& w) {
+    // Handle offset with recursion
+    if (res_off!=0) return from_mex(arg, res+"+"+numToString(res_off), 0, sp_res, w);
+
+    addInclude("mex.h");
+    addAuxiliary(AUX_FROM_MEX);
+    stringstream s;
+    s << "casadi_from_mex(" << arg
+      << ", " << res << ", " << sparsity(sp_res) << ", " << w << ");";
     return s.str();
   }
 

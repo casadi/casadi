@@ -125,6 +125,11 @@ namespace casadi {
     /** \brief Create matrix in MATLAB's MEX format */
     std::string to_mex(const Sparsity& sp, const std::string& data="0");
 
+    /** \brief Get matrix from MATLAB's MEX format */
+    std::string from_mex(std::string& arg,
+                         const std::string& res, std::size_t res_off, const Sparsity& sp_res,
+                         const std::string& w);
+
     /** \brief Assignment */
     static void assign(std::ostream &s, const std::string& lhs, const std::string& rhs);
 
