@@ -101,14 +101,8 @@ namespace casadi {
 
   void SetSparse::generate(std::ostream &stream, const std::vector<int>& arg,
                                     const std::vector<int>& res, CodeGenerator& gen) const {
-    // Codegen "copy sparse"
-    gen.addAuxiliary(CodeGenerator::AUX_PROJECT);
-
-    // Codegen the operation
-    int sp_arg = gen.addSparsity(dep(0).sparsity());
-    int sp_res = gen.addSparsity(sparsity());
-    stream << "  casadi_project(" << gen.work(arg.front()) << ", s" << sp_arg << ", "
-           << gen.work(res.front()) << ", s" << sp_res << ", w);" << std::endl;
+    stream << "  " << gen.project("w", arg.front(), dep(0).sparsity(),
+                                  "w", res.front(), sparsity(), "w") << endl;
   }
 
 

@@ -207,7 +207,7 @@ namespace casadi {
     (*this)->spEvaluate(fwd);
   }
 
-  void Function::nTmp(size_t& ni, size_t& nr) {
+  void Function::nTmp(size_t& ni, size_t& nr) const {
     (*this)->nTmp(ni, nr);
   }
 
@@ -401,7 +401,7 @@ namespace casadi {
     (*this)->setDerReverse(fcn, nadj);
   }
 
-  void Function::generateCode(const string& filename, bool generate_main) {
+  void Function::generateCode(const string& filename, bool generate_main, bool generate_mex) {
     // Detect a C++ ending
     vector<string> cpp_endings;
     cpp_endings.push_back(".cpp");
@@ -420,13 +420,14 @@ namespace casadi {
     // Create a file
     std::ofstream cfile;
     cfile.open(filename.c_str());
-    generateCode(cfile, generate_main);
+    generateCode(cfile, generate_main, generate_mex);
     cfile.close();
   }
 
   void Function::generateFunction(std::ostream &stream, const std::string& fname,
-                                  const std::string& type, CodeGenerator& gen) const {
-    (*this)->generateFunction(stream, fname, type, gen);
+                                  const std::string& type, CodeGenerator& gen,
+                                  bool mex_gateway) const {
+    (*this)->generateFunction(stream, fname, type, gen, mex_gateway);
   }
 
   std::string Function::generateCodeStr(bool generate_main) {
@@ -435,8 +436,8 @@ namespace casadi {
     return cfile.str();
   }
 
-  void Function::generateCode(std::ostream &stream, bool generate_main) {
-    (*this)->generateCode(stream, generate_main);
+  void Function::generateCode(std::ostream &stream, bool generate_main, bool generate_mex) {
+    (*this)->generateCode(stream, generate_main, generate_mex);
   }
 
   const IOScheme& Function::inputScheme() const {

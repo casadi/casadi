@@ -152,7 +152,7 @@ namespace casadi {
     FunctionInternal::init();
   }
 
-  void ExternalFunctionInternal::nTmp(size_t& ni, size_t& nr) {
+  void ExternalFunctionInternal::nTmp(size_t& ni, size_t& nr) const {
     ni=ni_;
     nr=nr_;
   }

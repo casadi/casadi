@@ -59,7 +59,7 @@ namespace casadi {
     virtual void evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp);
 
     /** \brief  Work vector sizes */
-    virtual void nTmp(size_t& ni, size_t& nr);
+    virtual void nTmp(size_t& ni, size_t& nr) const;
 
     /** \brief  Initialize */
     virtual void init();

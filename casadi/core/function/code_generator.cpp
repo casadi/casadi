@@ -108,7 +108,7 @@ namespace casadi {
       name << "f" << ind;
 
       // Print to file
-      f->generateFunction(dependencies_, name.str(), "d", *this);
+      f.generateFunction(dependencies_, name.str(), "d", *this);
     }
 
     return ind;
@@ -167,6 +167,10 @@ namespace casadi {
     }
 
     return ind;
+  }
+
+  std::string CodeGenerator::sparsity(const Sparsity& sp) {
+    return "s" + numToString(addSparsity(sp));
   }
 
   int CodeGenerator::getSparsity(const Sparsity& sp) const {
@@ -375,6 +379,26 @@ namespace casadi {
     addAuxiliary(AUX_DOT);
     stringstream s;
     s << "casadi_dot(" << n << ", " << x << ", " << inc_x << ", " << y << ", " << inc_y << ")";
+    return s.str();
+  }
+  std::string
+  CodeGenerator::project(const std::string& arg, std::size_t arg_off, const Sparsity& sp_arg,
+                         const std::string& res, std::size_t res_off, const Sparsity& sp_res,
+                         const std::string& w) {
+    // If sparsity match, simple copy
+    if (sp_arg==sp_res) return copy_n(arg, arg_off, sp_arg.nnz(), res, res_off);
+
+    // Handle offsets with recursion
+    if (arg_off!=0) return project(arg+"+"+numToString(arg_off), 0, sp_arg,
+                                   res, res_off, sp_res, w);
+    if (res_off!=0) return project(arg, arg_off, sp_arg,
+                                   res+"+"+numToString(res_off), 0, sp_res, w);
+
+    // Create call
+    addAuxiliary(CodeGenerator::AUX_PROJECT);
+    stringstream s;
+    s << "  casadi_project(" << arg << ", " << sparsity(sp_arg) << ", " << res << ", "
+      << sparsity(sp_res) << w << ");";
     return s.str();
   }
 

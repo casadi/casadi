@@ -1954,7 +1954,7 @@ namespace casadi {
     return MXFunction(ret_argv, J);
   }
 
-  void FunctionInternal::generateCode(std::ostream &cfile, bool generate_main) {
+  void FunctionInternal::generateCode(std::ostream &cfile, bool generate_main, bool generate_mex) {
     assertInit();
 
     // set stream parameters
@@ -1972,7 +1972,7 @@ namespace casadi {
     generateIO(gen);
 
     // Generate the actual function
-    generateFunction(gen.function_, "eval", "d", gen);
+    generateFunction(gen.function_, "eval", "d", gen, generate_mex);
 
     // Flush the code generator
     gen.flush(cfile);
@@ -2088,7 +2088,7 @@ namespace casadi {
 
   void FunctionInternal::generateFunction(
       std::ostream &stream, const std::string& fname, const std::string& type,
-      CodeGenerator& gen) const {
+      CodeGenerator& gen, bool mex_gateway) const {
 
     // Add standard math
     gen.addInclude("math.h");
@@ -2112,6 +2112,101 @@ namespace casadi {
     stream << "  return 0;" << endl;
     stream << "}" << endl;
     stream << endl;
+
+    // Generate mex gateway for the function
+    if (mex_gateway) {
+      // Mex header
+      gen.addInclude("mex.h");
+
+      // Declare wrapper
+      stream << "void mex_" << fname
+             << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {" << endl
+             << "  int i, j;" << endl;
+
+      // Check arguments
+      int n_in = getNumInputs();
+      stream << "  if (argc>" << n_in << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
+             << "\"Evaluation of \\\"" << fname << "\\\" failed. Too many input arguments (%d, max "
+             << n_in << ")\", argc);" << endl;
+
+      int n_out = getNumOutputs();
+      stream << "  if (resc>" << n_out << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
+             << "\"Evaluation of \\\"" << fname << "\\\" failed. "
+             << "Too many output arguments (%d, max " << n_out << ")\", resc);" << endl;
+
+      // Input sparsities
+      stream << "  const int* s_in[] = {";
+      int nnz=0;
+      for (int i=0; i<n_in; ++i) {
+        if (i!=0) stream << ", ";
+        stream << gen.sparsity(input(i).sparsity());
+        nnz += input(i).nnz();
+      }
+      stream << "};" << endl;
+
+      // Work vectors, including input buffers
+      size_t ni, nr;
+      nTmp(ni, nr);
+      nr += nnz;
+      stream << "  int iw[" << ni << "];" << endl;
+      stream << "  d rw[" << nr << "];" << endl;
+      stream << "  d* w = rw;" << endl;
+      stream << "  " << gen.fill_n("w", 0, nnz, "0") << endl;
+
+      // Copy inputs to buffers
+      stream << "  const d* arg[" << n_in << "];" << endl;
+      stream << "  for (i=0; i<" << n_in << "; ++i) {" << endl;
+      stream << "    if (i<argc) {" << endl;
+      stream << "      const int *colind=s_in[i];" << endl;
+      stream << "      int nrow=*colind++, ncol=*colind++, nnz=colind[ncol];" << endl;
+      stream << "      const int *row=colind+ncol+1;" << endl;
+      stream << "      const double* data = (const double*)mxGetData(argv[i]);" << endl;
+      stream << "      int r,c,k;" << endl;
+      stream << "      for (c=0; c<ncol; ++c) {" << endl;
+      stream << "        for (k=colind[c]; k<colind[c+1]; ++k) {" << endl;
+      stream << "          r=row[k];" << endl;
+      stream << "          w[k] = data[r+c*nrow];" << endl;
+      stream << "        }" << endl;
+      stream << "      }" << endl;
+      stream << "      arg[i] = w;" << endl;
+      stream << "      w += nnz;" << endl;
+      stream << "    } else {" << endl;
+      stream << "      arg[i] = 0;" << endl;
+      stream << "    }" << endl;
+      stream << "  }" << endl;
+
+      // Output sparsities
+      stream << "  const int* s_out[] = {";
+      for (int i=0; i<n_out; ++i) {
+        if (i!=0) stream << ", ";
+        stream << gen.sparsity(output(i).sparsity());
+      }
+      stream << "};" << endl;
+
+      // Allocate outputs
+      stream << "  d* res[" << n_out << "];" << endl;
+      stream << "  for (i=0; i<" << n_out << "; ++i) {" << endl;
+      stream << "    if (i<resc) {" << endl;
+      stream << "      const int *s=s_out[i];" << endl;
+      stream << "      int nrow=*s++, ncol=*s++, nnz=s[ncol];" << endl;
+      stream << "      resv[i] = mxCreateSparse(nrow, ncol, nnz, mxREAL);" << endl;
+      stream << "      mwIndex *Jc=mxGetJc(resv[i]), *Ir=mxGetIr(resv[i]);" << endl;
+      stream << "      for (j=0; j<=ncol; ++j) *Jc++ = *s++;" << endl;
+      stream << "      for (j=0; j<nnz; ++j) *Ir++ = *s++;" << endl;
+      stream << "      res[i] = (double*)mxGetData(resv[i]);" << endl;
+      stream << "    } else {" << endl;
+      stream << "      res[i] = 0;" << endl;
+      stream << "    }" << endl;
+      stream << "  }" << endl;
+
+      // Call the function
+      stream << "  i = " << fname << "(arg, res, iw, w);" << endl;
+      stream << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
+             << "\\\" failed.\");" << endl;
+
+      // Finalize mex gateway
+      stream << "}" << endl << endl;
+    }
   }
 
   void FunctionInternal::generateDeclarations(std::ostream &stream, const std::string& type,
@@ -2467,7 +2562,7 @@ namespace casadi {
     stream << "  }" << endl;
   }
 
-  void FunctionInternal::nTmp(size_t& ni, size_t& nr) {
+  void FunctionInternal::nTmp(size_t& ni, size_t& nr) const {
     ni=itmp_.size();
     nr=rtmp_.size();
   }

@@ -446,17 +446,19 @@ namespace casadi {
     ///@}
 
     /** \brief Export / Generate C code for the function */
-    void generateCode(const std::string& filename, bool generate_main=false);
+    void generateCode(const std::string& filename, bool generate_main=false,
+                      bool generate_mex=false);
 
     /** \brief Generate C code for the function */
-    void generateCode(std::ostream& filename, bool generate_main=false);
+    void generateCode(std::ostream& filename, bool generate_main=false, bool generate_mex=false);
 
     /** \brief Generate C code for the function */
     std::string generateCodeStr(bool generate_main=false);
 
     /** \brief Generate code without meta information */
     void generateFunction(std::ostream &stream, const std::string& fname,
-                          const std::string& type, CodeGenerator& gen) const;
+                          const std::string& type, CodeGenerator& gen,
+                          bool mex_gateway=false) const;
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
@@ -505,7 +507,7 @@ namespace casadi {
 
 #ifndef SWIG
     /// Get number of temporary variables needed
-    void nTmp(size_t& ni, size_t& nr);
+    void nTmp(size_t& ni, size_t& nr) const;
 
     /** \brief  Propagate sparsity forward */
     void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);

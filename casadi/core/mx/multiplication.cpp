@@ -128,9 +128,9 @@ namespace casadi {
     // Perform sparse matrix multiplication
     gen.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
     stream << "  casadi_mm_sparse(";
-    stream << gen.work(arg[1]) << ", s" << gen.addSparsity(dep(1).sparsity()) << ", ";
-    stream << gen.work(arg[2]) << ", s" << gen.addSparsity(dep(2).sparsity()) << ", ";
-    stream << gen.work(res[0]) << ", s" << gen.addSparsity(sparsity()) << ", w);" << endl;
+    stream << gen.work(arg[1]) << ", " << gen.sparsity(dep(1).sparsity()) << ", ";
+    stream << gen.work(arg[2]) << ", " << gen.sparsity(dep(2).sparsity()) << ", ";
+    stream << gen.work(res[0]) << ", " << gen.sparsity(sparsity()) << ", w);" << endl;
   }
 
   void DenseMultiplication::generate(std::ostream &stream,

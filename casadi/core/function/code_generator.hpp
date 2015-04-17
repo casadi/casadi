@@ -41,7 +41,10 @@ namespace casadi {
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path = false);
 
-    /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
+    // Add a sparsity pattern
+    std::string sparsity(const Sparsity& sp);
+
+    // Add a sparsity pattern, get index
     int addSparsity(const Sparsity& sp);
 
     /** \brief Get the index of an existing sparsity pattern */
@@ -114,6 +117,11 @@ namespace casadi {
     /** \brief Create a fill_n operation */
     std::string fill_n(const std::string& res, std::size_t res_off, std::size_t n,
                        const std::string& v);
+
+    /** \brief Sparse assignment */
+    std::string project(const std::string& arg, std::size_t arg_off, const Sparsity& sp_arg,
+                        const std::string& res, std::size_t res_off, const Sparsity& sp_res,
+                        const std::string& w);
 
     /** \brief Assignment */
     static void assign(std::ostream &s, const std::string& lhs, const std::string& rhs);

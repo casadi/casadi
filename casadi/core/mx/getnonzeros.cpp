@@ -447,7 +447,7 @@ namespace casadi {
                                             const std::vector<int>& arg,
                                             const std::vector<int>& res,
                                             CodeGenerator& gen) const {
-    // Condegen the indices
+    // Codegen the indices
     int ind = gen.getConstant(nz_, true);
 
     // Codegen the assignments
