@@ -1973,6 +1973,10 @@ namespace casadi {
 
     // Generate the actual function
     generateFunction(gen.function_, "eval", "d", gen, generate_mex);
+    gen.function_
+      << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {" << endl
+      << "  mex_eval(resc, resv, argc, argv);" << endl
+      << "}" << endl << endl;
 
     // Flush the code generator
     gen.flush(cfile);
