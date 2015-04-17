@@ -38,7 +38,7 @@ namespace casadi {
   class CASADI_EXPORT CodeGenerator {
   public:
     /// Constructor
-    CodeGenerator(bool mex=false) : mex_(mex) {}
+    CodeGenerator(const Dictionary& opts = Dictionary());
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path = false);
@@ -153,7 +153,19 @@ namespace casadi {
     //  private:
   public:
     // Are we creating a MEX file?
-    bool mex_;
+    bool mex;
+
+    // C++ guards (making the code valid C++)
+    bool cpp_guards;
+
+    // Should we generate a main (allowing evaluation from command line)
+    bool main;
+
+    // Prefix
+    std::string prefix;
+
+    // Include file
+    std::string include;
 
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes_;

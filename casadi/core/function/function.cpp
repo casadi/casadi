@@ -401,43 +401,27 @@ namespace casadi {
     (*this)->setDerReverse(fcn, nadj);
   }
 
-  void Function::generateCode(const string& filename, bool generate_main, bool generate_mex) {
-    // Detect a C++ ending
-    vector<string> cpp_endings;
-    cpp_endings.push_back(".cpp");
-    cpp_endings.push_back(".cxx");
-    cpp_endings.push_back(".cc");
-    cpp_endings.push_back(".cp");
-    cpp_endings.push_back(".c++");
-    for (vector<string>::const_iterator it=cpp_endings.begin(); it!=cpp_endings.end(); ++it) {
-      if (filename.size()>it->size() &&
-         filename.compare(filename.size()-it->size(), it->size(), *it)==0) {
-        casadi_warning("Function::generateCode: Detected C++ file ending "
-                       "(generated code is C, not C++)");
-      }
-    }
-
-    // Create a file
-    std::ofstream cfile;
-    cfile.open(filename.c_str());
-    generateCode(cfile, generate_main, generate_mex);
-    cfile.close();
-  }
-
   void Function::generateFunction(std::ostream &stream, const std::string& fname,
                                   const std::string& type, CodeGenerator& gen,
                                   bool mex_gateway) const {
     (*this)->generateFunction(stream, fname, type, gen, mex_gateway);
   }
 
-  std::string Function::generateCodeStr(bool generate_main) {
-    std::ostringstream cfile;
-    generateCode(cfile, generate_main);
-    return cfile.str();
+  void Function::generateCode(const string& filename, const Dictionary& opts) {
+    std::ofstream cfile;
+    cfile.open(filename.c_str());
+    generateCode(cfile, opts);
+    cfile.close();
   }
 
-  void Function::generateCode(std::ostream &stream, bool generate_main, bool generate_mex) {
-    (*this)->generateCode(stream, generate_main, generate_mex);
+  std::string Function::generateCode(const Dictionary& opts) {
+    std::stringstream ss;
+    generateCode(ss, opts);
+    return ss.str();
+  }
+
+  void Function::generateCode(std::ostream &stream, const Dictionary& opts) {
+    (*this)->generateCode(stream, opts);
   }
 
   const IOScheme& Function::inputScheme() const {

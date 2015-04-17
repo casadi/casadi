@@ -446,14 +446,13 @@ namespace casadi {
     ///@}
 
     /** \brief Export / Generate C code for the function */
-    void generateCode(const std::string& filename, bool generate_main=false,
-                      bool generate_mex=false);
+    void generateCode(const std::string& filename, const Dictionary& opts=Dictionary());
 
     /** \brief Generate C code for the function */
-    void generateCode(std::ostream& filename, bool generate_main=false, bool generate_mex=false);
+    void generateCode(std::ostream& filename, const Dictionary& opts=Dictionary());
 
     /** \brief Generate C code for the function */
-    std::string generateCodeStr(bool generate_main=false);
+    std::string generateCode(const Dictionary& opts=Dictionary());
 
     /** \brief Generate code without meta information */
     void generateFunction(std::ostream &stream, const std::string& fname,
