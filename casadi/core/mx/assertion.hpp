@@ -65,17 +65,24 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     virtual void evalSX(cp_SXElement* input, p_SXElement* output, int* itmp, SXElement* rtmp);
 
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
+
+    /** \brief Generate code for the operation */
+    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
+                          const std::vector<int>& res, CodeGenerator& gen) const;
+
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_ASSERTION;}
 
-    /** \brief  Propagate sparsity forward */
-    virtual void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
-
-    /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual int numInplace() const { return 1;}
 
   private:
     std::string fail_message_;

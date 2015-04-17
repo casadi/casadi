@@ -69,23 +69,29 @@ namespace casadi {
     }
   }
 
-  void Assertion::evalSX(cp_SXElement* input, p_SXElement* output,
+  void Assertion::evalSX(cp_SXElement* arg, p_SXElement* res,
                              int* itmp, SXElement* rtmp) {
-    copy(input[0], input[0]+nnz(), output[0]);
+    if (arg[0]!=res[0]) {
+      copy(arg[0], arg[0]+nnz(), res[0]);
+    }
   }
 
-  void Assertion::evalD(cp_double* input, p_double* output,
-                            int* itmp, double* rtmp) {
-    if (input[1][0]!=1) {
+  void Assertion::evalD(cp_double* arg, p_double* res,
+                        int* itmp, double* rtmp) {
+    if (arg[1][0]!=1) {
       casadi_error("Assertion error: " << fail_message_);
     }
 
-    copy(input[0], input[0]+nnz(), output[0]);
+    if (arg[0]!=res[0]) {
+      copy(arg[0], arg[0]+nnz(), res[0]);
+    }
   }
 
   void Assertion::spFwd(cp_bvec_t* arg,
                         p_bvec_t* res, int* itmp, bvec_t* rtmp) {
-    copy(arg[0], arg[0]+nnz(), res[0]);
+    if (arg[0]!=res[0]) {
+      copy(arg[0], arg[0]+nnz(), res[0]);
+    }
   }
 
   void Assertion::spAdj(p_bvec_t* arg,
@@ -93,9 +99,25 @@ namespace casadi {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();
-    for (int i=0; i<n; ++i) {
-      *a++ |= *r;
-      *r++ = 0;
+    if (a != r) {
+      for (int i=0; i<n; ++i) {
+        *a++ |= *r;
+        *r++ = 0;
+      }
+    }
+  }
+
+  void Assertion::generate(std::ostream &stream, const std::vector<int>& arg,
+                           const std::vector<int>& res, CodeGenerator& gen) const {
+    // Generate assertion
+    stream << "  if (" << gen.workelement(arg[1]) << "!=1.) {" << endl
+           << "    /* " << fail_message_ << " */" << endl
+           << "    return 1;" << endl
+           << "  }" << endl;
+
+    // Copy if not inplace
+    if (arg[0]!=res[0]) {
+      stream << "  " << gen.copy_n("w", arg[0], nnz(), "w", res[0]) << endl;
     }
   }
 
