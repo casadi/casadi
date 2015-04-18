@@ -403,8 +403,8 @@ namespace casadi {
 
   void Function::generateFunction(std::ostream &stream, const std::string& fname,
                                   const std::string& type, CodeGenerator& gen,
-                                  bool mex_gateway) const {
-    (*this)->generateFunction(stream, fname, type, gen, mex_gateway);
+                                  bool exposed) const {
+    (*this)->generateFunction(stream, fname, type, gen, exposed);
   }
 
   void Function::generateCode(const string& filename, const Dictionary& opts) {

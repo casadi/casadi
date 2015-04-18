@@ -457,7 +457,7 @@ namespace casadi {
     /** \brief Generate code without meta information */
     void generateFunction(std::ostream &stream, const std::string& fname,
                           const std::string& type, CodeGenerator& gen,
-                          bool mex_gateway=false) const;
+                          bool exposed=false) const;
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */

@@ -245,7 +245,7 @@ namespace casadi {
     /** \brief Generate code the function */
     virtual void generateFunction(std::ostream &stream, const std::string& fname,
                                   const std::string& type, CodeGenerator& gen,
-                                  bool mex_gateway) const;
+                                  bool exposed) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(std::ostream &stream, const std::string& type,

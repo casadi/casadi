@@ -56,6 +56,10 @@ namespace casadi {
         casadi_error("Unrecongnized option: " << it->first);
       }
     }
+
+    // Includes needed
+    if (this->main) addInclude("stdio.h");
+    if (this->mex) addInclude("mex.h");
   }
 
   void CodeGenerator::flush(std::ostream& s) const {
@@ -94,6 +98,21 @@ namespace casadi {
 
     s << dependencies_.str();
     s << function_.str();
+
+    // Mex gateway
+    if (this->mex) {
+      s << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {" << endl
+        << "  mex_eval(resc, resv, argc, argv);" << endl
+        << "}" << endl << endl;
+    }
+
+    // Generate main
+    if (this->main) {
+      s << "int main(int argc, char* argv[]) {" << endl
+        << "  return main_eval(argc, argv);" << endl
+        << "}" << endl << endl;
+    }
+
     s << finalization_.str();
 
     // C linkage
