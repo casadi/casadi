@@ -1951,7 +1951,7 @@ namespace casadi {
     MXFunction f(f_in, f_out);
     f.setOption("name", fname);
     f.init();
-    f.generateFunction(stream, fname, "double", gen, gen.mex);
+    f.generateFunction(gen, fname, stream);
     size_t ni, nr;
     f.nTmp(ni, nr);
 
@@ -1965,7 +1965,7 @@ namespace casadi {
     if (fwd) {
       MXFunction f_fwd = shared_cast<MXFunction>(f.derForward(1));
       generateFunction(stream, fname+"_fwd",
-                       f_fwd.inputExpr(), f_fwd.outputExpr(), gen, gen.mex);
+                       f_fwd.inputExpr(), f_fwd.outputExpr(), gen);
     }
 
     // Reverse mode mode directional derivative
@@ -1973,13 +1973,13 @@ namespace casadi {
       MXFunction f_adj = shared_cast<MXFunction>(f.derReverse(1));
       if (adj) {
         generateFunction(stream, fname+"_adj",
-                         f_adj.inputExpr(), f_adj.outputExpr(), gen, gen.mex);
+                         f_adj.inputExpr(), f_adj.outputExpr(), gen);
       }
       // Forward-over-reverse mode directional derivative
       if (foa) {
         MXFunction f_foa = shared_cast<MXFunction>(f_adj.derForward(1));
         generateFunction(stream, fname+"_foa",
-                         f_foa.inputExpr(), f_foa.outputExpr(), gen, gen.mex);
+                         f_foa.inputExpr(), f_foa.outputExpr(), gen);
       }
     }
   }

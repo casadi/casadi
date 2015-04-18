@@ -39,6 +39,7 @@ namespace casadi {
     this->mex = false;
     this->cpp_guards = true;
     this->main = false;
+    this->real_t = "double";
 
     // Read options
     for (Dictionary::const_iterator it=opts.begin(); it!=opts.end(); ++it) {
@@ -52,6 +53,8 @@ namespace casadi {
         this->cpp_guards = it->second;
       } else if (it->first=="main") {
         this->main = it->second;
+      } else if (it->first=="real_t") {
+        this->real_t = it->second.toString();
       } else {
         casadi_error("Unrecongnized option: " << it->first);
       }
@@ -173,7 +176,7 @@ namespace casadi {
       name << "f" << ind;
 
       // Print to file
-      f.generateFunction(dependencies_, name.str(), "d", *this);
+      f.generateFunction(*this, name.str(), dependencies_);
     }
 
     return ind;

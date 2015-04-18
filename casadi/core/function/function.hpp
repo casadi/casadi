@@ -455,9 +455,8 @@ namespace casadi {
     std::string generateCode(const Dictionary& opts=Dictionary());
 
     /** \brief Generate code without meta information */
-    void generateFunction(std::ostream &stream, const std::string& fname,
-                          const std::string& type, CodeGenerator& gen,
-                          bool exposed=false) const;
+    void generateFunction(CodeGenerator& gen, const std::string& fname,
+                          std::ostream &stream) const;
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */

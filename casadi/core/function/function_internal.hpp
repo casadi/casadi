@@ -239,13 +239,12 @@ namespace casadi {
     /** \brief  Print to a stream */
     virtual void generateCode(std::ostream &cfile, const Dictionary& opts);
 
-    /** \brief Generate code for function inputs and outputs */
-    void generateIO(CodeGenerator& gen);
-
     /** \brief Generate code the function */
-    virtual void generateFunction(std::ostream &stream, const std::string& fname,
-                                  const std::string& type, CodeGenerator& gen,
-                                  bool exposed) const;
+    virtual void generateFunction(CodeGenerator& gen, const std::string& fname,
+                                  std::ostream &stream) const;
+
+    /** \brief Generate meta-information allowing a user to evaluate a generated function */
+    void exposeFunction(CodeGenerator& gen, const std::string& fname) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(std::ostream &stream, const std::string& type,

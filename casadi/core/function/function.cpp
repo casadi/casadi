@@ -401,10 +401,9 @@ namespace casadi {
     (*this)->setDerReverse(fcn, nadj);
   }
 
-  void Function::generateFunction(std::ostream &stream, const std::string& fname,
-                                  const std::string& type, CodeGenerator& gen,
-                                  bool exposed) const {
-    (*this)->generateFunction(stream, fname, type, gen, exposed);
+  void Function::generateFunction(CodeGenerator& gen, const std::string& fname,
+                                  std::ostream &stream) const {
+    (*this)->generateFunction(gen, fname, stream);
   }
 
   void Function::generateCode(const string& filename, const Dictionary& opts) {

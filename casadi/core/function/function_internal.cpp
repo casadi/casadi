@@ -1960,19 +1960,17 @@ namespace casadi {
     // Create a code generator object
     CodeGenerator gen(opts);
 
-    // Generate function inputs and outputs information
-    generateIO(gen);
-
     // Generate the actual function
-    generateFunction(gen.function_, "eval", "d", gen, true);
+    generateFunction(gen, "eval", gen.function_);
+    exposeFunction(gen, "eval");
 
     // Flush the code generator
     gen.flush(cfile);
   }
 
-  void FunctionInternal::generateFunction(
-      std::ostream &stream, const std::string& fname, const std::string& type,
-      CodeGenerator& gen, bool exposed) const {
+  void FunctionInternal::
+  generateFunction(CodeGenerator& gen, const std::string& fname,
+                   std::ostream &stream) const {
 
     // Add standard math
     gen.addInclude("math.h");
@@ -1982,147 +1980,23 @@ namespace casadi {
     gen.addAuxiliary(CodeGenerator::AUX_SIGN);
 
     // Generate declarations
-    generateDeclarations(stream, type, gen);
+    generateDeclarations(stream, gen.real_t, gen);
 
     // Define function
     stream << "/* " << getSanitizedName() << " */" << endl;
-    stream << "int " << fname << "(const " << type << "* const* arg, " << type
-           << "* const* res, int* iii, " << type << "* w) {" << endl;
+    stream << "int " << fname << "(const " << gen.real_t << "* const* arg, " << gen.real_t
+           << "* const* res, int* iii, " << gen.real_t << "* w) {" << endl;
 
     // Insert the function body
-    generateBody(stream, type, gen);
+    generateBody(stream, gen.real_t, gen);
 
     // Finalize the function
     stream << "  return 0;" << endl;
     stream << "}" << endl;
     stream << endl;
-
-    // Generate mex gateway for the function
-    if (exposed) {
-      int n_in = getNumInputs();
-      int n_out = getNumOutputs();
-
-      if (gen.mex) {
-        // Declare wrapper
-        stream << "void mex_" << fname
-               << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {" << endl
-               << "  int i, j;" << endl;
-
-        // Check arguments
-        stream << "  if (argc>" << n_in << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
-               << "\"Evaluation of \\\"" << fname << "\\\" failed. Too many input arguments "
-               << "(%d, max " << n_in << ")\", argc);" << endl;
-
-        stream << "  if (resc>" << n_out << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
-               << "\"Evaluation of \\\"" << fname << "\\\" failed. "
-               << "Too many output arguments (%d, max " << n_out << ")\", resc);" << endl;
-
-        // Work vectors, including input buffers
-        size_t ni, nr;
-        nTmp(ni, nr);
-        int i_nnz = 0;
-        for (int i=0; i<n_in; ++i) {
-          const Sparsity& s = input(i).sparsity();
-          i_nnz += s.nnz();
-          nr = max(nr, static_cast<size_t>(s.size1())); // To be able to copy a column
-          nr = max(nr, static_cast<size_t>(s.size2())); // To be able to copy a row
-        }
-        nr += i_nnz;
-        stream << "  int iw[" << ni << "];" << endl;
-        stream << "  d w[" << nr << "];" << endl;
-        string fw = "w+" + gen.numToString(i_nnz);
-
-        // Copy inputs to buffers
-        int offset=0;
-        stream << "  const d* arg[" << n_in << "] = {0};" << endl;
-        for (int i=0; i<n_in; ++i) {
-          std::string p = "argv[" + gen.numToString(i) + "]";
-          stream << "  if (--argc>=0) arg[" << i << "] = "
-                 << gen.from_mex(p, "w", offset, input(i).sparsity(), fw) << endl;
-          offset += input(i).nnz();
-        }
-
-        // Output sparsities
-        stream << "  d* res[" << n_out << "] = {0};" << endl;
-        for (int i=0; i<n_out; ++i) {
-          stream << "  if (--resc>=0) resv[" << i << "] = "
-                 << gen.to_mex(output(i).sparsity(), "&res["+gen.numToString(i)+"]") << endl;
-        }
-
-        // Call the function
-        stream << "  i = " << fname << "(arg, res, iw, " << fw << ");" << endl;
-        stream << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
-               << "\\\" failed.\");" << endl;
-
-        // Finalize mex gateway
-        stream << "}" << endl << endl;
-      }
-      if (gen.main) {
-        // Declare wrapper
-        stream << "int main_" << fname << "(int argc, char* argv[]) {" << endl;
-
-        // Work vectors and input and output buffers
-        size_t ni, nr;
-        nTmp(ni, nr);
-        nr += getNumInputNonzeros() + getNumOutputNonzeros();
-        stream << "  int iw[" << ni << "];" << endl
-               << "  d w[" << nr << "];" << endl;
-
-        // Input buffers
-        stream << "  const d* arg[" << n_in << "] = {";
-        int off=0;
-        for (int i=0; i<n_in; ++i) {
-          if (i!=0) stream << ", ";
-          stream << gen.work(off);
-          off += input(i).nnz();
-        }
-        stream << "};" << endl;
-
-        // Output buffers
-        stream << "  d* res[" << n_out << "] = {";
-        for (int i=0; i<n_out; ++i) {
-          if (i!=0) stream << ", ";
-          stream << gen.work(off);
-          off += output(i).nnz();
-        }
-        stream << "};" << endl;
-
-        // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
-        stream << "  int j;" << endl
-               << "  d* a = w;" << endl
-               << "  for (j=0; j<" << getNumInputNonzeros() << "; ++j) "
-               << "scanf(\"%lf\", a++);" << endl;
-
-        // Call the function
-        stream << "  int flag = eval(arg, res, iw, " << gen.work(off) << ");" << endl
-               << "  if (flag) return flag;" << endl;
-
-        // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
-        stream << "  const d* r = w+" << getNumInputNonzeros() << ";" << endl
-               << "  for (j=0; j<" << getNumOutputNonzeros() << "; ++j) "
-               << gen.printf("%g ", "*r++") << endl;
-        // End with newline
-        stream << "  " << gen.printf("\\n") << endl;
-
-        // Finalize function
-        stream << "  return 0;" << endl
-               << "}" << endl << endl;
-      }
-    }
   }
 
-  void FunctionInternal::generateDeclarations(std::ostream &stream, const std::string& type,
-                                              CodeGenerator& gen) const {
-    // Nothing to declare
-  }
-
-  void FunctionInternal::generateBody(std::ostream &stream, const std::string& type,
-                                      CodeGenerator& gen) const {
-    casadi_error("FunctionInternal::generateBody: generateBody not defined for class "
-                 << typeid(*this).name());
-  }
-
-  void FunctionInternal::generateIO(CodeGenerator& gen) {
+  void FunctionInternal::exposeFunction(CodeGenerator& gen, const std::string& fname) const {
     // Short-hands
     int n_i = input_.data.size();
     int n_o = output_.data.size();
@@ -2201,6 +2075,128 @@ namespace casadi {
     s << "  return 0;" << endl;
     s << "}" << endl;
     s << endl;
+
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
+
+    // Generate mex gateway for the function
+    if (gen.mex) {
+      // Declare wrapper
+      s << "void mex_" << fname
+             << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {" << endl
+             << "  int i, j;" << endl;
+
+      // Check arguments
+      s << "  if (argc>" << n_in << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
+             << "\"Evaluation of \\\"" << fname << "\\\" failed. Too many input arguments "
+             << "(%d, max " << n_in << ")\", argc);" << endl;
+
+      s << "  if (resc>" << n_out << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
+             << "\"Evaluation of \\\"" << fname << "\\\" failed. "
+             << "Too many output arguments (%d, max " << n_out << ")\", resc);" << endl;
+
+      // Work vectors, including input buffers
+      size_t ni, nr;
+      nTmp(ni, nr);
+      int i_nnz = 0;
+      for (int i=0; i<n_in; ++i) {
+        const Sparsity& s = input(i).sparsity();
+        i_nnz += s.nnz();
+        nr = max(nr, static_cast<size_t>(s.size1())); // To be able to copy a column
+        nr = max(nr, static_cast<size_t>(s.size2())); // To be able to copy a row
+      }
+      nr += i_nnz;
+      s << "  int iw[" << ni << "];" << endl;
+      s << "  d w[" << nr << "];" << endl;
+      string fw = "w+" + gen.numToString(i_nnz);
+
+      // Copy inputs to buffers
+      int offset=0;
+      s << "  const d* arg[" << n_in << "] = {0};" << endl;
+      for (int i=0; i<n_in; ++i) {
+        std::string p = "argv[" + gen.numToString(i) + "]";
+        s << "  if (--argc>=0) arg[" << i << "] = "
+               << gen.from_mex(p, "w", offset, input(i).sparsity(), fw) << endl;
+        offset += input(i).nnz();
+      }
+
+      // Output sparsities
+      s << "  d* res[" << n_out << "] = {0};" << endl;
+      for (int i=0; i<n_out; ++i) {
+        s << "  if (--resc>=0) resv[" << i << "] = "
+               << gen.to_mex(output(i).sparsity(), "&res["+gen.numToString(i)+"]") << endl;
+      }
+
+      // Call the function
+      s << "  i = " << fname << "(arg, res, iw, " << fw << ");" << endl;
+      s << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
+             << "\\\" failed.\");" << endl;
+
+      // Finalize mex gateway
+      s << "}" << endl << endl;
+    }
+    if (gen.main) {
+      // Declare wrapper
+      s << "int main_" << fname << "(int argc, char* argv[]) {" << endl;
+
+      // Work vectors and input and output buffers
+      size_t ni, nr;
+      nTmp(ni, nr);
+      nr += getNumInputNonzeros() + getNumOutputNonzeros();
+      s << "  int iw[" << ni << "];" << endl
+             << "  d w[" << nr << "];" << endl;
+
+      // Input buffers
+      s << "  const d* arg[" << n_in << "] = {";
+      int off=0;
+      for (int i=0; i<n_in; ++i) {
+        if (i!=0) s << ", ";
+        s << gen.work(off);
+        off += input(i).nnz();
+      }
+      s << "};" << endl;
+
+      // Output buffers
+      s << "  d* res[" << n_out << "] = {";
+      for (int i=0; i<n_out; ++i) {
+        if (i!=0) s << ", ";
+        s << gen.work(off);
+        off += output(i).nnz();
+      }
+      s << "};" << endl;
+
+      // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
+      s << "  int j;" << endl
+             << "  d* a = w;" << endl
+             << "  for (j=0; j<" << getNumInputNonzeros() << "; ++j) "
+             << "scanf(\"%lf\", a++);" << endl;
+
+      // Call the function
+      s << "  int flag = eval(arg, res, iw, " << gen.work(off) << ");" << endl
+             << "  if (flag) return flag;" << endl;
+
+      // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
+      s << "  const d* r = w+" << getNumInputNonzeros() << ";" << endl
+             << "  for (j=0; j<" << getNumOutputNonzeros() << "; ++j) "
+             << gen.printf("%g ", "*r++") << endl;
+      // End with newline
+      s << "  " << gen.printf("\\n") << endl;
+
+      // Finalize function
+      s << "  return 0;" << endl
+        << "}" << endl << endl;
+    }
+  }
+
+  void FunctionInternal::generateDeclarations(std::ostream &stream, const std::string& type,
+                                              CodeGenerator& gen) const {
+    // Nothing to declare
+  }
+
+  void FunctionInternal::generateBody(std::ostream &stream, const std::string& type,
+                                      CodeGenerator& gen) const {
+    casadi_error("FunctionInternal::generateBody: generateBody not defined for class "
+                 << typeid(*this).name());
   }
 
   Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,

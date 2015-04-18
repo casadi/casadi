@@ -152,6 +152,9 @@ namespace casadi {
 
     //  private:
   public:
+    // Real-type used for the codegen
+    std::string real_t;
+
     // Are we creating a MEX file?
     bool mex;
 
