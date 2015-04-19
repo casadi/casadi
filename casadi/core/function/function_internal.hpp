@@ -236,12 +236,8 @@ namespace casadi {
     */
     MXFunction wrapMXFunction();
 
-    /** \brief  Print to a stream */
-    virtual void generateCode(std::ostream &cfile, const Dictionary& opts);
-
     /** \brief Generate code the function */
-    virtual void generateFunction(CodeGenerator& gen, const std::string& fname,
-                                  std::ostream &stream) const;
+    virtual void generateFunction(CodeGenerator& gen, const std::string& fname) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
     void exposeFunction(CodeGenerator& gen, const std::string& fname) const;

@@ -1943,7 +1943,7 @@ namespace casadi {
     s.close();
   }
 
-  void SymbolicOCP::generateFunction(std::ostream &stream, const std::string& fname,
+  void SymbolicOCP::generateFunction(const std::string& fname,
                                      const std::vector<MX>& f_in,
                                      const std::vector<MX>& f_out,
                                      CodeGenerator& gen,
@@ -1951,20 +1951,21 @@ namespace casadi {
     MXFunction f(f_in, f_out);
     f.setOption("name", fname);
     f.init();
-    f.generateFunction(gen, fname, stream);
+    gen.addFunction(f, fname, false);
     size_t ni, nr;
     f.nTmp(ni, nr);
 
     // Size of work vectors needed
-    stream << "void " << fname << "_nwork(int *ni, int *nr) {" << endl;
-    stream << "  if (ni) *ni = " << ni << ";" << endl;
-    stream << "  if (nr) *nr = " << nr << ";" << endl;
-    stream << "}" << endl << endl;
+    gen.functions
+      << "void " << fname << "_nwork(int *ni, int *nr) {" << endl
+      << "  if (ni) *ni = " << ni << ";" << endl
+      << "  if (nr) *nr = " << nr << ";" << endl
+      << "}" << endl << endl;
 
     // Forward mode directional derivative
     if (fwd) {
       MXFunction f_fwd = shared_cast<MXFunction>(f.derForward(1));
-      generateFunction(stream, fname+"_fwd",
+      generateFunction(fname+"_fwd",
                        f_fwd.inputExpr(), f_fwd.outputExpr(), gen);
     }
 
@@ -1972,13 +1973,13 @@ namespace casadi {
     if (adj || foa) {
       MXFunction f_adj = shared_cast<MXFunction>(f.derReverse(1));
       if (adj) {
-        generateFunction(stream, fname+"_adj",
+        generateFunction(fname+"_adj",
                          f_adj.inputExpr(), f_adj.outputExpr(), gen);
       }
       // Forward-over-reverse mode directional derivative
       if (foa) {
         MXFunction f_foa = shared_cast<MXFunction>(f_adj.derForward(1));
-        generateFunction(stream, fname+"_foa",
+        generateFunction(fname+"_foa",
                          f_foa.inputExpr(), f_foa.outputExpr(), gen);
       }
     }
@@ -2021,7 +2022,7 @@ namespace casadi {
     }
     int offset_ind = gen.getConstant(dims, true);
     int inv_offset_ind = gen.getConstant(inv_offset, true);
-    gen.function_
+    gen.functions
       << "void " << gen.prefix
       << "input_dims(const int **dims, const int **offset, const int **inv_offset) {" << endl
       << "  if (dims) *dims = s" << dims_ind << ";" << endl
@@ -2054,7 +2055,7 @@ namespace casadi {
     }
     offset_ind = gen.getConstant(dims, true);
     inv_offset_ind = gen.getConstant(inv_offset, true);
-    gen.function_
+    gen.functions
       << "void " << gen.prefix
       << "output_dims(const int **dims, const int **offset, const int **inv_offset) {" << endl
       << "  if (dims) *dims = s" << dims_ind << ";" << endl
@@ -2063,21 +2064,21 @@ namespace casadi {
       << "}" << endl << endl;
 
     // Basic functions individually
-    generateFunction(gen.function_, gen.prefix+"eval_ode", v_in,
+    generateFunction(gen.prefix+"eval_ode", v_in,
                      vector<MX>(1, vertcat(this->ode)), gen);
-    generateFunction(gen.function_, gen.prefix+"eval_dae", v_in,
+    generateFunction(gen.prefix+"eval_dae", v_in,
                      vector<MX>(1, vertcat(this->dae)), gen);
-    generateFunction(gen.function_, gen.prefix+"eval_alg", v_in,
+    generateFunction(gen.prefix+"eval_alg", v_in,
                      vector<MX>(1, vertcat(this->alg)), gen);
-    generateFunction(gen.function_, gen.prefix+"eval_quad", v_in,
+    generateFunction(gen.prefix+"eval_quad", v_in,
                      vector<MX>(1, vertcat(this->quad)), gen);
-    generateFunction(gen.function_, gen.prefix+"eval_idef", v_in,
+    generateFunction(gen.prefix+"eval_idef", v_in,
                      vector<MX>(1, vertcat(this->idef)), gen);
-    generateFunction(gen.function_, gen.prefix+"eval_ydef", v_in,
+    generateFunction(gen.prefix+"eval_ydef", v_in,
                      vector<MX>(1, vertcat(this->ydef)), gen);
 
     // All functions at once, with derivatives
-    generateFunction(gen.function_, gen.prefix+"eval", v_in, v_out, gen, true, true, true);
+    generateFunction(gen.prefix+"eval", v_in, v_out, gen, true, true, true);
 
     // Jacobian of all input w.r.t. all outputs
     MX v_in_all = vertcat(v_in);
@@ -2085,9 +2086,9 @@ namespace casadi {
     MX J = jacobian(v_out_all, v_in_all);
 
     // Codegen it
-    generateFunction(gen.function_, gen.prefix+"eval_jac", v_in, vector<MX>(1, J), gen);
+    generateFunction(gen.prefix+"eval_jac", v_in, vector<MX>(1, J), gen);
     int Jsp_ind = gen.addSparsity(J.sparsity());
-    gen.function_
+    gen.functions
       << "void " << gen.prefix
       << "jac_sparsity(int *nrow, int *ncol, const int **colind, const int **row) {" << endl
       << "  const int *s = s" << Jsp_ind << ";" << endl
@@ -2114,9 +2115,9 @@ namespace casadi {
     v_in.insert(v_in.begin(), lam.begin(), lam.end());
 
     // Codegen it
-    generateFunction(gen.function_, gen.prefix+"eval_hes", v_in, vector<MX>(1, H), gen);
+    generateFunction(gen.prefix+"eval_hes", v_in, vector<MX>(1, H), gen);
     int Hsp_ind = gen.addSparsity(H.sparsity());
-    gen.function_
+    gen.functions
       << "void " << gen.prefix
       << "hes_sparsity(int *nrow, int *ncol, const int **colind, const int **row) {" << endl
       << "  const int *s = s" << Hsp_ind << ";" << endl
@@ -2127,10 +2128,7 @@ namespace casadi {
       << "}" << endl << endl;
 
     // Flush to a file
-    ofstream s;
-    s.open(filename.c_str());
-    gen.flush(s);
-    s.close();
+    gen.generate(filename);
   }
 
 } // namespace casadi

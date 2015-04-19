@@ -1954,23 +1954,9 @@ namespace casadi {
     return MXFunction(ret_argv, J);
   }
 
-  void FunctionInternal::generateCode(std::ostream &cfile, const Dictionary& opts) {
+  void FunctionInternal::generateFunction(CodeGenerator& gen,
+                                          const std::string& fname) const {
     assertInit();
-
-    // Create a code generator object
-    CodeGenerator gen(opts);
-
-    // Generate the actual function
-    generateFunction(gen, "eval", gen.function_);
-    exposeFunction(gen, "eval");
-
-    // Flush the code generator
-    gen.flush(cfile);
-  }
-
-  void FunctionInternal::
-  generateFunction(CodeGenerator& gen, const std::string& fname,
-                   std::ostream &stream) const {
 
     // Add standard math
     gen.addInclude("math.h");
@@ -1980,20 +1966,21 @@ namespace casadi {
     gen.addAuxiliary(CodeGenerator::AUX_SIGN);
 
     // Generate declarations
-    generateDeclarations(stream, gen.real_t, gen);
+    generateDeclarations(gen.functions, gen.real_t, gen);
 
     // Define function
-    stream << "/* " << getSanitizedName() << " */" << endl;
-    stream << "int " << fname << "(const " << gen.real_t << "* const* arg, " << gen.real_t
-           << "* const* res, int* iii, " << gen.real_t << "* w) {" << endl;
+    gen.functions
+      << "/* " << getSanitizedName() << " */" << endl
+      << "int " << fname << "(const " << gen.real_t << "* const* arg, " << gen.real_t
+      << "* const* res, int* iii, " << gen.real_t << "* w) {" << endl;
 
     // Insert the function body
-    generateBody(stream, gen.real_t, gen);
+    generateBody(gen.functions, gen.real_t, gen);
 
     // Finalize the function
-    stream << "  return 0;" << endl;
-    stream << "}" << endl;
-    stream << endl;
+    gen.functions << "  return 0;" << endl
+                  << "}" << endl
+                  << endl;
   }
 
   void FunctionInternal::exposeFunction(CodeGenerator& gen, const std::string& fname) const {
@@ -2001,7 +1988,7 @@ namespace casadi {
     int n_i = input_.data.size();
     int n_o = output_.data.size();
     int n_io = n_i + n_o;
-    stringstream &s = gen.function_;
+    stringstream &s = gen.functions;
 
     // Function that returns the number of inputs and outputs
     s << endl;

@@ -454,10 +454,6 @@ namespace casadi {
     /** \brief Generate C code for the function */
     std::string generateCode(const Dictionary& opts=Dictionary());
 
-    /** \brief Generate code without meta information */
-    void generateFunction(CodeGenerator& gen, const std::string& fname,
-                          std::ostream &stream) const;
-
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
     FunctionInternal* operator->();

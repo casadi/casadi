@@ -40,6 +40,15 @@ namespace casadi {
     /// Constructor
     CodeGenerator(const Dictionary& opts = Dictionary());
 
+    /// Add a function
+    void addFunction(const Function& f, const std::string& fname, bool expose=true);
+
+    /// Generate the code to a stream
+    void generate(std::ostream& s) const;
+
+    /// Generate a file
+    void generate(const std::string& fname) const;
+
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path = false);
 
@@ -92,9 +101,6 @@ namespace casadi {
 
     /** \brief Add a built-in auxiliary function */
     void addAuxiliary(Auxiliary f);
-
-    /// Flush generated file to a stream
-    void flush(std::ostream& s) const;
 
     /** Convert in integer to a string */
     static std::string numToString(int n);
@@ -173,8 +179,7 @@ namespace casadi {
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes_;
     std::stringstream auxiliaries_;
-    std::stringstream dependencies_;
-    std::stringstream function_;
+    std::stringstream functions;
     std::stringstream finalization_;
 
     // Set of already included header files
