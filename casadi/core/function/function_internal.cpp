@@ -1983,21 +1983,19 @@ namespace casadi {
                   << endl;
   }
 
-  void FunctionInternal::exposeFunction(CodeGenerator& gen, const std::string& fname) const {
+  void FunctionInternal::generateMeta(CodeGenerator& gen, const std::string& fname) const {
     // Short-hands
-    int n_i = input_.data.size();
-    int n_o = output_.data.size();
-    int n_io = n_i + n_o;
+    int n_in = getNumInputs();
+    int n_out = getNumOutputs();
     stringstream &s = gen.functions;
 
     // Function that returns the number of inputs and outputs
-    s << endl;
-    s << "int init(int *n_in, int *n_out) {" << endl;
-    s << "  *n_in = " << n_i << ";" << endl;
-    s << "  *n_out = " << n_o << ";" << endl;
-    s << "  return 0;" << endl;
-    s << "}" << endl;
-    s << endl;
+    s << "int " << fname << "_narg(int *n_in, int *n_out) {" << endl
+      << "  *n_in = " << n_in << ";" << endl
+      << "  *n_out = " << n_out << ";" << endl
+      << "  return 0;" << endl
+      << "}" << endl
+      << endl;
 
     // Inputs and outputs for each parsity index
     std::multimap<int, int> io_sparsity_index;
@@ -2006,9 +2004,9 @@ namespace casadi {
     int num_io_patterns = 0;
 
     // Get the sparsity pattern of all inputs
-    for (int i=0; i<n_io; ++i) {
+    for (int i=0; i<n_in+n_out; ++i) {
       // Get the sparsity pattern
-      const Sparsity& sp = i<n_i ? input(i).sparsity() : output(i-n_i).sparsity();
+      const Sparsity& sp = i<n_in ? input(i).sparsity() : output(i-n_in).sparsity();
 
       // Print the sparsity pattern or retrieve the index of an existing pattern
       int ind = gen.addSparsity(sp);
@@ -2019,10 +2017,11 @@ namespace casadi {
     }
 
     // Function that returns the sparsity pattern
-    s << "int getSparsity(int i, int *nrow, int *ncol, int **colind, int **row) {" << endl;
+    s << "int " << fname << "_sparsity"
+      << "(int i, int *nrow, int *ncol, int **colind, int **row) {" << endl;
 
     // Get the sparsity index using a switch
-    s << "  int* sp;" << endl;
+    s << "  int* s;" << endl;
     s << "  switch (i) {" << endl;
 
     // Loop over all sparsity patterns
@@ -2037,7 +2036,7 @@ namespace casadi {
       }
 
       // Map to sparsity
-      s << "      sp = s" << i << "; break;" << endl;
+      s << "      s = s" << i << "; break;" << endl;
     }
 
     // Finalize the switch
@@ -2046,25 +2045,22 @@ namespace casadi {
     s << "  }" << endl << endl;
 
     // Decompress the sparsity pattern
-    s << "  *nrow = sp[0];" << endl;
-    s << "  *ncol = sp[1];" << endl;
-    s << "  *colind = sp + 2;" << endl;
-    s << "  *row = sp + 2 + (*ncol + 1);" << endl;
+    s << "  *nrow = s[0];" << endl;
+    s << "  *ncol = s[1];" << endl;
+    s << "  *colind = s + 2;" << endl;
+    s << "  *row = s + 2 + (*ncol + 1);" << endl;
     s << "  return 0;" << endl;
     s << "}" << endl << endl;
 
     // Function that returns work vector lengths
     size_t ni, nr;
     nTmp(ni, nr);
-    s << "int nwork(int *ni, int *nr) {" << endl;
+    s << "int " << fname << "_work(int *ni, int *nr) {" << endl;
     s << "  if (ni) *ni = " << ni << ";" << endl;
     s << "  if (nr) *nr = " << nr << ";" << endl;
     s << "  return 0;" << endl;
     s << "}" << endl;
     s << endl;
-
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
 
     // Generate mex gateway for the function
     if (gen.mex) {

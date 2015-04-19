@@ -41,7 +41,7 @@ namespace casadi {
     CodeGenerator(const Dictionary& opts = Dictionary());
 
     /// Add a function
-    void addFunction(const Function& f, const std::string& fname, bool expose=true);
+    void addFunction(const Function& f, const std::string& fname);
 
     /// Generate the code to a stream
     void generate(std::ostream& s) const;

@@ -44,14 +44,15 @@ namespace casadi {
     casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
                           << bin_name_ << ". error code (WIN32): "<< GetLastError());
 
-    initPtr init = (initPtr)GetProcAddress(handle_, TEXT("init"));
-    if (init==0) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
-    getSparsityPtr getSparsity = (getSparsityPtr)GetProcAddress(handle_, TEXT("getSparsity"));
-    if (getSparsity==0) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
+    initPtr init = (initPtr)GetProcAddress(handle_, TEXT("eval_narg"));
+    if (init==0) throw CasadiException("ExternalFunctionInternal: no \"eval_narg\" found");
+    getSparsityPtr getSparsity = (getSparsityPtr)GetProcAddress(handle_, TEXT("eval_sparsity"));
+    if (getSparsity==0)
+      throw CasadiException("ExternalFunctionInternal: no \"eval_sparsity\" found");
     eval_ = (evalPtr) GetProcAddress(handle_, TEXT("eval"));
     if (eval_==0) throw CasadiException("ExternalFunctionInternal: no \"eval\" found");
-    nworkPtr nwork = (nworkPtr)GetProcAddress(handle_, TEXT("nwork"));
-    if (nwork==0) throw CasadiException("ExternalFunctionInternal: no \"nwork\" found");
+    nworkPtr nwork = (nworkPtr)GetProcAddress(handle_, TEXT("eval_work"));
+    if (nwork==0) throw CasadiException("ExternalFunctionInternal: no \"eval_work\" found");
 
 #else // _WIN32
     handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
@@ -62,17 +63,17 @@ namespace casadi {
     dlerror();
 
     // Load symbols
-    initPtr init = (initPtr)dlsym(handle_, "init");
-    casadi_assert_message(!dlerror(), "ExternalFunctionInternal: no \"init\" found. "
+    initPtr init = (initPtr)dlsym(handle_, "eval_narg");
+    casadi_assert_message(!dlerror(), "ExternalFunctionInternal: no \"eval_narg\" found. "
                           "Possible cause: If the function was generated from CasADi, "
                           "make sure that it was compiled with a C compiler. If the "
                           "function is C++, make sure to use extern \"C\" linkage.");
-    getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "getSparsity");
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
+    getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "eval_sparsity");
+    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"eval_sparsity\" found");
     eval_ = (evalPtr) dlsym(handle_, "eval");
     if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"eval\" found");
-    nworkPtr nwork = (nworkPtr)dlsym(handle_, "nwork");
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"nwork\" found");
+    nworkPtr nwork = (nworkPtr)dlsym(handle_, "eval_work");
+    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"eval_work\" found");
 
 #endif // _WIN32
 

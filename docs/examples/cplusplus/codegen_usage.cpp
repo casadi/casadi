@@ -30,73 +30,27 @@
  *  Note that other usage, e.g. accessing the internal data structures in the 
  *  generated files is not recommended and subject to change.
  *
- *  We show three ways of calling generated code. First from C with the signature
- *  of the generated file known, secondly from C with the signature unknown
- *  and thirdly from C++ using the CasADi function ExternalFunction.
+ *  We show how the generated code can be used from C (or C++), without requiring
+ *  any CasADi classes as well as how to use it from C++ using CasADi's ExternalFunction.
  *
- *  Joel Andersson, K.U. Leuven 2013
+ *  Joel Andersson, 2013-2015
  */
 
 #include <stdio.h>
 #include <dlfcn.h>
 
-
-/* Usage from C with known signature of the generated function */
-int usage_c_known_signature(){
+// Usage from C
+int usage_c(){
   printf("---\n");
-  printf("Usage from C with known signature.\n");
+  printf("Usage from C.\n");
   printf("\n");
 
-  /* Signature of the entry point */
-  typedef void (*evaluatePtr)(const double* x0, const double* x1, double* r0, double* r1);
-  
-  /* Handle to the dll */
-  void* handle;
+  /* Signature of the entry points */
+  typedef int (*nargPtr)(int *n_in, int *n_out);
+  typedef int (*sparsityPtr)(int n_in, int *n_col, int *n_row, int **colind, int **row);
+  typedef int (*workPtr)(int *ni, int *nr);
+  typedef int (*evalPtr)(const double* const* arg, double* const* res, int* iw, double* w);
 
-  /* Load the dll */
-  handle = dlopen("./f.so", RTLD_LAZY);  
-  if(handle==0){
-    printf("Cannot open f.so, error %s\n", dlerror()); 
-    return 1;
-  }
-
-  /* Reset error */
-  dlerror(); 
-
-  /* Get a pointer to the function */
-  evaluatePtr evaluate = (evaluatePtr)dlsym(handle, "evaluate");
-  if(dlerror()){
-    printf("Failed to retrieve \"evaluate\" function.\n");
-    return 1;
-  }
-  
-  /* Evaluate the function */
-  const double x_val[] = {1,2,3,4};
-  const double y_val = 5;
-  double res0;
-  double res1[4];
-  evaluate(x_val, &y_val, &res0, res1);
-  
-  printf("result (0): %g\n",res0);
-  printf("result (1): [%g,%g;%g,%g]\n",res1[0],res1[1],res1[2],res1[3]);
-
-  /* Free the handle */
-  dlclose(handle);
-
-  return 0;
-}
-
-// Usage from C with unknown signature of the generated function
-int usage_c_unknown_signature(){
-  printf("---\n");
-  printf("Usage from C with unknown signature.\n");
-  printf("\n");
-
-  /* Signature of the entry point */
-  typedef int (*evaluateWrapPtr)(const double** x, double** r);
-  typedef int (*initPtr)(int *n_in_, int *n_out_);
-  typedef int (*getSparsityPtr)(int n_in, int *n_col, int *n_row, int **colind, int **row);
-  
   /* Handle to the dll */
   void* handle;
 
@@ -111,29 +65,36 @@ int usage_c_unknown_signature(){
   dlerror(); 
 
   /* Function for initialization and getting the number of inputs and outputs */
-  initPtr init = (initPtr)dlsym(handle, "init");
+  nargPtr narg = (nargPtr)dlsym(handle, "eval_narg");
   if(dlerror()){
-    printf("Failed to retrieve \"init\" function.\n");
+    printf("Failed to retrieve \"narg\" function.\n");
     return 1;
   }
 
   /* Function for getting the sparsities of the inputs and outptus */
-  getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle, "getSparsity");
+  sparsityPtr sparsity = (sparsityPtr)dlsym(handle, "eval_sparsity");
   if(dlerror()){
-    printf("Failed to retrieve \"getSparsity\" function.\n");
+    printf("Failed to retrieve \"sparsity\" function.\n");
+    return 1;
+  }
+
+  /* Function for getting the size of the required work vectors */
+  workPtr work = (workPtr)dlsym(handle, "eval_work");
+  if(dlerror()){
+    printf("Failed to retrieve \"work\" function.\n");
     return 1;
   }
 
   /* Function for numerical evaluation */
-  evaluateWrapPtr evaluateWrap = (evaluateWrapPtr)dlsym(handle, "evaluateWrap");
+  evalPtr eval = (evalPtr)dlsym(handle, "eval");
   if(dlerror()){
-    printf("Failed to retrieve \"evaluateWrap\" function.\n");
+    printf("Failed to retrieve \"eval\" function.\n");
     return 1;
   }
 
   /* Initialize and get the number of inputs and outputs */
   int n_in=-1, n_out=-1;
-  init(&n_in, &n_out);
+  narg(&n_in, &n_out);
   printf("n_in = %d, n_out = %d\n", n_in, n_out);
 
   /* Get sparsities */
@@ -147,7 +108,7 @@ int usage_c_unknown_signature(){
 
     int nrow,ncol;
     int *colind, *row;
-    getSparsity(ind,&nrow,&ncol,&colind,&row);
+    sparsity(ind,&nrow,&ncol,&colind,&row);
 
     printf("  Dimension: %d-by-%d\n",nrow,ncol);
     printf("  Nonzeros: {");
@@ -167,7 +128,21 @@ int usage_c_unknown_signature(){
 
     printf("}\n\n");
   }
-  
+
+  /* Allocate work vectors */
+  int n_iw=-1, n_w=-1;
+  work(&n_iw, &n_w);
+  printf("n_iw = %d, n_w = %d\n", n_iw, n_w);
+  const int n=256;
+  if (n_iw>n || n_w>n) {
+    printf("Too small work vectors allocated. Required int array of length %d"
+           "(%d allocated) and double array of length %d (%d allocated)\n",
+           n_iw, n, n_w, n);
+    return 1;
+  }
+  int iw[n];
+  double w[n];
+
   /* Evaluate the function */
   const double x_val[] = {1,2,3,4};
   const double y_val = 5;
@@ -175,7 +150,7 @@ int usage_c_unknown_signature(){
   double res1[4];
   const double *all_inputs[] = {x_val,&y_val};
   double *all_outputs[] = {&res0,res1};
-  evaluateWrap(all_inputs,all_outputs);
+  eval(all_inputs,all_outputs, iw, w);
   
   printf("result (0): %g\n",res0);
   printf("result (1): [%g,%g;%g,%g]\n",res1[0],res1[1],res1[2],res1[3]);
@@ -237,15 +212,11 @@ int main(){
   int flag = system(compile_command.c_str());
   casadi_assert_message(flag==0, "Compilation failed");
 
-  // Example 1, usage from C (signatures known)
-  flag = usage_c_known_signature();
-  casadi_assert_message(flag==0, "Example 1 failed");
+  // Usage from C
+  flag = usage_c();
+  casadi_assert_message(flag==0, "Example failed");
 
-  // Example 2, usage from C (signatured unknown)
-  flag = usage_c_unknown_signature();
-  casadi_assert_message(flag==0, "Example 2 failed");
-
-  // Example 3, usage from C++
+  // Usage from C++
   usage_cplusplus();
 
   return 0;

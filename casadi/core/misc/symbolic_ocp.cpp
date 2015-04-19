@@ -1845,7 +1845,7 @@ namespace casadi {
 
   void SymbolicOCP::generateFunctionHeader(std::ostream &stream, const std::string& fname,
                                            bool fwd, bool adj, bool foa) {
-    stream << "void " << fname << "_nwork(int *ni, int *nr);" << endl;
+    stream << "void " << fname << "_work(int *ni, int *nr);" << endl;
     stream << "int " << fname
            << "(const double* const* arg, double* const* res, int* iw, double* w);" << endl;
 
@@ -1951,16 +1951,9 @@ namespace casadi {
     MXFunction f(f_in, f_out);
     f.setOption("name", fname);
     f.init();
-    gen.addFunction(f, fname, false);
+    gen.addFunction(f, fname);
     size_t ni, nr;
     f.nTmp(ni, nr);
-
-    // Size of work vectors needed
-    gen.functions
-      << "void " << fname << "_nwork(int *ni, int *nr) {" << endl
-      << "  if (ni) *ni = " << ni << ";" << endl
-      << "  if (nr) *nr = " << nr << ";" << endl
-      << "}" << endl << endl;
 
     // Forward mode directional derivative
     if (fwd) {

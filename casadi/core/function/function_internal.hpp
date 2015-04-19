@@ -240,7 +240,7 @@ namespace casadi {
     virtual void generateFunction(CodeGenerator& gen, const std::string& fname) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
-    void exposeFunction(CodeGenerator& gen, const std::string& fname) const;
+    void generateMeta(CodeGenerator& gen, const std::string& fname) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(std::ostream &stream, const std::string& type,
