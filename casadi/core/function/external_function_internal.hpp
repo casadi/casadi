@@ -47,7 +47,7 @@ namespace casadi {
   public:
 
     /** \brief  constructor */
-    explicit ExternalFunctionInternal(const std::string& bin_name);
+    explicit ExternalFunctionInternal(const std::string& bin_name, const std::string& f_name);
 
     /** \brief  clone function */
     virtual ExternalFunctionInternal* clone() const;
@@ -68,14 +68,17 @@ namespace casadi {
 
     ///@{
     /** \brief  Function pointer types */
+    typedef int (*nargPtr)(int *n_in, int *n_out);
+    typedef int (*sparsityPtr)(int n_in, int *n_row, int *n_col, int **colind, int **row);
+    typedef int (*workPtr)(int *ni, int *nr);
     typedef int (*evalPtr)(const double* const* arg, double* const* res, int* iw, double* w);
-    typedef int (*initPtr)(int *n_in, int *n_out);
-    typedef int (*getSparsityPtr)(int n_in, int *n_row, int *n_col, int **colind, int **row);
-    typedef int (*nworkPtr)(int *ni, int *nr);
     ///@}
 
     /** \brief  Name of binary */
     std::string bin_name_;
+
+    /** \brief  Name of the function inside the binary */
+    std::string f_name_;
 
     /** \brief  Function pointers */
     evalPtr eval_;

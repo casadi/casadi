@@ -37,8 +37,8 @@ using namespace std;
   ExternalFunction::ExternalFunction() {
   }
 
-  ExternalFunction::ExternalFunction(const std::string& bin_name) {
-    assignNode(new ExternalFunctionInternal(bin_name));
+  ExternalFunction::ExternalFunction(const string& bin_name, const string& f_name) {
+    assignNode(new ExternalFunctionInternal(bin_name, f_name));
   }
 
   ExternalFunctionInternal* ExternalFunction::operator->() {

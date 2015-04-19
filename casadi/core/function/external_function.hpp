@@ -48,7 +48,7 @@ public:
   ExternalFunction();
 
   /** \brief  Create an empty function */
-  explicit ExternalFunction(const std::string& bin_name);
+  explicit ExternalFunction(const std::string& bin_name, const std::string& f_name="eval");
 
   /** \brief  Access functions of the node */
   ExternalFunctionInternal* operator->();

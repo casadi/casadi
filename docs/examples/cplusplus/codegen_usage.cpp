@@ -132,7 +132,6 @@ int usage_c(){
   /* Allocate work vectors */
   int n_iw=-1, n_w=-1;
   work(&n_iw, &n_w);
-  printf("n_iw = %d, n_w = %d\n", n_iw, n_w);
   const int n=256;
   if (n_iw>n || n_w>n) {
     printf("Too small work vectors allocated. Required int array of length %d"

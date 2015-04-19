@@ -34,9 +34,14 @@ namespace casadi {
 
   using namespace std;
 
-  ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) :
-    bin_name_(bin_name) {
+  ExternalFunctionInternal::ExternalFunctionInternal(const string& bin_name, const string& f_name) :
+    bin_name_(bin_name), f_name_(f_name) {
 #ifdef WITH_DL
+
+    // Names of the functions we want to access
+    string narg_s = f_name_ + "_narg";
+    string sparsity_s = f_name_ + "_sparsity";
+    string work_s = f_name_ + "_work";
 
     // Load the dll
 #ifdef _WIN32
@@ -44,15 +49,15 @@ namespace casadi {
     casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
                           << bin_name_ << ". error code (WIN32): "<< GetLastError());
 
-    initPtr init = (initPtr)GetProcAddress(handle_, TEXT("eval_narg"));
-    if (init==0) throw CasadiException("ExternalFunctionInternal: no \"eval_narg\" found");
-    getSparsityPtr getSparsity = (getSparsityPtr)GetProcAddress(handle_, TEXT("eval_sparsity"));
-    if (getSparsity==0)
-      throw CasadiException("ExternalFunctionInternal: no \"eval_sparsity\" found");
-    eval_ = (evalPtr) GetProcAddress(handle_, TEXT("eval"));
-    if (eval_==0) throw CasadiException("ExternalFunctionInternal: no \"eval\" found");
-    nworkPtr nwork = (nworkPtr)GetProcAddress(handle_, TEXT("eval_work"));
-    if (nwork==0) throw CasadiException("ExternalFunctionInternal: no \"eval_work\" found");
+    nargPtr narg = (nargPtr)GetProcAddress(handle_, TEXT(narg_s.c_str()));
+    if (init==0) throw CasadiException("ExternalFunctionInternal: no \""+narg_s+"\" found");
+    sparsityPtr sparsity = (sparsityPtr)GetProcAddress(handle_, TEXT(sparsity_s.c_str()));
+    if (sparsity==0)
+      throw CasadiException("ExternalFunctionInternal: no \""+sparsity_s+"\" found");
+    eval_ = (evalPtr) GetProcAddress(handle_, TEXT(f_name_.c_str()));
+    if (eval_==0) throw CasadiException("ExternalFunctionInternal: no \""+f_name_+"\" found");
+    workPtr work = (workPtr)GetProcAddress(handle_, TEXT(work_s.c_str()));
+    if (work==0) throw CasadiException("ExternalFunctionInternal: no \""+work_s+"\" found");
 
 #else // _WIN32
     handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
@@ -63,24 +68,23 @@ namespace casadi {
     dlerror();
 
     // Load symbols
-    initPtr init = (initPtr)dlsym(handle_, "eval_narg");
-    casadi_assert_message(!dlerror(), "ExternalFunctionInternal: no \"eval_narg\" found. "
+    nargPtr narg = (nargPtr)dlsym(handle_, narg_s.c_str());
+    casadi_assert_message(!dlerror(), "ExternalFunctionInternal: no \""+narg_s+"\" found. "
                           "Possible cause: If the function was generated from CasADi, "
                           "make sure that it was compiled with a C compiler. If the "
                           "function is C++, make sure to use extern \"C\" linkage.");
-    getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "eval_sparsity");
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"eval_sparsity\" found");
-    eval_ = (evalPtr) dlsym(handle_, "eval");
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"eval\" found");
-    nworkPtr nwork = (nworkPtr)dlsym(handle_, "eval_work");
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \"eval_work\" found");
+    sparsityPtr sparsity = (sparsityPtr)dlsym(handle_, sparsity_s.c_str());
+    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \""+sparsity_s+"\" found");
+    eval_ = (evalPtr) dlsym(handle_, f_name_.c_str());
+    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \""+f_name_+"\" found");
+    workPtr work = (workPtr)dlsym(handle_, work_s.c_str());
+    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \""+work_s+"\" found");
 
 #endif // _WIN32
-
     // Initialize and get the number of inputs and outputs
     int n_in=-1, n_out=-1;
-    int flag = init(&n_in, &n_out);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"init\" failed");
+    int flag = narg(&n_in, &n_out);
+    if (flag) throw CasadiException("ExternalFunctionInternal: \"narg\" failed");
 
     // Pass to casadi
     setNumInputs(n_in);
@@ -90,8 +94,8 @@ namespace casadi {
     for (int i=0; i<n_in+n_out; ++i) {
       // Get sparsity from file
       int nrow, ncol, *colind, *row;
-      flag = getSparsity(i, &nrow, &ncol, &colind, &row);
-      if (flag) throw CasadiException("ExternalFunctionInternal: \"getSparsity\" failed");
+      flag = sparsity(i, &nrow, &ncol, &colind, &row);
+      if (flag) throw CasadiException("ExternalFunctionInternal: \"sparsity\" failed");
 
       // Col offsets
       vector<int> colindv(colind, colind+ncol+1);
@@ -115,8 +119,8 @@ namespace casadi {
 
     // Get number of temporaries
     int ni, nr;
-    flag = nwork(&ni, &nr);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"nwork\" failed");
+    flag = work(&ni, &nr);
+    if (flag) throw CasadiException("ExternalFunctionInternal: \"work\" failed");
     ni_ = static_cast<size_t>(ni);
     nr_ = static_cast<size_t>(nr);
 #else // WITH_DL
@@ -144,7 +148,7 @@ namespace casadi {
                                        int* itmp, double* rtmp) {
 #ifdef WITH_DL
     int flag = eval_(arg, res, itmp, rtmp);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"eval\" failed");
+    if (flag) throw CasadiException("ExternalFunctionInternal: \""+f_name_+"\" failed");
 #endif // WITH_DL
   }
 
