@@ -1039,7 +1039,8 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],5.39346608659e-2,4,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
-      
+  
+  @memory_heavy()
   def test_QP(self):
     self.message("QP")
 

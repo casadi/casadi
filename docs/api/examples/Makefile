@@ -21,7 +21,8 @@ clean:
 $(PDF): %.pdf : %.py $(CASADI_OBJECT)
 	rm -rf pylab.py pylab.pyc matplotlibrc
 	grep -v "^#[^\!]" $< > _temp.py
-	pyreport -d -l _temp.py -o _temp.pdf
+	pyreport -v -d -l _temp.py -o _temp.pdf
+	ls -al
 	rm _temp.py
 	mv _temp.pdf $@
 	

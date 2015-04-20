@@ -580,3 +580,20 @@
     fun:_Znwm
     fun:_ZN2Py19ExtensionModuleBase10initializeEPKc
 }
+
+{
+   Travis errors (1)
+   Memcheck:Cond
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+}
+
+{
+   Travis errors (2)
+   Memcheck:Value8
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+}
+

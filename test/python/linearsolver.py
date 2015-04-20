@@ -353,7 +353,8 @@ class LinearSolverTests(casadiTestCase):
       solution.setInput(b_,"B")
       
       self.checkfunction(relay,solution,jacobian=False,evals=False)
-      
+  
+  @memory_heavy()
   def test_simple_solve_node(self):
     for A_,b_ in [
                      (DMatrix([[3,1],[7,2]]),DMatrix([[1,0.3],[0.5,0.7]])),    

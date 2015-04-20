@@ -47,7 +47,9 @@ try:
 except:
   pass
 
-class NLPtests(casadiTestCase):
+class ImplicitFunctiontests(casadiTestCase):
+  
+  @memory_heavy()
   def test_linear(self):
     for Solver, options in solvers:
       self.message(Solver)
