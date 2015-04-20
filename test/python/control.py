@@ -134,10 +134,14 @@ if not args.run_slow:
   lrdplesolvers = lrdplesolvers[:1]
   lrdlesolvers = lrdlesolvers[:1]
   
-def randstable(n,margin=0.8):
+def randstable(n,margin=0.8,minimal=0):
   r = margin
   A_ = tril(DMatrix(numpy.random.random((n,n))))
-  for i in range(n): A_[i,i] = numpy.random.random()*r*2-r
+  for i in range(n):
+    eig = 0
+    while abs(eig)<=minimal:
+      eig = numpy.random.random()*r*2-r
+    A_[i,i] = eig
 
   Q = scipy.linalg.orth(numpy.random.random((n,n)))
   return mul([Q,A_,Q.T])
@@ -561,7 +565,8 @@ class ControlTests(casadiTestCase):
           print Solver, options
           numpy.random.seed(1)
           print (n,K)
-          A_ = [randstable(n) for i in range(K)]
+          As = randstable(n,minimal=0.1)
+          A_ = [As+1e-6*randstable(n,minimal=0.1) for i in range(K)]
           
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
@@ -581,7 +586,7 @@ class ControlTests(casadiTestCase):
             return a[1:] + [a[0]]
             
           for a,v,x,xp in zip(A_,V_,X,sigma(X)):
-            self.checkarray(xp,mul([a,x,a.T])+v,digits=2 if "condensing" in str(Solver) else 7)
+            self.checkarray(xp,mul([a,x,a.T])+v,digits=2 if "condensing" in str(Solver) else 4)
           
   @requiresPlugin(DpleSolver,"slicot")
   def test_slicot_periodic_schur(self):

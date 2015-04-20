@@ -28,6 +28,7 @@ import unittest
 import sys
 from math import isnan, isinf
 import itertools
+import time
 
 import argparse
 import struct
@@ -112,7 +113,13 @@ class FunctionPool:
 
 class casadiTestCase(unittest.TestCase):
 
+
+  def tearDown(self):
+    t = time.time() - self.startTime
+    print "deltaT %s: %.3f" % ( self.id(), t)
+
   def __init__(self,*margs,**kwargs):
+    self.startTime = time.time()
     fun = getattr(getattr(self,margs[0]),'im_func')
     if not hasattr(fun,'tag_memory_heavy'):
       fun.tag_memory_heavy = False
