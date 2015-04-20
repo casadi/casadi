@@ -50,7 +50,7 @@ namespace casadi {
                           << bin_name_ << ". error code (WIN32): "<< GetLastError());
 
     nargPtr narg = (nargPtr)GetProcAddress(handle_, TEXT(narg_s.c_str()));
-    if (init==0) throw CasadiException("ExternalFunctionInternal: no \""+narg_s+"\" found");
+    if (narg==0) throw CasadiException("ExternalFunctionInternal: no \""+narg_s+"\" found");
     sparsityPtr sparsity = (sparsityPtr)GetProcAddress(handle_, TEXT(sparsity_s.c_str()));
     if (sparsity==0)
       throw CasadiException("ExternalFunctionInternal: no \""+sparsity_s+"\" found");
