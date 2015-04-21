@@ -35,7 +35,7 @@ matrix:
         - popd
         - sudo apt-get install valgrind -y
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test/python && ls -1 [o-z]*.py | grep -v helpers.py | xargs rm && popd
+        - pushd test/python && ls -1 [n-z]*.py | grep -v helpers.py | xargs rm && popd
         - pushd test && make unittests_py_valgrind && popd
     - compiler: gcc
       os: linux
@@ -52,7 +52,7 @@ matrix:
         - popd
         - sudo apt-get install valgrind -y
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test/python && ls -1 [n-z]*.py | grep -v helpers.py | xargs rm && popd
+        - pushd test/python && ls -1 [m-z]*.py | grep -v helpers.py | xargs rm && popd
         - pushd test && make unittests_py_valgrind && popd
     - compiler: gcc
       os: linux
@@ -109,7 +109,7 @@ matrix:
         - sudo apt-get install python-lxml python-ipdb python-docutils texlive-science latex2html doxygen texlive-font-utils texlive-latex-recommended texlive-fonts-recommended etoolbox graphviz -y
         - "mkdir -p ~/.matplotlib && echo 'backend : Agg' > ~/.matplotlib/matplotlibrc"
         - pushd docs/api && make full | grep -v "file loc from" && popd
-        - if [[ $TRAVIS_BRANCH == 'develop' ]]; then pushd docs/api; python /home/travis/build/testbot/helpers/publish_doc.py; popd; git pull; sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" ; python /home/travis/build/testbot/helpers/publish_builds.py ; fi
+        #- if [[ $TRAVIS_BRANCH == 'develop' ]]; then pushd docs/api; python /home/travis/build/casadi/testbot/helpers/publish_doc.py; popd; git pull; sh /home/travis/build/casadi/testbot/helpers/acommit.sh "automatic documentation update" ; python /home/travis/build/casadi/testbot/helpers/publish_builds.py ; fi
 
     - compiler: clang
       os: linux
