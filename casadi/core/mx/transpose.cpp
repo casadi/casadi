@@ -196,7 +196,7 @@ namespace casadi {
                                     CodeGenerator& gen) const {
     gen.addAuxiliary(CodeGenerator::AUX_TRANS);
 
-    stream << "  casadi_trans("
+    stream << "  trans("
            << gen.work(arg[0]) << ", " << gen.sparsity(dep().sparsity()) << ", "
            << gen.work(res[0]) << ", " << gen.sparsity(sparsity()) << ", iii);" << endl;
   }
