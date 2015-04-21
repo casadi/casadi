@@ -65,30 +65,30 @@ int usage_c(){
   dlerror(); 
 
   /* Function for initialization and getting the number of inputs and outputs */
-  nargPtr narg = (nargPtr)dlsym(handle, "eval_narg");
+  nargPtr narg = (nargPtr)dlsym(handle, "f_narg");
   if(dlerror()){
     printf("Failed to retrieve \"narg\" function.\n");
     return 1;
   }
 
   /* Function for getting the sparsities of the inputs and outptus */
-  sparsityPtr sparsity = (sparsityPtr)dlsym(handle, "eval_sparsity");
+  sparsityPtr sparsity = (sparsityPtr)dlsym(handle, "f_sparsity");
   if(dlerror()){
     printf("Failed to retrieve \"sparsity\" function.\n");
     return 1;
   }
 
   /* Function for getting the size of the required work vectors */
-  workPtr work = (workPtr)dlsym(handle, "eval_work");
+  workPtr work = (workPtr)dlsym(handle, "f_work");
   if(dlerror()){
     printf("Failed to retrieve \"work\" function.\n");
     return 1;
   }
 
   /* Function for numerical evaluation */
-  evalPtr eval = (evalPtr)dlsym(handle, "eval");
+  evalPtr eval = (evalPtr)dlsym(handle, "f");
   if(dlerror()){
-    printf("Failed to retrieve \"eval\" function.\n");
+    printf("Failed to retrieve \"f\" function.\n");
     return 1;
   }
 
@@ -172,7 +172,7 @@ void usage_cplusplus(){
   cout << endl;
 
   // Use CasADi's "ExternalFunction" to load the compiled function
-  ExternalFunction ff("./f.so");
+  ExternalFunction ff("f");
   ff.init();
 
   // Use like any other CasADi function (note that derivatives are not supported)
@@ -204,7 +204,7 @@ int main(){
   f.init();
 
   // Generate C-code
-  f.generateCode("f.c");
+  f.generate("f");
 
   // Compile the C-code to a shared library
   string compile_command = "gcc -fPIC -shared -O3 f.c -o f.so";

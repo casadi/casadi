@@ -34,7 +34,7 @@ using namespace std;
  *  Joel Andersson, K.U. Leuven 2013
  */
 
-void generateCode(Function fcn, const std::string& name, bool expand, std::ostream& makefile){
+void generate(Function fcn, const std::string& name, bool expand, std::ostream& makefile){
   cout << "Generating code for " << name << endl;
 
   // Convert to an SXFunction (may or may not improve efficiency)
@@ -44,7 +44,7 @@ void generateCode(Function fcn, const std::string& name, bool expand, std::ostre
   }
 
   // Generate C code
-  fcn.generateCode(name + ".c");
+  fcn.generate(name);
   
   // Generate compilation instructions
   makefile << "add_library(" << name << " SHARED " << name << ".c)" << endl;
@@ -100,10 +100,10 @@ int main(){
   makefile << "project(nlp-codegen-autogen C)" << endl;
 
   // Codegen and compile
-  generateCode(nlp,"nlp", expand, makefile);
-  generateCode(grad_f,"grad_f", expand, makefile);
-  generateCode(jac_g,"jac_g", expand, makefile);
-  generateCode(hess_lag,"hess_lag", expand, makefile);
+  generate(nlp,"nlp", expand, makefile);
+  generate(grad_f,"grad_f", expand, makefile);
+  generate(jac_g,"jac_g", expand, makefile);
+  generate(hess_lag,"hess_lag", expand, makefile);
 
   // Finalize makefile
   makefile.close();

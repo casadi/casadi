@@ -36,10 +36,10 @@ using namespace std;
 int main(){
     
   // Load the generated functions
-  ExternalFunction nlp("./nlp.casadi");
-  ExternalFunction grad_f("./grad_f.casadi");
-  ExternalFunction jac_g("./jac_g.casadi");
-  ExternalFunction hess_lag("./hess_lag.casadi");
+  ExternalFunction nlp("nlp", "./nlp.casadi");
+  ExternalFunction grad_f("grad_f", "./grad_f.casadi");
+  ExternalFunction jac_g("jac_g", "./jac_g.casadi");
+  ExternalFunction hess_lag("hess_lag", "./hess_lag.casadi");
 
   // Create an NLP solver passing derivative information
   NlpSolver solver("ipopt", nlp);

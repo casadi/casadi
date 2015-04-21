@@ -170,9 +170,6 @@ void Tester::model(){
   f_step_mx.init();
   cout << "generated single step dynamics (" << f_step_mx.getAlgorithmSize() << " nodes)" << endl;
   
-  f_step_mx.generateCode("f_step.c");
-
-
   // Expand the discrete dynamics?
   Function f_step = f_step_mx;
   if(false){

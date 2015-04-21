@@ -47,8 +47,16 @@ public:
 /** \brief  default constructor */
   ExternalFunction();
 
-  /** \brief  Create an empty function */
-  explicit ExternalFunction(const std::string& bin_name, const std::string& f_name="eval");
+  /** \brief  Load an external function 
+   * File name is assumed to be ./<f_name>.so
+   */
+  explicit ExternalFunction(const std::string& name);
+
+  /** \brief  Load an external function 
+   * File name given
+   */
+  explicit ExternalFunction(const std::string& name,
+                            const std::string& bin_name);
 
   /** \brief  Access functions of the node */
   ExternalFunctionInternal* operator->();

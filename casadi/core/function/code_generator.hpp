@@ -39,7 +39,7 @@ namespace casadi {
     CodeGenerator(const Dictionary& opts = Dictionary());
 
     /// Add a function
-    void addFunction(const Function& f, const std::string& fname);
+    void add(const Function& f, const std::string& fname);
 
 #ifndef SWIG
     /// Generate the code to a stream
@@ -48,6 +48,9 @@ namespace casadi {
 
     /// Generate a file
     void generate(const std::string& fname) const;
+
+    /// Generate a file, return code as string
+    std::string generate() const;
 
     /// Compile and load function
     void compile(const std::string& cname, const std::string& dlname,

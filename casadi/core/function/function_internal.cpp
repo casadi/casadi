@@ -2192,11 +2192,11 @@ namespace casadi {
 
     // Codegen and compile
     CodeGenerator gen;
-    gen.addFunction(f, fname);
+    gen.add(f, fname);
     gen.compile(cname, dlname, compiler);
 
     // Load it
-    ExternalFunction f_gen("./" + dlname);
+    ExternalFunction f_gen(fname, "./" + dlname);
     f_gen.setOption("name", fname + "_gen");
 
     // Initialize it if f was initialized

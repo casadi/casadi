@@ -37,8 +37,12 @@ using namespace std;
   ExternalFunction::ExternalFunction() {
   }
 
-  ExternalFunction::ExternalFunction(const string& bin_name, const string& f_name) {
-    assignNode(new ExternalFunctionInternal(bin_name, f_name));
+  ExternalFunction::ExternalFunction(const string& name) {
+    assignNode(new ExternalFunctionInternal("./" + name + ".so", name));
+  }
+
+  ExternalFunction::ExternalFunction(const string& name, const string& bin_name) {
+    assignNode(new ExternalFunctionInternal(bin_name, name));
   }
 
   ExternalFunctionInternal* ExternalFunction::operator->() {

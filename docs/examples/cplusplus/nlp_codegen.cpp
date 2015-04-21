@@ -46,7 +46,7 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
   }
 
   // Generate C code
-  fcn.generateCode(name + ".c");
+  fcn.generate(name);
 
   // Compilation command
   string compile_command = "gcc -fPIC -shared -O3 " + name + ".c -o " + name + ".so";
@@ -56,7 +56,7 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
   casadi_assert_message(flag==0, "Compilation failed");
 
   // Load the generated function for evaluation
-  ExternalFunction fcn_e("./" + name + ".so");
+  ExternalFunction fcn_e(name);
   return fcn_e;
 }
 

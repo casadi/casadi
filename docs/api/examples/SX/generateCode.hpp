@@ -26,12 +26,12 @@
 * This example looks at symbolic substitution is SX graphs
 *
 *
-* \pythonexample{SX/generateCode}
-* \include SX/generateCode.txt
+* \pythonexample{SX/generate}
+* \include SX/f_generated.c
 *
 * \sa
 * \code
-* casadi::SXFunction::generateCode(const std::string&);
+* casadi::SXFunction::generate(const std::string&);
 * casadi::SXFunction::repr(std::ostream &stream);
 * casadi::SXFunction::print(std::ostream &stream);
 * \endcode

@@ -1951,7 +1951,7 @@ namespace casadi {
     MXFunction f(f_in, f_out);
     f.setOption("name", fname);
     f.init();
-    gen.addFunction(f, fname);
+    gen.add(f, fname);
     size_t ni, nr;
     f.nTmp(ni, nr);
 

@@ -43,9 +43,9 @@ print f.__repr__()
 #! The result will look like a node-by-node tree evaluation
 print f
 
-#! The generateCode method will insert this node-by-node evaluation in exported C code
-f.generateCode("generateCode.txt")
+#! The generate method will insert this node-by-node evaluation in exported C code
+f.generate("f_generated")
 
 #! This is how the exported code looks like:
-print file('generateCode.txt').read()
+print file('f_generated.c').read()
 

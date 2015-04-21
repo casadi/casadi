@@ -549,10 +549,10 @@ namespace casadi {
     if (codegen_) {
       // Codegen the functions
       CodeGenerator gen;
-      gen.addFunction(res_fcn, "res_fcn");
-      gen.addFunction(mat_fcn, "mat_fcn");
-      gen.addFunction(vec_fcn, "vec_fcn");
-      gen.addFunction(exp_fcn, "exp_fcn");
+      gen.add(res_fcn, "res_fcn");
+      gen.add(mat_fcn, "mat_fcn");
+      gen.add(vec_fcn, "vec_fcn");
+      gen.add(exp_fcn, "exp_fcn");
 
       // Filenames
       string cname = "scpgen_codegen.c";
@@ -571,13 +571,13 @@ namespace casadi {
       }
 
       // Load the generated code
-      res_fcn_ = ExternalFunction(dlname, "res_fcn");
+      res_fcn_ = ExternalFunction("res_fcn", dlname);
       res_fcn_.init();
-      mat_fcn_ = ExternalFunction(dlname, "mat_fcn");
+      mat_fcn_ = ExternalFunction("mat_fcn", dlname);
       mat_fcn_.init();
-      vec_fcn_ = ExternalFunction(dlname, "vec_fcn");
+      vec_fcn_ = ExternalFunction("vec_fcn", dlname);
       vec_fcn_.init();
-      exp_fcn_ = ExternalFunction(dlname, "exp_fcn");
+      exp_fcn_ = ExternalFunction("exp_fcn", dlname);
       exp_fcn_.init();
     } else {
       mat_fcn_ = mat_fcn;

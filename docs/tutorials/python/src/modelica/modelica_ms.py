@@ -243,5 +243,4 @@ show()
 #$ with respect to the decision variables:
 hess_f = nlp.hessian("x","f")
 hess_f.init()
-hess_f.generateCode("hess_f.c")
-
+hess_f.generate("hess_f")

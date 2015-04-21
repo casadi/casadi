@@ -401,23 +401,10 @@ namespace casadi {
     (*this)->setDerReverse(fcn, nadj);
   }
 
-  void Function::generateCode(const string& filename, const Dictionary& opts) {
-    std::ofstream cfile;
-    cfile.open(filename.c_str());
-    generateCode(cfile, opts);
-    cfile.close();
-  }
-
-  std::string Function::generateCode(const Dictionary& opts) {
-    std::stringstream ss;
-    generateCode(ss, opts);
-    return ss.str();
-  }
-
-  void Function::generateCode(std::ostream &stream, const Dictionary& opts) {
+  void Function::generate(const string& fname, const Dictionary& opts) {
     CodeGenerator gen(opts);
-    gen.addFunction(*this, "eval");
-    gen.generate(stream);
+    gen.add(*this, fname);
+    gen.generate(fname + ".c");
   }
 
   const IOScheme& Function::inputScheme() const {

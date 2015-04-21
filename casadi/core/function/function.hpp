@@ -446,13 +446,7 @@ namespace casadi {
     ///@}
 
     /** \brief Export / Generate C code for the function */
-    void generateCode(const std::string& filename, const Dictionary& opts=Dictionary());
-
-    /** \brief Generate C code for the function */
-    void generateCode(std::ostream& filename, const Dictionary& opts=Dictionary());
-
-    /** \brief Generate C code for the function */
-    std::string generateCode(const Dictionary& opts=Dictionary());
+    void generate(const std::string& fname, const Dictionary& opts=Dictionary());
 
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
