@@ -930,6 +930,15 @@ class typemaptests(casadiTestCase):
     b = atleast_2d(None)
     with self.assertRaises(NotImplementedError):
       c = repmat(b, 1, 1)
-      
+  
+  def test_SXtypemap_bug(self):
+    x = casadi.SX.sym("x",3)
+    print "x =", repr(x), "\n"
+    print "array(x) =", repr(np.array(x)), "\n"
+    print "SX(array(x)) =", repr(casadi.SX(np.array(x))), "\n"
+    sx = casadi.SX(np.array(x))
+    self.assertTrue(sx[0] == x[0] )
+    self.assertTrue(sx[1] == x[1] )
+    self.assertTrue(sx[2] == x[2] )
 if __name__ == '__main__':
     unittest.main()
