@@ -49,6 +49,7 @@
 #include "mx/mx_tools.hpp"
 
 // Functions
+#include "function/code_generator.hpp"
 #include "function/sx_function.hpp"
 #include "function/mx_function.hpp"
 #include "function/external_function.hpp"

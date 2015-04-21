@@ -1966,7 +1966,7 @@ namespace casadi {
     gen.addAuxiliary(CodeGenerator::AUX_SIGN);
 
     // Generate declarations
-    generateDeclarations(gen.functions, gen.real_t, gen);
+    generateDeclarations(gen);
 
     // Define function
     gen.functions
@@ -1975,7 +1975,7 @@ namespace casadi {
       << "* const* res, int* iii, " << gen.real_t << "* w) {" << endl;
 
     // Insert the function body
-    generateBody(gen.functions, gen.real_t, gen);
+    generateBody(gen);
 
     // Finalize the function
     gen.functions << "  return 0;" << endl
@@ -2171,13 +2171,11 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::generateDeclarations(std::ostream &stream, const std::string& type,
-                                              CodeGenerator& gen) const {
+  void FunctionInternal::generateDeclarations(CodeGenerator& gen) const {
     // Nothing to declare
   }
 
-  void FunctionInternal::generateBody(std::ostream &stream, const std::string& type,
-                                      CodeGenerator& gen) const {
+  void FunctionInternal::generateBody(CodeGenerator& gen) const {
     casadi_error("FunctionInternal::generateBody: generateBody not defined for class "
                  << typeid(*this).name());
   }

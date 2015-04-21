@@ -244,8 +244,7 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::generateDeclarations(std::ostream &stream, const std::string& type,
-                                                CodeGenerator& gen) const {
+  void SymbolicQr::generateDeclarations(CodeGenerator& gen) const {
 
     // Generate code for the embedded functions
     gen.addDependency(fact_fcn_);
@@ -253,37 +252,40 @@ namespace casadi {
     gen.addDependency(solv_fcn_T_);
   }
 
-  void SymbolicQr::generateBody(std::ostream &stream, const std::string& type,
-                                        CodeGenerator& gen) const {
+  void SymbolicQr::generateBody(CodeGenerator& gen) const {
     casadi_warning("Code generation for SymbolicQR still experimental");
 
     // Data structures to hold A, Q and R
-    stream << "  static int prepared = 0;" << endl;
-    stream << "  static d A[" << input(LINSOL_A).nnz() << "];" << endl;
-    stream << "  static d Q[" << Q_.nnz() << "];" << endl;
-    stream << "  static d R[" << R_.nnz() << "];" << endl;
+    gen.functions
+       << "  static int prepared = 0;" << endl
+       << "  static d A[" << input(LINSOL_A).nnz() << "];" << endl
+       << "  static d Q[" << Q_.nnz() << "];" << endl
+       << "  static d R[" << R_.nnz() << "];" << endl;
 
     // Check if the factorization is up-to-date
-    stream << "  int i;" << endl;
-    stream << "  for (i=0; prepared && i<" << input(LINSOL_A).nnz()
-           << "; ++i) prepared=A[i]!=x0[i];" << endl;
+    gen.functions
+      << "  int i;" << endl
+      << "  for (i=0; prepared && i<" << input(LINSOL_A).nnz()
+      << "; ++i) prepared=A[i]!=x0[i];" << endl;
 
     // Factorize if needed
     int fact_ind = gen.getDependency(fact_fcn_);
-    stream << "  if (!prepared) {" << endl;
-    stream << "    for (i=0; i<" << input(LINSOL_A).nnz() << "; ++i) A[i]=x0[i];" << endl;
-    stream << "    f" << fact_ind << "(A, Q, R);" << endl;
-    stream << "    prepared = 1;" << endl;
-    stream << "  }" << endl;
+    gen.functions
+      << "  if (!prepared) {" << endl
+      << "    for (i=0; i<" << input(LINSOL_A).nnz() << "; ++i) A[i]=x0[i];" << endl
+      << "    f" << fact_ind << "(A, Q, R);" << endl
+      << "    prepared = 1;" << endl
+      << "  }" << endl;
 
     // Solve
     int solv_ind_N = gen.getDependency(solv_fcn_N_);
     int neq = input(LINSOL_B).size1();
     int nrhs = input(LINSOL_B).size2();
-    stream << "  for (i=0; i<" << nrhs << "; ++i) {" << endl;
-    stream << "    f" << solv_ind_N << "(Q, R, x1, r0);" << endl;
-    stream << "    x1+=" << neq << "; r0+=" << neq << ";" << endl;
-    stream << "  }" << endl;
+    gen.functions
+      << "  for (i=0; i<" << nrhs << "; ++i) {" << endl
+      << "    f" << solv_ind_N << "(Q, R, x1, r0);" << endl
+      << "    x1+=" << neq << "; r0+=" << neq << ";" << endl
+      << "  }" << endl;
   }
 
 } // namespace casadi

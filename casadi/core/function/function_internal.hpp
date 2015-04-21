@@ -243,12 +243,10 @@ namespace casadi {
     void generateMeta(CodeGenerator& gen, const std::string& fname) const;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(std::ostream &stream, const std::string& type,
-                                      CodeGenerator& gen) const;
+    virtual void generateDeclarations(CodeGenerator& gen) const;
 
     /** \brief Generate code for the function body */
-    virtual void generateBody(std::ostream &stream, const std::string& type,
-                              CodeGenerator& gen) const;
+    virtual void generateBody(CodeGenerator& gen) const;
 
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;

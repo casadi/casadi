@@ -86,12 +86,10 @@ namespace casadi {
     virtual void init();
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(std::ostream &stream, const std::string& type,
-                                      CodeGenerator& gen) const;
+    virtual void generateDeclarations(CodeGenerator& gen) const;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(std::ostream &stream, const std::string& type,
-                              CodeGenerator& gen) const;
+    virtual void generateBody(CodeGenerator& gen) const;
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
      * (see Albersmeyer2010 paper) */

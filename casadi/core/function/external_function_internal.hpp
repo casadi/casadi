@@ -64,6 +64,12 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& gen) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& gen) const;
+
   protected:
 
     ///@{

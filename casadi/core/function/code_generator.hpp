@@ -41,8 +41,10 @@ namespace casadi {
     /// Add a function
     void addFunction(const Function& f, const std::string& fname);
 
+#ifndef SWIG
     /// Generate the code to a stream
     void generate(std::ostream& s) const;
+#endif // SWIG
 
     /// Generate a file
     void generate(const std::string& fname) const;
@@ -51,6 +53,7 @@ namespace casadi {
     void compile(const std::string& cname, const std::string& dlname,
                  const std::string& compiler="gcc -fPIC -O2");
 
+#ifndef SWIG
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path = false);
 
@@ -160,7 +163,6 @@ namespace casadi {
 
     //  private:
   public:
-
     /// \cond INTERNAL
 
     // Real-type used for the codegen
@@ -213,6 +215,7 @@ namespace casadi {
       return true;
     }
     /// \endcond
+#endif // SWIG
   };
 
 

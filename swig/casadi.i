@@ -1184,6 +1184,8 @@ def PyFunction(obj,inputs,outputs):
 %include "io_scheme_vector.i"
 
 %include <casadi/core/function/function.hpp>
+%feature("copyctor", "0") casadi::CodeGenerator;
+%include <casadi/core/function/code_generator.hpp>
 %template(Pair_Function_Function) std::pair<casadi::Function,casadi::Function>;
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>

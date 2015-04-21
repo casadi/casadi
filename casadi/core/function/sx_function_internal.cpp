@@ -216,8 +216,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::generateDeclarations(std::ostream &stream, const std::string& type,
-                                                CodeGenerator& gen) const {
+  void SXFunctionInternal::generateDeclarations(CodeGenerator& gen) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -226,8 +225,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type,
-                                        CodeGenerator& gen) const {
+  void SXFunctionInternal::generateBody(CodeGenerator& gen) const {
 
     // Which variables have been declared
     vector<bool> declared(rtmp_.size(), false);
@@ -235,41 +233,41 @@ namespace casadi {
     // Run the algorithm
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       // Indent
-      stream << "  ";
+      gen.functions << "  ";
 
       if (it->op==OP_OUTPUT) {
-        stream << "if (res[" << it->i0 << "]!=0) "
-               << "res["<< it->i0 << "][" << it->i2 << "]=" << "a" << it->i1;
+        gen.functions << "if (res[" << it->i0 << "]!=0) "
+                      << "res["<< it->i0 << "][" << it->i2 << "]=" << "a" << it->i1;
       } else {
         // Declare result if not already declared
         if (!declared[it->i0]) {
-          stream << type << " ";
+          gen.functions << gen.real_t << " ";
           declared[it->i0]=true;
         }
 
         // Where to store the result
-        stream << "a" << it->i0 << "=";
+        gen.functions << "a" << it->i0 << "=";
 
         // What to store
         if (it->op==OP_CONST) {
-          stream << gen.constant(it->d);
+          gen.functions << gen.constant(it->d);
         } else if (it->op==OP_INPUT) {
-          stream << "arg[" << it->i1 << "] ? arg[" << it->i1 << "][" << it->i2 << "] : 0";
+          gen.functions << "arg[" << it->i1 << "] ? arg[" << it->i1 << "][" << it->i2 << "] : 0";
         } else {
           int ndep = casadi_math<double>::ndeps(it->op);
-          casadi_math<double>::printPre(it->op, stream);
+          casadi_math<double>::printPre(it->op, gen.functions);
           for (int c=0; c<ndep; ++c) {
             if (c==0) {
-              stream << "a" << it->i1;
+              gen.functions << "a" << it->i1;
             } else {
-              casadi_math<double>::printSep(it->op, stream);
-              stream << "a" << it->i2;
+              casadi_math<double>::printSep(it->op, gen.functions);
+              gen.functions << "a" << it->i2;
             }
           }
-          casadi_math<double>::printPost(it->op, stream);
+          casadi_math<double>::printPost(it->op, gen.functions);
         }
       }
-      stream  << ";" << endl;
+      gen.functions  << ";" << endl;
     }
   }
 
