@@ -371,10 +371,10 @@ namespace casadi {
     case AUX_AXPY:
       this->auxiliaries << codegen_str_axpy << endl;
       break;
-    case AUX_DOT:
+    case AUX_INNER_PROD:
       this->auxiliaries
-        << codegen_str_dot
-        << "#define dot(n, x, inc_x, y, inc_y) CASADI_PREFIX(dot)(n, x, inc_x, y, inc_y)" << endl
+        << codegen_str_inner_prod
+        << "#define inner_prod(n, x, y) CASADI_PREFIX(inner_prod)(n, x, y)" << endl
         << endl;
       break;
     case AUX_ASUM:
@@ -574,13 +574,14 @@ namespace casadi {
     return s.str();
   }
 
-  std::string CodeGenerator::casadi_dot(int n, const std::string& x, int inc_x,
-                                        const std::string& y, int inc_y) {
-    addAuxiliary(AUX_DOT);
+  std::string CodeGenerator::inner_prod(int n, const std::string& x,
+                                        const std::string& y) {
+    addAuxiliary(AUX_INNER_PROD);
     stringstream s;
-    s << "dot(" << n << ", " << x << ", " << inc_x << ", " << y << ", " << inc_y << ")";
+    s << "inner_prod(" << n << ", " << x << ", " << y << ")";
     return s.str();
   }
+
   std::string
   CodeGenerator::project(const std::string& arg, std::size_t arg_off, const Sparsity& sp_arg,
                          const std::string& res, std::size_t res_off, const Sparsity& sp_res,

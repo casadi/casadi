@@ -78,8 +78,8 @@ namespace casadi {
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
 
-    /** \brief Codegen casadi_dot */
-    std::string casadi_dot(int n, const std::string& x, int inc_x, const std::string& y, int inc_y);
+    /** \brief Codegen inner product */
+    std::string inner_prod(int n, const std::string& x, const std::string& y);
 
     /** \brief Auxiliary functions */
     enum Auxiliary {
@@ -87,7 +87,7 @@ namespace casadi {
       AUX_SWAP,
       AUX_SCAL,
       AUX_AXPY,
-      AUX_DOT,
+      AUX_INNER_PROD,
       AUX_NRM2,
       AUX_IAMAX,
       AUX_FILL_N,

@@ -51,9 +51,9 @@ namespace casadi {
   template<typename real_t>
   void CASADI_PREFIX(axpy)(int n, real_t alpha, const real_t* x, int inc_x, real_t* y, int inc_y);
 
-  /// DOT: inner_prod(x, y) -> return
+  /// Inner product
   template<typename real_t>
-  real_t CASADI_PREFIX(dot)(int n, const real_t* x, int inc_x, const real_t* y, int inc_y);
+  real_t CASADI_PREFIX(inner_prod)(int n, const real_t* x, const real_t* y);
 
   /// ASUM: ||x||_1 -> return
   template<typename real_t>
@@ -183,14 +183,10 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(dot)(int n, const real_t* x, int inc_x, const real_t* y, int inc_y) {
+  real_t CASADI_PREFIX(inner_prod)(int n, const real_t* x, const real_t* y) {
     real_t r = 0;
     int i;
-    for (i=0; i<n; ++i) {
-      r += *x**y;
-      x += inc_x;
-      y += inc_y;
-    }
+    for (i=0; i<n; ++i) r += *x++ * *y++;
     return r;
   }
 

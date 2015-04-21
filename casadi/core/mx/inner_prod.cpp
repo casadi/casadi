@@ -82,7 +82,7 @@ namespace casadi {
   template<typename T>
   void InnerProd::evalGen(const T* const* arg, T* const* res,
                           int* itmp, T* rtmp) {
-    *res[0] = casadi_dot(dep(0).nnz(), arg[0], 1, arg[1], 1);
+    *res[0] = casadi_inner_prod(dep(0).nnz(), arg[0], arg[1]);
   }
 
   void InnerProd::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
@@ -108,7 +108,7 @@ namespace casadi {
   void InnerProd::generate(std::ostream &stream, const std::vector<int>& arg,
                                     const std::vector<int>& res, CodeGenerator& gen) const {
     gen.assign(stream, gen.workelement(res[0]),
-               gen.casadi_dot(dep().nnz(), gen.work(arg[0]), 1, gen.work(arg[1]), 1));
+               gen.inner_prod(dep().nnz(), gen.work(arg[0]), gen.work(arg[1])));
   }
 
 } // namespace casadi
