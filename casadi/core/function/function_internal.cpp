@@ -2184,15 +2184,6 @@ namespace casadi {
 
   Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,
                                                 std::string compiler) {
-#ifdef WITH_DL
-
-    // Flag to get a DLL
-#ifdef __APPLE__
-    string dlflag = " -dynamiclib";
-#else // __APPLE__
-    string dlflag = " -shared";
-#endif // __APPLE__
-
     // Check if f is initialized
     bool f_is_init = f.isInit();
     if (!f_is_init) f.init();
@@ -2201,31 +2192,10 @@ namespace casadi {
     string cname = fname + ".c";
     string dlname = fname + ".so";
 
-    // Remove existing files, if any
-    string rm_command = "rm -rf " + cname + " " + dlname;
-    int flag = system(rm_command.c_str());
-    casadi_assert_message(flag==0, "Failed to remove old source");
-
-    // Codegen it
-    f.generateCode(cname);
-    if (verbose_) {
-      cout << "Generated c-code for " << fdescr << " (" << cname << ")" << endl;
-    }
-
-    // Compile it
-    string compile_command = compiler + " " + dlflag + " " + cname + " -o " + dlname;
-    if (verbose_) {
-      cout << "Compiling " << fdescr <<  " using \"" << compile_command << "\"" << endl;
-    }
-
-    time_t time1 = time(0);
-    flag = system(compile_command.c_str());
-    time_t time2 = time(0);
-    double comp_time = difftime(time2, time1);
-    casadi_assert_message(flag==0, "Compilation failed");
-    if (verbose_) {
-      cout << "Compiled " << fdescr << " (" << dlname << ") in " << comp_time << " s."  << endl;
-    }
+    // Codegen and compile
+    CodeGenerator gen;
+    gen.addFunction(f, fname);
+    gen.compile(cname, dlname, compiler);
 
     // Load it
     ExternalFunction f_gen("./" + dlname);
@@ -2239,10 +2209,6 @@ namespace casadi {
       }
     }
     return f_gen;
-#else // WITH_DL
-    casadi_error("Codegen in SCPgen requires CasADi to be compiled "
-                 "with option \"WITH_DL\" enabled");
-#endif // WITH_DL
   }
 
   std::vector<MX> FunctionInternal::createCall(const std::vector<MX> &arg) {

@@ -334,13 +334,6 @@ namespace casadi {
       cout << "Generated residual function ( " << res_fcn.getAlgorithmSize() << " nodes)." << endl;
     }
 
-    // Generate c code and load as DLL
-    if (codegen_) {
-      res_fcn_ = dynamicCompilation(res_fcn, "res_fcn", "residual function", compiler);
-    } else {
-      res_fcn_ = res_fcn;
-    }
-
     // Declare difference vector d and substitute out p and v
     stringstream ss;
     int i=0;
@@ -449,13 +442,6 @@ namespace casadi {
     MXFunction mat_fcn(mfcn_in, mat_out);
     mat_fcn.init();
 
-    // Generate c code and load as DLL
-    if (codegen_) {
-      mat_fcn_ = dynamicCompilation(mat_fcn, "mat_fcn", "Matrices function", compiler);
-    } else {
-      mat_fcn_ = mat_fcn;
-    }
-
     // Definition of intermediate variables
     n = mfcn_out.size();
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
@@ -505,13 +491,6 @@ namespace casadi {
     if (verbose_) {
       cout << "Generated linearization function ( " << vec_fcn.getAlgorithmSize()
            << " nodes)." << endl;
-    }
-
-    // Generate c code and load as DLL
-    if (codegen_) {
-      vec_fcn_ = dynamicCompilation(vec_fcn, "vec_fcn", "linearization function", compiler);
-    } else {
-      vec_fcn_ = vec_fcn;
     }
 
     // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
@@ -568,8 +547,42 @@ namespace casadi {
 
     // Generate c code and load as DLL
     if (codegen_) {
-      exp_fcn_ = dynamicCompilation(exp_fcn, "exp_fcn", "step expansion function", compiler);
+      // Codegen the functions
+      CodeGenerator gen;
+      gen.addFunction(res_fcn, "res_fcn");
+      gen.addFunction(mat_fcn, "mat_fcn");
+      gen.addFunction(vec_fcn, "vec_fcn");
+      gen.addFunction(exp_fcn, "exp_fcn");
+
+      // Filenames
+      string cname = "scpgen_codegen.c";
+      string dlname = "scpgen_codegen.so";
+
+      // Complile and run
+      if (verbose_) {
+        cout << "Starting compilation"  << endl;
+      }
+      time_t time1 = time(0);
+      gen.compile(cname, dlname, compiler);
+      time_t time2 = time(0);
+      double comp_time = difftime(time2, time1);
+      if (verbose_) {
+        cout << "Compilation completed after " << comp_time << " s."  << endl;
+      }
+
+      // Load the generated code
+      res_fcn_ = ExternalFunction(dlname, "res_fcn");
+      res_fcn_.init();
+      mat_fcn_ = ExternalFunction(dlname, "mat_fcn");
+      mat_fcn_.init();
+      vec_fcn_ = ExternalFunction(dlname, "vec_fcn");
+      vec_fcn_.init();
+      exp_fcn_ = ExternalFunction(dlname, "exp_fcn");
+      exp_fcn_.init();
     } else {
+      mat_fcn_ = mat_fcn;
+      res_fcn_ = res_fcn;
+      vec_fcn_ = vec_fcn;
       exp_fcn_ = exp_fcn;
     }
 
