@@ -1153,9 +1153,11 @@ namespace casadi {
   }
 
   void MXFunctionInternal::generateBody(CodeGenerator& gen) const {
+    // Shorthand
+    ostream &s = gen.functions;
+
     // Temporary variables and vectors
-    gen.functions
-      << "  int i, j, k, *ii, *jj, *kk;" << endl
+    s << "  int i, j, k, *ii, *jj, *kk;" << endl
       << "  d r, s, t, *rr, *ss, *tt;" << endl
       << "  const d *cr, *cs, *ct;" << endl;
 
@@ -1171,37 +1173,45 @@ namespace casadi {
     // Codegen the algorithm
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       // Mark the beginning of the operation
-      gen.functions << "  /* " << k++;
+      s << "  /* " << k++;
       if (codegen_class) {
         if (it->data.get()!=0) {
-          gen.functions << " : " << typeid(*it->data.get()).name();
+          s << " : " << typeid(*it->data.get()).name();
 
           // if this is a call node, also write the name of the Function
           MX algElem = it->data;
           if (algElem.getOp() == OP_CALL) {
-            gen.functions << " (" << algElem.getFunction().getSanitizedName() << ")";
+            s << " (" << algElem.getFunction().getSanitizedName() << ")";
           }
         }
       }
-      gen.functions << " */" << endl;
+      s << " */" << endl;
 
       // Print the operation
       if (it->op==OP_OUTPUT) {
         int n = output(it->res.front()).nnz();
         if (n!=0) {
-          string r = "res[" + CodeGenerator::numToString(it->res.front()) + "]";
-          gen.functions
-            << "  if (" << r << ") "
+          int oind = it->res.front();
+          s << "  /* Output " << oind;
+          if (!output_.scheme.isNull()) s << " (" << output_.scheme.describe(oind) << ")";
+          s << " */" << endl;
+          string r = "res[" + CodeGenerator::numToString(oind) + "]";
+          s << "  if (" << r << ") "
             << gen.copy_n("w", workloc_[it->arg.front()], n, r, 0) << endl;
         }
       } else if (it->op==OP_INPUT) {
         int n = it->data.nnz();
         if (n!=0) {
-          std::string arg = "arg[" + CodeGenerator::numToString(it->arg.at(0)) + "]";
+          int iind = it->arg.at(0), ic = it->arg.at(2);
+          std::string arg = "arg[" + CodeGenerator::numToString(iind) + "]";
           int i = workloc_[it->res.front()];
-          gen.functions
-            << "  if (" << arg << ") " << gen.copy_n(arg, it->arg.at(2), n, "w", i)
-            << " else " << gen.fill_n("w", i, n, "0") << endl;
+          s << "  /* Input " << iind;
+          if (!input_.scheme.isNull()) s << " (" << input_.scheme.describe(iind) << ")";
+          s << ", part " << ic << " (" << it->data.getName() << ") */" << endl
+            << "  if (" << arg << ")" << endl
+            << "    " << gen.copy_n(arg, ic, n, "w", i) << endl
+            << "  else " << endl
+            << "    " << gen.fill_n("w", i, n, "0") << endl;
         }
       } else {
         // Get the names of the operation arguments
@@ -1225,7 +1235,7 @@ namespace casadi {
         }
 
         // Generate operation
-        it->data->generate(gen.functions, arg, res, gen);
+        it->data->generate(s, arg, res, gen);
       }
     }
   }
