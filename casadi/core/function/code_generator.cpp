@@ -88,13 +88,13 @@ namespace casadi {
       s << "#endif" << endl << endl;
     }
 
-    s << includes_.str();
+    s << this->includes.str();
     s << endl;
 
     // Space saving macro
     s << "#define d double" << endl << endl;
 
-    s << auxiliaries_.str();
+    s << this->auxiliaries.str();
 
     // Print integer constants
     stringstream name;
@@ -126,8 +126,6 @@ namespace casadi {
         << "  return main_eval(argc, argv);" << endl
         << "}" << endl << endl;
     }
-
-    s << finalization_.str();
 
     // C linkage
     if (this->cpp_guards) {
@@ -221,9 +219,9 @@ namespace casadi {
 
     // Print to the header section
     if (relative_path) {
-      includes_ << "#include \"" << new_include << "\"" << endl;
+      this->includes << "#include \"" << new_include << "\"" << endl;
     } else {
-      includes_ << "#include <" << new_include << ">" << endl;
+      this->includes << "#include <" << new_include << ">" << endl;
     }
   }
 
@@ -342,34 +340,34 @@ namespace casadi {
     // Add the appropriate function
     switch (f) {
     case AUX_COPY_N:
-      auxiliaries_ << codegen_str_copy_n << endl;
+      this->auxiliaries << codegen_str_copy_n << endl;
       break;
     case AUX_SWAP:
-      auxiliaries_ << codegen_str_swap << endl;
+      this->auxiliaries << codegen_str_swap << endl;
       break;
     case AUX_SCAL:
-      auxiliaries_ << codegen_str_scal << endl;
+      this->auxiliaries << codegen_str_scal << endl;
       break;
     case AUX_AXPY:
-      auxiliaries_ << codegen_str_axpy << endl;
+      this->auxiliaries << codegen_str_axpy << endl;
       break;
     case AUX_DOT:
-      auxiliaries_ << codegen_str_dot << endl;
+      this->auxiliaries << codegen_str_dot << endl;
       break;
     case AUX_ASUM:
-      auxiliaries_ << codegen_str_asum << endl;
+      this->auxiliaries << codegen_str_asum << endl;
       break;
     case AUX_IAMAX:
-      auxiliaries_ << codegen_str_iamax << endl;
+      this->auxiliaries << codegen_str_iamax << endl;
       break;
     case AUX_NRM2:
-      auxiliaries_ << codegen_str_nrm2 << endl;
+      this->auxiliaries << codegen_str_nrm2 << endl;
       break;
     case AUX_FILL_N:
-      auxiliaries_ << codegen_str_fill_n << endl;
+      this->auxiliaries << codegen_str_fill_n << endl;
       break;
     case AUX_MM_SPARSE:
-      auxiliaries_ << codegen_str_mm_sparse << endl;
+      this->auxiliaries << codegen_str_mm_sparse << endl;
       break;
     case AUX_SQ:
       auxSq();
@@ -378,13 +376,13 @@ namespace casadi {
       auxSign();
       break;
     case AUX_PROJECT:
-      auxiliaries_ << codegen_str_project << endl;
+      this->auxiliaries << codegen_str_project << endl;
       break;
     case AUX_TRANS:
-      auxiliaries_ << codegen_str_trans << endl;
+      this->auxiliaries << codegen_str_trans << endl;
       break;
     case AUX_TO_MEX:
-      auxiliaries_
+      this->auxiliaries
         << "mxArray* casadi_to_mex(const int* sp, d** x) {" << endl
         << "  int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];" << endl
         << "  mxArray* p = mxCreateSparse(nrow, ncol, nnz, mxREAL);" << endl
@@ -398,7 +396,7 @@ namespace casadi {
       break;
     case AUX_FROM_MEX:
       addAuxiliary(AUX_FILL_N);
-      auxiliaries_
+      this->auxiliaries
         << "d* casadi_from_mex(const mxArray *p, d* y, const int* sp, d* w) {" << endl
         << "  if (!mxIsDouble(p) || mxGetNumberOfDimensions(p)!=2)" << endl
         << "    mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\\"casadi_from_mex\\\" failed: "
@@ -473,13 +471,13 @@ namespace casadi {
   }
 
   void CodeGenerator::auxSq() {
-    auxiliaries_ << "d casadi_sq(d x) { return x*x;}" << endl;
-    auxiliaries_ << "#define sq(x) casadi_sq(x)" << endl << endl;
+    this->auxiliaries << "d casadi_sq(d x) { return x*x;}" << endl;
+    this->auxiliaries << "#define sq(x) casadi_sq(x)" << endl << endl;
   }
 
   void CodeGenerator::auxSign() {
-    auxiliaries_ << "d casadi_sign(d x) { return x<0 ? -1 : x>0 ? 1 : x;}" << endl;
-    auxiliaries_ << "#define sign(x) casadi_sign(x)" << endl << endl;
+    this->auxiliaries << "d casadi_sign(d x) { return x<0 ? -1 : x>0 ? 1 : x;}" << endl;
+    this->auxiliaries << "#define sign(x) casadi_sign(x)" << endl << endl;
   }
 
   std::string CodeGenerator::constant(double v) {

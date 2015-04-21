@@ -31,8 +31,6 @@
 #include <map>
 #include <set>
 
-/// \cond INTERNAL
-
 namespace casadi {
 
   class CASADI_EXPORT CodeGenerator {
@@ -158,6 +156,9 @@ namespace casadi {
 
     //  private:
   public:
+
+    /// \cond INTERNAL
+
     // Real-type used for the codegen
     std::string real_t;
 
@@ -177,10 +178,9 @@ namespace casadi {
     std::string include;
 
     // Stringstreams holding the different parts of the file being generated
-    std::stringstream includes_;
-    std::stringstream auxiliaries_;
+    std::stringstream includes;
+    std::stringstream auxiliaries;
     std::stringstream functions;
-    std::stringstream finalization_;
 
     // Set of already included header files
     typedef std::map<const void*, int> PointerMap;
@@ -208,12 +208,11 @@ namespace casadi {
       }
       return true;
     }
+    /// \endcond
   };
 
 
 } // namespace casadi
-
-/// \endcond
 
 #endif // CASADI_CODE_GENERATOR_HPP
 
