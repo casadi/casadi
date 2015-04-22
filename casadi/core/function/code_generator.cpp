@@ -34,6 +34,7 @@ namespace casadi {
 
   CodeGenerator::CodeGenerator(const Dictionary& opts) {
     // Default options
+    this->verbose = false;
     this->prefix = "";
     this->include = "";
     this->mex = false;
@@ -43,7 +44,9 @@ namespace casadi {
 
     // Read options
     for (Dictionary::const_iterator it=opts.begin(); it!=opts.end(); ++it) {
-      if (it->first=="prefix") {
+      if (it->first=="verbose") {
+        this->verbose = it->second;
+      } else if (it->first=="prefix") {
         this->prefix = it->second.toString();
       } else if (it->first=="include") {
         this->include = it->second.toString();

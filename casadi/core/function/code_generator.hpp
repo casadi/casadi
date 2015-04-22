@@ -173,6 +173,9 @@ namespace casadi {
     // Are we creating a MEX file?
     bool mex;
 
+    // Verbose codegen?
+    bool verbose;
+
     // C++ guards (making the code valid C++)
     bool cpp_guards;
 

@@ -1173,28 +1173,32 @@ namespace casadi {
     // Codegen the algorithm
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       // Mark the beginning of the operation
-      s << "  /* " << k++;
-      if (codegen_class) {
-        if (it->data.get()!=0) {
-          s << " : " << typeid(*it->data.get()).name();
+      if (gen.verbose) {
+        s << "  /* " << k++;
+        if (codegen_class) {
+          if (it->data.get()!=0) {
+            s << " : " << typeid(*it->data.get()).name();
 
-          // if this is a call node, also write the name of the Function
-          MX algElem = it->data;
-          if (algElem.getOp() == OP_CALL) {
-            s << " (" << algElem.getFunction().getSanitizedName() << ")";
+            // if this is a call node, also write the name of the Function
+            MX algElem = it->data;
+            if (algElem.getOp() == OP_CALL) {
+              s << " (" << algElem.getFunction().getSanitizedName() << ")";
+            }
           }
         }
+        s << " */" << endl;
       }
-      s << " */" << endl;
 
       // Print the operation
       if (it->op==OP_OUTPUT) {
         int n = output(it->res.front()).nnz();
         if (n!=0) {
           int oind = it->res.front();
-          s << "  /* Output " << oind;
-          if (!output_.scheme.isNull()) s << " (" << output_.scheme.describe(oind) << ")";
-          s << " */" << endl;
+          if (gen.verbose) {
+            s << "  /* Output " << oind;
+            if (!output_.scheme.isNull()) s << " (" << output_.scheme.describe(oind) << ")";
+            s << " */" << endl;
+          }
           string r = "res[" + CodeGenerator::numToString(oind) + "]";
           s << "  if (" << r << ") "
             << gen.copy_n("w", workloc_[it->arg.front()], n, r, 0) << endl;
@@ -1205,10 +1209,12 @@ namespace casadi {
           int iind = it->arg.at(0), ic = it->arg.at(2);
           std::string arg = "arg[" + CodeGenerator::numToString(iind) + "]";
           int i = workloc_[it->res.front()];
-          s << "  /* Input " << iind;
-          if (!input_.scheme.isNull()) s << " (" << input_.scheme.describe(iind) << ")";
-          s << ", part " << ic << " (" << it->data.getName() << ") */" << endl
-            << "  if (" << arg << ")" << endl
+          if (gen.verbose) {
+            s << "  /* Input " << iind;
+            if (!input_.scheme.isNull()) s << " (" << input_.scheme.describe(iind) << ")";
+            s << ", part " << ic << " (" << it->data.getName() << ") */" << endl;
+          }
+          s << "  if (" << arg << ")" << endl
             << "    " << gen.copy_n(arg, ic, n, "w", i) << endl
             << "  else " << endl
             << "    " << gen.fill_n("w", i, n, "0") << endl;
