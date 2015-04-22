@@ -49,16 +49,27 @@ namespace casadi {
     casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
                           << bin_name_ << ". error code (WIN32): "<< GetLastError());
 
+    // Function to retrieving number of inputs and outputs
     nargPtr narg = (nargPtr)GetProcAddress(handle_, TEXT(narg_s.c_str()));
     if (narg==0) throw CasadiException("ExternalFunctionInternal: no \""+narg_s+"\" found");
-    sparsityPtr sparsity = (sparsityPtr)GetProcAddress(handle_, TEXT(sparsity_s.c_str()));
-    if (sparsity==0)
-      throw CasadiException("ExternalFunctionInternal: no \""+sparsity_s+"\" found");
+
+    // Function for numerical evaluation
     eval_ = (evalPtr) GetProcAddress(handle_, TEXT(f_name_.c_str()));
     if (eval_==0) throw CasadiException("ExternalFunctionInternal: no \""+f_name_+"\" found");
-    workPtr work = (workPtr)GetProcAddress(handle_, TEXT(work_s.c_str()));
-    if (work==0) throw CasadiException("ExternalFunctionInternal: no \""+work_s+"\" found");
 
+    // Function for retrieving sparsities of inputs and outputs
+    sparsityPtr sparsity = (sparsityPtr)GetProcAddress(handle_, TEXT(sparsity_s.c_str()));
+    if (sparsity==0) {
+      // Fall back to scalar sparsity
+      sparsity = scalarSparsity;
+    }
+
+    // Function for retriving sizes of required work vectors
+    workPtr work = (workPtr)GetProcAddress(handle_, TEXT(work_s.c_str()));
+    if (work==0) {
+      // No work vector needed
+      work = noWork;
+    }
 #else // _WIN32
     handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
     casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
@@ -67,18 +78,34 @@ namespace casadi {
     // reset error
     dlerror();
 
-    // Load symbols
+    // Function to retrieving number of inputs and outputs
     nargPtr narg = (nargPtr)dlsym(handle_, narg_s.c_str());
     casadi_assert_message(!dlerror(), "ExternalFunctionInternal: no \""+narg_s+"\" found. "
                           "Possible cause: If the function was generated from CasADi, "
                           "make sure that it was compiled with a C compiler. If the "
                           "function is C++, make sure to use extern \"C\" linkage.");
-    sparsityPtr sparsity = (sparsityPtr)dlsym(handle_, sparsity_s.c_str());
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \""+sparsity_s+"\" found");
+
+    // Function for numerical evaluation
     eval_ = (evalPtr) dlsym(handle_, f_name_.c_str());
     if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \""+f_name_+"\" found");
+
+    // Function for retrieving sparsities of inputs and outputs
+    sparsityPtr sparsity = (sparsityPtr)dlsym(handle_, sparsity_s.c_str());
+    if (dlerror()) {
+      // Fall back to scalar sparsity
+      sparsity = scalarSparsity;
+      // Reset error flags
+      dlerror();
+    }
+
+    // Function for retriving sizes of required work vectors
     workPtr work = (workPtr)dlsym(handle_, work_s.c_str());
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \""+work_s+"\" found");
+    if (dlerror()) {
+      // No work vector needed
+      work = noWork;
+      // Reset error flags
+      dlerror();
+    }
 
 #endif // _WIN32
     // Initialize and get the number of inputs and outputs
@@ -175,6 +202,26 @@ namespace casadi {
     gen.functions
       << "  int flag = " << f_name_ << "(arg, res, iw, w);" << endl
       << "  if (flag) return flag;" << endl;
+  }
+
+  int ExternalFunctionInternal::scalarSparsity(int i, int *n_row, int *n_col,
+                                               const int **colind, const int **row) {
+    // Dense scalar
+    static const int colind_scalar[]={0,1};
+    static const int row_scalar[]={0};
+
+    // Return to user
+    if (n_row) *n_row=1;
+    if (n_col) *n_col=1;
+    if (colind) *colind=colind_scalar;
+    if (row) *row=row_scalar;
+    return 0;
+  }
+
+  int ExternalFunctionInternal::noWork(int *ni, int *nr) {
+    if (ni) *ni=0;
+    if (nr) *nr=0;
+    return 0;
   }
 
 } // namespace casadi

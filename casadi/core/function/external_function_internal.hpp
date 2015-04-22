@@ -70,12 +70,19 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(CodeGenerator& gen) const;
 
+    /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
+    static int scalarSparsity(int i, int *n_row, int *n_col,
+                              const int **colind, const int **row);
+
+    /** \brief No work vector (default if work not defined) */
+    static int noWork(int *ni, int *nr);
+
   protected:
 
     ///@{
     /** \brief  Function pointer types */
     typedef int (*nargPtr)(int *n_in, int *n_out);
-    typedef int (*sparsityPtr)(int n_in, int *n_row, int *n_col,
+    typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
                                const int **colind, const int **row);
     typedef int (*workPtr)(int *ni, int *nr);
     typedef int (*evalPtr)(const double* const* arg, double* const* res, int* iw, double* w);
