@@ -207,8 +207,8 @@ namespace casadi {
   int ExternalFunctionInternal::scalarSparsity(int i, int *n_row, int *n_col,
                                                const int **colind, const int **row) {
     // Dense scalar
-    static const int colind_scalar[]={0,1};
-    static const int row_scalar[]={0};
+    static const int colind_scalar[] = {0, 1};
+    static const int row_scalar[] = {0};
 
     // Return to user
     if (n_row) *n_row=1;
