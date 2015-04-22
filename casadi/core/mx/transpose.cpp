@@ -198,7 +198,7 @@ namespace casadi {
 
     stream << "  trans("
            << gen.work(arg[0]) << ", " << gen.sparsity(dep().sparsity()) << ", "
-           << gen.work(res[0]) << ", " << gen.sparsity(sparsity()) << ", iii);" << endl;
+           << gen.work(res[0]) << ", " << gen.sparsity(sparsity()) << ", iw);" << endl;
   }
 
   void DenseTranspose::generate(std::ostream &stream,

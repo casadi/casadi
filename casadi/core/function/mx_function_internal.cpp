@@ -1158,8 +1158,8 @@ namespace casadi {
 
     // Temporary variables and vectors
     s << "  int i, j, k, *ii, *jj, *kk;" << endl
-      << "  d r, s, t, *rr, *ss, *tt;" << endl
-      << "  const d *cr, *cs, *ct;" << endl;
+      << "  real_t r, s, t, *rr, *ss, *tt;" << endl
+      << "  const real_t *cr, *cs, *ct;" << endl;
 
     // Operation number (for printing)
     int k=0;

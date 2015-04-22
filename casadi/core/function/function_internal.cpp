@@ -1971,16 +1971,17 @@ namespace casadi {
     // Define function
     gen.functions
       << "/* " << getSanitizedName() << " */" << endl
-      << "int " << fname << "(const " << gen.real_t << "* const* arg, " << gen.real_t
-      << "* const* res, int* iii, " << gen.real_t << "* w) {" << endl;
+      << "int " << fname << "(const real_t* const* arg, real_t* const* res, int* iw, real_t* w) {"
+      << endl;
 
     // Insert the function body
     generateBody(gen);
 
     // Finalize the function
-    gen.functions << "  return 0;" << endl
-                  << "}" << endl
-                  << endl;
+    gen.functions
+      << "  return 0;" << endl
+      << "}" << endl
+      << endl;
   }
 
   void FunctionInternal::generateMeta(CodeGenerator& gen, const std::string& fname) const {
@@ -2381,7 +2382,7 @@ namespace casadi {
     stream << "  {" << endl;
 
     // Collect input arguments
-    stream << "    const d* arg1[] = {";
+    stream << "    const real_t* arg1[] = {";
     for (int i=0; i<n_in; ++i) {
       if (i!=0) stream << ", ";
       stream << gen.work(arg.at(i));
@@ -2389,7 +2390,7 @@ namespace casadi {
     stream << "};" << endl;
 
     // Collect output arguments
-    stream << "    d* res1[] = {";
+    stream << "    real_t* res1[] = {";
     for (int i=0; i<n_out; ++i) {
       if (i!=0) stream << ", ";
       stream << gen.work(res.at(i));
@@ -2400,7 +2401,7 @@ namespace casadi {
     int f = gen.getDependency(shared_from_this<Function>());
 
     // Call function
-    stream << "    i=f" << f << "(arg1, res1, iii, w);" << endl;
+    stream << "    i=f" << f << "(arg1, res1, iw, w);" << endl;
     stream << "    if (i) return i;" << endl;
 
     // Finalize the function call

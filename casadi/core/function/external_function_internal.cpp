@@ -166,13 +166,13 @@ namespace casadi {
     // Declare function (definition in separate file)
     gen.functions
       << "/* Defined in " << bin_name_ << " */" << endl
-      << "int " << f_name_ << "(const " << gen.real_t << "* const* arg, " << gen.real_t
-      << "* const* res, int* iii, " << gen.real_t << "* w);" << endl << endl;
+      << "int " << f_name_ << "(const real_t* const* arg, real_t* const* res, "
+      << "int* iw, rea_t* w);" << endl << endl;
   }
 
   void ExternalFunctionInternal::generateBody(CodeGenerator& gen) const {
     gen.functions
-      << "  int flag = " << f_name_ << "(arg, res, iii, w);" << endl
+      << "  int flag = " << f_name_ << "(arg, res, iw, w);" << endl
       << "  if (flag) return flag;" << endl;
   }
 

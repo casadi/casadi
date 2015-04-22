@@ -241,7 +241,7 @@ namespace casadi {
       } else {
         // Declare result if not already declared
         if (!declared[it->i0]) {
-          gen.functions << gen.real_t << " ";
+          gen.functions << "real_t ";
           declared[it->i0]=true;
         }
 

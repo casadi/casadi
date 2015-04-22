@@ -106,8 +106,8 @@ namespace casadi {
     s << this->includes.str();
     s << endl;
 
-    // Space saving macro
-    s << "#define d double" << endl << endl;
+    // Real type (usually double)
+    s << "#define real_t " << this->real_t << endl << endl;
 
     // Codegen auxiliary functions
     s << this->auxiliaries.str();
@@ -225,7 +225,7 @@ namespace casadi {
 
   void CodeGenerator::printVector(std::ostream &s, const std::string& name,
                                   const vector<double>& v) {
-    s << "d " << name << "[] = {";
+    s << "real_t " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << constant(v[i]);
@@ -420,14 +420,14 @@ namespace casadi {
       break;
     case AUX_TO_MEX:
       this->auxiliaries
-        << "mxArray* CASADI_PREFIX(to_mex)(const int* sp, d** x) {" << endl
+        << "mxArray* CASADI_PREFIX(to_mex)(const int* sp, real_t** x) {" << endl
         << "  int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];" << endl
         << "  mxArray* p = mxCreateSparse(nrow, ncol, nnz, mxREAL);" << endl
         << "  int i;" << endl
         << "  mwIndex* j;" << endl
         << "  for (i=0, j=mxGetJc(p); i<=ncol; ++i) *j++ = *sp++;" << endl
         << "  for (i=0, j=mxGetIr(p); i<nnz; ++i) *j++ = *sp++;" << endl
-        << "  if (x) *x = (d*)mxGetData(p);" << endl
+        << "  if (x) *x = (real_t*)mxGetData(p);" << endl
         << "  return p;" << endl
         << "}" << endl
         << "#define to_mex(sp, x) CASADI_PREFIX(to_mex)(sp, x)" << endl << endl;
@@ -435,7 +435,8 @@ namespace casadi {
     case AUX_FROM_MEX:
       addAuxiliary(AUX_FILL_N);
       this->auxiliaries
-        << "d* CASADI_PREFIX(from_mex)(const mxArray *p, d* y, const int* sp, d* w) {" << endl
+        << "real_t* CASADI_PREFIX(from_mex)(const mxArray *p, "
+        << "real_t* y, const int* sp, real_t* w) {" << endl
         << "  if (!mxIsDouble(p) || mxGetNumberOfDimensions(p)!=2)" << endl
         << "    mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"\\\"from_mex\\\" failed: "
         << "Not a two-dimensional matrix of double precision.\");" << endl
@@ -511,14 +512,14 @@ namespace casadi {
 
   void CodeGenerator::auxSq() {
     this->auxiliaries
-      << this->real_t << " CASADI_PREFIX(sq)(" << this->real_t << " x) "
+      << "real_t CASADI_PREFIX(sq)(real_t x) "
       << "{ return x*x;}" << endl
       << "#define sq(x) CASADI_PREFIX(sq)(x)" << endl << endl;
   }
 
   void CodeGenerator::auxSign() {
     this->auxiliaries
-      << this->real_t << " CASADI_PREFIX(sign)(" << this->real_t << " x) "
+      << "real_t CASADI_PREFIX(sign)(real_t x) "
       << "{ return x<0 ? -1 : x>0 ? 1 : x;}" << endl
       << "#define sign(x) CASADI_PREFIX(sign)(x)" << endl << endl;
   }
