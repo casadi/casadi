@@ -1142,6 +1142,14 @@ namespace casadi {
     return new_u;
   }
 
+  MX SymbolicOCP::add_y(const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_y("y" + CodeGenerator::numToString(this->u.size()));
+    MX new_y = addVariable(name);
+    this->y.push_back(new_y);
+    return new_y;
+  }
+
   void SymbolicOCP::add_ode(const MX& new_ode, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_ode(new_ode, "ode" + CodeGenerator::numToString(this->ode.size()));
