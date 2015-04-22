@@ -155,6 +155,8 @@ namespace casadi {
     throw CasadiException("WITH_DL  not activated");
 #endif // WITH_DL
 
+    // Default name
+    setOption("name", f_name);
   }
 
   ExternalFunctionInternal* ExternalFunctionInternal::clone() const {
