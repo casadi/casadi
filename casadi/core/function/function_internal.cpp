@@ -2187,24 +2187,20 @@ namespace casadi {
     bool f_is_init = f.isInit();
     if (!f_is_init) f.init();
 
-    // Filenames
-    string cname = fname + ".c";
-    string dlname = fname + ".so";
-
     // Codegen and compile
     CodeGenerator gen;
     gen.add(f, fname);
-    gen.compile(cname, dlname, compiler);
+    string dlname = gen.compile(fname, compiler);
 
     // Load it
-    ExternalFunction f_gen(fname, "./" + dlname);
+    ExternalFunction f_gen(fname, dlname);
     f_gen.setOption("name", fname + "_gen");
 
     // Initialize it if f was initialized
     if (f_is_init) {
       f_gen.init();
       if (verbose_) {
-        cout << "Dynamically loaded " << fdescr << " (" << dlname << ")" << endl;
+        cout << "Dynamically loaded " << fdescr << " (" << fname << ")" << endl;
       }
     }
     return f_gen;

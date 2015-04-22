@@ -47,14 +47,13 @@ namespace casadi {
 #endif // SWIG
 
     /// Generate a file
-    void generate(const std::string& fname) const;
+    void generate(const std::string& name) const;
 
     /// Generate a file, return code as string
     std::string generate() const;
 
     /// Compile and load function
-    void compile(const std::string& cname, const std::string& dlname,
-                 const std::string& compiler="gcc -fPIC -O2");
+    std::string compile(const std::string& name, const std::string& compiler="gcc -fPIC -O2");
 
 #ifndef SWIG
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>

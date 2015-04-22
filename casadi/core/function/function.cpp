@@ -404,7 +404,7 @@ namespace casadi {
   void Function::generate(const string& fname, const Dictionary& opts) {
     CodeGenerator gen(opts);
     gen.add(*this, fname);
-    gen.generate(fname + ".c");
+    gen.generate(fname);
   }
 
   const IOScheme& Function::inputScheme() const {

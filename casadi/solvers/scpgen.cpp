@@ -555,15 +555,14 @@ namespace casadi {
       gen.add(exp_fcn, "exp_fcn");
 
       // Filenames
-      string cname = "scpgen_codegen.c";
-      string dlname = "scpgen_codegen.so";
+      string name = "scpgen_codegen";
 
       // Complile and run
       if (verbose_) {
         cout << "Starting compilation"  << endl;
       }
       time_t time1 = time(0);
-      gen.compile(cname, dlname, compiler);
+      string dlname = gen.compile(name, compiler);
       time_t time2 = time(0);
       double comp_time = difftime(time2, time1);
       if (verbose_) {
