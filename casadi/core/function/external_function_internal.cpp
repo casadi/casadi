@@ -93,7 +93,8 @@ namespace casadi {
     // Get the sparsity pattern
     for (int i=0; i<n_in+n_out; ++i) {
       // Get sparsity from file
-      int nrow, ncol, *colind, *row;
+      int nrow, ncol;
+      const int *colind, *row;
       flag = sparsity(i, &nrow, &ncol, &colind, &row);
       if (flag) throw CasadiException("ExternalFunctionInternal: \"sparsity\" failed");
 

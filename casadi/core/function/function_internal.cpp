@@ -2019,10 +2019,10 @@ namespace casadi {
 
     // Function that returns the sparsity pattern
     s << "int " << fname << "_sparsity"
-      << "(int i, int *nrow, int *ncol, int **colind, int **row) {" << endl;
+      << "(int i, int *nrow, int *ncol, const int **colind, const int **row) {" << endl;
 
     // Get the sparsity index using a switch
-    s << "  int* s;" << endl;
+    s << "  const int* s;" << endl;
     s << "  switch (i) {" << endl;
 
     // Loop over all sparsity patterns

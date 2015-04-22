@@ -215,7 +215,7 @@ namespace casadi {
   }
 
   void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<int>& v) {
-    s << "int " << name << "[] = {";
+    s << "const int " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << v[i];
@@ -225,7 +225,7 @@ namespace casadi {
 
   void CodeGenerator::printVector(std::ostream &s, const std::string& name,
                                   const vector<double>& v) {
-    s << "real_t " << name << "[] = {";
+    s << "const real_t " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << constant(v[i]);
