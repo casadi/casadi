@@ -168,7 +168,7 @@ namespace casadi {
     gen.functions
       << "/* Defined in " << bin_name_ << " */" << endl
       << "int " << f_name_ << "(const real_t* const* arg, real_t* const* res, "
-      << "int* iw, rea_t* w);" << endl << endl;
+      << "int* iw, real_t* w);" << endl << endl;
   }
 
   void ExternalFunctionInternal::generateBody(CodeGenerator& gen) const {
