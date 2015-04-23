@@ -131,26 +131,38 @@ namespace casadi {
       break;
     }
 
-    // Print loop and right hand side
-    stream << "  for (i=0, "
-           << "rr=" << gen.work(res.at(0)) << ", ";
-    if (!inplace) stream << "cr=" << gen.work(arg.at(0)) << ", ";
-    stream << "cs=" << gen.work(arg.at(1)) << "; i<" << sparsity().nnz() << "; ++i) "
-           << "*rr++";
+    // Print indent
+    stream << "  ";
 
-    if (inplace) {
-      casadi_math<double>::printSep(op_, stream);
-      stream << "=";
-      stream << (ScY ? " *cs " : " *cs++ ");
+    // Names of arguments
+    string x, y, r;
+    if (nnz()==1) {
+      // No loop needed
+      r = gen.workelement(res.at(0));
+      x = gen.workelement(arg.at(0));
+      y = gen.workelement(arg.at(1));
     } else {
-      stream << "=";
-      casadi_math<double>::printPre(op_, stream);
-      stream << (ScX ? " *cr " : " *cr++ ");
-      casadi_math<double>::printSep(op_, stream);
-      stream << (ScY ? " *cs " : " *cs++ ");
-      casadi_math<double>::printPost(op_, stream);
+      // Loop needed
+      stream << "for (i=0, " << "rr=" << gen.work(res.at(0)) << ", ";
+      if (!inplace) stream << "cr=" << gen.work(arg.at(0)) << ", ";
+      stream << "cs=" << gen.work(arg.at(1)) << "; i<" << nnz() << "; ++i) ";
+      r = "*rr++";
+      x = ScX ? "*cr" : "*cr++";
+      y = ScY ? "*cs" : "*cs++";
     }
 
+    stream << r << " ";
+    if (inplace) {
+      casadi_math<double>::printSep(op_, stream);
+      stream << "= " << y;
+    } else {
+      stream << " = ";
+      casadi_math<double>::printPre(op_, stream);
+      stream << x;
+      casadi_math<double>::printSep(op_, stream);
+      stream << y;
+      casadi_math<double>::printPost(op_, stream);
+    }
     stream << ";" << endl;
   }
 

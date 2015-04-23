@@ -182,11 +182,7 @@ namespace casadi {
 
   std::string CodeGenerator::workelement(int n) {
     casadi_assert(n>=0);
-    if (n==0) {
-      return "*w";
-    } else {
-      return "w[+" + numToString(n) + "]";
-    }
+    return "w[" + numToString(n) + "]";
   }
 
   void CodeGenerator::assign(std::ostream &s, const std::string& lhs, const std::string& rhs) {
