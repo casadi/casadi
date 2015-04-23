@@ -134,23 +134,34 @@ namespace casadi {
     // Print indent
     stream << "  ";
 
-    // Names of arguments
-    string x, y, r;
-    if (nnz()==1) {
-      // No loop needed
-      r = gen.workelement(res.at(0));
-      x = gen.workelement(arg.at(0));
-      y = gen.workelement(arg.at(1));
-    } else {
-      // Loop needed
-      stream << "for (i=0, " << "rr=" << gen.work(res.at(0)) << ", ";
-      if (!inplace) stream << "cr=" << gen.work(arg.at(0)) << ", ";
-      stream << "cs=" << gen.work(arg.at(1)) << "; i<" << nnz() << "; ++i) ";
+    // Scalar names of arguments (start assuming all scalars)
+    string r = gen.workelement(res.at(0));
+    string x = gen.workelement(arg.at(0));
+    string y = gen.workelement(arg.at(1));
+
+    // Codegen loop, if needed
+    if (nnz()>1) {
+      // Iterate over result
+      stream << "for (i=0, " << "rr=" << gen.work(res.at(0));
       r = "*rr++";
-      x = ScX ? "*cr" : "*cr++";
-      y = ScY ? "*cs" : "*cs++";
+
+      // Iterate over first argument?
+      if (!ScX && !inplace) {
+        stream << ", cr=" << gen.work(arg.at(0));
+        x = "*cr++";
+      }
+
+      // Iterate over second argument?
+      if (!ScY) {
+        stream << ", cs=" << gen.work(arg.at(1));
+        y = "*cs++";
+      }
+
+      // Close loop
+      stream << "; i<" << nnz() << "; ++i) ";
     }
 
+    // Perform operation
     stream << r << " ";
     if (inplace) {
       casadi_math<double>::printSep(op_, stream);
