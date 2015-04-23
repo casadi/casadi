@@ -479,6 +479,9 @@ namespace casadi {
   }
 
   void SymbolicOCP::print(ostream &stream, bool trailing_newline) const {
+    // Assert correctness
+    sanityCheck();
+
     stream << "Dimensions: ";
     stream << "#s = " << this->s.size() << ", ";
     stream << "#x = " << this->x.size() << ", ";
