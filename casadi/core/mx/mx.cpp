@@ -1774,7 +1774,7 @@ namespace casadi {
     if (!v.empty()) {
       stream << endl << "where:" << endl;
       for (int i=0; i<v.size(); ++i) {
-        stream << v[i] << " := " << vdef[i] << endl;
+        stream << str(v[i]) << " := " << str(vdef[i]) << endl;
       }
     }
   }
