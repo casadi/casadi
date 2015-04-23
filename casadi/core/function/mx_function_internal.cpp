@@ -1161,6 +1161,23 @@ namespace casadi {
       << "  real_t r, s, t, *rr, *ss, *tt;" << endl
       << "  const real_t *cr, *cs, *ct;" << endl;
 
+    // Declare scalar work vector elements as local variables
+    if (!gen.codegen_scalars) {
+      bool first = true;
+      for (int i=0; i<workloc_.size()-1; ++i) {
+        if (workloc_[i+1]==workloc_[i]+1) {
+          if (first) {
+            s << "  real_t ";
+            first = false;
+          } else {
+            s << ", ";
+          }
+          s << "w" << workloc_[i];
+        }
+      }
+      if (!first) s << ";" << endl;
+    }
+
     // Operation number (for printing)
     int k=0;
 
@@ -1200,24 +1217,34 @@ namespace casadi {
             s << " */" << endl;
           }
           string r = "res[" + CodeGenerator::numToString(oind) + "]";
-          s << "  if (" << r << ") "
-            << gen.copy_n("w", workloc_[it->arg.front()], n, r, 0) << endl;
+          int i = workloc_[it->arg.front()];
+          s << "  if (" << r << ") ";
+          if (n==1) {
+            s << "*" << r << " = " << gen.workelement(i, 1) << ";" << endl;
+          } else {
+            s << gen.copy_n("w", i, n, r, 0) << endl;
+          }
         }
       } else if (it->op==OP_INPUT) {
         int n = it->data.nnz();
         if (n!=0) {
-          int iind = it->arg.at(0), ic = it->arg.at(2);
+          int iind = it->arg.at(0), ip = it->arg.at(1), ic = it->arg.at(2);
           std::string arg = "arg[" + CodeGenerator::numToString(iind) + "]";
           int i = workloc_[it->res.front()];
           if (gen.verbose) {
             s << "  /* Input " << iind;
             if (!input_.scheme.isNull()) s << " (" << input_.scheme.describe(iind) << ")";
-            s << ", part " << ic << " (" << it->data.getName() << ") */" << endl;
+            s << ", part " << ip << " (" << it->data.getName() << ") */" << endl;
           }
-          s << "  if (" << arg << ")" << endl
-            << "    " << gen.copy_n(arg, ic, n, "w", i) << endl
-            << "  else " << endl
-            << "    " << gen.fill_n("w", i, n, "0") << endl;
+          if (n==1) {
+            s << "  " << gen.workelement(i, 1) << " = " << arg << " ? "
+              << arg << "[" << ic << "] : 0;" << endl;
+          } else {
+            s << "  if (" << arg << ")" << endl
+              << "    " << gen.copy_n(arg, ic, n, "w", i) << endl
+              << "  else " << endl
+              << "    " << gen.fill_n("w", i, n, "0") << endl;
+          }
         }
       } else {
         // Get the names of the operation arguments

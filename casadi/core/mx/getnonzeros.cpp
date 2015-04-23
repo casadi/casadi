@@ -444,14 +444,15 @@ namespace casadi {
   }
 
   void GetNonzerosVector::generate(std::ostream &stream,
-                                            const std::vector<int>& arg,
-                                            const std::vector<int>& res,
-                                            CodeGenerator& gen) const {
+                                   const std::vector<int>& arg,
+                                   const std::vector<int>& res,
+                                   CodeGenerator& gen) const {
     // Codegen the indices
     int ind = gen.getConstant(nz_, true);
 
     // Codegen the assignments
-    stream << "  for (ii=s" << ind << ", rr=" << gen.work(res[0]) << ", ss=" << gen.work(arg[0])
+    stream << "  for (ii=s" << ind << ", rr=" << gen.work(res[0], nnz())
+           << ", ss=" << gen.work(arg[0], dep(0).nnz())
            << "; ii!=s" << ind << "+" << nz_.size()
            << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
   }
@@ -480,21 +481,24 @@ namespace casadi {
                                            const std::vector<int>& arg,
                                            const std::vector<int>& res,
                                            CodeGenerator& gen) const {
-    stream << "  for (rr=" << gen.work(res[0]) << ", ss=" << gen.work(arg[0]+s_.start_)
-           << "; ss!=" << gen.work(arg[0]+s_.stop_) << "; ss+=" << s_.step_ << ") ";
-    stream << "*rr++ = *ss;" << endl;
+    stream << "  for (rr=" << gen.work(res[0], nnz()) << ", ss="
+           << gen.work(arg[0]+s_.start_, dep(0).nnz())
+           << "; ss!=" << gen.work(arg[0]+s_.stop_, dep(0).nnz())
+           << "; ss+=" << s_.step_ << ") "
+           << "*rr++ = *ss;" << endl;
   }
 
   void GetNonzerosSlice2::generate(std::ostream &stream,
                                             const std::vector<int>& arg,
                                             const std::vector<int>& res,
                                             CodeGenerator& gen) const {
-    stream << "  for (rr=" << gen.work(res[0]) << ", ss=" << gen.work(arg[0]+outer_.start_)
-           << "; ss!=" << gen.work(arg[0]+outer_.stop_) << "; ss+="
-           << outer_.step_ << ") ";
-    stream << "for (tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_
-           << "; tt+=" << inner_.step_ << ") ";
-    stream << "*rr++ = *tt;" << endl;
+    stream << "  for (rr=" << gen.work(res[0], nnz()) << ", ss="
+           << gen.work(arg[0]+outer_.start_, dep(0).nnz())
+           << "; ss!=" << gen.work(arg[0]+outer_.stop_, dep(0).nnz()) << "; ss+="
+           << outer_.step_ << ") "
+           << "for (tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_
+           << "; tt+=" << inner_.step_ << ") "
+           << "*rr++ = *tt;" << endl;
   }
 
   bool GetNonzerosVector::zz_isEqual(const MXNode* node, int depth) const {

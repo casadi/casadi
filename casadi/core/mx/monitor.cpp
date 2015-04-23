@@ -112,12 +112,13 @@ namespace casadi {
   void Monitor::generate(std::ostream &stream, const std::vector<int>& arg,
                          const std::vector<int>& res, CodeGenerator& gen) const {
     // Print comment
-    stream << "  " << gen.printf(comment_ + "\\n[") << endl;
-    stream << "  for (i=0, rr=" << gen.work(arg[0]) << "; i!=" << nnz() << "; ++i) {" << endl;
-    stream << "    if (i!=0) " << gen.printf(", ") << endl;
-    stream << "    " << gen.printf("%g", "*rr++") << endl;
-    stream << "  }" << endl;
-    stream << "  " << gen.printf("]\\n") << endl;
+    stream << "  " << gen.printf(comment_ + "\\n[") << endl
+           << "  for (i=0, rr=" << gen.work(arg[0], dep(0).nnz())
+           << "; i!=" << nnz() << "; ++i) {" << endl
+           << "    if (i!=0) " << gen.printf(", ") << endl
+           << "    " << gen.printf("%g", "*rr++") << endl
+           << "  }" << endl
+           << "  " << gen.printf("]\\n") << endl;
 
     // Copy if not inplace
     if (arg[0]!=res[0]) {

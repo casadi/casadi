@@ -91,8 +91,9 @@ namespace casadi {
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
       stream << "  for (i=0, ";
-      if (i==0) stream << "rr=" << gen.work(res[0]) << ", ";
-      stream << "cs=" << gen.work(arg[i]) << "; i<" << nz << "; ++i) *rr++ = *cs++;" << endl;
+      if (i==0) stream << "rr=" << gen.work(res[0], nnz()) << ", ";
+      stream << "cs=" << gen.work(arg[i], dep(i).nnz())
+             << "; i<" << nz << "; ++i) *rr++ = *cs++;" << endl;
     }
   }
 

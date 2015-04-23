@@ -128,9 +128,9 @@ namespace casadi {
     // Perform sparse matrix multiplication
     gen.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
     stream << "  casadi_mm_sparse(";
-    stream << gen.work(arg[1]) << ", " << gen.sparsity(dep(1).sparsity()) << ", ";
-    stream << gen.work(arg[2]) << ", " << gen.sparsity(dep(2).sparsity()) << ", ";
-    stream << gen.work(res[0]) << ", " << gen.sparsity(sparsity()) << ", w);" << endl;
+    stream << gen.work(arg[1], dep(1).nnz()) << ", " << gen.sparsity(dep(1).sparsity()) << ", ";
+    stream << gen.work(arg[2], dep(0).nnz()) << ", " << gen.sparsity(dep(2).sparsity()) << ", ";
+    stream << gen.work(res[0], nnz()) << ", " << gen.sparsity(sparsity()) << ", w);" << endl;
   }
 
   void DenseMultiplication::generate(std::ostream &stream,
@@ -143,10 +143,10 @@ namespace casadi {
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
-    stream << "  for (i=0, rr=" << gen.work(res[0]) <<"; i<" << ncol_y << "; ++i)";
+    stream << "  for (i=0, rr=" << gen.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)";
     stream << " for (j=0; j<" << nrow_x << "; ++j, ++rr)";
-    stream << " for (k=0, ss=" << gen.work(arg[1]) << "+j, tt="
-           << gen.work(arg[2]) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)";
+    stream << " for (k=0, ss=" << gen.work(arg[1], dep(1).nnz()) << "+j, tt="
+           << gen.work(arg[2], dep(2).nnz()) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)";
     stream << " *rr += ss[k*" << nrow_x << "]**tt++;" << endl;
   }
 

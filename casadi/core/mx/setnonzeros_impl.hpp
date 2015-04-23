@@ -767,8 +767,8 @@ namespace casadi {
     int ind = gen.getConstant(this->nz_, true);
 
     // Perform the operation inplace
-    stream << "  for (ii=s" << ind << ", rr=" << gen.work(res[0]) << ", "
-           << "ss=" << gen.work(arg[1]) << "; ii!=s" << ind
+    stream << "  for (ii=s" << ind << ", rr=" << gen.work(res[0], this->nnz()) << ", "
+           << "ss=" << gen.work(arg[1], this->dep(1).nnz()) << "; ii!=s" << ind
            << "+" << this->nz_.size() << "; ++ii, ++ss)";
     stream << " if (*ii>=0) rr[*ii] " << (Add?"+=":"=") << " *ss;" << endl;
   }
@@ -784,8 +784,9 @@ namespace casadi {
     }
 
     // Perform the operation inplace
-    stream << "  for (rr=" << gen.work(res[0]+s_.start_) << ", ss="
-           << gen.work(arg[1]) << "; rr!=" << gen.work(res[0]+s_.stop_)
+    stream << "  for (rr=" << gen.work(res[0]+s_.start_, this->nnz()) << ", ss="
+           << gen.work(arg[1], this->dep(1).nnz()) << "; rr!="
+           << gen.work(res[0]+s_.stop_, this->nnz())
            << "; rr+=" << s_.step_ << ")";
     stream << " *rr " << (Add?"+=":"=") << " *ss++;" << endl;
   }
@@ -801,8 +802,9 @@ namespace casadi {
     }
 
     // Perform the operation inplace
-    stream << "  for (rr=" << gen.work(res[0]+outer_.start_)
-           << ", ss=" << gen.work(arg[1]) << "; rr!=" << gen.work(res[0]+outer_.stop_)
+    stream << "  for (rr=" << gen.work(res[0]+outer_.start_, this->nnz())
+           << ", ss=" << gen.work(arg[1], this->dep(1).nnz()) << "; rr!="
+           << gen.work(res[0]+outer_.stop_, this->nnz())
            << "; rr+=" << outer_.step_ << ")";
     stream << " for (tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_
            << "; tt+=" << inner_.step_ << ")";

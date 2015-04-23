@@ -110,7 +110,7 @@ namespace casadi {
   void Assertion::generate(std::ostream &stream, const std::vector<int>& arg,
                            const std::vector<int>& res, CodeGenerator& gen) const {
     // Generate assertion
-    stream << "  if (" << gen.workelement(arg[1]) << "!=1.) {" << endl
+    stream << "  if (" << gen.workelement(arg[1], dep(1).nnz()) << "!=1.) {" << endl
            << "    /* " << fail_message_ << " */" << endl
            << "    return 1;" << endl
            << "  }" << endl;

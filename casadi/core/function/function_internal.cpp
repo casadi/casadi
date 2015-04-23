@@ -2135,7 +2135,7 @@ namespace casadi {
       int off=0;
       for (int i=0; i<n_in; ++i) {
         if (i!=0) s << ", ";
-        s << gen.work(off);
+        s << gen.work(off, input(i).nnz());
         off += input(i).nnz();
       }
       s << "};" << endl;
@@ -2144,7 +2144,7 @@ namespace casadi {
       s << "  d* res[" << n_out << "] = {";
       for (int i=0; i<n_out; ++i) {
         if (i!=0) s << ", ";
-        s << gen.work(off);
+        s << gen.work(off, output(i).nnz());
         off += output(i).nnz();
       }
       s << "};" << endl;
@@ -2156,7 +2156,7 @@ namespace casadi {
              << "scanf(\"%lf\", a++);" << endl;
 
       // Call the function
-      s << "  int flag = eval(arg, res, iw, " << gen.work(off) << ");" << endl
+      s << "  int flag = eval(arg, res, iw, w+" << off << ");" << endl
              << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
@@ -2381,7 +2381,7 @@ namespace casadi {
     stream << "    const real_t* arg1[] = {";
     for (int i=0; i<n_in; ++i) {
       if (i!=0) stream << ", ";
-      stream << gen.work(arg.at(i));
+      stream << gen.work(arg.at(i), input(i).nnz());
     }
     stream << "};" << endl;
 
@@ -2389,7 +2389,7 @@ namespace casadi {
     stream << "    real_t* res1[] = {";
     for (int i=0; i<n_out; ++i) {
       if (i!=0) stream << ", ";
-      stream << gen.work(res.at(i));
+      stream << gen.work(res.at(i), output(i).nnz());
     }
     stream << "};" << endl;
 

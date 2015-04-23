@@ -114,11 +114,25 @@ namespace casadi {
   }
 
   void UnaryMX::generate(std::ostream &stream, const std::vector<int>& arg,
-                                  const std::vector<int>& res, CodeGenerator& gen) const {
-    stream << "  for (i=0, rr=" << gen.work(res.at(0)) << ", cs=" << gen.work(arg.at(0))
-           << "; i<" << sparsity().nnz() << "; ++i) *rr++=";
+                         const std::vector<int>& res, CodeGenerator& gen) const {
+    string r, x;
+    stream << "  ";
+    if (nnz()==1) {
+      // Scalar assignment
+      r = gen.workelement(res[0], 1);
+      x = gen.workelement(arg[0], 1);
+    } else {
+      // Vector assignment
+      stream << "for (i=0, rr=" << gen.work(res[0], nnz()) << ", cs=" << gen.work(arg[0], nnz())
+             << "; i<" << sparsity().nnz() << "; ++i) ";
+      r = "*rr++";
+      x = "*cs++";
+    }
+
+    // Output the operation
+    stream << r << " = ";
     casadi_math<double>::printPre(op_, stream);
-    stream << " *cs++ ";
+    stream << x;
     casadi_math<double>::printPost(op_, stream);
     stream << ";" << endl;
   }

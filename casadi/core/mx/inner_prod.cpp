@@ -107,8 +107,9 @@ namespace casadi {
 
   void InnerProd::generate(std::ostream &stream, const std::vector<int>& arg,
                                     const std::vector<int>& res, CodeGenerator& gen) const {
-    gen.assign(stream, gen.workelement(res[0]),
-               gen.inner_prod(dep().nnz(), gen.work(arg[0]), gen.work(arg[1])));
+    gen.assign(stream, gen.workelement(res[0], nnz()),
+               gen.inner_prod(dep().nnz(), gen.work(arg[0], dep(0).nnz()),
+                              gen.work(arg[1], dep(1).nnz())));
   }
 
 } // namespace casadi

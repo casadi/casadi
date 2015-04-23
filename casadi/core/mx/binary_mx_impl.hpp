@@ -135,25 +135,25 @@ namespace casadi {
     stream << "  ";
 
     // Scalar names of arguments (start assuming all scalars)
-    string r = gen.workelement(res.at(0));
-    string x = gen.workelement(arg.at(0));
-    string y = gen.workelement(arg.at(1));
+    string r = gen.workelement(res[0], nnz());
+    string x = gen.workelement(arg[0], dep(0).nnz());
+    string y = gen.workelement(arg[1], dep(1).nnz());
 
     // Codegen loop, if needed
     if (nnz()>1) {
       // Iterate over result
-      stream << "for (i=0, " << "rr=" << gen.work(res.at(0));
+      stream << "for (i=0, " << "rr=" << gen.work(res[0], nnz());
       r = "*rr++";
 
       // Iterate over first argument?
       if (!ScX && !inplace) {
-        stream << ", cr=" << gen.work(arg.at(0));
+        stream << ", cr=" << gen.work(arg[0], dep(0).nnz());
         x = "*cr++";
       }
 
       // Iterate over second argument?
       if (!ScY) {
-        stream << ", cs=" << gen.work(arg.at(1));
+        stream << ", cs=" << gen.work(arg[1], dep(1).nnz());
         y = "*cs++";
       }
 

@@ -106,8 +106,8 @@ namespace casadi {
       int nz_last = offset_[i+1];
       int nz = nz_last-nz_first;
       if (res[i]>=0) {
-        stream << "  for (i=0, rr=" <<  gen.work(res[i]) << ", "
-               << "cr=" << gen.work(arg[0]+nz_first) << "; i<" << nz << "; ++i) "
+        stream << "  for (i=0, rr=" <<  gen.work(res[i], nnz(i)) << ", "
+               << "cr=" << gen.work(arg[0]+nz_first, dep(0).nnz()) << "; i<" << nz << "; ++i) "
                << "*rr++ = *cr++;" << endl;
       }
     }

@@ -233,7 +233,7 @@ namespace casadi {
 
     /// Get shape
     int numel() const { return sparsity().numel(); }
-    int nnz() const { return sparsity().nnz(); }
+    int nnz(int i=0) const { return sparsity(i).nnz(); }
     int size1() const { return sparsity().size1(); }
     int size2() const { return sparsity().size2(); }
     std::pair<int, int> shape() const { return sparsity().shape();}

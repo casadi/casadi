@@ -41,6 +41,7 @@ namespace casadi {
     this->cpp_guards = true;
     this->main = false;
     this->real_t = "double";
+    this->codegen_scalars = false;
 
     // Read options
     for (Dictionary::const_iterator it=opts.begin(); it!=opts.end(); ++it) {
@@ -58,6 +59,8 @@ namespace casadi {
         this->main = it->second;
       } else if (it->first=="real_t") {
         this->real_t = it->second.toString();
+      } else if (it->first=="codegen_scalars") {
+        this->codegen_scalars = it->second;
       } else {
         casadi_error("Unrecongnized option: " << it->first);
       }
@@ -170,9 +173,11 @@ namespace casadi {
     return ss.str();
   }
 
-  std::string CodeGenerator::work(int n) {
-    if (n<0) {
+  std::string CodeGenerator::work(int n, int sz) const {
+    if (n<0 || sz==0) {
       return "0";
+    } else if (sz==1 && !this->codegen_scalars) {
+      return "&w" + numToString(n);
     } else if (n==0) {
       return "w";
     } else {
@@ -180,9 +185,16 @@ namespace casadi {
     }
   }
 
-  std::string CodeGenerator::workelement(int n) {
+  std::string CodeGenerator::workelement(int n, int sz) const {
     casadi_assert(n>=0);
-    return "w[" + numToString(n) + "]";
+    stringstream s;
+    s << "w";
+    if (sz==1 && !this->codegen_scalars) {
+      s << n;
+    } else {
+      s << "[" << n << "]";
+    }
+    return s.str();
   }
 
   void CodeGenerator::assign(std::ostream &s, const std::string& lhs, const std::string& rhs) {

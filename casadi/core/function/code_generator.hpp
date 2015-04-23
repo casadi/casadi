@@ -113,10 +113,10 @@ namespace casadi {
     static std::string numToString(int n);
 
     /** Get work vector name from index */
-    static std::string work(int n);
+    std::string work(int n, int sz) const;
 
     /** Get work vector element from index */
-    static std::string workelement(int n);
+    std::string workelement(int n, int sz) const;
 
     /** \brief  Print int vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
@@ -187,6 +187,12 @@ namespace casadi {
 
     // Include file
     std::string include;
+
+    /** \brief Codegen scalar
+     * Use the work vector for storing work vector elements of length 1
+     * (typically scalar) instead of using local variables
+     */
+    bool codegen_scalars;
 
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;

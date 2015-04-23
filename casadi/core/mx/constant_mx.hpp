@@ -494,8 +494,14 @@ namespace casadi {
   void Constant<Value>::generate(std::ostream &stream, const std::vector<int>& arg,
                                           const std::vector<int>& res,
                                           CodeGenerator& gen) const {
-    if (nnz()==0) return; // Quick return
-    stream << "  " << gen.fill_n("w", res[0], nnz(), gen.constant(v_.value)) << std::endl;
+    if (nnz()==0) {
+      // Quick return
+    } else if (nnz()==1) {
+      stream << "  " << gen.workelement(res[0], 1) << " = " << gen.constant(v_.value)
+             << ";" << std::endl;
+    } else {
+      stream << "  " << gen.fill_n("w", res[0], nnz(), gen.constant(v_.value)) << std::endl;
+    }
   }
 
   template<typename Value>
