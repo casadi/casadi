@@ -114,6 +114,8 @@ namespace casadi {
                                     const std::vector<int>& arg,
                                     const std::vector<int>& res,
                                     CodeGenerator& gen) const {
+    // Quick return if nothing to do
+    if (nnz()==0) return;
 
     // Check if inplace
     bool inplace;
@@ -123,8 +125,10 @@ namespace casadi {
     case OP_MUL:
     case OP_DIV:
       inplace = res[0]==arg[0];
+      break;
     default:
       inplace = false;
+      break;
     }
 
     // Print loop and right hand side
