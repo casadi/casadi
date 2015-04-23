@@ -43,6 +43,18 @@
 using namespace std;
 namespace casadi {
 
+  inline string str(const vector<MX>& v) {
+    // TODO(@jaeandersson) Move to std_vector_tools.hpp
+    stringstream s;
+    s << "[";
+    for (int i=0; i<v.size(); ++i) {
+      if (i>0) s << ", ";
+      s << str(v[i]);
+    }
+    s << "]";
+    return s.str();
+  }
+
   SymbolicOCP::SymbolicOCP() {
     t = MX::sym("t");
     t0 = t0_guess = numeric_limits<double>::quiet_NaN();
@@ -484,14 +496,14 @@ namespace casadi {
     // Print the variables
     stream << "{" << endl;
     stream << "  t = " << str(this->t) << endl;
-    stream << "  s = " << this->s << endl;
-    stream << "  x = " << this->x << endl;
-    stream << "  z =  " << this->z << endl;
-    stream << "  q =  " << this->q << endl;
-    stream << "  i =  " << this->i << endl;
-    stream << "  y =  " << this->y << endl;
-    stream << "  u =  " << this->u << endl;
-    stream << "  p =  " << this->p << endl;
+    stream << "  s = " << str(this->s) << endl;
+    stream << "  x = " << str(this->x) << endl;
+    stream << "  z =  " << str(this->z) << endl;
+    stream << "  q =  " << str(this->q) << endl;
+    stream << "  i =  " << str(this->i) << endl;
+    stream << "  y =  " << str(this->y) << endl;
+    stream << "  u =  " << str(this->u) << endl;
+    stream << "  p =  " << str(this->p) << endl;
     stream << "}" << endl;
 
     if (!this->dae.empty()) {
@@ -537,28 +549,28 @@ namespace casadi {
     if (!this->i.empty()) {
       stream << "Intermediate variables" << endl;
       for (int i=0; i<this->i.size(); ++i)
-        stream << this->i[i] << " == " << str(this->idef[i]) << endl;
+        stream << str(this->i[i]) << " == " << str(this->idef[i]) << endl;
       stream << endl;
     }
 
     if (!this->y.empty()) {
       stream << "Output variables" << endl;
       for (int i=0; i<this->y.size(); ++i)
-        stream << this->y[i] << " == " << str(this->ydef[i]) << endl;
+        stream << str(this->y[i]) << " == " << str(this->ydef[i]) << endl;
       stream << endl;
     }
 
     if (!this->mterm.empty()) {
       stream << "Mayer objective terms" << endl;
       for (int i=0; i<this->mterm.size(); ++i)
-        stream << this->mterm[i] << endl;
+        stream << str(this->mterm[i]) << endl;
       stream << endl;
     }
 
     if (!this->lterm.empty()) {
       stream << "Lagrange objective terms" << endl;
       for (int i=0; i<this->lterm.size(); ++i)
-        stream << this->lterm[i] << endl;
+        stream << str(this->lterm[i]) << endl;
       stream << endl;
     }
 
@@ -1144,10 +1156,18 @@ namespace casadi {
 
   MX SymbolicOCP::add_y(const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_y("y" + CodeGenerator::numToString(this->u.size()));
+      return add_y("y" + CodeGenerator::numToString(this->y.size()));
     MX new_y = addVariable(name);
     this->y.push_back(new_y);
     return new_y;
+  }
+
+  MX SymbolicOCP::add_i(const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_i("i" + CodeGenerator::numToString(this->i.size()));
+    MX new_i = addVariable(name);
+    this->i.push_back(new_i);
+    return new_i;
   }
 
   void SymbolicOCP::add_ode(const MX& new_ode, const std::string& name) {

@@ -187,7 +187,7 @@ namespace casadi {
   }
 
   void FunctionInternal::repr(ostream &stream) const {
-    stream << "function(\"" << getOption("name") << "\")";
+    stream << getOption("name");
   }
 
   Function FunctionInternal::gradient(int iind, int oind) {
@@ -2412,9 +2412,9 @@ namespace casadi {
   void FunctionInternal::printPart(const MXNode* node, std::ostream &stream, int part) const {
     if (part == 0) {
       repr(stream);
-      stream << ".call([";
+      stream << "(";
     } else if (part == getNumInputs()) {
-      stream << "])";
+      stream << ")";
     } else {
       stream << ", ";
     }

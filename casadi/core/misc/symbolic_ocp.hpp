@@ -197,6 +197,9 @@ namespace casadi {
     /// Add a new output
     MX add_y(const std::string& name=std::string());
 
+    /// Add a new intermediate variable
+    MX add_i(const std::string& name=std::string());
+
     /// Add an ordinary differential equation
     void add_ode(const MX& new_ode, const std::string& name=std::string());
 
