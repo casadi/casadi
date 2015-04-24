@@ -287,7 +287,7 @@ namespace casadi {
     /// Generate code for a particular function
     static void generateFunction(const std::string& fname,
                                  const std::vector<MX>& f_in, const std::vector<MX>& f_out,
-                                 CodeGenerator& gen,
+                                 CodeGenerator& g,
                                  bool fwd=false, bool adj=false, bool foa=false);
 
     /// Corresponding header

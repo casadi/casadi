@@ -88,8 +88,8 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::generate(std::ostream &stream, const std::vector<int>& arg,
-                                    const std::vector<int>& res, CodeGenerator& gen) const {
+  void SubAssign::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                           CodeGenerator& g) const {
     casadi_error("not ready");
   }
 

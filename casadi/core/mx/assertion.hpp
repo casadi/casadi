@@ -72,8 +72,8 @@ namespace casadi {
     virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                          const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;

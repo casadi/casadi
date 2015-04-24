@@ -79,10 +79,10 @@ namespace casadi {
     virtual void solve(double* x, int nrhs, bool transpose);
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& gen) const;
+    virtual void generateDeclarations(CodeGenerator& g) const;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& gen) const;
+    virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief Evaluate symbolically (SX) */
     virtual void evalSXLinsol(cp_SXElement* arg, p_SXElement* res,

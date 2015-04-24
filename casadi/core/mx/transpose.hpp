@@ -84,8 +84,8 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_TRANSPOSE;}
@@ -143,8 +143,8 @@ namespace casadi {
                        p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=0;}

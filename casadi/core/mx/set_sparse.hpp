@@ -72,8 +72,8 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(std::ostream &stream, const std::vector<int>& arg,
-                           const std::vector<int>& res, CodeGenerator& gen) const;
+    void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                  CodeGenerator& g) const;
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);

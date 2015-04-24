@@ -109,20 +109,24 @@ namespace casadi {
     }
   }
 
-  void Monitor::generate(std::ostream &stream, const std::vector<int>& arg,
-                         const std::vector<int>& res, CodeGenerator& gen) const {
+  void Monitor::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                         CodeGenerator& g) const {
     // Print comment
-    stream << "  " << gen.printf(comment_ + "\\n[") << endl
-           << "  for (i=0, rr=" << gen.work(arg[0], dep(0).nnz())
+    g.body << "  " << g.printf(comment_ + "\\n[") << endl
+           << "  for (i=0, rr=" << g.work(arg[0], dep(0).nnz())
            << "; i!=" << nnz() << "; ++i) {" << endl
-           << "    if (i!=0) " << gen.printf(", ") << endl
-           << "    " << gen.printf("%g", "*rr++") << endl
+           << "    if (i!=0) " << g.printf(", ") << endl
+           << "    " << g.printf("%g", "*rr++") << endl
            << "  }" << endl
-           << "  " << gen.printf("]\\n") << endl;
+           << "  " << g.printf("]\\n") << endl;
 
     // Copy if not inplace
     if (arg[0]!=res[0]) {
-      stream << "  " << gen.copy_n("w", arg[0], nnz(), "w", res[0]) << endl;
+      if (nnz()==1) {
+        g.body << "  " << g.workel(res[0], 1) << " = " << g.workel(arg[0], 1) << ";" << endl;
+      } else {
+        g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
+      }
     }
   }
 

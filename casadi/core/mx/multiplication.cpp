@@ -116,38 +116,35 @@ namespace casadi {
     copyAdj(arg[0], res[0], nnz());
   }
 
-  void Multiplication::generate(std::ostream &stream,
-                                const std::vector<int>& arg,
-                                const std::vector<int>& res,
-                                CodeGenerator& gen) const {
+  void Multiplication::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                CodeGenerator& g) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      stream << "  " << gen.copy_n("w", arg[0], nnz(), "w", res[0]) << endl;
+      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
     }
 
     // Perform sparse matrix multiplication
-    gen.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
-    stream << "  casadi_mm_sparse(";
-    stream << gen.work(arg[1], dep(1).nnz()) << ", " << gen.sparsity(dep(1).sparsity()) << ", ";
-    stream << gen.work(arg[2], dep(0).nnz()) << ", " << gen.sparsity(dep(2).sparsity()) << ", ";
-    stream << gen.work(res[0], nnz()) << ", " << gen.sparsity(sparsity()) << ", w);" << endl;
+    g.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
+    g.body << "  casadi_mm_sparse(";
+    g.body << g.work(arg[1], dep(1).nnz()) << ", " << g.sparsity(dep(1).sparsity()) << ", ";
+    g.body << g.work(arg[2], dep(0).nnz()) << ", " << g.sparsity(dep(2).sparsity()) << ", ";
+    g.body << g.work(res[0], nnz()) << ", " << g.sparsity(sparsity()) << ", w);" << endl;
   }
 
-  void DenseMultiplication::generate(std::ostream &stream,
-                                              const std::vector<int>& arg,
-                                              const std::vector<int>& res,
-                                              CodeGenerator& gen) const {
+  void DenseMultiplication::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                     CodeGenerator& g) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      stream << "  " << gen.copy_n("w", arg[0], nnz(), "w", res[0]) << endl;
+      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(),
+                                 g.work(res[0], nnz())) << endl;
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
-    stream << "  for (i=0, rr=" << gen.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)";
-    stream << " for (j=0; j<" << nrow_x << "; ++j, ++rr)";
-    stream << " for (k=0, ss=" << gen.work(arg[1], dep(1).nnz()) << "+j, tt="
-           << gen.work(arg[2], dep(2).nnz()) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)";
-    stream << " *rr += ss[k*" << nrow_x << "]**tt++;" << endl;
+    g.body << "  for (i=0, rr=" << g.work(res[0], nnz()) <<"; i<" << ncol_y << "; ++i)";
+    g.body << " for (j=0; j<" << nrow_x << "; ++j, ++rr)";
+    g.body << " for (k=0, ss=" << g.work(arg[1], dep(1).nnz()) << "+j, tt="
+           << g.work(arg[2], dep(2).nnz()) << "+i*" << nrow_y << "; k<" << nrow_y << "; ++k)";
+    g.body << " *rr += ss[k*" << nrow_x << "]**tt++;" << endl;
   }
 
 } // namespace casadi

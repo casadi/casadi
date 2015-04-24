@@ -110,13 +110,13 @@ namespace casadi {
     void addAuxiliary(Auxiliary f);
 
     /** Convert in integer to a string */
-    static std::string numToString(int n);
+    static std::string to_string(int n);
 
     /** Get work vector name from index */
     std::string work(int n, int sz) const;
 
     /** Get work vector element from index */
-    std::string workelement(int n, int sz) const;
+    std::string workel(int n, int sz) const;
 
     /** \brief  Print int vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
@@ -125,16 +125,14 @@ namespace casadi {
     static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
 
     /** \brief Create a copy_n operation */
-    std::string copy_n(const std::string& arg, std::size_t arg_off, std::size_t n,
-                       const std::string& res, std::size_t res_off);
+    std::string copy_n(const std::string& arg, std::size_t n, const std::string& res);
 
     /** \brief Create a fill_n operation */
-    std::string fill_n(const std::string& res, std::size_t res_off, std::size_t n,
-                       const std::string& v);
+    std::string fill_n(const std::string& res, std::size_t n, const std::string& v);
 
     /** \brief Sparse assignment */
-    std::string project(const std::string& arg, std::size_t arg_off, const Sparsity& sp_arg,
-                        const std::string& res, std::size_t res_off, const Sparsity& sp_res,
+    std::string project(const std::string& arg, const Sparsity& sp_arg,
+                        const std::string& res, const Sparsity& sp_res,
                         const std::string& w);
 
     /** \brief Create matrix in MATLAB's MEX format */
@@ -197,7 +195,7 @@ namespace casadi {
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
-    std::stringstream functions;
+    std::stringstream body;
 
     // Set of already included header files
     typedef std::map<const void*, int> PointerMap;

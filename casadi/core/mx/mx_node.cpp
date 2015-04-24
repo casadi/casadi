@@ -344,9 +344,9 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  void MXNode::generate(std::ostream &stream, const std::vector<int>& arg,
-                                 const std::vector<int>& res, CodeGenerator& gen) const {
-    stream << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
+  void MXNode::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                        CodeGenerator& g) const {
+    g.body << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
   }
 
   double MXNode::getValue() const {

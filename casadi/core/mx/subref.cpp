@@ -85,8 +85,8 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubRef::generate(std::ostream &stream, const std::vector<int>& arg,
-                                 const std::vector<int>& res, CodeGenerator& gen) const {
+  void SubRef::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                        CodeGenerator& g) const {
     casadi_error("not ready");
   }
 

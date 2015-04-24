@@ -108,10 +108,10 @@ namespace casadi {
     ///@}
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& gen) const = 0;
+    virtual void generateDeclarations(CodeGenerator& g) const = 0;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& gen) const = 0;
+    virtual void generateBody(CodeGenerator& g) const = 0;
 
     /** \brief Helper function: Check if a vector equals inputv */
     virtual bool isInput(const std::vector<MatType>& arg) const;

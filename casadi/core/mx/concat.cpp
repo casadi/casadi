@@ -86,13 +86,13 @@ namespace casadi {
     }
   }
 
-  void Concat::generate(std::ostream &stream, const std::vector<int>& arg,
-                        const std::vector<int>& res, CodeGenerator& gen) const {
+  void Concat::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                        CodeGenerator& g) const {
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
-      stream << "  for (i=0, ";
-      if (i==0) stream << "rr=" << gen.work(res[0], nnz()) << ", ";
-      stream << "cs=" << gen.work(arg[i], dep(i).nnz())
+      g.body << "  for (i=0, ";
+      if (i==0) g.body << "rr=" << g.work(res[0], nnz()) << ", ";
+      g.body << "cs=" << g.work(arg[i], dep(i).nnz())
              << "; i<" << nz << "; ++i) *rr++ = *cs++;" << endl;
     }
   }

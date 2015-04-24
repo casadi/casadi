@@ -1954,41 +1954,41 @@ namespace casadi {
     return MXFunction(ret_argv, J);
   }
 
-  void FunctionInternal::generateFunction(CodeGenerator& gen,
+  void FunctionInternal::generateFunction(CodeGenerator& g,
                                           const std::string& fname) const {
     assertInit();
 
     // Add standard math
-    gen.addInclude("math.h");
+    g.addInclude("math.h");
 
     // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
-    gen.addAuxiliary(CodeGenerator::AUX_SQ);
-    gen.addAuxiliary(CodeGenerator::AUX_SIGN);
+    g.addAuxiliary(CodeGenerator::AUX_SQ);
+    g.addAuxiliary(CodeGenerator::AUX_SIGN);
 
     // Generate declarations
-    generateDeclarations(gen);
+    generateDeclarations(g);
 
     // Define function
-    gen.functions
+    g.body
       << "/* " << getSanitizedName() << " */" << endl
       << "int " << fname << "(const real_t* const* arg, real_t* const* res, int* iw, real_t* w) {"
       << endl;
 
     // Insert the function body
-    generateBody(gen);
+    generateBody(g);
 
     // Finalize the function
-    gen.functions
+    g.body
       << "  return 0;" << endl
       << "}" << endl
       << endl;
   }
 
-  void FunctionInternal::generateMeta(CodeGenerator& gen, const std::string& fname) const {
+  void FunctionInternal::generateMeta(CodeGenerator& g, const std::string& fname) const {
     // Short-hands
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
-    stringstream &s = gen.functions;
+    stringstream &s = g.body;
 
     // Function that returns the number of inputs and outputs
     s << "int " << fname << "_narg(int *n_in, int *n_out) {" << endl
@@ -2010,7 +2010,7 @@ namespace casadi {
       const Sparsity& sp = i<n_in ? input(i).sparsity() : output(i-n_in).sparsity();
 
       // Print the sparsity pattern or retrieve the index of an existing pattern
-      int ind = gen.addSparsity(sp);
+      int ind = g.addSparsity(sp);
       num_io_patterns = std::max(num_io_patterns, ind+1);
 
       // Store the index
@@ -2064,7 +2064,7 @@ namespace casadi {
     s << endl;
 
     // Generate mex gateway for the function
-    if (gen.mex) {
+    if (g.mex) {
       // Declare wrapper
       s << "void mex_" << fname
              << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {" << endl
@@ -2092,15 +2092,15 @@ namespace casadi {
       nr += i_nnz;
       s << "  int iw[" << ni << "];" << endl;
       s << "  d w[" << nr << "];" << endl;
-      string fw = "w+" + gen.numToString(i_nnz);
+      string fw = "w+" + g.to_string(i_nnz);
 
       // Copy inputs to buffers
       int offset=0;
       s << "  const d* arg[" << n_in << "] = {0};" << endl;
       for (int i=0; i<n_in; ++i) {
-        std::string p = "argv[" + gen.numToString(i) + "]";
+        std::string p = "argv[" + g.to_string(i) + "]";
         s << "  if (--argc>=0) arg[" << i << "] = "
-               << gen.from_mex(p, "w", offset, input(i).sparsity(), fw) << endl;
+               << g.from_mex(p, "w", offset, input(i).sparsity(), fw) << endl;
         offset += input(i).nnz();
       }
 
@@ -2108,7 +2108,7 @@ namespace casadi {
       s << "  d* res[" << n_out << "] = {0};" << endl;
       for (int i=0; i<n_out; ++i) {
         s << "  if (--resc>=0) resv[" << i << "] = "
-               << gen.to_mex(output(i).sparsity(), "&res["+gen.numToString(i)+"]") << endl;
+               << g.to_mex(output(i).sparsity(), "&res["+g.to_string(i)+"]") << endl;
       }
 
       // Call the function
@@ -2119,7 +2119,7 @@ namespace casadi {
       // Finalize mex gateway
       s << "}" << endl << endl;
     }
-    if (gen.main) {
+    if (g.main) {
       // Declare wrapper
       s << "int main_" << fname << "(int argc, char* argv[]) {" << endl;
 
@@ -2135,7 +2135,7 @@ namespace casadi {
       int off=0;
       for (int i=0; i<n_in; ++i) {
         if (i!=0) s << ", ";
-        s << gen.work(off, input(i).nnz());
+        s << g.work(off, input(i).nnz());
         off += input(i).nnz();
       }
       s << "};" << endl;
@@ -2144,7 +2144,7 @@ namespace casadi {
       s << "  d* res[" << n_out << "] = {";
       for (int i=0; i<n_out; ++i) {
         if (i!=0) s << ", ";
-        s << gen.work(off, output(i).nnz());
+        s << g.work(off, output(i).nnz());
         off += output(i).nnz();
       }
       s << "};" << endl;
@@ -2162,9 +2162,9 @@ namespace casadi {
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
       s << "  const d* r = w+" << getNumInputNonzeros() << ";" << endl
              << "  for (j=0; j<" << getNumOutputNonzeros() << "; ++j) "
-             << gen.printf("%g ", "*r++") << endl;
+             << g.printf("%g ", "*r++") << endl;
       // End with newline
-      s << "  " << gen.printf("\\n") << endl;
+      s << "  " << g.printf("\\n") << endl;
 
       // Finalize function
       s << "  return 0;" << endl
@@ -2172,11 +2172,11 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::generateDeclarations(CodeGenerator& gen) const {
+  void FunctionInternal::generateDeclarations(CodeGenerator& g) const {
     // Nothing to declare
   }
 
-  void FunctionInternal::generateBody(CodeGenerator& gen) const {
+  void FunctionInternal::generateBody(CodeGenerator& g) const {
     casadi_error("FunctionInternal::generateBody: generateBody not defined for class "
                  << typeid(*this).name());
   }
@@ -2188,9 +2188,9 @@ namespace casadi {
     if (!f_is_init) f.init();
 
     // Codegen and compile
-    CodeGenerator gen;
-    gen.add(f, fname);
-    string dlname = gen.compile(fname, compiler);
+    CodeGenerator g;
+    g.add(f, fname);
+    string dlname = g.compile(fname, compiler);
 
     // Load it
     ExternalFunction f_gen(fname, dlname);
@@ -2368,40 +2368,40 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::generate(std::ostream &stream, const std::vector<int>& arg,
-                                  const std::vector<int>& res, CodeGenerator& gen) const {
+  void FunctionInternal::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                  CodeGenerator& g) const {
     // Number inputs and outputs
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
 
     // Put in a separate scope to avoid name collisions
-    stream << "  {" << endl;
+    g.body << "  {" << endl;
 
     // Collect input arguments
-    stream << "    const real_t* arg1[] = {";
+    g.body << "    const real_t* arg1[] = {";
     for (int i=0; i<n_in; ++i) {
-      if (i!=0) stream << ", ";
-      stream << gen.work(arg.at(i), input(i).nnz());
+      if (i!=0) g.body << ", ";
+      g.body << g.work(arg.at(i), input(i).nnz());
     }
-    stream << "};" << endl;
+    g.body << "};" << endl;
 
     // Collect output arguments
-    stream << "    real_t* res1[] = {";
+    g.body << "    real_t* res1[] = {";
     for (int i=0; i<n_out; ++i) {
-      if (i!=0) stream << ", ";
-      stream << gen.work(res.at(i), output(i).nnz());
+      if (i!=0) g.body << ", ";
+      g.body << g.work(res.at(i), output(i).nnz());
     }
-    stream << "};" << endl;
+    g.body << "};" << endl;
 
     // Get the index of the function
-    int f = gen.getDependency(shared_from_this<Function>());
+    int f = g.getDependency(shared_from_this<Function>());
 
     // Call function
-    stream << "    i=f" << f << "(arg1, res1, iw, w);" << endl;
-    stream << "    if (i) return i;" << endl;
+    g.body << "    i=f" << f << "(arg1, res1, iw, w);" << endl;
+    g.body << "    if (i) return i;" << endl;
 
     // Finalize the function call
-    stream << "  }" << endl;
+    g.body << "  }" << endl;
   }
 
   void FunctionInternal::nTmp(size_t& ni, size_t& nr) const {

@@ -83,8 +83,8 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(std::ostream &stream, const std::vector<int>& arg,
-                           const std::vector<int>& res, CodeGenerator& gen) const;
+    void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                  CodeGenerator& g) const;
 
     /** \brief  Clone function */
     virtual NormF* clone() const { return new NormF(*this);}

@@ -99,10 +99,10 @@ namespace casadi {
     fill(res[0], res[0]+nnz(), 0);
   }
 
-  void SetSparse::generate(std::ostream &stream, const std::vector<int>& arg,
-                                    const std::vector<int>& res, CodeGenerator& gen) const {
-    stream << "  " << gen.project("w", arg.front(), dep(0).sparsity(),
-                                  "w", res.front(), sparsity(), "w") << endl;
+  void SetSparse::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                           CodeGenerator& g) const {
+    g.body << "  " << g.project(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
+                                g.work(res.front(), nnz()), sparsity(), "w") << endl;
   }
 
 

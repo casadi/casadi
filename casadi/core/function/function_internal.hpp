@@ -237,16 +237,16 @@ namespace casadi {
     MXFunction wrapMXFunction();
 
     /** \brief Generate code the function */
-    virtual void generateFunction(CodeGenerator& gen, const std::string& fname) const;
+    virtual void generateFunction(CodeGenerator& g, const std::string& fname) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
-    void generateMeta(CodeGenerator& gen, const std::string& fname) const;
+    void generateMeta(CodeGenerator& g, const std::string& fname) const;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& gen) const;
+    virtual void generateDeclarations(CodeGenerator& g) const;
 
     /** \brief Generate code for the function body */
-    virtual void generateBody(CodeGenerator& gen) const;
+    virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
@@ -367,8 +367,8 @@ namespace casadi {
     virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     virtual void nTmp(size_t& ni, size_t& nr) const;
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                          const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
     virtual void printPart(const MXNode* node, std::ostream &stream, int part) const;
     ///@}
 

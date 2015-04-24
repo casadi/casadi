@@ -1131,7 +1131,7 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::generateDeclarations(CodeGenerator& gen) const {
+  void MXFunctionInternal::generateDeclarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -1144,7 +1144,7 @@ namespace casadi {
       switch (it->op) {
       case OP_CALL:
       case OP_SOLVE:
-        gen.addDependency(it->data->getFunction());
+        g.addDependency(it->data->getFunction());
         break;
       default:
         break;
@@ -1152,9 +1152,9 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::generateBody(CodeGenerator& gen) const {
+  void MXFunctionInternal::generateBody(CodeGenerator& g) const {
     // Shorthand
-    ostream &s = gen.functions;
+    ostream &s = g.body;
 
     // Temporary variables and vectors
     s << "  int i, j, k, *ii, *jj, *kk;" << endl
@@ -1162,7 +1162,7 @@ namespace casadi {
       << "  const real_t *cr, *cs, *ct;" << endl;
 
     // Declare scalar work vector elements as local variables
-    if (!gen.codegen_scalars) {
+    if (!g.codegen_scalars) {
       bool first = true;
       for (int i=0; i<workloc_.size()-1; ++i) {
         if (workloc_[i+1]==workloc_[i]+1) {
@@ -1190,7 +1190,7 @@ namespace casadi {
     // Codegen the algorithm
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       // Mark the beginning of the operation
-      if (gen.verbose) {
+      if (g.verbose) {
         s << "  /* " << k++;
         if (codegen_class) {
           if (it->data.get()!=0) {
@@ -1211,39 +1211,41 @@ namespace casadi {
         int n = output(it->res.front()).nnz();
         if (n!=0) {
           int oind = it->res.front();
-          if (gen.verbose) {
+          if (g.verbose) {
             s << "  /* Output " << oind;
             if (!output_.scheme.isNull()) s << " (" << output_.scheme.describe(oind) << ")";
             s << " */" << endl;
           }
-          string r = "res[" + CodeGenerator::numToString(oind) + "]";
+          string r = "res[" + g.to_string(oind) + "]";
           int i = workloc_[it->arg.front()];
           s << "  if (" << r << ") ";
           if (n==1) {
-            s << "*" << r << " = " << gen.workelement(i, 1) << ";" << endl;
+            s << "*" << r << " = " << g.workel(i, 1) << ";" << endl;
           } else {
-            s << gen.copy_n("w", i, n, r, 0) << endl;
+            s << g.copy_n(g.work(i, n), n, r) << endl;
           }
         }
       } else if (it->op==OP_INPUT) {
         int n = it->data.nnz();
         if (n!=0) {
           int iind = it->arg.at(0), ip = it->arg.at(1), ic = it->arg.at(2);
-          std::string arg = "arg[" + CodeGenerator::numToString(iind) + "]";
+          std::string arg = "arg[" + g.to_string(iind) + "]";
+          std::string arg_nz = arg;
+          if (ic!=0) arg_nz += "+" + g.to_string(ic);
           int i = workloc_[it->res.front()];
-          if (gen.verbose) {
+          if (g.verbose) {
             s << "  /* Input " << iind;
             if (!input_.scheme.isNull()) s << " (" << input_.scheme.describe(iind) << ")";
             s << ", part " << ip << " (" << it->data.getName() << ") */" << endl;
           }
           if (n==1) {
-            s << "  " << gen.workelement(i, 1) << " = " << arg << " ? "
+            s << "  " << g.workel(i, 1) << " = " << arg << " ? "
               << arg << "[" << ic << "] : 0;" << endl;
           } else {
             s << "  if (" << arg << ")" << endl
-              << "    " << gen.copy_n(arg, ic, n, "w", i) << endl
+              << "    " << g.copy_n(arg_nz, n, g.work(i, n)) << endl
               << "  else " << endl
-              << "    " << gen.fill_n("w", i, n, "0") << endl;
+              << "    " << g.fill_n(g.work(i, n), n, "0") << endl;
           }
         }
       } else {
@@ -1268,7 +1270,7 @@ namespace casadi {
         }
 
         // Generate operation
-        it->data->generate(s, arg, res, gen);
+        it->data->generate(arg, res, g);
       }
     }
   }

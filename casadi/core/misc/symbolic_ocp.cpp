@@ -1117,7 +1117,7 @@ namespace casadi {
 
   MX SymbolicOCP::add_x(const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_x("x" + CodeGenerator::numToString(this->x.size()));
+      return add_x("x" + CodeGenerator::to_string(this->x.size()));
     MX new_x = addVariable(name);
     this->x.push_back(new_x);
     return new_x;
@@ -1125,7 +1125,7 @@ namespace casadi {
 
   std::pair<MX, MX> SymbolicOCP::add_s(const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_s("s" + CodeGenerator::numToString(this->s.size()));
+      return add_s("s" + CodeGenerator::to_string(this->s.size()));
     Variable v(name);
     addVariable(name, v);
     this->s.push_back(v.v);
@@ -1135,7 +1135,7 @@ namespace casadi {
 
   MX SymbolicOCP::add_z(const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_z("z" + CodeGenerator::numToString(this->z.size()));
+      return add_z("z" + CodeGenerator::to_string(this->z.size()));
     MX new_z = addVariable(name);
     this->z.push_back(new_z);
     return new_z;
@@ -1143,7 +1143,7 @@ namespace casadi {
 
   MX SymbolicOCP::add_p(const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_p("p" + CodeGenerator::numToString(this->p.size()));
+      return add_p("p" + CodeGenerator::to_string(this->p.size()));
     MX new_p = addVariable(name);
     this->p.push_back(new_p);
     return new_p;
@@ -1151,7 +1151,7 @@ namespace casadi {
 
   MX SymbolicOCP::add_u(const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_u("u" + CodeGenerator::numToString(this->u.size()));
+      return add_u("u" + CodeGenerator::to_string(this->u.size()));
     MX new_u = addVariable(name);
     this->u.push_back(new_u);
     return new_u;
@@ -1159,7 +1159,7 @@ namespace casadi {
 
   MX SymbolicOCP::add_y(const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_y("y" + CodeGenerator::numToString(this->y.size()));
+      return add_y("y" + CodeGenerator::to_string(this->y.size()));
     MX new_y = addVariable(name);
     this->y.push_back(new_y);
     return new_y;
@@ -1167,7 +1167,7 @@ namespace casadi {
 
   MX SymbolicOCP::add_i(const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_i("i" + CodeGenerator::numToString(this->i.size()));
+      return add_i("i" + CodeGenerator::to_string(this->i.size()));
     MX new_i = addVariable(name);
     this->i.push_back(new_i);
     return new_i;
@@ -1175,42 +1175,42 @@ namespace casadi {
 
   void SymbolicOCP::add_ode(const MX& new_ode, const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_ode(new_ode, "ode" + CodeGenerator::numToString(this->ode.size()));
+      return add_ode(new_ode, "ode" + CodeGenerator::to_string(this->ode.size()));
     this->ode.push_back(new_ode);
     this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
   }
 
   void SymbolicOCP::add_dae(const MX& new_dae, const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_dae(new_dae, "dae" + CodeGenerator::numToString(this->dae.size()));
+      return add_dae(new_dae, "dae" + CodeGenerator::to_string(this->dae.size()));
     this->dae.push_back(new_dae);
     this->lam_dae.push_back(MX::sym("lam_" + name, new_dae.sparsity()));
   }
 
   void SymbolicOCP::add_alg(const MX& new_alg, const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_alg(new_alg, "alg" + CodeGenerator::numToString(this->alg.size()));
+      return add_alg(new_alg, "alg" + CodeGenerator::to_string(this->alg.size()));
     this->alg.push_back(new_alg);
     this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
   }
 
   void SymbolicOCP::add_quad(const MX& new_quad, const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_quad(new_quad, "quad" + CodeGenerator::numToString(this->quad.size()));
+      return add_quad(new_quad, "quad" + CodeGenerator::to_string(this->quad.size()));
     this->quad.push_back(new_quad);
     this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
   }
 
   void SymbolicOCP::add_idef(const MX& new_idef, const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_idef(new_idef, "idef" + CodeGenerator::numToString(this->idef.size()));
+      return add_idef(new_idef, "idef" + CodeGenerator::to_string(this->idef.size()));
     this->idef.push_back(new_idef);
     this->lam_idef.push_back(MX::sym("lam_" + name, new_idef.sparsity()));
   }
 
   void SymbolicOCP::add_ydef(const MX& new_ydef, const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_ydef(new_ydef, "ydef" + CodeGenerator::numToString(this->ydef.size()));
+      return add_ydef(new_ydef, "ydef" + CodeGenerator::to_string(this->ydef.size()));
     this->ydef.push_back(new_ydef);
     this->lam_ydef.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
   }
@@ -1977,12 +1977,12 @@ namespace casadi {
   void SymbolicOCP::generateFunction(const std::string& fname,
                                      const std::vector<MX>& f_in,
                                      const std::vector<MX>& f_out,
-                                     CodeGenerator& gen,
+                                     CodeGenerator& g,
                                      bool fwd, bool adj, bool foa) {
     MXFunction f(f_in, f_out);
     f.setOption("name", fname);
     f.init();
-    gen.add(f, fname);
+    g.add(f, fname);
     size_t ni, nr;
     f.nTmp(ni, nr);
 
@@ -1990,7 +1990,7 @@ namespace casadi {
     if (fwd) {
       MXFunction f_fwd = shared_cast<MXFunction>(f.derForward(1));
       generateFunction(fname+"_fwd",
-                       f_fwd.inputExpr(), f_fwd.outputExpr(), gen);
+                       f_fwd.inputExpr(), f_fwd.outputExpr(), g);
     }
 
     // Reverse mode mode directional derivative
@@ -1998,13 +1998,13 @@ namespace casadi {
       MXFunction f_adj = shared_cast<MXFunction>(f.derReverse(1));
       if (adj) {
         generateFunction(fname+"_adj",
-                         f_adj.inputExpr(), f_adj.outputExpr(), gen);
+                         f_adj.inputExpr(), f_adj.outputExpr(), g);
       }
       // Forward-over-reverse mode directional derivative
       if (foa) {
         MXFunction f_foa = shared_cast<MXFunction>(f_adj.derForward(1));
         generateFunction(fname+"_foa",
-                         f_foa.inputExpr(), f_foa.outputExpr(), gen);
+                         f_foa.inputExpr(), f_foa.outputExpr(), g);
       }
     }
   }
@@ -2012,9 +2012,9 @@ namespace casadi {
   void SymbolicOCP::generateCode(const std::string& filename,
                                  const Dictionary& options) {
     // Create a code generator object
-    CodeGenerator gen(options);
-    if (!gen.include.empty()) {
-      gen.addInclude(gen.include, true);
+    CodeGenerator g(options);
+    if (!g.include.empty()) {
+      g.addInclude(g.include, true);
     }
 
     // All inputs
@@ -2035,7 +2035,7 @@ namespace casadi {
     for (int i=0; i<v_in.size(); ++i) {
       dims[i] = v_in[i].nnz();
     }
-    int dims_ind = gen.getConstant(dims, true);
+    int dims_ind = g.getConstant(dims, true);
 
     // Corresponding offsets
     dims.insert(dims.begin(), 0);
@@ -2044,10 +2044,10 @@ namespace casadi {
       dims[i+1] += dims[i]; // cumsum
       inv_offset.resize(dims[i+1], i);
     }
-    int offset_ind = gen.getConstant(dims, true);
-    int inv_offset_ind = gen.getConstant(inv_offset, true);
-    gen.functions
-      << "void " << gen.prefix
+    int offset_ind = g.getConstant(dims, true);
+    int inv_offset_ind = g.getConstant(inv_offset, true);
+    g.body
+      << "void " << g.prefix
       << "input_dims(const int **dims, const int **offset, const int **inv_offset) {" << endl
       << "  if (dims) *dims = s" << dims_ind << ";" << endl
       << "  if (offset) *offset = s" << offset_ind << ";" << endl
@@ -2068,7 +2068,7 @@ namespace casadi {
     for (int i=0; i<v_out.size(); ++i) {
       dims[i] = v_out[i].nnz();
     }
-    dims_ind = gen.getConstant(dims, true);
+    dims_ind = g.getConstant(dims, true);
 
     // Corresponding offsets
     dims.insert(dims.begin(), 0);
@@ -2077,10 +2077,10 @@ namespace casadi {
       dims[i+1] += dims[i]; // cumsum
       inv_offset.resize(dims[i+1], i);
     }
-    offset_ind = gen.getConstant(dims, true);
-    inv_offset_ind = gen.getConstant(inv_offset, true);
-    gen.functions
-      << "void " << gen.prefix
+    offset_ind = g.getConstant(dims, true);
+    inv_offset_ind = g.getConstant(inv_offset, true);
+    g.body
+      << "void " << g.prefix
       << "output_dims(const int **dims, const int **offset, const int **inv_offset) {" << endl
       << "  if (dims) *dims = s" << dims_ind << ";" << endl
       << "  if (offset) *offset = s" << offset_ind << ";" << endl
@@ -2088,21 +2088,21 @@ namespace casadi {
       << "}" << endl << endl;
 
     // Basic functions individually
-    generateFunction(gen.prefix+"eval_ode", v_in,
-                     vector<MX>(1, vertcat(this->ode)), gen);
-    generateFunction(gen.prefix+"eval_dae", v_in,
-                     vector<MX>(1, vertcat(this->dae)), gen);
-    generateFunction(gen.prefix+"eval_alg", v_in,
-                     vector<MX>(1, vertcat(this->alg)), gen);
-    generateFunction(gen.prefix+"eval_quad", v_in,
-                     vector<MX>(1, vertcat(this->quad)), gen);
-    generateFunction(gen.prefix+"eval_idef", v_in,
-                     vector<MX>(1, vertcat(this->idef)), gen);
-    generateFunction(gen.prefix+"eval_ydef", v_in,
-                     vector<MX>(1, vertcat(this->ydef)), gen);
+    generateFunction(g.prefix+"eval_ode", v_in,
+                     vector<MX>(1, vertcat(this->ode)), g);
+    generateFunction(g.prefix+"eval_dae", v_in,
+                     vector<MX>(1, vertcat(this->dae)), g);
+    generateFunction(g.prefix+"eval_alg", v_in,
+                     vector<MX>(1, vertcat(this->alg)), g);
+    generateFunction(g.prefix+"eval_quad", v_in,
+                     vector<MX>(1, vertcat(this->quad)), g);
+    generateFunction(g.prefix+"eval_idef", v_in,
+                     vector<MX>(1, vertcat(this->idef)), g);
+    generateFunction(g.prefix+"eval_ydef", v_in,
+                     vector<MX>(1, vertcat(this->ydef)), g);
 
     // All functions at once, with derivatives
-    generateFunction(gen.prefix+"eval", v_in, v_out, gen, true, true, true);
+    generateFunction(g.prefix+"eval", v_in, v_out, g, true, true, true);
 
     // Jacobian of all input w.r.t. all outputs
     MX v_in_all = vertcat(v_in);
@@ -2110,10 +2110,10 @@ namespace casadi {
     MX J = jacobian(v_out_all, v_in_all);
 
     // Codegen it
-    generateFunction(gen.prefix+"eval_jac", v_in, vector<MX>(1, J), gen);
-    int Jsp_ind = gen.addSparsity(J.sparsity());
-    gen.functions
-      << "void " << gen.prefix
+    generateFunction(g.prefix+"eval_jac", v_in, vector<MX>(1, J), g);
+    int Jsp_ind = g.addSparsity(J.sparsity());
+    g.body
+      << "void " << g.prefix
       << "jac_sparsity(int *nrow, int *ncol, const int **colind, const int **row) {" << endl
       << "  const int *s = s" << Jsp_ind << ";" << endl
       << "  if (nrow) *nrow = s[0];" << endl
@@ -2139,10 +2139,10 @@ namespace casadi {
     v_in.insert(v_in.begin(), lam.begin(), lam.end());
 
     // Codegen it
-    generateFunction(gen.prefix+"eval_hes", v_in, vector<MX>(1, H), gen);
-    int Hsp_ind = gen.addSparsity(H.sparsity());
-    gen.functions
-      << "void " << gen.prefix
+    generateFunction(g.prefix+"eval_hes", v_in, vector<MX>(1, H), g);
+    int Hsp_ind = g.addSparsity(H.sparsity());
+    g.body
+      << "void " << g.prefix
       << "hes_sparsity(int *nrow, int *ncol, const int **colind, const int **row) {" << endl
       << "  const int *s = s" << Hsp_ind << ";" << endl
       << "  if (nrow) *nrow = s[0];" << endl
@@ -2152,7 +2152,7 @@ namespace casadi {
       << "}" << endl << endl;
 
     // Flush to a file
-    gen.generate(filename);
+    g.generate(filename);
   }
 
 } // namespace casadi

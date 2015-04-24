@@ -120,8 +120,8 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool zz_isEqual(const MXNode* node, int depth) const;
@@ -177,8 +177,8 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool zz_isEqual(const MXNode* node, int depth) const;
@@ -229,8 +229,8 @@ namespace casadi {
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool zz_isEqual(const MXNode* node, int depth) const;

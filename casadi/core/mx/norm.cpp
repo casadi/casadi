@@ -79,11 +79,11 @@ namespace casadi {
     }
   }
 
-  void NormF::generate(std::ostream &stream, const std::vector<int>& arg,
-                       const std::vector<int>& res, CodeGenerator& gen) const {
-    gen.assign(stream, gen.workelement(res[0], nnz()),
-               "sqrt(" + gen.inner_prod(dep().nnz(), gen.work(arg[0], dep(0).nnz()),
-                                        gen.work(arg[0], dep(0).nnz())) + ")");
+  void NormF::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                       CodeGenerator& g) const {
+    g.assign(g.body, g.workel(res[0], nnz()),
+             "sqrt(" + g.inner_prod(dep().nnz(), g.work(arg[0], dep(0).nnz()),
+                                      g.work(arg[0], dep(0).nnz())) + ")");
   }
 
   void Norm2::printPart(std::ostream &stream, int part) const {

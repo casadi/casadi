@@ -98,16 +98,16 @@ namespace casadi {
     }
   }
 
-  void Split::generate(std::ostream &stream, const std::vector<int>& arg,
-                       const std::vector<int>& res, CodeGenerator& gen) const {
+  void Split::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                       CodeGenerator& g) const {
     int nx = nout();
     for (int i=0; i<nx; ++i) {
       int nz_first = offset_[i];
       int nz_last = offset_[i+1];
       int nz = nz_last-nz_first;
       if (res[i]>=0) {
-        stream << "  for (i=0, rr=" <<  gen.work(res[i], nnz(i)) << ", "
-               << "cr=" << gen.work(arg[0]+nz_first, dep(0).nnz()) << "; i<" << nz << "; ++i) "
+        g.body << "  for (i=0, rr=" <<  g.work(res[i], nnz(i)) << ", "
+               << "cr=" << g.work(arg[0]+nz_first, dep(0).nnz()) << "; i<" << nz << "; ++i) "
                << "*rr++ = *cr++;" << endl;
       }
     }

@@ -244,33 +244,33 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::generateDeclarations(CodeGenerator& gen) const {
+  void SymbolicQr::generateDeclarations(CodeGenerator& g) const {
 
     // Generate code for the embedded functions
-    gen.addDependency(fact_fcn_);
-    gen.addDependency(solv_fcn_N_);
-    gen.addDependency(solv_fcn_T_);
+    g.addDependency(fact_fcn_);
+    g.addDependency(solv_fcn_N_);
+    g.addDependency(solv_fcn_T_);
   }
 
-  void SymbolicQr::generateBody(CodeGenerator& gen) const {
+  void SymbolicQr::generateBody(CodeGenerator& g) const {
     casadi_warning("Code generation for SymbolicQR still experimental");
 
     // Data structures to hold A, Q and R
-    gen.functions
+    g.body
        << "  static int prepared = 0;" << endl
        << "  static d A[" << input(LINSOL_A).nnz() << "];" << endl
        << "  static d Q[" << Q_.nnz() << "];" << endl
        << "  static d R[" << R_.nnz() << "];" << endl;
 
     // Check if the factorization is up-to-date
-    gen.functions
+    g.body
       << "  int i;" << endl
       << "  for (i=0; prepared && i<" << input(LINSOL_A).nnz()
       << "; ++i) prepared=A[i]!=x0[i];" << endl;
 
     // Factorize if needed
-    int fact_ind = gen.getDependency(fact_fcn_);
-    gen.functions
+    int fact_ind = g.getDependency(fact_fcn_);
+    g.body
       << "  if (!prepared) {" << endl
       << "    for (i=0; i<" << input(LINSOL_A).nnz() << "; ++i) A[i]=x0[i];" << endl
       << "    f" << fact_ind << "(A, Q, R);" << endl
@@ -278,10 +278,10 @@ namespace casadi {
       << "  }" << endl;
 
     // Solve
-    int solv_ind_N = gen.getDependency(solv_fcn_N_);
+    int solv_ind_N = g.getDependency(solv_fcn_N_);
     int neq = input(LINSOL_B).size1();
     int nrhs = input(LINSOL_B).size2();
-    gen.functions
+    g.body
       << "  for (i=0; i<" << nrhs << "; ++i) {" << endl
       << "    f" << solv_ind_N << "(Q, R, x1, r0);" << endl
       << "    x1+=" << neq << "; r0+=" << neq << ";" << endl

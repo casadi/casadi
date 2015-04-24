@@ -113,28 +113,28 @@ namespace casadi {
     copyAdj(arg[0], res[0], nnz());
   }
 
-  void UnaryMX::generate(std::ostream &stream, const std::vector<int>& arg,
-                         const std::vector<int>& res, CodeGenerator& gen) const {
+  void UnaryMX::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                         CodeGenerator& g) const {
     string r, x;
-    stream << "  ";
+    g.body << "  ";
     if (nnz()==1) {
       // Scalar assignment
-      r = gen.workelement(res[0], 1);
-      x = gen.workelement(arg[0], 1);
+      r = g.workel(res[0], 1);
+      x = g.workel(arg[0], 1);
     } else {
       // Vector assignment
-      stream << "for (i=0, rr=" << gen.work(res[0], nnz()) << ", cs=" << gen.work(arg[0], nnz())
+      g.body << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
              << "; i<" << sparsity().nnz() << "; ++i) ";
       r = "*rr++";
       x = "*cs++";
     }
 
     // Output the operation
-    stream << r << " = ";
-    casadi_math<double>::printPre(op_, stream);
-    stream << x;
-    casadi_math<double>::printPost(op_, stream);
-    stream << ";" << endl;
+    g.body << r << " = ";
+    casadi_math<double>::printPre(op_, g.body);
+    g.body << x;
+    casadi_math<double>::printPost(op_, g.body);
+    g.body << ";" << endl;
   }
 
   MX UnaryMX::getUnary(int op) const {

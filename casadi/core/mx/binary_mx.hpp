@@ -87,8 +87,8 @@ namespace casadi {
     virtual int numInplace() const { return 2;}
 
     /** \brief Generate code for the operation */
-    void generate(std::ostream &stream, const std::vector<int>& arg,
-                           const std::vector<int>& res, CodeGenerator& gen) const;
+    void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                  CodeGenerator& g) const;
 
     /// Get a unary operation
     virtual MX getUnary(int op) const;

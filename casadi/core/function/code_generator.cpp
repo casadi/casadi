@@ -160,14 +160,14 @@ namespace casadi {
       s << "#define c" << i << " CASADI_PREFIX(c" << i << ")" << endl;
     }
 
-    // Codegen functions
-    s << this->functions.str();
+    // Codeg.body
+    s << this->body.str();
 
     // End with new line
     s << endl;
   }
 
-  std::string CodeGenerator::numToString(int n) {
+  std::string CodeGenerator::to_string(int n) {
     stringstream ss;
     ss << n;
     return ss.str();
@@ -177,15 +177,15 @@ namespace casadi {
     if (n<0 || sz==0) {
       return "0";
     } else if (sz==1 && !this->codegen_scalars) {
-      return "&w" + numToString(n);
+      return "&w" + to_string(n);
     } else if (n==0) {
       return "w";
     } else {
-      return "w+" + numToString(n);
+      return "w+" + to_string(n);
     }
   }
 
-  std::string CodeGenerator::workelement(int n, int sz) const {
+  std::string CodeGenerator::workel(int n, int sz) const {
     casadi_assert(n>=0);
     stringstream s;
     s << "w";
@@ -215,13 +215,13 @@ namespace casadi {
       ind = num_f_before;
 
       // Give it a name
-      string name = "f" + numToString(ind);
+      string name = "f" + to_string(ind);
 
       // Print to file
       f->generateFunction(*this, "CASADI_PREFIX(" + name + ")");
 
       // Shorthand
-      functions
+      this->body
         << "#define " << name << "(arg, res, iw, w) "
         << "CASADI_PREFIX(" << name << ")(arg, res, iw, w)" << endl << endl;
     }
@@ -285,7 +285,7 @@ namespace casadi {
   }
 
   std::string CodeGenerator::sparsity(const Sparsity& sp) {
-    return "s" + numToString(addSparsity(sp));
+    return "s" + to_string(addSparsity(sp));
   }
 
   int CodeGenerator::getSparsity(const Sparsity& sp) const {
@@ -515,7 +515,7 @@ namespace casadi {
                                       const std::string& res, std::size_t res_off,
                                       const Sparsity& sp_res, const std::string& w) {
     // Handle offset with recursion
-    if (res_off!=0) return from_mex(arg, res+"+"+numToString(res_off), 0, sp_res, w);
+    if (res_off!=0) return from_mex(arg, res+"+"+to_string(res_off), 0, sp_res, w);
 
     addInclude("mex.h");
     addAuxiliary(AUX_FROM_MEX);
@@ -561,38 +561,21 @@ namespace casadi {
     return s.str();
   }
 
-  std::string CodeGenerator::copy_n(const std::string& arg, std::size_t arg_off,
-                                    std::size_t n, const std::string& res, std::size_t res_off) {
+  std::string CodeGenerator::copy_n(const std::string& arg,
+                                    std::size_t n, const std::string& res) {
     stringstream s;
-    // inline if scalar
-    if (n==1) {
-      s << res << "[" << res_off << "] = " << arg << "[" << arg_off << "];";
-    } else {
-      // Handle offsets with recursion
-      if (arg_off!=0) return copy_n(arg+"+"+numToString(arg_off), 0, n, res, res_off);
-      if (res_off!=0) return copy_n(arg, arg_off, n, res+"+"+numToString(res_off), 0);
-
-      // Perform operation
-      addAuxiliary(AUX_COPY_N);
-      s << "copy_n(" << arg << ", " << n << ", " << res << ");";
-    }
+    // Perform operation
+    addAuxiliary(AUX_COPY_N);
+    s << "copy_n(" << arg << ", " << n << ", " << res << ");";
     return s.str();
   }
 
-  std::string CodeGenerator::fill_n(const std::string& res, std::size_t res_off,
+  std::string CodeGenerator::fill_n(const std::string& res,
                                     std::size_t n, const std::string& v) {
     stringstream s;
-    // Inline if scalar
-    if (n==1) {
-      s << res << "[" << res_off << "] = " << v << ";";
-    } else {
-      // Handle offset with recursion
-      if (res_off!=0) return fill_n(res+"+"+numToString(res_off), 0, n, v);
-
-      // Perform operation
-      addAuxiliary(AUX_FILL_N);
-      s << "fill_n(" << res << ", " << n << ", " << v << ");";
-    }
+    // Perform operation
+    addAuxiliary(AUX_FILL_N);
+    s << "fill_n(" << res << ", " << n << ", " << v << ");";
     return s.str();
   }
 
@@ -605,17 +588,11 @@ namespace casadi {
   }
 
   std::string
-  CodeGenerator::project(const std::string& arg, std::size_t arg_off, const Sparsity& sp_arg,
-                         const std::string& res, std::size_t res_off, const Sparsity& sp_res,
+  CodeGenerator::project(const std::string& arg, const Sparsity& sp_arg,
+                         const std::string& res, const Sparsity& sp_res,
                          const std::string& w) {
     // If sparsity match, simple copy
-    if (sp_arg==sp_res) return copy_n(arg, arg_off, sp_arg.nnz(), res, res_off);
-
-    // Handle offsets with recursion
-    if (arg_off!=0) return project(arg+"+"+numToString(arg_off), 0, sp_arg,
-                                   res, res_off, sp_res, w);
-    if (res_off!=0) return project(arg, arg_off, sp_arg,
-                                   res+"+"+numToString(res_off), 0, sp_res, w);
+    if (sp_arg==sp_res) return copy_n(arg, sp_arg.nnz(), res);
 
     // Create call
     addAuxiliary(CodeGenerator::AUX_PROJECT);

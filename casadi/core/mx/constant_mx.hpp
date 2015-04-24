@@ -138,8 +138,8 @@ namespace casadi {
     }
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const;
@@ -195,8 +195,8 @@ namespace casadi {
                             int* itmp, SXElement* rtmp) {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const {}
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const {}
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const { return 0;}
@@ -293,8 +293,8 @@ namespace casadi {
                             int* itmp, SXElement* rtmp);
 
     /** \brief Generate code for the operation */
-    virtual void generate(std::ostream &stream, const std::vector<int>& arg,
-                                   const std::vector<int>& res, CodeGenerator& gen) const;
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const { return v_.value==0;}
@@ -491,16 +491,15 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::generate(std::ostream &stream, const std::vector<int>& arg,
-                                          const std::vector<int>& res,
-                                          CodeGenerator& gen) const {
+  void Constant<Value>::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                 CodeGenerator& g) const {
     if (nnz()==0) {
       // Quick return
     } else if (nnz()==1) {
-      stream << "  " << gen.workelement(res[0], 1) << " = " << gen.constant(v_.value)
+      g.body << "  " << g.workel(res[0], 1) << " = " << g.constant(v_.value)
              << ";" << std::endl;
     } else {
-      stream << "  " << gen.fill_n("w", res[0], nnz(), gen.constant(v_.value)) << std::endl;
+      g.body << "  " << g.fill_n(g.work(res[0], nnz()), nnz(), g.constant(v_.value)) << std::endl;
     }
   }
 

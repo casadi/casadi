@@ -77,8 +77,8 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(std::ostream &stream, const std::vector<int>& arg,
-                  const std::vector<int>& res, CodeGenerator& gen) const;
+    void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                  CodeGenerator& g) const;
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;

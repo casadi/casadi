@@ -443,16 +443,14 @@ namespace casadi {
     return true;
   }
 
-  void GetNonzerosVector::generate(std::ostream &stream,
-                                   const std::vector<int>& arg,
-                                   const std::vector<int>& res,
-                                   CodeGenerator& gen) const {
+  void GetNonzerosVector::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                   CodeGenerator& g) const {
     // Codegen the indices
-    int ind = gen.getConstant(nz_, true);
+    int ind = g.getConstant(nz_, true);
 
     // Codegen the assignments
-    stream << "  for (ii=s" << ind << ", rr=" << gen.work(res[0], nnz())
-           << ", ss=" << gen.work(arg[0], dep(0).nnz())
+    g.body << "  for (ii=s" << ind << ", rr=" << g.work(res[0], nnz())
+           << ", ss=" << g.work(arg[0], dep(0).nnz())
            << "; ii!=s" << ind << "+" << nz_.size()
            << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
   }
@@ -477,24 +475,20 @@ namespace casadi {
     return dep()->getGetNonzeros(sp, nz_new);
   }
 
-  void GetNonzerosSlice::generate(std::ostream &stream,
-                                           const std::vector<int>& arg,
-                                           const std::vector<int>& res,
-                                           CodeGenerator& gen) const {
-    stream << "  for (rr=" << gen.work(res[0], nnz()) << ", ss="
-           << gen.work(arg[0]+s_.start_, dep(0).nnz())
-           << "; ss!=" << gen.work(arg[0]+s_.stop_, dep(0).nnz())
+  void GetNonzerosSlice::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                  CodeGenerator& g) const {
+    g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
+           << g.work(arg[0]+s_.start_, dep(0).nnz())
+           << "; ss!=" << g.work(arg[0]+s_.stop_, dep(0).nnz())
            << "; ss+=" << s_.step_ << ") "
            << "*rr++ = *ss;" << endl;
   }
 
-  void GetNonzerosSlice2::generate(std::ostream &stream,
-                                            const std::vector<int>& arg,
-                                            const std::vector<int>& res,
-                                            CodeGenerator& gen) const {
-    stream << "  for (rr=" << gen.work(res[0], nnz()) << ", ss="
-           << gen.work(arg[0]+outer_.start_, dep(0).nnz())
-           << "; ss!=" << gen.work(arg[0]+outer_.stop_, dep(0).nnz()) << "; ss+="
+  void GetNonzerosSlice2::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                   CodeGenerator& g) const {
+    g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
+           << g.work(arg[0]+outer_.start_, dep(0).nnz())
+           << "; ss!=" << g.work(arg[0]+outer_.stop_, dep(0).nnz()) << "; ss+="
            << outer_.step_ << ") "
            << "for (tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_
            << "; tt+=" << inner_.step_ << ") "

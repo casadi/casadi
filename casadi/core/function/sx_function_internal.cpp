@@ -216,7 +216,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::generateDeclarations(CodeGenerator& gen) const {
+  void SXFunctionInternal::generateDeclarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -225,7 +225,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::generateBody(CodeGenerator& gen) const {
+  void SXFunctionInternal::generateBody(CodeGenerator& g) const {
 
     // Which variables have been declared
     vector<bool> declared(rtmp_.size(), false);
@@ -233,41 +233,41 @@ namespace casadi {
     // Run the algorithm
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       // Indent
-      gen.functions << "  ";
+      g.body << "  ";
 
       if (it->op==OP_OUTPUT) {
-        gen.functions << "if (res[" << it->i0 << "]!=0) "
+        g.body << "if (res[" << it->i0 << "]!=0) "
                       << "res["<< it->i0 << "][" << it->i2 << "]=" << "a" << it->i1;
       } else {
         // Declare result if not already declared
         if (!declared[it->i0]) {
-          gen.functions << "real_t ";
+          g.body << "real_t ";
           declared[it->i0]=true;
         }
 
         // Where to store the result
-        gen.functions << "a" << it->i0 << "=";
+        g.body << "a" << it->i0 << "=";
 
         // What to store
         if (it->op==OP_CONST) {
-          gen.functions << gen.constant(it->d);
+          g.body << g.constant(it->d);
         } else if (it->op==OP_INPUT) {
-          gen.functions << "arg[" << it->i1 << "] ? arg[" << it->i1 << "][" << it->i2 << "] : 0";
+          g.body << "arg[" << it->i1 << "] ? arg[" << it->i1 << "][" << it->i2 << "] : 0";
         } else {
           int ndep = casadi_math<double>::ndeps(it->op);
-          casadi_math<double>::printPre(it->op, gen.functions);
+          casadi_math<double>::printPre(it->op, g.body);
           for (int c=0; c<ndep; ++c) {
             if (c==0) {
-              gen.functions << "a" << it->i1;
+              g.body << "a" << it->i1;
             } else {
-              casadi_math<double>::printSep(it->op, gen.functions);
-              gen.functions << "a" << it->i2;
+              casadi_math<double>::printSep(it->op, g.body);
+              g.body << "a" << it->i2;
             }
           }
-          casadi_math<double>::printPost(it->op, gen.functions);
+          casadi_math<double>::printPost(it->op, g.body);
         }
       }
-      gen.functions  << ";" << endl;
+      g.body  << ";" << endl;
     }
   }
 

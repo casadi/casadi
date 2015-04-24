@@ -147,9 +147,9 @@ namespace casadi {
     fcn_.spAdj(arg, res, itmp, rtmp);
   }
 
-  void Call::generate(std::ostream &stream, const vector<int>& arg,
-                      const vector<int>& res, CodeGenerator& gen) const {
-    fcn_->generate(stream, arg, res, gen);
+  void Call::generate(const vector<int>& arg, const vector<int>& res,
+                      CodeGenerator& g) const {
+    fcn_->generate(arg, res, g);
   }
 
   void Call::nTmp(size_t& ni, size_t& nr) {

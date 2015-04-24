@@ -74,14 +74,13 @@ namespace casadi {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantDMatrix::generate(std::ostream &stream, const std::vector<int>& arg,
-                                          const std::vector<int>& res,
-                                          CodeGenerator& gen) const {
+  void ConstantDMatrix::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                 CodeGenerator& g) const {
     // Print the constant
-    int ind = gen.getConstant(x_.data(), true);
+    int ind = g.getConstant(x_.data(), true);
 
     // Copy the constant to the work vector
-    stream << "  " << gen.copy_n("c"+gen.numToString(ind), 0, nnz(), "w", res[0]) << endl;
+    g.body << "  " << g.copy_n("c"+g.to_string(ind), nnz(), g.work(res[0], nnz())) << endl;
   }
 
   bool ConstantMX::__nonzero__() const {

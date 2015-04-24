@@ -754,61 +754,58 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::generate(std::ostream &stream,
-                                                 const std::vector<int>& arg,
-                                                 const std::vector<int>& res,
-                                                 CodeGenerator& gen) const {
+  void SetNonzerosVector<Add>::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                        CodeGenerator& g) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      stream << "  " << gen.copy_n("w", arg[0], this->nnz(), "w", res[0]) << endl;
+      g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                                 g.work(res[0], this->nnz())) << endl;
     }
 
     // Condegen the indices
-    int ind = gen.getConstant(this->nz_, true);
+    int ind = g.getConstant(this->nz_, true);
 
     // Perform the operation inplace
-    stream << "  for (ii=s" << ind << ", rr=" << gen.work(res[0], this->nnz()) << ", "
-           << "ss=" << gen.work(arg[1], this->dep(1).nnz()) << "; ii!=s" << ind
+    g.body << "  for (ii=s" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
+           << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; ii!=s" << ind
            << "+" << this->nz_.size() << "; ++ii, ++ss)";
-    stream << " if (*ii>=0) rr[*ii] " << (Add?"+=":"=") << " *ss;" << endl;
+    g.body << " if (*ii>=0) rr[*ii] " << (Add?"+=":"=") << " *ss;" << endl;
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::generate(std::ostream &stream,
-                                       const std::vector<int>& arg,
-                                       const std::vector<int>& res,
-                                       CodeGenerator& gen) const {
+  void SetNonzerosSlice<Add>::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                       CodeGenerator& g) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      stream << "  " << gen.copy_n("w", arg[0], this->nnz(), "w", res[0]) << endl;
+      g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                                 g.work(res[0], this->nnz())) << endl;
     }
 
     // Perform the operation inplace
-    stream << "  for (rr=" << gen.work(res[0]+s_.start_, this->nnz()) << ", ss="
-           << gen.work(arg[1], this->dep(1).nnz()) << "; rr!="
-           << gen.work(res[0]+s_.stop_, this->nnz())
+    g.body << "  for (rr=" << g.work(res[0]+s_.start_, this->nnz()) << ", ss="
+           << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
+           << g.work(res[0]+s_.stop_, this->nnz())
            << "; rr+=" << s_.step_ << ")";
-    stream << " *rr " << (Add?"+=":"=") << " *ss++;" << endl;
+    g.body << " *rr " << (Add?"+=":"=") << " *ss++;" << endl;
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::generate(std::ostream &stream,
-                                        const std::vector<int>& arg,
-                                        const std::vector<int>& res,
-                                        CodeGenerator& gen) const {
+  void SetNonzerosSlice2<Add>::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                        CodeGenerator& g) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      stream << "  " << gen.copy_n("w", arg[0], this->nnz(), "w", res[0]) << endl;
+      g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                                 g.work(res[0], this->nnz())) << endl;
     }
 
     // Perform the operation inplace
-    stream << "  for (rr=" << gen.work(res[0]+outer_.start_, this->nnz())
-           << ", ss=" << gen.work(arg[1], this->dep(1).nnz()) << "; rr!="
-           << gen.work(res[0]+outer_.stop_, this->nnz())
+    g.body << "  for (rr=" << g.work(res[0]+outer_.start_, this->nnz())
+           << ", ss=" << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
+           << g.work(res[0]+outer_.stop_, this->nnz())
            << "; rr+=" << outer_.step_ << ")";
-    stream << " for (tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_
+    g.body << " for (tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_
            << "; tt+=" << inner_.step_ << ")";
-    stream << " *tt " << (Add?"+=":"=") << " *ss++;" << endl;
+    g.body << " *tt " << (Add?"+=":"=") << " *ss++;" << endl;
   }
 
   template<bool Add>

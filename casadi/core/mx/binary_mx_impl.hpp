@@ -110,10 +110,8 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::generate(std::ostream &stream,
-                                    const std::vector<int>& arg,
-                                    const std::vector<int>& res,
-                                    CodeGenerator& gen) const {
+  void BinaryMX<ScX, ScY>::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                                    CodeGenerator& g) const {
     // Quick return if nothing to do
     if (nnz()==0) return;
 
@@ -132,49 +130,49 @@ namespace casadi {
     }
 
     // Print indent
-    stream << "  ";
+    g.body << "  ";
 
     // Scalar names of arguments (start assuming all scalars)
-    string r = gen.workelement(res[0], nnz());
-    string x = gen.workelement(arg[0], dep(0).nnz());
-    string y = gen.workelement(arg[1], dep(1).nnz());
+    string r = g.workel(res[0], nnz());
+    string x = g.workel(arg[0], dep(0).nnz());
+    string y = g.workel(arg[1], dep(1).nnz());
 
     // Codegen loop, if needed
     if (nnz()>1) {
       // Iterate over result
-      stream << "for (i=0, " << "rr=" << gen.work(res[0], nnz());
+      g.body << "for (i=0, " << "rr=" << g.work(res[0], nnz());
       r = "*rr++";
 
       // Iterate over first argument?
       if (!ScX && !inplace) {
-        stream << ", cr=" << gen.work(arg[0], dep(0).nnz());
+        g.body << ", cr=" << g.work(arg[0], dep(0).nnz());
         x = "*cr++";
       }
 
       // Iterate over second argument?
       if (!ScY) {
-        stream << ", cs=" << gen.work(arg[1], dep(1).nnz());
+        g.body << ", cs=" << g.work(arg[1], dep(1).nnz());
         y = "*cs++";
       }
 
       // Close loop
-      stream << "; i<" << nnz() << "; ++i) ";
+      g.body << "; i<" << nnz() << "; ++i) ";
     }
 
     // Perform operation
-    stream << r << " ";
+    g.body << r << " ";
     if (inplace) {
-      casadi_math<double>::printSep(op_, stream);
-      stream << "= " << y;
+      casadi_math<double>::printSep(op_, g.body);
+      g.body << "= " << y;
     } else {
-      stream << " = ";
-      casadi_math<double>::printPre(op_, stream);
-      stream << x;
-      casadi_math<double>::printSep(op_, stream);
-      stream << y;
-      casadi_math<double>::printPost(op_, stream);
+      g.body << " = ";
+      casadi_math<double>::printPre(op_, g.body);
+      g.body << x;
+      casadi_math<double>::printSep(op_, g.body);
+      g.body << y;
+      casadi_math<double>::printPost(op_, g.body);
     }
-    stream << ";" << endl;
+    g.body << ";" << endl;
   }
 
   template<bool ScX, bool ScY>

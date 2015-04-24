@@ -107,17 +107,18 @@ namespace casadi {
     }
   }
 
-  void Assertion::generate(std::ostream &stream, const std::vector<int>& arg,
-                           const std::vector<int>& res, CodeGenerator& gen) const {
+  void Assertion::generate(const std::vector<int>& arg, const std::vector<int>& res,
+                           CodeGenerator& g) const {
     // Generate assertion
-    stream << "  if (" << gen.workelement(arg[1], dep(1).nnz()) << "!=1.) {" << endl
+    g.body << "  if (" << g.workel(arg[1], dep(1).nnz()) << "!=1.) {" << endl
            << "    /* " << fail_message_ << " */" << endl
            << "    return 1;" << endl
            << "  }" << endl;
 
     // Copy if not inplace
     if (arg[0]!=res[0]) {
-      stream << "  " << gen.copy_n("w", arg[0], nnz(), "w", res[0]) << endl;
+      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(),
+                                 g.work(res[0], nnz())) << endl;
     }
   }
 
