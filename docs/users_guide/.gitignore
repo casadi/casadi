@@ -1,0 +1,5 @@
+*.aux
+*.log
+*.pdf
+pytex_*
+temp_pytex.py
