@@ -30,6 +30,10 @@ if(DSDP_FOUND)
   add_subdirectory(dsdp)
 endif()
 
+if(MOSEK_FOUND)
+  add_subdirectory(mosek)
+endif()
+
 if(OOQP_FOUND)
   add_subdirectory(ooqp)
 endif()

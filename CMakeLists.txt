@@ -65,6 +65,7 @@ option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_BUILD_DSDP "Compile the the included source code for DSDP" ON)
 option(WITH_DSDP "Compile the interface to DSDP" ON)
+option(WITH_MOSEK "Compile the interface to MOSEK" OFF)
 option(WITH_BUILD_CSPARSE "Compile the included source code for CSparse" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
@@ -408,6 +409,14 @@ if(WITH_DSDP)
   endif()
 endif()
 add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP.")
+
+# MOSEK
+if(WITH_MOSEK)
+  # try to find system mosek
+  find_package(MOSEK)
+endif()
+add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SDP solver MOSEK.")
+
 
 # Use the included qpOASES
 if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
