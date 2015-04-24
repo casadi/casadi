@@ -354,6 +354,7 @@ namespace casadi {
            ++it, ++alg_counter) {
         std::stringstream ss;
         print(ss, *it);
+        ss << endl;
         if (it->op == OP_CALL) {
           profileWriteSourceLineDep(CasadiOptions::profilingLog, this, alg_counter,
                             ss.str(), it->op, it->data->getFunction().operator->());
@@ -447,6 +448,7 @@ namespace casadi {
           }
           CasadiOptions::profilingLog << "|";
           print(CasadiOptions::profilingLog, *it);
+          CasadiOptions::profilingLog << endl;
         }
 
       }
@@ -505,13 +507,13 @@ namespace casadi {
         }
       }
     }
-    stream << endl;
   }
 
   void MXFunctionInternal::print(ostream &stream) const {
     FunctionInternal::print(stream);
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       print(stream, *it);
+      stream << endl;
     }
   }
 
@@ -1189,30 +1191,12 @@ namespace casadi {
 
     // Codegen the algorithm
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      // Mark the beginning of the operation
-      if (g.verbose) {
-        s << "  /* " << k++;
-        if (codegen_class) {
-          if (it->data.get()!=0) {
-            s << " : " << typeid(*it->data.get()).name();
-
-            // if this is a call node, also write the name of the Function
-            MX algElem = it->data;
-            if (algElem.getOp() == OP_CALL) {
-              s << " (" << algElem.getFunction().getSanitizedName() << ")";
-            }
-          }
-        }
-        s << " */" << endl;
-      }
-
-      // Print the operation
       if (it->op==OP_OUTPUT) {
         int n = output(it->res.front()).nnz();
         if (n!=0) {
           int oind = it->res.front();
           if (g.verbose) {
-            s << "  /* Output " << oind;
+            s << "  /* #" << k++ << ": Output " << oind;
             if (!output_.scheme.isNull()) s << " (" << output_.scheme.describe(oind) << ")";
             s << " */" << endl;
           }
@@ -1234,7 +1218,7 @@ namespace casadi {
           if (ic!=0) arg_nz += "+" + g.to_string(ic);
           int i = workloc_[it->res.front()];
           if (g.verbose) {
-            s << "  /* Input " << iind;
+            s << "  /* #" << k++ << ": Input " << iind;
             if (!input_.scheme.isNull()) s << " (" << input_.scheme.describe(iind) << ")";
             s << ", part " << ip << " (" << it->data.getName() << ") */" << endl;
           }
@@ -1249,6 +1233,13 @@ namespace casadi {
           }
         }
       } else {
+        // Generate comment
+        if (g.verbose) {
+          s << "  /* #" << k++ << ": ";
+          print(s, *it);
+          s << " */" << endl;
+        }
+
         // Get the names of the operation arguments
         arg.resize(it->arg.size());
         for (int i=0; i<it->arg.size(); ++i) {
