@@ -341,7 +341,7 @@ class SXtests(casadiTestCase):
     # Set some options
     fcn.setOption("name","f")
 
-    self.assertEqual(repr(fcn),'function("f")','SX representation is wrong')
+    self.assertEqual(repr(fcn),'f','SX representation is wrong')
     # Initialize the function for numerical calculations
     fcn.init()
 
