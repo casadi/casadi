@@ -255,8 +255,11 @@ namespace casadi {
     /// Checks if expression does not contain NaN or Inf
     bool isRegular() const;
 
+    /** \brief  Number of functions */
+    int numFunctions() const;
+
     /// Get function
-    Function getFunction();
+    Function getFunction(int i=0);
 
     /// Is binary operation
     bool isBinary() const;

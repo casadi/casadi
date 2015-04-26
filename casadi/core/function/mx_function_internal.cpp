@@ -355,9 +355,12 @@ namespace casadi {
         std::stringstream ss;
         print(ss, *it);
         ss << endl;
-        if (it->op == OP_CALL) {
-          profileWriteSourceLineDep(CasadiOptions::profilingLog, this, alg_counter,
-                            ss.str(), it->op, it->data->getFunction().operator->());
+        int nf = it->data->numFunctions();
+        if (nf>0) {
+          for (int i=0; i<nf; ++i) {
+            profileWriteSourceLineDep(CasadiOptions::profilingLog, this, alg_counter,
+                                      ss.str(), it->op, it->data->getFunction(i).operator->());
+          }
         } else {
           profileWriteSourceLine(CasadiOptions::profilingLog, this, alg_counter, ss.str(), it->op);
         }
@@ -442,8 +445,9 @@ namespace casadi {
                                        << (time_stop-time_zero)*1e3 << " ms | "
                                        << this << ":" <<getOption("name") << ":"
                                        << alg_counter <<"|";
-          if (it->op == OP_CALL) {
-            Function f = it->data->getFunction();
+          int nf = it->data->numFunctions();
+          for (int i=0; i<nf; ++i) {
+            Function f = it->data->getFunction(i);
             CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
           }
           CasadiOptions::profilingLog << "|";
@@ -525,14 +529,11 @@ namespace casadi {
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>::deepCopyMembers(already_copied);
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      switch (it->op) {
-      case OP_CALL:
-      case OP_SOLVE:
-        it->data.makeUnique(already_copied, false);
-        it->data->getFunction() = deepcopy(it->data->getFunction(), already_copied);
-        break;
-      default:
-        break;
+      int nf = it->data->numFunctions();
+      if (nf==0) continue;
+      it->data.makeUnique(already_copied, false);
+      for (int i=0; i<nf; ++i) {
+        it->data->getFunction(i) = deepcopy(it->data->getFunction(i), already_copied);
       }
     }
   }
@@ -1143,13 +1144,9 @@ namespace casadi {
 
     // Generate code for the embedded functions
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      switch (it->op) {
-      case OP_CALL:
-      case OP_SOLVE:
-        g.addDependency(it->data->getFunction());
-        break;
-      default:
-        break;
+      int nf = it->data->numFunctions();
+      for (int i=0; i<nf; ++i) {
+        g.addDependency(it->data->getFunction(i));
       }
     }
   }

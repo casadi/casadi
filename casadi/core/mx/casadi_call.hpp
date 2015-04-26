@@ -33,15 +33,38 @@
 
 namespace casadi {
 
-  /**
+  /** Base class for nodes involving function calls
       \author Joel Andersson
-      \date 2010-2013
+      \date 2015
   */
-  class CASADI_EXPORT Call : public MultipleOutput {
+  class CASADI_EXPORT GenericCall : public MultipleOutput {
+  public:
+
+    /** \brief Constructor */
+    GenericCall() {}
+
+    /** \brief Destructor */
+    virtual ~GenericCall() {}
+
+    /** \brief  Number of functions */
+    virtual int numFunctions() const = 0;
+
+    /** \brief  Get function reference */
+    virtual Function& getFunction(int i) = 0;
+
+    /** \brief Project a function input to a particular sparsity */
+    static MX projectArg(const MX& x, const Sparsity& sp, int i);
+  };
+
+  /** Embeds a function call in an expression graph
+      \author Joel Andersson
+      \date 2010-2015
+  */
+  class CASADI_EXPORT Call : public GenericCall {
   public:
 
     /** \brief  Constructor */
-    explicit Call(const Function& fcn, std::vector<MX> arg);
+    explicit Call(const Function& fcn, const std::vector<MX>& arg);
 
     /** \brief  Destructor */
     virtual ~Call() {}
@@ -79,8 +102,11 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
+    /** \brief  Number of functions */
+    virtual int numFunctions() const {return 1;}
+
     /** \brief  Get function reference */
-    virtual Function& getFunction();
+    virtual Function& getFunction(int i) { return fcn_;}
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const { return -1;}

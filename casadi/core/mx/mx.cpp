@@ -848,7 +848,8 @@ namespace casadi {
   bool         MX::isMultiplication () const { return (*this)->getOp()==OP_MATMUL; }
   bool         MX::isNorm () const { return dynamic_cast<const Norm*>(get())!=0; }
 
-  Function MX::getFunction () {  return (*this)->getFunction(); }
+  int MX::numFunctions() const { return (*this)->numFunctions(); }
+  Function MX::getFunction (int i) {  return (*this)->getFunction(i); }
 
   double MX::getValue() const {
     return (*this)->getValue();

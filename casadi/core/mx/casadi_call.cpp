@@ -33,39 +33,43 @@ using namespace std;
 
 namespace casadi {
 
-  Call::Call(const Function& fcn, vector<MX> arg) : fcn_(fcn) {
+  MX GenericCall::projectArg(const MX& x, const Sparsity& sp, int i) {
+    if (x.shape()==sp.shape()) {
+      // Insert sparsity projection nodes if needed
+      return x.setSparse(sp);
+    } else {
+      // Different dimensions
+      if (x.isEmpty() || sp.isEmpty()) { // NOTE: To permissive?
+        // Replace nulls with zeros of the right dimension
+        return MX::zeros(sp);
+      } else if (x.isScalar()) {
+        // Scalar argument means set all
+        return MX(sp, x);
+      } else if (x.size1()==sp.size2() && x.size2()==sp.size1() && sp.isVector(true)) {
+        // Transposed vector
+        return projectArg(x.T(), sp, i);
+      } else {
+        // Mismatching dimensions
+        casadi_error("Cannot create function call node: Dimension mismatch for argument "
+                     << i << ". Argument has shape " << x.shape()
+                     << " but function input has shape " << sp.shape());
+      }
+    }
+  }
+
+  Call::Call(const Function& fcn, const vector<MX>& arg) : fcn_(fcn) {
 
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
-    casadi_assert_message(arg.size()<=num_in, "Argument list length (" << arg.size()
-                          << ") exceeds number of inputs (" << num_in << ")");
+    casadi_assert_message(arg.size()==num_in, "Argument list length (" << arg.size()
+                          << ") does not match number of inputs (" << num_in << ")");
 
-    // Add arguments if needed
-    arg.resize(num_in);
-
-    // Assert argument of correct dimension and sparsity
-    for (int i=0; i<arg.size(); ++i) {
-      if (arg[i].shape()==fcn_.input(i).shape()) {
-        // Insert sparsity projection nodes if needed
-        arg[i] = arg[i].setSparse(fcn_.input(i).sparsity());
-      } else {
-        // Different dimensions
-        if (arg[i].isEmpty() || fcn_.input(i).isEmpty()) { // NOTE: To permissive?
-          // Replace nulls with zeros of the right dimension
-          arg[i] = MX::zeros(fcn_.input(i).sparsity());
-        } else if (arg[i].isScalar()) {
-          // Scalar argument means set all
-          arg[i] = MX(fcn_.input(i).sparsity(), arg[i]);
-        } else {
-          // Mismatching dimensions
-          casadi_error("Cannot create function call node: Dimension mismatch for argument "
-                       << i << ". Argument has shape " << arg[i].shape()
-                       << " but function input is " << fcn_.input(i).shape());
-        }
-      }
+    // Create arguments of the right dimensions and sparsity
+    vector<MX> arg1(num_in);
+    for (int i=0; i<num_in; ++i) {
+      arg1[i] = projectArg(arg[i], fcn_.input(i).sparsity(), i);
     }
-
-    setDependencies(arg);
+    setDependencies(arg1);
     setSparsity(Sparsity::scalar());
   }
 
@@ -88,10 +92,6 @@ namespace casadi {
 
   const Sparsity& Call::sparsity(int oind) const {
     return fcn_.output(oind).sparsity();
-  }
-
-  Function& Call::getFunction() {
-    return fcn_;
   }
 
   void Call::evalSX(cp_SXElement* arg, p_SXElement* res, int* itmp, SXElement* rtmp) {

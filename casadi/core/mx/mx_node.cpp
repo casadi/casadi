@@ -248,7 +248,7 @@ namespace casadi {
     stream << ", ";
   }
 
-  Function& MXNode::getFunction() {
+  Function& MXNode::getFunction(int i) {
     throw CasadiException(string("MXNode::getFunction() not defined for class ") +
                           typeid(*this).name());
   }

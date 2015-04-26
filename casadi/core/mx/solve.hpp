@@ -27,6 +27,7 @@
 #define CASADI_SOLVE_HPP
 
 #include "mx_node.hpp"
+#include "casadi_call.hpp"
 #include "../function/linear_solver.hpp"
 /// \cond INTERNAL
 
@@ -91,8 +92,11 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 1;}
 
+    /** \brief  Number of functions */
+    virtual int numFunctions() const {return 1;}
+
     /** \brief  Get function reference */
-    virtual Function& getFunction() { return linear_solver_;}
+    virtual Function& getFunction(int i) { return linear_solver_;}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);

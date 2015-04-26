@@ -184,11 +184,16 @@ namespace casadi {
     /** \brief  Check if a multiple output node */
     virtual bool isMultipleOutput() const {return false;}
 
-    /** \brief  Get function reference */
-    virtual Function& getFunction();
+    /** \brief  Number of functions */
+    virtual int numFunctions() const {return 0;}
 
     /** \brief  Get function reference */
-    virtual const Function& getFunction() const { return const_cast<MXNode*>(this)->getFunction();}
+    virtual Function& getFunction(int i);
+
+    /** \brief  Get function reference */
+    virtual const Function& getFunction(int i) const {
+      return const_cast<MXNode*>(this)->getFunction(i);
+    }
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const;
