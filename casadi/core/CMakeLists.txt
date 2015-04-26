@@ -70,6 +70,7 @@ set(CASADI_SRCS
   mx/multiplication.hpp      mx/multiplication.cpp      # Matrix multiplication
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
   mx/casadi_call.hpp         mx/casadi_call.cpp         # Function call
+  mx/casadi_switch.hpp       mx/casadi_switch.cpp       # Switch statement
   mx/casadi_map.hpp          mx/casadi_map.cpp          # Multiple function calls at once
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose

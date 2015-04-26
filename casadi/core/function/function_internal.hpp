@@ -105,9 +105,6 @@ namespace casadi {
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
-    /** \brief  Create function call node */
-    virtual std::vector<MX> createCall(const std::vector<MX>& arg);
-
     /** \brief  Create map node */
     virtual std::vector<std::vector<MX> >
       createMap(const std::vector<std::vector<MX> > &arg, const std::string& parallelization);

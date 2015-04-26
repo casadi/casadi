@@ -23,53 +23,31 @@
  */
 
 
-#ifndef CASADI_CALL_HPP
-#define CASADI_CALL_HPP
+#ifndef CASADI_SWITCH_HPP
+#define CASADI_SWITCH_HPP
 
-#include "multiple_output.hpp"
-#include "../function/function.hpp"
+#include "casadi_call.hpp"
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /** Base class for nodes involving function calls
+  /** Embeds a function call in an expression graph
       \author Joel Andersson
       \date 2015
   */
-  class CASADI_EXPORT GenericCall : public MultipleOutput {
-  public:
-
-    /** \brief Constructor */
-    GenericCall() {}
-
-    /** \brief Destructor */
-    virtual ~GenericCall() {}
-
-    /** \brief  Number of functions */
-    virtual int numFunctions() const = 0;
-
-    /** \brief  Get function reference */
-    virtual Function& getFunction(int i) = 0;
-
-    /** \brief Project a function input to a particular sparsity */
-    static MX projectArg(const MX& x, const Sparsity& sp, int i);
-  };
-
-  /** Embeds a function call in an expression graph
-      \author Joel Andersson
-      \date 2010-2015
-  */
-  class CASADI_EXPORT Call : public GenericCall {
+  class CASADI_EXPORT Switch : public GenericCall {
   public:
     /** \brief  Create function call node */
-    static std::vector<MX> create(const Function& fcn, const std::vector<MX>& arg);
+    static std::vector<MX> create(const MX& ind, const std::vector<MX>& arg,
+                                  const std::vector<Function>& f,
+                                  const Function& f_def);
 
     /** \brief  Destructor */
-    virtual ~Call() {}
+    virtual ~Switch() {}
 
     /** \brief  Clone function */
-    virtual Call* clone() const;
+    virtual Switch* clone() const;
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -102,10 +80,10 @@ namespace casadi {
     virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Number of functions */
-    virtual int numFunctions() const {return 1;}
+    virtual int numFunctions() const {return f_.size() + 1;}
 
     /** \brief  Get function reference */
-    virtual Function& getFunction(int i) { return fcn_;}
+    virtual Function& getFunction(int i);
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const { return -1;}
@@ -123,20 +101,25 @@ namespace casadi {
     virtual const Sparsity& sparsity(int oind) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_CALL;}
+    virtual int getOp() const { return OP_SWITCH;}
 
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr);
 
-  protected:
-    /** \brief  Constructor (should not be used directly) */
-    explicit Call(const Function& fcn, const std::vector<MX>& arg);
+  private:
+    /** \brief  Constructor */
+    explicit Switch(const MX& ind, const std::vector<MX>& arg,
+                    const std::vector<Function>& f, const Function& f_def);
 
     // Function to be evaluated
-    Function fcn_;
+    std::vector<Function> f_;
+    Function f_def_;
+
+    // Input and output sparsities
+    std::vector<Sparsity> sp_in_, sp_out_;
   };
 
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_CALL_HPP
+#endif // CASADI_SWITCH_HPP

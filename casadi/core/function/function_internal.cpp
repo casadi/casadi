@@ -1825,7 +1825,7 @@ namespace casadi {
           << ", " << input(i).size1() << ") while a shape (" << arg[i].size2() << ", "
           << arg[i].size1() << ") was supplied.");
       }
-      res = createCall(arg);
+      res = Call::create(shared_from_this<Function>(), arg);
     }
   }
 
@@ -2206,50 +2206,10 @@ namespace casadi {
     return f_gen;
   }
 
-  std::vector<MX> FunctionInternal::createCall(const std::vector<MX> &arg) {
-    return MX::createMultipleOutput(new Call(shared_from_this<Function>(), arg));
-  }
-
   std::vector<std::vector<MX> >
   FunctionInternal::createMap(const std::vector<std::vector<MX> > &arg,
                               const std::string& parallelization) {
-    int n = arg.size();
-    std::vector<std::vector<MX> > ret(n);
-    if (parallelization.compare("expand")==0) {
-      // Bypass the Map, call the original function n times
-      for (int i=0; i<n; ++i) {
-        call(arg[i], ret[i], false, false);
-      }
-    } else {
-      // Get type of parallelization
-      bool omp;
-      if (parallelization.compare("openmp")==0) {
-        omp = true;
-      } else if (parallelization.compare("serial")==0) {
-        omp = false;
-      } else {
-        casadi_error("Unsupported parallelization \"" << parallelization
-                     << "\": Available options are expand|serial|openmp");
-      }
-
-      // Call the map
-      std::vector<MX> v;
-      if (omp) {
-        v = MX::createMultipleOutput(new OmpMap(shared_from_this<Function>(), arg));
-      } else {
-        v = MX::createMultipleOutput(new Map(shared_from_this<Function>(), arg));
-      }
-
-      // Collect outputs
-      std::vector<MX>::const_iterator v_it = v.begin();
-      int n_out = getNumOutputs();
-      for (int i=0; i<n; ++i) {
-        ret[i] = std::vector<MX>(v_it, v_it+n_out);
-        v_it += n_out;
-      }
-      casadi_assert(v_it==v.end());
-    }
-    return ret;
+    return Map::create(shared_from_this<Function>(), arg, parallelization);
   }
 
   void FunctionInternal::spFwdSwitch(cp_bvec_t* arg, p_bvec_t* res,
@@ -2631,7 +2591,7 @@ namespace casadi {
     Function dfcn = derForward(nfwd);
 
     // Create the evaluation node
-    vector<MX> x = MX::createMultipleOutput(new Call(dfcn, darg));
+    vector<MX> x = Call::create(dfcn, darg);
     vector<MX>::iterator x_it = x.begin();
 
     // Retrieve sensitivities
@@ -2712,7 +2672,7 @@ namespace casadi {
     Function dfcn = derReverse(nadj);
 
     // Create the evaluation node
-    vector<MX> x = MX::createMultipleOutput(new Call(dfcn, darg));
+    vector<MX> x = Call::create(dfcn, darg);
     vector<MX>::iterator x_it = x.begin();
 
     // Retrieve sensitivities

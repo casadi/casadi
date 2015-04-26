@@ -99,7 +99,7 @@ namespace casadi {
   }
 
   void Call::evalMX(const vector<MX>& arg, vector<MX>& res) {
-    res = fcn_->createCall(arg);
+    res = create(fcn_, arg);
   }
 
   void Call::evalFwd(const vector<vector<MX> >& fseed,
@@ -154,6 +154,10 @@ namespace casadi {
 
   void Call::nTmp(size_t& ni, size_t& nr) {
     fcn_.nTmp(ni, nr);
+  }
+
+  std::vector<MX> Call::create(const Function& fcn, const std::vector<MX>& arg) {
+    return MX::createMultipleOutput(new Call(fcn, arg));
   }
 
 } // namespace casadi

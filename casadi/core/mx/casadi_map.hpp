@@ -39,9 +39,10 @@ namespace casadi {
   */
   class CASADI_EXPORT Map : public MultipleOutput {
   public:
-
-    /** \brief  Constructor */
-    explicit Map(const Function& fcn, const std::vector<std::vector<MX> >& arg);
+    /** \brief  Create map node */
+    static std::vector<std::vector<MX> >
+      create(const Function& fcn, const std::vector<std::vector<MX> > &arg,
+             const std::string& parallelization);
 
     /** \brief  Destructor */
     virtual ~Map() {}
@@ -102,6 +103,10 @@ namespace casadi {
 
     /// Get parallelization
     virtual std::string parallelization() const { return "serial";}
+
+  protected:
+    /** \brief  Constructor */
+    explicit Map(const Function& fcn, const std::vector<std::vector<MX> >& arg);
 
     // Function to be evaluated
     Function fcn_;
