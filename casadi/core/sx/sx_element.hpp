@@ -381,7 +381,6 @@ namespace casadi {
                                        std::vector<SX >& vdef,
                                        const std::string& v_prefix,
                                        const std::string& v_suffix);
-  template<> void SX::zz_printCompact(std::ostream &stream) const;
   template<> SX SX::zz_poly_coeff(const SX&x) const;
   template<> SX SX::zz_poly_roots() const;
   template<> SX SX::zz_eig_symbolic() const;

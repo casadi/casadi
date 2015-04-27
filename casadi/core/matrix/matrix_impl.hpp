@@ -2854,11 +2854,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::zz_printCompact(std::ostream &stream) const {
-    throw CasadiException("\"printCompact\" not defined for instantiation");
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_poly_coeff(const Matrix<DataType>&x) const {
     throw CasadiException("\"poly_coeff\" not defined for instantiation");
   }

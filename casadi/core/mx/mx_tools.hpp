@@ -121,11 +121,6 @@ namespace casadi {
     return MX::zz_extractShared(ex, v, vdef, v_prefix, v_suffix);
   }
 
-  /** \brief Print compact, introducing new variables for shared subexpressions */
-  inline void printCompact(const MX& ex, std::ostream &stream=CASADI_COUT) {
-    return ex.zz_printCompact(stream);
-  }
-
   ///@{
   /** \brief Calculate jacobian via source code transformation
 

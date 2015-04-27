@@ -463,7 +463,6 @@ namespace casadi {
                                                const std::vector<MX> &exprs);
     static void zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
                                  const std::string& v_prefix="v_", const std::string& v_suffix="");
-    void zz_printCompact(std::ostream &stream=CASADI_COUT) const;
     MX zz_jacobian(const MX &arg) const;
     MX zz_gradient(const MX &arg) const;
     MX zz_tangent(const MX &arg) const;

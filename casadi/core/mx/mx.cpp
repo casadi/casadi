@@ -1739,24 +1739,6 @@ namespace casadi {
     }
   }
 
-  void MX::zz_printCompact(std::ostream &stream) const {
-    // Extract shared subexpressions from ex
-    vector<MX> v, vdef;
-    vector<MX> ex_extracted(1, *this);
-    extractShared(ex_extracted, v, vdef, "@", "");
-
-    // Print the expression without shared subexpressions
-    ex_extracted.front().print(stream);
-
-    // Print the shared subexpressions
-    if (!v.empty()) {
-      stream << endl << "where:" << endl;
-      for (int i=0; i<v.size(); ++i) {
-        stream << str(v[i]) << " := " << str(vdef[i]) << endl;
-      }
-    }
-  }
-
   MX MX::zz_jacobian(const MX &arg) const {
     MXFunction temp(arg, *this); // make a runtime
     temp.setOption("name", "helper_jacobian_MX");

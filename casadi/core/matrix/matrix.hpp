@@ -454,7 +454,6 @@ namespace casadi {
                                  std::vector<Matrix<DataType> >& vdef,
                                  const std::string& v_prefix="v_",
                                  const std::string& v_suffix="");
-    void zz_printCompact(std::ostream &stream=CASADI_COUT) const;
     Matrix<DataType> zz_poly_coeff(const Matrix<DataType>&x) const;
     Matrix<DataType> zz_poly_roots() const;
     Matrix<DataType> zz_eig_symbolic() const;

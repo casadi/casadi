@@ -293,11 +293,6 @@ namespace casadi {
     SX::zz_extractShared(ex, v, vdef, v_prefix, v_suffix);
   }
 
-  /** \brief Print compact, introducing new variables for shared subexpressions */
-  inline void printCompact(const SX& ex, std::ostream &stream=CASADI_COUT) {
-    ex.zz_printCompact(stream);
-  }
-
   /** \brief extracts polynomial coefficients from an expression
    *
    * \param ex Scalar expression that represents a polynomial

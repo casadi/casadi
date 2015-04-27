@@ -1693,24 +1693,6 @@ namespace casadi {
     std::copy(vdef.begin(), vdef.end(), vdef_sx.begin());
   }
 
-  template<>
-  void SX::zz_printCompact(std::ostream &stream) const {
-    // Extract shared subexpressions from ex
-    vector<SX> v, vdef;
-    vector<SX> ex_extracted(1, *this);
-    extractShared(ex_extracted, v, vdef, "@", "");
-
-    // Print the expression without shared subexpressions
-    ex_extracted.at(0).print(stream);
-
-    // Print the shared subexpressions
-    if (!v.empty()) {
-      stream << endl << "where:" << endl;
-      for (int i=0; i<v.size(); ++i) {
-        stream << v[i].toScalar() << " := " << vdef[i].toScalar() << endl;
-      }
-    }
-  }
 
   template<>
   SX SX::zz_poly_coeff(const SX&x) const {
