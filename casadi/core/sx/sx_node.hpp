@@ -117,9 +117,6 @@ namespace casadi {
     // Mark by flipping the sign of the temporary and decreasing by one
     void mark();
 
-    // Maximum number of calls
-    static long max_num_calls_in_print_;
-
     // Depth when checking equalities
     static int eq_depth_;
 

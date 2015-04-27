@@ -193,7 +193,6 @@ namespace casadi {
     }
   }
 
-  long SXNode::max_num_calls_in_print_ = 10000;
   int SXNode::eq_depth_ = 1;
 
 } // namespace casadi

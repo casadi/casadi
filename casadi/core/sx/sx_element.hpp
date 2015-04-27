@@ -334,8 +334,6 @@ namespace casadi {
   template<> SX SX::getDep(int ch) const;
   template<> int SX::getNdeps() const;
   template<> std::string SX::getName() const;
-  template<> void SX::setMaxNumCallsInPrint(long num);
-  template<> long SX::getMaxNumCallsInPrint();
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
   template<> long SX::getElementHash() const;

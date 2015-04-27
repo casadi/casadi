@@ -823,16 +823,6 @@ namespace casadi {
     *this = horzcat(*this, y);
   }
 
-  long MX::max_num_calls_in_print_ = 10000;
-
-  void MX::setMaxNumCallsInPrint(long num) {
-    max_num_calls_in_print_ = num;
-  }
-
-  long MX::getMaxNumCallsInPrint() {
-    return max_num_calls_in_print_;
-  }
-
   MX MX::getDep(int ch) const { return (*this)->dep(ch); }
 
   int MX::getNdeps() const { return (*this)->ndep(); }

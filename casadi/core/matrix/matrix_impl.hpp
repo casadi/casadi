@@ -1995,16 +1995,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setMaxNumCallsInPrint(long num) {
-    throw CasadiException("\"setMaxNumCallsInPrint\" not defined for instantiation");
-  }
-
-  template<typename DataType>
-  long Matrix<DataType>::getMaxNumCallsInPrint() {
-    throw CasadiException("\"getMaxNumCallsInPrint\" not defined for instantiation");
-  }
-
-  template<typename DataType>
   void Matrix<DataType>::setEqualityCheckingDepth(int eq_depth) {
     throw CasadiException("\"setEqualityCheckingDepth\" not defined for instantiation");
   }

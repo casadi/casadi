@@ -785,16 +785,6 @@ namespace casadi {
   }
 
   template<>
-  void SX::setMaxNumCallsInPrint(long num) {
-    SXNode::max_num_calls_in_print_ = num;
-  }
-
-  template<>
-  long SX::getMaxNumCallsInPrint() {
-    return SXNode::max_num_calls_in_print_;
-  }
-
-  template<>
   void SX::setEqualityCheckingDepth(int eq_depth) {
     SXNode::eq_depth_ = eq_depth;
   }

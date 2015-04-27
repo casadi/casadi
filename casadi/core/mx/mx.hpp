@@ -519,14 +519,6 @@ namespace casadi {
     /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;
 
-    /** \brief Set or reset the maximum number of calls to the
-     * printing function when printing an expression */
-    static void setMaxNumCallsInPrint(long num=10000);
-
-    /** \brief Get the maximum number of calls to the printing
-     * function when printing an expression */
-    static long getMaxNumCallsInPrint();
-
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
     static void setEqualityCheckingDepth(int eq_depth=1);
 
@@ -544,9 +536,6 @@ namespace casadi {
 
     /// Create an expression from a node: extra dummy arguments to avoid ambiguity for 0/NULL
     MX(MXNode* node, bool dummy1, bool dummy2, bool dummy3, bool dummy4);
-
-    // Maximum number of calls
-    static long max_num_calls_in_print_;
 
     // Depth when checking equalities
     static int eq_depth_;
