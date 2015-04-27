@@ -1070,10 +1070,6 @@ class NZproxy:
 %include "matrix.i"
 %include "sx_element.i"
 %include "mx.i"
-%include "matrix_tools.i"
-%include "generic_expression_tools.i"
-%include "sx_tools.i"
-%include "mx_tools.i"
 
 #ifdef SWIGPYTHON
 %pythoncode %{
@@ -1187,6 +1183,12 @@ def PyFunction(obj,inputs,outputs):
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
 %template(Pair_Function_Function) std::pair<casadi::Function,casadi::Function>;
+
+%include "matrix_tools.i"
+%include "generic_expression_tools.i"
+%include "sx_tools.i"
+%include "mx_tools.i"
+
 %include <casadi/core/function/sx_function.hpp>
 %include <casadi/core/function/mx_function.hpp>
 %include <casadi/core/function/linear_solver.hpp>
