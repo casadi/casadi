@@ -1296,20 +1296,6 @@ class MXtests(casadiTestCase):
     y[[0, 2]]
     y[[0, 2]] = MX.sym("a")
     
-  def test_printLimiting(self):
-    self.message("printLimiting")
-
-    x = MX.sym("x")
-    for i in range(100):
-      x = sin(x)*x
-      
-    self.assertTrue(len(str(x)) <  4*MX.getMaxNumCallsInPrint())
-
-    MX.setMaxNumCallsInPrint(5)
-    self.assertTrue(len(str(x)) <  100)
-
-    MX.setMaxNumCallsInPrint()
-
   def test_mul(self):
     A = MX(DMatrix.ones((4,3)))
     B = MX(DMatrix.ones((3,8)))

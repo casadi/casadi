@@ -120,11 +120,21 @@ namespace casadi {
     /** \brief  Print a description */
     virtual void print(std::ostream &stream) const;
 
+    /** \brief Find out which nodes can be inlined */
+    void canInline(std::map<const MXNode*, int>& nodeind) const;
+
+    /** \brief Print compact */
+    std::string printCompact(std::map<const MXNode*, int>& nodeind,
+                             std::vector<std::string>& intermed) const;
+
     /** \brief  Print expression (make sure number of calls is not exceeded) */
     virtual void print(std::ostream &stream, long& remaining_calls) const;
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const = 0;
+
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Generate code for the operation */
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,

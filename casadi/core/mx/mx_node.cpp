@@ -225,8 +225,66 @@ namespace casadi {
   }
 
   void MXNode::print(std::ostream &stream) const {
-    long remaining_calls = MX::getMaxNumCallsInPrint();
-    print(stream, remaining_calls);
+    // Find out which noded can be inlined
+    std::map<const MXNode*, int> nodeind;
+    canInline(nodeind);
+
+    // Print expression
+    vector<string> intermed;
+    string s = printCompact(nodeind, intermed);
+
+    // Print intermediate expressions
+    for (int i=0; i<intermed.size(); ++i)
+      stream << "@" << (i+1) << "=" << intermed[i] << ", ";
+
+    // Print this
+    stream << s;
+  }
+
+  void MXNode::canInline(std::map<const MXNode*, int>& nodeind) const {
+    // Add or mark node in map
+    std::map<const MXNode*, int>::iterator it=nodeind.find(this);
+    if (it==nodeind.end()) {
+      // First time encountered, mark inlined
+      nodeind.insert(it, make_pair(this, 0));
+
+      // Handle dependencies with recursion
+      for (int i=0; i<ndep(); ++i) {
+        dep(i)->canInline(nodeind);
+      }
+    } else if (it->second==0) {
+      // Node encountered before, do not inline
+      it->second = -1;
+    }
+  }
+
+  std::string MXNode::printCompact(std::map<const MXNode*, int>& nodeind,
+                                   std::vector<std::string>& intermed) const {
+    // Get reference to node index
+    int& ind = nodeind[this];
+
+    // If positive, already in intermediate expressions
+    if (ind>0) return "@" + CodeGenerator::to_string(ind);
+
+    // Get expressions for dependencies
+    vector<string> arg(ndep());
+    for (int i=0; i<arg.size(); ++i) {
+      arg[i] = dep(i)->printCompact(nodeind, intermed);
+    }
+
+    // Get expression for this
+    string s = print(arg);
+
+    // Decide what to do with the expression
+    if (ind==0) {
+      // Inline expression
+      return s;
+    } else {
+      // Add to list of intermediate expressions and return reference
+      intermed.push_back(s);
+      ind = intermed.size(); // For subsequent references
+      return "@" + CodeGenerator::to_string(ind);
+    }
   }
 
   void MXNode::print(std::ostream &stream, long& remaining_calls) const {
@@ -240,6 +298,16 @@ namespace casadi {
     } else {
       stream << "...";
     }
+  }
+
+  std::string MXNode::print(const std::vector<std::string>& arg) const {
+    stringstream s;
+    printPart(s, 0);
+    for (int i=0; i<ndep(); ++i) {
+      s << arg.at(i);
+      printPart(s, i+1);
+    }
+    return s.str();
   }
 
   void MXNode::printPart(std::ostream &stream, int part) const {
