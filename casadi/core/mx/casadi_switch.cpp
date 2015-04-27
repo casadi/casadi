@@ -42,8 +42,8 @@ namespace casadi {
 
     // Get input and output sparsities
     int num_in = -1, num_out=-1;
-    for (int k=-1; k<f_.size(); ++k) {
-      Function& fk = k<0 ? f_[k] : f_def_;
+    for (int k=0; k<=f_.size(); ++k) {
+      Function& fk = k<f_.size() ? f_[k] : f_def_;
       if (fk.isNull()) continue;
       fk.assertInit();
       if (num_in<0) {
@@ -98,7 +98,7 @@ namespace casadi {
     int k = static_cast<int>(*arg[0]);
 
     // Get the function to be evaluated
-    Function& fk = k<0 ? f_[k] : f_def_;
+    Function& fk = k>=0 && k<f_.size() ? f_[k] : f_def_;
 
     // Input buffers
     for (int i=0; i<sp_in_.size(); ++i) {
@@ -206,8 +206,8 @@ namespace casadi {
   void Switch::nTmp(size_t& ni, size_t& nr) {
     ni=0;
     nr=0;
-    for (int k=-1; k<f_.size(); ++k) {
-      Function& fk = k<0 ? f_[k] : f_def_;
+    for (int k=0; k<=f_.size(); ++k) {
+      Function& fk = k<f_.size() ? f_[k] : f_def_;
       if (fk.isNull()) continue;
 
       // Get local work vector sizes
@@ -253,7 +253,7 @@ namespace casadi {
       if (k!=0) ss << ", ";
       ss << f_[k].getOption("name");
     }
-    ss << "]" << f_def_.getOption("name") << ")";
+    ss << "], " << f_def_.getOption("name") << ")";
     return ss.str();
   }
 
