@@ -52,8 +52,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual SymbolicMX* clone() const;
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
     virtual void evalD(cp_double* input, p_double* output, int* itmp, double* rtmp);

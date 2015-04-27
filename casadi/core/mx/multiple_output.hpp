@@ -77,8 +77,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual OutputNode* clone() const { return new OutputNode(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear() {return true;}

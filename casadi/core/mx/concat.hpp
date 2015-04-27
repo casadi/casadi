@@ -111,8 +111,8 @@ namespace casadi {
     /// Destructor
     virtual ~Horzcat() {}
 
-    /// Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -154,8 +154,8 @@ namespace casadi {
     /// Destructor
     virtual ~Vertcat() {}
 
-    /// Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -197,8 +197,8 @@ namespace casadi {
     /// Destructor
     virtual ~Diagcat() {}
 
-    /// Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);

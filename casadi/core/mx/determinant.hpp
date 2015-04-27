@@ -60,8 +60,8 @@ namespace casadi {
     virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens);
 
-    /// Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_DETERMINANT;}

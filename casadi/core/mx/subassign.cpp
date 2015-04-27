@@ -64,14 +64,10 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "(";
-    } else if (part==1) {
-      stream << "[" << i_ << ", " << j_ << "]=";
-    } else {
-      stream << ")";
-    }
+  std::string SubAssign::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << "(" << arg.at(0) << "[" << i_ << ", " << j_ << "]=" << arg.at(1) << ")";
+    return ss.str();
   }
 
   void SubAssign::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

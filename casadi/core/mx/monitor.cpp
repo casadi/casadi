@@ -38,12 +38,8 @@ namespace casadi {
     setSparsity(x.sparsity());
   }
 
-  void Monitor::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "monitor(";
-    } else {
-      stream << ", " << comment_ << ")";
-    }
+  std::string Monitor::print(const std::vector<std::string>& arg) const {
+    return "monitor(" + arg.at(0) + ", " + comment_ + ")";
   }
 
   void Monitor::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

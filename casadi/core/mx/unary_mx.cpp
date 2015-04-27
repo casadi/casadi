@@ -48,12 +48,12 @@ namespace casadi {
     return new UnaryMX(*this);
   }
 
-  void UnaryMX::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      casadi_math<double>::printPre(op_, stream);
-    } else {
-      casadi_math<double>::printPost(op_, stream);
-    }
+  std::string UnaryMX::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    casadi_math<double>::printPre(op_, ss);
+    ss << arg.at(0);
+    casadi_math<double>::printPost(op_, ss);
+    return ss.str();
   }
 
   void UnaryMX::evalD(cp_double* input, p_double* output,

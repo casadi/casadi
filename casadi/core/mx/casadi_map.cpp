@@ -68,14 +68,15 @@ namespace casadi {
     return new OmpMap(*this);
   }
 
-  void Map::printPart(ostream &stream, int part) const {
-    if (part==0) {
-      stream << "(";
-    } else if (part==ndep()) {
-      stream << ")";
-    } else {
-      stream << ",";
+  std::string Map::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << fcn_.getOption("name") << ".map(";
+    for (int i=0; i<ndep(); ++i) {
+      if (i!=0) ss << ", ";
+      ss << arg.at(i);
     }
+    ss << ")";
+    return ss.str();
   }
 
   void Map::evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp) {

@@ -69,23 +69,17 @@ namespace casadi {
     copyAdj(arg[0], res[0], nnz());
   }
 
-  void Reshape::printPart(std::ostream &stream, int part) const {
+  std::string Reshape::print(const std::vector<std::string>& arg) const {
     // For vectors, reshape is also a transpose
     if (dep().isVector(true) && sparsity().isVector(true)) {
       // Print as transpose: X'
-      if (part!=0) {
-        stream << "'";
-      }
+      return arg.at(0) + "'";
     } else {
       // Print as reshape(X) or vec(X)
-      if (part==0) {
-        if (sparsity().isVector()) {
-          stream << "vec(";
-        } else {
-          stream << "reshape(";
-        }
+      if (sparsity().isVector()) {
+        return "vec(" + arg.at(0) + ")";
       } else {
-        stream << ")";
+        return "reshape(" + arg.at(0) + ")";
       }
     }
   }

@@ -37,12 +37,8 @@ namespace casadi {
     setSparsity(Sparsity::dense(1, 1));
   }
 
-  void Determinant::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "det(";
-    } else {
-      stream << ")";
-    }
+  std::string Determinant::print(const std::vector<std::string>& arg) const {
+    return "det(" + arg.at(0) + ")";
   }
 
   void Determinant::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

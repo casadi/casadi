@@ -287,36 +287,6 @@ namespace casadi {
     }
   }
 
-  void MXNode::print(std::ostream &stream, long& remaining_calls) const {
-    if (remaining_calls>0) {
-      remaining_calls--;
-      printPart(stream, 0);
-      for (int i=0; i<ndep(); ++i) {
-        dep(i)->print(stream, remaining_calls);
-        printPart(stream, i+1);
-      }
-    } else {
-      stream << "...";
-    }
-  }
-
-  std::string MXNode::print(const std::vector<std::string>& arg) const {
-    stringstream s;
-    printPart(s, 0);
-    for (int i=0; i<ndep(); ++i) {
-      s << arg.at(i);
-      printPart(s, i+1);
-    }
-    return s.str();
-  }
-
-  void MXNode::printPart(std::ostream &stream, int part) const {
-    casadi_assert(ndep()>1);
-    casadi_assert(part>0);
-    casadi_assert(part<ndep());
-    stream << ", ";
-  }
-
   Function& MXNode::getFunction(int i) {
     throw CasadiException(string("MXNode::getFunction() not defined for class ") +
                           typeid(*this).name());

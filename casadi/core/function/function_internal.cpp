@@ -2369,17 +2369,6 @@ namespace casadi {
     nr=rtmp_.size();
   }
 
-  void FunctionInternal::printPart(const MXNode* node, std::ostream &stream, int part) const {
-    if (part == 0) {
-      repr(stream);
-      stream << "(";
-    } else if (part == getNumInputs()) {
-      stream << ")";
-    } else {
-      stream << ", ";
-    }
-  }
-
   void FunctionInternal::reportConstraints(std::ostream &stream, const Matrix<double> &v,
                                            const Matrix<double> &lb, const Matrix<double> &ub,
                                            const std::string &name, double tol) {

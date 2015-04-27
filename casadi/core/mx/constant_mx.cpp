@@ -188,8 +188,8 @@ namespace casadi {
     return true;
   }
 
-  void ZeroByZero::printPart(std::ostream &stream, int part) const {
-    stream << "0x0";
+  std::string ZeroByZero::print(const std::vector<std::string>& arg) const {
+    return "0x0";
   }
 
   MX ZeroByZero::getSetSparse(const Sparsity& sp) const {

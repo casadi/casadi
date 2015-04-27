@@ -46,8 +46,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual SetSparse * clone() const;
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function (template)
     template<typename T>

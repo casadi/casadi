@@ -118,9 +118,9 @@ namespace casadi {
     /** \brief  Clone function */
     virtual ConstantDMatrix* clone() const { return new ConstantDMatrix(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const {
-      x_.print(stream);
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const {
+      return x_.getDescription();
     }
 
     /** \brief  Evaluate the function numerically */
@@ -183,8 +183,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual ZeroByZero* clone() const { return getInstance();}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
@@ -281,8 +281,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual Constant* clone() const { return new Constant<Value>(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
@@ -541,37 +541,40 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::printPart(std::ostream &stream, int part) const {
+  std::string
+  Constant<Value>::print(const std::vector<std::string>& arg) const {
+    std::stringstream ss;
     if (sparsity().isScalar()) {
       // Print scalar
       if (sparsity().nnz()==0) {
-        stream << "00";
+        ss << "00";
       } else {
-        stream << v_.value;
+        ss << v_.value;
       }
     } else if (sparsity().isEmpty()) {
       // Print empty
-      sparsity().printCompact(stream);
+      sparsity().printCompact(ss);
     } else {
       // Print value
       if (v_.value==0) {
-        stream << "zeros(";
+        ss << "zeros(";
       } else if (v_.value==1) {
-        stream << "ones(";
+        ss << "ones(";
       } else if (v_.value!=v_.value) {
-        stream << "nan(";
+        ss << "nan(";
       } else if (v_.value==std::numeric_limits<double>::infinity()) {
-        stream << "inf(";
+        ss << "inf(";
       } else if (v_.value==-std::numeric_limits<double>::infinity()) {
-        stream << "-inf(";
+        ss << "-inf(";
       } else {
-        stream << "all_" << v_.value << "(";
+        ss << "all_" << v_.value << "(";
       }
 
       // Print sparsity
-      sparsity().printCompact(stream);
-      stream << ")";
+      sparsity().printCompact(ss);
+      ss << ")";
     }
+    return ss.str();
   }
 
 } // namespace casadi

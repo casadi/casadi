@@ -152,14 +152,13 @@ namespace casadi {
     setSparsity(diagcat(sp));
   }
 
-  void Diagcat::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "diagcat(";
-    } else if (part==ndep()) {
-      stream << ")";
-    } else {
-      stream << ", ";
-    }
+  std::string Diagcat::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << "diagcat(" << arg.at(0);
+    for (int i=1; i<ndep(); ++i)
+      ss << ", " << arg.at(i);
+    ss << ")";
+    return ss.str();
   }
 
   void Diagcat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -212,14 +211,13 @@ namespace casadi {
     setSparsity(sp);
   }
 
-  void Horzcat::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "horzcat(";
-    } else if (part==ndep()) {
-      stream << ")";
-    } else {
-      stream << ", ";
-    }
+  std::string Horzcat::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << "horzcat(" << arg.at(0);
+    for (int i=1; i<ndep(); ++i)
+      ss << ", " << arg.at(i);
+    ss << ")";
+    return ss.str();
   }
 
   void Horzcat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -269,14 +267,13 @@ namespace casadi {
     setSparsity(sp);
   }
 
-  void Vertcat::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "vertcat(";
-    } else if (part==ndep()) {
-      stream << ")";
-    } else {
-      stream << ", ";
-    }
+  std::string Vertcat::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << "vertcat(" << arg.at(0);
+    for (int i=1; i<ndep(); ++i)
+      ss << ", " << arg.at(i);
+    ss << ")";
+    return ss.str();
   }
 
   void Vertcat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

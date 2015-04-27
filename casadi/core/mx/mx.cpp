@@ -1407,20 +1407,7 @@ namespace casadi {
   }
 
   std::string MX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const {
-    std::stringstream s;
-    const MXNode* node = dynamic_cast<const MXNode*>(get());
-    node->printPart(s, 0);
-    if (isUnary()) {
-      s << args[0];
-      node->printPart(s, 1);
-    } else {
-      for (int i=0;i<args.size();++i) {
-        s << args[i];
-        node->printPart(s, 1+i);
-      }
-    }
-
-    return s.str();
+    return (*this)->print(args);
   }
 
   void MX::zz_substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse) {

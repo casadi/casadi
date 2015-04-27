@@ -89,8 +89,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual NormF* clone() const { return new NormF(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_NORMF;}
@@ -112,8 +112,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual Norm2* clone() const { return new Norm2(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_NORM2;}
@@ -135,8 +135,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual Norm1* clone() const { return new Norm1(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_NORM1;}
@@ -158,8 +158,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual NormInf* clone() const { return new NormInf(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_NORMINF;}

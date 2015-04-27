@@ -77,8 +77,15 @@ namespace casadi {
     return new Call(*this);
   }
 
-  void Call::printPart(std::ostream &stream, int part) const {
-    fcn_->printPart(this, stream, part);
+  std::string Call::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << fcn_.getOption("name") << "(";
+    for (int i=0; i<ndep(); ++i) {
+      if (i!=0) ss << ", ";
+      ss << arg.at(i);
+    }
+    ss << ")";
+    return ss.str();
   }
 
   void Call::evalD(cp_double* arg, p_double* res,

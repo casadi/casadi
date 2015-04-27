@@ -52,17 +52,8 @@ namespace casadi {
   OutputNode::~OutputNode() {
   }
 
-  void OutputNode::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      if (ndep()>1)
-        stream << "[";
-    } else if (part==ndep()) {
-      if (ndep()>1)
-        stream << "]";
-      stream << "{" << oind_ << "}";
-    } else {
-      stream << ", ";
-    }
+  std::string OutputNode::print(const std::vector<std::string>& arg) const {
+    return arg.at(0) + "{" + CodeGenerator::to_string(oind_) + "}";
   }
 
 } // namespace casadi

@@ -479,9 +479,10 @@ namespace casadi {
       if (el.res.front()!=el.arg.at(0)) {
         stream << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
       }
-      stream << "@" << el.res.front();
-      el.data->printPart(stream, 1);
-      stream << "@" << el.arg.at(1);
+      vector<string> arg(2);
+      arg[0] = "@" + CodeGenerator::to_string(el.res.front());
+      arg[1] = "@" + CodeGenerator::to_string(el.arg.at(1));
+      stream << el.data->print(arg);
     } else {
       if (el.res.size()==1) {
         stream << "@" << el.res.front() << " = ";
@@ -500,15 +501,15 @@ namespace casadi {
       if (el.op==OP_INPUT) {
         stream << "input[" << el.arg.at(0) << "][" << el.arg.at(1) << "]";
       } else {
-        el.data->printPart(stream, 0);
+        vector<string> arg(el.arg.size());
         for (int i=0; i<el.arg.size(); ++i) {
           if (el.arg[i]>=0) {
-            stream << "@" << el.arg[i];
+            arg[i] = "@" + CodeGenerator::to_string(el.arg[i]);
           } else {
-            stream << "NULL";
+            arg[i] = "NULL";
           }
-          el.data->printPart(stream, i+1);
         }
+        stream << el.data->print(arg);
       }
     }
   }

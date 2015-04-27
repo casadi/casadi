@@ -241,8 +241,20 @@ namespace casadi {
     }
   }
 
-  void Switch::printPart(std::ostream &stream, int part) const {
-    f_def_->printPart(this, stream, part);
+  std::string Switch::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << "conditional(" << arg.at(0) << ", [";
+    for (int i=1; i<ndep(); ++i) {
+      if (i!=1) ss << ", ";
+      ss << arg.at(i);
+    }
+    ss << "], [";
+    for (int k=0; k<f_.size(); ++k) {
+      if (k!=0) ss << ", ";
+      ss << f_[k].getOption("name");
+    }
+    ss << "]" << f_def_.getOption("name") << ")";
+    return ss.str();
   }
 
   std::vector<MX> Switch::create(const MX& ind, const std::vector<MX>& arg,

@@ -42,15 +42,11 @@ namespace casadi {
     return new SetSparse(*this);
   }
 
-  void SetSparse::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      if (sparsity().isDense()) {
-        stream << "dense(";
-      } else {
-        stream << "set_sparse(";
-      }
+  std::string SetSparse::print(const std::vector<std::string>& arg) const {
+    if (sparsity().isDense()) {
+      return "dense(" + arg.at(0) + ")";
     } else {
-      stream << ")";
+      return "set_sparse(" + arg.at(0) + ")";
     }
   }
 

@@ -116,8 +116,8 @@ namespace casadi {
     virtual void spAdj(p_bvec_t* arg,
                        p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
-    /// Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Generate code for the operation */
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
@@ -173,8 +173,8 @@ namespace casadi {
     virtual void evalSX(cp_SXElement* input, p_SXElement* output,
                         int* itmp, SXElement* rtmp);
 
-    /// Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Generate code for the operation */
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
@@ -225,8 +225,8 @@ namespace casadi {
     virtual void evalSX(cp_SXElement* input, p_SXElement* output,
                             int* itmp, SXElement* rtmp);
 
-    /// Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Generate code for the operation */
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,

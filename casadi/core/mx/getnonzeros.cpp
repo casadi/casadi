@@ -170,22 +170,22 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosVector::printPart(std::ostream &stream, int part) const {
-    switch (part) {
-    case 1: stream << nz_; break;
-    }
+  std::string GetNonzerosVector::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << arg.at(0) << nz_;
+    return ss.str();
   }
 
-  void GetNonzerosSlice::printPart(std::ostream &stream, int part) const {
-    switch (part) {
-    case 1: stream << "[" << s_ << "]"; break;
-    }
+  std::string GetNonzerosSlice::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << arg.at(0) << "[" << s_ << "]";
+    return ss.str();
   }
 
-  void GetNonzerosSlice2::printPart(std::ostream &stream, int part) const {
-    switch (part) {
-    case 1: stream << "[" << outer_ << ";" << inner_ << "]"; break;
-    }
+  std::string GetNonzerosSlice2::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << arg.at(0) << "[" << outer_ << ";" << inner_ << "]";
+    return ss.str();
   }
 
   void GetNonzeros::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

@@ -63,12 +63,10 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubRef::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "(";
-    } else {
-      stream << "[" << i_ << ", " << j_ << "])";
-    }
+  std::string SubRef::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << arg.at(0) << "[" << i_ << ", " << j_ << "]";
+    return ss.str();
   }
 
   void SubRef::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

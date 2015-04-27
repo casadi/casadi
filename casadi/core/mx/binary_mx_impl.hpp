@@ -54,16 +54,15 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      casadi_math<double>::printPre(op_, stream);
-    } else if (part==1) {
-      casadi_math<double>::printSep(op_, stream);
-    } else {
-      casadi_math<double>::printPost(op_, stream);
-    }
+  std::string BinaryMX<ScX, ScY>::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    casadi_math<double>::printPre(op_, ss);
+    ss << arg.at(0);
+    casadi_math<double>::printSep(op_, ss);
+    ss << arg.at(1);
+    casadi_math<double>::printPost(op_, ss);
+    return ss.str();
   }
-
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

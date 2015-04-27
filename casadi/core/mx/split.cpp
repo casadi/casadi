@@ -127,12 +127,8 @@ namespace casadi {
     }
   }
 
-  void Horzsplit::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "horzsplit(";
-    } else {
-      stream << ")";
-    }
+  std::string Horzsplit::print(const std::vector<std::string>& arg) const {
+    return "horzsplit(" + arg.at(0) + ")";
   }
 
   void Horzsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -206,12 +202,8 @@ namespace casadi {
       "DiagSplit:: the presence of nonzeros outside the diagonal blocks in unsupported.");
   }
 
-  void Diagsplit::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "diagsplit(";
-    } else {
-      stream << ")";
-    }
+  std::string Diagsplit::print(const std::vector<std::string>& arg) const {
+    return "diagsplit(" + arg.at(0) + ")";
   }
 
   void Diagsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -292,12 +284,8 @@ namespace casadi {
     }
   }
 
-  void Vertsplit::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "vertsplit(";
-    } else {
-      stream << ")";
-    }
+  std::string Vertsplit::print(const std::vector<std::string>& arg) const {
+    return "vertsplit(" + arg.at(0) + ")";
   }
 
   void Vertsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

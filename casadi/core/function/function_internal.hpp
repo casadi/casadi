@@ -366,7 +366,6 @@ namespace casadi {
     virtual void nTmp(size_t& ni, size_t& nr) const;
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
                           CodeGenerator& g) const;
-    virtual void printPart(const MXNode* node, std::ostream &stream, int part) const;
     ///@}
 
     /** \brief Prints out a human readable report about possible constraint violations

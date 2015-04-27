@@ -39,14 +39,8 @@ namespace casadi {
     setSparsity(Sparsity::scalar());
   }
 
-  void InnerProd::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "inner_prod(";
-    } else if (part==1) {
-      stream << ", ";
-    } else {
-      stream << ")";
-    }
+  std::string InnerProd::print(const std::vector<std::string>& arg) const {
+    return "inner_prod(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
   void InnerProd::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

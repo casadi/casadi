@@ -166,10 +166,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::printPart(std::ostream &stream, int part) const {
-    if (part!=0) {
-      stream << "'";
-    }
+  std::string Transpose::print(const std::vector<std::string>& arg) const {
+    return arg.at(0) + "'";
   }
 
   void Transpose::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

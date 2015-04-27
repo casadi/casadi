@@ -41,14 +41,8 @@ namespace casadi {
     setSparsity(x.sparsity());
   }
 
-  void Assertion::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "assertion(";
-    } else if (part==1) {
-       stream << ", ";
-    } else {
-      stream << ")";
-    }
+  std::string Assertion::print(const std::vector<std::string>& arg) const {
+    return "assertion(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
   void Assertion::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

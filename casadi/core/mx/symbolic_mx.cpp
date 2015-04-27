@@ -42,8 +42,8 @@ namespace casadi {
     return new SymbolicMX(*this);
   }
 
-  void SymbolicMX::printPart(std::ostream &stream, int part) const {
-    stream << name_;
+  std::string SymbolicMX::print(const std::vector<std::string>& arg) const {
+    return name_;
   }
 
   void SymbolicMX::evalD(cp_double* input, p_double* output,

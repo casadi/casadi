@@ -39,12 +39,8 @@ namespace casadi {
     setSparsity(Sparsity::dense(x.size1(), x.size2()));
   }
 
-  void Inverse::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "inv(";
-    } else {
-      stream << ")";
-    }
+  std::string Inverse::print(const std::vector<std::string>& arg) const {
+    return "inv(" + arg.at(0) + ")";
   }
 
   void Inverse::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {

@@ -80,8 +80,8 @@ namespace casadi {
     void generate(const std::vector<int>& arg, const std::vector<int>& res,
                   CodeGenerator& g) const;
 
-    /// Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return OP_INNER_PROD;}

@@ -35,12 +35,8 @@ namespace casadi {
     setSparsity(Sparsity::scalar());
   }
 
-  void NormF::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "||";
-    } else {
-      stream << "||_F";
-    }
+  std::string NormF::print(const std::vector<std::string>& arg) const {
+    return "||" + arg.at(0) + "||_F";
   }
 
   void NormF::evalD(cp_double* input, p_double* output,
@@ -86,28 +82,16 @@ namespace casadi {
                                       g.work(arg[0], dep(0).nnz())) + ")");
   }
 
-  void Norm2::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "||";
-    } else {
-      stream << "||_2";
-    }
+  std::string Norm2::print(const std::vector<std::string>& arg) const {
+    return "||" + arg.at(0) + "||_2";
   }
 
-  void Norm1::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "||";
-    } else {
-      stream << "||_1";
-    }
+  std::string Norm1::print(const std::vector<std::string>& arg) const {
+    return "||" + arg.at(0) + "||_1";
   }
 
-  void NormInf::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "||";
-    } else {
-      stream << "||_inf";
-    }
+  std::string NormInf::print(const std::vector<std::string>& arg) const {
+    return "||" + arg.at(0) + "||_inf";
   }
 
 } // namespace casadi

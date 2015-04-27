@@ -651,30 +651,25 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::printPart(std::ostream &stream, int part) const {
-    switch (part) {
-    case 0: stream << "(";           break;
-    case 1: stream << this->nz_ << (Add ? " += " : " = ") ; break;
-    case 2: stream << ")";           break;
-    }
+  std::string SetNonzerosVector<Add>::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << arg.at(0) << nz_ << (Add ? " += " : " = ") << arg.at(1) << ")";
+    return ss.str();
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::printPart(std::ostream &stream, int part) const {
-    switch (part) {
-    case 0: stream << "(";           break;
-    case 1: stream << "[" << s_ << "]" << (Add ? " += " : " = "); break;
-    case 2: stream << ")";           break;
-    }
+  std::string SetNonzerosSlice<Add>::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << arg.at(0) << "[" << s_ << "]" << (Add ? " += " : " = ") << arg.at(1) << ")";
+    return ss.str();
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::printPart(std::ostream &stream, int part) const {
-    switch (part) {
-    case 0: stream << "(";           break;
-    case 1: stream << "[" << outer_ << ";" << inner_ << "]" << (Add ? " += " : " = "); break;
-    case 2: stream << ")";           break;
-    }
+  std::string SetNonzerosSlice2<Add>::print(const std::vector<std::string>& arg) const {
+    stringstream ss;
+    ss << arg.at(0) << "[" << outer_ << ";" << inner_ << "]" << (Add ? " += " : " = ")
+       << arg.at(1) << ")";
+    return ss.str();
   }
 
   template<bool Add>

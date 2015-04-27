@@ -47,16 +47,8 @@ namespace casadi {
     setSparsity(z.sparsity());
   }
 
-  void Multiplication::printPart(std::ostream &stream, int part) const {
-    if (part==0) {
-      stream << "(";
-    } else if (part==1) {
-      stream << "+mul(";
-    } else if (part==2) {
-      stream << ", ";
-    } else {
-      stream << "))";
-    }
+  std::string Multiplication::print(const std::vector<std::string>& arg) const {
+    return "(" + arg.at(0) + "+mul(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
   void Multiplication::evalD(cp_double* input, p_double* output,

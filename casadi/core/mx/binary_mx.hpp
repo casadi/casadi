@@ -47,8 +47,8 @@ namespace casadi {
     /** \brief  Clone function */
     virtual BinaryMX* clone() const { return new BinaryMX(*this);}
 
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    /** \brief  Print expression */
+    virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
     virtual int getOp() const { return op_;}
