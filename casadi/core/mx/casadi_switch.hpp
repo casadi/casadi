@@ -49,6 +49,9 @@ namespace casadi {
     /** \brief  Clone function */
     virtual Switch* clone() const;
 
+    /** \brief  Print argument vector */
+    static std::string printArg(const std::vector<std::string>& arg);
+
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 

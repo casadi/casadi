@@ -37,6 +37,9 @@ namespace casadi {
                  const std::vector<Function>& f, const Function& f_def)
     : f_(f), f_def_(f_def) {
 
+    // Consitency check
+    casadi_assert(!f_.empty());
+
     // Make sure ind scalar and dense (constructor should not have been called if sparse)
     casadi_assert(ind.isScalar(true));
 
@@ -241,19 +244,32 @@ namespace casadi {
     }
   }
 
+  std::string Switch::printArg(const std::vector<std::string>& arg) {
+    stringstream ss;
+    ss << "[";
+    for (int i=1; i<arg.size(); ++i) {
+      if (i>1) ss << ", ";
+      ss << arg[i];
+    }
+    ss << "]";
+    return ss.str();
+  }
+
   std::string Switch::print(const std::vector<std::string>& arg) const {
     stringstream ss;
-    ss << "conditional(" << arg.at(0) << ", [";
-    for (int i=1; i<ndep(); ++i) {
-      if (i!=1) ss << ", ";
-      ss << arg.at(i);
+    if (f_.size()==1) {
+      // Print as if-then-else
+      ss << "if_then_else(" << arg[0] << ", " << printArg(arg) << ", "
+         << f_def_.getOption("name") << ", " << f_[0].getOption("name") << ")";
+    } else {
+      // Print generic
+      ss << "conditional(" << arg[0] << ", " << printArg(arg) << ", [";
+      for (int k=0; k<f_.size(); ++k) {
+        if (k!=0) ss << ", ";
+        ss << f_[k].getOption("name");
+      }
+      ss << "], " << f_def_.getOption("name") << ")";
     }
-    ss << "], [";
-    for (int k=0; k<f_.size(); ++k) {
-      if (k!=0) ss << ", ";
-      ss << f_[k].getOption("name");
-    }
-    ss << "], " << f_def_.getOption("name") << ")";
     return ss.str();
   }
 
