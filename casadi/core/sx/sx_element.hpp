@@ -387,6 +387,8 @@ namespace casadi {
   template<> SX SX::zz_poly_coeff(const SX&x) const;
   template<> SX SX::zz_poly_roots() const;
   template<> SX SX::zz_eig_symbolic() const;
+  template<> void SX::printSplit(std::vector<std::string>& nz,
+                                 std::vector<std::string>& inter) const;
 } // namespace casadi
 
 #ifndef SWIG

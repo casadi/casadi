@@ -620,6 +620,10 @@ namespace casadi {
     /// Print a description of the object
     void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
+    /// Get strings corresponding to the nonzeros and the interdependencies
+    void printSplit(std::vector<std::string>& SWIG_OUTPUT(nz),
+                    std::vector<std::string>& SWIG_OUTPUT(inter)) const;
+
     /// Print a representation of the object
     void repr(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 

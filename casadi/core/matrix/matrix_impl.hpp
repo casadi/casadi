@@ -627,17 +627,14 @@ namespace casadi {
   void Matrix<DataType>::printVector(std::ostream &stream, bool trailing_newline) const {
     casadi_assert_message(isVector(), "Not a vector");
 
-    std::streamsize precision = stream.precision();
-    std::streamsize width = stream.width();
-    std::ios_base::fmtflags flags = stream.flags();
+    // Get components
+    std::vector<std::string> nz, inter;
+    printSplit(nz, inter);
 
-    stream.precision(stream_precision_);
-    stream.width(stream_width_);
-    if (stream_scientific_) {
-      stream.setf(std::ios::scientific);
-    } else {
-      stream.unsetf(std::ios::scientific);
-    }
+    // Print intermediate expressions
+    for (int i=0; i<inter.size(); ++i)
+      stream << "@" << (i+1) << "=" << inter[i] << ", ";
+    inter.clear();
 
     // Access data structures
     const int* r = row();
@@ -654,7 +651,7 @@ namespace casadi {
 
       // Check if nonzero
       if (el<sz && rr==r[el]) {
-        stream << at(el++);
+        stream << nz.at(el++);
       } else {
         stream << "00";
       }
@@ -663,9 +660,6 @@ namespace casadi {
 
     if (trailing_newline) stream << std::endl;
     stream << std::flush;
-    stream.precision(precision);
-    stream.width(width);
-    stream.flags(flags);
   }
 
   template<typename DataType>
@@ -673,17 +667,14 @@ namespace casadi {
     // Print as a single line
     bool oneliner=this->size1()<=1;
 
-    std::streamsize precision = stream.precision();
-    std::streamsize width = stream.width();
-    std::ios_base::fmtflags flags = stream.flags();
+    // Get components
+    std::vector<std::string> nz, inter;
+    printSplit(nz, inter);
 
-    stream.precision(stream_precision_);
-    stream.width(stream_width_);
-    if (stream_scientific_) {
-      stream.setf(std::ios::scientific);
-    } else {
-      stream.unsetf(std::ios::scientific);
-    }
+    // Print intermediate expressions
+    for (int i=0; i<inter.size(); ++i)
+      stream << "@" << (i+1) << "=" << inter[i] << ", ";
+    inter.clear();
 
     // Index counter for each column
     const int* cptr = this->colind();
@@ -707,7 +698,7 @@ namespace casadi {
 
         // Check if nonzero
         if (cind[cc]<colind(cc+1) && row(cind[cc])==rr) {
-          stream << data().at(cind[cc]++);
+          stream << nz.at(cind[cc]++);
         } else {
           stream << "00";
         }
@@ -724,9 +715,6 @@ namespace casadi {
 
     if (trailing_newline) stream << std::endl;
     stream << std::flush;
-    stream.precision(precision);
-    stream.width(width);
-    stream.flags(flags);
   }
 
   template<typename DataType>
@@ -734,16 +722,52 @@ namespace casadi {
     if (nnz()==0) {
       stream << "all zero sparse: " << size1() << "-by-" << size2();
     } else {
+      // Print header
       stream << "sparse: " << size1() << "-by-" << size2() << ", " << nnz() << " nnz";
+
+      // Get components
+      std::vector<std::string> nz, inter;
+      printSplit(nz, inter);
+
+      // Print intermediate expressions
+      for (int i=0; i<inter.size(); ++i)
+        stream << std::endl << " @" << (i+1) << "=" << inter[i] << ",";
+      inter.clear();
+
+      // Print nonzeros
       for (int cc=0; cc<size2(); ++cc) {
         for (int el=colind(cc); el<colind(cc+1); ++el) {
           int rr=row(el);
-          stream << std::endl << " (" << rr << ", " << cc << ") -> " << at(el);
+          stream << std::endl << " (" << rr << ", " << cc << ") -> " << nz.at(el);
         }
       }
     }
     if (trailing_newline) stream << std::endl;
     stream << std::flush;
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::printSplit(std::vector<std::string>& nz,
+                                    std::vector<std::string>& inter) const {
+    nz.resize(nnz());
+    inter.resize(0);
+
+    // Temporary
+    std::stringstream ss;
+    ss.precision(stream_precision_);
+    ss.width(stream_width_);
+    if (stream_scientific_) {
+      ss.setf(std::ios::scientific);
+    } else {
+      ss.unsetf(std::ios::scientific);
+    }
+
+    // Print nonzeros
+    for (int i=0; i<nz.size(); ++i) {
+      ss.str(std::string());
+      ss << data().at(i);
+      nz[i] = ss.str();
+    }
   }
 
   template<typename DataType>

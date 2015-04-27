@@ -1881,6 +1881,22 @@ namespace casadi {
     return s.toScalar();
   }
 
+  template<>
+  void SX::printSplit(std::vector<std::string>& nz,
+                      std::vector<std::string>& inter) const {
+    // Find out which noded can be inlined
+    std::map<const SXNode*, int> nodeind;
+    for (vector<SXElement>::const_iterator i=begin(); i!=end(); ++i)
+      (*i)->canInline(nodeind);
+
+    // Print expression
+    nz.resize(0);
+    nz.reserve(nnz());
+    inter.resize(0);
+    for (vector<SXElement>::const_iterator i=begin(); i!=end(); ++i)
+      nz.push_back((*i)->printCompact(nodeind, inter));
+  }
+
 } // namespace casadi
 
 using namespace casadi;

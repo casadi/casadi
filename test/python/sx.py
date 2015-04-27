@@ -700,22 +700,7 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
     #self.assertRaises(TypeError,lambda : SX([x,None]))  # FIXME: this is leaking memory
     self.assertRaises(NotImplementedError,lambda: SXFunction([[x], [None]], [[2 * x]]))
-    
-  def test_printLimiting(self):
-    self.message("printLimiting")
 
-    x = SX.sym("x")
-    for i in range(100):
-      x = sin(x)*x
-      
-      
-    self.assertTrue(len(str(x)) <  4*SX.getMaxNumCallsInPrint())
-    
-    SX.setMaxNumCallsInPrint(5)
-    self.assertTrue(len(str(x)) <  100)
-    
-    SX.getMaxNumCallsInPrint()
-    
   @known_bug()  # Not implemented
   def test_isEqual(self):
     self.message("equivalent")
