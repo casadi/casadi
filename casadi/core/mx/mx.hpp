@@ -487,9 +487,9 @@ namespace casadi {
 #ifndef SWIG
     bool zz_isEqual(const MXNode* y, int depth=0) const;
 #endif // SWIG
-    std::vector<MX> zz_if_then_else(std::vector<MX>& arg, const Function &f_true,
+    std::vector<MX> zz_if_then_else(const std::vector<MX>& arg, const Function &f_true,
                                     const Function &f_false) const;
-    std::vector<MX> zz_conditional(std::vector<MX>& arg, const std::vector<Function> &f,
+    std::vector<MX> zz_conditional(const std::vector<MX>& arg, const std::vector<Function> &f,
                                    const Function &f_default) const;
     /// \endcond
 

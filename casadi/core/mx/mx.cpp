@@ -1914,12 +1914,12 @@ namespace casadi {
     return false;
   }
 
-  std::vector<MX> MX::zz_if_then_else(std::vector<MX>& arg, const Function &f_true,
+  std::vector<MX> MX::zz_if_then_else(const std::vector<MX>& arg, const Function &f_true,
                                       const Function &f_false) const {
     return conditional(*this, arg, vector<Function>(1, f_false), f_true);
   }
 
-  std::vector<MX> MX::zz_conditional(std::vector<MX>& arg, const std::vector<Function> &f,
+  std::vector<MX> MX::zz_conditional(const std::vector<MX>& arg, const std::vector<Function> &f,
                                      const Function &f_default) const {
     return (*this)->getConditional(arg, f, f_default);
   }

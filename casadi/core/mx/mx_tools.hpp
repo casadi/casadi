@@ -198,7 +198,7 @@ namespace casadi {
   * If the condition \param cond evaluates to true (i.e. nonzero), \param f_true will
   * be evaluated, \param otherwise f_false will be evaluated.
   */
-  inline std::vector<MX> if_then_else(const MX& cond, std::vector<MX>& arg,
+  inline std::vector<MX> if_then_else(const MX& cond, const std::vector<MX>& arg,
                                       const Function &f_true, const Function &f_false) {
     return cond.zz_if_then_else(arg, f_true, f_false);
   }
@@ -209,7 +209,7 @@ namespace casadi {
    * then f[k] will be evaluated, otherwise \param f_default will be evaluated.
    */
   inline std::vector<MX>
-  conditional(const MX& ind, std::vector<MX>& arg,
+  conditional(const MX& ind, const std::vector<MX>& arg,
               const std::vector<Function> &f, const Function &f_default) {
     return ind.zz_conditional(arg, f, f_default);
   }
