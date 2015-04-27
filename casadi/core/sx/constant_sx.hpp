@@ -76,10 +76,12 @@ virtual bool zz_isEqual(const SXNode* node, int depth) const {
 
 protected:
 
-/** \brief  print */
-virtual void print(std::ostream &stream, long& remaining_calls) const {
-  stream << getValue();
-}
+/** \brief  Print expression */
+ virtual std::string print(const std::string& arg1, const std::string& arg2) const {
+   std::stringstream ss;
+   ss << getValue();
+   return ss.str();
+ }
 
 };
 

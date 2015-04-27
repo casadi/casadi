@@ -117,8 +117,20 @@ namespace casadi {
   }
 
   void SXNode::print(std::ostream &stream) const {
-    long remaining_calls = max_num_calls_in_print_;
-    print(stream, remaining_calls);
+    // Find out which noded can be inlined
+    std::map<const SXNode*, int> nodeind;
+    canInline(nodeind);
+
+    // Print expression
+    vector<string> intermed;
+    string s = printCompact(nodeind, intermed);
+
+    // Print intermediate expressions
+    for (int i=0; i<intermed.size(); ++i)
+      stream << "@" << (i+1) << "=" << intermed[i] << ", ";
+
+    // Print this
+    stream << s;
   }
 
   bool SXNode::marked() const {
@@ -127,6 +139,58 @@ namespace casadi {
 
   void SXNode::mark() {
     temp = -temp-1;
+  }
+
+  void SXNode::canInline(std::map<const SXNode*, int>& nodeind) const {
+    // Add or mark node in map
+    std::map<const SXNode*, int>::iterator it=nodeind.find(this);
+    if (it==nodeind.end()) {
+      // First time encountered, mark inlined
+      nodeind.insert(it, make_pair(this, 0));
+
+      // Handle dependencies with recursion
+      for (int i=0; i<ndep(); ++i) {
+        dep(i)->canInline(nodeind);
+      }
+    } else if (it->second==0) {
+      // Node encountered before, do not inline
+      it->second = -1;
+    }
+  }
+
+  std::string SXNode::printCompact(std::map<const SXNode*, int>& nodeind,
+                                   std::vector<std::string>& intermed) const {
+    // Get reference to node index
+    int& ind = nodeind[this];
+
+    // If positive, already in intermediate expressions
+    if (ind>0) {
+      stringstream ss;
+      ss << "@" << ind;
+      return ss.str();
+    }
+
+    // Get expressions for dependencies
+    std::string arg[2];
+    for (int i=0; i<ndep(); ++i) {
+      arg[i] = dep(i)->printCompact(nodeind, intermed);
+    }
+
+    // Get expression for this
+    string s = print(arg[0], arg[1]);
+
+    // Decide what to do with the expression
+    if (ind==0) {
+      // Inline expression
+      return s;
+    } else {
+      // Add to list of intermediate expressions and return reference
+      intermed.push_back(s);
+      ind = intermed.size(); // For subsequent references
+      stringstream ss;
+      ss << "@" << ind;
+      return ss.str();
+    }
   }
 
   long SXNode::max_num_calls_in_print_ = 10000;

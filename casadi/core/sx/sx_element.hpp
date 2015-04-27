@@ -113,9 +113,6 @@ namespace casadi {
     /// Print a description of the object
     void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const;
 
-    /** \brief  print to stream, limited */
-    void print(std::ostream &stream, long& remaining_calls) const;
-
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */
     SXNode* get() const; // note: constant pointer, not pointer to constant object!

@@ -139,15 +139,6 @@ namespace casadi {
     if (trailing_newline) stream << std::endl;
   }
 
-  void SXElement::print(std::ostream &stream, long& remaining_calls) const {
-    if (remaining_calls>0) {
-      remaining_calls--;
-      node->print(stream, remaining_calls);
-    } else {
-      stream << "...";
-    }
-  }
-
   SXElement SXElement::operator-() const {
     if (isOp(OP_NEG))
       return getDep();
