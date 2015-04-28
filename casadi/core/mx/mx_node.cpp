@@ -252,8 +252,8 @@ namespace casadi {
       for (int i=0; i<ndep(); ++i) {
         dep(i)->canInline(nodeind);
       }
-    } else if (it->second==0) {
-      // Node encountered before, do not inline
+    } else if (it->second==0 && getOp()!=OP_PARAMETER) {
+      // Node encountered before, do not inline (except if symbolic primitive)
       it->second = -1;
     }
   }
