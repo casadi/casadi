@@ -88,12 +88,15 @@ namespace casadi {
 
   void Concat::generate(const std::vector<int>& arg, const std::vector<int>& res,
                         CodeGenerator& g) const {
+    g.body << "  rr=" << g.work(res[0], nnz()) << ";" << endl;
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
-      g.body << "  for (i=0, ";
-      if (i==0) g.body << "rr=" << g.work(res[0], nnz()) << ", ";
-      g.body << "cs=" << g.work(arg[i], dep(i).nnz())
-             << "; i<" << nz << "; ++i) *rr++ = *cs++;" << endl;
+      if (dep(i).nnz()==1) {
+        g.body << "  *rr++ = " << g.workel(arg[i], 1) << ";" << endl;
+      } else {
+        g.body << "  for (i=0, " << "cs=" << g.work(arg[i], dep(i).nnz()) << "; "
+               << "i<" << nz << "; ++i) *rr++ = *cs++;" << endl;
+      }
     }
   }
 
