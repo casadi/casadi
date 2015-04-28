@@ -271,8 +271,7 @@ namespace casadi {
         int f = g.getDependency(fk);
 
         // Call function
-        g.body << "      i=f" << f << "(arg1, res1, iw, w);" << endl;
-        g.body << "      if (i) return i;" << endl;
+        g.body << "      if (f" << f << "(arg1, res1, iw, w)) return 1;" << endl;
         if (!if_else)
           g.body << "      break;" << endl;
       }
