@@ -78,7 +78,7 @@ namespace casadi {
            << " && *cr++==0; ++i) {}" << endl
            << "  " << g.workel(res[0], 1) << " = ";
     if (dep(0).isDense()) {
-      g.body << "i" << endl;
+      g.body << "i" << ";" << endl;
     } else {
       // The row is in position 1+1+2+i (colind has length 2)
       g.body << "i<" << nnz << " ? " << g.sparsity(dep(0).sparsity()) << "[4+i] : "
