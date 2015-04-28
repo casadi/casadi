@@ -69,7 +69,7 @@ namespace casadi {
         }
         // Intersect with input sparsity
         for (int i=0; i<num_in; ++i) {
-          sp_out_[i] = sp_out_[i].patternIntersection(fk.input(i).sparsity());
+          sp_in_[i] = sp_in_[i].patternIntersection(fk.input(i).sparsity());
         }
       }
     }
@@ -130,6 +130,95 @@ namespace casadi {
   void Switch::evalMX(const vector<MX>& arg, vector<MX>& res) {
     vector<MX> arg1(arg.begin()+1, arg.end());
     res = conditional(arg.at(0), arg1, f_, f_def_);
+  }
+
+  void Switch::evalFwd(const vector<vector<MX> >& fseed,
+                       vector<vector<MX> >& fsens) {
+    // Number of directional derivatives
+    int nfwd = fseed.size();
+
+    // Number inputs and outputs
+    int n_in = ndep();
+    int n_out = nout();
+
+    // Create derivative functions
+    vector<Function> der(f_.size());
+    for (int k=0; k<f_.size(); ++k) {
+      if (!f_[k].isNull()) der[k] = f_[k].derForward(nfwd);
+    }
+
+    // Default case
+    Function der_def;
+    if (!f_def_.isNull()) der_def = f_def_.derForward(nfwd);
+
+    // Branch index
+    MX c = dep(0);
+
+    // Inputs to derivative functions
+    vector<MX> v;
+    v.reserve((n_in-1) + n_out + (n_in-1)*nfwd);
+    for (int i=1; i<n_in; ++i) v.push_back(dep(i));
+    for (int i=0; i<n_out; ++i) v.push_back(getOutput(i));
+    for (int d=0; d<nfwd; ++d) {
+      for (int i=1; i<n_in; ++i) v.push_back(fseed[d].at(i));
+    }
+
+    // Conditional call
+    v = conditional(c, v, der, der_def);
+    vector<MX>::const_iterator v_it = v.begin();
+
+    // Collect forward sensitivities
+    for (int d=0; d<nfwd; ++d) {
+      fsens[d].resize(n_out);
+      for (int i=0; i<n_out; ++i) {
+        fsens[d][i] = *v_it++;
+      }
+    }
+    casadi_assert(v_it==v.end());
+  }
+
+  void Switch::evalAdj(const vector<vector<MX> >& aseed,
+                     vector<vector<MX> >& asens) {
+    // Number of directional derivatives
+    int nadj = aseed.size();
+
+    // Number inputs and outputs
+    int n_in = ndep();
+    int n_out = nout();
+
+    // Create derivative functions
+    vector<Function> der(f_.size());
+    for (int k=0; k<f_.size(); ++k) {
+      if (!f_[k].isNull()) der[k] = f_[k].derReverse(nadj);
+    }
+
+    // Default case
+    Function der_def;
+    if (!f_def_.isNull()) der_def = f_def_.derReverse(nadj);
+
+    // Branch index
+    MX c = dep(0);
+
+    // Inputs to derivative functions
+    vector<MX> v;
+    v.reserve((n_in-1) + n_out + n_out*nadj);
+    for (int i=1; i<n_in; ++i) v.push_back(dep(i));
+    for (int i=0; i<n_out; ++i) v.push_back(getOutput(i));
+    for (int d=0; d<nadj; ++d) {
+      for (int i=0; i<n_out; ++i) v.push_back(aseed[d].at(i));
+    }
+
+    // Conditional call
+    v = conditional(c, v, der, der_def);
+    vector<MX>::const_iterator v_it = v.begin();
+
+    // Collect adjoint sensitivities
+    for (int d=0; d<nadj; ++d) {
+      for (int i=1; i<n_in; ++i) {
+        asens[d].at(i) += *v_it++;
+      }
+    }
+    casadi_assert(v_it==v.end());
   }
 
   void Switch::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
