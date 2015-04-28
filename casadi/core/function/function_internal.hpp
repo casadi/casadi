@@ -364,8 +364,6 @@ namespace casadi {
     virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     virtual void nTmp(size_t& ni, size_t& nr) const;
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
     ///@}
 
     /** \brief Prints out a human readable report about possible constraint violations

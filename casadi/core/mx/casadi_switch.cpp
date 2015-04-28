@@ -127,61 +127,17 @@ namespace casadi {
     return sp_out_.at(oind);
   }
 
-  void Switch::evalSX(cp_SXElement* arg, p_SXElement* res, int* itmp, SXElement* rtmp) {
-    //    fcn_->evalSX(arg, res, itmp, rtmp);
-  }
-
   void Switch::evalMX(const vector<MX>& arg, vector<MX>& res) {
-    //    res = fcn_->createCall(arg);
-  }
-
-  void Switch::evalFwd(const vector<vector<MX> >& fseed,
-                     vector<vector<MX> >& fsens) {
-    /*
-    // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
-    for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
-    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
-
-    // Call the cached functions
-    fcn_.callForward(arg, res, fseed, fsens);
-    */
-  }
-
-  void Switch::evalAdj(const vector<vector<MX> >& aseed,
-                     vector<vector<MX> >& asens) {
-    /*
-    // Nondifferentiated inputs and outputs
-    vector<MX> arg(ndep());
-    for (int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
-    for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
-
-    // Call the cached functions
-    vector<vector<MX> > v;
-    fcn_.callReverse(arg, res, aseed, v);
-    for (int i=0; i<v.size(); ++i) {
-      for (int j=0; j<v[i].size(); ++j) {
-        if (!v[i][j].isEmpty()) { // TODO(@jaeandersson): Hack
-          asens[i][j] += v[i][j];
-        }
-      }
-    }
-    */
+    vector<MX> arg1(arg.begin()+1, arg.end());
+    res = conditional(arg.at(0), arg1, f_, f_def_);
   }
 
   void Switch::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     MXNode::deepCopyMembers(already_copied);
-    //    fcn_ = deepcopy(fcn_, already_copied);
-  }
-
-  void Switch::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
-    //    fcn_.spFwd(arg, res, itmp, rtmp);
-  }
-
-  void Switch::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
-    //    fcn_.spAdj(arg, res, itmp, rtmp);
+    for (int k=0; k<=f_.size(); ++k) {
+      Function& fk = const_cast<Function&>(getFunction(k)); // FIXME or remove function
+      fk = deepcopy(fk, already_copied);
+    }
   }
 
   void Switch::generate(const vector<int>& arg, const vector<int>& res,

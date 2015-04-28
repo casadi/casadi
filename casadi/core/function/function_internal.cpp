@@ -2328,42 +2328,6 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                  CodeGenerator& g) const {
-    // Number inputs and outputs
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
-
-    // Put in a separate scope to avoid name collisions
-    g.body << "  {" << endl;
-
-    // Collect input arguments
-    g.body << "    const real_t* arg1[] = {";
-    for (int i=0; i<n_in; ++i) {
-      if (i!=0) g.body << ", ";
-      g.body << g.work(arg.at(i), input(i).nnz());
-    }
-    g.body << "};" << endl;
-
-    // Collect output arguments
-    g.body << "    real_t* res1[] = {";
-    for (int i=0; i<n_out; ++i) {
-      if (i!=0) g.body << ", ";
-      g.body << g.work(res.at(i), output(i).nnz());
-    }
-    g.body << "};" << endl;
-
-    // Get the index of the function
-    int f = g.getDependency(shared_from_this<Function>());
-
-    // Call function
-    g.body << "    i=f" << f << "(arg1, res1, iw, w);" << endl;
-    g.body << "    if (i) return i;" << endl;
-
-    // Finalize the function call
-    g.body << "  }" << endl;
-  }
-
   void FunctionInternal::nTmp(size_t& ni, size_t& nr) const {
     ni=itmp_.size();
     nr=rtmp_.size();

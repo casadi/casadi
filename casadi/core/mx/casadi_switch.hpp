@@ -62,25 +62,8 @@ namespace casadi {
     /// Evaluate the function numerically
     virtual void evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp);
 
-    /// Evaluate the function symbolically (SX)
-    virtual void evalSX(cp_SXElement* arg, p_SXElement* res, int* itmp, SXElement* rtmp);
-
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
-
-    /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens);
-
-    /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens);
-
-    /** \brief  Propagate sparsity forward */
-    virtual void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
-
-    /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Number of functions */
     virtual int numFunctions() const {return f_.size() + 1;}
