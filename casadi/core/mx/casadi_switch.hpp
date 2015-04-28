@@ -86,7 +86,7 @@ namespace casadi {
     virtual int numFunctions() const {return f_.size() + 1;}
 
     /** \brief  Get function reference */
-    virtual Function& getFunction(int i);
+    virtual const Function& getFunction(int i) const;
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const { return -1;}

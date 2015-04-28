@@ -46,7 +46,7 @@ namespace casadi {
     // Get input and output sparsities
     int num_in = -1, num_out=-1;
     for (int k=0; k<=f_.size(); ++k) {
-      Function& fk = k<f_.size() ? f_[k] : f_def_;
+      const Function& fk = getFunction(k);
       if (fk.isNull()) continue;
       fk.assertInit();
       if (num_in<0) {
@@ -101,7 +101,7 @@ namespace casadi {
     int k = static_cast<int>(*arg[0]);
 
     // Get the function to be evaluated
-    Function& fk = k>=0 && k<f_.size() ? f_[k] : f_def_;
+    const Function& fk = getFunction(k);
 
     // Input buffers
     for (int i=0; i<sp_in_.size(); ++i) {
@@ -115,8 +115,8 @@ namespace casadi {
       casadi_assert_message(s==sp_out_[i], "Not implemented");
     }
 
-    // Evaluate case
-    fk->evalD(arg+1, res, itmp, rtmp);
+    // Evaluate case FIXME: evalD should be a const method
+    const_cast<Function&>(fk)->evalD(arg+1, res, itmp, rtmp);
   }
 
   int Switch::nout() const {
@@ -185,24 +185,58 @@ namespace casadi {
   }
 
   void Switch::generate(const vector<int>& arg, const vector<int>& res,
-                      CodeGenerator& g) const {
-    // Argument without the case index
-    vector<int> arg1(arg.begin()+1, arg.end());
+                        CodeGenerator& g) const {
+    // Put in a separate scope to avoid name collisions
+    g.body << "  {" << endl;
 
-    // Codegen switch
-    g.body << "  switch(int(" << g.workel(arg[0], dep(0).nnz()) << ")) {" << endl;
-    for (int k=0; k<f_.size(); ++k) {
-      g.body << "  case " << k << ": {" << endl;
-      f_[k]->generate(arg1, res, g);
-      g.body << "  }" << endl;
+    // Input and output arrays
+    generateIO(arg, res, g, 1);
+
+    // Codegen as if-else
+    bool if_else = f_.size()==1;
+
+    // Codegen condition
+    g.body << "    " << (if_else ? "if" : "switch")  << " (int("
+           << g.workel(arg[0], dep(0).nnz()) << ")) {" << endl;
+
+    // Loop over cases/functions
+    for (int k=0; k<=f_.size(); ++k) {
+
+      // For if,  reverse order
+      int k1 = if_else ? 1-k : k;
+
+      if (!if_else) {
+        // Codegen cases
+        if (k1<f_.size()) {
+          g.body << "    case " << k1 << ":" << endl;
+        } else {
+          g.body << "    default:" << endl;
+        }
+      } else if (k1==0) {
+        // Else
+        g.body << "    } else {" << endl;
+      }
+
+      // Get the function:
+      const Function& fk = getFunction(k1);
+      if (fk.isNull()) {
+        g.body << "      return 1;" << endl;
+      } else {
+        // Get the index of the function
+        int f = g.getDependency(fk);
+
+        // Call function
+        g.body << "      i=f" << f << "(arg1, res1, iw, w);" << endl;
+        g.body << "      if (i) return i;" << endl;
+        if (!if_else)
+          g.body << "      break;" << endl;
+      }
     }
 
-    // Codegen default case
-    g.body << "  default: {" << endl;
-    f_def_->generate(arg1, res, g);
-    g.body << "  }" << endl;
+    // End switch/else
+    g.body << "    }" << endl;
 
-    // End switch
+    // Finalize the function call
     g.body << "  }" << endl;
   }
 
@@ -210,7 +244,7 @@ namespace casadi {
     ni=0;
     nr=0;
     for (int k=0; k<=f_.size(); ++k) {
-      Function& fk = k<f_.size() ? f_[k] : f_def_;
+      const Function& fk = getFunction(k);
       if (fk.isNull()) continue;
 
       // Get local work vector sizes
@@ -235,11 +269,11 @@ namespace casadi {
     }
   }
 
-  Function& Switch::getFunction(int i) {
+  const Function& Switch::getFunction(int i) const {
+    casadi_assert(i>=0 && i<=f_.size());
     if (i<f_.size()) {
       return f_[i];
     } else {
-      casadi_assert(i==f_.size());
       return f_def_;
     }
   }

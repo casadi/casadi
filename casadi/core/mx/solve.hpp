@@ -93,7 +93,7 @@ namespace casadi {
     virtual int numFunctions() const {return 1;}
 
     /** \brief  Get function reference */
-    virtual Function& getFunction(int i) { return linear_solver_;}
+    virtual const Function& getFunction(int i) const { return linear_solver_;}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);

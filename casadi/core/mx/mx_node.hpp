@@ -192,12 +192,7 @@ namespace casadi {
     virtual int numFunctions() const {return 0;}
 
     /** \brief  Get function reference */
-    virtual Function& getFunction(int i);
-
-    /** \brief  Get function reference */
-    virtual const Function& getFunction(int i) const {
-      return const_cast<MXNode*>(this)->getFunction(i);
-    }
+    virtual const Function& getFunction(int i) const;
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const;

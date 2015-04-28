@@ -154,9 +154,42 @@ namespace casadi {
     fcn_.spAdj(arg, res, itmp, rtmp);
   }
 
+  void GenericCall::generateIO(const vector<int>& arg, const vector<int>& res,
+                               CodeGenerator& g, int arg_off) const {
+    // Collect input arguments
+    g.body << "    const real_t* arg1[] = {";
+    for (int i=arg_off; i<arg.size(); ++i) {
+      if (i!=arg_off) g.body << ", ";
+      g.body << g.work(arg[i], dep(i).nnz());
+    }
+    g.body << "};" << endl;
+
+    // Collect output arguments
+    g.body << "    real_t* res1[] = {";
+    for (int i=0; i<res.size(); ++i) {
+      if (i!=0) g.body << ", ";
+      g.body << g.work(res[i], nnz(i));
+    }
+    g.body << "};" << endl;
+  }
+
   void Call::generate(const vector<int>& arg, const vector<int>& res,
                       CodeGenerator& g) const {
-    fcn_->generate(arg, res, g);
+    // Put in a separate scope to avoid name collisions
+    g.body << "  {" << endl;
+
+    // Input and output arrays
+    generateIO(arg, res, g);
+
+    // Get the index of the function
+    int f = g.getDependency(fcn_);
+
+    // Call function
+    g.body << "    i=f" << f << "(arg1, res1, iw, w);" << endl;
+    g.body << "    if (i) return i;" << endl;
+
+    // Finalize the function call
+    g.body << "  }" << endl;
   }
 
   void Call::nTmp(size_t& ni, size_t& nr) {

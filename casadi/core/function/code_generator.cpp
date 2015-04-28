@@ -202,6 +202,8 @@ namespace casadi {
   }
 
   int CodeGenerator::addDependency(const Function& f) {
+    casadi_assert(!f.isNull());
+
     // Get the current number of functions before looking for it
     size_t num_f_before = added_dependencies_.size();
 

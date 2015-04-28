@@ -136,7 +136,7 @@ namespace casadi {
     return fcn_.output(oind % f_num_out).sparsity();
   }
 
-  Function& Map::getFunction() {
+  const Function& Map::getFunction() const {
     return fcn_;
   }
 

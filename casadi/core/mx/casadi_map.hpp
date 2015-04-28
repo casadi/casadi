@@ -78,7 +78,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Get function reference */
-    virtual Function& getFunction();
+    virtual const Function& getFunction() const;
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const { return -1;}

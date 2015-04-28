@@ -50,10 +50,14 @@ namespace casadi {
     virtual int numFunctions() const = 0;
 
     /** \brief  Get function reference */
-    virtual Function& getFunction(int i) = 0;
+    virtual const Function& getFunction(int i) const = 0;
 
     /** \brief Project a function input to a particular sparsity */
     static MX projectArg(const MX& x, const Sparsity& sp, int i);
+
+    /** \brief Generate input and output arrays */
+    virtual void generateIO(const std::vector<int>& arg, const std::vector<int>& res,
+                            CodeGenerator& g, int arg_off=0) const;
   };
 
   /** Embeds a function call in an expression graph
@@ -105,7 +109,7 @@ namespace casadi {
     virtual int numFunctions() const {return 1;}
 
     /** \brief  Get function reference */
-    virtual Function& getFunction(int i) { return fcn_;}
+    virtual const Function& getFunction(int i) const { return fcn_;}
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const { return -1;}

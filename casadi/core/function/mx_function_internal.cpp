@@ -355,7 +355,7 @@ namespace casadi {
         std::stringstream ss;
         print(ss, *it);
         ss << endl;
-        int nf = it->data->numFunctions();
+        int nf = it->data.isNull() ? 0 : it->data->numFunctions();
         if (nf>0) {
           for (int i=0; i<nf; ++i) {
             profileWriteSourceLineDep(CasadiOptions::profilingLog, this, alg_counter,
@@ -445,10 +445,12 @@ namespace casadi {
                                        << (time_stop-time_zero)*1e3 << " ms | "
                                        << this << ":" <<getOption("name") << ":"
                                        << alg_counter <<"|";
-          int nf = it->data->numFunctions();
-          for (int i=0; i<nf; ++i) {
-            Function f = it->data->getFunction(i);
-            CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
+          if (!it->data.isNull()) {
+            int nf = it->data->numFunctions();
+            for (int i=0; i<nf; ++i) {
+              Function f = it->data->getFunction(i);
+              CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
+            }
           }
           CasadiOptions::profilingLog << "|";
           print(CasadiOptions::profilingLog, *it);
@@ -530,11 +532,13 @@ namespace casadi {
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
     XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>::deepCopyMembers(already_copied);
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      if (it->data.isNull()) continue;
       int nf = it->data->numFunctions();
       if (nf==0) continue;
       it->data.makeUnique(already_copied, false);
       for (int i=0; i<nf; ++i) {
-        it->data->getFunction(i) = deepcopy(it->data->getFunction(i), already_copied);
+        Function& f_i = const_cast<Function&>(it->data->getFunction(i)); // FIXME or remove function
+        f_i = deepcopy(f_i, already_copied);
       }
     }
   }
@@ -1145,6 +1149,7 @@ namespace casadi {
 
     // Generate code for the embedded functions
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+      if (it->data.isNull()) continue;
       int nf = it->data->numFunctions();
       for (int i=0; i<nf; ++i) {
         g.addDependency(it->data->getFunction(i));
