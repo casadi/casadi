@@ -209,6 +209,13 @@ namespace casadi {
     return ind.zz_conditional(arg, f, f_default);
   }
 
+  /** \brief Find first nonzero
+   * If failed, returns the number of rows
+   */
+  inline MX find(const MX& x) {
+    return x.zz_find();
+  }
+
 #endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
 /** @}

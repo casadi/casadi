@@ -490,6 +490,7 @@ namespace casadi {
                                     const Function &f_false) const;
     std::vector<MX> zz_conditional(const std::vector<MX>& arg, const std::vector<Function> &f,
                                    const Function &f_default) const;
+    MX zz_find() const;
     /// \endcond
 
     /** \brief returns itself, but with an assertion attached

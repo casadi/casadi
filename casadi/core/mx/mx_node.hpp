@@ -388,6 +388,9 @@ namespace casadi {
     /// Monitor
     MX getMonitor(const std::string& comment) const;
 
+    /// Find
+    MX getFind() const;
+
     /// Conditional evaluation
     virtual std::vector<MX>
       getConditional(const std::vector<MX>& arg,

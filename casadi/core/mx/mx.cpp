@@ -1896,4 +1896,8 @@ namespace casadi {
     return (*this)->getConditional(arg, f, f_default);
   }
 
+  MX MX::zz_find() const {
+    return (*this)->getFind();
+  }
+
 } // namespace casadi

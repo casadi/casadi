@@ -48,6 +48,7 @@
 #include "split.hpp"
 #include "assertion.hpp"
 #include "monitor.hpp"
+#include "casadi_find.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -719,6 +720,10 @@ namespace casadi {
     } else {
       return MX::create(new Monitor(shared_from_this<MX>(), comment));
     }
+  }
+
+  MX MXNode::getFind() const {
+    return MX::create(new Find(shared_from_this<MX>()));
   }
 
   MX MXNode::getDeterminant() const {

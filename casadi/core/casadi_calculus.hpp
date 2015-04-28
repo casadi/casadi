@@ -77,6 +77,9 @@ namespace casadi {
     // Switch statement
     OP_SWITCH,
 
+    // Find first nonzero in a vector
+    OP_FIND,
+
     // Embedded function call in parallel
     OP_MAP,
 
