@@ -2091,12 +2091,12 @@ namespace casadi {
       }
       nr += i_nnz;
       s << "  int iw[" << ni << "];" << endl;
-      s << "  d w[" << nr << "];" << endl;
+      s << "  real_t w[" << nr << "];" << endl;
       string fw = "w+" + g.to_string(i_nnz);
 
       // Copy inputs to buffers
       int offset=0;
-      s << "  const d* arg[" << n_in << "] = {0};" << endl;
+      s << "  const real_t* arg[" << n_in << "] = {0};" << endl;
       for (int i=0; i<n_in; ++i) {
         std::string p = "argv[" + g.to_string(i) + "]";
         s << "  if (--argc>=0) arg[" << i << "] = "
@@ -2105,7 +2105,7 @@ namespace casadi {
       }
 
       // Output sparsities
-      s << "  d* res[" << n_out << "] = {0};" << endl;
+      s << "  real_t* res[" << n_out << "] = {0};" << endl;
       for (int i=0; i<n_out; ++i) {
         s << "  if (--resc>=0) resv[" << i << "] = "
                << g.to_mex(output(i).sparsity(), "&res["+g.to_string(i)+"]") << endl;
@@ -2128,10 +2128,10 @@ namespace casadi {
       nTmp(ni, nr);
       nr += getNumInputNonzeros() + getNumOutputNonzeros();
       s << "  int iw[" << ni << "];" << endl
-             << "  d w[" << nr << "];" << endl;
+             << "  real_t w[" << nr << "];" << endl;
 
       // Input buffers
-      s << "  const d* arg[" << n_in << "] = {";
+      s << "  const real_t* arg[" << n_in << "] = {";
       int off=0;
       for (int i=0; i<n_in; ++i) {
         if (i!=0) s << ", ";
@@ -2141,7 +2141,7 @@ namespace casadi {
       s << "};" << endl;
 
       // Output buffers
-      s << "  d* res[" << n_out << "] = {";
+      s << "  real_t* res[" << n_out << "] = {";
       for (int i=0; i<n_out; ++i) {
         if (i!=0) s << ", ";
         s << g.work(off, output(i).nnz());
@@ -2151,7 +2151,7 @@ namespace casadi {
 
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
       s << "  int j;" << endl
-             << "  d* a = w;" << endl
+             << "  real_t* a = w;" << endl
              << "  for (j=0; j<" << getNumInputNonzeros() << "; ++j) "
              << "scanf(\"%lf\", a++);" << endl;
 
@@ -2160,7 +2160,7 @@ namespace casadi {
              << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
-      s << "  const d* r = w+" << getNumInputNonzeros() << ";" << endl
+      s << "  const real_t* r = w+" << getNumInputNonzeros() << ";" << endl
              << "  for (j=0; j<" << getNumOutputNonzeros() << "; ++j) "
              << g.printf("%g ", "*r++") << endl;
       // End with newline
