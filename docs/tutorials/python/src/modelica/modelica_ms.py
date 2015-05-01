@@ -65,13 +65,14 @@ print hessian(L,x)
 #$
 #$ We can also retrieve other information from the model such as the end time,
 #$ variable bounds and initial guess:
-tf = ocp.tf
 ubx = ocp.max(x)
 lbx = ocp.min(x)
 ubu = ocp.max(u)
 lbu = ocp.min(u)
 x0 = ocp.initialGuess(x)
 u0 = ocp.initialGuess(u)
+#$ Formulate the optimal control problem
+tf = 150.
 #$ We now proceeed to solve the optimal control problem, which can be written more compactly as:
 #$  $$ \begin{array}{cl}   \textbf{minimize}    &  \displaystyle\int_{t=0}^{\texttt{tf}}{\texttt{L} \, dt} \\ \\
 #$                         \textbf{subject to}  &  \texttt{I}(t) = 0, \quad \text{for} \quad t=0 \\

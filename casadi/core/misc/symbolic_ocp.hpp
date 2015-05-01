@@ -139,28 +139,6 @@ namespace casadi {
      * the ode and/or dae.
      */
     std::vector<MX> init;
-
-    /// Interval start time
-    double t0;
-
-    /// Interval final time
-    double tf;
-
-    /// Interval start time is free
-    bool t0_free;
-
-    /// Interval final time is free
-    bool tf_free;
-
-    /// Interval start time initial guess
-    double t0_guess;
-
-    /// Interval final time initial guess
-    double tf_guess;
-
-    /// Time points
-    std::vector<double> tp;
-
     ///@}
 
     /** @name Objective function terms
@@ -272,10 +250,6 @@ namespace casadi {
     ///@{
     /// Import existing problem from FMI/XML
     void parseFMI(const std::string& filename);
-
-    /// Generate a <tt>MUSCOD-II</tt> compatible DAT file
-    void generateMuscodDatFile(const std::string& filename,
-                               const Dictionary& mc2_ops=Dictionary()) const;
 
     /// Generate a file for numerical evaluation
     void generateCode(const std::string& filename,
