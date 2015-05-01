@@ -32,25 +32,25 @@ import os
 fmux = zipfile.ZipFile("CSTR_CSTR_Opt2.fmux",'r')
 fmux.extract('modelDescription.xml','.')
 #$ This file can be imported into CasADi, building up a symbolic representation of the model
-#$ The logic for importing Modelica models is located in the SymbolicOCP class:
+#$ The logic for importing Modelica models is located in the SymbolicIVP class:
 from casadi import *
-ocp = SymbolicOCP()
-ocp.parseFMI("modelDescription.xml")
+ivp = SymbolicIVP()
+ivp.parseFMI("modelDescription.xml")
 #! Let us have a look at the flat optimal control problem:
-print ocp
-#$ As we see, the optimal control problem (OCP) has two differential states (cstr.c and cstr.T),
-#$ two algebraic variables (cstr.Tc and q) and one free control.
+print ivp
+#$ As we see, the initial-value problem (IVP) has two differential states (cstr.c and cstr.T),
+#$ two algebraic variables (cstr.Tc and q) and one control.
 #$
 #$ By insprecting the equations, we see that it is relatively both straightforward to eliminate 
 #$ the algebraic variables from the problem and to rewrite the DAE as an explicit ODE.
 #$ Indeed, for cases like this one, CasADi can do this reformulation automatically:
-ocp.makeExplicit()
+ivp.makeExplicit()
 #! Let us extract variables for the states, the control and equations
-x = vertcat(ocp.x)
-u = vertcat(ocp.u)
-f = vertcat(ocp.ode)
-L = vertcat(ocp.quad)
-I = vertcat(ocp.init)
+x = vertcat(ivp.x)
+u = vertcat(ivp.u)
+f = vertcat(ivp.ode)
+L = vertcat(ivp.quad)
+I = vertcat(ivp.init)
 #$ These are expressions that can be visualized or manipulated using CasADi's 
 #$ symbolic framework:
 print 5*sin(f[0])
@@ -65,12 +65,12 @@ print hessian(L,x)
 #$
 #$ We can also retrieve other information from the model such as the end time,
 #$ variable bounds and initial guess:
-ubx = ocp.max(x)
-lbx = ocp.min(x)
-ubu = ocp.max(u)
-lbu = ocp.min(u)
-x0 = ocp.initialGuess(x)
-u0 = ocp.initialGuess(u)
+ubx = ivp.max(x)
+lbx = ivp.min(x)
+ubu = ivp.max(u)
+lbu = ivp.min(u)
+x0 = ivp.initialGuess(x)
+u0 = ivp.initialGuess(u)
 #$ Formulate the optimal control problem
 tf = 150.
 #$ We now proceeed to solve the optimal control problem, which can be written more compactly as:
@@ -102,7 +102,7 @@ ode_fcn.init()
 init_fcn = SXFunction(init_fcn)
 init_fcn.init()
 #$ We shall use the "direct multiple shooting" method with 20 shooting intervals of equal length
-#$ to solve the OCP. 
+#$ to solve the IVP. 
 nk = 20
 dt = tf/nk
 #$ The first step of this method is to make a finite-dimensional representation of the control trajectory. 

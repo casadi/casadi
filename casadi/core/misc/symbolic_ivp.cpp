@@ -23,7 +23,7 @@
  */
 
 
-#include "symbolic_ocp.hpp"
+#include "symbolic_ivp.hpp"
 
 #include <map>
 #include <string>
@@ -55,11 +55,11 @@ namespace casadi {
     return s.str();
   }
 
-  SymbolicOCP::SymbolicOCP() {
+  SymbolicIVP::SymbolicIVP() {
     this->t = MX::sym("t");
   }
 
-  void SymbolicOCP::parseFMI(const std::string& filename) {
+  void SymbolicIVP::parseFMI(const std::string& filename) {
 
     // Load
     XmlFile xml_file("tinyxml");
@@ -329,7 +329,7 @@ namespace casadi {
         } else if (onode.checkName("opt:PathConstraints")) {
           casadi_warning("opt:PointConstraints not supported, ignored");
         } else {
-          casadi_warning("SymbolicOCP::addOptimization: Unknown node " << onode.getName());
+          casadi_warning("SymbolicIVP::addOptimization: Unknown node " << onode.getName());
         }
       }
     }
@@ -344,7 +344,7 @@ namespace casadi {
                           "algebraic variables.");
   }
 
-  Variable& SymbolicOCP::readVariable(const XmlNode& node) {
+  Variable& SymbolicIVP::readVariable(const XmlNode& node) {
     // Qualified name
     string qn = qualifiedName(node);
 
@@ -352,10 +352,10 @@ namespace casadi {
     return variable(qn);
   }
 
-  MX SymbolicOCP::readExpr(const XmlNode& node) {
+  MX SymbolicIVP::readExpr(const XmlNode& node) {
     const string& fullname = node.getName();
     if (fullname.find("exp:")== string::npos) {
-      casadi_error("SymbolicOCP::readExpr: unknown - expression is supposed to "
+      casadi_error("SymbolicIVP::readExpr: unknown - expression is supposed to "
                    "start with 'exp:' , got " << fullname);
     }
 
@@ -437,34 +437,32 @@ namespace casadi {
     }
 
     // throw error if reached this point
-    throw CasadiException(string("SymbolicOCP::readExpr: Unknown node: ") + name);
+    throw CasadiException(string("SymbolicIVP::readExpr: Unknown node: ") + name);
 
   }
 
-  void SymbolicOCP::repr(std::ostream &stream, bool trailing_newline) const {
-    stream << "Flat OCP";
+  void SymbolicIVP::repr(std::ostream &stream, bool trailing_newline) const {
+    stream << "IVP("
+           << "#s = " << this->s.size() << ", "
+           << "#x = " << this->x.size() << ", "
+           << "#z = " << this->z.size() << ", "
+           << "#q = " << this->q.size() << ", "
+           << "#i = " << this->i.size() << ", "
+           << "#y = " << this->y.size() << ", "
+           << "#u = " << this->u.size() << ", "
+           << "#p = " << this->p.size() << ")";
     if (trailing_newline) stream << endl;
   }
 
-  void SymbolicOCP::print(ostream &stream, bool trailing_newline) const {
+  void SymbolicIVP::print(ostream &stream, bool trailing_newline) const {
     // Assert correctness
     sanityCheck();
 
-    stream << "Dimensions: ";
-    stream << "#s = " << this->s.size() << ", ";
-    stream << "#x = " << this->x.size() << ", ";
-    stream << "#z = " << this->z.size() << ", ";
-    stream << "#q = " << this->q.size() << ", ";
-    stream << "#i = " << this->i.size() << ", ";
-    stream << "#y = " << this->y.size() << ", ";
-    stream << "#u = " << this->u.size() << ", ";
-    stream << "#p = " << this->p.size() << ", ";
-    stream << endl << endl;
-
-    // Variables in the class hierarchy
-    stream << "Variables" << endl;
+    // Print dimensions
+    repr(stream);
 
     // Print the variables
+    stream << "Variables" << endl;
     stream << "{" << endl;
     stream << "  t = " << str(this->t) << endl;
     stream << "  s = " << str(this->s) << endl;
@@ -533,13 +531,13 @@ namespace casadi {
     if (trailing_newline) stream << endl;
   }
 
-  void SymbolicOCP::eliminate_quad() {
+  void SymbolicIVP::eliminate_quad() {
     // Move all the quadratures to the list of differential states
     this->x.insert(this->x.end(), this->q.begin(), this->q.end());
     this->q.clear();
   }
 
-  void SymbolicOCP::scaleVariables() {
+  void SymbolicIVP::scaleVariables() {
     // Assert correctness
     sanityCheck();
 
@@ -594,7 +592,7 @@ namespace casadi {
     }
   }
 
-  void SymbolicOCP::sort_i() {
+  void SymbolicIVP::sort_i() {
     // Quick return if no intermediates
     if (this->i.empty()) return;
 
@@ -621,7 +619,7 @@ namespace casadi {
     this->i = inew;
   }
 
-  void SymbolicOCP::split_i() {
+  void SymbolicIVP::split_i() {
     // Quick return if no intermediates
     if (this->i.empty()) return;
 
@@ -636,7 +634,7 @@ namespace casadi {
     casadi_assert(!dependsOn(vertcat(this->idef), vertcat(this->i)));
   }
 
-  void SymbolicOCP::eliminate_i() {
+  void SymbolicIVP::eliminate_i() {
     // Quick return if possible
     if (this->i.empty()) return;
 
@@ -666,8 +664,8 @@ namespace casadi {
     casadi_assert(it==ex.end());
   }
 
-  void SymbolicOCP::scaleEquations() {
-    casadi_error("SymbolicOCP::scaleEquations broken");
+  void SymbolicIVP::scaleEquations() {
+    casadi_error("SymbolicIVP::scaleEquations broken");
 #if 0
     cout << "Scaling equations ..." << endl;
     double time1 = clock();
@@ -734,7 +732,7 @@ namespace casadi {
 #endif
   }
 
-  void SymbolicOCP::sort_dae() {
+  void SymbolicIVP::sort_dae() {
     // Quick return if no differential states
     if (this->x.empty()) return;
 
@@ -763,7 +761,7 @@ namespace casadi {
     this->sdot = sdotnew;
   }
 
-  void SymbolicOCP::sort_alg() {
+  void SymbolicIVP::sort_alg() {
     // Quick return if no algebraic states
     if (this->z.empty()) return;
 
@@ -790,7 +788,7 @@ namespace casadi {
     this->z = znew;
   }
 
-  void SymbolicOCP::makeSemiExplicit() {
+  void SymbolicIVP::makeSemiExplicit() {
     // Only works if there are no i
     eliminate_i();
 
@@ -879,7 +877,7 @@ namespace casadi {
     this->sdot.clear();
   }
 
-  void SymbolicOCP::eliminate_alg() {
+  void SymbolicIVP::eliminate_alg() {
     // Only works if there are no i
     eliminate_i();
 
@@ -975,7 +973,7 @@ namespace casadi {
     eliminate_i();
   }
 
-  void SymbolicOCP::makeExplicit() {
+  void SymbolicIVP::makeExplicit() {
     // Only works if there are no i
     eliminate_i();
 
@@ -989,11 +987,11 @@ namespace casadi {
     casadi_assert_message(this->z.empty(), "Failed to eliminate algebraic variables");
   }
 
-  const Variable& SymbolicOCP::variable(const std::string& name) const {
-    return const_cast<SymbolicOCP*>(this)->variable(name);
+  const Variable& SymbolicIVP::variable(const std::string& name) const {
+    return const_cast<SymbolicIVP*>(this)->variable(name);
   }
 
-  Variable& SymbolicOCP::variable(const std::string& name) {
+  Variable& SymbolicIVP::variable(const std::string& name) {
     // Find the variable
     VarMap::iterator it = varmap_.find(name);
     if (it==varmap_.end()) {
@@ -1004,7 +1002,7 @@ namespace casadi {
     return it->second;
   }
 
-  void SymbolicOCP::addVariable(const std::string& name, const Variable& var) {
+  void SymbolicIVP::addVariable(const std::string& name, const Variable& var) {
     // Try to find the component
     if (varmap_.find(name)!=varmap_.end()) {
       stringstream ss;
@@ -1015,13 +1013,13 @@ namespace casadi {
     varmap_[name] = var;
   }
 
-  MX SymbolicOCP::addVariable(const std::string& name) {
+  MX SymbolicIVP::addVariable(const std::string& name) {
     Variable v(name);
     addVariable(name, v);
     return v.v;
   }
 
-  MX SymbolicOCP::add_x(const std::string& name) {
+  MX SymbolicIVP::add_x(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_x("x" + CodeGenerator::to_string(this->x.size()));
     MX new_x = addVariable(name);
@@ -1029,7 +1027,7 @@ namespace casadi {
     return new_x;
   }
 
-  MX SymbolicOCP::add_q(const std::string& name) {
+  MX SymbolicIVP::add_q(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_q("q" + CodeGenerator::to_string(this->q.size()));
     MX new_q = addVariable(name);
@@ -1037,7 +1035,7 @@ namespace casadi {
     return new_q;
   }
 
-  std::pair<MX, MX> SymbolicOCP::add_s(const std::string& name) {
+  std::pair<MX, MX> SymbolicIVP::add_s(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_s("s" + CodeGenerator::to_string(this->s.size()));
     Variable v(name);
@@ -1047,7 +1045,7 @@ namespace casadi {
     return std::pair<MX, MX>(v.v, v.d);
   }
 
-  MX SymbolicOCP::add_z(const std::string& name) {
+  MX SymbolicIVP::add_z(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_z("z" + CodeGenerator::to_string(this->z.size()));
     MX new_z = addVariable(name);
@@ -1055,7 +1053,7 @@ namespace casadi {
     return new_z;
   }
 
-  MX SymbolicOCP::add_p(const std::string& name) {
+  MX SymbolicIVP::add_p(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_p("p" + CodeGenerator::to_string(this->p.size()));
     MX new_p = addVariable(name);
@@ -1063,7 +1061,7 @@ namespace casadi {
     return new_p;
   }
 
-  MX SymbolicOCP::add_u(const std::string& name) {
+  MX SymbolicIVP::add_u(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_u("u" + CodeGenerator::to_string(this->u.size()));
     MX new_u = addVariable(name);
@@ -1071,7 +1069,7 @@ namespace casadi {
     return new_u;
   }
 
-  MX SymbolicOCP::add_y(const std::string& name) {
+  MX SymbolicIVP::add_y(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_y("y" + CodeGenerator::to_string(this->y.size()));
     MX new_y = addVariable(name);
@@ -1079,7 +1077,7 @@ namespace casadi {
     return new_y;
   }
 
-  MX SymbolicOCP::add_i(const std::string& name) {
+  MX SymbolicIVP::add_i(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_i("i" + CodeGenerator::to_string(this->i.size()));
     MX new_i = addVariable(name);
@@ -1087,49 +1085,49 @@ namespace casadi {
     return new_i;
   }
 
-  void SymbolicOCP::add_ode(const MX& new_ode, const std::string& name) {
+  void SymbolicIVP::add_ode(const MX& new_ode, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_ode(new_ode, "ode" + CodeGenerator::to_string(this->ode.size()));
     this->ode.push_back(new_ode);
     this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
   }
 
-  void SymbolicOCP::add_dae(const MX& new_dae, const std::string& name) {
+  void SymbolicIVP::add_dae(const MX& new_dae, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_dae(new_dae, "dae" + CodeGenerator::to_string(this->dae.size()));
     this->dae.push_back(new_dae);
     this->lam_dae.push_back(MX::sym("lam_" + name, new_dae.sparsity()));
   }
 
-  void SymbolicOCP::add_alg(const MX& new_alg, const std::string& name) {
+  void SymbolicIVP::add_alg(const MX& new_alg, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_alg(new_alg, "alg" + CodeGenerator::to_string(this->alg.size()));
     this->alg.push_back(new_alg);
     this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
   }
 
-  void SymbolicOCP::add_quad(const MX& new_quad, const std::string& name) {
+  void SymbolicIVP::add_quad(const MX& new_quad, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_quad(new_quad, "quad" + CodeGenerator::to_string(this->quad.size()));
     this->quad.push_back(new_quad);
     this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
   }
 
-  void SymbolicOCP::add_idef(const MX& new_idef, const std::string& name) {
+  void SymbolicIVP::add_idef(const MX& new_idef, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_idef(new_idef, "idef" + CodeGenerator::to_string(this->idef.size()));
     this->idef.push_back(new_idef);
     this->lam_idef.push_back(MX::sym("lam_" + name, new_idef.sparsity()));
   }
 
-  void SymbolicOCP::add_ydef(const MX& new_ydef, const std::string& name) {
+  void SymbolicIVP::add_ydef(const MX& new_ydef, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_ydef(new_ydef, "ydef" + CodeGenerator::to_string(this->ydef.size()));
     this->ydef.push_back(new_ydef);
     this->lam_ydef.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
   }
 
-  void SymbolicOCP::sanityCheck() const {
+  void SymbolicIVP::sanityCheck() const {
     // Time
     casadi_assert_message(this->t.isSymbolic(), "Non-symbolic time t");
     casadi_assert_message(this->t.isScalar(), "Non-scalar time t");
@@ -1203,7 +1201,7 @@ namespace casadi {
     }
   }
 
-  std::string SymbolicOCP::qualifiedName(const XmlNode& nn) {
+  std::string SymbolicIVP::qualifiedName(const XmlNode& nn) {
     // Stringstream to assemble name
     stringstream qn;
 
@@ -1226,15 +1224,15 @@ namespace casadi {
     return qn.str();
   }
 
-  MX SymbolicOCP::operator()(const std::string& name) const {
+  MX SymbolicIVP::operator()(const std::string& name) const {
     return variable(name).v;
   }
 
-  MX SymbolicOCP::der(const std::string& name) const {
+  MX SymbolicIVP::der(const std::string& name) const {
     return variable(name).d;
   }
 
-  MX SymbolicOCP::der(const MX& var) const {
+  MX SymbolicIVP::der(const MX& var) const {
     casadi_assert(var.isVector() && var.isSymbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
@@ -1243,7 +1241,7 @@ namespace casadi {
     return ret;
   }
 
-  void SymbolicOCP::split_dae() {
+  void SymbolicIVP::split_dae() {
     // Only works if there are no i
     eliminate_i();
 
@@ -1318,13 +1316,13 @@ namespace casadi {
     this->z.insert(this->z.end(), new_z.begin(), new_z.end());
   }
 
-  std::string SymbolicOCP::unit(const std::string& name) const {
+  std::string SymbolicIVP::unit(const std::string& name) const {
     return variable(name).unit;
   }
 
-  std::string SymbolicOCP::unit(const MX& var) const {
+  std::string SymbolicIVP::unit(const MX& var) const {
     casadi_assert_message(!var.isVector() && var.isValidInput(),
-                          "SymbolicOCP::unit: Argument must be a symbolic vector");
+                          "SymbolicIVP::unit: Argument must be a symbolic vector");
     if (var.isEmpty()) {
       return "n/a";
     } else {
@@ -1332,27 +1330,27 @@ namespace casadi {
       string ret = unit(prim.at(0).getName());
       for (int i=1; i<prim.size(); ++i) {
         casadi_assert_message(ret == unit(prim.at(i).getName()),
-                              "SymbolicOCP::unit: Argument has mixed units");
+                              "SymbolicIVP::unit: Argument has mixed units");
       }
       return ret;
     }
   }
 
-  void SymbolicOCP::setUnit(const std::string& name, const std::string& val) {
+  void SymbolicIVP::setUnit(const std::string& name, const std::string& val) {
     variable(name).unit = val;
   }
 
-  double SymbolicOCP::nominal(const std::string& name) const {
+  double SymbolicIVP::nominal(const std::string& name) const {
     return variable(name).nominal;
   }
 
-  void SymbolicOCP::setNominal(const std::string& name, double val) {
+  void SymbolicIVP::setNominal(const std::string& name, double val) {
     variable(name).nominal = val;
   }
 
-  std::vector<double> SymbolicOCP::nominal(const MX& var) const {
+  std::vector<double> SymbolicIVP::nominal(const MX& var) const {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicOCP::nominal: Argument must be a symbolic vector");
+                          "SymbolicIVP::nominal: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
@@ -1362,10 +1360,10 @@ namespace casadi {
     return ret;
   }
 
-  void SymbolicOCP::setNominal(const MX& var, const std::vector<double>& val) {
+  void SymbolicIVP::setNominal(const MX& var, const std::vector<double>& val) {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicOCP::nominal: Argument must be a symbolic vector");
-    casadi_assert_message(var.nnz()==var.nnz(), "SymbolicOCP::nominal: Dimension mismatch");
+                          "SymbolicIVP::nominal: Argument must be a symbolic vector");
+    casadi_assert_message(var.nnz()==var.nnz(), "SymbolicIVP::nominal: Dimension mismatch");
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
@@ -1373,9 +1371,9 @@ namespace casadi {
     }
   }
 
-  std::vector<double> SymbolicOCP::attribute(getAtt f, const MX& var, bool normalized) const {
+  std::vector<double> SymbolicIVP::attribute(getAtt f, const MX& var, bool normalized) const {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicOCP::attribute: Argument must be a symbolic vector");
+                          "SymbolicIVP::attribute: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
@@ -1385,9 +1383,9 @@ namespace casadi {
     return ret;
   }
 
-  MX SymbolicOCP::attribute(getAttS f, const MX& var) const {
+  MX SymbolicIVP::attribute(getAttS f, const MX& var) const {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicOCP::attribute: Argument must be a symbolic vector");
+                          "SymbolicIVP::attribute: Argument must be a symbolic vector");
     MX ret = MX::zeros(var.sparsity());
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
@@ -1397,11 +1395,11 @@ namespace casadi {
     return ret;
   }
 
-  void SymbolicOCP::setAttribute(setAtt f, const MX& var, const std::vector<double>& val,
+  void SymbolicIVP::setAttribute(setAtt f, const MX& var, const std::vector<double>& val,
                                  bool normalized) {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicOCP::setAttribute: Argument must be a symbolic vector");
-    casadi_assert_message(var.nnz()==val.size(), "SymbolicOCP::setAttribute: Dimension mismatch");
+                          "SymbolicIVP::setAttribute: Argument must be a symbolic vector");
+    casadi_assert_message(var.nnz()==val.size(), "SymbolicIVP::setAttribute: Dimension mismatch");
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
@@ -1409,11 +1407,11 @@ namespace casadi {
     }
   }
 
-  void SymbolicOCP::setAttribute(setAttS f, const MX& var, const MX& val) {
+  void SymbolicIVP::setAttribute(setAttS f, const MX& var, const MX& val) {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicOCP::setAttribute: Argument must be a symbolic vector");
+                          "SymbolicIVP::setAttribute: Argument must be a symbolic vector");
     casadi_assert_message(var.sparsity()==val.sparsity(),
-                          "SymbolicOCP::setAttribute: Sparsity mismatch");
+                          "SymbolicIVP::setAttribute: Sparsity mismatch");
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
@@ -1421,99 +1419,99 @@ namespace casadi {
     }
   }
 
-  double SymbolicOCP::min(const std::string& name, bool normalized) const {
+  double SymbolicIVP::min(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.min / v.nominal : v.min;
   }
 
-  std::vector<double> SymbolicOCP::min(const MX& var, bool normalized) const {
-    return attribute(&SymbolicOCP::min, var, normalized);
+  std::vector<double> SymbolicIVP::min(const MX& var, bool normalized) const {
+    return attribute(&SymbolicIVP::min, var, normalized);
   }
 
-  void SymbolicOCP::setMin(const std::string& name, double val, bool normalized) {
+  void SymbolicIVP::setMin(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.min = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicOCP::setMin(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&SymbolicOCP::setMin, var, val, normalized);
+  void SymbolicIVP::setMin(const MX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&SymbolicIVP::setMin, var, val, normalized);
   }
 
-  double SymbolicOCP::max(const std::string& name, bool normalized) const {
+  double SymbolicIVP::max(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.max / v.nominal : v.max;
   }
 
-  std::vector<double> SymbolicOCP::max(const MX& var, bool normalized) const {
-    return attribute(&SymbolicOCP::max, var, normalized);
+  std::vector<double> SymbolicIVP::max(const MX& var, bool normalized) const {
+    return attribute(&SymbolicIVP::max, var, normalized);
   }
 
-  void SymbolicOCP::setMax(const std::string& name, double val, bool normalized) {
+  void SymbolicIVP::setMax(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.max = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicOCP::setMax(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&SymbolicOCP::setMax, var, val, normalized);
+  void SymbolicIVP::setMax(const MX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&SymbolicIVP::setMax, var, val, normalized);
   }
 
-  double SymbolicOCP::initialGuess(const std::string& name, bool normalized) const {
+  double SymbolicIVP::initialGuess(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.initialGuess / v.nominal : v.initialGuess;
   }
 
-  std::vector<double> SymbolicOCP::initialGuess(const MX& var, bool normalized) const {
-    return attribute(&SymbolicOCP::initialGuess, var, normalized);
+  std::vector<double> SymbolicIVP::initialGuess(const MX& var, bool normalized) const {
+    return attribute(&SymbolicIVP::initialGuess, var, normalized);
   }
 
-  void SymbolicOCP::setInitialGuess(const std::string& name, double val, bool normalized) {
+  void SymbolicIVP::setInitialGuess(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.initialGuess = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicOCP::setInitialGuess(const MX& var, const std::vector<double>& val,
+  void SymbolicIVP::setInitialGuess(const MX& var, const std::vector<double>& val,
                                     bool normalized) {
-    setAttribute(&SymbolicOCP::setInitialGuess, var, val, normalized);
+    setAttribute(&SymbolicIVP::setInitialGuess, var, val, normalized);
   }
 
-  double SymbolicOCP::start(const std::string& name, bool normalized) const {
+  double SymbolicIVP::start(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.start / v.nominal : v.start;
   }
 
-  std::vector<double> SymbolicOCP::start(const MX& var, bool normalized) const {
-    return attribute(&SymbolicOCP::start, var, normalized);
+  std::vector<double> SymbolicIVP::start(const MX& var, bool normalized) const {
+    return attribute(&SymbolicIVP::start, var, normalized);
   }
 
-  void SymbolicOCP::setStart(const std::string& name, double val, bool normalized) {
+  void SymbolicIVP::setStart(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.start = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicOCP::setStart(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&SymbolicOCP::setStart, var, val, normalized);
+  void SymbolicIVP::setStart(const MX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&SymbolicIVP::setStart, var, val, normalized);
   }
 
-  double SymbolicOCP::derivativeStart(const std::string& name, bool normalized) const {
+  double SymbolicIVP::derivativeStart(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.derivativeStart / v.nominal : v.derivativeStart;
   }
 
-  std::vector<double> SymbolicOCP::derivativeStart(const MX& var, bool normalized) const {
-    return attribute(&SymbolicOCP::derivativeStart, var, normalized);
+  std::vector<double> SymbolicIVP::derivativeStart(const MX& var, bool normalized) const {
+    return attribute(&SymbolicIVP::derivativeStart, var, normalized);
   }
 
-  void SymbolicOCP::setDerivativeStart(const std::string& name, double val, bool normalized) {
+  void SymbolicIVP::setDerivativeStart(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.derivativeStart = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicOCP::setDerivativeStart(const MX& var, const std::vector<double>& val,
+  void SymbolicIVP::setDerivativeStart(const MX& var, const std::vector<double>& val,
                                        bool normalized) {
-    setAttribute(&SymbolicOCP::setDerivativeStart, var, val, normalized);
+    setAttribute(&SymbolicIVP::setDerivativeStart, var, val, normalized);
   }
 
-  void SymbolicOCP::generateFunctionHeader(std::ostream &stream, const std::string& fname,
+  void SymbolicIVP::generateFunctionHeader(std::ostream &stream, const std::string& fname,
                                            bool fwd, bool adj, bool foa) {
     stream << "void " << fname << "_work(int *ni, int *nr);" << endl;
     stream << "int " << fname
@@ -1525,7 +1523,7 @@ namespace casadi {
     if (foa) generateFunctionHeader(stream, fname+"_foa");
   }
 
-  void SymbolicOCP::generateHeader(const std::string& filename, const std::string& prefix) {
+  void SymbolicIVP::generateHeader(const std::string& filename, const std::string& prefix) {
     // Create header file
     ofstream s;
     s.open(filename.c_str());
@@ -1534,8 +1532,8 @@ namespace casadi {
     s << "/* This file was automatically generated by CasADi */" << endl << endl;
 
     // Include guards
-    s << "#ifndef " << prefix << "OCP_HEADER_FILE" << endl;
-    s << "#define "<< prefix << "OCP_HEADER_FILE" << endl << endl;
+    s << "#ifndef " << prefix << "IVP_HEADER_FILE" << endl;
+    s << "#define "<< prefix << "IVP_HEADER_FILE" << endl << endl;
 
     // C linkage
     s << "#ifdef __cplusplus" << endl;
@@ -1545,28 +1543,28 @@ namespace casadi {
     // Typedef input enum corresponding to generated format
     s << "/* Input convension */" << endl;
     s << "typedef enum {"
-      << "OCP_T, "
-      << "OCP_X, "
-      << "OCP_S, "
-      << "OCP_SDOT, "
-      << "OCP_Z, "
-      << "OCP_U, "
-      << "OCP_Q, "
-      << "OCP_I, "
-      << "OCP_Y, "
-      << "OCP_P, "
-      << "OCP_NUM_IN} " << prefix << "ocp_input_t;" << endl << endl;
+      << "IVP_T, "
+      << "IVP_X, "
+      << "IVP_S, "
+      << "IVP_SDOT, "
+      << "IVP_Z, "
+      << "IVP_U, "
+      << "IVP_Q, "
+      << "IVP_I, "
+      << "IVP_Y, "
+      << "IVP_P, "
+      << "IVP_NUM_IN} " << prefix << "ivp_input_t;" << endl << endl;
 
     // Typedef input enum corresponding to generated format
     s << "/* Output convension */" << endl;
     s << "typedef enum {"
-      << "OCP_ODE, "
-      << "OCP_DAE, "
-      << "OCP_ALG, "
-      << "OCP_QUAD, "
-      << "OCP_IDEF, "
-      << "OCP_YDEF, "
-      << "OCP_NUM_OUT} " << prefix << "ocp_output_t;" << endl << endl;
+      << "IVP_ODE, "
+      << "IVP_DAE, "
+      << "IVP_ALG, "
+      << "IVP_QUAD, "
+      << "IVP_IDEF, "
+      << "IVP_YDEF, "
+      << "IVP_NUM_OUT} " << prefix << "ivp_output_t;" << endl << endl;
 
     // Input dimensions and offset
     s << "/* Input dimensions and offsets */" << endl
@@ -1608,12 +1606,12 @@ namespace casadi {
     s << "#endif" << endl << endl;
 
     // Include guards
-    s << "#endif /* " << prefix << "OCP_HEADER_FILE */" << endl << endl;
+    s << "#endif /* " << prefix << "IVP_HEADER_FILE */" << endl << endl;
 
     s.close();
   }
 
-  void SymbolicOCP::generateFunction(const std::string& fname,
+  void SymbolicIVP::generateFunction(const std::string& fname,
                                      const std::vector<MX>& f_in,
                                      const std::vector<MX>& f_out,
                                      CodeGenerator& g,
@@ -1648,7 +1646,7 @@ namespace casadi {
     }
   }
 
-  void SymbolicOCP::generateCode(const std::string& filename,
+  void SymbolicIVP::generateCode(const std::string& filename,
                                  const Dictionary& options) {
     // Create a code generator object
     CodeGenerator g(options);

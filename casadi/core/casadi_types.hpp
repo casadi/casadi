@@ -86,7 +86,7 @@ namespace casadi {
   class CustomFunction;
   class SymbolicNLP;
   class Variable;
-  class SymbolicOCP;
+  class SymbolicIVP;
   class XmlFile;
 
 #ifndef SWIG

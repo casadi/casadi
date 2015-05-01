@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_SYMBOLIC_OCP_HPP
-#define CASADI_SYMBOLIC_OCP_HPP
+#ifndef CASADI_SYMBOLIC_IVP_HPP
+#define CASADI_SYMBOLIC_IVP_HPP
 
 #include "variable.hpp"
 
@@ -33,7 +33,7 @@ namespace casadi {
   // Forward declarations
   class XmlNode;
 
-  /** \brief A flat OCP representation
+  /** \brief An initial-value problem in differential-algebraic equations
       <H3>Independent variables:  </H3>
       \verbatim
       t:      time
@@ -73,11 +73,11 @@ namespace casadi {
       \date 2012-2015
       \author Joel Andersson
   */
-  class CASADI_EXPORT SymbolicOCP : public PrintableObject<SymbolicOCP> {
+  class CASADI_EXPORT SymbolicIVP : public PrintableObject<SymbolicIVP> {
   public:
 
     /// Default constructor
-    SymbolicOCP();
+    SymbolicIVP();
 
     /** @name Variables and equations
      *  Public data members
@@ -377,19 +377,19 @@ namespace casadi {
     Variable& readVariable(const XmlNode& node);
 
     /// Get an attribute by expression
-    typedef double (SymbolicOCP::*getAtt)(const std::string& name, bool normalized) const;
+    typedef double (SymbolicIVP::*getAtt)(const std::string& name, bool normalized) const;
     std::vector<double> attribute(getAtt f, const MX& var, bool normalized) const;
 
     /// Get a symbolic attribute by expression
-    typedef MX (SymbolicOCP::*getAttS)(const std::string& name) const;
+    typedef MX (SymbolicIVP::*getAttS)(const std::string& name) const;
     MX attribute(getAttS f, const MX& var) const;
 
     /// Set an attribute by expression
-    typedef void (SymbolicOCP::*setAtt)(const std::string& name, double val, bool normalized);
+    typedef void (SymbolicIVP::*setAtt)(const std::string& name, double val, bool normalized);
     void setAttribute(setAtt f, const MX& var, const std::vector<double>& val, bool normalized);
 
     /// Set a symbolic attribute by expression
-    typedef void (SymbolicOCP::*setAttS)(const std::string& name, const MX& val);
+    typedef void (SymbolicIVP::*setAttS)(const std::string& name, const MX& val);
     void setAttribute(setAttS f, const MX& var, const MX& val);
 
 #endif // SWIG
@@ -398,4 +398,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_SYMBOLIC_OCP_HPP
+#endif // CASADI_SYMBOLIC_IVP_HPP

@@ -199,48 +199,48 @@ class OCPtests(casadiTestCase):
   @requiresPlugin(XmlFile,"tinyxml")
   def test_XML(self):
     self.message("JModelica XML parsing")
-    ocp = SymbolicOCP()
-    ocp.parseFMI('data/cstr.xml')
+    ivp = SymbolicIVP()
+    ivp.parseFMI('data/cstr.xml')
     
     # Separate differential and algebraic variables
-    ocp.split_dae()
+    ivp.split_dae()
     
-    self.assertTrue(len(ocp.q)==0)
-    self.assertTrue(len(ocp.y)==1)
-    m = vertcat(ocp.ydef)
+    self.assertTrue(len(ivp.q)==0)
+    self.assertTrue(len(ivp.y)==1)
+    m = vertcat(ivp.ydef)
     self.assertTrue(isinstance(m,MX))
     self.assertEquals(str(m),'cost')
-    print dir(ocp)
-    self.assertEquals(len(ocp.dae),3)
-    print type(ocp.s)
-    self.assertEquals(len(ocp.s),3) # there are three states
-    c = ocp("cstr.c")
-    T = ocp("cstr.T")
-    cost = ocp("cost")
+    print dir(ivp)
+    self.assertEquals(len(ivp.dae),3)
+    print type(ivp.s)
+    self.assertEquals(len(ivp.s),3) # there are three states
+    c = ivp("cstr.c")
+    T = ivp("cstr.T")
+    cost = ivp("cost")
     self.assertTrue(isinstance(c,MX))
     
     self.assertEquals(c.getName(),"cstr.c")
     self.assertEquals(T.getName(),"cstr.T")
     self.assertEquals(cost.getName(),"cost")
-    self.assertEquals(ocp.nominal("cstr.c"),1000)
+    self.assertEquals(ivp.nominal("cstr.c"),1000)
    
-    u = ocp("u")
-    #self.assertEquals(ocp.path.nnz(),3)
-    #self.assertEquals(len(ocp.cfcn_lb),3)
-    #self.assertEquals(len(ocp.cfcn_ub),3)
-    #self.assertTrue(ocp.cfcn[0].isEqual(T)) 
-    #self.assertTrue(ocp.cfcn[1].isEqual(u)) 
-    #self.assertTrue(ocp.cfcn[2].isEqual(u)) 
-    #self.assertTrue(ocp.cfcn_lb[0].isMinusInf()) 
-    #self.assertEquals(ocp.cfcn_lb[1].getValue(),230) 
-    #self.assertTrue(ocp.cfcn_lb[2].isMinusInf()) 
-    #self.assertEquals(ocp.cfcn_ub[0].getValue(),350) 
-    #self.assertTrue(ocp.cfcn_ub[1].isInf())
-    #self.assertEquals(ocp.cfcn_ub[2].getValue(),370) 
-    print ocp.init
+    u = ivp("u")
+    #self.assertEquals(ivp.path.nnz(),3)
+    #self.assertEquals(len(ivp.cfcn_lb),3)
+    #self.assertEquals(len(ivp.cfcn_ub),3)
+    #self.assertTrue(ivp.cfcn[0].isEqual(T)) 
+    #self.assertTrue(ivp.cfcn[1].isEqual(u)) 
+    #self.assertTrue(ivp.cfcn[2].isEqual(u)) 
+    #self.assertTrue(ivp.cfcn_lb[0].isMinusInf()) 
+    #self.assertEquals(ivp.cfcn_lb[1].getValue(),230) 
+    #self.assertTrue(ivp.cfcn_lb[2].isMinusInf()) 
+    #self.assertEquals(ivp.cfcn_ub[0].getValue(),350) 
+    #self.assertTrue(ivp.cfcn_ub[1].isInf())
+    #self.assertEquals(ivp.cfcn_ub[2].getValue(),370) 
+    print ivp.init
     print c,T,cost
     #print c.atTime(0)
-    f=MXFunction([vertcat([c,T,cost])],[vertcat(ocp.init)])
+    f=MXFunction([vertcat([c,T,cost])],[vertcat(ivp.init)])
     f.init()
     return 
     f.evaluate()
@@ -273,16 +273,16 @@ class OCPtests(casadiTestCase):
   #   ms.setOption("nlp_solver", "ipopt")
   #   ms.init()
     
-  #   for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
+  #   for i in [IVP_LBX,IVP_UBX,IVP_X_INIT]:
   #     self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-  #   for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
+  #   for i in [IVP_LBU,IVP_UBU,IVP_U_INIT]:
   #     self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
-  #   for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
+  #   for i in [IVP_LBP,IVP_UBP,IVP_P_INIT]:
   #     self.checkarray(ms.input(i).shape,(np,1),"shape")
 
-  #   for i in [OCP_LBH,OCP_UBH]:
+  #   for i in [IVP_LBH,IVP_UBH]:
   #     self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
       
   #   ns = 20
@@ -311,16 +311,16 @@ class OCPtests(casadiTestCase):
   #   ms.setOption("nlp_solver", "ipopt")
   #   ms.init()
     
-  #   for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
+  #   for i in [IVP_LBX,IVP_UBX,IVP_X_INIT]:
   #     self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-  #   for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
+  #   for i in [IVP_LBU,IVP_UBU,IVP_U_INIT]:
   #     self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
-  #   for i in [OCP_LBP,OCP_UBP,OCP_P_INIT]:
+  #   for i in [IVP_LBP,IVP_UBP,IVP_P_INIT]:
   #     self.checkarray(ms.input(i).shape,(np,1),"shape")
 
-  #   for i in [OCP_LBH,OCP_UBH]:
+  #   for i in [IVP_LBH,IVP_UBH]:
   #     self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
 
   # @requiresPlugin(NlpSolver,"ipopt")
