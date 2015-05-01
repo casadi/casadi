@@ -758,10 +758,6 @@ namespace casadi {
     for (int i=0; i<this->mterm.size(); ++i) this->mterm[i] = *it++;
     for (int i=0; i<this->lterm.size(); ++i) this->lterm[i] = *it++;
     casadi_assert(it==ex.end());
-
-    // Get rid of i and idef
-    this->i.clear();
-    this->idef.clear();
   }
 
   void SymbolicOCP::scaleEquations() {
