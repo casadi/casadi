@@ -205,9 +205,9 @@ class OCPtests(casadiTestCase):
     # Separate differential and algebraic variables
     ocp.split_dae()
     
-    self.assertTrue(len(ocp.lterm)==0)
-    self.assertTrue(len(ocp.mterm)==1)
-    m = vertcat(ocp.mterm)
+    self.assertTrue(len(ocp.q)==0)
+    self.assertTrue(len(ocp.y)==1)
+    m = vertcat(ocp.ydef)
     self.assertTrue(isinstance(m,MX))
     self.assertEquals(str(m),'cost')
     print dir(ocp)

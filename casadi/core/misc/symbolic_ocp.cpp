@@ -289,7 +289,10 @@ namespace casadi {
 
               // Read expression
               MX v = readExpr(var);
-              this->mterm.push_back(v);
+
+              // Treat as an output
+              add_y("mterm");
+              add_ydef(v, "mterm_rhs");
             }
           } catch(exception& ex) {
             throw CasadiException(std::string("addObjectiveFunction failed: ") + ex.what());
@@ -300,12 +303,14 @@ namespace casadi {
               const XmlNode& var = onode[i];
 
               // If string literal, ignore
-              if (var.checkName("exp:StringLiteral"))
-                continue;
+              if (var.checkName("exp:StringLiteral")) continue;
 
               // Read expression
               MX v = readExpr(var);
-              this->lterm.push_back(v);
+
+              // Treat as a quadrature state
+              add_q("lterm");
+              add_quad(v, "lterm_rhs");
             }
           } catch(exception& ex) {
             throw CasadiException(std::string("addIntegrandObjectiveFunction failed: ")
@@ -525,56 +530,7 @@ namespace casadi {
         stream << str(this->y[i]) << " == " << str(this->ydef[i]) << endl;
       stream << endl;
     }
-
-    if (!this->mterm.empty()) {
-      stream << "Mayer objective terms" << endl;
-      for (int i=0; i<this->mterm.size(); ++i)
-        stream << str(this->mterm[i]) << endl;
-      stream << endl;
-    }
-
-    if (!this->lterm.empty()) {
-      stream << "Lagrange objective terms" << endl;
-      for (int i=0; i<this->lterm.size(); ++i)
-        stream << str(this->lterm[i]) << endl;
-      stream << endl;
-    }
-
     if (trailing_newline) stream << endl;
-  }
-
-  void SymbolicOCP::eliminate_lterm() {
-    // For every integral term in the objective function
-    for (int i=0; i<this->lterm.size(); ++i) {
-
-      // Give a name to the quadrature state
-      stringstream q_name;
-      q_name << "q_" << i;
-
-      // Create a new quadrature state
-      Variable qv(q_name.str());
-
-      // Set attributes
-      qv.variability = CONTINUOUS;
-      qv.causality = INTERNAL;
-      qv.start = 0.0;
-      qv.nominal = 1.0;
-
-      // Add to the list of variables
-      addVariable(q_name.str(), qv);
-
-      // Add to the quadrature states
-      this->q.push_back(qv.v);
-
-      // Add the Lagrange term to the list of quadratures
-      this->quad.push_back(this->lterm[i]);
-
-      // Add to the list of Mayer terms
-      this->mterm.push_back(qv.v);
-    }
-
-    // Remove the Lagrange terms
-    this->lterm.clear();
   }
 
   void SymbolicOCP::eliminate_quad() {
@@ -617,8 +573,6 @@ namespace casadi {
     ex.insert(ex.end(), this->idef.begin(), this->idef.end());
     ex.insert(ex.end(), this->ydef.begin(), this->ydef.end());
     ex.insert(ex.end(), this->init.begin(), this->init.end());
-    ex.insert(ex.end(), this->mterm.begin(), this->mterm.end());
-    ex.insert(ex.end(), this->lterm.begin(), this->lterm.end());
 
     // Substitute all at once (more efficient since they may have common subexpressions)
     ex = substitute(ex, v_id, v_rep);
@@ -632,8 +586,6 @@ namespace casadi {
     for (int i=0; i<this->i.size(); ++i) this->idef[i] = *it++ / nominal(this->i[i]);
     for (int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++ / nominal(this->y[i]);
     for (int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
-    for (int i=0; i<this->mterm.size(); ++i) this->mterm[i] = *it++;
-    for (int i=0; i<this->lterm.size(); ++i) this->lterm[i] = *it++;
     casadi_assert(it==ex.end());
 
     // Nominal value is 1 after scaling
@@ -699,8 +651,6 @@ namespace casadi {
     ex.insert(ex.end(), this->quad.begin(), this->quad.end());
     ex.insert(ex.end(), this->ydef.begin(), this->ydef.end());
     ex.insert(ex.end(), this->init.begin(), this->init.end());
-    ex.insert(ex.end(), this->mterm.begin(), this->mterm.end());
-    ex.insert(ex.end(), this->lterm.begin(), this->lterm.end());
 
     // Substitute all at once (since they may have common subexpressions)
     substituteInPlace(this->i, this->idef, ex);
@@ -713,8 +663,6 @@ namespace casadi {
     for (int i=0; i<this->q.size(); ++i) this->quad[i] = *it++;
     for (int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++;
     for (int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
-    for (int i=0; i<this->mterm.size(); ++i) this->mterm[i] = *it++;
-    for (int i=0; i<this->lterm.size(); ++i) this->lterm[i] = *it++;
     casadi_assert(it==ex.end());
   }
 
@@ -1079,6 +1027,14 @@ namespace casadi {
     MX new_x = addVariable(name);
     this->x.push_back(new_x);
     return new_x;
+  }
+
+  MX SymbolicOCP::add_q(const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_q("q" + CodeGenerator::to_string(this->q.size()));
+    MX new_q = addVariable(name);
+    this->q.push_back(new_q);
+    return new_q;
   }
 
   std::pair<MX, MX> SymbolicOCP::add_s(const std::string& name) {

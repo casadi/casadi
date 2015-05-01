@@ -70,12 +70,6 @@ namespace casadi {
       Initial equations:           0 == init(t, x, s, z, u, p, i, sdot)
       \endverbatim
 
-      <H3>Contributions to the objective function:  </H3>
-      \verbatim
-      Mayer terms:          \sum {mterm_k}
-      Lagrange terms:       \sum {\integral{mterm}}
-      \endverbatim
-
       \date 2012-2015
       \author Joel Andersson
   */
@@ -141,18 +135,6 @@ namespace casadi {
     std::vector<MX> init;
     ///@}
 
-    /** @name Objective function terms
-     *  Terms in the objective function.
-     */
-    ///@{
-
-    /// Mayer terms in the objective (point terms)
-    std::vector<MX> mterm;
-
-    /// Lagrange terms in the objective (integral terms)
-    std::vector<MX> lterm;
-    ///@}
-
     /** @name Symbolic modeling
      *  Formulate an optimal control problem
      */
@@ -171,6 +153,9 @@ namespace casadi {
 
     /// Add a new control
     MX add_u(const std::string& name=std::string());
+
+    /// Add a new quadrature state
+    MX add_q(const std::string& name=std::string());
 
     /// Add a new output
     MX add_y(const std::string& name=std::string());
@@ -225,9 +210,6 @@ namespace casadi {
 
     /// Eliminate intermediate variables
     void eliminate_i();
-
-    /// Eliminate Lagrange terms from the objective function and make them quadrature states
-    void eliminate_lterm();
 
     /// Eliminate quadrature states and turn them into ODE states
     void eliminate_quad();
