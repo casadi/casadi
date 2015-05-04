@@ -32,9 +32,9 @@ import os
 fmux = zipfile.ZipFile("CSTR_CSTR_Opt2.fmux",'r')
 fmux.extract('modelDescription.xml','.')
 #$ This file can be imported into CasADi, building up a symbolic representation of the model
-#$ The logic for importing Modelica models is located in the SymbolicIVP class:
+#$ The logic for importing Modelica models is located in the DaeBuilder class:
 from casadi import *
-ivp = SymbolicIVP()
+ivp = DaeBuilder()
 ivp.parseFMI("modelDescription.xml")
 #! Let us have a look at the flat optimal control problem:
 print ivp

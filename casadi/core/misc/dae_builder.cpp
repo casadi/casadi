@@ -23,7 +23,7 @@
  */
 
 
-#include "symbolic_ivp.hpp"
+#include "dae_builder.hpp"
 
 #include <map>
 #include <string>
@@ -55,11 +55,11 @@ namespace casadi {
     return s.str();
   }
 
-  SymbolicIVP::SymbolicIVP() {
+  DaeBuilder::DaeBuilder() {
     this->t = MX::sym("t");
   }
 
-  void SymbolicIVP::parseFMI(const std::string& filename) {
+  void DaeBuilder::parseFMI(const std::string& filename) {
 
     // Load
     XmlFile xml_file("tinyxml");
@@ -329,7 +329,7 @@ namespace casadi {
         } else if (onode.checkName("opt:PathConstraints")) {
           casadi_warning("opt:PointConstraints not supported, ignored");
         } else {
-          casadi_warning("SymbolicIVP::addOptimization: Unknown node " << onode.getName());
+          casadi_warning("DaeBuilder::addOptimization: Unknown node " << onode.getName());
         }
       }
     }
@@ -344,7 +344,7 @@ namespace casadi {
                           "algebraic variables.");
   }
 
-  Variable& SymbolicIVP::readVariable(const XmlNode& node) {
+  Variable& DaeBuilder::readVariable(const XmlNode& node) {
     // Qualified name
     string qn = qualifiedName(node);
 
@@ -352,10 +352,10 @@ namespace casadi {
     return variable(qn);
   }
 
-  MX SymbolicIVP::readExpr(const XmlNode& node) {
+  MX DaeBuilder::readExpr(const XmlNode& node) {
     const string& fullname = node.getName();
     if (fullname.find("exp:")== string::npos) {
-      casadi_error("SymbolicIVP::readExpr: unknown - expression is supposed to "
+      casadi_error("DaeBuilder::readExpr: unknown - expression is supposed to "
                    "start with 'exp:' , got " << fullname);
     }
 
@@ -437,12 +437,12 @@ namespace casadi {
     }
 
     // throw error if reached this point
-    throw CasadiException(string("SymbolicIVP::readExpr: Unknown node: ") + name);
+    throw CasadiException(string("DaeBuilder::readExpr: Unknown node: ") + name);
 
   }
 
-  void SymbolicIVP::repr(std::ostream &stream, bool trailing_newline) const {
-    stream << "IVP("
+  void DaeBuilder::repr(std::ostream &stream, bool trailing_newline) const {
+    stream << "DAE("
            << "#s = " << this->s.size() << ", "
            << "#x = " << this->x.size() << ", "
            << "#z = " << this->z.size() << ", "
@@ -454,7 +454,7 @@ namespace casadi {
     if (trailing_newline) stream << endl;
   }
 
-  void SymbolicIVP::print(ostream &stream, bool trailing_newline) const {
+  void DaeBuilder::print(ostream &stream, bool trailing_newline) const {
     // Assert correctness
     sanityCheck();
 
@@ -531,13 +531,13 @@ namespace casadi {
     if (trailing_newline) stream << endl;
   }
 
-  void SymbolicIVP::eliminate_quad() {
+  void DaeBuilder::eliminate_quad() {
     // Move all the quadratures to the list of differential states
     this->x.insert(this->x.end(), this->q.begin(), this->q.end());
     this->q.clear();
   }
 
-  void SymbolicIVP::scaleVariables() {
+  void DaeBuilder::scaleVariables() {
     // Assert correctness
     sanityCheck();
 
@@ -592,7 +592,7 @@ namespace casadi {
     }
   }
 
-  void SymbolicIVP::sort_i() {
+  void DaeBuilder::sort_i() {
     // Quick return if no intermediates
     if (this->i.empty()) return;
 
@@ -619,7 +619,7 @@ namespace casadi {
     this->i = inew;
   }
 
-  void SymbolicIVP::split_i() {
+  void DaeBuilder::split_i() {
     // Quick return if no intermediates
     if (this->i.empty()) return;
 
@@ -634,7 +634,7 @@ namespace casadi {
     casadi_assert(!dependsOn(vertcat(this->idef), vertcat(this->i)));
   }
 
-  void SymbolicIVP::eliminate_i() {
+  void DaeBuilder::eliminate_i() {
     // Quick return if possible
     if (this->i.empty()) return;
 
@@ -664,8 +664,8 @@ namespace casadi {
     casadi_assert(it==ex.end());
   }
 
-  void SymbolicIVP::scaleEquations() {
-    casadi_error("SymbolicIVP::scaleEquations broken");
+  void DaeBuilder::scaleEquations() {
+    casadi_error("DaeBuilder::scaleEquations broken");
 #if 0
     cout << "Scaling equations ..." << endl;
     double time1 = clock();
@@ -732,7 +732,7 @@ namespace casadi {
 #endif
   }
 
-  void SymbolicIVP::sort_dae() {
+  void DaeBuilder::sort_dae() {
     // Quick return if no differential states
     if (this->x.empty()) return;
 
@@ -761,7 +761,7 @@ namespace casadi {
     this->sdot = sdotnew;
   }
 
-  void SymbolicIVP::sort_alg() {
+  void DaeBuilder::sort_alg() {
     // Quick return if no algebraic states
     if (this->z.empty()) return;
 
@@ -788,7 +788,7 @@ namespace casadi {
     this->z = znew;
   }
 
-  void SymbolicIVP::makeSemiExplicit() {
+  void DaeBuilder::makeSemiExplicit() {
     // Only works if there are no i
     eliminate_i();
 
@@ -877,7 +877,7 @@ namespace casadi {
     this->sdot.clear();
   }
 
-  void SymbolicIVP::eliminate_alg() {
+  void DaeBuilder::eliminate_alg() {
     // Only works if there are no i
     eliminate_i();
 
@@ -973,7 +973,7 @@ namespace casadi {
     eliminate_i();
   }
 
-  void SymbolicIVP::makeExplicit() {
+  void DaeBuilder::makeExplicit() {
     // Only works if there are no i
     eliminate_i();
 
@@ -987,11 +987,11 @@ namespace casadi {
     casadi_assert_message(this->z.empty(), "Failed to eliminate algebraic variables");
   }
 
-  const Variable& SymbolicIVP::variable(const std::string& name) const {
-    return const_cast<SymbolicIVP*>(this)->variable(name);
+  const Variable& DaeBuilder::variable(const std::string& name) const {
+    return const_cast<DaeBuilder*>(this)->variable(name);
   }
 
-  Variable& SymbolicIVP::variable(const std::string& name) {
+  Variable& DaeBuilder::variable(const std::string& name) {
     // Find the variable
     VarMap::iterator it = varmap_.find(name);
     if (it==varmap_.end()) {
@@ -1002,7 +1002,7 @@ namespace casadi {
     return it->second;
   }
 
-  void SymbolicIVP::addVariable(const std::string& name, const Variable& var) {
+  void DaeBuilder::addVariable(const std::string& name, const Variable& var) {
     // Try to find the component
     if (varmap_.find(name)!=varmap_.end()) {
       stringstream ss;
@@ -1013,13 +1013,13 @@ namespace casadi {
     varmap_[name] = var;
   }
 
-  MX SymbolicIVP::addVariable(const std::string& name) {
+  MX DaeBuilder::addVariable(const std::string& name) {
     Variable v(name);
     addVariable(name, v);
     return v.v;
   }
 
-  MX SymbolicIVP::add_x(const std::string& name) {
+  MX DaeBuilder::add_x(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_x("x" + CodeGenerator::to_string(this->x.size()));
     MX new_x = addVariable(name);
@@ -1027,7 +1027,7 @@ namespace casadi {
     return new_x;
   }
 
-  MX SymbolicIVP::add_q(const std::string& name) {
+  MX DaeBuilder::add_q(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_q("q" + CodeGenerator::to_string(this->q.size()));
     MX new_q = addVariable(name);
@@ -1035,7 +1035,7 @@ namespace casadi {
     return new_q;
   }
 
-  std::pair<MX, MX> SymbolicIVP::add_s(const std::string& name) {
+  std::pair<MX, MX> DaeBuilder::add_s(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_s("s" + CodeGenerator::to_string(this->s.size()));
     Variable v(name);
@@ -1045,7 +1045,7 @@ namespace casadi {
     return std::pair<MX, MX>(v.v, v.d);
   }
 
-  MX SymbolicIVP::add_z(const std::string& name) {
+  MX DaeBuilder::add_z(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_z("z" + CodeGenerator::to_string(this->z.size()));
     MX new_z = addVariable(name);
@@ -1053,7 +1053,7 @@ namespace casadi {
     return new_z;
   }
 
-  MX SymbolicIVP::add_p(const std::string& name) {
+  MX DaeBuilder::add_p(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_p("p" + CodeGenerator::to_string(this->p.size()));
     MX new_p = addVariable(name);
@@ -1061,7 +1061,7 @@ namespace casadi {
     return new_p;
   }
 
-  MX SymbolicIVP::add_u(const std::string& name) {
+  MX DaeBuilder::add_u(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_u("u" + CodeGenerator::to_string(this->u.size()));
     MX new_u = addVariable(name);
@@ -1069,7 +1069,7 @@ namespace casadi {
     return new_u;
   }
 
-  MX SymbolicIVP::add_y(const std::string& name) {
+  MX DaeBuilder::add_y(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_y("y" + CodeGenerator::to_string(this->y.size()));
     MX new_y = addVariable(name);
@@ -1077,7 +1077,7 @@ namespace casadi {
     return new_y;
   }
 
-  MX SymbolicIVP::add_i(const std::string& name) {
+  MX DaeBuilder::add_i(const std::string& name) {
     if (name.empty()) // Generate a name
       return add_i("i" + CodeGenerator::to_string(this->i.size()));
     MX new_i = addVariable(name);
@@ -1085,49 +1085,49 @@ namespace casadi {
     return new_i;
   }
 
-  void SymbolicIVP::add_ode(const MX& new_ode, const std::string& name) {
+  void DaeBuilder::add_ode(const MX& new_ode, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_ode(new_ode, "ode" + CodeGenerator::to_string(this->ode.size()));
     this->ode.push_back(new_ode);
     this->lam_ode.push_back(MX::sym("lam_" + name, new_ode.sparsity()));
   }
 
-  void SymbolicIVP::add_dae(const MX& new_dae, const std::string& name) {
+  void DaeBuilder::add_dae(const MX& new_dae, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_dae(new_dae, "dae" + CodeGenerator::to_string(this->dae.size()));
     this->dae.push_back(new_dae);
     this->lam_dae.push_back(MX::sym("lam_" + name, new_dae.sparsity()));
   }
 
-  void SymbolicIVP::add_alg(const MX& new_alg, const std::string& name) {
+  void DaeBuilder::add_alg(const MX& new_alg, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_alg(new_alg, "alg" + CodeGenerator::to_string(this->alg.size()));
     this->alg.push_back(new_alg);
     this->lam_alg.push_back(MX::sym("lam_" + name, new_alg.sparsity()));
   }
 
-  void SymbolicIVP::add_quad(const MX& new_quad, const std::string& name) {
+  void DaeBuilder::add_quad(const MX& new_quad, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_quad(new_quad, "quad" + CodeGenerator::to_string(this->quad.size()));
     this->quad.push_back(new_quad);
     this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
   }
 
-  void SymbolicIVP::add_idef(const MX& new_idef, const std::string& name) {
+  void DaeBuilder::add_idef(const MX& new_idef, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_idef(new_idef, "idef" + CodeGenerator::to_string(this->idef.size()));
     this->idef.push_back(new_idef);
     this->lam_idef.push_back(MX::sym("lam_" + name, new_idef.sparsity()));
   }
 
-  void SymbolicIVP::add_ydef(const MX& new_ydef, const std::string& name) {
+  void DaeBuilder::add_ydef(const MX& new_ydef, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_ydef(new_ydef, "ydef" + CodeGenerator::to_string(this->ydef.size()));
     this->ydef.push_back(new_ydef);
     this->lam_ydef.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
   }
 
-  void SymbolicIVP::sanityCheck() const {
+  void DaeBuilder::sanityCheck() const {
     // Time
     casadi_assert_message(this->t.isSymbolic(), "Non-symbolic time t");
     casadi_assert_message(this->t.isScalar(), "Non-scalar time t");
@@ -1201,7 +1201,7 @@ namespace casadi {
     }
   }
 
-  std::string SymbolicIVP::qualifiedName(const XmlNode& nn) {
+  std::string DaeBuilder::qualifiedName(const XmlNode& nn) {
     // Stringstream to assemble name
     stringstream qn;
 
@@ -1224,15 +1224,15 @@ namespace casadi {
     return qn.str();
   }
 
-  MX SymbolicIVP::operator()(const std::string& name) const {
+  MX DaeBuilder::operator()(const std::string& name) const {
     return variable(name).v;
   }
 
-  MX SymbolicIVP::der(const std::string& name) const {
+  MX DaeBuilder::der(const std::string& name) const {
     return variable(name).d;
   }
 
-  MX SymbolicIVP::der(const MX& var) const {
+  MX DaeBuilder::der(const MX& var) const {
     casadi_assert(var.isVector() && var.isSymbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
@@ -1241,7 +1241,7 @@ namespace casadi {
     return ret;
   }
 
-  void SymbolicIVP::split_dae() {
+  void DaeBuilder::split_dae() {
     // Only works if there are no i
     eliminate_i();
 
@@ -1316,13 +1316,13 @@ namespace casadi {
     this->z.insert(this->z.end(), new_z.begin(), new_z.end());
   }
 
-  std::string SymbolicIVP::unit(const std::string& name) const {
+  std::string DaeBuilder::unit(const std::string& name) const {
     return variable(name).unit;
   }
 
-  std::string SymbolicIVP::unit(const MX& var) const {
+  std::string DaeBuilder::unit(const MX& var) const {
     casadi_assert_message(!var.isVector() && var.isValidInput(),
-                          "SymbolicIVP::unit: Argument must be a symbolic vector");
+                          "DaeBuilder::unit: Argument must be a symbolic vector");
     if (var.isEmpty()) {
       return "n/a";
     } else {
@@ -1330,27 +1330,27 @@ namespace casadi {
       string ret = unit(prim.at(0).getName());
       for (int i=1; i<prim.size(); ++i) {
         casadi_assert_message(ret == unit(prim.at(i).getName()),
-                              "SymbolicIVP::unit: Argument has mixed units");
+                              "DaeBuilder::unit: Argument has mixed units");
       }
       return ret;
     }
   }
 
-  void SymbolicIVP::setUnit(const std::string& name, const std::string& val) {
+  void DaeBuilder::setUnit(const std::string& name, const std::string& val) {
     variable(name).unit = val;
   }
 
-  double SymbolicIVP::nominal(const std::string& name) const {
+  double DaeBuilder::nominal(const std::string& name) const {
     return variable(name).nominal;
   }
 
-  void SymbolicIVP::setNominal(const std::string& name, double val) {
+  void DaeBuilder::setNominal(const std::string& name, double val) {
     variable(name).nominal = val;
   }
 
-  std::vector<double> SymbolicIVP::nominal(const MX& var) const {
+  std::vector<double> DaeBuilder::nominal(const MX& var) const {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicIVP::nominal: Argument must be a symbolic vector");
+                          "DaeBuilder::nominal: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
@@ -1360,10 +1360,10 @@ namespace casadi {
     return ret;
   }
 
-  void SymbolicIVP::setNominal(const MX& var, const std::vector<double>& val) {
+  void DaeBuilder::setNominal(const MX& var, const std::vector<double>& val) {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicIVP::nominal: Argument must be a symbolic vector");
-    casadi_assert_message(var.nnz()==var.nnz(), "SymbolicIVP::nominal: Dimension mismatch");
+                          "DaeBuilder::nominal: Argument must be a symbolic vector");
+    casadi_assert_message(var.nnz()==var.nnz(), "DaeBuilder::nominal: Dimension mismatch");
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
@@ -1371,9 +1371,9 @@ namespace casadi {
     }
   }
 
-  std::vector<double> SymbolicIVP::attribute(getAtt f, const MX& var, bool normalized) const {
+  std::vector<double> DaeBuilder::attribute(getAtt f, const MX& var, bool normalized) const {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicIVP::attribute: Argument must be a symbolic vector");
+                          "DaeBuilder::attribute: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
@@ -1383,9 +1383,9 @@ namespace casadi {
     return ret;
   }
 
-  MX SymbolicIVP::attribute(getAttS f, const MX& var) const {
+  MX DaeBuilder::attribute(getAttS f, const MX& var) const {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicIVP::attribute: Argument must be a symbolic vector");
+                          "DaeBuilder::attribute: Argument must be a symbolic vector");
     MX ret = MX::zeros(var.sparsity());
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
@@ -1395,11 +1395,11 @@ namespace casadi {
     return ret;
   }
 
-  void SymbolicIVP::setAttribute(setAtt f, const MX& var, const std::vector<double>& val,
+  void DaeBuilder::setAttribute(setAtt f, const MX& var, const std::vector<double>& val,
                                  bool normalized) {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicIVP::setAttribute: Argument must be a symbolic vector");
-    casadi_assert_message(var.nnz()==val.size(), "SymbolicIVP::setAttribute: Dimension mismatch");
+                          "DaeBuilder::setAttribute: Argument must be a symbolic vector");
+    casadi_assert_message(var.nnz()==val.size(), "DaeBuilder::setAttribute: Dimension mismatch");
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
@@ -1407,11 +1407,11 @@ namespace casadi {
     }
   }
 
-  void SymbolicIVP::setAttribute(setAttS f, const MX& var, const MX& val) {
+  void DaeBuilder::setAttribute(setAttS f, const MX& var, const MX& val) {
     casadi_assert_message(var.isVector() && var.isValidInput(),
-                          "SymbolicIVP::setAttribute: Argument must be a symbolic vector");
+                          "DaeBuilder::setAttribute: Argument must be a symbolic vector");
     casadi_assert_message(var.sparsity()==val.sparsity(),
-                          "SymbolicIVP::setAttribute: Sparsity mismatch");
+                          "DaeBuilder::setAttribute: Sparsity mismatch");
     std::vector<MX> prim = var.getPrimitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
@@ -1419,99 +1419,99 @@ namespace casadi {
     }
   }
 
-  double SymbolicIVP::min(const std::string& name, bool normalized) const {
+  double DaeBuilder::min(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.min / v.nominal : v.min;
   }
 
-  std::vector<double> SymbolicIVP::min(const MX& var, bool normalized) const {
-    return attribute(&SymbolicIVP::min, var, normalized);
+  std::vector<double> DaeBuilder::min(const MX& var, bool normalized) const {
+    return attribute(&DaeBuilder::min, var, normalized);
   }
 
-  void SymbolicIVP::setMin(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::setMin(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.min = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicIVP::setMin(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&SymbolicIVP::setMin, var, val, normalized);
+  void DaeBuilder::setMin(const MX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&DaeBuilder::setMin, var, val, normalized);
   }
 
-  double SymbolicIVP::max(const std::string& name, bool normalized) const {
+  double DaeBuilder::max(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.max / v.nominal : v.max;
   }
 
-  std::vector<double> SymbolicIVP::max(const MX& var, bool normalized) const {
-    return attribute(&SymbolicIVP::max, var, normalized);
+  std::vector<double> DaeBuilder::max(const MX& var, bool normalized) const {
+    return attribute(&DaeBuilder::max, var, normalized);
   }
 
-  void SymbolicIVP::setMax(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::setMax(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.max = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicIVP::setMax(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&SymbolicIVP::setMax, var, val, normalized);
+  void DaeBuilder::setMax(const MX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&DaeBuilder::setMax, var, val, normalized);
   }
 
-  double SymbolicIVP::initialGuess(const std::string& name, bool normalized) const {
+  double DaeBuilder::initialGuess(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.initialGuess / v.nominal : v.initialGuess;
   }
 
-  std::vector<double> SymbolicIVP::initialGuess(const MX& var, bool normalized) const {
-    return attribute(&SymbolicIVP::initialGuess, var, normalized);
+  std::vector<double> DaeBuilder::initialGuess(const MX& var, bool normalized) const {
+    return attribute(&DaeBuilder::initialGuess, var, normalized);
   }
 
-  void SymbolicIVP::setInitialGuess(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::setInitialGuess(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.initialGuess = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicIVP::setInitialGuess(const MX& var, const std::vector<double>& val,
+  void DaeBuilder::setInitialGuess(const MX& var, const std::vector<double>& val,
                                     bool normalized) {
-    setAttribute(&SymbolicIVP::setInitialGuess, var, val, normalized);
+    setAttribute(&DaeBuilder::setInitialGuess, var, val, normalized);
   }
 
-  double SymbolicIVP::start(const std::string& name, bool normalized) const {
+  double DaeBuilder::start(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.start / v.nominal : v.start;
   }
 
-  std::vector<double> SymbolicIVP::start(const MX& var, bool normalized) const {
-    return attribute(&SymbolicIVP::start, var, normalized);
+  std::vector<double> DaeBuilder::start(const MX& var, bool normalized) const {
+    return attribute(&DaeBuilder::start, var, normalized);
   }
 
-  void SymbolicIVP::setStart(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::setStart(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.start = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicIVP::setStart(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&SymbolicIVP::setStart, var, val, normalized);
+  void DaeBuilder::setStart(const MX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&DaeBuilder::setStart, var, val, normalized);
   }
 
-  double SymbolicIVP::derivativeStart(const std::string& name, bool normalized) const {
+  double DaeBuilder::derivativeStart(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
     return normalized ? v.derivativeStart / v.nominal : v.derivativeStart;
   }
 
-  std::vector<double> SymbolicIVP::derivativeStart(const MX& var, bool normalized) const {
-    return attribute(&SymbolicIVP::derivativeStart, var, normalized);
+  std::vector<double> DaeBuilder::derivativeStart(const MX& var, bool normalized) const {
+    return attribute(&DaeBuilder::derivativeStart, var, normalized);
   }
 
-  void SymbolicIVP::setDerivativeStart(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::setDerivativeStart(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.derivativeStart = normalized ? val*v.nominal : val;
   }
 
-  void SymbolicIVP::setDerivativeStart(const MX& var, const std::vector<double>& val,
+  void DaeBuilder::setDerivativeStart(const MX& var, const std::vector<double>& val,
                                        bool normalized) {
-    setAttribute(&SymbolicIVP::setDerivativeStart, var, val, normalized);
+    setAttribute(&DaeBuilder::setDerivativeStart, var, val, normalized);
   }
 
-  void SymbolicIVP::generateFunctionHeader(std::ostream &stream, const std::string& fname,
+  void DaeBuilder::generateFunctionHeader(std::ostream &stream, const std::string& fname,
                                            bool fwd, bool adj, bool foa) {
     stream << "void " << fname << "_work(int *ni, int *nr);" << endl;
     stream << "int " << fname
@@ -1523,7 +1523,7 @@ namespace casadi {
     if (foa) generateFunctionHeader(stream, fname+"_foa");
   }
 
-  void SymbolicIVP::generateHeader(const std::string& filename, const std::string& prefix) {
+  void DaeBuilder::generateHeader(const std::string& filename, const std::string& prefix) {
     // Create header file
     ofstream s;
     s.open(filename.c_str());
@@ -1611,7 +1611,7 @@ namespace casadi {
     s.close();
   }
 
-  void SymbolicIVP::generateFunction(const std::string& fname,
+  void DaeBuilder::generateFunction(const std::string& fname,
                                      const std::vector<MX>& f_in,
                                      const std::vector<MX>& f_out,
                                      CodeGenerator& g,
@@ -1646,7 +1646,7 @@ namespace casadi {
     }
   }
 
-  void SymbolicIVP::generateCode(const std::string& filename,
+  void DaeBuilder::generateCode(const std::string& filename,
                                  const Dictionary& options) {
     // Create a code generator object
     CodeGenerator g(options);

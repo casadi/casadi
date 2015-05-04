@@ -199,7 +199,7 @@ class OCPtests(casadiTestCase):
   @requiresPlugin(XmlFile,"tinyxml")
   def test_XML(self):
     self.message("JModelica XML parsing")
-    ivp = SymbolicIVP()
+    ivp = DaeBuilder()
     ivp.parseFMI('data/cstr.xml')
     
     # Separate differential and algebraic variables

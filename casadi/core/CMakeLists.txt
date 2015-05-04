@@ -130,7 +130,7 @@ set(CASADI_SRCS
   misc/xml_node.hpp                misc/xml_node.cpp
   misc/xml_file.hpp                misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
   misc/variable.hpp                misc/variable.cpp
-  misc/symbolic_ivp.hpp            misc/symbolic_ivp.cpp
+  misc/dae_builder.hpp             misc/dae_builder.cpp
 
   # User include class with the most essential includes
   core.hpp

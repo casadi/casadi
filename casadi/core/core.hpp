@@ -79,7 +79,7 @@
 #include "misc/integration_tools.hpp"
 #include "misc/symbolic_nlp.hpp"
 #include "misc/variable.hpp"
-#include "misc/symbolic_ivp.hpp"
+#include "misc/dae_builder.hpp"
 #include "misc/xml_file.hpp"
 
 #endif // CASADI_CORE_HPP

@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_SYMBOLIC_IVP_HPP
-#define CASADI_SYMBOLIC_IVP_HPP
+#ifndef CASADI_DAE_BUILDER_HPP
+#define CASADI_DAE_BUILDER_HPP
 
 #include "variable.hpp"
 
@@ -73,11 +73,11 @@ namespace casadi {
       \date 2012-2015
       \author Joel Andersson
   */
-  class CASADI_EXPORT SymbolicIVP : public PrintableObject<SymbolicIVP> {
+  class CASADI_EXPORT DaeBuilder : public PrintableObject<DaeBuilder> {
   public:
 
     /// Default constructor
-    SymbolicIVP();
+    DaeBuilder();
 
     /** @name Variables and equations
      *  Public data members
@@ -377,19 +377,19 @@ namespace casadi {
     Variable& readVariable(const XmlNode& node);
 
     /// Get an attribute by expression
-    typedef double (SymbolicIVP::*getAtt)(const std::string& name, bool normalized) const;
+    typedef double (DaeBuilder::*getAtt)(const std::string& name, bool normalized) const;
     std::vector<double> attribute(getAtt f, const MX& var, bool normalized) const;
 
     /// Get a symbolic attribute by expression
-    typedef MX (SymbolicIVP::*getAttS)(const std::string& name) const;
+    typedef MX (DaeBuilder::*getAttS)(const std::string& name) const;
     MX attribute(getAttS f, const MX& var) const;
 
     /// Set an attribute by expression
-    typedef void (SymbolicIVP::*setAtt)(const std::string& name, double val, bool normalized);
+    typedef void (DaeBuilder::*setAtt)(const std::string& name, double val, bool normalized);
     void setAttribute(setAtt f, const MX& var, const std::vector<double>& val, bool normalized);
 
     /// Set a symbolic attribute by expression
-    typedef void (SymbolicIVP::*setAttS)(const std::string& name, const MX& val);
+    typedef void (DaeBuilder::*setAttS)(const std::string& name, const MX& val);
     void setAttribute(setAttS f, const MX& var, const MX& val);
 
 #endif // SWIG
@@ -398,4 +398,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_SYMBOLIC_IVP_HPP
+#endif // CASADI_DAE_BUILDER_HPP

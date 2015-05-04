@@ -64,7 +64,7 @@ def comp(name):
 comp("BasicVolumeMassConservation")
 
 # Read a model from XML
-ivp = SymbolicIVP()
+ivp = DaeBuilder()
 ivp.parseFMI('BasicVolumeMassConservation.xml')
 
 # Transform into an explicit ODE
@@ -123,7 +123,7 @@ plt.draw()
 comp("BasicVolumeEnergyConservation")
 
 # Allocate a parser and load the xml
-ivp = SymbolicIVP()
+ivp = DaeBuilder()
 ivp.parseFMI('BasicVolumeEnergyConservation.xml')
 
 # Transform into an explicit ODE
@@ -175,7 +175,7 @@ plt.draw()
 comp("BasicVolumeTest")
 
 # Allocate a parser and load the xml
-ivp = SymbolicIVP()
+ivp = DaeBuilder()
 ivp.parseFMI('BasicVolumeTest.xml')
 
 # Transform into an explicit ODE
@@ -235,7 +235,7 @@ plt.draw()
 comp("CtrlFlowSystem")
 
 # Allocate a parser and load the xml
-ivp = SymbolicIVP()
+ivp = DaeBuilder()
 ivp.parseFMI('CtrlFlowSystem.xml')
 
 # Transform into a semi-explicit ODE
