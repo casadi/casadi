@@ -44,7 +44,7 @@
 *
 */
 #include <casadi/casadi.hpp>
-#include <casadi/core/misc/symbolic_nlp.hpp> 
+
 /**
  * This example demonstrates how NL-files, which can be generated
  * by AMPl or Pyomo, can be imported in CasADi and solved using
@@ -62,7 +62,7 @@ int main(int argc, char **argv){
   std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
 
   // Parse an NL-file
-  SymbolicNLP nl;
+  NlpBuilder nl;
   nl.parseNL(problem);
 
   // NLP

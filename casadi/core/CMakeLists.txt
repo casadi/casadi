@@ -126,7 +126,7 @@ set(CASADI_SRCS
 
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
-  misc/symbolic_nlp.hpp            misc/symbolic_nlp.cpp
+  misc/nlp_builder.hpp             misc/nlp_builder.cpp
   misc/xml_node.hpp                misc/xml_node.cpp
   misc/xml_file.hpp                misc/xml_file.cpp                misc/xml_file_internal.hpp                misc/xml_file_internal.cpp
   misc/variable.hpp                misc/variable.cpp

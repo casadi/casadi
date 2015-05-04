@@ -23,14 +23,14 @@
  */
 
 
-#include "symbolic_nlp.hpp"
+#include "nlp_builder.hpp"
 #include "../core.hpp"
 #include <fstream>
 
 using namespace std;
 namespace casadi {
 
-void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options) {
+void NlpBuilder::parseNL(const std::string& filename, const Dictionary& options) {
   // Note: The implementation of this function follows the
   // "Writing .nl Files" paper by David M. Gay (2005)
 
@@ -410,7 +410,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   nlfile.close();
 }
 
-SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SXElement>& v) {
+SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXElement>& v) {
   // Read the instruction
   char inst;
   stream >> inst;
@@ -586,10 +586,10 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
   }
 
   // Throw error message
-  throw CasadiException("Error in SymbolicNLP::readExpressionNL: " + msg.str());
+  throw CasadiException("Error in NlpBuilder::readExpressionNL: " + msg.str());
 }
 
-void SymbolicNLP::print(std::ostream &stream, bool trailing_newline) const {
+void NlpBuilder::print(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP:" << endl;
   stream << "x = " << x << endl;
   stream << "#f=" << f.nnz() << endl;
@@ -597,7 +597,7 @@ void SymbolicNLP::print(std::ostream &stream, bool trailing_newline) const {
   if (trailing_newline) stream << endl;
 }
 
-void SymbolicNLP::repr(std::ostream &stream, bool trailing_newline) const {
+void NlpBuilder::repr(std::ostream &stream, bool trailing_newline) const {
   stream << "NLP(#f=" << f.nnz() << ",#g="<< g.nnz() << ")";
   if (trailing_newline) stream << endl;
 }

@@ -1221,7 +1221,7 @@ def PyFunction(obj,inputs,outputs):
 %include <casadi/core/casadi_options.hpp>
 %include <casadi/core/casadi_meta.hpp>
 %include <casadi/core/misc/integration_tools.hpp>
-%include <casadi/core/misc/symbolic_nlp.hpp>
+%include <casadi/core/misc/nlp_builder.hpp>
 %include <casadi/core/misc/variable.hpp>
 %include <casadi/core/misc/dae_builder.hpp>
 %include <casadi/core/misc/xml_file.hpp>

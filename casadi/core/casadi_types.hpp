@@ -84,7 +84,7 @@ namespace casadi {
   class Callback;
   class CustomEvaluate;
   class CustomFunction;
-  class SymbolicNLP;
+  class NlpBuilder;
   class Variable;
   class DaeBuilder;
   class XmlFile;

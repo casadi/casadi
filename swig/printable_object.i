@@ -35,7 +35,7 @@
 %template(PrintIMatrix)      casadi::PrintableObject<casadi::Matrix<int> >;
 %template(PrintDMatrix)      casadi::PrintableObject<casadi::Matrix<double> >;
 //%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
-%template(PrintSymbolicNLP)     casadi::PrintableObject<casadi::SymbolicNLP>;
+%template(PrintNlpBuilder)     casadi::PrintableObject<casadi::NlpBuilder>;
 %template(PrintVariable)        casadi::PrintableObject<casadi::Variable>;
 %template(PrintDaeBuilder)     casadi::PrintableObject<casadi::DaeBuilder>;
 

@@ -34,7 +34,7 @@ Joel Andersson
 """
 
 # Create an NLP instance
-nl = SymbolicNLP()
+nl = NlpBuilder()
 
 # Parse an NL-file
 nl.parseNL("../nl_files/hs107.nl",{"verbose":False})

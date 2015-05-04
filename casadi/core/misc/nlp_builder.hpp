@@ -23,21 +23,18 @@
  */
 
 
-#ifndef CASADI_SYMBOLIC_NLP_HPP
-#define CASADI_SYMBOLIC_NLP_HPP
+#ifndef CASADI_NLP_BUILDER_HPP
+#define CASADI_NLP_BUILDER_HPP
 
 #include "../sx/sx_element.hpp"
 
 namespace casadi {
 
-// Forward declaration
-class SymbolicNLPInternal;
-
 /** \brief A symbolic NLP representation
-  \date 2012
+  \date 2012-2015
   \author Joel Andersson
 */
-class CASADI_EXPORT SymbolicNLP : public PrintableObject<SymbolicNLP> {
+class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
   public:
 
     /** @name Symbolic representation of the NLP
@@ -88,4 +85,4 @@ class CASADI_EXPORT SymbolicNLP : public PrintableObject<SymbolicNLP> {
 
 } // namespace casadi
 
-#endif // CASADI_SYMBOLIC_NLP_HPP
+#endif // CASADI_NLP_BUILDER_HPP

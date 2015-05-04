@@ -1189,9 +1189,6 @@ namespace casadi {
     // Names of operation argument and results
     vector<int> arg, res;
 
-    // Print class (for debugging)
-    bool codegen_class = true;
-
     // Codegen the algorithm
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (it->op==OP_OUTPUT) {
