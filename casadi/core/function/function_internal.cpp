@@ -1991,7 +1991,11 @@ namespace casadi {
     stringstream &s = g.body;
 
     // Function that returns the number of inputs and outputs
-    s << "int " << fname << "_narg(int *n_in, int *n_out) {" << endl
+    string tmp = "int " + fname + "_narg(int *n_in, int *n_out)";
+    if (g.with_header) {
+      g.header << "extern " << tmp << ";" << endl;
+    }
+    s << tmp << " {" << endl
       << "  *n_in = " << n_in << ";" << endl
       << "  *n_out = " << n_out << ";" << endl
       << "  return 0;" << endl
@@ -2018,8 +2022,12 @@ namespace casadi {
     }
 
     // Function that returns the sparsity pattern
-    s << "int " << fname << "_sparsity"
-      << "(int i, int *nrow, int *ncol, const int **colind, const int **row) {" << endl;
+    tmp = "int " + fname + "_sparsity"
+      "(int i, int *nrow, int *ncol, const int **colind, const int **row)";
+    if (g.with_header) {
+      g.header << "extern " << tmp << ";" << endl;
+    }
+    s << tmp << " {" << endl;
 
     // Get the sparsity index using a switch
     s << "  const int* s;" << endl;
@@ -2054,9 +2062,13 @@ namespace casadi {
     s << "}" << endl << endl;
 
     // Function that returns work vector lengths
+    tmp = "int " + fname + "_work(int *ni, int *nr)";
+    if (g.with_header) {
+      g.header << "extern " << tmp << ";" << endl;
+    }
     size_t ni, nr;
     nTmp(ni, nr);
-    s << "int " << fname << "_work(int *ni, int *nr) {" << endl;
+    s << tmp << " {" << endl;
     s << "  if (ni) *ni = " << ni << ";" << endl;
     s << "  if (nr) *nr = " << nr << ";" << endl;
     s << "  return 0;" << endl;

@@ -91,10 +91,10 @@ namespace casadi {
     g.body << "  rr=" << g.work(res[0], nnz()) << ";" << endl;
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
-      if (dep(i).nnz()==1) {
+      if (nz==1) {
         g.body << "  *rr++ = " << g.workel(arg[i], 1) << ";" << endl;
-      } else {
-        g.body << "  for (i=0, " << "cs=" << g.work(arg[i], dep(i).nnz()) << "; "
+      } else if (nz!=0) {
+        g.body << "  for (i=0, " << "cs=" << g.work(arg[i], nz) << "; "
                << "i<" << nz << "; ++i) *rr++ = *cs++;" << endl;
       }
     }

@@ -168,6 +168,9 @@ namespace casadi {
     // Real-type used for the codegen
     std::string real_t;
 
+    // Generate header file?
+    bool with_header;
+
     // Are we creating a MEX file?
     bool mex;
 
@@ -180,12 +183,6 @@ namespace casadi {
     // Should we generate a main (allowing evaluation from command line)
     bool main;
 
-    // Prefix
-    std::string prefix;
-
-    // Include file
-    std::string include;
-
     /** \brief Codegen scalar
      * Use the work vector for storing work vector elements of length 1
      * (typically scalar) instead of using local variables
@@ -196,6 +193,7 @@ namespace casadi {
     std::stringstream includes;
     std::stringstream auxiliaries;
     std::stringstream body;
+    std::stringstream header;
 
     // Set of already included header files
     typedef std::map<const void*, int> PointerMap;

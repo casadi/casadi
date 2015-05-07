@@ -233,22 +233,42 @@ namespace casadi {
     /// Import existing problem from FMI/XML
     void parseFMI(const std::string& filename);
 
-    /// Generate a file for numerical evaluation
-    void generateCode(const std::string& filename,
-                      const Dictionary& options=Dictionary());
+#ifndef SWIG
+    // Input convension in codegen
+    enum DaeBuilderIn {
+      DAE_BUILDER_T,
+      DAE_BUILDER_X,
+      DAE_BUILDER_S,
+      DAE_BUILDER_SDOT,
+      DAE_BUILDER_Z,
+      DAE_BUILDER_U,
+      DAE_BUILDER_Q,
+      DAE_BUILDER_I,
+      DAE_BUILDER_Y,
+      DAE_BUILDER_P,
+      DAE_BUILDER_NUM_IN
+    };
 
-    /// Generate a header file for generateCode
-    static void generateHeader(const std::string& filename, const std::string& prefix="");
+    // Output convension in codegen
+    enum DaeBuilderOut {
+      DAE_BUILDER_ODE,
+      DAE_BUILDER_DAE,
+      DAE_BUILDER_ALG,
+      DAE_BUILDER_QUAD,
+      DAE_BUILDER_IDEF,
+      DAE_BUILDER_YDEF,
+      DAE_BUILDER_NUM_OUT
+    };
+#endif // SWIG
+
+    /// Generate a file for numerical evaluation
+    void generate(const std::string& filename, const Dictionary& options=Dictionary());
 
     /// Generate code for a particular function
     static void generateFunction(const std::string& fname,
                                  const std::vector<MX>& f_in, const std::vector<MX>& f_out,
                                  CodeGenerator& g,
                                  bool fwd=false, bool adj=false, bool foa=false);
-
-    /// Corresponding header
-    static void generateFunctionHeader(std::ostream &stream, const std::string& fname,
-                                       bool fwd=false, bool adj=false, bool foa=false);
     ///@}
 
     /// Get variable expression by name
