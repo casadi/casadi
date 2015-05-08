@@ -82,7 +82,7 @@ dae = MXFunction(dae_fcn_in,daeOut(ode=vertcat(ivp.ode)))
 integrator = Integrator("cvodes", dae)
 
 # Output function
-output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.i, ivp.idef)
+output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.d, ivp.ddef)
 output_fcn_in = daeIn(
   t=ivp.t,
   x = vertcat(ivp.x),
@@ -141,7 +141,7 @@ dae = MXFunction(dae_fcn_in,daeOut(ode=vertcat(ivp.ode)))
 integrator = Integrator("cvodes", dae)
 
 # Output function
-output_fcn_out = substitute([ivp("T")], ivp.i, ivp.idef)
+output_fcn_out = substitute([ivp("T")], ivp.d, ivp.ddef)
 output_fcn_in = daeIn(
   t=ivp.t,
   x = vertcat(ivp.x),
@@ -193,7 +193,7 @@ dae = MXFunction(dae_fcn_in,daeOut(ode=densify(vertcat(ivp.ode))))
 integrator = Integrator("cvodes", dae)
 
 # Output function
-output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.i, ivp.idef)
+output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.d, ivp.ddef)
 output_fcn_in = daeIn(
   t=ivp.t,
   x = vertcat(ivp.x),

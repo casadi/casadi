@@ -106,11 +106,6 @@ namespace casadi {
      */
     std::vector<MX> q, quad, lam_quad;
 
-    /** \brief Intermediate variables and definitions definitions
-     * Interdependencies are allowed but must be non-cyclic.
-     */
-    std::vector<MX> i, idef, lam_idef;
-
     /** \brief Output variables and corresponding definitions
      */
     std::vector<MX> y, ydef, lam_ydef;
@@ -121,11 +116,16 @@ namespace casadi {
      */
     std::vector<MX> u;
 
-    /** \brief Free parameters
-     * A free parameter is variables which is constant over time, but whose value is chosen by the
-     * optimization algorithm in order to minimize the cost functional.
+    /** \brief Parameters
+     * A parameter is constant over time, but whose value is chosen by e.g. an
+     * optimization algorithm.
      */
     std::vector<MX> p;
+
+    /** \brief Dependent parameters and corresponding definitions 
+     * Interdependencies are allowed but must be non-cyclic.
+     */
+    std::vector<MX> d, ddef, lam_ddef;
     ///@}
 
     /** \brief Initial conditions
@@ -160,8 +160,8 @@ namespace casadi {
     /// Add a new output
     MX add_y(const std::string& name=std::string());
 
-    /// Add a new intermediate variable
-    MX add_i(const std::string& name=std::string());
+    /// Add a new dependent parameter
+    MX add_d(const std::string& name=std::string());
 
     /// Add an ordinary differential equation
     void add_ode(const MX& new_ode, const std::string& name=std::string());
@@ -175,8 +175,8 @@ namespace casadi {
     /// Add a quadrature equation
     void add_quad(const MX& new_quad, const std::string& name=std::string());
 
-    /// Add an intermediate variable equation
-    void add_idef(const MX& new_idef, const std::string& name=std::string());
+    /// Add an dependent parameter equation
+    void add_ddef(const MX& new_idef, const std::string& name=std::string());
 
     /// Add an output equation
     void add_ydef(const MX& new_ydef, const std::string& name=std::string());
@@ -202,14 +202,14 @@ namespace casadi {
     /// Transform the implicit DAE or semi-explicit DAE into an explicit ODE
     void makeExplicit();
 
-    /// Sort intermediate variables
-    void sort_i();
+    /// Sort dependent parameters
+    void sort_d();
 
-    /// Eliminate interdependencies amongst intermediate variables
-    void split_i();
+    /// Eliminate interdependencies amongst dependent parameters
+    void split_d();
 
-    /// Eliminate intermediate variables
-    void eliminate_i();
+    /// Eliminate dependent parameters
+    void eliminate_d();
 
     /// Eliminate quadrature states and turn them into ODE states
     void eliminate_quad();
@@ -243,7 +243,7 @@ namespace casadi {
       DAE_BUILDER_Z,
       DAE_BUILDER_U,
       DAE_BUILDER_Q,
-      DAE_BUILDER_I,
+      DAE_BUILDER_D,
       DAE_BUILDER_Y,
       DAE_BUILDER_P,
       DAE_BUILDER_NUM_IN
@@ -255,7 +255,7 @@ namespace casadi {
       DAE_BUILDER_DAE,
       DAE_BUILDER_ALG,
       DAE_BUILDER_QUAD,
-      DAE_BUILDER_IDEF,
+      DAE_BUILDER_DDEF,
       DAE_BUILDER_YDEF,
       DAE_BUILDER_NUM_OUT
     };
