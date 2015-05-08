@@ -139,6 +139,12 @@ namespace casadi {
      *  Formulate an optimal control problem
      */
     ///@{
+    /// Add a new parameter
+    MX add_p(const std::string& name=std::string());
+
+    /// Add a new control
+    MX add_u(const std::string& name=std::string());
+
     /// Add a new differential state
     MX add_x(const std::string& name=std::string());
 
@@ -148,20 +154,14 @@ namespace casadi {
     /// Add a new algebraic variable
     MX add_z(const std::string& name=std::string());
 
-    /// Add a new parameter
-    MX add_p(const std::string& name=std::string());
-
-    /// Add a new control
-    MX add_u(const std::string& name=std::string());
-
     /// Add a new quadrature state
     MX add_q(const std::string& name=std::string());
 
-    /// Add a new output
-    MX add_y(const std::string& name=std::string());
-
     /// Add a new dependent parameter
-    MX add_d(const std::string& name=std::string());
+    MX add_d(const MX& new_ddef, const std::string& name=std::string());
+
+    /// Add a new output
+    MX add_y(const MX& new_ydef, const std::string& name=std::string());
 
     /// Add an ordinary differential equation
     void add_ode(const MX& new_ode, const std::string& name=std::string());
@@ -174,12 +174,6 @@ namespace casadi {
 
     /// Add a quadrature equation
     void add_quad(const MX& new_quad, const std::string& name=std::string());
-
-    /// Add an dependent parameter equation
-    void add_ddef(const MX& new_idef, const std::string& name=std::string());
-
-    /// Add an output equation
-    void add_ydef(const MX& new_ydef, const std::string& name=std::string());
 
     /// Check if dimensions match
     void sanityCheck() const;

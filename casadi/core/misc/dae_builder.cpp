@@ -291,8 +291,7 @@ namespace casadi {
               MX v = readExpr(var);
 
               // Treat as an output
-              add_y("mterm");
-              add_ydef(v, "mterm_rhs");
+              add_y(v, "mterm");
             }
           } catch(exception& ex) {
             throw CasadiException(std::string("addObjectiveFunction failed: ") + ex.what());
@@ -1069,20 +1068,24 @@ namespace casadi {
     return new_u;
   }
 
-  MX DaeBuilder::add_y(const std::string& name) {
+  MX DaeBuilder::add_d(const MX& new_ddef, const std::string& name) {
     if (name.empty()) // Generate a name
-      return add_y("y" + CodeGenerator::to_string(this->y.size()));
-    MX new_y = addVariable(name);
-    this->y.push_back(new_y);
-    return new_y;
-  }
-
-  MX DaeBuilder::add_d(const std::string& name) {
-    if (name.empty()) // Generate a name
-      return add_d("d" + CodeGenerator::to_string(this->d.size()));
+      return add_d(new_ddef, "d" + CodeGenerator::to_string(this->d.size()));
     MX new_d = addVariable(name);
     this->d.push_back(new_d);
+    this->ddef.push_back(new_ddef);
+    this->lam_ddef.push_back(MX::sym("lam_" + name, new_ddef.sparsity()));
     return new_d;
+  }
+
+  MX DaeBuilder::add_y(const MX& new_ydef, const std::string& name) {
+    if (name.empty()) // Generate a name
+      return add_y(new_ydef, "y" + CodeGenerator::to_string(this->y.size()));
+    MX new_y = addVariable(name);
+    this->y.push_back(new_y);
+    this->ydef.push_back(new_ydef);
+    this->lam_ydef.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
+    return new_y;
   }
 
   void DaeBuilder::add_ode(const MX& new_ode, const std::string& name) {
@@ -1111,20 +1114,6 @@ namespace casadi {
       return add_quad(new_quad, "quad" + CodeGenerator::to_string(this->quad.size()));
     this->quad.push_back(new_quad);
     this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
-  }
-
-  void DaeBuilder::add_ddef(const MX& new_ddef, const std::string& name) {
-    if (name.empty()) // Generate a name
-      return add_ddef(new_ddef, "ddef" + CodeGenerator::to_string(this->ddef.size()));
-    this->ddef.push_back(new_ddef);
-    this->lam_ddef.push_back(MX::sym("lam_" + name, new_ddef.sparsity()));
-  }
-
-  void DaeBuilder::add_ydef(const MX& new_ydef, const std::string& name) {
-    if (name.empty()) // Generate a name
-      return add_ydef(new_ydef, "ydef" + CodeGenerator::to_string(this->ydef.size()));
-    this->ydef.push_back(new_ydef);
-    this->lam_ydef.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
   }
 
   void DaeBuilder::sanityCheck() const {
