@@ -46,28 +46,28 @@ namespace casadi {
       z:      algebraic variables
       u:      control signals
       q:      quadrature states
-      i:      intermediate variables
       y:      outputs
       \endverbatim
 
       <H3>Time-constant variables:  </H3>
       \verbatim
       p:      free parameters
+      d:      dependent parameters
       \endverbatim
 
       <H3>Dynamic constraints (imposed everywhere):  </H3>
       \verbatim
-      ODE                    \dot{x} ==  ode(t, x, s, z, u, p, i)
-      DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, i, sdot)
-      algebraic equations:         0 ==  alg(t, x, s, z, u, p, i)
-      quadrature equations:  \dot{q} == quad(t, x, s, z, u, p, i)
-      intermediate equations:      i == idef(t, x, s, z, u, p, i)
-      output equations:            y == ydef(t, x, s, z, u, p, i)
+      ODE                    \dot{x} ==  ode(t, x, s, z, u, p, d)
+      DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, d, sdot)
+      algebraic equations:         0 ==  alg(t, x, s, z, u, p, d)
+      quadrature equations:  \dot{q} == quad(t, x, s, z, u, p, d)
+      deppendent parameters:       d == ddef(t, x, s, z, u, p, d)
+      output equations:            y == ydef(t, x, s, z, u, p, d)
       \endverbatim
 
       <H3>Point constraints (imposed pointwise):  </H3>
       \verbatim
-      Initial equations:           0 == init(t, x, s, z, u, p, i, sdot)
+      Initial equations:           0 == init(t, x, s, z, u, p, d, sdot)
       \endverbatim
 
       \date 2012-2015

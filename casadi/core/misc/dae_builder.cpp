@@ -464,14 +464,14 @@ namespace casadi {
     stream << "Variables" << endl;
     stream << "{" << endl;
     stream << "  t = " << str(this->t) << endl;
-    stream << "  s = " << str(this->s) << endl;
-    stream << "  x = " << str(this->x) << endl;
-    stream << "  z =  " << str(this->z) << endl;
-    stream << "  q =  " << str(this->q) << endl;
-    stream << "  y =  " << str(this->y) << endl;
-    stream << "  p =  " << str(this->p) << endl;
-    stream << "  d =  " << str(this->d) << endl;
-    stream << "  u =  " << str(this->u) << endl;
+    if (!this->s.empty()) stream << "  s = " << str(this->s) << endl;
+    if (!this->x.empty()) stream << "  x = " << str(this->x) << endl;
+    if (!this->z.empty()) stream << "  z =  " << str(this->z) << endl;
+    if (!this->q.empty()) stream << "  q =  " << str(this->q) << endl;
+    if (!this->y.empty()) stream << "  y =  " << str(this->y) << endl;
+    if (!this->p.empty()) stream << "  p =  " << str(this->p) << endl;
+    if (!this->d.empty()) stream << "  d =  " << str(this->d) << endl;
+    if (!this->u.empty()) stream << "  u =  " << str(this->u) << endl;
     stream << "}" << endl;
 
     if (!this->d.empty()) {
