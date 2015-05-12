@@ -73,10 +73,21 @@ namespace casadi {
 
     /** \brief Concatenate horizontally, two matrices */
     inline friend MatType horzcat(const MatType &x, const MatType &y) {
-      std::vector<MatType> v(2);
-      v[0] = x;
-      v[1] = y;
-      return horzcat(v);
+      MatType v[] = {x, y};
+      return horzcat(std::vector<MatType>(v, v+2));
+    }
+
+    /** \brief Concatenate horizontally, three matrices */
+    inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z) {
+      MatType v[] = {x, y, z};
+      return horzcat(std::vector<MatType>(v, v+3));
+    }
+
+    /** \brief Concatenate horizontally, four matrices */
+    inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w) {
+      MatType v[] = {x, y, z, w};
+      return horzcat(std::vector<MatType>(v, v+4));
     }
 
     /** \brief Concatenate a list of matrices vertically
@@ -90,10 +101,21 @@ namespace casadi {
 
     /** \brief Concatenate vertically, two matrices */
     inline friend MatType vertcat(const MatType &x, const MatType &y) {
-      std::vector<MatType> v(2);
-      v[0] = x;
-      v[1] = y;
-      return vertcat(v);
+      MatType v[] = {x, y};
+      return vertcat(std::vector<MatType>(v, v+2));
+    }
+
+    /** \brief Concatenate vertically, three matrices */
+    inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z) {
+      MatType v[] = {x, y, z};
+      return vertcat(std::vector<MatType>(v, v+3));
+    }
+
+    /** \brief Concatenate vertically, four matrices */
+    inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w) {
+      MatType v[] = {x, y, z, w};
+      return vertcat(std::vector<MatType>(v, v+4));
     }
 
     /** \brief  split horizontally, retaining groups of columns
@@ -218,10 +240,21 @@ namespace casadi {
 
     /** \brief Concatenate along diagonal, two matrices */
     inline friend MatType diagcat(const MatType &x, const MatType &y) {
-      std::vector<MatType> v(2);
-      v[0] = x;
-      v[1] = y;
-      return diagcat(v);
+      MatType v[] = {x, y};
+      return diagcat(std::vector<MatType>(v, v+2));
+    }
+
+    /** \brief Concatenate along diagonal, three matrices */
+    inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z) {
+      MatType v[] = {x, y, z};
+      return diagcat(std::vector<MatType>(v, v+3));
+    }
+
+    /** \brief Concatenate along diagonal, four matrices */
+    inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w) {
+      MatType v[] = {x, y, z, w};
+      return diagcat(std::vector<MatType>(v, v+4));
     }
 
     /** \brief  split diagonally, retaining square matrices
