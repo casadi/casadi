@@ -399,6 +399,7 @@ namespace casadi {
         if (*i<0) *i += sz;
       }
       getNZ(m, false, kk_mod); // Call recursively
+      return;
     }
 
     // Return reference to the nonzeros
