@@ -437,6 +437,10 @@ namespace casadi {
     // Copy nonzeros
     m = zeros(kk.sparsity());
     for (int el=0; el<k.size(); ++el) {
+      casadi_assert_message(!(ind1 && k[el]<=0), "Matlab is 1-based, but requested index " <<
+                                                k[el] <<  ". Note that negative slices are" <<
+                                                " disabled in the Matlab interface. " <<
+                                                "Possibly you may want to use 'end'.");
       int k_el = k[el]-ind1;
       m.at(el) = at(k_el>=0 ? k_el : k_el+sz);
     }
@@ -495,6 +499,10 @@ namespace casadi {
 
     // Set nonzeros, ignoring negative indices
     for (int el=0; el<k.size(); ++el) {
+      casadi_assert_message(!(ind1 && k[el]<=0), "Matlab is 1-based, but requested index " <<
+                                                k[el] <<  ". Note that negative slices are" <<
+                                                " disabled in the Matlab interface. " <<
+                                                "Possibly you may want to use 'end'.");
       int k_el = k[el]-ind1;
       at(k_el>=0 ? k_el : k_el+sz) = m.at(el);
     }

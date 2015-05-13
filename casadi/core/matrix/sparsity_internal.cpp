@@ -2306,6 +2306,10 @@ namespace casadi {
     if (ind1 || hasNegative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+        casadi_assert_message(!(ind1 && (*i)<=0), "Matlab is 1-based, but requested index " <<
+                                                (*i) <<  ". Note that negative slices are" <<
+                                                " disabled in the Matlab interface. " <<
+                                                "Possibly you may want to use 'end'.");
         if (ind1) (*i)--;
         if (*i<0) *i += numel();
       }

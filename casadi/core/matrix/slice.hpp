@@ -45,7 +45,7 @@ namespace casadi {
     Slice();
 
     /// A single element (explicit to avoid ambiguity with IMatrix overload
-    explicit Slice(int i);
+    explicit Slice(int i, bool ind1=false);
 
     /// A slice
     Slice(int start, int stop, int step=1);

@@ -395,6 +395,10 @@ namespace casadi {
     if (ind1 || *std::min_element(kk.begin(), kk.end())<0) {
       Matrix<int> kk_mod = kk;
       for (vector<int>::iterator i=kk_mod.begin(); i!=kk_mod.end(); ++i) {
+        casadi_assert_message(!(ind1 && (*i)<=0), "Matlab is 1-based, but requested index " <<
+                                                (*i) <<  ". Note that negative slices are" <<
+                                                " disabled in the Matlab interface. " <<
+                                                "Possibly you may want to use 'end'.");
         if (ind1) (*i)--;
         if (*i<0) *i += sz;
       }
@@ -458,6 +462,10 @@ namespace casadi {
     if (ind1 || *std::min_element(kk.begin(), kk.end())<0) {
       Matrix<int> kk_mod = kk;
       for (vector<int>::iterator i=kk_mod.begin(); i!=kk_mod.end(); ++i) {
+        casadi_assert_message(!(ind1 && (*i)<=0), "Matlab is 1-based, but requested index " <<
+                                                (*i) <<  ". Note that negative slices are" <<
+                                                " disabled in the Matlab interface. " <<
+                                                "Possibly you may want to use 'end'.");
         if (ind1) (*i)--;
         if (*i<0) *i += sz;
       }

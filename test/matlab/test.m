@@ -30,7 +30,7 @@ assert(res.isZero())
 
 x = SX.sym('x',4);
 
-f = SXFunction({x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1))});
+f = SXFunction({x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
 f.init()
 
 f.setInput([1,2,3,4])
@@ -42,10 +42,29 @@ for i=1:f.getNumOutputs()
   assert(res.isZero())
 
 end
+
+flag = false;
+try
+  x(5);
+catch
+  flag = true;
+end
+assert(flag);
+
+
+
+flag = false;
+try
+  x(0);
+catch
+  flag = true;
+end
+assert(flag);
+
 
 x = MX.sym('x',4);
 
-f = MXFunction({x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1))});
+f = MXFunction({x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
 f.init()
 
 f.setInput([1,2,3,4])
@@ -58,6 +77,22 @@ for i=1:f.getNumOutputs()
 
 end
 
+
+flag = false;
+try
+  x(5);
+catch
+  flag = true;
+end
+assert(flag);
+
+flag = false;
+try
+  x(0);
+catch
+  flag = true;
+end
+assert(flag);
 
 clear
 

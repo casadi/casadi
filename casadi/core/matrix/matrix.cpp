@@ -35,7 +35,7 @@ namespace casadi {
 
   template<>
   Slice Matrix<int>::toSlice(bool ind1) const {
-    return isScalar() ? Slice(toScalar()-ind1) : Slice(data(), ind1);
+    return isScalar() ? Slice(toScalar(), ind1) : Slice(data(), ind1);
   }
 
 } // namespace casadi
