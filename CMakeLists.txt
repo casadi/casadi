@@ -190,7 +190,7 @@ string(TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 ############################# C++11 ####################################
 ########################################################################
 # Check if the compiler supports C++11
-foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x" "-std=c++11 --DUSE_TR1_HASHMAP" "-std=c++0x -DUSE_TR1_HASHMAP")
+foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x")
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
@@ -215,6 +215,8 @@ if(USE_CXX11)
     message(STATUS "No flag needed for enabling C++11 features.")
   endif()
   add_definitions(-DUSE_CXX11)
+else()
+  message(STATUS "Cannot enable C++11 features.")
 endif()
 add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficiency and is required for some examples).")
 

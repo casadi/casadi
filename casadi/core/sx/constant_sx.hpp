@@ -34,13 +34,8 @@
 // Cashing of constants requires a map (preferably a hash map)
 #ifdef USE_CXX11
 // Using C++11 unordered_map (hash map)
-#ifdef USE_TR1_HASHMAP
-#include <tr1/unordered_map>
-#define CACHING_MAP std::tr1::unordered_map
-#else // USE_TR1_HASHMAP
 #include <unordered_map>
 #define CACHING_MAP std::unordered_map
-#endif // USE_TR1_HASHMAP
 #else // USE_CXX11
 // Falling back to std::map (binary search tree)
 #include <map>

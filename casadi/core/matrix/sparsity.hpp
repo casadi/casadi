@@ -50,15 +50,10 @@
 // Cashing requires a multimap (preferably a hash map)
 #ifdef USE_CXX11
 // Using C++11 unordered_multimap (hash map)
-#ifdef USE_TR1_HASHMAP
-#include <tr1/unordered_map>
-#define CACHING_MULTIMAP std::tr1::unordered_multimap
-#else // USE_TR1_HASHMAP
 #include <unordered_map>
 #define CACHING_MULTIMAP std::unordered_multimap
-#endif // USE_TR1_HASHMAP
 #else // USE_CXX11
-// Falling back to std::map (binary search tree)
+// Falling back to std::multimap (binary search tree)
 #include <map>
 #define CACHING_MULTIMAP std::multimap
 #endif // USE_CXX11
