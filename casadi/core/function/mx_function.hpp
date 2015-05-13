@@ -28,7 +28,6 @@
 
 #include <set>
 #include <iostream>
-
 #include "../mx/mx.hpp"
 #include "sx_function.hpp"
 
@@ -80,26 +79,31 @@ public:
 
 #ifndef SWIG
   /** \brief  Single input, single output */
-  MXFunction(const MX& input, const MX& output);
+  MXFunction(const MX& arg, const MX& res);
 
   /** \brief  Single input, multiple output */
-  MXFunction(const MX& input, const std::vector<MX>& output);
+  MXFunction(const MX& arg, const std::vector<MX>& res);
 
   /** \brief  Multiple input, single output */
-  MXFunction(const std::vector<MX>& input, const MX& output);
+  MXFunction(const std::vector<MX>& arg, const MX& res);
+
+#ifdef USE_CXX11
+  /** \brief  Initializer lists */
+  MXFunction(std::initializer_list<MX> arg, std::initializer_list<MX> res);
+#endif // USE_CXX11
 #endif // SWIG
 
   /** \brief  Multiple input, multiple output*/
-  MXFunction(const std::vector<MX>& input, const std::vector<MX>& output);
+  MXFunction(const std::vector<MX>& arg, const std::vector<MX>& res);
 
   /** \brief  Multiple input, multiple output*/
-  MXFunction(const std::vector<MX>& input, const IOSchemeVector< MX >& output);
+  MXFunction(const std::vector<MX>& arg, const IOSchemeVector<MX>& res);
 
   /** \brief  Multiple input, multiple output*/
-  MXFunction(const IOSchemeVector< MX >& input, const std::vector<MX>& output);
+  MXFunction(const IOSchemeVector<MX>& arg, const std::vector<MX>& res);
 
   /** \brief  Multiple input, multiple output*/
-  MXFunction(const IOSchemeVector< MX >& input, const IOSchemeVector< MX >& output);
+  MXFunction(const IOSchemeVector<MX>& arg, const IOSchemeVector<MX>& res);
 
   /// \cond INTERNAL
   /** \brief  Access functions of the node */

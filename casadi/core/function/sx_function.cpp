@@ -36,146 +36,130 @@
 
 namespace casadi {
 
-using namespace std;
+  using namespace std;
 
 
-SXFunction::SXFunction() {
-}
+  SXFunction::SXFunction() {
+  }
 
-SXFunction::SXFunction(const SX& arg, const SX& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(1, arg),
-                                    vector<SX>(1, res)));
-}
+  SXFunction::SXFunction(const SX& arg, const SX& res) {
+    assignNode(new SXFunctionInternal(vector<SX>(1, arg), vector<SX>(1, res)));
+  }
 
-SXFunction::SXFunction(const vector< vector<SXElement> >& arg,
-                       const vector< vector<SXElement> >& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(arg.begin(), arg.end()),
-                                    vector<SX>(res.begin(), res.end())));
-}
+  SXFunction::SXFunction(const vector<SX>& arg, const vector<SX>& res) {
+    assignNode(new SXFunctionInternal(arg, res));
+  }
 
-SXFunction::SXFunction(const vector< SX>& arg, const vector<SX>& res) {
-  assignNode(new SXFunctionInternal(arg, res));
-}
+  SXFunction::SXFunction(const vector<SX>& arg, const IOSchemeVector<SX>& res) {
+    assignNode(new SXFunctionInternal(arg, res));
+    setOutputScheme(res.scheme);
+  }
 
-SXFunction::SXFunction(const vector< SX>& arg, const IOSchemeVector< SX >& res) {
-  assignNode(new SXFunctionInternal(arg, res));
-  setOutputScheme(res.scheme);
-}
+  SXFunction::SXFunction(const IOSchemeVector<SX>& arg, const vector<SX>& res) {
+    assignNode(new SXFunctionInternal(arg, res));
+    setInputScheme(arg.scheme);
+  }
 
-SXFunction::SXFunction(const IOSchemeVector< SX >& arg, const vector< SX>& res) {
-  assignNode(new SXFunctionInternal(arg, res));
-  setInputScheme(arg.scheme);
-}
+  SXFunction::SXFunction(const IOSchemeVector<SX>& arg, const IOSchemeVector<SX>& res) {
+    assignNode(new SXFunctionInternal(arg, res));
+    setInputScheme(arg.scheme);
+    setOutputScheme(res.scheme);
+  }
 
-SXFunction::SXFunction(const IOSchemeVector< SX >& arg, const IOSchemeVector< SX >& res) {
-  assignNode(new SXFunctionInternal(arg, res));
-  setInputScheme(arg.scheme);
-  setOutputScheme(res.scheme);
-}
+  SXFunction::SXFunction(const vector<SX>& arg, const SX& res) {
+    assignNode(new SXFunctionInternal(arg, vector<SX>(1, res)));
+  }
 
-SXFunction::SXFunction(const vector< vector<SXElement> >& arg, const SX& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(arg.begin(), arg.end()),
-                                    vector<SX>(1, res)));
-}
+  SXFunction::SXFunction(const SX& arg, const std::vector<SX>& res) {
+    assignNode(new SXFunctionInternal(vector<SX>(1, arg), res));
+  }
 
-SXFunction::SXFunction(const vector< SX>& arg, const SX& res) {
-  assignNode(new SXFunctionInternal(arg,
-                                    vector<SX>(1, res)));
-}
+#ifdef USE_CXX11
+  SXFunction::SXFunction(std::initializer_list<SX> arg, std::initializer_list<SX> res) {
+    assignNode(new SXFunctionInternal(vector<SX>(arg), vector<SX>(res)));
+  }
+#endif // USE_CXX11
 
-SXFunction::SXFunction(const SX& arg, const std::vector< std::vector<SXElement> >& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(1, arg),
-                                    vector<SX>(res.begin(), res.end())));
+  const SXFunctionInternal* SXFunction::operator->() const {
+    return static_cast<const SXFunctionInternal*>(Function::operator->());
+  }
 
-}
+  SXFunctionInternal* SXFunction::operator->() {
+    return static_cast<SXFunctionInternal*>(Function::operator->());
+  }
 
-SXFunction::SXFunction(const SX& arg, const std::vector< SX>& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(1, arg),
-                                    res));
-}
+  bool SXFunction::testCast(const SharedObjectNode* ptr) {
+    return dynamic_cast<const SXFunctionInternal*>(ptr)!=0;
+  }
 
+  SX SXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
+    return (*this)->jac(iind, oind, compact, symmetric);
+  }
 
-const SXFunctionInternal* SXFunction::operator->() const {
-  return static_cast<const SXFunctionInternal*>(Function::operator->());
-}
+  SX SXFunction::grad(int iind, int oind) {
+    return (*this)->grad(iind, oind);
+  }
 
-SXFunctionInternal* SXFunction::operator->() {
-  return static_cast<SXFunctionInternal*>(Function::operator->());
-}
+  SX SXFunction::tang(int iind, int oind) {
+    return (*this)->tang(iind, oind);
+  }
 
-bool SXFunction::testCast(const SharedObjectNode* ptr) {
-  return dynamic_cast<const SXFunctionInternal*>(ptr)!=0;
-}
+  SX SXFunction::hess(int iind, int oind) {
+    return (*this)->hess(iind, oind);
+  }
 
-SX SXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
-  return (*this)->jac(iind, oind, compact, symmetric);
-}
+  const SX& SXFunction::inputExpr(int ind) const {
+    return (*this)->inputv_.at(ind);
+  }
 
-SX SXFunction::grad(int iind, int oind) {
-  return (*this)->grad(iind, oind);
-}
+  const SX& SXFunction::outputExpr(int ind) const {
+    return (*this)->outputv_.at(ind);
+  }
 
-SX SXFunction::tang(int iind, int oind) {
-  return (*this)->tang(iind, oind);
-}
+  const std::vector<SX>& SXFunction::inputExpr() const {
+    return (*this)->inputv_;
+  }
 
-SX SXFunction::hess(int iind, int oind) {
-  return (*this)->hess(iind, oind);
-}
+  const std::vector<SX> & SXFunction::outputExpr() const {
+    return (*this)->outputv_;
+  }
 
-const SX& SXFunction::inputExpr(int ind) const {
-  return (*this)->inputv_.at(ind);
-}
+  const vector<ScalarAtomic>& SXFunction::algorithm() const {
+    return (*this)->algorithm_;
+  }
 
-const SX& SXFunction::outputExpr(int ind) const {
-  return (*this)->outputv_.at(ind);
-}
+  int SXFunction::countNodes() const {
+    assertInit();
+    return algorithm().size() - getNumOutputNonzeros();
+  }
 
-const std::vector<SX>& SXFunction::inputExpr() const {
-  return (*this)->inputv_;
-}
+  void SXFunction::clearSymbolic() {
+    (*this)->clearSymbolic();
+  }
 
-const std::vector<SX> & SXFunction::outputExpr() const {
-  return (*this)->outputv_;
-}
-
-const vector<ScalarAtomic>& SXFunction::algorithm() const {
-  return (*this)->algorithm_;
-}
-
-int SXFunction::countNodes() const {
-  assertInit();
-  return algorithm().size() - getNumOutputNonzeros();
-}
-
-void SXFunction::clearSymbolic() {
-  (*this)->clearSymbolic();
-}
-
-SXFunction::SXFunction(const MXFunction& f) {
-  MXFunction f2 = f;
-  SXFunction t = f2.expand();
-  assignNode(t.get());
-}
-
-SXFunction::SXFunction(const Function& f) {
-  const SXFunctionInternal* temp = dynamic_cast<const SXFunctionInternal*>(f.get());
-  if (temp) {
-    assignNode(temp->clone());
-  } else {
-    MXFunction f2(f);
+  SXFunction::SXFunction(const MXFunction& f) {
+    MXFunction f2 = f;
     SXFunction t = f2.expand();
     assignNode(t.get());
   }
-}
 
-SX SXFunction::getFree() const {
-  return (*this)->free_vars_;
-}
+  SXFunction::SXFunction(const Function& f) {
+    const SXFunctionInternal* temp = dynamic_cast<const SXFunctionInternal*>(f.get());
+    if (temp) {
+      assignNode(temp->clone());
+    } else {
+      MXFunction f2(f);
+      SXFunction t = f2.expand();
+      assignNode(t.get());
+    }
+  }
 
-int SXFunction::getWorkSize() const {
-  return (*this)->rtmp_.size();
-}
+  SX SXFunction::getFree() const {
+    return (*this)->free_vars_;
+  }
+
+  int SXFunction::getWorkSize() const {
+    return (*this)->rtmp_.size();
+  }
 
 } // namespace casadi
-

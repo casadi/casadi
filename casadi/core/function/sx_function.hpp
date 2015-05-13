@@ -27,6 +27,9 @@
 #define CASADI_SX_FUNCTION_HPP
 
 #include "function.hpp"
+#ifdef USE_CXX11
+#include <initializer_list>
+#endif // USE_CXX11
 
 namespace casadi {
 
@@ -71,13 +74,13 @@ namespace casadi {
     explicit SXFunction(const Function &f);
 
     /// Multiple (matrix valued) input, multiple (matrix valued) output
-    SXFunction(const std::vector< SX>& arg, const std::vector<SX>& res);
+    SXFunction(const std::vector<SX>& arg, const std::vector<SX>& res);
 
     /// Multiple (matrix valued) input, multiple (matrix valued) output
-    SXFunction(const std::vector< SX>& arg, const IOSchemeVector< SX >& res);
+    SXFunction(const std::vector<SX>& arg, const IOSchemeVector<SX>& res);
 
     /// Multiple (matrix valued) input, multiple (matrix valued) output
-    SXFunction(const IOSchemeVector< SX >& arg, const std::vector< SX>& res);
+    SXFunction(const IOSchemeVector<SX>& arg, const std::vector<SX>& res);
 
     /** \brief Multiple (matrix valued) input, multiple (matrix valued) output
     
@@ -103,28 +106,22 @@ namespace casadi {
     \enddoctest
     
     */
-    SXFunction(const IOSchemeVector< SX >& arg, const IOSchemeVector< SX >& res);
+    SXFunction(const IOSchemeVector<SX>& arg, const IOSchemeVector<SX>& res);
 
 #ifndef SWIG
-
-    /// Multiple (vector valued) input, multiple (vector valued) output
-    SXFunction(const std::vector< std::vector<SXElement> >& arg,
-               const std::vector< std::vector<SXElement> >& res);
-
     /// Single (scalar/matrix/vector valued) input, single (scalar/matrix/vector valued) output
     SXFunction(const SX& arg, const SX& res);
 
-    /// Multiple (vector valued) input, single (scalar/vector/matrix valued) output
-    SXFunction(const std::vector< std::vector<SXElement> >& arg, const SX& res);
-
     /// Multiple (matrix valued) input, single (scalar/vector/matrix valued) output
-    SXFunction(const std::vector< SX>& arg, const SX& res);
-
-    /// Single (scalar/vector/matrix valued) input, multiple (vector valued) output
-    SXFunction(const SX& arg, const std::vector< std::vector<SXElement> >& res);
+    SXFunction(const std::vector<SX>& arg, const SX& res);
 
     /// Single (scalar/vector/matrix valued) input, multiple (matrix valued) output
-    SXFunction(const SX& arg, const std::vector< SX>& res);
+    SXFunction(const SX& arg, const std::vector<SX>& res);
+
+#ifdef USE_CXX11
+    /** \brief  Initializer lists */
+    SXFunction(std::initializer_list<SX> arg, std::initializer_list<SX> res);
+#endif // USE_CXX11
 #endif // SWIG
 
 /// \cond INTERNAL
