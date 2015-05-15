@@ -123,6 +123,7 @@ set(CASADI_SRCS
   function/lr_dle_solver.hpp       function/lr_dle_solver.cpp       function/lr_dle_internal.hpp   function/lr_dle_internal.cpp
   function/cle_solver.hpp          function/cle_solver.cpp          function/cle_internal.hpp      function/cle_internal.cpp
   function/wrapper.hpp             function/adaptor.hpp             function/dense_io.hpp
+  function/switch.hpp              function/switch.cpp              function/switch_internal.hpp   function/switch_internal.cpp
 
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
