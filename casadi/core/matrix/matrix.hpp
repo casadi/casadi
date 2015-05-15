@@ -408,8 +408,11 @@ namespace casadi {
     void zz_expand(Matrix<DataType> &weights, Matrix<DataType>& terms) const;
     Matrix<DataType> zz_pw_const(const Matrix<DataType> &tval, const Matrix<DataType> &val) const;
     Matrix<DataType> zz_pw_lin(const Matrix<DataType> &tval, const Matrix<DataType> &val) const;
-    Matrix<DataType> zz_if_else(const Matrix<DataType> &if_true,
-                                const Matrix<DataType> &if_false) const;
+    Matrix<DataType> zz_if_else(const Matrix<DataType> &if_true, const Matrix<DataType> &if_false,
+                                bool short_circuit=true) const;
+    Matrix<DataType> zz_conditional(const std::vector<Matrix<DataType> > &x,
+                                    const Matrix<DataType> &x_default,
+                                    bool short_circuit=true) const;
     Matrix<DataType> zz_heaviside() const;
     Matrix<DataType> zz_rectangle() const;
     Matrix<DataType> zz_triangle() const;

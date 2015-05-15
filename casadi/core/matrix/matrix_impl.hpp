@@ -2686,9 +2686,20 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_if_else(const Matrix<DataType> &if_true,
-                                                const Matrix<DataType> &if_false) const {
-    throw CasadiException("\"if_else\" not defined for instantiation");
-    return Matrix<DataType>();
+                                                const Matrix<DataType> &if_false,
+                                                bool short_circuit) const {
+    return *this*if_true + !*this*if_false;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::zz_conditional(const std::vector<Matrix<DataType> > &x,
+                                                    const Matrix<DataType> &x_default,
+                                                    bool short_circuit) const {
+    Matrix<DataType> ret = x_default;
+    for (int k=0; k<x.size(); ++k) {
+      ret = if_else(*this==k, x[k], ret, short_circuit);
+    }
+    return ret;
   }
 
   template<typename DataType>

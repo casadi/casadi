@@ -277,7 +277,7 @@ namespace casadi {
     /** \brief inline if-test */
     /// replaces the ternary conditional operator "?:", which cannot be overloaded
     friend SXElement if_else(const SXElement& cond, const SXElement& if_true,
-                             const SXElement& if_false);
+                             const SXElement& if_false, bool short_circuit);
     /** @} */
   };
 
@@ -340,8 +340,8 @@ namespace casadi {
   template<> void SX::zz_expand(SX &weights, SX& terms) const;
   template<> SX SX::zz_pw_const(const SX &tval, const SX &val) const;
   template<> SX SX::zz_pw_lin(const SX &tval, const SX &val) const;
-  template<> SX SX::zz_if_else(const SX &if_true,
-                               const SX &if_false) const;
+  template<> SX SX::zz_if_else(const SX &if_true, const SX &if_false,
+                               bool short_circuit) const;
   template<> SX SX::zz_heaviside() const;
   template<> SX SX::zz_rectangle() const;
   template<> SX SX::zz_triangle() const;

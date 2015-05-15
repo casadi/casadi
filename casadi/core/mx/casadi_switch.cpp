@@ -129,7 +129,7 @@ namespace casadi {
 
   void Switch::evalMX(const vector<MX>& arg, vector<MX>& res) {
     vector<MX> arg1(arg.begin()+1, arg.end());
-    res = conditional(arg.at(0), arg1, f_, f_def_);
+    res = conditional2(arg.at(0), arg1, f_, f_def_);
   }
 
   void Switch::evalFwd(const vector<vector<MX> >& fseed,
@@ -164,7 +164,7 @@ namespace casadi {
     }
 
     // Conditional call
-    v = conditional(c, v, der, der_def);
+    v = conditional2(c, v, der, der_def);
     vector<MX>::const_iterator v_it = v.begin();
 
     // Collect forward sensitivities
@@ -209,7 +209,7 @@ namespace casadi {
     }
 
     // Conditional call
-    v = conditional(c, v, der, der_def);
+    v = conditional2(c, v, der, der_def);
     vector<MX>::const_iterator v_it = v.begin();
 
     // Collect adjoint sensitivities
@@ -341,7 +341,7 @@ namespace casadi {
          << f_def_.getOption("name") << ", " << f_[0].getOption("name") << ")";
     } else {
       // Print generic
-      ss << "conditional(" << arg[0] << ", " << printArg(arg) << ", [";
+      ss << "conditional2(" << arg[0] << ", " << printArg(arg) << ", [";
       for (int k=0; k<f_.size(); ++k) {
         if (k!=0) ss << ", ";
         ss << f_[k].getOption("name");

@@ -403,7 +403,8 @@ namespace casadi {
     return node;
   }
 
-  SXElement if_else(const SXElement& cond, const SXElement& if_true, const SXElement& if_false) {
+  SXElement if_else(const SXElement& cond, const SXElement& if_true,
+                    const SXElement& if_false, bool short_circuit) {
     return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
   }
 
@@ -1146,8 +1147,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_if_else(const SX &if_true,
-                    const SX &if_false) const {
+  SX SX::zz_if_else(const SX &if_true, const SX &if_false, bool short_circuit) const {
     return if_else_zero(*this, if_true) + if_else_zero(!*this, if_false);
   }
 

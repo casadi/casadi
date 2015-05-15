@@ -436,7 +436,13 @@ namespace casadi {
     MX zz_reshape(int nrow, int ncol) const;
     MX zz_reshape(const Sparsity& sp) const;
     MX zz_vecNZ() const;
-    MX zz_if_else(const MX &if_true, const MX &if_false) const;
+    MX zz_if_else(const MX &if_true, const MX &if_false, bool short_circuit=true) const;
+    MX zz_conditional(const std::vector<MX> &x, const MX &x_default,
+                      bool short_circuit=true) const;
+    std::vector<MX> zz_if_else(const std::vector<MX>& arg, const Function &f_true,
+                               const Function &f_false) const;
+    std::vector<MX> zz_conditional(const std::vector<MX>& arg, const std::vector<Function> &f,
+                                   const Function &f_default) const;
     MX zz_unite(const MX& B) const;
     MX zz_trace() const;
     static MX zz_createParent(std::vector<MX> &deps);
@@ -486,10 +492,6 @@ namespace casadi {
 #ifndef SWIG
     bool zz_isEqual(const MXNode* y, int depth=0) const;
 #endif // SWIG
-    std::vector<MX> zz_if_then_else(const std::vector<MX>& arg, const Function &f_true,
-                                    const Function &f_false) const;
-    std::vector<MX> zz_conditional(const std::vector<MX>& arg, const std::vector<Function> &f,
-                                   const Function &f_default) const;
     MX zz_find() const;
     /// \endcond
 

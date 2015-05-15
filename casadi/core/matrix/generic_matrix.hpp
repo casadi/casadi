@@ -371,10 +371,19 @@ namespace casadi {
     /** \brief Branching on MX nodes
         Ternary operator, "cond ? if_true : if_false"
     */
-    inline friend MatType if_else(const MatType &cond,
-                                  const MatType &if_true,
-                                  const MatType &if_false) {
-      return cond.zz_if_else(if_true, if_false);
+    inline friend MatType if_else(const MatType &cond, const MatType &if_true,
+                                  const MatType &if_false, bool short_circuit=true) {
+      return cond.zz_if_else(if_true, if_false, short_circuit);
+    }
+
+    /** \brief Create a switch
+     *
+     * If the condition \param ind evaluates to the integer k, where 0<=k<f.size(),
+     * then x[k] will be returned, otherwise \param x_default will be returned.
+     */
+    inline friend MatType conditional(const MatType& ind, const std::vector<MatType> &x,
+                                      const MatType &x_default, bool short_circuit=true) {
+      return ind.zz_conditional(x, x_default, short_circuit);
     }
 
     /** \brief Check if expression depends on the argument
