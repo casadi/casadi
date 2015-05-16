@@ -188,27 +188,6 @@ namespace casadi {
   inline MX pinv(const MX& A, const std::string& lsolver,
                  const Dictionary& dict = Dictionary()) { return A.zz_pinv(lsolver, dict);}
 
-  /** \brief Create a if_else statement
-  *
-  * If the condition \param cond evaluates to true (i.e. nonzero), \param f_true will
-  * be evaluated, \param otherwise f_false will be evaluated.
-  */
-  inline std::vector<MX> if_else2(const MX& cond, const std::vector<MX>& arg,
-                                 const Function &f_true, const Function &f_false) {
-    return cond.zz_if_else(arg, f_true, f_false);
-  }
-
-  /** \brief Create a switch
-   *
-   * If the condition \param ind evaluates to the integer k, where 0<=k<f.size(),
-   * then f[k] will be evaluated, otherwise \param f_default will be evaluated.
-   */
-  inline std::vector<MX>
-  conditional2(const MX& ind, const std::vector<MX>& arg,
-              const std::vector<Function> &f, const Function &f_default) {
-    return ind.zz_conditional(arg, f, f_default);
-  }
-
   /** \brief Find first nonzero
    * If failed, returns the number of rows
    */

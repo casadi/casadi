@@ -35,6 +35,9 @@ namespace casadi {
 
     // Consitency check
     casadi_assert(!f_.empty());
+
+    // Give a name
+    setOption("name", "unnamed_switch");
   }
 
   SwitchInternal::~SwitchInternal() {

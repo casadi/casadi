@@ -35,6 +35,7 @@
 #include "norm.hpp"
 #include "../casadi_math.hpp"
 #include "../function/mx_function_internal.hpp"
+#include "../function/switch.hpp"
 
 using namespace std;
 namespace casadi {
@@ -1281,7 +1282,7 @@ namespace casadi {
       arg.push_back(x_false);
       arg = getSymbols(arg);
 
-      // Form functions
+      // Form functions for cases
       MXFunction f_true(arg, x_true);
       f_true.setOption("name", "f_true");
       f_true.init();
@@ -1289,9 +1290,15 @@ namespace casadi {
       f_false.setOption("name", "f_false");
       f_false.init();
 
-      // Conditional call with functions
-      return if_else2(*this, arg, f_true, f_false).at(0);
+      // Form Switch
+      Switch sw(f_true, f_false);
+      sw.init();
 
+      // Call the Switch
+      vector<MX> sw_arg;
+      sw_arg.push_back(*this);
+      sw_arg.insert(sw_arg.end(), arg.begin(), arg.end());
+      return sw(sw_arg).at(0);
     } else {
       return if_else_zero(*this, x_true) + if_else_zero(!*this, x_false);
     }
@@ -1304,21 +1311,26 @@ namespace casadi {
       arg.push_back(x_default);
       arg = getSymbols(arg);
 
-      // Form functions
+      // Form functions for cases
       vector<Function> f(x.size());
       for (int k=0; k<x.size(); ++k) {
         f[k] = MXFunction(arg, x[k]);
         stringstream ss;
         ss << "f_case" << k;
         f[k].setOption("name", ss.str());
-        f[k].init();
       }
       MXFunction f_default(arg, x_default);
       f_default.setOption("name", "f_default");
-      f_default.init();
 
-      // Conditional call with functions
-      return conditional2(*this, arg, f, f_default).at(0);
+      // Form Switch
+      Switch sw(f, f_default);
+      sw.init();
+
+      // Call the Switch
+      vector<MX> sw_arg;
+      sw_arg.push_back(*this);
+      sw_arg.insert(sw_arg.end(), arg.begin(), arg.end());
+      return sw(sw_arg).at(0);
     } else {
       MX ret = x_default;
       for (int k=0; k<x.size(); ++k) {
@@ -1326,16 +1338,6 @@ namespace casadi {
       }
       return ret;
     }
-  }
-
-  std::vector<MX> MX::zz_if_else(const std::vector<MX>& arg, const Function &f_true,
-                                 const Function &f_false) const {
-    return conditional2(*this, arg, vector<Function>(1, f_false), f_true);
-  }
-
-  std::vector<MX> MX::zz_conditional(const std::vector<MX>& arg, const std::vector<Function> &f,
-                                     const Function &f_default) const {
-    return (*this)->getConditional(arg, f, f_default);
   }
 
   MX MX::zz_unite(const MX& B) const {

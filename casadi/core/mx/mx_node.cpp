@@ -37,7 +37,6 @@
 #include "setnonzeros.hpp"
 #include "set_sparse.hpp"
 #include "solve.hpp"
-#include "casadi_switch.hpp"
 #include "unary_mx.hpp"
 #include "binary_mx.hpp"
 #include "determinant.hpp"
@@ -914,12 +913,6 @@ namespace casadi {
         *res++ = 0;
       }
     }
-  }
-
-  std::vector<MX>
-  MXNode::getConditional(const std::vector<MX>& arg,
-                         const std::vector<Function> &f, const Function &f_default) const {
-    return Switch::create(shared_from_this<MX>(), arg, f, f_default);
   }
 
 } // namespace casadi

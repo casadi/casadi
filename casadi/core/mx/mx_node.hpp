@@ -391,11 +391,6 @@ namespace casadi {
     /// Find
     MX getFind() const;
 
-    /// Conditional evaluation
-    virtual std::vector<MX>
-      getConditional(const std::vector<MX>& arg,
-                     const std::vector<Function> &f, const Function &f_default) const;
-
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe
         The variable is initialized to zero
