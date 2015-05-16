@@ -24,6 +24,7 @@
 
 
 #include "switch_internal.hpp"
+#include "mx_function.hpp"
 
 using namespace std;
 
@@ -111,6 +112,7 @@ namespace casadi {
   }
 
   Function SwitchInternal::getDerForward(int nfwd) {
+    // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
       if (!f_[k].isNull()) der[k] = f_[k].derForward(nfwd);
@@ -120,11 +122,38 @@ namespace casadi {
     Function der_def;
     if (!f_def_.isNull()) der_def = f_def_.derForward(nfwd);
 
-    // Form directional derivative
-    return Switch(der, der_def);
+    // New Switch for derivatives
+    Switch sw(der, der_def);
+    sw.init();
+
+    // Construct wrapper inputs and arguments for calling sw
+    vector<MX> arg = symbolicInput();
+    vector<MX> res = symbolicOutput();
+    vector<vector<MX> > seed = symbolicFwdSeed(nfwd, arg);
+    // Wrapper input being constructed
+    vector<MX> w_in = arg;
+    w_in.insert(w_in.end(), res.begin(), res.end());
+    // Arguments for calling sw being constructed
+    vector<MX> v;
+    v.push_back(arg.at(0)); // index
+    for (int d=0; d<nfwd; ++d) {
+      // ignore seed for ind
+      seed[d][0] = MX::sym(seed[d][0].getName(), Sparsity::scalar(false));
+      // Add to wrapper input
+      w_in.insert(w_in.end(), seed[d].begin(), seed[d].end());
+      // Add to sw argument vector
+      v.insert(v.end(), arg.begin()+1, arg.end());
+      v.insert(v.end(), res.begin(), res.end());
+      v.insert(v.end(), seed[d].begin()+1, seed[d].end());
+    }
+
+    // Create wrapper
+    MXFunction ret(w_in, sw(v));
+    return ret;
   }
 
   Function SwitchInternal::getDerReverse(int nadj) {
+    // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
       if (!f_[k].isNull()) der[k] = f_[k].derReverse(nadj);
@@ -134,8 +163,43 @@ namespace casadi {
     Function der_def;
     if (!f_def_.isNull()) der_def = f_def_.derReverse(nadj);
 
-    // Form directional derivative
-    return Switch(der, der_def);
+    // New Switch for derivatives
+    Switch sw(der, der_def);
+    sw.init();
+
+    // Construct wrapper inputs and arguments for calling sw
+    vector<MX> arg = symbolicInput();
+    vector<MX> res = symbolicOutput();
+    vector<vector<MX> > seed = symbolicAdjSeed(nadj, res);
+    vector<MX> w_in = arg;
+    w_in.insert(w_in.end(), res.begin(), res.end());
+    // Arguments for calling sw being constructed
+    vector<MX> v;
+    v.push_back(arg.at(0)); // index
+    for (int d=0; d<nadj; ++d) {
+      // Add to wrapper input
+      w_in.insert(w_in.end(), seed[d].begin(), seed[d].end());
+      // Add to sw argument vector
+      v.insert(v.end(), arg.begin()+1, arg.end());
+      v.insert(v.end(), res.begin(), res.end());
+      v.insert(v.end(), seed[d].begin(), seed[d].end());
+    }
+
+    // Construct wrapper outputs
+    v = sw(v);
+    vector<MX> w_out;
+    MX ind_sens = MX(1, 1); // no dependency on index
+    vector<MX>::const_iterator v_it = v.begin(), v_it_next;
+    for (int d=0; d<nadj; ++d) {
+      w_out.push_back(ind_sens);
+      v_it_next = v_it + (getNumInputs()-1);
+      w_out.insert(w_out.end(), v_it, v_it_next);
+      v_it = v_it_next;
+    }
+
+    // Create wrapper
+    MXFunction ret(w_in, w_out);
+    return ret;
   }
 
   void SwitchInternal::nTmp(size_t& ni, size_t& nr) const {
