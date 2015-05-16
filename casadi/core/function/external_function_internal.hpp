@@ -85,7 +85,7 @@ namespace casadi {
     typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
                                const int **colind, const int **row);
     typedef int (*workPtr)(int *ni, int *nr);
-    typedef int (*evalPtr)(const double* const* arg, double* const* res, int* iw, double* w);
+    typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
     ///@}
 
     /** \brief  Name of binary */

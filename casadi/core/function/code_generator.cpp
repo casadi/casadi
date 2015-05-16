@@ -73,7 +73,7 @@ namespace casadi {
     if (this->with_header) {
       this->header
         << "extern int " << fname
-        << "(const real_t* const* arg, real_t* const* res, int* iw, real_t* w);" << endl;
+        << "(const real_t** arg, real_t** res, int* iw, real_t* w);" << endl;
     }
     f->generateMeta(*this, fname);
   }

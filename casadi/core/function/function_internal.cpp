@@ -1971,7 +1971,7 @@ namespace casadi {
     // Define function
     g.body
       << "/* " << getSanitizedName() << " */" << endl
-      << "int " << fname << "(const real_t* const* arg, real_t* const* res, int* iw, real_t* w) {"
+      << "int " << fname << "(const real_t** arg, real_t** res, int* iw, real_t* w) {"
       << endl;
 
     // Insert the function body
