@@ -89,19 +89,24 @@ namespace casadi {
     }
   }
 
-  void OmpMap::evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp) {
+  void OmpMap::evalD(cp_double* arg, p_double* res, int* iw, double* w) {
 #ifndef WITH_OPENMP
     // Not available, switching to serial mode
-    Map::evalD(arg, res, itmp, rtmp);
+    Map::evalD(arg, res, iw, w);
 #else // WITH_OPENMP
     int f_num_in = fcn_.getNumInputs();
     int f_num_out = fcn_.getNumOutputs();
-    size_t ni, nr;
-    fcn_.nTmp(ni, nr);
+    size_t n_arg, n_res, n_iw, n_w;
+    fcn_.nwork(n_arg, n_res, n_iw, n_w);
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
-      fcn_->evalD(arg + i*f_num_in, res + i*f_num_out,
-                  itmp + i*ni, rtmp + i*nr);
+      const double* arg_thread = arg + n_*n_in + i*(n_in+n_arg);
+      copy(arg+i*n_in, arg+(i+1)*n_in, arg_thread);
+      double* res_thread = res + n_*n_out + i*(n_out+n_res);
+      copy(res+i*n_out, res+(i+1)*n_out, res_thread);
+      int* iw_thread = iw + i*n_iw;
+      double* w_thread = w + i*n_w;
+      fcn_->evalD(arg_thread, res_thread, iw_thread, w_local);
     }
 #endif // WITH_OPENMP
   }
@@ -230,14 +235,18 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void Map::nTmp(size_t& ni, size_t& nr) {
-    fcn_.nTmp(ni, nr);
+  void Map::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
+    fcn_.nwork(n_arg, n_res, n_iw, n_w);
   }
 
-  void OmpMap::nTmp(size_t& ni, size_t& nr) {
-    fcn_.nTmp(ni, nr);
-    ni *= static_cast<size_t>(n_);
-    nr *= static_cast<size_t>(n_);
+  void OmpMap::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
+    fcn_.nwork(n_arg, n_res, n_iw, n_w);
+    n_arg += static_cast<size_t>(ndep());
+    n_res += static_cast<size_t>(nout());
+    n_arg *= static_cast<size_t>(n_);
+    n_res *= static_cast<size_t>(n_);
+    n_iw *= static_cast<size_t>(n_);
+    n_w *= static_cast<size_t>(n_);
   }
 
   std::vector<std::vector<MX> >

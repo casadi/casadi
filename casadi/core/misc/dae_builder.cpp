@@ -1509,8 +1509,6 @@ namespace casadi {
     f.setOption("name", fname);
     f.init();
     g.add(f, fname);
-    size_t ni, nr;
-    f.nTmp(ni, nr);
 
     // Forward mode directional derivative
     if (fwd) {

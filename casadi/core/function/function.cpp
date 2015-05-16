@@ -207,8 +207,8 @@ namespace casadi {
     (*this)->spEvaluate(fwd);
   }
 
-  void Function::nTmp(size_t& ni, size_t& nr) const {
-    (*this)->nTmp(ni, nr);
+  void Function::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
+    (*this)->nwork(n_arg, n_res, n_iw, n_w);
   }
 
   void Function::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {

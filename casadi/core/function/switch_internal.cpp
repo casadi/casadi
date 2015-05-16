@@ -89,6 +89,31 @@ namespace casadi {
 
     // Call the initialization method of the base class
     FunctionInternal::init();
+
+    // Get required work
+    for (int k=0; k<=f_.size(); ++k) {
+      const Function& fk = k<f_.size() ? f_[k] : f_def_;
+      if (fk.isNull()) continue;
+
+      // Get local work vector sizes
+      size_t n_arg, n_res, n_iw, n_w;
+      fk.nwork(n_arg, n_res, n_iw, n_w);
+
+      // Add size for input buffers
+      for (int i=1; i<getNumInputs(); ++i) {
+        const Sparsity& s = fk.input(i-1).sparsity();
+        if (s!=input(i).sparsity()) n_w += s.nnz();
+      }
+
+      // Add size for output buffers
+      for (int i=0; i<getNumOutputs(); ++i) {
+        const Sparsity& s = fk.output(i).sparsity();
+        if (s!=output(i).sparsity()) n_w += s.nnz();
+      }
+
+      // Mae sure enough work for this
+      allocwork(n_arg, n_res, n_iw, n_w);
+    }
   }
 
   void SwitchInternal::evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp) {
@@ -203,35 +228,6 @@ namespace casadi {
     // Create wrapper
     MXFunction ret(w_in, w_out);
     return ret;
-  }
-
-  void SwitchInternal::nTmp(size_t& ni, size_t& nr) const {
-    ni=0;
-    nr=0;
-    for (int k=0; k<=f_.size(); ++k) {
-      const Function& fk = k<f_.size() ? f_[k] : f_def_;
-      if (fk.isNull()) continue;
-
-      // Get local work vector sizes
-      size_t ni_k, nr_k;
-      fk.nTmp(ni_k, nr_k);
-
-      // Add size for input buffers
-      for (int i=1; i<getNumInputs(); ++i) {
-        const Sparsity& s = fk.input(i-1).sparsity();
-        if (s!=input(i).sparsity()) nr_k += s.nnz();
-      }
-
-      // Add size for output buffers
-      for (int i=0; i<getNumOutputs(); ++i) {
-        const Sparsity& s = fk.output(i).sparsity();
-        if (s!=output(i).sparsity()) nr_k += s.nnz();
-      }
-
-      // Find the largest
-      ni = max(ni, ni_k);
-      nr = max(nr, nr_k);
-    }
   }
 
   inline string name(const Function& f) {

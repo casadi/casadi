@@ -363,7 +363,11 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
 
-    virtual void nTmp(size_t& ni, size_t& nr) const;
+    /** \brief Get number of temporary variables needed */
+    void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const;
+
+    /** \brief Allocate temporary variables  */
+    void allocwork(size_t n_arg, size_t n_res, size_t n_iw, size_t n_w);
     ///@}
 
     /** \brief Prints out a human readable report about possible constraint violations
@@ -421,11 +425,8 @@ namespace casadi {
     /// Cache for Jacobians
     SparseStorage<WeakRef> jac_, jac_compact_;
 
-    /** \brief  Temporary vector needed for the evaluation (integer) */
-    std::vector<int> itmp_;
-
-    /** \brief  Temporary vector needed for the evaluation (real) */
-    std::vector<double> rtmp_;
+    /** \brief Sizes of input and output buffers */
+    size_t n_arg_, n_res_, n_iw_, n_w_;
 
     /// User-set field
     void* user_data_;
@@ -452,6 +453,13 @@ namespace casadi {
     /** \brief Symbolic expressions for the adjoint seeds */
     template<typename MatType>
     std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
+
+  protected:
+    /** \brief  Temporary vector needed for the evaluation (integer) */
+    std::vector<int> iw_tmp_;
+
+    /** \brief  Temporary vector needed for the evaluation (real) */
+    std::vector<double> w_tmp_;
   };
 
   // Template implementations

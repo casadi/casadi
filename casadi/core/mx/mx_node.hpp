@@ -248,8 +248,10 @@ namespace casadi {
     /// Set the sparsity
     void setSparsity(const Sparsity& sparsity);
 
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=0;}
+    /** \brief Get number of temporary variables needed */
+    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
+      n_arg=n_res=n_iw=n_w=0;
+    }
 
     /// Set unary dependency
     void setDependencies(const MX& dep);

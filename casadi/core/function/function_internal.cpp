@@ -89,8 +89,11 @@ namespace casadi {
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
+    n_arg_ = 0;
+    n_res_ = 0;
+    n_iw_ = 0;
+    n_w_ = 0;
   }
-
 
   FunctionInternal::~FunctionInternal() {
   }
@@ -1255,21 +1258,21 @@ namespace casadi {
 
   void FunctionInternal::evaluate() {
     // Allocate temporary memory if needed
-    size_t ni, nr;
-    nTmp(ni, nr);
-    itmp_.resize(ni);
-    rtmp_.resize(nr);
+    iw_tmp_.resize(n_iw_);
+    w_tmp_.resize(n_w_);
 
     // Get pointers to input arguments
-    vector<cp_double> arg(getNumInputs());
-    for (int i=0; i<arg.size(); ++i) arg[i]=input(i).ptr();
+    int n_in = getNumInputs();
+    vector<cp_double> arg(n_in+n_arg_);
+    for (int i=0; i<n_in; ++i) arg[i]=input(i).ptr();
 
     // Get pointers to output arguments
-    vector<p_double> res(getNumOutputs());
-    for (int i=0; i<res.size(); ++i) res[i]=output(i).ptr();
+    int n_out = getNumOutputs();
+    vector<p_double> res(n_out+n_res_);
+    for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
     // Call memory-less
-    evalD(getPtr(arg), getPtr(res), getPtr(itmp_), getPtr(rtmp_));
+    evalD(getPtr(arg), getPtr(res), getPtr(iw_tmp_), getPtr(w_tmp_));
   }
 
   void FunctionInternal::evalD(cp_double* arg,
@@ -1350,21 +1353,19 @@ namespace casadi {
         res[i] = SX::zeros(output(i).sparsity());
 
     // Allocate temporary memory if needed
-    size_t ni, nr;
-    nTmp(ni, nr);
-    itmp_.resize(ni);
-    vector<SXElement> rtmp(nr);
+    iw_tmp_.resize(n_iw_);
+    vector<SXElement> w_tmp(n_w_);
 
     // Get pointers to input arguments
-    vector<cp_SXElement> argp(arg.size());
-    for (int i=0; i<argp.size(); ++i) argp[i]=getPtr(arg[i]);
+    vector<cp_SXElement> argp(arg.size()+n_arg_);
+    for (int i=0; i<arg.size(); ++i) argp[i]=getPtr(arg[i]);
 
     // Get pointers to output arguments
-    vector<p_SXElement> resp(getNumOutputs());
-    for (int i=0; i<resp.size(); ++i) resp[i]=getPtr(res[i]);
+    vector<p_SXElement> resp(getNumOutputs()+n_res_);
+    for (int i=0; i<getNumOutputs(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
-    evalSX(getPtr(argp), getPtr(resp), getPtr(itmp_), getPtr(rtmp));
+    evalSX(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp));
   }
 
   void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -1375,12 +1376,10 @@ namespace casadi {
 
   void FunctionInternal::spEvaluate(bool fwd) {
     // Allocate temporary memory if needed
-    size_t ni, nr;
-    nTmp(ni, nr);
-    itmp_.resize(ni);
-    rtmp_.resize(nr);
-    int *iw = getPtr(itmp_);
-    bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(rtmp_));
+    iw_tmp_.resize(n_iw_);
+    w_tmp_.resize(n_w_);
+    int *iw = getPtr(iw_tmp_);
+    bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(w_tmp_));
 
     // Get pointers to output arguments
     vector<p_bvec_t> res(getNumOutputs());
@@ -2062,15 +2061,15 @@ namespace casadi {
     s << "}" << endl << endl;
 
     // Function that returns work vector lengths
-    tmp = "int " + fname + "_work(int *ni, int *nr)";
+    tmp = "int " + fname + "_nwork(int *n_arg, int* n_res, int *n_iw, int *n_w)";
     if (g.with_header) {
       g.header << "extern " << tmp << ";" << endl;
     }
-    size_t ni, nr;
-    nTmp(ni, nr);
     s << tmp << " {" << endl;
-    s << "  if (ni) *ni = " << ni << ";" << endl;
-    s << "  if (nr) *nr = " << nr << ";" << endl;
+    s << "  if (n_arg) *n_arg = " << n_arg_ << ";" << endl;
+    s << "  if (n_res) *n_res = " << n_res_ << ";" << endl;
+    s << "  if (n_iw) *n_iw = " << n_iw_ << ";" << endl;
+    s << "  if (n_w) *n_w = " << n_w_ << ";" << endl;
     s << "  return 0;" << endl;
     s << "}" << endl;
     s << endl;
@@ -2092,18 +2091,17 @@ namespace casadi {
              << "Too many output arguments (%d, max " << n_out << ")\", resc);" << endl;
 
       // Work vectors, including input buffers
-      size_t ni, nr;
-      nTmp(ni, nr);
       int i_nnz = 0;
+      size_t n_w = n_w_;
       for (int i=0; i<n_in; ++i) {
         const Sparsity& s = input(i).sparsity();
         i_nnz += s.nnz();
-        nr = max(nr, static_cast<size_t>(s.size1())); // To be able to copy a column
-        nr = max(nr, static_cast<size_t>(s.size2())); // To be able to copy a row
+        n_w = max(n_w, static_cast<size_t>(s.size1())); // To be able to copy a column
+        n_w = max(n_w, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
-      nr += i_nnz;
-      s << "  int iw[" << ni << "];" << endl;
-      s << "  real_t w[" << nr << "];" << endl;
+      n_w += i_nnz;
+      s << "  int iw[" << n_iw_ << "];" << endl;
+      s << "  real_t w[" << n_w << "];" << endl;
       string fw = "w+" + g.to_string(i_nnz);
 
       // Copy inputs to buffers
@@ -2136,11 +2134,9 @@ namespace casadi {
       s << "int main_" << fname << "(int argc, char* argv[]) {" << endl;
 
       // Work vectors and input and output buffers
-      size_t ni, nr;
-      nTmp(ni, nr);
-      nr += getNumInputNonzeros() + getNumOutputNonzeros();
-      s << "  int iw[" << ni << "];" << endl
-             << "  real_t w[" << nr << "];" << endl;
+      size_t nr = n_w_ + getNumInputNonzeros() + getNumOutputNonzeros();
+      s << "  int iw[" << n_iw_ << "];" << endl
+             << "  real_t w[" << n_w_ << "];" << endl;
 
       // Input buffers
       s << "  const real_t* arg[" << n_in << "] = {";
@@ -2340,9 +2336,18 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::nTmp(size_t& ni, size_t& nr) const {
-    ni=itmp_.size();
-    nr=rtmp_.size();
+  void FunctionInternal::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
+    n_arg = n_arg_;
+    n_res = n_res_;
+    n_iw=n_iw_;
+    n_w=n_w_;
+  }
+
+  void FunctionInternal::allocwork(size_t n_arg, size_t n_res, size_t n_iw, size_t n_w) {
+    n_arg_ = max(n_arg, n_arg_);
+    n_res_ = max(n_res, n_res_);
+    n_iw_ = max(n_iw, n_iw_);
+    n_w_ = max(n_w, n_w_);
   }
 
   void FunctionInternal::reportConstraints(std::ostream &stream, const Matrix<double> &v,

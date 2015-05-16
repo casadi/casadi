@@ -58,9 +58,6 @@ namespace casadi {
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp);
 
-    /** \brief  Work vector sizes */
-    virtual void nTmp(size_t& ni, size_t& nr) const;
-
     /** \brief  Initialize */
     virtual void init();
 
@@ -75,7 +72,7 @@ namespace casadi {
                               const int **colind, const int **row);
 
     /** \brief No work vector (default if work not defined) */
-    static int noWork(int *ni, int *nr);
+    static int noWork(int *n_arg, int* n_res, int *n_iw, int *n_w);
 
   protected:
 
@@ -84,7 +81,7 @@ namespace casadi {
     typedef int (*nargPtr)(int *n_in, int *n_out);
     typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
                                const int **colind, const int **row);
-    typedef int (*workPtr)(int *ni, int *nr);
+    typedef int (*nworkPtr)(int *n_arg, int* n_res, int *n_iw, int *n_w);
     typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
     ///@}
 
@@ -105,9 +102,6 @@ namespace casadi {
 
     /** \brief  handle to the dll */
     handle_t handle_;
-
-    /** \brief Work vector sizes */
-    size_t ni_, nr_;
   };
 
 } // namespace casadi

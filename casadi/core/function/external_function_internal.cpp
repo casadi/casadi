@@ -41,7 +41,7 @@ namespace casadi {
     // Names of the functions we want to access
     string narg_s = f_name_ + "_narg";
     string sparsity_s = f_name_ + "_sparsity";
-    string work_s = f_name_ + "_work";
+    string nwork_s = f_name_ + "_nwork";
 
     // Load the dll
 #ifdef _WIN32
@@ -65,10 +65,10 @@ namespace casadi {
     }
 
     // Function for retriving sizes of required work vectors
-    workPtr work = (workPtr)GetProcAddress(handle_, TEXT(work_s.c_str()));
-    if (work==0) {
+    nworkPtr nwork = (nworkPtr)GetProcAddress(handle_, TEXT(nwork_s.c_str()));
+    if (nwork==0) {
       // No work vector needed
-      work = noWork;
+      nwork = noWork;
     }
 #else // _WIN32
     handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
@@ -99,10 +99,10 @@ namespace casadi {
     }
 
     // Function for retriving sizes of required work vectors
-    workPtr work = (workPtr)dlsym(handle_, work_s.c_str());
+    nworkPtr nwork = (nworkPtr)dlsym(handle_, nwork_s.c_str());
     if (dlerror()) {
       // No work vector needed
-      work = noWork;
+      nwork = noWork;
       // Reset error flags
       dlerror();
     }
@@ -146,11 +146,13 @@ namespace casadi {
     }
 
     // Get number of temporaries
-    int ni, nr;
-    flag = work(&ni, &nr);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"work\" failed");
-    ni_ = static_cast<size_t>(ni);
-    nr_ = static_cast<size_t>(nr);
+    int n_arg, n_res, n_iw, n_w;
+    flag = nwork(&n_arg, &n_res, &n_iw, &n_w);
+    if (flag) throw CasadiException("ExternalFunctionInternal: \"nwork\" failed");
+    n_arg_ = static_cast<size_t>(n_arg);
+    n_res_ = static_cast<size_t>(n_res);
+    n_iw_ = static_cast<size_t>(n_iw);
+    n_w_ = static_cast<size_t>(n_w);
 #else // WITH_DL
     throw CasadiException("WITH_DL  not activated");
 #endif // WITH_DL
@@ -187,11 +189,6 @@ namespace casadi {
     FunctionInternal::init();
   }
 
-  void ExternalFunctionInternal::nTmp(size_t& ni, size_t& nr) const {
-    ni=ni_;
-    nr=nr_;
-  }
-
   void ExternalFunctionInternal::generateDeclarations(CodeGenerator& g) const {
     // Declare function (definition in separate file)
     g.body
@@ -220,9 +217,11 @@ namespace casadi {
     return 0;
   }
 
-  int ExternalFunctionInternal::noWork(int *ni, int *nr) {
-    if (ni) *ni=0;
-    if (nr) *nr=0;
+  int ExternalFunctionInternal::noWork(int *n_arg, int* n_res, int *n_iw, int *n_w) {
+    if (n_arg) *n_arg=0;
+    if (n_res) *n_res=0;
+    if (n_iw) *n_iw=0;
+    if (n_w) *n_w=0;
     return 0;
   }
 

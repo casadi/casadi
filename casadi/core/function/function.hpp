@@ -494,8 +494,8 @@ namespace casadi {
     void spEvaluate(bool fwd);
 
 #ifndef SWIG
-    /// Get number of temporary variables needed
-    void nTmp(size_t& ni, size_t& nr) const;
+    /** \brief Get number of temporary variables needed */
+    void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const;
 
     /** \brief  Propagate sparsity forward */
     void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);

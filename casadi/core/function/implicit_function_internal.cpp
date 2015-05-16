@@ -164,16 +164,14 @@ namespace casadi {
                           << u_c_.size() << " and n = " << n_);
 
     // Allocate sufficiently large work vectors
-    size_t ni, nr;
-    f_.nTmp(ni, nr);
-    itmp_.resize(ni);
-    rtmp_.resize(nr);
+    size_t n_internal = 2*n_;
+    size_t n_arg, n_res, n_iw, n_w;
+    f_.nwork(n_arg, n_res, n_iw, n_w);
+    allocwork(n_arg, n_res, n_iw, n_w + n_internal);
     if (!jac_.isNull()) {
-      jac_.nTmp(ni, nr);
-      itmp_.resize(max(itmp_.size(), ni));
-      rtmp_.resize(max(rtmp_.size(), nr));
+      jac_.nwork(n_arg, n_res, n_iw, n_w);
+      allocwork(n_arg, n_res, n_iw, n_w + n_internal);
     }
-    rtmp_.resize(rtmp_.size() + 2*n_);
   }
 
   void ImplicitFunctionInternal::evaluate() {

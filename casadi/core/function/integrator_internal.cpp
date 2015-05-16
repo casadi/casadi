@@ -186,20 +186,16 @@ namespace casadi {
     }
 
     // Allocate sufficiently large work vectors
-    size_t ni, nr;
-    f_.nTmp(ni, nr);
-    itmp_.resize(ni);
-    rtmp_.resize(nr);
+    size_t n_internal = nx_ + nz_ + nrx_ + nrz_;
+    allocwork(0, 0, 0, n_internal+nx_+nz_);
+    allocwork(0, 0, 0, n_internal+nrx_+nrz_);
+    size_t n_arg, n_res, n_iw, n_w;
+    f_.nwork(n_arg, n_res, n_iw, n_w);
+    allocwork(n_arg, n_res, n_iw, n_internal+n_w);
     if (!g_.isNull()) {
-      g_.nTmp(ni, nr);
-      itmp_.resize(max(itmp_.size(), ni));
-      rtmp_.resize(max(rtmp_.size(), nr));
+      g_.nwork(n_arg, n_res, n_iw, n_w);
+      allocwork(n_arg, n_res, n_iw, n_internal+n_w);
     }
-
-    // Needed for sparsity pattern propagation
-    rtmp_.resize(max(rtmp_.size(), static_cast<size_t>(nx_+nz_)));
-    rtmp_.resize(max(rtmp_.size(), static_cast<size_t>(nrx_+nrz_)));
-    rtmp_.resize(rtmp_.size() + nx_ + nz_ + nrx_ + nrz_);
   }
 
   void IntegratorInternal::deepCopyMembers(

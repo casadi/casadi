@@ -96,8 +96,11 @@ namespace casadi {
     virtual bool zz_isEqual(const MXNode* node, int depth) const
     { return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;}
 
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=sparsity().size1();}
+    /** \brief Get number of temporary variables needed */
+    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
+      n_arg=n_res=n_iw=0;
+      n_w=sparsity().size1();
+    }
   };
 
 

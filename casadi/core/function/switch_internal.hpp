@@ -68,9 +68,6 @@ namespace casadi {
     virtual bool hasDerReverse() const { return true;}
     ///@}
 
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr) const;
-
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
 
@@ -89,92 +86,5 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-
-#if 0
-
-    /** \brief Constructor */
-    Switch(const std::vector<Function>& f, const Function& f_def);
-
-    /** \brief  Destructor */
-    virtual ~Switch() {}
-
-    /** \brief  Access functions of the node */
-    SwitchInternal* operator->();
-
-    /** \brief  Const access functions of the node */
-    const SwitchInternal* operator->() const;
-
-    /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
-
-
-    /** \brief  Clone function */
-    virtual Switch* clone() const;
-
-    /** \brief  Print argument vector */
-    static std::string printArg(const std::vector<std::string>& arg);
-
-    /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const;
-
-    /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
-
-    /// Evaluate the function numerically
-    virtual void evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp);
-
-    /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
-
-    /** \brief Calculate forward mode directional derivatives */
-    virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens);
-
-    /** \brief Calculate reverse mode directional derivatives */
-    virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens);
-
-    /** \brief  Number of functions */
-    virtual int numFunctions() const {return f_.size() + 1;}
-
-    /** \brief  Get function reference */
-    virtual const Function& getFunction(int i) const;
-
-    /** \brief  Get function input */
-    virtual int getFunctionInput() const { return -1;}
-
-    /** \brief  Get function output */
-    virtual int getFunctionOutput() const { return -1;}
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
-    /** \brief  Number of outputs */
-    virtual int nout() const;
-
-    /** \brief  Get the sparsity of output oind */
-    virtual const Sparsity& sparsity(int oind) const;
-
-    /** \brief Get the operation */
-    virtual int getOp() const { return OP_SWITCH;}
-
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr);
-
-  private:
-    /** \brief  Constructor */
-    explicit Switch(const MX& ind, const std::vector<MX>& arg,
-                    const std::vector<Function>& f, const Function& f_def);
-
-    // Function to be evaluated
-    std::vector<Function> f_;
-    Function f_def_;
-
-    // Input and output sparsities
-    std::vector<Sparsity> sp_in_, sp_out_;
-  };
-#endif
-
 
 #endif // CASADI_SWITCH_INTERNAL_HPP

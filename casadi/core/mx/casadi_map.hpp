@@ -98,8 +98,8 @@ namespace casadi {
     /** \brief Get the operation */
     virtual int getOp() const { return OP_MAP;}
 
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr);
+    /** \brief Get number of temporary variables needed */
+    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const;
 
     /// Get parallelization
     virtual std::string parallelization() const { return "serial";}
@@ -134,8 +134,8 @@ namespace casadi {
     /// Evaluate the function numerically
     virtual void evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp);
 
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr);
+    /** \brief Get number of temporary variables needed */
+    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const;
 
     /// Get parallelization
     virtual std::string parallelization() const { return "openmp";}

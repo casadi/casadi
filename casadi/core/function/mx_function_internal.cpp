@@ -269,16 +269,18 @@ namespace casadi {
     // Allocate work vectors (numeric)
     workloc_.resize(worksize+1);
     fill(workloc_.begin(), workloc_.end(), -1);
-    size_t nitmp=0, nrtmp=0;
+    n_w_ = n_iw_ = 0;
     size_t wind=0;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (it->op!=OP_OUTPUT) {
         for (int c=0; c<it->res.size(); ++c) {
           if (it->res[c]>=0) {
-            size_t nr=0, ni=0;
-            it->data->nTmp(ni, nr);
-            nitmp = std::max(nitmp, ni);
-            nrtmp = std::max(nrtmp, nr);
+            size_t n_arg, n_res, n_iw, n_w;
+            it->data->nwork(n_arg, n_res, n_iw, n_w);
+            n_arg_ = std::max(n_arg_, n_arg+getNumInputs());
+            n_res_ = std::max(n_res_, n_res+getNumOutputs());
+            n_iw_ = std::max(n_iw_, n_iw);
+            n_w_ = std::max(n_w_, n_w);
             if (workloc_[it->res[c]] < 0) {
               workloc_[it->res[c]] = wind;
               wind += it->data->sparsity(c).nnz();
@@ -290,10 +292,9 @@ namespace casadi {
     workloc_.back()=wind;
     for (int i=0; i<workloc_.size(); ++i) {
       if (workloc_[i]<0) workloc_[i] = i==0 ? 0 : workloc_[i-1];
-      workloc_[i] += nrtmp;
+      workloc_[i] += n_w_;
     }
-    itmp_.resize(nitmp);
-    rtmp_.resize(nrtmp+wind);
+    n_w_ += wind;
 
     // Reset the temporary variables
     for (int i=0; i<nodes.size(); ++i) {
@@ -544,7 +545,8 @@ namespace casadi {
   }
 
   void MXFunctionInternal::spInit(bool fwd) {
-    bvec_t *iwork = get_bvec_t(rtmp_);
+    w_tmp_.resize(n_w_);
+    bvec_t *iwork = get_bvec_t(w_tmp_);
     fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
 
@@ -594,9 +596,7 @@ namespace casadi {
     vector<bvec_t*> ores(max_res_);
     vector<bvec_t*> oarg(max_arg_); // Non-const since seeds are cleared
 
-    size_t ni, nr;
-    nTmp(ni, nr);
-    fill_n(rtmp, nr, 0);
+    fill_n(rtmp, n_w_, 0);
 
     // Propagate sparsity backwards
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
@@ -1133,8 +1133,8 @@ namespace casadi {
 
   void MXFunctionInternal::printWork(ostream &stream) {
     for (int k=0; k<workloc_.size()-1; ++k) {
-      vector<double>::const_iterator start=rtmp_.begin() + workloc_[k];
-      vector<double>::const_iterator stop=rtmp_.begin() + workloc_[k+1];
+      vector<double>::const_iterator start=w_tmp_.begin() + workloc_[k];
+      vector<double>::const_iterator stop=w_tmp_.begin() + workloc_[k+1];
       stream << "work[" << k << "] = " << vector<double>(start, stop) << endl;
     }
   }

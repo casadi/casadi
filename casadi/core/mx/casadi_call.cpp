@@ -191,8 +191,8 @@ namespace casadi {
     g.body << "  }" << endl;
   }
 
-  void Call::nTmp(size_t& ni, size_t& nr) {
-    fcn_.nTmp(ni, nr);
+  void Call::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
+    fcn_.nwork(n_arg, n_res, n_iw, n_w);
   }
 
   std::vector<MX> Call::create(const Function& fcn, const std::vector<MX>& arg) {

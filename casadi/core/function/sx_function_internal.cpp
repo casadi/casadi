@@ -228,7 +228,7 @@ namespace casadi {
   void SXFunctionInternal::generateBody(CodeGenerator& g) const {
 
     // Which variables have been declared
-    vector<bool> declared(rtmp_.size(), false);
+    vector<bool> declared(n_w_, false);
 
     // Run the algorithm
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -397,7 +397,7 @@ namespace casadi {
     stack<int> unused;
 
     // Work vector size
-    int worksize = 0;
+    size_t worksize = 0;
 
     // Find a place in the work vector for the operation
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -451,7 +451,8 @@ namespace casadi {
     }
 
     // Allocate work vectors (symbolic/numeric)
-    rtmp_.resize(worksize, numeric_limits<double>::quiet_NaN());
+    n_w_ = max(n_w_, worksize);
+    w_tmp_.resize(n_w_, numeric_limits<double>::quiet_NaN());
     s_work_.resize(worksize);
 
     // Reset the temporary variables
@@ -850,8 +851,9 @@ namespace casadi {
     // We need a work array containing unsigned long rather than doubles.
     // Since the two datatypes have the same size (64 bits)
     // we can save overhead by reusing the double array
-    bvec_t *iwork = get_bvec_t(rtmp_);
-    if (!fwd) fill_n(iwork, rtmp_.size(), bvec_t(0));
+    w_tmp_.resize(n_w_);
+    bvec_t *iwork = get_bvec_t(w_tmp_);
+    if (!fwd) fill_n(iwork, n_w_, bvec_t(0));
   }
 
   void SXFunctionInternal::spFwd(cp_bvec_t* arg, p_bvec_t* res,
@@ -874,10 +876,7 @@ namespace casadi {
 
   void SXFunctionInternal::spAdj(p_bvec_t* arg, p_bvec_t* res,
                                  int* itmp, bvec_t* rtmp) {
-
-    size_t ni, nr;
-    nTmp(ni, nr);
-    fill_n(rtmp, nr, 0);
+    fill_n(rtmp, n_w_, 0);
 
     // Propagate sparsity backward
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
@@ -977,7 +976,7 @@ namespace casadi {
 
       if (use_fwd) {
         // Which variables have been declared
-        vector<bool> declared(rtmp_.size(), false);
+        vector<bool> declared(n_w_, false);
 
         // Propagate sparsity forward
         for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -1018,7 +1017,7 @@ namespace casadi {
         ss << "ulong t;" << endl;
 
         // Declare and initialize work vector
-        for (int i=0; i<rtmp_.size(); ++i) {
+        for (int i=0; i<n_w_; ++i) {
           ss << "ulong a" << i << "=0;"<< endl;
         }
 

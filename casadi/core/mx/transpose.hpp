@@ -90,8 +90,11 @@ namespace casadi {
     /** \brief Get the operation */
     virtual int getOp() const { return OP_TRANSPOSE;}
 
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr) { ni=size2()+1; nr=0;}
+    /** \brief Get number of temporary variables needed */
+    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
+      n_arg=n_res=n_w=0;
+      n_iw=size2()+1;
+    }
 
     /// Transpose
     virtual MX getTranspose() const { return dep();}
@@ -146,8 +149,10 @@ namespace casadi {
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
                           CodeGenerator& g) const;
 
-    /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=0;}
+    /** \brief Get number of temporary variables needed */
+    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
+      n_arg=n_res=n_iw=n_w=0;
+    }
   };
 
 
