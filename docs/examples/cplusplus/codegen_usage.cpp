@@ -48,7 +48,7 @@ int usage_c(){
   /* Signature of the entry points */
   typedef int (*nargPtr)(int *n_in, int *n_out);
   typedef int (*sparsityPtr)(int n_in, int *n_col, int *n_row, int **colind, int **row);
-  typedef int (*workPtr)(int *ni, int *nr);
+  typedef int (*nworkPtr)(int *n_arg, int* n_res, int *n_iw, int *n_w);
   typedef int (*evalPtr)(const double* const* arg, double* const* res, int* iw, double* w);
 
   /* Handle to the dll */
@@ -79,9 +79,9 @@ int usage_c(){
   }
 
   /* Function for getting the size of the required work vectors */
-  workPtr work = (workPtr)dlsym(handle, "f_work");
+  nworkPtr nwork = (nworkPtr)dlsym(handle, "f_nwork");
   if(dlerror()){
-    printf("Failed to retrieve \"work\" function.\n");
+    printf("Failed to retrieve \"nwork\" function.\n");
     return 1;
   }
 
@@ -130,25 +130,22 @@ int usage_c(){
   }
 
   /* Allocate work vectors */
-  int n_iw=-1, n_w=-1;
-  work(&n_iw, &n_w);
-  const int n=256;
-  if (n_iw>n || n_w>n) {
-    printf("Too small work vectors allocated. Required int array of length %d"
-           "(%d allocated) and double array of length %d (%d allocated)\n",
-           n_iw, n, n_w, n);
-    return 1;
-  }
-  int iw[n];
-  double w[n];
+  int n_arg, n_res, n_iw, n_w;
+  nwork(&n_arg, &n_res, &n_iw, &n_w);
+  int iw[n_iw];
+  double w[n_w];
 
   /* Evaluate the function */
   const double x_val[] = {1,2,3,4};
   const double y_val = 5;
   double res0;
   double res1[4];
-  const double *all_inputs[] = {x_val,&y_val};
-  double *all_outputs[] = {&res0,res1};
+  const double *all_inputs[2 + n_arg];
+  all_inputs[0] = x_val;
+  all_inputs[1] = &y_val;
+  double *all_outputs[2 + n_res];
+  all_outputs[0] = &res0;
+  all_outputs[1] = res1;
   eval(all_inputs,all_outputs, iw, w);
   
   printf("result (0): %g\n",res0);
