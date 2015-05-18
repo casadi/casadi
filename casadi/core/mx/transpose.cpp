@@ -37,24 +37,23 @@ namespace casadi {
     setSparsity(x.sparsity().T());
   }
 
-  void Transpose::evalD(const double** input, double** output,
+  void Transpose::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
+  }
+
+ void DenseTranspose::evalD(const double** arg, double** res,
                             int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+    evalGen<double>(arg, res, iw, w);
   }
 
- void DenseTranspose::evalD(const double** input, double** output,
-                                int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+  void Transpose::evalSX(const SXElement** arg, SXElement** res,
+                         int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
-  void Transpose::evalSX(const SXElement** input, SXElement** output,
-                             int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
-  }
-
-  void DenseTranspose::evalSX(const SXElement** input, SXElement** output,
-                                  int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void DenseTranspose::evalSX(const SXElement** arg, SXElement** res,
+                              int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>

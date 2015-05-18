@@ -44,28 +44,24 @@ namespace casadi {
     return new Reshape(*this);
   }
 
-  void Reshape::evalD(const double** input, double** output, int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+  void Reshape::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void Reshape::evalSX(const SXElement** input, SXElement** output,
-                       int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void Reshape::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Reshape::evalGen(const T* const* arg, T* const* res,
-                        int* iw, T* w) {
+  void Reshape::evalGen(const T** arg, T** res, int* iw, T* w) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
-  void Reshape::spFwd(const bvec_t** arg,
-                      bvec_t** res, int* iw, bvec_t* w) {
+  void Reshape::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void Reshape::spAdj(bvec_t** arg,
-                      bvec_t** res, int* iw, bvec_t* w) {
+  void Reshape::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     copyAdj(arg[0], res[0], nnz());
   }
 

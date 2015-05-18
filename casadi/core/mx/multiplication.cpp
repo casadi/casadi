@@ -51,19 +51,17 @@ namespace casadi {
     return "(" + arg.at(0) + "+mul(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
-  void Multiplication::evalD(const double** input, double** output,
-                                 int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+  void Multiplication::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void Multiplication::evalSX(const SXElement** input, SXElement** output,
-                                  int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void Multiplication::evalSX(const SXElement** arg, SXElement** res,
+                              int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Multiplication::evalGen(const T* const* arg, T* const* res,
-                               int* iw, T* w) {
+  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     casadi_mm_sparse(arg[1], dep(1).sparsity(),
                      arg[2], dep(2).sparsity(),

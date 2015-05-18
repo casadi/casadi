@@ -38,29 +38,24 @@ namespace casadi {
     return new SubAssign(*this);
   }
 
-  void SubAssign::evalD(const double** input, double** output,
-                        int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+  void SubAssign::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void SubAssign::evalSX(const SXElement** input, SXElement** output,
-                         int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void SubAssign::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
-  void SubAssign::evalGen(const T* const* arg, T* const* res,
-                          int* iw, T* w) {
+  void SubAssign::evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
     casadi_error("not ready");
   }
 
-  void SubAssign::spFwd(const bvec_t** arg,
-                     bvec_t** res, int* iw, bvec_t* w) {
+  void SubAssign::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     casadi_error("not ready");
   }
 
-  void SubAssign::spAdj(bvec_t** arg,
-                     bvec_t** res, int* iw, bvec_t* w) {
+  void SubAssign::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     casadi_error("not ready");
   }
 

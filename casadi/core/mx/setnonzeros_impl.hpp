@@ -440,20 +440,20 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalD(const double** input, double** output,
-                                         int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+  void SetNonzerosVector<Add>::evalD(const double** arg, double** res,
+                                     int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalSX(const SXElement** input, SXElement** output,
-                                          int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void SetNonzerosVector<Add>::evalSX(const SXElement** arg, SXElement** res,
+                                      int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosVector<Add>::evalGen(const T* const* arg, T* const* res,
+  void SetNonzerosVector<Add>::evalGen(const T** arg, T** res,
                                        int* iw, T* w) {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
@@ -471,20 +471,20 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalD(const double** input, double** output,
+  void SetNonzerosSlice<Add>::evalD(const double** arg, double** res,
                                     int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+    evalGen<double>(arg, res, iw, w);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalSX(const SXElement** input, SXElement** output,
-                                         int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void SetNonzerosSlice<Add>::evalSX(const SXElement** arg, SXElement** res,
+                                     int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice<Add>::evalGen(const T* const* arg, T* const* res,
+  void SetNonzerosSlice<Add>::evalGen(const T** arg, T** res,
                                       int* iw, T* w) {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
@@ -503,20 +503,20 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalD(const double** input, double** output,
-                                         int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+  void SetNonzerosSlice2<Add>::evalD(const double** arg, double** res,
+                                     int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalSX(const SXElement** input, SXElement** output,
-                                          int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void SetNonzerosSlice2<Add>::evalSX(const SXElement** arg, SXElement** res,
+                                      int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice2<Add>::evalGen(const T* const* arg, T* const* res,
+  void SetNonzerosSlice2<Add>::evalGen(const T** arg, T** res,
                                        int* iw, T* w) {
     const T* idata0 = arg[0];
     const T* idata = arg[1];

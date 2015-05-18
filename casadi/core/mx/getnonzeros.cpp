@@ -39,14 +39,14 @@ namespace casadi {
     setDependencies(y);
   }
 
-  void GetNonzerosVector::evalD(const double** input, double** output,
-                                    int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+  void GetNonzerosVector::evalD(const double** arg, double** res,
+                                int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void GetNonzerosVector::evalSX(const SXElement** input, SXElement** output,
-                                     int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void GetNonzerosVector::evalSX(const SXElement** arg, SXElement** res,
+                                 int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
@@ -59,14 +59,14 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice::evalD(const double** input, double** output,
+  void GetNonzerosSlice::evalD(const double** arg, double** res,
                                int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void GetNonzerosSlice::evalSX(const SXElement** input, SXElement** output,
-                                    int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void GetNonzerosSlice::evalSX(const SXElement** arg, SXElement** res,
+                                int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
@@ -80,14 +80,14 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice2::evalD(const double** input, double** output,
+  void GetNonzerosSlice2::evalD(const double** arg, double** res,
                                 int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void GetNonzerosSlice2::evalSX(const SXElement** input, SXElement** output,
+  void GetNonzerosSlice2::evalSX(const SXElement** arg, SXElement** res,
                                  int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>

@@ -43,18 +43,16 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::evalD(const double** input, double** output,
-                        int* iw, double* w) {
-    evalGen<double>(input, output, iw, w);
+  void Split::evalD(const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(arg, res, iw, w);
   }
 
-  void Split::evalSX(const SXElement** input, SXElement** output,
-                         int* iw, SXElement* w) {
-    evalGen<SXElement>(input, output, iw, w);
+  void Split::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    evalGen<SXElement>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Split::evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
+  void Split::evalGen(const T** arg, T** res, int* iw, T* w) {
     // Number of derivatives
     int nx = offset_.size()-1;
 
@@ -67,8 +65,7 @@ namespace casadi {
     }
   }
 
-  void Split::spFwd(const bvec_t** arg,
-                    bvec_t** res, int* iw, bvec_t* w) {
+  void Split::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {
@@ -82,8 +79,7 @@ namespace casadi {
     }
   }
 
-  void Split::spAdj(bvec_t** arg,
-                    bvec_t** res, int* iw, bvec_t* w) {
+  void Split::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {

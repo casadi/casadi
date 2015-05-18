@@ -302,13 +302,12 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::evalD(const double** input, double** output, int* iw, double* w) {
+  void MXNode::evalD(const double** arg, double** res, int* iw, double* w) {
     throw CasadiException(string("MXNode::evalD not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalSX(const SXElement** input, SXElement** output,
-                          int* iw, SXElement* w) {
+  void MXNode::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
     throw CasadiException(string("MXNode::evalSX not defined for class ")
                           + typeid(*this).name());
   }
