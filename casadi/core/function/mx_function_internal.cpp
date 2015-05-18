@@ -96,10 +96,6 @@ namespace casadi {
     // Count the number of times each node is used
     vector<int> refcount(nodes.size(), 0);
 
-    // Maximum number of input and output arguments
-    max_arg_ = 0;
-    max_res_ = 0;
-
     // Get the sequence of instructions for the virtual machine
     algorithm_.resize(0);
     algorithm_.reserve(nodes.size());
@@ -139,10 +135,6 @@ namespace casadi {
             ae.res[0] = n->temp;
           }
         }
-
-        // Update maximum size of arg and res
-        max_arg_ = std::max(max_arg_, ae.arg.size());
-        max_res_ = std::max(max_res_, ae.res.size());
 
         // Increase the reference count of the dependencies
         for (int c=0; c<ae.arg.size(); ++c) {
@@ -277,10 +269,7 @@ namespace casadi {
           if (it->res[c]>=0) {
             size_t n_arg, n_res, n_iw, n_w;
             it->data->nwork(n_arg, n_res, n_iw, n_w);
-            n_arg_ = std::max(n_arg_, n_arg+nIn());
-            n_res_ = std::max(n_res_, n_res+nOut());
-            n_iw_ = std::max(n_iw_, n_iw);
-            n_w_ = std::max(n_w_, n_w);
+            allocwork(n_arg+it->arg.size(), n_res+it->res.size(), n_iw, n_w);
             if (workloc_[it->res[c]] < 0) {
               workloc_[it->res[c]] = wind;
               wind += it->data->sparsity(c).nnz();
@@ -388,8 +377,8 @@ namespace casadi {
     }
 
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<const double*> oarg(nIn()+max_arg_);
-    vector<double*> ores(nOut()+max_res_);
+    vector<const double*> oarg(n_arg_);
+    vector<double*> ores(n_res_);
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -552,9 +541,9 @@ namespace casadi {
 
   void MXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
-    // Tmporaries to hold pointers to operation input and outputs
-    vector<const bvec_t*> oarg(nIn()+max_arg_);
-    vector<bvec_t*> ores(nOut()+max_res_);
+    // Temporaries to hold pointers to operation input and outputs
+    vector<const bvec_t*> oarg(n_arg_);
+    vector<bvec_t*> ores(n_res_);
 
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
@@ -592,9 +581,9 @@ namespace casadi {
 
   void MXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
-    // Tmporaries to hold pointers to operation input and outputs
-    vector<bvec_t*> oarg(nIn()+max_arg_); // Non-const since seeds are cleared
-    vector<bvec_t*> ores(nOut()+max_res_);
+    // Temporaries to hold pointers to operation input and outputs
+    vector<bvec_t*> oarg(n_arg_);
+    vector<bvec_t*> ores(n_res_);
 
     fill_n(rtmp, n_w_, 0);
 
@@ -1040,8 +1029,8 @@ namespace casadi {
   void MXFunctionInternal::evalSX(const SXElement** arg, SXElement** res,
                                   int* itmp, SXElement* rtmp) {
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<const SXElement*> argp(max_arg_);
-    vector<SXElement*> resp(max_res_);
+    vector<const SXElement*> argp(n_arg_);
+    vector<SXElement*> resp(n_res_);
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
@@ -1270,8 +1259,6 @@ namespace casadi {
     vector<MX> swork(workloc_.size()-1);
 
     vector<MX> oarg, ores;
-    oarg.reserve(max_arg_);
-    ores.reserve(max_res_);
 
     // Definition of intermediate variables
     vector<MX> y;

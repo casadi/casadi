@@ -505,16 +505,15 @@ namespace casadi {
     bvec_t *tmp_rz = rtmp; rtmp += nrz_;
 
     // Propagate through f
-    //const bvec_t** arg1 = arg+INTEGRATOR_NUM_IN;
-    
-
-    const bvec_t* dae_in[DAE_NUM_IN] = {0};
-    dae_in[DAE_X] = arg[INTEGRATOR_X0];
-    dae_in[DAE_P] = arg[INTEGRATOR_P];
-    bvec_t* dae_out[DAE_NUM_OUT] = {0};
-    dae_out[DAE_ODE] = tmp_x;
-    dae_out[DAE_ALG] = tmp_z;
-    f_.spFwd(dae_in, dae_out, itmp, rtmp);
+    const bvec_t** arg1 = arg+nIn();
+    fill(arg1, arg1+DAE_NUM_IN, static_cast<bvec_t*>(0));
+    arg1[DAE_X] = arg[INTEGRATOR_X0];
+    arg1[DAE_P] = arg[INTEGRATOR_P];
+    bvec_t** res1 = res+nOut();
+    fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
+    res1[DAE_ODE] = tmp_x;
+    res1[DAE_ALG] = tmp_z;
+    f_.spFwd(arg1, res1, itmp, rtmp);
     if (arg[INTEGRATOR_X0]) {
       const bvec_t *tmp = arg[INTEGRATOR_X0];
       for (int i=0; i<nx_; ++i) tmp_x[i] |= *tmp++;
@@ -534,26 +533,26 @@ namespace casadi {
 
     // Propagate to quadratures
     if (nq_>0 && res[INTEGRATOR_QF]) {
-      dae_in[DAE_X] = tmp_x;
-      dae_in[DAE_Z] = tmp_z;
-      dae_out[DAE_ODE] = dae_out[DAE_ALG] = 0;
-      dae_out[DAE_QUAD] = res[INTEGRATOR_QF];
-      f_.spFwd(dae_in, dae_out, itmp, rtmp);
+      arg1[DAE_X] = tmp_x;
+      arg1[DAE_Z] = tmp_z;
+      res1[DAE_ODE] = res1[DAE_ALG] = 0;
+      res1[DAE_QUAD] = res[INTEGRATOR_QF];
+      f_.spFwd(arg1, res1, itmp, rtmp);
     }
 
     if (!g_.isNull()) {
       // Propagate through g
-      const bvec_t* rdae_in[RDAE_NUM_IN] = {0};
-      rdae_in[RDAE_X] = tmp_x;
-      rdae_in[RDAE_P] = arg[INTEGRATOR_P];
-      rdae_in[RDAE_Z] = tmp_z;
-      rdae_in[RDAE_RX] = arg[INTEGRATOR_X0];
-      rdae_in[RDAE_RX] = arg[INTEGRATOR_RX0];
-      rdae_in[RDAE_RP] = arg[INTEGRATOR_RP];
-      bvec_t* rdae_out[RDAE_NUM_OUT] = {0};
-      rdae_out[RDAE_ODE] = tmp_rx;
-      rdae_out[RDAE_ALG] = tmp_rz;
-      g_.spFwd(rdae_in, rdae_out, itmp, rtmp);
+      fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
+      arg1[RDAE_X] = tmp_x;
+      arg1[RDAE_P] = arg[INTEGRATOR_P];
+      arg1[RDAE_Z] = tmp_z;
+      arg1[RDAE_RX] = arg[INTEGRATOR_X0];
+      arg1[RDAE_RX] = arg[INTEGRATOR_RX0];
+      arg1[RDAE_RP] = arg[INTEGRATOR_RP];
+      fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
+      res1[RDAE_ODE] = tmp_rx;
+      res1[RDAE_ALG] = tmp_rz;
+      g_.spFwd(arg1, res1, itmp, rtmp);
       if (arg[INTEGRATOR_RX0]) {
         const bvec_t *tmp = arg[INTEGRATOR_RX0];
         for (int i=0; i<nrx_; ++i) tmp_rx[i] |= *tmp++;
@@ -573,11 +572,11 @@ namespace casadi {
 
       // Propagate to quadratures
       if (nrq_>0 && res[INTEGRATOR_RQF]) {
-        rdae_in[RDAE_RX] = tmp_rx;
-        rdae_in[RDAE_RZ] = tmp_rz;
-        rdae_out[RDAE_ODE] = rdae_out[RDAE_ALG] = 0;
-        rdae_out[RDAE_QUAD] = res[INTEGRATOR_RQF];
-        g_.spFwd(rdae_in, rdae_out, itmp, rtmp);
+        arg1[RDAE_RX] = tmp_rx;
+        arg1[RDAE_RZ] = tmp_rz;
+        res1[RDAE_ODE] = res1[RDAE_ALG] = 0;
+        res1[RDAE_QUAD] = res[INTEGRATOR_RQF];
+        g_.spFwd(arg1, res1, itmp, rtmp);
       }
     }
     log("IntegratorInternal::spFwd", "end");
@@ -592,6 +591,8 @@ namespace casadi {
     bvec_t *tmp_z = rtmp; rtmp += nz_;
     bvec_t *tmp_rx = rtmp; rtmp += nrx_;
     bvec_t *tmp_rz = rtmp; rtmp += nrz_;
+    bvec_t** arg1 = arg+nIn();
+    bvec_t** res1 = res+nOut();
 
     // Get & clear seeds (forward integration)
     if (res[INTEGRATOR_XF]) {
@@ -623,17 +624,17 @@ namespace casadi {
       }
 
       // Propagate dependencies from quadratures
-      bvec_t* rdae_out[RDAE_NUM_OUT] = {0};
-      rdae_out[RDAE_QUAD] = res[INTEGRATOR_RQF];
-      bvec_t* rdae_in[RDAE_NUM_IN] = {0};
-      rdae_in[RDAE_X] = tmp_x;
-      rdae_in[RDAE_Z] = tmp_z;
-      rdae_in[RDAE_P] = arg[INTEGRATOR_P];
-      rdae_in[RDAE_RX] = tmp_rx;
-      rdae_in[RDAE_RZ] = tmp_rz;
-      rdae_in[RDAE_RP] = arg[INTEGRATOR_RP];
+      fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
+      res1[RDAE_QUAD] = res[INTEGRATOR_RQF];
+      fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
+      arg1[RDAE_X] = tmp_x;
+      arg1[RDAE_Z] = tmp_z;
+      arg1[RDAE_P] = arg[INTEGRATOR_P];
+      arg1[RDAE_RX] = tmp_rx;
+      arg1[RDAE_RZ] = tmp_rz;
+      arg1[RDAE_RP] = arg[INTEGRATOR_RP];
       if (nrq_>0 && res[INTEGRATOR_RQF]) {
-        g_.spAdj(rdae_in, rdae_out, itmp, rtmp);
+        g_.spAdj(arg1, res1, itmp, rtmp);
       }
 
       // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
@@ -643,23 +644,23 @@ namespace casadi {
       linsol_g_.spSolve(tmp_rx, rtmp, true);
 
       // Propagate through g
-      rdae_out[RDAE_ODE] = tmp_rx;
-      rdae_out[RDAE_ALG] = tmp_rx + nrx_;
-      rdae_out[RDAE_QUAD] = 0;
-      rdae_in[RDAE_X] = arg[INTEGRATOR_RX0];
-      rdae_in[RDAE_Z] = 0;
-      g_.spAdj(rdae_in, rdae_out, itmp, rtmp);
+      res1[RDAE_ODE] = tmp_rx;
+      res1[RDAE_ALG] = tmp_rx + nrx_;
+      res1[RDAE_QUAD] = 0;
+      arg1[RDAE_X] = arg[INTEGRATOR_RX0];
+      arg1[RDAE_Z] = 0;
+      g_.spAdj(arg1, res1, itmp, rtmp);
     }
 
     // Propagate dependencies from quadratures
-    bvec_t* dae_out[DAE_NUM_OUT] = {0};
-    dae_out[DAE_QUAD] = res[INTEGRATOR_QF];
-    bvec_t* dae_in[DAE_NUM_IN] = {0};
-    dae_in[DAE_X] = tmp_x;
-    dae_in[DAE_Z] = tmp_z;
-    dae_in[DAE_P] = arg[INTEGRATOR_P];
+    fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
+    res1[DAE_QUAD] = res[INTEGRATOR_QF];
+    fill(arg1, arg1+DAE_NUM_IN, static_cast<bvec_t*>(0));
+    arg1[DAE_X] = tmp_x;
+    arg1[DAE_Z] = tmp_z;
+    arg1[DAE_P] = arg[INTEGRATOR_P];
     if (nq_>0 && res[INTEGRATOR_QF]) {
-      f_.spAdj(dae_in, dae_out, itmp, rtmp);
+      f_.spAdj(arg1, res1, itmp, rtmp);
     }
 
     // "Solve" in order to resolve interdependencies (cf. ImplicitFunction)
@@ -669,12 +670,12 @@ namespace casadi {
     linsol_f_.spSolve(tmp_x, rtmp, true);
 
     // Propagate through f
-    dae_out[DAE_ODE] = tmp_x;
-    dae_out[DAE_ALG] = tmp_x + nx_;
-    dae_out[DAE_QUAD] = 0;
-    dae_in[DAE_X] = arg[INTEGRATOR_X0];
-    dae_in[DAE_Z] = 0; // Note: Ignored, just a guess
-    f_.spAdj(dae_in, dae_out, itmp, rtmp);
+    res1[DAE_ODE] = tmp_x;
+    res1[DAE_ALG] = tmp_x + nx_;
+    res1[DAE_QUAD] = 0;
+    arg1[DAE_X] = arg[INTEGRATOR_X0];
+    arg1[DAE_Z] = 0; // Note: Ignored, just a guess
+    f_.spAdj(arg1, res1, itmp, rtmp);
 
     log("IntegratorInternal::spAdj", "end");
   }

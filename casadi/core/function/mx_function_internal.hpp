@@ -57,9 +57,6 @@ namespace casadi {
     /** \brief Offsets for elements in the rtmp_ vector */
     std::vector<int> workloc_;
 
-    // Length of pointer arrays needed during evaluation
-    std::size_t max_arg_, max_res_;
-
     /// Free variables
     std::vector<MX> free_vars_;
 
