@@ -1380,20 +1380,20 @@ namespace casadi {
     bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(w_tmp_));
 
     // Get pointers to output arguments
-    vector<bvec_t*> res(nOut());
-    for (int i=0; i<res.size(); ++i) res[i]=reinterpret_cast<bvec_t*>(output(i).ptr());
+    vector<bvec_t*> res(sz_res());
+    for (int i=0; i<nOut(); ++i) res[i]=reinterpret_cast<bvec_t*>(output(i).ptr());
 
     if (fwd) {
       // Get pointers to input arguments
-      vector<const bvec_t*> arg(nIn());
-      for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
+      vector<const bvec_t*> arg(sz_arg());
+      for (int i=0; i<nIn(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
 
       // Call memory-less
       spFwd(getPtr(arg), getPtr(res), iw, w);
     } else {
       // Get pointers to input arguments
-      vector<bvec_t*> arg(nIn());
-      for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
+      vector<bvec_t*> arg(sz_arg());
+      for (int i=0; i<nIn(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
 
       // Call memory-less
       spAdj(getPtr(arg), getPtr(res), iw, w);

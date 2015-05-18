@@ -378,8 +378,8 @@ namespace casadi {
     }
 
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<const double*> oarg(sz_arg());
-    vector<double*> ores(sz_res());
+    const double** arg1 = arg+nIn();
+    double** res1 = res+nOut();
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -416,12 +416,12 @@ namespace casadi {
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<it->arg.size(); ++i)
-          oarg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
+          arg1[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
         for (int i=0; i<it->res.size(); ++i)
-          ores[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+          res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalD(getPtr(oarg), getPtr(ores), iw, w);
+        it->data->evalD(arg1, res1, iw, w);
       }
 
       // Write out profiling information
@@ -540,11 +540,10 @@ namespace casadi {
     fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
 
-  void MXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* w) {
+  void MXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
-    vector<const bvec_t*> oarg(sz_arg());
-    vector<bvec_t*> ores(sz_res());
+    const bvec_t** arg1=arg+nIn();
+    bvec_t** res1=res+nOut();
 
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
@@ -570,21 +569,20 @@ namespace casadi {
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<it->arg.size(); ++i)
-          oarg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
+          arg1[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
         for (int i=0; i<it->res.size(); ++i)
-          ores[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+          res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity forwards
-        it->data->spFwd(getPtr(oarg), getPtr(ores), iw, w);
+        it->data->spFwd(arg1, res1, iw, w);
       }
     }
   }
 
-  void MXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* w) {
+  void MXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
-    vector<bvec_t*> oarg(sz_arg());
-    vector<bvec_t*> ores(sz_res());
+    bvec_t** arg1=arg+nIn();
+    bvec_t** res1=res+nOut();
 
     fill_n(w, sz_w(), 0);
 
@@ -612,12 +610,12 @@ namespace casadi {
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<it->arg.size(); ++i)
-          oarg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
+          arg1[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
         for (int i=0; i<it->res.size(); ++i)
-          ores[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+          res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        it->data->spAdj(getPtr(oarg), getPtr(ores), iw, w);
+        it->data->spAdj(arg1, res1, iw, w);
       }
     }
   }
@@ -687,7 +685,7 @@ namespace casadi {
     for (int i=0; i<arg.size(); ++i)
       arg_split[i] = inputv_[i].splitPrimitives(arg[i]);
 
-    vector<MX> oarg, ores;
+    vector<MX> arg1, res1;
 
     // Loop over computational nodes in forward order
     int alg_counter = 0;
@@ -703,20 +701,20 @@ namespace casadi {
         swork[it->res.front()] = it->data;
       } else {
         // Arguments of the operation
-        oarg.resize(it->arg.size());
-        for (int i=0; i<oarg.size(); ++i) {
+        arg1.resize(it->arg.size());
+        for (int i=0; i<arg1.size(); ++i) {
           int el = it->arg[i]; // index of the argument
-          oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : swork[el];
+          arg1[i] = el<0 ? MX(it->data->dep(i).shape()) : swork[el];
         }
 
         // Perform the operation
-        ores.resize(it->res.size());
-        it->data->evalMX(oarg, ores);
+        res1.resize(it->res.size());
+        it->data->evalMX(arg1, res1);
 
         // Get the result
-        for (int i=0; i<ores.size(); ++i) {
+        for (int i=0; i<res1.size(); ++i) {
           int el = it->res[i]; // index of the output
-          if (el>=0) swork[el] = ores[i];
+          if (el>=0) swork[el] = res1[i];
         }
       }
     }
@@ -1259,7 +1257,7 @@ namespace casadi {
 
     vector<MX> swork(workloc_.size()-1);
 
-    vector<MX> oarg, ores;
+    vector<MX> arg1, res1;
 
     // Definition of intermediate variables
     vector<MX> y;
@@ -1307,20 +1305,20 @@ namespace casadi {
         default:
           {
             // Arguments of the operation
-            oarg.resize(it->arg.size());
-            for (int i=0; i<oarg.size(); ++i) {
+            arg1.resize(it->arg.size());
+            for (int i=0; i<arg1.size(); ++i) {
               int el = it->arg[i]; // index of the argument
-              oarg[i] = el<0 ? MX(it->data->dep(i).shape()) : swork[el];
+              arg1[i] = el<0 ? MX(it->data->dep(i).shape()) : swork[el];
             }
 
             // Perform the operation
-            ores.resize(it->res.size());
-            it->data->evalMX(oarg, ores);
+            res1.resize(it->res.size());
+            it->data->evalMX(arg1, res1);
 
             // Get the result
-            for (int i=0; i<ores.size(); ++i) {
+            for (int i=0; i<res1.size(); ++i) {
               int el = it->res[i]; // index of the output
-              if (el>=0) swork[el] = ores[i];
+              if (el>=0) swork[el] = res1[i];
             }
           }
         }
