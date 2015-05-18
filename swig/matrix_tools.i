@@ -113,7 +113,7 @@ MatType densify(const MatType& x);
 MatType simplify(const MatType &x);
 MatType if_else(const MatType &cond, const MatType &if_true, const MatType &if_false,
                 bool short_circuit=true);
-MatType conditional(const MatType& ind, const std::vector<MatType> &x,
+MatType conditional(const MatType& ind, const std::vector< MatType > &x,
                     const MatType &x_default, bool short_circuit=true);
 bool dependsOn(const MatType& f, const MatType &arg);
 %enddef
