@@ -89,6 +89,10 @@ namespace casadi {
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
+    sz_arg_ = 0;
+    sz_res_ = 0;
+    sz_iw_ = 0;
+    sz_w_ = 0;
   }
 
   FunctionInternal::~FunctionInternal() {
@@ -141,11 +145,8 @@ namespace casadi {
     monitor_outputs_ = monitored("outputs");
     gather_stats_ = getOption("gather_stats");
     inputs_check_ = getOption("inputs_check");
-
-    sz_arg_ = nIn();
-    sz_res_ = nOut();
-    sz_iw_ = 0;
-    sz_w_ = 0;
+    alloc_arg(0);
+    alloc_res(0);
 
     // Mark the function as initialized
     is_init_ = true;
