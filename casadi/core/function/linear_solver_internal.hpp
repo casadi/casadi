@@ -70,12 +70,12 @@ namespace casadi {
 
     /// Evaluate SX, possibly transposed
     virtual void evalSXLinsol(const SXElement** arg, SXElement** res,
-                              int* iw, SXElement* rtmp, bool tr, int nrhs);
+                              int* iw, SXElement* w, bool tr, int nrhs);
 
     /// Evaluate SX
     virtual void evalSX(const SXElement** arg, SXElement** res,
-                        int* iw, SXElement* rtmp) {
-      evalSXLinsol(arg, res, iw, rtmp, false, output(LINSOL_X).size2());
+                        int* iw, SXElement* w) {
+      evalSXLinsol(arg, res, iw, w, false, output(LINSOL_X).size2());
     }
 
     /** \brief Calculate forward mode directional derivatives */
@@ -90,11 +90,11 @@ namespace casadi {
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwdLinsol(const bvec_t** arg, bvec_t** res,
-                             int* iw, bvec_t* rtmp, bool tr, int nrhs);
+                             int* iw, bvec_t* w, bool tr, int nrhs);
 
     /** \brief  Propagate sparsity backwards */
     virtual void spAdjLinsol(bvec_t** arg, bvec_t** res,
-                             int* iw, bvec_t* rtmp, bool tr, int nrhs);
+                             int* iw, bvec_t* w, bool tr, int nrhs);
 
     ///@{
     /// Propagate sparsity through a linear solve

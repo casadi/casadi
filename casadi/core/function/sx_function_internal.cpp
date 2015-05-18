@@ -73,7 +73,7 @@ namespace casadi {
   }
 
   void SXFunctionInternal::evalD(const double** arg, double** res,
-                                 int* iw, double* rtmp) {
+                                 int* iw, double* w) {
     double time_start=0;
     double time_stop=0;
     if (CasadiOptions::profiling) {
@@ -107,11 +107,11 @@ namespace casadi {
     // Evaluate the algorithm
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
-        CASADI_MATH_FUN_BUILTIN(rtmp[it->i1], rtmp[it->i2], rtmp[it->i0])
+        CASADI_MATH_FUN_BUILTIN(w[it->i1], w[it->i2], w[it->i0])
 
-      case OP_CONST: rtmp[it->i0] = it->d; break;
-      case OP_INPUT: rtmp[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
-      case OP_OUTPUT: if (res[it->i0]!=0) res[it->i0][it->i2] = rtmp[it->i1]; break;
+      case OP_CONST: w[it->i0] = it->d; break;
+      case OP_INPUT: w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
+      case OP_OUTPUT: if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1]; break;
       default:
         casadi_error("SXFunctionInternal::evalD: Unknown operation" << it->op);
       }
@@ -579,7 +579,7 @@ namespace casadi {
   }
 
   void SXFunctionInternal::evalSX(const SXElement** arg, SXElement** res,
-                                  int* iw, SXElement* rtmp) {
+                                  int* iw, SXElement* w) {
     if (verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
     // Iterator to the binary operations
@@ -596,23 +596,23 @@ namespace casadi {
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
-        rtmp[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2];
+        w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2];
         break;
       case OP_OUTPUT:
-        if (res[it->i0]!=0) res[it->i0][it->i2] = rtmp[it->i1];
+        if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1];
         break;
       case OP_CONST:
-        rtmp[it->i0] = *c_it++;
+        w[it->i0] = *c_it++;
         break;
       case OP_PARAMETER:
-        rtmp[it->i0] = *p_it++; break;
+        w[it->i0] = *p_it++; break;
       default:
         {
           // Evaluate the function to a temporary value
           // (as it might overwrite the children in the work vector)
           SXElement f;
           switch (it->op) {
-            CASADI_MATH_FUN_BUILTIN(rtmp[it->i1], rtmp[it->i2], f)
+            CASADI_MATH_FUN_BUILTIN(w[it->i1], w[it->i2], f)
           }
 
           // If this new expression is identical to the expression used
@@ -621,7 +621,7 @@ namespace casadi {
           f.assignIfDuplicate(*b_it++, depth);
 
           // Finally save the function value
-          rtmp[it->i0] = f;
+          w[it->i0] = f;
         }
       }
     }
@@ -857,26 +857,26 @@ namespace casadi {
   }
 
   void SXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* rtmp) {
+                                 int* iw, bvec_t* w) {
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_CONST:
       case OP_PARAMETER:
-        rtmp[it->i0] = 0; break;
+        w[it->i0] = 0; break;
       case OP_INPUT:
-        rtmp[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
+        w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
       case OP_OUTPUT:
-        if (res[it->i0]!=0) res[it->i0][it->i2] = rtmp[it->i1]; break;
+        if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1]; break;
       default: // Unary or binary operation
-        rtmp[it->i0] = rtmp[it->i1] | rtmp[it->i2]; break;
+        w[it->i0] = w[it->i1] | w[it->i2]; break;
       }
     }
   }
 
   void SXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* rtmp) {
-    fill_n(rtmp, n_w_, 0);
+                                 int* iw, bvec_t* w) {
+    fill_n(w, n_w_, 0);
 
     // Propagate sparsity backward
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
@@ -887,23 +887,23 @@ namespace casadi {
       switch (it->op) {
       case OP_CONST:
       case OP_PARAMETER:
-        rtmp[it->i0] = 0;
+        w[it->i0] = 0;
         break;
       case OP_INPUT:
-        if (arg[it->i1]!=0) arg[it->i1][it->i2] |= rtmp[it->i0];
-        rtmp[it->i0] = 0;
+        if (arg[it->i1]!=0) arg[it->i1][it->i2] |= w[it->i0];
+        w[it->i0] = 0;
         break;
       case OP_OUTPUT:
         if (res[it->i0]!=0) {
-          rtmp[it->i1] |= res[it->i0][it->i2];
+          w[it->i1] |= res[it->i0][it->i2];
           res[it->i0][it->i2] = 0;
         }
         break;
       default: // Unary or binary operation
-        seed = rtmp[it->i0];
-        rtmp[it->i0] = 0;
-        rtmp[it->i1] |= seed;
-        rtmp[it->i2] |= seed;
+        seed = w[it->i0];
+        w[it->i0] = 0;
+        w[it->i1] |= seed;
+        w[it->i2] |= seed;
       }
     }
   }

@@ -38,28 +38,28 @@ namespace casadi {
   }
 
   void SubRef::evalD(const double** input, double** output,
-                         int* iw, double* rtmp) {
-    evalGen<double>(input, output, iw, rtmp);
+                         int* iw, double* w) {
+    evalGen<double>(input, output, iw, w);
   }
 
   void SubRef::evalSX(const SXElement** input, SXElement** output,
-                          int* iw, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, iw, rtmp);
+                          int* iw, SXElement* w) {
+    evalGen<SXElement>(input, output, iw, w);
   }
 
   template<typename T>
   void SubRef::evalGen(const T* const* arg, T* const* res,
-                       int* iw, T* rtmp) {
+                       int* iw, T* w) {
     casadi_error("not ready");
   }
 
   void SubRef::spFwd(const bvec_t** arg,
-                     bvec_t** res, int* iw, bvec_t* rtmp) {
+                     bvec_t** res, int* iw, bvec_t* w) {
     casadi_error("not ready");
   }
 
   void SubRef::spAdj(bvec_t** arg,
-                     bvec_t** res, int* iw, bvec_t* rtmp) {
+                     bvec_t** res, int* iw, bvec_t* w) {
     casadi_error("not ready");
   }
 

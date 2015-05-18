@@ -302,13 +302,13 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::evalD(const double** input, double** output, int* iw, double* rtmp) {
+  void MXNode::evalD(const double** input, double** output, int* iw, double* w) {
     throw CasadiException(string("MXNode::evalD not defined for class ")
                           + typeid(*this).name());
   }
 
   void MXNode::evalSX(const SXElement** input, SXElement** output,
-                          int* iw, SXElement* rtmp) {
+                          int* iw, SXElement* w) {
     throw CasadiException(string("MXNode::evalSX not defined for class ")
                           + typeid(*this).name());
   }
@@ -330,7 +330,7 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp) {
+  void MXNode::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -351,7 +351,7 @@ namespace casadi {
     }
   }
 
-  void MXNode::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp) {
+  void MXNode::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 

@@ -54,7 +54,7 @@ namespace casadi {
     /** \brief  All the runtime elements in the order of evaluation */
     std::vector<AlgEl> algorithm_;
 
-    /** \brief Offsets for elements in the rtmp_ vector */
+    /** \brief Offsets for elements in the w_ vector */
     std::vector<int> workloc_;
 
     /// Free variables
@@ -74,7 +74,7 @@ namespace casadi {
     virtual ~MXFunctionInternal();
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
@@ -97,7 +97,7 @@ namespace casadi {
 
     /** \brief Evaluate symbolically, SX type*/
     virtual void evalSX(const SXElement** arg, SXElement** res,
-                        int* iw, SXElement* rtmp);
+                        int* iw, SXElement* w);
 
     /** \brief Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -120,10 +120,10 @@ namespace casadi {
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd) { return true;}

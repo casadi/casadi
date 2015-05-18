@@ -1275,7 +1275,7 @@ namespace casadi {
   }
 
   void FunctionInternal::evalD(const double** arg,
-                               double** res, int* iw, double* rtmp) {
+                               double** res, int* iw, double* w) {
     // Number of inputs and outputs
     int num_in = nIn();
     int num_out = nOut();
@@ -1299,7 +1299,7 @@ namespace casadi {
   }
 
   void FunctionInternal::evalSX(const SXElement** arg, SXElement** res,
-                                int* iw, SXElement* rtmp) {
+                                int* iw, SXElement* w) {
     // Number of inputs and outputs
     int num_in = nIn();
     int num_out = nOut();
@@ -2220,13 +2220,13 @@ namespace casadi {
   }
 
   void FunctionInternal::spFwdSwitch(const bvec_t** arg, bvec_t** res,
-                                     int* iw, bvec_t* rtmp) {
+                                     int* iw, bvec_t* w) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
-    spFwd(arg, res, iw, rtmp);
+    spFwd(arg, res, iw, w);
   }
 
   void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
-                               int* iw, bvec_t* rtmp) {
+                               int* iw, bvec_t* w) {
     // Number inputs and outputs
     int n_in = nIn();
     int n_out = nOut();
@@ -2277,13 +2277,13 @@ namespace casadi {
   }
 
   void FunctionInternal::spAdjSwitch(bvec_t** arg, bvec_t** res,
-                                     int* iw, bvec_t* rtmp) {
+                                     int* iw, bvec_t* w) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
-    spAdj(arg, res, iw, rtmp);
+    spAdj(arg, res, iw, w);
   }
 
   void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
-                               int* iw, bvec_t* rtmp) {
+                               int* iw, bvec_t* w) {
     // Number inputs and outputs
     int n_in = nIn();
     int n_out = nOut();

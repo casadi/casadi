@@ -79,11 +79,11 @@ namespace casadi {
     return ss.str();
   }
 
-  void Map::evalD(const double** arg, double** res, int* iw, double* rtmp) {
+  void Map::evalD(const double** arg, double** res, int* iw, double* w) {
     int f_num_in = fcn_.nIn();
     int f_num_out = fcn_.nOut();
     for (int i=0; i<n_; ++i) {
-      fcn_->evalD(arg, res, iw, rtmp);
+      fcn_->evalD(arg, res, iw, w);
       arg += f_num_in;
       res += f_num_out;
     }
@@ -111,21 +111,21 @@ namespace casadi {
 #endif // WITH_OPENMP
   }
 
-  void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp) {
+  void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     int f_num_in = fcn_.nIn();
     int f_num_out = fcn_.nOut();
     for (int i=0; i<n_; ++i) {
-      fcn_->spFwd(arg, res, iw, rtmp);
+      fcn_->spFwd(arg, res, iw, w);
       arg += f_num_in;
       res += f_num_out;
     }
   }
 
-  void Map::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp) {
+  void Map::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     int f_num_in = fcn_.nIn();
     int f_num_out = fcn_.nOut();
     for (int i=0; i<n_; ++i) {
-      fcn_->spAdj(arg, res, iw, rtmp);
+      fcn_->spAdj(arg, res, iw, w);
       arg += f_num_in;
       res += f_num_out;
     }
@@ -145,11 +145,11 @@ namespace casadi {
     return fcn_;
   }
 
-  void Map::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* rtmp) {
+  void Map::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
     int f_num_in = fcn_.nIn();
     int f_num_out = fcn_.nOut();
     for (int i=0; i<n_; ++i) {
-      fcn_->evalSX(arg, res, iw, rtmp);
+      fcn_->evalSX(arg, res, iw, w);
       arg += f_num_in;
       res += f_num_out;
     }

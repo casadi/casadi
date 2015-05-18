@@ -98,23 +98,23 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T* const* arg, T* const* res, int* iw, T* rtmp);
+    void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
 
     /// Evaluate the function numerically
     virtual void evalD(const double** input, double** output,
-                       int* iw, double* rtmp);
+                       int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
     virtual void evalSX(const SXElement** input, SXElement** output,
-                            int* iw, SXElement* rtmp);
+                            int* iw, SXElement* w);
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* rtmp);
+                       bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* rtmp);
+                       bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -155,23 +155,23 @@ namespace casadi {
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* rtmp);
+                       bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* rtmp);
+                       bvec_t** res, int* iw, bvec_t* w);
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T* const* arg, T* const* res, int* iw, T* rtmp);
+    void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
 
     /// Evaluate the function numerically
     virtual void evalD(const double** input, double** output,
-                       int* iw, double* rtmp);
+                       int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
     virtual void evalSX(const SXElement** input, SXElement** output,
-                        int* iw, SXElement* rtmp);
+                        int* iw, SXElement* w);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -207,23 +207,23 @@ namespace casadi {
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* rtmp);
+                       bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* rtmp);
+                       bvec_t** res, int* iw, bvec_t* w);
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T* const* arg, T* const* res, int* iw, T* rtmp);
+    void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
 
     /// Evaluate the function numerically
     virtual void evalD(const double** input, double** output,
-                       int* iw, double* rtmp);
+                       int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
     virtual void evalSX(const SXElement** input, SXElement** output,
-                            int* iw, SXElement* rtmp);
+                            int* iw, SXElement* w);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;

@@ -361,7 +361,7 @@ namespace casadi {
   }
 
   void MXFunctionInternal::evalD(const double** arg,
-                                 double** res, int* iw, double* rtmp) {
+                                 double** res, int* iw, double* w) {
     casadi_log("MXFunctionInternal::evalD():begin "  << getOption("name"));
     // Set up timers for profiling
     double time_zero=0;
@@ -398,29 +398,29 @@ namespace casadi {
 
       if (it->op==OP_INPUT) {
         // Pass an input
-        double *w = rtmp+workloc_[it->res.front()];
+        double *w1 = w+workloc_[it->res.front()];
         int nnz=it->data.nnz();
         int i=it->arg.at(0);
         int nz_offset=it->arg.at(2);
         if (arg[i]==0) {
-          fill(w, w+nnz, 0);
+          fill(w1, w1+nnz, 0);
         } else {
-          copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w);
+          copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
         }
       } else if (it->op==OP_OUTPUT) {
         // Get an output
-        double *w = rtmp+workloc_[it->arg.front()];
+        double *w1 = w+workloc_[it->arg.front()];
         int i=it->res.front();
-        if (res[i]!=0) copy(w, w+output(i).nnz(), res[i]);
+        if (res[i]!=0) copy(w1, w1+output(i).nnz(), res[i]);
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<it->arg.size(); ++i)
-          oarg[i] = it->arg[i]>=0 ? rtmp+workloc_[it->arg[i]] : 0;
+          oarg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
         for (int i=0; i<it->res.size(); ++i)
-          ores[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
+          ores[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalD(getPtr(oarg), getPtr(ores), iw, rtmp);
+        it->data->evalD(getPtr(oarg), getPtr(ores), iw, w);
       }
 
       // Write out profiling information
@@ -540,7 +540,7 @@ namespace casadi {
   }
 
   void MXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* rtmp) {
+                                 int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
     vector<const bvec_t*> oarg(n_arg_);
     vector<bvec_t*> ores(n_res_);
@@ -553,7 +553,7 @@ namespace casadi {
         int i=it->arg.at(0);
         int nz_offset=it->arg.at(2);
         const bvec_t* argi = arg[i];
-        bvec_t* w1 = rtmp + workloc_[it->res.front()];
+        bvec_t* w1 = w + workloc_[it->res.front()];
         if (argi!=0) {
           copy(argi+nz_offset, argi+nz_offset+nnz, w1);
         } else {
@@ -564,28 +564,28 @@ namespace casadi {
         int i=it->res.front();
         int nnz=output(i).nnz();
         bvec_t* resi = res[i];
-        bvec_t* w1 = rtmp + workloc_[it->arg.front()];
+        bvec_t* w1 = w + workloc_[it->arg.front()];
         if (resi!=0) copy(w1, w1+nnz, resi);
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<it->arg.size(); ++i)
-          oarg[i] = it->arg[i]>=0 ? rtmp+workloc_[it->arg[i]] : 0;
+          oarg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
         for (int i=0; i<it->res.size(); ++i)
-          ores[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
+          ores[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity forwards
-        it->data->spFwd(getPtr(oarg), getPtr(ores), iw, rtmp);
+        it->data->spFwd(getPtr(oarg), getPtr(ores), iw, w);
       }
     }
   }
 
   void MXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* rtmp) {
+                                 int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
     vector<bvec_t*> oarg(n_arg_);
     vector<bvec_t*> ores(n_res_);
 
-    fill_n(rtmp, n_w_, 0);
+    fill_n(w, n_w_, 0);
 
     // Propagate sparsity backwards
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
@@ -595,28 +595,28 @@ namespace casadi {
         int i=it->arg.at(0);
         int nz_offset=it->arg.at(2);
         bvec_t* argi = arg[i];
-        bvec_t* w = rtmp + workloc_[it->res.front()];
-        if (argi!=0) for (int k=0; k<nnz; ++k) argi[nz_offset+k] |= w[k];
-        fill_n(w, nnz, 0);
+        bvec_t* w1 = w + workloc_[it->res.front()];
+        if (argi!=0) for (int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
+        fill_n(w1, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
         int i=it->res.front();
         int nnz=output(i).nnz();
-        bvec_t* ow = res[i];
-        bvec_t* w = rtmp + workloc_[it->arg.front()];
-        if (ow!=0) {
-          for (int k=0; k<nnz; ++k) w[k] |= ow[k];
-          fill_n(ow, nnz, 0);
+        bvec_t* resi = res[i];
+        bvec_t* w1 = w + workloc_[it->arg.front()];
+        if (resi!=0) {
+          for (int k=0; k<nnz; ++k) w1[k] |= resi[k];
+          fill_n(resi, nnz, 0);
         }
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<it->arg.size(); ++i)
-          oarg[i] = it->arg[i]>=0 ? rtmp+workloc_[it->arg[i]] : 0;
+          oarg[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
         for (int i=0; i<it->res.size(); ++i)
-          ores[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
+          ores[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        it->data->spAdj(getPtr(oarg), getPtr(ores), iw, rtmp);
+        it->data->spAdj(getPtr(oarg), getPtr(ores), iw, w);
       }
     }
   }
@@ -1027,7 +1027,7 @@ namespace casadi {
   }
 
   void MXFunctionInternal::evalSX(const SXElement** arg, SXElement** res,
-                                  int* iw, SXElement* rtmp) {
+                                  int* iw, SXElement* w) {
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElement*> argp(n_arg_);
     vector<SXElement*> resp(n_res_);
@@ -1037,32 +1037,32 @@ namespace casadi {
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
       if (it->op==OP_INPUT) {
         // Pass an input
-        SXElement *w = rtmp+workloc_[it->res.front()];
+        SXElement *w1 = w+workloc_[it->res.front()];
         int nnz=it->data.nnz();
         int i=it->arg.at(0);
         int nz_offset=it->arg.at(2);
         if (arg[i]==0) {
-          std::fill(w, w+nnz, 0);
+          std::fill(w1, w1+nnz, 0);
         } else {
-          std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w);
+          std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
         }
       } else if (it->op==OP_OUTPUT) {
         // Get the outputs
-        SXElement *w = rtmp+workloc_[it->arg.front()];
+        SXElement *w1 = w+workloc_[it->arg.front()];
         int i=it->res.front();
         if (res[i]!=0)
-          std::copy(w, w+output(i).nnz(), res[i]);
+          std::copy(w1, w1+output(i).nnz(), res[i]);
       } else if (it->op==OP_PARAMETER) {
         continue; // FIXME
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<it->arg.size(); ++i)
-          argp[i] = it->arg[i]>=0 ? rtmp+workloc_[it->arg[i]] : 0;
+          argp[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
         for (int i=0; i<it->res.size(); ++i)
-          resp[i] = it->res[i]>=0 ? rtmp+workloc_[it->res[i]] : 0;
+          resp[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalSX(getPtr(argp), getPtr(resp), iw, rtmp);
+        it->data->evalSX(getPtr(argp), getPtr(resp), iw, w);
       }
     }
   }

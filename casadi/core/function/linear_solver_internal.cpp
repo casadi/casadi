@@ -195,7 +195,7 @@ namespace casadi {
 
   void LinearSolverInternal::
   spFwdLinsol(const bvec_t** arg, bvec_t** res,
-              int* iw, bvec_t* rtmp, bool tr, int nrhs) {
+              int* iw, bvec_t* w, bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -205,7 +205,7 @@ namespace casadi {
     // Get pointers to data
     const bvec_t *B=arg[0], *A = arg[1];
     bvec_t* X = res[0];
-    bvec_t* tmp = rtmp;
+    bvec_t* tmp = w;
 
     // For all right-hand-sides
     for (int r=0; r<nrhs; ++r) {
@@ -232,7 +232,7 @@ namespace casadi {
 
   void LinearSolverInternal::
   spAdjLinsol(bvec_t** arg, bvec_t** res,
-              int* iw, bvec_t* rtmp, bool tr, int nrhs) {
+              int* iw, bvec_t* w, bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -241,7 +241,7 @@ namespace casadi {
 
     // Get pointers to data
     bvec_t *B=arg[0], *A=arg[1], *X=res[0];
-    bvec_t* tmp = rtmp;
+    bvec_t* tmp = w;
 
     // For all right-hand-sides
     for (int r=0; r<nrhs; ++r) {
@@ -341,7 +341,7 @@ namespace casadi {
   }
 
   void LinearSolverInternal::evalSXLinsol(const SXElement** arg, SXElement** res,
-                                           int* iw, SXElement* rtmp, bool tr, int nrhs) {
+                                           int* iw, SXElement* w, bool tr, int nrhs) {
     casadi_error("LinearSolverInternal::evalSXLinsol not defined for class "
                  << typeid(*this).name());
   }

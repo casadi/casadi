@@ -221,11 +221,11 @@ namespace casadi {
   }
 
   void ImplicitFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
-                                       int* iw, bvec_t* rtmp) {
+                                       int* iw, bvec_t* w) {
     int num_out = nOut();
     int num_in = nIn();
-    bvec_t* tmp1 = rtmp; rtmp += n_;
-    bvec_t* tmp2 = rtmp; rtmp += n_;
+    bvec_t* tmp1 = w; w += n_;
+    bvec_t* tmp2 = w; w += n_;
 
     // Propagate dependencies through the function
     const bvec_t** arg1 = arg+nIn();
@@ -234,7 +234,7 @@ namespace casadi {
     bvec_t** res1 = res+nOut();
     fill_n(res1, num_out, static_cast<bvec_t*>(0));
     res1[iout_] = tmp1;
-    f_.spFwd(arg1, res1, iw, rtmp);
+    f_.spFwd(arg1, res1, iw, w);
 
     // "Solve" in order to propagate to z
     fill_n(tmp2, n_, 0);
@@ -246,16 +246,16 @@ namespace casadi {
       arg1[iin_] = tmp2;
       copy(res, res+num_out, res1);
       res1[iout_] = 0;
-      f_.spFwd(arg1, res1, iw, rtmp);
+      f_.spFwd(arg1, res1, iw, w);
     }
   }
 
   void ImplicitFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
-                                       int* iw, bvec_t* rtmp) {
+                                       int* iw, bvec_t* w) {
     int num_out = nOut();
     int num_in = nIn();
-    bvec_t* tmp1 = rtmp; rtmp += n_;
-    bvec_t* tmp2 = rtmp; rtmp += n_;
+    bvec_t* tmp1 = w; w += n_;
+    bvec_t* tmp2 = w; w += n_;
 
     // Get & clear seed corresponding to implicitly defined variable
     if (res[iout_]) {
@@ -273,7 +273,7 @@ namespace casadi {
     copy(arg, arg+num_in, arg1);
     arg1[iin_] = tmp1;
     if (num_out>1) {
-      f_.spAdj(arg1, res1, iw, rtmp);
+      f_.spAdj(arg1, res1, iw, w);
     }
 
     // "Solve" in order to get seed
@@ -284,7 +284,7 @@ namespace casadi {
     for (int i=0; i<num_out; ++i) res1[i] = 0;
     res1[iout_] = tmp2;
     arg1[iin_] = 0; // just a guess
-    f_.spAdj(arg1, res1, iw, rtmp);
+    f_.spAdj(arg1, res1, iw, w);
   }
 
   std::map<std::string, ImplicitFunctionInternal::Plugin> ImplicitFunctionInternal::solvers_;

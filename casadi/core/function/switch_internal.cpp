@@ -116,7 +116,7 @@ namespace casadi {
     }
   }
 
-  void SwitchInternal::evalD(const double** arg, double** res, int* iw, double* rtmp) {
+  void SwitchInternal::evalD(const double** arg, double** res, int* iw, double* w) {
     // Get conditional
     int k = static_cast<int>(*arg[0]);
 
@@ -136,7 +136,7 @@ namespace casadi {
     }
 
     // Evaluate the corresponding function
-    fk->evalD(arg+1, res, iw, rtmp);
+    fk->evalD(arg+1, res, iw, w);
   }
 
   Function SwitchInternal::getDerForward(int nfwd) {

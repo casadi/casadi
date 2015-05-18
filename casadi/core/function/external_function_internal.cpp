@@ -184,9 +184,9 @@ namespace casadi {
   }
 
   void ExternalFunctionInternal::evalD(const double** arg, double** res,
-                                       int* iw, double* rtmp) {
+                                       int* iw, double* w) {
 #ifdef WITH_DL
-    int flag = eval_(arg, res, iw, rtmp);
+    int flag = eval_(arg, res, iw, w);
     if (flag) throw CasadiException("ExternalFunctionInternal: \""+f_name_+"\" failed");
 #endif // WITH_DL
   }

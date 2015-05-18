@@ -40,14 +40,6 @@ namespace casadi {
   ConstantMX::~ConstantMX() {
   }
 
-  void ConstantMX::evalD(const double** input, double** output,
-                             int* iw, double* rtmp) {
-  }
-
-  void ConstantMX::evalSX(const SXElement** input, SXElement** output,
-                              int* iw, SXElement* rtmp) {
-  }
-
   void ConstantMX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = shared_from_this<MX>();
   }
@@ -65,12 +57,12 @@ namespace casadi {
   }
 
   void ConstantMX::spFwd(const bvec_t** arg,
-                         bvec_t** res, int* iw, bvec_t* rtmp) {
+                         bvec_t** res, int* iw, bvec_t* w) {
     fill_n(res[0], nnz(), 0);
   }
 
   void ConstantMX::spAdj(bvec_t** arg,
-                         bvec_t** res, int* iw, bvec_t* rtmp) {
+                         bvec_t** res, int* iw, bvec_t* w) {
     fill_n(res[0], nnz(), 0);
   }
 

@@ -40,18 +40,18 @@ namespace casadi {
   }
 
   void NormF::evalD(const double** input, double** output,
-                    int* iw, double* rtmp) {
-    evalGen<double>(input, output, iw, rtmp);
+                    int* iw, double* w) {
+    evalGen<double>(input, output, iw, w);
   }
 
   void NormF::evalSX(const SXElement** input, SXElement** output,
-                         int* iw, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, iw, rtmp);
+                         int* iw, SXElement* w) {
+    evalGen<SXElement>(input, output, iw, w);
   }
 
   template<typename T>
   void NormF::evalGen(const T* const* arg, T* const* res,
-                      int* iw, T* rtmp) {
+                      int* iw, T* w) {
     *res[0] = sqrt(casadi_inner_prod(dep().nnz(), arg[0], arg[0]));
   }
 

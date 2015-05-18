@@ -52,22 +52,22 @@ namespace casadi {
   }
 
   void Multiplication::evalD(const double** input, double** output,
-                                 int* iw, double* rtmp) {
-    evalGen<double>(input, output, iw, rtmp);
+                                 int* iw, double* w) {
+    evalGen<double>(input, output, iw, w);
   }
 
   void Multiplication::evalSX(const SXElement** input, SXElement** output,
-                                  int* iw, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, iw, rtmp);
+                                  int* iw, SXElement* w) {
+    evalGen<SXElement>(input, output, iw, w);
   }
 
   template<typename T>
   void Multiplication::evalGen(const T* const* arg, T* const* res,
-                               int* iw, T* rtmp) {
+                               int* iw, T* w) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     casadi_mm_sparse(arg[1], dep(1).sparsity(),
                      arg[2], dep(2).sparsity(),
-                     res[0], sparsity(), rtmp);
+                     res[0], sparsity(), w);
   }
 
   void Multiplication::evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -93,18 +93,18 @@ namespace casadi {
   }
 
   void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* iw,
-                             bvec_t* rtmp) {
+                             bvec_t* w) {
     copyFwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
-                            res[0], sparsity(), rtmp);
+                            res[0], sparsity(), w);
   }
 
   void Multiplication::spAdj(bvec_t** arg, bvec_t** res,
-                             int* iw, bvec_t* rtmp) {
+                             int* iw, bvec_t* w) {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
-                            res[0], sparsity(), rtmp);
+                            res[0], sparsity(), w);
     copyAdj(arg[0], res[0], nnz());
   }
 

@@ -54,21 +54,21 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T* const* arg, T* const* res, int* iw, T* rtmp);
+    void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
 
     /// Evaluate the function numerically
     virtual void evalD(const double** input, double** output,
-                       int* iw, double* rtmp);
+                       int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
     virtual void evalSX(const SXElement** input, SXElement** output,
-                            int* iw, SXElement* rtmp);
+                            int* iw, SXElement* w);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Generate code for the operation */
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
