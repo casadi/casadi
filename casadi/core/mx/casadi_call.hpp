@@ -129,8 +129,17 @@ namespace casadi {
     /** \brief Get the operation */
     virtual int getOp() const { return OP_CALL;}
 
-    /** \brief Get number of temporary variables needed */
-    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const;
+    /** \brief Get required length of arg field */
+    virtual size_t sz_arg() const;
+
+    /** \brief Get required length of res field */
+    virtual size_t sz_res() const;
+
+    /** \brief Get required length of iw field */
+    virtual size_t sz_iw() const;
+
+    /** \brief Get required length of w field */
+    virtual size_t sz_w() const;
 
   protected:
     /** \brief  Constructor (should not be used directly) */

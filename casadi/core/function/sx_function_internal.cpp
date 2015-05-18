@@ -228,7 +228,7 @@ namespace casadi {
   void SXFunctionInternal::generateBody(CodeGenerator& g) const {
 
     // Which variables have been declared
-    vector<bool> declared(n_w_, false);
+    vector<bool> declared(sz_w(), false);
 
     // Run the algorithm
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -451,8 +451,8 @@ namespace casadi {
     }
 
     // Allocate work vectors (symbolic/numeric)
-    n_w_ = max(n_w_, worksize);
-    w_tmp_.resize(n_w_, numeric_limits<double>::quiet_NaN());
+    alloc_w(worksize);
+    alloc();
     s_work_.resize(worksize);
 
     // Reset the temporary variables
@@ -851,9 +851,9 @@ namespace casadi {
     // We need a work array containing unsigned long rather than doubles.
     // Since the two datatypes have the same size (64 bits)
     // we can save overhead by reusing the double array
-    w_tmp_.resize(n_w_);
+    alloc();
     bvec_t *iwork = get_bvec_t(w_tmp_);
-    if (!fwd) fill_n(iwork, n_w_, bvec_t(0));
+    if (!fwd) fill_n(iwork, sz_w(), bvec_t(0));
   }
 
   void SXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
@@ -876,7 +876,7 @@ namespace casadi {
 
   void SXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                  int* iw, bvec_t* w) {
-    fill_n(w, n_w_, 0);
+    fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {

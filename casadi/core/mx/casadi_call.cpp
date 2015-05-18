@@ -191,8 +191,20 @@ namespace casadi {
     g.body << "  }" << endl;
   }
 
-  void Call::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-    fcn_.nwork(n_arg, n_res, n_iw, n_w);
+  size_t Call::sz_arg() const {
+    return fcn_.sz_arg();
+  }
+
+  size_t Call::sz_res() const {
+    return fcn_.sz_res();
+  }
+
+  size_t Call::sz_iw() const {
+    return fcn_.sz_iw();
+  }
+
+  size_t Call::sz_w() const {
+    return fcn_.sz_w();
   }
 
   std::vector<MX> Call::create(const Function& fcn, const std::vector<MX>& arg) {

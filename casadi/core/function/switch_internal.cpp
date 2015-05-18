@@ -96,23 +96,23 @@ namespace casadi {
       if (fk.isNull()) continue;
 
       // Get local work vector sizes
-      size_t n_arg, n_res, n_iw, n_w;
-      fk.nwork(n_arg, n_res, n_iw, n_w);
+      alloc(fk);
+      size_t sz_w = fk.sz_w();
 
       // Add size for input buffers
       for (int i=1; i<nIn(); ++i) {
         const Sparsity& s = fk.input(i-1).sparsity();
-        if (s!=input(i).sparsity()) n_w += s.nnz();
+        if (s!=input(i).sparsity()) sz_w += s.nnz();
       }
 
       // Add size for output buffers
       for (int i=0; i<nOut(); ++i) {
         const Sparsity& s = fk.output(i).sparsity();
-        if (s!=output(i).sparsity()) n_w += s.nnz();
+        if (s!=output(i).sparsity()) sz_w += s.nnz();
       }
 
-      // Mae sure enough work for this
-      allocwork(n_arg, n_res, n_iw, n_w);
+      // Make sure enough work for this
+      alloc_w(sz_w);
     }
   }
 

@@ -261,15 +261,15 @@ namespace casadi {
     // Allocate work vectors (numeric)
     workloc_.resize(worksize+1);
     fill(workloc_.begin(), workloc_.end(), -1);
-    n_w_ = n_iw_ = 0;
-    size_t wind=0;
+    size_t wind=0, sz_w=0;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (it->op!=OP_OUTPUT) {
         for (int c=0; c<it->res.size(); ++c) {
           if (it->res[c]>=0) {
-            size_t n_arg, n_res, n_iw, n_w;
-            it->data->nwork(n_arg, n_res, n_iw, n_w);
-            allocwork(n_arg+it->arg.size(), n_res+it->res.size(), n_iw, n_w);
+            alloc_arg(it->data->sz_arg());
+            alloc_res(it->data->sz_res());
+            alloc_iw(it->data->sz_iw());
+            sz_w = max(sz_w, it->data->sz_w());
             if (workloc_[it->res[c]] < 0) {
               workloc_[it->res[c]] = wind;
               wind += it->data->sparsity(c).nnz();
@@ -281,9 +281,10 @@ namespace casadi {
     workloc_.back()=wind;
     for (int i=0; i<workloc_.size(); ++i) {
       if (workloc_[i]<0) workloc_[i] = i==0 ? 0 : workloc_[i-1];
-      workloc_[i] += n_w_;
+      workloc_[i] += sz_w;
     }
-    n_w_ += wind;
+    sz_w += wind;
+    alloc_w(sz_w);
 
     // Reset the temporary variables
     for (int i=0; i<nodes.size(); ++i) {
@@ -377,8 +378,8 @@ namespace casadi {
     }
 
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<const double*> oarg(n_arg_);
-    vector<double*> ores(n_res_);
+    vector<const double*> oarg(sz_arg());
+    vector<double*> ores(sz_res());
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -534,7 +535,7 @@ namespace casadi {
   }
 
   void MXFunctionInternal::spInit(bool fwd) {
-    w_tmp_.resize(n_w_);
+    alloc();
     bvec_t *iwork = get_bvec_t(w_tmp_);
     fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
@@ -542,8 +543,8 @@ namespace casadi {
   void MXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                  int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
-    vector<const bvec_t*> oarg(n_arg_);
-    vector<bvec_t*> ores(n_res_);
+    vector<const bvec_t*> oarg(sz_arg());
+    vector<bvec_t*> ores(sz_res());
 
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
@@ -582,10 +583,10 @@ namespace casadi {
   void MXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                  int* iw, bvec_t* w) {
     // Temporaries to hold pointers to operation input and outputs
-    vector<bvec_t*> oarg(n_arg_);
-    vector<bvec_t*> ores(n_res_);
+    vector<bvec_t*> oarg(sz_arg());
+    vector<bvec_t*> ores(sz_res());
 
-    fill_n(w, n_w_, 0);
+    fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backwards
     for (vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
@@ -1029,8 +1030,8 @@ namespace casadi {
   void MXFunctionInternal::evalSX(const SXElement** arg, SXElement** res,
                                   int* iw, SXElement* w) {
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<const SXElement*> argp(n_arg_);
-    vector<SXElement*> resp(n_res_);
+    vector<const SXElement*> argp(sz_arg());
+    vector<SXElement*> resp(sz_res());
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!

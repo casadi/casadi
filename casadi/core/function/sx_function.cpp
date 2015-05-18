@@ -159,7 +159,7 @@ namespace casadi {
   }
 
   int SXFunction::getWorkSize() const {
-    return (*this)->n_w_;
+    return (*this)->sz_w();
   }
 
 } // namespace casadi

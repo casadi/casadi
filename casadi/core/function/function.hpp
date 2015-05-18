@@ -493,9 +493,21 @@ namespace casadi {
      * derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
     void spEvaluate(bool fwd);
 
+    /** \brief Get required length of arg field */
+    size_t sz_arg() const;
+
+    /** \brief Get required length of res field */
+    size_t sz_res() const;
+
+    /** \brief Get required length of iw field */
+    size_t sz_iw() const;
+
+    /** \brief Get required length of w field */
+    size_t sz_w() const;
+
 #ifndef SWIG
     /** \brief Get number of temporary variables needed */
-    void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const;
+    void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 
     /** \brief  Propagate sparsity forward */
     void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);

@@ -88,11 +88,8 @@ namespace casadi {
     /** \brief Get the operation */
     virtual int getOp() const { return OP_TRANSPOSE;}
 
-    /** \brief Get number of temporary variables needed */
-    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-      n_arg=n_res=n_w=0;
-      n_iw=size2()+1;
-    }
+    /** \brief Get required length of iw field */
+    virtual size_t sz_iw() const { return size2()+1;}
 
     /// Transpose
     virtual MX getTranspose() const { return dep();}
@@ -144,10 +141,8 @@ namespace casadi {
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
                           CodeGenerator& g) const;
 
-    /** \brief Get number of temporary variables needed */
-    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-      n_arg=n_res=n_iw=n_w=0;
-    }
+    /** \brief Get required length of iw field */
+    virtual size_t sz_iw() const { return 0;}
   };
 
 

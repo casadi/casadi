@@ -142,10 +142,10 @@ namespace casadi {
     gather_stats_ = getOption("gather_stats");
     inputs_check_ = getOption("inputs_check");
 
-    n_arg_ = nIn();
-    n_res_ = nOut();
-    n_iw_ = 0;
-    n_w_ = 0;
+    sz_arg_ = nIn();
+    sz_res_ = nOut();
+    sz_iw_ = 0;
+    sz_w_ = 0;
 
     // Mark the function as initialized
     is_init_ = true;
@@ -1257,17 +1257,16 @@ namespace casadi {
 
   void FunctionInternal::evaluate() {
     // Allocate temporary memory if needed
-    iw_tmp_.resize(n_iw_);
-    w_tmp_.resize(n_w_);
+    alloc();
 
     // Get pointers to input arguments
     int n_in = nIn();
-    vector<const double*> arg(n_arg_);
+    vector<const double*> arg(sz_arg());
     for (int i=0; i<n_in; ++i) arg[i]=input(i).ptr();
 
     // Get pointers to output arguments
     int n_out = nOut();
-    vector<double*> res(n_res_);
+    vector<double*> res(sz_res());
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
     // Call memory-less
@@ -1352,15 +1351,15 @@ namespace casadi {
         res[i] = SX::zeros(output(i).sparsity());
 
     // Allocate temporary memory if needed
-    iw_tmp_.resize(n_iw_);
-    vector<SXElement> w_tmp(n_w_);
+    iw_tmp_.resize(sz_iw());
+    vector<SXElement> w_tmp(sz_w());
 
     // Get pointers to input arguments
-    vector<const SXElement*> argp(n_arg_);
+    vector<const SXElement*> argp(sz_arg());
     for (int i=0; i<arg.size(); ++i) argp[i]=getPtr(arg[i]);
 
     // Get pointers to output arguments
-    vector<SXElement*> resp(n_res_);
+    vector<SXElement*> resp(sz_res());
     for (int i=0; i<nOut(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
@@ -1375,8 +1374,8 @@ namespace casadi {
 
   void FunctionInternal::spEvaluate(bool fwd) {
     // Allocate temporary memory if needed
-    iw_tmp_.resize(n_iw_);
-    w_tmp_.resize(n_w_);
+    iw_tmp_.resize(sz_iw());
+    w_tmp_.resize(sz_w());
     int *iw = getPtr(iw_tmp_);
     bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(w_tmp_));
 
@@ -2060,15 +2059,15 @@ namespace casadi {
     s << "}" << endl << endl;
 
     // Function that returns work vector lengths
-    tmp = "int " + fname + "_nwork(int *n_arg, int* n_res, int *n_iw, int *n_w)";
+    tmp = "int " + fname + "_nwork(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)";
     if (g.with_header) {
       g.header << "extern " << tmp << ";" << endl;
     }
     s << tmp << " {" << endl;
-    s << "  if (n_arg) *n_arg = " << n_arg_ << ";" << endl;
-    s << "  if (n_res) *n_res = " << n_res_ << ";" << endl;
-    s << "  if (n_iw) *n_iw = " << n_iw_ << ";" << endl;
-    s << "  if (n_w) *n_w = " << n_w_ << ";" << endl;
+    s << "  if (sz_arg) *sz_arg = " << sz_arg() << ";" << endl;
+    s << "  if (sz_res) *sz_res = " << sz_res() << ";" << endl;
+    s << "  if (sz_iw) *sz_iw = " << sz_iw() << ";" << endl;
+    s << "  if (sz_w) *sz_w = " << sz_w() << ";" << endl;
     s << "  return 0;" << endl;
     s << "}" << endl;
     s << endl;
@@ -2091,16 +2090,16 @@ namespace casadi {
 
       // Work vectors, including input buffers
       int i_nnz = 0;
-      size_t n_w = n_w_;
+      size_t sz_w = this->sz_w();
       for (int i=0; i<n_in; ++i) {
         const Sparsity& s = input(i).sparsity();
         i_nnz += s.nnz();
-        n_w = max(n_w, static_cast<size_t>(s.size1())); // To be able to copy a column
-        n_w = max(n_w, static_cast<size_t>(s.size2())); // To be able to copy a row
+        sz_w = max(sz_w, static_cast<size_t>(s.size1())); // To be able to copy a column
+        sz_w = max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
-      n_w += i_nnz;
-      s << "  int iw[" << n_iw_ << "];" << endl;
-      s << "  real_t w[" << n_w << "];" << endl;
+      sz_w += i_nnz;
+      s << "  int iw[" << sz_iw() << "];" << endl;
+      s << "  real_t w[" << sz_w << "];" << endl;
       string fw = "w+" + g.to_string(i_nnz);
 
       // Copy inputs to buffers
@@ -2133,9 +2132,9 @@ namespace casadi {
       s << "int main_" << fname << "(int argc, char* argv[]) {" << endl;
 
       // Work vectors and input and output buffers
-      size_t nr = n_w_ + nnzIn() + nnzOut();
-      s << "  int iw[" << n_iw_ << "];" << endl
-             << "  real_t w[" << n_w_ << "];" << endl;
+      size_t nr = sz_w() + nnzIn() + nnzOut();
+      s << "  int iw[" << sz_iw() << "];" << endl
+             << "  real_t w[" << sz_w() << "];" << endl;
 
       // Input buffers
       s << "  const real_t* arg[" << n_in << "] = {";
@@ -2335,18 +2334,42 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-    n_arg = n_arg_;
-    n_res = n_res_;
-    n_iw=n_iw_;
-    n_w=n_w_;
+  void FunctionInternal::sz_work(size_t& sz_arg, size_t& sz_res,
+                                 size_t& sz_iw, size_t& sz_w) const {
+    sz_arg = sz_arg_;
+    sz_res = sz_res_;
+    sz_iw = sz_iw_;
+    sz_w = sz_w_;
   }
 
-  void FunctionInternal::allocwork(size_t n_arg, size_t n_res, size_t n_iw, size_t n_w) {
-    n_arg_ = max(n_arg + nIn(), n_arg_);
-    n_res_ = max(n_res + nOut(), n_res_);
-    n_iw_ = max(n_iw, n_iw_);
-    n_w_ = max(n_w, n_w_);
+  void FunctionInternal::alloc_arg(size_t sz_arg) {
+    sz_arg_ = max(sz_arg + nIn(), sz_arg_);
+  }
+
+  void FunctionInternal::alloc_res(size_t sz_res) {
+    sz_res_ = max(sz_res + nOut(), sz_res_);
+  }
+
+  void FunctionInternal::alloc_iw(size_t sz_iw) {
+    sz_iw_ = max(sz_iw, sz_iw_);
+  }
+
+  void FunctionInternal::alloc_w(size_t sz_w) {
+    sz_w_ = max(sz_w, sz_w_);
+  }
+
+  void FunctionInternal::alloc(const Function& f) {
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+    alloc_arg(sz_arg);
+    alloc_res(sz_res);
+    alloc_iw(sz_iw);
+    alloc_w(sz_w);
+  }
+
+  void FunctionInternal::alloc() {
+    iw_tmp_.resize(sz_iw_);
+    w_tmp_.resize(sz_w_);
   }
 
   void FunctionInternal::reportConstraints(std::ostream &stream, const Matrix<double> &v,

@@ -84,13 +84,8 @@ namespace casadi {
     /** \brief Get the operation */
     virtual int getOp() const { return OP_SET_SPARSE;}
 
-    /** \brief Get number of temporary variables needed */
-    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-      n_arg=0;
-      n_res=0;
-      n_iw=0;
-      n_w=size1();
-    }
+    /** \brief Get required length of w field */
+    virtual size_t sz_w() const { return size1();}
   };
 
 } // namespace casadi

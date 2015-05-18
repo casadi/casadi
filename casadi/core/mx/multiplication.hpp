@@ -91,14 +91,12 @@ namespace casadi {
     virtual int numInplace() const { return 1;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const
-    { return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;}
-
-    /** \brief Get number of temporary variables needed */
-    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-      n_arg=n_res=n_iw=0;
-      n_w=sparsity().size1();
+    virtual bool zz_isEqual(const MXNode* node, int depth) const {
+      return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;
     }
+
+    /** \brief Get required length of w field */
+    virtual size_t sz_w() const { return sparsity().size1();}
   };
 
 

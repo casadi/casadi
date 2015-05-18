@@ -364,10 +364,37 @@ namespace casadi {
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get number of temporary variables needed */
-    void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const;
+    void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 
-    /** \brief Allocate temporary variables  */
-    void allocwork(size_t n_arg, size_t n_res, size_t n_iw, size_t n_w);
+    /** \brief Get required length of arg field */
+    size_t sz_arg() const { return sz_arg_;}
+
+    /** \brief Get required length of res field */
+    size_t sz_res() const { return sz_res_;}
+
+    /** \brief Get required length of iw field */
+    size_t sz_iw() const { return sz_iw_;}
+
+    /** \brief Get required length of w field */
+    size_t sz_w() const { return sz_w_;}
+
+    /** \brief Ensure required length of arg field */
+    void alloc_arg(size_t sz_arg);
+
+    /** \brief Ensure required length of res field */
+    void alloc_res(size_t sz_res);
+
+    /** \brief Ensure required length of iw field */
+    void alloc_iw(size_t sz_iw);
+
+    /** \brief Ensure required length of w field */
+    void alloc_w(size_t sz_w);
+
+    /** \brief Ensure work vectors long enough to evaluate function */
+    void alloc(const Function& f);
+
+    /** \brief Update lengths of temporary work vectors */
+    void alloc();
     ///@}
 
     /** \brief Prints out a human readable report about possible constraint violations
@@ -425,9 +452,6 @@ namespace casadi {
     /// Cache for Jacobians
     SparseStorage<WeakRef> jac_, jac_compact_;
 
-    /** \brief Sizes of input and output buffers */
-    size_t n_arg_, n_res_, n_iw_, n_w_;
-
     /// User-set field
     void* user_data_;
 
@@ -460,6 +484,10 @@ namespace casadi {
 
     /** \brief  Temporary vector needed for the evaluation (real) */
     std::vector<double> w_tmp_;
+
+  private:
+    /** \brief Sizes of input and output buffers */
+    size_t sz_arg_, sz_res_, sz_iw_, sz_w_;
   };
 
   // Template implementations

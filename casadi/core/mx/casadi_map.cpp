@@ -80,12 +80,13 @@ namespace casadi {
   }
 
   void Map::evalD(const double** arg, double** res, int* iw, double* w) {
-    int f_num_in = fcn_.nIn();
-    int f_num_out = fcn_.nOut();
+    int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+    const double** arg1 = arg+ndep();
+    double** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      fcn_->evalD(arg, res, iw, w);
-      arg += f_num_in;
-      res += f_num_out;
+      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
+      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      fcn_->evalD(arg1, res1, iw, w);
     }
   }
 
@@ -94,51 +95,50 @@ namespace casadi {
     // Not available, switching to serial mode
     Map::evalD(arg, res, iw, w);
 #else // WITH_OPENMP
-    int f_num_in = fcn_.nIn();
-    int f_num_out = fcn_.nOut();
-    size_t n_arg, n_res, n_iw, n_w;
-    fcn_.nwork(n_arg, n_res, n_iw, n_w);
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    fcn_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
-      const double* arg_thread = arg + n_*n_in + i*(n_in+n_arg);
-      copy(arg+i*n_in, arg+(i+1)*n_in, arg_thread);
-      double* res_thread = res + n_*n_out + i*(n_out+n_res);
-      copy(res+i*n_out, res+(i+1)*n_out, res_thread);
-      int* iw_thread = iw + i*n_iw;
-      double* w_thread = w + i*n_w;
-      fcn_->evalD(arg_thread, res_thread, iw_thread, w_local);
+      int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+      const double* arg_i = arg + n_in*n_ + sz_arg*i;
+      copy(arg+i*n_in, arg+(i+1)*n_in, arg_i);
+      double* res_i = res + n_out*n_ + sz_res*i;
+      copy(res+i*n_out, res+(i+1)*n_out, res_i);
+      int* iw_i = iw + i*sz_iw;
+      double* w_i = w + i*sz_w;
+      fcn_->evalD(arg_i, res_i, iw_i, w_i);
     }
 #endif // WITH_OPENMP
   }
 
   void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    int f_num_in = fcn_.nIn();
-    int f_num_out = fcn_.nOut();
+    int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+    const bvec_t** arg1 = arg+ndep();
+    bvec_t** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      fcn_->spFwd(arg, res, iw, w);
-      arg += f_num_in;
-      res += f_num_out;
+      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
+      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      fcn_->spFwd(arg1, res1, iw, w);
     }
   }
 
   void Map::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    int f_num_in = fcn_.nIn();
-    int f_num_out = fcn_.nOut();
+    int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+    bvec_t** arg1 = arg+ndep();
+    bvec_t** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      fcn_->spAdj(arg, res, iw, w);
-      arg += f_num_in;
-      res += f_num_out;
+      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
+      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      fcn_->spAdj(arg1, res1, iw, w);
     }
   }
 
   int Map::nout() const {
-    int f_num_out = fcn_.nOut();
-    return n_ * f_num_out;
+    return n_ * fcn_.nOut();
   }
 
   const Sparsity& Map::sparsity(int oind) const {
-    int f_num_out = fcn_.nOut();
-    return fcn_.output(oind % f_num_out).sparsity();
+    return fcn_.output(oind % fcn_.nOut()).sparsity();
   }
 
   const Function& Map::getFunction() const {
@@ -146,12 +146,13 @@ namespace casadi {
   }
 
   void Map::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    int f_num_in = fcn_.nIn();
-    int f_num_out = fcn_.nOut();
+    int n_in = fcn_.nIn(), n_out = fcn_.nOut();
+    const SXElement** arg1 = arg+ndep();
+    SXElement** res1 = res+nout();
     for (int i=0; i<n_; ++i) {
-      fcn_->evalSX(arg, res, iw, w);
-      arg += f_num_in;
-      res += f_num_out;
+      for (int j=0; j<n_in; ++j) arg1[j]=*arg++;
+      for (int j=0; j<n_out; ++j) res1[j]=*res++;
+      fcn_->evalSX(arg1, res1, iw, w);
     }
   }
 
@@ -235,16 +236,36 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void Map::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-    fcn_.nwork(n_arg, n_res, n_iw, n_w);
+  size_t Map::sz_arg() const {
+    return ndep() + fcn_.sz_arg();
   }
 
-  void OmpMap::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-    fcn_.nwork(n_arg, n_res, n_iw, n_w);
-    n_arg *= static_cast<size_t>(n_);
-    n_res *= static_cast<size_t>(n_);
-    n_iw *= static_cast<size_t>(n_);
-    n_w *= static_cast<size_t>(n_);
+  size_t Map::sz_res() const {
+    return nout() + fcn_.sz_res();
+  }
+
+  size_t Map::sz_iw() const {
+    return fcn_.sz_iw();
+  }
+
+  size_t Map::sz_w() const {
+    return fcn_.sz_w();
+  }
+
+  size_t OmpMap::sz_arg() const {
+    return ndep() + fcn_.sz_arg()*n_;
+  }
+
+  size_t OmpMap::sz_res() const {
+    return nout() + fcn_.sz_res()*n_;
+  }
+
+  size_t OmpMap::sz_iw() const {
+    return fcn_.sz_iw()*n_;
+  }
+
+  size_t OmpMap::sz_w() const {
+    return fcn_.sz_w()*n_;
   }
 
   std::vector<std::vector<MX> >

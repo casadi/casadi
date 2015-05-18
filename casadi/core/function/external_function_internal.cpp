@@ -156,10 +156,10 @@ namespace casadi {
       n_res=n_out;
       n_iw=n_w=0;
     }
-    n_arg_ = static_cast<size_t>(n_arg);
-    n_res_ = static_cast<size_t>(n_res);
-    n_iw_ = static_cast<size_t>(n_iw);
-    n_w_ = static_cast<size_t>(n_w);
+    alloc_arg(n_arg);
+    alloc_res(n_res);
+    alloc_iw(n_iw);
+    alloc_w(n_w);
 #else // WITH_DL
     throw CasadiException("WITH_DL  not activated");
 #endif // WITH_DL

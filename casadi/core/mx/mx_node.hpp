@@ -248,10 +248,17 @@ namespace casadi {
     /// Set the sparsity
     void setSparsity(const Sparsity& sparsity);
 
-    /** \brief Get number of temporary variables needed */
-    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-      n_arg=n_res=n_iw=n_w=0;
-    }
+    /** \brief Get required length of arg field */
+    virtual size_t sz_arg() const { return ndep();}
+
+    /** \brief Get required length of res field */
+    virtual size_t sz_res() const { return nout();}
+
+    /** \brief Get required length of iw field */
+    virtual size_t sz_iw() const { return 0;}
+
+    /** \brief Get required length of w field */
+    virtual size_t sz_w() const { return 0;}
 
     /// Set unary dependency
     void setDependencies(const MX& dep);

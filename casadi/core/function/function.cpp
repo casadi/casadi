@@ -207,9 +207,17 @@ namespace casadi {
     (*this)->spEvaluate(fwd);
   }
 
-  void Function::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-    (*this)->nwork(n_arg, n_res, n_iw, n_w);
+  void Function::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {
+    (*this)->sz_work(sz_arg, sz_res, sz_iw, sz_w);
   }
+
+  size_t Function::sz_arg() const { return (*this)->sz_arg();}
+
+  size_t Function::sz_res() const { return (*this)->sz_res();}
+
+  size_t Function::sz_iw() const { return (*this)->sz_w();}
+
+  size_t Function::sz_w() const { return (*this)->sz_w();}
 
   void Function::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     (*this)->spFwdSwitch(arg, res, iw, w);

@@ -186,16 +186,15 @@ namespace casadi {
     }
 
     // Allocate sufficiently large work vectors
-    size_t n_internal = nx_ + nz_ + nrx_ + nrz_;
-    allocwork(0, 0, 0, n_internal+nx_+nz_);
-    allocwork(0, 0, 0, n_internal+nrx_+nrz_);
-    size_t n_arg, n_res, n_iw, n_w;
-    f_.nwork(n_arg, n_res, n_iw, n_w);
-    allocwork(n_arg, n_res, n_iw, n_internal+n_w);
+    size_t sz_w = f_.sz_w();
+    alloc(f_);
     if (!g_.isNull()) {
-      g_.nwork(n_arg, n_res, n_iw, n_w);
-      allocwork(n_arg, n_res, n_iw, n_internal+n_w);
+      alloc(g_);
+      sz_w = max(sz_w, g_.sz_w());
     }
+    sz_w = max(sz_w, static_cast<size_t>(nx_+nz_));
+    sz_w = max(sz_w, static_cast<size_t>(nrx_+nrz_));
+    alloc_w(sz_w + nx_ + nz_ + nrx_ + nrz_);
   }
 
   void IntegratorInternal::deepCopyMembers(
@@ -494,8 +493,7 @@ namespace casadi {
     return ret;
   }
 
-  void IntegratorInternal::spFwd(const bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* w) {
+  void IntegratorInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     log("IntegratorInternal::spFwd", "begin");
 
     // Work vectors

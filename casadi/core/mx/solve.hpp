@@ -98,11 +98,8 @@ namespace casadi {
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
-    /** \brief Get number of temporary variables needed */
-    virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
-      n_arg=n_res=n_iw=0;
-      n_w=sparsity().size1();
-    }
+    /** \brief Get required length of w field */
+    virtual size_t sz_w() const { return sparsity().size1();}
 
     /// Linear Solver (may be shared between multiple nodes)
     LinearSolver linear_solver_;
