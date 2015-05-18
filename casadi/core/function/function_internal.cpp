@@ -1953,7 +1953,7 @@ namespace casadi {
   }
 
   void FunctionInternal::generateFunction(CodeGenerator& g,
-                                          const std::string& fname) const {
+                                          const std::string& fname, bool decl_static) const {
     assertInit();
 
     // Add standard math
@@ -1967,9 +1967,9 @@ namespace casadi {
     generateDeclarations(g);
 
     // Define function
-    g.body
-      << "/* " << getSanitizedName() << " */" << endl
-      << "int " << fname << "(const real_t** arg, real_t** res, int* iw, real_t* w) {"
+    g.body << "/* " << getSanitizedName() << " */" << endl;
+    if (decl_static) g.body << "static ";
+    g.body << "int " << fname << "(const real_t** arg, real_t** res, int* iw, real_t* w) {"
       << endl;
 
     // Insert the function body

@@ -69,7 +69,7 @@ namespace casadi {
   }
 
   void CodeGenerator::add(const Function& f, const std::string& fname) {
-    f->generateFunction(*this, fname);
+    f->generateFunction(*this, fname, false);
     if (this->with_header) {
       this->header
         << "extern int " << fname
@@ -243,7 +243,7 @@ namespace casadi {
       string name = "f" + to_string(ind);
 
       // Print to file
-      f->generateFunction(*this, "CASADI_PREFIX(" + name + ")");
+      f->generateFunction(*this, "CASADI_PREFIX(" + name + ")", true);
 
       // Shorthand
       this->body
@@ -255,7 +255,7 @@ namespace casadi {
   }
 
   void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<int>& v) {
-    s << "const int " << name << "[] = {";
+    s << "static const int " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << v[i];
@@ -265,7 +265,7 @@ namespace casadi {
 
   void CodeGenerator::printVector(std::ostream &s, const std::string& name,
                                   const vector<double>& v) {
-    s << "const real_t " << name << "[] = {";
+    s << "static const real_t " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << constant(v[i]);

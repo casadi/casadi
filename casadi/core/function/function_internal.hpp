@@ -234,7 +234,8 @@ namespace casadi {
     MXFunction wrapMXFunction();
 
     /** \brief Generate code the function */
-    virtual void generateFunction(CodeGenerator& g, const std::string& fname) const;
+    virtual void generateFunction(CodeGenerator& g, const std::string& fname,
+                                  bool decl_static) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
     void generateMeta(CodeGenerator& g, const std::string& fname) const;
