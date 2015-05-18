@@ -2177,9 +2177,18 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_horzcat(const std::vector<Matrix<DataType> > &v) {
-    Matrix<DataType> ret;
-    for (int i=0; i<v.size(); ++i)
-      ret.appendColumns(v[i]);
+    // Concatenate sparsity patterns
+    std::vector<Sparsity> sp(v.size());
+    for (int i=0; i<v.size(); ++i) sp[i] = v[i].sparsity();
+    Matrix<DataType> ret(horzcat(sp));
+
+    // Copy nonzeros
+    typename Matrix<DataType>::iterator i=ret.begin();
+    for (typename std::vector<Matrix<DataType> >::const_iterator j=v.begin();
+         j!=v.end(); ++j) {
+      std::copy(j->begin(), j->end(), i);
+      i += j->size();
+    }
     return ret;
   }
 
@@ -2209,10 +2218,9 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_vertcat(const std::vector<Matrix<DataType> > &v) {
-    Matrix<DataType> ret;
-    for (int i=0; i<v.size(); ++i)
-      ret.appendColumns(v[i].T());
-    return ret.T();
+    std::vector<Matrix<DataType> > vT(v.size());
+    for (int i=0; i<v.size(); ++i) vT[i] = v[i].T();
+    return horzcat(vT).T();
   }
 
   template<typename DataType>
