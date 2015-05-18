@@ -191,8 +191,8 @@ class Functiontests(casadiTestCase):
 
     g = f.jacobian(0,0)
 
-    self.assertEqual(g.getNumInputs(),f.getNumInputs())
-    self.assertEqual(g.getNumOutputs(),f.getNumOutputs()+1)
+    self.assertEqual(g.nIn(),f.nIn())
+    self.assertEqual(g.nOut(),f.nOut()+1)
 
   def test_xfunction(self):
     x = SX.sym("x",3,1)
@@ -497,8 +497,8 @@ class Functiontests(casadiTestCase):
           z.set(z2)
           
         def getDerForward(self,f,nfwd):
-          inputs = [f.input(i).sparsity() for i in range(f.getNumInputs())]
-          outputs = [f.output(i).sparsity() for i in range(f.getNumOutputs())]
+          inputs = [f.input(i).sparsity() for i in range(f.nIn())]
+          outputs = [f.output(i).sparsity() for i in range(f.nOut())]
           
           sself = self
 
@@ -509,8 +509,8 @@ class Functiontests(casadiTestCase):
           return FunDer
 
         def getDerReverse(self,f,nadj):
-          inputs = [f.input(i).sparsity() for i in range(f.getNumInputs())]
-          outputs = [f.output(i).sparsity() for i in range(f.getNumOutputs())]
+          inputs = [f.input(i).sparsity() for i in range(f.nIn())]
+          outputs = [f.output(i).sparsity() for i in range(f.nOut())]
           
           sself = self
 

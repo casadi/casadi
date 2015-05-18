@@ -1096,10 +1096,10 @@ def pyfunction(inputs,outputs):
     
     @pyevaluate
     def fcustom(f2):
-      res = f([f2.getInput(i) for i in range(f2.getNumInputs())])
+      res = f([f2.getInput(i) for i in range(f2.nIn())])
       if not isinstance(res,list):
         res = [res]
-      for i in range(f2.getNumOutputs()):
+      for i in range(f2.nOut()):
         f2.setOutput(res[i],i)
     Fun = CustomFunction(fcustom,inputs,outputs)
     Fun.setOption("name","CustomFunction")
@@ -1109,7 +1109,7 @@ def pyfunction(inputs,outputs):
 def PyFunction(obj,inputs,outputs):
     @pyevaluate
     def fcustom(f):
-      obj.evaluate([f.input(i) for i in range(f.getNumInputs())],[f.output(i) for i in range(f.getNumOutputs())])
+      obj.evaluate([f.input(i) for i in range(f.nIn())],[f.output(i) for i in range(f.nOut())])
       
     Fun = CustomFunction(fcustom,inputs,outputs)
     Fun.setOption("name","CustomFunction")
@@ -1128,13 +1128,13 @@ def PyFunction(obj,inputs,outputs):
     if hasattr(obj,'fwd'):
       @pyderivativegenerator
       def derivativewrapFwd(f,nfwd):
-        num_in = f.getNumInputs()
-        num_out = f.getNumOutputs()
+        num_in = f.nIn()
+        num_out = f.nOut()
         
         @pyevaluate
         def der(f2):
-          all_inputs = [f2.input(i) for i in range(f2.getNumInputs())]
-          all_outputs = [f2.output(i) for i in range(f2.getNumOutputs())]
+          all_inputs = [f2.input(i) for i in range(f2.nIn())]
+          all_outputs = [f2.output(i) for i in range(f2.nOut())]
           inputs=all_inputs[:num_in]
           outputs=all_inputs[num_in:num_in+num_out]
           fwd_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_in)
@@ -1151,13 +1151,13 @@ def PyFunction(obj,inputs,outputs):
     if hasattr(obj,'adj'):
       @pyderivativegenerator
       def derivativewrapAdj(f,nadj):
-        num_in = f.getNumInputs()
-        num_out = f.getNumOutputs()
+        num_in = f.nIn()
+        num_out = f.nOut()
         
         @pyevaluate
         def der(f2):
-          all_inputs = [f2.input(i) for i in range(f2.getNumInputs())]
-          all_outputs = [f2.output(i) for i in range(f2.getNumOutputs())]
+          all_inputs = [f2.input(i) for i in range(f2.nIn())]
+          all_outputs = [f2.output(i) for i in range(f2.nOut())]
           inputs=all_inputs[:num_in]
           outputs=all_inputs[num_in:num_in+num_out]
           adj_seeds=zip(*[iter(all_inputs[num_in+num_out:])]*num_out)

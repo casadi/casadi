@@ -137,7 +137,7 @@ namespace casadi {
         SXFunction F_sx = shared_cast<SXFunction>(F);
         SXFunction G_sx = shared_cast<SXFunction>(G);
         nlp_in[NL_X] = G_sx.inputExpr(0);
-        if (G_sx.getNumInputs()>1) {
+        if (G_sx.nIn()>1) {
           nlp_in[NL_P] = G_sx.inputExpr(1);
         } else {
           nlp_in[NL_P] = SX::sym("p", 1, 0);
@@ -159,7 +159,7 @@ namespace casadi {
         // use the same expressions if cast was successful
         if (!G_mx.isNull()) {
           nlp_in[NL_X] = G_mx.inputExpr(0);
-          if (G_mx.getNumInputs()>1) {
+          if (G_mx.nIn()>1) {
             nlp_in[NL_P] = G_mx.inputExpr(1);
           } else {
             nlp_in[NL_P] = MX::sym("p", 1, 0);
@@ -174,7 +174,7 @@ namespace casadi {
         } else {
           if (!F_mx.isNull()) { // F but not G MXFunction
             nlp_in[NL_X] = F_mx.inputExpr(0);
-            if (F_mx.getNumInputs()>1) {
+            if (F_mx.nIn()>1) {
               nlp_in[NL_P] = F_mx.inputExpr(1);
             } else {
               nlp_in[NL_P] = MX::sym("p", 1, 0);

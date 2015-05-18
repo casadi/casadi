@@ -89,9 +89,9 @@ namespace casadi {
   void NlpSolverInternal::init() {
     // Initialize the NLP
     nlp_.init(false);
-    casadi_assert_message(nlp_.getNumInputs()==NL_NUM_IN,
+    casadi_assert_message(nlp_.nIn()==NL_NUM_IN,
                           "The NLP function must have exactly two input");
-    casadi_assert_message(nlp_.getNumOutputs()==NL_NUM_OUT,
+    casadi_assert_message(nlp_.nOut()==NL_NUM_OUT,
                           "The NLP function must have exactly two outputs");
 
     // Sparsity patterns
@@ -216,10 +216,10 @@ namespace casadi {
     }
     jacF.setOption("name", "jac_f");
     jacF.init(false);
-    casadi_assert_message(jacF.getNumInputs()==GRADF_NUM_IN,
+    casadi_assert_message(jacF.nIn()==GRADF_NUM_IN,
                           "Wrong number of inputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    casadi_assert_message(jacF.getNumOutputs()==GRADF_NUM_OUT,
+    casadi_assert_message(jacF.nOut()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
     jacF.setInputScheme(SCHEME_GradFInput);
@@ -239,10 +239,10 @@ namespace casadi {
     }
     gradF.setOption("name", "grad_f");
     gradF.init(false);
-    casadi_assert_message(gradF.getNumInputs()==GRADF_NUM_IN,
+    casadi_assert_message(gradF.nIn()==GRADF_NUM_IN,
                           "Wrong number of inputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    casadi_assert_message(gradF.getNumOutputs()==GRADF_NUM_OUT,
+    casadi_assert_message(gradF.nOut()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
     gradF.setInputScheme(SCHEME_GradFInput);
@@ -273,10 +273,10 @@ namespace casadi {
     }
     jacG.setOption("name", "jac_g");
     jacG.init(false);
-    casadi_assert_message(jacG.getNumInputs()==JACG_NUM_IN,
+    casadi_assert_message(jacG.nIn()==JACG_NUM_IN,
                           "Wrong number of inputs to the Jacobian function. "
                           "Note: The Jacobian signature was changed in #544");
-    casadi_assert_message(jacG.getNumOutputs()==JACG_NUM_OUT,
+    casadi_assert_message(jacG.nOut()==JACG_NUM_OUT,
                           "Wrong number of outputs to the Jacobian function. "
                           "Note: The Jacobian signature was changed in #544");
     jacG.setInputScheme(SCHEME_JacGInput);
@@ -326,10 +326,10 @@ namespace casadi {
     }
     hessLag.setOption("name", "hess_lag");
     hessLag.init(false);
-    casadi_assert_message(hessLag.getNumInputs()==HESSLAG_NUM_IN,
+    casadi_assert_message(hessLag.nIn()==HESSLAG_NUM_IN,
                           "Wrong number of inputs to the Hessian function. "
                           "Note: The Lagrangian Hessian signature was changed in #544");
-    casadi_assert_message(hessLag.getNumOutputs()==HESSLAG_NUM_OUT,
+    casadi_assert_message(hessLag.nOut()==HESSLAG_NUM_OUT,
                           "Wrong number of outputs to the Hessian function. "
                           "Note: The Lagrangian Hessian signature was changed in #544");
     hessLag.setInputScheme(SCHEME_HessLagInput);

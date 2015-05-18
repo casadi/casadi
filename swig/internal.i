@@ -832,16 +832,16 @@
 %exception  casadi::FunctionInternal::getJacobian(int iind, int oind, bool compact, bool symmetric) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::getNumInputElements() const  {
+%exception  casadi::FunctionInternal::numelIn() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::getNumInputNonzeros() const  {
+%exception  casadi::FunctionInternal::nnzIn() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::getNumOutputElements() const  {
+%exception  casadi::FunctionInternal::numelOut() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::getNumOutputNonzeros() const  {
+%exception  casadi::FunctionInternal::nnzOut() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric) {
@@ -1234,10 +1234,10 @@
 %exception  casadi::IOInterface< FunctionInternal  >::getInputScheme() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::IOInterface< FunctionInternal  >::getNumInputs() const {
+%exception  casadi::IOInterface< FunctionInternal  >::nIn() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::IOInterface< FunctionInternal  >::getNumOutputs() const {
+%exception  casadi::IOInterface< FunctionInternal  >::nOut() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::IOInterface< FunctionInternal  >::getOutput(T val, const std::string &oname) {

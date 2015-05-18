@@ -237,10 +237,10 @@ class MXEvaluationArtist(DotArtist):
     graph = pydot.Cluster(str(s.__hash__()), rank='max', label='Function:\n %s' % f.getOption("name"))
     self.graph.add_subgraph(graph)
     
-    s = (" %d inputs: |" % f.getNumInputs()) + " | ".join("<f%d> %d" % (i,i) for i in range(f.getNumInputs()))
+    s = (" %d inputs: |" % f.nIn()) + " | ".join("<f%d> %d" % (i,i) for i in range(f.nIn()))
     graph.add_node(pydot.Node("funinput" + str(self.s.__hash__()),label=s,shape='Mrecord'))
 
-    s = (" %d outputs: |" % f.getNumOutputs())+ " | ".join("<f%d> %d" % (i,i) for i in range(f.getNumOutputs()))
+    s = (" %d outputs: |" % f.nOut())+ " | ".join("<f%d> %d" % (i,i) for i in range(f.nOut()))
     graph.add_node(pydot.Node(str(self.s.__hash__()),label=s,shape='Mrecord'))
     
     

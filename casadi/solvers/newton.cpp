@@ -81,7 +81,7 @@ namespace casadi {
     }
 
     // Pass the inputs to J
-    for (int i=0; i<getNumInputs(); ++i) {
+    for (int i=0; i<nIn(); ++i) {
       if (i!=iin_) jac_.setInput(input(i), i);
     }
 
@@ -118,7 +118,7 @@ namespace casadi {
 
       // Use u to evaluate J
       jac_.setInput(u, iin_);
-      for (int i=0; i<getNumInputs(); ++i)
+      for (int i=0; i<nIn(); ++i)
         if (i!=iin_) jac_.setInput(input(i), i);
 
       if (CasadiOptions::profiling) {
@@ -222,7 +222,7 @@ namespace casadi {
     }
 
     // Get auxiliary outputs
-    for (int i=0; i<getNumOutputs(); ++i) {
+    for (int i=0; i<nOut(); ++i) {
       if (i!=iout_) jac_.getOutput(output(i), 1+i);
     }
 
@@ -242,7 +242,7 @@ namespace casadi {
     // Call the base class initializer
     ImplicitFunctionInternal::init();
 
-    casadi_assert_message(f_.getNumInputs()>0,
+    casadi_assert_message(f_.nIn()>0,
                           "Newton: the supplied f must have at least one input.");
     casadi_assert_message(!linsol_.isNull(),
                           "Newton::init: linear_solver must be supplied");

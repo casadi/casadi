@@ -559,7 +559,7 @@ namespace casadi {
     static_cast<DerivedType*>(this)->callReverse(inputv_, outputv_, aseed, asens, true, false);
 
     int dir = 0;
-    for (int i=0; i<getNumInputs(); ++i) { // Correct sparsities #1025
+    for (int i=0; i<nIn(); ++i) { // Correct sparsities #1025
       if (asens[dir][i].sparsity()!=inputv_[i].sparsity()) {
         asens[dir][i] = asens[dir][i].setSparse(inputv_[i].sparsity());
       }
@@ -730,7 +730,7 @@ namespace casadi {
         }
 
         // initialize to zero
-        fseed[d].resize(getNumInputs());
+        fseed[d].resize(nIn());
         for (int ind=0; ind<fseed[d].size(); ++ind) {
           int nrow = input(ind).size1(), ncol = input(ind).size2(); // Input dimensions
           if (ind==iind) {
@@ -760,7 +760,7 @@ namespace casadi {
         }
 
         //initialize to zero
-        aseed[d].resize(getNumOutputs());
+        aseed[d].resize(nOut());
         for (int ind=0; ind<aseed[d].size(); ++ind) {
           int nrow = output(ind).size1(), ncol = output(ind).size2(); // Output dimensions
           if (ind==oind) {
@@ -775,7 +775,7 @@ namespace casadi {
       fsens.resize(nfdir_batch);
       for (int d=0; d<nfdir_batch; ++d) {
         // initialize to zero
-        fsens[d].resize(getNumOutputs());
+        fsens[d].resize(nOut());
         for (int oind=0; oind<fsens[d].size(); ++oind) {
           fsens[d][oind] = MatType::zeros(output(oind).sparsity());
         }
@@ -785,7 +785,7 @@ namespace casadi {
       asens.resize(nadir_batch);
       for (int d=0; d<nadir_batch; ++d) {
         // initialize to zero
-        asens[d].resize(getNumInputs());
+        asens[d].resize(nIn());
         for (int ind=0; ind<asens[d].size(); ++ind) {
           asens[d][ind] = MatType::zeros(input(ind).sparsity());
         }
@@ -1001,8 +1001,8 @@ namespace casadi {
     casadi_assert(fsens.size()==fseed.size());
 
     // Number inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // All inputs of the return function
     std::vector<MatType> ret_in;
@@ -1039,8 +1039,8 @@ namespace casadi {
     static_cast<DerivedType*>(this)->evalAdj(aseed, asens);
 
     // Number inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // All inputs of the return function
     std::vector<MatType> ret_in;

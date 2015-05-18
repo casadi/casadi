@@ -277,8 +277,8 @@ namespace casadi {
           if (it->res[c]>=0) {
             size_t n_arg, n_res, n_iw, n_w;
             it->data->nwork(n_arg, n_res, n_iw, n_w);
-            n_arg_ = std::max(n_arg_, n_arg+getNumInputs());
-            n_res_ = std::max(n_res_, n_res+getNumOutputs());
+            n_arg_ = std::max(n_arg_, n_arg+nIn());
+            n_res_ = std::max(n_res_, n_res+nOut());
             n_iw_ = std::max(n_iw_, n_iw);
             n_w_ = std::max(n_w_, n_w);
             if (workloc_[it->res[c]] < 0) {
@@ -667,7 +667,7 @@ namespace casadi {
   void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     log("MXFunctionInternal::evalMX begin");
     assertInit();
-    casadi_assert_message(arg.size()==getNumInputs(), "Wrong number of input arguments");
+    casadi_assert_message(arg.size()==nIn(), "Wrong number of input arguments");
 
     // Resize the number of outputs
     res.resize(outputv_.size());
@@ -744,7 +744,7 @@ namespace casadi {
     int nfwd = fseed.size();
     fsens.resize(nfwd);
     for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(getNumOutputs());
+      fsens[d].resize(nOut());
     }
 
     // Quick return if no directions
@@ -874,7 +874,7 @@ namespace casadi {
     int nadj = aseed.size();
     asens.resize(nadj);
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(getNumInputs());
+      asens[d].resize(nIn());
     }
 
     // Quick return if no directions
@@ -1278,7 +1278,7 @@ namespace casadi {
     // Definition of intermediate variables
     vector<MX> y;
     vector<MX> g;
-    vector<MX> f_G(getNumOutputs());
+    vector<MX> f_G(nOut());
 
     // Initial guess for intermediate variables
     vector<MX> x_init;

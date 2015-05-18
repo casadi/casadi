@@ -140,8 +140,8 @@ namespace casadi {
     casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
                           << N << ".");
     casadi_assert_message(order==4, "Only RK order 4 is supported now.");
-    casadi_assert_message(f.getNumInputs()==2, "Function must have two inputs: x and p");
-    casadi_assert_message(f.getNumOutputs()==1, "Function must have one outputs: dot(x)");
+    casadi_assert_message(f.nIn()==2, "Function must have two inputs: x and p");
+    casadi_assert_message(f.nOut()==1, "Function must have one outputs: dot(x)");
 
     MX x0 = MX::sym("x0", f.input(0).sparsity());
     MX p = MX::sym("p", f.input(1).sparsity());
@@ -262,8 +262,8 @@ namespace casadi {
     // Consistency check
     casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
                           << N << ".");
-    casadi_assert_message(f.getNumInputs()==2, "Function must have two inputs: x and p");
-    casadi_assert_message(f.getNumOutputs()==1, "Function must have one outputs: dot(x)");
+    casadi_assert_message(f.nIn()==2, "Function must have two inputs: x and p");
+    casadi_assert_message(f.nOut()==1, "Function must have one outputs: dot(x)");
 
     // Obtain collocation points
     std::vector<double> tau_root = collocationPoints(order, scheme);
@@ -351,8 +351,8 @@ namespace casadi {
     f.init(false);
 
     // Consistency check
-    casadi_assert_message(f.getNumInputs()==2, "Function must have two inputs: x and p");
-    casadi_assert_message(f.getNumOutputs()==1, "Function must have one outputs: dot(x)");
+    casadi_assert_message(f.nIn()==2, "Function must have two inputs: x and p");
+    casadi_assert_message(f.nOut()==1, "Function must have one outputs: dot(x)");
 
     // Sparsities
     Sparsity x_sp = f.input(0).sparsity();

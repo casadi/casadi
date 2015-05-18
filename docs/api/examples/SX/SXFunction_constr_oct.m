@@ -34,8 +34,8 @@ f = SXFunction(in,out);
 f.init();
 
 %! f now has two inputs and a 4 outputs:
-number_in = f.getNumInputs()
-number_out = f.getNumOutputs()
+number_in = f.nIn()
+number_out = f.nOut()
 
 %! The outputs has the following string representation.
 %! Note how all elements of out have been converted to SX by

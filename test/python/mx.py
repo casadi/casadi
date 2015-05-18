@@ -155,8 +155,8 @@ class MXtests(casadiTestCase):
     x = MX.sym("x")
     y = 2*x
     f = MXFunction([x],[y])
-    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    self.assertEqual(f.nIn(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.nOut(),1,"MXFunction fails to indicate correct number of outputs")
     f.init()
     f.setInput(3,0);
     f.evaluate()
@@ -174,8 +174,8 @@ class MXtests(casadiTestCase):
     x = MX.sym("x")
     y = MX.sym("y")
     f = MXFunction([x,y],[x+y,y*x])
-    self.assertEqual(f.getNumInputs(),2,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),2,"MXFunction fails to indicate correct number of outputs")
+    self.assertEqual(f.nIn(),2,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.nOut(),2,"MXFunction fails to indicate correct number of outputs")
 
     f.init()
     f.setInput(3,0);
@@ -203,8 +203,8 @@ class MXtests(casadiTestCase):
     # now with single input, multi output
     xy = MX.sym("xy",2)
     f = MXFunction([xy],[xy[0]+xy[1],xy[0]*xy[1]])
-    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),2,"MXFunction fails to indicate correct number of outputs")
+    self.assertEqual(f.nIn(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.nOut(),2,"MXFunction fails to indicate correct number of outputs")
     f.init()
     f.setInput([3,7],0);
     f.evaluate()
@@ -228,8 +228,8 @@ class MXtests(casadiTestCase):
     # now with single input, multi output
     xy = MX.sym("xy",1,2)
     f = MXFunction([xy],[xy[0,0]+xy[0,1],xy[0,0]*xy[0,1]])
-    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),2,"MXFunction fails to indicate correct number of outputs")
+    self.assertEqual(f.nIn(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.nOut(),2,"MXFunction fails to indicate correct number of outputs")
     f.init()
     f.setInput([3,7],0);
     f.evaluate()
@@ -259,8 +259,8 @@ class MXtests(casadiTestCase):
     xy = MX.sym("xy",2)
     z=vertcat([xy[0]+xy[1],xy[0]*xy[1]])
     f = MXFunction([xy],[z])
-    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    self.assertEqual(f.nIn(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.nOut(),1,"MXFunction fails to indicate correct number of outputs")
     f.init()
     f.setInput([3,7],0);
     f.evaluate()
@@ -283,8 +283,8 @@ class MXtests(casadiTestCase):
     xy = MX.sym("xy",2)
     z=horzcat([xy[0]+xy[1],xy[0]*xy[1]])
     f = MXFunction([xy],[z])
-    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    self.assertEqual(f.nIn(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.nOut(),1,"MXFunction fails to indicate correct number of outputs")
     f.init()
     f.setInput([3,7],0);
     f.evaluate()
@@ -349,8 +349,8 @@ class MXtests(casadiTestCase):
     x = MX.sym("x",2,3)
     f = MXFunction([x],[x+x])
 
-    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    self.assertEqual(f.nIn(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.nOut(),1,"MXFunction fails to indicate correct number of outputs")
     f.init()
     L=[1,2,3,4,5,6]
     f.setInput(L,0)
@@ -378,8 +378,8 @@ class MXtests(casadiTestCase):
     self.assertEqual(z.size1(),3,"Vec returns MX of wrong dimension")
     self.assertEqual(z.size2(),2,"Vec returns MX of wrong dimension")
     f = MXFunction([x],[z])
-    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    self.assertEqual(f.nIn(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.nOut(),1,"MXFunction fails to indicate correct number of outputs")
     f.init()
     L=[1,2,3,4,5,6]
     f.setInput(L,0)
@@ -430,8 +430,8 @@ class MXtests(casadiTestCase):
     self.assertEqual(z.size1(),1,"Vec returns MX of wrong dimension")
     self.assertEqual(z.size2(),6,"Vec returns MX of wrong dimension")
     f = MXFunction([x],[z])
-    self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
-    self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
+    self.assertEqual(f.nIn(),1,"MXFunction fails to indicate correct number of inputs")
+    self.assertEqual(f.nOut(),1,"MXFunction fails to indicate correct number of outputs")
     f.init()
     L=[1,2,3,4,5,6]
     f.setInput(L,0)
@@ -2359,7 +2359,7 @@ class MXtests(casadiTestCase):
       f.setInput(zz_,5+2)
       f.setInput(aa_,5+3)
       f.evaluate()
-      return [f.getOutput(i) for i in range(f.getNumOutputs())]
+      return [f.getOutput(i) for i in range(f.nOut())]
       
     s= evalvertsplit(vertcat([y]+dvars+[z]))
     self.checkarray(s[0],y_)
@@ -2438,7 +2438,7 @@ class MXtests(casadiTestCase):
       f.setInput(zz_,5+2)
       f.setInput(aa_,5+3)
       f.evaluate()
-      return [f.getOutput(i) for i in range(f.getNumOutputs())]
+      return [f.getOutput(i) for i in range(f.nOut())]
       
     s= evalhorzsplit(horzcat([y]+dvars+[z]))
     self.checkarray(s[0],y_)

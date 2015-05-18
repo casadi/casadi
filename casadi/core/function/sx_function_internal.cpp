@@ -639,8 +639,8 @@ namespace casadi {
     if (nfwd==0) return;
 
     // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // Make sure matching sparsity of fseed
     bool matching_sparsity = true;
@@ -730,8 +730,8 @@ namespace casadi {
     if (nadj==0) return;
 
     // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // Make sure matching sparsity of fseed
     bool matching_sparsity = true;
@@ -962,12 +962,12 @@ namespace casadi {
       bool use_fwd = kernel==0;
       ss << "__kernel void " << fcn_name[kernel] << "(";
       bool first=true;
-      for (int i=0; i<getNumInputs(); ++i) {
+      for (int i=0; i<nIn(); ++i) {
         if (first) first=false;
         else      ss << ", ";
         ss << "__global unsigned long *x" << i;
       }
-      for (int i=0; i<getNumOutputs(); ++i) {
+      for (int i=0; i<nOut(); ++i) {
         if (first) first=false;
         else      ss << ", ";
         ss << "__global unsigned long *r" << i;
@@ -1076,7 +1076,7 @@ namespace casadi {
     casadi_assert(ret == CL_SUCCESS);
 
     // Memory buffer for each of the input arrays
-    sp_input_memobj_.resize(getNumInputs(), static_cast<cl_mem>(0));
+    sp_input_memobj_.resize(nIn(), static_cast<cl_mem>(0));
     for (int i=0; i<sp_input_memobj_.size(); ++i) {
       sp_input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
                                            CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
@@ -1086,7 +1086,7 @@ namespace casadi {
     }
 
     // Memory buffer for each of the output arrays
-    sp_output_memobj_.resize(getNumOutputs(), static_cast<cl_mem>(0));
+    sp_output_memobj_.resize(nOut(), static_cast<cl_mem>(0));
     for (int i=0; i<sp_output_memobj_.size(); ++i) {
       sp_output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
                                             CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
@@ -1107,14 +1107,14 @@ namespace casadi {
     int kernel_arg = 0;
 
     // Pass inputs
-    for (int i=0; i<getNumInputs(); ++i) {
+    for (int i=0; i<nIn(); ++i) {
       ret = clSetKernelArg(kernel, kernel_arg++,
                            sizeof(cl_mem), static_cast<void *>(&sp_input_memobj_[i]));
       casadi_assert(ret == CL_SUCCESS);
     }
 
     // Pass outputs
-    for (int i=0; i<getNumOutputs(); ++i) {
+    for (int i=0; i<nOut(); ++i) {
       ret = clSetKernelArg(kernel, kernel_arg++,
                            sizeof(cl_mem), static_cast<void *>(&sp_output_memobj_[i]));
       casadi_assert(ret == CL_SUCCESS);
@@ -1224,7 +1224,7 @@ namespace casadi {
     casadi_assert(ret == CL_SUCCESS);
 
     // Memory buffer for each of the input arrays
-    input_memobj_.resize(getNumInputs(), static_cast<cl_mem>(0));
+    input_memobj_.resize(nIn(), static_cast<cl_mem>(0));
     for (int i=0; i<input_memobj_.size(); ++i) {
       input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
                                         CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
@@ -1234,7 +1234,7 @@ namespace casadi {
     }
 
     // Memory buffer for each of the output arrays
-    output_memobj_.resize(getNumOutputs(), static_cast<cl_mem>(0));
+    output_memobj_.resize(nOut(), static_cast<cl_mem>(0));
     for (int i=0; i<output_memobj_.size(); ++i) {
       output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
                                          CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
@@ -1254,14 +1254,14 @@ namespace casadi {
     int kernel_arg = 0;
 
     // Pass inputs
-    for (int i=0; i<getNumInputs(); ++i) {
+    for (int i=0; i<nIn(); ++i) {
       ret = clSetKernelArg(kernel_, kernel_arg++,
                            sizeof(cl_mem), static_cast<void *>(&input_memobj_[i]));
       casadi_assert(ret == CL_SUCCESS);
     }
 
     // Pass outputs
-    for (int i=0; i<getNumOutputs(); ++i) {
+    for (int i=0; i<nOut(); ++i) {
       ret = clSetKernelArg(kernel_, kernel_arg++, sizeof(cl_mem),
                            static_cast<void *>(&output_memobj_[i]));
       casadi_assert(ret == CL_SUCCESS);

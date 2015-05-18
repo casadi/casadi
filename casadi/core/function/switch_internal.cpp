@@ -54,8 +54,8 @@ namespace casadi {
       fk.init(false);
       if (num_in<0) {
         // Number of inputs and outputs
-        num_in=fk.getNumInputs();
-        num_out=fk.getNumOutputs();
+        num_in=fk.nIn();
+        num_out=fk.nOut();
         // Output sparsity
         sp_out.resize(num_out);
         for (int i=0; i<num_out; ++i) sp_out[i] = fk.output(i).sparsity();
@@ -64,8 +64,8 @@ namespace casadi {
         for (int i=0; i<num_in; ++i) sp_in[i] = fk.input(i).sparsity();
       } else {
         // Assert matching number of inputs and outputs
-        casadi_assert(num_in==fk.getNumInputs());
-        casadi_assert(num_out==fk.getNumOutputs());
+        casadi_assert(num_in==fk.nIn());
+        casadi_assert(num_out==fk.nOut());
         // Intersect with output sparsity
         for (int i=0; i<num_out; ++i) {
           sp_out[i] = sp_out[i].patternIntersection(fk.output(i).sparsity());
@@ -100,13 +100,13 @@ namespace casadi {
       fk.nwork(n_arg, n_res, n_iw, n_w);
 
       // Add size for input buffers
-      for (int i=1; i<getNumInputs(); ++i) {
+      for (int i=1; i<nIn(); ++i) {
         const Sparsity& s = fk.input(i-1).sparsity();
         if (s!=input(i).sparsity()) n_w += s.nnz();
       }
 
       // Add size for output buffers
-      for (int i=0; i<getNumOutputs(); ++i) {
+      for (int i=0; i<nOut(); ++i) {
         const Sparsity& s = fk.output(i).sparsity();
         if (s!=output(i).sparsity()) n_w += s.nnz();
       }
@@ -124,13 +124,13 @@ namespace casadi {
     Function& fk = k<f_.size() ? f_[k] : f_def_;
 
     // Input buffers
-    for (int i=1; i<getNumInputs(); ++i) {
+    for (int i=1; i<nIn(); ++i) {
       const Sparsity& s = fk.input(i-1).sparsity();
       casadi_assert_message(s==input(i).sparsity(), "Not implemented");
     }
 
     // Output buffers
-    for (int i=0; i<getNumOutputs(); ++i) {
+    for (int i=0; i<nOut(); ++i) {
       const Sparsity& s = fk.output(i).sparsity();
       casadi_assert_message(s==output(i).sparsity(), "Not implemented");
     }
@@ -220,7 +220,7 @@ namespace casadi {
     vector<MX>::const_iterator v_it = v.begin(), v_it_next;
     for (int d=0; d<nadj; ++d) {
       w_out.push_back(ind_sens);
-      v_it_next = v_it + (getNumInputs()-1);
+      v_it_next = v_it + (nIn()-1);
       w_out.insert(w_out.end(), v_it, v_it_next);
       v_it = v_it_next;
     }

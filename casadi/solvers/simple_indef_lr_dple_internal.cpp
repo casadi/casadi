@@ -125,11 +125,11 @@ namespace casadi {
 
 
   void SimpleIndefDpleInternal::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), f_.input(i).begin());
     }
     f_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       std::copy(f_.output(i).begin(), f_.output(i).end(), output(i).begin());
     }
   }

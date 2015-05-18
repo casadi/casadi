@@ -78,11 +78,11 @@ namespace casadi {
     /// \endcond
 
     /// Get the number of function inputs
-    inline int getNumInputs() const
+    inline int nIn() const
     { return static_cast<const Derived*>(this)->input_struct().data.size();}
 
     /// Get the number of function outputs
-    inline int getNumOutputs() const
+    inline int nOut() const
     { return static_cast<const Derived*>(this)->output_struct().data.size();}
 
     /// Set the number of function inputs
@@ -104,7 +104,7 @@ namespace casadi {
         } catch(std::out_of_range&) {
           std::stringstream ss;
           ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
-             << ": input " << i << " not in interval [0, " << getNumInputs() << ")";
+             << ": input " << i << " not in interval [0, " << nIn() << ")";
           if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl
                                                                << "Did you forget to initialize?";
           throw CasadiException(ss.str());
@@ -129,7 +129,7 @@ namespace casadi {
         } catch(std::out_of_range&) {
           std::stringstream ss;
           ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
-             << ": output " << i << " not in interval [0, " << getNumOutputs() << ")";
+             << ": output " << i << " not in interval [0, " << nOut() << ")";
           if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl
                                                                << "Did you forget to initialize?";
           throw CasadiException(ss.str());
@@ -149,13 +149,13 @@ namespace casadi {
 
     /** \brief Set input scheme */
     void setInputScheme(const casadi::IOScheme &scheme) {
-      casadi_assert(scheme.compatibleSize(getNumInputs()));
+      casadi_assert(scheme.compatibleSize(nIn()));
       static_cast<Derived*>(this)->inputScheme() = scheme;
     }
 
     /** \brief Set output scheme */
     void setOutputScheme(const casadi::IOScheme &scheme) {
-      casadi_assert(scheme.compatibleSize(getNumOutputs()));
+      casadi_assert(scheme.compatibleSize(nOut()));
       static_cast<Derived*>(this)->outputScheme() = scheme;
     }
 
@@ -219,12 +219,12 @@ namespace casadi {
 
     /**
     * \defgroup  iind
-    *   \param[in] iind index within the range [0..getNumInputs()-1]
+    *   \param[in] iind index within the range [0..nIn()-1]
     */
 
     /**
     * \defgroup  oind
-    *   \param[in] oind index within the range [0..getNumOutputs()-1]
+    *   \param[in] oind index within the range [0..nOut()-1]
     */
 
     /**

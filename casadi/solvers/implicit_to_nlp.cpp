@@ -79,7 +79,7 @@ namespace casadi {
 
     // Add auxiliary inputs
     vector<double>::iterator nlp_p = solver_.input(NLP_SOLVER_P).begin();
-    for (int i=0; i<getNumInputs(); ++i) {
+    for (int i=0; i<nIn(); ++i) {
       if (i!=iin_) {
         std::copy(input(i).begin(), input(i).end(), nlp_p);
         nlp_p += input(i).nnz();
@@ -94,12 +94,12 @@ namespace casadi {
     output(iout_).set(solver_.output(NLP_SOLVER_X));
 
     // Evaluate auxilary outputs, if necessary
-    if (getNumOutputs()>0) {
+    if (nOut()>0) {
       f_.setInput(output(iout_), iin_);
-      for (int i=0; i<getNumInputs(); ++i)
+      for (int i=0; i<nIn(); ++i)
         if (i!=iin_) f_.setInput(input(i), i);
       f_.evaluate();
-      for (int i=0; i<getNumOutputs(); ++i) {
+      for (int i=0; i<nOut(); ++i) {
         if (i!=iout_) f_.getOutput(output(i), i);
       }
     }
@@ -114,7 +114,7 @@ namespace casadi {
 
     // So that we can pass it on to createParent
     std::vector<Sparsity> sps;
-    for (int i=0; i<getNumInputs(); ++i)
+    for (int i=0; i<nIn(); ++i)
       if (i!=iin_) sps.push_back(input(i).sparsity());
 
     // u groups all parameters in an MX
@@ -125,9 +125,9 @@ namespace casadi {
     MX nlp_f = 0;
 
     // NLP constraints
-    std::vector< MX > args_call(getNumInputs());
+    std::vector< MX > args_call(nIn());
     args_call[iin_] = u;
-    for (int i=0, i2=0; i<getNumInputs(); ++i)
+    for (int i=0, i2=0; i<nIn(); ++i)
       if (i!=iin_) args_call[i] = inputs[i2++];
     MX nlp_g = f_(args_call).at(iout_);
 

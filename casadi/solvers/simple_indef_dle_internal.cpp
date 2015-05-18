@@ -100,13 +100,13 @@ namespace casadi {
 
     f_.init();
 
-    casadi_assert(getNumOutputs()==f_.getNumOutputs());
-    for (int i=0;i<getNumInputs();++i) {
+    casadi_assert(nOut()==f_.nOut());
+    for (int i=0;i<nIn();++i) {
       casadi_assert_message(input(i).sparsity()==f_.input(i).sparsity(),
         "Sparsity mismatch for input " << i << ":" <<
         input(i).dimString() << " <-> " << f_.input(i).dimString() << ".");
     }
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       casadi_assert_message(output(i).sparsity()==f_.output(i).sparsity(),
         "Sparsity mismatch for output " << i << ":" <<
         output(i).dimString() << " <-> " << f_.output(i).dimString() << ".");
@@ -116,11 +116,11 @@ namespace casadi {
 
 
   void SimpleIndefDleInternal::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), f_.input(i).begin());
     }
     f_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       std::copy(f_.output(i).begin(), f_.output(i).end(), output(i).begin());
     }
   }

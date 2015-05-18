@@ -661,8 +661,8 @@ class ADtests(casadiTestCase):
         d2 = f.derReverse(ndir)
         d2.init()
         
-        num_in = f.getNumInputs()
-        num_out = f.getNumOutputs()
+        num_in = f.nIn()
+        num_out = f.nOut()
 
         """# Fwd and Adjoint AD
         for i,v in enumerate(values):
@@ -695,9 +695,9 @@ class ADtests(casadiTestCase):
 
           # dense
           for spmod,spmod2 in itertools.product(spmods,repeat=2):
-            fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.getNumInputs())]  for d in range(ndir)]
-            aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.getNumOutputs())] for d in range(ndir)]
-            inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs())]
+            fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.nIn())]  for d in range(ndir)]
+            aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.nOut())] for d in range(ndir)]
+            inputss = [sym("i",f.input(i).sparsity()) for i in range(f.nIn())]
         
             with internalAPI():
               res = f.call(inputss,True)
@@ -725,7 +725,7 @@ class ADtests(casadiTestCase):
               vf.setInput(0,offset+1)
               offset+=2
               
-            assert(offset==vf.getNumInputs())
+            assert(offset==vf.nIn())
             
             vf.evaluate()
               
@@ -740,21 +740,21 @@ class ADtests(casadiTestCase):
               sens = array(vf.getOutput(offset+0)).ravel()
               offset+=len(inputss)
               
-              self.checkarray(sens,mul(J_.T,seed),"eval Adj %d %s" % (d,str([vf.getOutput(i) for i in range(vf.getNumOutputs())])))
+              self.checkarray(sens,mul(J_.T,seed),"eval Adj %d %s" % (d,str([vf.getOutput(i) for i in range(vf.nOut())])))
           
           
-            assert(offset==vf.getNumOutputs())
+            assert(offset==vf.nOut())
           
             # Complete random seeding
             random.seed(1)
-            for i in range(vf.getNumInputs()):
+            for i in range(vf.nIn()):
               vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).nnz())),i)
             
             vf.evaluate()
             storagekey = (spmod,spmod2)
             if not(storagekey in storage):
               storage[storagekey] = []
-            storage[storagekey].append([vf.getOutput(i) for i in range(vf.getNumOutputs())])
+            storage[storagekey].append([vf.getOutput(i) for i in range(vf.nOut())])
             
             # Added to make sure that the same seeds are used for SX and MX
             if Function is MXFunction:
@@ -768,9 +768,9 @@ class ADtests(casadiTestCase):
             
 
             for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-              fseeds2 = [[sym2("f",vf_mx.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
-              aseeds2 = [[sym2("a",vf_mx.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
-              inputss2 = [sym2("i",vf_mx.input(i).sparsity()) for i in range(vf.getNumInputs())]
+              fseeds2 = [[sym2("f",vf_mx.input(i).sparsity()) for i in range(vf.nIn())] for d in range(ndir)]
+              aseeds2 = [[sym2("a",vf_mx.output(i).sparsity())  for i in range(vf.nOut()) ] for d in range(ndir)]
+              inputss2 = [sym2("i",vf_mx.input(i).sparsity()) for i in range(vf.nIn())]
            
               with internalAPI():
                 res2 = vf.call(inputss2,True)
@@ -781,14 +781,14 @@ class ADtests(casadiTestCase):
               vf2.init()
                 
               random.seed(1)
-              for i in range(vf2.getNumInputs()):
+              for i in range(vf2.nIn()):
                 vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).nnz())),i)
               
               vf2.evaluate()
               storagekey = (spmod,spmod2)
               if not(storagekey in storage2):
                 storage2[storagekey] = []
-              storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
+              storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.nOut())])
 
       # Remainder of eval testing
       for store,order in [(storage,"first-order"),(storage2,"second-order")]:

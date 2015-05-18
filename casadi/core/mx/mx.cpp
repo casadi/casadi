@@ -908,7 +908,7 @@ namespace casadi {
     (*this)->temp = t;
   }
 
-  int MX::getNumOutputs() const {
+  int MX::nOut() const {
     return (*this)->nout();
   }
 
@@ -1607,7 +1607,7 @@ namespace casadi {
     std::vector<bool> expr_found(expr.size());
 
     // Allocate output vector
-    vector<MX> f_out(f.getNumOutputs());
+    vector<MX> f_out(f.nOut());
     vector<MX> oarg, ores;
 
     // expr_lookup iterator

@@ -264,16 +264,16 @@ namespace casadi {
     bool monitored(const std::string& mod) const;
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
-    int getNumInputNonzeros() const;
+    int nnzIn() const;
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
-    int getNumOutputNonzeros() const;
+    int nnzOut() const;
 
     /** \brief  Get total number of elements in all of the matrix-valued inputs */
-    int getNumInputElements() const;
+    int numelIn() const;
 
     /** \brief  Get total number of elements in all of the matrix-valued outputs */
-    int getNumOutputElements() const;
+    int numelOut() const;
 
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary & getStats() const;

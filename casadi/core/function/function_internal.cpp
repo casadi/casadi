@@ -113,17 +113,17 @@ namespace casadi {
     regularity_check_ = getOption("regularity_check");
 
     // Warn for functions with too many inputs or outputs
-    casadi_assert_warning(getNumInputs()<10000, "Function " << getOption("name")
+    casadi_assert_warning(nIn()<10000, "Function " << getOption("name")
                           << " has a large number of inputs. "
                           "Changing the problem formulation is strongly encouraged.");
-    casadi_assert_warning(getNumOutputs()<10000, "Function " << getOption("name")
+    casadi_assert_warning(nOut()<10000, "Function " << getOption("name")
                           << " has a large number of outputs. "
                           "Changing the problem formulation is strongly encouraged.");
 
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ =
-        SparseStorage<Sparsity>(Sparsity(getNumOutputs(), getNumInputs()));
-    jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(getNumOutputs(), getNumInputs()));
+        SparseStorage<Sparsity>(Sparsity(nOut(), nIn()));
+    jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(nOut(), nIn()));
 
     if (hasSetOption("user_data")) {
       user_data_ = getOption("user_data").toVoidPointer();
@@ -142,8 +142,8 @@ namespace casadi {
     gather_stats_ = getOption("gather_stats");
     inputs_check_ = getOption("inputs_check");
 
-    n_arg_ = getNumInputs();
-    n_res_ = getNumOutputs();
+    n_arg_ = nIn();
+    n_res_ = nOut();
     n_iw_ = 0;
     n_w_ = 0;
 
@@ -152,35 +152,35 @@ namespace casadi {
   }
 
   void FunctionInternal::print(ostream &stream) const {
-    if (getNumInputs()==1) {
+    if (nIn()==1) {
       stream << " Input: " << input().dimString() << endl;
     } else {
       if (input_.scheme.isNull()) {
-        stream << " Inputs (" << getNumInputs() << "):" << endl;
-        for (int i=0;i<getNumInputs();i++) {
+        stream << " Inputs (" << nIn() << "):" << endl;
+        for (int i=0;i<nIn();i++) {
           stream << "  " << i << ". " << input(i).dimString() << endl;
         }
       } else {
-        stream << " Inputs (" << input_.scheme.name() << ": " << getNumInputs()
+        stream << " Inputs (" << input_.scheme.name() << ": " << nIn()
                << "):" << endl;
-        for (int i=0;i<getNumInputs();i++) {
+        for (int i=0;i<nIn();i++) {
           stream << "  " << i  << ". (" << input_.scheme.describe(i) << ")   "
                  << input(i).dimString() << endl;
         }
       }
     }
-    if (getNumOutputs()==1) {
+    if (nOut()==1) {
       stream << " Output: " << output().dimString() << endl;
     } else {
       if (output_.scheme.isNull()) {
-        stream << " Outputs (" << getNumOutputs() << "):" << endl;
-        for (int i=0;i<getNumOutputs();i++) {
+        stream << " Outputs (" << nOut() << "):" << endl;
+        for (int i=0;i<nOut();i++) {
           stream << "  " << i << ". " << output(i).dimString() << endl;
         }
       } else {
         stream << " Outputs (" << output_.scheme.name() << ": "
-               << getNumOutputs() << "):" << endl;
-        for (int i=0;i<getNumOutputs();i++) {
+               << nOut() << "):" << endl;
+        for (int i=0;i<nOut();i++) {
           stream << "  " << i << ". (" << output_.scheme.describe(i) << ")   "
                  << output(i).dimString() << endl;
         }
@@ -210,9 +210,9 @@ namespace casadi {
 
     // Output names
     std::vector<std::string> ionames;
-    ionames.reserve(ret.getNumOutputs());
+    ionames.reserve(ret.nOut());
     ionames.push_back("grad");
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       ionames.push_back(output_.scheme.entryLabel(i));
     }
 
@@ -239,9 +239,9 @@ namespace casadi {
 
     // Output names
     std::vector<std::string> ionames;
-    ionames.reserve(ret.getNumOutputs());
+    ionames.reserve(ret.nOut());
     ionames.push_back("tangent");
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       ionames.push_back(output_.scheme.entryLabel(i));
     }
 
@@ -269,10 +269,10 @@ namespace casadi {
 
     // Output names
     std::vector<std::string> ionames;
-    ionames.reserve(ret.getNumOutputs());
+    ionames.reserve(ret.nOut());
     ionames.push_back("hess");
     ionames.push_back("grad");
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       ionames.push_back(output_.scheme.entryLabel(i));
     }
 
@@ -369,7 +369,7 @@ namespace casadi {
 
   std::vector<MX> FunctionInternal::symbolicInput() const {
     assertInit();
-    vector<MX> ret(getNumInputs());
+    vector<MX> ret(nIn());
     for (int i=0; i<ret.size(); ++i) {
       stringstream name;
       name << "x_" << i;
@@ -380,7 +380,7 @@ namespace casadi {
 
   std::vector<MX> FunctionInternal::symbolicOutput() const {
     assertInit();
-    vector<MX> ret(getNumOutputs());
+    vector<MX> ret(nOut());
     for (int i=0; i<ret.size(); ++i) {
       stringstream name;
       name << "r_" << i;
@@ -394,7 +394,7 @@ namespace casadi {
   }
 
   std::vector<SX> FunctionInternal::symbolicInputSX() const {
-    vector<SX> ret(getNumInputs());
+    vector<SX> ret(nIn());
     assertInit();
     for (int i=0; i<ret.size(); ++i) {
       stringstream name;
@@ -449,13 +449,13 @@ namespace casadi {
     spInit(use_fwd);
 
     // Clear the forward seeds/adjoint sensitivities
-    for (int ind=0; ind<getNumInputs(); ++ind) {
+    for (int ind=0; ind<nIn(); ++ind) {
       vector<double> &v = inputNoCheck(ind).data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
-    for (int ind=0; ind<getNumOutputs(); ++ind) {
+    for (int ind=0; ind<nOut(); ++ind) {
       vector<double> &v = outputNoCheck(ind).data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
@@ -546,8 +546,8 @@ namespace casadi {
     }
 
     // Set inputs and outputs to zero
-    for (int ind=0; ind<getNumInputs(); ++ind) input(ind).setZero();
-    for (int ind=0; ind<getNumOutputs(); ++ind) output(ind).setZero();
+    for (int ind=0; ind<nIn(); ++ind) input(ind).setZero();
+    for (int ind=0; ind<nOut(); ++ind) output(ind).setZero();
 
     // Construct sparsity pattern
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
@@ -567,13 +567,13 @@ namespace casadi {
     int nz = input(iind).nnz();
 
     // Clear the forward seeds/adjoint sensitivities
-    for (int ind=0; ind<getNumInputs(); ++ind) {
+    for (int ind=0; ind<nIn(); ++ind) {
       vector<double> &v = inputNoCheck(ind).data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
-    for (int ind=0; ind<getNumOutputs(); ++ind) {
+    for (int ind=0; ind<nOut(); ++ind) {
       vector<double> &v = outputNoCheck(ind).data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
@@ -748,13 +748,13 @@ namespace casadi {
             }
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
-            for (int ind=0; ind<getNumInputs(); ++ind) {
+            for (int ind=0; ind<nIn(); ++ind) {
               vector<double> &v = inputNoCheck(ind).data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 
             // Clear the adjoint seeds/forward sensitivities, ready for next bvec sweep
-            for (int ind=0; ind<getNumOutputs(); ++ind) {
+            for (int ind=0; ind<nOut(); ++ind) {
               vector<double> &v = outputNoCheck(ind).data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
@@ -798,13 +798,13 @@ namespace casadi {
     int nz_out = output(oind).nnz();
 
     // Clear the forward seeds/adjoint sensitivities
-    for (int ind=0; ind<getNumInputs(); ++ind) {
+    for (int ind=0; ind<nIn(); ++ind) {
       vector<double> &v = inputNoCheck(ind).data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
-    for (int ind=0; ind<getNumOutputs(); ++ind) {
+    for (int ind=0; ind<nOut(); ++ind) {
       vector<double> &v = outputNoCheck(ind).data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
@@ -1037,13 +1037,13 @@ namespace casadi {
             }
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
-            for (int ind=0; ind<getNumInputs(); ++ind) {
+            for (int ind=0; ind<nIn(); ++ind) {
               vector<double> &v = inputNoCheck(ind).data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 
             // Clear the adjoint seeds/forward sensitivities, ready for next bvec sweep
-            for (int ind=0; ind<getNumOutputs(); ++ind) {
+            for (int ind=0; ind<nOut(); ++ind) {
               vector<double> &v = outputNoCheck(ind).data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
@@ -1261,12 +1261,12 @@ namespace casadi {
     w_tmp_.resize(n_w_);
 
     // Get pointers to input arguments
-    int n_in = getNumInputs();
+    int n_in = nIn();
     vector<const double*> arg(n_arg_);
     for (int i=0; i<n_in; ++i) arg[i]=input(i).ptr();
 
     // Get pointers to output arguments
-    int n_out = getNumOutputs();
+    int n_out = nOut();
     vector<double*> res(n_res_);
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
@@ -1277,8 +1277,8 @@ namespace casadi {
   void FunctionInternal::evalD(const double** arg,
                                double** res, int* itmp, double* rtmp) {
     // Number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // Pass the inputs to the function
     for (int i=0; i<num_in; ++i) {
@@ -1301,8 +1301,8 @@ namespace casadi {
   void FunctionInternal::evalSX(const SXElement** arg, SXElement** res,
                                 int* itmp, SXElement* rtmp) {
     // Number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // Create input arguments
     vector<SX> argv(num_in);
@@ -1327,8 +1327,8 @@ namespace casadi {
 
   void FunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res) {
     // Get the number of inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    int num_in = nIn();
+    int num_out = nOut();
 
     // Check if matching input sparsity
     bool matching_sparsity = true;
@@ -1361,7 +1361,7 @@ namespace casadi {
 
     // Get pointers to output arguments
     vector<SXElement*> resp(n_res_);
-    for (int i=0; i<getNumOutputs(); ++i) resp[i]=getPtr(res[i]);
+    for (int i=0; i<nOut(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
     evalSX(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp));
@@ -1381,19 +1381,19 @@ namespace casadi {
     bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(w_tmp_));
 
     // Get pointers to output arguments
-    vector<bvec_t*> res(getNumOutputs());
+    vector<bvec_t*> res(nOut());
     for (int i=0; i<res.size(); ++i) res[i]=reinterpret_cast<bvec_t*>(output(i).ptr());
 
     if (fwd) {
       // Get pointers to input arguments
-      vector<const bvec_t*> arg(getNumInputs());
+      vector<const bvec_t*> arg(nIn());
       for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
 
       // Call memory-less
       spFwd(getPtr(arg), getPtr(res), iw, w);
     } else {
       // Get pointers to input arguments
-      vector<bvec_t*> arg(getNumInputs());
+      vector<bvec_t*> arg(nIn());
       for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
 
       // Call memory-less
@@ -1404,7 +1404,7 @@ namespace casadi {
   void FunctionInternal::spEvaluateViaJacSparsity(bool fwd) {
     if (fwd) {
       // Clear the outputs
-      for (int oind = 0; oind < getNumOutputs(); ++oind) {
+      for (int oind = 0; oind < nOut(); ++oind) {
         // Get data array for output and clear it
         bvec_t *outputd = get_bvec_t(output(oind).data());
         fill_n(outputd, output(oind).nnz(), 0);
@@ -1412,7 +1412,7 @@ namespace casadi {
     }
 
     // Loop over inputs
-    for (int iind = 0; iind < getNumInputs(); ++iind) {
+    for (int iind = 0; iind < nIn(); ++iind) {
       // Skip if no seeds
       if (fwd && input(iind).isEmpty())
         continue;
@@ -1421,7 +1421,7 @@ namespace casadi {
       bvec_t *inputd = get_bvec_t(input(iind).data());
 
       // Loop over outputs
-      for (int oind = 0; oind < getNumOutputs(); ++oind) {
+      for (int oind = 0; oind < nOut(); ++oind) {
 
         // Skip if no seeds
         if (!fwd && output(oind).isEmpty())
@@ -1457,7 +1457,7 @@ namespace casadi {
       }
     }
     if (!fwd) {
-      for (int oind=0; oind < getNumOutputs(); ++oind) {
+      for (int oind=0; oind < nOut(); ++oind) {
         vector<double> &w = output(oind).data();
         fill_n(get_bvec_t(w), w.size(), bvec_t(0));
       }
@@ -1489,9 +1489,9 @@ namespace casadi {
 
       // Output names
       std::vector<std::string> ionames;
-      ionames.reserve(ret.getNumOutputs());
+      ionames.reserve(ret.nOut());
       ionames.push_back("jac");
-      for (int i=0; i<getNumOutputs(); ++i) {
+      for (int i=0; i<nOut(); ++i) {
         ionames.push_back(output_.scheme.entryLabel(i));
       }
       ret.setOutputScheme(ionames);
@@ -1546,8 +1546,8 @@ namespace casadi {
     ret.setOption("name", ss.str());
 
     // Get the number of inputs and outputs
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
+    int n_in = nIn();
+    int n_out = nOut();
 
     // Names of inputs
     std::vector<std::string> i_names;
@@ -1595,7 +1595,7 @@ namespace casadi {
     ret.init();
 
     // Consistency check for inputs
-    for (int i=0; i<ret.getNumInputs(); ++i) {
+    for (int i=0; i<ret.nIn(); ++i) {
       const Sparsity& sp = i<n_in ? input(i).sparsity() :
         i<n_in+n_out ? output(i-n_in).sparsity() :
         input((i-n_in-n_out) % n_in).sparsity();
@@ -1606,7 +1606,7 @@ namespace casadi {
     }
 
     // Consistency check for outputs
-    for (int i=0; i<ret.getNumOutputs(); ++i) {
+    for (int i=0; i<ret.nOut(); ++i) {
       const Sparsity& sp = output(i % n_out).sparsity();
       casadi_assert_message(ret.output(i).shape()==sp.shape(),
                             "Incorrect shape for " << ret << " output " << i << " \""
@@ -1652,8 +1652,8 @@ namespace casadi {
     ret.setOption("name", ss.str());
 
     // Get the number of inputs and outputs
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
+    int n_in = nIn();
+    int n_out = nOut();
 
     // Names of inputs
     std::vector<std::string> i_names;
@@ -1701,7 +1701,7 @@ namespace casadi {
     ret.init();
 
     // Consistency check for inputs
-    for (int i=0; i<ret.getNumInputs(); ++i) {
+    for (int i=0; i<ret.nIn(); ++i) {
       const Sparsity& sp = i<n_in ? input(i).sparsity() :
         i<n_in+n_out ? output(i-n_in).sparsity() :
         output((i-n_in-n_out) % n_out).sparsity();
@@ -1712,7 +1712,7 @@ namespace casadi {
     }
 
     // Consistency check for outputs
-    for (int i=0; i<ret.getNumOutputs(); ++i) {
+    for (int i=0; i<ret.nOut(); ++i) {
       const Sparsity& sp = input(i % n_in).sparsity();
       casadi_assert_message(ret.output(i).shape()==sp.shape(),
                             "Incorrect shape for " << ret << " output " << i << " \""
@@ -1760,33 +1760,33 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  int FunctionInternal::getNumInputNonzeros() const {
+  int FunctionInternal::nnzIn() const {
     int ret=0;
-    for (int iind=0; iind<getNumInputs(); ++iind) {
+    for (int iind=0; iind<nIn(); ++iind) {
       ret += input(iind).nnz();
     }
     return ret;
   }
 
-  int FunctionInternal::getNumOutputNonzeros() const {
+  int FunctionInternal::nnzOut() const {
     int ret=0;
-    for (int oind=0; oind<getNumOutputs(); ++oind) {
+    for (int oind=0; oind<nOut(); ++oind) {
       ret += output(oind).nnz();
     }
     return ret;
   }
 
-  int FunctionInternal::getNumInputElements() const {
+  int FunctionInternal::numelIn() const {
     int ret=0;
-    for (int iind=0; iind<getNumInputs(); ++iind) {
+    for (int iind=0; iind<nIn(); ++iind) {
       ret += input(iind).numel();
     }
     return ret;
   }
 
-  int FunctionInternal::getNumOutputElements() const {
+  int FunctionInternal::numelOut() const {
     int ret=0;
-    for (int oind=0; oind<getNumOutputs(); ++oind) {
+    for (int oind=0; oind<nOut(); ++oind) {
       ret += output(oind).numel();
     }
     return ret;
@@ -1809,9 +1809,9 @@ namespace casadi {
 
       // Argument checking
       casadi_assert_message(
-        arg.size()<=getNumInputs(), "Function::call: number of passed-in dependencies ("
+        arg.size()<=nIn(), "Function::call: number of passed-in dependencies ("
         << arg.size() << ") should not exceed the number of inputs of the function ("
-        << getNumInputs() << ").");
+        << nIn() << ").");
 
       // Assumes initialized
       for (int i=0; i<arg.size(); ++i) {
@@ -1840,7 +1840,7 @@ namespace casadi {
       setInput(arg[i], i);
     }
     evaluate();
-    res.resize(getNumOutputs());
+    res.resize(nOut());
     for (int i=0;i<res.size();++i) {
       res[i]=output(i);
     }
@@ -1881,8 +1881,8 @@ namespace casadi {
       ret.init();
 
       // Consistency check
-      casadi_assert(ret.getNumInputs()==getNumInputs());
-      casadi_assert(ret.getNumOutputs()==1);
+      casadi_assert(ret.nIn()==nIn());
+      casadi_assert(ret.nOut()==1);
 
       // Cache it for reuse and return
       full_jacobian_ = ret;
@@ -1894,8 +1894,8 @@ namespace casadi {
     casadi_assert(hasDerForward() || hasDerReverse());
 
     // Number inputs and outputs
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
+    int n_in = nIn();
+    int n_out = nOut();
 
     // Symbolic inputs of the full Jacobian function under construction
     vector<MX> ret_argv = symbolicInput(), argv, resv;
@@ -1984,8 +1984,8 @@ namespace casadi {
 
   void FunctionInternal::generateMeta(CodeGenerator& g, const std::string& fname) const {
     // Short-hands
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
+    int n_in = nIn();
+    int n_out = nOut();
     stringstream &s = g.body;
 
     // Function that returns the number of inputs and outputs
@@ -2133,7 +2133,7 @@ namespace casadi {
       s << "int main_" << fname << "(int argc, char* argv[]) {" << endl;
 
       // Work vectors and input and output buffers
-      size_t nr = n_w_ + getNumInputNonzeros() + getNumOutputNonzeros();
+      size_t nr = n_w_ + nnzIn() + nnzOut();
       s << "  int iw[" << n_iw_ << "];" << endl
              << "  real_t w[" << n_w_ << "];" << endl;
 
@@ -2159,7 +2159,7 @@ namespace casadi {
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
       s << "  int j;" << endl
              << "  real_t* a = w;" << endl
-             << "  for (j=0; j<" << getNumInputNonzeros() << "; ++j) "
+             << "  for (j=0; j<" << nnzIn() << "; ++j) "
              << "scanf(\"%lf\", a++);" << endl;
 
       // Call the function
@@ -2167,8 +2167,8 @@ namespace casadi {
              << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
-      s << "  const real_t* r = w+" << getNumInputNonzeros() << ";" << endl
-             << "  for (j=0; j<" << getNumOutputNonzeros() << "; ++j) "
+      s << "  const real_t* r = w+" << nnzIn() << ";" << endl
+             << "  for (j=0; j<" << nnzOut() << "; ++j) "
              << g.printf("%g ", "*r++") << endl;
       // End with newline
       s << "  " << g.printf("\\n") << endl;
@@ -2228,8 +2228,8 @@ namespace casadi {
   void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
+    int n_in = nIn();
+    int n_out = nOut();
 
     // Pass/clear forward seeds/adjoint sensitivities
     for (int i=0; i<n_in; ++i) {
@@ -2285,8 +2285,8 @@ namespace casadi {
   void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
+    int n_in = nIn();
+    int n_out = nOut();
 
     // Pass/clear forward seeds/adjoint sensitivities
     for (int i=0; i<n_in; ++i) {
@@ -2343,8 +2343,8 @@ namespace casadi {
   }
 
   void FunctionInternal::allocwork(size_t n_arg, size_t n_res, size_t n_iw, size_t n_w) {
-    n_arg_ = max(n_arg + getNumInputs(), n_arg_);
-    n_res_ = max(n_res + getNumOutputs(), n_res_);
+    n_arg_ = max(n_arg + nIn(), n_arg_);
+    n_res_ = max(n_res + nOut(), n_res_);
     n_iw_ = max(n_iw, n_iw_);
     n_w_ = max(n_w, n_w_);
   }
@@ -2470,11 +2470,11 @@ namespace casadi {
     const int jac_penalty = 2;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
-    if (jac_penalty*getNumInputNonzeros()<nfwd) return true;
+    if (jac_penalty*nnzIn()<nfwd) return true;
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = adWeight();
-    if (hasDerReverse() && jac_penalty*(1-w)*getNumOutputNonzeros()<w*nfwd)
+    if (hasDerReverse() && jac_penalty*(1-w)*nnzOut()<w*nfwd)
       return true;
 
     return false;
@@ -2487,11 +2487,11 @@ namespace casadi {
     const int jac_penalty = 2;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
-    if (jac_penalty*getNumOutputNonzeros()<nadj) return true;
+    if (jac_penalty*nnzOut()<nadj) return true;
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = adWeight();
-    if (hasDerForward() && jac_penalty*w*getNumInputNonzeros()<(1-w)*nadj)
+    if (hasDerForward() && jac_penalty*w*nnzIn()<(1-w)*nadj)
       return true;
 
     return false;
@@ -2516,8 +2516,8 @@ namespace casadi {
     if (nfwd==0) return;
 
     // Number inputs and outputs
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
+    int n_in = nIn();
+    int n_out = nOut();
 
     // Calculating full Jacobian and then multiplying
     if (fwdViaJac(nfwd)) {
@@ -2592,8 +2592,8 @@ namespace casadi {
     if (nadj==0) return;
 
     // Number inputs and outputs
-    int n_in = getNumInputs();
-    int n_out = getNumOutputs();
+    int n_in = nIn();
+    int n_out = nOut();
 
     // Calculating full Jacobian and then multiplying likely cheaper
     if (adjViaJac(nadj)) {
@@ -2699,7 +2699,7 @@ namespace casadi {
     Function dfcn = derForward(nfwd);
 
     // Pass inputs
-    int n_in = getNumInputs();
+    int n_in = nIn();
     int di=0;
     casadi_assert(arg.size()==n_in);
     for (int i=0; i<n_in; ++i) {
@@ -2707,7 +2707,7 @@ namespace casadi {
     }
 
     // Pass outputs
-    int n_out = getNumOutputs();
+    int n_out = nOut();
     casadi_assert(res.size()==n_out);
     for (int i=0; i<n_out; ++i) {
       dfcn.setInput(res[i], di++);
@@ -2720,7 +2720,7 @@ namespace casadi {
         dfcn.setInput(fseed[d][i], di++);
       }
     }
-    casadi_assert(di==dfcn.getNumInputs()); // Consistency check
+    casadi_assert(di==dfcn.nIn()); // Consistency check
 
     // Calculate derivatives
     dfcn.evaluate();
@@ -2734,7 +2734,7 @@ namespace casadi {
         fsens[d][i] = dfcn.output(di++);
       }
     }
-    casadi_assert(di==dfcn.getNumOutputs()); // Consistency check
+    casadi_assert(di==dfcn.nOut()); // Consistency check
   }
 
   void FunctionInternal::
@@ -2752,7 +2752,7 @@ namespace casadi {
     Function dfcn = derReverse(nadj);
 
     // Pass inputs
-    int n_in = getNumInputs();
+    int n_in = nIn();
     int di=0;
     casadi_assert(arg.size()==n_in);
     for (int i=0; i<n_in; ++i) {
@@ -2760,7 +2760,7 @@ namespace casadi {
     }
 
     // Pass outputs
-    int n_out = getNumOutputs();
+    int n_out = nOut();
     casadi_assert(res.size()==n_out);
     for (int i=0; i<n_out; ++i) {
       dfcn.setInput(res[i], di++);
@@ -2773,7 +2773,7 @@ namespace casadi {
         dfcn.setInput(aseed[d][i], di++);
       }
     }
-    casadi_assert(di==dfcn.getNumInputs()); // Consistency check
+    casadi_assert(di==dfcn.nIn()); // Consistency check
 
     // Calculate derivatives
     dfcn.evaluate();
@@ -2787,7 +2787,7 @@ namespace casadi {
         asens[d][i] = dfcn.output(di++);
       }
     }
-    casadi_assert(di==dfcn.getNumOutputs()); // Consistency check
+    casadi_assert(di==dfcn.nOut()); // Consistency check
   }
 
   double FunctionInternal::adWeight() {

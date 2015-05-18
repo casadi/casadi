@@ -41,7 +41,7 @@ namespace casadi {
     n_ = arg.size();
 
     // Get all inputs
-    int f_num_in = fcn_.getNumInputs();
+    int f_num_in = fcn_.nIn();
     vector<MX> all_arg;
     all_arg.reserve(n_ * f_num_in);
     for (vector<vector<MX> >::const_iterator j=arg.begin(); j!=arg.end(); ++j) {
@@ -80,8 +80,8 @@ namespace casadi {
   }
 
   void Map::evalD(const double** arg, double** res, int* itmp, double* rtmp) {
-    int f_num_in = fcn_.getNumInputs();
-    int f_num_out = fcn_.getNumOutputs();
+    int f_num_in = fcn_.nIn();
+    int f_num_out = fcn_.nOut();
     for (int i=0; i<n_; ++i) {
       fcn_->evalD(arg, res, itmp, rtmp);
       arg += f_num_in;
@@ -94,8 +94,8 @@ namespace casadi {
     // Not available, switching to serial mode
     Map::evalD(arg, res, iw, w);
 #else // WITH_OPENMP
-    int f_num_in = fcn_.getNumInputs();
-    int f_num_out = fcn_.getNumOutputs();
+    int f_num_in = fcn_.nIn();
+    int f_num_out = fcn_.nOut();
     size_t n_arg, n_res, n_iw, n_w;
     fcn_.nwork(n_arg, n_res, n_iw, n_w);
 #pragma omp parallel for
@@ -112,8 +112,8 @@ namespace casadi {
   }
 
   void Map::spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
-    int f_num_in = fcn_.getNumInputs();
-    int f_num_out = fcn_.getNumOutputs();
+    int f_num_in = fcn_.nIn();
+    int f_num_out = fcn_.nOut();
     for (int i=0; i<n_; ++i) {
       fcn_->spFwd(arg, res, itmp, rtmp);
       arg += f_num_in;
@@ -122,8 +122,8 @@ namespace casadi {
   }
 
   void Map::spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
-    int f_num_in = fcn_.getNumInputs();
-    int f_num_out = fcn_.getNumOutputs();
+    int f_num_in = fcn_.nIn();
+    int f_num_out = fcn_.nOut();
     for (int i=0; i<n_; ++i) {
       fcn_->spAdj(arg, res, itmp, rtmp);
       arg += f_num_in;
@@ -132,12 +132,12 @@ namespace casadi {
   }
 
   int Map::nout() const {
-    int f_num_out = fcn_.getNumOutputs();
+    int f_num_out = fcn_.nOut();
     return n_ * f_num_out;
   }
 
   const Sparsity& Map::sparsity(int oind) const {
-    int f_num_out = fcn_.getNumOutputs();
+    int f_num_out = fcn_.nOut();
     return fcn_.output(oind % f_num_out).sparsity();
   }
 
@@ -146,8 +146,8 @@ namespace casadi {
   }
 
   void Map::evalSX(const SXElement** arg, SXElement** res, int* itmp, SXElement* rtmp) {
-    int f_num_in = fcn_.getNumInputs();
-    int f_num_out = fcn_.getNumOutputs();
+    int f_num_in = fcn_.nIn();
+    int f_num_out = fcn_.nOut();
     for (int i=0; i<n_; ++i) {
       fcn_->evalSX(arg, res, itmp, rtmp);
       arg += f_num_in;
@@ -157,7 +157,7 @@ namespace casadi {
 
   void Map::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Collect arguments
-    int f_num_in = fcn_.getNumInputs();
+    int f_num_in = fcn_.nIn();
     vector<vector<MX> > v(n_);
     vector<MX>::const_iterator arg_it = arg.begin();
     for (int i=0; i<n_; ++i) {
@@ -169,7 +169,7 @@ namespace casadi {
     v = fcn_.map(v, parallelization());
 
     // Get results
-    int f_num_out = fcn_.getNumOutputs();
+    int f_num_out = fcn_.nOut();
     vector<MX>::iterator res_it = res.begin();
     for (int i=0; i<n_; ++i) {
       copy(v[i].begin(), v[i].end(), res_it);
@@ -279,7 +279,7 @@ namespace casadi {
 
       // Collect outputs
       std::vector<MX>::const_iterator v_it = v.begin();
-      int n_out = fcn.getNumOutputs();
+      int n_out = fcn.nOut();
       for (int i=0; i<n; ++i) {
         ret[i] = std::vector<MX>(v_it, v_it+n_out);
         v_it += n_out;

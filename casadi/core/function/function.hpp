@@ -35,8 +35,8 @@ namespace casadi {
   /** \brief General function
 
       A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
-      Number of inputs:  \a nin    getNumInputs()\n
-      Number of outputs: \a nout   getNumOutputs()\n
+      Number of inputs:  \a nin    nIn()\n
+      Number of outputs: \a nout   nOut()\n
 
       We can view this function as a being composed of a (\a nin, \a nout) grid of single-input,
       single-output primitive functions.\n
@@ -126,16 +126,16 @@ namespace casadi {
     /// \endcond
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
-    int getNumInputNonzeros() const;
+    int nnzIn() const;
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
-    int getNumOutputNonzeros() const;
+    int nnzOut() const;
 
     /** \brief  Get total number of elements in all of the matrix-valued inputs */
-    int getNumInputElements() const;
+    int numelIn() const;
 
     /** \brief  Get total number of elements in all of the matrix-valued outputs */
-    int getNumOutputElements() const;
+    int numelOut() const;
 
     /** \brief Set input scheme */
     void setInputScheme(const casadi::IOScheme &scheme);
@@ -370,7 +370,7 @@ namespace casadi {
      *         one direction at a time and the last <tt>nadj*n_in</tt> outputs corresponds to
      *         adjoint sensitivities, one direction at a time.
      *
-     *         <tt>(n_in = getNumInputs(), n_out = getNumOutputs())</tt>
+     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
      *
      */
     Function derivative(int nfwd, int nadj);
@@ -385,7 +385,7 @@ namespace casadi {
      *         one direction at a time
      *         The  <tt>nfwd*n_out</tt> outputs correspond to forward sensitivities,
      *         one direction at a time.     *
-     *         <tt>(n_in = getNumInputs(), n_out = getNumOutputs())</tt>
+     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
@@ -402,9 +402,9 @@ namespace casadi {
      *         one direction at a time
      *         The  <tt>nadj*n_in</tt> outputs correspond to adjoint sensitivities,
      *         one direction at a time.     *
-     *         <tt>(n_in = getNumInputs(), n_out = getNumOutputs())</tt>
+     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
      *
-     *         <tt>(n_in = getNumInputs(), n_out = getNumOutputs())</tt>
+     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.

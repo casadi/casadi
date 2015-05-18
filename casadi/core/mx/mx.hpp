@@ -161,7 +161,7 @@ namespace casadi {
     MX getDep(int ch=0) const;
 
     /** \brief  Number of outputs */
-    int getNumOutputs() const;
+    int nOut() const;
 
     /** \brief  Get an output */
     MX getOutput(int oind=0) const;

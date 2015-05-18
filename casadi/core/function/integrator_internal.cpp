@@ -92,9 +92,9 @@ namespace casadi {
 
     // Initialize and get dimensions for the forward integration
     if (!f_.isInit()) f_.init();
-    casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN,
+    casadi_assert_message(f_.nIn()==DAE_NUM_IN,
                           "Wrong number of inputs for the DAE callback function");
-    casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT,
+    casadi_assert_message(f_.nOut()==DAE_NUM_OUT,
                           "Wrong number of outputs for the DAE callback function");
     nx_ = f_.input(DAE_X).nnz();
     nz_ = f_.input(DAE_Z).nnz();
@@ -107,9 +107,9 @@ namespace casadi {
       nrx_ = nrz_ = nrq_ = nrp_ = 0;
     } else {
       if (!g_.isInit()) g_.init();
-      casadi_assert_message(g_.getNumInputs()==RDAE_NUM_IN,
+      casadi_assert_message(g_.nIn()==RDAE_NUM_IN,
                             "Wrong number of inputs for the backwards DAE callback function");
-      casadi_assert_message(g_.getNumOutputs()==RDAE_NUM_OUT,
+      casadi_assert_message(g_.nOut()==RDAE_NUM_OUT,
                             "Wrong number of outputs for the backwards DAE callback function");
       nrx_ = g_.input(RDAE_RX).nnz();
       nrz_ = g_.input(RDAE_RZ).nnz();
@@ -254,7 +254,7 @@ namespace casadi {
     // Forward derivatives of f
     Function d = f_.derivative(nfwd, 0);
     vector<MX> f_arg;
-    f_arg.reserve(d.getNumInputs());
+    f_arg.reserve(d.nIn());
     tmp.resize(DAE_NUM_IN);
     fill(tmp.begin(), tmp.end(), MX());
 
@@ -290,7 +290,7 @@ namespace casadi {
 
       // Forward derivatives of g
       d = g_.derivative(nfwd, 0);
-      g_arg.reserve(d.getNumInputs());
+      g_arg.reserve(d.nIn());
       tmp.resize(RDAE_NUM_IN);
       fill(tmp.begin(), tmp.end(), MX());
 
@@ -335,7 +335,7 @@ namespace casadi {
       // Adjoint derivatives of f
       d = f_.derivative(0, nadj);
       f_arg.resize(DAE_NUM_IN);
-      f_arg.reserve(d.getNumInputs());
+      f_arg.reserve(d.nIn());
 
       // Collect arguments for calling d
       tmp.resize(DAE_NUM_OUT);
@@ -374,7 +374,7 @@ namespace casadi {
         // Adjoint derivatives of g
         d = g_.derivative(0, nadj);
         g_arg.resize(RDAE_NUM_IN);
-        g_arg.reserve(d.getNumInputs());
+        g_arg.reserve(d.nIn());
 
         // Collect arguments for calling der
         tmp.resize(RDAE_NUM_OUT);

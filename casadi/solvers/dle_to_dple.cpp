@@ -80,11 +80,11 @@ namespace casadi {
   }
 
   void DleToDple::evaluate() {
-    for (int i=0;i<getNumInputs();++i) {
+    for (int i=0;i<nIn();++i) {
       std::copy(input(i).begin(), input(i).end(), solver_.input(i).begin());
     }
     solver_.evaluate();
-    for (int i=0;i<getNumOutputs();++i) {
+    for (int i=0;i<nOut();++i) {
       std::copy(solver_.output(i).begin(), solver_.output(i).end(), output(i).begin());
     }
   }

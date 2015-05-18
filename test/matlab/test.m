@@ -36,7 +36,7 @@ f.init()
 f.setInput([1,2,3,4])
 f.evaluate()
 
-for i=1:f.getNumOutputs()
+for i=1:f.nOut()
   res = f.getOutput(i-1)-2;
 
   assert(res.isZero())
@@ -70,7 +70,7 @@ f.init()
 f.setInput([1,2,3,4])
 f.evaluate()
 
-for i=1:f.getNumOutputs()
+for i=1:f.nOut()
   res = f.getOutput(i-1)-2;
 
   assert(res.isZero())

@@ -57,16 +57,16 @@ void Wrapper<Derived>::checkDimensions() {
   Derived* d = static_cast<Derived*>(this);
 
   // Check number of inputs/outputs
-  casadi_assert(d->getNumInputs()==f_.getNumInputs());
-  casadi_assert(d->getNumOutputs()==f_.getNumOutputs());
+  casadi_assert(d->nIn()==f_.nIn());
+  casadi_assert(d->nOut()==f_.nOut());
 
   // Check sparsities of inputs/outputs
-  for (int i=0;i< d->getNumInputs();++i) {
+  for (int i=0;i< d->nIn();++i) {
     casadi_assert_message(d->input(i).sparsity()==f_.input(i).sparsity(),
       "Sparsity mismatch for input " << i << ":" <<
       d->input(i).dimString() << " <-> " << f_.input(i).dimString() << ".");
   }
-  for (int i=0;i< d->getNumOutputs();++i) {
+  for (int i=0;i< d->nOut();++i) {
     casadi_assert_message(d->output(i).sparsity()==f_.output(i).sparsity(),
       "Sparsity mismatch for output " << i << ":" <<
       d->output(i).dimString() << " <-> " << f_.output(i).dimString() << ".");
@@ -79,7 +79,7 @@ void Wrapper<Derived>::evaluate() {
   Derived* d = static_cast<Derived*>(this);
 
   // Copy the inputs from external to internal
-  for (int i=0;i< d->getNumInputs();++i) {
+  for (int i=0;i< d->nIn();++i) {
     std::copy(d->input(i).begin(), d->input(i).end(), f_.input(i).begin());
   }
 
@@ -87,7 +87,7 @@ void Wrapper<Derived>::evaluate() {
   f_.evaluate();
 
   // Copy the outputs from internal to external
-  for (int i=0;i< d->getNumOutputs();++i) {
+  for (int i=0;i< d->nOut();++i) {
     std::copy(f_.output(i).begin(), f_.output(i).end(), d->output(i).begin());
   }
 }

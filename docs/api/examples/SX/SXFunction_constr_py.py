@@ -38,8 +38,8 @@ f = SXFunction(ins,outs)
 f.init()
 
 #! f now has two inputs and a 4 outputs:
-print f.getNumInputs()
-print f.getNumOutputs()
+print f.nIn()
+print f.nOut()
 
 #! The outputs has the following string representation.
 #! Note how all elements of out have been converted to SX by
