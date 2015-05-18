@@ -228,11 +228,13 @@ namespace casadi {
     bvec_t* tmp2 = rtmp; rtmp += n_;
 
     // Propagate dependencies through the function
-    vector<const bvec_t*> argf(arg, arg+num_in);
-    argf[iin_] = 0;
-    vector<bvec_t*> resf(num_out, static_cast<bvec_t*>(0));
-    resf[iout_] = tmp1;
-    f_.spFwd(getPtr(argf), getPtr(resf), itmp, rtmp);
+    const bvec_t** arg1 = arg+nIn();
+    copy(arg, arg+num_in, arg1);
+    arg1[iin_] = 0;
+    bvec_t** res1 = res+nOut();
+    fill_n(res1, num_out, static_cast<bvec_t*>(0));
+    res1[iout_] = tmp1;
+    f_.spFwd(arg1, res1, itmp, rtmp);
 
     // "Solve" in order to propagate to z
     fill_n(tmp2, n_, 0);
@@ -241,10 +243,10 @@ namespace casadi {
 
     // Propagate to auxiliary outputs
     if (num_out>1) {
-      argf[iin_] = tmp2;
-      copy(res, res+num_out, resf.begin());
-      resf[iout_] = 0;
-      f_.spFwd(getPtr(argf), getPtr(resf), itmp, rtmp);
+      arg1[iin_] = tmp2;
+      copy(res, res+num_out, res1);
+      res1[iout_] = 0;
+      f_.spFwd(arg1, res1, itmp, rtmp);
     }
   }
 
@@ -264,12 +266,14 @@ namespace casadi {
     }
 
     // Propagate dependencies from auxiliary outputs to z
-    vector<bvec_t*> resf(res, res+num_out);
-    resf[iout_] = 0;
-    vector<bvec_t*> argf(arg, arg+num_in);
-    argf[iin_] = tmp1;
+    bvec_t** res1 = res+num_out;
+    copy(res, res+num_out, res1);
+    res1[iout_] = 0;
+    bvec_t** arg1 = arg+num_in;
+    copy(arg, arg+num_in, arg1);
+    arg1[iin_] = tmp1;
     if (num_out>1) {
-      f_.spAdj(getPtr(argf), getPtr(resf), itmp, rtmp);
+      f_.spAdj(arg1, res1, itmp, rtmp);
     }
 
     // "Solve" in order to get seed
@@ -277,10 +281,10 @@ namespace casadi {
     linsol_.spSolve(tmp2, tmp1, true);
 
     // Propagate dependencies through the function
-    for (int i=0; i<num_out; ++i) resf[i] = 0;
-    resf[iout_] = tmp2;
-    argf[iin_] = 0; // just a guess
-    f_.spAdj(getPtr(argf), getPtr(resf), itmp, rtmp);
+    for (int i=0; i<num_out; ++i) res1[i] = 0;
+    res1[iout_] = tmp2;
+    arg1[iin_] = 0; // just a guess
+    f_.spAdj(arg1, res1, itmp, rtmp);
   }
 
   std::map<std::string, ImplicitFunctionInternal::Plugin> ImplicitFunctionInternal::solvers_;

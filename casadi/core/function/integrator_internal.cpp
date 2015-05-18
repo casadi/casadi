@@ -505,6 +505,9 @@ namespace casadi {
     bvec_t *tmp_rz = rtmp; rtmp += nrz_;
 
     // Propagate through f
+    //const bvec_t** arg1 = arg+INTEGRATOR_NUM_IN;
+    
+
     const bvec_t* dae_in[DAE_NUM_IN] = {0};
     dae_in[DAE_X] = arg[INTEGRATOR_X0];
     dae_in[DAE_P] = arg[INTEGRATOR_P];

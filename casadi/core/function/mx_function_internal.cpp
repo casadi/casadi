@@ -388,8 +388,8 @@ namespace casadi {
     }
 
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<const double*> oarg(max_arg_);
-    vector<double*> ores(max_res_);
+    vector<const double*> oarg(nIn()+max_arg_);
+    vector<double*> ores(nOut()+max_res_);
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -553,8 +553,8 @@ namespace casadi {
   void MXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     // Tmporaries to hold pointers to operation input and outputs
-    vector<const bvec_t*> oarg(max_arg_);
-    vector<bvec_t*> ores(max_res_);
+    vector<const bvec_t*> oarg(nIn()+max_arg_);
+    vector<bvec_t*> ores(nOut()+max_res_);
 
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
@@ -593,8 +593,8 @@ namespace casadi {
   void MXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     // Tmporaries to hold pointers to operation input and outputs
-    vector<bvec_t*> ores(max_res_);
-    vector<bvec_t*> oarg(max_arg_); // Non-const since seeds are cleared
+    vector<bvec_t*> oarg(nIn()+max_arg_); // Non-const since seeds are cleared
+    vector<bvec_t*> ores(nOut()+max_res_);
 
     fill_n(rtmp, n_w_, 0);
 
@@ -698,8 +698,6 @@ namespace casadi {
       arg_split[i] = inputv_[i].splitPrimitives(arg[i]);
 
     vector<MX> oarg, ores;
-    oarg.reserve(max_arg_);
-    ores.reserve(max_res_);
 
     // Loop over computational nodes in forward order
     int alg_counter = 0;
