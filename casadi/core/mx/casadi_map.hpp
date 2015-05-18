@@ -54,17 +54,17 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
     virtual void evalSX(const SXElement** arg, SXElement** res,
-                        int* itmp, SXElement* rtmp);
+                        int* iw, SXElement* rtmp);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -132,7 +132,7 @@ namespace casadi {
     virtual OmpMap* clone() const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* rtmp);
 
     /** \brief Get number of temporary variables needed */
     virtual void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const;

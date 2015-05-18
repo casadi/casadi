@@ -89,8 +89,8 @@ namespace casadi {
   }
 
   void Call::evalD(const double** arg, double** res,
-                           int* itmp, double* rtmp) {
-    fcn_->evalD(arg, res, itmp, rtmp);
+                           int* iw, double* rtmp) {
+    fcn_->evalD(arg, res, iw, rtmp);
   }
 
   int Call::nout() const {
@@ -101,8 +101,8 @@ namespace casadi {
     return fcn_.output(oind).sparsity();
   }
 
-  void Call::evalSX(const SXElement** arg, SXElement** res, int* itmp, SXElement* rtmp) {
-    fcn_->evalSX(arg, res, itmp, rtmp);
+  void Call::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* rtmp) {
+    fcn_->evalSX(arg, res, iw, rtmp);
   }
 
   void Call::evalMX(const vector<MX>& arg, vector<MX>& res) {
@@ -146,12 +146,12 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void Call::spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
-    fcn_.spFwd(arg, res, itmp, rtmp);
+  void Call::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp) {
+    fcn_.spFwd(arg, res, iw, rtmp);
   }
 
-  void Call::spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
-    fcn_.spAdj(arg, res, itmp, rtmp);
+  void Call::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp) {
+    fcn_.spAdj(arg, res, iw, rtmp);
   }
 
   void GenericCall::generateIO(const vector<int>& arg, const vector<int>& res,

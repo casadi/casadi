@@ -211,12 +211,12 @@ namespace casadi {
     (*this)->nwork(n_arg, n_res, n_iw, n_w);
   }
 
-  void Function::spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
-    (*this)->spFwdSwitch(arg, res, itmp, rtmp);
+  void Function::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp) {
+    (*this)->spFwdSwitch(arg, res, iw, rtmp);
   }
 
-  void Function::spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
-    (*this)->spAdjSwitch(arg, res, itmp, rtmp);
+  void Function::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp) {
+    (*this)->spAdjSwitch(arg, res, iw, rtmp);
   }
 
   bool Function::spCanEvaluate(bool fwd) {

@@ -57,7 +57,7 @@ namespace casadi {
   }
 
   void UnaryMX::evalD(const double** input, double** output,
-                          int* itmp, double* rtmp) {
+                          int* iw, double* rtmp) {
     double dummy = numeric_limits<double>::quiet_NaN();
     double* outputd = output[0];
     const double* inputd = input[0];
@@ -65,7 +65,7 @@ namespace casadi {
   }
 
   void UnaryMX::evalSX(const SXElement** input, SXElement** output,
-                           int* itmp, SXElement* rtmp) {
+                           int* iw, SXElement* rtmp) {
     SXElement dummy = 0;
     SXElement* outputd = output[0];
     const SXElement* inputd = input[0];
@@ -104,12 +104,12 @@ namespace casadi {
   }
 
   void UnaryMX::spFwd(const bvec_t** arg,
-                      bvec_t** res, int* itmp, bvec_t* rtmp) {
+                      bvec_t** res, int* iw, bvec_t* rtmp) {
     copyFwd(arg[0], res[0], nnz());
   }
 
   void UnaryMX::spAdj(bvec_t** arg,
-                      bvec_t** res, int* itmp, bvec_t* rtmp) {
+                      bvec_t** res, int* iw, bvec_t* rtmp) {
     copyAdj(arg[0], res[0], nnz());
   }
 

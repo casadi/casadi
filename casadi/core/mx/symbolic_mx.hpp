@@ -56,11 +56,11 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** input, double** output, int* itmp, double* rtmp);
+    virtual void evalD(const double** input, double** output, int* iw, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
     virtual void evalSX(const SXElement** input, SXElement** output,
-                            int* itmp, SXElement* rtmp);
+                            int* iw, SXElement* rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -75,11 +75,11 @@ namespace casadi {
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg,
-                       bvec_t** res, int* itmp, bvec_t* rtmp);
+                       bvec_t** res, int* iw, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg,
-                       bvec_t** res, int* itmp, bvec_t* rtmp);
+                       bvec_t** res, int* iw, bvec_t* rtmp);
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;

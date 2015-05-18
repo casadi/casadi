@@ -52,18 +52,18 @@ namespace casadi {
   }
 
   void Multiplication::evalD(const double** input, double** output,
-                                 int* itmp, double* rtmp) {
-    evalGen<double>(input, output, itmp, rtmp);
+                                 int* iw, double* rtmp) {
+    evalGen<double>(input, output, iw, rtmp);
   }
 
   void Multiplication::evalSX(const SXElement** input, SXElement** output,
-                                  int* itmp, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, itmp, rtmp);
+                                  int* iw, SXElement* rtmp) {
+    evalGen<SXElement>(input, output, iw, rtmp);
   }
 
   template<typename T>
   void Multiplication::evalGen(const T* const* arg, T* const* res,
-                               int* itmp, T* rtmp) {
+                               int* iw, T* rtmp) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     casadi_mm_sparse(arg[1], dep(1).sparsity(),
                      arg[2], dep(2).sparsity(),
@@ -92,7 +92,7 @@ namespace casadi {
     res[0] = mul(arg[1], arg[2], arg[0]);
   }
 
-  void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* itmp,
+  void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* iw,
                              bvec_t* rtmp) {
     copyFwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
@@ -101,7 +101,7 @@ namespace casadi {
   }
 
   void Multiplication::spAdj(bvec_t** arg, bvec_t** res,
-                             int* itmp, bvec_t* rtmp) {
+                             int* iw, bvec_t* rtmp) {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), rtmp);

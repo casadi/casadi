@@ -42,18 +42,18 @@ namespace casadi {
   }
 
   void Concat::evalD(const double** input, double** output,
-                         int* itmp, double* rtmp) {
-    evalGen<double>(input, output, itmp, rtmp);
+                         int* iw, double* rtmp) {
+    evalGen<double>(input, output, iw, rtmp);
   }
 
   void Concat::evalSX(const SXElement** input, SXElement** output,
-                          int* itmp, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, itmp, rtmp);
+                          int* iw, SXElement* rtmp) {
+    evalGen<SXElement>(input, output, iw, rtmp);
   }
 
   template<typename T>
   void Concat::evalGen(const T* const* arg, T* const* res,
-                       int* itmp, T* rtmp) {
+                       int* iw, T* rtmp) {
     T* r = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n = dep(i).nnz();
@@ -63,7 +63,7 @@ namespace casadi {
   }
 
   void Concat::spFwd(const bvec_t** arg,
-                     bvec_t** res, int* itmp, bvec_t* rtmp) {
+                     bvec_t** res, int* iw, bvec_t* rtmp) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();
@@ -74,7 +74,7 @@ namespace casadi {
   }
 
   void Concat::spAdj(bvec_t** arg,
-                     bvec_t** res, int* itmp, bvec_t* rtmp) {
+                     bvec_t** res, int* iw, bvec_t* rtmp) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();

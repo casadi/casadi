@@ -38,28 +38,28 @@ namespace casadi {
   }
 
   void Transpose::evalD(const double** input, double** output,
-                            int* itmp, double* rtmp) {
-    evalGen<double>(input, output, itmp, rtmp);
+                            int* iw, double* rtmp) {
+    evalGen<double>(input, output, iw, rtmp);
   }
 
  void DenseTranspose::evalD(const double** input, double** output,
-                                int* itmp, double* rtmp) {
-    evalGen<double>(input, output, itmp, rtmp);
+                                int* iw, double* rtmp) {
+    evalGen<double>(input, output, iw, rtmp);
   }
 
   void Transpose::evalSX(const SXElement** input, SXElement** output,
-                             int* itmp, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, itmp, rtmp);
+                             int* iw, SXElement* rtmp) {
+    evalGen<SXElement>(input, output, iw, rtmp);
   }
 
   void DenseTranspose::evalSX(const SXElement** input, SXElement** output,
-                                  int* itmp, SXElement* rtmp) {
-    evalGen<SXElement>(input, output, itmp, rtmp);
+                                  int* iw, SXElement* rtmp) {
+    evalGen<SXElement>(input, output, iw, rtmp);
   }
 
   template<typename T>
   void Transpose::evalGen(const T* const* arg, T* const* res,
-                          int* itmp, T* rtmp) {
+                          int* iw, T* rtmp) {
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
     const int* x_row = dep(0).row();
@@ -71,15 +71,15 @@ namespace casadi {
     T* xT = res[0];
 
     // Transpose
-    copy(xT_colind, xT_colind+xT_ncol+1, itmp);
+    copy(xT_colind, xT_colind+xT_ncol+1, iw);
     for (int el=0; el<x_sz; ++el) {
-      xT[itmp[x_row[el]]++] = x[el];
+      xT[iw[x_row[el]]++] = x[el];
     }
   }
 
   template<typename T>
   void DenseTranspose::evalGen(const T* const* arg, T* const* res,
-                               int* itmp, T* rtmp) {
+                               int* iw, T* rtmp) {
     // Get sparsity patterns
     int x_nrow = dep().size1();
     int x_ncol = dep().size2();
@@ -94,7 +94,7 @@ namespace casadi {
   }
 
   void Transpose::spFwd(const bvec_t** arg,
-                        bvec_t** res, int* itmp, bvec_t* rtmp) {
+                        bvec_t** res, int* iw, bvec_t* rtmp) {
     // Shortands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -106,14 +106,14 @@ namespace casadi {
     int xT_ncol = sparsity().size2();
 
     // Loop over the nonzeros of the argument
-    copy(xT_colind, xT_colind+xT_ncol+1, itmp);
+    copy(xT_colind, xT_colind+xT_ncol+1, iw);
     for (int el=0; el<nz; ++el) {
-      xT[itmp[*x_row++]++] = *x++;
+      xT[iw[*x_row++]++] = *x++;
     }
   }
 
   void Transpose::spAdj(bvec_t** arg,
-                        bvec_t** res, int* itmp, bvec_t* rtmp) {
+                        bvec_t** res, int* iw, bvec_t* rtmp) {
     // Shortands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -125,16 +125,16 @@ namespace casadi {
     int xT_ncol = sparsity().size2();
 
     // Loop over the nonzeros of the argument
-    copy(xT_colind, xT_colind+xT_ncol+1, itmp);
+    copy(xT_colind, xT_colind+xT_ncol+1, iw);
     for (int el=0; el<nz; ++el) {
-      int elT = itmp[*x_row++]++;
+      int elT = iw[*x_row++]++;
       *x++ |= xT[elT];
       xT[elT] = 0;
     }
   }
 
   void DenseTranspose::spFwd(const bvec_t** arg,
-                             bvec_t** res, int* itmp, bvec_t* rtmp) {
+                             bvec_t** res, int* iw, bvec_t* rtmp) {
     // Shorthands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -150,7 +150,7 @@ namespace casadi {
   }
 
   void DenseTranspose::spAdj(bvec_t** arg,
-                             bvec_t** res, int* itmp, bvec_t* rtmp) {
+                             bvec_t** res, int* iw, bvec_t* rtmp) {
     // Shorthands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];

@@ -195,7 +195,7 @@ namespace casadi {
 
   void LinearSolverInternal::
   spFwdLinsol(const bvec_t** arg, bvec_t** res,
-              int* itmp, bvec_t* rtmp, bool tr, int nrhs) {
+              int* iw, bvec_t* rtmp, bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -232,7 +232,7 @@ namespace casadi {
 
   void LinearSolverInternal::
   spAdjLinsol(bvec_t** arg, bvec_t** res,
-              int* itmp, bvec_t* rtmp, bool tr, int nrhs) {
+              int* iw, bvec_t* rtmp, bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -341,7 +341,7 @@ namespace casadi {
   }
 
   void LinearSolverInternal::evalSXLinsol(const SXElement** arg, SXElement** res,
-                                           int* itmp, SXElement* rtmp, bool tr, int nrhs) {
+                                           int* iw, SXElement* rtmp, bool tr, int nrhs) {
     casadi_error("LinearSolverInternal::evalSXLinsol not defined for class "
                  << typeid(*this).name());
   }

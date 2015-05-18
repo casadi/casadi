@@ -86,7 +86,7 @@ namespace casadi {
 
     /** \brief Evaluate symbolically (SX) */
     virtual void evalSXLinsol(const SXElement** arg, SXElement** res,
-                              int* itmp, SXElement* rtmp, bool tr, int nrhs);
+                              int* iw, SXElement* rtmp, bool tr, int nrhs);
 
     // Factorization function
     Function fact_fcn_;

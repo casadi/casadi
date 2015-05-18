@@ -83,10 +83,10 @@ namespace casadi {
                           CodeGenerator& g) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* iw, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* itmp, SXElement* rtmp);
+    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -100,10 +100,10 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* rtmp);
 
     /** \brief  Number of functions */
     virtual int numFunctions() const {return 1;}
