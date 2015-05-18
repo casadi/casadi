@@ -42,6 +42,7 @@ namespace casadi {
     string narg_s = f_name_ + "_narg";
     string sparsity_s = f_name_ + "_sparsity";
     string nwork_s = f_name_ + "_nwork";
+    bool has_work = true;
 
     // Load the dll
 #ifdef _WIN32
@@ -67,8 +68,8 @@ namespace casadi {
     // Function for retriving sizes of required work vectors
     nworkPtr nwork = (nworkPtr)GetProcAddress(handle_, TEXT(nwork_s.c_str()));
     if (nwork==0) {
-      // No work vector needed
-      nwork = noWork;
+      // No work vectors needed
+      has_work = false;
     }
 #else // _WIN32
     handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
@@ -101,8 +102,8 @@ namespace casadi {
     // Function for retriving sizes of required work vectors
     nworkPtr nwork = (nworkPtr)dlsym(handle_, nwork_s.c_str());
     if (dlerror()) {
-      // No work vector needed
-      nwork = noWork;
+      // No work vectors needed
+      has_work = false;
       // Reset error flags
       dlerror();
     }
@@ -147,8 +148,14 @@ namespace casadi {
 
     // Get number of temporaries
     int n_arg, n_res, n_iw, n_w;
-    flag = nwork(&n_arg, &n_res, &n_iw, &n_w);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"nwork\" failed");
+    if (has_work) {
+      flag = nwork(&n_arg, &n_res, &n_iw, &n_w);
+      if (flag) throw CasadiException("ExternalFunctionInternal: \"nwork\" failed");
+    } else {
+      n_arg=n_in;
+      n_res=n_out;
+      n_iw=n_w=0;
+    }
     n_arg_ = static_cast<size_t>(n_arg);
     n_res_ = static_cast<size_t>(n_res);
     n_iw_ = static_cast<size_t>(n_iw);
@@ -216,14 +223,5 @@ namespace casadi {
     if (row) *row=row_scalar;
     return 0;
   }
-
-  int ExternalFunctionInternal::noWork(int *n_arg, int* n_res, int *n_iw, int *n_w) {
-    if (n_arg) *n_arg=0;
-    if (n_res) *n_res=0;
-    if (n_iw) *n_iw=0;
-    if (n_w) *n_w=0;
-    return 0;
-  }
-
 } // namespace casadi
 

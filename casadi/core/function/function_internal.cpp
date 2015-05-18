@@ -89,10 +89,6 @@ namespace casadi {
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
-    n_arg_ = 0;
-    n_res_ = 0;
-    n_iw_ = 0;
-    n_w_ = 0;
   }
 
   FunctionInternal::~FunctionInternal() {
@@ -143,10 +139,13 @@ namespace casadi {
 
     monitor_inputs_ = monitored("inputs");
     monitor_outputs_ = monitored("outputs");
-
     gather_stats_ = getOption("gather_stats");
-
     inputs_check_ = getOption("inputs_check");
+
+    n_arg_ = getNumInputs();
+    n_res_ = getNumOutputs();
+    n_iw_ = 0;
+    n_w_ = 0;
 
     // Mark the function as initialized
     is_init_ = true;
@@ -1263,12 +1262,12 @@ namespace casadi {
 
     // Get pointers to input arguments
     int n_in = getNumInputs();
-    vector<const double*> arg(n_in+n_arg_);
+    vector<const double*> arg(n_arg_);
     for (int i=0; i<n_in; ++i) arg[i]=input(i).ptr();
 
     // Get pointers to output arguments
     int n_out = getNumOutputs();
-    vector<double*> res(n_out+n_res_);
+    vector<double*> res(n_res_);
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
     // Call memory-less
@@ -1357,11 +1356,11 @@ namespace casadi {
     vector<SXElement> w_tmp(n_w_);
 
     // Get pointers to input arguments
-    vector<const SXElement*> argp(arg.size()+n_arg_);
+    vector<const SXElement*> argp(n_arg_);
     for (int i=0; i<arg.size(); ++i) argp[i]=getPtr(arg[i]);
 
     // Get pointers to output arguments
-    vector<SXElement*> resp(getNumOutputs()+n_res_);
+    vector<SXElement*> resp(n_res_);
     for (int i=0; i<getNumOutputs(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
@@ -2344,8 +2343,8 @@ namespace casadi {
   }
 
   void FunctionInternal::allocwork(size_t n_arg, size_t n_res, size_t n_iw, size_t n_w) {
-    n_arg_ = max(n_arg, n_arg_);
-    n_res_ = max(n_res, n_res_);
+    n_arg_ = max(n_arg + getNumInputs(), n_arg_);
+    n_res_ = max(n_res + getNumOutputs(), n_res_);
     n_iw_ = max(n_iw, n_iw_);
     n_w_ = max(n_w, n_w_);
   }

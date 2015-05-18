@@ -70,10 +70,6 @@ namespace casadi {
     /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
     static int scalarSparsity(int i, int *n_row, int *n_col,
                               const int **colind, const int **row);
-
-    /** \brief No work vector (default if work not defined) */
-    static int noWork(int *n_arg, int* n_res, int *n_iw, int *n_w);
-
   protected:
 
     ///@{

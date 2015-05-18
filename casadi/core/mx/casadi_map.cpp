@@ -241,8 +241,6 @@ namespace casadi {
 
   void OmpMap::nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const {
     fcn_.nwork(n_arg, n_res, n_iw, n_w);
-    n_arg += static_cast<size_t>(ndep());
-    n_res += static_cast<size_t>(nout());
     n_arg *= static_cast<size_t>(n_);
     n_res *= static_cast<size_t>(n_);
     n_iw *= static_cast<size_t>(n_);
