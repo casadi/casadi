@@ -371,8 +371,8 @@ namespace casadi {
     log("MXFunctionInternal::init end");
   }
 
-  void MXFunctionInternal::evalD(cp_double* arg,
-                                 p_double* res, int* itmp, double* rtmp) {
+  void MXFunctionInternal::evalD(const double** arg,
+                                 double** res, int* itmp, double* rtmp) {
     casadi_log("MXFunctionInternal::evalD():begin "  << getOption("name"));
     // Set up timers for profiling
     double time_zero=0;
@@ -388,8 +388,8 @@ namespace casadi {
     }
 
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<cp_double> oarg(max_arg_);
-    vector<p_double> ores(max_res_);
+    vector<const double*> oarg(max_arg_);
+    vector<double*> ores(max_res_);
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -550,11 +550,11 @@ namespace casadi {
     fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
 
-  void MXFunctionInternal::spFwd(cp_bvec_t* arg, p_bvec_t* res,
+  void MXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     // Tmporaries to hold pointers to operation input and outputs
-    vector<cp_bvec_t> oarg(max_arg_);
-    vector<p_bvec_t> ores(max_res_);
+    vector<const bvec_t*> oarg(max_arg_);
+    vector<bvec_t*> ores(max_res_);
 
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++) {
@@ -590,7 +590,7 @@ namespace casadi {
     }
   }
 
-  void MXFunctionInternal::spAdj(p_bvec_t* arg, p_bvec_t* res,
+  void MXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     // Tmporaries to hold pointers to operation input and outputs
     vector<bvec_t*> ores(max_res_);
@@ -1039,11 +1039,11 @@ namespace casadi {
     log("MXFunctionInternal::evalAdj end");
   }
 
-  void MXFunctionInternal::evalSX(cp_SXElement* arg, p_SXElement* res,
+  void MXFunctionInternal::evalSX(const SXElement** arg, SXElement** res,
                                   int* itmp, SXElement* rtmp) {
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<cp_SXElement> argp(max_arg_);
-    vector<p_SXElement> resp(max_res_);
+    vector<const SXElement*> argp(max_arg_);
+    vector<SXElement*> resp(max_res_);
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!

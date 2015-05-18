@@ -108,15 +108,6 @@ namespace casadi {
 
   // Make sure that the integer datatype is indeed smaller or equal to the double
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
-
-
-  /** Pointer shorthands */
-  typedef SXElement* p_SXElement;
-  typedef const SXElement* cp_SXElement;
-  typedef double* p_double;
-  typedef const double* cp_double;
-  typedef bvec_t* p_bvec_t;
-  typedef const bvec_t* cp_bvec_t;
 #endif // SWIG
 
   /* Standard stream used for printing

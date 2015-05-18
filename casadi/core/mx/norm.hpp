@@ -64,11 +64,11 @@ namespace casadi {
     void evalGen(const T* const* arg, T* const* res, int* itmp, T* rtmp);
 
     /// Evaluate the function numerically
-    virtual void evalD(cp_double* input, p_double* output,
+    virtual void evalD(const double** input, double** output,
                        int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(cp_SXElement* input, p_SXElement* output,
+    virtual void evalSX(const SXElement** input, SXElement** output,
                             int* itmp, SXElement* rtmp);
 
     /** \brief  Evaluate symbolically (MX) */

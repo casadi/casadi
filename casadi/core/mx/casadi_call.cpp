@@ -88,7 +88,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Call::evalD(cp_double* arg, p_double* res,
+  void Call::evalD(const double** arg, double** res,
                            int* itmp, double* rtmp) {
     fcn_->evalD(arg, res, itmp, rtmp);
   }
@@ -101,7 +101,7 @@ namespace casadi {
     return fcn_.output(oind).sparsity();
   }
 
-  void Call::evalSX(cp_SXElement* arg, p_SXElement* res, int* itmp, SXElement* rtmp) {
+  void Call::evalSX(const SXElement** arg, SXElement** res, int* itmp, SXElement* rtmp) {
     fcn_->evalSX(arg, res, itmp, rtmp);
   }
 
@@ -146,11 +146,11 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void Call::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Call::spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
     fcn_.spFwd(arg, res, itmp, rtmp);
   }
 
-  void Call::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Call::spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
     fcn_.spAdj(arg, res, itmp, rtmp);
   }
 

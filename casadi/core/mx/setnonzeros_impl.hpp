@@ -440,13 +440,13 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalD(cp_double* input, p_double* output,
+  void SetNonzerosVector<Add>::evalD(const double** input, double** output,
                                          int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalSX(cp_SXElement* input, p_SXElement* output,
+  void SetNonzerosVector<Add>::evalSX(const SXElement** input, SXElement** output,
                                           int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -471,13 +471,13 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalD(cp_double* input, p_double* output,
+  void SetNonzerosSlice<Add>::evalD(const double** input, double** output,
                                     int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalSX(cp_SXElement* input, p_SXElement* output,
+  void SetNonzerosSlice<Add>::evalSX(const SXElement** input, SXElement** output,
                                          int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -503,13 +503,13 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalD(cp_double* input, p_double* output,
+  void SetNonzerosSlice2<Add>::evalD(const double** input, double** output,
                                          int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalSX(cp_SXElement* input, p_SXElement* output,
+  void SetNonzerosSlice2<Add>::evalSX(const SXElement** input, SXElement** output,
                                           int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -541,8 +541,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spFwd(cp_bvec_t* arg,
-        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  spFwd(const bvec_t** arg,
+        bvec_t** res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -561,8 +561,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spAdj(p_bvec_t* arg,
-        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  spAdj(bvec_t** arg,
+        bvec_t** res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
@@ -578,8 +578,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spFwd(cp_bvec_t* arg,
-        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  spFwd(const bvec_t** arg,
+        bvec_t** res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -598,8 +598,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spAdj(p_bvec_t* arg,
-        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  spAdj(bvec_t** arg,
+        bvec_t** res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
@@ -613,8 +613,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spFwd(cp_bvec_t* arg,
-        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  spFwd(const bvec_t** arg,
+        bvec_t** res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -635,8 +635,8 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spAdj(p_bvec_t* arg,
-        p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  spAdj(bvec_t** arg,
+        bvec_t** res, int* itmp, bvec_t* rtmp) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {

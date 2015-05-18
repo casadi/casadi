@@ -175,13 +175,13 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalD(cp_double* input, p_double* output,
+  void BinaryMX<ScX, ScY>::evalD(const double** input, double** output,
                                      int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalSX(cp_SXElement* input, p_SXElement* output,
+  void BinaryMX<ScX, ScY>::evalSX(const SXElement** input, SXElement** output,
                                       int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -205,8 +205,8 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::spFwd(cp_bvec_t* arg,
-                                 p_bvec_t* res,
+  void BinaryMX<ScX, ScY>::spFwd(const bvec_t** arg,
+                                 bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t *r=res[0];
@@ -224,8 +224,8 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::spAdj(p_bvec_t* arg,
-                                 p_bvec_t* res,
+  void BinaryMX<ScX, ScY>::spAdj(bvec_t** arg,
+                                 bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     bvec_t *a0=arg[0], *a1=arg[1], *r = res[0];
     int n=nnz();

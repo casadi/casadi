@@ -176,7 +176,7 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  void ExternalFunctionInternal::evalD(cp_double* arg, p_double* res,
+  void ExternalFunctionInternal::evalD(const double** arg, double** res,
                                        int* itmp, double* rtmp) {
 #ifdef WITH_DL
     int flag = eval_(arg, res, itmp, rtmp);

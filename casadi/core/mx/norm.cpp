@@ -39,12 +39,12 @@ namespace casadi {
     return "||" + arg.at(0) + "||_F";
   }
 
-  void NormF::evalD(cp_double* input, p_double* output,
+  void NormF::evalD(const double** input, double** output,
                     int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void NormF::evalSX(cp_SXElement* input, p_SXElement* output,
+  void NormF::evalSX(const SXElement** input, SXElement** output,
                          int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }

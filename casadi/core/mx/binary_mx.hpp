@@ -68,20 +68,20 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp);
 
     /// Evaluate the function (template)
     template<typename T>
     void evalGen(const T* const* arg, T* const* res, int* itmp, T* rtmp);
 
     /// Evaluate the function numerically
-    virtual void evalD(cp_double* input, p_double* output, int* itmp, double* rtmp);
+    virtual void evalD(const double** input, double** output, int* itmp, double* rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(cp_SXElement* input, p_SXElement* output, int* itmp, SXElement* rtmp);
+    virtual void evalSX(const SXElement** input, SXElement** output, int* itmp, SXElement* rtmp);
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 2;}

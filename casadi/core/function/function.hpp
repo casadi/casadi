@@ -498,10 +498,10 @@ namespace casadi {
     void nwork(size_t& n_arg, size_t& n_res, size_t& n_iw, size_t& n_w) const;
 
     /** \brief  Propagate sparsity forward */
-    void spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    void spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp);
 
     /** \brief  Propagate sparsity backwards */
-    void spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp);
+    void spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp);
 #endif // SWIG
 
     /// \endcond

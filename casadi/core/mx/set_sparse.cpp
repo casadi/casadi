@@ -56,12 +56,12 @@ namespace casadi {
     casadi_project(arg[0], dep().sparsity(), res[0], sparsity(), rtmp);
   }
 
-  void SetSparse::evalD(cp_double* input, p_double* output,
+  void SetSparse::evalD(const double** input, double** output,
                             int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void SetSparse::evalSX(cp_SXElement* input, p_SXElement* output,
+  void SetSparse::evalSX(const SXElement** input, SXElement** output,
                              int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -86,11 +86,11 @@ namespace casadi {
     }
   }
 
-  void SetSparse::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void SetSparse::spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
     sparsity().set(res[0], arg[0], dep().sparsity());
   }
 
-  void SetSparse::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void SetSparse::spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
   }

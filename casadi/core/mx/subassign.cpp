@@ -38,12 +38,12 @@ namespace casadi {
     return new SubAssign(*this);
   }
 
-  void SubAssign::evalD(cp_double* input, p_double* output,
+  void SubAssign::evalD(const double** input, double** output,
                         int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void SubAssign::evalSX(cp_SXElement* input, p_SXElement* output,
+  void SubAssign::evalSX(const SXElement** input, SXElement** output,
                          int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -54,13 +54,13 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::spFwd(cp_bvec_t* arg,
-                     p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void SubAssign::spFwd(const bvec_t** arg,
+                     bvec_t** res, int* itmp, bvec_t* rtmp) {
     casadi_error("not ready");
   }
 
-  void SubAssign::spAdj(p_bvec_t* arg,
-                     p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void SubAssign::spAdj(bvec_t** arg,
+                     bvec_t** res, int* itmp, bvec_t* rtmp) {
     casadi_error("not ready");
   }
 

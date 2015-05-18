@@ -44,11 +44,11 @@ namespace casadi {
     return new Reshape(*this);
   }
 
-  void Reshape::evalD(cp_double* input, p_double* output, int* itmp, double* rtmp) {
+  void Reshape::evalD(const double** input, double** output, int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Reshape::evalSX(cp_SXElement* input, p_SXElement* output,
+  void Reshape::evalSX(const SXElement** input, SXElement** output,
                        int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -59,13 +59,13 @@ namespace casadi {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
-  void Reshape::spFwd(cp_bvec_t* arg,
-                      p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Reshape::spFwd(const bvec_t** arg,
+                      bvec_t** res, int* itmp, bvec_t* rtmp) {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void Reshape::spAdj(p_bvec_t* arg,
-                      p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Reshape::spAdj(bvec_t** arg,
+                      bvec_t** res, int* itmp, bvec_t* rtmp) {
     copyAdj(arg[0], res[0], nnz());
   }
 

@@ -220,7 +220,7 @@ namespace casadi {
     return MXFunction(arg, res);
   }
 
-  void ImplicitFunctionInternal::spFwd(cp_bvec_t* arg, p_bvec_t* res,
+  void ImplicitFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                        int* itmp, bvec_t* rtmp) {
     int num_out = getNumOutputs();
     int num_in = getNumInputs();
@@ -228,9 +228,9 @@ namespace casadi {
     bvec_t* tmp2 = rtmp; rtmp += n_;
 
     // Propagate dependencies through the function
-    vector<cp_bvec_t> argf(arg, arg+num_in);
+    vector<const bvec_t*> argf(arg, arg+num_in);
     argf[iin_] = 0;
-    vector<p_bvec_t> resf(num_out, static_cast<p_bvec_t>(0));
+    vector<bvec_t*> resf(num_out, static_cast<bvec_t*>(0));
     resf[iout_] = tmp1;
     f_.spFwd(getPtr(argf), getPtr(resf), itmp, rtmp);
 
@@ -248,7 +248,7 @@ namespace casadi {
     }
   }
 
-  void ImplicitFunctionInternal::spAdj(p_bvec_t* arg, p_bvec_t* res,
+  void ImplicitFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                        int* itmp, bvec_t* rtmp) {
     int num_out = getNumOutputs();
     int num_in = getNumInputs();
@@ -264,9 +264,9 @@ namespace casadi {
     }
 
     // Propagate dependencies from auxiliary outputs to z
-    vector<p_bvec_t> resf(res, res+num_out);
+    vector<bvec_t*> resf(res, res+num_out);
     resf[iout_] = 0;
-    vector<p_bvec_t> argf(arg, arg+num_in);
+    vector<bvec_t*> argf(arg, arg+num_in);
     argf[iin_] = tmp1;
     if (num_out>1) {
       f_.spAdj(getPtr(argf), getPtr(resf), itmp, rtmp);

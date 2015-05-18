@@ -63,12 +63,12 @@ namespace casadi {
     }
   }
 
-  void InnerProd::evalD(cp_double* input, p_double* output,
+  void InnerProd::evalD(const double** input, double** output,
                             int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void InnerProd::evalSX(cp_SXElement* input, p_SXElement* output,
+  void InnerProd::evalSX(const SXElement** input, SXElement** output,
                          int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -79,7 +79,7 @@ namespace casadi {
     *res[0] = casadi_inner_prod(dep(0).nnz(), arg[0], arg[1]);
   }
 
-  void InnerProd::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t* r = res[0];
     const int n = dep(0).nnz();
@@ -89,7 +89,7 @@ namespace casadi {
     }
   }
 
-  void InnerProd::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void InnerProd::spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
     bvec_t *a0=arg[0], *a1=arg[1], *r=res[0];
     const int n = dep(0).nnz();
     for (int i=0; i<n; ++i) {

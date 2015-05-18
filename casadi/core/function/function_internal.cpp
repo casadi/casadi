@@ -1263,20 +1263,20 @@ namespace casadi {
 
     // Get pointers to input arguments
     int n_in = getNumInputs();
-    vector<cp_double> arg(n_in+n_arg_);
+    vector<const double*> arg(n_in+n_arg_);
     for (int i=0; i<n_in; ++i) arg[i]=input(i).ptr();
 
     // Get pointers to output arguments
     int n_out = getNumOutputs();
-    vector<p_double> res(n_out+n_res_);
+    vector<double*> res(n_out+n_res_);
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
     // Call memory-less
     evalD(getPtr(arg), getPtr(res), getPtr(iw_tmp_), getPtr(w_tmp_));
   }
 
-  void FunctionInternal::evalD(cp_double* arg,
-                               p_double* res, int* itmp, double* rtmp) {
+  void FunctionInternal::evalD(const double** arg,
+                               double** res, int* itmp, double* rtmp) {
     // Number of inputs and outputs
     int num_in = getNumInputs();
     int num_out = getNumOutputs();
@@ -1299,7 +1299,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::evalSX(cp_SXElement* arg, p_SXElement* res,
+  void FunctionInternal::evalSX(const SXElement** arg, SXElement** res,
                                 int* itmp, SXElement* rtmp) {
     // Number of inputs and outputs
     int num_in = getNumInputs();
@@ -1357,11 +1357,11 @@ namespace casadi {
     vector<SXElement> w_tmp(n_w_);
 
     // Get pointers to input arguments
-    vector<cp_SXElement> argp(arg.size()+n_arg_);
+    vector<const SXElement*> argp(arg.size()+n_arg_);
     for (int i=0; i<arg.size(); ++i) argp[i]=getPtr(arg[i]);
 
     // Get pointers to output arguments
-    vector<p_SXElement> resp(getNumOutputs()+n_res_);
+    vector<SXElement*> resp(getNumOutputs()+n_res_);
     for (int i=0; i<getNumOutputs(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
@@ -1382,19 +1382,19 @@ namespace casadi {
     bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(w_tmp_));
 
     // Get pointers to output arguments
-    vector<p_bvec_t> res(getNumOutputs());
+    vector<bvec_t*> res(getNumOutputs());
     for (int i=0; i<res.size(); ++i) res[i]=reinterpret_cast<bvec_t*>(output(i).ptr());
 
     if (fwd) {
       // Get pointers to input arguments
-      vector<cp_bvec_t> arg(getNumInputs());
+      vector<const bvec_t*> arg(getNumInputs());
       for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
 
       // Call memory-less
       spFwd(getPtr(arg), getPtr(res), iw, w);
     } else {
       // Get pointers to input arguments
-      vector<p_bvec_t> arg(getNumInputs());
+      vector<bvec_t*> arg(getNumInputs());
       for (int i=0; i<arg.size(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
 
       // Call memory-less
@@ -2220,13 +2220,13 @@ namespace casadi {
     return Map::create(shared_from_this<Function>(), arg, parallelization);
   }
 
-  void FunctionInternal::spFwdSwitch(cp_bvec_t* arg, p_bvec_t* res,
+  void FunctionInternal::spFwdSwitch(const bvec_t** arg, bvec_t** res,
                                      int* itmp, bvec_t* rtmp) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
     spFwd(arg, res, itmp, rtmp);
   }
 
-  void FunctionInternal::spFwd(cp_bvec_t* arg, p_bvec_t* res,
+  void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
     int n_in = getNumInputs();
@@ -2277,13 +2277,13 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::spAdjSwitch(p_bvec_t* arg, p_bvec_t* res,
+  void FunctionInternal::spAdjSwitch(bvec_t** arg, bvec_t** res,
                                      int* itmp, bvec_t* rtmp) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
     spAdj(arg, res, itmp, rtmp);
   }
 
-  void FunctionInternal::spAdj(p_bvec_t* arg, p_bvec_t* res,
+  void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                int* itmp, bvec_t* rtmp) {
     // Number inputs and outputs
     int n_in = getNumInputs();

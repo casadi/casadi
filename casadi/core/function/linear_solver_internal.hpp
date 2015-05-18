@@ -69,11 +69,11 @@ namespace casadi {
     MX solve(const MX& A, const MX& B, bool transpose);
 
     /// Evaluate SX, possibly transposed
-    virtual void evalSXLinsol(cp_SXElement* arg, p_SXElement* res,
+    virtual void evalSXLinsol(const SXElement** arg, SXElement** res,
                               int* itmp, SXElement* rtmp, bool tr, int nrhs);
 
     /// Evaluate SX
-    virtual void evalSX(cp_SXElement* arg, p_SXElement* res,
+    virtual void evalSX(const SXElement** arg, SXElement** res,
                         int* itmp, SXElement* rtmp) {
       evalSXLinsol(arg, res, itmp, rtmp, false, output(LINSOL_X).size2());
     }
@@ -89,11 +89,11 @@ namespace casadi {
                                std::vector<std::vector<MX> >& asens, bool tr);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwdLinsol(cp_bvec_t* arg, p_bvec_t* res,
+    virtual void spFwdLinsol(const bvec_t** arg, bvec_t** res,
                              int* itmp, bvec_t* rtmp, bool tr, int nrhs);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdjLinsol(p_bvec_t* arg, p_bvec_t* res,
+    virtual void spAdjLinsol(bvec_t** arg, bvec_t** res,
                              int* itmp, bvec_t* rtmp, bool tr, int nrhs);
 
     ///@{

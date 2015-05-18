@@ -51,12 +51,12 @@ namespace casadi {
     return "(" + arg.at(0) + "+mul(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
-  void Multiplication::evalD(cp_double* input, p_double* output,
+  void Multiplication::evalD(const double** input, double** output,
                                  int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Multiplication::evalSX(cp_SXElement* input, p_SXElement* output,
+  void Multiplication::evalSX(const SXElement** input, SXElement** output,
                                   int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -92,7 +92,7 @@ namespace casadi {
     res[0] = mul(arg[1], arg[2], arg[0]);
   }
 
-  void Multiplication::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp,
+  void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* itmp,
                              bvec_t* rtmp) {
     copyFwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
@@ -100,7 +100,7 @@ namespace casadi {
                             res[0], sparsity(), rtmp);
   }
 
-  void Multiplication::spAdj(p_bvec_t* arg, p_bvec_t* res,
+  void Multiplication::spAdj(bvec_t** arg, bvec_t** res,
                              int* itmp, bvec_t* rtmp) {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),

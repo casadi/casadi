@@ -43,12 +43,12 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::evalD(cp_double* input, p_double* output,
+  void Split::evalD(const double** input, double** output,
                         int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void Split::evalSX(cp_SXElement* input, p_SXElement* output,
+  void Split::evalSX(const SXElement** input, SXElement** output,
                          int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -67,8 +67,8 @@ namespace casadi {
     }
   }
 
-  void Split::spFwd(cp_bvec_t* arg,
-                    p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Split::spFwd(const bvec_t** arg,
+                    bvec_t** res, int* itmp, bvec_t* rtmp) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {
@@ -82,8 +82,8 @@ namespace casadi {
     }
   }
 
-  void Split::spAdj(p_bvec_t* arg,
-                    p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Split::spAdj(bvec_t** arg,
+                    bvec_t** res, int* itmp, bvec_t* rtmp) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {

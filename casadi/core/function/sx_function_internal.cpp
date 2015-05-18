@@ -72,7 +72,7 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunctionInternal::evalD(cp_double* arg, p_double* res,
+  void SXFunctionInternal::evalD(const double** arg, double** res,
                                  int* itmp, double* rtmp) {
     double time_start=0;
     double time_stop=0;
@@ -578,7 +578,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::evalSX(cp_SXElement* arg, p_SXElement* res,
+  void SXFunctionInternal::evalSX(const SXElement** arg, SXElement** res,
                                   int* itmp, SXElement* rtmp) {
     if (verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
@@ -856,7 +856,7 @@ namespace casadi {
     if (!fwd) fill_n(iwork, n_w_, bvec_t(0));
   }
 
-  void SXFunctionInternal::spFwd(cp_bvec_t* arg, p_bvec_t* res,
+  void SXFunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -874,7 +874,7 @@ namespace casadi {
     }
   }
 
-  void SXFunctionInternal::spAdj(p_bvec_t* arg, p_bvec_t* res,
+  void SXFunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     fill_n(rtmp, n_w_, 0);
 

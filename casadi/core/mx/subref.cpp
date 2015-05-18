@@ -37,12 +37,12 @@ namespace casadi {
     return new SubRef(*this);
   }
 
-  void SubRef::evalD(cp_double* input, p_double* output,
+  void SubRef::evalD(const double** input, double** output,
                          int* itmp, double* rtmp) {
     evalGen<double>(input, output, itmp, rtmp);
   }
 
-  void SubRef::evalSX(cp_SXElement* input, p_SXElement* output,
+  void SubRef::evalSX(const SXElement** input, SXElement** output,
                           int* itmp, SXElement* rtmp) {
     evalGen<SXElement>(input, output, itmp, rtmp);
   }
@@ -53,13 +53,13 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubRef::spFwd(cp_bvec_t* arg,
-                     p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void SubRef::spFwd(const bvec_t** arg,
+                     bvec_t** res, int* itmp, bvec_t* rtmp) {
     casadi_error("not ready");
   }
 
-  void SubRef::spAdj(p_bvec_t* arg,
-                     p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void SubRef::spAdj(bvec_t** arg,
+                     bvec_t** res, int* itmp, bvec_t* rtmp) {
     casadi_error("not ready");
   }
 

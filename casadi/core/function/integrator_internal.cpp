@@ -494,7 +494,7 @@ namespace casadi {
     return ret;
   }
 
-  void IntegratorInternal::spFwd(cp_bvec_t* arg, p_bvec_t* res,
+  void IntegratorInternal::spFwd(const bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     log("IntegratorInternal::spFwd", "begin");
 
@@ -505,10 +505,10 @@ namespace casadi {
     bvec_t *tmp_rz = rtmp; rtmp += nrz_;
 
     // Propagate through f
-    cp_bvec_t dae_in[DAE_NUM_IN] = {0};
+    const bvec_t* dae_in[DAE_NUM_IN] = {0};
     dae_in[DAE_X] = arg[INTEGRATOR_X0];
     dae_in[DAE_P] = arg[INTEGRATOR_P];
-    p_bvec_t dae_out[DAE_NUM_OUT] = {0};
+    bvec_t* dae_out[DAE_NUM_OUT] = {0};
     dae_out[DAE_ODE] = tmp_x;
     dae_out[DAE_ALG] = tmp_z;
     f_.spFwd(dae_in, dae_out, itmp, rtmp);
@@ -540,14 +540,14 @@ namespace casadi {
 
     if (!g_.isNull()) {
       // Propagate through g
-      cp_bvec_t rdae_in[RDAE_NUM_IN] = {0};
+      const bvec_t* rdae_in[RDAE_NUM_IN] = {0};
       rdae_in[RDAE_X] = tmp_x;
       rdae_in[RDAE_P] = arg[INTEGRATOR_P];
       rdae_in[RDAE_Z] = tmp_z;
       rdae_in[RDAE_RX] = arg[INTEGRATOR_X0];
       rdae_in[RDAE_RX] = arg[INTEGRATOR_RX0];
       rdae_in[RDAE_RP] = arg[INTEGRATOR_RP];
-      p_bvec_t rdae_out[RDAE_NUM_OUT] = {0};
+      bvec_t* rdae_out[RDAE_NUM_OUT] = {0};
       rdae_out[RDAE_ODE] = tmp_rx;
       rdae_out[RDAE_ALG] = tmp_rz;
       g_.spFwd(rdae_in, rdae_out, itmp, rtmp);
@@ -580,7 +580,7 @@ namespace casadi {
     log("IntegratorInternal::spFwd", "end");
   }
 
-  void IntegratorInternal::spAdj(p_bvec_t* arg, p_bvec_t* res,
+  void IntegratorInternal::spAdj(bvec_t** arg, bvec_t** res,
                                  int* itmp, bvec_t* rtmp) {
     log("IntegratorInternal::spAdj", "begin");
 
@@ -620,9 +620,9 @@ namespace casadi {
       }
 
       // Propagate dependencies from quadratures
-      p_bvec_t rdae_out[RDAE_NUM_OUT] = {0};
+      bvec_t* rdae_out[RDAE_NUM_OUT] = {0};
       rdae_out[RDAE_QUAD] = res[INTEGRATOR_RQF];
-      p_bvec_t rdae_in[RDAE_NUM_IN] = {0};
+      bvec_t* rdae_in[RDAE_NUM_IN] = {0};
       rdae_in[RDAE_X] = tmp_x;
       rdae_in[RDAE_Z] = tmp_z;
       rdae_in[RDAE_P] = arg[INTEGRATOR_P];
@@ -649,9 +649,9 @@ namespace casadi {
     }
 
     // Propagate dependencies from quadratures
-    p_bvec_t dae_out[DAE_NUM_OUT] = {0};
+    bvec_t* dae_out[DAE_NUM_OUT] = {0};
     dae_out[DAE_QUAD] = res[INTEGRATOR_QF];
-    p_bvec_t dae_in[DAE_NUM_IN] = {0};
+    bvec_t* dae_in[DAE_NUM_IN] = {0};
     dae_in[DAE_X] = tmp_x;
     dae_in[DAE_Z] = tmp_z;
     dae_in[DAE_P] = arg[INTEGRATOR_P];

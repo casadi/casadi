@@ -116,7 +116,7 @@ namespace casadi {
     }
   }
 
-  void SwitchInternal::evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp) {
+  void SwitchInternal::evalD(const double** arg, double** res, int* itmp, double* rtmp) {
     // Get conditional
     int k = static_cast<int>(*arg[0]);
 

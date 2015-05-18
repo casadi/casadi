@@ -79,7 +79,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Map::evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp) {
+  void Map::evalD(const double** arg, double** res, int* itmp, double* rtmp) {
     int f_num_in = fcn_.getNumInputs();
     int f_num_out = fcn_.getNumOutputs();
     for (int i=0; i<n_; ++i) {
@@ -89,7 +89,7 @@ namespace casadi {
     }
   }
 
-  void OmpMap::evalD(cp_double* arg, p_double* res, int* iw, double* w) {
+  void OmpMap::evalD(const double** arg, double** res, int* iw, double* w) {
 #ifndef WITH_OPENMP
     // Not available, switching to serial mode
     Map::evalD(arg, res, iw, w);
@@ -111,7 +111,7 @@ namespace casadi {
 #endif // WITH_OPENMP
   }
 
-  void Map::spFwd(cp_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Map::spFwd(const bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
     int f_num_in = fcn_.getNumInputs();
     int f_num_out = fcn_.getNumOutputs();
     for (int i=0; i<n_; ++i) {
@@ -121,7 +121,7 @@ namespace casadi {
     }
   }
 
-  void Map::spAdj(p_bvec_t* arg, p_bvec_t* res, int* itmp, bvec_t* rtmp) {
+  void Map::spAdj(bvec_t** arg, bvec_t** res, int* itmp, bvec_t* rtmp) {
     int f_num_in = fcn_.getNumInputs();
     int f_num_out = fcn_.getNumOutputs();
     for (int i=0; i<n_; ++i) {
@@ -145,7 +145,7 @@ namespace casadi {
     return fcn_;
   }
 
-  void Map::evalSX(cp_SXElement* arg, p_SXElement* res, int* itmp, SXElement* rtmp) {
+  void Map::evalSX(const SXElement** arg, SXElement** res, int* itmp, SXElement* rtmp) {
     int f_num_in = fcn_.getNumInputs();
     int f_num_out = fcn_.getNumOutputs();
     for (int i=0; i<n_; ++i) {

@@ -56,7 +56,7 @@ namespace casadi {
     virtual ~ExternalFunctionInternal();
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(cp_double* arg, p_double* res, int* itmp, double* rtmp);
+    virtual void evalD(const double** arg, double** res, int* itmp, double* rtmp);
 
     /** \brief  Initialize */
     virtual void init();
