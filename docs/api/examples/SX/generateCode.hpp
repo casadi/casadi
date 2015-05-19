@@ -26,7 +26,7 @@
 * This example looks at symbolic substitution is SX graphs
 *
 *
-* \pythonexample{SX/generate}
+* \pythonexample{SX/generateCode}
 * \include SX/f_generated.c
 *
 * \sa
