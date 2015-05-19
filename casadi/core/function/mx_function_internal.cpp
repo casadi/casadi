@@ -1150,7 +1150,9 @@ namespace casadi {
     // Temporary variables and vectors
     s << "  int i, j, k, *ii, *jj, *kk;" << endl
       << "  real_t r, s, t, *rr, *ss, *tt;" << endl
-      << "  const real_t *cr, *cs, *ct;" << endl;
+      << "  const real_t *cr, *cs, *ct;" << endl
+      << "  const real_t** arg1=arg+" << nIn() << ";" << endl
+      << "  real_t** res1=res+" << nOut() << ";" << endl;
 
     // Declare scalar work vector elements as local variables
     if (!g.codegen_scalars) {

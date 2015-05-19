@@ -155,29 +155,20 @@ namespace casadi {
   }
 
   void GenericCall::generateIO(const vector<int>& arg, const vector<int>& res,
-                               CodeGenerator& g, int arg_off) const {
+                               CodeGenerator& g) const {
     // Collect input arguments
-    g.body << "    const real_t* arg1[] = {";
-    for (int i=arg_off; i<arg.size(); ++i) {
-      if (i!=arg_off) g.body << ", ";
-      g.body << g.work(arg[i], dep(i).nnz());
+    for (int i=0; i<arg.size(); ++i) {
+      g.body << "  arg1[" << i << "]=" << g.work(arg[i], dep(i).nnz()) << ";" << endl;
     }
-    g.body << "};" << endl;
 
     // Collect output arguments
-    g.body << "    real_t* res1[] = {";
     for (int i=0; i<res.size(); ++i) {
-      if (i!=0) g.body << ", ";
-      g.body << g.work(res[i], nnz(i));
+      g.body << "  res1[" << i << "]=" << g.work(res[i], nnz(i)) << ";" << endl;
     }
-    g.body << "};" << endl;
   }
 
   void Call::generate(const vector<int>& arg, const vector<int>& res,
                       CodeGenerator& g) const {
-    // Put in a separate scope to avoid name collisions
-    g.body << "  {" << endl;
-
     // Input and output arrays
     generateIO(arg, res, g);
 
@@ -185,10 +176,7 @@ namespace casadi {
     int f = g.getDependency(fcn_);
 
     // Call function
-    g.body << "    if (f" << f << "(arg1, res1, iw, w)) return 1;" << endl;
-
-    // Finalize the function call
-    g.body << "  }" << endl;
+    g.body << "  if (f" << f << "(arg1, res1, iw, w)) return 1;" << endl;
   }
 
   size_t Call::sz_arg() const {

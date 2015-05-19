@@ -57,7 +57,7 @@ namespace casadi {
 
     /** \brief Generate input and output arrays */
     virtual void generateIO(const std::vector<int>& arg, const std::vector<int>& res,
-                            CodeGenerator& g, int arg_off=0) const;
+                            CodeGenerator& g) const;
   };
 
   /** Embeds a function call in an expression graph
