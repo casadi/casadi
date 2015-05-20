@@ -144,7 +144,7 @@ class CASADI_EXPORT CasadiException : public std::exception {
 #define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.")
 #else
 #define casadi_assert(x) casadi_assert_message(x, \
-    "(Hint for developers: CasadiOptions.setCatchErrorsPython(False)" \
+    "(Hint for developers: CasadiOptions.setCatchErrorsSwig(False)" \
     " to obtain gdb stacktrace in python.)" \
     << std::endl << "Please notify the CasADi developers.")
 #endif
