@@ -709,14 +709,22 @@ namespace casadi {
 
     /** \brief Perform a star coloring of a symmetric matrix:
         A greedy distance-2 coloring algorithm
-        (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+        Algorithm 4.1 in
+          What Color Is Your Jacobian? Graph Coloring for Computing Derivatives
+          A. H. GEBREMEDHIN, F. MANNE, A. POTHEN
+          SIAM Rev., 47(4), 629–705 (2006)
+
         Ordering options: None (0), largest first (1)
     */
     Sparsity starColoring(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
         A new greedy distance-2 coloring algorithm
-        (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
+        Algorithm 4.1 in
+          NEW ACYCLIC AND STAR COLORING ALGORITHMS WITH APPLICATION TO COMPUTING HESSIANS
+          A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN
+          SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 1042–1072 (2007)
+
         Ordering options: None (0), largest first (1)
     */
     Sparsity starColoring2(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;

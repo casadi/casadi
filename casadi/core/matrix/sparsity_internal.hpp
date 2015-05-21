@@ -410,17 +410,13 @@ namespace casadi {
      */
     Sparsity unidirectionalColoring(const Sparsity& AT, int cutoff) const;
 
-    /** \brief Perform a star coloring of a symmetric matrix
-     *
-     * A greedy distance-2 coloring algorithm
-     * (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+    /** \brief A greedy distance-2 coloring algorithm
+     * See description in public class.
      */
     Sparsity starColoring(int ordering, int cutoff) const;
 
-    /** \brief Perform a star coloring of a symmetric matrix
-     *
-     * An improved distance-2 coloring algorithm
-     * (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
+    /** \brief An improved distance-2 coloring algorithm
+     * See description in public class.
      */
     Sparsity starColoring2(int ordering, int cutoff) const;
 
