@@ -1600,5 +1600,86 @@ namespace casadi {
     g.generate(fname);
   }
 
+  std::string DaeBuilder::inputString(int ind) {
+    switch (ind) {
+    case DAE_BUILDER_T: return "t";
+    case DAE_BUILDER_C: return "c";
+    case DAE_BUILDER_P: return "p";
+    case DAE_BUILDER_D: return "d";
+    case DAE_BUILDER_U: return "u";
+    case DAE_BUILDER_X: return "x";
+    case DAE_BUILDER_S: return "s";
+    case DAE_BUILDER_SDOT: return "sdot";
+    case DAE_BUILDER_Z: return "z";
+    case DAE_BUILDER_Q: return "q";
+    case DAE_BUILDER_W: return "w";
+    case DAE_BUILDER_Y: return "y";
+    default: return "";
+    }
+  }
+
+  DaeBuilder::DaeBuilderIn DaeBuilder::inputEnum(const std::string& id) {
+    if (id=="t") {
+      return DAE_BUILDER_T;
+    } else if (id=="c") {
+      return DAE_BUILDER_C;
+    } else if (id=="p") {
+      return DAE_BUILDER_P;
+    } else if (id=="d") {
+      return DAE_BUILDER_D;
+    } else if (id=="u") {
+      return DAE_BUILDER_U;
+    } else if (id=="x") {
+      return DAE_BUILDER_X;
+    } else if (id=="s") {
+      return DAE_BUILDER_S;
+    } else if (id=="sdot") {
+      return DAE_BUILDER_SDOT;
+    } else if (id=="z") {
+      return DAE_BUILDER_Z;
+    } else if (id=="q") {
+      return DAE_BUILDER_Q;
+    } else if (id=="w") {
+      return DAE_BUILDER_W;
+    } else if (id=="y") {
+      return DAE_BUILDER_Y;
+    } else {
+      return DAE_BUILDER_NUM_IN;
+    }
+  }
+
+  std::string DaeBuilder::outputString(int ind) {
+    switch (ind) {
+    case DAE_BUILDER_DDEF: return "ddef";
+    case DAE_BUILDER_WDEF: return "wdef";
+    case DAE_BUILDER_ODE: return "ode";
+    case DAE_BUILDER_DAE: return "dae";
+    case DAE_BUILDER_ALG: return "alg";
+    case DAE_BUILDER_QUAD: return "quad";
+    case DAE_BUILDER_YDEF: return "ydef";
+    default: return "";
+    }
+  }
+
+  DaeBuilder::DaeBuilderOut DaeBuilder::outputEnum(const std::string& id) {
+    if (id=="ddef") {
+      return DAE_BUILDER_DDEF;
+    } else if (id=="wdef") {
+      return DAE_BUILDER_WDEF;
+    } else if (id=="ode") {
+      return DAE_BUILDER_ODE;
+    } else if (id=="dae") {
+      return DAE_BUILDER_DAE;
+    } else if (id=="alg") {
+      return DAE_BUILDER_ALG;
+    } else if (id=="quad") {
+      return DAE_BUILDER_QUAD;
+    } else if (id=="ydef") {
+      return DAE_BUILDER_YDEF;
+    } else {
+      return DAE_BUILDER_NUM_OUT;
+    }
+  }
+
 } // namespace casadi
 

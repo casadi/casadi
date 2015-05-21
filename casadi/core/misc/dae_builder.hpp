@@ -231,28 +231,43 @@ namespace casadi {
     // Input convension in codegen
     enum DaeBuilderIn {
       DAE_BUILDER_T,
+      DAE_BUILDER_C,
+      DAE_BUILDER_P,
+      DAE_BUILDER_D,
+      DAE_BUILDER_U,
       DAE_BUILDER_X,
       DAE_BUILDER_S,
       DAE_BUILDER_SDOT,
       DAE_BUILDER_Z,
-      DAE_BUILDER_U,
       DAE_BUILDER_Q,
-      DAE_BUILDER_D,
+      DAE_BUILDER_W,
       DAE_BUILDER_Y,
-      DAE_BUILDER_P,
       DAE_BUILDER_NUM_IN
     };
 
     // Output convension in codegen
     enum DaeBuilderOut {
+      DAE_BUILDER_DDEF,
+      DAE_BUILDER_WDEF,
       DAE_BUILDER_ODE,
       DAE_BUILDER_DAE,
       DAE_BUILDER_ALG,
       DAE_BUILDER_QUAD,
-      DAE_BUILDER_DDEF,
       DAE_BUILDER_YDEF,
       DAE_BUILDER_NUM_OUT
     };
+
+    // Get string representation for input, given enum
+    static std::string inputString(int ind);
+
+    // Get string representation for input, given enum
+    static DaeBuilderIn inputEnum(const std::string& id);
+
+    // Get enum representation for output, given string
+    static std::string outputString(int ind);
+
+    // Get enum representation for output, given string
+    static DaeBuilderOut outputEnum(const std::string& id);
 #endif // SWIG
 
     /// Generate a file for numerical evaluation
