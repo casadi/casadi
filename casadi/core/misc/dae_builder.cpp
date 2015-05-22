@@ -1649,6 +1649,15 @@ namespace casadi {
     }
   }
 
+  std::vector<DaeBuilder::DaeBuilderIn>
+  DaeBuilder::inputEnum(const std::vector<std::string>& id) {
+    std::vector<DaeBuilderIn> ret(id.size());
+    for (int i=0; i<id.size(); ++i) {
+      ret[i] = inputEnum(id[i]);
+    }
+    return ret;
+  }
+
   std::string DaeBuilder::outputString(DaeBuilderOut ind) {
     switch (ind) {
     case DAE_BUILDER_DDEF: return "ddef";
@@ -1680,6 +1689,15 @@ namespace casadi {
     } else {
       return DAE_BUILDER_NUM_OUT;
     }
+  }
+
+  std::vector<DaeBuilder::DaeBuilderOut>
+  DaeBuilder::outputEnum(const std::vector<std::string>& id) {
+    std::vector<DaeBuilderOut> ret(id.size());
+    for (int i=0; i<id.size(); ++i) {
+      ret[i] = outputEnum(id[i]);
+    }
+    return ret;
   }
 
   std::string DaeBuilder::inputString() {
@@ -1722,6 +1740,14 @@ namespace casadi {
     }
   }
 
+  std::vector<MX> DaeBuilder::input(std::vector<DaeBuilderIn>& ind) const {
+    vector<MX> ret(ind.size());
+    for (int i=0; i<ind.size(); ++i) {
+      ret[i] = vertcat(input(ind[i]));
+    }
+    return ret;
+  }
+
   std::vector<MX> DaeBuilder::output(DaeBuilderOut ind) const {
     switch (ind) {
     case DAE_BUILDER_DDEF: return this->ddef;
@@ -1733,6 +1759,14 @@ namespace casadi {
     case DAE_BUILDER_YDEF: return this->ydef;
     default: return std::vector<MX>();
     }
+  }
+
+  std::vector<MX> DaeBuilder::output(std::vector<DaeBuilderOut>& ind) const {
+    vector<MX> ret(ind.size());
+    for (int i=0; i<ind.size(); ++i) {
+      ret[i] = vertcat(output(ind[i]));
+    }
+    return ret;
   }
 
   std::vector<MX> DaeBuilder::multiplier(DaeBuilderOut ind) const {
@@ -1767,15 +1801,15 @@ namespace casadi {
 
     // Get indices of outputs
     std::vector<DaeBuilderOut> f_out_enum(f_out.size());
-    std::vector<bool> encountered(DAE_BUILDER_NUM_OUT, false);
+    std::vector<bool> in_use(DAE_BUILDER_NUM_OUT, false);
     for (int i=0; i<f_out.size(); ++i) {
       DaeBuilderOut oind = outputEnum(f_out[i]);
       casadi_assert_message(oind!=DAE_BUILDER_NUM_OUT,
                             "DaeBuilder::addLinearCombination: No output expression " << f_out[i]
                             << ". Valid expressions are " << outputString());
-      casadi_assert_message(!encountered[oind],
+      casadi_assert_message(!in_use[oind],
                             "DaeBuilder::addLinearCombination: Duplicate expression " << f_out[i]);
-      encountered[oind] = true;
+      in_use[oind] = true;
 
       // Add linear combination of expressions
       vector<MX> res=output(oind), lam_res=multiplier(oind);
@@ -1788,9 +1822,146 @@ namespace casadi {
     return ret;
   }
 
-  void DaeBuilder::generateFunction(CodeGenerator& g, const std::string& fname,
-                                    const std::vector<std::string>& f_in,
-                                    const std::vector<std::string>& f_out) {
+  MXFunction DaeBuilder::function(const std::string& fname,
+                                  const std::vector<std::string>& s_in,
+                                  const std::vector<std::string>& s_out) const {
+    // Collect function inputs
+    vector<MX> ret_in(s_in.size());
+    std::vector<bool> input_used(DAE_BUILDER_NUM_IN, false);
+    for (vector<string>::const_iterator i=s_in.begin(); i!=s_in.end(); ++i) {
+      DaeBuilderIn iind = inputEnum(*i);
+      casadi_assert_message(iind!=DAE_BUILDER_NUM_IN,
+                            "DaeBuilder::function: No input expression " << *i
+                            << ". Valid expressions are " << inputString());
+      casadi_assert_message(!input_used[iind],
+                            "DaeBuilder::function: Duplicate expression " << *i);
+      input_used[iind] = true;
+      ret_in[i-s_in.begin()] = vertcat(input(iind));
+    }
+
+    // Function outputs
+    vector<MX> ret_out(s_out.size());
+    vector<bool> assigned(s_out.size(), false);
+
+    // Non-differentiated outputs
+    std::vector<bool> output_used(DAE_BUILDER_NUM_IN, false);
+    for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
+      DaeBuilderOut oind = outputEnum(*i);
+      if (oind!=DAE_BUILDER_NUM_OUT) {
+        casadi_assert_message(!output_used[oind],
+                              "DaeBuilder::function: Duplicate expression " << *i);
+        output_used[oind] = true;
+        ret_out[i-s_out.begin()] = vertcat(output(oind));
+        assigned[i-s_out.begin()] = true;
+      }
+    }
+
+    // Linear combination of outputs
+    for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
+      if (assigned[i-s_out.begin()]) continue;
+      std::map<std::string, MX>::const_iterator j=lin_comb_.find(*i);
+      if (j!=lin_comb_.end()) {
+        ret_out[i-s_out.begin()] = j->second;
+        assigned[i-s_out.begin()] = true;
+      }
+    }
+
+    // Determine which Jacobian blocks to generate
+    vector<vector<int> > wanted(DAE_BUILDER_NUM_OUT, vector<int>(DAE_BUILDER_NUM_IN, -1));
+    for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
+      if (assigned[i-s_out.begin()]) continue;
+
+      // Find the first underscore separator
+      size_t pos = i->find('_');
+      if (pos>=i->size()) continue;
+
+      // Get operation
+      string s = i->substr(0, pos);
+      if (s!="jac") continue;
+
+      // Get expression to be differentiated
+      size_t pos1 = i->find('_', pos+1);
+      if (pos1>=i->size()) continue;
+      s = i->substr(pos+1, pos1-pos-1);
+      DaeBuilderOut oind = outputEnum(s);
+      if (oind==DAE_BUILDER_NUM_OUT) continue;
+
+      // Jacobian with respect to what variable
+      s = i->substr(pos1+1, string::npos);
+      DaeBuilderIn iind = inputEnum(s);
+      if (iind==DAE_BUILDER_NUM_IN) continue;
+
+      // Check if duplicate
+      casadi_assert_message(wanted[oind][iind]==-1,
+                            "DaeBuilder::function: Duplicate Jacobian " << *i);
+      wanted[oind][iind] = i-s_out.begin();
+      assigned[i-s_out.begin()] = true;
+    }
+
+    // Generate Jacobian blocks
+    for (int oind=0; oind!=DAE_BUILDER_NUM_OUT; ++oind) {
+      for (int iind=0; iind!=DAE_BUILDER_NUM_IN; ++iind) {
+        // Skip if not wanted
+        if (wanted[oind][iind]==-1) continue;
+
+        // List of blocks to be calculated together, starting with current
+        vector<DaeBuilderIn> iblocks(1, static_cast<DaeBuilderIn>(iind));
+        vector<DaeBuilderOut> oblocks(1, static_cast<DaeBuilderOut>(oind));
+
+        // Add other blocks that can be calculated with the same inputs
+        // (typically cheap if forward mode used)
+        for (int oind1=oind+1; oind1!=DAE_BUILDER_NUM_OUT; ++oind1) {
+          if (wanted[oind1][iind]>=0) {
+            oblocks.push_back(static_cast<DaeBuilderOut>(oind1));
+          }
+        }
+
+        // Add other blocks that can be calculated with the same outputs
+        // (typically cheap if reverse mode used)
+        for (int iind1=iind+1; iind1!=DAE_BUILDER_NUM_IN; ++iind1) {
+          // Do we really want _all_ the input/output combinations?
+          bool all_wanted = true;
+          for (int k=0; k<oblocks.size() && all_wanted; ++k) {
+            all_wanted = wanted[oblocks[k]][iind1]>=0;
+          }
+
+          // Add block(s)
+          if (all_wanted) {
+            iblocks.push_back(static_cast<DaeBuilderIn>(iind1));
+          }
+        }
+
+        // When we know which blocks we are interested in, we form the Jacobian
+        vector<MX> arg=input(iblocks), res=output(oblocks);
+        MX J = jacobian(vertcat(res), vertcat(arg));
+
+        // Divide into blocks and copy to output
+        vector<vector<MX> > J_all = blocksplit(J, offset(res), offset(arg));
+        for (int ib=0; ib<iblocks.size(); ++ib) {
+          for (int ob=0; ob<oblocks.size(); ++ob) {
+            int& ind=wanted[oblocks[ob]][iblocks[ib]];
+            ret_out[ind] = J_all[ob][ib];
+            assigned[ind] = true;
+            ind = -1;
+          }
+        }
+      }
+    }
+
+    // Make sure all outputs have been assigned
+    for (int i=0; i<assigned.size(); ++i) {
+      if (!assigned[i]) {
+        casadi_error("DaeBuilder::function: Cannot treat output expression " << s_out[i]);
+      }
+    }
+
+    // Generate the constructed function
+    MXFunction ret(ret_in, ret_out);
+    ret.setOption("name", fname);
+    ret.setInputScheme(IOScheme(s_in));
+    ret.setOutputScheme(IOScheme(s_out));
+    ret.init();
+    return ret;
   }
 
 } // namespace casadi

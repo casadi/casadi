@@ -68,6 +68,11 @@ namespace casadi {
     if (this->mex) addInclude("mex.h");
   }
 
+  void CodeGenerator::add(const Function& f) {
+    casadi_assert(f.isInit());
+    add(f, f.getSanitizedName());
+  }
+
   void CodeGenerator::add(const Function& f, const std::string& fname) {
     f->generateFunction(*this, fname, false);
     if (this->with_header) {

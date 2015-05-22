@@ -55,6 +55,7 @@ namespace casadi {
     static MatType zz_vecNZcat(const std::vector< MatType >& x);
     MatType zz_vec() const;
     MatType zz_repmat(int n, int m=1) const;
+    static std::vector<int> zz_offset(const std::vector< MatType > &v, bool vert=true);
     /// \endcond
 
 /**
@@ -151,6 +152,12 @@ namespace casadi {
     inline friend std::vector<MatType > vertsplit(const MatType &v,
                                                   const std::vector<int>& offset) {
       return v.zz_vertsplit(offset);
+    }
+
+    /** \brief Helper function, get offsets corresponding to a vector of matrices
+     */
+    inline friend std::vector<int > offset(const std::vector<MatType> &v, bool vert=true) {
+      return MatType::zz_offset(v, vert);
     }
 
     /** \brief  split vertically, retaining fixed-sized groups of rows
@@ -454,6 +461,17 @@ namespace casadi {
     std::vector< std::vector< MatType > > ret;
     for (int i=0;i<rows.size();++i) {
       ret.push_back(horzsplit(rows[i], horz_offset));
+    }
+    return ret;
+  }
+
+  template<typename MatType>
+  std::vector<int>
+  SparsityInterface<MatType>::zz_offset(const std::vector< MatType > &v, bool vert) {
+    std::vector<int> ret(v.size()+1);
+    ret[0]=0;
+    for (int i=0; i<v.size(); ++i) {
+      ret[i+1] = ret[i] + (vert ? v[i].size1() : v[i].size2());
     }
     return ret;
   }

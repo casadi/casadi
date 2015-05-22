@@ -274,6 +274,9 @@ namespace casadi {
     // Get enum representation for input, given string
     static DaeBuilderIn inputEnum(const std::string& id);
 
+    // Get enum representation for input, given vector of strings
+    static std::vector<DaeBuilderIn> inputEnum(const std::vector<std::string>& id);
+
     // Get string representation for output, given enum
     static std::string outputString(DaeBuilderOut ind);
 
@@ -283,11 +286,20 @@ namespace casadi {
     // Get enum representation for output, given string
     static DaeBuilderOut outputEnum(const std::string& id);
 
+    // Get enum representation for output, given vector of strings
+    static std::vector<DaeBuilderOut> outputEnum(const std::vector<std::string>& id);
+
     // Get input expression, given enum
     std::vector<MX> input(DaeBuilderIn ind) const;
 
     // Get output expression, given enum
     std::vector<MX> output(DaeBuilderOut ind) const;
+
+    // Get input expression, given enum
+    std::vector<MX> input(std::vector<DaeBuilderIn>& ind) const;
+
+    // Get output expression, given enum
+    std::vector<MX> output(std::vector<DaeBuilderOut>& ind) const;
 
     // Get multiplier corresponding to an output expression, given enum
     std::vector<MX> multiplier(DaeBuilderOut ind) const;
@@ -298,9 +310,9 @@ namespace casadi {
                             const std::vector<std::string>& f_out);
 
     /// Generate code for a particular function
-    void generateFunction(CodeGenerator& g, const std::string& fname,
-                          const std::vector<std::string>& f_in,
-                          const std::vector<std::string>& f_out);
+    MXFunction function(const std::string& fname,
+                        const std::vector<std::string>& s_in,
+                        const std::vector<std::string>& s_out) const;
 
     /// Generate a file for numerical evaluation
     void generate(const std::string& filename, const Dictionary& options=Dictionary());

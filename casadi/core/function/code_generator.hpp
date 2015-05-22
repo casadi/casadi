@@ -38,6 +38,9 @@ namespace casadi {
     /// Constructor
     CodeGenerator(const Dictionary& opts = Dictionary());
 
+    /// Add a function (name generated)
+    void add(const Function& f);
+
     /// Add a function
     void add(const Function& f, const std::string& fname);
 
