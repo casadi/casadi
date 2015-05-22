@@ -29,6 +29,7 @@
 #include <string>
 #include <sstream>
 #include <ctime>
+#include <cctype>
 
 #include "../std_vector_tools.hpp"
 #include "../casadi_exception.hpp"
@@ -1600,7 +1601,7 @@ namespace casadi {
     g.generate(fname);
   }
 
-  std::string DaeBuilder::inputString(int ind) {
+  std::string DaeBuilder::inputString(DaeBuilderIn ind) {
     switch (ind) {
     case DAE_BUILDER_T: return "t";
     case DAE_BUILDER_C: return "c";
@@ -1648,7 +1649,7 @@ namespace casadi {
     }
   }
 
-  std::string DaeBuilder::outputString(int ind) {
+  std::string DaeBuilder::outputString(DaeBuilderOut ind) {
     switch (ind) {
     case DAE_BUILDER_DDEF: return "ddef";
     case DAE_BUILDER_WDEF: return "wdef";
@@ -1679,6 +1680,117 @@ namespace casadi {
     } else {
       return DAE_BUILDER_NUM_OUT;
     }
+  }
+
+  std::string DaeBuilder::inputString() {
+    stringstream ss;
+    ss << "[";
+    for (int i=0; i!=DAE_BUILDER_NUM_IN; ++i) {
+      if (i!=0) ss << ",";
+      ss << inputString(static_cast<DaeBuilderIn>(i));
+    }
+    ss << "]";
+    return ss.str();
+  }
+
+  std::string DaeBuilder::outputString() {
+    stringstream ss;
+    ss << "[";
+    for (int i=0; i!=DAE_BUILDER_NUM_OUT; ++i) {
+      if (i!=0) ss << ",";
+      ss << outputString(static_cast<DaeBuilderOut>(i));
+    }
+    ss << "]";
+    return ss.str();
+  }
+
+  std::vector<MX> DaeBuilder::input(DaeBuilderIn ind) const {
+    switch (ind) {
+    case DAE_BUILDER_T: return vector<MX>(1, this->t);
+    case DAE_BUILDER_C: return this->c;
+    case DAE_BUILDER_P: return this->p;
+    case DAE_BUILDER_D: return this->d;
+    case DAE_BUILDER_U: return this->u;
+    case DAE_BUILDER_X: return this->x;
+    case DAE_BUILDER_S: return this->s;
+    case DAE_BUILDER_SDOT: return this->sdot;
+    case DAE_BUILDER_Z: return this->z;
+    case DAE_BUILDER_Q: return this->q;
+    case DAE_BUILDER_W: return this->w;
+    case DAE_BUILDER_Y: return this->y;
+    default: return std::vector<MX>();
+    }
+  }
+
+  std::vector<MX> DaeBuilder::output(DaeBuilderOut ind) const {
+    switch (ind) {
+    case DAE_BUILDER_DDEF: return this->ddef;
+    case DAE_BUILDER_WDEF: return this->wdef;
+    case DAE_BUILDER_ODE: return this->ode;
+    case DAE_BUILDER_DAE: return this->dae;
+    case DAE_BUILDER_ALG: return this->alg;
+    case DAE_BUILDER_QUAD: return this->quad;
+    case DAE_BUILDER_YDEF: return this->ydef;
+    default: return std::vector<MX>();
+    }
+  }
+
+  std::vector<MX> DaeBuilder::multiplier(DaeBuilderOut ind) const {
+    switch (ind) {
+    case DAE_BUILDER_DDEF: return this->lam_ddef;
+    case DAE_BUILDER_WDEF: return this->lam_wdef;
+    case DAE_BUILDER_ODE: return this->lam_ode;
+    case DAE_BUILDER_DAE: return this->lam_dae;
+    case DAE_BUILDER_ALG: return this->lam_alg;
+    case DAE_BUILDER_QUAD: return this->lam_quad;
+    case DAE_BUILDER_YDEF: return this->lam_ydef;
+    default: return std::vector<MX>();
+    }
+  }
+
+  MX DaeBuilder::addLinearCombination(const std::string& name,
+                                      const std::vector<std::string>& f_out) {
+    // Make sure object valid
+    sanityCheck();
+
+    // Make sure name is valid
+    casadi_assert_message(!name.empty(), "DaeBuilder::addLinearCombination: \"name\" is empty");
+    for (string::const_iterator i=name.begin(); i!=name.end(); ++i) {
+      casadi_assert_message(isalnum(*i),
+                            "DaeBuilder::addLinearCombination: \"name\" must be alphanumeric");
+    }
+
+    // Get a reference to the expression
+    MX& ret = lin_comb_[name];
+    casadi_assert_warning(ret.isEmpty(), "DaeBuilder::addLinearCombination: Overwriting " << name);
+    ret = 0;
+
+    // Get indices of outputs
+    std::vector<DaeBuilderOut> f_out_enum(f_out.size());
+    std::vector<bool> encountered(DAE_BUILDER_NUM_OUT, false);
+    for (int i=0; i<f_out.size(); ++i) {
+      DaeBuilderOut oind = outputEnum(f_out[i]);
+      casadi_assert_message(oind!=DAE_BUILDER_NUM_OUT,
+                            "DaeBuilder::addLinearCombination: No output expression " << f_out[i]
+                            << ". Valid expressions are " << outputString());
+      casadi_assert_message(!encountered[oind],
+                            "DaeBuilder::addLinearCombination: Duplicate expression " << f_out[i]);
+      encountered[oind] = true;
+
+      // Add linear combination of expressions
+      vector<MX> res=output(oind), lam_res=multiplier(oind);
+      for (int i=0; i<res.size(); ++i) {
+        ret += inner_prod(lam_res[i], res[i]);
+      }
+    }
+
+    // Return the (cached) expression
+    return ret;
+  }
+
+  void DaeBuilder::generateFunction(CodeGenerator& g, const std::string& fname,
+                                    const std::vector<std::string>& f_in,
+                                    const std::vector<std::string>& f_out) {
   }
 
 } // namespace casadi

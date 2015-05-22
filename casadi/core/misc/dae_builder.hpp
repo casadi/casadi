@@ -106,6 +106,11 @@ namespace casadi {
      */
     std::vector<MX> q, quad, lam_quad;
 
+
+    /** \brief Local variables and corresponding definitions
+     */
+    std::vector<MX> w, wdef, lam_wdef;
+
     /** \brief Output variables and corresponding definitions
      */
     std::vector<MX> y, ydef, lam_ydef;
@@ -121,6 +126,9 @@ namespace casadi {
      * optimization algorithm.
      */
     std::vector<MX> p;
+
+    /** \brief Named constants */
+    std::vector<MX> c, cdef;
 
     /** \brief Dependent parameters and corresponding definitions 
      * Interdependencies are allowed but must be non-cyclic.
@@ -258,17 +266,41 @@ namespace casadi {
     };
 
     // Get string representation for input, given enum
-    static std::string inputString(int ind);
+    static std::string inputString(DaeBuilderIn ind);
 
-    // Get string representation for input, given enum
+    // Get string representation for all inputs
+    static std::string inputString();
+
+    // Get enum representation for input, given string
     static DaeBuilderIn inputEnum(const std::string& id);
 
-    // Get enum representation for output, given string
-    static std::string outputString(int ind);
+    // Get string representation for output, given enum
+    static std::string outputString(DaeBuilderOut ind);
+
+    // Get string representation for all outputs
+    static std::string outputString();
 
     // Get enum representation for output, given string
     static DaeBuilderOut outputEnum(const std::string& id);
+
+    // Get input expression, given enum
+    std::vector<MX> input(DaeBuilderIn ind) const;
+
+    // Get output expression, given enum
+    std::vector<MX> output(DaeBuilderOut ind) const;
+
+    // Get multiplier corresponding to an output expression, given enum
+    std::vector<MX> multiplier(DaeBuilderOut ind) const;
 #endif // SWIG
+
+    /// Add a named linear combination of output expressions
+    MX addLinearCombination(const std::string& name,
+                            const std::vector<std::string>& f_out);
+
+    /// Generate code for a particular function
+    void generateFunction(CodeGenerator& g, const std::string& fname,
+                          const std::vector<std::string>& f_in,
+                          const std::vector<std::string>& f_out);
 
     /// Generate a file for numerical evaluation
     void generate(const std::string& filename, const Dictionary& options=Dictionary());
@@ -398,6 +430,9 @@ namespace casadi {
     /// Find of variable by name
     typedef std::map<std::string, Variable> VarMap;
     VarMap varmap_;
+
+    /// Linear combinations of output expressions
+    std::map<std::string, MX> lin_comb_;
 
     /// Read an equation
     MX readExpr(const XmlNode& odenode);
