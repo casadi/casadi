@@ -1828,15 +1828,43 @@ namespace casadi {
     // Collect function inputs
     vector<MX> ret_in(s_in.size());
     std::vector<bool> input_used(DAE_BUILDER_NUM_IN, false);
-    for (vector<string>::const_iterator i=s_in.begin(); i!=s_in.end(); ++i) {
-      DaeBuilderIn iind = inputEnum(*i);
-      casadi_assert_message(iind!=DAE_BUILDER_NUM_IN,
-                            "DaeBuilder::function: No input expression " << *i
-                            << ". Valid expressions are " << inputString());
-      casadi_assert_message(!input_used[iind],
-                            "DaeBuilder::function: Duplicate expression " << *i);
-      input_used[iind] = true;
-      ret_in[i-s_in.begin()] = vertcat(input(iind));
+    std::vector<bool> output_used(DAE_BUILDER_NUM_IN, false);
+    for (vector<string>::const_iterator s_in_it=s_in.begin(); s_in_it!=s_in.end(); ++s_in_it) {
+      // Primal variable
+      DaeBuilderIn iind = inputEnum(*s_in_it);
+      if (iind!=DAE_BUILDER_NUM_IN) {
+        casadi_assert_message(!input_used[iind],
+                              "DaeBuilder::function: Duplicate expression " << *s_in_it);
+        input_used[iind] = true;
+        ret_in[s_in_it-s_in.begin()] = vertcat(input(iind));
+        continue;
+      }
+
+      // Dual variable
+      if (s_in_it->size()>4 && s_in_it->substr(0, 4)=="lam_") {
+        DaeBuilderOut oind = outputEnum(s_in_it->substr(4, string::npos));
+        if (oind!=DAE_BUILDER_NUM_OUT) {
+          casadi_assert_message(!output_used[oind],
+                                "DaeBuilder::function: Duplicate expression " << *s_in_it);
+          output_used[oind] = true;
+          ret_in[s_in_it-s_in.begin()] = vertcat(multiplier(oind));
+          continue;
+        }
+      }
+
+      // Error if reached this point
+      stringstream ss;
+      ss << "DaeBuilder::function: No input expression " << *s_in_it << "." << endl;
+      ss << "Valid expressions are: [";
+      for (int i=0; i!=DAE_BUILDER_NUM_IN; ++i) {
+        if (i!=0) ss << ", ";
+        ss << inputString(static_cast<DaeBuilderIn>(i));
+      }
+      for (int i=0; i!=DAE_BUILDER_NUM_OUT; ++i) {
+        ss << ", lam_" << outputString(static_cast<DaeBuilderOut>(i));
+      }
+      ss << "]";
+      casadi_error(ss.str());
     }
 
     // Function outputs
@@ -1844,7 +1872,7 @@ namespace casadi {
     vector<bool> assigned(s_out.size(), false);
 
     // Non-differentiated outputs
-    std::vector<bool> output_used(DAE_BUILDER_NUM_IN, false);
+    fill(output_used.begin(), output_used.end(), false);
     for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
       DaeBuilderOut oind = outputEnum(*i);
       if (oind!=DAE_BUILDER_NUM_OUT) {
@@ -1895,7 +1923,6 @@ namespace casadi {
       casadi_assert_message(wanted[oind][iind]==-1,
                             "DaeBuilder::function: Duplicate Jacobian " << *i);
       wanted[oind][iind] = i-s_out.begin();
-      assigned[i-s_out.begin()] = true;
     }
 
     // Generate Jacobian blocks
@@ -1905,14 +1932,14 @@ namespace casadi {
         if (wanted[oind][iind]==-1) continue;
 
         // List of blocks to be calculated together, starting with current
-        vector<DaeBuilderIn> iblocks(1, static_cast<DaeBuilderIn>(iind));
-        vector<DaeBuilderOut> oblocks(1, static_cast<DaeBuilderOut>(oind));
+        vector<DaeBuilderIn> ib(1, static_cast<DaeBuilderIn>(iind));
+        vector<DaeBuilderOut> ob(1, static_cast<DaeBuilderOut>(oind));
 
         // Add other blocks that can be calculated with the same inputs
         // (typically cheap if forward mode used)
         for (int oind1=oind+1; oind1!=DAE_BUILDER_NUM_OUT; ++oind1) {
           if (wanted[oind1][iind]>=0) {
-            oblocks.push_back(static_cast<DaeBuilderOut>(oind1));
+            ob.push_back(static_cast<DaeBuilderOut>(oind1));
           }
         }
 
@@ -1921,28 +1948,129 @@ namespace casadi {
         for (int iind1=iind+1; iind1!=DAE_BUILDER_NUM_IN; ++iind1) {
           // Do we really want _all_ the input/output combinations?
           bool all_wanted = true;
-          for (int k=0; k<oblocks.size() && all_wanted; ++k) {
-            all_wanted = wanted[oblocks[k]][iind1]>=0;
+          for (int k=0; k<ob.size() && all_wanted; ++k) {
+            all_wanted = wanted[ob[k]][iind1]>=0;
           }
 
           // Add block(s)
           if (all_wanted) {
-            iblocks.push_back(static_cast<DaeBuilderIn>(iind1));
+            ib.push_back(static_cast<DaeBuilderIn>(iind1));
           }
         }
 
         // When we know which blocks we are interested in, we form the Jacobian
-        vector<MX> arg=input(iblocks), res=output(oblocks);
+        vector<MX> arg=input(ib), res=output(ob);
         MX J = jacobian(vertcat(res), vertcat(arg));
 
         // Divide into blocks and copy to output
         vector<vector<MX> > J_all = blocksplit(J, offset(res), offset(arg));
-        for (int ib=0; ib<iblocks.size(); ++ib) {
-          for (int ob=0; ob<oblocks.size(); ++ob) {
-            int& ind=wanted[oblocks[ob]][iblocks[ib]];
-            ret_out[ind] = J_all[ob][ib];
+        for (int ki=0; ki<ib.size(); ++ki) {
+          for (int ko=0; ko<ob.size(); ++ko) {
+            int& ind=wanted[ob[ko]][ib[ki]];
+            ret_out[ind] = J_all[ko][ki];
             assigned[ind] = true;
             ind = -1;
+          }
+        }
+      }
+    }
+
+    // For all linear combinations
+    for (std::map<std::string, MX>::const_iterator lin_comb_it=lin_comb_.begin();
+         lin_comb_it!=lin_comb_.end(); ++lin_comb_it) {
+      // Determine which Hessian blocks to generate
+      wanted.resize(DAE_BUILDER_NUM_IN);
+      fill(wanted.begin(), wanted.end(), vector<int>(DAE_BUILDER_NUM_IN, -1));
+      for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
+        if (assigned[i-s_out.begin()]) continue;
+
+        // Get operation
+        size_t pos = i->find('_');
+        if (pos>=i->size()) continue;
+        string s = i->substr(0, pos);
+        if (s!="hes") continue;
+
+        // Get expression to be differentiated
+        size_t pos1 = i->find('_', pos+1);
+        if (pos1>=i->size()) continue;
+        s = i->substr(pos+1, pos1-pos-1);
+        if (s!=lin_comb_it->first) continue;
+
+        // Get first derivative
+        pos = i->find('_', pos1+1);
+        if (pos>=i->size()) continue;
+        s = i->substr(pos1+1, pos-pos1-1);
+        DaeBuilderIn iind1 = inputEnum(s);
+        if (iind1==DAE_BUILDER_NUM_IN) continue;
+
+        // Get second derivative
+        s = i->substr(pos+1, string::npos);
+        DaeBuilderIn iind2 = inputEnum(s);
+        if (iind2==DAE_BUILDER_NUM_IN) continue;
+
+        // Check if duplicate
+        casadi_assert_message(wanted[iind1][iind2]==-1,
+                              "DaeBuilder::function: Duplicate Hessian " << *i);
+        wanted[iind1][iind2] = i-s_out.begin();
+      }
+
+      // Created wanted Hessian blocks
+      for (int iind1=0; iind1!=DAE_BUILDER_NUM_IN; ++iind1) {
+        for (int iind2=0; iind2!=DAE_BUILDER_NUM_IN; ++iind2) {
+          // Skip if not wanted
+          if (wanted[iind1][iind2]==-1) continue;
+
+          // List of blocks to be calculated together, starting with current
+          vector<DaeBuilderIn> ib1(1, static_cast<DaeBuilderIn>(iind1));
+          vector<DaeBuilderIn> ib2(1, static_cast<DaeBuilderIn>(iind2));
+
+          // Add other blocks vertically
+          for (int iind=iind1+1; iind!=DAE_BUILDER_NUM_IN; ++iind) {
+            if (wanted[iind][iind2]>=0 || wanted[iind2][iind]>=0) {
+              ib1.push_back(static_cast<DaeBuilderIn>(iind));
+            }
+          }
+
+          // Add other blocks horizontally
+          for (int iind=iind2+1; iind!=DAE_BUILDER_NUM_IN; ++iind) {
+            // Do we really want _all_ the blocks?
+            bool all_wanted = true;
+            for (int k=0; k<ib1.size() && all_wanted; ++k) {
+              all_wanted = wanted[ib1[k]][iind]>=0 || wanted[iind][ib1[k]]>=0;
+            }
+
+            // Add block(s)
+            if (all_wanted) {
+              ib2.push_back(static_cast<DaeBuilderIn>(iind));
+            }
+          }
+
+          // Symmetric or not?
+          bool symmetric=ib1.size()==ib2.size();
+          for (int i=0; symmetric && i<ib1.size(); ++i) symmetric=ib1[i]==ib2[i];
+
+          // Calculate blocks
+          vector<vector<MX> > H_all;
+          if (symmetric) {
+            vector<MX> arg=input(ib1);
+            MX H = hessian(lin_comb_it->second, vertcat(arg));
+            H_all = blocksplit(H, offset(arg), offset(arg));
+          } else {
+            vector<MX> arg1=input(ib1), arg2=input(ib2);
+            MX g = gradient(lin_comb_it->second, vertcat(arg1));
+            MX J = jacobian(g, vertcat(arg2));
+            H_all = blocksplit(J, offset(arg1), offset(arg2));
+          }
+          // Fetch the requested blocks
+          for (int k1=0; k1<ib1.size(); ++k1) {
+            for (int k2=0; k2<ib2.size(); ++k2) {
+              int& ind=wanted[ib1[k1]][ib2[k2]];
+              if (ind>=0) {
+                ret_out[ind] = H_all[k1][k2];
+                assigned[ind] = true;
+                ind = -1;
+              }
+            }
           }
         }
       }
