@@ -313,15 +313,6 @@ namespace casadi {
     MXFunction function(const std::string& fname,
                         const std::vector<std::string>& s_in,
                         const std::vector<std::string>& s_out) const;
-
-    /// Generate a file for numerical evaluation
-    void generate(const std::string& filename, const Dictionary& options=Dictionary());
-
-    /// Generate code for a particular function
-    static void generateFunction(const std::string& fname,
-                                 const std::vector<MX>& f_in, const std::vector<MX>& f_out,
-                                 CodeGenerator& g,
-                                 bool fwd=false, bool adj=false, bool foa=false);
     ///@}
 
     /// Get variable expression by name
