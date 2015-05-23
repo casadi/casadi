@@ -1283,16 +1283,11 @@ namespace casadi {
       arg = getSymbols(arg);
 
       // Form functions for cases
-      MXFunction f_true(arg, x_true);
-      f_true.setOption("name", "f_true");
-      f_true.init();
-      MXFunction f_false(arg, x_false);
-      f_false.setOption("name", "f_false");
-      f_false.init();
+      MXFunction f_true("f_true", arg, make_vector(x_true));
+      MXFunction f_false("f_false", arg, make_vector(x_false));
 
       // Form Switch
-      Switch sw(f_true, f_false);
-      sw.init();
+      Switch sw("if_else", f_true, f_false);
 
       // Call the Switch
       vector<MX> sw_arg;
@@ -1314,17 +1309,14 @@ namespace casadi {
       // Form functions for cases
       vector<Function> f(x.size());
       for (int k=0; k<x.size(); ++k) {
-        f[k] = MXFunction(arg, x[k]);
         stringstream ss;
         ss << "f_case" << k;
-        f[k].setOption("name", ss.str());
+        f[k] = MXFunction(ss.str(), arg, make_vector(x[k]));
       }
-      MXFunction f_default(arg, x_default);
-      f_default.setOption("name", "f_default");
+      MXFunction f_default("f_default", arg, make_vector(x_default));
 
       // Form Switch
-      Switch sw(f, f_default);
-      sw.init();
+      Switch sw("conditional", f, f_default);
 
       // Call the Switch
       vector<MX> sw_arg;

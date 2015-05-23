@@ -43,10 +43,12 @@ namespace casadi {
     Switch();
 
     /** \brief Constructor (generic switch) */
-    Switch(const std::vector<Function>& f, const Function& f_def);
+    Switch(const std::string& name, const std::vector<Function>& f,
+           const Function& f_def, const Dictionary& opts=Dictionary());
 
     /** \brief Constructor (if-else) */
-    Switch(const Function &f_true, const Function &f_false);
+    Switch(const std::string& name, const Function& f_true,
+           const Function& f_false, const Dictionary& opts=Dictionary());
 
     /** \brief  Access functions of the node */
     SwitchInternal* operator->();

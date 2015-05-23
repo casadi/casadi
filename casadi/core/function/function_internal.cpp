@@ -115,6 +115,7 @@ namespace casadi {
   void FunctionInternal::init() {
     verbose_ = getOption("verbose");
     regularity_check_ = getOption("regularity_check");
+    name_ = getOption("name").toString();
 
     // Warn for functions with too many inputs or outputs
     casadi_assert_warning(nIn()<10000, "Function " << getOption("name")

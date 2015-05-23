@@ -151,8 +151,9 @@ namespace casadi {
     if (!f_def_.isNull()) der_def = f_def_.derForward(nfwd);
 
     // New Switch for derivatives
-    Switch sw(der, der_def);
-    sw.init();
+    stringstream ss;
+    ss << "fwd" << nfwd << "_" << name_;
+    Switch sw(ss.str(), der, der_def);
 
     // Construct wrapper inputs and arguments for calling sw
     vector<MX> arg = symbolicInput();
@@ -192,8 +193,9 @@ namespace casadi {
     if (!f_def_.isNull()) der_def = f_def_.derReverse(nadj);
 
     // New Switch for derivatives
-    Switch sw(der, der_def);
-    sw.init();
+    stringstream ss;
+    ss << "adj" << nadj << "_" << name_;
+    Switch sw(ss.str(), der, der_def);
 
     // Construct wrapper inputs and arguments for calling sw
     vector<MX> arg = symbolicInput();

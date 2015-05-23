@@ -45,6 +45,47 @@ namespace casadi {
     // Helper functions
     inline const MatType& self() const { return static_cast<const MatType&>(*this); }
     inline MatType& self() { return static_cast<MatType&>(*this); }
+  public:
+    // Create vector with 1 element
+    inline friend std::vector<MatType> make_vector(const MatType& x0) {
+      return std::vector<MatType>(1, x0);
+    }
+
+    // Create vector with 2 elements
+    inline friend std::vector<MatType> make_vector(const MatType& x0, const MatType& x1) {
+      MatType x[] = {x0, x1};
+      return std::vector<MatType>(x, x+2);
+    }
+
+    // Create vector with 3 elements
+    inline friend std::vector<MatType> make_vector(const MatType& x0, const MatType& x1,
+                                                   const MatType& x2) {
+      MatType x[] = {x0, x1, x2};
+      return std::vector<MatType>(x, x+3);
+    }
+
+    // Create vector with 4 elements
+    inline friend std::vector<MatType> make_vector(const MatType& x0, const MatType& x1,
+                                                   const MatType& x2, const MatType& x3) {
+      MatType x[] = {x0, x1, x2, x3};
+      return std::vector<MatType>(x, x+4);
+    }
+
+    // Create vector with 5 elements
+    inline friend std::vector<MatType> make_vector(const MatType& x0, const MatType& x1,
+                                                   const MatType& x2, const MatType& x3,
+                                                   const MatType& x4) {
+      MatType x[] = {x0, x1, x2, x3, x4};
+      return std::vector<MatType>(x, x+5);
+    }
+
+    // Create vector with 6 elements
+    inline friend std::vector<MatType> make_vector(const MatType& x0, const MatType& x1,
+                                                   const MatType& x2, const MatType& x3,
+                                                   const MatType& x4, const MatType& x5) {
+      MatType x[] = {x0, x1, x2, x3, x4, x5};
+      return std::vector<MatType>(x, x+6);
+    }
 #endif // SWIG
   public:
 

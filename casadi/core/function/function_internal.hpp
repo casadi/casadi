@@ -456,6 +456,9 @@ namespace casadi {
     /// User-set field
     void* user_data_;
 
+    /// Name
+    std::string name_;
+
     bool monitor_inputs_, monitor_outputs_;
 
     /// Errors are thrown when NaN is produced
