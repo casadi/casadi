@@ -77,32 +77,43 @@ public:
   /** \brief  Attempt to form an MXFunction out of an Function */
   explicit MXFunction(const Function& function);
 
+  /** \brief Construct from vectors (new syntax, includes initialization) */
+  MXFunction(const std::string& name,
+             const std::vector<MX>& arg,
+             const std::vector<MX>& res,
+             const Dictionary& opts=Dictionary());
+
 #ifndef SWIG
-  /** \brief  Single input, single output */
-  MXFunction(const MX& arg, const MX& res);
-
-  /** \brief  Single input, multiple output */
-  MXFunction(const MX& arg, const std::vector<MX>& res);
-
-  /** \brief  Multiple input, single output */
-  MXFunction(const std::vector<MX>& arg, const MX& res);
-
 #ifdef USE_CXX11
-  /** \brief  Initializer lists */
-  MXFunction(std::initializer_list<MX> arg, std::initializer_list<MX> res);
+  /** \brief Construct from initializer lists (new syntax, includes initialization) */
+  MXFunction(const std::string& name,
+             std::initializer_list<MX> arg,
+             std::initializer_list<MX> res,
+             const Dictionary& opts=Dictionary());
 #endif // USE_CXX11
 #endif // SWIG
 
-  /** \brief  Multiple input, multiple output*/
+#ifndef SWIG
+  /** \brief  Single input, single output, no initialization (to be deprecated) */
+  MXFunction(const MX& arg, const MX& res);
+
+  /** \brief  Single input, multiple output, no initialization (to be deprecated) */
+  MXFunction(const MX& arg, const std::vector<MX>& res);
+
+  /** \brief  Multiple input, single output, no initialization (to be deprecated) */
+  MXFunction(const std::vector<MX>& arg, const MX& res);
+#endif // SWIG
+
+  /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
   MXFunction(const std::vector<MX>& arg, const std::vector<MX>& res);
 
-  /** \brief  Multiple input, multiple output*/
+  /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
   MXFunction(const std::vector<MX>& arg, const IOSchemeVector<MX>& res);
 
-  /** \brief  Multiple input, multiple output*/
+  /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
   MXFunction(const IOSchemeVector<MX>& arg, const std::vector<MX>& res);
 
-  /** \brief  Multiple input, multiple output*/
+  /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
   MXFunction(const IOSchemeVector<MX>& arg, const IOSchemeVector<MX>& res);
 
   /// \cond INTERNAL

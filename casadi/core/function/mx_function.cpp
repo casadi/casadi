@@ -81,9 +81,21 @@ namespace casadi {
     setOutputScheme(res.scheme);
   }
 
+  MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,
+                         const std::vector<MX>& res, const Dictionary& opts) {
+    assignNode(new MXFunctionInternal(arg, res));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
 #ifdef USE_CXX11
-  MXFunction::MXFunction(std::initializer_list<MX> arg, std::initializer_list<MX> res) {
+  MXFunction::MXFunction(const std::string& name, std::initializer_list<MX> arg,
+                         std::initializer_list<MX> res, const Dictionary& opts) {
     assignNode(new MXFunctionInternal(vector<MX>(arg), vector<MX>(res)));
+    setOption("name", name);
+    setOption(opts);
+    init();
   }
 #endif // USE_CXX11
 
