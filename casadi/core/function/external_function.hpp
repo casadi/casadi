@@ -30,44 +30,40 @@
 #include <string>
 
 namespace casadi {
-
-
 /** \brief  Forward declaration of internal class */
 class ExternalFunctionInternal;
 
-/** \brief  Interface for a function that is not implemented by CasADi symbolics
-  \author Joel Andersson
-  \date 2011
+  /** \brief  Interface for a function that is not implemented by CasADi symbolics
+      \author Joel Andersson
+      \date 2011-2015
   */
-class CASADI_EXPORT ExternalFunction : public Function {
+  class CASADI_EXPORT ExternalFunction : public Function {
+  public:
 
-public:
+    /** \brief  CONSTRUCTORS: */
+    /** \brief  default constructor */
+    ExternalFunction();
 
-/** \brief  CONSTRUCTORS: */
-/** \brief  default constructor */
-  ExternalFunction();
+    /** \brief  Load an external function 
+     * File name is assumed to be ./<f_name>.so
+     */
+    explicit ExternalFunction(const std::string& name, const Dictionary& opts=Dictionary());
 
-  /** \brief  Load an external function 
-   * File name is assumed to be ./<f_name>.so
-   */
-  explicit ExternalFunction(const std::string& name);
+    /** \brief  Load an external function 
+     * File name given
+     */
+    ExternalFunction(const std::string& name, const std::string& bin_name,
+                     const Dictionary& opts=Dictionary());
 
-  /** \brief  Load an external function 
-   * File name given
-   */
-  explicit ExternalFunction(const std::string& name,
-                            const std::string& bin_name);
+    /** \brief  Access functions of the node */
+    ExternalFunctionInternal* operator->();
 
-  /** \brief  Access functions of the node */
-  ExternalFunctionInternal* operator->();
+    /** \brief  Const access functions of the node */
+    const ExternalFunctionInternal* operator->() const;
 
-  /** \brief  Const access functions of the node */
-  const ExternalFunctionInternal* operator->() const;
-
-  /// Check if a particular cast is allowed
-  static bool testCast(const SharedObjectNode* ptr);
-
-};
+    /// Check if a particular cast is allowed
+    static bool testCast(const SharedObjectNode* ptr);
+  };
 
 } // namespace casadi
 
