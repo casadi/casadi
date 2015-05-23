@@ -280,9 +280,9 @@ namespace casadi {
 #ifndef SWIG
     ///@{
     /// Functor shorthand for evaluation, single argument (only C++)
-    std::vector<DMatrix> operator()(const DMatrix& arg0) { return operator()(toVector(arg0));}
-    std::vector<SX> operator()(const SX& arg0) { return operator()(toVector(arg0));}
-    std::vector<MX> operator()(const MX& arg0) { return operator()(toVector(arg0));}
+    std::vector<DMatrix> operator()(const DMatrix& arg0) { return operator()(make_vector(arg0));}
+    std::vector<SX> operator()(const SX& arg0) { return operator()(make_vector(arg0));}
+    std::vector<MX> operator()(const MX& arg0) { return operator()(make_vector(arg0));}
     ///@}
 #endif // SWIG
 

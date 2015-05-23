@@ -260,68 +260,6 @@ namespace casadi {
 
 #endif //SWIG
 
-  /** \brief Make a vector of a certain length with its entries specified
-  * Usage C++:
-  *   makeVector<ClassName>(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2, ...)
-  * Usage Python:
-  *   makeVector(ClassName,(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...)
-  */
-#ifndef SWIG
-  template<typename T>
-  std::vector<T> makeVector(int size,
-                            int ind0=-1, const T& val0=T(),
-                            int ind1=-1, const T& val1=T(),
-                            int ind2=-1, const T& val2=T(),
-                            int ind3=-1, const T& val3=T(),
-                            int ind4=-1, const T& val4=T(),
-                            int ind5=-1, const T& val5=T(),
-                            int ind6=-1, const T& val6=T(),
-                            int ind7=-1, const T& val7=T(),
-                            int ind8=-1, const T& val8=T(),
-                            int ind9=-1, const T& val9=T(),
-                            int ind10=-1, const T& val10=T(),
-                            int ind11=-1, const T& val11=T(),
-                            int ind12=-1, const T& val12=T(),
-                            int ind13=-1, const T& val13=T(),
-                            int ind14=-1, const T& val14=T(),
-                            int ind15=-1, const T& val15=T(),
-                            int ind16=-1, const T& val16=T(),
-                            int ind17=-1, const T& val17=T(),
-                            int ind18=-1, const T& val18=T(),
-                            int ind19=-1, const T& val19=T());
-#else // SWIG
-#ifdef SWIGPYTHON
-%pythoncode %{ #NOLINT(whitespace/braces)
- def makeVector(T, size, *elems):
-     assert len(elems) % 2 == 0, \
-         "The number of provided indices does not the number of provided values"
-     num_elem = len(elems)/2
-     ret = [T()]*size
-     for i in range(num_elem):
-         ind = elems[2*i]
-         val = elems[2*i+1]
-         ret[ind] = val
-     return ret
-%}
-#endif // SWIGPYTHON
-#endif // SWIG
-
-#ifndef SWIG
-  // Create a vector of length 1
-  template<typename T>
-  std::vector<T> toVector(const T& v0);
-
-  // Create a vector of length 2
-  template<typename T>
-  std::vector<T> toVector(const T& v0, const T& v1);
-
-  // Create a vector of length 3
-  template<typename T>
-  std::vector<T> toVector(const T& v0, const T& v1, const T& v2);
-
-#endif // SWIG
-
-
   /// Checks if vector does not contain NaN or Inf
   template<typename T>
   bool isRegular(const std::vector<T> &v);
