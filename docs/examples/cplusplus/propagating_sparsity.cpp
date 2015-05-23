@@ -66,7 +66,7 @@ int main(){
       cout << "MXFunction:" << endl;
       MX x = MX::sym("x",3);
       MX z = x[0]*x[0]+x[2] + 3;
-      f = MXFunction(x,z);
+      f = MXFunction(make_vector(x), make_vector(z));
     }
     f.init();
     

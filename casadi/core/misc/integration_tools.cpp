@@ -197,7 +197,7 @@ namespace casadi {
     ret_in[0] = x0;
     ret_in[1] = p;
     ret_in[2] = h;
-    MXFunction ret(ret_in, xf);
+    MXFunction ret(ret_in, make_vector(xf));
     ret.setOption("name", "F");
     ret.setInputScheme(IOScheme("x0", "p", "h"));
     ret.setOutputScheme(IOScheme("xf"));
@@ -301,13 +301,7 @@ namespace casadi {
     }
 
     // Root-finding function
-    std::vector<MX> rfp_in(4);
-    rfp_in[0] = v;
-    rfp_in[1] = x0;
-    rfp_in[2] = p;
-    rfp_in[3] = h;
-    Function rfp = MXFunction(rfp_in, vertcat(V_eq));
-    rfp.init();
+    MXFunction rfp("rfp", make_vector(v, x0, p, h), make_vector(vertcat(V_eq)));
 
     // Create a implicit function instance to solve the system of equations
     ImplicitFunction ifcn(solver, rfp);
@@ -315,14 +309,9 @@ namespace casadi {
     ifcn.init();
 
     // Get state at end time
-    std::vector<MX> ifcn_in(4), ifcn_out;
     MX xf = x0;
     for (int k=0; k<N; ++k) {
-      ifcn_in[0] = repmat(xf, order);
-      ifcn_in[1] = xf;
-      ifcn_in[2] = p;
-      ifcn_in[3] = h;
-      ifcn_out = ifcn(ifcn_in);
+      std::vector<MX> ifcn_out = ifcn(make_vector(repmat(xf, order), xf, p, h));
       x = vertsplit(ifcn_out[0], x0.size1());
 
       // State at end of step
@@ -333,11 +322,7 @@ namespace casadi {
     }
 
     // Form discrete-time dynamics
-    vector<MX> ret_in(3);
-    ret_in[0] = x0;
-    ret_in[1] = p;
-    ret_in[2] = h;
-    MXFunction ret(ret_in, xf);
+    MXFunction ret(make_vector(x0, p, h), make_vector(xf));
     ret.setOption("name", "F");
     ret.setInputScheme(IOScheme("x0", "p", "h"));
     ret.setOutputScheme(IOScheme("xf"));
@@ -391,11 +376,7 @@ namespace casadi {
     MX xf = ifcn(integratorIn("x0", x0, "p", vertcat(h, vec(p))))[INTEGRATOR_XF];
 
     // Form discrete-time dynamics
-    vector<MX> ret_in(3);
-    ret_in[0] = x0;
-    ret_in[1] = p;
-    ret_in[2] = h;
-    MXFunction ret(ret_in, xf);
+    MXFunction ret(make_vector(x0, p, h), make_vector(xf));
     ret.setOption("name", "F");
     ret.setInputScheme(IOScheme("x0", "p", "h"));
     ret.setOutputScheme(IOScheme("xf"));

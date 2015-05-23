@@ -48,18 +48,6 @@ namespace casadi {
     assignNode(temp->clone());
   }
 
-  MXFunction::MXFunction(const MX& arg, const MX& res) {
-    assignNode(new MXFunctionInternal(vector<MX>(1, arg), vector<MX>(1, res)));
-  }
-
-  MXFunction::MXFunction(const MX& arg, const std::vector<MX>& res) {
-    assignNode(new MXFunctionInternal(vector<MX>(1, arg), res));
-  }
-
-  MXFunction::MXFunction(const std::vector<MX>& arg, const MX& res) {
-    assignNode(new MXFunctionInternal(arg, vector<MX>(1, res)));
-  }
-
   MXFunction::MXFunction(const std::vector<MX>& arg, const std::vector<MX>& res) {
     assignNode(new MXFunctionInternal(arg, res));
   }
@@ -93,6 +81,22 @@ namespace casadi {
   MXFunction::MXFunction(const std::string& name, std::initializer_list<MX> arg,
                          std::initializer_list<MX> res, const Dictionary& opts) {
     assignNode(new MXFunctionInternal(vector<MX>(arg), vector<MX>(res)));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  MXFunction::MXFunction(const std::string& name, std::vector<MX> arg,
+                         std::initializer_list<MX> res, const Dictionary& opts) {
+    assignNode(new MXFunctionInternal(arg, vector<MX>(res)));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  MXFunction::MXFunction(const std::string& name, std::initializer_list<MX> arg,
+                         std::vector<MX> res, const Dictionary& opts) {
+    assignNode(new MXFunctionInternal(vector<MX>(arg), res));
     setOption("name", name);
     setOption(opts);
     init();

@@ -1938,7 +1938,7 @@ namespace casadi {
     // Form Jacobian
     MX J;
     {
-      MXFunction tmp(arg, res);
+      MXFunction tmp(make_vector(arg), make_vector(res));
       tmp.setOption("ad_weight", adWeight());
       tmp.init();
       J = tmp.jac();
@@ -1950,7 +1950,7 @@ namespace casadi {
     }
 
     // Form an expression for the full Jacobian
-    return MXFunction(ret_argv, J);
+    return MXFunction(ret_argv, make_vector(J));
   }
 
   void FunctionInternal::generateFunction(CodeGenerator& g,

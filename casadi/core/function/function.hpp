@@ -86,7 +86,6 @@ namespace casadi {
       \date 2010
   */
   class CASADI_EXPORT Function : public OptionsFunctionality, public IOInterface<Function>{
-
   public:
 
     /// \cond CLUTTER
@@ -579,6 +578,49 @@ namespace casadi {
       replaceAdjSeed(const std::vector<std::vector<M> >& aseed) const;
 #endif // SWIG
     /// \endcond
+
+#ifndef SWIG
+    // Create vector with 1 element
+    inline friend std::vector<Function> make_vector(const Function& x0) {
+      return std::vector<Function>(1, x0);
+    }
+
+    // Create vector with 2 elements
+    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1) {
+      Function x[] = {x0, x1};
+      return std::vector<Function>(x, x+2);
+    }
+
+    // Create vector with 3 elements
+    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1,
+                                                   const Function& x2) {
+      Function x[] = {x0, x1, x2};
+      return std::vector<Function>(x, x+3);
+    }
+
+    // Create vector with 4 elements
+    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1,
+                                                   const Function& x2, const Function& x3) {
+      Function x[] = {x0, x1, x2, x3};
+      return std::vector<Function>(x, x+4);
+    }
+
+    // Create vector with 5 elements
+    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1,
+                                                   const Function& x2, const Function& x3,
+                                                   const Function& x4) {
+      Function x[] = {x0, x1, x2, x3, x4};
+      return std::vector<Function>(x, x+5);
+    }
+
+    // Create vector with 6 elements
+    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1,
+                                                   const Function& x2, const Function& x3,
+                                                   const Function& x4, const Function& x5) {
+      Function x[] = {x0, x1, x2, x3, x4, x5};
+      return std::vector<Function>(x, x+6);
+    }
+#endif // SWIG
 
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;

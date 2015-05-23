@@ -90,18 +90,19 @@ public:
              std::initializer_list<MX> arg,
              std::initializer_list<MX> res,
              const Dictionary& opts=Dictionary());
+
+  /** \brief Construct from vector & initializer list (new syntax, includes initialization) */
+  MXFunction(const std::string& name,
+             std::vector<MX> arg,
+             std::initializer_list<MX> res,
+             const Dictionary& opts=Dictionary());
+
+  /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
+  MXFunction(const std::string& name,
+             std::initializer_list<MX> arg,
+             std::vector<MX> res,
+             const Dictionary& opts=Dictionary());
 #endif // USE_CXX11
-#endif // SWIG
-
-#ifndef SWIG
-  /** \brief  Single input, single output, no initialization (to be deprecated) */
-  MXFunction(const MX& arg, const MX& res);
-
-  /** \brief  Single input, multiple output, no initialization (to be deprecated) */
-  MXFunction(const MX& arg, const std::vector<MX>& res);
-
-  /** \brief  Multiple input, single output, no initialization (to be deprecated) */
-  MXFunction(const std::vector<MX>& arg, const MX& res);
 #endif // SWIG
 
   /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/

@@ -94,7 +94,7 @@ namespace casadi {
     std::vector<MX> v_in;
     v_in.push_back(As);
     v_in.push_back(Vs);
-    f_ = MXFunction(v_in, reshape(Pf, n_, n_));
+    f_ = MXFunction(v_in, make_vector(reshape(Pf, n_, n_)));
     f_.setInputScheme(SCHEME_CLEInput);
     f_.setOutputScheme(SCHEME_CLEOutput);
     f_.init();

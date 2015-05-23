@@ -1432,7 +1432,7 @@ namespace casadi {
   }
 
   int MX::zz_countNodes() const {
-    MXFunction f(vector<MX>(), *this);
+    MXFunction f(vector<MX>(), make_vector(*this));
     f.init();
     return f.countNodes();
   }
@@ -1804,21 +1804,21 @@ namespace casadi {
   }
 
   MX MX::zz_jacobian(const MX &arg) const {
-    MXFunction temp(arg, *this); // make a runtime
+    MXFunction temp(make_vector(arg), make_vector(*this)); // make a runtime
     temp.setOption("name", "helper_jacobian_MX");
     temp.init();
     return temp.jac();
   }
 
   MX MX::zz_gradient(const MX &arg) const {
-    MXFunction temp(arg, *this); // make a runtime
+    MXFunction temp(make_vector(arg), make_vector(*this)); // make a runtime
     temp.setOption("name", "helper_gradient_MX");
     temp.init();
     return temp.grad();
   }
 
   MX MX::zz_tangent(const MX &arg) const {
-    MXFunction temp(arg, *this); // make a runtime
+    MXFunction temp(make_vector(arg), make_vector(*this)); // make a runtime
     temp.setOption("name", "helper_tangent_MX");
     temp.init();
     return temp.tang();
@@ -1833,7 +1833,7 @@ namespace casadi {
   void MX::zz_hessian(const MX &arg, MX &H, MX &g) const {
     g = gradient(*this, arg);
 
-    MXFunction temp(arg, g); // make a runtime
+    MXFunction temp(make_vector(arg), make_vector(g)); // make a runtime
     temp.init();
     H = temp.jac(0, 0, false, true);
   }
@@ -1847,7 +1847,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::zz_getSymbols() const {
-    MXFunction f(std::vector<MX>(), *this);
+    MXFunction f(std::vector<MX>(), make_vector(*this));
     f.init();
     return f.getFree();
   }
@@ -1931,7 +1931,7 @@ namespace casadi {
     if (nnz()==0) return false;
 
     // Construct a temporary algorithm
-    MXFunction temp(arg, *this);
+    MXFunction temp(make_vector(arg), make_vector(*this));
     temp.init();
     temp.spInit(true);
 

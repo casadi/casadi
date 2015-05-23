@@ -121,12 +121,7 @@ int main(){
   }
 
   // Root-finding function, implicitly defines V as a function of X0 and P
-  vector<MX> vfcn_in;
-  vfcn_in.push_back(V);
-  vfcn_in.push_back(X0);
-  vfcn_in.push_back(P);
-  MXFunction vfcn(vfcn_in,V_eq);
-  vfcn.init();
+  MXFunction vfcn("vfcn", make_vector(V, X0, P), make_vector(V_eq));
   
   // Convert to SXFunction to decrease overhead
   SXFunction vfcn_sx(vfcn);
@@ -152,10 +147,8 @@ int main(){
   }
   
   // Get the discrete time dynamics
-  vector<MX> F_arg;
-  F_arg.push_back(X0);
-  F_arg.push_back(P);
-  MXFunction F(F_arg,XF);
+  vector<MX> F_arg = make_vector(X0, P);
+  MXFunction F(F_arg, make_vector(XF));
   F.init();
 
   // Do this iteratively for all finite elements
