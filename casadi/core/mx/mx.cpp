@@ -1921,9 +1921,7 @@ namespace casadi {
 
   MX MX::zz_nullspace() const {
     SX n = SX::sym("A", sparsity());
-    SXFunction f(n, nullspace(n));
-    f.setOption("name", "nullspace");
-    f.init();
+    SXFunction f("nullspace", make_vector(n), make_vector(nullspace(n)));
     return f(*this).at(0);
   }
 

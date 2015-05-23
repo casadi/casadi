@@ -86,6 +86,69 @@ namespace casadi {
       MatType x[] = {x0, x1, x2, x3, x4, x5};
       return std::vector<MatType>(x, x+6);
     }
+
+    // Assign 1 element from a vector
+    template<typename T0>
+      inline friend void assign_vector(T0& x0,
+                                       const std::vector<MatType>& x) {
+      casadi_assert(x.size()==1);
+      x[0].get(x0);
+    }
+
+    // Assign 2 elements from a vector
+    template<typename T0, typename T1>
+      inline friend void assign_vector(T0& x0, T1& x1,
+                                       const std::vector<MatType>& x) {
+      casadi_assert(x.size()==2);
+      x[0].get(x0);
+      x[1].get(x1);
+    }
+
+    // Assign 3 elements from a vector
+    template<typename T0, typename T1, typename T2>
+      inline friend void assign_vector(T0& x0, T1& x1, T2& x2,
+                                       const std::vector<MatType>& x) {
+      casadi_assert(x.size()==3);
+      x[0].get(x0);
+      x[1].get(x1);
+      x[2].get(x2);
+    }
+
+    // Assign 4 elements from a vector
+    template<typename T0, typename T1, typename T2, typename T3>
+      inline friend void assign_vector(T0& x0, T1& x1, T2& x2, T3& x3,
+                                       const std::vector<MatType>& x) {
+      casadi_assert(x.size()==4);
+      x[0].get(x0);
+      x[1].get(x1);
+      x[2].get(x2);
+      x[3].get(x3);
+    }
+
+    // Assign 5 elements from a vector
+    template<typename T0, typename T1, typename T2, typename T3, typename T4>
+      inline friend void assign_vector(T0& x0, T1& x1, T2& x2, T3& x3, T4& x4,
+                                       const std::vector<MatType>& x) {
+      casadi_assert(x.size()==5);
+      x[0].get(x0);
+      x[1].get(x1);
+      x[2].get(x2);
+      x[3].get(x3);
+      x[4].get(x4);
+    }
+
+    // Assign 6 elements from a vector
+    template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
+      inline friend void assign_vector(T0& x0, T1& x1, T2& x2, T3& x3, T4& x4, T5& x5,
+                                       const std::vector<MatType>& x) {
+      casadi_assert(x.size()==6);
+      x[0].get(x0);
+      x[1].get(x1);
+      x[2].get(x2);
+      x[3].get(x3);
+      x[4].get(x4);
+      x[5].get(x5);
+    }
 #endif // SWIG
   public:
 

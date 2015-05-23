@@ -86,6 +86,18 @@ namespace casadi {
                std::initializer_list<SX> arg,
                std::initializer_list<SX> res,
                const Dictionary& opts=Dictionary());
+
+    /** \brief Construct from vector & nitializer list (new syntax, includes initialization) */
+    SXFunction(const std::string& name,
+               std::vector<SX> arg,
+               std::initializer_list<SX> res,
+               const Dictionary& opts=Dictionary());
+
+    /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
+    SXFunction(const std::string& name,
+               std::initializer_list<SX> arg,
+               std::vector<SX> res,
+               const Dictionary& opts=Dictionary());
 #endif // USE_CXX11
 #endif // SWIG
 
@@ -123,17 +135,6 @@ namespace casadi {
     
     */
     SXFunction(const IOSchemeVector<SX>& arg, const IOSchemeVector<SX>& res);
-
-#ifndef SWIG
-    /// Single input, single output, no initialization (to be deprecated)
-    SXFunction(const SX& arg, const SX& res);
-
-    /// Multiple input, single output, no initialization (to be deprecated)
-    SXFunction(const std::vector<SX>& arg, const SX& res);
-
-    /// Single input, multiple output, no initialization (to be deprecated)
-    SXFunction(const SX& arg, const std::vector<SX>& res);
-#endif // SWIG
 
 /// \cond INTERNAL
     /// Access functions of the node

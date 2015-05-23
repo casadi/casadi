@@ -121,17 +121,8 @@ int main(){
 
   // Get the state trajectory
   vector<double> sopt(nu), vopt(nu), mopt(nu);
-  vector<SX> xfcn_out(3);
-  xfcn_out[0] = s_traj;
-  xfcn_out[1] = v_traj;
-  xfcn_out[2] = m_traj;
-  SXFunction xfcn(u,xfcn_out);
-  xfcn.init();
-  xfcn.setInput(uopt);
-  xfcn.evaluate();
-  xfcn.getOutput(sopt,0);
-  xfcn.getOutput(vopt,1);
-  xfcn.getOutput(mopt,2);
+  SXFunction xfcn("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
+  assign_vector(sopt, vopt, mopt, xfcn(make_vector(DMatrix(uopt))));
   cout << "position: " << sopt << endl;
   cout << "velocity: " << vopt << endl;
   cout << "mass:     " << mopt << endl;

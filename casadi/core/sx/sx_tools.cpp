@@ -34,16 +34,14 @@ using namespace std;
 namespace casadi {
 
   Matrix<double> evalf(const SX &ex, const SX &v, const Matrix<double> &vdef) {
-    SXFunction fcn(v, ex);
-    fcn.init();
-    fcn.setInput(vdef, 0);
+    SXFunction fcn("tmp", make_vector(v), make_vector(ex));
+    fcn.setInput(vdef);
     fcn.evaluate();
     return fcn.output();
   }
 
-  Matrix<double> evalf(const SX &ex) {
-    SXFunction fcn(std::vector< SX >(0), ex);
-    fcn.init();
+  Matrix<double> evalf(const SX& ex) {
+    SXFunction fcn("tmp", std::vector<SX>(), make_vector(ex));
     fcn.evaluate();
     return fcn.output();
   }

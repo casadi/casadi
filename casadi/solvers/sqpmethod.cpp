@@ -204,8 +204,7 @@ namespace casadi {
       bfgs_in[BFGS_X_OLD] = x_old;
       bfgs_in[BFGS_GLAG] = gLag;
       bfgs_in[BFGS_GLAG_OLD] = gLag_old;
-      bfgs_ = SXFunction(bfgs_in, Bk_new);
-      bfgs_.init();
+      bfgs_ = SXFunction("bfgs", bfgs_in, make_vector(Bk_new));
 
       // Initial Hessian approximation
       B_init_ = DMatrix::eye(nx_);

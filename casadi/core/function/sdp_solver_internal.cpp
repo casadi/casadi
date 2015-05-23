@@ -117,13 +117,14 @@ void SdpSolverInternal::init() {
   }
 
   // Make a mapping function from dense blocks to inversely-permuted block diagonal P
-  std::vector< SX > full_blocks;
+  std::vector<SX> full_blocks;
   for (int i=0;i<nb_;++i) {
     full_blocks.push_back(SX::sym("block", block_sizes_[i], block_sizes_[i]));
   }
 
-  Pmapper_ = SXFunction(full_blocks, diagcat(full_blocks)(lookupvector(p, p.size()),
-                                                         lookupvector(p, p.size())));
+  Pmapper_ = SXFunction(full_blocks,
+                        make_vector(diagcat(full_blocks)(lookupvector(p, p.size()),
+                                                         lookupvector(p, p.size()))));
   Pmapper_.init();
 
   if (nb_>0) {

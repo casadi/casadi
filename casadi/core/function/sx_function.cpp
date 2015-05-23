@@ -42,10 +42,6 @@ namespace casadi {
   SXFunction::SXFunction() {
   }
 
-  SXFunction::SXFunction(const SX& arg, const SX& res) {
-    assignNode(new SXFunctionInternal(vector<SX>(1, arg), vector<SX>(1, res)));
-  }
-
   SXFunction::SXFunction(const vector<SX>& arg, const vector<SX>& res) {
     assignNode(new SXFunctionInternal(arg, res));
   }
@@ -66,14 +62,6 @@ namespace casadi {
     setOutputScheme(res.scheme);
   }
 
-  SXFunction::SXFunction(const vector<SX>& arg, const SX& res) {
-    assignNode(new SXFunctionInternal(arg, vector<SX>(1, res)));
-  }
-
-  SXFunction::SXFunction(const SX& arg, const std::vector<SX>& res) {
-    assignNode(new SXFunctionInternal(vector<SX>(1, arg), res));
-  }
-
   SXFunction::SXFunction(const std::string& name, const std::vector<SX>& arg,
                          const std::vector<SX>& res, const Dictionary& opts) {
     assignNode(new SXFunctionInternal(arg, res));
@@ -86,6 +74,22 @@ namespace casadi {
   SXFunction::SXFunction(const std::string& name, std::initializer_list<SX> arg,
                          std::initializer_list<SX> res, const Dictionary& opts) {
     assignNode(new SXFunctionInternal(vector<SX>(arg), vector<SX>(res)));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  SXFunction::SXFunction(const std::string& name, std::vector<SX> arg,
+                         std::initializer_list<SX> res, const Dictionary& opts) {
+    assignNode(new SXFunctionInternal(arg, vector<SX>(res)));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  SXFunction::SXFunction(const std::string& name, std::initializer_list<SX> arg,
+                         std::vector<SX> res, const Dictionary& opts) {
+    assignNode(new SXFunctionInternal(vector<SX>(arg), res));
     setOption("name", name);
     setOption(opts);
     init();

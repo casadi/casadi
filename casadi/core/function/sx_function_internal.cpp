@@ -142,9 +142,10 @@ namespace casadi {
     if (verbose())  cout << "SXFunctionInternal::hess: calculating gradient done " << endl;
 
     // Create function
-    SXFunction gfcn(inputv_.at(iind), g);
-    gfcn.setOption("verbose", getOption("verbose"));
-    gfcn.init();
+    Dictionary opts;
+    opts["verbose"] = getOption("verbose");
+    SXFunction gfcn("gfcn", make_vector(inputv_.at(iind)),
+                    make_vector(g), opts);
 
     // Calculate jacobian of gradient
     if (verbose()) {
@@ -910,7 +911,7 @@ namespace casadi {
 
   Function SXFunctionInternal::getFullJacobian() {
     SX J = casadi::jacobian(veccat(outputv_), veccat(inputv_));
-    return SXFunction(inputv_, J);
+    return SXFunction(inputv_, make_vector(J));
   }
 
 

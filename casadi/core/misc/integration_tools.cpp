@@ -232,8 +232,7 @@ namespace casadi {
         }
       }
 
-      SXFunction lfcn(tau, L);
-      lfcn.init();
+      SXFunction lfcn("lfcn", make_vector(tau), make_vector(L));
 
       // Evaluate the polynomial at the final time to get the
       // coefficients of the continuity equation

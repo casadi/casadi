@@ -870,8 +870,7 @@ namespace casadi {
   template<>
   bool SX::isSmooth() const {
     // Make a function
-    SXFunction temp(SX(), *this);
-    temp.init();
+    SXFunction temp("temp", make_vector(SX()), make_vector(*this));
 
     // Run the function on the temporary variable
     return temp->isSmooth();
@@ -1185,8 +1184,7 @@ namespace casadi {
       SX q1 = (b-a)/2;
       SX q2 = (b+a)/2;
 
-      SXFunction fcn(x, f);
-      fcn.init();
+      SXFunction fcn("gauss_quadrature", make_vector(x), make_vector(f));
 
       return q1*gauss_quadrature(fcn(q1*x+q2).at(0), x, -1, 1);
     }
@@ -1208,7 +1206,7 @@ namespace casadi {
     wi.push_back((322-13*sqrt(70.0))/900.0);
 
     // Evaluate at the Gauss points
-    SXFunction fcn(x, f);
+    SXFunction fcn(make_vector(x), make_vector(f));
     vector<SXElement> f_val(5);
     for (int i=0; i<5; ++i)
       f_val[i] = fcn(SX(xi[i])).at(0).toScalar();
@@ -1368,8 +1366,7 @@ namespace casadi {
     if (nnz()==0) return false;
 
     // Construct a temporary algorithm
-    SXFunction temp(arg, *this);
-    temp.init();
+    SXFunction temp("temp", make_vector(arg), make_vector(*this));
     temp.spInit(true);
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());
@@ -1389,22 +1386,19 @@ namespace casadi {
 
   template<>
   SX SX::zz_jacobian(const SX &arg) const {
-    SXFunction temp(arg, *this); // make a runtime
-    temp.init();
+    SXFunction temp("temp", make_vector(arg), make_vector(*this)); // make a runtime
     return temp.jac();
   }
 
   template<>
   SX SX::zz_gradient(const SX &arg) const {
-    SXFunction temp(arg, *this); // make a runtime
-    temp.init();
+    SXFunction temp("temp", make_vector(arg), make_vector(*this)); // make a runtime
     return temp.grad();
   }
 
   template<>
   SX SX::zz_tangent(const SX &arg) const {
-    SXFunction temp(arg, *this); // make a runtime
-    temp.init();
+    SXFunction temp("temp", make_vector(arg), make_vector(*this)); // make a runtime
     return temp.tang();
   }
 
@@ -1419,15 +1413,13 @@ namespace casadi {
   void SX::zz_hessian(const SX &arg, SX &H, SX &g) const {
     g = gradient(*this, arg);
 
-    SXFunction temp(arg, g); // make a runtime
-    temp.init();
+    SXFunction temp("temp", make_vector(arg), make_vector(g)); // make a runtime
     H = temp.jac(0, 0, false, true);
   }
 
   template<>
   SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v, bool transpose_jacobian) const {
-    SXFunction f(arg, *this);
-    f.init();
+    SXFunction f("tmp", make_vector(arg), make_vector(*this));
 
     // Split up v
     vector<SX> vv = horzsplit(v);
@@ -1537,8 +1529,7 @@ namespace casadi {
 
   template<>
   int SX::zz_countNodes() const {
-    SXFunction f(SX(), *this);
-    f.init();
+    SXFunction f("tmp", make_vector(SX()), make_vector(*this));
     return f.countNodes();
   }
 
@@ -1557,9 +1548,8 @@ namespace casadi {
 
   template<>
   std::vector<SX> SX::zz_getSymbols() const {
-    SXFunction f(std::vector<SX>(), *this);
-    f.init();
-    return std::vector<SX>(1, f.getFree());
+    SXFunction f("tmp", std::vector<SX>(), make_vector(*this));
+    return make_vector(f.getFree());
   }
 
   template<>
@@ -1695,15 +1685,14 @@ namespace casadi {
 
 
   template<>
-  SX SX::zz_poly_coeff(const SX&x) const {
+  SX SX::zz_poly_coeff(const SX& x) const {
     casadi_assert(isScalar());
     casadi_assert(x.isScalar());
     casadi_assert(x.isSymbolic());
 
     SX ret;
 
-    SXFunction f(x, *this);
-    f.init();
+    SXFunction f("tmp", make_vector(x), make_vector(*this));
     int mult = 1;
     bool success = false;
     for (int i=0;i<1000;++i) {
@@ -1713,8 +1702,7 @@ namespace casadi {
         success = true;
         break;
       }
-      f = SXFunction(x, j);
-      f.init();
+      f = SXFunction("tmp", make_vector(x), make_vector(j));
       mult*=i+1;
     }
 

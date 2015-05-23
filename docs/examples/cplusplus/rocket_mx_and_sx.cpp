@@ -53,22 +53,11 @@ Function create_integrator(int nj, int nu){
   }
 
   // State vector
-  SX x, x0;
-  x.append(s);
-  x.append(v);
-  x.append(m);
-  x0.append(s0);
-  x0.append(v0);
-  x0.append(m0);
+  SX x = vertcat(make_vector(s, v, m));
+  SX x0 = vertcat(make_vector(s0, v0, m0));
 
   // Integrator
-  vector<SX> input(2);
-  input[0] = u;
-  input[1] = x0;
-  SX output = x;
-  SXFunction integrator(input,output);
-  integrator.init();
-
+  SXFunction integrator("integrator", make_vector(u, x0), make_vector(x));
   return integrator;
 }
 

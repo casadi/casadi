@@ -104,7 +104,7 @@ namespace casadi {
     // Generate the QR factorization function
     vector<SX> QR(2);
     qr(Aperm, QR[0], QR[1]);
-    SXFunction fact_fcn(A, QR);
+    SXFunction fact_fcn("QR_fact", make_vector(A), QR);
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -115,10 +115,6 @@ namespace casadi {
     } else {
       fact_fcn_ = fact_fcn;
     }
-
-    // Initialize factorization function
-    fact_fcn_.setOption("name", "QR_fact");
-    fact_fcn_.init();
 
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", QR[0].sparsity());
@@ -138,11 +134,8 @@ namespace casadi {
     SX x = xperm(inv_colperm, ALL);
 
     // Generate the QR solve function
-    vector<SX> solv_in(3);
-    solv_in[0] = Q;
-    solv_in[1] = R;
-    solv_in[2] = b;
-    SXFunction solv_fcn(solv_in, x);
+    vector<SX> solv_in = make_vector(Q, R, b);
+    SXFunction solv_fcn("QR_solv", solv_in, make_vector(x));
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -152,10 +145,6 @@ namespace casadi {
     } else {
       solv_fcn_N_ = solv_fcn;
     }
-
-    // Initialize solve function
-    solv_fcn_N_.setOption("name", "QR_solv");
-    solv_fcn_N_.init();
 
     // Solve transposed
     // We have (Pb' * Q * R * Px)' * x = b
@@ -172,7 +161,7 @@ namespace casadi {
     x = xperm(inv_rowperm, ALL);
 
     // Mofify the QR solve function
-    solv_fcn = SXFunction(solv_in, x);
+    solv_fcn = SXFunction("QR_solv_T", solv_in, make_vector(x));
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -182,10 +171,6 @@ namespace casadi {
     } else {
       solv_fcn_T_ = solv_fcn;
     }
-
-    // Initialize solve function
-    solv_fcn_T_.setOption("name", "QR_solv_T");
-    solv_fcn_T_.init();
 
     // Allocate storage for QR factorization
     Q_ = DMatrix::zeros(Q.sparsity());
