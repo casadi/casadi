@@ -73,16 +73,32 @@ namespace casadi {
     /// Expand an Function
     explicit SXFunction(const Function &f);
 
-    /// Multiple (matrix valued) input, multiple (matrix valued) output
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name,
+               const std::vector<SX>& arg,
+               const std::vector<SX>& res,
+               const Dictionary& opts=Dictionary());
+
+#ifndef SWIG
+#ifdef USE_CXX11
+    /** \brief Construct from initializer lists (new syntax, includes initialization) */
+    SXFunction(const std::string& name,
+               std::initializer_list<SX> arg,
+               std::initializer_list<SX> res,
+               const Dictionary& opts=Dictionary());
+#endif // USE_CXX11
+#endif // SWIG
+
+    /// Multiple input, multiple output, no initialization (to be deprecated)
     SXFunction(const std::vector<SX>& arg, const std::vector<SX>& res);
 
-    /// Multiple (matrix valued) input, multiple (matrix valued) output
+    /// Multiple input, multiple  output, no initialization (to be deprecated)
     SXFunction(const std::vector<SX>& arg, const IOSchemeVector<SX>& res);
 
-    /// Multiple (matrix valued) input, multiple (matrix valued) output
+    /// Multiple input, multiple output, no initialization (to be deprecated)
     SXFunction(const IOSchemeVector<SX>& arg, const std::vector<SX>& res);
 
-    /** \brief Multiple (matrix valued) input, multiple (matrix valued) output
+    /** \brief Multiple input, multiple output, no initialization (to be deprecated)
     
     \doctest
     X = SX.sym("X")
@@ -109,19 +125,14 @@ namespace casadi {
     SXFunction(const IOSchemeVector<SX>& arg, const IOSchemeVector<SX>& res);
 
 #ifndef SWIG
-    /// Single (scalar/matrix/vector valued) input, single (scalar/matrix/vector valued) output
+    /// Single input, single output, no initialization (to be deprecated)
     SXFunction(const SX& arg, const SX& res);
 
-    /// Multiple (matrix valued) input, single (scalar/vector/matrix valued) output
+    /// Multiple input, single output, no initialization (to be deprecated)
     SXFunction(const std::vector<SX>& arg, const SX& res);
 
-    /// Single (scalar/vector/matrix valued) input, multiple (matrix valued) output
+    /// Single input, multiple output, no initialization (to be deprecated)
     SXFunction(const SX& arg, const std::vector<SX>& res);
-
-#ifdef USE_CXX11
-    /** \brief  Initializer lists */
-    SXFunction(std::initializer_list<SX> arg, std::initializer_list<SX> res);
-#endif // USE_CXX11
 #endif // SWIG
 
 /// \cond INTERNAL

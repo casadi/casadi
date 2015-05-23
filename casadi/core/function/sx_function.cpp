@@ -74,9 +74,21 @@ namespace casadi {
     assignNode(new SXFunctionInternal(vector<SX>(1, arg), res));
   }
 
+  SXFunction::SXFunction(const std::string& name, const std::vector<SX>& arg,
+                         const std::vector<SX>& res, const Dictionary& opts) {
+    assignNode(new SXFunctionInternal(arg, res));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
 #ifdef USE_CXX11
-  SXFunction::SXFunction(std::initializer_list<SX> arg, std::initializer_list<SX> res) {
+  SXFunction::SXFunction(const std::string& name, std::initializer_list<SX> arg,
+                         std::initializer_list<SX> res, const Dictionary& opts) {
     assignNode(new SXFunctionInternal(vector<SX>(arg), vector<SX>(res)));
+    setOption("name", name);
+    setOption(opts);
+    init();
   }
 #endif // USE_CXX11
 
