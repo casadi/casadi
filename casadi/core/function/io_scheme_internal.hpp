@@ -72,8 +72,7 @@ class CASADI_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
   public:
 
     /// Default constructor
-    IOSchemeCustomInternal(const std::vector<std::string> &entries,
-                           const std::vector<std::string> &descriptions=std::vector<std::string>());
+    IOSchemeCustomInternal(const std::vector<std::string>& data);
 
     /// Name of the scheme
     virtual std::string name() const;
@@ -103,12 +102,12 @@ class CASADI_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
     virtual void repr(std::ostream &stream=std::cout) const;
 
     /// Clone
-    virtual IOSchemeCustomInternal* clone() const
-    { return new IOSchemeCustomInternal(entries_, descriptions_); }
+    virtual IOSchemeCustomInternal* clone() const {
+      return new IOSchemeCustomInternal(data_);
+    }
 
   private:
-    std::vector<std::string> entries_;
-    std::vector<std::string> descriptions_;
+    std::vector<std::string> data_;
 };
 
 

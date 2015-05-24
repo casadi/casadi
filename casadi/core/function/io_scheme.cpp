@@ -33,19 +33,27 @@ namespace casadi {
 
   IOScheme::IOScheme(InputOutputScheme scheme) {
     int sz = getSchemeSize(scheme);
-    std::vector<std::string> entries(sz);
-    std::vector<std::string> descriptions(sz);
+    std::vector<std::string> data(sz);
     for (int i=0; i<sz; ++i) {
-      entries[i] = getSchemeEntryName(scheme, i);
-      descriptions[i] = getSchemeEntryEnumName(scheme, i)
+      data[i] = getSchemeEntryName(scheme, i) + ":"
+        + getSchemeEntryEnumName(scheme, i)
         + " aka '" + getSchemeEntryName(scheme, i) + "'";
     }
-    assignNode(new IOSchemeCustomInternal(entries, descriptions));
+    assignNode(new IOSchemeCustomInternal(data));
   }
 
-  IOScheme::IOScheme(const std::vector<std::string> &entries,
-                     const std::vector<std::string> &descriptions) {
-    assignNode(new IOSchemeCustomInternal(entries, descriptions));
+  IOScheme::IOScheme(const std::vector<std::string>& entries,
+                     const std::vector<std::string>& descriptions) {
+    if (descriptions.empty()) {
+      assignNode(new IOSchemeCustomInternal(entries));
+    } else {
+      casadi_assert(entries.size()==descriptions.size());
+      std::vector<std::string> data=entries;
+      for (size_t i=0; i!=entries.size(); ++i) {
+        data[i] += ":" + descriptions[i];
+      }
+      assignNode(new IOSchemeCustomInternal(data));
+    }
   }
 
   IOScheme::IOScheme(

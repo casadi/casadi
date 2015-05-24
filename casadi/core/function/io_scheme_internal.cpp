@@ -29,12 +29,8 @@ using namespace std;
 
 namespace casadi {
 
-    IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string> &entries,
-                                                   const std::vector<std::string> &descriptions) :
-        entries_(entries), descriptions_(descriptions)  {
-      if (descriptions_.empty())
-        descriptions_.resize(entries.size());
-      casadi_assert(descriptions_.size()==entries.size());
+    IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string>& data) :
+      data_(data) {
     }
 
     std::string IOSchemeCustomInternal::name() const {
@@ -43,18 +39,20 @@ namespace casadi {
 
     std::string IOSchemeCustomInternal::entryNames() const {
       std::stringstream ss;
-      for (int i=0;i<entries_.size();++i) {
+      for (int i=0; i<data_.size();++i) {
          if (i!=0) ss << ", ";
-         ss << entries_[i];
+         size_t col = data_[i].find(':');
+         ss << data_[i].substr(0, col);
       }
       return ss.str();
     }
 
     std::string IOSchemeCustomInternal::entry(int i) const {
-      casadi_assert_message(i>=0 && i<entries_.size(),
+      casadi_assert_message(i>=0 && i<data_.size(),
                             "customIO::entry(): requesting entry for index " << i
-                            << ", but IOScheme is only length " << entries_.size());
-      return entries_[i];
+                            << ", but IOScheme is only length " << data_.size());
+      size_t col = data_[i].find(':');
+      return data_[i].substr(0, col);
     }
 
     std::string IOSchemeCustomInternal::entryEnum(int i) const {
@@ -62,18 +60,16 @@ namespace casadi {
     }
 
     std::string IOSchemeCustomInternal::describe(int i) const {
-      if (descriptions_[i].empty()) {
-        return entry(i);
-      }  else {
-        std::stringstream ss;
-        ss << entry(i) <<  " '" << descriptions_[i] << "'";
-        return ss.str();
-      }
+      casadi_assert_message(i>=0 && i<data_.size(),
+                            "customIO::entry(): requesting entry for index " << i
+                            << ", but IOScheme is only length " << data_.size());
+      return data_[i];
     }
 
     int IOSchemeCustomInternal::index(const std::string &name) const {
-      for (vector<string>::const_iterator i=entries_.begin(); i!=entries_.end(); ++i) {
-        if (name==*i) return i-entries_.begin();
+      for (vector<string>::const_iterator i=data_.begin(); i!=data_.end(); ++i) {
+        size_t col = i->find(':');
+        if (i->compare(0, col, name)==0) return i-data_.begin();
       }
       casadi_error("customIO::index(): entry '" << name
                    << "' not available. Available entries are " << entryNames());
@@ -81,7 +77,7 @@ namespace casadi {
     }
 
     int IOSchemeCustomInternal::size() const {
-      return entries_.size();
+      return data_.size();
     }
 
     void IOSchemeCustomInternal::print(std::ostream &stream) const {
