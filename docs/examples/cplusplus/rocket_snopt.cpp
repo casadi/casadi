@@ -122,12 +122,7 @@ int main(){
 
   // Get the state trajectory
   vector<double> sopt(nu), vopt(nu), mopt(nu);
-  vector<SX> xfcn_out(3);
-  xfcn_out[0] = s_traj;
-  xfcn_out[1] = v_traj;
-  xfcn_out[2] = m_traj;
-  SXFunction xfcn(u,xfcn_out);
-  xfcn.init();
+  SXFunction xfcn("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
   xfcn.setInput(uopt);
   xfcn.evaluate();
   xfcn.getOutput(sopt,0);
