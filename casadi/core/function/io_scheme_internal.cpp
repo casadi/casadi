@@ -32,10 +32,8 @@ namespace casadi {
     IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string> &entries,
                                                    const std::vector<std::string> &descriptions) :
         entries_(entries), descriptions_(descriptions)  {
-      for (int i=0;i<entries.size();++i) {
-        entrymap_[entries[i]] = i;
-      }
-      if (descriptions_.empty())  descriptions_.resize(entries.size());
+      if (descriptions_.empty())
+        descriptions_.resize(entries.size());
       casadi_assert(descriptions_.size()==entries.size());
     }
 
@@ -74,10 +72,12 @@ namespace casadi {
     }
 
     int IOSchemeCustomInternal::index(const std::string &name) const {
-      std::map<std::string, int>::const_iterator it = entrymap_.find(name);
-      casadi_assert_message(it!=entrymap_.end(), "customIO::index(): entry '" << name
-                            << "' not available. Available entries are " << entryNames());
-      return it->second;
+      for (vector<string>::const_iterator i=entries_.begin(); i!=entries_.end(); ++i) {
+        if (name==*i) return i-entries_.begin();
+      }
+      casadi_error("customIO::index(): entry '" << name
+                   << "' not available. Available entries are " << entryNames());
+      return -1;
     }
 
     int IOSchemeCustomInternal::size() const {

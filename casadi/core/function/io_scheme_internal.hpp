@@ -109,7 +109,6 @@ class CASADI_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
   private:
     std::vector<std::string> entries_;
     std::vector<std::string> descriptions_;
-    std::map<std::string, int> entrymap_;
 };
 
 
