@@ -112,10 +112,17 @@ namespace casadi {
     LpSolver();
 
     /** \brief Constructor
-     *  \param name \pluginargument{LpSolver}
+     *  \param solver \pluginargument{LpSolver}
      *  \param st \structargument{LP}
      */
-    LpSolver(const std::string& name, const LPStructure& st);
+    LpSolver(const std::string& name, const std::string& solver,
+             const LPStructure& st, const Dictionary& opts=Dictionary());
+
+    /** \brief Constructor
+     *  \param solver \pluginargument{LpSolver}
+     *  \param st \structargument{LP}
+     */
+    LpSolver(const std::string& solver, const LPStructure& st);
 
     /// Access functions of the node
     LpSolverInternal* operator->();
