@@ -96,11 +96,18 @@ namespace casadi {
     /// Clone
     DpleSolver clone() const;
 
-    /** \brief DpleSolver solver factory
-    * \param solver \pluginargument{DpleSolver}
-    * \param st \structargument{Dple}
-    */
-    DpleSolver(const std::string& solver, const DpleStructure & st);
+    /** \brief Constructor (new syntax, includes initialization)
+     * \param solver \pluginargument{DpleSolver}
+     * \param st \structargument{Dple}
+     */
+    DpleSolver(const std::string& name, const std::string& solver,
+               const DpleStructure& st, const Dictionary& opts=Dictionary());
+
+    /** \brief Constructor (no initialization, to be deprecated)
+     * \param solver \pluginargument{DpleSolver}
+     * \param st \structargument{Dple}
+     */
+    DpleSolver(const std::string& solver, const DpleStructure& st);
 
     /// Print solver statistics
     void printStats(std::ostream &stream=CASADI_COUT) const;

@@ -67,6 +67,14 @@ namespace casadi {
     return DpleInternal::getPlugin(name).doc;
   }
 
+  DpleSolver::DpleSolver(const std::string& name, const std::string& solver,
+                         const DpleStructure& st, const Dictionary& opts) {
+    assignNode(DpleInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
   DpleSolver::DpleSolver(const std::string& solver, const DpleStructure & st) {
     assignNode(DpleInternal::instantiatePlugin(solver, st));
   }
