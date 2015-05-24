@@ -181,11 +181,18 @@ namespace casadi {
     /// Default constructor
     SdpSolver();
 
-    /** \brief Constructor
-     *  \param name \pluginargument{SdpSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+     *  \param solver \pluginargument{SdpSolver}
      *  \param st \structargument{SDP}
      */
-    SdpSolver(const std::string& name, const SDPStructure& st);
+    SdpSolver(const std::string& name, const std::string& solver,
+              const SDPStructure& st, const Dictionary& opts=Dictionary());
+
+    /** \brief Constructor (to be deprecated)
+     *  \param solver \pluginargument{SdpSolver}
+     *  \param st \structargument{SDP}
+     */
+    SdpSolver(const std::string& solver, const SDPStructure& st);
 
     /// Access functions of the node
     SdpSolverInternal* operator->();
