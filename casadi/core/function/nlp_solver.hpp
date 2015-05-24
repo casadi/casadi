@@ -201,9 +201,28 @@ namespace casadi {
     /// Default constructor
     NlpSolver();
 
-    /// NLP solver factory
+    /// NLP solver factory (new syntax, includes initialization)
     NlpSolver(
       const std::string& name,
+      const std::string& solver,
+      /**< \pluginargument{NlpSolver}
+      */
+      const Function& nlp,
+      /**< \parblock
+       *  nlp function: \f$ [\mathbb {R}^{n_x} \times \mathbb{R}^{n_p}]
+       * \mapsto [\mathbb {R} \times \mathbb{R}^{n_g}]\f$
+       *
+       *  @copydoc scheme_NLPInput
+       *  @copydoc scheme_NLPOutput
+       *
+       *  \endparblock
+       */
+      const Dictionary& opts=Dictionary()
+      ); // NOLINT(whitespace/parens)
+
+    /// NLP solver factory, no initialization (to be deprecated)
+    NlpSolver(
+      const std::string& solver,
       /**< \pluginargument{NlpSolver}
       */
       const Function& nlp
@@ -217,6 +236,7 @@ namespace casadi {
        *  \endparblock
        */
       ); // NOLINT(whitespace/parens)
+
     /// Access functions of the node
     NlpSolverInternal* operator->();
     const NlpSolverInternal* operator->() const;
