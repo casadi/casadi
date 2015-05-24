@@ -123,11 +123,18 @@ namespace casadi {
     /// Default constructor
     QpSolver();
 
-    /** \brief Constructor
+    /** \brief Constructor (new syntax, includes initialization)
      *  \param name \pluginargument{QpSolver}
      *  \param st \structargument{QP}
      */
-    QpSolver(const std::string& name, const QPStructure& st);
+    QpSolver(const std::string& name, const std::string& solver,
+             const QPStructure& st, const Dictionary& opts=Dictionary());
+
+    /** \brief Constructor, no initialization (to be deprecated)
+     *  \param name \pluginargument{QpSolver}
+     *  \param st \structargument{QP}
+     */
+    QpSolver(const std::string& solver, const QPStructure& st);
 
     /// Access functions of the node
     QpSolverInternal* operator->();
