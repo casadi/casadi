@@ -67,9 +67,16 @@ namespace casadi {
     return DleInternal::getPlugin(name).doc;
   }
 
-  DleSolver::DleSolver(const std::string& name,
-                         const DleStructure& st) {
-    assignNode(DleInternal::instantiatePlugin(name, st));
+  DleSolver::DleSolver(const std::string& name, const std::string& solver,
+                       const DleStructure& st, const Dictionary& opts) {
+    assignNode(DleInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  DleSolver::DleSolver(const std::string& solver, const DleStructure& st) {
+    assignNode(DleInternal::instantiatePlugin(solver, st));
   }
 
   Sparsity DleSolver::getSparsity(const DleStructure& st) {
