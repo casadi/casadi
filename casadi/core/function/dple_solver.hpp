@@ -97,17 +97,10 @@ namespace casadi {
     DpleSolver clone() const;
 
     /** \brief DpleSolver solver factory
-    * \param name \pluginargument{DpleSolver}
+    * \param solver \pluginargument{DpleSolver}
     * \param st \structargument{Dple}
     */
-    DpleSolver(const std::string& name,
-               const DpleStructure & st);
-
-
-    /// Older constructor
-    DpleSolver(const std::string& name,
-               const std::vector<Sparsity> & A,
-               const std::vector<Sparsity> & V);
+    DpleSolver(const std::string& solver, const DpleStructure & st);
 
     /// Print solver statistics
     void printStats(std::ostream &stream=CASADI_COUT) const;
