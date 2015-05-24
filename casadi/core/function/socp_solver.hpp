@@ -125,11 +125,18 @@ namespace casadi {
     /// Default constructor
     SocpSolver();
 
-    /** \brief Constructor
-     *  \param name \pluginargument{SocpSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+     *  \param solver \pluginargument{SocpSolver}
      *  \param st \structargument{SOCP}
      */
-    SocpSolver(const std::string& name, const SOCPStructure& st);
+    SocpSolver(const std::string& name, const std::string& solver,
+               const SOCPStructure& st, const Dictionary& opts=Dictionary());
+
+    /** \brief Constructor (to be deprecated)
+     *  \param solver \pluginargument{SocpSolver}
+     *  \param st \structargument{SOCP}
+     */
+    SocpSolver(const std::string& solver, const SOCPStructure& st);
 
     /// Access functions of the node
     SocpSolverInternal* operator->();
