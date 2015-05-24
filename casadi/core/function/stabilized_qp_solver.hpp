@@ -105,12 +105,20 @@ namespace casadi {
     /// Default constructor
     StabilizedQpSolver();
 
-    /** \brief Constructor
-     *  \param name \pluginargument{StabilizedQpSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+     *  \param solver \pluginargument{StabilizedQpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_QPStruct
      */
-    StabilizedQpSolver(const std::string& name, const QPStructure& st);
+    StabilizedQpSolver(const std::string& name, const std::string& solver,
+                       const QPStructure& st, const Dictionary& opts=Dictionary());
+
+    /** \brief Constructor (no initialization, to be deprecated)
+     *  \param solver \pluginargument{StabilizedQpSolver}
+     *  \param st Problem structure
+     *  \copydoc scheme_QPStruct
+     */
+    StabilizedQpSolver(const std::string& solver, const QPStructure& st);
 
     /// Access functions of the node
     StabilizedQpSolverInternal* operator->();

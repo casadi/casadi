@@ -53,8 +53,16 @@ namespace casadi {
     (*this)->generateNativeCode(file);
   }
 
-  StabilizedQpSolver::StabilizedQpSolver(const std::string& name, const QPStructure& st) {
-    assignNode(StabilizedQpSolverInternal::instantiatePlugin(name, st));
+  StabilizedQpSolver::StabilizedQpSolver(const std::string& name, const std::string& solver,
+                                         const QPStructure& st, const Dictionary& opts) {
+    assignNode(StabilizedQpSolverInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  StabilizedQpSolver::StabilizedQpSolver(const std::string& solver, const QPStructure& st) {
+    assignNode(StabilizedQpSolverInternal::instantiatePlugin(solver, st));
   }
 
   bool StabilizedQpSolver::hasPlugin(const std::string& name) {
