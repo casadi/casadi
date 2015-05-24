@@ -62,12 +62,9 @@ public:
   *
   */
   Simulator(const Integrator& integrator, const Function& output_fcn,
-            const std::vector<double>& grid);
-  Simulator(const Integrator& integrator, const Function& output_fcn,
             const Matrix<double>& grid);
 
   /// Output function equal to the state
-  Simulator(const Integrator& integrator, const std::vector<double>& grid);
   Simulator(const Integrator& integrator, const Matrix<double>& grid);
 
   /// Access functions of the node.
