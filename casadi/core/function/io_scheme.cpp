@@ -32,7 +32,15 @@ namespace casadi {
   }
 
   IOScheme::IOScheme(InputOutputScheme scheme) {
-    assignNode(new IOSchemeBuiltinInternal(scheme));
+    int sz = getSchemeSize(scheme);
+    std::vector<std::string> entries(sz);
+    std::vector<std::string> descriptions(sz);
+    for (int i=0; i<sz; ++i) {
+      entries[i] = getSchemeEntryName(scheme, i);
+      descriptions[i] = getSchemeEntryEnumName(scheme, i)
+        + " aka '" + getSchemeEntryName(scheme, i) + "'";
+    }
+    assignNode(new IOSchemeCustomInternal(entries, descriptions));
   }
 
   IOScheme::IOScheme(const std::vector<std::string> &entries,

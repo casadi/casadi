@@ -29,46 +29,6 @@ using namespace std;
 
 namespace casadi {
 
-    IOSchemeBuiltinInternal::IOSchemeBuiltinInternal(InputOutputScheme scheme) : scheme_(scheme) {}
-
-    std::string IOSchemeBuiltinInternal::name() const {
-      return getSchemeName(scheme_);
-    }
-
-    std::string IOSchemeBuiltinInternal::entryNames() const {
-      return getSchemeEntryNames(scheme_);
-    }
-
-    std::string IOSchemeBuiltinInternal::entry(int i) const {
-      return getSchemeEntryName(scheme_, i);
-    }
-
-    std::string IOSchemeBuiltinInternal::entryEnum(int i) const {
-      return getSchemeEntryEnumName(scheme_, i);
-    }
-
-    std::string IOSchemeBuiltinInternal::describe(int i) const {
-      std::stringstream ss;
-      ss << entryEnum(i) <<  " aka '" << entry(i) << "'";
-      return ss.str();
-    }
-
-    int IOSchemeBuiltinInternal::index(const std::string &name) const {
-      return getSchemeEntryEnum(scheme_, name);
-    }
-
-    int IOSchemeBuiltinInternal::size() const {
-      return getSchemeSize(scheme_);
-    }
-
-    void IOSchemeBuiltinInternal::print(std::ostream &stream) const {
-      stream << "builtinIO(" << name() << ")";
-    }
-
-    void IOSchemeBuiltinInternal::repr(std::ostream &stream) const {
-      stream << "builtinIO(" << name() << ")";
-    }
-
     IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string> &entries,
                                                    const std::vector<std::string> &descriptions) :
         entries_(entries), descriptions_(descriptions)  {

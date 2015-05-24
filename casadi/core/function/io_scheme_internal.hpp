@@ -68,47 +68,6 @@ class CASADI_EXPORT IOSchemeInternal : public SharedObjectNode {
 
 };
 
-class CASADI_EXPORT IOSchemeBuiltinInternal : public IOSchemeInternal {
-  public:
-
-    /// Default constructor
-    IOSchemeBuiltinInternal(InputOutputScheme scheme);
-
-    /// Name of the scheme
-    virtual std::string name() const;
-
-    /// List available entries
-    virtual std::string entryNames() const;
-
-    /// Get index by entry name
-    virtual int index(const std::string &name) const;
-
-    /// Number of entries
-    virtual int size() const;
-
-    /// Get the entry name by index
-    virtual std::string entry(int i) const;
-
-    /// Get the entry enum name by index
-    virtual std::string entryEnum(int i) const;
-
-    /// Describe the index
-    virtual std::string describe(int i) const;
-
-    /// Print a description of the object
-    virtual void print(std::ostream &stream=std::cout) const;
-
-    /// Print a representation of the object
-    virtual void repr(std::ostream &stream=std::cout) const;
-
-    /// Clone
-    virtual IOSchemeBuiltinInternal* clone() const { return new IOSchemeBuiltinInternal(scheme_); }
-
-  private:
-    InputOutputScheme scheme_;
-
-};
-
 class CASADI_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
   public:
 
