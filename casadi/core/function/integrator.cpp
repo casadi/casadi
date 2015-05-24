@@ -32,8 +32,24 @@ namespace casadi {
   Integrator::Integrator() {
   }
 
-  Integrator::Integrator(const std::string& name, const Function& f, const Function& g) {
-    assignNode(IntegratorInternal::getPlugin(name).creator(f, g));
+  Integrator::Integrator(const std::string& name, const std::string& solver, const Function& f,
+                         const Dictionary& opts) {
+    // Backwards DAE
+    Function g;
+    Dictionary opts2 = opts;
+    Dictionary::const_iterator it=opts2.find("rdae");
+    if (it!=opts2.end()) g = it->second;
+    opts2.erase(it);
+
+    // Create an initialize
+    assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));
+    setOption("name", name);
+    setOption(opts2);
+    init();
+  }
+
+  Integrator::Integrator(const std::string& solver, const Function& f, const Function& g) {
+    assignNode(IntegratorInternal::getPlugin(solver).creator(f, g));
   }
 
   Integrator  Integrator::clone() const {

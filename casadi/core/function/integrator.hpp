@@ -180,7 +180,19 @@ namespace casadi {
     /// Default constructor
     Integrator();
 
-    /** \brief  Integrator factory
+    /** \brief  Integrator factory (new syntax, includes initialization)
+    *
+    * \param solver \pluginargument{Integrator}
+    * \param f dynamical system
+    * \parblock
+    * \copydoc scheme_DAEInput
+    * \copydoc scheme_DAEOutput
+    * \endparblock
+    */
+    Integrator(const std::string& name, const std::string& solver, const Function& f,
+               const Dictionary& opts=Dictionary());
+
+    /** \brief  Integrator factory, no initialization (to be deprecated)
     *
     * \param name \pluginargument{Integrator}
     * \param f dynamical system
@@ -194,7 +206,7 @@ namespace casadi {
     * \copydoc scheme_RDAEOutput
     * \endparblock
     */
-    Integrator(const std::string& name, const Function& f, const Function& g=Function());
+    Integrator(const std::string& solver, const Function& f, const Function& g=Function());
 
     /// Clone
     Integrator clone() const;
