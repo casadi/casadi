@@ -67,9 +67,16 @@ namespace casadi {
     return CleInternal::getPlugin(name).doc;
   }
 
-  CleSolver::CleSolver(const std::string& name,
-                         const CleStructure& st) {
-    assignNode(CleInternal::instantiatePlugin(name, st));
+  CleSolver::CleSolver(const std::string& name, const std::string& solver,
+                       const CleStructure& st, const Dictionary& opts) {
+    assignNode(CleInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  CleSolver::CleSolver(const std::string& solver, const CleStructure& st) {
+    assignNode(CleInternal::instantiatePlugin(solver, st));
   }
 
 } // namespace casadi

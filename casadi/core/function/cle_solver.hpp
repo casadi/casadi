@@ -98,12 +98,18 @@ namespace casadi {
     /// Clone
     CleSolver clone() const;
 
-    /** \brief CleSolver solver factory
-    * \param name \pluginargument{CleSolver}
-    * \param st \structargument{Cle}
-    */
-    CleSolver(const std::string& name,
-               const CleStructure& st);
+    /** \brief Constructor (new syntax, includes initialization)
+     * \param solver \pluginargument{CleSolver}
+     * \param st \structargument{Cle}
+     */
+    CleSolver(const std::string& name, const std::string& solver,
+              const CleStructure& st, const Dictionary& opts=Dictionary());
+
+    /** \brief Constructor (no initialization, to be deprecated)
+     * \param solver \pluginargument{CleSolver}
+     * \param st \structargument{Cle}
+     */
+    CleSolver(const std::string& solver, const CleStructure& st);
 
     /// Print solver statistics
     void printStats(std::ostream &stream=CASADI_COUT) const;
