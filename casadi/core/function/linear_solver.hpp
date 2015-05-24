@@ -86,9 +86,6 @@ namespace casadi {
     LinearSolver();
     /// \endcond
 
-    /// Create a linear solver given a sparsity pattern (creates a dummy solver only)
-    explicit LinearSolver(const Sparsity& sp, int nrhs=1);
-
     /** \brief Create a linear solver given a sparsity pattern
     * \param name \pluginargument{LinearSolver}
     */
