@@ -114,12 +114,9 @@ namespace casadi {
      * \param grid the major time grid
      */
     ControlSimulator(const Function& dae, const Function& output_fcn,
-                     const std::vector<double>& grid);
-    ControlSimulator(const Function& dae, const Function& output_fcn,
                      const Matrix<double>& grid);
 
     /// Output function equal to the state
-    ControlSimulator(const Function& dae, const std::vector<double>& grid);
     ControlSimulator(const Function& dae, const Matrix<double>& grid);
 
     /// Access functions of the node.

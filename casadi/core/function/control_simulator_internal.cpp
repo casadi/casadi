@@ -37,11 +37,14 @@ INPUTSCHEME(ControlSimulatorInput)
 
 using namespace std;
 namespace casadi {
-
-
-  ControlSimulatorInternal::ControlSimulatorInternal(
-      const Function& control_dae, const Function& output_fcn, const vector<double>& gridc) :
-      control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(gridc) {
+  ControlSimulatorInternal::
+  ControlSimulatorInternal(const Function& control_dae, const Function& output_fcn,
+                           const DMatrix& grid) :
+    control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(grid.data()) {
+    casadi_assert_message(grid.isVector(), "ControlSimulator::ControlSimulator: grid must be a "
+                          "column vector, but got " << grid.dimString());
+    casadi_assert_message(grid.isDense(), "ControlSimulator::ControlSimulator: grid must be dense, "
+                          "but got " << grid.dimString());
     setOption("name", "unnamed controlsimulator");
     addOption("nf", OT_INTEGER, 1, "Number of minor grained integration steps per major interval. "
               "nf>0 must hold. This option is not used when 'minor_grid' is provided.");
