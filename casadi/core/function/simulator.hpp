@@ -61,6 +61,18 @@ public:
   * \copydoc scheme_DAEInput
   *
   */
+  Simulator(const std::string& name, const Integrator& integrator, const Function& output_fcn,
+            const Matrix<double>& grid, const Dictionary& opts=Dictionary());
+
+  /// Output function equal to the state
+  Simulator(const std::string& name, const Integrator& integrator,
+            const Matrix<double>& grid, const Dictionary& opts=Dictionary());
+
+  /** \brief Constructor
+  * \param output_fcn output function which maps to n outputs.
+  * \copydoc scheme_DAEInput
+  *
+  */
   Simulator(const Integrator& integrator, const Function& output_fcn,
             const Matrix<double>& grid);
 

@@ -32,25 +32,30 @@ namespace casadi {
   Simulator::Simulator() {
   }
 
+  Simulator::Simulator(const std::string& name, const Integrator& integrator,
+                       const Function& output_fcn,
+                       const Matrix<double>& grid, const Dictionary& opts) {
+    assignNode(new SimulatorInternal(integrator, output_fcn, grid));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  Simulator::Simulator(const std::string& name, const Integrator& integrator,
+                       const Matrix<double>& grid, const Dictionary& opts) {
+    assignNode(new SimulatorInternal(integrator, Function(), grid));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
   Simulator::Simulator(const Integrator& integrator, const Function& output_fcn,
                        const Matrix<double>& grid) {
-    casadi_assert_message(grid.isVector(),
-                          "Simulator::Simulator: grid must be a column vector, but got "
-                          << grid.dimString());
-    casadi_assert_message(grid.isDense(),
-                          "Simulator::Simulator: grid must be dense, but got "
-                          << grid.dimString());
-    assignNode(new SimulatorInternal(integrator, output_fcn, grid.data()));
+    assignNode(new SimulatorInternal(integrator, output_fcn, grid));
   }
 
   Simulator::Simulator(const Integrator& integrator, const Matrix<double>& grid) {
-    casadi_assert_message(grid.isVector(),
-                          "Simulator::Simulator: grid must be column vector, but got "
-                          << grid.dimString());
-    casadi_assert_message(grid.isDense(),
-                          "Simulator::Simulator: grid must be dense, but got "
-                          << grid.dimString());
-    assignNode(new SimulatorInternal(integrator, Function(), grid.data()));
+    assignNode(new SimulatorInternal(integrator, Function(), grid));
   }
 
 

@@ -37,8 +37,14 @@ namespace casadi {
 
   SimulatorInternal::SimulatorInternal(const Integrator& integrator,
                                        const Function& output_fcn,
-                                       const vector<double>& grid) :
-      integrator_(integrator), output_fcn_(output_fcn), grid_(grid) {
+                                       const DMatrix& grid) :
+    integrator_(integrator), output_fcn_(output_fcn), grid_(grid.data()) {
+    casadi_assert_message(grid.isVector(),
+                          "Simulator::Simulator: grid must be a column vector, but got "
+                          << grid.dimString());
+    casadi_assert_message(grid.isDense(),
+                          "Simulator::Simulator: grid must be dense, but got "
+                          << grid.dimString());
     setOption("name", "unnamed simulator");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
 
