@@ -102,7 +102,25 @@ namespace casadi {
     /// Default constructor
     ControlSimulator();
 
-    /** \brief Creates a piecewise simulator
+    /** \brief Creates a piecewise simulator (new syntax, includes initialization)
+     * \param ffcn Continuous time dynamics, an casadi::Function with the following mapping:
+     * \copydoc scheme_ControlledDAEInput
+     * \copydoc scheme_DAEOutput
+     *
+     *
+     * \param output_fcn output function which maps ControlledDAEInput or DAEInput to n outputs.
+     * \copydoc scheme_DAEInput
+     * \copydoc scheme_ControlledDAEInput
+     * \param grid the major time grid
+     */
+    ControlSimulator(const std::string& name, const Function& dae, const Function& output_fcn,
+                     const Matrix<double>& grid, const Dictionary& opts=Dictionary());
+
+    /// Output function equal to the state (new syntax, includes initialization)
+    ControlSimulator(const std::string& name, const Function& dae,
+                     const Matrix<double>& grid, const Dictionary& opts=Dictionary());
+
+    /** \brief Creates a piecewise simulator, no initialization (to be deprecated)
      * \param ffcn Continuous time dynamics, an casadi::Function with the following mapping:
      * \copydoc scheme_ControlledDAEInput
      * \copydoc scheme_DAEOutput
@@ -116,7 +134,7 @@ namespace casadi {
     ControlSimulator(const Function& dae, const Function& output_fcn,
                      const Matrix<double>& grid);
 
-    /// Output function equal to the state
+    /// Output function equal to the state, no initialization (to be deprecated)
     ControlSimulator(const Function& dae, const Matrix<double>& grid);
 
     /// Access functions of the node.

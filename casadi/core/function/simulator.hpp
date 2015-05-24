@@ -57,18 +57,18 @@ public:
   Simulator();
 
   /** \brief Constructor
-  * \param output_fcn output function which maps to n outputs.
+  * \param output_fcn output function which maps to n outputs. (new syntax, includes initialization)
   * \copydoc scheme_DAEInput
   *
   */
   Simulator(const std::string& name, const Integrator& integrator, const Function& output_fcn,
             const Matrix<double>& grid, const Dictionary& opts=Dictionary());
 
-  /// Output function equal to the state
+  /// Output function equal to the state (new syntax, includes initialization)
   Simulator(const std::string& name, const Integrator& integrator,
             const Matrix<double>& grid, const Dictionary& opts=Dictionary());
 
-  /** \brief Constructor
+  /** \brief Constructor, no initialization (to be deprecated)
   * \param output_fcn output function which maps to n outputs.
   * \copydoc scheme_DAEInput
   *
@@ -76,7 +76,7 @@ public:
   Simulator(const Integrator& integrator, const Function& output_fcn,
             const Matrix<double>& grid);
 
-  /// Output function equal to the state
+  /// Output function equal to the state, no initialization (to be deprecated)
   Simulator(const Integrator& integrator, const Matrix<double>& grid);
 
   /// Access functions of the node.

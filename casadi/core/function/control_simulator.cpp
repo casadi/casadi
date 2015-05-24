@@ -32,6 +32,23 @@ namespace casadi {
   ControlSimulator::ControlSimulator() {
   }
 
+  ControlSimulator::ControlSimulator(const std::string& name, const Function& dae,
+                                     const Function& output_fcn,
+                                     const Matrix<double>& grid, const Dictionary& opts) {
+    assignNode(new ControlSimulatorInternal(dae, output_fcn, grid));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  ControlSimulator::ControlSimulator(const std::string& name, const Function& dae,
+                                     const Matrix<double>& grid, const Dictionary& opts) {
+    assignNode(new ControlSimulatorInternal(dae, Function(), grid));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
   ControlSimulator::ControlSimulator(const Function& dae, const Function& output_fcn,
                                      const Matrix<double>& grid) {
     assignNode(new ControlSimulatorInternal(dae, output_fcn, grid));
