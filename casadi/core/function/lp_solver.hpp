@@ -111,14 +111,14 @@ namespace casadi {
     /// Default constructor
     LpSolver();
 
-    /** \brief Constructor
+    /** \brief Constructor (new syntax, includes initialization)
      *  \param solver \pluginargument{LpSolver}
      *  \param st \structargument{LP}
      */
     LpSolver(const std::string& name, const std::string& solver,
              const LPStructure& st, const Dictionary& opts=Dictionary());
 
-    /** \brief Constructor
+    /** \brief Constructor, no initialization (to be deprecated)
      *  \param solver \pluginargument{LpSolver}
      *  \param st \structargument{LP}
      */
