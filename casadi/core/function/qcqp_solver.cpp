@@ -47,8 +47,16 @@ namespace casadi {
     (*this)->setQPOptions();
   }
 
-  QcqpSolver::QcqpSolver(const std::string& name, const QCQPStructure& st) {
-    assignNode(QcqpSolverInternal::instantiatePlugin(name, st));
+  QcqpSolver::QcqpSolver(const std::string& name, const std::string& solver,
+                         const QCQPStructure& st, const Dictionary& opts) {
+    assignNode(QcqpSolverInternal::instantiatePlugin(solver, st));
+    setOption("name", name);
+    setOption(opts);
+    init();
+  }
+
+  QcqpSolver::QcqpSolver(const std::string& solver, const QCQPStructure& st) {
+    assignNode(QcqpSolverInternal::instantiatePlugin(solver, st));
   }
 
   bool QcqpSolver::hasPlugin(const std::string& name) {

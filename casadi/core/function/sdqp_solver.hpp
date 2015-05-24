@@ -116,7 +116,7 @@ namespace casadi {
     SdqpSolver(const std::string& name, const std::string& solver,
                const SDQPStructure& st, const Dictionary& opts=Dictionary());
 
-    /** \brief Constructor (to be deprecated)
+    /** \brief Constructor (no initialization, to be deprecated)
      *  \param solver \pluginargument{SdqpSolver}
      *  \param st \structargument{SDQP}
      */
