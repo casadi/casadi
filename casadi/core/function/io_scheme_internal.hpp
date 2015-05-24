@@ -36,43 +36,13 @@ class SharedObjectNode;
 
 namespace casadi {
 
-class CASADI_EXPORT IOSchemeInternal : public SharedObjectNode {
+  class CASADI_EXPORT IOSchemeInternal : public SharedObjectNode {
   public:
+    /// Constructor
+    IOSchemeInternal(const std::vector<std::string>& data);
 
-    /// Name of the scheme
-    virtual std::string name() const=0;
-
-    /// List available entries
-    virtual std::string entryNames() const=0;
-
-    /// Get index by entry name
-    virtual int index(const std::string &name) const=0;
-
-    /// Number of entries
-    virtual int size() const=0;
-
-    /// Get the entry name by index
-    virtual std::string entry(int i) const=0;
-
-    /// Get the entry enum name by index
-    virtual std::string entryEnum(int i) const=0;
-
-    /// Print a description of the object
-    virtual void print(std::ostream &stream=std::cout) const=0;
-
-    /// Print a representation of the object
-    virtual void repr(std::ostream &stream=std::cout) const=0;
-
-    /// Describe the index
-    virtual std::string describe(int i) const=0;
-
-};
-
-class CASADI_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
-  public:
-
-    /// Default constructor
-    IOSchemeCustomInternal(const std::vector<std::string>& data);
+    /// Clone
+    virtual IOSchemeInternal* clone() const { return new IOSchemeInternal(data_);}
 
     /// Name of the scheme
     virtual std::string name() const;
@@ -92,24 +62,16 @@ class CASADI_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
     /// Get the entry enum name by index
     virtual std::string entryEnum(int i) const;
 
-    /// Describe the index
-    virtual std::string describe(int i) const;
-
     /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const;
 
-    /// Clone
-    virtual IOSchemeCustomInternal* clone() const {
-      return new IOSchemeCustomInternal(data_);
-    }
-
-  private:
+    /// Describe the index
+    virtual std::string describe(int i) const;
     std::vector<std::string> data_;
-};
-
+  };
 
 
 } // namespace casadi

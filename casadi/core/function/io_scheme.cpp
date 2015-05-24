@@ -39,20 +39,20 @@ namespace casadi {
         + getSchemeEntryEnumName(scheme, i)
         + " aka '" + getSchemeEntryName(scheme, i) + "'";
     }
-    assignNode(new IOSchemeCustomInternal(data));
+    assignNode(new IOSchemeInternal(data));
   }
 
   IOScheme::IOScheme(const std::vector<std::string>& entries,
                      const std::vector<std::string>& descriptions) {
     if (descriptions.empty()) {
-      assignNode(new IOSchemeCustomInternal(entries));
+      assignNode(new IOSchemeInternal(entries));
     } else {
       casadi_assert(entries.size()==descriptions.size());
       std::vector<std::string> data=entries;
       for (size_t i=0; i!=entries.size(); ++i) {
         data[i] += ":" + descriptions[i];
       }
-      assignNode(new IOSchemeCustomInternal(data));
+      assignNode(new IOSchemeInternal(data));
     }
   }
 
@@ -88,7 +88,7 @@ namespace casadi {
     if (arg_s17!="") { k.push_back(arg_s17);}
     if (arg_s18!="") { k.push_back(arg_s18);}
     if (arg_s19!="") { k.push_back(arg_s19);}
-    assignNode(new IOSchemeCustomInternal(k));
+    assignNode(new IOSchemeInternal(k));
   }
 
   IOSchemeInternal* IOScheme::operator->() {

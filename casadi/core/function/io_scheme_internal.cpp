@@ -29,15 +29,15 @@ using namespace std;
 
 namespace casadi {
 
-    IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string>& data) :
+    IOSchemeInternal::IOSchemeInternal(const std::vector<std::string>& data) :
       data_(data) {
     }
 
-    std::string IOSchemeCustomInternal::name() const {
+    std::string IOSchemeInternal::name() const {
       return "customIO";
     }
 
-    std::string IOSchemeCustomInternal::entryNames() const {
+    std::string IOSchemeInternal::entryNames() const {
       std::stringstream ss;
       for (int i=0; i<data_.size();++i) {
          if (i!=0) ss << ", ";
@@ -47,7 +47,7 @@ namespace casadi {
       return ss.str();
     }
 
-    std::string IOSchemeCustomInternal::entry(int i) const {
+    std::string IOSchemeInternal::entry(int i) const {
       casadi_assert_message(i>=0 && i<data_.size(),
                             "customIO::entry(): requesting entry for index " << i
                             << ", but IOScheme is only length " << data_.size());
@@ -55,18 +55,18 @@ namespace casadi {
       return data_[i].substr(0, col);
     }
 
-    std::string IOSchemeCustomInternal::entryEnum(int i) const {
+    std::string IOSchemeInternal::entryEnum(int i) const {
       return "";
     }
 
-    std::string IOSchemeCustomInternal::describe(int i) const {
+    std::string IOSchemeInternal::describe(int i) const {
       casadi_assert_message(i>=0 && i<data_.size(),
                             "customIO::entry(): requesting entry for index " << i
                             << ", but IOScheme is only length " << data_.size());
       return data_[i];
     }
 
-    int IOSchemeCustomInternal::index(const std::string &name) const {
+    int IOSchemeInternal::index(const std::string &name) const {
       for (vector<string>::const_iterator i=data_.begin(); i!=data_.end(); ++i) {
         size_t col = i->find(':');
         if (i->compare(0, col, name)==0) return i-data_.begin();
@@ -76,15 +76,15 @@ namespace casadi {
       return -1;
     }
 
-    int IOSchemeCustomInternal::size() const {
+    int IOSchemeInternal::size() const {
       return data_.size();
     }
 
-    void IOSchemeCustomInternal::print(std::ostream &stream) const {
+    void IOSchemeInternal::print(std::ostream &stream) const {
       stream << "customIO(" << entryNames() << ")";
     }
 
-    void IOSchemeCustomInternal::repr(std::ostream &stream) const {
+    void IOSchemeInternal::repr(std::ostream &stream) const {
       stream << "customIO(" << entryNames() << ")";
     }
 
