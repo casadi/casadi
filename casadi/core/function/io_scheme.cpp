@@ -193,4 +193,9 @@ namespace casadi {
     return (*this)->repr(stream);
   }
 
+  IOScheme::operator const std::vector<std::string>& () const {
+    return (*this)->data_;
+  }
+
+
 } // namespace casadi

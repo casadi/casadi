@@ -56,7 +56,12 @@ class CASADI_EXPORT IOScheme : public SharedObject {
     IOScheme(const std::vector<std::string> &entries,
              const std::vector<std::string> &descriptions=std::vector<std::string>());
 
-    #ifndef SWIGPYTHON
+#ifndef SWIG
+    /// Inplicit type conversion
+    operator const std::vector<std::string>& () const;
+#endif // SWIG
+
+#ifndef SWIGPYTHON
     IOScheme(
         const std::string &arg_s0, const std::string &arg_s1="",
         const std::string &arg_s2="", const std::string &arg_s3="",
@@ -68,7 +73,7 @@ class CASADI_EXPORT IOScheme : public SharedObject {
         const std::string &arg_s14="", const std::string &arg_s15="",
         const std::string &arg_s16="", const std::string &arg_s17="",
         const std::string &arg_s18="", const std::string &arg_s19="");
-   #endif // SWIG
+#endif // SWIG
 
     /** \brief  Access functions of the node */
     IOSchemeInternal* operator->();
