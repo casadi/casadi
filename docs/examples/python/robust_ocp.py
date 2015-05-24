@@ -116,7 +116,7 @@ for k in range(N):
  
 
 # DPLE solver
-dple = DpleSolver("slicot",[i.sparsity() for i in As],[i.sparsity() for i in Qs])
+dple = DpleSolver("slicot",dpleStruct(a=[i.sparsity() for i in As],v=[i.sparsity() for i in Qs]))
 dple.setOption("linear_solver","csparse")
 dple.init()
 
