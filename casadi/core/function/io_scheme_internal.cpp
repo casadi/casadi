@@ -33,10 +33,6 @@ namespace casadi {
       data_(data) {
     }
 
-    std::string IOSchemeInternal::name() const {
-      return "customIO";
-    }
-
     std::string IOSchemeInternal::entryNames() const {
       std::stringstream ss;
       for (int i=0; i<data_.size();++i) {

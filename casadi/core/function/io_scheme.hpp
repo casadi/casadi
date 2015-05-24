@@ -82,9 +82,6 @@ class CASADI_EXPORT IOScheme : public SharedObject {
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);
 
-    /// Name of the scheme
-    std::string name() const;
-
     /// List available entries
     std::string entryNames() const;
 

@@ -196,12 +196,11 @@ namespace casadi {
                                         << " scheme of this function is unknown. "
                                         "You can only index with integers.");
       if (name=="") casadi_error("FunctionInternal::schemeEntry: you supplied an empty "
-                                 "string as the name of a entry in "
-                                 << scheme.name() << ". Available names are: "
+                                 "string as the name of a entry. Available names are: "
                                  << scheme.entryNames() << ".");
       int n = scheme.index(name);
       if (n==-1) casadi_error("FunctionInternal::schemeEntry: could not find entry '"
-                              << name << "' in " << scheme.name() << ". Available names are: "
+                              << name << "'. Available names are: "
                               << scheme.entryNames() << ".");
       return n;
     }

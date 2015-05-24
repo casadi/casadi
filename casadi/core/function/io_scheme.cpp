@@ -103,11 +103,6 @@ namespace casadi {
     return dynamic_cast<const IOScheme*>(ptr)!=0;
   }
 
-  std::string IOScheme::name() const {
-    if (isNull()) return "Unknown";
-    return (*this)->name();
-  }
-
   std::string IOScheme::entryNames() const {
     if (isNull()) return "Not available";
     return (*this)->entryNames();

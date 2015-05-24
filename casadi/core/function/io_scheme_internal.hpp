@@ -44,9 +44,6 @@ namespace casadi {
     /// Clone
     virtual IOSchemeInternal* clone() const { return new IOSchemeInternal(data_);}
 
-    /// Name of the scheme
-    virtual std::string name() const;
-
     /// List available entries
     virtual std::string entryNames() const;
 

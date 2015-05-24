@@ -163,7 +163,7 @@ namespace casadi {
           stream << "  " << i << ". " << input(i).dimString() << endl;
         }
       } else {
-        stream << " Inputs (" << input_.scheme.name() << ": " << nIn()
+        stream << " Inputs (" << nIn()
                << "):" << endl;
         for (int i=0;i<nIn();i++) {
           stream << "  " << i  << ". (" << input_.scheme.describe(i) << ")   "
@@ -180,7 +180,7 @@ namespace casadi {
           stream << "  " << i << ". " << output(i).dimString() << endl;
         }
       } else {
-        stream << " Outputs (" << output_.scheme.name() << ": "
+        stream << " Outputs (" << ": "
                << nOut() << "):" << endl;
         for (int i=0;i<nOut();i++) {
           stream << "  " << i << ". (" << output_.scheme.describe(i) << ")   "

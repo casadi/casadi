@@ -56,7 +56,7 @@ namespace casadi {
     operator const std::vector<T>&() const { return this->data;}
     ///@}
     T operator[](int i) const {
-      casadi_assert_message(i>=0 && i<this->data.size(), "Index error for " << this->scheme.name() << ": supplied integer must be >=0 and <= " << this->data.size() << " but got " << i << ".");
+      casadi_assert_message(i>=0 && i<this->data.size(), "Index error: supplied integer must be >=0 and <= " << this->data.size() << " but got " << i << ".");
       return this->data.at(i);
     }
     T operator[](const std::string& name) const { return (*this)[this->scheme.index(name)]; }
@@ -76,7 +76,7 @@ namespace casadi {
         if (i<this->data.size()-1) stream << ", ";
       }
 
-      stream << ";" << this->scheme.name() <<  ")";
+      stream <<  ")";
       if (trailing_newline) stream << std::endl;
     }
 
