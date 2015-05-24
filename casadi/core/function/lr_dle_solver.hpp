@@ -106,11 +106,18 @@ namespace casadi {
     /// Clone
     LrDleSolver clone() const;
 
-    /** \brief LrDleSolver solver factory
-    * \param name \pluginargument{LrDleSolver}
+    /** \brief Constructor (new syntax, includes initialization)
+    * \param solver \pluginargument{LrDleSolver}
     * \param st \structargument{LrDle}
     */
-    LrDleSolver(const std::string& name, const LrDleStructure& st);
+    LrDleSolver(const std::string& name, const std::string& solver,
+                const LrDleStructure& st, const Dictionary& opts=Dictionary());
+
+    /** \brief Constructor (no initialization, to be deprecated)
+    * \param solver \pluginargument{LrDleSolver}
+    * \param st \structargument{LrDle}
+    */
+    LrDleSolver(const std::string& solver, const LrDleStructure& st);
 
     /// Print solver statistics
     void printStats(std::ostream &stream=CASADI_COUT) const;
