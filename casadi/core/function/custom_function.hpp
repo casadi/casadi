@@ -49,27 +49,30 @@ public:
 /** \brief  default constructor */
   CustomFunction();
 
+  /** \brief Constructor (new syntax, includes initialization) */
+  CustomFunction(const std::string& name, const CustomEvaluate &c_fcn,
+                 const std::vector<Sparsity>& inputscheme,
+                 const std::vector<Sparsity>& outputscheme,
+                 const Dictionary& opts=Dictionary());
+
   ///@{
-  /** \brief  Create a function with input/output schemes given */
-  explicit CustomFunction(const CustomEvaluate &c_fcn,
-                          const std::vector<Sparsity> &inputscheme,
-                          const std::vector<Sparsity> &outputscheme);
+  /** \brief Constructor (no initialization, to be deprecated) */
+  CustomFunction(const CustomEvaluate &c_fcn,
+                 const std::vector<Sparsity>& inputscheme,
+                 const std::vector<Sparsity>& outputscheme);
 
-  explicit CustomFunction(const CustomEvaluate &c_fcn,
-                          const IOSchemeVector< Sparsity > &inputscheme,
-                          const std::vector<Sparsity> &outputscheme);
+  CustomFunction(const CustomEvaluate &c_fcn,
+                 const IOSchemeVector<Sparsity>& inputscheme,
+                 const std::vector<Sparsity>& outputscheme);
 
-  explicit CustomFunction(const CustomEvaluate &c_fcn,
-                          const std::vector<Sparsity> &inputscheme,
-                          const IOSchemeVector< Sparsity > &outputscheme);
+  CustomFunction(const CustomEvaluate &c_fcn,
+                 const std::vector<Sparsity>& inputscheme,
+                 const IOSchemeVector<Sparsity>& outputscheme);
 
-  explicit CustomFunction(const CustomEvaluate &c_fcn,
-                          const IOSchemeVector< Sparsity > &inputscheme,
-                          const IOSchemeVector< Sparsity > &outputscheme);
+  CustomFunction(const CustomEvaluate &c_fcn,
+                 const IOSchemeVector<Sparsity>& inputscheme,
+                 const IOSchemeVector<Sparsity>& outputscheme);
   ///@}
-
-  /** \brief  Create a function, user sets inputs outputs manually */
-  explicit CustomFunction(const CustomEvaluate &c_fcn);
 
   /** \brief  Access functions of the node */
   CustomFunctionInternal* operator->();
