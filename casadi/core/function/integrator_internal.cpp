@@ -118,7 +118,7 @@ namespace casadi {
     }
 
     // Allocate space for inputs
-    setNumInputs(INTEGRATOR_NUM_IN);
+    input_.data.resize(INTEGRATOR_NUM_IN);
     x0()  = DMatrix::zeros(f_.input(DAE_X).sparsity());
     p()   = DMatrix::zeros(f_.input(DAE_P).sparsity());
     z0()   = DMatrix::zeros(f_.input(DAE_Z).sparsity());
@@ -129,7 +129,7 @@ namespace casadi {
     }
 
     // Allocate space for outputs
-    setNumOutputs(INTEGRATOR_NUM_OUT);
+    output_.data.resize(INTEGRATOR_NUM_OUT);
     xf() = x0();
     qf() = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
     zf() = z0();

@@ -119,7 +119,7 @@ namespace casadi {
     solver_.input(SDP_SOLVER_C).at(n_)=1;
 
     // Output arguments
-    setNumOutputs(SDQP_SOLVER_NUM_OUT);
+    output_.data.resize(SDQP_SOLVER_NUM_OUT);
     output(SDQP_SOLVER_X) = DMatrix::zeros(n_, 1);
 
     std::vector<int> r = range(input(SDQP_SOLVER_G).size1());

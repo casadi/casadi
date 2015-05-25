@@ -68,7 +68,7 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
                         << "), but got remainder " << F.size2()%n_);
 
   // Input arguments
-  setNumInputs(SDP_SOLVER_NUM_IN);
+  input_.data.resize(SDP_SOLVER_NUM_IN);
   input(SDP_SOLVER_G) = DMatrix::zeros(G);
   input(SDP_SOLVER_F) = DMatrix::zeros(F);
   input(SDP_SOLVER_A) = DMatrix::zeros(A);
@@ -149,7 +149,7 @@ void SdpSolverInternal::init() {
   }
 
   // Output arguments
-  setNumOutputs(SDP_SOLVER_NUM_OUT);
+  output_.data.resize(SDP_SOLVER_NUM_OUT);
   output(SDP_SOLVER_X) = DMatrix::zeros(n_, 1);
   output(SDP_SOLVER_P) = calc_p_? DMatrix::zeros(Pmapper_.output().sparsity()) : DMatrix();
   output(SDP_SOLVER_DUAL) = calc_dual_? DMatrix::zeros(Pmapper_.output().sparsity()) : DMatrix();

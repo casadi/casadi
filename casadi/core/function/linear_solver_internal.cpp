@@ -53,12 +53,12 @@ namespace casadi {
                                coarse_rowblock, coarse_colblock);
 
     // Allocate inputs
-    setNumInputs(LINSOL_NUM_IN);
+    input_.data.resize(LINSOL_NUM_IN);
     input(LINSOL_A) = DMatrix(sparsity);
     input(LINSOL_B) = DMatrix::zeros(sparsity.size2(), nrhs);
 
     // Allocate outputs
-    setNumOutputs(LINSOL_NUM_OUT);
+    output_.data.resize(LINSOL_NUM_OUT);
     output(LINSOL_X) = input(LINSOL_B);
 
     input_.str = IOScheme(SCHEME_LinsolInput).v();

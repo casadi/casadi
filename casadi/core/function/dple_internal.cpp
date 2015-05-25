@@ -96,7 +96,7 @@ namespace casadi {
     }
 
     // Allocate inputs
-    setNumInputs(1+nrhs_);
+    input_.data.resize(1+nrhs_);
 
     if (const_dim_) {
       input(0)  = DMatrix::zeros(horzcat(A_));
@@ -114,8 +114,7 @@ namespace casadi {
 
     // Allocate outputs
     std::vector<Sparsity> P = LrDpleInternal::getSparsity(lrdpleStruct("a", A_, "v", V_));
-
-    setNumOutputs(nrhs_);
+    output_.data.resize(nrhs_);
     for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
         output(i) = DMatrix::zeros(horzcat(P));

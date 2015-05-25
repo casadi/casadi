@@ -90,14 +90,6 @@ namespace casadi {
     inline int nOut() const
     { return static_cast<const Derived*>(this)->output_struct().data.size();}
 
-    /// Set the number of function inputs
-    inline void setNumInputs(int num_in)
-    { static_cast<Derived*>(this)->input_struct().data.resize(num_in); }
-
-    /// Set the number of function outputs
-    inline void setNumOutputs(int num_out)
-    { static_cast<Derived*>(this)->output_struct().data.resize(num_out); }
-
     /// \cond INTERNAL
 
     /** \brief  Access an input */

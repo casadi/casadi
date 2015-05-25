@@ -37,8 +37,8 @@ CustomFunctionInternal::CustomFunctionInternal(
     const CustomEvaluate &c_fcn,
     const std::vector<casadi::Sparsity> &inputscheme,
     const std::vector<casadi::Sparsity> &outputscheme) : evaluate_(c_fcn) {
-  setNumInputs(inputscheme.size());
-  setNumOutputs(outputscheme.size());
+  input_.data.resize(inputscheme.size());
+  output_.data.resize(outputscheme.size());
 
   for (int k=0;k<inputscheme.size();k++) {
     input(k) = DMatrix::zeros(inputscheme[k]);

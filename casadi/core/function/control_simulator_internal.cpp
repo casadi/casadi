@@ -337,13 +337,13 @@ namespace casadi {
     simulator_.init();
 
     // Allocate inputs
-    setNumInputs(CONTROLSIMULATOR_NUM_IN);
+    input_.data.resize(CONTROLSIMULATOR_NUM_IN);
     input(CONTROLSIMULATOR_X0)  = DMatrix(dae_.input(DAE_X));
     input(CONTROLSIMULATOR_P)   = control_dae_.input(CONTROL_DAE_P);
     input(CONTROLSIMULATOR_U)   = DMatrix::zeros(nu_, ns_-1+(control_endpoint?1:0));
 
     // Allocate outputs
-    setNumOutputs(output_fcn_.nOut()-2);
+    output_.data.resize(output_fcn_.nOut()-2);
     for (int i=0; i<nOut(); ++i)
       output(i) = Matrix<double>::zeros(output_fcn_.output(i+2).numel(), (ns_-1)*nf_+1);
 

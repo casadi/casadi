@@ -75,7 +75,7 @@ namespace casadi {
                           << n_ << "), but got remainder " << F.size2()%n_);
 
     // Input arguments
-    setNumInputs(SDQP_SOLVER_NUM_IN);
+    input_.data.resize(SDQP_SOLVER_NUM_IN);
     input(SDQP_SOLVER_H) = DMatrix::zeros(H);
     input(SDQP_SOLVER_G) = DMatrix::zeros(G);
     input(SDQP_SOLVER_F) = DMatrix::zeros(F);

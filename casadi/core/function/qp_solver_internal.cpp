@@ -62,7 +62,7 @@ namespace casadi {
     Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
 
     // Input arguments
-    setNumInputs(QP_SOLVER_NUM_IN);
+    input_.data.resize(QP_SOLVER_NUM_IN);
     input(QP_SOLVER_X0) = DMatrix::zeros(x_sparsity);
     input(QP_SOLVER_H) = DMatrix::zeros(H);
     input(QP_SOLVER_G) = DMatrix::zeros(x_sparsity);
@@ -75,7 +75,7 @@ namespace casadi {
     //input(QP_SOLVER_LAM_A0) = DMatrix::zeros(x_sparsity);
 
     // Output arguments
-    setNumOutputs(QP_SOLVER_NUM_OUT);
+    output_.data.resize(QP_SOLVER_NUM_OUT);
     output(QP_SOLVER_X) = DMatrix::zeros(x_sparsity);
     output(QP_SOLVER_COST) = 0.0;
     output(QP_SOLVER_LAM_X) = DMatrix::zeros(x_sparsity);

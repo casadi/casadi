@@ -141,8 +141,7 @@ namespace casadi {
     casadi_assert(nrhs_==1);
 
     // Allocate inputs
-    setNumInputs(LR_DLE_NUM_IN);
-
+    input_.data.resize(LR_DLE_NUM_IN);
     input(LR_DLE_A)  = DMatrix::zeros(A_);
 
 
@@ -154,7 +153,7 @@ namespace casadi {
       input(LR_DLE_H)  = DMatrix::zeros(H_);
     }
 
-    setNumOutputs(nrhs_*LR_DLE_NUM_OUT);
+    output_.data.resize(nrhs_*LR_DLE_NUM_OUT);
 
     Sparsity Pnew = getSparsity(st_, Hs_);
 

@@ -441,6 +441,12 @@ namespace casadi {
     virtual bool adjViaJac(int nadj);
     ///@}
 
+    /// Input and output buffers
+    //std::vector<DMatrix> ibuf_, obuf_;
+
+    /// Input and output scheme
+    //std::vector<std::string> ischeme_, oscheme_;
+
     /** \brief  Inputs of the function */
     IOSchemeVector<DMatrix> input_;
 

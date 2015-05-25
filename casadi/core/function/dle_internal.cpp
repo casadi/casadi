@@ -54,9 +54,6 @@ namespace casadi {
 
     if (nrhs_==1) {
       input_.str = IOScheme(SCHEME_DLEInput);
-    }
-
-    if (nrhs_==1) {
       output_.str = IOScheme(SCHEME_DLEOutput);
     }
   }
@@ -87,10 +84,8 @@ namespace casadi {
                            << " ) deviating from n = " << n << ".");
 
     // Allocate inputs
-    setNumInputs(1+nrhs_);
-
+    input_.data.resize(1+nrhs_);
     input(0)  = DMatrix::zeros(A_);
-
     for (int i=0;i<nrhs_;++i) {
       input(1+i)  = DMatrix::zeros(V_);
     }
@@ -101,8 +96,7 @@ namespace casadi {
     Sparsity P2 = DleInternal::getSparsity(dleStruct("a", A_, "v", V_));
 
     casadi_assert(P==P2);
-
-    setNumOutputs(nrhs_);
+    output_.data.resize(nrhs_);
     for (int i=0;i<nrhs_;++i) {
       output(i) = DMatrix::zeros(P);
     }

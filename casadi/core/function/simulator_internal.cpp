@@ -97,13 +97,13 @@ namespace casadi {
     output_fcn_.init();
 
     // Allocate inputs
-    setNumInputs(INTEGRATOR_NUM_IN);
+    input_.data.resize(INTEGRATOR_NUM_IN);
     for (int i=0; i<INTEGRATOR_NUM_IN; ++i) {
       input(i) = integrator_.input(i);
     }
 
     // Allocate outputs
-    setNumOutputs(output_fcn_->nOut());
+    output_.data.resize(output_fcn_->nOut());
     for (int i=0; i<nOut(); ++i) {
       output(i) = Matrix<double>::zeros(output_fcn_.output(i).numel(), grid_.size());
       if (!output_fcn_.output(i).isEmpty()) {

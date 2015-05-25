@@ -43,7 +43,7 @@ namespace casadi {
 
 
     // Input arguments
-    setNumInputs(LP_SOLVER_NUM_IN);
+    input_.data.resize(LP_SOLVER_NUM_IN);
     input(LP_SOLVER_A) = DMatrix(A);
     input(LP_SOLVER_C) = DMatrix::zeros(n_);
     input(LP_SOLVER_LBA) = -DMatrix::inf(nc_);
@@ -52,7 +52,7 @@ namespace casadi {
     input(LP_SOLVER_UBX) = DMatrix::inf(n_);
 
     // Output arguments
-    setNumOutputs(LP_SOLVER_NUM_OUT);
+    output_.data.resize(LP_SOLVER_NUM_OUT);
     output(LP_SOLVER_X) = DMatrix::zeros(n_);
     output(LP_SOLVER_COST) = 0.0;
     output(LP_SOLVER_LAM_X) = DMatrix::zeros(n_);
