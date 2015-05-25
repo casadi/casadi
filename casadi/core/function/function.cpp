@@ -188,11 +188,11 @@ namespace casadi {
   }
 
   IOScheme Function::getInputScheme() const {
-    return (*this)->getInputScheme();
+    return (*this)->input_.scheme;
   }
 
   IOScheme Function::getOutputScheme() const {
-    return (*this)->getOutputScheme();
+    return (*this)->output_.scheme;
   }
 
   int Function::inputSchemeEntry(const std::string &name) const {
@@ -289,17 +289,19 @@ namespace casadi {
     // Names of inputs
     std::vector<std::string> i_names;
     i_names.reserve(nIn()*(1+nfwd)+nOut()*nadj);
+    const std::vector<std::string>& ischeme=(*this)->input_.scheme;
+    const std::vector<std::string>& oscheme=(*this)->output_.scheme;
 
     // Nondifferentiated inputs
     for (int i=0; i<nIn(); ++i) {
-      i_names.push_back("der_" + inputScheme().entryLabel(i));
+      i_names.push_back("der_" + ischeme.at(i));
     }
 
     // Forward seeds
     for (int d=0; d<nfwd; ++d) {
       for (int i=0; i<nIn(); ++i) {
         ss.str(string());
-        ss << "fwd" << d << "_" << inputScheme().entryLabel(i);
+        ss << "fwd" << d << "_" << ischeme.at(i);
         i_names.push_back(ss.str());
       }
     }
@@ -308,7 +310,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<nOut(); ++i) {
         ss.str(string());
-        ss << "adj" << d << "_" << outputScheme().entryLabel(i);
+        ss << "adj" << d << "_" << oscheme.at(i);
         i_names.push_back(ss.str());
       }
     }
@@ -322,14 +324,14 @@ namespace casadi {
 
     // Nondifferentiated inputs
     for (int i=0; i<nOut(); ++i) {
-      o_names.push_back("der_" + outputScheme().entryLabel(i));
+      o_names.push_back("der_" + oscheme.at(i));
     }
 
     // Forward sensitivities
     for (int d=0; d<nfwd; ++d) {
       for (int i=0; i<nOut(); ++i) {
         ss.str(string());
-        ss << "fwd" << d << "_" << outputScheme().entryLabel(i);
+        ss << "fwd" << d << "_" << oscheme.at(i);
         o_names.push_back(ss.str());
       }
     }
@@ -338,7 +340,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<nIn(); ++i) {
         ss.str(string());
-        ss << "adj" << d << "_" << inputScheme().entryLabel(i);
+        ss << "adj" << d << "_" << ischeme.at(i);
         o_names.push_back(ss.str());
       }
     }
@@ -413,22 +415,6 @@ namespace casadi {
     CodeGenerator gen(opts);
     gen.add(*this, fname);
     gen.generate(fname);
-  }
-
-  const IOScheme& Function::inputScheme() const {
-    return (*this)->inputScheme();
-  }
-
-  const IOScheme& Function::outputScheme() const {
-    return (*this)->outputScheme();
-  }
-
-  IOScheme& Function::inputScheme() {
-    return (*this)->inputScheme();
-  }
-
-  IOScheme& Function::outputScheme() {
-    return (*this)->outputScheme();
   }
 
   const IOSchemeVector<DMatrix>& Function::input_struct() const {
@@ -583,17 +569,17 @@ namespace casadi {
 
   IOSchemeVector<DMatrix> Function::
   operator()(const IOSchemeVector<DMatrix>& arg, bool always_inline, bool never_inline) {
-    return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
+    return (*this)->output_.scheme.fromVector(operator()(arg.data, always_inline, never_inline));
   }
 
   IOSchemeVector<SX> Function::
   operator()(const IOSchemeVector<SX>& arg, bool always_inline, bool never_inline) {
-    return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
+    return (*this)->output_.scheme.fromVector(operator()(arg.data, always_inline, never_inline));
   }
 
   IOSchemeVector<MX> Function::
   operator()(const IOSchemeVector<MX>& arg, bool always_inline, bool never_inline) {
-    return outputScheme().fromVector(operator()(arg.data, always_inline, never_inline));
+    return (*this)->output_.scheme.fromVector(operator()(arg.data, always_inline, never_inline));
   }
 
   inline bool checkMat(const Sparsity& arg, const Sparsity& inp) {

@@ -104,15 +104,6 @@ namespace casadi {
     /// \endcond
 
     /// \cond INTERNAL
-    ///@{
-    /** \brief Access input/output scheme */
-    const casadi::IOScheme& inputScheme() const;
-    const casadi::IOScheme& outputScheme() const;
-
-    casadi::IOScheme& inputScheme();
-    casadi::IOScheme& outputScheme();
-    ///@}
-
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to

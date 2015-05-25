@@ -151,15 +151,6 @@ namespace casadi {
     }
 
     /// \endcond
-
-    /** \brief Get input scheme */
-    casadi::IOScheme getInputScheme() const
-    { return static_cast<const Derived*>(this)->inputScheme(); }
-
-    /** \brief Get output scheme */
-    casadi::IOScheme getOutputScheme() const
-    { return static_cast<const Derived*>(this)->outputScheme(); }
-
     /**
     * \defgroup  iname
     *   \param[in] iname input name. Only allowed when an input scheme is set.

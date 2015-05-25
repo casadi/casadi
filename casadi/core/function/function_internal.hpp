@@ -315,12 +315,7 @@ namespace casadi {
     virtual std::vector<SX> symbolicInputSX() const;
 
     ///@{
-    /** \brief Access input/output scheme */
-    inline const IOScheme& inputScheme() const { return input_.scheme;}
-    inline const IOScheme& outputScheme() const { return output_.scheme;}
-    inline IOScheme& inputScheme() { return input_.scheme;}
-    inline IOScheme& outputScheme() { return output_.scheme;}
-
+    /** \brief Get input scheme index by name */
     virtual int inputSchemeEntry(const std::string &name) const {
       casadi_assert(!input_.scheme.isNull());
       const std::vector<std::string>& v=input_.scheme;
@@ -333,6 +328,7 @@ namespace casadi {
       return -1;
     }
 
+    /** \brief Get output scheme index by name */
     virtual int outputSchemeEntry(const std::string &name) const {
       casadi_assert(!output_.scheme.isNull());
       const std::vector<std::string>& v=output_.scheme;

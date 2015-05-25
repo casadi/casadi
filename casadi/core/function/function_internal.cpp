@@ -147,13 +147,27 @@ namespace casadi {
     // Custom input scheme
     if (hasSetOption("input_scheme")) {
       const vector<string>& v = getOption("input_scheme");
-      if (!v.empty()) inputScheme() = IOScheme(v);
+      if (!v.empty()) input_.scheme = IOScheme(v);
+    }
+
+    // If input scheme null, provide default names
+    if (input_.scheme.isNull()) {
+      vector<string> v(nIn());
+      for (size_t i=0; i!=v.size(); ++i) v[i]=CodeGenerator::to_string(i);
+      input_.scheme = IOScheme(v);
     }
 
     // Custom output scheme
     if (hasSetOption("output_scheme")) {
       const vector<string>& v = getOption("output_scheme");
-      if (!v.empty()) outputScheme() = IOScheme(v);
+      if (!v.empty()) output_.scheme = IOScheme(v);
+    }
+
+    // If output scheme null, provide default names
+    if (output_.scheme.isNull()) {
+      vector<string> v(nOut());
+      for (size_t i=0; i!=v.size(); ++i) v[i]=CodeGenerator::to_string(i);
+      output_.scheme = IOScheme(v);
     }
 
     monitor_inputs_ = monitored("inputs");
@@ -305,8 +319,8 @@ namespace casadi {
 
     MXFunction f = MXFunction(arg, res);
     f.setOption("name", "wrap_" + string(getOption("name")));
-    f.setOption("input_scheme", getInputScheme().v());
-    f.setOption("output_scheme", getOutputScheme().v());
+    f.setOption("input_scheme", input_.scheme.v());
+    f.setOption("output_scheme", output_.scheme.v());
     f.setOption("ad_weight", adWeight());
     f.setOption("ad_weight_sp", adWeightSp());
     for (int i=0; i<3; ++i) {
@@ -328,7 +342,7 @@ namespace casadi {
     log("FunctionInternal::getHessian generating gradient");
     Function g = gradient(iind, oind);
     g.setOption("verbose", getOption("verbose"));
-    g.setOption("input_scheme", getInputScheme().v());
+    g.setOption("input_scheme", input_.scheme.v());
     g.init();
 
     // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
@@ -1490,7 +1504,7 @@ namespace casadi {
       ret.setOption("verbose", getOption("verbose"));
 
       // Same input scheme
-      ret.setOption("input_scheme", getInputScheme().v());
+      ret.setOption("input_scheme", input_.scheme.v());
 
       // Output names
       std::vector<std::string> ionames;
@@ -1878,7 +1892,7 @@ namespace casadi {
       ret.setOption("verbose", getOption("verbose"));
 
       // Set input and output schemes
-      ret.setOption("input_scheme", getInputScheme().v());
+      ret.setOption("input_scheme", input_.scheme.v());
       std::vector<std::string> oscheme(1, "jac");
       ret.setOption("output_scheme", oscheme);
 
