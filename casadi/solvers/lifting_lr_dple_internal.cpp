@@ -162,9 +162,9 @@ namespace casadi {
       v_in[LR_DLE_H] = Hs;
     }
 
-    std::vector<MX> Pr = solver_(lrdpleIn("a", A, "v", V, "c", C, "h", H));
+    IOSchemeVector<MX> Pr = solver_(lrdpleIn("a", A, "v", V, "c", C, "h", H));
 
-    MX Pf = Pr[0];
+    MX Pf = Pr.data[0];
 
     std::vector<MX> Ps = with_H_ ? diagsplit(Pf, Hsi_) : diagsplit(Pf, n_);
 

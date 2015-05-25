@@ -63,7 +63,7 @@ namespace casadi {
 
     /** \brief  Create a new Stabilized QP Solver */
     static StabilizedQpSolverInternal* creator(const QPStructure& st)
-    { return new StabilizedQpToQp(st);}
+    { return new StabilizedQpToQp(st.data);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);

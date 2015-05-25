@@ -131,9 +131,9 @@ namespace casadi {
     // Initialize the NLP solver
     solver_.init();
 
-    std::vector<MX> Pr = solver_(dleIn("a", A, "v" , V));
+    IOSchemeVector<MX> Pr = solver_(dleIn("a", A, "v" , V));
 
-    MX Pf = Pr[0];
+    MX Pf = Pr.data[0];
 
     std::vector<MX> Ps = diagsplit(Pf, n_);
 

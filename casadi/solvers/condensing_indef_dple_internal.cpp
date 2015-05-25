@@ -110,10 +110,10 @@ namespace casadi {
     // Initialize the NLP solver
     solver_.init();
 
-    std::vector<MX> Pr = solver_(dpleIn("a", Ap, "v", R));
+    IOSchemeVector<MX> Pr = solver_(dpleIn("a", Ap, "v", R));
 
     std::vector<MX> Ps(K_);
-    Ps[0] = Pr[0];
+    Ps[0] = Pr.data[0];
 
     for (int k=0;k<K_-1;++k) {
       Ps[k+1] = mul(mul(Ass[k], Ps[k]), Ass[k].T()) + Vss[k];

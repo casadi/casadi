@@ -56,7 +56,7 @@ namespace casadi {
     /** \brief  Constructor
      * \param st \structargument{LrDple}
      */
-    DpleToLrDple(const DpleStructure & st);
+    DpleToLrDple(const DpleStructure& st);
 
     /** \brief  Destructor */
     virtual ~DpleToLrDple();

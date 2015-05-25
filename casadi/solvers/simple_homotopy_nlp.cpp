@@ -85,8 +85,6 @@ namespace casadi {
     std::vector<MX> p_tau = vertsplit(P, split);
     MX x = MX::sym("x", hnlp_.input(HNL_X).nnz());
 
-    std::vector<MX> nlp_in = nlpIn("x", x, "p", P);
-
     MXFunction nlp(nlpIn("x", x, "p", P),
                    hnlp_(hnlpIn("x", x, "p", p_tau[0], "tau", p_tau[1])));
 
