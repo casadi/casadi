@@ -115,8 +115,8 @@ namespace casadi {
     if (flag) throw CasadiException("ExternalFunctionInternal: \"narg\" failed");
 
     // Pass to casadi
-    input_.data.resize(n_in);
-    output_.data.resize(n_out);
+    ibuf_.resize(n_in);
+    obuf_.resize(n_out);
 
     // Get the sparsity pattern
     for (int i=0; i<n_in+n_out; ++i) {

@@ -629,7 +629,7 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     MXFunction ret(inputv_, ret_out);
-    ret.setOption("input_scheme", input_.str);
+    ret.setOption("input_scheme", ischeme_);
     return ret;
   }
 
@@ -1109,8 +1109,8 @@ namespace casadi {
 
     // Create function
     SXFunction f(arg, res);
-    f.setOption("input_scheme", input_.str);
-    f.setOption("output_scheme", output_.str);
+    f.setOption("input_scheme", ischeme_);
+    f.setOption("output_scheme", oscheme_);
     string name = getOption("name");
     f.setOption("name", "expand_" + name);
     return f;
@@ -1184,7 +1184,7 @@ namespace casadi {
           int oind = it->res.front();
           if (g.verbose) {
             s << "  /* #" << k++ << ": Output " << oind;
-            s << " (" << output_.str.at(oind) << ")";
+            s << " (" << oscheme_.at(oind) << ")";
             s << " */" << endl;
           }
           string r = "res[" + g.to_string(oind) + "]";
@@ -1206,7 +1206,7 @@ namespace casadi {
           int i = workloc_[it->res.front()];
           if (g.verbose) {
             s << "  /* #" << k++ << ": Input " << iind;
-            s << " (" << input_.str.at(iind) << ")";
+            s << " (" << ischeme_.at(iind) << ")";
             s << ", part " << ip << " (" << it->data.getName() << ") */" << endl;
           }
           if (n==1) {

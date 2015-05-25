@@ -73,7 +73,7 @@ namespace casadi {
     Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
 
     // Input arguments
-    input_.data.resize(QCQP_SOLVER_NUM_IN);
+    ibuf_.resize(QCQP_SOLVER_NUM_IN);
     input(QCQP_SOLVER_X0) = DMatrix::zeros(x_sparsity);
     input(QCQP_SOLVER_H) = DMatrix::zeros(H);
     input(QCQP_SOLVER_G) = DMatrix::zeros(x_sparsity);
@@ -94,14 +94,14 @@ namespace casadi {
     }
 
     // Output arguments
-    output_.data.resize(QCQP_SOLVER_NUM_OUT);
+    obuf_.resize(QCQP_SOLVER_NUM_OUT);
     output(QCQP_SOLVER_X) = DMatrix(x_sparsity);
     output(QCQP_SOLVER_COST) = 0.0;
     output(QCQP_SOLVER_LAM_X) = DMatrix(x_sparsity);
     output(QCQP_SOLVER_LAM_A) = DMatrix(bounds_sparsity);
 
-    input_.str = IOScheme(SCHEME_QcqpSolverInput);
-    output_.str = IOScheme(SCHEME_QcqpSolverOutput);
+    ischeme_ = IOScheme(SCHEME_QcqpSolverInput);
+    oscheme_ = IOScheme(SCHEME_QcqpSolverOutput);
   }
 
   void QcqpSolverInternal::init() {

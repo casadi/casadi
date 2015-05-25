@@ -196,11 +196,11 @@ namespace casadi {
   }
 
   std::vector<std::string> Function::inputScheme() const {
-    return (*this)->input_.str;
+    return (*this)->ischeme_;
   }
 
   std::vector<std::string> Function::outputScheme() const {
-    return (*this)->output_.str;
+    return (*this)->oscheme_;
   }
 
   int Function::inputIndex(const std::string &name) const {
@@ -329,8 +329,8 @@ namespace casadi {
     // Names of inputs
     std::vector<std::string> i_names;
     i_names.reserve(nIn()*(1+nfwd)+nOut()*nadj);
-    const std::vector<std::string>& ischeme=(*this)->input_.str;
-    const std::vector<std::string>& oscheme=(*this)->output_.str;
+    const std::vector<std::string>& ischeme=(*this)->ischeme_;
+    const std::vector<std::string>& oscheme=(*this)->oscheme_;
 
     // Nondifferentiated inputs
     for (int i=0; i<nIn(); ++i) {
@@ -455,22 +455,6 @@ namespace casadi {
     CodeGenerator gen(opts);
     gen.add(*this, fname);
     gen.generate(fname);
-  }
-
-  const IOSchemeVector<DMatrix>& Function::input_struct() const {
-    return (*this)->input_struct();
-  }
-
-  const IOSchemeVector<DMatrix>& Function::output_struct() const {
-    return (*this)->output_struct();
-  }
-
-  IOSchemeVector<DMatrix>& Function::input_struct() {
-    return (*this)->input_struct();
-  }
-
-  IOSchemeVector<DMatrix>& Function::output_struct() {
-    return (*this)->output_struct();
   }
 
   void Function::checkInputs() const {
@@ -610,19 +594,19 @@ namespace casadi {
   IOSchemeVector<DMatrix> Function::
   operator()(const IOSchemeVector<DMatrix>& arg, bool always_inline, bool never_inline) {
     return IOSchemeVector<DMatrix>(operator()(arg.data, always_inline, never_inline),
-                                   IOScheme((*this)->output_.str));
+                                   IOScheme((*this)->oscheme_));
   }
 
   IOSchemeVector<SX> Function::
   operator()(const IOSchemeVector<SX>& arg, bool always_inline, bool never_inline) {
     return IOSchemeVector<SX>(operator()(arg.data, always_inline, never_inline),
-                              IOScheme((*this)->output_.str));
+                              IOScheme((*this)->oscheme_));
   }
 
   IOSchemeVector<MX> Function::
   operator()(const IOSchemeVector<MX>& arg, bool always_inline, bool never_inline) {
     return IOSchemeVector<MX>(operator()(arg.data, always_inline, never_inline),
-                              IOScheme((*this)->output_.str));
+                              IOScheme((*this)->oscheme_));
   }
 
   inline bool checkMat(const Sparsity& arg, const Sparsity& inp) {

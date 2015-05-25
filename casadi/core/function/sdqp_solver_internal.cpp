@@ -75,7 +75,7 @@ namespace casadi {
                           << n_ << "), but got remainder " << F.size2()%n_);
 
     // Input arguments
-    input_.data.resize(SDQP_SOLVER_NUM_IN);
+    ibuf_.resize(SDQP_SOLVER_NUM_IN);
     input(SDQP_SOLVER_H) = DMatrix::zeros(H);
     input(SDQP_SOLVER_G) = DMatrix::zeros(G);
     input(SDQP_SOLVER_F) = DMatrix::zeros(F);
@@ -93,8 +93,8 @@ namespace casadi {
                             "But got " << s.dimString() <<  " for i = " << i << ".");
     }
 
-    input_.str = IOScheme(SCHEME_SDQPInput);
-    output_.str = IOScheme(SCHEME_SDQPOutput);
+    ischeme_ = IOScheme(SCHEME_SDQPInput);
+    oscheme_ = IOScheme(SCHEME_SDQPOutput);
   }
 
   void SdqpSolverInternal::init() {

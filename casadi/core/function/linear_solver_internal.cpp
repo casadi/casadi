@@ -53,16 +53,16 @@ namespace casadi {
                                coarse_rowblock, coarse_colblock);
 
     // Allocate inputs
-    input_.data.resize(LINSOL_NUM_IN);
+    ibuf_.resize(LINSOL_NUM_IN);
     input(LINSOL_A) = DMatrix(sparsity);
     input(LINSOL_B) = DMatrix::zeros(sparsity.size2(), nrhs);
 
     // Allocate outputs
-    output_.data.resize(LINSOL_NUM_OUT);
+    obuf_.resize(LINSOL_NUM_OUT);
     output(LINSOL_X) = input(LINSOL_B);
 
-    input_.str = IOScheme(SCHEME_LinsolInput).v();
-    output_.str = IOScheme(SCHEME_LinsolOutput).v();
+    ischeme_ = IOScheme(SCHEME_LinsolInput).v();
+    oscheme_ = IOScheme(SCHEME_LinsolOutput).v();
   }
 
   void LinearSolverInternal::init() {

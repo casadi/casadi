@@ -54,8 +54,8 @@ namespace casadi {
 
 
     if (nrhs_==1) {
-      input_.str = IOScheme(SCHEME_LR_DLEInput);
-      output_.str = IOScheme(SCHEME_LR_DLEOutput);
+      ischeme_ = IOScheme(SCHEME_LR_DLEInput);
+      oscheme_ = IOScheme(SCHEME_LR_DLEOutput);
     }
   }
 
@@ -141,7 +141,7 @@ namespace casadi {
     casadi_assert(nrhs_==1);
 
     // Allocate inputs
-    input_.data.resize(LR_DLE_NUM_IN);
+    ibuf_.resize(LR_DLE_NUM_IN);
     input(LR_DLE_A)  = DMatrix::zeros(A_);
 
 
@@ -153,7 +153,7 @@ namespace casadi {
       input(LR_DLE_H)  = DMatrix::zeros(H_);
     }
 
-    output_.data.resize(nrhs_*LR_DLE_NUM_OUT);
+    obuf_.resize(nrhs_*LR_DLE_NUM_OUT);
 
     Sparsity Pnew = getSparsity(st_, Hs_);
 

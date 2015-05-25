@@ -91,13 +91,13 @@ namespace casadi {
                           << f_.output(iout_).nnz());
 
     // Allocate inputs
-    input_.data.resize(f_.nIn());
+    ibuf_.resize(f_.nIn());
     for (int i=0; i<nIn(); ++i) {
       input(i) = f_.input(i);
     }
 
     // Allocate output
-    output_.data.resize(f_.nOut());
+    obuf_.resize(f_.nOut());
     for (int i=0; i<nOut(); ++i) {
       output(i) = f_.output(i);
     }

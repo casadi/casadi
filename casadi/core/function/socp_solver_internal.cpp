@@ -41,8 +41,8 @@ namespace casadi {
               "Provide the size of each SOC constraint. Must sum up to N.");
     addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");
 
-    input_.str = IOScheme(SCHEME_SOCPInput);
-    output_.str = IOScheme(SCHEME_SOCPOutput);
+    ischeme_ = IOScheme(SCHEME_SOCPInput);
+    oscheme_ = IOScheme(SCHEME_SOCPOutput);
   }
 
   void SocpSolverInternal::init() {
@@ -74,7 +74,7 @@ namespace casadi {
 
 
     // Input arguments
-    input_.data.resize(SOCP_SOLVER_NUM_IN);
+    ibuf_.resize(SOCP_SOLVER_NUM_IN);
     input(SOCP_SOLVER_G) = DMatrix::zeros(G);
     input(SOCP_SOLVER_H) = DMatrix::zeros(N_, 1);
     input(SOCP_SOLVER_E) = DMatrix::zeros(n_*m_, 1);
@@ -87,7 +87,7 @@ namespace casadi {
     input(SOCP_SOLVER_UBA) = DMatrix::inf(nc_);
 
     // Output arguments
-    output_.data.resize(SOCP_SOLVER_NUM_OUT);
+    obuf_.resize(SOCP_SOLVER_NUM_OUT);
     output(SOCP_SOLVER_X) = DMatrix::zeros(n_, 1);
     output(SOCP_SOLVER_COST) = 0.0;
     output(SOCP_SOLVER_LAM_X) = DMatrix::zeros(n_, 1);

@@ -57,8 +57,8 @@ namespace casadi {
     // Negative number of parameters for consistancy checking
     np_ = -1;
 
-    input_.str = IOScheme(SCHEME_IntegratorInput);
-    output_.str = IOScheme(SCHEME_IntegratorOutput);
+    ischeme_ = IOScheme(SCHEME_IntegratorInput);
+    oscheme_ = IOScheme(SCHEME_IntegratorOutput);
   }
 
   IntegratorInternal::~IntegratorInternal() {
@@ -118,7 +118,7 @@ namespace casadi {
     }
 
     // Allocate space for inputs
-    input_.data.resize(INTEGRATOR_NUM_IN);
+    ibuf_.resize(INTEGRATOR_NUM_IN);
     x0()  = DMatrix::zeros(f_.input(DAE_X).sparsity());
     p()   = DMatrix::zeros(f_.input(DAE_P).sparsity());
     z0()   = DMatrix::zeros(f_.input(DAE_Z).sparsity());
@@ -129,7 +129,7 @@ namespace casadi {
     }
 
     // Allocate space for outputs
-    output_.data.resize(INTEGRATOR_NUM_OUT);
+    obuf_.resize(INTEGRATOR_NUM_OUT);
     xf() = x0();
     qf() = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
     zf() = z0();

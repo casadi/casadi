@@ -149,16 +149,6 @@ namespace casadi {
     ///@}
     /// \endcond
 
-    /// \cond INTERNAL
-    ///@{
-    /// Input/output structures of the function */
-    const IOSchemeVector<DMatrix>& input_struct() const;
-    const IOSchemeVector<DMatrix>& output_struct() const;
-    IOSchemeVector<DMatrix>& input_struct();
-    IOSchemeVector<DMatrix>& output_struct();
-    ///@}
-    /// \endcond
-
     /** \brief Get the number of function inputs */
     int nIn() const;
 

@@ -41,8 +41,8 @@ namespace casadi {
               "Expand the NLP function in terms of scalar operations, i.e. MX->SX");
 
     // Enable string notation for IO
-    input_.str = IOScheme(SCHEME_NlpSolverInput).v();
-    output_.str = IOScheme(SCHEME_NlpSolverOutput).v();
+    ischeme_ = IOScheme(SCHEME_NlpSolverInput).v();
+    oscheme_ = IOScheme(SCHEME_NlpSolverOutput).v();
   }
 
   HomotopyNLPInternal::~HomotopyNLPInternal() {
@@ -68,7 +68,7 @@ namespace casadi {
     ng_ = g_sparsity.nnz();
 
     // Allocate space for inputs
-    input_.data.resize(NLP_SOLVER_NUM_IN);
+    ibuf_.resize(NLP_SOLVER_NUM_IN);
     input(NLP_SOLVER_X0)       =  DMatrix::zeros(x_sparsity);
     input(NLP_SOLVER_LBX)      = -DMatrix::inf(x_sparsity);
     input(NLP_SOLVER_UBX)      =  DMatrix::inf(x_sparsity);
@@ -79,7 +79,7 @@ namespace casadi {
     input(NLP_SOLVER_P)        =  DMatrix::zeros(p_sparsity);
 
     // Allocate space for outputs
-    output_.data.resize(NLP_SOLVER_NUM_OUT);
+    obuf_.resize(NLP_SOLVER_NUM_OUT);
     output(NLP_SOLVER_X)       = DMatrix::zeros(x_sparsity);
     output(NLP_SOLVER_F)       = DMatrix::zeros(1);
     output(NLP_SOLVER_LAM_X)   = DMatrix::zeros(x_sparsity);

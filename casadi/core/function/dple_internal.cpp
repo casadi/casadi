@@ -55,8 +55,8 @@ namespace casadi {
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
 
     if (nrhs_==1) {
-      input_.str = IOScheme(SCHEME_DPLEInput);
-      output_.str = IOScheme(SCHEME_DPLEOutput);
+      ischeme_ = IOScheme(SCHEME_DPLEInput);
+      oscheme_ = IOScheme(SCHEME_DPLEOutput);
     }
   }
 
@@ -96,7 +96,7 @@ namespace casadi {
     }
 
     // Allocate inputs
-    input_.data.resize(1+nrhs_);
+    ibuf_.resize(1+nrhs_);
 
     if (const_dim_) {
       input(0)  = DMatrix::zeros(horzcat(A_));
@@ -114,7 +114,7 @@ namespace casadi {
 
     // Allocate outputs
     std::vector<Sparsity> P = LrDpleInternal::getSparsity(lrdpleStruct("a", A_, "v", V_));
-    output_.data.resize(nrhs_);
+    obuf_.resize(nrhs_);
     for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
         output(i) = DMatrix::zeros(horzcat(P));

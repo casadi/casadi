@@ -146,27 +146,27 @@ namespace casadi {
 
     // Custom input scheme
     if (hasSetOption("input_scheme")) {
-      input_.str = getOption("input_scheme");
+      ischeme_ = getOption("input_scheme");
     }
 
     // If input scheme empty, provide default names
-    if (input_.str.empty()) {
-      input_.str.resize(nIn());
-      for (size_t i=0; i!=input_.str.size(); ++i) {
-        input_.str[i]=CodeGenerator::to_string(i);
+    if (ischeme_.empty()) {
+      ischeme_.resize(nIn());
+      for (size_t i=0; i!=ischeme_.size(); ++i) {
+        ischeme_[i]=CodeGenerator::to_string(i);
       }
     }
 
     // Custom output scheme
     if (hasSetOption("output_scheme")) {
-      output_.str = getOption("output_scheme");
+      oscheme_ = getOption("output_scheme");
     }
 
     // If output scheme null, provide default names
-    if (output_.str.empty()) {
-      output_.str.resize(nOut());
-      for (size_t i=0; i!=output_.str.size(); ++i) {
-        output_.str[i]=CodeGenerator::to_string(i);
+    if (oscheme_.empty()) {
+      oscheme_.resize(nOut());
+      for (size_t i=0; i!=oscheme_.size(); ++i) {
+        oscheme_[i]=CodeGenerator::to_string(i);
       }
     }
 
@@ -188,7 +188,7 @@ namespace casadi {
       stream << " Inputs (" << nIn()
              << "):" << endl;
       for (int i=0;i<nIn();i++) {
-        stream << "  " << i  << ". (" << input_.str.at(i) << ")   "
+        stream << "  " << i  << ". (" << ischeme_.at(i) << ")   "
                << input(i).dimString() << endl;
       }
     }
@@ -198,7 +198,7 @@ namespace casadi {
       stream << " Outputs (" << ": "
              << nOut() << "):" << endl;
       for (int i=0;i<nOut();i++) {
-        stream << "  " << i << ". (" << output_.str.at(i) << ")   "
+        stream << "  " << i << ". (" << oscheme_.at(i) << ")   "
                << output(i).dimString() << endl;
       }
     }
@@ -220,14 +220,14 @@ namespace casadi {
     stringstream ss;
     ss << "gradient_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name", ss.str());
-    ret.setOption("input_scheme", input_.str);
+    ret.setOption("input_scheme", ischeme_);
 
     // Output names
     std::vector<std::string> ionames;
     ionames.reserve(ret.nOut());
     ionames.push_back("grad");
     for (int i=0;i<nOut();++i) {
-      ionames.push_back(output_.str.at(i));
+      ionames.push_back(oscheme_.at(i));
     }
     ret.setOption("output_scheme", ionames);
     return ret;
@@ -245,14 +245,14 @@ namespace casadi {
     stringstream ss;
     ss << "tangent_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name", ss.str());
-    ret.setOption("input_scheme", input_.str);
+    ret.setOption("input_scheme", ischeme_);
 
     // Output names
     std::vector<std::string> ionames;
     ionames.reserve(ret.nOut());
     ionames.push_back("tangent");
     for (int i=0;i<nOut();++i) {
-      ionames.push_back(output_.str.at(i));
+      ionames.push_back(oscheme_.at(i));
     }
     ret.setOption("output_scheme", ionames);
 
@@ -272,7 +272,7 @@ namespace casadi {
     stringstream ss;
     ss << "hessian_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name", ss.str());
-    ret.setOption("input_scheme", input_.str);
+    ret.setOption("input_scheme", ischeme_);
 
     // Output names
     std::vector<std::string> ionames;
@@ -280,7 +280,7 @@ namespace casadi {
     ionames.push_back("hess");
     ionames.push_back("grad");
     for (int i=0;i<nOut();++i) {
-      ionames.push_back(output_.str.at(i));
+      ionames.push_back(oscheme_.at(i));
     }
     ret.setOption("output_scheme", ionames);
 
@@ -305,8 +305,8 @@ namespace casadi {
 
     MXFunction f = MXFunction(arg, res);
     f.setOption("name", "wrap_" + string(getOption("name")));
-    f.setOption("input_scheme", input_.str);
-    f.setOption("output_scheme", output_.str);
+    f.setOption("input_scheme", ischeme_);
+    f.setOption("output_scheme", oscheme_);
     f.setOption("ad_weight", adWeight());
     f.setOption("ad_weight_sp", adWeightSp());
     for (int i=0; i<3; ++i) {
@@ -328,7 +328,7 @@ namespace casadi {
     log("FunctionInternal::getHessian generating gradient");
     Function g = gradient(iind, oind);
     g.setOption("verbose", getOption("verbose"));
-    g.setOption("input_scheme", input_.str);
+    g.setOption("input_scheme", ischeme_);
     g.init();
 
     // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
@@ -456,19 +456,19 @@ namespace casadi {
 
     // Clear the forward seeds/adjoint sensitivities
     for (int ind=0; ind<nIn(); ++ind) {
-      vector<double> &v = input_.data[ind].data();
+      vector<double> &v = ibuf_[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
     for (int ind=0; ind<nOut(); ++ind) {
-      vector<double> &v = output_.data[ind].data();
+      vector<double> &v = obuf_[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Get seeds and sensitivities
-    bvec_t* input_v = get_bvec_t(input_.data[iind].data());
-    bvec_t* output_v = get_bvec_t(output_.data[oind].data());
+    bvec_t* input_v = get_bvec_t(ibuf_[iind].data());
+    bvec_t* output_v = get_bvec_t(obuf_[oind].data());
     bvec_t* seed_v = use_fwd ? input_v : output_v;
     bvec_t* sens_v = use_fwd ? output_v : input_v;
 
@@ -574,13 +574,13 @@ namespace casadi {
 
     // Clear the forward seeds/adjoint sensitivities
     for (int ind=0; ind<nIn(); ++ind) {
-      vector<double> &v = input_.data[ind].data();
+      vector<double> &v = ibuf_[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
     for (int ind=0; ind<nOut(); ++ind) {
-      vector<double> &v = output_.data[ind].data();
+      vector<double> &v = obuf_[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
@@ -623,8 +623,8 @@ namespace casadi {
       spInit(true);
 
       // Get seeds and sensitivities
-      bvec_t* input_v = get_bvec_t(input_.data[iind].data());
-      bvec_t* output_v = get_bvec_t(output_.data[oind].data());
+      bvec_t* input_v = get_bvec_t(ibuf_[iind].data());
+      bvec_t* output_v = get_bvec_t(obuf_[oind].data());
       bvec_t* seed_v = input_v;
       bvec_t* sens_v = output_v;
 
@@ -755,13 +755,13 @@ namespace casadi {
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
             for (int ind=0; ind<nIn(); ++ind) {
-              vector<double> &v = input_.data[ind].data();
+              vector<double> &v = ibuf_[ind].data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 
             // Clear the adjoint seeds/forward sensitivities, ready for next bvec sweep
             for (int ind=0; ind<nOut(); ++ind) {
-              vector<double> &v = output_.data[ind].data();
+              vector<double> &v = obuf_[ind].data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 
@@ -805,13 +805,13 @@ namespace casadi {
 
     // Clear the forward seeds/adjoint sensitivities
     for (int ind=0; ind<nIn(); ++ind) {
-      vector<double> &v = input_.data[ind].data();
+      vector<double> &v = ibuf_[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
     for (int ind=0; ind<nOut(); ++ind) {
-      vector<double> &v = output_.data[ind].data();
+      vector<double> &v = obuf_[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
@@ -897,8 +897,8 @@ namespace casadi {
       spInit(use_fwd);
 
       // Get seeds and sensitivities
-      bvec_t* input_v = get_bvec_t(input_.data[iind].data());
-      bvec_t* output_v = get_bvec_t(output_.data[oind].data());
+      bvec_t* input_v = get_bvec_t(ibuf_[iind].data());
+      bvec_t* output_v = get_bvec_t(obuf_[oind].data());
       bvec_t* seed_v = use_fwd ? input_v : output_v;
       bvec_t* sens_v = use_fwd ? output_v : input_v;
 
@@ -1044,13 +1044,13 @@ namespace casadi {
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
             for (int ind=0; ind<nIn(); ++ind) {
-              vector<double> &v = input_.data[ind].data();
+              vector<double> &v = ibuf_[ind].data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 
             // Clear the adjoint seeds/forward sensitivities, ready for next bvec sweep
             for (int ind=0; ind<nOut(); ++ind) {
-              vector<double> &v = output_.data[ind].data();
+              vector<double> &v = obuf_[ind].data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 
@@ -1490,14 +1490,14 @@ namespace casadi {
       ret.setOption("verbose", getOption("verbose"));
 
       // Same input scheme
-      ret.setOption("input_scheme", input_.str);
+      ret.setOption("input_scheme", ischeme_);
 
       // Output names
       std::vector<std::string> ionames;
       ionames.reserve(ret.nOut());
       ionames.push_back("jac");
       for (int i=0; i<nOut(); ++i) {
-        ionames.push_back(output_.str.at(i));
+        ionames.push_back(oscheme_.at(i));
       }
       ret.setOption("output_scheme", ionames);
 
@@ -1560,19 +1560,19 @@ namespace casadi {
 
     // Nondifferentiated inputs
     for (int i=0; i<n_in; ++i) {
-      i_names.push_back("der_" + input_.str.at(i));
+      i_names.push_back("der_" + ischeme_.at(i));
     }
 
     // Nondifferentiated outputs (given)
     for (int i=0; i<n_out; ++i) {
-      i_names.push_back("der_" + output_.str.at(i));
+      i_names.push_back("der_" + oscheme_.at(i));
     }
 
     // Forward seeds
     for (int d=0; d<nfwd; ++d) {
       for (int i=0; i<n_in; ++i) {
         ss.str(string());
-        ss << "fwd" << d << "_" << input_.str.at(i);
+        ss << "fwd" << d << "_" << ischeme_.at(i);
         i_names.push_back(ss.str());
       }
     }
@@ -1588,7 +1588,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       for (int i=0; i<n_out; ++i) {
         ss.str(string());
-        ss << "fwd" << d << "_" << output_.str.at(i);
+        ss << "fwd" << d << "_" << oscheme_.at(i);
         o_names.push_back(ss.str());
       }
     }
@@ -1666,19 +1666,19 @@ namespace casadi {
 
     // Nondifferentiated inputs
     for (int i=0; i<n_in; ++i) {
-      i_names.push_back("der_" + input_.str.at(i));
+      i_names.push_back("der_" + ischeme_.at(i));
     }
 
     // Nondifferentiated outputs (given)
     for (int i=0; i<n_out; ++i) {
-      i_names.push_back("der_" + output_.str.at(i));
+      i_names.push_back("der_" + oscheme_.at(i));
     }
 
     // Adjoint seeds
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<n_out; ++i) {
         ss.str(string());
-        ss << "adj" << d << "_" << output_.str.at(i);
+        ss << "adj" << d << "_" << oscheme_.at(i);
         i_names.push_back(ss.str());
       }
     }
@@ -1694,7 +1694,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<n_in; ++i) {
         ss.str(string());
-        ss << "adj" << d << "_" << input_.str.at(i);
+        ss << "adj" << d << "_" << ischeme_.at(i);
         o_names.push_back(ss.str());
       }
     }
@@ -1824,7 +1824,7 @@ namespace casadi {
         casadi_assert_message(
           arg[i].size2()==input(i).size2() && arg[i].size1()==input(i).size1(),
           "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function."
-          << endl << input_.str.at(i) <<  " has shape (" << input(i).size2()
+          << endl << ischeme_.at(i) <<  " has shape (" << input(i).size2()
           << ", " << input(i).size1() << ") while a shape (" << arg[i].size2() << ", "
           << arg[i].size1() << ") was supplied.");
       }
@@ -1878,7 +1878,7 @@ namespace casadi {
       ret.setOption("verbose", getOption("verbose"));
 
       // Set input and output schemes
-      ret.setOption("input_scheme", input_.str);
+      ret.setOption("input_scheme", ischeme_);
       std::vector<std::string> oscheme(1, "jac");
       ret.setOption("output_scheme", oscheme);
 

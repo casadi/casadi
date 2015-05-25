@@ -64,10 +64,10 @@ namespace casadi {
 
     FunctionInternal::init();
 
-    input_.data.resize(1);
+    ibuf_.resize(1);
     input(0)  = DMatrix::zeros(A_sp_);
 
-    output_.data.resize(1);
+    obuf_.resize(1);
     if (dense_) {
       output(0)  = DMatrix::zeros(dense);
     }

@@ -81,10 +81,10 @@ namespace casadi {
     casadi_assert_message(num_in>=0, "All functions are null");
 
     // Allocate input and output buffers
-    input_.data.resize(1+num_in);
+    ibuf_.resize(1+num_in);
     input(0) = 0; // conditional
     for (int i=0; i<num_in; ++i) input(i+1) = DMatrix(sp_in[i]);
-    output_.data.resize(num_out);
+    obuf_.resize(num_out);
     for (int i=0; i<num_out; ++i) output(i) = DMatrix(sp_out[i]);
 
     // Call the initialization method of the base class

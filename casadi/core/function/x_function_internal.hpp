@@ -153,12 +153,12 @@ namespace casadi {
     }
 
     // Allocate space for inputs
-    input_.data.resize(inputv_.size());
+    ibuf_.resize(inputv_.size());
     for (int i=0; i<inputv_.size(); ++i)
       input(i) = DMatrix(inputv_[i].sparsity());
 
     // Allocate space for outputs
-    output_.data.resize(outputv_.size());
+    obuf_.resize(outputv_.size());
     for (int i=0; i<outputv_.size(); ++i)
       output(i) = DMatrix(outputv_[i].sparsity());
 

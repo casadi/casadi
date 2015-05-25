@@ -265,10 +265,10 @@ namespace casadi {
     bool monitored(const std::string& mod) const;
 
     /** \brief Get the number of function inputs */
-    inline int nIn() const { return input_.data.size();}
+    inline int nIn() const { return ibuf_.size();}
 
     /** \brief Get the number of function outputs */
-    inline int nOut() const { return output_.data.size();}
+    inline int nOut() const { return obuf_.size();}
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
     int nnzIn() const;
@@ -323,7 +323,7 @@ namespace casadi {
     ///@{
     /** \brief Get input scheme index by name */
     virtual int inputIndex(const std::string &name) const {
-      const std::vector<std::string>& v=input_.str;
+      const std::vector<std::string>& v=ischeme_;
       for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
         size_t col = i->find(':');
         if (i->compare(0, col, name)==0) return i-v.begin();
@@ -335,7 +335,7 @@ namespace casadi {
 
     /** \brief Get output scheme index by name */
     virtual int outputIndex(const std::string &name) const {
-      const std::vector<std::string>& v=output_.str;
+      const std::vector<std::string>& v=oscheme_;
       for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
         size_t col = i->find(':');
         if (i->compare(0, col, name)==0) return i-v.begin();
@@ -349,7 +349,7 @@ namespace casadi {
     /// Access input argument by index
     inline Matrix<double>& input(int i=0) {
       try {
-        return input_.data.at(i);
+        return ibuf_.at(i);
       } catch(std::out_of_range&) {
         std::stringstream ss;
         ss <<  "In function " << getOption("name")
@@ -377,7 +377,7 @@ namespace casadi {
     /// Access output argument by index
     inline Matrix<double>& output(int i=0) {
       try {
-        return output_.data.at(i);
+        return obuf_.at(i);
       } catch(std::out_of_range&) {
         std::stringstream ss;
         ss <<  "In function " << getOption("name")
@@ -401,14 +401,6 @@ namespace casadi {
     inline const Matrix<double>& output(const std::string &oname) const {
       return const_cast<FunctionInternal*>(this)->output(oname);
     }
-
-    ///@{
-    /// Input/output structures of the function */
-    inline const IOSchemeVector<DMatrix>& input_struct() const { return input_;}
-    inline const IOSchemeVector<DMatrix>& output_struct() const { return output_;}
-    inline IOSchemeVector<DMatrix>& input_struct() { return input_;}
-    inline IOSchemeVector<DMatrix>& output_struct() { return output_;}
-    ///@}
 
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;
@@ -495,16 +487,10 @@ namespace casadi {
     ///@}
 
     /// Input and output buffers
-    //std::vector<DMatrix> ibuf_, obuf_;
+    std::vector<DMatrix> ibuf_, obuf_;
 
     /// Input and output scheme
-    //std::vector<std::string> ischeme_, oscheme_;
-
-    /** \brief  Inputs of the function */
-    IOSchemeVector<DMatrix> input_;
-
-    /** \brief  Output of the function */
-    IOSchemeVector<DMatrix> output_;
+    std::vector<std::string> ischeme_, oscheme_;
 
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
