@@ -320,6 +320,32 @@ namespace casadi {
     inline const IOScheme& outputScheme() const { return output_.scheme;}
     inline IOScheme& inputScheme() { return input_.scheme;}
     inline IOScheme& outputScheme() { return output_.scheme;}
+
+    virtual int inputSchemeEntry(const std::string &name) const {
+      if (input_.scheme.isNull()) casadi_error("Unable to look up '" << name << "' in "
+                                        << "inputscheme, as the "
+                                        << " input scheme of this function is unknown. "
+                                        "You can only index with integers.");
+      const std::vector<std::string>& v=input_.scheme;
+      for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
+        size_t col = i->find(':');
+        if (i->compare(0, col, name)==0) return i-v.begin();
+      }
+      casadi_error("FunctionInternal::inputSchemeEntry: could not find entry \""
+                   << name << "\". Available names are: " << v << ".");
+      return -1;
+    }
+
+    virtual int outputSchemeEntry(const std::string &name) const {
+      const std::vector<std::string>& v=output_.scheme;
+      for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
+        size_t col = i->find(':');
+        if (i->compare(0, col, name)==0) return i-v.begin();
+      }
+      casadi_error("FunctionInternal::outputSchemeEntry: could not find entry \""
+                   << name << "\". Available names are: " << v << ".");
+      return -1;
+    }
     ///@}
 
     ///@{

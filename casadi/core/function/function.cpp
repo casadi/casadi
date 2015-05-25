@@ -203,6 +203,14 @@ namespace casadi {
     return (*this)->getOutputScheme();
   }
 
+  int Function::inputSchemeEntry(const std::string &name) const {
+    return (*this)->inputSchemeEntry(name);
+  }
+
+  int Function::outputSchemeEntry(const std::string &name) const {
+    return (*this)->outputSchemeEntry(name);
+  }
+
   void Function::spEvaluate(bool fwd) {
     (*this)->spEvaluate(fwd);
   }

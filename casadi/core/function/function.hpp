@@ -112,6 +112,20 @@ namespace casadi {
     casadi::IOScheme& inputScheme();
     casadi::IOScheme& outputScheme();
     ///@}
+
+    /** \brief Find the index for a string describing a particular entry of an input scheme
+     *
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * SCHEME_NLPINput
+     */
+    int inputSchemeEntry(const std::string &name) const;
+
+    /** \brief Find the index for a string describing a particular entry of an output scheme
+     *
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * SCHEME_NLPINput
+     */
+    int outputSchemeEntry(const std::string &name) const;
     /// \endcond
 
     /// \cond INTERNAL
