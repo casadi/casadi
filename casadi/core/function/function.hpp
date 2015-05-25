@@ -150,12 +150,6 @@ namespace casadi {
     /** \brief  Get total number of elements in all of the matrix-valued outputs */
     int numelOut() const;
 
-    /** \brief Set input scheme */
-    void setInputScheme(const casadi::IOScheme &scheme);
-
-    /** \brief Set output scheme */
-    void setOutputScheme(const casadi::IOScheme &scheme);
-
     /** \brief Get input scheme */
     casadi::IOScheme getInputScheme() const;
 

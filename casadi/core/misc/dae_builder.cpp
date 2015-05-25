@@ -1982,8 +1982,8 @@ namespace casadi {
     // Generate the constructed function
     MXFunction ret(ret_in, ret_out);
     ret.setOption("name", fname);
-    ret.setInputScheme(IOScheme(s_in));
-    ret.setOutputScheme(IOScheme(s_out));
+    ret.setOption("input_scheme", s_in);
+    ret.setOption("output_scheme", s_out);
     ret.init();
     return ret;
   }

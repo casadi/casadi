@@ -222,8 +222,8 @@ namespace casadi {
     casadi_assert_message(jacF.nOut()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    jacF.setInputScheme(SCHEME_GradFInput);
-    jacF.setOutputScheme(SCHEME_GradFOutput);
+    jacF.setOption("input_scheme", IOScheme(SCHEME_GradFInput).v());
+    jacF.setOption("output_scheme", IOScheme(SCHEME_GradFOutput).v());
     log("Objective gradient function initialized");
     return jacF;
   }
@@ -245,8 +245,8 @@ namespace casadi {
     casadi_assert_message(gradF.nOut()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    gradF.setInputScheme(SCHEME_GradFInput);
-    gradF.setOutputScheme(SCHEME_GradFOutput);
+    gradF.setOption("input_scheme", IOScheme(SCHEME_GradFInput).v());
+    gradF.setOption("output_scheme", IOScheme(SCHEME_GradFOutput).v());
     log("Objective gradient function initialized");
     return gradF;
   }
@@ -279,8 +279,8 @@ namespace casadi {
     casadi_assert_message(jacG.nOut()==JACG_NUM_OUT,
                           "Wrong number of outputs to the Jacobian function. "
                           "Note: The Jacobian signature was changed in #544");
-    jacG.setInputScheme(SCHEME_JacGInput);
-    jacG.setOutputScheme(SCHEME_JacGOutput);
+    jacG.setOption("input_scheme", IOScheme(SCHEME_JacGInput).v());
+    jacG.setOption("output_scheme", IOScheme(SCHEME_JacGOutput).v());
     log("Jacobian function initialized");
     return jacG;
   }
@@ -332,8 +332,9 @@ namespace casadi {
     casadi_assert_message(hessLag.nOut()==HESSLAG_NUM_OUT,
                           "Wrong number of outputs to the Hessian function. "
                           "Note: The Lagrangian Hessian signature was changed in #544");
-    hessLag.setInputScheme(SCHEME_HessLagInput);
-    hessLag.setOutputScheme(SCHEME_HessLagOutput);
+    hessLag.setOption("input_scheme", IOScheme(SCHEME_HessLagInput).v());
+    hessLag.setOption("output_scheme", IOScheme(SCHEME_HessLagOutput).v());
+
     log("Hessian function initialized");
     return hessLag;
   }

@@ -95,8 +95,8 @@ namespace casadi {
     v_in.push_back(As);
     v_in.push_back(Vs);
     f_ = MXFunction(v_in, make_vector(reshape(Pf, n_, n_)));
-    f_.setInputScheme(SCHEME_CLEInput);
-    f_.setOutputScheme(SCHEME_CLEOutput);
+    f_.setOption("input_scheme", IOScheme(SCHEME_CLEInput).v());
+    f_.setOption("output_scheme", IOScheme(SCHEME_CLEOutput).v());
     f_.init();
   }
 

@@ -119,8 +119,8 @@ class Integrationtests(casadiTestCase):
       integrator.init()
 
       solution = SXFunction([x,p,tf],[x*exp(tf)])
-      solution.setInputScheme(IOScheme(["x0","p","h"]))
-      solution.setOutputScheme(IOScheme(["xf"]))
+      solution.setOption("input_scheme", ["x0","p","h"])
+      solution.setOption("output_scheme", ["xf"])
       solution.init()
 
       for f in [solution,integrator]:

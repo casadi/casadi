@@ -84,6 +84,8 @@ namespace casadi {
               "mode directional derivatives. Overrides default routines.");
     addOption("full_jacobian",                 OT_FUNCTION,              GenericType(),
               "The Jacobian of all outputs with respect to all inputs.");
+    addOption("input_scheme", OT_STRINGVECTOR, GenericType(), "Custom input scheme");
+    addOption("output_scheme", OT_STRINGVECTOR, GenericType(), "Custom output scheme");
 
     verbose_ = false;
     user_data_ = 0;
@@ -140,6 +142,18 @@ namespace casadi {
       for (std::vector<std::string>::const_iterator it=monitors.begin();it!=monitors.end();it++) {
         monitors_.insert(*it);
       }
+    }
+
+    // Custom input scheme
+    if (hasSetOption("input_scheme")) {
+      const vector<string>& v = getOption("input_scheme");
+      if (!v.empty()) inputScheme() = IOScheme(v);
+    }
+
+    // Custom output scheme
+    if (hasSetOption("output_scheme")) {
+      const vector<string>& v = getOption("output_scheme");
+      if (!v.empty()) outputScheme() = IOScheme(v);
     }
 
     monitor_inputs_ = monitored("inputs");
@@ -206,9 +220,7 @@ namespace casadi {
     stringstream ss;
     ss << "gradient_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name", ss.str());
-
-    // Same input scheme
-    ret.setInputScheme(input_.scheme);
+    ret.setOption("input_scheme", input_.scheme.v());
 
     // Output names
     std::vector<std::string> ionames;
@@ -217,9 +229,7 @@ namespace casadi {
     for (int i=0;i<nOut();++i) {
       ionames.push_back(output_.scheme.entryLabel(i));
     }
-
-    ret.setOutputScheme(ionames);
-
+    ret.setOption("output_scheme", ionames);
     return ret;
   }
 
@@ -235,9 +245,7 @@ namespace casadi {
     stringstream ss;
     ss << "tangent_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name", ss.str());
-
-    // Same input scheme
-    ret.setInputScheme(input_.scheme);
+    ret.setOption("input_scheme", input_.scheme.v());
 
     // Output names
     std::vector<std::string> ionames;
@@ -246,8 +254,7 @@ namespace casadi {
     for (int i=0;i<nOut();++i) {
       ionames.push_back(output_.scheme.entryLabel(i));
     }
-
-    ret.setOutputScheme(ionames);
+    ret.setOption("output_scheme", ionames);
 
     return ret;
   }
@@ -265,9 +272,7 @@ namespace casadi {
     stringstream ss;
     ss << "hessian_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name", ss.str());
-
-    // Same input scheme
-    ret.setInputScheme(input_.scheme);
+    ret.setOption("input_scheme", input_.scheme.v());
 
     // Output names
     std::vector<std::string> ionames;
@@ -277,8 +282,7 @@ namespace casadi {
     for (int i=0;i<nOut();++i) {
       ionames.push_back(output_.scheme.entryLabel(i));
     }
-
-    ret.setOutputScheme(ionames);
+    ret.setOption("output_scheme", ionames);
 
     return ret;
   }
@@ -301,8 +305,8 @@ namespace casadi {
 
     MXFunction f = MXFunction(arg, res);
     f.setOption("name", "wrap_" + string(getOption("name")));
-    f.setInputScheme(getInputScheme());
-    f.setOutputScheme(getOutputScheme());
+    f.setOption("input_scheme", getInputScheme().v());
+    f.setOption("output_scheme", getOutputScheme().v());
     f.setOption("ad_weight", adWeight());
     f.setOption("ad_weight_sp", adWeightSp());
     for (int i=0; i<3; ++i) {
@@ -324,7 +328,7 @@ namespace casadi {
     log("FunctionInternal::getHessian generating gradient");
     Function g = gradient(iind, oind);
     g.setOption("verbose", getOption("verbose"));
-    g.setInputScheme(input_.scheme);
+    g.setOption("input_scheme", getInputScheme().v());
     g.init();
 
     // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
@@ -1486,7 +1490,7 @@ namespace casadi {
       ret.setOption("verbose", getOption("verbose"));
 
       // Same input scheme
-      ret.setInputScheme(input_.scheme);
+      ret.setOption("input_scheme", getInputScheme().v());
 
       // Output names
       std::vector<std::string> ionames;
@@ -1495,7 +1499,7 @@ namespace casadi {
       for (int i=0; i<nOut(); ++i) {
         ionames.push_back(output_.scheme.entryLabel(i));
       }
-      ret.setOutputScheme(ionames);
+      ret.setOption("output_scheme", ionames);
 
       // Save in cache
       compact ? jac_compact_.elem(oind, iind) : jac_.elem(oind, iind) = ret;
@@ -1574,7 +1578,7 @@ namespace casadi {
     }
 
     // Pass to return object
-    ret.setInputScheme(i_names);
+    ret.setOption("input_scheme", i_names);
 
     // Names of outputs
     std::vector<std::string> o_names;
@@ -1590,7 +1594,7 @@ namespace casadi {
     }
 
     // Pass to return object
-    ret.setOutputScheme(o_names);
+    ret.setOption("output_scheme", o_names);
 
     // Initialize it
     ret.init();
@@ -1680,7 +1684,7 @@ namespace casadi {
     }
 
     // Pass to return object
-    ret.setInputScheme(i_names);
+    ret.setOption("input_scheme", i_names);
 
     // Names of outputs
     std::vector<std::string> o_names;
@@ -1696,7 +1700,7 @@ namespace casadi {
     }
 
     // Pass to return object
-    ret.setOutputScheme(o_names);
+    ret.setOption("output_scheme", o_names);
 
     // Initialize it
     ret.init();
@@ -1874,9 +1878,9 @@ namespace casadi {
       ret.setOption("verbose", getOption("verbose"));
 
       // Set input and output schemes
-      ret.setInputScheme(input_.scheme);
+      ret.setOption("input_scheme", getInputScheme().v());
       std::vector<std::string> oscheme(1, "jac");
-      ret.setOutputScheme(oscheme);
+      ret.setOption("output_scheme", oscheme);
 
       // Initialize
       ret.init();

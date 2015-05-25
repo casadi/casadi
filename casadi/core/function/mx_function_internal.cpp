@@ -629,8 +629,7 @@ namespace casadi {
     ret_out.insert(ret_out.end(), outputv_.begin(), outputv_.end());
 
     MXFunction ret(inputv_, ret_out);
-    ret.setInputScheme(inputScheme());
-    // Return function
+    ret.setOption("input_scheme", inputScheme().v());
     return ret;
   }
 
@@ -1110,8 +1109,8 @@ namespace casadi {
 
     // Create function
     SXFunction f(arg, res);
-    f.setInputScheme(getInputScheme());
-    f.setOutputScheme(getOutputScheme());
+    f.setOption("input_scheme", getInputScheme().v());
+    f.setOption("output_scheme", getOutputScheme().v());
     string name = getOption("name");
     f.setOption("name", "expand_" + name);
     return f;

@@ -188,8 +188,13 @@ namespace casadi {
     return (*this)->repr(stream);
   }
 
-  IOScheme::operator const std::vector<std::string>& () const {
-    return (*this)->data_;
+  const std::vector<std::string>& IOScheme::v() const {
+    static const std::vector<std::string> v_null;
+    if (isNull()) {
+      return v_null;
+    } else {
+      return (*this)->data_;
+    }
   }
 
 

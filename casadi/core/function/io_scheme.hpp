@@ -57,8 +57,8 @@ class CASADI_EXPORT IOScheme : public SharedObject {
              const std::vector<std::string> &descriptions=std::vector<std::string>());
 
 #ifndef SWIG
-    /// Inplicit type conversion
-    operator const std::vector<std::string>& () const;
+    const std::vector<std::string>& v() const;
+    inline operator const std::vector<std::string>& () const { return v();}
 #endif // SWIG
 
 #ifndef SWIGPYTHON

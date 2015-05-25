@@ -187,14 +187,6 @@ namespace casadi {
     return (*this)->symbolicInputSX();
   }
 
-  void Function::setInputScheme(const IOScheme &scheme) {
-    return (*this)->setInputScheme(scheme);
-  }
-
-  void Function::setOutputScheme(const IOScheme &scheme) {
-    return (*this)->setOutputScheme(scheme);
-  }
-
   IOScheme Function::getInputScheme() const {
     return (*this)->getInputScheme();
   }
@@ -322,7 +314,7 @@ namespace casadi {
     }
 
     // Pass to return object
-    ret.setInputScheme(i_names);
+    ret.setOption("input_scheme", i_names);
 
     // Names of outputs
     std::vector<std::string> o_names;
@@ -352,7 +344,7 @@ namespace casadi {
     }
 
     // Pass to return object
-    ret.setOutputScheme(o_names);
+    ret.setOption("output_scheme", o_names);
 
     // Initialize it
     ret.init();

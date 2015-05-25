@@ -303,6 +303,7 @@ class NLPtests(casadiTestCase):
     
     obj = (1-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=x**2+y**2))
+    nlp.init()
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -478,6 +479,7 @@ class NLPtests(casadiTestCase):
     
     obj = (p-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj,g=x**2+y**2))
+    nlp.init()
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]

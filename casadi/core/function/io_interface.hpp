@@ -152,18 +152,6 @@ namespace casadi {
 
     /// \endcond
 
-    /** \brief Set input scheme */
-    void setInputScheme(const casadi::IOScheme &scheme) {
-      casadi_assert(scheme.compatibleSize(nIn()));
-      static_cast<Derived*>(this)->inputScheme() = scheme;
-    }
-
-    /** \brief Set output scheme */
-    void setOutputScheme(const casadi::IOScheme &scheme) {
-      casadi_assert(scheme.compatibleSize(nOut()));
-      static_cast<Derived*>(this)->outputScheme() = scheme;
-    }
-
     /** \brief Get input scheme */
     casadi::IOScheme getInputScheme() const
     { return static_cast<const Derived*>(this)->inputScheme(); }
