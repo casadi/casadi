@@ -102,6 +102,14 @@ namespace casadi {
     (*this)->evaluate();
   }
 
+  int Function::nIn() const {
+    return (*this)->nIn();
+  }
+
+  int Function::nOut() const {
+    return (*this)->nOut();
+  }
+
   int Function::nnzIn() const {
     return (*this)->nnzIn();
   }
@@ -195,12 +203,44 @@ namespace casadi {
     return (*this)->output_.str;
   }
 
-  int Function::inputSchemeEntry(const std::string &name) const {
-    return (*this)->inputSchemeEntry(name);
+  int Function::inputIndex(const std::string &name) const {
+    return (*this)->inputIndex(name);
   }
 
-  int Function::outputSchemeEntry(const std::string &name) const {
-    return (*this)->outputSchemeEntry(name);
+  int Function::outputIndex(const std::string &name) const {
+    return (*this)->outputIndex(name);
+  }
+
+  const Matrix<double>& Function::input(int i) const {
+    return (*this)->input(i);
+  }
+
+  const Matrix<double>& Function::input(const std::string &iname) const {
+    return (*this)->input(iname);
+  }
+
+  Matrix<double>& Function::input(int i) {
+    return (*this)->input(i);
+  }
+
+  Matrix<double>& Function::input(const std::string &iname) {
+    return (*this)->input(iname);
+  }
+
+  const Matrix<double>& Function::output(int i) const {
+    return (*this)->output(i);
+  }
+
+  const Matrix<double>& Function::output(const std::string &oname) const {
+    return (*this)->output(oname);
+  }
+
+  Matrix<double>& Function::output(int i) {
+    return (*this)->output(i);
+  }
+
+  Matrix<double>& Function::output(const std::string &oname) {
+    return (*this)->output(oname);
   }
 
   void Function::spEvaluate(bool fwd) {
@@ -733,6 +773,7 @@ namespace casadi {
     for (int d=0; d<r.size(); ++d) r[d] = replaceRes(aseed[d]);
     return r;
   }
+
 
 } // namespace casadi
 

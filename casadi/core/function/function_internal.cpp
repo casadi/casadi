@@ -456,19 +456,19 @@ namespace casadi {
 
     // Clear the forward seeds/adjoint sensitivities
     for (int ind=0; ind<nIn(); ++ind) {
-      vector<double> &v = inputNoCheck(ind).data();
+      vector<double> &v = input_.data[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
     for (int ind=0; ind<nOut(); ++ind) {
-      vector<double> &v = outputNoCheck(ind).data();
+      vector<double> &v = output_.data[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Get seeds and sensitivities
-    bvec_t* input_v = get_bvec_t(inputNoCheck(iind).data());
-    bvec_t* output_v = get_bvec_t(outputNoCheck(oind).data());
+    bvec_t* input_v = get_bvec_t(input_.data[iind].data());
+    bvec_t* output_v = get_bvec_t(output_.data[oind].data());
     bvec_t* seed_v = use_fwd ? input_v : output_v;
     bvec_t* sens_v = use_fwd ? output_v : input_v;
 
@@ -574,13 +574,13 @@ namespace casadi {
 
     // Clear the forward seeds/adjoint sensitivities
     for (int ind=0; ind<nIn(); ++ind) {
-      vector<double> &v = inputNoCheck(ind).data();
+      vector<double> &v = input_.data[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
     for (int ind=0; ind<nOut(); ++ind) {
-      vector<double> &v = outputNoCheck(ind).data();
+      vector<double> &v = output_.data[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
@@ -623,8 +623,8 @@ namespace casadi {
       spInit(true);
 
       // Get seeds and sensitivities
-      bvec_t* input_v = get_bvec_t(inputNoCheck(iind).data());
-      bvec_t* output_v = get_bvec_t(outputNoCheck(oind).data());
+      bvec_t* input_v = get_bvec_t(input_.data[iind].data());
+      bvec_t* output_v = get_bvec_t(output_.data[oind].data());
       bvec_t* seed_v = input_v;
       bvec_t* sens_v = output_v;
 
@@ -755,13 +755,13 @@ namespace casadi {
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
             for (int ind=0; ind<nIn(); ++ind) {
-              vector<double> &v = inputNoCheck(ind).data();
+              vector<double> &v = input_.data[ind].data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 
             // Clear the adjoint seeds/forward sensitivities, ready for next bvec sweep
             for (int ind=0; ind<nOut(); ++ind) {
-              vector<double> &v = outputNoCheck(ind).data();
+              vector<double> &v = output_.data[ind].data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 
@@ -805,13 +805,13 @@ namespace casadi {
 
     // Clear the forward seeds/adjoint sensitivities
     for (int ind=0; ind<nIn(); ++ind) {
-      vector<double> &v = inputNoCheck(ind).data();
+      vector<double> &v = input_.data[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
     for (int ind=0; ind<nOut(); ++ind) {
-      vector<double> &v = outputNoCheck(ind).data();
+      vector<double> &v = output_.data[ind].data();
       if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
     }
 
@@ -897,8 +897,8 @@ namespace casadi {
       spInit(use_fwd);
 
       // Get seeds and sensitivities
-      bvec_t* input_v = get_bvec_t(inputNoCheck(iind).data());
-      bvec_t* output_v = get_bvec_t(outputNoCheck(oind).data());
+      bvec_t* input_v = get_bvec_t(input_.data[iind].data());
+      bvec_t* output_v = get_bvec_t(output_.data[oind].data());
       bvec_t* seed_v = use_fwd ? input_v : output_v;
       bvec_t* sens_v = use_fwd ? output_v : input_v;
 
@@ -1044,13 +1044,13 @@ namespace casadi {
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
             for (int ind=0; ind<nIn(); ++ind) {
-              vector<double> &v = inputNoCheck(ind).data();
+              vector<double> &v = input_.data[ind].data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 
             // Clear the adjoint seeds/forward sensitivities, ready for next bvec sweep
             for (int ind=0; ind<nOut(); ++ind) {
-              vector<double> &v = outputNoCheck(ind).data();
+              vector<double> &v = output_.data[ind].data();
               if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
             }
 

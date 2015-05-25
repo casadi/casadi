@@ -264,6 +264,12 @@ namespace casadi {
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
 
+    /** \brief Get the number of function inputs */
+    inline int nIn() const { return input_.data.size();}
+
+    /** \brief Get the number of function outputs */
+    inline int nOut() const { return output_.data.size();}
+
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
     int nnzIn() const;
 
@@ -316,29 +322,85 @@ namespace casadi {
 
     ///@{
     /** \brief Get input scheme index by name */
-    virtual int inputSchemeEntry(const std::string &name) const {
+    virtual int inputIndex(const std::string &name) const {
       const std::vector<std::string>& v=input_.str;
       for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
         size_t col = i->find(':');
         if (i->compare(0, col, name)==0) return i-v.begin();
       }
-      casadi_error("FunctionInternal::inputSchemeEntry: could not find entry \""
+      casadi_error("FunctionInternal::inputIndex: could not find entry \""
                    << name << "\". Available names are: " << v << ".");
       return -1;
     }
 
     /** \brief Get output scheme index by name */
-    virtual int outputSchemeEntry(const std::string &name) const {
+    virtual int outputIndex(const std::string &name) const {
       const std::vector<std::string>& v=output_.str;
       for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
         size_t col = i->find(':');
         if (i->compare(0, col, name)==0) return i-v.begin();
       }
-      casadi_error("FunctionInternal::outputSchemeEntry: could not find entry \""
+      casadi_error("FunctionInternal::outputIndex: could not find entry \""
                    << name << "\". Available names are: " << v << ".");
       return -1;
     }
     ///@}
+
+    /// Access input argument by index
+    inline Matrix<double>& input(int i=0) {
+      try {
+        return input_.data.at(i);
+      } catch(std::out_of_range&) {
+        std::stringstream ss;
+        ss <<  "In function " << getOption("name")
+           << ": input " << i << " not in interval [0, " << nIn() << ")";
+        if (!isInit()) ss << std::endl << "Did you forget to initialize?";
+        throw CasadiException(ss.str());
+      }
+    }
+
+    /// Access input argument by name
+    inline Matrix<double>& input(const std::string &iname) {
+      return input(inputIndex(iname));
+    }
+
+    /// Const access input argument by index
+    inline const Matrix<double>& input(int i=0) const {
+      return const_cast<FunctionInternal*>(this)->input(i);
+    }
+
+    /// Const access input argument by name
+    inline const Matrix<double>& input(const std::string &iname) const {
+      return const_cast<FunctionInternal*>(this)->input(iname);
+    }
+
+    /// Access output argument by index
+    inline Matrix<double>& output(int i=0) {
+      try {
+        return output_.data.at(i);
+      } catch(std::out_of_range&) {
+        std::stringstream ss;
+        ss <<  "In function " << getOption("name")
+           << ": output " << i << " not in interval [0, " << nOut() << ")";
+        if (!isInit()) ss << std::endl << "Did you forget to initialize?";
+        throw CasadiException(ss.str());
+      }
+    }
+
+    /// Access output argument by name
+    inline Matrix<double>& output(const std::string &oname) {
+      return output(outputIndex(oname));
+    }
+
+    /// Const access output argument by index
+    inline const Matrix<double>& output(int i=0) const {
+      return const_cast<FunctionInternal*>(this)->output(i);
+    }
+
+    /// Const access output argument by name
+    inline const Matrix<double>& output(const std::string &oname) const {
+      return const_cast<FunctionInternal*>(this)->output(oname);
+    }
 
     ///@{
     /// Input/output structures of the function */
@@ -346,15 +408,6 @@ namespace casadi {
     inline const IOSchemeVector<DMatrix>& output_struct() const { return output_;}
     inline IOSchemeVector<DMatrix>& input_struct() { return input_;}
     inline IOSchemeVector<DMatrix>& output_struct() { return output_;}
-    ///@}
-
-    ///@{
-    /// Input/output access without checking (faster, but unsafe)
-    inline const Matrix<double>& inputNoCheck(int iind=0) const { return inputS<false>(iind);}
-    inline const Matrix<double>& outputNoCheck(int oind=0) const { return outputS<false>(oind);}
-
-    inline Matrix<double>& inputNoCheck(int iind=0) { return inputS<false>(iind);}
-    inline Matrix<double>& outputNoCheck(int oind=0) { return outputS<false>(oind);}
     ///@}
 
     /** \brief  Log the status of the solver */

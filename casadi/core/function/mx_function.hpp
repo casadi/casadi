@@ -128,12 +128,12 @@ public:
   /** \brief Get function input */
   const MX& inputExpr(int ind) const;
   const MX& inputExpr(const std::string & iname) const
-  { return inputExpr(inputSchemeEntry(iname)); }
+  { return inputExpr(inputIndex(iname)); }
 
   /** \brief Get function output */
   const MX& outputExpr(int ind) const;
   const MX& outputExpr(const std::string & oname) const
-  { return outputExpr(outputSchemeEntry(oname)); }
+  { return outputExpr(outputIndex(oname)); }
 
   /** \brief Get all function inputs */
   const std::vector<MX>& inputExpr() const;
@@ -164,30 +164,30 @@ public:
   /** \brief Jacobian via source code transformation */
   MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
   MX jac(const std::string & iname, int oind=0, bool compact=false, bool symmetric=false)
-  { return jac(inputSchemeEntry(iname), oind, compact, symmetric); }
+  { return jac(inputIndex(iname), oind, compact, symmetric); }
   MX jac(int iind, const std::string & oname, bool compact=false, bool symmetric=false)
-  { return jac(iind, outputSchemeEntry(oname), compact, symmetric); }
+  { return jac(iind, outputIndex(oname), compact, symmetric); }
   MX jac(const std::string & iname, const std::string & oname,
          bool compact=false, bool symmetric=false)
-  { return jac(inputSchemeEntry(iname), outputSchemeEntry(oname), compact, symmetric); }
+  { return jac(inputIndex(iname), outputIndex(oname), compact, symmetric); }
   ///@}
 
   ///@{
   /** \brief Gradient via source code transformation */
   MX grad(int iind=0, int oind=0);
-  MX grad(const std::string & iname, int oind=0) { return grad(inputSchemeEntry(iname), oind); }
-  MX grad(int iind, const std::string & oname) { return grad(iind, outputSchemeEntry(oname)); }
+  MX grad(const std::string & iname, int oind=0) { return grad(inputIndex(iname), oind); }
+  MX grad(int iind, const std::string & oname) { return grad(iind, outputIndex(oname)); }
   MX grad(const std::string & iname, const std::string & oname)
-  { return grad(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
+  { return grad(inputIndex(iname), outputIndex(oname)); }
   ///@}
 
   ///@{
   /** \brief Tangent via source code transformation */
   MX tang(int iind=0, int oind=0);
-  MX tang(const std::string & iname, int oind=0) { return tang(inputSchemeEntry(iname), oind); }
-  MX tang(int iind, const std::string & oname) { return tang(iind, outputSchemeEntry(oname)); }
+  MX tang(const std::string & iname, int oind=0) { return tang(inputIndex(iname), oind); }
+  MX tang(int iind, const std::string & oname) { return tang(iind, outputIndex(oname)); }
   MX tang(const std::string & iname, const std::string & oname)
-  { return tang(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
+  { return tang(inputIndex(iname), outputIndex(oname)); }
   ///@}
 
   /** \brief Expand the matrix valued graph into a scalar valued graph */
