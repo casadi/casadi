@@ -142,10 +142,10 @@ namespace casadi {
     int numelOut() const;
 
     /** \brief Get input scheme */
-    casadi::IOScheme getInputScheme() const;
+    std::vector<std::string> inputScheme() const;
 
     /** \brief Get output scheme */
-    casadi::IOScheme getOutputScheme() const;
+    std::vector<std::string> outputScheme() const;
 
     /** \brief  Evaluate */
     void evaluate();

@@ -187,12 +187,12 @@ namespace casadi {
     return (*this)->symbolicInputSX();
   }
 
-  IOScheme Function::getInputScheme() const {
-    return (*this)->input_.scheme;
+  std::vector<std::string> Function::inputScheme() const {
+    return (*this)->input_.scheme.v();
   }
 
-  IOScheme Function::getOutputScheme() const {
-    return (*this)->output_.scheme;
+  std::vector<std::string> Function::outputScheme() const {
+    return (*this)->output_.scheme.v();
   }
 
   int Function::inputSchemeEntry(const std::string &name) const {

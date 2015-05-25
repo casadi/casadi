@@ -207,7 +207,7 @@ def improvedcall(v):
     if len(args)>0 and len(kwargs)>0:
       raise Exception("You cannot mix positional and keyword arguments in __call__")
     if len(kwargs)>0:
-      scheme = self.getInputScheme()
+      scheme = IOScheme(self.inputScheme())
       if scheme.known():
         return v(self,scheme(**kwargs))
       else:
