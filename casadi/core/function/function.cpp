@@ -188,11 +188,11 @@ namespace casadi {
   }
 
   std::vector<std::string> Function::inputScheme() const {
-    return (*this)->input_.scheme.v();
+    return (*this)->input_.str;
   }
 
   std::vector<std::string> Function::outputScheme() const {
-    return (*this)->output_.scheme.v();
+    return (*this)->output_.str;
   }
 
   int Function::inputSchemeEntry(const std::string &name) const {
@@ -289,8 +289,8 @@ namespace casadi {
     // Names of inputs
     std::vector<std::string> i_names;
     i_names.reserve(nIn()*(1+nfwd)+nOut()*nadj);
-    const std::vector<std::string>& ischeme=(*this)->input_.scheme;
-    const std::vector<std::string>& oscheme=(*this)->output_.scheme;
+    const std::vector<std::string>& ischeme=(*this)->input_.str;
+    const std::vector<std::string>& oscheme=(*this)->output_.str;
 
     // Nondifferentiated inputs
     for (int i=0; i<nIn(); ++i) {
@@ -569,17 +569,20 @@ namespace casadi {
 
   IOSchemeVector<DMatrix> Function::
   operator()(const IOSchemeVector<DMatrix>& arg, bool always_inline, bool never_inline) {
-    return (*this)->output_.scheme.fromVector(operator()(arg.data, always_inline, never_inline));
+    return IOSchemeVector<DMatrix>(operator()(arg.data, always_inline, never_inline),
+                                   IOScheme((*this)->output_.str));
   }
 
   IOSchemeVector<SX> Function::
   operator()(const IOSchemeVector<SX>& arg, bool always_inline, bool never_inline) {
-    return (*this)->output_.scheme.fromVector(operator()(arg.data, always_inline, never_inline));
+    return IOSchemeVector<SX>(operator()(arg.data, always_inline, never_inline),
+                              IOScheme((*this)->output_.str));
   }
 
   IOSchemeVector<MX> Function::
   operator()(const IOSchemeVector<MX>& arg, bool always_inline, bool never_inline) {
-    return (*this)->output_.scheme.fromVector(operator()(arg.data, always_inline, never_inline));
+    return IOSchemeVector<MX>(operator()(arg.data, always_inline, never_inline),
+                              IOScheme((*this)->output_.str));
   }
 
   inline bool checkMat(const Sparsity& arg, const Sparsity& inp) {

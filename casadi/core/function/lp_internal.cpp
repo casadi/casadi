@@ -58,8 +58,8 @@ namespace casadi {
     output(LP_SOLVER_LAM_X) = DMatrix::zeros(n_);
     output(LP_SOLVER_LAM_A) = DMatrix::zeros(nc_);
 
-    input_.scheme = SCHEME_LpSolverInput;
-    output_.scheme = SCHEME_LpSolverOutput;
+    input_.str = IOScheme(SCHEME_LpSolverInput);
+    output_.str = IOScheme(SCHEME_LpSolverOutput);
   }
 
   void LpSolverInternal::init() {

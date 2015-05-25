@@ -100,8 +100,8 @@ namespace casadi {
     output(QCQP_SOLVER_LAM_X) = DMatrix(x_sparsity);
     output(QCQP_SOLVER_LAM_A) = DMatrix(bounds_sparsity);
 
-    input_.scheme = SCHEME_QcqpSolverInput;
-    output_.scheme = SCHEME_QcqpSolverOutput;
+    input_.str = IOScheme(SCHEME_QcqpSolverInput);
+    output_.str = IOScheme(SCHEME_QcqpSolverOutput);
   }
 
   void QcqpSolverInternal::init() {

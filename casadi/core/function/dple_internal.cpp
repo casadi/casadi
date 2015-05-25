@@ -55,10 +55,9 @@ namespace casadi {
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
 
     if (nrhs_==1) {
-      input_.scheme = SCHEME_DPLEInput;
-      output_.scheme = SCHEME_DPLEOutput;
+      input_.str = IOScheme(SCHEME_DPLEInput);
+      output_.str = IOScheme(SCHEME_DPLEOutput);
     }
-
   }
 
   DpleInternal::~DpleInternal() {

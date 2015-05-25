@@ -61,8 +61,8 @@ namespace casadi {
     setNumOutputs(LINSOL_NUM_OUT);
     output(LINSOL_X) = input(LINSOL_B);
 
-    input_.scheme = SCHEME_LinsolInput;
-    output_.scheme = SCHEME_LinsolOutput;
+    input_.str = IOScheme(SCHEME_LinsolInput).v();
+    output_.str = IOScheme(SCHEME_LinsolOutput).v();
   }
 
   void LinearSolverInternal::init() {

@@ -54,13 +54,9 @@ namespace casadi {
 
 
     if (nrhs_==1) {
-      input_.scheme = SCHEME_LR_DLEInput;
+      input_.str = IOScheme(SCHEME_LR_DLEInput);
+      output_.str = IOScheme(SCHEME_LR_DLEOutput);
     }
-
-    if (nrhs_==1) {
-      output_.scheme = SCHEME_LR_DLEOutput;
-    }
-
   }
 
   LrDleInternal::~LrDleInternal() {

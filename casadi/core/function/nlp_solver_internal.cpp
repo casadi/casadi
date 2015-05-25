@@ -72,8 +72,8 @@ namespace casadi {
               "stop the iterations");
 
     // Enable string notation for IO
-    input_.scheme = SCHEME_NlpSolverInput;
-    output_.scheme = SCHEME_NlpSolverOutput;
+    input_.str = IOScheme(SCHEME_NlpSolverInput).v();
+    output_.str = IOScheme(SCHEME_NlpSolverOutput).v();
 
     // Make the ref object a non-refence counted pointer to this (as reference counting would
     // prevent deletion of the object)

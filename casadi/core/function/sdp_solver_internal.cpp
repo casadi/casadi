@@ -85,9 +85,8 @@ SdpSolverInternal::SdpSolverInternal(const std::vector<Sparsity> &st) : st_(st) 
                           "But got " << s.dimString() <<  " for i = " << i << ".");
   }
 
-  input_.scheme = SCHEME_SDPInput;
-  output_.scheme = SCHEME_SDPOutput;
-
+  input_.str = IOScheme(SCHEME_SDPInput);
+  output_.str = IOScheme(SCHEME_SDPOutput);
 }
 
 void SdpSolverInternal::init() {

@@ -47,8 +47,7 @@ namespace casadi {
                           << grid.dimString());
     setOption("name", "unnamed simulator");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
-
-    input_.scheme = SCHEME_IntegratorInput;
+    input_.str = IOScheme(SCHEME_IntegratorInput).v();
   }
 
   SimulatorInternal::~SimulatorInternal() {
@@ -91,8 +90,7 @@ namespace casadi {
 
       // Create the output function
       output_fcn_ = SXFunction(arg, out);
-
-      output_.scheme = SCHEME_IntegratorOutput;
+      output_.str = IOScheme(SCHEME_IntegratorOutput);
     }
 
     // Initialize the output function

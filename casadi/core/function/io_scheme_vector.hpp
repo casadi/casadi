@@ -43,18 +43,34 @@ namespace casadi {
     std::vector<T> data;
 
     /// Scheme
-    IOScheme scheme;
+    std::vector<std::string> str;
 
   public:
     // Constructor
-    IOSchemeVector(const std::vector<T>& d = std::vector<T>(), const IOScheme& s = IOScheme()) : data(d), scheme(s) {}
+    IOSchemeVector(const std::vector<T>& d = std::vector<T>(),
+                   const IOScheme& s = IOScheme()) : data(d), str(s.v()) {}
 
 #ifndef SWIG
     T operator[](int i) const {
       casadi_assert_message(i>=0 && i<this->data.size(), "Index error: supplied integer must be >=0 and <= " << this->data.size() << " but got " << i << ".");
       return this->data.at(i);
     }
-    T operator[](const std::string& name) const { return (*this)[this->scheme.index(name)]; }
+    T operator[](const std::string& name) const {
+      for (std::vector<std::string>::const_iterator i=str.begin(); i!=str.end(); ++i) {
+        size_t col = i->find(':');
+        if (i->compare(0, col, name)==0) {
+          return (*this)[i-str.begin()];
+        }
+      }
+      std::stringstream entries;
+      for (size_t i=0; i!=str.size(); ++i) {
+         if (i!=0) entries << ", ";
+         size_t col = str[i].find(':');
+         entries << str[i].substr(0, col);
+      }
+      casadi_error("entry '" << name << "' not available. Available entries are " << entries.str());
+      return T();
+    }
 #endif // SWIG
 #ifndef SWIGMATLAB
     T __getitem__(int i) const { if (i<0) i+= this->data.size(); return (*this)[i]; }
@@ -66,8 +82,13 @@ namespace casadi {
     /// Print a description of the object
     void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const {
       stream << "IOSchemeVector(" ;
-      for (int i=0;i<this->data.size();++i) {
-        stream << this->scheme.entry(i) << "=" << this->data[i];
+      for (int i=0; i<this->data.size(); ++i) {
+        if (this->str.empty()) {
+          stream << "none";
+        } else {
+          str.at(i);
+        }
+        stream << "=" << this->data[i];
         if (i<this->data.size()-1) stream << ", ";
       }
 

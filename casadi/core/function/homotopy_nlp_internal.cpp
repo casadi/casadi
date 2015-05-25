@@ -41,9 +41,8 @@ namespace casadi {
               "Expand the NLP function in terms of scalar operations, i.e. MX->SX");
 
     // Enable string notation for IO
-    input_.scheme = SCHEME_NlpSolverInput;
-    output_.scheme = SCHEME_NlpSolverOutput;
-
+    input_.str = IOScheme(SCHEME_NlpSolverInput).v();
+    output_.str = IOScheme(SCHEME_NlpSolverOutput).v();
   }
 
   HomotopyNLPInternal::~HomotopyNLPInternal() {

@@ -57,8 +57,8 @@ namespace casadi {
     // Negative number of parameters for consistancy checking
     np_ = -1;
 
-    input_.scheme = SCHEME_IntegratorInput;
-    output_.scheme = SCHEME_IntegratorOutput;
+    input_.str = IOScheme(SCHEME_IntegratorInput);
+    output_.str = IOScheme(SCHEME_IntegratorOutput);
   }
 
   IntegratorInternal::~IntegratorInternal() {

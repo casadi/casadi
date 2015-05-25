@@ -55,21 +55,21 @@ using namespace std;
                                  const IOSchemeVector<Sparsity>& inputscheme,
                                  const vector<Sparsity>& outputscheme) {
     assignNode(new CustomFunctionInternal(c_fcn, inputscheme.data, outputscheme));
-    setOption("input_scheme", inputscheme.scheme.v());
+    setOption("input_scheme", inputscheme.str);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
                                  const IOSchemeVector<Sparsity> &outputscheme) {
     assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme.data));
-    setOption("output_scheme", outputscheme.scheme.v());
+    setOption("output_scheme", outputscheme.str);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
                                  const IOSchemeVector<Sparsity> &inputscheme,
                                  const IOSchemeVector<Sparsity> &outputscheme) {
     assignNode(new CustomFunctionInternal(c_fcn, inputscheme.data, outputscheme.data));
-    setOption("input_scheme", inputscheme.scheme.v());
-    setOption("output_scheme", outputscheme.scheme.v());
+    setOption("input_scheme", inputscheme.str);
+    setOption("output_scheme", outputscheme.str);
   }
 
   CustomFunctionInternal* CustomFunction::operator->() {

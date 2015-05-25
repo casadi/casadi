@@ -93,9 +93,8 @@ namespace casadi {
                             "But got " << s.dimString() <<  " for i = " << i << ".");
     }
 
-    input_.scheme = SCHEME_SDQPInput;
-    output_.scheme = SCHEME_SDQPOutput;
-
+    input_.str = IOScheme(SCHEME_SDQPInput);
+    output_.str = IOScheme(SCHEME_SDQPOutput);
   }
 
   void SdqpSolverInternal::init() {

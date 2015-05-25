@@ -53,13 +53,12 @@ namespace casadi {
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
 
     if (nrhs_==1) {
-      input_.scheme = SCHEME_DLEInput;
+      input_.str = IOScheme(SCHEME_DLEInput);
     }
 
     if (nrhs_==1) {
-      output_.scheme = SCHEME_DLEOutput;
+      output_.str = IOScheme(SCHEME_DLEOutput);
     }
-
   }
 
   DleInternal::~DleInternal() {

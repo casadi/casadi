@@ -63,7 +63,7 @@ namespace casadi {
               "Include a control value at the end of the simulation domain. "
               "Used for interpolation.");
 
-    input_.scheme = SCHEME_ControlSimulatorInput;
+    input_.str = IOScheme(SCHEME_ControlSimulatorInput);
   }
 
   ControlSimulatorInternal::~ControlSimulatorInternal() {
@@ -257,7 +257,7 @@ namespace casadi {
       // Create the output function
       output_fcn_ = SXFunction(arg, out);
       output_fcn_.setOption("name", "output");
-      output_.scheme = SCHEME_IntegratorOutput;
+      output_.str = IOScheme(SCHEME_IntegratorOutput);
     } else {
       output_fcn_ = orig_output_fcn_;
     }
