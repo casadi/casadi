@@ -2140,7 +2140,7 @@ namespace casadi {
       // Work vectors and input and output buffers
       size_t nr = sz_w() + nnzIn() + nnzOut();
       s << "  int iw[" << sz_iw() << "];" << endl
-             << "  real_t w[" << sz_w() << "];" << endl;
+             << "  real_t w[" << nr << "];" << endl;
 
       // Input buffers
       s << "  const real_t* arg[" << n_in << "] = {";
