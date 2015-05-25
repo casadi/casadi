@@ -655,12 +655,6 @@
 %exception  casadi::Function::checkRes(const std::vector< M > &res) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Function::inputScheme() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::inputScheme() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Function::input_struct() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -680,12 +674,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::nTmp(size_t &ni, size_t &nr) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::outputScheme() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::outputScheme() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::output_struct() const  {
@@ -883,12 +871,6 @@
 %exception  casadi::FunctionInternal::inputNoCheck(int iind=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::inputScheme() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::inputScheme() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::input_struct() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -917,12 +899,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::outputNoCheck(int oind=0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::outputScheme() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::outputScheme() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::output_struct() const  {
