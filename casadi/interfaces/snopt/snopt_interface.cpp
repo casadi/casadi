@@ -244,12 +244,12 @@ namespace casadi {
       jacF_.spInit(true);
       // Detect dependencies w.r.t. gradF
       // Dependency seeds
-      bvec_t* input_v_x =  get_bvec_t(jacF_->inputNoCheck(GRADF_X).data());
-      bvec_t* input_v_p =  get_bvec_t(jacF_->inputNoCheck(GRADF_P).data());
+      bvec_t* input_v_x =  get_bvec_t(jacF_->input(GRADF_X).data());
+      bvec_t* input_v_p =  get_bvec_t(jacF_->input(GRADF_P).data());
       // Make a column with all variables active
       std::fill(input_v_x, input_v_x+nx_, bvec_t(1));
       std::fill(input_v_p, input_v_p+np_, bvec_t(0));
-      bvec_t* output_v = get_bvec_t(jacF_->outputNoCheck().data());
+      bvec_t* output_v = get_bvec_t(jacF_->output().data());
       // Perform a single dependency sweep
       jacF_.spEvaluate(true);
 
@@ -264,12 +264,12 @@ namespace casadi {
 
       if (!jacG_.isNull()) {  // Detect dependencies w.r.t. jacG
         // Dependency seeds
-        bvec_t* input_v_x =  get_bvec_t(jacG_->inputNoCheck(JACG_X).data());
-        bvec_t* input_v_p =  get_bvec_t(jacG_->inputNoCheck(JACG_P).data());
+        bvec_t* input_v_x =  get_bvec_t(jacG_->input(JACG_X).data());
+        bvec_t* input_v_p =  get_bvec_t(jacG_->input(JACG_P).data());
         // Make a column with all variables active
         std::fill(input_v_x, input_v_x+nx_, bvec_t(1));
         std::fill(input_v_p, input_v_p+np_, bvec_t(0));
-        bvec_t* output_v = get_bvec_t(jacG_->outputNoCheck().data());
+        bvec_t* output_v = get_bvec_t(jacG_->output().data());
         // Perform a single dependency sweep
         jacG_.spEvaluate(true);
 
