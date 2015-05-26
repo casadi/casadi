@@ -990,7 +990,7 @@ x = SX.sym("x")
 z = SX.sym("z")
 f = -z*x
 g = z*z-2
-dae = SXFunction(daeIn(x=x,z=z),daeOut(ode=f,alg=g))
+dae = SXFunction('dae',daeIn(x=x,z=z),daeOut(ode=f,alg=g))
 print dae
 \end{pytex}
 

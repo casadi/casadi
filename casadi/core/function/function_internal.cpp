@@ -182,10 +182,7 @@ namespace casadi {
   }
 
   void FunctionInternal::print(ostream &stream) const {
-    if (!isInit()) {
-      stream << "  Function not initialized." << endl;
-      return;
-    }
+    casadi_assert(isInit());
     if (nIn()==1) {
       stream << " Input: " << input().dimString() << endl;
     } else {

@@ -175,12 +175,6 @@ namespace casadi {
   void SXFunctionInternal::print(ostream &stream) const {
     FunctionInternal::print(stream);
 
-    // Quick return if not initialized
-    if (!isInit()) {
-      stream << "Function not initialized" << endl;
-      return;
-    }
-
     // Iterator to free variables
     vector<SXElement>::const_iterator p_it = free_vars_.begin();
 
