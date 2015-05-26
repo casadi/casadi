@@ -119,7 +119,7 @@ namespace casadi {
     std::string work(int n, int sz) const;
 
     /** Get work vector element from index */
-    std::string workel(int n, int sz) const;
+    std::string workel(int n) const;
 
     /** \brief  Print int vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);

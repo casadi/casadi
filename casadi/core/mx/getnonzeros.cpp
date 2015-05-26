@@ -478,8 +478,8 @@ namespace casadi {
   void GetNonzerosSlice::generate(const std::vector<int>& arg, const std::vector<int>& res,
                                   CodeGenerator& g) const {
     g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
-           << g.work(arg[0]+s_.start_, dep(0).nnz())
-           << "; ss!=" << g.work(arg[0]+s_.stop_, dep(0).nnz())
+           << g.work(arg[0], dep(0).nnz()) << "+" << s_.start_
+           << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop_
            << "; ss+=" << s_.step_ << ") "
            << "*rr++ = *ss;" << endl;
   }
@@ -487,8 +487,8 @@ namespace casadi {
   void GetNonzerosSlice2::generate(const std::vector<int>& arg, const std::vector<int>& res,
                                    CodeGenerator& g) const {
     g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
-           << g.work(arg[0]+outer_.start_, dep(0).nnz())
-           << "; ss!=" << g.work(arg[0]+outer_.stop_, dep(0).nnz()) << "; ss+="
+           << g.work(arg[0], dep(0).nnz()) << "+" << outer_.start_
+           << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << outer_.stop_ << "; ss+="
            << outer_.step_ << ") "
            << "for (tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_
            << "; tt+=" << inner_.step_ << ") "

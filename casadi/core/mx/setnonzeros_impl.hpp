@@ -777,9 +777,9 @@ namespace casadi {
     }
 
     // Perform the operation inplace
-    g.body << "  for (rr=" << g.work(res[0]+s_.start_, this->nnz()) << ", ss="
+    g.body << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start_ << ", ss="
            << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-           << g.work(res[0]+s_.stop_, this->nnz())
+           << g.work(res[0], this->nnz()) << "+" << s_.stop_
            << "; rr+=" << s_.step_ << ")";
     g.body << " *rr " << (Add?"+=":"=") << " *ss++;" << endl;
   }
@@ -794,9 +794,9 @@ namespace casadi {
     }
 
     // Perform the operation inplace
-    g.body << "  for (rr=" << g.work(res[0]+outer_.start_, this->nnz())
+    g.body << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start_
            << ", ss=" << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-           << g.work(res[0]+outer_.stop_, this->nnz())
+           << g.work(res[0], this->nnz()) << "+" << outer_.stop_
            << "; rr+=" << outer_.step_ << ")";
     g.body << " for (tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_
            << "; tt+=" << inner_.step_ << ")";

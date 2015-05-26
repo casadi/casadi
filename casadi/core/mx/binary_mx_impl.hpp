@@ -132,9 +132,9 @@ namespace casadi {
     g.body << "  ";
 
     // Scalar names of arguments (start assuming all scalars)
-    string r = g.workel(res[0], nnz());
-    string x = g.workel(arg[0], dep(0).nnz());
-    string y = g.workel(arg[1], dep(1).nnz());
+    string r = g.workel(res[0]);
+    string x = g.workel(arg[0]);
+    string y = g.workel(arg[1]);
 
     // Codegen loop, if needed
     if (nnz()>1) {

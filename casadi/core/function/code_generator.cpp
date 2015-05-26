@@ -206,22 +206,16 @@ namespace casadi {
       return "0";
     } else if (sz==1 && !this->codegen_scalars) {
       return "&w" + to_string(n);
-    } else if (n==0) {
-      return "w";
     } else {
-      return "w+" + to_string(n);
+      return "w" + to_string(n);
     }
   }
 
-  std::string CodeGenerator::workel(int n, int sz) const {
+  std::string CodeGenerator::workel(int n) const {
     casadi_assert(n>=0);
     stringstream s;
-    s << "w";
-    if (sz==1 && !this->codegen_scalars) {
-      s << n;
-    } else {
-      s << "[" << n << "]";
-    }
+    if (this->codegen_scalars) s << "*";
+    s << "w" << n;
     return s.str();
   }
 

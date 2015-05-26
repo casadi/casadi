@@ -1154,21 +1154,30 @@ namespace casadi {
       << "  real_t** res1=res+" << nOut() << ";" << endl;
 
     // Declare scalar work vector elements as local variables
-    if (!g.codegen_scalars) {
-      bool first = true;
-      for (int i=0; i<workloc_.size()-1; ++i) {
-        if (workloc_[i+1]==workloc_[i]+1) {
-          if (first) {
-            s << "  real_t ";
-            first = false;
-          } else {
-            s << ", ";
-          }
-          s << "w" << workloc_[i];
-        }
+    bool first = true;
+    for (int i=0; i<workloc_.size()-1; ++i) {
+      int n=workloc_[i+1]-workloc_[i];
+      if (n==0) continue;
+      if (first) {
+        s << "  real_t ";
+        first = false;
+      } else {
+        s << ", ";
       }
-      if (!first) s << ";" << endl;
+      /* Could use local variables for small work vector elements here, e.g.:
+         ...
+         } else if (n<10) {
+         s << "w" << i << "[" << n << "]";
+         } else {
+         ...
+      */
+      if (!g.codegen_scalars && n==1) {
+        s << "w" << i;
+      } else {
+        s << "*w" << i << "=w+" << workloc_[i];
+      }
     }
+    if (!first) s << ";" << endl;
 
     // Operation number (for printing)
     int k=0;
@@ -1188,10 +1197,10 @@ namespace casadi {
             s << " */" << endl;
           }
           string r = "res[" + g.to_string(oind) + "]";
-          int i = workloc_[it->arg.front()];
+          int i = it->arg.front();
           s << "  if (" << r << ") ";
           if (n==1) {
-            s << "*" << r << " = " << g.workel(i, 1) << ";" << endl;
+            s << "*" << r << " = " << g.workel(i) << ";" << endl;
           } else {
             s << g.copy_n(g.work(i, n), n, r) << endl;
           }
@@ -1203,14 +1212,14 @@ namespace casadi {
           std::string arg = "arg[" + g.to_string(iind) + "]";
           std::string arg_nz = arg;
           if (ic!=0) arg_nz += "+" + g.to_string(ic);
-          int i = workloc_[it->res.front()];
+          int i = it->res.front();
           if (g.verbose) {
             s << "  /* #" << k++ << ": Input " << iind;
             s << " (" << ischeme_.at(iind) << ")";
             s << ", part " << ip << " (" << it->data.getName() << ") */" << endl;
           }
           if (n==1) {
-            s << "  " << g.workel(i, 1) << " = " << arg << " ? "
+            s << "  " << g.workel(i) << " = " << arg << " ? "
               << arg << "[" << ic << "] : 0;" << endl;
           } else {
             s << "  if (" << arg << ")" << endl
@@ -1230,8 +1239,9 @@ namespace casadi {
         // Get the names of the operation arguments
         arg.resize(it->arg.size());
         for (int i=0; i<it->arg.size(); ++i) {
-          if (it->arg.at(i)>=0) {
-            arg.at(i) = workloc_.at(it->arg.at(i));
+          int j=it->arg.at(i);
+          if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
+            arg.at(i) = j;
           } else {
             arg.at(i) = -1;
           }
@@ -1240,8 +1250,9 @@ namespace casadi {
         // Get the names of the operation results
         res.resize(it->res.size());
         for (int i=0; i<it->res.size(); ++i) {
-          if (it->res.at(i)>=0) {
-            res.at(i) = workloc_.at(it->res.at(i));
+          int j=it->res.at(i);
+          if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
+            res.at(i) = j;
           } else {
             res.at(i) = -1;
           }

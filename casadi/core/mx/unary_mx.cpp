@@ -114,8 +114,8 @@ namespace casadi {
     g.body << "  ";
     if (nnz()==1) {
       // Scalar assignment
-      r = g.workel(res[0], 1);
-      x = g.workel(arg[0], 1);
+      r = g.workel(res[0]);
+      x = g.workel(arg[0]);
     } else {
       // Vector assignment
       g.body << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())

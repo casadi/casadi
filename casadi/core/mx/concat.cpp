@@ -90,7 +90,7 @@ namespace casadi {
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
       if (nz==1) {
-        g.body << "  *rr++ = " << g.workel(arg[i], 1) << ";" << endl;
+        g.body << "  *rr++ = " << g.workel(arg[i]) << ";" << endl;
       } else if (nz!=0) {
         g.body << "  for (i=0, " << "cs=" << g.work(arg[i], nz) << "; "
                << "i<" << nz << "; ++i) *rr++ = *cs++;" << endl;

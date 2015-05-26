@@ -119,7 +119,7 @@ namespace casadi {
     // Copy if not inplace
     if (arg[0]!=res[0]) {
       if (nnz()==1) {
-        g.body << "  " << g.workel(res[0], 1) << " = " << g.workel(arg[0], 1) << ";" << endl;
+        g.body << "  " << g.workel(res[0]) << " = " << g.workel(arg[0]) << ";" << endl;
       } else {
         g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
       }

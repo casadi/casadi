@@ -76,7 +76,7 @@ namespace casadi {
     int nnz = dep(0).nnz();
     g.body << "  for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
            << " && *cr++==0; ++i) {}" << endl
-           << "  " << g.workel(res[0], 1) << " = ";
+           << "  " << g.workel(res[0]) << " = ";
     if (dep(0).isDense()) {
       g.body << "i" << ";" << endl;
     } else {
