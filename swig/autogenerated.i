@@ -2986,18 +2986,20 @@ def socpOut(*dummy,**kwargs):
   Helper function for 'SOCPOutput'
 
   Two use cases:
-     a) arg = socpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+     a) arg = socpOut(x=my_x, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x, lam_cone=my_lam_cone)
           all arguments optional
-     b) x, cost, lam_a, lam_x = socpOut(arg,"x", "cost", "lam_a", "lam_x")
+     b) x, cost, dual_cost, lam_a, lam_x, lam_cone = socpOut(arg,"x", "cost", "dual_cost", "lam_a", "lam_x", "lam_cone")
           all arguments after the first optional
   Output arguments of an SOCP Solver
   
   Keyword arguments::
 
-    x     -- The primal solution (n x 1) [SOCP_SOLVER_X]
-    cost  -- The primal optimal cost (1 x 1) [SOCP_SOLVER_COST]
-    lam_a -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
-    lam_x -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
+    x         -- The primal solution (n x 1) [SOCP_SOLVER_X]
+    cost      -- The primal optimal cost (1 x 1) [SOCP_SOLVER_COST]
+    dual_cost -- The dual optimal cost (1 x 1) [SOCP_SOLVER_DUAL_COST]
+    lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
+    lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
+    lam_cone  -- The dual solution correspoding to cone (2-norm) constraints (m x 1) [SOCP_SOLVER_LAM_CONE]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPOutput,n)] for n in dummy[1:]]
@@ -3007,16 +3009,22 @@ def socpOut(*dummy,**kwargs):
   cost = []
   if 'cost' in kwargs:
     cost = kwargs['cost']
+  dual_cost = []
+  if 'dual_cost' in kwargs:
+    dual_cost = kwargs['dual_cost']
   lam_a = []
   if 'lam_a' in kwargs:
     lam_a = kwargs['lam_a']
   lam_x = []
   if 'lam_x' in kwargs:
     lam_x = kwargs['lam_x']
+  lam_cone = []
+  if 'lam_cone' in kwargs:
+    lam_cone = kwargs['lam_cone']
   for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in socpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_SOCPOutput))
+    if not(k in ['x','cost','dual_cost','lam_a','lam_x','lam_cone']):
+      raise Exception("Keyword error in socpOut: '%s' is not recognized. Available keywords are: x, cost, dual_cost, lam_a, lam_x, lam_cone" % k )
+  return IOSchemeVector([x,cost,dual_cost,lam_a,lam_x,lam_cone], IOScheme(SCHEME_SOCPOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
