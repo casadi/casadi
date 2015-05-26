@@ -102,14 +102,10 @@ matrix:
         - popd
         - sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
         - sudo apt-get update -q
-        - git clone https://github.com/jgillis/pyreport.git
-        - pushd pyreport && sudo python setup.py install && popd
         - sudo pip install texttable
-        - sudo pip install --allow-unverified pydot pydot==1.0.28
-        - sudo apt-get install python-lxml python-ipdb python-docutils texlive-science latex2html doxygen texlive-font-utils texlive-latex-recommended texlive-fonts-recommended etoolbox graphviz -y
-        - "mkdir -p ~/.matplotlib && echo 'backend : Agg' > ~/.matplotlib/matplotlibrc"
-        - pushd docs/api && make full | grep -v "file loc from" && popd
-        #- if [[ $TRAVIS_BRANCH == 'develop' ]]; then pushd docs/api; python /home/travis/build/casadi/testbot/helpers/publish_doc.py; popd; git pull; sh /home/travis/build/casadi/testbot/helpers/acommit.sh "automatic documentation update" ; python /home/travis/build/casadi/testbot/helpers/publish_builds.py ; fi
+        - sudo apt-get install doxygen -y
+        - pushd docs/api && make doxexport && popd
+        - git pull && sh /home/travis/build/casadi/testbot/helpers/acommit.sh "automatic documentation update" && python /home/travis/build/casadi/testbot/helpers/publish_builds.py
 
     - compiler: clang
       os: linux
