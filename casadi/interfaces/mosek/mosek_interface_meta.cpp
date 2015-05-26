@@ -26,7 +26,7 @@
       #include "mosek_interface.hpp"
       #include <string>
 
-      const std::string casadi::DsdpInterface::meta_doc=
+      const std::string casadi::MosekInterface::meta_doc=
       "\n"
 "Interface to the SDP solver MOSEK Warning: The solver MOSEK is not good\n"
 "at handling linear equalities. There are several options if you notice\n"

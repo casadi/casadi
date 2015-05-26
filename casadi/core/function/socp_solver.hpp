@@ -91,10 +91,14 @@ namespace casadi {
     SOCP_SOLVER_X,
     /// The primal optimal cost (1 x 1) [cost]
     SOCP_SOLVER_COST,
+    /// The dual optimal cost (1 x 1) [dual_cost]
+    SOCP_SOLVER_DUAL_COST,
     /// The dual solution corresponding to the linear constraints  (nc x 1) [lam_a]
     SOCP_SOLVER_LAM_A,
     /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
     SOCP_SOLVER_LAM_X,
+    /// The dual solution correspoding to cone (2-norm) constraints (m x 1) [lam_cone]
+    SOCP_SOLVER_LAM_CONE,
     SOCP_SOLVER_NUM_OUT};
 
   /// Structure specification of an SOCP [socpStruct]

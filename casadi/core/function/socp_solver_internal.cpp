@@ -91,9 +91,10 @@ namespace casadi {
     setNumOutputs(SOCP_SOLVER_NUM_OUT);
     output(SOCP_SOLVER_X) = DMatrix::zeros(n_, 1);
     output(SOCP_SOLVER_COST) = 0.0;
+    output(SOCP_SOLVER_DUAL_COST) = 0.0;
     output(SOCP_SOLVER_LAM_X) = DMatrix::zeros(n_, 1);
     output(SOCP_SOLVER_LAM_A) = DMatrix::zeros(nc_, 1);
-
+    output(SOCP_SOLVER_LAM_CONE) = DMatrix::zeros(m_, 1);
   }
 
   SocpSolverInternal::~SocpSolverInternal() {

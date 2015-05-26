@@ -26,33 +26,29 @@
 #ifndef CASADI_MOSEK_INTERFACE_HPP
 #define CASADI_MOSEK_INTERFACE_HPP
 
-#include "casadi/core/function/sdp_solver_internal.hpp"
-#include <casadi/interfaces/mosek/casadi_sdpsolver_mosek_export.h>
-#include <mosek5.h>
+#include "casadi/core/function/socp_solver_internal.hpp"
+#include <casadi/interfaces/mosek/casadi_socpsolver_mosek_export.h>
 
-/** \defgroup plugin_SdpSolver_mosek
-      Interface to the SDP solver MOSEK
-      Warning: The solver MOSEK is not good at handling linear equalities.
-      There are several options if you notice difficulties:
-      * play around with the parameter "_penalty"
-      * leave a gap manually
-      * switch to another SDP Solver
+#include <mosek.h>
+
+/** \defgroup plugin_SocpSolver_mosek
+      Interface to the SOCP solver MOSEK
 */
 
-/** \pluginsection{SdpSolver,mosek} */
+/** \pluginsection{SocpSolver,mosek} */
 
 /// \cond INTERNAL
 namespace casadi {
-  /** \brief \pluginbrief{SdpSolver,mosek}
+  /** \brief \pluginbrief{SocpSolver,mosek}
 
 
-   \author Joris Gillis
-   \date 2013
+   \author Niels van Duijkeren
+   \date 2015
    *
-   @copydoc SdpSolver_doc
-   @copydoc plugin_SdpSolver_mosek
+   @copydoc SocpSolver_doc
+   @copydoc plugin_SocpSolver_mosek
    * */
-  class CASADI_SDPSOLVER_MOSEK_EXPORT MosekInterface : public SdpSolverInternal {
+  class CASADI_SOCPSOLVER_MOSEK_EXPORT MosekInterface : public SocpSolverInternal {
   public:
 
     /** \brief Constructor */
@@ -61,8 +57,8 @@ namespace casadi {
     /** \brief Clone */
     virtual MosekInterface* clone() const;
 
-    /** \brief  Create a new SDP Solver */
-    static SdpSolverInternal* creator(const SDPStructure& st)
+    /** \brief  Create a new SOCP Solver */
+    static SocpSolverInternal* creator(const SOCPStructure& st)
     { return new MosekInterface(st);}
 
     /** \brief Destructor */
@@ -71,8 +67,41 @@ namespace casadi {
     /** \brief Initialize */
     virtual void init();
 
-    /** \brief Solve the SDP */
+    /** \brief Solve the SOCP */
     virtual void evaluate();
+
+    /** Get termination reason from flag */
+    static const char* terminationReason(int flag);
+
+    /** Get solution type from flag */
+    static const char* solutionType(int flag);
+
+    /// A documentation string
+    static const std::string meta_doc;
+
+  private:
+    /** Generate dual of SOCP to obtain conic form required by Mosek */
+    void convertToDualSocp();
+
+    /** Dual problem data */
+    std::vector<double> dual_c_;
+    std::vector<double> dual_A_data_;
+    std::vector<int> dual_A_row_;
+    std::vector<int> dual_A_colind_;
+    std::vector<double> dual_b_;
+    std::vector<double> dual_yi_;
+    std::vector<double> dual_ti_;
+
+    /** Indices of relevant bounds */
+    std::vector<int> primal_idx_lba_;     // Indices of lower bounded linear inequality constraints (LBA != -inf)
+    std::vector<int> primal_idx_uba_;     // Indices of upper bounded linear inequality constraints (UBA != inf)
+    std::vector<int> primal_idx_lbx_;     // Indices of simple lower bounds  (LBX != -inf)
+    std::vector<int> primal_idx_ubx_;     // Indices of simple upper bounds (UBX != inf)
+
+    /** MOSEK variables */
+    MSKenv_t         mosek_env_;
+    MSKtask_t        mosek_task_;
+    bool             initialized_;
 
   };
 

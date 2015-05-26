@@ -35,6 +35,9 @@ if SdpSolver.hasPlugin("dsdp"):
 if SdpSolver.hasPlugin("dsdp"):
   socpsolvers.append(("sdp.dsdp",{ "sdp_solver_options": {"verbose":True}},False))
 
+if SocpSolver.hasPlugin("mosek"):
+  socpsolvers.append(("mosek",{ },False))
+
 print socpsolvers
   
 class SocpSolverTests(casadiTestCase):
