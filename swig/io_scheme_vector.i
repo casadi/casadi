@@ -34,6 +34,10 @@
 %template(IOSchemeVectorSparsity) casadi::IOSchemeVector< casadi::Sparsity >;
 %template(IOSchemeVectorSparsityVector) casadi::IOSchemeVector< std::vector< casadi::Sparsity > >;
 
+%template() std::map<std::string, casadi::MX >;
+%template() std::map<std::string, casadi::Matrix<casadi::SXElement> >;
+%template() std::map<std::string, casadi::Matrix<double> >;
+
 #ifdef SWIGPYTHON
 %extend casadi::IOSchemeVector< casadi::MX > {
 %pythoncode %{
