@@ -149,6 +149,70 @@ namespace casadi {
       x[4].get(x4);
       x[5].get(x5);
     }
+
+    // Create map with 1 element
+    inline friend std::map<std::string, MatType>
+      make_map(const std::string& n0, const MatType& x0) {
+      std::map<std::string, MatType> ret;
+      ret[n0]=x0;
+      return ret;
+    }
+
+    // Create map with 2 elements
+    inline friend std::map<std::string, MatType>
+      make_map(const std::string& n0, const MatType& x0,
+               const std::string& n1, const MatType& x1) {
+      std::map<std::string, MatType> ret=make_map(n0, x0);
+      ret[n1]=x1;
+      return ret;
+    }
+
+    // Create map with 3 elements
+    inline friend std::map<std::string, MatType>
+      make_map(const std::string& n0, const MatType& x0,
+               const std::string& n1, const MatType& x1,
+               const std::string& n2, const MatType& x2) {
+      std::map<std::string, MatType> ret=make_map(n0, x0, n1, x1);
+      ret[n2]=x2;
+      return ret;
+    }
+
+    // Create map with 4 elements
+    inline friend std::map<std::string, MatType>
+      make_map(const std::string& n0, const MatType& x0,
+               const std::string& n1, const MatType& x1,
+               const std::string& n2, const MatType& x2,
+               const std::string& n3, const MatType& x3) {
+      std::map<std::string, MatType> ret=make_map(n0, x0, n1, x1, n2, x2);
+      ret[n3]=x3;
+      return ret;
+    }
+
+    // Create map with 5 elements
+    inline friend std::map<std::string, MatType>
+      make_map(const std::string& n0, const MatType& x0,
+               const std::string& n1, const MatType& x1,
+               const std::string& n2, const MatType& x2,
+               const std::string& n3, const MatType& x3,
+               const std::string& n4, const MatType& x4) {
+      std::map<std::string, MatType> ret=make_map(n0, x0, n1, x1, n2, x2, n3, x3);
+      ret[n4]=x4;
+      return ret;
+    }
+
+    // Create map with 6 elements
+    inline friend std::map<std::string, MatType>
+      make_map(const std::string& n0, const MatType& x0,
+               const std::string& n1, const MatType& x1,
+               const std::string& n2, const MatType& x2,
+               const std::string& n3, const MatType& x3,
+               const std::string& n4, const MatType& x4,
+               const std::string& n5, const MatType& x5) {
+      std::map<std::string, MatType> ret=make_map(n0, x0, n1, x1, n2, x2, n3, x3, n4, x4);
+      ret[n5]=x5;
+      return ret;
+    }
+
 #endif // SWIG
   public:
 
