@@ -57,6 +57,7 @@ namespace casadi {
 
     const Sparsity& A = st_[SOCP_STRUCT_A];
     const Sparsity& G = st_[SOCP_STRUCT_G];
+    const Sparsity& E = st_[SOCP_STRUCT_E];
 
     N_ = std::accumulate(ni_.begin(), ni_.end(), 0);
     casadi_assert_message(N_==G.size2(),
@@ -64,6 +65,11 @@ namespace casadi {
                           << G.size2()
                           <<  ")  must match sum of vector provided with option 'ni' ("
                           << N_ << ").");
+    casadi_assert_message(m_==E.size2(),
+                          "SocpSolverInternal: Supplied E sparsity: number of cols ("
+                          << E.size2()
+                          <<  ")  must match number of cone (2-norm) constraints ("
+                          << m_ << ").");
 
     nc_ = A.size1();
     n_ = A.size2();
@@ -72,13 +78,16 @@ namespace casadi {
        "SocpSolverInternal: Supplied G sparsity: number of rows ("
         << G.size1()
         <<  ") must match number of decision variables (cols of A): " << n_ << ".");
-
+    casadi_assert_message(n_==E.size1(),
+       "SocpSolverInternal: Supplied E sparsity: number of rows ("
+        << E.size1()
+        <<  ") must match number of decision variables (cols of A): " << n_ << ".");
 
     // Input arguments
     setNumInputs(SOCP_SOLVER_NUM_IN);
     input(SOCP_SOLVER_G) = DMatrix::zeros(G);
     input(SOCP_SOLVER_H) = DMatrix::zeros(N_, 1);
-    input(SOCP_SOLVER_E) = DMatrix::zeros(n_*m_, 1);
+    input(SOCP_SOLVER_E) = DMatrix::zeros(E);
     input(SOCP_SOLVER_F) = DMatrix::zeros(m_, 1);
     input(SOCP_SOLVER_A) = DMatrix::zeros(A);
     input(SOCP_SOLVER_C) = DMatrix::zeros(n_);
@@ -113,7 +122,7 @@ namespace casadi {
     stream << "ni: "<< ni_ << std::endl;
     stream << "g: "<< std::endl;  input(SOCP_SOLVER_G).printDense(stream);
     stream << "h: "<< std::endl;  input(SOCP_SOLVER_H).printDense(stream);
-    stream << "e: "<< std::endl;  input(SOCP_SOLVER_E).printDense(stream);
+    stream << "e: "<< input(SOCP_SOLVER_E) << std::endl;
     stream << "f: "<< std::endl;  input(SOCP_SOLVER_F).printDense(stream);
     stream << "c: " << input(SOCP_SOLVER_C) << std::endl;
     stream << "a: " << input(SOCP_SOLVER_A) << std::endl;

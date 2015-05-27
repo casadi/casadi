@@ -2914,7 +2914,7 @@ def socpIn(*dummy,**kwargs):
 
     g   -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_SOLVER_G]
     h   -- The vertical stack of all vectors hi: ( N x 1) [SOCP_SOLVER_H]
-    e   -- The vertical stack of all vectors ei: ( nm x 1) [SOCP_SOLVER_E]
+    e   -- The horizontal stack of all vectors ei: ( n x m) [SOCP_SOLVER_E]
     f   -- The vertical stack of all scalars fi: ( m x 1) [SOCP_SOLVER_F]
     c   -- The vector c: ( n x 1) [SOCP_SOLVER_C]
     a   -- The matrix A: ( nc x n) [SOCP_SOLVER_A]
@@ -3052,15 +3052,16 @@ def socpStruct(*dummy,**kwargs):
   Helper function for 'SOCPStruct'
 
   Two use cases:
-     a) arg = socpStruct(g=my_g, a=my_a)
+     a) arg = socpStruct(g=my_g, e=my_e, a=my_a)
           all arguments optional
-     b) g, a = socpStruct(arg,"g", "a")
+     b) g, e, a = socpStruct(arg,"g", "e", "a")
           all arguments after the first optional
   Structure specification of an SOCP
   
   Keyword arguments::
 
     g -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_STRUCT_G]
+    e -- The horizontal stack of all vectors ei: ( n x m) [SOCP_STRUCT_E]
     a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpStruct. Either use keywords or non-keywords ")
@@ -3068,13 +3069,16 @@ def socpStruct(*dummy,**kwargs):
   g = Sparsity()
   if 'g' in kwargs:
     g = kwargs['g']
+  e = Sparsity()
+  if 'e' in kwargs:
+    e = kwargs['e']
   a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
   for k in kwargs.keys():
-    if not(k in ['g','a']):
-      raise Exception("Keyword error in socpStruct: '%s' is not recognized. Available keywords are: g, a" % k )
-  return SOCPStructure([g,a])
+    if not(k in ['g','e','a']):
+      raise Exception("Keyword error in socpStruct: '%s' is not recognized. Available keywords are: g, e, a" % k )
+  return SOCPStructure([g,e,a])
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

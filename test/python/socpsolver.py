@@ -49,9 +49,9 @@ class SocpSolverTests(casadiTestCase):
     #
     #
     c = DMatrix([2,1])
-    G = DMatrix([[1,0],[0,1]]).T
+    G = sparsify(DMatrix([[1,0],[0,1]])).T
     H = DMatrix([-5,-7])
-    E = DMatrix([0,0])
+    E = sparsify(DMatrix([0,0]))
     F = DMatrix([4])
 
     A = DMatrix(0,2)
@@ -63,7 +63,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -90,9 +90,9 @@ class SocpSolverTests(casadiTestCase):
     a = 1.3
     
     c = DMatrix([2,1])
-    G = DMatrix([[1,0],[0,1]]).T
+    G = sparsify(DMatrix([[1,0],[0,1]])).T
     H = DMatrix([0,0])
-    E = DMatrix([a,0])
+    E = sparsify(DMatrix([a,0]))
     F = DMatrix([4])
 
     A = DMatrix(0,2)
@@ -102,7 +102,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -130,9 +130,9 @@ class SocpSolverTests(casadiTestCase):
     a = 1.3
     
     c = DMatrix([2,1])
-    G = DMatrix([[1,0],[0,1]]).T
+    G = sparsify(DMatrix([[1,0],[0,1]])).T
     H = DMatrix([0,0])
-    E = DMatrix([a,0])
+    E = sparsify(DMatrix([a,0]))
     F = DMatrix([4])
 
     A = DMatrix(0,2)
@@ -142,7 +142,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
@@ -172,9 +172,9 @@ class SocpSolverTests(casadiTestCase):
     #
     #  solution is in cornerpoint of intersection
     c = DMatrix([2,1])
-    G = DMatrix([[1,0],[0,1],[1.0/6,0],[0,1.0/5]]).T
+    G = sparsify(DMatrix([[1,0],[0,1],[1.0/6,0],[0,1.0/5]])).T
     H = DMatrix([-5,-7,0,0])
-    E = DMatrix([0,0,0,0])
+    E = sparsify(DMatrix([[0,0],[0,0]]))
     F = DMatrix([4,1])
 
     A = DMatrix(0,2)
@@ -186,7 +186,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2,2])
       solver.init()
@@ -215,7 +215,7 @@ class SocpSolverTests(casadiTestCase):
     c = DMatrix([-2., 1., 5.])
     G = DMatrix([[-13,3,5],[-12,12,-6],[-3,6,2],[1,9,2],[-1,-19,3]]).T
     H = DMatrix([-3,-2,0,3,-42])
-    E = DMatrix([-12,-6,5,-3,6,-10])
+    E = DMatrix([[-12,-6,5],[-3,6,-10]]).T
     F = DMatrix([-12,27])
     A = DMatrix(0,3)
     LBA = DMatrix()
@@ -226,7 +226,7 @@ class SocpSolverTests(casadiTestCase):
     for socpsolver, socp_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
-      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2,3])
       solver.init()
