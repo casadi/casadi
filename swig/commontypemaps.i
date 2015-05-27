@@ -774,9 +774,9 @@
 
 /* Map conversion from dictionaries (default routines handle opposite direction) */
 %define %typemaps_map(xName, xPrec, xType...)
-%casadi_typecheck_typemap_constref(Map, xPrec, std::map<std::string, xType>)
-%casadi_in_typemap_constref2(Map, std::map<std::string, xType>)
-%casadi_freearg_typemap(const std::map<std::string, xType>&)
+%casadi_typecheck_typemap_constref(Map, xPrec, std::map<std::string, xType >)
+%casadi_in_typemap_constref2(Map, std::map<std::string, xType >)
+%casadi_freearg_typemap(const std::map<std::string, xType >&)
 %enddef
 %typemaps_map(Map, PRECEDENCE_MX, casadi::MX)
 %typemaps_map(Map, PRECEDENCE_DMatrix, casadi::Matrix<double>)
