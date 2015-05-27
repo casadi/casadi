@@ -104,8 +104,8 @@ namespace casadi {
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    IOSchemeVector<MX> Pr = solver_(dpleIn("a", horzcat(As_), "v", horzcat(V_)));
-    std::vector<MX> Ps_ = horzsplit(Pr.data[DPLE_P], n_);
+    MX P = solver_(make_map("a", horzcat(As_), "v", horzcat(V_)))["p"];
+    std::vector<MX> Ps_ = horzsplit(P, n_);
 
     std::vector<MX> HPH(K_);
 

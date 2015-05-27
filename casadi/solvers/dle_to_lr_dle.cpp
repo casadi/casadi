@@ -81,10 +81,10 @@ namespace casadi {
     if (hasSetOption(optionsname())) solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    IOSchemeVector<MX> Pr = solver_(lrdleIn("a", A, "v", V));
+    MX P = solver_(make_map("a", A, "v", V))["p"];
 
     f_ = MXFunction(dleIn("a", A, "v", V),
-                    dleOut("p", Pr.data[DLE_P]));
+                    dleOut("p", P));
     f_.init();
 
     Wrapper<DleToLrDle>::checkDimensions();

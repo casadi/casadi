@@ -607,24 +607,6 @@ namespace casadi {
     return res;
   }
 
-  IOSchemeVector<DMatrix> Function::
-  operator()(const IOSchemeVector<DMatrix>& arg, bool always_inline, bool never_inline) {
-    return IOSchemeVector<DMatrix>(operator()(arg.data, always_inline, never_inline),
-                                   IOScheme((*this)->oscheme_));
-  }
-
-  IOSchemeVector<SX> Function::
-  operator()(const IOSchemeVector<SX>& arg, bool always_inline, bool never_inline) {
-    return IOSchemeVector<SX>(operator()(arg.data, always_inline, never_inline),
-                              IOScheme((*this)->oscheme_));
-  }
-
-  IOSchemeVector<MX> Function::
-  operator()(const IOSchemeVector<MX>& arg, bool always_inline, bool never_inline) {
-    return IOSchemeVector<MX>(operator()(arg.data, always_inline, never_inline),
-                              IOScheme((*this)->oscheme_));
-  }
-
   template<typename M>
   std::map<std::string, M> Function::callMap(const std::map<std::string, M>& arg,
                                              bool always_inline, bool never_inline) {

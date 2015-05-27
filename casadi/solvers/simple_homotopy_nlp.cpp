@@ -85,8 +85,9 @@ namespace casadi {
     std::vector<MX> p_tau = vertsplit(P, split);
     MX x = MX::sym("x", hnlp_.input(HNL_X).nnz());
 
+    map<string, MX> v = hnlp_(make_map("x", x, "p", p_tau[0], "tau", p_tau[1]));
     MXFunction nlp(nlpIn("x", x, "p", P),
-                   hnlp_(hnlpIn("x", x, "p", p_tau[0], "tau", p_tau[1])));
+                   nlpOut("f", v["f"], "g", v["g"]));
 
     // Create an nlpsolver instance
     std::string nlpsolver_name = getOption("nlp_solver");

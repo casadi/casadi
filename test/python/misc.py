@@ -469,7 +469,6 @@ class Misctests(casadiTestCase):
         [f_,g_] = itemgetter('f','g')(f({'x':Sparsity.dense(2)}))
         self.assertTrue(False)
       except RuntimeError as e:
-        self.assertTrue("Function(scheme(SX)" in e.message)
         self.assertTrue("Function([SX]" in e.message)
         self.assertTrue("You have: Function(dict)" in e.message)
 

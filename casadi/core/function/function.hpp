@@ -304,12 +304,6 @@ namespace casadi {
                                bool always_inline=false, bool never_inline=false);
     std::vector<MX> operator()(const std::vector<MX>& arg,
                                bool always_inline=false, bool never_inline=false);
-    IOSchemeVector<DMatrix> operator()(const IOSchemeVector<DMatrix>& arg,
-                                       bool always_inline=false, bool never_inline=false);
-    IOSchemeVector<SX> operator()(const IOSchemeVector<SX>& arg,
-                                  bool always_inline=false, bool never_inline=false);
-    IOSchemeVector<MX> operator()(const IOSchemeVector<MX>& arg,
-                                  bool always_inline=false, bool never_inline=false);
     std::map<std::string, DMatrix> operator()(const std::map<std::string, DMatrix>& arg,
                                               bool always_inline=false, bool never_inline=false);
     std::map<std::string, SX> operator()(const std::map<std::string, SX>& arg,

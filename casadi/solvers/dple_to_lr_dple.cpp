@@ -93,11 +93,9 @@ namespace casadi {
     solver_.setOption(getOption(optionsname()));
     solver_.init();
 
-    IOSchemeVector<MX> Pr = solver_(
-      lrdpleIn("a", A, "v", V, "c", MX(repmat(C, 1, K)), "h", MX(repmat(H, 1, K))));
+    MX P = solver_(make_map("a", A, "v", V, "c", repmat(C, 1, K), "h", repmat(H, 1, K)))["p"];
 
-    f_ = MXFunction(dpleIn("a", A, "v", V),
-                    dpleOut("p", Pr.data[DPLE_P]));
+    f_ = MXFunction(dpleIn("a", A, "v", V), dpleOut("p", P));
     f_.init();
 
     Wrapper<DpleToLrDple>::checkDimensions();
