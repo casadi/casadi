@@ -538,7 +538,7 @@ namespace casadi {
     // Fill lagrange multipliers on A*x and x
     std::fill(output(SOCP_SOLVER_LAM_A).begin(),output(SOCP_SOLVER_LAM_A).end(),0);
     std::fill(output(SOCP_SOLVER_LAM_X).begin(),output(SOCP_SOLVER_LAM_X).end(),0);
-    int idx = m_+N_; //int idx = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() + primal_idx_lbx_.size() + primal_idx_ubx_.size();
+    int idx = m_+N_;
     for (int i : primal_idx_lba_) {
       output(SOCP_SOLVER_LAM_A).data()[i] = std::max(output(SOCP_SOLVER_LAM_A).data()[i], dual_solution[idx]);
       idx += 1;
