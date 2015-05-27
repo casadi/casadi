@@ -173,8 +173,8 @@ namespace casadi {
     }
 
     f_ = MXFunction(v_in, dpleOut("p", horzcat(Ps)));
-    f_.setOption("input_scheme", IOScheme(SCHEME_LR_DPLEInput).v());
-    f_.setOption("output_scheme", IOScheme(SCHEME_LR_DPLEOutput).v());
+    f_.setOption("input_scheme", IOScheme(SCHEME_LR_DPLEInput));
+    f_.setOption("output_scheme", IOScheme(SCHEME_LR_DPLEOutput));
     f_.init();
 
     Wrapper<LiftingLrDpleInternal>::checkDimensions();

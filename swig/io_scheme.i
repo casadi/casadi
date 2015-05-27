@@ -26,23 +26,6 @@
 
 %include "shared_object.i"
 
-%rename(__call__original__) casadi::IOScheme::operator();
-
 %include <casadi/core/function/io_scheme.hpp>
-
-#ifdef SWIGPYTHON
-%extend casadi::IOScheme {
-%template(__call__original__) operator()< casadi::Sparsity >;
-%template(__call__original__) operator()< casadi::MX>;
-%template(__call__original__) operator()< casadi::SX>;
-%template(__call__original__) operator()< casadi::Matrix<double> >;
-
-%pythoncode %{
-  def __call__(self,*dummy,**kwargs):
-    if len(dummy)>1: return self.__call__original__(dummy[0],dummy[1:])
-    return self.__call__original__(kwargs.keys(),kwargs.values())
-%}
-}
-#endif
 
 #endif // CASADI_IO_SCHEME_I

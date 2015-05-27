@@ -47,7 +47,7 @@ namespace casadi {
                           << grid.dimString());
     setOption("name", "unnamed simulator");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
-    ischeme_ = IOScheme(SCHEME_IntegratorInput).v();
+    ischeme_ = IOScheme(SCHEME_IntegratorInput);
   }
 
   SimulatorInternal::~SimulatorInternal() {

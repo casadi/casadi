@@ -72,8 +72,8 @@ namespace casadi {
               "stop the iterations");
 
     // Enable string notation for IO
-    ischeme_ = IOScheme(SCHEME_NlpSolverInput).v();
-    oscheme_ = IOScheme(SCHEME_NlpSolverOutput).v();
+    ischeme_ = IOScheme(SCHEME_NlpSolverInput);
+    oscheme_ = IOScheme(SCHEME_NlpSolverOutput);
 
     // Make the ref object a non-refence counted pointer to this (as reference counting would
     // prevent deletion of the object)
@@ -222,8 +222,8 @@ namespace casadi {
     casadi_assert_message(jacF.nOut()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    jacF.setOption("input_scheme", IOScheme(SCHEME_GradFInput).v());
-    jacF.setOption("output_scheme", IOScheme(SCHEME_GradFOutput).v());
+    jacF.setOption("input_scheme", IOScheme(SCHEME_GradFInput));
+    jacF.setOption("output_scheme", IOScheme(SCHEME_GradFOutput));
     log("Objective gradient function initialized");
     return jacF;
   }
@@ -245,8 +245,8 @@ namespace casadi {
     casadi_assert_message(gradF.nOut()==GRADF_NUM_OUT,
                           "Wrong number of outputs to the gradient function. "
                           "Note: The gradient signature was changed in #544");
-    gradF.setOption("input_scheme", IOScheme(SCHEME_GradFInput).v());
-    gradF.setOption("output_scheme", IOScheme(SCHEME_GradFOutput).v());
+    gradF.setOption("input_scheme", IOScheme(SCHEME_GradFInput));
+    gradF.setOption("output_scheme", IOScheme(SCHEME_GradFOutput));
     log("Objective gradient function initialized");
     return gradF;
   }
@@ -279,8 +279,8 @@ namespace casadi {
     casadi_assert_message(jacG.nOut()==JACG_NUM_OUT,
                           "Wrong number of outputs to the Jacobian function. "
                           "Note: The Jacobian signature was changed in #544");
-    jacG.setOption("input_scheme", IOScheme(SCHEME_JacGInput).v());
-    jacG.setOption("output_scheme", IOScheme(SCHEME_JacGOutput).v());
+    jacG.setOption("input_scheme", IOScheme(SCHEME_JacGInput));
+    jacG.setOption("output_scheme", IOScheme(SCHEME_JacGOutput));
     log("Jacobian function initialized");
     return jacG;
   }
@@ -332,8 +332,8 @@ namespace casadi {
     casadi_assert_message(hessLag.nOut()==HESSLAG_NUM_OUT,
                           "Wrong number of outputs to the Hessian function. "
                           "Note: The Lagrangian Hessian signature was changed in #544");
-    hessLag.setOption("input_scheme", IOScheme(SCHEME_HessLagInput).v());
-    hessLag.setOption("output_scheme", IOScheme(SCHEME_HessLagOutput).v());
+    hessLag.setOption("input_scheme", IOScheme(SCHEME_HessLagInput));
+    hessLag.setOption("output_scheme", IOScheme(SCHEME_HessLagOutput));
 
     log("Hessian function initialized");
     return hessLag;

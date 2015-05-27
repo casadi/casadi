@@ -81,8 +81,8 @@ namespace casadi {
     output(QP_SOLVER_LAM_X) = DMatrix::zeros(x_sparsity);
     output(QP_SOLVER_LAM_A) = DMatrix::zeros(bounds_sparsity);
 
-    ischeme_ = IOScheme(SCHEME_QpSolverInput).v();
-    oscheme_ = IOScheme(SCHEME_QpSolverOutput).v();
+    ischeme_ = IOScheme(SCHEME_QpSolverInput);
+    oscheme_ = IOScheme(SCHEME_QpSolverOutput);
   }
 
   void QpSolverInternal::init() {

@@ -199,8 +199,8 @@ namespace casadi {
     ret_in[2] = h;
     MXFunction ret(ret_in, make_vector(xf));
     ret.setOption("name", "F");
-    ret.setOption("input_scheme", IOScheme("x0", "p", "h").v());
-    ret.setOption("output_scheme", IOScheme("xf").v());
+    ret.setOption("input_scheme", IOScheme("x0", "p", "h"));
+    ret.setOption("output_scheme", IOScheme("xf"));
     ret.init();
     return ret;
   }
@@ -323,8 +323,8 @@ namespace casadi {
     // Form discrete-time dynamics
     MXFunction ret(make_vector(x0, p, h), make_vector(xf));
     ret.setOption("name", "F");
-    ret.setOption("input_scheme", IOScheme("x0", "p", "h").v());
-    ret.setOption("output_scheme", IOScheme("xf").v());
+    ret.setOption("input_scheme", IOScheme("x0", "p", "h"));
+    ret.setOption("output_scheme", IOScheme("xf"));
     ret.init();
     return ret;
   }
@@ -377,8 +377,8 @@ namespace casadi {
     // Form discrete-time dynamics
     MXFunction ret(make_vector(x0, p, h), make_vector(xf));
     ret.setOption("name", "F");
-    ret.setOption("input_scheme", IOScheme("x0", "p", "h").v());
-    ret.setOption("output_scheme", IOScheme("xf").v());
+    ret.setOption("input_scheme", IOScheme("x0", "p", "h"));
+    ret.setOption("output_scheme", IOScheme("xf"));
     ret.init();
     return ret;
   }

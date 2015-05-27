@@ -471,29 +471,29 @@ class Misctests(casadiTestCase):
       f = SXFunction(nlpIn(x=x),nlpOut(g=x**2))
       f.init()
 
-      [f_,g_] = itemgetter('f','g')(f({'x':SX(4)}))
+      [f_,g_] = itemgetter('f','g')(f({'x':4}))
       self.checkarray(g_,DMatrix(16))
 
       with self.assertRaises(RuntimeError):
-        [f_,g_] = f(m=4)
+        [f_,g_] = itemgetter('f','g')(f({'m':4}))
       
       try:
-        [f_,g_] = f(x=Sparsity.dense(2))
+        [f_,g_] = itemgetter('f','g')(f({'x':Sparsity.dense(2)}))
         self.assertTrue(False)
       except RuntimeError as e:
         self.assertTrue("Function(scheme(SX)" in e.message)
         self.assertTrue("Function([SX]" in e.message)
-        self.assertTrue("You have: Function(scheme(Sparsity))" in e.message)
+        self.assertTrue("You have: Function(dict)" in e.message)
 
       with self.assertRaises(RuntimeError):
-        [f_,g_] = f(x=[x])
+        [f_,g_] = itemgetter('f','g')(f({'x':[x]}))
 
 
       f = SXFunction([x],nlpOut(g=x**2))
       f.init()
 
       with self.assertRaises(Exception):
-        [f_,g_] = f(x=4)
+        [f_,g_] = itemgetter('f','g')(f({'x':4}))
         
   def test_getscheme(self):
     x = SX.sym("x")
@@ -502,15 +502,15 @@ class Misctests(casadiTestCase):
     F = SXFunction(nlpIn(x=x,p=p),nlpOut(g=x**2,f=x+p))
     F.init()
     
-    fc = F(x=3,p=4)
-    [f] = fc.get.f
+    fc = F({'x':3,'p':4})
+    [f] = fc['f']
     self.checkarray(f,DMatrix([7]))
-    [g] = fc.get.g
+    [g] = fc['g']
     self.checkarray(g,DMatrix([9]))
-    [f,g] = fc.get.f.g
+    [f,g] = itemgetter('f','g')(fc)
     self.checkarray(f,DMatrix([7]))
     self.checkarray(g,DMatrix([9]))
-    [g,f] = fc.get.g.f
+    [g,f] = itemgetter('g','f')(fc)
     self.checkarray(f,DMatrix([7]))
     self.checkarray(g,DMatrix([9]))
     

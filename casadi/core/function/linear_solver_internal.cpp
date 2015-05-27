@@ -61,8 +61,8 @@ namespace casadi {
     obuf_.resize(LINSOL_NUM_OUT);
     output(LINSOL_X) = input(LINSOL_B);
 
-    ischeme_ = IOScheme(SCHEME_LinsolInput).v();
-    oscheme_ = IOScheme(SCHEME_LinsolOutput).v();
+    ischeme_ = IOScheme(SCHEME_LinsolInput);
+    oscheme_ = IOScheme(SCHEME_LinsolOutput);
   }
 
   void LinearSolverInternal::init() {

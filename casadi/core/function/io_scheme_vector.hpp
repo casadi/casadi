@@ -46,9 +46,9 @@ namespace casadi {
     std::vector<std::string> str;
 
   public:
-    // Constructor
     IOSchemeVector(const std::vector<T>& d = std::vector<T>(),
-                   const IOScheme& s = IOScheme()) : data(d), str(s.v()) {}
+                   const std::vector<std::string>& s = std::vector<std::string>()) : data(d), str(s) {}
+    IOSchemeVector(const std::vector<T>& d, InputOutputScheme scheme) : data(d), str(IOScheme(scheme)) {}
 
 #ifndef SWIG
     T operator[](int i) const {

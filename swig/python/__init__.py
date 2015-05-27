@@ -207,11 +207,7 @@ def improvedcall(v):
     if len(args)>0 and len(kwargs)>0:
       raise Exception("You cannot mix positional and keyword arguments in __call__")
     if len(kwargs)>0:
-      scheme = IOScheme(self.inputScheme())
-      if scheme.known():
-        return v(self,scheme(**kwargs))
-      else:
-        raise Exception("The CasADi Function that you call has no known input scheme. You cannot use keyword arguments, just possitional arguments.")
+      return v(self,kwargs)
     else:
       return v(self,*args)
 

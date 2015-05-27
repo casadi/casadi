@@ -431,15 +431,8 @@ class Functiontests(casadiTestCase):
     
   def test_customIO(self):
     
-    myOut = IOScheme(["foo","bar"])
-
     x = SX.sym("x")
-    
-    with self.assertRaises(Exception):
-      myOut(baz=x)
-    
-    f = SXFunction([x],myOut(foo=x*x,bar=x))
-    f.init()
+    f = SXFunction('f',[x],[x*x, x],{'output_scheme':["foo","bar"]})
     
     f.setInput(12,0)
     f.evaluate()
@@ -450,11 +443,11 @@ class Functiontests(casadiTestCase):
     with self.assertRaises(Exception):
       f.output("baz")
       
-    ret = f.call([SX(12)])
-    self.checkarray(myOut(ret,"foo")[0],DMatrix([144]))
-    self.checkarray(myOut(ret,"bar")[0],DMatrix([12]))
+    ret = f({'0':SX(12)})
+    self.checkarray(ret["foo"],DMatrix([144]))
+    self.checkarray(ret["bar"],DMatrix([12]))
     with self.assertRaises(Exception):
-      self.checkarray(myOut(ret,"baz")[0],DMatrix([12]))
+      self.checkarray(ret["baz"],DMatrix([12]))
      
       
   def test_unknown_options(self):
@@ -1147,7 +1140,7 @@ class Functiontests(casadiTestCase):
     f = SXFunction(daeIn(x=x),[x**2])
     f.init()
 
-    self.checkarray(f(x=0.3)[0],DMatrix(0.09))
+    self.checkarray(f(x=0.3)['0'],DMatrix(0.09))
     
 if __name__ == '__main__':
     unittest.main()

@@ -99,13 +99,11 @@ namespace casadi {
 
     g = diagcat(g_sdqp, g);
 
-    IOScheme mappingIn("g_socp", "h_socp", "f_sdqp", "g_sdqp");
-    IOScheme mappingOut("f", "g");
-
-    mapping_ = MXFunction(mappingIn("g_socp", g_socp, "h_socp", h_socp,
-                                    "f_sdqp", f_sdqp, "g_sdqp", g_sdqp),
-                          mappingOut("f", horzcat(fi), "g", g));
-    mapping_.init();
+    Dictionary opts;
+    opts["input_scheme"] = IOScheme("g_socp", "h_socp", "f_sdqp", "g_sdqp");
+    opts["output_scheme"] = IOScheme("f", "g");
+    mapping_ = MXFunction("mapping", make_vector(g_socp, h_socp, f_sdqp, g_sdqp),
+                          make_vector(horzcat(fi), g), opts);
 
     // Create an SdpSolver instance
     solver_ = SdpSolver(getOption(solvername()),
