@@ -103,8 +103,8 @@ matrix:
         - sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
         - sudo apt-get update -q
         - sudo pip install texttable
-        - sudo apt-get install doxygen -y
-        - pushd docs/api && make doxexport && popd
+        - sudo apt-get install python-lxml doxygen -y
+        - pushd docs/api && make doxexport | grep -v "file loc from" && popd
         - git pull && sh /home/travis/build/casadi/testbot/helpers/acommit.sh "automatic documentation update" && python /home/travis/build/casadi/testbot/helpers/publish_builds.py
 
     - compiler: clang
