@@ -54,22 +54,26 @@ using namespace std;
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
                                  const IOSchemeVector<Sparsity>& inputscheme,
                                  const vector<Sparsity>& outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme.data, outputscheme));
-    setOption("input_scheme", inputscheme.str);
+    pair<vector<string>, vector<Sparsity> > inputscheme2 = unzip(inputscheme.v);
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme2.second, outputscheme));
+    setOption("input_scheme", inputscheme2.first);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
                                  const IOSchemeVector<Sparsity> &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme.data));
-    setOption("output_scheme", outputscheme.str);
+    pair<vector<string>, vector<Sparsity> > outputscheme2 = unzip(outputscheme.v);
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme2.second));
+    setOption("output_scheme", outputscheme2.first);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
                                  const IOSchemeVector<Sparsity> &inputscheme,
                                  const IOSchemeVector<Sparsity> &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme.data, outputscheme.data));
-    setOption("input_scheme", inputscheme.str);
-    setOption("output_scheme", outputscheme.str);
+    pair<vector<string>, vector<Sparsity> > inputscheme2 = unzip(inputscheme.v);
+    pair<vector<string>, vector<Sparsity> > outputscheme2 = unzip(outputscheme.v);
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme2.second, outputscheme2.second));
+    setOption("input_scheme", inputscheme2.first);
+    setOption("output_scheme", outputscheme2.first);
   }
 
   CustomFunctionInternal* CustomFunction::operator->() {

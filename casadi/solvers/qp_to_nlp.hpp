@@ -60,7 +60,7 @@ public:
 
   /** \brief  Create a new QP Solver */
   static QpSolverInternal* creator(const QPStructure& st)
-  { return new QpToNlp(st.data);}
+  { return new QpToNlp(unzip(st.v).second);}
 
   /** \brief  Create a new Solver */
   explicit QpToNlp(const std::vector<Sparsity> &st);
