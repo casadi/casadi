@@ -303,19 +303,7 @@ class Misctests(casadiTestCase):
     sim = ControlSimulator(f,[0,1])
     sim.setOption("integrator_options",{"abstol": 1e-4})
     sim.printOptions()
-    
-  def test_IOscheme_indexing(self):
-    self.message("IOscheme indexing")
-    s = daeIn(x=2)
-    
-    self.assertEqual(s[0],2)
-    self.assertEqual(s["x"],2)
-    with self.assertRaises(Exception):
-      s["xfgfd"]
-    with self.assertRaises(Exception):
-      s[100]
-    s[-1]
-    
+        
   def test_IOscheme_output(self):
     x = 2
     p = 3

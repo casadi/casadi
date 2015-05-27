@@ -55,26 +55,9 @@ namespace casadi {
       casadi_assert_message(i>=0 && i<this->data.size(), "Index error: supplied integer must be >=0 and <= " << this->data.size() << " but got " << i << ".");
       return this->data.at(i);
     }
-    T operator[](const std::string& name) const {
-      for (std::vector<std::string>::const_iterator i=str.begin(); i!=str.end(); ++i) {
-        size_t col = i->find(':');
-        if (i->compare(0, col, name)==0) {
-          return (*this)[i-str.begin()];
-        }
-      }
-      std::stringstream entries;
-      for (size_t i=0; i!=str.size(); ++i) {
-         if (i!=0) entries << ", ";
-         size_t col = str[i].find(':');
-         entries << str[i].substr(0, col);
-      }
-      casadi_error("entry '" << name << "' not available. Available entries are " << entries.str());
-      return T();
-    }
 #endif // SWIG
 #ifndef SWIGMATLAB
     T __getitem__(int i) const { if (i<0) i+= this->data.size(); return (*this)[i]; }
-    T __getitem__(const std::string& name) const { return (*this)[name]; }
     int __len__() const { return this->data.size(); }
 #endif // SWIGMATLAB
     std::vector<T> vector() const { return this->data; }
