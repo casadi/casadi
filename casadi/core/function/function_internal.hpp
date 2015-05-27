@@ -320,7 +320,6 @@ namespace casadi {
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SX> symbolicInputSX() const;
 
-    ///@{
     /** \brief Get input scheme index by name */
     virtual int inputIndex(const std::string &name) const {
       const std::vector<std::string>& v=ischeme_;
@@ -344,7 +343,42 @@ namespace casadi {
                    << name << "\". Available names are: " << v << ".");
       return -1;
     }
-    ///@}
+
+    /** \brief Get input scheme name by index */
+    virtual std::string inputName(int ind) const {
+      const std::string& s=ischeme_.at(ind);
+      size_t col = s.find(':'); // Colon seprates name from description
+      return s.substr(0, col);
+    }
+
+    /** \brief Get output scheme name by index */
+    virtual std::string outputName(int ind) const {
+      const std::string& s=oscheme_.at(ind);
+      size_t col = s.find(':'); // Colon seprates name from description
+      return s.substr(0, col);
+    }
+
+    /** \brief Get input scheme description by index */
+    virtual std::string inputDescription(int ind) const {
+      const std::string& s=ischeme_.at(ind);
+      size_t col = s.find(':'); // Colon seprates name from description
+      if (col==std::string::npos) {
+        return std::string("No description available");
+      } else {
+        return s.substr(col+1);
+      }
+    }
+
+    /** \brief Get output scheme description by index */
+    virtual std::string outputDescription(int ind) const {
+      const std::string& s=oscheme_.at(ind);
+      size_t col = s.find(':'); // Colon seprates name from description
+      if (col==std::string::npos) {
+        return std::string("No description available");
+      } else {
+        return s.substr(col+1);
+      }
+    }
 
     /// Access input argument by index
     inline Matrix<double>& input(int i=0) {

@@ -211,6 +211,22 @@ namespace casadi {
     return (*this)->outputIndex(name);
   }
 
+  std::string Function::inputName(int ind) const {
+    return (*this)->inputName(ind);
+  }
+
+  std::string Function::outputName(int ind) const {
+    return (*this)->outputName(ind);
+  }
+
+  std::string Function::inputDescription(int ind) const {
+    return (*this)->inputDescription(ind);
+  }
+
+  std::string Function::outputDescription(int ind) const {
+    return (*this)->outputDescription(ind);
+  }
+
   const Matrix<double>& Function::input(int i) const {
     return (*this)->input(i);
   }
@@ -607,6 +623,43 @@ namespace casadi {
   operator()(const IOSchemeVector<MX>& arg, bool always_inline, bool never_inline) {
     return IOSchemeVector<MX>(operator()(arg.data, always_inline, never_inline),
                               IOScheme((*this)->oscheme_));
+  }
+
+  template<typename M>
+  std::map<std::string, M> Function::callMap(const std::map<std::string, M>& arg,
+                                             bool always_inline, bool never_inline) {
+    casadi_assert(isInit());
+
+    // Order inputs
+    std::vector<M> v(nIn());
+    for (typename std::map<std::string, M>::const_iterator i=arg.begin(); i!=arg.end(); ++i) {
+      v.at(inputIndex(i->first)) = i->second;
+    }
+
+    // Make call
+    v = (*this)(v, always_inline, never_inline);
+
+    // Save to map
+    std::map<std::string, M> ret;
+    for (int i=0; i<v.size(); ++i) {
+      ret[outputName(i)] = v[i];
+    }
+    return ret;
+  }
+
+  std::map<std::string, DMatrix> Function::
+  operator()(const std::map<std::string, DMatrix>& arg, bool always_inline, bool never_inline) {
+    return callMap(arg, always_inline, never_inline);
+  }
+
+  std::map<std::string, SX> Function::
+  operator()(const std::map<std::string, SX>& arg, bool always_inline, bool never_inline) {
+    return callMap(arg, always_inline, never_inline);
+  }
+
+  std::map<std::string, MX> Function::
+  operator()(const std::map<std::string, MX>& arg, bool always_inline, bool never_inline) {
+    return callMap(arg, always_inline, never_inline);
   }
 
   inline bool checkMat(const Sparsity& arg, const Sparsity& inp) {

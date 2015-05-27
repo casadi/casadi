@@ -103,7 +103,6 @@ namespace casadi {
 #endif // SWIG
     /// \endcond
 
-    /// \cond INTERNAL
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
@@ -117,7 +116,18 @@ namespace casadi {
      * SCHEME_NLPINput
      */
     int outputIndex(const std::string &name) const;
-    /// \endcond
+
+    /** \brief Get input scheme name by index */
+    std::string inputName(int ind) const;
+
+    /** \brief Get output scheme name by index */
+    std::string outputName(int ind) const;
+
+    /** \brief Get input scheme description by index */
+    std::string inputDescription(int ind) const;
+
+    /** \brief Get output scheme description by index */
+    std::string outputDescription(int ind) const;
 
     /// \cond UNSAFE
     /** \brief [UNSAFE] Obtain reference to inputs
@@ -300,6 +310,12 @@ namespace casadi {
                                   bool always_inline=false, bool never_inline=false);
     IOSchemeVector<MX> operator()(const IOSchemeVector<MX>& arg,
                                   bool always_inline=false, bool never_inline=false);
+    std::map<std::string, DMatrix> operator()(const std::map<std::string, DMatrix>& arg,
+                                              bool always_inline=false, bool never_inline=false);
+    std::map<std::string, SX> operator()(const std::map<std::string, SX>& arg,
+                 bool always_inline=false, bool never_inline=false);
+    std::map<std::string, MX> operator()(const std::map<std::string, MX>& arg,
+                                         bool always_inline=false, bool never_inline=false);
     ///@}
 
 #ifndef SWIG
@@ -552,6 +568,11 @@ namespace casadi {
     /** \brief Check if the numerical values of the supplied bounds make sense */
     void checkInputs() const;
 #ifndef SWIG
+    /** \brief Call using a map */
+    template<typename M>
+      std::map<std::string, M> callMap(const std::map<std::string, M>& arg,
+                                       bool always_inline, bool never_inline);
+
     /** \brief Check if input arguments have correct length and dimensions */
     template<typename M>
     void checkArg(const std::vector<M>& arg) const;

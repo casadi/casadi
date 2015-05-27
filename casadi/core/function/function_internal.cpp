@@ -183,25 +183,15 @@ namespace casadi {
 
   void FunctionInternal::print(ostream &stream) const {
     casadi_assert(isInit());
-    if (nIn()==1) {
-      stream << " Input: " << input().dimString() << endl;
-    } else {
-      stream << " Inputs (" << nIn()
-             << "):" << endl;
-      for (int i=0;i<nIn();i++) {
-        stream << "  " << i  << ". (" << ischeme_.at(i) << ")   "
-               << input(i).dimString() << endl;
-      }
+    stream << " Number of inputs: " << nIn() << endl;
+    for (int i=0; i<nIn(); ++i) {
+      stream << "  Input " << i  << ", a.k.a. \"" << inputName(i) << "\", "
+             << input(i).dimString() << ", " << inputDescription(i) << endl;
     }
-    if (nOut()==1) {
-      stream << " Output: " << output().dimString() << endl;
-    } else {
-      stream << " Outputs (" << ": "
-             << nOut() << "):" << endl;
-      for (int i=0;i<nOut();i++) {
-        stream << "  " << i << ". (" << oscheme_.at(i) << ")   "
-               << output(i).dimString() << endl;
-      }
+    stream << " Number of outputs: " << nOut() << endl;
+    for (int i=0; i<nOut(); ++i) {
+      stream << "  Output " << i  << ", a.k.a. \"" << outputName(i) << "\", "
+             << output(i).dimString() << ", " << outputDescription(i) << endl;
     }
   }
 
