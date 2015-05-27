@@ -192,6 +192,13 @@
   }
  }
 
+%define %casadi_in_typemap_constref2(xName, xType...)
+%typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
+  if (!to_##xName($input, &m)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
+  $1 = &m;
+}
+%enddef
+
 %define %casadi_in_typemap_constref(xName, xType...)
 %typemap(in, noblock=1, fragment="to"{xName}) const xType & (xType m) {
   if (!conv_constref($input, $1, m, $1_descriptor, to_##xName)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input to xName.");
@@ -239,13 +246,13 @@ bool conv_vector2(GUESTOBJECT *p, std::vector< std::vector<T> >* &ptr, std::vect
 
 %define %casadi_typecheck_typemap(xName, xPrec, xType...)
 %typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) xType {
-  $1 = to_##xName($input, 0);
+  $1 = to_##xName($input, static_cast< xType *>(0));
  }
 %enddef
 
 %define %casadi_typecheck_typemap_constref(xName, xPrec, xType...)
 %typemap(typecheck, noblock=1, fragment="to"{xName}, precedence=xPrec) const xType& {
-  $1 = to_##xName($input, 0);
+  $1 = to_##xName($input, static_cast< xType *>(0));
  }
 %enddef
 
@@ -531,6 +538,12 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
   int to_Slice(GUESTOBJECT *p, void *mv, int offs=0);
   int to_string(GUESTOBJECT *p, void *mv, int offs=0);
   int to_Function(GUESTOBJECT *p, void *mv, int offs=0);
+
+  inline int to_Casadi(GUESTOBJECT *p, casadi::MX* m) { return to_MX(p, m);}
+  inline int to_Casadi(GUESTOBJECT *p, casadi::Matrix<double>* m) { return to_DMatrix(p, m);}
+  inline int to_Casadi(GUESTOBJECT *p, casadi::Matrix<casadi::SXElement>* m) { return to_SX(p, m);}
+
+  template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m);
 
   GUESTOBJECT * from_GenericType(const casadi::GenericType &a);
   GUESTOBJECT * from_Dictionary(const casadi::GenericType::Dictionary &a);

@@ -295,6 +295,28 @@
   }
 }
 
+%fragment("to"{Map}, "header", fragment="fwd") {
+  template<typename M> int to_Map(GUESTOBJECT *p, std::map<std::string, M> *m) {
+#ifdef SWIGPYTHON
+    if (PyDict_Check(p)) {
+      PyObject *key, *value;
+      Py_ssize_t pos = 0;
+      while (PyDict_Next(p, &pos, &key, &value)) {
+        if (!PyString_Check(key)) return false;
+        if (m) {
+          M& v=(*m)[std::string(PyString_AsString(key))];
+          if (!to_Casadi(value, &v)) return false;
+        } else {
+          if (!to_Casadi(value, static_cast<M*>(0))) return false;
+        }
+      }
+      return true;
+    }
+#endif // SWIGPYTHON
+    return false;
+  }
+ }
+
 %fragment("to"{IVector}, "header", fragment="fwd,make_vector", fragment="to"{int}) {
   int to_IVector(GUESTOBJECT *p, void *mv, int offs) {
     std::vector<int> *m = static_cast<std::vector<int>*>(mv);
@@ -742,6 +764,23 @@
  }
 %casadi_typemaps_constref(MX, PRECEDENCE_MX, casadi::MX)
 %casadi_typemaps_genericmatrix(MX, PRECEDENCE_MX, casadi::MX)
+
+ /* Maps are treated as dictionaries in the target language
+    First instantiate the templates (no proxy classes needed)
+  */
+%template() std::map<std::string, casadi::MX >;
+%template() std::map<std::string, casadi::Matrix<casadi::SXElement> >;
+%template() std::map<std::string, casadi::Matrix<double> >;
+
+/* Map conversion from dictionaries (default routines handle opposite direction) */
+%define %typemaps_map(xName, xPrec, xType...)
+%casadi_typecheck_typemap_constref(Map, xPrec, std::map<std::string, xType>)
+%casadi_in_typemap_constref2(Map, std::map<std::string, xType>)
+%casadi_freearg_typemap(const std::map<std::string, xType>&)
+%enddef
+%typemaps_map(Map, PRECEDENCE_MX, casadi::MX)
+%typemaps_map(Map, PRECEDENCE_DMatrix, casadi::Matrix<double>)
+%typemaps_map(Map, PRECEDENCE_SX, casadi::Matrix<casadi::SXElement>)
 
 %fragment("to"{DMatrix}, "header", fragment="fwd,make_vector", fragment="to"{double}) {
   int to_DMatrix(GUESTOBJECT *p, void *mv, int offs) {

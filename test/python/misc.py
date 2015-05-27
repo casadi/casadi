@@ -28,6 +28,7 @@ import unittest
 from types import *
 from helpers import *
 import pickle
+from operator import itemgetter
 
 scipy_available = True
 try:
@@ -470,7 +471,7 @@ class Misctests(casadiTestCase):
       f = SXFunction(nlpIn(x=x),nlpOut(g=x**2))
       f.init()
 
-      [f_,g_] = f(x=4)
+      [f_,g_] = itemgetter('f','g')(f({'x':SX(4)}))
       self.checkarray(g_,DMatrix(16))
 
       with self.assertRaises(RuntimeError):
