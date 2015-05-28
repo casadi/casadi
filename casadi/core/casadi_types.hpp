@@ -41,31 +41,18 @@ namespace casadi {
   class Function;
   class Sparsity;
   class CodeGenerator;
-
-  /// \cond INTERNAL
-  template<class T> class LPStructIOSchemeVector;
-  template<class T> class QPStructIOSchemeVector;
-  template<class T> class QCQPStructIOSchemeVector;
-  template<class T> class SDPStructIOSchemeVector;
-  template<class T> class SOCPStructIOSchemeVector;
-  template<class T> class SDQPStructIOSchemeVector;
-  template<class T> class DleStructIOSchemeVector;
-  template<class T> class DpleVecStructIOSchemeVector;
-  template<class T> class LrDleStructIOSchemeVector;
-  template<class T> class LrDpleVecStructIOSchemeVector;
-  template<class T> class CleStructIOSchemeVector;
-  /// \endcond
-  typedef LPStructIOSchemeVector<Sparsity> LPStructure;
-  typedef QPStructIOSchemeVector<Sparsity> QPStructure;
-  typedef QCQPStructIOSchemeVector<Sparsity> QCQPStructure;
-  typedef SDPStructIOSchemeVector<Sparsity> SDPStructure;
-  typedef SOCPStructIOSchemeVector<Sparsity> SOCPStructure;
-  typedef SDQPStructIOSchemeVector<Sparsity> SDQPStructure;
-  typedef DleStructIOSchemeVector<Sparsity> DleStructure;
-  typedef LrDleStructIOSchemeVector<Sparsity> LrDleStructure;
-  typedef CleStructIOSchemeVector<Sparsity> CleStructure;
-  typedef DpleVecStructIOSchemeVector< std::vector<Sparsity> > DpleStructure;
-  typedef LrDpleVecStructIOSchemeVector< std::vector<Sparsity> > LrDpleStructure;
+  template<class T> class IOSchemeVector;
+  typedef IOSchemeVector<Sparsity> LPStructure;
+  typedef IOSchemeVector<Sparsity> QPStructure;
+  typedef IOSchemeVector<Sparsity> QCQPStructure;
+  typedef IOSchemeVector<Sparsity> SDPStructure;
+  typedef IOSchemeVector<Sparsity> SOCPStructure;
+  typedef IOSchemeVector<Sparsity> SDQPStructure;
+  typedef IOSchemeVector<Sparsity> DleStructure;
+  typedef IOSchemeVector<Sparsity> LrDleStructure;
+  typedef IOSchemeVector<Sparsity> CleStructure;
+  typedef IOSchemeVector< std::vector<Sparsity> > DpleStructure;
+  typedef IOSchemeVector< std::vector<Sparsity> > LrDpleStructure;
   class NlpSolver;
   class LinearSolver;
   class Integrator;

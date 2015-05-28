@@ -124,22 +124,12 @@ class Enum:
     return str(len(self.entries))
 
   def hppcode(self):
-    s= "/// \cond INTERNAL\n/// Helper function for '" + self.enum + "'\n"
-    s+="""
-template<class M>
-class CASADI_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit %sIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_%s) {}
-};
-/// \endcond
-""" % (self.enum,self.enum,self.enum)
     #if self.enum.endswith("Struct"):
     #  s+="typedef %sIOSchemeVector<Sparsity> %sure;\n" % (self.enum,self.enum)
-    s+= "\n".join(map(lambda x: ("/// " + x).rstrip(),self.doc.split("\n")))+"\n"
+    s= "\n".join(map(lambda x: ("/// " + x).rstrip(),self.doc.split("\n")))+"\n"
     s+= "/// \\copydoc scheme_" + self.enum +  "\n"
     s+= "template<class M>" + "\n"
-    s+= self.enum + "IOSchemeVector<M> " + self.name + "("
+    s+= "IOSchemeVector<M> " + self.name + "("
     for i, (name, doc, enum) in enumerate(self.entries):
       s+="""\n    const std::string &arg_s%d ="", const M &arg_m%d =M()""" % (i,i) + ","
     s=s[:-1] + ") {\n"
@@ -159,7 +149,7 @@ class CASADI_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     ret[n] = it->second;
   }
 """  % (self.enum,self.enum,", ".join([name for name, doc, enum in self.entries]))
-    s+= "  return %sIOSchemeVector<M>(ret);" % self.enum
+    s+= "  return IOSchemeVector<M>(ret, IOScheme(SCHEME_%s));" % self.enum
     s+="\n}\n"
     s+= "template<class M>" + "\n"
     s+= "std::vector<M> " + self.name + "(const std::vector<M>& args,"
@@ -190,26 +180,6 @@ class CASADI_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
       s+="%template(" + self.name + ") " + self.name + "<casadi::MX>;\n"
       s+="%template(" + self.name + ") " + self.name + "<casadi::Matrix<double> >;\n"
       s+="%template(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + "SX) " + self.enum + "IOSchemeVector<SX>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + "MX) " + self.enum + "IOSchemeVector<MX>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + "D) " + self.enum + "IOSchemeVector< Matrix<double> >;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + "Sparsity) " + self.enum + "IOSchemeVector<Sparsity>;\n"
-      #s+="%rename(" + self.name + ") " + self.name + "<casadi::SX>;\n"
-      #s+="%rename(" + self.name + ") " + self.name + "<casadi::MX>;\n"
-      #s+="%rename(" + self.name + ") " + self.name + "<casadi::Sparsity>;\n"
-      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "SX;\n"
-      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "MX;\n"
-      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "D;\n"
-      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum+ "Sparsity;\n"
-    s+="}\n"
-    return s
-
-  def pureswigcode(self):
-    s="namespace casadi {\n"
-    if self.enum.endswith('VecStruct'):
-      s+="%template(" + self.enum + "ure) " + self.enum + "IOSchemeVector< std::vector<Sparsity> >;\n"
-    elif self.enum.endswith('Struct'):
-      s+="%template(" + self.enum + "ure) " + self.enum + "IOSchemeVector<Sparsity>;\n"
     s+="}\n"
     return s
 
@@ -406,13 +376,7 @@ for p in schemes:
   autogenpy.write("#ifndef SWIGPYTHON\n")
   autogenpy.write(p.swigcode())
   autogenpy.write("#endif //SWIGPYTHON\n")
-  autogenpy.write(p.pureswigcode())
   
-autogenhelpershpp.write("#define INSTANTIATE_IOSCHEME_HELPERS(T) \\\n")
-for p in schemes:
-  autogenhelpershpp.write("template class %sIOSchemeVector<T>;\\\n" % p.enum)
-autogenhelpershpp.write("\n")
-
 autogencpp.write("std::string getSchemeName(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("""    case SCHEME_%s: return "%s";\n""" % (p.enum,p.enum))
