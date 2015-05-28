@@ -257,37 +257,6 @@ namespace casadi {
   */
   template<typename T>
   std::vector<T> cumsum0(const std::vector<T> &values);
-
-  /** \brief Zip two vectors of same length
-  *
-  */
-  template<typename T1, typename T2>
-  std::vector<std::pair<T1, T2> >
-  zip(const std::pair<std::vector<T1>, std::vector<T2> >& v) {
-    casadi_assert(v.first.size()==v.second.size());
-    std::vector<std::pair<T1, T2> > ret(v.first.size());
-    for (size_t i=0; i!=ret.size(); ++i) {
-      ret[i].first = v.first[i];
-      ret[i].second = v.second[i];
-    }
-    return ret;
-  }
-
-  /** \brief Unzip a vector of pairs
-  *
-  */
-  template<typename T1, typename T2>
-  std::pair<std::vector<T1>, std::vector<T2> >
-  unzip(const std::vector<std::pair<T1, T2> >& v) {
-    std::pair<std::vector<T1>, std::vector<T2> > ret;
-    ret.first.reserve(v.size());
-    ret.second.reserve(v.size());
-    for (size_t i=0; i!=v.size(); ++i) {
-      ret.first.push_back(v[i].first);
-      ret.second.push_back(v[i].second);
-    }
-    return ret;
-  }
 #endif //SWIG
 
   /// Checks if vector does not contain NaN or Inf

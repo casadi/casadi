@@ -332,7 +332,7 @@ class LinearSolverTests(casadiTestCase):
       solver.setInput(A_,"A")
       solver.setInput(b_,"B")
       
-      relay = MXFunction(linsolIn(A=A,B=b),solver.call(linsolIn(A=A,B=b)))
+      relay = MXFunction(linsolIn(A=A,B=b),linsolOut(**solver({'A':A,'B':b})))
       relay.init()
 
       relay.setInput(A_,"A")

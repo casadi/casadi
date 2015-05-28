@@ -58,7 +58,7 @@ class Simulatortests(casadiTestCase):
     integrator.init()
     q0   = MX.sym("q0")
     par  = MX.sym("p")
-    qend, = integratorOut(integrator.call(integratorIn(x0=q0,p=par)),"xf")
+    qend = integrator({'x0':q0,'p':par})["xf"]
     qe=MXFunction([q0,par],[qend])
     qe.init()
     self.integrator = integrator

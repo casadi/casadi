@@ -59,7 +59,7 @@ public:
 
   /** \brief  Create a new QP Solver */
   static QpSolverInternal* creator(const QPStructure& st)
-  { return new QpoasesInterface(unzip(st.v).second);}
+  { return new QpoasesInterface(st.v2.first);}
 
   /** \brief  Create a new Solver */
   explicit QpoasesInterface(const std::vector<Sparsity>& st);

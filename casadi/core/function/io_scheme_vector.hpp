@@ -38,54 +38,60 @@ namespace casadi {
   template<typename T>
   class CASADI_EXPORT IOSchemeVector : public PrintableObject<IOSchemeVector<T> > {
   public:
-    std::vector<std::pair<std::string, T> > v;
+    std::pair<std::vector<T>, std::vector<std::string> > v2;
+
+    IOSchemeVector(const std::map<std::string, T>& m,
+                   const std::vector<std::string>& s) {
+      v2.second = s;
+      v2.first.resize(s.size());
+      for (size_t i=0; i!=s.size(); ++i) {
+        typename std::map<std::string, T>::const_iterator it=m.find(s[i]);
+        if (it!=m.end()) {
+          v2.first[i]=it->second;
+        }
+      }
+    }
 
     IOSchemeVector(const std::vector<T>& d = std::vector<T>(),
                    const std::vector<std::string>& s = std::vector<std::string>()) {
-      v.resize(d.size());
-      for (size_t i=0; i<d.size(); ++i) v[i].second = d[i];
-      if (!s.empty()) {
-        casadi_assert(s.size()==d.size());
-        for (size_t i=0; i<d.size(); ++i) v[i].first = s[i];
+      v2.first = d;
+      v2.second = s;
+      if (v2.second.empty()) {
+        v2.second.resize(v2.first.size());
       }
+      casadi_assert(v2.first.size()==v2.second.size());
     }
     IOSchemeVector(const std::vector<T>& d, InputOutputScheme scheme) {
-      std::vector<std::string> s = IOScheme(scheme);
-      v.resize(d.size());
-      for (size_t i=0; i<d.size(); ++i) v[i].second = d[i];
-      if (!s.empty()) {
-        casadi_assert(s.size()==d.size());
-        for (size_t i=0; i<d.size(); ++i) v[i].first = s[i];
-      }
+      v2.first = d;
+      v2.second = IOScheme(scheme);
+      casadi_assert(v2.second.size()==v2.first.size());
     }
 
 #ifndef SWIG
     T operator[](int i) const {
-      casadi_assert_message(i>=0 && i<this->v.size(), "Index error: supplied integer must be >=0 and <= " << this->v.size() << " but got " << i << ".");
-      return this->v.at(i).second;
+      casadi_assert_message(i>=0 && i<this->v2.first.size(), "Index error: supplied integer must be >=0 and <= " << this->v2.first.size() << " but got " << i << ".");
+      return this->v2.first.at(i);
     }
 #endif // SWIG
 #ifndef SWIGMATLAB
-    T __getitem__(int i) const { if (i<0) i+= this->v.size(); return (*this)[i]; }
-    int __len__() const { return this->v.size(); }
+    T __getitem__(int i) const { if (i<0) i+= this->v2.first.size(); return (*this)[i]; }
+    int __len__() const { return this->v2.first.size(); }
 #endif // SWIGMATLAB
     std::vector<T> vector() const {
-      std::vector<T> d(v.size());
-      for (size_t i=0; i<d.size(); ++i) d[i] = v[i].second;
-      return d;
+      return v2.first;
     }
 
     /// Print a description of the object
     void print(std::ostream &stream=CASADI_COUT, bool trailing_newline=true) const {
       stream << "IOSchemeVector(" ;
-      for (int i=0; i<this->v.size(); ++i) {
-        if (this->v.at(i).first.empty()) {
+      for (int i=0; i<this->v2.first.size(); ++i) {
+        if (this->v2.second.at(i).empty()) {
           stream << "none";
         } else {
-          stream << this->v.at(i).first;
+          stream << this->v2.second.at(i);
         }
-        stream << "=" << this->v[i].second;
-        if (i<this->v.size()-1) stream << ", ";
+        stream << "=" << this->v2.first[i];
+        if (i<this->v2.first.size()-1) stream << ", ";
       }
 
       stream <<  ")";

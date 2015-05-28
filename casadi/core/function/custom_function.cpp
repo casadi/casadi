@@ -54,26 +54,22 @@ using namespace std;
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
                                  const IOSchemeVector<Sparsity>& inputscheme,
                                  const vector<Sparsity>& outputscheme) {
-    pair<vector<string>, vector<Sparsity> > inputscheme2 = unzip(inputscheme.v);
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme2.second, outputscheme));
-    setOption("input_scheme", inputscheme2.first);
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme.v2.first, outputscheme));
+    setOption("input_scheme", inputscheme.v2.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
                                  const IOSchemeVector<Sparsity> &outputscheme) {
-    pair<vector<string>, vector<Sparsity> > outputscheme2 = unzip(outputscheme.v);
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme2.second));
-    setOption("output_scheme", outputscheme2.first);
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme.v2.first));
+    setOption("output_scheme", outputscheme.v2.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
                                  const IOSchemeVector<Sparsity> &inputscheme,
                                  const IOSchemeVector<Sparsity> &outputscheme) {
-    pair<vector<string>, vector<Sparsity> > inputscheme2 = unzip(inputscheme.v);
-    pair<vector<string>, vector<Sparsity> > outputscheme2 = unzip(outputscheme.v);
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme2.second, outputscheme2.second));
-    setOption("input_scheme", inputscheme2.first);
-    setOption("output_scheme", outputscheme2.first);
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme.v2.first, outputscheme.v2.first));
+    setOption("input_scheme", inputscheme.v2.second);
+    setOption("output_scheme", outputscheme.v2.second);
   }
 
   CustomFunctionInternal* CustomFunction::operator->() {

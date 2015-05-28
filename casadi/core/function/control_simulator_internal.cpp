@@ -170,8 +170,8 @@ namespace casadi {
 
 
     std::vector<MX> dae_out =
-      unzip(daeOut("ode",
-                   (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]).v).second;
+      daeOut("ode",
+             (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]).v2.first;
 
     int i=1;
     while ( control_dae_call.size()>i && dae_out.size()>i) {dae_out[i] = control_dae_call[i];i++;}

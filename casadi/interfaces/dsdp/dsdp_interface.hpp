@@ -63,7 +63,7 @@ namespace casadi {
 
     /** \brief  Create a new SDP Solver */
     static SdpSolverInternal* creator(const SDPStructure& st)
-    { return new DsdpInterface(unzip(st.v).second);}
+    { return new DsdpInterface(st.v2.first);}
 
     /** \brief Destructor */
     virtual ~DsdpInterface();
