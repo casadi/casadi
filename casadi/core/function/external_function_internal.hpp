@@ -74,10 +74,10 @@ namespace casadi {
 
     ///@{
     /** \brief  Function pointer types */
-    typedef int (*nargPtr)(int *n_in, int *n_out);
+    typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *n_arg, int* n_res);
     typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
                                const int **colind, const int **row);
-    typedef int (*nworkPtr)(int *n_arg, int* n_res, int *n_iw, int *n_w);
+    typedef int (*workPtr)(int *n_iw, int *n_w);
     typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
     ///@}
 

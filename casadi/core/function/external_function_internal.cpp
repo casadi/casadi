@@ -39,9 +39,9 @@ namespace casadi {
 #ifdef WITH_DL
 
     // Names of the functions we want to access
-    string narg_s = f_name_ + "_narg";
+    string init_s = f_name_ + "_init";
     string sparsity_s = f_name_ + "_sparsity";
-    string nwork_s = f_name_ + "_nwork";
+    string work_s = f_name_ + "_work";
     bool has_work = true;
 
     // Load the dll
@@ -51,8 +51,8 @@ namespace casadi {
                           << bin_name_ << ". error code (WIN32): "<< GetLastError());
 
     // Function to retrieving number of inputs and outputs
-    nargPtr narg = (nargPtr)GetProcAddress(handle_, TEXT(narg_s.c_str()));
-    if (narg==0) throw CasadiException("ExternalFunctionInternal: no \""+narg_s+"\" found");
+    initPtr init = (initPtr)GetProcAddress(handle_, TEXT(init_s.c_str()));
+    if (init==0) throw CasadiException("ExternalFunctionInternal: no \""+init_s+"\" found");
 
     // Function for numerical evaluation
     eval_ = (evalPtr) GetProcAddress(handle_, TEXT(f_name_.c_str()));
@@ -66,8 +66,8 @@ namespace casadi {
     }
 
     // Function for retriving sizes of required work vectors
-    nworkPtr nwork = (nworkPtr)GetProcAddress(handle_, TEXT(nwork_s.c_str()));
-    if (nwork==0) {
+    workPtr work = (workPtr)GetProcAddress(handle_, TEXT(work_s.c_str()));
+    if (work==0) {
       // No work vectors needed
       has_work = false;
     }
@@ -80,8 +80,8 @@ namespace casadi {
     dlerror();
 
     // Function to retrieving number of inputs and outputs
-    nargPtr narg = (nargPtr)dlsym(handle_, narg_s.c_str());
-    casadi_assert_message(!dlerror(), "ExternalFunctionInternal: no \""+narg_s+"\" found. "
+    initPtr init = (initPtr)dlsym(handle_, init_s.c_str());
+    casadi_assert_message(!dlerror(), "ExternalFunctionInternal: no \""+init_s+"\" found. "
                           "Possible cause: If the function was generated from CasADi, "
                           "make sure that it was compiled with a C compiler. If the "
                           "function is C++, make sure to use extern \"C\" linkage.");
@@ -100,7 +100,7 @@ namespace casadi {
     }
 
     // Function for retriving sizes of required work vectors
-    nworkPtr nwork = (nworkPtr)dlsym(handle_, nwork_s.c_str());
+    workPtr work = (workPtr)dlsym(handle_, work_s.c_str());
     if (dlerror()) {
       // No work vectors needed
       has_work = false;
@@ -110,13 +110,17 @@ namespace casadi {
 
 #endif // _WIN32
     // Initialize and get the number of inputs and outputs
-    int n_in=-1, n_out=-1;
-    int flag = narg(&n_in, &n_out);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"narg\" failed");
+    int f_type=-1, n_in=-1, n_out=-1, n_arg=-1, n_res=-1;
+    int flag = init(&f_type, &n_in, &n_out, &n_arg, &n_res);
+    if (flag) throw CasadiException("ExternalFunctionInternal: \"init\" failed");
+    casadi_assert(f_type>=0 && n_in>=0 && n_out>=0 && n_arg>=0);
+    casadi_assert(n_in<=n_arg && n_out<=n_res);
 
     // Pass to casadi
     ibuf_.resize(n_in);
     obuf_.resize(n_out);
+    alloc_arg(n_arg);
+    alloc_res(n_res);
 
     // Get the sparsity pattern
     for (int i=0; i<n_in+n_out; ++i) {
@@ -147,17 +151,13 @@ namespace casadi {
     }
 
     // Get number of temporaries
-    int n_arg, n_res, n_iw, n_w;
+    int n_iw, n_w;
     if (has_work) {
-      flag = nwork(&n_arg, &n_res, &n_iw, &n_w);
-      if (flag) throw CasadiException("ExternalFunctionInternal: \"nwork\" failed");
+      flag = work(&n_iw, &n_w);
+      if (flag) throw CasadiException("ExternalFunctionInternal: \"work\" failed");
     } else {
-      n_arg=n_in;
-      n_res=n_out;
       n_iw=n_w=0;
     }
-    alloc_arg(n_arg);
-    alloc_res(n_res);
     alloc_iw(n_iw);
     alloc_w(n_w);
 #else // WITH_DL

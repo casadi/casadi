@@ -46,9 +46,9 @@ int usage_c(){
   printf("\n");
 
   /* Signature of the entry points */
-  typedef int (*nargPtr)(int *n_in, int *n_out);
+  typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
   typedef int (*sparsityPtr)(int n_in, int *n_col, int *n_row, int **colind, int **row);
-  typedef int (*nworkPtr)(int *n_arg, int* n_res, int *n_iw, int *n_w);
+  typedef int (*workPtr)(int *sz_iw, int *sz_w);
   typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
 
   /* Handle to the dll */
@@ -65,9 +65,9 @@ int usage_c(){
   dlerror(); 
 
   /* Function for initialization and getting the number of inputs and outputs */
-  nargPtr narg = (nargPtr)dlsym(handle, "f_narg");
+  initPtr init = (initPtr)dlsym(handle, "f_init");
   if(dlerror()){
-    printf("Failed to retrieve \"narg\" function.\n");
+    printf("Failed to retrieve \"init\" function.\n");
     return 1;
   }
 
@@ -79,9 +79,9 @@ int usage_c(){
   }
 
   /* Function for getting the size of the required work vectors */
-  nworkPtr nwork = (nworkPtr)dlsym(handle, "f_nwork");
+  workPtr work = (workPtr)dlsym(handle, "f_work");
   if(dlerror()){
-    printf("Failed to retrieve \"nwork\" function.\n");
+    printf("Failed to retrieve \"work\" function.\n");
     return 1;
   }
 
@@ -93,9 +93,17 @@ int usage_c(){
   }
 
   /* Initialize and get the number of inputs and outputs */
-  int n_in=-1, n_out=-1;
-  narg(&n_in, &n_out);
-  printf("n_in = %d, n_out = %d\n", n_in, n_out);
+  int f_type, n_in, n_out, sz_arg, sz_res;
+  int flag = init(&f_type, &n_in, &n_out, &sz_arg, &sz_res);
+  if (flag) {
+    printf("Initialization failed.\n");
+    return 1;
+  }
+  if (f_type!=1) {
+    printf("Function type not supported.\n");
+    return 1;
+  }
+  printf("n_in = %d, n_out = %d, sz_arg = %d, sz_out = %d\n", n_in, n_out, sz_arg, sz_res);
 
   /* Get sparsities */
   int ind;
@@ -129,25 +137,30 @@ int usage_c(){
     printf("}\n\n");
   }
 
-  /* Allocate work vectors */
-  int n_arg, n_res, n_iw, n_w;
-  nwork(&n_arg, &n_res, &n_iw, &n_w);
-  int iw[n_iw];
-  double w[n_w];
+  /* Work vector size */
+  int sz_iw, sz_w;
+  work(&sz_iw, &sz_w);
 
-  /* Evaluate the function */
+  /* Allocate input/output buffers and work vectors*/
+  const double *arg[sz_arg];
+  double *res[sz_res];
+  int iw[sz_iw];
+  double w[sz_w];
+
+  /* Function input and output */
   const double x_val[] = {1,2,3,4};
   const double y_val = 5;
   double res0;
   double res1[4];
-  const double *all_inputs[2 + n_arg];
-  all_inputs[0] = x_val;
-  all_inputs[1] = &y_val;
-  double *all_outputs[2 + n_res];
-  all_outputs[0] = &res0;
-  all_outputs[1] = res1;
-  eval(all_inputs,all_outputs, iw, w);
-  
+
+  /* Evaluate the function */
+  arg[0] = x_val;
+  arg[1] = &y_val;
+  res[0] = &res0;
+  res[1] = res1;
+  eval(arg, res, iw, w);
+
+  /* Print result of evaluation */
   printf("result (0): %g\n",res0);
   printf("result (1): [%g,%g;%g,%g]\n",res1[0],res1[1],res1[2],res1[3]);
   

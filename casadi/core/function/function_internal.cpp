@@ -1985,13 +1985,17 @@ namespace casadi {
     stringstream &s = g.body;
 
     // Function that returns the number of inputs and outputs
-    string tmp = "int " + fname + "_narg(int *n_in, int *n_out)";
+    string tmp = "int " + fname + "_init(int *f_type, int *n_in, int *n_out, "
+      "int *sz_arg, int* sz_res)";
     if (g.with_header) {
       g.header << "extern " << tmp << ";" << endl;
     }
     s << tmp << " {" << endl
+      << "  *f_type = 1;" << endl
       << "  *n_in = " << n_in << ";" << endl
       << "  *n_out = " << n_out << ";" << endl
+      << "  *sz_arg = " << sz_arg() << ";" << endl
+      << "  *sz_res = " << sz_res() << ";" << endl
       << "  return 0;" << endl
       << "}" << endl
       << endl;
@@ -2056,13 +2060,11 @@ namespace casadi {
     s << "}" << endl << endl;
 
     // Function that returns work vector lengths
-    tmp = "int " + fname + "_nwork(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)";
+    tmp = "int " + fname + "_work(int *sz_iw, int *sz_w)";
     if (g.with_header) {
       g.header << "extern " << tmp << ";" << endl;
     }
     s << tmp << " {" << endl;
-    s << "  if (sz_arg) *sz_arg = " << sz_arg() << ";" << endl;
-    s << "  if (sz_res) *sz_res = " << sz_res() << ";" << endl;
     s << "  if (sz_iw) *sz_iw = " << sz_iw() << ";" << endl;
     s << "  if (sz_w) *sz_w = " << sz_w() << ";" << endl;
     s << "  return 0;" << endl;
