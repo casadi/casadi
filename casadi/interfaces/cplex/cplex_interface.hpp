@@ -60,7 +60,7 @@ namespace casadi {
 
     /** \brief  Create a new QP Solver */
     static QpSolverInternal* creator(const QPStructure& st)
-    { return new CplexInterface(st.v2.first);}
+    { return new CplexInterface(make_vector(st.v3.first, st.v3.second));}
 
     /// Constructor using sparsity patterns
     explicit CplexInterface(const std::vector<Sparsity>& st);

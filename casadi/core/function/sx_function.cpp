@@ -47,19 +47,19 @@ namespace casadi {
   }
 
   SXFunction::SXFunction(const vector<SX>& arg, const IOSchemeVector<SX>& res) {
-    assignNode(new SXFunctionInternal(arg, res.v2.first));
-    setOption("output_scheme", res.v2.second);
+    assignNode(new SXFunctionInternal(arg, make_vector(res.v3)));
+    setOption("output_scheme", res.v3.second);
   }
 
   SXFunction::SXFunction(const IOSchemeVector<SX>& arg, const vector<SX>& res) {
-    assignNode(new SXFunctionInternal(arg.v2.first, res));
-    setOption("input_scheme", arg.v2.second);
+    assignNode(new SXFunctionInternal(make_vector(arg.v3), res));
+    setOption("input_scheme", arg.v3.second);
   }
 
   SXFunction::SXFunction(const IOSchemeVector<SX>& arg, const IOSchemeVector<SX>& res) {
-    assignNode(new SXFunctionInternal(arg.v2.first, res.v2.first));
-    setOption("input_scheme", arg.v2.second);
-    setOption("output_scheme", res.v2.second);
+    assignNode(new SXFunctionInternal(make_vector(arg.v3), make_vector(res.v3)));
+    setOption("input_scheme", arg.v3.second);
+    setOption("output_scheme", res.v3.second);
   }
 
   SXFunction::SXFunction(const std::string& name, const std::vector<SX>& arg,

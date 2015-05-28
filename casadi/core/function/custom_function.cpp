@@ -54,22 +54,23 @@ using namespace std;
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
                                  const IOSchemeVector<Sparsity>& inputscheme,
                                  const vector<Sparsity>& outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme.v2.first, outputscheme));
-    setOption("input_scheme", inputscheme.v2.second);
+    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme.v3), outputscheme));
+    setOption("input_scheme", inputscheme.v3.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
                                  const IOSchemeVector<Sparsity> &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, outputscheme.v2.first));
-    setOption("output_scheme", outputscheme.v2.second);
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, make_vector(outputscheme.v3)));
+    setOption("output_scheme", outputscheme.v3.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
                                  const IOSchemeVector<Sparsity> &inputscheme,
                                  const IOSchemeVector<Sparsity> &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme.v2.first, outputscheme.v2.first));
-    setOption("input_scheme", inputscheme.v2.second);
-    setOption("output_scheme", outputscheme.v2.second);
+    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme.v3),
+                                          make_vector(outputscheme.v3)));
+    setOption("input_scheme", inputscheme.v3.second);
+    setOption("output_scheme", outputscheme.v3.second);
   }
 
   CustomFunctionInternal* CustomFunction::operator->() {

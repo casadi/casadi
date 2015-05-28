@@ -53,19 +53,19 @@ namespace casadi {
   }
 
   MXFunction::MXFunction(const std::vector<MX>& arg, const IOSchemeVector<MX>& res) {
-    assignNode(new MXFunctionInternal(arg, res.v2.first));
-    setOption("output_scheme", res.v2.second);
+    assignNode(new MXFunctionInternal(arg, make_vector(res.v3)));
+    setOption("output_scheme", res.v3.second);
   }
 
   MXFunction::MXFunction(const IOSchemeVector<MX>& arg, const std::vector<MX>& res) {
-    assignNode(new MXFunctionInternal(arg.v2.first, res));
-    setOption("input_scheme", arg.v2.second);
+    assignNode(new MXFunctionInternal(make_vector(arg.v3), res));
+    setOption("input_scheme", arg.v3.second);
   }
 
   MXFunction::MXFunction(const IOSchemeVector<MX>& arg, const IOSchemeVector<MX>& res) {
-    assignNode(new MXFunctionInternal(arg.v2.first, res.v2.first));
-    setOption("input_scheme", arg.v2.second);
-    setOption("output_scheme", res.v2.second);
+    assignNode(new MXFunctionInternal(make_vector(arg.v3), make_vector(res.v3)));
+    setOption("input_scheme", arg.v3.second);
+    setOption("output_scheme", res.v3.second);
   }
 
   MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,

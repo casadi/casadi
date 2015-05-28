@@ -64,7 +64,7 @@ public:
 
   /** \brief  Create a new QP Solver */
   static LpSolverInternal* creator(const LPStructure& st)
-  { return new LpToQp(st.v2.first);}
+  { return new LpToQp(make_vector(st.v3.first, st.v3.second));}
 
   /** \brief  Initialize */
   virtual void init();
