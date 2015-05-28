@@ -49,7 +49,7 @@ int usage_c(){
   typedef int (*nargPtr)(int *n_in, int *n_out);
   typedef int (*sparsityPtr)(int n_in, int *n_col, int *n_row, int **colind, int **row);
   typedef int (*nworkPtr)(int *n_arg, int* n_res, int *n_iw, int *n_w);
-  typedef int (*evalPtr)(const double* const* arg, double* const* res, int* iw, double* w);
+  typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
 
   /* Handle to the dll */
   void* handle;
