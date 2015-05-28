@@ -87,6 +87,19 @@ namespace casadi {
       return std::vector<MatType>(x, x+6);
     }
 
+    // Create vector from map and vector with key order
+    inline friend std::vector<MatType> make_vector(const std::map<std::string, MatType>& m,
+                                                   const std::vector<std::string>& s) {
+      std::vector<MatType> ret(s.size());
+      for (size_t i=0; i!=s.size(); ++i) {
+        typename std::map<std::string, MatType>::const_iterator it=m.find(s[i]);
+        if (it!=m.end()) {
+          ret[i]=it->second;
+        }
+      }
+      return ret;
+    }
+
     // Assign 1 element from a vector
     template<typename T0>
       inline friend void assign_vector(T0& x0,
