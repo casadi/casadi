@@ -204,16 +204,10 @@ class Enum:
       s+="  %s = %s\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,"Sparsity()" if self.enum.endswith("Struct") and not self.enum.endswith("VecStruct") else "[]",name,name,name)
     s+="""  for k in kwargs.keys():\n    if not(k in [%s]):\n      raise Exception("Keyword error in %s: '%%s' is not recognized. Available keywords are: %s" %% k )\n""" % (",".join(["'%s'" % name for name, doc, enum in self.entries]),self.name,", ".join([name for name, doc, enum in self.entries]))
 
-    if (self.enum.endswith("Struct")):
-      s+="  return %sure([" % self.enum
-      for name, doc, enum in self.entries:
-        s+=name+","
-      s=s[:-1] + "])\n"
-    else:
-      s+="  return IOSchemeVector(["
-      for name, doc, enum in self.entries:
-        s+=name+","
-      s=s[:-1] + "], IOScheme(SCHEME_%s))\n" % self.enum
+    s+="  return IOSchemeVector(["
+    for name, doc, enum in self.entries:
+      s+=name+","
+    s=s[:-1] + "], IOScheme(SCHEME_%s))\n" % self.enum
     return s
 
 class Input(Enum):
@@ -360,7 +354,11 @@ def IOSchemeVector(arg,io_scheme):
     return IOSchemeVectorSparsity(arg,io_scheme)
   except:
     pass
-  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX or Sparsity.")
+  try:
+    return IOSchemeVectorSparsityVector(arg,io_scheme)
+  except:
+    pass
+  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX, Sparsity or [Sparsity].")
 """)
 autogenpy.write("%}\n")
 autogenpy.write("#endif //SWIGPYTHON\n")

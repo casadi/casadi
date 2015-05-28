@@ -425,11 +425,9 @@ class Misctests(casadiTestCase):
     try:
       SXFunction(qpStruct(a=12),[x])
       self.assertTrue(False)
-    except NotImplementedError as e:
+    except TypeError as e:
       print e.message
-      assert "QPStructure([Sparsity] )" in e.message
-      assert "You have: QPStructure([int,Sparsity])" in e.message
-      assert "QPStructure(a=int)" in e.message
+      assert "You have: (a=int)" in e.message
   
     try:
       x.reshape(2)

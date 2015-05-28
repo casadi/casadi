@@ -48,7 +48,11 @@ def IOSchemeVector(arg,io_scheme):
     return IOSchemeVectorSparsity(arg,io_scheme)
   except:
     pass
-  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX or Sparsity.")
+  try:
+    return IOSchemeVectorSparsityVector(arg,io_scheme)
+  except:
+    pass
+  raise TypeError("IOSchemeVector called with faulty arguments. Individual values must be SX, MX, Sparsity or [Sparsity].")
 %}
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -160,7 +164,7 @@ def cleStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['a','v','c']):
       raise Exception("Keyword error in cleStruct: '%s' is not recognized. Available keywords are: a, v, c" % k )
-  return CleStructure([a,v,c])
+  return IOSchemeVector([a,v,c], IOScheme(SCHEME_CleStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -385,7 +389,7 @@ def dleStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['a','v']):
       raise Exception("Keyword error in dleStruct: '%s' is not recognized. Available keywords are: a, v" % k )
-  return DleStructure([a,v])
+  return IOSchemeVector([a,v], IOScheme(SCHEME_DleStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -498,7 +502,7 @@ def dpleStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['a','v']):
       raise Exception("Keyword error in dpleStruct: '%s' is not recognized. Available keywords are: a, v" % k )
-  return DpleVecStructure([a,v])
+  return IOSchemeVector([a,v], IOScheme(SCHEME_DpleVecStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1063,7 +1067,7 @@ def lpStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['a']):
       raise Exception("Keyword error in lpStruct: '%s' is not recognized. Available keywords are: a" % k )
-  return LPStructure([a])
+  return IOSchemeVector([a], IOScheme(SCHEME_LPStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1192,7 +1196,7 @@ def lrdleStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['a','v','c','h']):
       raise Exception("Keyword error in lrdleStruct: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return LrDleStructure([a,v,c,h])
+  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LrDleStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1321,7 +1325,7 @@ def lrdpleStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['a','v','c','h']):
       raise Exception("Keyword error in lrdpleStruct: '%s' is not recognized. Available keywords are: a, v, c, h" % k )
-  return LrDpleVecStructure([a,v,c,h])
+  return IOSchemeVector([a,v,c,h], IOScheme(SCHEME_LrDpleVecStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1958,7 +1962,7 @@ def qcqpStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['h','p','a']):
       raise Exception("Keyword error in qcqpStruct: '%s' is not recognized. Available keywords are: h, p, a" % k )
-  return QCQPStructure([h,p,a])
+  return IOSchemeVector([h,p,a], IOScheme(SCHEME_QCQPStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2111,7 +2115,7 @@ def qpStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['h','a']):
       raise Exception("Keyword error in qpStruct: '%s' is not recognized. Available keywords are: h, a" % k )
-  return QPStructure([h,a])
+  return IOSchemeVector([h,a], IOScheme(SCHEME_QPStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2276,7 +2280,7 @@ def sdpStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['f','g','a']):
       raise Exception("Keyword error in sdpStruct: '%s' is not recognized. Available keywords are: f, g, a" % k )
-  return SDPStructure([f,g,a])
+  return IOSchemeVector([f,g,a], IOScheme(SCHEME_SDPStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2449,7 +2453,7 @@ def sdqpStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['h','f','g','a']):
       raise Exception("Keyword error in sdqpStruct: '%s' is not recognized. Available keywords are: h, f, g, a" % k )
-  return SDQPStructure([h,f,g,a])
+  return IOSchemeVector([h,f,g,a], IOScheme(SCHEME_SDQPStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2606,7 +2610,7 @@ def socpStruct(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['g','a']):
       raise Exception("Keyword error in socpStruct: '%s' is not recognized. Available keywords are: g, a" % k )
-  return SOCPStructure([g,a])
+  return IOSchemeVector([g,a], IOScheme(SCHEME_SOCPStruct))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
