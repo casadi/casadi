@@ -303,19 +303,7 @@ class Misctests(casadiTestCase):
     sim = ControlSimulator(f,[0,1])
     sim.setOption("integrator_options",{"abstol": 1e-4})
     sim.printOptions()
-        
-  def test_IOscheme_output(self):
-    x = 2
-    p = 3
-    s = daeIn(x=x,p=p)
-    
-    pp, = daeIn(s,"p")
-    self.assertEqual(pp,p)
-    
-    xx,pp = daeIn(s,"x","p")
-    self.assertEqual(pp,p)
-    self.assertEqual(xx,x)
-    
+            
   def test_pickling(self):
 
     a = Sparsity.lower(4)

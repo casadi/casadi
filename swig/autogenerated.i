@@ -57,15 +57,13 @@ def IOSchemeVector(arg,io_scheme):
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def cleIn(*dummy,**kwargs):
+def cleIn(**kwargs):
   """
   Helper function for 'CLEInput'
 
-  Two use cases:
-     a) arg = cleIn(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = cleIn(arg,"a", "v")
-          all arguments after the first optional
+  Usage:
+    arg = cleIn(a=my_a, v=my_v)
+        all arguments optional
   Input arguments of a \e cle solver
   
   Keyword arguments::
@@ -73,8 +71,6 @@ def cleIn(*dummy,**kwargs):
     a -- A matrix [CLE_A]
     v -- V matrix [CLE_V]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of cleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_CLEInput,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
     a = kwargs['a']
@@ -97,23 +93,19 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def cleOut(*dummy,**kwargs):
+def cleOut(**kwargs):
   """
   Helper function for 'CLEOutput'
 
-  Two use cases:
-     a) arg = cleOut(p=my_p)
-          all arguments optional
-     b) p = cleOut(arg,"p")
-          all arguments after the first optional
+  Usage:
+    arg = cleOut(p=my_p)
+        all arguments optional
   Output arguments of a \e cle solver
   
   Keyword arguments::
 
     p -- Lyapunov matrix [CLE_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of cleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_CLEOutput,n)] for n in dummy[1:]]
   p = []
   if 'p' in kwargs:
     p = kwargs['p']
@@ -133,15 +125,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def cleStruct(*dummy,**kwargs):
+def cleStruct(**kwargs):
   """
   Helper function for 'CleStruct'
 
-  Two use cases:
-     a) arg = cleStruct(a=my_a, v=my_v, c=my_c)
-          all arguments optional
-     b) a, v, c = cleStruct(arg,"a", "v", "c")
-          all arguments after the first optional
+  Usage:
+    arg = cleStruct(a=my_a, v=my_v, c=my_c)
+        all arguments optional
   Structure specification of a CLE
   
   Keyword arguments::
@@ -150,8 +140,6 @@ def cleStruct(*dummy,**kwargs):
     v -- The matrix V [Cle_STRUCT_V]
     c -- The matrix C (defaults to unity) [Cle_STRUCT_C]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of cleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_CleStruct,n)] for n in dummy[1:]]
   a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
@@ -174,15 +162,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def controldaeIn(*dummy,**kwargs):
+def controldaeIn(**kwargs):
   """
   Helper function for 'ControlledDAEInput'
 
-  Two use cases:
-     a) arg = controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf)
-          all arguments optional
-     b) t, x, z, p, u, u_interp, x_major, t0, tf = controldaeIn(arg,"t", "x", "z", "p", "u", "u_interp", "x_major", "t0", "tf")
-          all arguments after the first optional
+  Usage:
+    arg = controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf)
+        all arguments optional
   Input arguments of an ODE/DAE function
   
   Keyword arguments::
@@ -197,8 +183,6 @@ def controldaeIn(*dummy,**kwargs):
     t0       -- Time at start of control interval (1-by-1) [CONTROL_DAE_T0]
     tf       -- Time at end of control interval (1-by-1) [CONTROL_DAE_TF]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controldaeIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ControlledDAEInput,n)] for n in dummy[1:]]
   t = []
   if 't' in kwargs:
     t = kwargs['t']
@@ -242,15 +226,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def controlsimulatorIn(*dummy,**kwargs):
+def controlsimulatorIn(**kwargs):
   """
   Helper function for 'ControlSimulatorInput'
 
-  Two use cases:
-     a) arg = controlsimulatorIn(x0=my_x0, p=my_p, u=my_u)
-          all arguments optional
-     b) x0, p, u = controlsimulatorIn(arg,"x0", "p", "u")
-          all arguments after the first optional
+  Usage:
+    arg = controlsimulatorIn(x0=my_x0, p=my_p, u=my_u)
+        all arguments optional
   Input arguments of a control simulator
   
   Keyword arguments::
@@ -259,8 +241,6 @@ def controlsimulatorIn(*dummy,**kwargs):
     p  -- Parameters that are fixed over the entire horizon  (dimension np-by-1) [CONTROLSIMULATOR_P]
     u  -- Parameters that change over the integration intervals (dimension nu-by-(ns-1)) [CONTROLSIMULATOR_U]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controlsimulatorIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ControlSimulatorInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
     x0 = kwargs['x0']
@@ -286,15 +266,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dleIn(*dummy,**kwargs):
+def dleIn(**kwargs):
   """
   Helper function for 'DLEInput'
 
-  Two use cases:
-     a) arg = dleIn(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = dleIn(arg,"a", "v")
-          all arguments after the first optional
+  Usage:
+    arg = dleIn(a=my_a, v=my_v)
+        all arguments optional
   Input arguments of a \e dle solver
   
   Keyword arguments::
@@ -302,8 +280,6 @@ def dleIn(*dummy,**kwargs):
     a -- A matrix [DLE_A]
     v -- V matrix [DLE_V]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DLEInput,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
     a = kwargs['a']
@@ -326,23 +302,19 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dleOut(*dummy,**kwargs):
+def dleOut(**kwargs):
   """
   Helper function for 'DLEOutput'
 
-  Two use cases:
-     a) arg = dleOut(p=my_p)
-          all arguments optional
-     b) p = dleOut(arg,"p")
-          all arguments after the first optional
+  Usage:
+    arg = dleOut(p=my_p)
+        all arguments optional
   Output arguments of a \e dle solver
   
   Keyword arguments::
 
     p -- P matrix [DLE_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DLEOutput,n)] for n in dummy[1:]]
   p = []
   if 'p' in kwargs:
     p = kwargs['p']
@@ -362,15 +334,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dleStruct(*dummy,**kwargs):
+def dleStruct(**kwargs):
   """
   Helper function for 'DleStruct'
 
-  Two use cases:
-     a) arg = dleStruct(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = dleStruct(arg,"a", "v")
-          all arguments after the first optional
+  Usage:
+    arg = dleStruct(a=my_a, v=my_v)
+        all arguments optional
   Structure specification of a DLE
   
   Keyword arguments::
@@ -378,8 +348,6 @@ def dleStruct(*dummy,**kwargs):
     a -- The matrix A [Dle_STRUCT_A]
     v -- The matrix V [Dle_STRUCT_V]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DleStruct,n)] for n in dummy[1:]]
   a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
@@ -399,15 +367,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dpleIn(*dummy,**kwargs):
+def dpleIn(**kwargs):
   """
   Helper function for 'DPLEInput'
 
-  Two use cases:
-     a) arg = dpleIn(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = dpleIn(arg,"a", "v")
-          all arguments after the first optional
+  Usage:
+    arg = dpleIn(a=my_a, v=my_v)
+        all arguments optional
   Input arguments of a \e dple solver
   
   Keyword arguments::
@@ -415,8 +381,6 @@ def dpleIn(*dummy,**kwargs):
     a -- A matrices (horzcat when const_dim, diagcat otherwise) [DPLE_A]
     v -- V matrices (horzcat when const_dim, diagcat otherwise) [DPLE_V]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEInput,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
     a = kwargs['a']
@@ -439,23 +403,19 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dpleOut(*dummy,**kwargs):
+def dpleOut(**kwargs):
   """
   Helper function for 'DPLEOutput'
 
-  Two use cases:
-     a) arg = dpleOut(p=my_p)
-          all arguments optional
-     b) p = dpleOut(arg,"p")
-          all arguments after the first optional
+  Usage:
+    arg = dpleOut(p=my_p)
+        all arguments optional
   Output arguments of a \e dple solver
   
   Keyword arguments::
 
     p -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [DPLE_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEOutput,n)] for n in dummy[1:]]
   p = []
   if 'p' in kwargs:
     p = kwargs['p']
@@ -475,15 +435,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def dpleStruct(*dummy,**kwargs):
+def dpleStruct(**kwargs):
   """
   Helper function for 'DpleVecStruct'
 
-  Two use cases:
-     a) arg = dpleStruct(a=my_a, v=my_v)
-          all arguments optional
-     b) a, v = dpleStruct(arg,"a", "v")
-          all arguments after the first optional
+  Usage:
+    arg = dpleStruct(a=my_a, v=my_v)
+        all arguments optional
   Structure specification of a DPLE
   
   Keyword arguments::
@@ -491,8 +449,6 @@ def dpleStruct(*dummy,**kwargs):
     a -- Sparsities for A_i, block diagonal form [Dple_STRUCT_A]
     v -- Sparsities for V_i, block diagonal form [Dple_STRUCT_V]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DpleVecStruct,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
     a = kwargs['a']
@@ -512,15 +468,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def hnlpIn(*dummy,**kwargs):
+def hnlpIn(**kwargs):
   """
   Helper function for 'HNLPInput'
 
-  Two use cases:
-     a) arg = hnlpIn(x=my_x, p=my_p, tau=my_tau)
-          all arguments optional
-     b) x, p, tau = hnlpIn(arg,"x", "p", "tau")
-          all arguments after the first optional
+  Usage:
+    arg = hnlpIn(x=my_x, p=my_p, tau=my_tau)
+        all arguments optional
   Input arguments of an Homotopy NLP function
   
   Keyword arguments::
@@ -529,8 +483,6 @@ def hnlpIn(*dummy,**kwargs):
     p   -- Fixed parameter [HNL_P]
     tau -- Homotopy parameter [HNL_TAU]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hnlpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HNLPInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -556,15 +508,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def daeIn(*dummy,**kwargs):
+def daeIn(**kwargs):
   """
   Helper function for 'DAEInput'
 
-  Two use cases:
-     a) arg = daeIn(x=my_x, z=my_z, p=my_p, t=my_t)
-          all arguments optional
-     b) x, z, p, t = daeIn(arg,"x", "z", "p", "t")
-          all arguments after the first optional
+  Usage:
+    arg = daeIn(x=my_x, z=my_z, p=my_p, t=my_t)
+        all arguments optional
   Input arguments of an ODE/DAE function
   
   Keyword arguments::
@@ -574,8 +524,6 @@ def daeIn(*dummy,**kwargs):
     p -- Parameter [DAE_P]
     t -- Explicit time dependence [DAE_T]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DAEInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -604,15 +552,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def daeOut(*dummy,**kwargs):
+def daeOut(**kwargs):
   """
   Helper function for 'DAEOutput'
 
-  Two use cases:
-     a) arg = daeOut(ode=my_ode, alg=my_alg, quad=my_quad)
-          all arguments optional
-     b) ode, alg, quad = daeOut(arg,"ode", "alg", "quad")
-          all arguments after the first optional
+  Usage:
+    arg = daeOut(ode=my_ode, alg=my_alg, quad=my_quad)
+        all arguments optional
   Output arguments of an DAE function
   
   Keyword arguments::
@@ -621,8 +567,6 @@ def daeOut(*dummy,**kwargs):
     alg  -- Right hand side of algebraic equations [DAE_ALG]
     quad -- Right hand side of quadratures equations [DAE_QUAD]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DAEOutput,n)] for n in dummy[1:]]
   ode = []
   if 'ode' in kwargs:
     ode = kwargs['ode']
@@ -648,15 +592,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def rdaeIn(*dummy,**kwargs):
+def rdaeIn(**kwargs):
   """
   Helper function for 'RDAEInput'
 
-  Two use cases:
-     a) arg = rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t)
-          all arguments optional
-     b) rx, rz, rp, x, z, p, t = rdaeIn(arg,"rx", "rz", "rp", "x", "z", "p", "t")
-          all arguments after the first optional
+  Usage:
+    arg = rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t)
+        all arguments optional
   Input arguments of an ODE/DAE backward integration function
   
   Keyword arguments::
@@ -669,8 +611,6 @@ def rdaeIn(*dummy,**kwargs):
     p  -- Parameter vector [RDAE_P]
     t  -- Explicit time dependence [RDAE_T]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_RDAEInput,n)] for n in dummy[1:]]
   rx = []
   if 'rx' in kwargs:
     rx = kwargs['rx']
@@ -708,15 +648,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def rdaeOut(*dummy,**kwargs):
+def rdaeOut(**kwargs):
   """
   Helper function for 'RDAEOutput'
 
-  Two use cases:
-     a) arg = rdaeOut(ode=my_ode, alg=my_alg, quad=my_quad)
-          all arguments optional
-     b) ode, alg, quad = rdaeOut(arg,"ode", "alg", "quad")
-          all arguments after the first optional
+  Usage:
+    arg = rdaeOut(ode=my_ode, alg=my_alg, quad=my_quad)
+        all arguments optional
   Output arguments of an ODE/DAE backward integration function
   
   Keyword arguments::
@@ -725,8 +663,6 @@ def rdaeOut(*dummy,**kwargs):
     alg  -- Right hand side of algebraic equations. [RDAE_ALG]
     quad -- Right hand side of quadratures. [RDAE_QUAD]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_RDAEOutput,n)] for n in dummy[1:]]
   ode = []
   if 'ode' in kwargs:
     ode = kwargs['ode']
@@ -752,15 +688,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def integratorIn(*dummy,**kwargs):
+def integratorIn(**kwargs):
   """
   Helper function for 'IntegratorInput'
 
-  Two use cases:
-     a) arg = integratorIn(x0=my_x0, p=my_p, z0=my_z0, rx0=my_rx0, rp=my_rp, rz0=my_rz0)
-          all arguments optional
-     b) x0, p, z0, rx0, rp, rz0 = integratorIn(arg,"x0", "p", "z0", "rx0", "rp", "rz0")
-          all arguments after the first optional
+  Usage:
+    arg = integratorIn(x0=my_x0, p=my_p, z0=my_z0, rx0=my_rx0, rp=my_rp, rz0=my_rz0)
+        all arguments optional
   Input arguments of an integrator
   
   Keyword arguments::
@@ -772,8 +706,6 @@ def integratorIn(*dummy,**kwargs):
     rp  -- Backward parameter vector [INTEGRATOR_RP]
     rz0 -- Initial guess for the backwards algebraic variable [INTEGRATOR_RZ0]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
     x0 = kwargs['x0']
@@ -808,15 +740,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def integratorOut(*dummy,**kwargs):
+def integratorOut(**kwargs):
   """
   Helper function for 'IntegratorOutput'
 
-  Two use cases:
-     a) arg = integratorOut(xf=my_xf, qf=my_qf, zf=my_zf, rxf=my_rxf, rqf=my_rqf, rzf=my_rzf)
-          all arguments optional
-     b) xf, qf, zf, rxf, rqf, rzf = integratorOut(arg,"xf", "qf", "zf", "rxf", "rqf", "rzf")
-          all arguments after the first optional
+  Usage:
+    arg = integratorOut(xf=my_xf, qf=my_qf, zf=my_zf, rxf=my_rxf, rqf=my_rqf, rzf=my_rzf)
+        all arguments optional
   Output arguments of an integrator
   
   Keyword arguments::
@@ -828,8 +758,6 @@ def integratorOut(*dummy,**kwargs):
     rqf -- Backward quadrature state at the initial time [INTEGRATOR_RQF]
     rzf -- Backward algebraic variable at the initial time [INTEGRATOR_RZF]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorOutput,n)] for n in dummy[1:]]
   xf = []
   if 'xf' in kwargs:
     xf = kwargs['xf']
@@ -864,15 +792,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def linsolIn(*dummy,**kwargs):
+def linsolIn(**kwargs):
   """
   Helper function for 'LinsolInput'
 
-  Two use cases:
-     a) arg = linsolIn(A=my_A, B=my_B)
-          all arguments optional
-     b) A, B = linsolIn(arg,"A", "B")
-          all arguments after the first optional
+  Usage:
+    arg = linsolIn(A=my_A, B=my_B)
+        all arguments optional
   Input arguments of a linear solver
   
   Keyword arguments::
@@ -880,8 +806,6 @@ def linsolIn(*dummy,**kwargs):
     A -- The square matrix A: sparse, (n x n). [LINSOL_A]
     B -- The right-hand-side matrix b: dense,  (n x m) [LINSOL_B]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolInput,n)] for n in dummy[1:]]
   A = []
   if 'A' in kwargs:
     A = kwargs['A']
@@ -904,23 +828,19 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def linsolOut(*dummy,**kwargs):
+def linsolOut(**kwargs):
   """
   Helper function for 'LinsolOutput'
 
-  Two use cases:
-     a) arg = linsolOut(X=my_X)
-          all arguments optional
-     b) X = linsolOut(arg,"X")
-          all arguments after the first optional
+  Usage:
+    arg = linsolOut(X=my_X)
+        all arguments optional
   Output arguments of a linear solver
   
   Keyword arguments::
 
     X -- Solution to the linear system of equations [LINSOL_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolOutput,n)] for n in dummy[1:]]
   X = []
   if 'X' in kwargs:
     X = kwargs['X']
@@ -940,15 +860,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lpIn(*dummy,**kwargs):
+def lpIn(**kwargs):
   """
   Helper function for 'LpSolverInput'
 
-  Two use cases:
-     a) arg = lpIn(c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
-          all arguments optional
-     b) c, a, lba, uba, lbx, ubx = lpIn(arg,"c", "a", "lba", "uba", "lbx", "ubx")
-          all arguments after the first optional
+  Usage:
+    arg = lpIn(c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
+        all arguments optional
   Input arguments of a LP problem
   
   Keyword arguments::
@@ -960,8 +878,6 @@ def lpIn(*dummy,**kwargs):
     lbx -- dense, (n x 1) [LP_SOLVER_LBX]
     ubx -- dense, (n x 1) [LP_SOLVER_UBX]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LpSolverInput,n)] for n in dummy[1:]]
   c = []
   if 'c' in kwargs:
     c = kwargs['c']
@@ -996,15 +912,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lpOut(*dummy,**kwargs):
+def lpOut(**kwargs):
   """
   Helper function for 'LpSolverOutput'
 
-  Two use cases:
-     a) arg = lpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, cost, lam_a, lam_x = lpOut(arg,"x", "cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = lpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an LP Solver
   
   Keyword arguments::
@@ -1014,8 +928,6 @@ def lpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [LP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [LP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LpSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -1044,23 +956,19 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lpStruct(*dummy,**kwargs):
+def lpStruct(**kwargs):
   """
   Helper function for 'LPStruct'
 
-  Two use cases:
-     a) arg = lpStruct(a=my_a)
-          all arguments optional
-     b) a = lpStruct(arg,"a")
-          all arguments after the first optional
+  Usage:
+    arg = lpStruct(a=my_a)
+        all arguments optional
   Structure specification of an LP
   
   Keyword arguments::
 
     a -- The matrix A: sparse [LP_STRUCT_A]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LPStruct,n)] for n in dummy[1:]]
   a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
@@ -1077,15 +985,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdleIn(*dummy,**kwargs):
+def lrdleIn(**kwargs):
   """
   Helper function for 'LR_DLEInput'
 
-  Two use cases:
-     a) arg = lrdleIn(a=my_a, v=my_v, c=my_c, h=my_h)
-          all arguments optional
-     b) a, v, c, h = lrdleIn(arg,"a", "v", "c", "h")
-          all arguments after the first optional
+  Usage:
+    arg = lrdleIn(a=my_a, v=my_v, c=my_c, h=my_h)
+        all arguments optional
   Input arguments of a \e dle solver
   
   Keyword arguments::
@@ -1095,8 +1001,6 @@ def lrdleIn(*dummy,**kwargs):
     c -- C matrix [LR_DLE_C]
     h -- H matrix: horizontal stack of all Hi [LR_DLE_H]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DLEInput,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
     a = kwargs['a']
@@ -1125,23 +1029,19 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdleOut(*dummy,**kwargs):
+def lrdleOut(**kwargs):
   """
   Helper function for 'LR_DLEOutput'
 
-  Two use cases:
-     a) arg = lrdleOut(y=my_y)
-          all arguments optional
-     b) y = lrdleOut(arg,"y")
-          all arguments after the first optional
+  Usage:
+    arg = lrdleOut(y=my_y)
+        all arguments optional
   Output arguments of a \e dle solver
   
   Keyword arguments::
 
     y -- Y matrix, block diagonal form [LR_DLE_Y]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DLEOutput,n)] for n in dummy[1:]]
   y = []
   if 'y' in kwargs:
     y = kwargs['y']
@@ -1161,15 +1061,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdleStruct(*dummy,**kwargs):
+def lrdleStruct(**kwargs):
   """
   Helper function for 'LrDleStruct'
 
-  Two use cases:
-     a) arg = lrdleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
-          all arguments optional
-     b) a, v, c, h = lrdleStruct(arg,"a", "v", "c", "h")
-          all arguments after the first optional
+  Usage:
+    arg = lrdleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
+        all arguments optional
   Structure specification of a DLE
   
   Keyword arguments::
@@ -1179,8 +1077,6 @@ def lrdleStruct(*dummy,**kwargs):
     c -- The matrix C (defaults to unity) [LR_DLE_STRUCT_C]
     h -- H matrix: horizontal stack of all Hi [LR_DLE_STRUCT_H]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LrDleStruct,n)] for n in dummy[1:]]
   a = Sparsity()
   if 'a' in kwargs:
     a = kwargs['a']
@@ -1206,15 +1102,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdpleIn(*dummy,**kwargs):
+def lrdpleIn(**kwargs):
   """
   Helper function for 'LR_DPLEInput'
 
-  Two use cases:
-     a) arg = lrdpleIn(a=my_a, v=my_v, c=my_c, h=my_h)
-          all arguments optional
-     b) a, v, c, h = lrdpleIn(arg,"a", "v", "c", "h")
-          all arguments after the first optional
+  Usage:
+    arg = lrdpleIn(a=my_a, v=my_v, c=my_c, h=my_h)
+        all arguments optional
   Input arguments of a \e dple solver
   
   Keyword arguments::
@@ -1224,8 +1118,6 @@ def lrdpleIn(*dummy,**kwargs):
     c -- C matrix [LR_DPLE_C]
     h -- H matrix: horizontal stack of all Hi [LR_DPLE_H]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DPLEInput,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
     a = kwargs['a']
@@ -1254,23 +1146,19 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdpleOut(*dummy,**kwargs):
+def lrdpleOut(**kwargs):
   """
   Helper function for 'LR_DPLEOutput'
 
-  Two use cases:
-     a) arg = lrdpleOut(y=my_y)
-          all arguments optional
-     b) y = lrdpleOut(arg,"y")
-          all arguments after the first optional
+  Usage:
+    arg = lrdpleOut(y=my_y)
+        all arguments optional
   Output arguments of a \e dple solver
   
   Keyword arguments::
 
     y -- Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [LR_DPLE_Y]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LR_DPLEOutput,n)] for n in dummy[1:]]
   y = []
   if 'y' in kwargs:
     y = kwargs['y']
@@ -1290,15 +1178,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def lrdpleStruct(*dummy,**kwargs):
+def lrdpleStruct(**kwargs):
   """
   Helper function for 'LrDpleVecStruct'
 
-  Two use cases:
-     a) arg = lrdpleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
-          all arguments optional
-     b) a, v, c, h = lrdpleStruct(arg,"a", "v", "c", "h")
-          all arguments after the first optional
+  Usage:
+    arg = lrdpleStruct(a=my_a, v=my_v, c=my_c, h=my_h)
+        all arguments optional
   Structure specification of a DPLE
   
   Keyword arguments::
@@ -1308,8 +1194,6 @@ def lrdpleStruct(*dummy,**kwargs):
     c -- Sparsities for C_i (defaults to unity), block diagonal form [LR_Dple_STRUCT_C]
     h -- Sparsities for H_i (defaults to unity), block diagonal form [LR_Dple_STRUCT_H]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lrdpleStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LrDpleVecStruct,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
     a = kwargs['a']
@@ -1335,15 +1219,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def nlpIn(*dummy,**kwargs):
+def nlpIn(**kwargs):
   """
   Helper function for 'NLPInput'
 
-  Two use cases:
-     a) arg = nlpIn(x=my_x, p=my_p)
-          all arguments optional
-     b) x, p = nlpIn(arg,"x", "p")
-          all arguments after the first optional
+  Usage:
+    arg = nlpIn(x=my_x, p=my_p)
+        all arguments optional
   Input arguments of an NLP function
   
   Keyword arguments::
@@ -1351,8 +1233,6 @@ def nlpIn(*dummy,**kwargs):
     x -- Decision variable [NL_X]
     p -- Fixed parameter [NL_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -1375,15 +1255,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def nlpOut(*dummy,**kwargs):
+def nlpOut(**kwargs):
   """
   Helper function for 'NLPOutput'
 
-  Two use cases:
-     a) arg = nlpOut(f=my_f, g=my_g)
-          all arguments optional
-     b) f, g = nlpOut(arg,"f", "g")
-          all arguments after the first optional
+  Usage:
+    arg = nlpOut(f=my_f, g=my_g)
+        all arguments optional
   Output arguments of an NLP function
   
   Keyword arguments::
@@ -1391,8 +1269,6 @@ def nlpOut(*dummy,**kwargs):
     f -- Objective function [NL_F]
     g -- Constraint function [NL_G]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPOutput,n)] for n in dummy[1:]]
   f = []
   if 'f' in kwargs:
     f = kwargs['f']
@@ -1415,15 +1291,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def gradFIn(*dummy,**kwargs):
+def gradFIn(**kwargs):
   """
   Helper function for 'GradFInput'
 
-  Two use cases:
-     a) arg = gradFIn(x=my_x, p=my_p)
-          all arguments optional
-     b) x, p = gradFIn(arg,"x", "p")
-          all arguments after the first optional
+  Usage:
+    arg = gradFIn(x=my_x, p=my_p)
+        all arguments optional
   Input arguments of an NLP objective gradient function
   
   Keyword arguments::
@@ -1431,8 +1305,6 @@ def gradFIn(*dummy,**kwargs):
     x -- Decision variable [GRADF_X]
     p -- Fixed parameter [GRADF_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of gradFIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_GradFInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -1455,15 +1327,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def gradFOut(*dummy,**kwargs):
+def gradFOut(**kwargs):
   """
   Helper function for 'GradFOutput'
 
-  Two use cases:
-     a) arg = gradFOut(grad=my_grad, f=my_f, g=my_g)
-          all arguments optional
-     b) grad, f, g = gradFOut(arg,"grad", "f", "g")
-          all arguments after the first optional
+  Usage:
+    arg = gradFOut(grad=my_grad, f=my_f, g=my_g)
+        all arguments optional
   Output arguments of an NLP objective gradient function
   
   Keyword arguments::
@@ -1472,8 +1342,6 @@ def gradFOut(*dummy,**kwargs):
     f    -- Objective function [GRADF_F]
     g    -- Constraint function [GRADF_G]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of gradFOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_GradFOutput,n)] for n in dummy[1:]]
   grad = []
   if 'grad' in kwargs:
     grad = kwargs['grad']
@@ -1499,15 +1367,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def jacGIn(*dummy,**kwargs):
+def jacGIn(**kwargs):
   """
   Helper function for 'JacGInput'
 
-  Two use cases:
-     a) arg = jacGIn(x=my_x, p=my_p)
-          all arguments optional
-     b) x, p = jacGIn(arg,"x", "p")
-          all arguments after the first optional
+  Usage:
+    arg = jacGIn(x=my_x, p=my_p)
+        all arguments optional
   Input arguments of an NLP Jacobian function
   
   Keyword arguments::
@@ -1515,8 +1381,6 @@ def jacGIn(*dummy,**kwargs):
     x -- Decision variable [JACG_X]
     p -- Fixed parameter [JACG_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of jacGIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_JacGInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -1539,15 +1403,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def jacGOut(*dummy,**kwargs):
+def jacGOut(**kwargs):
   """
   Helper function for 'JacGOutput'
 
-  Two use cases:
-     a) arg = jacGOut(jac=my_jac, f=my_f, g=my_g)
-          all arguments optional
-     b) jac, f, g = jacGOut(arg,"jac", "f", "g")
-          all arguments after the first optional
+  Usage:
+    arg = jacGOut(jac=my_jac, f=my_f, g=my_g)
+        all arguments optional
   Output arguments of an NLP Jacobian function
   
   Keyword arguments::
@@ -1556,8 +1418,6 @@ def jacGOut(*dummy,**kwargs):
     f   -- Objective function [JACG_F]
     g   -- Constraint function [JACG_G]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of jacGOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_JacGOutput,n)] for n in dummy[1:]]
   jac = []
   if 'jac' in kwargs:
     jac = kwargs['jac']
@@ -1583,15 +1443,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def hessLagIn(*dummy,**kwargs):
+def hessLagIn(**kwargs):
   """
   Helper function for 'HessLagInput'
 
-  Two use cases:
-     a) arg = hessLagIn(x=my_x, p=my_p, lam_f=my_lam_f, lam_g=my_lam_g)
-          all arguments optional
-     b) x, p, lam_f, lam_g = hessLagIn(arg,"x", "p", "lam_f", "lam_g")
-          all arguments after the first optional
+  Usage:
+    arg = hessLagIn(x=my_x, p=my_p, lam_f=my_lam_f, lam_g=my_lam_g)
+        all arguments optional
   Input arguments of an NLP Hessian function
   
   Keyword arguments::
@@ -1601,8 +1459,6 @@ def hessLagIn(*dummy,**kwargs):
     lam_f -- NLP solver might use to scale the objective. [HESSLAG_LAM_F]
     lam_g -- Multiplier for g [HESSLAG_LAM_G]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HessLagInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -1631,15 +1487,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def hessLagOut(*dummy,**kwargs):
+def hessLagOut(**kwargs):
   """
   Helper function for 'HessLagOutput'
 
-  Two use cases:
-     a) arg = hessLagOut(hess=my_hess, f=my_f, g=my_g, grad_x=my_grad_x, grad_p=my_grad_p)
-          all arguments optional
-     b) hess, f, g, grad_x, grad_p = hessLagOut(arg,"hess", "f", "g", "grad_x", "grad_p")
-          all arguments after the first optional
+  Usage:
+    arg = hessLagOut(hess=my_hess, f=my_f, g=my_g, grad_x=my_grad_x, grad_p=my_grad_p)
+        all arguments optional
   Output arguments of an NLP Hessian function
   
   Keyword arguments::
@@ -1650,8 +1504,6 @@ def hessLagOut(*dummy,**kwargs):
     grad_x -- Gradient of the Lagrangian with respect to x [HESSLAG_GRAD_X]
     grad_p -- Gradient of the Lagrangian with respect to p [HESSLAG_GRAD_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HessLagOutput,n)] for n in dummy[1:]]
   hess = []
   if 'hess' in kwargs:
     hess = kwargs['hess']
@@ -1683,15 +1535,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def nlpSolverIn(*dummy,**kwargs):
+def nlpSolverIn(**kwargs):
   """
   Helper function for 'NlpSolverInput'
 
-  Two use cases:
-     a) arg = nlpSolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0)
-          all arguments optional
-     b) x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0 = nlpSolverIn(arg,"x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0")
-          all arguments after the first optional
+  Usage:
+    arg = nlpSolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0)
+        all arguments optional
   Input arguments of an NLP Solver
   
   Keyword arguments::
@@ -1705,8 +1555,6 @@ def nlpSolverIn(*dummy,**kwargs):
     lam_x0 -- Lagrange multipliers for bounds on X, initial guess (nx x 1) [NLP_SOLVER_LAM_X0]
     lam_g0 -- Lagrange multipliers for bounds on G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NlpSolverInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
     x0 = kwargs['x0']
@@ -1747,15 +1595,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def nlpSolverOut(*dummy,**kwargs):
+def nlpSolverOut(**kwargs):
   """
   Helper function for 'NlpSolverOutput'
 
-  Two use cases:
-     a) arg = nlpSolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p)
-          all arguments optional
-     b) x, f, g, lam_x, lam_g, lam_p = nlpSolverOut(arg,"x", "f", "g", "lam_x", "lam_g", "lam_p")
-          all arguments after the first optional
+  Usage:
+    arg = nlpSolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p)
+        all arguments optional
   Output arguments of an NLP Solver
   
   Keyword arguments::
@@ -1767,8 +1613,6 @@ def nlpSolverOut(*dummy,**kwargs):
     lam_g -- Lagrange multipliers for bounds on G at the solution (ng x 1) [NLP_SOLVER_LAM_G]
     lam_p -- Lagrange multipliers for bounds on P at the solution (np x 1) [NLP_SOLVER_LAM_P]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NlpSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -1803,15 +1647,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qcqpIn(*dummy,**kwargs):
+def qcqpIn(**kwargs):
   """
   Helper function for 'QcqpSolverInput'
 
-  Two use cases:
-     a) arg = qcqpIn(h=my_h, g=my_g, p=my_p, q=my_q, r=my_r, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
-          all arguments optional
-     b) h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0 = qcqpIn(arg,"h", "g", "p", "q", "r", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0")
-          all arguments after the first optional
+  Usage:
+    arg = qcqpIn(h=my_h, g=my_g, p=my_p, q=my_q, r=my_r, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
+        all arguments optional
   Input arguments of a QP problem
   
   Keyword arguments::
@@ -1829,8 +1671,6 @@ def qcqpIn(*dummy,**kwargs):
     x0     -- dense, (n x 1) [QCQP_SOLVER_X0]
     lam_x0 -- dense [QCQP_SOLVER_LAM_X0]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QcqpSolverInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
     h = kwargs['h']
@@ -1883,15 +1723,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qcqpOut(*dummy,**kwargs):
+def qcqpOut(**kwargs):
   """
   Helper function for 'QcqpSolverOutput'
 
-  Two use cases:
-     a) arg = qcqpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, cost, lam_a, lam_x = qcqpOut(arg,"x", "cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = qcqpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an QP Solver
   
   Keyword arguments::
@@ -1901,8 +1739,6 @@ def qcqpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QCQP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QCQP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QcqpSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -1931,15 +1767,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qcqpStruct(*dummy,**kwargs):
+def qcqpStruct(**kwargs):
   """
   Helper function for 'QCQPStruct'
 
-  Two use cases:
-     a) arg = qcqpStruct(h=my_h, p=my_p, a=my_a)
-          all arguments optional
-     b) h, p, a = qcqpStruct(arg,"h", "p", "a")
-          all arguments after the first optional
+  Usage:
+    arg = qcqpStruct(h=my_h, p=my_p, a=my_a)
+        all arguments optional
   Structure specification of a QP
   
   Keyword arguments::
@@ -1948,8 +1782,6 @@ def qcqpStruct(*dummy,**kwargs):
     p -- triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_STRUCT_P]
     a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QCQP_STRUCT_A]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPStruct,n)] for n in dummy[1:]]
   h = Sparsity()
   if 'h' in kwargs:
     h = kwargs['h']
@@ -1972,15 +1804,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qpIn(*dummy,**kwargs):
+def qpIn(**kwargs):
   """
   Helper function for 'QpSolverInput'
 
-  Two use cases:
-     a) arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
-          all arguments optional
-     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0 = qpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0")
-          all arguments after the first optional
+  Usage:
+    arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
+        all arguments optional
   Input arguments of a QP problem
   
   Keyword arguments::
@@ -1995,8 +1825,6 @@ def qpIn(*dummy,**kwargs):
     x0     -- dense, (n x 1) [QP_SOLVER_X0]
     lam_x0 -- dense [QP_SOLVER_LAM_X0]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QpSolverInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
     h = kwargs['h']
@@ -2040,15 +1868,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qpOut(*dummy,**kwargs):
+def qpOut(**kwargs):
   """
   Helper function for 'QpSolverOutput'
 
-  Two use cases:
-     a) arg = qpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, cost, lam_a, lam_x = qpOut(arg,"x", "cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = qpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an QP Solver
   
   Keyword arguments::
@@ -2058,8 +1884,6 @@ def qpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QpSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -2088,15 +1912,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qpStruct(*dummy,**kwargs):
+def qpStruct(**kwargs):
   """
   Helper function for 'QPStruct'
 
-  Two use cases:
-     a) arg = qpStruct(h=my_h, a=my_a)
-          all arguments optional
-     b) h, a = qpStruct(arg,"h", "a")
-          all arguments after the first optional
+  Usage:
+    arg = qpStruct(h=my_h, a=my_a)
+        all arguments optional
   Structure specification of a QP
   
   Keyword arguments::
@@ -2104,8 +1926,6 @@ def qpStruct(*dummy,**kwargs):
     h -- The matrix is assumed to be symmetrical. [QP_STRUCT_H]
     a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_STRUCT_A]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPStruct,n)] for n in dummy[1:]]
   h = Sparsity()
   if 'h' in kwargs:
     h = kwargs['h']
@@ -2125,15 +1945,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdpIn(*dummy,**kwargs):
+def sdpIn(**kwargs):
   """
   Helper function for 'SDPInput'
 
-  Two use cases:
-     a) arg = sdpIn(f=my_f, c=my_c, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
-          all arguments optional
-     b) f, c, g, a, lba, uba, lbx, ubx = sdpIn(arg,"f", "c", "g", "a", "lba", "uba", "lbx", "ubx")
-          all arguments after the first optional
+  Usage:
+    arg = sdpIn(f=my_f, c=my_c, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
+        all arguments optional
   Input arguments of a SDP problem
   
   Keyword arguments::
@@ -2147,8 +1965,6 @@ def sdpIn(*dummy,**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDP_SOLVER_UBX]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPInput,n)] for n in dummy[1:]]
   f = []
   if 'f' in kwargs:
     f = kwargs['f']
@@ -2189,15 +2005,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdpOut(*dummy,**kwargs):
+def sdpOut(**kwargs):
   """
   Helper function for 'SDPOutput'
 
-  Two use cases:
-     a) arg = sdpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = sdpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an SDP Solver
   
   Keyword arguments::
@@ -2210,8 +2024,6 @@ def sdpOut(*dummy,**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -2249,15 +2061,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdpStruct(*dummy,**kwargs):
+def sdpStruct(**kwargs):
   """
   Helper function for 'SDPStruct'
 
-  Two use cases:
-     a) arg = sdpStruct(f=my_f, g=my_g, a=my_a)
-          all arguments optional
-     b) f, g, a = sdpStruct(arg,"f", "g", "a")
-          all arguments after the first optional
+  Usage:
+    arg = sdpStruct(f=my_f, g=my_g, a=my_a)
+        all arguments optional
   Structure specification of an SDP
   
   Keyword arguments::
@@ -2266,8 +2076,6 @@ def sdpStruct(*dummy,**kwargs):
     g -- The matrix G: ( m x m) [SDP_STRUCT_G]
     a -- The matrix A: ( nc x n) [SDP_STRUCT_A]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPStruct,n)] for n in dummy[1:]]
   f = Sparsity()
   if 'f' in kwargs:
     f = kwargs['f']
@@ -2290,15 +2098,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdqpIn(*dummy,**kwargs):
+def sdqpIn(**kwargs):
   """
   Helper function for 'SDQPInput'
 
-  Two use cases:
-     a) arg = sdqpIn(h=my_h, c=my_c, f=my_f, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
-          all arguments optional
-     b) h, c, f, g, a, lba, uba, lbx, ubx = sdqpIn(arg,"h", "c", "f", "g", "a", "lba", "uba", "lbx", "ubx")
-          all arguments after the first optional
+  Usage:
+    arg = sdqpIn(h=my_h, c=my_c, f=my_f, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
+        all arguments optional
   Input arguments of a SDQP problem
   
   Keyword arguments::
@@ -2313,8 +2119,6 @@ def sdqpIn(*dummy,**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDQP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDQP_SOLVER_UBX]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
     h = kwargs['h']
@@ -2358,15 +2162,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdqpOut(*dummy,**kwargs):
+def sdqpOut(**kwargs):
   """
   Helper function for 'SDQPOutput'
 
-  Two use cases:
-     a) arg = sdqpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdqpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = sdqpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an SDQP Solver
   
   Keyword arguments::
@@ -2379,8 +2181,6 @@ def sdqpOut(*dummy,**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDQP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDQP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -2418,15 +2218,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def sdqpStruct(*dummy,**kwargs):
+def sdqpStruct(**kwargs):
   """
   Helper function for 'SDQPStruct'
 
-  Two use cases:
-     a) arg = sdqpStruct(h=my_h, f=my_f, g=my_g, a=my_a)
-          all arguments optional
-     b) h, f, g, a = sdqpStruct(arg,"h", "f", "g", "a")
-          all arguments after the first optional
+  Usage:
+    arg = sdqpStruct(h=my_h, f=my_f, g=my_g, a=my_a)
+        all arguments optional
   Structure specification of an SDQP
   
   Keyword arguments::
@@ -2436,8 +2234,6 @@ def sdqpStruct(*dummy,**kwargs):
     g -- The matrix G: ( m x m) [SDQP_STRUCT_G]
     a -- The matrix A: ( nc x n) [SDQP_STRUCT_A]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPStruct,n)] for n in dummy[1:]]
   h = Sparsity()
   if 'h' in kwargs:
     h = kwargs['h']
@@ -2463,15 +2259,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def socpIn(*dummy,**kwargs):
+def socpIn(**kwargs):
   """
   Helper function for 'SOCPInput'
 
-  Two use cases:
-     a) arg = socpIn(g=my_g, h=my_h, e=my_e, f=my_f, c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
-          all arguments optional
-     b) g, h, e, f, c, a, lba, uba, lbx, ubx = socpIn(arg,"g", "h", "e", "f", "c", "a", "lba", "uba", "lbx", "ubx")
-          all arguments after the first optional
+  Usage:
+    arg = socpIn(g=my_g, h=my_h, e=my_e, f=my_f, c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
+        all arguments optional
   Input arguments of a SOCP problem
   
   Keyword arguments::
@@ -2487,8 +2281,6 @@ def socpIn(*dummy,**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SOCP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SOCP_SOLVER_UBX]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPInput,n)] for n in dummy[1:]]
   g = []
   if 'g' in kwargs:
     g = kwargs['g']
@@ -2535,15 +2327,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def socpOut(*dummy,**kwargs):
+def socpOut(**kwargs):
   """
   Helper function for 'SOCPOutput'
 
-  Two use cases:
-     a) arg = socpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
-          all arguments optional
-     b) x, cost, lam_a, lam_x = socpOut(arg,"x", "cost", "lam_a", "lam_x")
-          all arguments after the first optional
+  Usage:
+    arg = socpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
+        all arguments optional
   Output arguments of an SOCP Solver
   
   Keyword arguments::
@@ -2553,8 +2343,6 @@ def socpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -2583,15 +2371,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def socpStruct(*dummy,**kwargs):
+def socpStruct(**kwargs):
   """
   Helper function for 'SOCPStruct'
 
-  Two use cases:
-     a) arg = socpStruct(g=my_g, a=my_a)
-          all arguments optional
-     b) g, a = socpStruct(arg,"g", "a")
-          all arguments after the first optional
+  Usage:
+    arg = socpStruct(g=my_g, a=my_a)
+        all arguments optional
   Structure specification of an SOCP
   
   Keyword arguments::
@@ -2599,8 +2385,6 @@ def socpStruct(*dummy,**kwargs):
     g -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_STRUCT_G]
     a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpStruct. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPStruct,n)] for n in dummy[1:]]
   g = Sparsity()
   if 'g' in kwargs:
     g = kwargs['g']
@@ -2620,15 +2404,13 @@ namespace casadi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def stabilizedQpIn(*dummy,**kwargs):
+def stabilizedQpIn(**kwargs):
   """
   Helper function for 'StabilizedQpSolverInput'
 
-  Two use cases:
-     a) arg = stabilizedQpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0, muR=my_muR, muE=my_muE, mu=my_mu)
-          all arguments optional
-     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu = stabilizedQpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0", "muR", "muE", "mu")
-          all arguments after the first optional
+  Usage:
+    arg = stabilizedQpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0, muR=my_muR, muE=my_muE, mu=my_mu)
+        all arguments optional
   Input arguments of a QP problem
   
   Keyword arguments::
@@ -2646,8 +2428,6 @@ def stabilizedQpIn(*dummy,**kwargs):
     muE    -- dense (nc x 1) [STABILIZED_QP_SOLVER_MUE]
     mu     -- dense (nc x 1) [STABILIZED_QP_SOLVER_MU]
   """
-  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of stabilizedQpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
     h = kwargs['h']

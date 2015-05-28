@@ -54,16 +54,6 @@ IOSchemeVector<M> cleIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_CLEInput));
 }
-template<class M>
-std::vector<M> cleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of a \e cle solver
 ///
 /// \copydoc scheme_CLEOutput
@@ -83,14 +73,6 @@ IOSchemeVector<M> cleOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_CLEOutput));
-}
-template<class M>
-std::vector<M> cleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Structure specification of a CLE
 ///
@@ -115,18 +97,6 @@ IOSchemeVector<M> cleStruct(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_CleStruct));
-}
-template<class M>
-std::vector<M> cleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CleStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CleStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_CleStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of an ODE/DAE function
 ///
@@ -164,30 +134,6 @@ IOSchemeVector<M> controldaeIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_ControlledDAEInput));
 }
-template<class M>
-std::vector<M> controldaeIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s8))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Input arguments of a control simulator
 ///
 /// \copydoc scheme_ControlSimulatorInput
@@ -212,18 +158,6 @@ IOSchemeVector<M> controlsimulatorIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_ControlSimulatorInput));
 }
-template<class M>
-std::vector<M> controlsimulatorIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Input arguments of a \e dle solver
 ///
 /// \copydoc scheme_DLEInput
@@ -246,16 +180,6 @@ IOSchemeVector<M> dleIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_DLEInput));
 }
-template<class M>
-std::vector<M> dleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of a \e dle solver
 ///
 /// \copydoc scheme_DLEOutput
@@ -275,14 +199,6 @@ IOSchemeVector<M> dleOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_DLEOutput));
-}
-template<class M>
-std::vector<M> dleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Structure specification of a DLE
 ///
@@ -306,16 +222,6 @@ IOSchemeVector<M> dleStruct(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_DleStruct));
 }
-template<class M>
-std::vector<M> dleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DleStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DleStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Input arguments of a \e dple solver
 ///
 /// \copydoc scheme_DPLEInput
@@ -338,16 +244,6 @@ IOSchemeVector<M> dpleIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_DPLEInput));
 }
-template<class M>
-std::vector<M> dpleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of a \e dple solver
 ///
 /// \copydoc scheme_DPLEOutput
@@ -367,14 +263,6 @@ IOSchemeVector<M> dpleOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_DPLEOutput));
-}
-template<class M>
-std::vector<M> dpleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Structure specification of a DPLE
 ///
@@ -397,16 +285,6 @@ IOSchemeVector<M> dpleStruct(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_DpleVecStruct));
-}
-template<class M>
-std::vector<M> dpleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DpleVecStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DpleVecStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of an Homotopy NLP function
 ///
@@ -431,18 +309,6 @@ IOSchemeVector<M> hnlpIn(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_HNLPInput));
-}
-template<class M>
-std::vector<M> hnlpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of an ODE/DAE function
 ///
@@ -470,20 +336,6 @@ IOSchemeVector<M> daeIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_DAEInput));
 }
-template<class M>
-std::vector<M> daeIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an DAE function
 ///
 /// \copydoc scheme_DAEOutput
@@ -507,18 +359,6 @@ IOSchemeVector<M> daeOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_DAEOutput));
-}
-template<class M>
-std::vector<M> daeOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of an ODE/DAE backward integration function
 ///
@@ -552,26 +392,6 @@ IOSchemeVector<M> rdaeIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_RDAEInput));
 }
-template<class M>
-std::vector<M> rdaeIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s6))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an ODE/DAE backward integration function
 ///
 /// \copydoc scheme_RDAEOutput
@@ -595,18 +415,6 @@ IOSchemeVector<M> rdaeOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_RDAEOutput));
-}
-template<class M>
-std::vector<M> rdaeOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of an integrator
 ///
@@ -638,24 +446,6 @@ IOSchemeVector<M> integratorIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_IntegratorInput));
 }
-template<class M>
-std::vector<M> integratorIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s5))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an integrator
 ///
 /// \copydoc scheme_IntegratorOutput
@@ -686,24 +476,6 @@ IOSchemeVector<M> integratorOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_IntegratorOutput));
 }
-template<class M>
-std::vector<M> integratorOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Input arguments of a linear solver
 ///
 /// \copydoc scheme_LinsolInput
@@ -726,16 +498,6 @@ IOSchemeVector<M> linsolIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LinsolInput));
 }
-template<class M>
-std::vector<M> linsolIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of a linear solver
 ///
 /// \copydoc scheme_LinsolOutput
@@ -755,14 +517,6 @@ IOSchemeVector<M> linsolOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LinsolOutput));
-}
-template<class M>
-std::vector<M> linsolOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of a LP problem
 ///
@@ -794,24 +548,6 @@ IOSchemeVector<M> lpIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LpSolverInput));
 }
-template<class M>
-std::vector<M> lpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an LP Solver
 ///
 /// \copydoc scheme_LpSolverOutput
@@ -838,20 +574,6 @@ IOSchemeVector<M> lpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LpSolverOutput));
 }
-template<class M>
-std::vector<M> lpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Structure specification of an LP
 ///
 /// \copydoc scheme_LPStruct
@@ -871,14 +593,6 @@ IOSchemeVector<M> lpStruct(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LPStruct));
-}
-template<class M>
-std::vector<M> lpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of a \e dle solver
 ///
@@ -906,20 +620,6 @@ IOSchemeVector<M> lrdleIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LR_DLEInput));
 }
-template<class M>
-std::vector<M> lrdleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of a \e dle solver
 ///
 /// \copydoc scheme_LR_DLEOutput
@@ -939,14 +639,6 @@ IOSchemeVector<M> lrdleOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LR_DLEOutput));
-}
-template<class M>
-std::vector<M> lrdleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Structure specification of a DLE
 ///
@@ -974,20 +666,6 @@ IOSchemeVector<M> lrdleStruct(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LrDleStruct));
 }
-template<class M>
-std::vector<M> lrdleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDleStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDleStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDleStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDleStruct, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Input arguments of a \e dple solver
 ///
 /// \copydoc scheme_LR_DPLEInput
@@ -1014,20 +692,6 @@ IOSchemeVector<M> lrdpleIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LR_DPLEInput));
 }
-template<class M>
-std::vector<M> lrdpleIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of a \e dple solver
 ///
 /// \copydoc scheme_LR_DPLEOutput
@@ -1047,14 +711,6 @@ IOSchemeVector<M> lrdpleOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LR_DPLEOutput));
-}
-template<class M>
-std::vector<M> lrdpleOut(const std::vector<M>& args,
-    const std::string &arg_s0="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LR_DPLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Structure specification of a DPLE
 ///
@@ -1082,20 +738,6 @@ IOSchemeVector<M> lrdpleStruct(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_LrDpleVecStruct));
 }
-template<class M>
-std::vector<M> lrdpleStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDpleVecStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDpleVecStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDpleVecStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LrDpleVecStruct, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Input arguments of an NLP function
 ///
 /// \copydoc scheme_NLPInput
@@ -1117,16 +759,6 @@ IOSchemeVector<M> nlpIn(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_NLPInput));
-}
-template<class M>
-std::vector<M> nlpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Output arguments of an NLP function
 ///
@@ -1150,16 +782,6 @@ IOSchemeVector<M> nlpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_NLPOutput));
 }
-template<class M>
-std::vector<M> nlpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Input arguments of an NLP objective gradient function
 ///
 /// \copydoc scheme_GradFInput
@@ -1181,16 +803,6 @@ IOSchemeVector<M> gradFIn(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_GradFInput));
-}
-template<class M>
-std::vector<M> gradFIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Output arguments of an NLP objective gradient function
 ///
@@ -1216,18 +828,6 @@ IOSchemeVector<M> gradFOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_GradFOutput));
 }
-template<class M>
-std::vector<M> gradFOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Input arguments of an NLP Jacobian function
 ///
 /// \copydoc scheme_JacGInput
@@ -1249,16 +849,6 @@ IOSchemeVector<M> jacGIn(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_JacGInput));
-}
-template<class M>
-std::vector<M> jacGIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Output arguments of an NLP Jacobian function
 ///
@@ -1283,18 +873,6 @@ IOSchemeVector<M> jacGOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_JacGOutput));
-}
-template<class M>
-std::vector<M> jacGOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of an NLP Hessian function
 ///
@@ -1321,20 +899,6 @@ IOSchemeVector<M> hessLagIn(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_HessLagInput));
-}
-template<class M>
-std::vector<M> hessLagIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Output arguments of an NLP Hessian function
 ///
@@ -1363,22 +927,6 @@ IOSchemeVector<M> hessLagOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_HessLagOutput));
-}
-template<class M>
-std::vector<M> hessLagOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of an NLP Solver
 ///
@@ -1414,28 +962,6 @@ IOSchemeVector<M> nlpSolverIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_NlpSolverInput));
 }
-template<class M>
-std::vector<M> nlpSolverIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an NLP Solver
 ///
 /// \copydoc scheme_NlpSolverOutput
@@ -1465,24 +991,6 @@ IOSchemeVector<M> nlpSolverOut(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_NlpSolverOutput));
-}
-template<class M>
-std::vector<M> nlpSolverOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of a QP problem
 ///
@@ -1526,36 +1034,6 @@ IOSchemeVector<M> qcqpIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_QcqpSolverInput));
 }
-template<class M>
-std::vector<M> qcqpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="",
-    const std::string &arg_s9="",
-    const std::string &arg_s10="",
-    const std::string &arg_s11="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
-  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
-  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an QP Solver
 ///
 /// \copydoc scheme_QcqpSolverOutput
@@ -1582,20 +1060,6 @@ IOSchemeVector<M> qcqpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_QcqpSolverOutput));
 }
-template<class M>
-std::vector<M> qcqpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QcqpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Structure specification of a QP
 ///
 /// \copydoc scheme_QCQPStruct
@@ -1619,18 +1083,6 @@ IOSchemeVector<M> qcqpStruct(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_QCQPStruct));
-}
-template<class M>
-std::vector<M> qcqpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of a QP problem
 ///
@@ -1668,30 +1120,6 @@ IOSchemeVector<M> qpIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_QpSolverInput));
 }
-template<class M>
-std::vector<M> qpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an QP Solver
 ///
 /// \copydoc scheme_QpSolverOutput
@@ -1718,20 +1146,6 @@ IOSchemeVector<M> qpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_QpSolverOutput));
 }
-template<class M>
-std::vector<M> qpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Structure specification of a QP
 ///
 /// \copydoc scheme_QPStruct
@@ -1753,16 +1167,6 @@ IOSchemeVector<M> qpStruct(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_QPStruct));
-}
-template<class M>
-std::vector<M> qpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of a SDP problem
 ///
@@ -1798,28 +1202,6 @@ IOSchemeVector<M> sdpIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SDPInput));
 }
-template<class M>
-std::vector<M> sdpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s7))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an SDP Solver
 ///
 /// \copydoc scheme_SDPOutput
@@ -1852,26 +1234,6 @@ IOSchemeVector<M> sdpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SDPOutput));
 }
-template<class M>
-std::vector<M> sdpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s6))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Structure specification of an SDP
 ///
 /// \copydoc scheme_SDPStruct
@@ -1895,18 +1257,6 @@ IOSchemeVector<M> sdpStruct(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SDPStruct));
-}
-template<class M>
-std::vector<M> sdpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of a SDQP problem
 ///
@@ -1944,30 +1294,6 @@ IOSchemeVector<M> sdqpIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SDQPInput));
 }
-template<class M>
-std::vector<M> sdqpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s8))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an SDQP Solver
 ///
 /// \copydoc scheme_SDQPOutput
@@ -2000,26 +1326,6 @@ IOSchemeVector<M> sdqpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SDQPOutput));
 }
-template<class M>
-std::vector<M> sdqpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s6))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Structure specification of an SDQP
 ///
 /// \copydoc scheme_SDQPStruct
@@ -2045,20 +1351,6 @@ IOSchemeVector<M> sdqpStruct(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SDQPStruct));
-}
-template<class M>
-std::vector<M> sdqpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of a SOCP problem
 ///
@@ -2098,32 +1390,6 @@ IOSchemeVector<M> socpIn(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SOCPInput));
 }
-template<class M>
-std::vector<M> socpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="",
-    const std::string &arg_s9="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s9))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Output arguments of an SOCP Solver
 ///
 /// \copydoc scheme_SOCPOutput
@@ -2150,20 +1416,6 @@ IOSchemeVector<M> socpOut(
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SOCPOutput));
 }
-template<class M>
-std::vector<M> socpOut(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  return ret;
-
-}
 /// Structure specification of an SOCP
 ///
 /// \copydoc scheme_SOCPStruct
@@ -2185,16 +1437,6 @@ IOSchemeVector<M> socpStruct(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_SOCPStruct));
-}
-template<class M>
-std::vector<M> socpStruct(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 /// Input arguments of a QP problem
 ///
@@ -2237,36 +1479,6 @@ IOSchemeVector<M> stabilizedQpIn(
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret, IOScheme(SCHEME_StabilizedQpSolverInput));
-}
-template<class M>
-std::vector<M> stabilizedQpIn(const std::vector<M>& args,
-    const std::string &arg_s0="",
-    const std::string &arg_s1="",
-    const std::string &arg_s2="",
-    const std::string &arg_s3="",
-    const std::string &arg_s4="",
-    const std::string &arg_s5="",
-    const std::string &arg_s6="",
-    const std::string &arg_s7="",
-    const std::string &arg_s8="",
-    const std::string &arg_s9="",
-    const std::string &arg_s10="",
-    const std::string &arg_s11="") {
-  std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
-  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
-  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
-  return ret;
-
 }
 } // namespace casadi
 #endif //SCHEMES_HELPERS_HPP
