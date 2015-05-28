@@ -56,22 +56,25 @@ public:
                  const Dictionary& opts=Dictionary());
 
   ///@{
+  //typedef std::pair<std::map<std::string, Sparsity>, std::vector<std::string> > MappedIO;
+  typedef IOSchemeVector<Sparsity> MappedIO;
+
   /** \brief Constructor (no initialization, to be deprecated) */
   CustomFunction(const CustomEvaluate &c_fcn,
                  const std::vector<Sparsity>& inputscheme,
                  const std::vector<Sparsity>& outputscheme);
 
   CustomFunction(const CustomEvaluate &c_fcn,
-                 const IOSchemeVector<Sparsity>& inputscheme,
+                 const MappedIO& inputscheme,
                  const std::vector<Sparsity>& outputscheme);
 
   CustomFunction(const CustomEvaluate &c_fcn,
                  const std::vector<Sparsity>& inputscheme,
-                 const IOSchemeVector<Sparsity>& outputscheme);
+                 const MappedIO& outputscheme);
 
   CustomFunction(const CustomEvaluate &c_fcn,
-                 const IOSchemeVector<Sparsity>& inputscheme,
-                 const IOSchemeVector<Sparsity>& outputscheme);
+                 const MappedIO& inputscheme,
+                 const MappedIO& outputscheme);
   ///@}
 
   /** \brief  Access functions of the node */

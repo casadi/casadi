@@ -73,7 +73,7 @@ namespace casadi {
 
     /** \brief  Create a new SDQP Solver */
     static SdqpSolverInternal* creator(const SDQPStructure& st)
-    { return new SdqpToSdp(make_vector(st.v3.first, st.v3.second));}
+    { return new SdqpToSdp(make_vector(st));}
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);

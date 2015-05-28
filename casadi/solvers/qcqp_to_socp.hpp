@@ -93,7 +93,7 @@ namespace casadi {
 
     /** \brief  Create a new QP Solver */
     static QcqpSolverInternal* creator(const QCQPStructure& st)
-    { return new QcqpToSocp(make_vector(st.v3.first, st.v3.second));}
+    { return new QcqpToSocp(make_vector(st));}
 
     /** \brief  Initialize */
     virtual void init();

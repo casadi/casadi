@@ -52,20 +52,20 @@ namespace casadi {
     assignNode(new MXFunctionInternal(arg, res));
   }
 
-  MXFunction::MXFunction(const std::vector<MX>& arg, const IOSchemeVector<MX>& res) {
-    assignNode(new MXFunctionInternal(arg, make_vector(res.v3)));
-    setOption("output_scheme", res.v3.second);
+  MXFunction::MXFunction(const std::vector<MX>& arg, const MappedIO& res) {
+    assignNode(new MXFunctionInternal(arg, make_vector(res)));
+    setOption("output_scheme", res.second);
   }
 
-  MXFunction::MXFunction(const IOSchemeVector<MX>& arg, const std::vector<MX>& res) {
-    assignNode(new MXFunctionInternal(make_vector(arg.v3), res));
-    setOption("input_scheme", arg.v3.second);
+  MXFunction::MXFunction(const MappedIO& arg, const std::vector<MX>& res) {
+    assignNode(new MXFunctionInternal(make_vector(arg), res));
+    setOption("input_scheme", arg.second);
   }
 
-  MXFunction::MXFunction(const IOSchemeVector<MX>& arg, const IOSchemeVector<MX>& res) {
-    assignNode(new MXFunctionInternal(make_vector(arg.v3), make_vector(res.v3)));
-    setOption("input_scheme", arg.v3.second);
-    setOption("output_scheme", res.v3.second);
+  MXFunction::MXFunction(const MappedIO& arg, const MappedIO& res) {
+    assignNode(new MXFunctionInternal(make_vector(arg), make_vector(res)));
+    setOption("input_scheme", arg.second);
+    setOption("output_scheme", res.second);
   }
 
   MXFunction::MXFunction(const std::string& name, const std::vector<MX>& arg,

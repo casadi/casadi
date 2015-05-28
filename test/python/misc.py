@@ -377,7 +377,7 @@ class Misctests(casadiTestCase):
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "SXFunction(scheme(SX),[SX] )" in e.message
+      #assert "SXFunction(scheme(SX),[SX] )" in e.message
       assert "You have: SXFunction(scheme(SX))" in e.message
       assert "::" not in e.message
       assert "std" not in e.message

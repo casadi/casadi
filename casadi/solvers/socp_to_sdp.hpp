@@ -64,7 +64,7 @@ namespace casadi {
 
     /** \brief  Create a new SOCP Solver */
     static SocpSolverInternal* creator(const SOCPStructure& st)
-    { return new SocpToSdp(make_vector(st.v3.first, st.v3.second));}
+    { return new SocpToSdp(make_vector(st));}
 
     /** \brief  Initialize */
     virtual void init();

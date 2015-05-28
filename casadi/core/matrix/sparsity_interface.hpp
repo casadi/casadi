@@ -101,8 +101,29 @@ namespace casadi {
     }
 
     // Create vector from map and vector with key order
+    inline friend std::vector<std::vector<MatType> >
+      make_vector(const std::map<std::string, std::vector<MatType> >& m,
+                  const std::vector<std::string>& s) {
+      std::vector<std::vector<MatType> > ret(s.size());
+      for (size_t i=0; i!=s.size(); ++i) {
+        typename std::map<std::string, std::vector<MatType> >::const_iterator it=m.find(s[i]);
+        if (it!=m.end()) {
+          ret[i]=it->second;
+        }
+      }
+      return ret;
+    }
+
+    // Create vector from map and vector with key order
     inline friend std::vector<MatType>
       make_vector(const std::pair<std::map<std::string, MatType>, std::vector<std::string> >& ms) {
+      return make_vector(ms.first, ms.second);
+    }
+
+    // Create vector from map and vector with key order
+    inline friend std::vector<std::vector<MatType> >
+      make_vector(const std::pair<std::map<std::string, std::vector<MatType> >,
+                  std::vector<std::string> >& ms) {
       return make_vector(ms.first, ms.second);
     }
 

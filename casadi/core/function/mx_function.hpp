@@ -104,18 +104,20 @@ public:
              const Dictionary& opts=Dictionary());
 #endif // USE_CXX11
 #endif // SWIG
+  //typedef std::pair<std::map<std::string, MX>, std::vector<std::string> > MappedIO;
+  typedef IOSchemeVector<MX> MappedIO;
 
   /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
   MXFunction(const std::vector<MX>& arg, const std::vector<MX>& res);
 
   /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
-  MXFunction(const std::vector<MX>& arg, const IOSchemeVector<MX>& res);
+  MXFunction(const std::vector<MX>& arg, const MappedIO& res);
 
   /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
-  MXFunction(const IOSchemeVector<MX>& arg, const std::vector<MX>& res);
+  MXFunction(const MappedIO& arg, const std::vector<MX>& res);
 
   /** \brief  Multiple input, multiple output, no initialization (to be deprecated)*/
-  MXFunction(const IOSchemeVector<MX>& arg, const IOSchemeVector<MX>& res);
+  MXFunction(const MappedIO& arg, const MappedIO& res);
 
   /// \cond INTERNAL
   /** \brief  Access functions of the node */

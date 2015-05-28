@@ -52,25 +52,25 @@ using namespace std;
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                                 const IOSchemeVector<Sparsity>& inputscheme,
+                                 const MappedIO& inputscheme,
                                  const vector<Sparsity>& outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme.v3), outputscheme));
-    setOption("input_scheme", inputscheme.v3.second);
+    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme), outputscheme));
+    setOption("input_scheme", inputscheme.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn, const vector<Sparsity> &inputscheme,
-                                 const IOSchemeVector<Sparsity> &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, make_vector(outputscheme.v3)));
-    setOption("output_scheme", outputscheme.v3.second);
+                                 const MappedIO &outputscheme) {
+    assignNode(new CustomFunctionInternal(c_fcn, inputscheme, make_vector(outputscheme)));
+    setOption("output_scheme", outputscheme.second);
   }
 
   CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
-                                 const IOSchemeVector<Sparsity> &inputscheme,
-                                 const IOSchemeVector<Sparsity> &outputscheme) {
-    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme.v3),
-                                          make_vector(outputscheme.v3)));
-    setOption("input_scheme", inputscheme.v3.second);
-    setOption("output_scheme", outputscheme.v3.second);
+                                 const MappedIO &inputscheme,
+                                 const MappedIO &outputscheme) {
+    assignNode(new CustomFunctionInternal(c_fcn, make_vector(inputscheme),
+                                          make_vector(outputscheme)));
+    setOption("input_scheme", inputscheme.second);
+    setOption("output_scheme", outputscheme.second);
   }
 
   CustomFunctionInternal* CustomFunction::operator->() {

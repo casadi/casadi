@@ -40,13 +40,16 @@ namespace casadi {
   class CASADI_EXPORT IOSchemeVector : public PrintableObject<IOSchemeVector<T> > {
   public:
     std::pair<std::map<std::string, T>, std::vector<std::string> > v3;
-
+    std::map<std::string, T>& first;
+    std::vector<std::string>& second;
     IOSchemeVector(const std::map<std::string, T>& m,
-                   const std::vector<std::string>& s) : v3(make_pair(m, s)) {
+                   const std::vector<std::string>& s) : v3(make_pair(m, s)),
+      first(v3.first), second(v3.second) {
     }
 
     IOSchemeVector(const std::vector<T>& d = std::vector<T>(),
-                   const std::vector<std::string>& s = std::vector<std::string>()) {
+                   const std::vector<std::string>& s = std::vector<std::string>()) :
+      first(v3.first), second(v3.second) {
       // Get/form string
       if (s.empty()) {
         v3.second.resize(d.size());
@@ -66,7 +69,8 @@ namespace casadi {
       }
     }
 
-    IOSchemeVector(const std::vector<T>& d, InputOutputScheme scheme) {
+    IOSchemeVector(const std::vector<T>& d, InputOutputScheme scheme) :
+      first(v3.first), second(v3.second) {
       v3.second = IOScheme(scheme);
       casadi_assert(d.size()==v3.second.size());
       for (size_t i=0; i!=d.size(); ++i) {
@@ -75,6 +79,9 @@ namespace casadi {
     }
 
 #ifndef SWIG
+    // Implicit type conversion
+    operator const std::pair<std::map<std::string, T>, std::vector<std::string> >&() const { return this->v3;}
+
     T operator[](int i) const {
       casadi_assert_message(i>=0 && i<this->v3.second.size(), "Index error: supplied integer must be >=0 and <= " << this->v3.second.size() << " but got " << i << ".");
       std::string s = this->v3.second.at(i);

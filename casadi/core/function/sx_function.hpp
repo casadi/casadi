@@ -100,15 +100,17 @@ namespace casadi {
                const Dictionary& opts=Dictionary());
 #endif // USE_CXX11
 #endif // SWIG
+    //typedef std::pair<std::map<std::string, SX>, std::vector<std::string> > MappedIO;
+    typedef IOSchemeVector<SX> MappedIO;
 
     /// Multiple input, multiple output, no initialization (to be deprecated)
     SXFunction(const std::vector<SX>& arg, const std::vector<SX>& res);
 
     /// Multiple input, multiple  output, no initialization (to be deprecated)
-    SXFunction(const std::vector<SX>& arg, const IOSchemeVector<SX>& res);
+    SXFunction(const std::vector<SX>& arg, const MappedIO& res);
 
     /// Multiple input, multiple output, no initialization (to be deprecated)
-    SXFunction(const IOSchemeVector<SX>& arg, const std::vector<SX>& res);
+    SXFunction(const MappedIO& arg, const std::vector<SX>& res);
 
     /** \brief Multiple input, multiple output, no initialization (to be deprecated)
     
@@ -134,7 +136,7 @@ namespace casadi {
     \enddoctest
     
     */
-    SXFunction(const IOSchemeVector<SX>& arg, const IOSchemeVector<SX>& res);
+    SXFunction(const MappedIO& arg, const MappedIO& res);
 
 /// \cond INTERNAL
     /// Access functions of the node
