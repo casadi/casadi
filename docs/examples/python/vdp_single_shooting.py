@@ -24,6 +24,7 @@
 from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
+from operator import itemgetter
 
 nk = 20    # Control discretization
 tf = 10.0  # End time
@@ -56,7 +57,7 @@ f = 0
 
 # Build a graph of integrator calls
 for k in range(nk):
-  X,QF = integratorOut(integrator(integratorIn(x0=X,p=U[k])),"xf","qf")
+  X,QF = itemgetter('xf','qf')(integrator({'x0':X,'p':U[k]}))
   f += QF
 
 # Terminal constraints: x_0(T)=x_1(T)=0

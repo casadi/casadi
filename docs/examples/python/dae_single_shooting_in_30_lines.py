@@ -22,6 +22,7 @@
 #
 #
 from casadi import *
+from operator import itemgetter
 
 """
 This example mainly intended for CasADi presentations. 
@@ -63,9 +64,8 @@ U = MX.sym("U",20)
 X  = MX([0,1])
 J = 0
 for k in range(20):
-  tmp = I.call( integratorIn(x0=X,p=U[k]) )   # Call the integrator
-  X,Q = integratorOut(tmp,"xf","qf")
-  J += Q                           # Sum up quadratures
+  X,Q = itemgetter('xf','qf')(I({'x0':X,'p':U[k]}))
+  J += Q   # Sum up quadratures
   
 # NLP callback functions
 nlp = MXFunction(nlpIn(x=U),nlpOut(f=J,g=X))

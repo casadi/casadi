@@ -89,7 +89,7 @@ l_init = MX.sym("l_init",2)
 X = vertcat((x_init,l_init))
 
 # Call the integrator
-X, = integratorOut(I.call(integratorIn(x0=X)),"xf")
+X = I({'x0':X})["xf"]
 
 # Costate at the final time should be zero (cf. Bryson and Ho)
 lam_f = X[2:4]

@@ -110,7 +110,7 @@ for j in range(1,d+1):
     xp_j += C[r,j]*X[r]
       
   # Append collocation equations
-  [f_j] = daeOut(f.call(daeIn(x=X[j],p=P)),"ode")
+  f_j = f({'x':X[j],'p':P})["ode"]
   V_eq.append(h*f_j - xp_j)
 
 # Concatenate constraints

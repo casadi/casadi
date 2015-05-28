@@ -102,7 +102,7 @@ for k in range(num_nodes+1):
 G = []
 G.append(X[0][:2] - NP.array([0,1])) # states fixed, costates free at initial time
 for k in range(num_nodes):
-  XF, = integratorOut(I.call(integratorIn(x0=X[k])),"xf")
+  XF = I({'x0':X[k]})["xf"]
   G.append(XF-X[k+1])
 G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
