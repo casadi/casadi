@@ -38,7 +38,7 @@ using namespace std;
   }
 
   ExternalFunction::ExternalFunction(const string& name, const Dictionary& opts) {
-    assignNode(new ExternalFunctionInternal("./" + name + ".so", name));
+    assignNode(ExternalFunctionInternal::create("./" + name + ".so", name));
     setOption("name", name);
     setOption(opts);
     init();
@@ -46,7 +46,7 @@ using namespace std;
 
   ExternalFunction::ExternalFunction(const string& name, const string& bin_name,
                                      const Dictionary& opts) {
-    assignNode(new ExternalFunctionInternal(bin_name, name));
+    assignNode(ExternalFunctionInternal::create(bin_name, name));
     setOption("name", name);
     setOption(opts);
     init();

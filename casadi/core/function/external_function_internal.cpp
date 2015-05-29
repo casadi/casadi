@@ -31,104 +31,132 @@
 #include <sstream>
 
 namespace casadi {
-
   using namespace std;
 
-  ExternalFunctionInternal::ExternalFunctionInternal(const string& bin_name, const string& f_name) :
-    bin_name_(bin_name), f_name_(f_name) {
+   ExternalFunctionInternal::handle_t
+   ExternalFunctionInternal::getHandle(const std::string& bin_name) {
+     handle_t handle;
 #ifdef WITH_DL
-
-    // Names of the functions we want to access
-    string init_s = f_name_ + "_init";
-    string sparsity_s = f_name_ + "_sparsity";
-    string work_s = f_name_ + "_work";
-    bool has_work = true;
-
-    // Load the dll
 #ifdef _WIN32
-    handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
-    casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
-                          << bin_name_ << ". error code (WIN32): "<< GetLastError());
+    handle = LoadLibrary(TEXT(bin_name.c_str()));
+    casadi_assert_message(handle!=0, "ExternalFunctionInternal: Cannot open function: "
+                          << bin_name << ". error code (WIN32): "<< GetLastError());
+#else // _WIN32
+    handle = dlopen(bin_name.c_str(), RTLD_LAZY);
+    casadi_assert_message(handle!=0, "ExternalFunctionInternal: Cannot open function: "
+                          << bin_name << ". error code: "<< dlerror());
+    // reset error
+    dlerror();
+#endif // _WIN32
+#else // WITH_DL
+    casadi_error("ExternalFunctionInternal: WITH_DL  not activated");
+#endif // WITH_DL
+    return handle;
+   }
+
+  template<typename FcnPtr>
+  void ExternalFunctionInternal::getSym(FcnPtr& fcnPtr, handle_t handle,
+                                        const std::string& sym) {
+#ifdef WITH_DL
+#ifdef _WIN32
+    fcnPtr = (FcnPtr)GetProcAddress(handle, TEXT(sym.c_str()));
+#else // _WIN32
+    fcnPtr = (FcnPtr)dlsym(handle, sym.c_str());
+    if (dlerror()) {
+      fcnPtr=0;
+      dlerror(); // Reset error flags
+    }
+#endif // _WIN32
+#else // WITH_DL
+#endif // WITH_DL
+  }
+
+  void ExternalFunctionInternal::freeHandle(handle_t& handle) {
+#ifdef WITH_DL
+    // close the dll
+#ifdef _WIN32
+    if (handle) {
+      FreeLibrary(handle);
+      handle=0;
+    }
+#else // _WIN32
+    if (handle) {
+      dlclose(handle);
+      handle=0;
+    }
+#endif // _WIN32
+#endif // WITH_DL
+  }
+
+  ExternalFunctionInternal*
+  ExternalFunctionInternal::create(const std::string& bin_name, const std::string& f_name) {
+    // Structure with info about the library to be passed to the constructor
+    LibInfo li = {bin_name, f_name};
+
+    // Load the dll and get the handle
+    li.handle = getHandle(bin_name);
 
     // Function to retrieving number of inputs and outputs
-    initPtr init = (initPtr)GetProcAddress(handle_, TEXT(init_s.c_str()));
-    if (init==0) throw CasadiException("ExternalFunctionInternal: no \""+init_s+"\" found");
+    initPtr init;
+    string init_s = f_name + "_init";
+    getSym(init, li.handle, init_s);
+    if (init==0) {
+      freeHandle(li.handle);
+      casadi_error("ExternalFunctionInternal: no \""+init_s+"\" found. "
+                   "Possible cause: If the function was generated from CasADi, "
+                   "make sure that it was compiled with a C compiler. If the "
+                   "function is C++, make sure to use extern \"C\" linkage.");
+    }
+
+    // Initialize and get the number of inputs and outputs
+    int f_type=-1;
+    int flag = init(&f_type, &li.n_in, &li.n_out, &li.n_arg, &li.n_res);
+    if (flag) {
+      freeHandle(li.handle);
+      casadi_error("ExternalFunctionInternal: \"init\" failed");
+    }
+
+    // Call the constructor
+    switch (f_type) {
+    case 1:
+      // Full information constructor
+      return new ExternalFunctionInternal(li);
+    default:
+      freeHandle(li.handle);
+      casadi_error("ExternalFunctionInternal: Function type " << f_type << " not supported.");
+    }
+    return 0;
+  }
+
+  ExternalFunctionInternal::ExternalFunctionInternal(const LibInfo& li)
+    : bin_name_(li.bin_name), f_name_(li.f_name), handle_(li.handle) {
+    ibuf_.resize(li.n_in);
+    obuf_.resize(li.n_out);
+    alloc_arg(li.n_arg);
+    alloc_res(li.n_res);
+
+    // Set name TODO(@jaeandersson): remove 'name' from options
+    setOption("name", f_name_);
 
     // Function for numerical evaluation
-    eval_ = (evalPtr) GetProcAddress(handle_, TEXT(f_name_.c_str()));
-    if (eval_==0) throw CasadiException("ExternalFunctionInternal: no \""+f_name_+"\" found");
+    getSym(eval_, handle_, f_name_);
+    casadi_assert_message(eval_!=0, "ExternalFunctionInternal: no \""+f_name_+"\" found");
 
     // Function for retrieving sparsities of inputs and outputs
-    sparsityPtr sparsity = (sparsityPtr)GetProcAddress(handle_, TEXT(sparsity_s.c_str()));
+    sparsityPtr sparsity;
+    getSym(sparsity, handle_, f_name_ + "_sparsity");
     if (sparsity==0) {
       // Fall back to scalar sparsity
       sparsity = scalarSparsity;
     }
 
-    // Function for retriving sizes of required work vectors
-    workPtr work = (workPtr)GetProcAddress(handle_, TEXT(work_s.c_str()));
-    if (work==0) {
-      // No work vectors needed
-      has_work = false;
-    }
-#else // _WIN32
-    handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
-    casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
-                          << bin_name_ << ". error code: "<< dlerror());
-
-    // reset error
-    dlerror();
-
-    // Function to retrieving number of inputs and outputs
-    initPtr init = (initPtr)dlsym(handle_, init_s.c_str());
-    casadi_assert_message(!dlerror(), "ExternalFunctionInternal: no \""+init_s+"\" found. "
-                          "Possible cause: If the function was generated from CasADi, "
-                          "make sure that it was compiled with a C compiler. If the "
-                          "function is C++, make sure to use extern \"C\" linkage.");
-
-    // Function for numerical evaluation
-    eval_ = (evalPtr) dlsym(handle_, f_name_.c_str());
-    if (dlerror()) throw CasadiException("ExternalFunctionInternal: no \""+f_name_+"\" found");
-
-    // Function for retrieving sparsities of inputs and outputs
-    sparsityPtr sparsity = (sparsityPtr)dlsym(handle_, sparsity_s.c_str());
-    if (dlerror()) {
-      // Fall back to scalar sparsity
-      sparsity = scalarSparsity;
-      // Reset error flags
-      dlerror();
-    }
-
-    // Function for retriving sizes of required work vectors
-    workPtr work = (workPtr)dlsym(handle_, work_s.c_str());
-    if (dlerror()) {
-      // No work vectors needed
-      has_work = false;
-      // Reset error flags
-      dlerror();
-    }
-
-#endif // _WIN32
-    // Initialize and get the number of inputs and outputs
-    int f_type=-1, n_in=-1, n_out=-1, n_arg=-1, n_res=-1;
-    int flag = init(&f_type, &n_in, &n_out, &n_arg, &n_res);
-    if (flag) throw CasadiException("ExternalFunctionInternal: \"init\" failed");
-    casadi_assert(f_type>=0 && n_in>=0 && n_out>=0 && n_arg>=0);
-    casadi_assert(n_in<=n_arg && n_out<=n_res);
-
-    // Pass to casadi
-    ibuf_.resize(n_in);
-    obuf_.resize(n_out);
-    alloc_arg(n_arg);
-    alloc_res(n_res);
-
-    // Get the sparsity pattern
-    for (int i=0; i<n_in+n_out; ++i) {
+    // Get the sparsity patterns
+    for (int i=0; i<li.n_in+li.n_out; ++i) {
       // Get sparsity from file
       int nrow, ncol;
       const int *colind, *row;
-      flag = sparsity(i, &nrow, &ncol, &colind, &row);
-      if (flag) throw CasadiException("ExternalFunctionInternal: \"sparsity\" failed");
+      int flag = sparsity(i, &nrow, &ncol, &colind, &row);
+      casadi_assert_message(flag==0, "ExternalFunctionInternal: \"sparsity\" failed");
 
       // Col offsets
       vector<int> colindv(colind, colind+ncol+1);
@@ -140,32 +168,26 @@ namespace casadi {
       vector<int> rowv(row, row+nnz);
 
       // Sparsity
-      Sparsity sp = Sparsity(nrow, ncol, colindv, rowv);
+      Sparsity sp(nrow, ncol, colindv, rowv);
 
       // Save to inputs/outputs
-      if (i<n_in) {
+      if (i<li.n_in) {
         input(i) = Matrix<double>::zeros(sp);
       } else {
-        output(i-n_in) = Matrix<double>::zeros(sp);
+        output(i-li.n_in) = Matrix<double>::zeros(sp);
       }
     }
 
     // Get number of temporaries
-    int n_iw, n_w;
-    if (has_work) {
-      flag = work(&n_iw, &n_w);
-      if (flag) throw CasadiException("ExternalFunctionInternal: \"work\" failed");
-    } else {
-      n_iw=n_w=0;
+    workPtr work;
+    getSym(work, handle_, f_name_ + "_work");
+    if (work!=0) {
+      int n_iw, n_w;
+      int flag = work(&n_iw, &n_w);
+      casadi_assert_message(flag==0, "ExternalFunctionInternal: \"work\" failed");
+      alloc_iw(n_iw);
+      alloc_w(n_w);
     }
-    alloc_iw(n_iw);
-    alloc_w(n_w);
-#else // WITH_DL
-    throw CasadiException("WITH_DL  not activated");
-#endif // WITH_DL
-
-    // Default name
-    setOption("name", f_name);
   }
 
   ExternalFunctionInternal* ExternalFunctionInternal::clone() const {
@@ -173,14 +195,7 @@ namespace casadi {
   }
 
   ExternalFunctionInternal::~ExternalFunctionInternal() {
-#ifdef WITH_DL
-    // close the dll
-#ifdef _WIN32
-    if (handle_) FreeLibrary(handle_);
-#else // _WIN32
-    if (handle_) dlclose(handle_);
-#endif // _WIN32
-#endif // WITH_DL
+    freeHandle(handle_);
   }
 
   void ExternalFunctionInternal::evalD(const double** arg, double** res,

@@ -45,9 +45,9 @@ namespace casadi {
   class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal {
     friend class ExternalFunction;
   public:
-
-    /** \brief  constructor */
-    explicit ExternalFunctionInternal(const std::string& bin_name, const std::string& f_name);
+    /** \brief Creator function, use this for creating instances of the class */
+    static ExternalFunctionInternal*
+      create(const std::string& bin_name, const std::string& f_name);
 
     /** \brief  clone function */
     virtual ExternalFunctionInternal* clone() const;
@@ -87,9 +87,6 @@ namespace casadi {
     /** \brief  Name of the function inside the binary */
     std::string f_name_;
 
-    /** \brief  Function pointers */
-    evalPtr eval_;
-
 #if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
     typedef HINSTANCE handle_t;
 #else
@@ -98,6 +95,30 @@ namespace casadi {
 
     /** \brief  handle to the dll */
     handle_t handle_;
+
+    /** \brief  Function pointers */
+    evalPtr eval_;
+
+    /** \brief Structure with information about the library */
+    struct LibInfo {
+      std::string bin_name;
+      std::string f_name;
+      handle_t handle;
+      int n_in, n_out, n_arg, n_res;
+    };
+
+    /** \brief  constructor is protected */
+    ExternalFunctionInternal(const LibInfo& li);
+
+    /** \brief  Get a library handle */
+    static handle_t getHandle(const std::string& bin_name);
+
+    /** \brief  Get function pointer */
+    template<typename FcnPtr>
+      static void getSym(FcnPtr& fcnPtr, handle_t handle, const std::string& sym);
+
+    /** \brief  Free a library handle */
+    static void freeHandle(handle_t& handle);
   };
 
 } // namespace casadi
