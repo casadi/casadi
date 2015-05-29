@@ -44,7 +44,7 @@ namespace casadi {
     plugin->creator = MosekInterface::creator;
     plugin->name = "mosek";
     plugin->doc = MosekInterface::meta_doc.c_str();
-    plugin->version = 22;
+    plugin->version = 23;
     return 0;
   }
 
@@ -62,9 +62,6 @@ namespace casadi {
   }
 
   MosekInterface::MosekInterface(const std::vector<Sparsity> &st) : SocpSolverInternal(st) {
-    initialized_ = false;
-    // Set options 
-
     // Introduce temporary task
     MSKenv_t temp_env;
     MSKtask_t temp_task;
@@ -97,7 +94,7 @@ namespace casadi {
       addOption(par_name, OT_REAL, dou_buffer, "Consult MOSEK manual.");
     }
 
-    // Harvest integer parameters for MOSEK, are passed as string to accept enumeration options
+    // Harvest integer parameters for MOSEK, passed as string to accept enumeration options
     MSK_getparammax(temp_task,MSK_PAR_INT_TYPE,&num_param);
     for (int i=0;i<num_param;++i) {
       MSK_getparamname(temp_task,MSK_PAR_INT_TYPE,i,str_buffer);
@@ -114,7 +111,7 @@ namespace casadi {
   }
 
   MosekInterface::~MosekInterface() {
-    if (initialized_) {
+    if (is_init_) {
       MSK_deletetask(&mosek_task_);
       MSK_deleteenv(&mosek_env_);
     }
@@ -132,28 +129,25 @@ namespace casadi {
     // Initialize the base classes
     SocpSolverInternal::init();
     log("MosekInterface::init", "Enter");
-
-    initialized_ = true;
-	  MSKrescodee  r;
 	   
 	  // Create the MOSEK environment
-	  r = MSK_makeenv(&mosek_env_,NULL);
+	  MSK_makeenv(&mosek_env_,NULL);
     // Create empty MOSEK task
-    if ( r==MSK_RES_OK ) r = MSK_maketask(mosek_env_,n_,m_+N_,&mosek_task_);
+    MSK_maketask(mosek_env_,n_,m_+N_,&mosek_task_);
     // Link MOSEK task to stream printer
-    if ( r==MSK_RES_OK ) r = MSK_linkfunctotaskstream(mosek_task_,MSK_STREAM_LOG,NULL,printstr);
+    MSK_linkfunctotaskstream(mosek_task_,MSK_STREAM_LOG,NULL,printstr);
     // Pre-allocate memory for MOSEK
-    if ( r==MSK_RES_OK ) r = MSK_putmaxnumvar(mosek_task_,m_+N_+2*nc_+2*n_);
-    if ( r==MSK_RES_OK ) r = MSK_putmaxnumcon(mosek_task_,n_);
-    if ( r==MSK_RES_OK ) r = MSK_putmaxnumcone(mosek_task_,m_);
+    MSK_putmaxnumvar(mosek_task_,m_+N_+2*nc_+2*n_);
+    MSK_putmaxnumcon(mosek_task_,n_);
+    MSK_putmaxnumcone(mosek_task_,m_);
     // Append variables and constraints
-    if ( r==MSK_RES_OK ) r = MSK_appendcons(mosek_task_,n_);
-    if ( r==MSK_RES_OK ) r = MSK_appendvars(mosek_task_,m_+N_);
+    MSK_appendcons(mosek_task_,n_);
+    MSK_appendvars(mosek_task_,m_+N_);
     // Set that we desire to minimize SOCP
-    if ( r==MSK_RES_OK ) r = MSK_putobjsense(mosek_task_, MSK_OBJECTIVE_SENSE_MAXIMIZE);
+    MSK_putobjsense(mosek_task_, MSK_OBJECTIVE_SENSE_MAXIMIZE);
     // Set known variable bounds
     for (int i=0;i<m_+N_;++i){
-      r = MSK_putvarbound(mosek_task_,i,MSK_BK_FR,-MSK_INFINITY,+MSK_INFINITY);
+      MSK_putvarbound(mosek_task_,i,MSK_BK_FR,-MSK_INFINITY,+MSK_INFINITY);
     }
 
     // Pass all the options to mosek
@@ -164,7 +158,7 @@ namespace casadi {
         std::stringstream ss;
         ss << op;
         std::string optionAsString = ss.str();
-        r = MSK_putparam(mosek_task_,(*it).c_str(), optionAsString.c_str());
+        MSK_putparam(mosek_task_,(*it).c_str(), optionAsString.c_str());
       }
 
     // Set cone constraints (fixed)
@@ -222,34 +216,29 @@ namespace casadi {
     if (inputs_check_) checkInputs();
     if (print_problem_) printProblem();
 
-    // TODO: MOSEK often expects a arrat of indices. Since most of the time the
-    // array we  provide is monotonically increasing, we might initialize such array
-    // as a member of the class. 
-    MSKrescodee r;
-    
     // MOSEK expects the SOCP in conic form, obtain this form by formulating dual SOCP
     convertToDualSocp();
 
     // Remove or append variables
-    MSKint32t numvar_old;
-    r = MSK_getnumvar(mosek_task_,&numvar_old);
+    int numvar_old;
+    MSK_getnumvar(mosek_task_,&numvar_old);
     int numvar_new = m_ + N_ + primal_idx_lba_.size() + primal_idx_uba_.size() + primal_idx_lbx_.size() + primal_idx_ubx_.size();
     int num_vars_to_remove = numvar_old - numvar_new;
     if (num_vars_to_remove < 0){
-      r = MSK_appendvars(mosek_task_,-num_vars_to_remove);
+      MSK_appendvars(mosek_task_,-num_vars_to_remove);
     } else if (num_vars_to_remove > 0){
-      MSKint32t vars_to_remove [num_vars_to_remove];
+      int vars_to_remove [num_vars_to_remove];
       for (int i=0;i<num_vars_to_remove;++i) vars_to_remove[i] = numvar_new + num_vars_to_remove - i - 1;
-      r = MSK_removevars(mosek_task_,num_vars_to_remove,vars_to_remove);      
+      MSK_removevars(mosek_task_,num_vars_to_remove,vars_to_remove);      
     }
 
     // Add objective function
     int subj [numvar_new];
     double* c_val = &dual_c_[0];
     for (int i=0;i<numvar_new;++i) subj [i] = i;
-    r = MSK_putclist(mosek_task_,numvar_new,subj,c_val);
+    MSK_putclist(mosek_task_,numvar_new,subj,c_val);
     for (int i=m_+N_;i<numvar_new;++i) {
-      r = MSK_putvarbound(mosek_task_,i,MSK_BK_LO,0.0,+MSK_INFINITY);
+      MSK_putvarbound(mosek_task_,i,MSK_BK_LO,0.0,+MSK_INFINITY);
     }
 
     // Add equality constraints
@@ -257,14 +246,14 @@ namespace casadi {
     int* ptre = &dual_A_colind_[1];
     int* asub = &dual_A_row_[0];
     double* aval = &dual_A_data_[0];
-    r = MSK_putacollist(mosek_task_,numvar_new,subj,ptrb,ptre,asub,aval);
+    MSK_putacollist(mosek_task_,numvar_new,subj,ptrb,ptre,asub,aval);
     for (int i=0;i<n_;++i) {
-      r = MSK_putconbound(mosek_task_,i,MSK_BK_FX,-dual_b_[i],-dual_b_[i]);
+      MSK_putconbound(mosek_task_,i,MSK_BK_FX,-dual_b_[i],-dual_b_[i]);
     }
 
     // Solve SOCP
-    MSKrescodee trmcode;
-    r = MSK_optimizetrm(mosek_task_,&trmcode);
+    MSKrescodee r;
+    r = MSK_optimize(mosek_task_);
 
     casadi_assert_message(r==MSK_RES_OK, "MosekInterface failed");
 
@@ -275,10 +264,10 @@ namespace casadi {
     double dual_objective;
     double* primal_solution = &output(SOCP_SOLVER_X).data()[0];
     double dual_solution [numvar_new];
-    r = MSK_getdualobj(mosek_task_,MSK_SOL_ITR,&primal_objective);
-    r = MSK_getprimalobj(mosek_task_,MSK_SOL_ITR,&dual_objective);
-    r = MSK_gety(mosek_task_,MSK_SOL_ITR,primal_solution);
-    r = MSK_getxx(mosek_task_,MSK_SOL_ITR,dual_solution);
+    MSK_getdualobj(mosek_task_,MSK_SOL_ITR,&primal_objective);
+    MSK_getprimalobj(mosek_task_,MSK_SOL_ITR,&dual_objective);
+    MSK_gety(mosek_task_,MSK_SOL_ITR,primal_solution);
+    MSK_getxx(mosek_task_,MSK_SOL_ITR,dual_solution);
     output(SOCP_SOLVER_COST).set(primal_objective);
     output(SOCP_SOLVER_DUAL_COST).set(dual_objective);
     // Change sign of primal solution

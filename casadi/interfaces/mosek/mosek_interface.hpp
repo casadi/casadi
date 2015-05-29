@@ -90,24 +90,23 @@ namespace casadi {
     std::string problemStatus(MSKprostae& prosta);
 
     /** Dual problem data */
-    std::vector<double> dual_c_;
-    std::vector<double> dual_A_data_;
-    std::vector<int> dual_A_row_;
-    std::vector<int> dual_A_colind_;
-    std::vector<double> dual_b_;
-    std::vector<double> dual_yi_;
-    std::vector<double> dual_ti_;
+    std::vector<double>  dual_c_;
+    std::vector<double>  dual_A_data_;
+    std::vector<int>     dual_A_row_;
+    std::vector<int>     dual_A_colind_;
+    std::vector<double>  dual_b_;
+    std::vector<double>  dual_yi_;
+    std::vector<double>  dual_ti_;
 
     /** Indices of relevant bounds */
-    std::vector<int> primal_idx_lba_;     // Indices of lower bounded linear inequality constraints (LBA != -inf)
-    std::vector<int> primal_idx_uba_;     // Indices of upper bounded linear inequality constraints (UBA != inf)
-    std::vector<int> primal_idx_lbx_;     // Indices of simple lower bounds  (LBX != -inf)
-    std::vector<int> primal_idx_ubx_;     // Indices of simple upper bounds (UBX != inf)
+    std::vector<int>  primal_idx_lba_;     // Indices of lower bounded linear inequality constraints (LBA != -inf)
+    std::vector<int>  primal_idx_uba_;     // Indices of upper bounded linear inequality constraints (UBA != inf)
+    std::vector<int>  primal_idx_lbx_;     // Indices of simple lower bounds  (LBX != -inf)
+    std::vector<int>  primal_idx_ubx_;     // Indices of simple upper bounds (UBX != inf)
 
     /** MOSEK variables */
-    MSKenv_t         mosek_env_;
-    MSKtask_t        mosek_task_;
-    bool             initialized_;
+    MSKenv_t   mosek_env_;
+    MSKtask_t  mosek_task_;
 
   };
 
