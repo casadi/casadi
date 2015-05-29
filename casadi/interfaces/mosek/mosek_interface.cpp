@@ -138,8 +138,6 @@ namespace casadi {
     MSK_linkfunctotaskstream(mosek_task_,MSK_STREAM_LOG,NULL,printstr);
     // Pre-allocate memory for MOSEK
     MSK_putmaxnumvar(mosek_task_,m_+N_+2*nc_+2*n_);
-    MSK_putmaxnumcon(mosek_task_,n_);
-    MSK_putmaxnumcone(mosek_task_,m_);
     // Append variables and constraints
     MSK_appendcons(mosek_task_,n_);
     MSK_appendvars(mosek_task_,m_+N_);
@@ -253,7 +251,9 @@ namespace casadi {
 
     // Solve SOCP
     MSKrescodee r;
-    r = MSK_optimize(mosek_task_);
+    MSKrescodee trmcode;
+
+    r = MSK_optimizetrm(mosek_task_,&trmcode);
 
     casadi_assert_message(r==MSK_RES_OK, "MosekInterface failed");
 
@@ -307,6 +307,9 @@ namespace casadi {
     MSKprostae prosta;
     MSK_getprosta(mosek_task_,MSK_SOL_ITR,&prosta);
     stats_["problem_status"] = problemStatus(prosta);    
+
+    // Termination reason
+    stats_["termination_reason"] = trmcode;
 
   }
 
@@ -486,7 +489,7 @@ namespace casadi {
     std::string problem_status;
     switch (prosta) {
       case MSK_PRO_STA_PRIM_AND_DUAL_FEAS:
-        problem_status = "";
+        problem_status = "MSK_PRO_STA_PRIM_AND_DUAL_FEAS";
         break;
       case MSK_PRO_STA_PRIM_FEAS:
         problem_status = "MSK_PRO_STA_PRIM_FEAS";
@@ -519,6 +522,7 @@ namespace casadi {
         problem_status = "MSK_PRO_STA_PRIM_INFEAS_OR_UNBOUNDED";
         break;
       case MSK_PRO_STA_UNKNOWN:
+        problem_status = "MSK_PRO_STA_UNKNOWN";
         break;
       default:
         problem_status = "Unknown MOSEK problem status, contact CasADi developers.";
