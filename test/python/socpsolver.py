@@ -30,13 +30,13 @@ from helpers import *
 
 socpsolvers = []
 if SdpSolver.hasPlugin("dsdp"):
-  socpsolvers.append(("sdp",{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
+  socpsolvers.append(("sdp",{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},{},False))
 
 if SdpSolver.hasPlugin("dsdp"):
-  socpsolvers.append(("sdp.dsdp",{ "sdp_solver_options": {"verbose":True}},False))
+  socpsolvers.append(("sdp.dsdp",{ "sdp_solver_options": {"verbose":True}},{},False))
 
 if SocpSolver.hasPlugin("mosek"):
-  socpsolvers.append(("mosek",{ },False))
+  socpsolvers.append(("mosek",{ "MSK_DPAR_INTPNT_CO_TOL_REL_GAP":1e-10 },{"less_digits": 1},False))
 
 print socpsolvers
   
@@ -60,13 +60,18 @@ class SocpSolverTests(casadiTestCase):
     LBX = DMatrix([ 0 ]*2)
     UBX = DMatrix([ 100 ]*2)
     
-    for socpsolver, socp_options, re_init in socpsolvers:
+    for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
       solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
+
+      try:
+        less_digits=aux_options["less_digits"]
+      except:
+        less_digits=0
 
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -81,9 +86,9 @@ class SocpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.checkarray(solver.getOutput(),DMatrix([5-8/sqrt(5),7-4/sqrt(5)]),str(socpsolver),digits=5)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(socpsolver),digits=5)
-      self.assertAlmostEqual(solver.getOutput("cost")[0],10-16/sqrt(5)+7-4/sqrt(5),5,str(socpsolver))
+      self.checkarray(solver.getOutput(),DMatrix([5-8/sqrt(5),7-4/sqrt(5)]),str(socpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(socpsolver),digits=max(1,5-less_digits))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],10-16/sqrt(5)+7-4/sqrt(5),max(1,5-less_digits),str(socpsolver))
       
   def testboundsviol(self):
 
@@ -99,7 +104,7 @@ class SocpSolverTests(casadiTestCase):
     LBA = DMatrix()
     UBA = DMatrix()
     
-    for socpsolver, socp_options, re_init in socpsolvers:
+    for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
       solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
@@ -139,13 +144,18 @@ class SocpSolverTests(casadiTestCase):
     LBA = DMatrix()
     UBA = DMatrix()
     
-    for socpsolver, socp_options, re_init in socpsolvers:
+    for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
       solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2])
       solver.init()
+
+      try:
+        less_digits=aux_options["less_digits"]
+      except:
+        less_digits=0
 
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -157,12 +167,12 @@ class SocpSolverTests(casadiTestCase):
       solver.evaluate()
       
       # solution: intersection of 2*x-4*y-(2*a*(a*x+4))=0,x^2+y^2=(4+a*x)^2
-      
+
       xs = -(8*sqrt(5-a**2)+4*a**3-20*a)/(a**4-6*a**2+5)
       ys = 4*sqrt(5-a**2)/(a**2-5)
-      self.checkarray(solver.getOutput(),DMatrix([xs,ys]),str(socpsolver),digits=5)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(socpsolver),digits=5)
-      self.assertAlmostEqual(solver.getOutput("cost")[0],2*xs+ys,5,str(socpsolver))
+      self.checkarray(solver.getOutput(),DMatrix([xs,ys]),str(socpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(socpsolver),digits=max(1,5-less_digits))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],2*xs+ys,max(1,5-less_digits),str(socpsolver))
             
   def test_multi(self):
     #  min  2 x + y
@@ -183,13 +193,18 @@ class SocpSolverTests(casadiTestCase):
     LBX = DMatrix([ 0 ]*2)
     UBX = DMatrix([ 100 ]*2)
     
-    for socpsolver, socp_options, re_init in socpsolvers:
+    for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
       solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2,2])
       solver.init()
+
+      try:
+        less_digits=aux_options["less_digits"]
+      except:
+        less_digits=0
 
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -204,8 +219,8 @@ class SocpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.checkarray(solver.getOutput(),DMatrix([1.655450403084473,4.805919456574478]),str(socpsolver),digits=5)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(socpsolver),digits=5)
+      self.checkarray(solver.getOutput(),DMatrix([1.655450403084473,4.805919456574478]),str(socpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(socpsolver),digits=max(1,5-less_digits))
 
   def test_all(self):
     #  min  2 x + y
@@ -223,13 +238,18 @@ class SocpSolverTests(casadiTestCase):
     LBX = DMatrix([ -inf ]*3)
     UBX = DMatrix([ inf ]*3)
     
-    for socpsolver, socp_options, re_init in socpsolvers:
+    for socpsolver, socp_options, aux_options, re_init in socpsolvers:
       self.message("socpsolver: " + str(socpsolver))
 
       solver = SocpSolver(socpsolver,socpStruct(g=G.sparsity(),e=E.sparsity(),a=A.sparsity()))
       solver.setOption(socp_options)
       solver.setOption("ni",[2,3])
       solver.init()
+
+      try:
+        less_digits=aux_options["less_digits"]
+      except:
+        less_digits=0
 
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -245,7 +265,7 @@ class SocpSolverTests(casadiTestCase):
       solver.evaluate()
 
       # checked with http://abel.ee.ucla.edu/cvxopt/userguide/coneprog.html
-      self.checkarray(solver.getOutput(),DMatrix([-5.0147928622,-5.766930599,-8.52180472]),str(socpsolver),digits=5)
+      self.checkarray(solver.getOutput(),DMatrix([-5.0147928622,-5.766930599,-8.52180472]),str(socpsolver),digits=max(1,5-less_digits))
 
 if __name__ == '__main__':
     unittest.main()

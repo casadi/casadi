@@ -83,6 +83,12 @@ namespace casadi {
     /** Generate dual of SOCP to obtain conic form required by Mosek */
     void convertToDualSocp();
 
+    /** Get solution status from MOSEK solsta value */
+    std::string solutionStatus(MSKsolstae& solsta);
+
+    /** Get problem status from MOSEK prosta value */
+    std::string problemStatus(MSKprostae& prosta);
+
     /** Dual problem data */
     std::vector<double> dual_c_;
     std::vector<double> dual_A_data_;
