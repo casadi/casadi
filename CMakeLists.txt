@@ -415,7 +415,7 @@ if(WITH_MOSEK)
   # try to find system mosek
   find_package(MOSEK)
 endif()
-add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SDP solver MOSEK.")
+add_feature_info(mosek-interface MOSEK_FOUND "Interface to the interior point SOCP solver MOSEK.")
 
 
 # Use the included qpOASES
