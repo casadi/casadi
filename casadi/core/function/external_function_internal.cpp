@@ -118,9 +118,12 @@ namespace casadi {
 
     // Call the constructor
     switch (f_type) {
+    case 0:
+      // Simplified, lower overhead external
+      return new SimplifiedExternal(li);
     case 1:
-      // Full information constructor
-      return new ExternalFunctionInternal(li);
+      // Full information external
+      return new GenericExternal(li);
     default:
       freeHandle(li.handle);
       casadi_error("ExternalFunctionInternal: Function type " << f_type << " not supported.");
@@ -137,10 +140,31 @@ namespace casadi {
 
     // Set name TODO(@jaeandersson): remove 'name' from options
     setOption("name", f_name_);
+  }
 
+  SimplifiedExternal::SimplifiedExternal(const LibInfo& li) : ExternalFunctionInternal(li) {
     // Function for numerical evaluation
     getSym(eval_, handle_, f_name_);
-    casadi_assert_message(eval_!=0, "ExternalFunctionInternal: no \""+f_name_+"\" found");
+    casadi_assert_message(eval_!=0, "SimplifiedExternal: no \""+f_name_+"\" found");
+
+    // All inputs are scalars
+    for (int i=0; i<nIn(); ++i) {
+      input(i) = 0;
+    }
+
+    // All outputs are scalars
+    for (int i=0; i<nOut(); ++i) {
+      output(i) = 0;
+    }
+
+    // Arrays for holding inputs and outputs
+    alloc_w(nIn() + nOut());
+  }
+
+  GenericExternal::GenericExternal(const LibInfo& li) : ExternalFunctionInternal(li) {
+    // Function for numerical evaluation
+    getSym(eval_, handle_, f_name_);
+    casadi_assert_message(eval_!=0, "GenericExternal: no \""+f_name_+"\" found");
 
     // Function for retrieving sparsities of inputs and outputs
     sparsityPtr sparsity;
@@ -151,7 +175,7 @@ namespace casadi {
     }
 
     // Get the sparsity patterns
-    for (int i=0; i<li.n_in+li.n_out; ++i) {
+    for (int i=0; i<nIn()+nOut(); ++i) {
       // Get sparsity from file
       int nrow, ncol;
       const int *colind, *row;
@@ -171,10 +195,10 @@ namespace casadi {
       Sparsity sp(nrow, ncol, colindv, rowv);
 
       // Save to inputs/outputs
-      if (i<li.n_in) {
+      if (i<nIn()) {
         input(i) = Matrix<double>::zeros(sp);
       } else {
-        output(i-li.n_in) = Matrix<double>::zeros(sp);
+        output(i-nIn()) = Matrix<double>::zeros(sp);
       }
     }
 
@@ -198,12 +222,28 @@ namespace casadi {
     freeHandle(handle_);
   }
 
-  void ExternalFunctionInternal::evalD(const double** arg, double** res,
+  void SimplifiedExternal::evalD(const double** arg, double** res,
+                                 int* iw, double* w) {
+    // Copy arguments to input buffers
+    const double* arg1=w;
+    for (int i=0; i<nIn(); ++i) {
+      *w++ = arg[i] ? *arg[i] : 0;
+    }
+
+    // Evaluate
+    eval_(arg1, w);
+
+    // Get outputs
+    for (int i=0; i<nOut(); ++i) {
+      if (res[i]) *res[i] = *w;
+      ++w;
+    }
+  }
+
+  void GenericExternal::evalD(const double** arg, double** res,
                                        int* iw, double* w) {
-#ifdef WITH_DL
     int flag = eval_(arg, res, iw, w);
     if (flag) throw CasadiException("ExternalFunctionInternal: \""+f_name_+"\" failed");
-#endif // WITH_DL
   }
 
   void ExternalFunctionInternal::init() {
@@ -211,7 +251,7 @@ namespace casadi {
     FunctionInternal::init();
   }
 
-  void ExternalFunctionInternal::generateDeclarations(CodeGenerator& g) const {
+  void GenericExternal::generateDeclarations(CodeGenerator& g) const {
     // Declare function (definition in separate file)
     g.body
       << "/* Defined in " << bin_name_ << " */" << endl
@@ -219,13 +259,13 @@ namespace casadi {
       << "int* iw, real_t* w);" << endl << endl;
   }
 
-  void ExternalFunctionInternal::generateBody(CodeGenerator& g) const {
+  void GenericExternal::generateBody(CodeGenerator& g) const {
     g.body
       << "  int flag = " << f_name_ << "(arg, res, iw, w);" << endl
       << "  if (flag) return flag;" << endl;
   }
 
-  int ExternalFunctionInternal::scalarSparsity(int i, int *n_row, int *n_col,
+  int GenericExternal::scalarSparsity(int i, int *n_row, int *n_col,
                                                const int **colind, const int **row) {
     // Dense scalar
     static const int colind_scalar[] = {0, 1};

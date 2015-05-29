@@ -53,33 +53,14 @@ namespace casadi {
     virtual ExternalFunctionInternal* clone() const;
 
     /** \brief  Destructor */
-    virtual ~ExternalFunctionInternal();
-
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual ~ExternalFunctionInternal() = 0;
 
     /** \brief  Initialize */
     virtual void init();
-
-    /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const;
-
-    /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
-
-    /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
-    static int scalarSparsity(int i, int *n_row, int *n_col,
-                              const int **colind, const int **row);
   protected:
 
-    ///@{
-    /** \brief  Function pointer types */
+    /** \brief Function pointer for initialization of external */
     typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *n_arg, int* n_res);
-    typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
-                               const int **colind, const int **row);
-    typedef int (*workPtr)(int *n_iw, int *n_w);
-    typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
-    ///@}
 
     /** \brief  Name of binary */
     std::string bin_name_;
@@ -95,9 +76,6 @@ namespace casadi {
 
     /** \brief  handle to the dll */
     handle_t handle_;
-
-    /** \brief  Function pointers */
-    evalPtr eval_;
 
     /** \brief Structure with information about the library */
     struct LibInfo {
@@ -119,6 +97,61 @@ namespace casadi {
 
     /** \brief  Free a library handle */
     static void freeHandle(handle_t& handle);
+  };
+
+  class CASADI_EXPORT SimplifiedExternal : public ExternalFunctionInternal {
+    friend class ExternalFunctionInternal;
+  private:
+    /** \brief Constructor is called from factory */
+    SimplifiedExternal(const LibInfo& li);
+  public:
+    /** \brief  Destructor */
+    virtual ~SimplifiedExternal() {}
+
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+  protected:
+    ///@{
+    /** \brief  Function pointer types */
+    typedef void (*evalPtr)(const double* arg, double* res);
+    ///@}
+
+    /** \brief  Function pointers */
+    evalPtr eval_;
+  };
+
+  class CASADI_EXPORT GenericExternal : public ExternalFunctionInternal {
+    friend class ExternalFunctionInternal;
+  private:
+    /** \brief Constructor is called from factory */
+    GenericExternal(const LibInfo& li);
+  public:
+    /** \brief  Destructor */
+    virtual ~GenericExternal() {}
+
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
+
+    /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
+    static int scalarSparsity(int i, int *n_row, int *n_col,
+                              const int **colind, const int **row);
+  protected:
+    ///@{
+    /** \brief  Function pointer types */
+    typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
+                               const int **colind, const int **row);
+    typedef int (*workPtr)(int *n_iw, int *n_w);
+    typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
+    ///@}
+
+    /** \brief  Function pointers */
+    evalPtr eval_;
   };
 
 } // namespace casadi
