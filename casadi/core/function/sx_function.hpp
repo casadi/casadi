@@ -73,12 +73,24 @@ namespace casadi {
     /// Expand an Function
     explicit SXFunction(const Function &f);
 
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name,
-               const std::vector<SX>& arg,
-               const std::vector<SX>& res,
-               const Dictionary& opts=Dictionary());
+    //typedef std::pair<std::map<std::string, SX>, std::vector<std::string> > MappedIO;
+    typedef IOSchemeVector<SX> MappedIO;
 
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const std::vector<SX>& arg,
+               const std::vector<SX>& res, const Dictionary& opts=Dictionary());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const MappedIO& arg,
+               const std::vector<SX>& res, const Dictionary& opts=Dictionary());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const std::vector<SX>& arg,
+               const MappedIO& res, const Dictionary& opts=Dictionary());
+
+    /** \brief Construct from vectors (new syntax, includes initialization) */
+    SXFunction(const std::string& name, const MappedIO& arg,
+               const MappedIO& res, const Dictionary& opts=Dictionary());
 #ifndef SWIG
 #ifdef USE_CXX11
     /** \brief Construct from initializer lists (new syntax, includes initialization) */
@@ -100,8 +112,6 @@ namespace casadi {
                const Dictionary& opts=Dictionary());
 #endif // USE_CXX11
 #endif // SWIG
-    //typedef std::pair<std::map<std::string, SX>, std::vector<std::string> > MappedIO;
-    typedef IOSchemeVector<SX> MappedIO;
 
     /// Multiple input, multiple output, no initialization (to be deprecated)
     SXFunction(const std::vector<SX>& arg, const std::vector<SX>& res);
@@ -208,6 +218,12 @@ namespace casadi {
 #ifndef SWIG
     /** \brief Access the algorithm directly */
     const std::vector<ScalarAtomic>& algorithm() const;
+
+    /** \brief Called from constructor */
+    void construct(const std::string& name, const std::vector<SX>& arg,
+                   const std::vector<SX>& res, const Dictionary& opts,
+                   const std::vector<std::string>& ischeme=std::vector<std::string>(),
+                   const std::vector<std::string>& oscheme=std::vector<std::string>());
 #endif // SWIG
 /// \endcond
 
