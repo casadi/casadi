@@ -164,19 +164,19 @@ namespace casadi {
     w_in.insert(w_in.end(), res.begin(), res.end());
     // Arguments for calling sw being constructed
     vector<MX> v;
-    v.push_back(arg.at(0)); // index
+    v.insert(v.end(), arg.begin(), arg.end());
+    v.insert(v.end(), res.begin(), res.end());
     for (int d=0; d<nfwd; ++d) {
       // ignore seed for ind
       seed[d][0] = MX::sym(seed[d][0].getName(), Sparsity::scalar(false));
       // Add to wrapper input
       w_in.insert(w_in.end(), seed[d].begin(), seed[d].end());
       // Add to sw argument vector
-      v.insert(v.end(), arg.begin()+1, arg.end());
-      v.insert(v.end(), res.begin(), res.end());
       v.insert(v.end(), seed[d].begin()+1, seed[d].end());
     }
 
     // Create wrapper
+    casadi_assert(v.size()==sw.nIn());
     MXFunction ret(w_in, sw(v));
     return ret;
   }
@@ -216,6 +216,7 @@ namespace casadi {
     }
 
     // Construct wrapper outputs
+    casadi_assert(v.size()==sw.nIn());
     v = sw(v);
     vector<MX> w_out;
     MX ind_sens = MX(1, 1); // no dependency on index
