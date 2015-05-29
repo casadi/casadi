@@ -258,7 +258,7 @@ namespace casadi {
   void SwitchInternal::generateDeclarations(CodeGenerator& g) const {
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
-      g.addDependency(fk);
+      fk->addDependency(g);
     }
   }
 
@@ -292,13 +292,14 @@ namespace casadi {
       if (fk.isNull()) {
         g.body << "    return 1;" << endl;
       } else {
-        // Get the index of the function
-        int f = g.getDependency(fk);
-
         // Call function
-        g.body << "    if (f" << f << "(arg+1, res, iw, w)) return 1;" << endl;
-        if (!if_else)
-          g.body << "    break;" << endl;
+        if (g.simplifiedCall(fk)) {
+          casadi_error("Not implemented.");
+        } else {
+          g.body << "    if (" << g.call(fk, "arg+1", "res", "iw", "w") << ") return 1;" << endl;
+          if (!if_else)
+            g.body << "    break;" << endl;
+        }
       }
     }
 

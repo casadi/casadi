@@ -232,14 +232,14 @@ namespace casadi {
   void SymbolicQr::generateDeclarations(CodeGenerator& g) const {
 
     // Generate code for the embedded functions
-    g.addDependency(fact_fcn_);
-    g.addDependency(solv_fcn_N_);
-    g.addDependency(solv_fcn_T_);
+    fact_fcn_->addDependency(g);
+    solv_fcn_N_->addDependency(g);
+    solv_fcn_T_->addDependency(g);
   }
 
   void SymbolicQr::generateBody(CodeGenerator& g) const {
-    casadi_warning("Code generation for SymbolicQR still experimental");
-
+    casadi_error("Code generation for SymbolicQR still experimental");
+#if 0
     // Data structures to hold A, Q and R
     g.body
        << "  static int prepared = 0;" << endl
@@ -271,6 +271,7 @@ namespace casadi {
       << "    f" << solv_ind_N << "(Q, R, x1, r0);" << endl
       << "    x1+=" << neq << "; r0+=" << neq << ";" << endl
       << "  }" << endl;
+#endif
   }
 
 } // namespace casadi

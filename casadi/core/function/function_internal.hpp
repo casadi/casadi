@@ -233,12 +233,31 @@ namespace casadi {
     */
     MXFunction wrapMXFunction();
 
+    /** \brief Generate function call */
+    virtual void generate(CodeGenerator& g, const std::vector<int>& arg,
+                          const std::vector<int>& res) const;
+
     /** \brief Generate code the function */
     virtual void generateFunction(CodeGenerator& g, const std::string& fname,
                                   bool decl_static) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
     void generateMeta(CodeGenerator& g, const std::string& fname) const;
+
+    /** \brief Use simplified signature */
+    virtual bool simplifiedCall() const { return false;}
+
+    /** \brief Generate a call to a function (generic signature) */
+    virtual std::string generateCall(const CodeGenerator& g,
+                                     const std::string& arg, const std::string& res,
+                                     const std::string& iw, const std::string& w) const;
+
+    /** \brief Generate a call to a function (simplified signature) */
+    virtual std::string generateCall(const CodeGenerator& g,
+                                     const std::string& arg, const std::string& res) const;
+
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;

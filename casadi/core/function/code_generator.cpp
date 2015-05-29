@@ -129,6 +129,16 @@ namespace casadi {
         << "#endif /* real_t */" << endl << endl;
     }
 
+    // External function declarations
+    if (!added_externals_.empty()) {
+      s[0] << "/* External functions */" << endl;
+      for (std::set<std::string>::const_iterator it=added_externals_.begin();
+           it!=added_externals_.end(); ++it) {
+        s[0] << *it << endl;
+      }
+      s[0] << endl;
+    }
+
     // Generate the actual function
     generate(s[0]);
 
@@ -223,36 +233,6 @@ namespace casadi {
     s << "  " << lhs << " = " << rhs << ";" << endl;
   }
 
-  int CodeGenerator::addDependency(const Function& f) {
-    casadi_assert(!f.isNull());
-
-    // Get the current number of functions before looking for it
-    size_t num_f_before = added_dependencies_.size();
-
-    // Get index of the pattern
-    const void* h = static_cast<const void*>(f.get());
-    int& ind = added_dependencies_[h];
-
-    // Generate it if it does not exist
-    if (added_dependencies_.size() > num_f_before) {
-      // Add at the end
-      ind = num_f_before;
-
-      // Give it a name
-      string name = "f" + to_string(ind);
-
-      // Print to file
-      f->generateFunction(*this, "CASADI_PREFIX(" + name + ")", true);
-
-      // Shorthand
-      this->body
-        << "#define " << name << "(arg, res, iw, w) "
-        << "CASADI_PREFIX(" << name << ")(arg, res, iw, w)" << endl << endl;
-    }
-
-    return ind;
-  }
-
   void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<int>& v) {
     s << "static const int " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
@@ -285,6 +265,24 @@ namespace casadi {
     } else {
       this->includes << "#include <" << new_include << ">" << endl;
     }
+  }
+
+  bool CodeGenerator::simplifiedCall(const Function& f) {
+    return f->simplifiedCall();
+  }
+
+  std::string CodeGenerator::call(const Function& f, const std::string& arg, const std::string& res,
+                                  const std::string& iw, const std::string& w) const {
+    return f->generateCall(*this, arg, res, iw, w);
+  }
+
+  std::string CodeGenerator::call(const Function& f,
+                                  const std::string& arg, const std::string& res) const {
+    return f->generateCall(*this, arg, res);
+  }
+
+  void CodeGenerator::addExternal(const std::string& new_external) {
+    added_externals_.insert(new_external);
   }
 
   int CodeGenerator::addSparsity(const Sparsity& sp) {
@@ -383,13 +381,6 @@ namespace casadi {
       casadi_error("Constant not found");
       return -1;
     }
-  }
-
-  int CodeGenerator::getDependency(const Function& f) const {
-    const void* h = static_cast<const void*>(f.get());
-    PointerMap::const_iterator it=added_dependencies_.find(h);
-    casadi_assert(it!=added_dependencies_.end());
-    return it->second;
   }
 
   void CodeGenerator::addAuxiliary(Auxiliary f) {

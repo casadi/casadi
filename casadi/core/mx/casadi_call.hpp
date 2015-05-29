@@ -54,10 +54,6 @@ namespace casadi {
 
     /** \brief Project a function input to a particular sparsity */
     static MX projectArg(const MX& x, const Sparsity& sp, int i);
-
-    /** \brief Generate input and output arrays */
-    virtual void generateIO(const std::vector<int>& arg, const std::vector<int>& res,
-                            CodeGenerator& g) const;
   };
 
   /** Embeds a function call in an expression graph
@@ -77,6 +73,9 @@ namespace casadi {
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
+
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const;
 
     /** \brief Generate code for the operation */
     virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,

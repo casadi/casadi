@@ -109,12 +109,16 @@ namespace casadi {
     }
 
     // Initialize and get the number of inputs and outputs
-    int f_type=-1;
-    int flag = init(&f_type, &li.n_in, &li.n_out, &li.n_arg, &li.n_res);
+    int f_type=0;
+    li.sz_arg=0;
+    li.sz_res=0;
+    int flag = init(&f_type, &li.n_in, &li.n_out, &li.sz_arg, &li.sz_res);
     if (flag) {
       freeHandle(li.handle);
       casadi_error("ExternalFunctionInternal: \"init\" failed");
     }
+    li.sz_arg = max(li.sz_arg, li.n_in);
+    li.sz_res = max(li.sz_res, li.n_out);
 
     // Call the constructor
     switch (f_type) {
@@ -135,8 +139,8 @@ namespace casadi {
     : bin_name_(li.bin_name), f_name_(li.f_name), handle_(li.handle) {
     ibuf_.resize(li.n_in);
     obuf_.resize(li.n_out);
-    alloc_arg(li.n_arg);
-    alloc_res(li.n_res);
+    alloc_arg(li.sz_arg);
+    alloc_res(li.sz_res);
 
     // Set name TODO(@jaeandersson): remove 'name' from options
     setOption("name", f_name_);
@@ -251,18 +255,30 @@ namespace casadi {
     FunctionInternal::init();
   }
 
-  void GenericExternal::generateDeclarations(CodeGenerator& g) const {
-    // Declare function (definition in separate file)
-    g.body
-      << "/* Defined in " << bin_name_ << " */" << endl
-      << "int " << f_name_ << "(const real_t* const* arg, real_t* const* res, "
-      << "int* iw, real_t* w);" << endl << endl;
+  void SimplifiedExternal::addDependency(CodeGenerator& g) const {
+    g.addExternal("void " + f_name_ + "(const real_t* arg, real_t* res);");
   }
 
-  void GenericExternal::generateBody(CodeGenerator& g) const {
-    g.body
-      << "  int flag = " << f_name_ << "(arg, res, iw, w);" << endl
-      << "  if (flag) return flag;" << endl;
+  void GenericExternal::addDependency(CodeGenerator& g) const {
+    g.addExternal("int " + f_name_ + "(const real_t** arg, real_t** res, int* iw, real_t* w);");
+  }
+
+  std::string SimplifiedExternal::generateCall(const CodeGenerator& g,
+                                               const std::string& arg,
+                                               const std::string& res) const {
+    // Create a function call
+    stringstream ss;
+    ss << f_name_ << "(" << arg << ", " << res << ")";
+    return ss.str();
+  }
+
+  std::string GenericExternal::generateCall(const CodeGenerator& g,
+                                            const std::string& arg, const std::string& res,
+                                            const std::string& iw, const std::string& w) const {
+    // Create a function call
+    stringstream ss;
+    ss << f_name_ << "(" << arg << ", " << res << ", " << iw << ", " << w << ")";
+    return ss.str();
   }
 
   int GenericExternal::scalarSparsity(int i, int *n_row, int *n_col,

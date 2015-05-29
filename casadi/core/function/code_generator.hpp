@@ -62,6 +62,9 @@ namespace casadi {
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path = false);
 
+    /// Add an external function declaration
+    void addExternal(const std::string& new_external);
+
     // Add a sparsity pattern
     std::string sparsity(const Sparsity& sp);
 
@@ -77,11 +80,15 @@ namespace casadi {
     /** \brief Get or add an integer constant */
     int getConstant(const std::vector<int>& v, bool allow_adding=false);
 
-    /** \brief Add a dependent function */
-    int addDependency(const Function& f);
+    /** \brief Use simplified signature */
+    static bool simplifiedCall(const Function& f);
 
-    /** \brief Get the index of an existing dependency */
-    int getDependency(const Function& f) const;
+    /** \brief Generate a call to a function (generic signature) */
+    std::string call(const Function& f, const std::string& arg, const std::string& res,
+                     const std::string& iw, const std::string& w) const;
+
+    /** \brief Generate a call to a function (simplified signature) */
+    std::string call(const Function& f, const std::string& arg, const std::string& res) const;
 
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
@@ -201,6 +208,7 @@ namespace casadi {
     // Set of already included header files
     typedef std::map<const void*, int> PointerMap;
     std::set<std::string> added_includes_;
+    std::set<std::string> added_externals_;
     std::set<Auxiliary> added_auxiliaries_;
     PointerMap added_sparsities_;
     PointerMap added_dependencies_;

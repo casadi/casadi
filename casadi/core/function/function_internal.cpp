@@ -1978,6 +1978,39 @@ namespace casadi {
       << endl;
   }
 
+  void FunctionInternal::generate(CodeGenerator& g,
+                                  const vector<int>& arg, const vector<int>& res) const {
+    if (simplifiedCall()) {
+
+      // Collect input arguments
+      for (int i=0; i<arg.size(); ++i) {
+        g.body << "  w[" << i << "]=" << g.workel(arg[i]) << ";" << endl;
+      }
+
+      // Call function
+      g.body << "  " << generateCall(g, "w", "w+"+g.to_string(arg.size())) << ";" << endl;
+
+      // Collect output arguments
+      for (int i=0; i<res.size(); ++i) {
+        g.body << "  " << g.workel(res[i]) << "=w[" << (arg.size()+i) << "];" << endl;
+      }
+    } else {
+
+      // Collect input arguments
+      for (int i=0; i<arg.size(); ++i) {
+        g.body << "  arg1[" << i << "]=" << g.work(arg[i], input(i).nnz()) << ";" << endl;
+      }
+
+      // Collect output arguments
+      for (int i=0; i<res.size(); ++i) {
+        g.body << "  res1[" << i << "]=" << g.work(res[i], output(i).nnz()) << ";" << endl;
+      }
+
+      // Call function
+      g.body << "  if (" << generateCall(g, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+    }
+  }
+
   void FunctionInternal::generateMeta(CodeGenerator& g, const std::string& fname) const {
     // Short-hands
     int n_in = nIn();
@@ -2174,6 +2207,53 @@ namespace casadi {
       // Finalize function
       s << "  return 0;" << endl
         << "}" << endl << endl;
+    }
+  }
+
+  std::string FunctionInternal::generateCall(const CodeGenerator& g,
+                                             const std::string& arg, const std::string& res,
+                                             const std::string& iw, const std::string& w) const {
+    // Get the index of the function
+    CodeGenerator::PointerMap::const_iterator it=g.added_dependencies_.find(this);
+    casadi_assert(it!=g.added_dependencies_.end());
+    int f = it->second;
+
+    // Create a function call
+    stringstream ss;
+    ss << "f" << f << "(" << arg << ", " << res << ", " << iw << ", " << w << ")";
+    return ss.str();
+  }
+
+  std::string FunctionInternal::generateCall(const CodeGenerator& g,
+                                             const std::string& arg,
+                                             const std::string& res) const {
+    casadi_error("FunctionInternal::generateCall (simplified): not defined for class "
+                 << typeid(*this).name());
+  }
+
+
+  void FunctionInternal::addDependency(CodeGenerator& g) const {
+    // Get the current number of functions before looking for it
+    size_t num_f_before = g.added_dependencies_.size();
+
+    // Get index of the pattern
+    int& ind = g.added_dependencies_[this];
+
+    // Generate it if it does not exist
+    if (g.added_dependencies_.size() > num_f_before) {
+      // Add at the end
+      ind = num_f_before;
+
+      // Give it a name
+      string name = "f" + CodeGenerator::to_string(ind);
+
+      // Print to file
+      generateFunction(g, "CASADI_PREFIX(" + name + ")", true);
+
+      // Shorthand
+      g.body
+        << "#define " << name << "(arg, res, iw, w) "
+        << "CASADI_PREFIX(" << name << ")(arg, res, iw, w)" << endl << endl;
     }
   }
 

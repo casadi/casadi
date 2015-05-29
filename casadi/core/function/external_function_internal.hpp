@@ -60,7 +60,7 @@ namespace casadi {
   protected:
 
     /** \brief Function pointer for initialization of external */
-    typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *n_arg, int* n_res);
+    typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
 
     /** \brief  Name of binary */
     std::string bin_name_;
@@ -82,7 +82,7 @@ namespace casadi {
       std::string bin_name;
       std::string f_name;
       handle_t handle;
-      int n_in, n_out, n_arg, n_res;
+      int n_in, n_out, sz_arg, sz_res;
     };
 
     /** \brief  constructor is protected */
@@ -110,6 +110,16 @@ namespace casadi {
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const;
+
+    /** \brief Generate a call to a function (simplified signature) */
+    virtual std::string generateCall(const CodeGenerator& g,
+                                     const std::string& arg, const std::string& res) const;
+
+    /** \brief Use simplified signature */
+    virtual bool simplifiedCall() const { return true;}
   protected:
     ///@{
     /** \brief  Function pointer types */
@@ -132,11 +142,13 @@ namespace casadi {
     /** \brief  Evaluate numerically, work vectors given */
     virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
-    /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const;
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const;
 
-    /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
+    /** \brief Generate a call to a function (generic signature) */
+    virtual std::string generateCall(const CodeGenerator& g,
+                                     const std::string& arg, const std::string& res,
+                                     const std::string& iw, const std::string& w) const;
 
     /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
     static int scalarSparsity(int i, int *n_row, int *n_col,
