@@ -31,8 +31,13 @@ import random
 import time
 
 import __builtin__
-import scipy.linalg
 
+try:
+  import scipy.linalg
+  scipy_available = True
+except:
+  scipy_available = False
+  
 clesolvers = []
 if LinearSolver.hasPlugin("csparse") and CleSolver.hasPlugin("simple"):
   clesolvers.append(("simple",{"linear_solver": "csparse"}))
@@ -144,6 +149,7 @@ def randstable(n,margin=0.8):
 
 class ControlTests(casadiTestCase):
   
+  @skip(not scipy_available)
   @slow()
   @memory_heavy()
   def test_dple_CH(self):
@@ -281,6 +287,7 @@ class ControlTests(casadiTestCase):
             else:
               raise e
 
+  @skip(not scipy_available)
   @memory_heavy()
   def test_custom2(self):
     numpy.random.seed(1)
@@ -363,6 +370,8 @@ class ControlTests(casadiTestCase):
               self.checkfunction(g,f,evals=1,hessian=False,sens_der=False,digits=7)
             else:
               raise e
+              
+  @skip(not scipy_available)
   @memory_heavy()
   def test_dle_small(self):
     
@@ -428,6 +437,7 @@ class ControlTests(casadiTestCase):
             else:
               raise e
        
+  @skip(not scipy_available)
   @memory_heavy()
   def test_cle_small(self):
     
@@ -477,7 +487,8 @@ class ControlTests(casadiTestCase):
           self.checkarray(a0,DMatrix.zeros(n,n))
 
           self.checkfunction(solver,refsol,sens_der=True,hessian=True,evals=2)
-
+  
+  @skip(not scipy_available)
   @memory_heavy()
   def test_dple_small(self):
     
@@ -548,6 +559,7 @@ class ControlTests(casadiTestCase):
             else:
               raise e
   
+  @skip(not scipy_available)
   @memory_heavy()
   def test_dple_large(self):
     
