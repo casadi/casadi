@@ -882,11 +882,11 @@ class typemaptests(casadiTestCase):
         ]
         
     if scipy_available:
-      Ds.append([
+      Ds+=[
           csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
           csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.int),
           DMatrix([[1,2],[3,4]]).toCsc_matrix()
-      ])
+      ]
 
 
     for D in Ds:
