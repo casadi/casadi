@@ -105,7 +105,7 @@ matrix:
         - sudo pip install texttable
         - sudo apt-get install python-lxml doxygen -y
         - pushd docs/api && make doxexport | grep -v "file loc from" && popd
-        - git stash && git checkout $TRAVIS_BRANCH && git stash pop && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git fetch && git rebase -s origin/$TRAVIS_BRANCH && git push
+        - git stash && git checkout $TRAVIS_BRANCH && git stash pop && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git fetch && git rebase -s origin/$TRAVIS_BRANCH && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
     - compiler: clang
       os: linux
       env: TESTMODE=minimal
